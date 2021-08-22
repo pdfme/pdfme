@@ -1,0 +1,25 @@
+.codeWrapper {
+  padding: 0;
+  margin-bottom: 1rem;
+  background-color: #1e1e1e;
+  text-align: left;
+}
+
+.wrapper {
+  padding-bottom: 0.75rem;
+  display: flex;
+  justify-content: flex-end;
+  .desktopFlex {
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+  }
+  button {
+    margin-left: 0.5rem;
+    padding-right: 1rem;
+  }
+  img {
+    width: 20px;
+    margin-right: 0.25rem;
+  }
+}
