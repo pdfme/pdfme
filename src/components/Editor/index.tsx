@@ -1,17 +1,17 @@
-import labelmake from "labelmake";
-import React, { Component } from "react";
-import styles from "./index.module.scss";
+import labelmake from 'labelmake';
+import React, { Component } from 'react';
+import styles from './index.module.scss';
 import {
   Template,
   PageSize,
   Schema,
   SaveTemplateArg,
   TemplateEditorProp,
-} from "../../types";
-import Sidebar from "../Sidebar";
-import Preview from "../Preview";
-import { i18n } from "../../i18n";
-import { zoom } from "../../constants";
+} from '../../types';
+import Sidebar from '../Sidebar';
+import Preview from '../Preview';
+import { i18n } from '../../i18n';
+import { zoom } from '../../constants';
 import {
   uuid,
   set,
@@ -35,17 +35,17 @@ import {
   getInitialTemplate,
   getSampleByType,
   getKeepRaitoHeightByWidth,
-} from "../../utils";
+} from '../../utils';
 
 const fmtValue = (key: string, value: string) => {
   const skip = [
-    "id",
-    "key",
-    "type",
-    "data",
-    "alignment",
-    "fontColor",
-    "backgroundColor",
+    'id',
+    'key',
+    'type',
+    'data',
+    'alignment',
+    'fontColor',
+    'backgroundColor',
   ];
   return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
 };
@@ -69,7 +69,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   state: State = {
     processing: false,
     template: getInitialTemplate(),
-    focusElementId: "",
+    focusElementId: '',
     activeElements: [],
     schemas: [[]] as Schema[][],
     pageCursor: 0,
@@ -101,35 +101,35 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
         const ps = pages[pageCursor].size;
         const activeSchemas = this.getActiveSchemas();
         const arg = activeSchemas.map((as) => {
-          let key: "x" | "y" = "x";
+          let key: 'x' | 'y' = 'x';
           let value = 0;
           const num = isShift ? 0.1 : 1;
           const { position, height, width } = as;
           switch (command) {
-            case "up": {
-              key = "y";
-              value = round(position["y"] - num, 2);
+            case 'up': {
+              key = 'y';
+              value = round(position['y'] - num, 2);
               break;
             }
-            case "down": {
-              key = "y";
-              value = round(position["y"] + num, 2);
+            case 'down': {
+              key = 'y';
+              value = round(position['y'] + num, 2);
               break;
             }
-            case "left":
-              value = round(position["x"] - num, 2);
+            case 'left':
+              value = round(position['x'] - num, 2);
               break;
-            case "right":
-              value = round(position["x"] + num, 2);
+            case 'right':
+              value = round(position['x'] + num, 2);
               break;
           }
-          if (key === "x") {
+          if (key === 'x') {
             value = value > ps.width - width ? ps.width - width : value;
           } else {
             value = value > ps.height - height ? ps.height - height : value;
           }
           return {
-            key: "position." + key,
+            key: 'position.' + key,
             value: String(value),
             schemaId: as.id,
           };
@@ -168,7 +168,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
             id: uuid(),
             position,
           });
-          schema.key = schema.key + " copy";
+          schema.key = schema.key + ' copy';
           return schema;
         });
 
@@ -211,7 +211,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       if (!pageSizes[0]) {
         return;
       }
-      const width = typeof window !== "undefined" ? window.innerWidth : 0;
+      const width = typeof window !== 'undefined' ? window.innerWidth : 0;
       const paperWidth = pageSizes[0].width * zoom;
       const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
 
@@ -274,8 +274,8 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     const headerHeight = 53;
     s.position.y =
       rectTop - headerHeight > 0 ? 0 : pages[pageCursor].size.height / 2;
-    s.data = "text";
-    s.key = `${i18n(lang, "field")}${schemas[pageCursor].length + 1}`;
+    s.data = 'text';
+    s.key = `${i18n(lang, 'field')}${schemas[pageCursor].length + 1}`;
     this.commitSchemas(schemas[pageCursor].concat(s), () => {
       this.setActiveElements([document.getElementById(s.id)!]);
     });
@@ -295,12 +295,12 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       const tgt = acc.find((s) => s.id === schemaId)!;
       // Assign to reference
       set(tgt, key, fmtValue(key, value));
-      if (key === "type") {
+      if (key === 'type') {
         // set default value, text or barcode
-        set(tgt, "data", value === "text" ? "text" : getSampleByType(value));
+        set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(value));
         // For barcodes, adjust the height to get the correct ratio.
-        if (value !== "text" && value !== "image") {
-          set(tgt, "height", getKeepRaitoHeightByWidth(value, tgt.width));
+        if (value !== 'text' && value !== 'image') {
+          set(tgt, 'height', getKeepRaitoHeightByWidth(value, tgt.width));
         }
       }
       return acc;
@@ -360,13 +360,13 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   };
 
   onMouseLeave = () => {
-    this.setState({ focusElementId: "" });
+    this.setState({ focusElementId: '' });
   };
 
   previewPdf = () => {
     const { lang } = this.props;
     if (isIos()) {
-      alert(i18n(lang, "previewWarnMsg"));
+      alert(i18n(lang, 'previewWarnMsg'));
       return;
     }
     this.setState({ processing: true });
@@ -382,11 +382,11 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       template: fmtTemplate(this.state.template, this.state.schemas),
     })
       .then((pdf) => {
-        const blob = new Blob([pdf.buffer], { type: "application/pdf" });
+        const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
         window.open(URL.createObjectURL(blob));
       })
       .catch(() => {
-        alert(i18n(lang, "previewErrMsg"));
+        alert(i18n(lang, 'previewErrMsg'));
       })
       .then(() => this.setState({ processing: false }));
   };
@@ -396,14 +396,13 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     const pdfBlob = b64toBlob(basePdf as string);
     const pageSizes = await getPdfPageSizes(pdfBlob);
     const images = await pdf2Pngs(pdfBlob, pageSizes[0].width * zoom);
-    const schemas = (
-      this.state.schemas.length < pageSizes.length
-        ? this.state.schemas.concat(
-            new Array(pageSizes.length - this.state.schemas.length).fill(
-              cloneDeep([])
-            )
+    const schemas = (this.state.schemas.length < pageSizes.length
+      ? this.state.schemas.concat(
+          new Array(pageSizes.length - this.state.schemas.length).fill(
+            cloneDeep([])
           )
-        : this.state.schemas.slice(0, images.length)
+        )
+      : this.state.schemas.slice(0, images.length)
     ).map((schema, i) => {
       Object.values(schema).forEach((value) => {
         const { width, height } = pageSizes[i];
@@ -424,7 +423,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
 
     this.setState({
       activeElements: [],
-      focusElementId: "",
+      focusElementId: '',
       pageCursor: 0,
       schemas,
       pages,
@@ -433,7 +432,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   };
 
   changeBasePdf = (file: File) => {
-    readFile(file, "dataURL").then(async (basePdf) => {
+    readFile(file, 'dataURL').then(async (basePdf) => {
       this.processAndSetBasePdf(basePdf as string);
     });
   };
@@ -444,7 +443,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
         const schemas = sortSchemas(template, template.schemas.length);
         this.setState({ template, schemas });
         this.changeBasePdf(
-          blob2File(b64toBlob(template.basePdf as string), "")
+          blob2File(b64toBlob(template.basePdf as string), '')
         );
       })
       .catch(alert);

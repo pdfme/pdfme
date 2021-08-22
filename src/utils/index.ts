@@ -1,26 +1,27 @@
-import { PageSize, Template, TemplateSchema, Schema } from "../types";
-import { blankPdf, CANVA_API } from "../constants";
-import { v1 as _uuid } from "uuid";
-import * as pdfjsLib from "pdfjs-dist/webpack";
-import _set from "lodash.set";
-import { debounce as _debounce } from "debounce";
-import { saveAs } from "file-saver";
-import { UAParser } from "ua-parser-js";
-import hotkeys from "hotkeys-js";
-import memoizeOne from "memoize-one";
+import { PageSize, Template, TemplateSchema, Schema } from '../types';
+import { blankPdf, CANVA_API } from '../constants';
+// import { v1 as uuidv1 } from 'uuid';
+import { nanoid } from 'nanoid';
+import * as pdfjsLib from 'pdfjs-dist/webpack';
+import _set from 'lodash.set';
+import { debounce as _debounce } from 'debounce';
+import { saveAs } from 'file-saver';
+import { UAParser } from 'ua-parser-js';
+import hotkeys from 'hotkeys-js';
+import memoizeOne from 'memoize-one';
 
-export const uuid = _uuid;
+export const uuid = nanoid;
 export const set = _set;
 export const debounce = _debounce;
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 export const readFiles = (
   files: FileList | null,
-  type: "text" | "dataURL" | "arrayBuffer"
+  type: 'text' | 'dataURL' | 'arrayBuffer'
 ) => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
-    fileReader.addEventListener("load", (e) => {
+    fileReader.addEventListener('load', (e) => {
       if (e && e.target && e.target.result && files !== null) {
         r(e.target.result);
       }
@@ -33,21 +34,21 @@ export const readFiles = (
 
 export const readFile = (
   file: File | null,
-  type: "text" | "dataURL" | "arrayBuffer"
+  type: 'text' | 'dataURL' | 'arrayBuffer'
 ) => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
-    fileReader.addEventListener("load", (e) => {
+    fileReader.addEventListener('load', (e) => {
       if (e && e.target && e.target.result && file !== null) {
         r(e.target.result);
       }
     });
     if (file !== null) {
-      if (type === "text") {
+      if (type === 'text') {
         fileReader.readAsText(file);
-      } else if (type === "dataURL") {
+      } else if (type === 'dataURL') {
         fileReader.readAsDataURL(file);
-      } else if (type === "arrayBuffer") {
+      } else if (type === 'arrayBuffer') {
         fileReader.readAsArrayBuffer(file);
       }
     }
@@ -66,10 +67,10 @@ export const round = (number: number, precision: number) => {
     if (reverseShift) {
       precision = -precision;
     }
-    const numArray = ("" + number).split("e");
+    const numArray = ('' + number).split('e');
     return +(
       numArray[0] +
-      "e" +
+      'e' +
       (numArray[1] ? +numArray[1] + precision : precision)
     );
   };
@@ -77,7 +78,7 @@ export const round = (number: number, precision: number) => {
 };
 
 export const b64toBlob = (base64: string) => {
-  const byteString = atob(base64.split(",")[1]);
+  const byteString = atob(base64.split(',')[1]);
   const mimeType = base64.match(/(:)([a-z/]+)(;)/)![2];
   const buffer = new Uint8Array(byteString.length);
   for (let i = 0; i < byteString.length; i++) {
@@ -89,13 +90,13 @@ export const b64toBlob = (base64: string) => {
 export const isIos = () => {
   const parser = new UAParser();
   const os = parser.getOS().name;
-  return os === "iOS";
+  return os === 'iOS';
 };
 
 export const fileSave = (data: Blob | string, name: string) => {
   isIos()
     ? window.open(
-        URL.createObjectURL(typeof data === "string" ? b64toBlob(data) : data)
+        URL.createObjectURL(typeof data === 'string' ? b64toBlob(data) : data)
       )
     : saveAs(data, name);
 };
@@ -118,7 +119,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
   return Promise.all(
-    new Array(pdfDoc.numPages).fill("").map((_, i) => {
+    new Array(pdfDoc.numPages).fill('').map((_, i) => {
       return new Promise<PageSize>(async (r) =>
         r(
           await pdfDoc.getPage(i + 1).then((page) => {
@@ -135,18 +136,18 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
 const pdf2Images = async (
   pdfBlob: Blob,
   width: number,
-  imagetype: "png" | "jpeg"
+  imagetype: 'png' | 'jpeg'
 ) => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
   return Promise.all(
-    new Array(pdfDoc.numPages).fill("").map((_, i) => {
+    new Array(pdfDoc.numPages).fill('').map((_, i) => {
       return new Promise<string>(async (r) =>
         r(
           await pdfDoc.getPage(i + 1).then((page) => {
-            const canvas = document.createElement("canvas");
+            const canvas = document.createElement('canvas');
             canvas.width = width * 2;
-            const canvasContext = canvas.getContext("2d")!;
+            const canvasContext = canvas.getContext('2d')!;
             const scaleRequired =
               canvas.width / page.getViewport({ scale: 1 }).width;
             const viewport = page.getViewport({ scale: scaleRequired });
@@ -163,7 +164,7 @@ const pdf2Images = async (
 };
 
 export const pdf2Pngs = async (pdfBlob: Blob, width: number) =>
-  pdf2Images(pdfBlob, width, "png");
+  pdf2Images(pdfBlob, width, 'png');
 
 export const fmtTemplate = (
   template: Template,
@@ -172,7 +173,7 @@ export const fmtTemplate = (
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
-    canvaId: template.canvaId ? template.canvaId : "",
+    canvaId: template.canvaId ? template.canvaId : '',
     fontName: template.fontName,
     sampledata: [
       _schemas.reduce((acc, cur) => {
@@ -204,7 +205,7 @@ export const fmtTemplate = (
 };
 
 export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
-  new Array(pageNum).fill("").reduce((acc, _, i) => {
+  new Array(pageNum).fill('').reduce((acc, _, i) => {
     acc.push(
       template.schemas[i]
         ? Object.entries(template.schemas[i])
@@ -228,19 +229,19 @@ export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
 
 export const getInitialSchema = (): Schema => ({
   id: uuid(),
-  key: "",
-  type: "text",
+  key: '',
+  type: 'text',
   position: {
     x: 0,
     y: 0,
   },
   width: 35,
   height: 7,
-  alignment: "left",
+  alignment: 'left',
   fontSize: 12,
   characterSpacing: 0,
   lineHeight: 1,
-  data: "",
+  data: '',
 });
 
 const isEmptyObj = (obj: Object) => {
@@ -252,7 +253,7 @@ const tempalteDataTest = (template: Template) => {
     template.sampledata.length > 0
       ? Object.entries(template.sampledata[0]).every((entry) => {
           const [key, value] = entry;
-          return typeof key === "string" && typeof value === "string";
+          return typeof key === 'string' && typeof value === 'string';
         })
       : true;
   const schemas = template.schemas.map((schema) =>
@@ -260,24 +261,24 @@ const tempalteDataTest = (template: Template) => {
       const [key, value] = entry;
       return (
         isEmptyObj({ [key]: value }) ||
-        (typeof key === "string" &&
-          typeof value.type === "string" &&
-          typeof value.position.x === "number" &&
-          typeof value.position.y === "number" &&
-          typeof value.width === "number" &&
-          typeof value.height === "number" &&
-          ["left", "right", "center"].includes(value.alignment) &&
-          typeof value.fontSize === "number" &&
-          typeof value.characterSpacing === "number" &&
-          typeof value.lineHeight === "number")
+        (typeof key === 'string' &&
+          typeof value.type === 'string' &&
+          typeof value.position.x === 'number' &&
+          typeof value.position.y === 'number' &&
+          typeof value.width === 'number' &&
+          typeof value.height === 'number' &&
+          ['left', 'right', 'center'].includes(value.alignment) &&
+          typeof value.fontSize === 'number' &&
+          typeof value.characterSpacing === 'number' &&
+          typeof value.lineHeight === 'number')
       );
     })
   );
   const columns = template.columns.every(
-    (column) => typeof column === "string" && typeof column === "string"
+    (column) => typeof column === 'string' && typeof column === 'string'
   );
-  const fontName = typeof template.fontName === "string";
-  const basePdf = typeof template.basePdf === "string";
+  const fontName = typeof template.fontName === 'string';
+  const basePdf = typeof template.basePdf === 'string';
   return (
     sampledata &&
     schemas &&
@@ -293,10 +294,10 @@ const tempalteDataTest = (template: Template) => {
 export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
 
 export const fmtTemplateFromJson = (file: File) => {
-  return readFile(file, "text").then((jsonStr) => {
+  return readFile(file, 'text').then((jsonStr) => {
     try {
       const templateFromJson: Template = JSON.parse(jsonStr as string);
-      templateFromJson.fontName = "";
+      templateFromJson.fontName = '';
       const flatSchemaLength = templateFromJson.schemas
         .map((schema) => Object.keys(schema).length)
         .reduce((acc, cur) => acc + cur, 0);
@@ -322,7 +323,7 @@ export const fmtTemplateFromJson = (file: File) => {
               Object.assign(
                 acc,
                 Object.keys(cur).reduce(
-                  (a, c) => Object.assign(a, { [c]: "" }),
+                  (a, c) => Object.assign(a, { [c]: '' }),
                   {} as { [key: string]: string }
                 )
               ),
@@ -333,7 +334,7 @@ export const fmtTemplateFromJson = (file: File) => {
       // basePdf
       if (
         !templateFromJson.basePdf ||
-        typeof templateFromJson.basePdf !== "string"
+        typeof templateFromJson.basePdf !== 'string'
       ) {
         templateFromJson.basePdf = blankPdf;
       }
@@ -352,7 +353,7 @@ export const fmtTemplateFromJson = (file: File) => {
   });
 };
 
-type Command = "up" | "down" | "left" | "right";
+type Command = 'up' | 'down' | 'left' | 'right';
 export const initShortCuts = (arg: {
   move: (command: Command, isShift: boolean) => void;
   remove: () => void;
@@ -363,28 +364,28 @@ export const initShortCuts = (arg: {
   undo: () => void;
   save: () => void;
 }) => {
-  const up = "up";
-  const shiftUp = "shift+up";
-  const down = "down";
-  const shiftDown = "shift+down";
-  const left = "left";
-  const shiftLeft = "shift+left";
-  const right = "right";
-  const shiftRight = "shift+right";
+  const up = 'up';
+  const shiftUp = 'shift+up';
+  const down = 'down';
+  const shiftDown = 'shift+down';
+  const left = 'left';
+  const shiftLeft = 'shift+left';
+  const right = 'right';
+  const shiftRight = 'shift+right';
 
-  const rmWin = "backspace";
-  const rmMac = "delete";
-  const esc = "esc";
-  const copyWin = "ctrl+c";
-  const copyMac = "command+c";
-  const pasteWin = "ctrl+v";
-  const pasteMac = "command+v";
-  const redoWin = "ctrl+y";
-  const redoMac = "shift+command+z";
-  const undoWin = "ctrl+z";
-  const undoMac = "command+z";
-  const saveWin = "ctrl+s";
-  const saveMac = "command+s";
+  const rmWin = 'backspace';
+  const rmMac = 'delete';
+  const esc = 'esc';
+  const copyWin = 'ctrl+c';
+  const copyMac = 'command+c';
+  const pasteWin = 'ctrl+v';
+  const pasteMac = 'command+v';
+  const redoWin = 'ctrl+y';
+  const redoMac = 'shift+command+z';
+  const undoWin = 'ctrl+z';
+  const undoMac = 'command+z';
+  const saveWin = 'ctrl+s';
+  const saveMac = 'command+s';
 
   const keys = [
     up,
@@ -415,19 +416,19 @@ export const initShortCuts = (arg: {
     switch (handler.shortcut) {
       case up:
       case shiftUp:
-        arg.move("up", hotkeys.shift);
+        arg.move('up', hotkeys.shift);
         break;
       case down:
       case shiftDown:
-        arg.move("down", hotkeys.shift);
+        arg.move('down', hotkeys.shift);
         break;
       case left:
       case shiftLeft:
-        arg.move("left", hotkeys.shift);
+        arg.move('left', hotkeys.shift);
         break;
       case right:
       case shiftRight:
-        arg.move("right", hotkeys.shift);
+        arg.move('right', hotkeys.shift);
         break;
       case rmWin:
       case rmMac:
@@ -470,24 +471,24 @@ export const getInitialTemplate = (): Template => {
     schemas: [],
     columns: [],
     basePdf: blankPdf,
-    fontName: "",
+    fontName: '',
   };
 };
 
 export const getSampleByType = (type: string) => {
   const defaultValue: { [key: string]: string } = {
-    qrcode: "https://labelmake.jp/",
-    japanpost: "6540123789-A-K-Z",
-    ean13: "2112345678900",
-    ean8: "02345673",
-    code39: "THIS IS CODE 39",
-    code128: "This is Code 128!",
-    nw7: "A0123456789B",
-    itf14: "04601234567893",
-    upca: "416000336108",
-    upce: "00123457",
+    qrcode: 'https://labelmake.jp/',
+    japanpost: '6540123789-A-K-Z',
+    ean13: '2112345678900',
+    ean8: '02345673',
+    code39: 'THIS IS CODE 39',
+    code128: 'This is Code 128!',
+    nw7: 'A0123456789B',
+    itf14: '04601234567893',
+    upca: '416000336108',
+    upce: '00123457',
   };
-  return defaultValue[type] ? defaultValue[type] : "";
+  return defaultValue[type] ? defaultValue[type] : '';
 };
 
 export const getKeepRaitoHeightByWidth = (type: string, width: number) => {
@@ -526,7 +527,7 @@ export const fmtTemplateForDev = (template: Template, schemas: Schema[][]) => {
     delete schema.key;
     delete schema.data;
     Object.values(schema).forEach((s: any) => {
-      if (s.type !== "text") {
+      if (s.type !== 'text') {
         delete s.alignment;
         delete s.fontSize;
         delete s.characterSpacing;
@@ -542,84 +543,84 @@ export const fmtTemplateForDev = (template: Template, schemas: Schema[][]) => {
 };
 
 export const copyTextToClipboard = (textVal: string): void => {
-  const copyFrom = document.createElement("textarea");
+  const copyFrom = document.createElement('textarea');
   copyFrom.textContent = textVal;
-  const bodyElm = document.getElementsByTagName("body")[0];
+  const bodyElm = document.getElementsByTagName('body')[0];
   bodyElm.appendChild(copyFrom);
   copyFrom.select();
-  document.execCommand("copy");
+  document.execCommand('copy');
   bodyElm.removeChild(copyFrom);
 };
 
 export const designTypes: string[] = [
-  "A4Document",
-  "Announcement",
-  "BirthdayCard",
-  "BirthdayInvitation",
-  "BlogBanner",
-  "BookCover",
-  "Bookmark",
-  "Brochure",
-  "BusinessCard",
-  "Calendar",
-  "Card",
-  "Certificate",
-  "DesktopWallpaper",
-  "EmailHeader",
-  "EtsyShopCover",
-  "EtsyShopIcon",
-  "FacebookAd",
-  "FacebookAppAd",
-  "FacebookCover",
-  "FacebookEventCover",
-  "FacebookPost",
-  "Flyer",
-  "GiftCertificate",
-  "Infographic",
-  "InstagramPost",
-  "InstagramStory",
-  "Invitation",
-  "Invoice",
-  "Label",
-  "LargeRectangleAd",
-  "LeaderboardAd",
-  "LessonPlan",
-  "Letter",
-  "LinkedInBanner",
-  "Logo",
-  "MagazineCover",
-  "MediumRectangleAd",
-  "Menu",
-  "MindMap",
-  "Newsletter",
-  "PhotoCollage",
-  "PinterestGraphic",
-  "Postcard",
-  "Poster",
-  "Presentation",
-  "Presentation43",
-  "ProductLabel",
-  "RecipeCard",
-  "Resume",
-  "SnapchatGeofilter",
-  "SocialMedia",
-  "Ticket",
-  "TumblrGraphic",
-  "TwitterHeader",
-  "TwitterPost",
-  "WattpadBookCover",
-  "WeddingInvitation",
-  "WideSkyscraperAd",
-  "Worksheet",
-  "Yearbook",
-  "YouTubeChannelArt",
-  "YouTubeThumbnail",
+  'A4Document',
+  'Announcement',
+  'BirthdayCard',
+  'BirthdayInvitation',
+  'BlogBanner',
+  'BookCover',
+  'Bookmark',
+  'Brochure',
+  'BusinessCard',
+  'Calendar',
+  'Card',
+  'Certificate',
+  'DesktopWallpaper',
+  'EmailHeader',
+  'EtsyShopCover',
+  'EtsyShopIcon',
+  'FacebookAd',
+  'FacebookAppAd',
+  'FacebookCover',
+  'FacebookEventCover',
+  'FacebookPost',
+  'Flyer',
+  'GiftCertificate',
+  'Infographic',
+  'InstagramPost',
+  'InstagramStory',
+  'Invitation',
+  'Invoice',
+  'Label',
+  'LargeRectangleAd',
+  'LeaderboardAd',
+  'LessonPlan',
+  'Letter',
+  'LinkedInBanner',
+  'Logo',
+  'MagazineCover',
+  'MediumRectangleAd',
+  'Menu',
+  'MindMap',
+  'Newsletter',
+  'PhotoCollage',
+  'PinterestGraphic',
+  'Postcard',
+  'Poster',
+  'Presentation',
+  'Presentation43',
+  'ProductLabel',
+  'RecipeCard',
+  'Resume',
+  'SnapchatGeofilter',
+  'SocialMedia',
+  'Ticket',
+  'TumblrGraphic',
+  'TwitterHeader',
+  'TwitterPost',
+  'WattpadBookCover',
+  'WeddingInvitation',
+  'WideSkyscraperAd',
+  'Worksheet',
+  'Yearbook',
+  'YouTubeChannelArt',
+  'YouTubeThumbnail',
 ];
 
 const _getCanvaApi = async (): Promise<any> => {
   return new Promise((r) => {
-    const script = document.createElement("script");
-    script.src = "https://sdk.canva.com/designbutton/v2/api.js";
+    const script = document.createElement('script');
+    script.src = 'https://sdk.canva.com/designbutton/v2/api.js';
     script.onload = async () => {
       const api = await window.Canva.DesignButton.initialize({
         apiKey: CANVA_API,
@@ -635,18 +636,18 @@ const memoize = <T extends (...args: any) => any>(func: T): T =>
 
 const getCanvaApi = memoize(_getCanvaApi);
 
-type fmt = "yyyy" | "MM" | "dd" | "hh" | "mm" | "ss";
+type fmt = 'yyyy' | 'MM' | 'dd' | 'hh' | 'mm' | 'ss';
 const dateFmt = (date: Date, format: string): string => {
   const dateFormat = {
     _fmt: {
-      yyyy: (d: Date): string => d.getFullYear() + "",
-      MM: (d: Date): string => ("0" + (d.getMonth() + 1)).slice(-2),
-      dd: (d: Date): string => ("0" + d.getDate()).slice(-2),
-      hh: (d: Date): string => ("0" + d.getHours()).slice(-2),
-      mm: (d: Date): string => ("0" + d.getMinutes()).slice(-2),
-      ss: (d: Date): string => ("0" + d.getSeconds()).slice(-2),
+      yyyy: (d: Date): string => d.getFullYear() + '',
+      MM: (d: Date): string => ('0' + (d.getMonth() + 1)).slice(-2),
+      dd: (d: Date): string => ('0' + d.getDate()).slice(-2),
+      hh: (d: Date): string => ('0' + d.getHours()).slice(-2),
+      mm: (d: Date): string => ('0' + d.getMinutes()).slice(-2),
+      ss: (d: Date): string => ('0' + d.getSeconds()).slice(-2),
     },
-    _priority: ["yyyy", "MM", "dd", "hh", "mm", "ss"],
+    _priority: ['yyyy', 'MM', 'dd', 'hh', 'mm', 'ss'],
     format: function (_d: Date, format: string) {
       return this._priority.reduce(
         (res, fmt) => res.replace(fmt, this._fmt[fmt as fmt](_d)),
@@ -658,7 +659,7 @@ const dateFmt = (date: Date, format: string): string => {
 };
 
 const getTemplateName = () =>
-  "Template@" + dateFmt(new Date(), "yyyy-MM-dd-hh:mm");
+  'Template@' + dateFmt(new Date(), 'yyyy-MM-dd-hh:mm');
 
 export const canvaCreate = (
   designType: string,
@@ -667,7 +668,7 @@ export const canvaCreate = (
   getCanvaApi().then((canva) => {
     canva.createDesign({
       design: { type: designType },
-      editor: { fileType: "pdf" },
+      editor: { fileType: 'pdf' },
       onDesignPublish: (options: any) => {
         const exportUrl = options.exportUrl;
         const canvaId = options.designId;
@@ -688,7 +689,7 @@ export const canvaEdit = (
   getCanvaApi().then((canva) => {
     canva.editDesign({
       design: { id: templateCanvaId },
-      editor: { fileType: "pdf" },
+      editor: { fileType: 'pdf' },
       onDesignPublish: (options: any) => {
         const exportUrl = options.exportUrl;
         const canvaId = options.designId;

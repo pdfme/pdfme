@@ -1,22 +1,22 @@
-import React, { useState } from "react";
-import styles from "./index.module.scss";
+import React, { useState } from 'react';
+import styles from './index.module.scss';
 import {
   SortableContainer,
   SortableElement,
   SortableHandle,
-} from "react-sortable-hoc";
-import { Schema, Lang } from "../../types";
-import { readFiles } from "../../utils";
-import { i18n } from "../../i18n";
-import { inputTypeList } from "../../constants";
-import Divider from "../Divider";
-import backIcon from "../../img/back.svg";
-import forwardIcon from "../../img/forward.svg";
-import infoIcon from "../../img/info.svg";
-import createIcon from "../../img/create.svg";
-import dragIcon from "../../img/drag.svg";
-import warningIcon from "../../img/warning.svg";
-import deleteIcon from "../../img/delete.svg";
+} from 'react-sortable-hoc';
+import { Schema, Lang } from '../../types';
+import { readFiles } from '../../utils';
+import { i18n } from '../../i18n';
+import { inputTypeList } from '../../constants';
+import Divider from '../Divider';
+import backIcon from '../../img/back.svg';
+import forwardIcon from '../../img/forward.svg';
+import infoIcon from '../../img/info.svg';
+import createIcon from '../../img/create.svg';
+import dragIcon from '../../img/drag.svg';
+import warningIcon from '../../img/warning.svg';
+import deleteIcon from '../../img/delete.svg';
 
 const isTouchable = () => true;
 
@@ -24,7 +24,7 @@ const DragHandle = SortableHandle(({ disabled }: { disabled: boolean }) => (
   <button
     disabled={disabled}
     className="button is-small is-light"
-    style={{ padding: 5, margin: 5, cursor: "grab" }}
+    style={{ padding: 5, margin: 5, cursor: 'grab' }}
   >
     <img src={dragIcon} width={15} alt="Drag icon" />
   </button>
@@ -51,24 +51,24 @@ const SortableItem = SortableElement(
     onMouseLeave: () => void;
   }) => {
     const sc = schema;
-    let status: "" | "is-warning" | "is-danger" = "";
+    let status: '' | 'is-warning' | 'is-danger' = '';
     if (!sc.key) {
-      status = "is-warning";
+      status = 'is-warning';
     } else if (
       schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)
     ) {
-      status = "is-danger";
+      status = 'is-danger';
     }
 
     const touchable = isTouchable();
 
     const getTitle = () => {
-      if (status === "is-warning") {
-        return i18n(lang, "plsInputName");
-      } else if (status === "is-danger") {
-        return i18n(lang, "fieldMustUniq");
+      if (status === 'is-warning') {
+        return i18n(lang, 'plsInputName');
+      } else if (status === 'is-danger') {
+        return i18n(lang, 'fieldMustUniq');
       } else {
-        return i18n(lang, "edit");
+        return i18n(lang, 'edit');
       }
     };
     return (
@@ -78,8 +78,8 @@ const SortableItem = SortableElement(
         style={{
           border:
             focusElementId === sc.id
-              ? "1px solid #d42802"
-              : "1px solid transparent",
+              ? '1px solid #d42802'
+              : '1px solid transparent',
         }}
         onMouseEnter={() => onMouseEnter(sc.id)}
         onMouseLeave={() => onMouseLeave()}
@@ -93,7 +93,7 @@ const SortableItem = SortableElement(
           title={getTitle()}
         >
           <span className={`is-size-7 ${styles.keyLabel}`}>
-            {status === "" ? (
+            {status === '' ? (
               sc.key
             ) : (
               <span className={styles.warning}>
@@ -101,9 +101,9 @@ const SortableItem = SortableElement(
                   alt="Warning icon"
                   src={warningIcon}
                   width={15}
-                  style={{ marginRight: "0.5rem" }}
+                  style={{ marginRight: '0.5rem' }}
                 />
-                {status === "is-warning" ? i18n(lang, "noKeyName") : sc.key}
+                {status === 'is-warning' ? i18n(lang, 'noKeyName') : sc.key}
               </span>
             )}
           </span>
@@ -140,7 +140,7 @@ const SortableList = SortableContainer(
     onMouseLeave: () => void;
     focusElementId: string;
   }) => (
-    <div style={{ maxHeight: 350, overflowY: "auto" }}>
+    <div style={{ maxHeight: 350, overflowY: 'auto' }}>
       {schemas.map((s, i) => (
         <SortableItem
           disabled={!isTouchable()}
@@ -204,7 +204,7 @@ const Sidebar = ({
   const top = 25;
   const right = (open ? sidebarWidth : 0) - 1;
   return (
-    <div style={{ position: "sticky", top, zIndex: 29 }}>
+    <div style={{ position: 'sticky', top, zIndex: 29 }}>
       <button
         className={`button is-small is-light ${styles.tglBtn}`}
         style={{ right, top }}
@@ -214,15 +214,15 @@ const Sidebar = ({
       </button>
       <div
         className={styles.sideBar}
-        style={{ width: sidebarWidth, display: open ? "block" : "none", top }}
+        style={{ width: sidebarWidth, display: open ? 'block' : 'none', top }}
       >
-        <aside style={{ display: activeElement ? "none" : "block" }}>
-          <div style={{ height: 40, display: "flex", alignItems: "center" }}>
+        <aside style={{ display: activeElement ? 'none' : 'block' }}>
+          <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
             <h3
               className="is-size-7"
-              style={{ textAlign: "center", width: "100%", fontWeight: "bold" }}
+              style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}
             >
-              {i18n(lang, "fieldsList")}({pageCursor + 1}P)
+              {i18n(lang, 'fieldsList')}({pageCursor + 1}P)
             </h3>
           </div>
           <Divider />
@@ -243,21 +243,21 @@ const Sidebar = ({
             />
           ) : (
             <p
-              style={{ alignItems: "center", display: "flex" }}
+              style={{ alignItems: 'center', display: 'flex' }}
               className="is-size-7"
             >
               <img
                 src={infoIcon}
-                style={{ marginRight: "0.5rem" }}
+                style={{ marginRight: '0.5rem' }}
                 alt="Info icon"
               />
-              {i18n(lang, "plsAddNewField")}
+              {i18n(lang, 'plsAddNewField')}
             </p>
           )}
 
           <Divider />
         </aside>
-        <aside style={{ display: activeElement ? "block" : "none" }}>
+        <aside style={{ display: activeElement ? 'block' : 'none' }}>
           <div className={styles.flx}>
             <button
               className="button is-small is-light"
@@ -266,8 +266,8 @@ const Sidebar = ({
             >
               <img src={backIcon} width={15} alt="Back icon" />
             </button>
-            <h3 className="is-size-7" style={{ fontWeight: "bold" }}>
-              {i18n(lang, "editField")}({pageCursor + 1}P)
+            <h3 className="is-size-7" style={{ fontWeight: 'bold' }}>
+              {i18n(lang, 'editField')}({pageCursor + 1}P)
             </h3>
             <button
               className="button is-small is-light"
@@ -280,21 +280,21 @@ const Sidebar = ({
             </button>
           </div>
           <Divider />
-          <div style={{ display: "flex" }}>
-            <div style={{ marginBottom: "0.5rem" }}>
+          <div style={{ display: 'flex' }}>
+            <div style={{ marginBottom: '0.5rem' }}>
               <label
                 className="label is-small has-text-white"
                 style={{ marginBottom: 0 }}
               >
-                {i18n(lang, "type")}
+                {i18n(lang, 'type')}
               </label>
               <select
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 className="select is-small"
                 onChange={(e) =>
                   changeSchema([
                     {
-                      key: "type",
+                      key: 'type',
                       value: e.target.value,
                       schemaId: activeSchema.id,
                     },
@@ -309,14 +309,14 @@ const Sidebar = ({
                 ))}
               </select>
             </div>
-            <div style={{ width: "100%" }}>
+            <div style={{ width: '100%' }}>
               <label
                 className="label is-small has-text-white"
                 style={{ marginBottom: 0 }}
               >
-                {i18n(lang, "fieldName")}
-                <u style={{ fontSize: "0.7rem" }}>
-                  ({i18n(lang, "requireAndUniq")})
+                {i18n(lang, 'fieldName')}
+                <u style={{ fontSize: '0.7rem' }}>
+                  ({i18n(lang, 'requireAndUniq')})
                 </u>
               </label>
               <input
@@ -324,14 +324,14 @@ const Sidebar = ({
                 onChange={(e) =>
                   changeSchema([
                     {
-                      key: "key",
+                      key: 'key',
                       value: e.target.value,
                       schemaId: activeSchema.id,
                     },
                   ])
                 }
                 style={{
-                  backgroundColor: activeSchema.key ? "#fff" : "#ffa19b",
+                  backgroundColor: activeSchema.key ? '#fff' : '#ffa19b',
                 }}
                 value={activeSchema.key}
               />
@@ -344,7 +344,7 @@ const Sidebar = ({
                 className="label is-small has-text-white"
                 style={{ marginBottom: 0 }}
               >
-                {i18n(lang, "posAndSize")}
+                {i18n(lang, 'posAndSize')}
               </p>
               <div className={styles.flx}>
                 <div className={styles.inputSet}>
@@ -356,7 +356,7 @@ const Sidebar = ({
                     onChange={(e) =>
                       changeSchema([
                         {
-                          key: "position.x",
+                          key: 'position.x',
                           value: String(+e.target.value),
                           schemaId: activeSchema.id,
                         },
@@ -375,7 +375,7 @@ const Sidebar = ({
                     onChange={(e) =>
                       changeSchema([
                         {
-                          key: "position.y",
+                          key: 'position.y',
                           value: String(+e.target.value),
                           schemaId: activeSchema.id,
                         },
@@ -386,7 +386,7 @@ const Sidebar = ({
                   <span className="is-size-7">mm</span>
                 </div>
               </div>
-              <div className={styles.flx} style={{ marginTop: "0.25rem" }}>
+              <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>W:</label>
                   <input
@@ -396,7 +396,7 @@ const Sidebar = ({
                     onChange={(e) =>
                       changeSchema([
                         {
-                          key: "width",
+                          key: 'width',
                           value: String(+e.target.value),
                           schemaId: activeSchema.id,
                         },
@@ -415,7 +415,7 @@ const Sidebar = ({
                     onChange={(e) =>
                       changeSchema([
                         {
-                          key: "height",
+                          key: 'height',
                           value: String(+e.target.value),
                           schemaId: activeSchema.id,
                         },
@@ -428,25 +428,25 @@ const Sidebar = ({
               </div>
             </div>
             <Divider />
-            {activeSchema.type === "text" && (
+            {activeSchema.type === 'text' && (
               <>
                 <p
                   className="label is-small has-text-white"
                   style={{ marginBottom: 0 }}
                 >
-                  {i18n(lang, "style")}
+                  {i18n(lang, 'style')}
                 </p>
-                <div style={{ display: "flex", marginBottom: "0.25rem" }}>
-                  <div style={{ width: "50%" }}>
+                <div style={{ display: 'flex', marginBottom: '0.25rem' }}>
+                  <div style={{ width: '50%' }}>
                     <div>
                       <label className="is-size-7">Alignment</label>
                       <select
-                        style={{ width: "100%" }}
+                        style={{ width: '100%' }}
                         className="select is-small"
                         onChange={(e) =>
                           changeSchema([
                             {
-                              key: "alignment",
+                              key: 'alignment',
                               value: e.target.value,
                               schemaId: activeSchema.id,
                             },
@@ -466,7 +466,7 @@ const Sidebar = ({
                         onChange={(e) =>
                           changeSchema([
                             {
-                              key: "fontSize",
+                              key: 'fontSize',
                               value: e.target.value,
                               schemaId: activeSchema.id,
                             },
@@ -478,19 +478,19 @@ const Sidebar = ({
                     </div>
                     <div>
                       <label className="is-size-7">FontColor</label>
-                      <div style={{ display: "flex" }}>
+                      <div style={{ display: 'flex' }}>
                         <input
                           className="input is-small"
                           onChange={(e) =>
                             changeSchema([
                               {
-                                key: "fontColor",
+                                key: 'fontColor',
                                 value: e.target.value,
                                 schemaId: activeSchema.id,
                               },
                             ])
                           }
-                          value={activeSchema.fontColor || "#000000"}
+                          value={activeSchema.fontColor || '#000000'}
                           type="color"
                         />
                         <button
@@ -498,8 +498,8 @@ const Sidebar = ({
                           onClick={() =>
                             changeSchema([
                               {
-                                key: "fontColor",
-                                value: "",
+                                key: 'fontColor',
+                                value: '',
                                 schemaId: activeSchema.id,
                               },
                             ])
@@ -510,7 +510,7 @@ const Sidebar = ({
                       </div>
                     </div>
                   </div>
-                  <div style={{ width: "50%" }}>
+                  <div style={{ width: '50%' }}>
                     <div>
                       <label className="is-size-7">CharacterSpacing(pt):</label>
                       <input
@@ -518,7 +518,7 @@ const Sidebar = ({
                         onChange={(e) =>
                           changeSchema([
                             {
-                              key: "characterSpacing",
+                              key: 'characterSpacing',
                               value: e.target.value,
                               schemaId: activeSchema.id,
                             },
@@ -535,7 +535,7 @@ const Sidebar = ({
                         onChange={(e) =>
                           changeSchema([
                             {
-                              key: "lineHeight",
+                              key: 'lineHeight',
                               value: e.target.value,
                               schemaId: activeSchema.id,
                             },
@@ -547,19 +547,19 @@ const Sidebar = ({
                     </div>
                     <div>
                       <label className="is-size-7">Background</label>
-                      <div style={{ display: "flex" }}>
+                      <div style={{ display: 'flex' }}>
                         <input
                           className="input is-small"
                           onChange={(e) =>
                             changeSchema([
                               {
-                                key: "backgroundColor",
+                                key: 'backgroundColor',
                                 value: e.target.value,
                                 schemaId: activeSchema.id,
                               },
                             ])
                           }
-                          value={activeSchema.backgroundColor || "#ffffff"}
+                          value={activeSchema.backgroundColor || '#ffffff'}
                           type="color"
                         />
                         <button
@@ -567,8 +567,8 @@ const Sidebar = ({
                           onClick={() =>
                             changeSchema([
                               {
-                                key: "backgroundColor",
-                                value: "",
+                                key: 'backgroundColor',
+                                value: '',
                                 schemaId: activeSchema.id,
                               },
                             ])
@@ -587,20 +587,20 @@ const Sidebar = ({
                 className="label is-small has-text-white"
                 style={{ marginBottom: 0 }}
               >
-                {i18n(lang, "inputExample")}
+                {i18n(lang, 'inputExample')}
               </label>
-              {activeSchema.type === "image" ? (
+              {activeSchema.type === 'image' ? (
                 <div className="file is-small">
                   {activeSchema.data ? (
-                    <div style={{ margin: "0 auto" }}>
+                    <div style={{ margin: '0 auto' }}>
                       <button
                         className={`delete ${styles.dltBtn}`}
                         aria-label="close"
                         onClick={() =>
                           changeSchema([
                             {
-                              key: "data",
-                              value: "",
+                              key: 'data',
+                              value: '',
                               schemaId: activeSchema.id,
                             },
                           ])
@@ -617,10 +617,10 @@ const Sidebar = ({
                       <input
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const files = e.target.files;
-                          readFiles(files, "dataURL").then((result) => {
+                          readFiles(files, 'dataURL').then((result) => {
                             changeSchema([
                               {
-                                key: "data",
+                                key: 'data',
                                 value: result as string,
                                 schemaId: activeSchema.id,
                               },
@@ -633,7 +633,7 @@ const Sidebar = ({
                       />
                       <span className="file-cta">
                         <span className="file-label">
-                          {i18n(lang, "plsSelect")}
+                          {i18n(lang, 'plsSelect')}
                         </span>
                       </span>
                     </label>
@@ -646,14 +646,14 @@ const Sidebar = ({
                   onChange={(e) =>
                     changeSchema([
                       {
-                        key: "data",
+                        key: 'data',
                         value: e.target.value,
                         schemaId: activeSchema.id,
                       },
                     ])
                   }
                   style={{
-                    backgroundColor: activeSchema.data ? "#fff" : "#ffa19b",
+                    backgroundColor: activeSchema.data ? '#fff' : '#ffa19b',
                   }}
                   value={activeSchema.data}
                 />
@@ -664,7 +664,7 @@ const Sidebar = ({
 
         <div className={styles.addBtn}>
           <button className="button is-small is-danger" onClick={addSchema}>
-            <strong>{i18n(lang, "addNewField")}</strong>
+            <strong>{i18n(lang, 'addNewField')}</strong>
           </button>
         </div>
       </div>

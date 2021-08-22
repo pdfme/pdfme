@@ -1,18 +1,31 @@
-declare module "*.scss";
-declare module "*.module.scss";
-
 declare global {
   interface Window {
     Canva: any;
   }
 }
 
-export type Lang = "en" | "ja";
+export type Lang = 'en' | 'ja';
 
 export interface PageSize {
   height: number;
   width: number;
 }
+
+type TemplateType =
+  | 'text'
+  | 'image'
+  | 'qrcode'
+  | 'japanpost'
+  | 'ean13'
+  | 'ean8'
+  | 'code39'
+  | 'code128'
+  | 'nw7'
+  | 'itf14'
+  | 'upca'
+  | 'upce';
+
+type Alignment = 'left' | 'right' | 'center';
 
 // TODO labelmakeのtypeを使うようにするべき
 export interface TemplateSchema {

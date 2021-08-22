@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
 type Props = {
   open: boolean;
@@ -29,21 +29,21 @@ const Modal = ({
 }: Props) => {
   useEffect(() => {
     if (open) {
-      document.getElementsByTagName("html")[0].classList.add("is-clipped");
+      document.getElementsByTagName('html')[0].classList.add('is-clipped');
     } else {
-      document.getElementsByTagName("html")[0].classList.remove("is-clipped");
+      document.getElementsByTagName('html')[0].classList.remove('is-clipped');
     }
   }, [open]);
   return (
     <div className={`modal-container`} style={{ zIndex: 9999 }}>
-      <div className={`modal is-clipped ${open ? "is-active" : ""}`}>
+      <div className={`modal is-clipped ${open ? 'is-active' : ''}`}>
         <div className="modal-background" />
         <div
           className="modal-card"
-          style={fullSize ? { width: "100%", height: "100%" } : {}}
+          style={fullSize ? { width: '100%', height: '100%' } : {}}
         >
           <header className="modal-card-head">
-            <span className="modal-card-title" style={{ textAlign: "left" }}>
+            <span className="modal-card-title" style={{ textAlign: 'left' }}>
               {title}
             </span>
             <button className="delete" aria-label="close" onClick={onClose} />
@@ -51,19 +51,19 @@ const Modal = ({
           <section className="modal-card-body">{children}</section>
           <footer
             className="modal-card-foot"
-            style={{ flexDirection: "row-reverse" }}
+            style={{ flexDirection: 'row-reverse' }}
           >
             {onAction && actionLabel && (
               <button
                 disabled={disabled}
-                className={`button ${red ? "is-danger" : "is-success"}`}
+                className={`button ${red ? 'is-danger' : 'is-success'}`}
                 onClick={onAction}
-                style={{ position: "relative" }}
+                style={{ position: 'relative' }}
               >
                 {actionLabel}
               </button>
             )}
-            <div style={{ width: "1rem" }} />
+            <div style={{ width: '1rem' }} />
             {onCancel && cancelLabel && (
               <button disabled={disabled} className="button" onClick={onCancel}>
                 {cancelLabel}

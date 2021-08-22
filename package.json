@@ -1,10 +1,66 @@
 {
-  "name": "labelmake-editor",
   "version": "0.1.0",
-  "private": true,
-  "dependencies": {
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --passWithNoTests",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "labelmake-editor",
+  "author": "hand-dot",
+  "module": "dist/labelmake-editor.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/labelmake-editor.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/labelmake-editor.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
     "@creativebulma/bulma-tooltip": "^1.2.0",
+    "@rollup/plugin-image": "^2.1.0",
+    "@rollup/plugin-url": "^6.1.0",
     "@scena/react-guides": "^0.16.0",
+    "@size-limit/preset-small-lib": "^5.0.3",
+    "@storybook/addon-essentials": "^6.3.7",
+    "@storybook/addon-info": "^5.3.21",
+    "@storybook/addon-links": "^6.3.7",
+    "@storybook/addons": "^6.3.7",
+    "@storybook/react": "^6.3.7",
+    "@svgr/rollup": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -19,50 +75,40 @@
     "@types/react-dom": "^17.0.9",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.1",
+    "autoprefixer": "^10.3.2",
+    "babel-loader": "^8.2.2",
     "bulma": "^0.9.3",
+    "css-loader": "^6.2.0",
+    "cssnano": "^5.0.8",
     "debounce": "^1.2.1",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.2.0",
     "hotkeys-js": "^3.8.7",
+    "husky": "^7.0.1",
     "labelmake": "^2.0.18",
     "lodash.set": "^4.3.2",
     "memoize-one": "^5.2.1",
-    "node-sass": "4.14.1",
+    "nanoid": "^3.1.25",
+    "node-sass": "^4.14.1",
     "pdfjs-dist": "2.6.347",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-is": "^17.0.2",
     "react-moveable": "^0.29.0",
     "react-scripts": "4.0.3",
     "react-selecto": "^1.12.0",
     "react-sortable-hoc": "^2.0.0",
+    "rollup-plugin-postcss": "^4.0.1",
+    "sass-loader": "^10.1.1",
+    "size-limit": "^5.0.3",
+    "style-loader": "^3.2.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
     "typescript": "^4.3.5",
     "ua-parser-js": "^0.7.28",
     "uuid": "^8.3.2",
     "web-vitals": "^1.0.1",
     "worker-loader": "^3.0.8"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "dependencies": {}
 }

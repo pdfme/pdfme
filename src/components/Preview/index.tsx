@@ -1,21 +1,21 @@
-import React, { Component } from "react";
-import Selecto from "react-selecto";
-import Moveable, { OnDrag, OnResize } from "react-moveable";
-import Guides from "@scena/react-guides";
-import styles from "./index.module.scss";
-import { GuidesInterface, Schema, Template, PageSize } from "../../types";
-import { round, flatten } from "../../utils";
-import { barcodeList, zoom, barcodeExampleImageObj } from "../../constants";
+import React, { Component } from 'react';
+import Selecto from 'react-selecto';
+import Moveable, { OnDrag, OnResize } from 'react-moveable';
+import Guides from '@scena/react-guides';
+import styles from './index.module.scss';
+import { GuidesInterface, Schema, Template, PageSize } from '../../types';
+import { round, flatten } from '../../utils';
+import { barcodeList, zoom, barcodeExampleImageObj } from '../../constants';
 
-const SELECTABLE = "selectable";
+const SELECTABLE = 'selectable';
 
-const fmt4Num = (prop: string) => Number(prop.replace("px", ""));
+const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
 
 const rulerHeight = 30;
 
-const getFontFamily = (fontName: string) => {
-  return "Helvetica, Arial, sans-serif";
+const getFontFamily = () => {
+  return 'Helvetica, Arial, sans-serif';
 };
 
 interface Props {
@@ -49,7 +49,7 @@ export default class Preview extends Component<Props, State> {
     }
   };
   private keyup = (e: KeyboardEvent) => {
-    if (e.key === "Shift") {
+    if (e.key === 'Shift') {
       this.setState({ isPressShiftKey: false });
     }
   };
@@ -59,8 +59,8 @@ export default class Preview extends Component<Props, State> {
   };
   componentDidMount() {
     this.setDisplay();
-    window.addEventListener("keydown", this.keydown);
-    window.addEventListener("keyup", this.keyup);
+    window.addEventListener('keydown', this.keydown);
+    window.addEventListener('keyup', this.keyup);
   }
   componentDidUpdate(prevProps: Props) {
     if (prevProps.pages !== this.props.pages) {
@@ -69,8 +69,8 @@ export default class Preview extends Component<Props, State> {
     this.moveable && this.moveable.updateRect();
   }
   componentWillUnmount() {
-    window.removeEventListener("keydown", this.keydown);
-    window.removeEventListener("keyup", this.keyup);
+    window.removeEventListener('keydown', this.keydown);
+    window.removeEventListener('keyup', this.keyup);
     window.onresize = () => {};
   }
 
@@ -81,12 +81,12 @@ export default class Preview extends Component<Props, State> {
       return;
     }
     const paperWidth = pageSize.width * zoom + rulerHeight;
-    const width = typeof window !== "undefined" ? window.innerWidth : 0;
+    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
     this.setState({
       scale: width / paperWidth > 1 ? 1 : width / paperWidth,
     });
     window.onresize = () => {
-      const width = typeof window !== "undefined" ? window.innerWidth : 0;
+      const width = typeof window !== 'undefined' ? window.innerWidth : 0;
       this.setState({
         scale: width / paperWidth > 1 ? 1 : width / paperWidth,
       });
@@ -100,8 +100,8 @@ export default class Preview extends Component<Props, State> {
   }
 
   onDrag = ({ target, left, top }: OnDrag) => {
-    target!.style.left = (left < 0 ? 0 : left) + "px";
-    target!.style.top = (top < 0 ? 0 : top) + "px";
+    target!.style.left = (left < 0 ? 0 : left) + 'px';
+    target!.style.top = (top < 0 ? 0 : top) + 'px';
   };
 
   onResize = ({ target, width, height, direction }: OnResize) => {
@@ -112,12 +112,12 @@ export default class Preview extends Component<Props, State> {
       Number(fmt4Num(s.top)) + (Number(fmt4Num(s.height)) - height);
     const obj: any = { width: `${width}px`, height: `${height}px` };
     const d = direction.toString();
-    if (d === "-1,-1" || d === "-1,0" || d === "0,-1") {
+    if (d === '-1,-1' || d === '-1,0' || d === '0,-1') {
       obj.top = `${newTop}px`;
       obj.left = `${newLeft}px`;
-    } else if (d === "1,-1") {
+    } else if (d === '1,-1') {
       obj.top = `${newTop}px`;
-    } else if (d === "-1,1") {
+    } else if (d === '-1,1') {
       obj.left = `${newLeft}px`;
     }
     Object.assign(s, obj);
@@ -127,8 +127,8 @@ export default class Preview extends Component<Props, State> {
     const { top, left } = target.style;
     const { changeSchema } = this.props;
     changeSchema([
-      { key: "position.y", value: fmt(top), schemaId: target.id },
-      { key: "position.x", value: fmt(left), schemaId: target.id },
+      { key: 'position.y', value: fmt(top), schemaId: target.id },
+      { key: 'position.x', value: fmt(left), schemaId: target.id },
     ]);
   };
 
@@ -136,10 +136,10 @@ export default class Preview extends Component<Props, State> {
     const { width, height, top, left } = target.style;
     const { changeSchema } = this.props;
     changeSchema([
-      { key: "width", value: fmt(width), schemaId: target.id },
-      { key: "height", value: fmt(height), schemaId: target.id },
-      { key: "position.y", value: fmt(top), schemaId: target.id },
-      { key: "position.x", value: fmt(left), schemaId: target.id },
+      { key: 'width', value: fmt(width), schemaId: target.id },
+      { key: 'height', value: fmt(height), schemaId: target.id },
+      { key: 'position.y', value: fmt(top), schemaId: target.id },
+      { key: 'position.x', value: fmt(left), schemaId: target.id },
     ]);
   };
 
@@ -148,8 +148,8 @@ export default class Preview extends Component<Props, State> {
     const arg = targets.map((target) => {
       const { top, left } = target.style;
       return [
-        { key: "position.y", value: fmt(top), schemaId: target.id },
-        { key: "position.x", value: fmt(left), schemaId: target.id },
+        { key: 'position.y', value: fmt(top), schemaId: target.id },
+        { key: 'position.x', value: fmt(left), schemaId: target.id },
       ];
     });
     changeSchema(flatten(arg));
@@ -160,10 +160,10 @@ export default class Preview extends Component<Props, State> {
     const arg = targets.map((target) => {
       const { width, height, top, left } = target.style;
       return [
-        { key: "width", value: fmt(width), schemaId: target.id },
-        { key: "height", value: fmt(height), schemaId: target.id },
-        { key: "position.y", value: fmt(top), schemaId: target.id },
-        { key: "position.x", value: fmt(left), schemaId: target.id },
+        { key: 'width', value: fmt(width), schemaId: target.id },
+        { key: 'height', value: fmt(height), schemaId: target.id },
+        { key: 'position.y', value: fmt(top), schemaId: target.id },
+        { key: 'position.x', value: fmt(left), schemaId: target.id },
       ];
     });
     changeSchema(flatten(arg));
@@ -174,7 +174,6 @@ export default class Preview extends Component<Props, State> {
       pageCursor,
       pages,
       activeElements,
-      template,
       schemas,
       onSelectSchemas,
       onMouseEnter,
@@ -201,8 +200,8 @@ export default class Preview extends Component<Props, State> {
               style={{
                 width: paperWidth * scale,
                 height: paperHeight * scale,
-                position: "relative",
-                margin: "0 auto",
+                position: 'relative',
+                margin: '0 auto',
                 left: (-rulerHeight * scale) / 2,
               }}
             >
@@ -218,7 +217,7 @@ export default class Preview extends Component<Props, State> {
                   const inputEvent = e.inputEvent;
                   const target = inputEvent.target;
                   if (
-                    (inputEvent.type === "touchstart" && e.isTrusted) ||
+                    (inputEvent.type === 'touchstart' && e.isTrusted) ||
                     (this.moveable && this.moveable.isMoveableElement(target))
                   ) {
                     e.stop();
@@ -233,17 +232,17 @@ export default class Preview extends Component<Props, State> {
               <div
                 style={{
                   transform: `scale(${scale})`,
-                  transformOrigin: "top left",
+                  transformOrigin: 'top left',
                 }}
               >
                 {pageCursor !== index && (
                   <div
                     style={{
-                      position: "absolute",
+                      position: 'absolute',
                       width: paperWidth + rulerHeight,
                       height: paperHeight,
                       zIndex: 100,
-                      background: "#9e9e9e94",
+                      background: '#9e9e9e94',
                     }}
                   />
                 )}
@@ -251,8 +250,8 @@ export default class Preview extends Component<Props, State> {
                   style={{
                     width: paperWidth + rulerHeight,
                     height: paperHeight + rulerHeight,
-                    position: "relative",
-                    background: "#333",
+                    position: 'relative',
+                    background: '#333',
                   }}
                 >
                   {pageCursor === index &&
@@ -303,8 +302,8 @@ export default class Preview extends Component<Props, State> {
                   <Guides
                     zoom={zoom}
                     style={{
-                      display: pageCursor === index ? "inherit" : "none",
-                      position: "absolute",
+                      display: pageCursor === index ? 'inherit' : 'none',
+                      position: 'absolute',
                       top: 0,
                       left: rulerHeight,
                       height: rulerHeight,
@@ -318,8 +317,8 @@ export default class Preview extends Component<Props, State> {
                   <Guides
                     zoom={zoom}
                     style={{
-                      display: pageCursor === index ? "inherit" : "none",
-                      position: "absolute",
+                      display: pageCursor === index ? 'inherit' : 'none',
+                      position: 'absolute',
                       top: rulerHeight,
                       left: 0,
                       height: paperHeight,
@@ -334,9 +333,9 @@ export default class Preview extends Component<Props, State> {
                   <div
                     id={`paper-${index}`}
                     style={{
-                      fontFamily: getFontFamily(template.fontName),
-                      backgroundColor: "#fff",
-                      position: "absolute",
+                      fontFamily: getFontFamily(),
+                      backgroundColor: '#fff',
+                      position: 'absolute',
                       top: rulerHeight,
                       left: rulerHeight,
                       width: paperWidth,
@@ -345,7 +344,7 @@ export default class Preview extends Component<Props, State> {
                   >
                     <div
                       style={{
-                        position: "absolute",
+                        position: 'absolute',
                         top: 0,
                         left: 0,
                         width: paperWidth,
@@ -361,8 +360,8 @@ export default class Preview extends Component<Props, State> {
                     {schemas[index].map((s) => (
                       <div
                         data-tooltip={
-                          s.key.replace(/^{\d+}/, "")
-                            ? s.key.replace(/^{\d+}/, "")
+                          s.key.replace(/^{\d+}/, '')
+                            ? s.key.replace(/^{\d+}/, '')
                             : null
                         }
                         className={`schema has-tooltip-arrow ${SELECTABLE}`}
@@ -371,43 +370,43 @@ export default class Preview extends Component<Props, State> {
                         key={s.id}
                         id={s.id}
                         style={{
-                          display: "block",
-                          position: "absolute",
+                          display: 'block',
+                          position: 'absolute',
                           height: +s.height * zoom,
                           width: +s.width * zoom,
                           top: +s.position.y * zoom,
                           left: +s.position.x * zoom,
                           border:
                             focusElementId === s.id
-                              ? "1px solid #d42802"
-                              : "1px dashed #4af",
+                              ? '1px solid #d42802'
+                              : '1px dashed #4af',
                           backgroundColor:
-                            s.type === "text" && s.backgroundColor
+                            s.type === 'text' && s.backgroundColor
                               ? s.backgroundColor
-                              : "transparent",
+                              : 'transparent',
                         }}
                       >
-                        {s.type === "text" && (
+                        {s.type === 'text' && (
                           <div
                             style={{
                               textAlign: s.alignment,
-                              fontSize: s.fontSize + "pt",
-                              letterSpacing: s.characterSpacing + "pt",
-                              lineHeight: s.lineHeight + "em",
-                              whiteSpace: "pre-line",
-                              wordBreak: "break-all",
-                              color: s.fontColor || "#000",
+                              fontSize: s.fontSize + 'pt',
+                              letterSpacing: s.characterSpacing + 'pt',
+                              lineHeight: s.lineHeight + 'em',
+                              whiteSpace: 'pre-line',
+                              wordBreak: 'break-all',
+                              color: s.fontColor || '#000',
                             }}
                           >
                             {/*  Set the letterSpacing of the last character to 0. */}
-                            {s.data.split("").map((l, i) => (
+                            {s.data.split('').map((l, i) => (
                               <span
                                 key={i}
                                 style={{
                                   letterSpacing:
                                     String(s.data).length === i + 1
                                       ? 0
-                                      : "inherit",
+                                      : 'inherit',
                                 }}
                               >
                                 {l}
@@ -415,7 +414,7 @@ export default class Preview extends Component<Props, State> {
                             ))}
                           </div>
                         )}
-                        {s.type === "image" && (
+                        {s.type === 'image' && (
                           <img
                             alt={s.key}
                             style={{

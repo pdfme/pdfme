@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import hljs from "highlight.js";
-import javascript from "highlight.js/lib/languages/javascript";
-import "highlight.js/styles/vs2015.css";
-import styles from "./index.module.scss";
-import "./canva.css";
-import Modal from "../Modal";
-import Divider from "../Divider";
-import readmeTop from "../../img/readme-top.png";
-import visibility from "../../img/visibility.svg";
-import help from "../../img/help.svg";
-import code from "../../img/code.svg";
-import save from "../../img/save.svg";
-import pdf from "../../img/pdf.svg";
-import download from "../../img/download_bk.svg";
-import { Schema, TemplateEditorCtlProp, Template } from "../../types";
+import React, { useState } from 'react';
+import hljs from 'highlight.js';
+import javascript from 'highlight.js/lib/languages/javascript';
+import 'highlight.js/styles/vs2015.css';
+import styles from './index.module.scss';
+import './canva.css';
+import Modal from '../Modal';
+import Divider from '../Divider';
+import visibility from '../../img/visibility.svg';
+import help from '../../img/help.svg';
+import code from '../../img/code.svg';
+import save from '../../img/save.svg';
+import pdf from '../../img/pdf.svg';
+import download from '../../img/download_bk.svg';
+import { Schema, TemplateEditorCtlProp, Template } from '../../types';
 import {
   fmtTemplate,
   fmtTemplateForDev,
@@ -21,10 +20,10 @@ import {
   canvaEdit,
   canvaCreate,
   designTypes,
-} from "../../utils/";
-import { CANVA_LINK } from "../../constants";
+} from '../../utils/';
+import { CANVA_LINK } from '../../constants';
 
-hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage('javascript', javascript);
 
 const getCode = (template: Template, schemas: Schema[][]) => {
   return `import labelmake from "labelmake";
@@ -35,7 +34,7 @@ const getCode = (template: Template, schemas: Schema[][]) => {
   const template = ${JSON.stringify(
     fmtTemplateForDev(template, schemas),
     null,
-    "\t"
+    '\t'
   )};
   const inputs = ${JSON.stringify(fmtTemplate(template, schemas).sampledata)};
   const pdf = await labelmake({ template, inputs });
@@ -94,7 +93,7 @@ const EditorCtl = ({
         actionLabel="Copy"
         onAction={() => {
           copyTextToClipboard(getCode(template, schemas));
-          alert("Copied Clipboard!");
+          alert('Copied Clipboard!');
         }}
         onCancel={() => setIsOpenCodeModal(false)}
         onClose={() => setIsOpenCodeModal(false)}
@@ -105,7 +104,7 @@ const EditorCtl = ({
               className="javascript hljs"
               style={{ tabSize: 2 }}
               dangerouslySetInnerHTML={{
-                __html: hljs.highlight("javascript", getCode(template, schemas))
+                __html: hljs.highlight('javascript', getCode(template, schemas))
                   .value,
               }}
             ></code>
@@ -120,19 +119,18 @@ const EditorCtl = ({
         onCancel={() => setIsOpenHelpModal(false)}
         cancelLabel="Close"
       >
-        <div className="content" style={{ textAlign: "left" }}>
-          <img src={readmeTop} alt="Concept" />
+        <div className="content" style={{ textAlign: 'left' }}>
           <p>
             <u>
-              Labelmake template is composed by setting{" "}
+              Labelmake template is composed by setting{' '}
               <strong>Base PDF</strong> and <strong>fileds</strong>.
             </u>
             <br />・
             <u>
-              <strong>Base PDF</strong> can design on{" "}
+              <strong>Base PDF</strong> can design on{' '}
               <a target="_blank" rel="noreferrer" href={CANVA_LINK}>
                 canva
-              </a>{" "}
+              </a>{' '}
               or you can use your pdf file.
             </u>
             <br />・
@@ -146,12 +144,12 @@ const EditorCtl = ({
           <Divider />
           <div>
             <p style={{ margin: 0 }}>
-              <strong>Keyboard shortcuts</strong>{" "}
+              <strong>Keyboard shortcuts</strong>{' '}
               <span className="is-size-7">
                 For the currently selected entry (light blue frame dot)
               </span>
             </p>
-            <ul style={{ margin: "0 0 1rem 2rem" }}>
+            <ul style={{ margin: '0 0 1rem 2rem' }}>
               <li>
                 <span>
                   Move 1mm(Hold down the <kbd>shift</kbd> to move 0.1 mm)
@@ -184,38 +182,38 @@ const EditorCtl = ({
       </Modal>
       <div className={`container ${styles.wrapper}`}>
         <div className={`desktop-flex ${styles.desktopFlex}`}>
-          <div style={{ display: "flex", marginTop: "0.75rem" }}>
+          <div style={{ display: 'flex', marginTop: '0.75rem' }}>
             <button
-              style={{ margin: "0 0.5rem" }}
-              className={`button is-small ${processing ? "is-loading" : ""}`}
+              style={{ margin: '0 0.5rem' }}
+              className={`button is-small ${processing ? 'is-loading' : ''}`}
               disabled={processing}
               onClick={() => setIsOpenHelpModal(true)}
             >
-              <img src={help} alt={"Help"} />
+              <img src={help} alt={'Help'} />
               How to Use
             </button>
             <button
-              className={`button is-small ${processing ? "is-loading" : ""}`}
+              className={`button is-small ${processing ? 'is-loading' : ''}`}
               disabled={processing}
               onClick={previewPdf}
             >
-              <img src={visibility} alt={"Preview"} />
+              <img src={visibility} alt={'Preview'} />
               Preview
             </button>
             <div
               className={`dropdown is-right ${
-                processing ? "" : "is-hoverable"
+                processing ? '' : 'is-hoverable'
               }`}
             >
               <div className="dropdown-trigger">
                 <button
                   id="pdfedit-button-introduction"
-                  style={{ marginLeft: "0.5rem" }}
+                  style={{ marginLeft: '0.5rem' }}
                   className="button is-small"
                   aria-haspopup="true"
                   aria-controls="dropdown-menu"
                 >
-                  <img src={pdf} alt={"背景PDF編集"} />
+                  <img src={pdf} alt={'背景PDF編集'} />
                   Base PDF
                 </button>
               </div>
@@ -227,12 +225,12 @@ const EditorCtl = ({
               >
                 <div className="dropdown-content">
                   <div
-                    style={{ borderBottom: "1px solid #eee", paddingLeft: 0 }}
+                    style={{ borderBottom: '1px solid #eee', paddingLeft: 0 }}
                     className="dropdown-item is-size-7"
                     onClick={templateCanvaId ? onCanvaEdit : onCanvaCreate}
                   >
                     <span
-                      style={{ border: "none", background: "none" }}
+                      style={{ border: 'none', background: 'none' }}
                       className="canva-btn canva-btn-theme-light canva-btn-size-s"
                     >
                       <span className="canva-btn-i"></span>
@@ -251,14 +249,14 @@ const EditorCtl = ({
                         }
                       }}
                       onClick={(e) => {
-                        e.currentTarget.value = "";
+                        e.currentTarget.value = '';
                       }}
                     />
                   </div>
                   <hr className="dropdown-divider" />
                   <div
                     className="dropdown-item is-size-7"
-                    onClick={() => downloadBasePdf("basePdf")}
+                    onClick={() => downloadBasePdf('basePdf')}
                   >
                     Download Base PDF
                   </div>
@@ -266,14 +264,14 @@ const EditorCtl = ({
               </div>
             </div>
           </div>
-          <div style={{ display: "flex", marginTop: "0.75rem" }}>
+          <div style={{ display: 'flex', marginTop: '0.75rem' }}>
             <button
               className={`button is-small is-light is-success ${
-                processing ? "is-loading" : ""
+                processing ? 'is-loading' : ''
               }`}
               disabled={processing}
             >
-              <img src={download} alt={"Load Json Template"} />
+              <img src={download} alt={'Load Json Template'} />
               Load
               <input
                 className="file-input is-small"
@@ -285,30 +283,30 @@ const EditorCtl = ({
                   }
                 }}
                 onClick={(e) => {
-                  e.currentTarget.value = "";
+                  e.currentTarget.value = '';
                 }}
               />
             </button>
             <button
               className={`button is-light is-small is-info ${
-                processing ? "is-loading" : ""
+                processing ? 'is-loading' : ''
               }`}
               disabled={processing}
               onClick={() =>
                 saveTemplate({ isSaveAs: false, template, schemas })
               }
             >
-              <img src={save} alt={"Get Template as Json"} />
+              <img src={save} alt={'Get Template as Json'} />
               Save
             </button>
             <button
               className={`button is-light is-small is-warning ${
-                processing ? "is-loading" : ""
+                processing ? 'is-loading' : ''
               }`}
               disabled={processing}
               onClick={() => setIsOpenCodeModal(true)}
             >
-              <img src={code} alt={"Show Executable Code"} />
+              <img src={code} alt={'Show Executable Code'} />
               Get Code
             </button>
           </div>
