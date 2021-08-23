@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
-// import styles from './index.module.scss';
+import * as styles from './index.module.scss';
 import { GuidesInterface, Schema, Template, PageSize } from '../../types';
 import { round, flatten } from '../../utils';
 import { barcodeList, zoom, barcodeExampleImageObj } from '../../constants';
@@ -339,11 +339,7 @@ export default class Preview extends Component<Props, State> {
                         height: paperHeight,
                       }}
                     >
-                      <img
-                        // className={styles.paperImage}
-                        src={bgi}
-                        alt="background"
-                      />
+                      <img className={styles.paperImage} src={bgi} alt="background" />
                     </div>
                     {schemas[index].map((s) => (
                       <div
@@ -406,15 +402,13 @@ export default class Preview extends Component<Props, State> {
                           />
                         )}
                         {barcodeList.includes(s.type) && (
-                          // <div className={styles.barcodeWrap}>
-                          <div>
+                          <div className={styles.barcodeWrap}>
                             {s.data ? (
                               <>
-                                {/* <p className={styles.example}>Example</p> */}
-                                <p>Example</p>
+                                <p className={styles.example}>Example</p>
                                 <img
                                   alt="barcode"
-                                  // className={styles.barcodeImg}
+                                  className={styles.barcodeImg}
                                   src={barcodeExampleImageObj[s.type]}
                                 />
                               </>

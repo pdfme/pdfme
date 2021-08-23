@@ -14,10 +14,7 @@ export const set = _set;
 export const debounce = _debounce;
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
-export const readFiles = (
-  files: FileList | null,
-  type: 'text' | 'dataURL' | 'arrayBuffer'
-) => {
+export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
     fileReader.addEventListener('load', (e) => {
@@ -31,10 +28,7 @@ export const readFiles = (
   });
 };
 
-export const readFile = (
-  file: File | null,
-  type: 'text' | 'dataURL' | 'arrayBuffer'
-) => {
+export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
     fileReader.addEventListener('load', (e) => {
@@ -67,11 +61,7 @@ export const round = (number: number, precision: number) => {
       precision = -precision;
     }
     const numArray = ('' + number).split('e');
-    return +(
-      numArray[0] +
-      'e' +
-      (numArray[1] ? +numArray[1] + precision : precision)
-    );
+    return +(numArray[0] + 'e' + (numArray[1] ? +numArray[1] + precision : precision));
   };
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
@@ -94,9 +84,7 @@ export const isIos = () => {
 
 export const fileSave = (data: Blob | string, name: string) => {
   isIos()
-    ? window.open(
-        URL.createObjectURL(typeof data === 'string' ? b64toBlob(data) : data)
-      )
+    ? window.open(URL.createObjectURL(typeof data === 'string' ? b64toBlob(data) : data))
     : saveAs(data, name);
 };
 
@@ -132,11 +120,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
   );
 };
 
-const pdf2Images = async (
-  pdfBlob: Blob,
-  width: number,
-  imagetype: 'png' | 'jpeg'
-) => {
+const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg') => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
   return Promise.all(
@@ -147,8 +131,7 @@ const pdf2Images = async (
             const canvas = document.createElement('canvas');
             canvas.width = width * 2;
             const canvasContext = canvas.getContext('2d')!;
-            const scaleRequired =
-              canvas.width / page.getViewport({ scale: 1 }).width;
+            const scaleRequired = canvas.width / page.getViewport({ scale: 1 }).width;
             const viewport = page.getViewport({ scale: scaleRequired });
             canvas.height = viewport.height;
             URL.revokeObjectURL(url);
@@ -162,13 +145,9 @@ const pdf2Images = async (
   );
 };
 
-export const pdf2Pngs = async (pdfBlob: Blob, width: number) =>
-  pdf2Images(pdfBlob, width, 'png');
+export const pdf2Pngs = async (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
 
-export const fmtTemplate = (
-  template: Template,
-  schemas: Schema[][]
-): Template => {
+export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
@@ -182,10 +161,7 @@ export const fmtTemplate = (
         return acc;
       }, {} as { [key: string]: string }),
     ],
-    columns: _schemas.reduce(
-      (acc, cur) => acc.concat(cur.map((s) => s.key)),
-      [] as string[]
-    ),
+    columns: _schemas.reduce((acc, cur) => acc.concat(cur.map((s) => s.key)), [] as string[]),
     schemas: _schemas.map((_schema) =>
       _schema.reduce((acc, cur) => {
         const k = cur.key;
@@ -266,7 +242,7 @@ const tempalteDataTest = (template: Template) => {
           typeof value.position.y === 'number' &&
           typeof value.width === 'number' &&
           typeof value.height === 'number' &&
-          ['left', 'right', 'center'].includes(value.alignment) &&
+          ['left', 'right', 'center'].includes(value.alignment || '') &&
           typeof value.fontSize === 'number' &&
           typeof value.characterSpacing === 'number' &&
           typeof value.lineHeight === 'number')
@@ -301,10 +277,7 @@ export const fmtTemplateFromJson = (file: File) => {
         .map((schema) => Object.keys(schema).length)
         .reduce((acc, cur) => acc + cur, 0);
       // columns
-      if (
-        !templateFromJson.columns ||
-        flatSchemaLength !== templateFromJson.columns.length
-      ) {
+      if (!templateFromJson.columns || flatSchemaLength !== templateFromJson.columns.length) {
         templateFromJson.columns = flatten(
           templateFromJson.schemas.map((schema) => Object.keys(schema))
         );
@@ -331,10 +304,7 @@ export const fmtTemplateFromJson = (file: File) => {
         ];
       }
       // basePdf
-      if (
-        !templateFromJson.basePdf ||
-        typeof templateFromJson.basePdf !== 'string'
-      ) {
+      if (!templateFromJson.basePdf || typeof templateFromJson.basePdf !== 'string') {
         templateFromJson.basePdf = blankPdf;
       }
       if (tempalteDataTest(templateFromJson)) {
@@ -345,9 +315,7 @@ export const fmtTemplateFromJson = (file: File) => {
         );
       }
     } catch (e) {
-      return Promise.reject(
-        "Invalid template data: This Template can't load. invalid JSON."
-      );
+      return Promise.reject("Invalid template data: This Template can't load. invalid JSON.");
     }
   });
 };
@@ -630,8 +598,7 @@ const _getCanvaApi = async (): Promise<any> => {
   });
 };
 
-const memoize = <T extends (...args: any) => any>(func: T): T =>
-  memoizeOne(func);
+const memoize = <T extends (...args: any) => any>(func: T): T => memoizeOne(func);
 
 const getCanvaApi = memoize(_getCanvaApi);
 
@@ -657,8 +624,7 @@ const dateFmt = (date: Date, format: string): string => {
   return dateFormat.format(date, format);
 };
 
-const getTemplateName = () =>
-  'Template@' + dateFmt(new Date(), 'yyyy-MM-dd-hh:mm');
+const getTemplateName = () => 'Template@' + dateFmt(new Date(), 'yyyy-MM-dd-hh:mm');
 
 export const canvaCreate = (
   designType: string,

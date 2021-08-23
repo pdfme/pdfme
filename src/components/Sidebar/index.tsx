@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
-// import styles from './index.module.scss';
+import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { Schema, Lang } from '../../types';
 import { readFiles } from '../../utils';
 import { i18n } from '../../i18n';
 import { inputTypeList } from '../../constants';
 import Divider from '../Divider';
-const backIcon = require('../../img/back.svg') as string;
-const forwardIcon = require('../../img/forward.svg') as string;
-const infoIcon = require('../../img/info.svg') as string;
-const createIcon = require('../../img/create.svg') as string;
-const dragIcon = require('../../img/drag.svg') as string;
-const warningIcon = require('../../img/warning.svg') as string;
-const deleteIcon = require('../../img/delete.svg') as string;
+import backIcon from '../../img/back.svg';
+import forwardIcon from '../../img/forward.svg';
+import infoIcon from '../../img/info.svg';
+import createIcon from '../../img/create.svg';
+import dragIcon from '../../img/drag.svg';
+import warningIcon from '../../img/warning.svg';
+import deleteIcon from '../../img/delete.svg';
 
 const isTouchable = () => true;
 
@@ -68,7 +68,7 @@ const SortableItem = SortableElement(
     return (
       <div
         key={sc.id}
-        // className={styles.flx}
+        className={styles.flx}
         style={{
           border: focusElementId === sc.id ? '1px solid #d42802' : '1px solid transparent',
         }}
@@ -83,13 +83,11 @@ const SortableItem = SortableElement(
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
-          {/* <span className={`is-size-7 ${styles.keyLabel}`}> */}
-          <span className={`is-size-7`}>
+          <span className={`is-size-7 ${styles.keyLabel}`}>
             {status === '' ? (
               sc.key
             ) : (
-              // <span className={styles.warning}>
-              <span>
+              <span className={styles.warning}>
                 <img
                   alt="Warning icon"
                   src={warningIcon}
@@ -191,15 +189,14 @@ const Sidebar = ({
   return (
     <div style={{ position: 'sticky', top, zIndex: 29 }}>
       <button
-        // className={`button is-small is-light ${styles.tglBtn}`}
-        className={`button is-small is-light`}
-        style={{ right, top }}
+        className={`button is-small is-light ${styles.tglBtn}`}
+        style={{ right, top, position: 'absolute' }}
         onClick={() => setOpen(!open)}
       >
         <img src={open ? forwardIcon : backIcon} width={15} alt="Toggle icon" />
       </button>
       <div
-        // className={styles.sideBar}
+        className={styles.sideBar}
         style={{ width: sidebarWidth, display: open ? 'block' : 'none', top }}
       >
         <aside style={{ display: activeElement ? 'none' : 'block' }}>
@@ -216,7 +213,7 @@ const Sidebar = ({
             <SortableList
               lang={lang}
               focusElementId={focusElementId}
-              // helperClass={styles.sortableHelper}
+              helperClass={styles.sortableHelper}
               useDragHandle={true}
               axis="y"
               lockAxis="y"
@@ -237,8 +234,7 @@ const Sidebar = ({
           <Divider />
         </aside>
         <aside style={{ display: activeElement ? 'block' : 'none' }}>
-          {/* <div className={styles.flx}> */}
-          <div>
+          <div className={styles.flx}>
             <button
               className="button is-small is-light"
               style={{ padding: 5, margin: 5 }}
@@ -315,10 +311,8 @@ const Sidebar = ({
               <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'posAndSize')}
               </p>
-              {/* <div className={styles.flx}> */}
-              <div>
-                {/* <div className={styles.inputSet}> */}
-                <div>
+              <div className={styles.flx}>
+                <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>X:</label>
                   <input
                     className="input is-small"
@@ -337,8 +331,7 @@ const Sidebar = ({
                   />
                   <span className="is-size-7">mm</span>
                 </div>
-                {/* <div className={styles.inputSet}> */}
-                <div>
+                <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>Y:</label>
                   <input
                     className="input is-small"
@@ -358,10 +351,8 @@ const Sidebar = ({
                   <span className="is-size-7">mm</span>
                 </div>
               </div>
-              {/* <div className={styles.flx} style={{ marginTop: '0.25rem' }}> */}
-              <div style={{ marginTop: '0.25rem' }}>
-                {/* <div className={styles.inputSet}> */}
-                <div>
+              <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
+                <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>W:</label>
                   <input
                     className="input is-small"
@@ -380,8 +371,7 @@ const Sidebar = ({
                   />
                   <span className="is-size-7">mm</span>
                 </div>
-                {/* <div className={styles.inputSet}> */}
-                <div>
+                <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>H:</label>
                   <input
                     className="input is-small"
@@ -563,7 +553,7 @@ const Sidebar = ({
                   {activeSchema.data ? (
                     <div style={{ margin: '0 auto' }}>
                       <button
-                        // className={`delete ${styles.dltBtn}`}
+                        className={`delete ${styles.dltBtn}`}
                         aria-label="close"
                         onClick={() =>
                           changeSchema([
@@ -625,8 +615,7 @@ const Sidebar = ({
           </div>
         </aside>
 
-        {/* <div className={styles.addBtn}> */}
-        <div>
+        <div className={styles.addBtn}>
           <button className="button is-small is-danger" onClick={addSchema}>
             <strong>{i18n(lang, 'addNewField')}</strong>
           </button>

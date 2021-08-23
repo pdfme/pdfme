@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "types": ["node"],
     "typeRoots": ["src/types/", "node_modules/@types"],
     "sourceMap": true
   },

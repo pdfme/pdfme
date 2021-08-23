@@ -2,13 +2,9 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const postcssPrefixer = require('postcss-prefixer');
 const pkg = require('./package.json');
 const isProduction = process.env.NODE_ENV === 'production';
 const FILENAME = pkg.name + (isProduction ? '.min' : '');
-
-const isDevServer = process.env.DEV_SERVER === 'true';
 
 const BANNER = [
     'labelmake editor',
@@ -19,16 +15,13 @@ const BANNER = [
 
 const config = {
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.scss', '.css'], // '.js'を追加する。
+        extensions: ['.ts', '.tsx', '.js', '.scss', '.css', '.png', '.svg'],
     },
     plugins: [
         new StyleLintPlugin(),
         new webpack.BannerPlugin({
             banner: BANNER,
             entryOnly: true
-        }),
-        new MiniCssExtractPlugin({
-            filename: `${FILENAME}.css`
         }),
         new HtmlWebpackPlugin({
             template: './public/index.html'
@@ -42,8 +35,8 @@ const config = {
     entry: './src/index.tsx',
     output: {
         library: 'LabelmakeEditor',
-        libraryTarget: 'umd',          // ライブラリターゲットの設定
-        libraryExport: 'default',     // エントリーポイントのdefaultexportをネームスペースに設定するオプション
+        libraryTarget: 'umd',
+        libraryExport: 'default',
         path: path.join(__dirname, 'dist'),
         filename: FILENAME + '.js'
     },
@@ -55,44 +48,38 @@ const config = {
             },
             {
                 test: /\.(png|jpg|svg|gif)$/i,
-                use: [
-                    {
-                        loader: 'url-loader',
-                    },
-                ],
+                use: ['url-loader'],
             },
             {
-                test: /\.s[ac]ss$/i,
+                test: /\.module\.scss$/,
                 use: [
-                    'style-loader',
+                    {
+                        loader: 'style-loader',
+                    },
                     {
                         loader: 'css-loader',
                         options: {
-                            sourceMap: true,
-                            esModule: true,
-                            // modules: {
-                            //     namedExport: true,
-                            // },
+                            modules: {
+                                namedExport: true,
+                            },
                         }
                     },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            sourceMap: true,
-                        }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true
-                        }
-                    }
+                    'sass-loader',
+                ],
+            },
+            {
+                test: /\.scss$/,
+                exclude: /\.module\.scss$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader'
                 ]
             },
             {
-                test: /\.(gif|png|jpe?g)$/,
-                use: 'url-loader'
-            }
+                test: /\.css$/i,
+                use: ["style-loader", "css-loader"],
+            },
         ]
     },
 };

@@ -1,7 +1,6 @@
 import Editor from './components/Editor';
 import './index.scss';
 import EditorCtl from './components/EditorCtl';
-import Divider from './components/Divider';
 import ReactDOM from 'react-dom';
 import { Template } from './types';
 import { blankPdf } from './constants';

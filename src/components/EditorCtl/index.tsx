@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
-// import 'highlight.js/styles/vs2015.css';
-// import styles from './index.module.scss';
-// import './canva.css';
+import 'highlight.js/styles/vs2015.css';
 import Modal from '../Modal';
 import Divider from '../Divider';
-const visibility = require('../../img/visibility.svg') as string;
-const help = require('../../img/help.svg') as string;
-const code = require('../../img/code.svg') as string;
-const save = require('../../img/save.svg') as string;
-const pdf = require('../../img/pdf.svg') as string;
-const download = require('../../img/download_bk.svg') as string;
+import './canva.css';
+import * as styles from './index.module.scss';
+import visibility from '../../img/visibility.svg';
+import help from '../../img/help.svg';
+import code from '../../img/code.svg';
+import save from '../../img/save.svg';
+import pdf from '../../img/pdf.svg';
+import download from '../../img/download_bk.svg';
 import { Schema, TemplateEditorCtlProp, Template } from '../../types';
 import {
   fmtTemplate,
@@ -22,7 +22,7 @@ import {
   designTypes,
 } from '../../utils/';
 import { CANVA_LINK } from '../../constants';
-
+console.log(styles);
 hljs.registerLanguage('javascript', javascript);
 
 const getCode = (template: Template, schemas: Schema[][]) => {
@@ -91,8 +91,7 @@ const EditorCtl = ({
         onClose={() => setIsOpenCodeModal(false)}
       >
         <div>
-          {/* <pre className={styles.codeWrapper}> */}
-          <pre>
+          <pre className={styles.codeWrapper}>
             <code
               className="javascript hljs"
               style={{ tabSize: 2 }}
@@ -168,10 +167,8 @@ const EditorCtl = ({
         </div>
         <Divider />
       </Modal>
-      {/* <div className={`container ${styles.wrapper}`}> */}
-      <div className={`container`}>
-        {/* <div className={`desktop-flex ${styles.desktopFlex}`}> */}
-        <div className={`desktop-flex`}>
+      <div className={`container ${styles.wrapper}`}>
+        <div className={`desktop-flex ${styles.desktopFlex}`}>
           <div style={{ display: 'flex', marginTop: '0.75rem' }}>
             <button
               style={{ margin: '0 0.5rem' }}
@@ -199,7 +196,7 @@ const EditorCtl = ({
                   aria-haspopup="true"
                   aria-controls="dropdown-menu"
                 >
-                  <img src={pdf} alt={'背景PDF編集'} />
+                  <img src={pdf} alt={'edit background PDF'} />
                   Base PDF
                 </button>
               </div>

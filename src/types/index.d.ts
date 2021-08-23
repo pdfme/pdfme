@@ -1,25 +1,4 @@
-declare module '*.css';
-declare module '*.scss';
-
-declare module '*.png' {
-  const value: any;
-  export = value;
-}
-
-declare module '*.svg' {
-  const content: any;
-  export default content;
-}
-declare module '*.module.css' {
-  const content: { [className: string]: string };
-  export default content;
-}
-
-declare module '*.module.scss' {
-  const content: { [className: string]: string };
-  export default content;
-}
-
+import type { TemplateSchema as _TemplateSchema } from 'labelmake/dist/types/type';
 declare global {
   interface Window {
     Canva: any;
@@ -33,37 +12,9 @@ export interface PageSize {
   width: number;
 }
 
-type TemplateType =
-  | 'text'
-  | 'image'
-  | 'qrcode'
-  | 'japanpost'
-  | 'ean13'
-  | 'ean8'
-  | 'code39'
-  | 'code128'
-  | 'nw7'
-  | 'itf14'
-  | 'upca'
-  | 'upce';
-
 type Alignment = 'left' | 'right' | 'center';
 
-// TODO labelmakeのtypeを使うようにするべき
-export interface TemplateSchema {
-  type: TemplateType;
-  position: { x: number; y: number };
-  width: number;
-  height: number;
-  alignment: Alignment;
-  fontSize: number;
-  characterSpacing: number;
-  lineHeight: number;
-  rotate?: number;
-  fontName?: string;
-  fontColor?: string;
-  backgroundColor?: string;
-}
+export type TemplateSchema = _TemplateSchema;
 
 export interface Template {
   canvaId?: string;

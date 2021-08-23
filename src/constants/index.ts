@@ -1,26 +1,25 @@
-// import ean8 from '../img/barcodeExamples/ean8.png';
-// import ean13 from '../img/barcodeExamples/ean13.png';
-// import code39 from '../img/barcodeExamples/code39.png';
-// import code128 from '../img/barcodeExamples/code128.png';
-// import nw7 from '../img/barcodeExamples/nw7.png';
-// import itf14 from '../img/barcodeExamples/itf14.png';
-// import japanpost from '../img/barcodeExamples/japanpost.png';
-// import qrcode from '../img/barcodeExamples/qrcode.png';
-// import upca from '../img/barcodeExamples/upca.png';
-// import upce from '../img/barcodeExamples/upce.png';
+import ean8 from '../img/barcodeExamples/ean8.png';
+import ean13 from '../img/barcodeExamples/ean13.png';
+import code39 from '../img/barcodeExamples/code39.png';
+import code128 from '../img/barcodeExamples/code128.png';
+import nw7 from '../img/barcodeExamples/nw7.png';
+import itf14 from '../img/barcodeExamples/itf14.png';
+import japanpost from '../img/barcodeExamples/japanpost.png';
+import qrcode from '../img/barcodeExamples/qrcode.png';
+import upca from '../img/barcodeExamples/upca.png';
+import upce from '../img/barcodeExamples/upce.png';
 
-// TODO Fix
 export const barcodeExampleImageObj: { [key: string]: string } = {
-  qrcode: "qrcode",
-  japanpost: "japanpost",
-  ean13: "ean13",
-  ean8: "ean8",
-  code39: "code39",
-  code128: "code128",
-  nw7: "nw7",
-  itf14: "itf14",
-  upca: "upca",
-  upce: "upce",
+  qrcode,
+  japanpost,
+  ean13,
+  ean8,
+  code39,
+  code128,
+  nw7,
+  itf14,
+  upca,
+  upce,
 };
 export const zoom = 3.7795275591;
 export const barcodeList = [
@@ -36,8 +35,7 @@ export const barcodeList = [
   'upce',
 ];
 export const inputTypeList = ['text', 'image'].concat(barcodeList);
-export const CANVA_LINK =
-  'https://www.canva.com/join/strategies-splashing-grain';
+export const CANVA_LINK = 'https://www.canva.com/join/strategies-splashing-grain';
 // TODO CANVA_API is not working in production
 export const CANVA_API = 'IDGL5mzAJ_VVoX7g3myMnald';
 export const blankPdf =

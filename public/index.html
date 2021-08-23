@@ -47,7 +47,7 @@
       const getForDevTemplate = () => new Promise((r) => r(devTemplate));
       const domContainer = document.getElementById('app');
       window.onload = function () {
-        console.log(LabelmakeEditor.init(domContainer, getForDevTemplate));
+        LabelmakeEditor.init(domContainer, getForDevTemplate);
       };
     </script>
   </body>
