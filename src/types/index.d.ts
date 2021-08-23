@@ -1,3 +1,25 @@
+declare module '*.css';
+declare module '*.scss';
+
+declare module '*.png' {
+  const value: any;
+  export = value;
+}
+
+declare module '*.svg' {
+  const content: any;
+  export default content;
+}
+declare module '*.module.css' {
+  const content: { [className: string]: string };
+  export default content;
+}
+
+declare module '*.module.scss' {
+  const content: { [className: string]: string };
+  export default content;
+}
+
 declare global {
   interface Window {
     Canva: any;

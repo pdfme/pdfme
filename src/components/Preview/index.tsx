@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
-import styles from './index.module.scss';
+// import styles from './index.module.scss';
 import { GuidesInterface, Schema, Template, PageSize } from '../../types';
 import { round, flatten } from '../../utils';
 import { barcodeList, zoom, barcodeExampleImageObj } from '../../constants';
@@ -28,9 +28,7 @@ interface Props {
   onMouseLeave: () => void;
   onSelectSchemas: (targets: HTMLElement[]) => void;
   focusElementId: string;
-  changeSchema: (
-    obj: { key: string; value: string; schemaId: string }[]
-  ) => void;
+  changeSchema: (obj: { key: string; value: string; schemaId: string }[]) => void;
 }
 
 interface State {
@@ -92,10 +90,8 @@ export default class Preview extends Component<Props, State> {
       });
       const { pageCursor } = this.props;
       this.moveable && this.moveable.updateRect();
-      this.verticalGuides[pageCursor] &&
-        this.verticalGuides[pageCursor].resize();
-      this.horizontalGuides[pageCursor] &&
-        this.horizontalGuides[pageCursor].resize();
+      this.verticalGuides[pageCursor] && this.verticalGuides[pageCursor].resize();
+      this.horizontalGuides[pageCursor] && this.horizontalGuides[pageCursor].resize();
     };
   }
 
@@ -106,10 +102,8 @@ export default class Preview extends Component<Props, State> {
 
   onResize = ({ target, width, height, direction }: OnResize) => {
     const s = target!.style;
-    const newLeft =
-      Number(fmt4Num(s.left)) + (Number(fmt4Num(s.width)) - width);
-    const newTop =
-      Number(fmt4Num(s.top)) + (Number(fmt4Num(s.height)) - height);
+    const newLeft = Number(fmt4Num(s.left)) + (Number(fmt4Num(s.width)) - width);
+    const newTop = Number(fmt4Num(s.top)) + (Number(fmt4Num(s.height)) - height);
     const obj: any = { width: `${width}px`, height: `${height}px` };
     const d = direction.toString();
     if (d === '-1,-1' || d === '-1,0' || d === '0,-1') {
@@ -272,14 +266,8 @@ export default class Preview extends Component<Props, State> {
                         }}
                         snappable
                         snapCenter
-                        horizontalGuidelines={getGuideLines(
-                          this.horizontalGuides,
-                          index
-                        )}
-                        verticalGuidelines={getGuideLines(
-                          this.verticalGuides,
-                          index
-                        )}
+                        horizontalGuidelines={getGuideLines(this.horizontalGuides, index)}
+                        verticalGuidelines={getGuideLines(this.verticalGuides, index)}
                         draggable
                         resizable
                         keepRatio={isPressShiftKey}
@@ -352,7 +340,7 @@ export default class Preview extends Component<Props, State> {
                       }}
                     >
                       <img
-                        className={styles.paperImage}
+                        // className={styles.paperImage}
                         src={bgi}
                         alt="background"
                       />
@@ -360,9 +348,7 @@ export default class Preview extends Component<Props, State> {
                     {schemas[index].map((s) => (
                       <div
                         data-tooltip={
-                          s.key.replace(/^{\d+}/, '')
-                            ? s.key.replace(/^{\d+}/, '')
-                            : null
+                          s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : null
                         }
                         className={`schema has-tooltip-arrow ${SELECTABLE}`}
                         onMouseEnter={() => onMouseEnter(s.id)}
@@ -376,10 +362,7 @@ export default class Preview extends Component<Props, State> {
                           width: +s.width * zoom,
                           top: +s.position.y * zoom,
                           left: +s.position.x * zoom,
-                          border:
-                            focusElementId === s.id
-                              ? '1px solid #d42802'
-                              : '1px dashed #4af',
+                          border: focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
                           backgroundColor:
                             s.type === 'text' && s.backgroundColor
                               ? s.backgroundColor
@@ -403,10 +386,7 @@ export default class Preview extends Component<Props, State> {
                               <span
                                 key={i}
                                 style={{
-                                  letterSpacing:
-                                    String(s.data).length === i + 1
-                                      ? 0
-                                      : 'inherit',
+                                  letterSpacing: String(s.data).length === i + 1 ? 0 : 'inherit',
                                 }}
                               >
                                 {l}
@@ -426,13 +406,15 @@ export default class Preview extends Component<Props, State> {
                           />
                         )}
                         {barcodeList.includes(s.type) && (
-                          <div className={styles.barcodeWrap}>
+                          // <div className={styles.barcodeWrap}>
+                          <div>
                             {s.data ? (
                               <>
-                                <p className={styles.example}>Example</p>
+                                {/* <p className={styles.example}>Example</p> */}
+                                <p>Example</p>
                                 <img
                                   alt="barcode"
-                                  className={styles.barcodeImg}
+                                  // className={styles.barcodeImg}
                                   src={barcodeExampleImageObj[s.type]}
                                 />
                               </>

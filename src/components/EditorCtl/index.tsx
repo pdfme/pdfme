@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
-import 'highlight.js/styles/vs2015.css';
-import styles from './index.module.scss';
-import './canva.css';
+// import 'highlight.js/styles/vs2015.css';
+// import styles from './index.module.scss';
+// import './canva.css';
 import Modal from '../Modal';
 import Divider from '../Divider';
-import visibility from '../../img/visibility.svg';
-import help from '../../img/help.svg';
-import code from '../../img/code.svg';
-import save from '../../img/save.svg';
-import pdf from '../../img/pdf.svg';
-import download from '../../img/download_bk.svg';
+const visibility = require('../../img/visibility.svg') as string;
+const help = require('../../img/help.svg') as string;
+const code = require('../../img/code.svg') as string;
+const save = require('../../img/save.svg') as string;
+const pdf = require('../../img/pdf.svg') as string;
+const download = require('../../img/download_bk.svg') as string;
 import { Schema, TemplateEditorCtlProp, Template } from '../../types';
 import {
   fmtTemplate,
@@ -31,11 +31,7 @@ const getCode = (template: Template, schemas: Schema[][]) => {
   // You can also use Uint8Array or ArrayBuffer as a basePdf
   // const basePdf = fs.readFileSync("path/to/your.pdf")
   // const basePdf = await fetch("path/to/your.pdf").then((res) => res.arrayBuffer());
-  const template = ${JSON.stringify(
-    fmtTemplateForDev(template, schemas),
-    null,
-    '\t'
-  )};
+  const template = ${JSON.stringify(fmtTemplateForDev(template, schemas), null, '\t')};
   const inputs = ${JSON.stringify(fmtTemplate(template, schemas).sampledata)};
   const pdf = await labelmake({ template, inputs });
   // Node
@@ -62,9 +58,7 @@ const EditorCtl = ({
 
   const templateCanvaId = template.canvaId;
 
-  const onCanvaCreate = async (
-    event: React.MouseEvent<HTMLSpanElement, MouseEvent>
-  ) => {
+  const onCanvaCreate = async (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     event.stopPropagation();
     canvaCreate(designTypes[0], (file, id) => {
       changeBasePdf(file);
@@ -72,9 +66,7 @@ const EditorCtl = ({
     });
   };
 
-  const onCanvaEdit = async (
-    event: React.MouseEvent<HTMLSpanElement, MouseEvent>
-  ) => {
+  const onCanvaEdit = async (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     event.stopPropagation();
     if (templateCanvaId) {
       canvaEdit(templateCanvaId, (file, id) => {
@@ -99,13 +91,13 @@ const EditorCtl = ({
         onClose={() => setIsOpenCodeModal(false)}
       >
         <div>
-          <pre className={styles.codeWrapper}>
+          {/* <pre className={styles.codeWrapper}> */}
+          <pre>
             <code
               className="javascript hljs"
               style={{ tabSize: 2 }}
               dangerouslySetInnerHTML={{
-                __html: hljs.highlight('javascript', getCode(template, schemas))
-                  .value,
+                __html: hljs.highlight('javascript', getCode(template, schemas)).value,
               }}
             ></code>
           </pre>
@@ -122,8 +114,8 @@ const EditorCtl = ({
         <div className="content" style={{ textAlign: 'left' }}>
           <p>
             <u>
-              Labelmake template is composed by setting{' '}
-              <strong>Base PDF</strong> and <strong>fileds</strong>.
+              Labelmake template is composed by setting <strong>Base PDF</strong> and{' '}
+              <strong>fileds</strong>.
             </u>
             <br />・
             <u>
@@ -135,8 +127,7 @@ const EditorCtl = ({
             </u>
             <br />・
             <u>
-              <strong>Fileds</strong> can add from sidebar, and can edit like
-              PowerPoint.
+              <strong>Fileds</strong> can add from sidebar, and can edit like PowerPoint.
             </u>
             <br />
             You can save template as json, and load json template file.
@@ -157,19 +148,16 @@ const EditorCtl = ({
                 ＝ <kbd>↑</kbd> , <kbd>→</kbd> , <kbd>↓</kbd> , <kbd>←</kbd>
               </li>
               <li>
-                <span>Copy</span> ＝ ( <kbd>ctrl</kbd>or<kbd>⌘</kbd>) +
-                <kbd>c</kbd>
+                <span>Copy</span> ＝ ( <kbd>ctrl</kbd>or<kbd>⌘</kbd>) +<kbd>c</kbd>
               </li>
               <li>
-                <span>Paste</span>＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +
-                <kbd>v</kbd>
+                <span>Paste</span>＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +<kbd>v</kbd>
               </li>
               <li>
                 <span>Delete</span>＝ <kbd>backspace</kbd> or <kbd>delete</kbd>
               </li>
               <li>
-                <span>Undo</span> ＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +
-                <kbd>z</kbd>
+                <span>Undo</span> ＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +<kbd>z</kbd>
               </li>
               <li>
                 <span>Redo</span>＝ <kbd>ctrl</kbd> +<kbd>y</kbd>
@@ -180,8 +168,10 @@ const EditorCtl = ({
         </div>
         <Divider />
       </Modal>
-      <div className={`container ${styles.wrapper}`}>
-        <div className={`desktop-flex ${styles.desktopFlex}`}>
+      {/* <div className={`container ${styles.wrapper}`}> */}
+      <div className={`container`}>
+        {/* <div className={`desktop-flex ${styles.desktopFlex}`}> */}
+        <div className={`desktop-flex`}>
           <div style={{ display: 'flex', marginTop: '0.75rem' }}>
             <button
               style={{ margin: '0 0.5rem' }}
@@ -200,11 +190,7 @@ const EditorCtl = ({
               <img src={visibility} alt={'Preview'} />
               Preview
             </button>
-            <div
-              className={`dropdown is-right ${
-                processing ? '' : 'is-hoverable'
-              }`}
-            >
+            <div className={`dropdown is-right ${processing ? '' : 'is-hoverable'}`}>
               <div className="dropdown-trigger">
                 <button
                   id="pdfedit-button-introduction"
@@ -266,9 +252,7 @@ const EditorCtl = ({
           </div>
           <div style={{ display: 'flex', marginTop: '0.75rem' }}>
             <button
-              className={`button is-small is-light is-success ${
-                processing ? 'is-loading' : ''
-              }`}
+              className={`button is-small is-light is-success ${processing ? 'is-loading' : ''}`}
               disabled={processing}
             >
               <img src={download} alt={'Load Json Template'} />
@@ -288,21 +272,15 @@ const EditorCtl = ({
               />
             </button>
             <button
-              className={`button is-light is-small is-info ${
-                processing ? 'is-loading' : ''
-              }`}
+              className={`button is-light is-small is-info ${processing ? 'is-loading' : ''}`}
               disabled={processing}
-              onClick={() =>
-                saveTemplate({ isSaveAs: false, template, schemas })
-              }
+              onClick={() => saveTemplate({ isSaveAs: false, template, schemas })}
             >
               <img src={save} alt={'Get Template as Json'} />
               Save
             </button>
             <button
-              className={`button is-light is-small is-warning ${
-                processing ? 'is-loading' : ''
-              }`}
+              className={`button is-light is-small is-warning ${processing ? 'is-loading' : ''}`}
               disabled={processing}
               onClick={() => setIsOpenCodeModal(true)}
             >

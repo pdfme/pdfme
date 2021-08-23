@@ -1,22 +1,18 @@
 import React, { useState } from 'react';
-import styles from './index.module.scss';
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from 'react-sortable-hoc';
+// import styles from './index.module.scss';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { Schema, Lang } from '../../types';
 import { readFiles } from '../../utils';
 import { i18n } from '../../i18n';
 import { inputTypeList } from '../../constants';
 import Divider from '../Divider';
-import backIcon from '../../img/back.svg';
-import forwardIcon from '../../img/forward.svg';
-import infoIcon from '../../img/info.svg';
-import createIcon from '../../img/create.svg';
-import dragIcon from '../../img/drag.svg';
-import warningIcon from '../../img/warning.svg';
-import deleteIcon from '../../img/delete.svg';
+const backIcon = require('../../img/back.svg') as string;
+const forwardIcon = require('../../img/forward.svg') as string;
+const infoIcon = require('../../img/info.svg') as string;
+const createIcon = require('../../img/create.svg') as string;
+const dragIcon = require('../../img/drag.svg') as string;
+const warningIcon = require('../../img/warning.svg') as string;
+const deleteIcon = require('../../img/delete.svg') as string;
 
 const isTouchable = () => true;
 
@@ -54,9 +50,7 @@ const SortableItem = SortableElement(
     let status: '' | 'is-warning' | 'is-danger' = '';
     if (!sc.key) {
       status = 'is-warning';
-    } else if (
-      schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)
-    ) {
+    } else if (schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)) {
       status = 'is-danger';
     }
 
@@ -74,12 +68,9 @@ const SortableItem = SortableElement(
     return (
       <div
         key={sc.id}
-        className={styles.flx}
+        // className={styles.flx}
         style={{
-          border:
-            focusElementId === sc.id
-              ? '1px solid #d42802'
-              : '1px solid transparent',
+          border: focusElementId === sc.id ? '1px solid #d42802' : '1px solid transparent',
         }}
         onMouseEnter={() => onMouseEnter(sc.id)}
         onMouseLeave={() => onMouseLeave()}
@@ -92,11 +83,13 @@ const SortableItem = SortableElement(
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
-          <span className={`is-size-7 ${styles.keyLabel}`}>
+          {/* <span className={`is-size-7 ${styles.keyLabel}`}> */}
+          <span className={`is-size-7`}>
             {status === '' ? (
               sc.key
             ) : (
-              <span className={styles.warning}>
+              // <span className={styles.warning}>
+              <span>
                 <img
                   alt="Warning icon"
                   src={warningIcon}
@@ -182,21 +175,13 @@ const Sidebar = ({
   activeSchema: Schema;
   schemas: Schema[];
   focusElementId: string;
-  onSortEnd: ({
-    oldIndex,
-    newIndex,
-  }: {
-    oldIndex: number;
-    newIndex: number;
-  }) => void;
+  onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   removeSchema: (id: string) => void;
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
-  changeSchema: (
-    obj: Array<{ key: string; value: string; schemaId: string }>
-  ) => void;
+  changeSchema: (obj: Array<{ key: string; value: string; schemaId: string }>) => void;
   addSchema: () => void;
 }) => {
   const [open, setOpen] = useState(true);
@@ -206,14 +191,15 @@ const Sidebar = ({
   return (
     <div style={{ position: 'sticky', top, zIndex: 29 }}>
       <button
-        className={`button is-small is-light ${styles.tglBtn}`}
+        // className={`button is-small is-light ${styles.tglBtn}`}
+        className={`button is-small is-light`}
         style={{ right, top }}
         onClick={() => setOpen(!open)}
       >
         <img src={open ? forwardIcon : backIcon} width={15} alt="Toggle icon" />
       </button>
       <div
-        className={styles.sideBar}
+        // className={styles.sideBar}
         style={{ width: sidebarWidth, display: open ? 'block' : 'none', top }}
       >
         <aside style={{ display: activeElement ? 'none' : 'block' }}>
@@ -230,7 +216,7 @@ const Sidebar = ({
             <SortableList
               lang={lang}
               focusElementId={focusElementId}
-              helperClass={styles.sortableHelper}
+              // helperClass={styles.sortableHelper}
               useDragHandle={true}
               axis="y"
               lockAxis="y"
@@ -242,15 +228,8 @@ const Sidebar = ({
               onMouseLeave={onMouseLeave}
             />
           ) : (
-            <p
-              style={{ alignItems: 'center', display: 'flex' }}
-              className="is-size-7"
-            >
-              <img
-                src={infoIcon}
-                style={{ marginRight: '0.5rem' }}
-                alt="Info icon"
-              />
+            <p style={{ alignItems: 'center', display: 'flex' }} className="is-size-7">
+              <img src={infoIcon} style={{ marginRight: '0.5rem' }} alt="Info icon" />
               {i18n(lang, 'plsAddNewField')}
             </p>
           )}
@@ -258,7 +237,8 @@ const Sidebar = ({
           <Divider />
         </aside>
         <aside style={{ display: activeElement ? 'block' : 'none' }}>
-          <div className={styles.flx}>
+          {/* <div className={styles.flx}> */}
+          <div>
             <button
               className="button is-small is-light"
               style={{ padding: 5, margin: 5 }}
@@ -282,10 +262,7 @@ const Sidebar = ({
           <Divider />
           <div style={{ display: 'flex' }}>
             <div style={{ marginBottom: '0.5rem' }}>
-              <label
-                className="label is-small has-text-white"
-                style={{ marginBottom: 0 }}
-              >
+              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'type')}
               </label>
               <select
@@ -310,14 +287,9 @@ const Sidebar = ({
               </select>
             </div>
             <div style={{ width: '100%' }}>
-              <label
-                className="label is-small has-text-white"
-                style={{ marginBottom: 0 }}
-              >
+              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'fieldName')}
-                <u style={{ fontSize: '0.7rem' }}>
-                  ({i18n(lang, 'requireAndUniq')})
-                </u>
+                <u style={{ fontSize: '0.7rem' }}>({i18n(lang, 'requireAndUniq')})</u>
               </label>
               <input
                 className="input is-small"
@@ -340,14 +312,13 @@ const Sidebar = ({
           <Divider />
           <div>
             <div>
-              <p
-                className="label is-small has-text-white"
-                style={{ marginBottom: 0 }}
-              >
+              <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'posAndSize')}
               </p>
-              <div className={styles.flx}>
-                <div className={styles.inputSet}>
+              {/* <div className={styles.flx}> */}
+              <div>
+                {/* <div className={styles.inputSet}> */}
+                <div>
                   <label style={{ width: 17 }}>X:</label>
                   <input
                     className="input is-small"
@@ -366,7 +337,8 @@ const Sidebar = ({
                   />
                   <span className="is-size-7">mm</span>
                 </div>
-                <div className={styles.inputSet}>
+                {/* <div className={styles.inputSet}> */}
+                <div>
                   <label style={{ width: 17 }}>Y:</label>
                   <input
                     className="input is-small"
@@ -386,8 +358,10 @@ const Sidebar = ({
                   <span className="is-size-7">mm</span>
                 </div>
               </div>
-              <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
-                <div className={styles.inputSet}>
+              {/* <div className={styles.flx} style={{ marginTop: '0.25rem' }}> */}
+              <div style={{ marginTop: '0.25rem' }}>
+                {/* <div className={styles.inputSet}> */}
+                <div>
                   <label style={{ width: 17 }}>W:</label>
                   <input
                     className="input is-small"
@@ -406,7 +380,8 @@ const Sidebar = ({
                   />
                   <span className="is-size-7">mm</span>
                 </div>
-                <div className={styles.inputSet}>
+                {/* <div className={styles.inputSet}> */}
+                <div>
                   <label style={{ width: 17 }}>H:</label>
                   <input
                     className="input is-small"
@@ -430,10 +405,7 @@ const Sidebar = ({
             <Divider />
             {activeSchema.type === 'text' && (
               <>
-                <p
-                  className="label is-small has-text-white"
-                  style={{ marginBottom: 0 }}
-                >
+                <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                   {i18n(lang, 'style')}
                 </p>
                 <div style={{ display: 'flex', marginBottom: '0.25rem' }}>
@@ -583,10 +555,7 @@ const Sidebar = ({
               </>
             )}
             <div>
-              <label
-                className="label is-small has-text-white"
-                style={{ marginBottom: 0 }}
-              >
+              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'inputExample')}
               </label>
               {activeSchema.type === 'image' ? (
@@ -594,7 +563,7 @@ const Sidebar = ({
                   {activeSchema.data ? (
                     <div style={{ margin: '0 auto' }}>
                       <button
-                        className={`delete ${styles.dltBtn}`}
+                        // className={`delete ${styles.dltBtn}`}
                         aria-label="close"
                         onClick={() =>
                           changeSchema([
@@ -606,11 +575,7 @@ const Sidebar = ({
                           ])
                         }
                       />
-                      <img
-                        style={{ maxHeight: 180 }}
-                        src={activeSchema.data}
-                        alt="Input Example"
-                      />
+                      <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
                     </div>
                   ) : (
                     <label className="file-label">
@@ -632,9 +597,7 @@ const Sidebar = ({
                         className="file-input"
                       />
                       <span className="file-cta">
-                        <span className="file-label">
-                          {i18n(lang, 'plsSelect')}
-                        </span>
+                        <span className="file-label">{i18n(lang, 'plsSelect')}</span>
                       </span>
                     </label>
                   )}
@@ -662,7 +625,8 @@ const Sidebar = ({
           </div>
         </aside>
 
-        <div className={styles.addBtn}>
+        {/* <div className={styles.addBtn}> */}
+        <div>
           <button className="button is-small is-danger" onClick={addSchema}>
             <strong>{i18n(lang, 'addNewField')}</strong>
           </button>

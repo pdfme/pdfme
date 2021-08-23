@@ -1,6 +1,6 @@
 import labelmake from 'labelmake';
 import React, { Component } from 'react';
-import styles from './index.module.scss';
+//　import styles from './index.module.scss';
 import {
   Template,
   PageSize,
@@ -484,7 +484,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
         />
         <div
           ref={(node) => (this.prevWrapRef = node)}
-          className={`${styles.wrapper}`}
+          // className={`${styles.wrapper}`}
         >
           <Sidebar
             lang={lang}

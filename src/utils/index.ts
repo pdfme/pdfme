@@ -1,6 +1,5 @@
 import { PageSize, Template, TemplateSchema, Schema } from '../types';
 import { blankPdf, CANVA_API } from '../constants';
-// import { v1 as uuidv1 } from 'uuid';
 import { nanoid } from 'nanoid';
 import * as pdfjsLib from 'pdfjs-dist/webpack';
 import _set from 'lodash.set';

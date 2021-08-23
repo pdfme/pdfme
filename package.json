@@ -1,114 +1,81 @@
 {
-  "version": "0.1.0",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
+  "name": "labelmake-editor_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test --passWithNoTests",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "develop": "DEV_SERVER=true webpack-dev-server --mode development",
+    "build:dev": "webpack --mode development",
+    "build:prod": "NODE_ENV=production webpack --mode production",
+    "build": "rm -rf dist && npm run build:dev && npm run build:prod"
   },
-  "peerDependencies": {
-    "react": ">=16"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "name": "labelmake-editor",
-  "author": "hand-dot",
-  "module": "dist/labelmake-editor.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/labelmake-editor.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/labelmake-editor.esm.js",
-      "limit": "10 KB"
-    }
+  "files": [
+    "src",
+    "dist",
+    "index.d.ts"
   ],
+  "author": "hand-dot",
+  "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@creativebulma/bulma-tooltip": "^1.2.0",
-    "@rollup/plugin-image": "^2.1.0",
-    "@rollup/plugin-url": "^6.1.0",
     "@scena/react-guides": "^0.16.0",
-    "@size-limit/preset-small-lib": "^5.0.3",
-    "@storybook/addon-essentials": "^6.3.7",
-    "@storybook/addon-info": "^5.3.21",
-    "@storybook/addon-links": "^6.3.7",
-    "@storybook/addons": "^6.3.7",
-    "@storybook/react": "^6.3.7",
-    "@svgr/rollup": "^5.5.0",
-    "@testing-library/jest-dom": "^5.11.4",
-    "@testing-library/react": "^11.1.0",
-    "@testing-library/user-event": "^12.1.10",
     "@types/debounce": "^1.2.0",
     "@types/file-saver": "^2.0.3",
     "@types/highlight.js": "^10.1.0",
-    "@types/jest": "^27.0.1",
     "@types/lodash.set": "^4.3.6",
-    "@types/node": "^16.7.1",
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
     "@types/ua-parser-js": "^0.7.36",
-    "@types/uuid": "^8.3.1",
-    "autoprefixer": "^10.3.2",
-    "babel-loader": "^8.2.2",
-    "bulma": "^0.9.3",
+    "@typescript-eslint/eslint-plugin": "^4.29.2",
+    "@typescript-eslint/parser": "^4.29.2",
     "css-loader": "^6.2.0",
-    "cssnano": "^5.0.8",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-tui": "^4.2.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-react": "^7.24.0",
+    "html-webpack-plugin": "^5.3.2",
+    "mini-css-extract-plugin": "^2.2.0",
+    "node-sass": "^6.0.1",
+    "postcss-loader": "^6.1.1",
+    "postcss-prefixer": "^2.1.3",
+    "prettier": "^2.3.2",
+    "sass-loader": "^12.1.0",
+    "style-loader": "^3.2.1",
+    "stylelint": "^13.13.1",
+    "stylelint-config-recommended": "^5.0.0",
+    "stylelint-scss": "^3.20.1",
+    "stylelint-webpack-plugin": "^3.0.1",
+    "ts-loader": "^9.2.5",
+    "typescript": "^4.3.5",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.0.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "dependencies": {
+    "@creativebulma/bulma-tooltip": "^1.2.0",
+    "bulma": "^0.9.3",
     "debounce": "^1.2.1",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.2.0",
     "hotkeys-js": "^3.8.7",
-    "husky": "^7.0.1",
     "labelmake": "^2.0.18",
     "lodash.set": "^4.3.2",
     "memoize-one": "^5.2.1",
     "nanoid": "^3.1.25",
-    "node-sass": "^4.14.1",
-    "pdfjs-dist": "2.6.347",
+    "pdfjs-dist": "^2.9.359",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-is": "^17.0.2",
     "react-moveable": "^0.29.0",
-    "react-scripts": "4.0.3",
     "react-selecto": "^1.12.0",
     "react-sortable-hoc": "^2.0.0",
-    "rollup-plugin-postcss": "^4.0.1",
-    "sass-loader": "^10.1.1",
-    "size-limit": "^5.0.3",
-    "style-loader": "^3.2.1",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.3.5",
     "ua-parser-js": "^0.7.28",
-    "uuid": "^8.3.2",
-    "web-vitals": "^1.0.1",
     "worker-loader": "^3.0.8"
-  },
-  "dependencies": {}
+  }
 }
