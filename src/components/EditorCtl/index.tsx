@@ -22,7 +22,7 @@ import {
   designTypes,
 } from '../../utils/';
 import { CANVA_LINK } from '../../constants';
-console.log(styles);
+
 hljs.registerLanguage('javascript', javascript);
 
 const getCode = (template: Template, schemas: Schema[][]) => {
@@ -271,7 +271,7 @@ const EditorCtl = ({
             <button
               className={`button is-light is-small is-info ${processing ? 'is-loading' : ''}`}
               disabled={processing}
-              onClick={() => saveTemplate({ isSaveAs: false, template, schemas })}
+              onClick={() => saveTemplate(fmtTemplate(template, schemas))}
             >
               <img src={save} alt={'Get Template as Json'} />
               Save

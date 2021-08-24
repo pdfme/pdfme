@@ -31,16 +31,10 @@ export type Schema = TemplateSchema & {
   data: string;
 };
 
-export interface SaveTemplateArg {
-  isSaveAs: boolean;
-  template: Template;
-  schemas: Schema[][];
-}
-
 export interface TemplateEditorProp {
   lang: Lang;
-  initTemplate: () => Promise<Template>;
-  saveTemplate: (saveTemplateArg: SaveTemplateArg) => Promise<void | Template>;
+  fetchTemplate: () => Promise<Template>;
+  saveTemplate: (template: Template) => Promise<Template>;
   EditorCtl: React.ComponentType<TemplateEditorCtlProp>;
 }
 
@@ -52,7 +46,7 @@ export interface TemplateEditorCtlProp {
   changeCanvaId: (canvaId: string) => void;
   changeBasePdf: (file: File) => void;
   downloadBasePdf: (pdfName: string) => void;
-  saveTemplate: (saveTemplateArg: SaveTemplateArg) => Promise<Template | void>;
+  saveTemplate: (template: Template) => Promise<Template>;
   // --------base end------------
   previewPdf?: () => void;
   loadJsonTemplate?: (file: File) => void;

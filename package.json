@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "develop": "DEV_SERVER=true webpack-dev-server --mode development",
+    "develop": "DEV_SERVER=true webpack-dev-server --hot --mode development",
     "build:dev": "webpack --mode development",
     "build:prod": "NODE_ENV=production webpack --mode production",
-    "build": "rm -rf dist && npm run build:dev && npm run build:prod"
+    "build": "rm -rf dist && npm run build:dev && npm run build:prod",
+    "lint": "tsc --noEmit",
+    "lint:watch": "tsc -w --noEmit"
   },
   "files": [
     "src",
