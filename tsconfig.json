@@ -4,6 +4,8 @@
     "target": "es5",
     "jsx": "react-jsx",
     "esModuleInterop": true,
+    "declaration": true,
+    "declarationDir": "dist/types",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": ["node"],

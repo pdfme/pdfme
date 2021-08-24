@@ -1,8 +1,12 @@
 {
-  "name": "labelmake-editor_test",
+  "name": "labelmake-editor",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/labelmake-editor.min.jp",
+  "typings": "dist/types/labelmake-editor.d.ts",
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "develop": "DEV_SERVER=true webpack-dev-server --hot --mode development",
     "build:dev": "webpack --mode development",
@@ -17,7 +21,7 @@
     "index.d.ts"
   ],
   "author": "hand-dot",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "devDependencies": {
     "@scena/react-guides": "^0.16.0",
     "@types/debounce": "^1.2.0",
