@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { Schema, Lang } from '../../../types';

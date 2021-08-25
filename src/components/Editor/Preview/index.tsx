@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
@@ -342,78 +344,84 @@ export default class Preview extends Component<Props, State> {
                       <img className={styles.paperImage} src={bgi} alt="background" />
                     </div>
                     {schemas[index].map((s) => (
-                      <div
-                        title={s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : ''}
-                        className={`schema has-tooltip-arrow ${SELECTABLE}`}
-                        onMouseEnter={() => onMouseEnter(s.id)}
-                        onMouseLeave={() => onMouseLeave()}
-                        key={s.id}
-                        id={s.id}
-                        style={{
-                          display: 'block',
-                          position: 'absolute',
-                          height: +s.height * zoom,
-                          width: +s.width * zoom,
-                          top: +s.position.y * zoom,
-                          left: +s.position.x * zoom,
-                          border: focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
-                          backgroundColor:
-                            s.type === 'text' && s.backgroundColor
-                              ? s.backgroundColor
-                              : 'transparent',
-                        }}
+                      <Tippy
+                        delay={0}
+                        interactive
+                        content={s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : ''}
                       >
-                        {s.type === 'text' && (
-                          <div
-                            style={{
-                              textAlign: s.alignment,
-                              fontSize: s.fontSize + 'pt',
-                              letterSpacing: s.characterSpacing + 'pt',
-                              lineHeight: s.lineHeight + 'em',
-                              whiteSpace: 'pre-line',
-                              wordBreak: 'break-all',
-                              color: s.fontColor || '#000',
-                            }}
-                          >
-                            {/*  Set the letterSpacing of the last character to 0. */}
-                            {s.data.split('').map((l, i) => (
-                              <span
-                                key={i}
-                                style={{
-                                  letterSpacing: String(s.data).length === i + 1 ? 0 : 'inherit',
-                                }}
-                              >
-                                {l}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {s.type === 'image' && (
-                          <img
-                            alt={s.key}
-                            style={{
-                              width: s.width * zoom,
-                              height: s.height * zoom - 2,
-                              borderRadius: 0,
-                            }}
-                            src={s.data}
-                          />
-                        )}
-                        {barcodeList.includes(s.type) && (
-                          <div className={styles.barcodeWrap}>
-                            {s.data ? (
-                              <>
-                                <p className={styles.example}>Example</p>
-                                <img
-                                  alt="barcode"
-                                  className={styles.barcodeImg}
-                                  src={barcodeExampleImageObj[s.type]}
-                                />
-                              </>
-                            ) : null}
-                          </div>
-                        )}
-                      </div>
+                        <div
+                          className={`schema ${SELECTABLE}`}
+                          onMouseEnter={() => onMouseEnter(s.id)}
+                          onMouseLeave={() => onMouseLeave()}
+                          key={s.id}
+                          id={s.id}
+                          style={{
+                            display: 'block',
+                            position: 'absolute',
+                            height: +s.height * zoom,
+                            width: +s.width * zoom,
+                            top: +s.position.y * zoom,
+                            left: +s.position.x * zoom,
+                            border:
+                              focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
+                            backgroundColor:
+                              s.type === 'text' && s.backgroundColor
+                                ? s.backgroundColor
+                                : 'transparent',
+                          }}
+                        >
+                          {s.type === 'text' && (
+                            <div
+                              style={{
+                                textAlign: s.alignment,
+                                fontSize: s.fontSize + 'pt',
+                                letterSpacing: s.characterSpacing + 'pt',
+                                lineHeight: s.lineHeight + 'em',
+                                whiteSpace: 'pre-line',
+                                wordBreak: 'break-all',
+                                color: s.fontColor || '#000',
+                              }}
+                            >
+                              {/*  Set the letterSpacing of the last character to 0. */}
+                              {s.data.split('').map((l, i) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    letterSpacing: String(s.data).length === i + 1 ? 0 : 'inherit',
+                                  }}
+                                >
+                                  {l}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {s.type === 'image' && (
+                            <img
+                              alt={s.key}
+                              style={{
+                                width: s.width * zoom,
+                                height: s.height * zoom - 2,
+                                borderRadius: 0,
+                              }}
+                              src={s.data}
+                            />
+                          )}
+                          {barcodeList.includes(s.type) && (
+                            <div className={styles.barcodeWrap}>
+                              {s.data ? (
+                                <>
+                                  <p className={styles.example}>Example</p>
+                                  <img
+                                    alt="barcode"
+                                    className={styles.barcodeImg}
+                                    src={barcodeExampleImageObj[s.type]}
+                                  />
+                                </>
+                              ) : null}
+                            </div>
+                          )}
+                        </div>
+                      </Tippy>
                     ))}
                   </div>
                 </div>

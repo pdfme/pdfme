@@ -26,7 +26,7 @@ const EditorCtl = ({
     <>
       <div className={`${styles.wrapper}`}>
         <div className={`${styles.desktopFlex}`}>
-          <div style={{ display: 'flex', marginTop: '0.75rem' }}>
+          <div style={{ display: 'flex', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
             <button
               className={`button is-small ${processing ? 'is-loading' : ''}`}
               disabled={processing}

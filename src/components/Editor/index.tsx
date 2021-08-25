@@ -1,5 +1,5 @@
 import labelmake from 'labelmake';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as styles from './index.module.scss';
 import { Template, PageSize, Schema, TemplateEditorProp } from '../../types';
 import Sidebar from './Sidebar';

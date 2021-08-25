@@ -1,7 +1,10 @@
 import { PageSize, Template, TemplateSchema, Schema } from '../types';
 import { blankPdf } from '../constants';
 import { nanoid } from 'nanoid';
-import * as pdfjsLib from 'pdfjs-dist/webpack';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf'
+// @ts-ignore
+import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker
 import _set from 'lodash.set';
 import { debounce as _debounce } from 'debounce';
 import { saveAs } from 'file-saver';
