@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { Schema, Lang } from '../../types';
-import { readFiles } from '../../utils';
-import { i18n } from '../../i18n';
-import { inputTypeList } from '../../constants';
-import Divider from '../Divider';
-import backIcon from '../../img/back.svg';
-import forwardIcon from '../../img/forward.svg';
-import infoIcon from '../../img/info.svg';
-import createIcon from '../../img/create.svg';
-import dragIcon from '../../img/drag.svg';
-import warningIcon from '../../img/warning.svg';
-import deleteIcon from '../../img/delete.svg';
+import { Schema, Lang } from '../../../types';
+import { readFiles } from '../../../utils';
+import { i18n } from '../../../i18n';
+import { inputTypeList } from '../../../constants';
+import Divider from '../../Divider';
+import backIcon from '../../../img/back.svg';
+import forwardIcon from '../../../img/forward.svg';
+import infoIcon from '../../../img/info.svg';
+import createIcon from '../../../img/create.svg';
+import dragIcon from '../../../img/drag.svg';
+import warningIcon from '../../../img/warning.svg';
+import deleteIcon from '../../../img/delete.svg';
 
 const isTouchable = () => true;
 

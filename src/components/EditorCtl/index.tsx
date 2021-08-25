@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import hljs from 'highlight.js';
 import javascript from 'highlight.js/lib/languages/javascript';
 import 'highlight.js/styles/vs2015.css';
-import Modal from '../Modal';
+import Modal from './Modal';
 import Divider from '../Divider';
 import './canva.css';
 import * as styles from './index.module.scss';

@@ -1,5 +1,5 @@
 import Editor from './components/Editor';
-import './index.scss';
+import * as styles from './index.module.css';
 import defaultEditorCtl from './components/EditorCtl';
 import ReactDOM from 'react-dom';
 import { Template, TemplateEditorCtlProp } from './types';
@@ -12,12 +12,14 @@ const init = (
   customEditorCtl?: React.ComponentType<TemplateEditorCtlProp>
 ) => {
   ReactDOM.render(
-    <Editor
-      lang="en"
-      fetchTemplate={fetchTemplate}
-      saveTemplate={saveTemplate}
-      EditorCtl={customEditorCtl || defaultEditorCtl}
-    />,
+    <div className={styles.labelmakeEditor}>
+      <Editor
+        lang="en"
+        fetchTemplate={fetchTemplate}
+        saveTemplate={saveTemplate}
+        EditorCtl={customEditorCtl || defaultEditorCtl}
+      />
+    </div>,
     domContainer
   );
 };

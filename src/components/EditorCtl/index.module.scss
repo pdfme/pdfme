@@ -1,3 +1,6 @@
+$gap: 32px !default;
+$desktop: 960px + (2 * $gap) !default;
+
 .codeWrapper {
   padding: 0;
   margin-bottom: 1rem;
@@ -13,6 +16,10 @@
     align-items: center;
     width: 100%;
     justify-content: space-between;
+    display: block;
+    @media (min-width: $desktop) {
+      display: flex;
+    }
   }
   button {
     margin-left: 0.5rem;

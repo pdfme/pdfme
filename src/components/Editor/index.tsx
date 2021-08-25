@@ -2,8 +2,8 @@ import labelmake from 'labelmake';
 import React, { Component } from 'react';
 import * as styles from './index.module.scss';
 import { Template, PageSize, Schema, TemplateEditorProp } from '../../types';
-import Sidebar from '../Sidebar';
-import Preview from '../Preview';
+import Sidebar from './Sidebar';
+import Preview from './Preview';
 import { i18n } from '../../i18n';
 import { zoom } from '../../constants';
 import {
