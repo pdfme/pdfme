@@ -1,3 +1,19 @@
+.sideBar {
+  background: #444;
+  color: #fff;
+  border: 1px solid #777;
+  height: 544px;
+  padding: 0.5rem;
+  overflow-y: auto;
+  position: absolute;
+  right: 0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  label {
+    font-size: 0.75rem;
+  }
+}
+
 .keyLabel {
   margin-right: 1rem;
   width: 160px;
@@ -17,18 +33,6 @@
   position: absolute;
 }
 
-.sideBar {
-  box-shadow: 3px 3px 3px 0px #000;
-  background: #444;
-  color: #fff;
-  border: 1px solid #777;
-  height: 544px;
-  padding: 0.5rem;
-  overflow-y: auto;
-  position: absolute;
-  right: 0;
-}
-
 .flx {
   display: flex;
   align-items: center;
@@ -45,7 +49,6 @@
   position: absolute;
   left: 0;
   top: 0;
-  background: rgb(255, 68, 0);
 }
 
 .addBtn {

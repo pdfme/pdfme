@@ -343,9 +343,7 @@ export default class Preview extends Component<Props, State> {
                     </div>
                     {schemas[index].map((s) => (
                       <div
-                        data-tooltip={
-                          s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : null
-                        }
+                        title={s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : ''}
                         className={`schema has-tooltip-arrow ${SELECTABLE}`}
                         onMouseEnter={() => onMouseEnter(s.id)}
                         onMouseLeave={() => onMouseLeave()}

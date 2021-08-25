@@ -1,5 +1,5 @@
 import { PageSize, Template, TemplateSchema, Schema } from '../types';
-import { blankPdf, CANVA_API } from '../constants';
+import { blankPdf } from '../constants';
 import { nanoid } from 'nanoid';
 import * as pdfjsLib from 'pdfjs-dist/webpack';
 import _set from 'lodash.set';
@@ -7,7 +7,6 @@ import { debounce as _debounce } from 'debounce';
 import { saveAs } from 'file-saver';
 import { UAParser } from 'ua-parser-js';
 import hotkeys from 'hotkeys-js';
-import memoizeOne from 'memoize-one';
 
 export const uuid = nanoid;
 export const set = _set;
@@ -151,7 +150,6 @@ export const fmtTemplate = (template: Template, schemas: Schema[][]): Template =
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
-    canvaId: template.canvaId ? template.canvaId : '',
     fontName: template.fontName,
     sampledata: [
       _schemas.reduce((acc, cur) => {
@@ -472,198 +470,4 @@ export const getKeepRaitoHeightByWidth = (type: string, width: number) => {
     upce: 0.5,
   };
   return width * (raito[type] ? raito[type] : 1);
-};
-
-export const fmtTemplateForDev = (template: Template, schemas: Schema[][]) => {
-  const fmtdTmplt: any = fmtTemplate(template, schemas);
-  delete fmtdTmplt.id;
-  delete fmtdTmplt.status;
-  delete fmtdTmplt.owner;
-  delete fmtdTmplt.name;
-  delete fmtdTmplt.description;
-  delete fmtdTmplt.tags;
-  delete fmtdTmplt.photo;
-  delete fmtdTmplt.columns;
-  delete fmtdTmplt.sampledata;
-  delete fmtdTmplt.fontName;
-  delete fmtdTmplt.createdAt;
-  delete fmtdTmplt.updatedAt;
-  delete fmtdTmplt.canvaId;
-  fmtdTmplt.schemas.forEach((schema: any) => {
-    delete schema.id;
-    delete schema.key;
-    delete schema.data;
-    Object.values(schema).forEach((s: any) => {
-      if (s.type !== 'text') {
-        delete s.alignment;
-        delete s.fontSize;
-        delete s.characterSpacing;
-        delete s.lineHeight;
-        delete s.fontColor;
-        delete s.backgroundColor;
-      }
-      if (!s.fontColor) delete s.fontColor;
-      if (!s.backgroundColor) delete s.backgroundColor;
-    });
-  });
-  return fmtdTmplt;
-};
-
-export const copyTextToClipboard = (textVal: string): void => {
-  const copyFrom = document.createElement('textarea');
-  copyFrom.textContent = textVal;
-  const bodyElm = document.getElementsByTagName('body')[0];
-  bodyElm.appendChild(copyFrom);
-  copyFrom.select();
-  document.execCommand('copy');
-  bodyElm.removeChild(copyFrom);
-};
-
-export const designTypes: string[] = [
-  'A4Document',
-  'Announcement',
-  'BirthdayCard',
-  'BirthdayInvitation',
-  'BlogBanner',
-  'BookCover',
-  'Bookmark',
-  'Brochure',
-  'BusinessCard',
-  'Calendar',
-  'Card',
-  'Certificate',
-  'DesktopWallpaper',
-  'EmailHeader',
-  'EtsyShopCover',
-  'EtsyShopIcon',
-  'FacebookAd',
-  'FacebookAppAd',
-  'FacebookCover',
-  'FacebookEventCover',
-  'FacebookPost',
-  'Flyer',
-  'GiftCertificate',
-  'Infographic',
-  'InstagramPost',
-  'InstagramStory',
-  'Invitation',
-  'Invoice',
-  'Label',
-  'LargeRectangleAd',
-  'LeaderboardAd',
-  'LessonPlan',
-  'Letter',
-  'LinkedInBanner',
-  'Logo',
-  'MagazineCover',
-  'MediumRectangleAd',
-  'Menu',
-  'MindMap',
-  'Newsletter',
-  'PhotoCollage',
-  'PinterestGraphic',
-  'Postcard',
-  'Poster',
-  'Presentation',
-  'Presentation43',
-  'ProductLabel',
-  'RecipeCard',
-  'Resume',
-  'SnapchatGeofilter',
-  'SocialMedia',
-  'Ticket',
-  'TumblrGraphic',
-  'TwitterHeader',
-  'TwitterPost',
-  'WattpadBookCover',
-  'WeddingInvitation',
-  'WideSkyscraperAd',
-  'Worksheet',
-  'Yearbook',
-  'YouTubeChannelArt',
-  'YouTubeThumbnail',
-];
-
-const _getCanvaApi = async (): Promise<any> => {
-  return new Promise((r) => {
-    const script = document.createElement('script');
-    script.src = 'https://sdk.canva.com/designbutton/v2/api.js';
-    script.onload = async () => {
-      const api = await window.Canva.DesignButton.initialize({
-        apiKey: CANVA_API,
-      });
-      r(api);
-    };
-    document.body.appendChild(script);
-  });
-};
-
-const memoize = <T extends (...args: any) => any>(func: T): T => memoizeOne(func);
-
-const getCanvaApi = memoize(_getCanvaApi);
-
-type fmt = 'yyyy' | 'MM' | 'dd' | 'hh' | 'mm' | 'ss';
-const dateFmt = (date: Date, format: string): string => {
-  const dateFormat = {
-    _fmt: {
-      yyyy: (d: Date): string => d.getFullYear() + '',
-      MM: (d: Date): string => ('0' + (d.getMonth() + 1)).slice(-2),
-      dd: (d: Date): string => ('0' + d.getDate()).slice(-2),
-      hh: (d: Date): string => ('0' + d.getHours()).slice(-2),
-      mm: (d: Date): string => ('0' + d.getMinutes()).slice(-2),
-      ss: (d: Date): string => ('0' + d.getSeconds()).slice(-2),
-    },
-    _priority: ['yyyy', 'MM', 'dd', 'hh', 'mm', 'ss'],
-    format: function (_d: Date, format: string) {
-      return this._priority.reduce(
-        (res, fmt) => res.replace(fmt, this._fmt[fmt as fmt](_d)),
-        format
-      );
-    },
-  };
-  return dateFormat.format(date, format);
-};
-
-const getTemplateName = () => 'Template@' + dateFmt(new Date(), 'yyyy-MM-dd-hh:mm');
-
-export const canvaCreate = (
-  designType: string,
-  onPublish: (file: File, canvaId: string) => void
-) => {
-  getCanvaApi().then((canva) => {
-    canva.createDesign({
-      design: { type: designType },
-      editor: { fileType: 'pdf' },
-      onDesignPublish: (options: any) => {
-        const exportUrl = options.exportUrl;
-        const canvaId = options.designId;
-        fetch(exportUrl)
-          .then((res) => res.blob())
-          .then((blob) => {
-            onPublish(blob2File(blob, getTemplateName()), canvaId);
-          });
-      },
-    });
-  });
-};
-
-export const canvaEdit = (
-  templateCanvaId: string,
-  onPublish: (file: File, canvaId: string) => void
-) => {
-  getCanvaApi().then((canva) => {
-    canva.editDesign({
-      design: { id: templateCanvaId },
-      editor: { fileType: 'pdf' },
-      onDesignPublish: (options: any) => {
-        const exportUrl = options.exportUrl;
-        const canvaId = options.designId;
-        fetch(exportUrl)
-          .then((res) => res.blob())
-          .then((blob) => {
-            onPublish(blob2File(blob, getTemplateName()), canvaId);
-          });
-      },
-    });
-  });
 };

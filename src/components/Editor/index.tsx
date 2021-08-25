@@ -299,13 +299,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     this.setState({ template: Object.assign(template, { fontName }) });
   };
 
-  changeCanvaId = (canvaId: string) => {
-    const { template } = this.state;
-    this.setState({
-      template: Object.assign(template, { canvaId }),
-    });
-  };
-
   downloadBasePdf = (pdfName: string) => {
     const { template } = this.state;
     const pdfBlob = b64toBlob(template.basePdf as string);
@@ -439,7 +432,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
           template={template}
           schemas={schemas}
           changeBasePdf={this.changeBasePdf}
-          changeCanvaId={this.changeCanvaId}
           previewPdf={this.previewPdf}
           downloadBasePdf={this.downloadBasePdf}
           saveTemplate={this.saveTemplateWithProcessing}

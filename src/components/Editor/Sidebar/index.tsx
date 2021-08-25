@@ -79,7 +79,7 @@ const SortableItem = SortableElement(
         <button
           disabled={!touchable}
           className={`button is-small is-light ${status}`}
-          style={{ padding: 5, margin: 5 }}
+          style={{ padding: 5, margin: 5, width: '100%', display: 'flex', alignItems: 'center' }}
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
@@ -185,7 +185,7 @@ const Sidebar = ({
   const [open, setOpen] = useState(true);
   const sidebarWidth = 300;
   const top = 25;
-  const right = (open ? sidebarWidth : 0) - 1;
+  const right = open ? sidebarWidth + 18 : 0;
   return (
     <div style={{ position: 'sticky', top, zIndex: 29 }}>
       <button
@@ -256,8 +256,8 @@ const Sidebar = ({
             </button>
           </div>
           <Divider />
-          <div style={{ display: 'flex' }}>
-            <div style={{ marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div>
               <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                 {i18n(lang, 'type')}
               </label>
@@ -398,7 +398,7 @@ const Sidebar = ({
                 <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
                   {i18n(lang, 'style')}
                 </p>
-                <div style={{ display: 'flex', marginBottom: '0.25rem' }}>
+                <div className={styles.flx} style={{ marginBottom: '0.25rem' }}>
                   <div style={{ width: '50%' }}>
                     <div>
                       <label className="is-size-7">Alignment</label>
@@ -454,6 +454,7 @@ const Sidebar = ({
                           }
                           value={activeSchema.fontColor || '#000000'}
                           type="color"
+                          style={{ width: '100%' }}
                         />
                         <button
                           className="button is-small"
@@ -523,6 +524,7 @@ const Sidebar = ({
                           }
                           value={activeSchema.backgroundColor || '#ffffff'}
                           type="color"
+                          style={{ width: '100%' }}
                         />
                         <button
                           className="button is-small"
@@ -549,11 +551,11 @@ const Sidebar = ({
                 {i18n(lang, 'inputExample')}
               </label>
               {activeSchema.type === 'image' ? (
-                <div className="file is-small">
+                <div className="file is-small" style={{ position: 'relative' }}>
                   {activeSchema.data ? (
                     <div style={{ margin: '0 auto' }}>
                       <button
-                        className={`delete ${styles.dltBtn}`}
+                        className={`${styles.dltBtn}`}
                         aria-label="close"
                         onClick={() =>
                           changeSchema([
@@ -564,7 +566,7 @@ const Sidebar = ({
                             },
                           ])
                         }
-                      />
+                      >x</button>
                       <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
                     </div>
                   ) : (
@@ -586,15 +588,12 @@ const Sidebar = ({
                         accept="image/jpeg, image/png"
                         className="file-input"
                       />
-                      <span className="file-cta">
-                        <span className="file-label">{i18n(lang, 'plsSelect')}</span>
-                      </span>
                     </label>
                   )}
                 </div>
               ) : (
                 <textarea
-                  rows={2}
+                  rows={6}
                   className="textarea is-size-7"
                   onChange={(e) =>
                     changeSchema([
@@ -606,6 +605,7 @@ const Sidebar = ({
                     ])
                   }
                   style={{
+                    width: '100%',
                     backgroundColor: activeSchema.data ? '#fff' : '#ffa19b',
                   }}
                   value={activeSchema.data}
@@ -616,7 +616,11 @@ const Sidebar = ({
         </aside>
 
         <div className={styles.addBtn}>
-          <button className="button is-small is-danger" onClick={addSchema}>
+          <button
+            className="button is-small is-danger"
+            style={{ padding: '0.5rem' }}
+            onClick={addSchema}
+          >
             <strong>{i18n(lang, 'addNewField')}</strong>
           </button>
         </div>

@@ -1,9 +1,4 @@
 import type { TemplateSchema as _TemplateSchema } from 'labelmake/dist/types/type';
-declare global {
-  interface Window {
-    Canva: any;
-  }
-}
 
 export type Lang = 'en' | 'ja';
 
@@ -17,7 +12,6 @@ type Alignment = 'left' | 'right' | 'center';
 export type TemplateSchema = _TemplateSchema;
 
 export interface Template {
-  canvaId?: string;
   basePdf: PageSize | string | Uint8Array | ArrayBuffer;
   columns: string[];
   sampledata: { [key: string]: string }[];
@@ -43,7 +37,6 @@ export interface TemplateEditorCtlProp {
   processing: boolean;
   template: Template;
   schemas: Schema[][];
-  changeCanvaId: (canvaId: string) => void;
   changeBasePdf: (file: File) => void;
   downloadBasePdf: (pdfName: string) => void;
   saveTemplate: (template: Template) => Promise<Template>;
