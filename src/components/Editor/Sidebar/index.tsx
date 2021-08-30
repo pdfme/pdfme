@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { Schema, Lang } from '../../../types';
+import { Schema, Lang } from '../../../type';
 import { readFiles } from '../../../utils';
 import { i18n } from '../../../i18n';
 import { inputTypeList } from '../../../constants';

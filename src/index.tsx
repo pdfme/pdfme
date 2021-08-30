@@ -1,7 +1,7 @@
 import Editor from './components/Editor';
 import defaultEditorCtl from './components/EditorCtl';
 import ReactDOM from 'react-dom';
-import { Template, TemplateEditorCtlProp } from './types';
+import { Template, TemplateEditorCtlProp } from './type';
 import { blankPdf } from './constants';
 
 const init = (

@@ -1,10 +1,10 @@
-import { PageSize, Template, TemplateSchema, Schema } from '../types';
+import { PageSize, Template, TemplateSchema, Schema } from '../type';
 import { blankPdf } from '../constants';
 import { nanoid } from 'nanoid';
-import * as pdfjsLib from 'pdfjs-dist'
+import * as pdfjsLib from 'pdfjs-dist';
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
 import { debounce as _debounce } from 'debounce';
 import { saveAs } from 'file-saver';
@@ -98,7 +98,7 @@ export const arrayMove = (array: any[], from: number, to: number) => {
   return array;
 };
 
-export const pt2mm = (pt: number) => {
+const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
   return parseFloat(String(pt)) * mmRatio;

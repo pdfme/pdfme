@@ -1,16 +1,11 @@
-import React from 'react';
-import hljs from 'highlight.js';
-import javascript from 'highlight.js/lib/languages/javascript';
-import 'highlight.js/styles/vs2015.css';
 import * as styles from './index.module.scss';
 import visibility from '../../img/visibility.svg';
 import save from '../../img/save.svg';
 import pdf from '../../img/pdf.svg';
 import download from '../../img/download_bk.svg';
-import { TemplateEditorCtlProp } from '../../types';
+import { TemplateEditorCtlProp } from '../../type';
 import { fmtTemplate } from '../../utils/';
 
-hljs.registerLanguage('javascript', javascript);
 
 const EditorCtl = ({
   processing,

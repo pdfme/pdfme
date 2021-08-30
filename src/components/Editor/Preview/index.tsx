@@ -5,7 +5,7 @@ import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
-import { GuidesInterface, Schema, Template, PageSize } from '../../../types';
+import { GuidesInterface, Schema, Template, PageSize } from '../../../type';
 import { round, flatten } from '../../../utils';
 import { barcodeList, zoom, barcodeExampleImageObj } from '../../../constants';
 

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/labelmake-editor.min.jp",
-  "typings": "dist/types/labelmake-editor.d.ts",
+  "typings": "dist/types/index.d.ts",
   "engines": {
     "node": "14.x"
   },
@@ -14,7 +14,8 @@
     "lint": "tsc --noEmit",
     "lint:watch": "tsc -w --noEmit",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "prune": "ts-prune src"
   },
   "files": [
     "src",
@@ -34,7 +35,6 @@
     "@storybook/react": "^6.3.7",
     "@types/debounce": "^1.2.0",
     "@types/file-saver": "^2.0.3",
-    "@types/highlight.js": "^10.1.0",
     "@types/lodash.set": "^4.3.6",
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.19",
@@ -65,6 +65,7 @@
     "stylelint-scss": "^3.20.1",
     "stylelint-webpack-plugin": "^3.0.1",
     "ts-loader": "^9.2.5",
+    "ts-prune": "^0.10.0",
     "typescript": "^4.3.5",
     "url-loader": "^4.1.1",
     "webpack": "^5.51.1",
@@ -80,7 +81,6 @@
     "@tippyjs/react": "^4.2.5",
     "debounce": "^1.2.1",
     "file-saver": "^2.0.5",
-    "highlight.js": "^11.2.0",
     "hotkeys-js": "^3.8.7",
     "labelmake": "^2.0.19",
     "lodash.set": "^4.3.2",

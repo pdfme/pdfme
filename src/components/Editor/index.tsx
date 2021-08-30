@@ -1,7 +1,7 @@
 import labelmake from 'labelmake';
 import { Component } from 'react';
 import * as styles from './index.module.scss';
-import { Template, PageSize, Schema, TemplateEditorProp } from '../../types';
+import { Template, PageSize, Schema, TemplateEditorProp } from '../../type';
 import Sidebar from './Sidebar';
 import Preview from './Preview';
 import { i18n } from '../../i18n';
