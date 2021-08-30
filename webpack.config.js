@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const pkg = require('./package.json');
@@ -18,6 +19,7 @@ const config = {
         extensions: ['.ts', '.tsx', '.js', '.scss', '.css', '.png', '.svg'],
     },
     plugins: [
+        new BundleAnalyzerPlugin(),
         new StyleLintPlugin(),
         new webpack.BannerPlugin({
             banner: BANNER,
