@@ -1,29 +1,25 @@
-import type { TemplateSchema as _TemplateSchema } from 'labelmake/dist/types/type';
+import type {
+  TemplateSchema as _TemplateSchema,
+  Template as _Template,
+  PageSize as _PageSize,
+} from 'labelmake/dist/types/type';
 
-export type Lang = 'en' | 'ja';
-
-export interface PageSize {
-  height: number;
-  width: number;
-}
-
-type Alignment = 'left' | 'right' | 'center';
+export type PageSize = _PageSize;
 
 export type TemplateSchema = _TemplateSchema;
 
-export interface Template {
-  basePdf: PageSize | string | Uint8Array | ArrayBuffer;
-  columns: string[];
+export type Template = _Template & {
   sampledata: { [key: string]: string }[];
-  schemas: { [key: string]: TemplateSchema }[];
-  fontName: string;
-}
+  columns: string[];
+};
 
 export type Schema = TemplateSchema & {
   id: string;
   key: string;
   data: string;
 };
+
+export type Lang = 'en' | 'ja';
 
 export interface TemplateEditorProp {
   lang: Lang;

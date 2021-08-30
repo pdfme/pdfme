@@ -82,7 +82,7 @@
     "file-saver": "^2.0.5",
     "highlight.js": "^11.2.0",
     "hotkeys-js": "^3.8.7",
-    "labelmake": "^2.0.18",
+    "labelmake": "^2.0.19",
     "lodash.set": "^4.3.2",
     "nanoid": "^3.1.25",
     "pdfjs-dist": "^2.9.359",
