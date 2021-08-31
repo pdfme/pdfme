@@ -19,8 +19,7 @@
   },
   "files": [
     "src",
-    "dist",
-    "index.d.ts"
+    "dist"
   ],
   "author": "hand-dot",
   "license": "SEE LICENSE IN LICENSE.txt",

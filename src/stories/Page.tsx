@@ -1,7 +1,5 @@
 import { useEffect } from 'react';
-// @ts-ignore
-import LabelmakeEditor from '../../dist/labelmake-editor.min.js';
-// import LabelmakeEditor from '../index';
+import LabelmakeEditor from '../index';
 import './page.css';
 
 export const Page = () => {

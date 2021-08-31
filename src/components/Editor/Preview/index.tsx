@@ -351,7 +351,7 @@ export default class Preview extends Component<Props, State> {
                           content={s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : ''}
                         >
                           <div
-                            className={`schema ${SELECTABLE}`}
+                            className={`${SELECTABLE}`}
                             onMouseEnter={() => onMouseEnter(s.id)}
                             onMouseLeave={() => onMouseLeave()}
                             id={s.id}

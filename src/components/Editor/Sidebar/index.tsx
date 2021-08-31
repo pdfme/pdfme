@@ -17,11 +17,7 @@ import deleteIcon from '../../../img/delete.svg';
 const isTouchable = () => true;
 
 const DragHandle = SortableHandle(({ disabled }: { disabled: boolean }) => (
-  <button
-    disabled={disabled}
-    className="button is-small is-light"
-    style={{ padding: 5, margin: 5, cursor: 'grab' }}
-  >
+  <button disabled={disabled} style={{ padding: 5, margin: 5, cursor: 'grab' }}>
     <img src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
@@ -78,12 +74,12 @@ const SortableItem = SortableElement(
         <DragHandle disabled={!touchable} />
         <button
           disabled={!touchable}
-          className={`button is-small is-light ${status}`}
+          className={`${status}`}
           style={{ padding: 5, margin: 5, width: '100%', display: 'flex', alignItems: 'center' }}
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
-          <span className={`is-size-7 ${styles.keyLabel}`}>
+          <span className={`${styles.keyLabel}`}>
             {status === '' ? (
               sc.key
             ) : (
@@ -102,7 +98,6 @@ const SortableItem = SortableElement(
         </button>
         <button
           disabled={!touchable}
-          className="button is-small is-light"
           style={{ padding: 5, margin: 5 }}
           onClick={() => onDelete(sc.id)}
         >
@@ -189,7 +184,7 @@ const Sidebar = ({
   return (
     <div style={{ position: 'sticky', top, zIndex: 29 }}>
       <button
-        className={`button is-small is-light ${styles.tglBtn}`}
+        className={`${styles.tglBtn}`}
         style={{ right, top, position: 'absolute' }}
         onClick={() => setOpen(!open)}
       >
@@ -201,10 +196,7 @@ const Sidebar = ({
       >
         <aside style={{ display: activeElement ? 'none' : 'block' }}>
           <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-            <h3
-              className="is-size-7"
-              style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}
-            >
+            <h3 style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
               {i18n(lang, 'fieldsList')}({pageCursor + 1}P)
             </h3>
           </div>
@@ -225,7 +217,7 @@ const Sidebar = ({
               onMouseLeave={onMouseLeave}
             />
           ) : (
-            <p style={{ alignItems: 'center', display: 'flex' }} className="is-size-7">
+            <p style={{ alignItems: 'center', display: 'flex' }}>
               <img src={infoIcon} style={{ marginRight: '0.5rem' }} alt="Info icon" />
               {i18n(lang, 'plsAddNewField')}
             </p>
@@ -235,18 +227,13 @@ const Sidebar = ({
         </aside>
         <aside style={{ display: activeElement ? 'block' : 'none' }}>
           <div className={styles.flx}>
-            <button
-              className="button is-small is-light"
-              style={{ padding: 5, margin: 5 }}
-              onClick={onEditEnd}
-            >
+            <button style={{ padding: 5, margin: 5 }} onClick={onEditEnd}>
               <img src={backIcon} width={15} alt="Back icon" />
             </button>
-            <h3 className="is-size-7" style={{ fontWeight: 'bold' }}>
+            <h3 style={{ fontWeight: 'bold' }}>
               {i18n(lang, 'editField')}({pageCursor + 1}P)
             </h3>
             <button
-              className="button is-small is-light"
               style={{ padding: 5, margin: 5 }}
               onClick={() => {
                 removeSchema(activeSchema.id);
@@ -258,12 +245,9 @@ const Sidebar = ({
           <Divider />
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div>
-              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
-                {i18n(lang, 'type')}
-              </label>
+              <label style={{ marginBottom: 0 }}>{i18n(lang, 'type')}</label>
               <select
                 style={{ width: '100%' }}
-                className="select is-small"
                 onChange={(e) =>
                   changeSchema([
                     {
@@ -283,12 +267,11 @@ const Sidebar = ({
               </select>
             </div>
             <div style={{ width: '100%' }}>
-              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
+              <label style={{ marginBottom: 0 }}>
                 {i18n(lang, 'fieldName')}
                 <u style={{ fontSize: '0.7rem' }}>({i18n(lang, 'requireAndUniq')})</u>
               </label>
               <input
-                className="input is-small"
                 onChange={(e) =>
                   changeSchema([
                     {
@@ -308,14 +291,11 @@ const Sidebar = ({
           <Divider />
           <div>
             <div>
-              <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
-                {i18n(lang, 'posAndSize')}
-              </p>
+              <p style={{ marginBottom: 0 }}>{i18n(lang, 'posAndSize')}</p>
               <div className={styles.flx}>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>X:</label>
                   <input
-                    className="input is-small"
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
@@ -329,12 +309,11 @@ const Sidebar = ({
                     }
                     value={activeSchema.position.x}
                   />
-                  <span className="is-size-7">mm</span>
+                  <span>mm</span>
                 </div>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>Y:</label>
                   <input
-                    className="input is-small"
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
@@ -348,14 +327,13 @@ const Sidebar = ({
                     }
                     value={activeSchema.position.y}
                   />
-                  <span className="is-size-7">mm</span>
+                  <span>mm</span>
                 </div>
               </div>
               <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>W:</label>
                   <input
-                    className="input is-small"
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
@@ -369,12 +347,11 @@ const Sidebar = ({
                     }
                     value={activeSchema.width}
                   />
-                  <span className="is-size-7">mm</span>
+                  <span>mm</span>
                 </div>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>H:</label>
                   <input
-                    className="input is-small"
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
@@ -388,23 +365,20 @@ const Sidebar = ({
                     }
                     value={activeSchema.height}
                   />
-                  <span className="is-size-7">mm</span>
+                  <span>mm</span>
                 </div>
               </div>
             </div>
             <Divider />
             {activeSchema.type === 'text' && (
               <>
-                <p className="label is-small has-text-white" style={{ marginBottom: 0 }}>
-                  {i18n(lang, 'style')}
-                </p>
+                <p style={{ marginBottom: 0 }}>{i18n(lang, 'style')}</p>
                 <div className={styles.flx} style={{ marginBottom: '0.25rem' }}>
                   <div style={{ width: '50%' }}>
                     <div>
-                      <label className="is-size-7">Alignment</label>
+                      <label>Alignment</label>
                       <select
                         style={{ width: '100%' }}
-                        className="select is-small"
                         onChange={(e) =>
                           changeSchema([
                             {
@@ -422,9 +396,8 @@ const Sidebar = ({
                       </select>
                     </div>
                     <div>
-                      <label className="is-size-7">FontSize(pt)</label>
+                      <label>FontSize(pt)</label>
                       <input
-                        className="input is-small"
                         onChange={(e) =>
                           changeSchema([
                             {
@@ -439,10 +412,9 @@ const Sidebar = ({
                       />
                     </div>
                     <div>
-                      <label className="is-size-7">FontColor</label>
+                      <label>FontColor</label>
                       <div style={{ display: 'flex' }}>
                         <input
-                          className="input is-small"
                           onChange={(e) =>
                             changeSchema([
                               {
@@ -457,7 +429,6 @@ const Sidebar = ({
                           style={{ width: '100%' }}
                         />
                         <button
-                          className="button is-small"
                           onClick={() =>
                             changeSchema([
                               {
@@ -475,9 +446,8 @@ const Sidebar = ({
                   </div>
                   <div style={{ width: '50%' }}>
                     <div>
-                      <label className="is-size-7">CharacterSpacing(pt):</label>
+                      <label>CharacterSpacing(pt):</label>
                       <input
-                        className="input is-small"
                         onChange={(e) =>
                           changeSchema([
                             {
@@ -492,9 +462,8 @@ const Sidebar = ({
                       />
                     </div>
                     <div>
-                      <label className="is-size-7">LineHeight(em)</label>
+                      <label>LineHeight(em)</label>
                       <input
-                        className="input is-small"
                         onChange={(e) =>
                           changeSchema([
                             {
@@ -509,10 +478,9 @@ const Sidebar = ({
                       />
                     </div>
                     <div>
-                      <label className="is-size-7">Background</label>
+                      <label>Background</label>
                       <div style={{ display: 'flex' }}>
                         <input
-                          className="input is-small"
                           onChange={(e) =>
                             changeSchema([
                               {
@@ -527,7 +495,6 @@ const Sidebar = ({
                           style={{ width: '100%' }}
                         />
                         <button
-                          className="button is-small"
                           onClick={() =>
                             changeSchema([
                               {
@@ -547,11 +514,9 @@ const Sidebar = ({
               </>
             )}
             <div>
-              <label className="label is-small has-text-white" style={{ marginBottom: 0 }}>
-                {i18n(lang, 'inputExample')}
-              </label>
+              <label style={{ marginBottom: 0 }}>{i18n(lang, 'inputExample')}</label>
               {activeSchema.type === 'image' ? (
-                <div className="file is-small" style={{ position: 'relative' }}>
+                <div style={{ position: 'relative' }}>
                   {activeSchema.data ? (
                     <div style={{ margin: '0 auto' }}>
                       <button
@@ -566,11 +531,13 @@ const Sidebar = ({
                             },
                           ])
                         }
-                      >x</button>
+                      >
+                        x
+                      </button>
                       <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
                     </div>
                   ) : (
-                    <label className="file-label">
+                    <label>
                       <input
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const files = e.target.files;
@@ -586,7 +553,6 @@ const Sidebar = ({
                         }}
                         type="file"
                         accept="image/jpeg, image/png"
-                        className="file-input"
                       />
                     </label>
                   )}
@@ -594,7 +560,6 @@ const Sidebar = ({
               ) : (
                 <textarea
                   rows={6}
-                  className="textarea is-size-7"
                   onChange={(e) =>
                     changeSchema([
                       {
@@ -616,11 +581,7 @@ const Sidebar = ({
         </aside>
 
         <div className={styles.addBtn}>
-          <button
-            className="button is-small is-danger"
-            style={{ padding: '0.5rem' }}
-            onClick={addSchema}
-          >
+          <button style={{ padding: '0.5rem' }} onClick={addSchema}>
             <strong>{i18n(lang, 'addNewField')}</strong>
           </button>
         </div>

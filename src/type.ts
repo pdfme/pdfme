@@ -33,13 +33,15 @@ export interface TemplateEditorCtlProp {
   processing: boolean;
   template: Template;
   schemas: Schema[][];
-  changeBasePdf: (file: File) => void;
+  // editorにsetStateする処理として抽象化したPropを追加するか下記で行う
+  [prop: string]: any;
+  changeBasePdf: (file: File) => void; // TODO editorにsetStateする処理として抽象化
   downloadBasePdf: (pdfName: string) => void;
   saveTemplate: (template: Template) => Promise<Template>;
   // --------base end------------
   previewPdf?: () => void;
-  loadJsonTemplate?: (file: File) => void;
-  handleChangeFontName?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  loadJsonTemplate?: (file: File) => void; // TODO editorにsetStateする処理として抽象化
+  handleChangeFontName?: (event: React.ChangeEvent<HTMLSelectElement>) => void; // TODO editorにsetStateする処理として抽象化
   preview?: boolean;
   togglePreview?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }

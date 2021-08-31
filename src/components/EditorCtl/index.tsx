@@ -6,7 +6,6 @@ import download from '../../img/download_bk.svg';
 import { TemplateEditorCtlProp } from '../../type';
 import { fmtTemplate } from '../../utils/';
 
-
 const EditorCtl = ({
   processing,
   template,
@@ -22,30 +21,18 @@ const EditorCtl = ({
       <div className={`${styles.wrapper}`}>
         <div className={`${styles.desktopFlex}`}>
           <div style={{ display: 'flex', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
-            <button
-              className={`button is-small ${processing ? 'is-loading' : ''}`}
-              disabled={processing}
-              onClick={previewPdf}
-            >
+            <button disabled={processing} onClick={previewPdf}>
               <img src={visibility} alt={'Preview'} />
               Preview
             </button>
-            <button
-              className={`button is-small ${processing ? 'is-loading' : ''}`}
-              disabled={processing}
-              onClick={() => downloadBasePdf('basePdf')}
-            >
+            <button disabled={processing} onClick={() => downloadBasePdf('basePdf')}>
               <img src={pdf} alt={'Download Base PDF'} />
               Download Base PDF
             </button>
-            <button
-              className={`button is-small ${processing ? 'is-loading' : ''}`}
-              disabled={processing}
-            >
+            <button disabled={processing}>
               <img src={pdf} alt={'Change Base PDF'} />
               Change Base PDF
               <input
-                className="file-input is-small"
                 type="file"
                 accept="application/pdf"
                 onChange={(e) => {
@@ -58,14 +45,10 @@ const EditorCtl = ({
                 }}
               />
             </button>
-            <button
-              className={`button is-small is-light is-success ${processing ? 'is-loading' : ''}`}
-              disabled={processing}
-            >
+            <button disabled={processing}>
               <img src={download} alt={'Load Json Template'} />
               Load
               <input
-                className="file-input is-small"
                 type="file"
                 accept="application/json"
                 onChange={(e) => {
@@ -76,7 +59,6 @@ const EditorCtl = ({
               />
             </button>
             <button
-              className={`button is-light is-small is-info ${processing ? 'is-loading' : ''}`}
               disabled={processing}
               onClick={() => saveTemplate(fmtTemplate(template, schemas))}
             >
