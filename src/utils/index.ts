@@ -1,7 +1,10 @@
-import { PageSize, Template, TemplateSchema, Schema } from '../types';
+import { PageSize, Template, TemplateWithPages, TemplateSchema, Schema } from '../type';
 import { blankPdf } from '../constants';
 import { nanoid } from 'nanoid';
-import * as pdfjsLib from 'pdfjs-dist/webpack';
+import * as pdfjsLib from 'pdfjs-dist';
+// @ts-ignore
+import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
 import { debounce as _debounce } from 'debounce';
 import { saveAs } from 'file-saver';
@@ -87,7 +90,7 @@ export const fileSave = (data: Blob | string, name: string) => {
     : saveAs(data, name);
 };
 
-export const arrayMove = (array: any[], from: number, to: number) => {
+export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   array = array.slice();
   const startIndex = to < 0 ? array.length + to : to;
   const item = array.splice(from, 1)[0];
@@ -95,7 +98,7 @@ export const arrayMove = (array: any[], from: number, to: number) => {
   return array;
 };
 
-export const pt2mm = (pt: number) => {
+const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
   return parseFloat(String(pt)) * mmRatio;
@@ -430,13 +433,14 @@ export const destroyShortCuts = () => {
   hotkeys.unbind();
 };
 
-export const getInitialTemplate = (): Template => {
+export const getInitialTemplate = (): TemplateWithPages => {
   return {
     sampledata: [],
     schemas: [],
     columns: [],
     basePdf: blankPdf,
     fontName: '',
+    pages: [],
   };
 };
 

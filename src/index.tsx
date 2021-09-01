@@ -1,8 +1,8 @@
 import Editor from './components/Editor';
 import defaultEditorCtl from './components/EditorCtl';
 import ReactDOM from 'react-dom';
-import { Template, TemplateEditorCtlProp } from './types';
-import { blankPdf } from './constants';
+import { Template, TemplateEditorCtlProp } from './type';
+import { blankPdf, lang } from './constants';
 
 const init = (
   domContainer: HTMLElement,
@@ -12,7 +12,7 @@ const init = (
 ) => {
   ReactDOM.render(
     <Editor
-      lang="en"
+      lang={lang}
       fetchTemplate={fetchTemplate}
       saveTemplate={saveTemplate}
       EditorCtl={customEditorCtl || defaultEditorCtl}

@@ -1,29 +1,23 @@
-import labelmake from 'labelmake';
-import React, { Component } from 'react';
+import { Component } from 'react';
 import * as styles from './index.module.scss';
-import { Template, PageSize, Schema, TemplateEditorProp } from '../../types';
+import { Template, Schema, TemplateWithPages, TemplateEditorProp } from '../../type';
 import Sidebar from './Sidebar';
 import Preview from './Preview';
-import { i18n } from '../../i18n';
 import { zoom } from '../../constants';
+import { i18n } from '../../i18n';
 import {
   uuid,
   set,
   cloneDeep,
   debounce,
-  readFile,
-  blob2File,
   round,
   b64toBlob,
-  fileSave,
   arrayMove,
-  isIos,
   pdf2Pngs,
   getPdfPageSizes,
   fmtTemplate,
   sortSchemas,
   getInitialSchema,
-  fmtTemplateFromJson,
   initShortCuts,
   destroyShortCuts,
   getInitialTemplate,
@@ -38,12 +32,11 @@ const fmtValue = (key: string, value: string) => {
 
 interface State {
   processing: boolean;
-  template: Template;
+  template: TemplateWithPages;
+  schemas: Schema[][];
   pageCursor: number;
-  pages: { size: PageSize; image: string }[];
   focusElementId: string;
   activeElements: HTMLElement[];
-  schemas: Schema[][];
 }
 
 class TemplateEditor extends Component<TemplateEditorProp, State> {
@@ -59,7 +52,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     activeElements: [],
     schemas: [[]] as Schema[][],
     pageCursor: 0,
-    pages: [],
   };
 
   componentDidMount() {
@@ -68,8 +60,12 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     this.props
       .fetchTemplate()
       .then(async (template) => {
-        this.setState({ template, schemas: sortSchemas(template, template.schemas.length) }, () =>
-          this.processAndSetBasePdf(template.basePdf as string)
+        this.setState(
+          {
+            template: Object.assign(template, { pages: [] }),
+            schemas: sortSchemas(template, template.schemas.length),
+          },
+          () => this.processAndSetBasePdf(template.basePdf as string)
         );
       })
       .catch(console.error);
@@ -82,8 +78,8 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   initEvents = () => {
     initShortCuts({
       move: (command, isShift) => {
-        const { pages, pageCursor } = this.state;
-        const ps = pages[pageCursor].size;
+        const { template, pageCursor } = this.state;
+        const ps = template.pages[pageCursor].size;
         const activeSchemas = this.getActiveSchemas();
         const arg = activeSchemas.map((as) => {
           let key: 'x' | 'y' = 'x';
@@ -139,8 +135,8 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       },
       paste: () => {
         if (!this.copiedSchemas || this.copiedSchemas.length === 0) return;
-        const { pages, pageCursor } = this.state;
-        const ps = pages[pageCursor].size;
+        const { template, pageCursor } = this.state;
+        const ps = template.pages[pageCursor].size;
         const _schemas = this.copiedSchemas.map((cs) => {
           const { height, width, position: p } = cs;
           const position = {
@@ -178,16 +174,15 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       },
       save: () => {
         this.setState({ processing: true });
-        const { schemas, template } = this.state;
+        const { template } = this.state;
         const { saveTemplate } = this.props;
-        const fmtdTemplate = fmtTemplate(template, schemas);
-        saveTemplate(fmtdTemplate).then(() => this.setState({ processing: false }));
+        saveTemplate(template).then(() => this.setState({ processing: false }));
       },
     });
 
     window.onscroll = debounce(() => {
-      const { pages } = this.state;
-      const pageSizes = pages.map((p) => p.size);
+      const { template } = this.state;
+      const pageSizes = template.pages.map((p) => p.size);
       if (!pageSizes[0]) {
         return;
       }
@@ -242,12 +237,12 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
 
   addSchema = () => {
     const { lang } = this.props;
-    const { pageCursor, pages, schemas } = this.state;
+    const { pageCursor, template, schemas } = this.state;
     const s = getInitialSchema();
     const paper = document.getElementById(`paper-${pageCursor}`);
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     const headerHeight = 53;
-    s.position.y = rectTop - headerHeight > 0 ? 0 : pages[pageCursor].size.height / 2;
+    s.position.y = rectTop - headerHeight > 0 ? 0 : template.pages[pageCursor].size.height / 2;
     s.data = 'text';
     s.key = `${i18n(lang, 'field')}${schemas[pageCursor].length + 1}`;
     this.commitSchemas(schemas[pageCursor].concat(s), () => {
@@ -283,35 +278,25 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   };
 
   commitSchemas = (newSchemas: Schema[], cb?: Function) => {
-    const { schemas, pageCursor } = this.state;
+    const { schemas, pageCursor, template } = this.state;
     this.future = [];
     this.past.push(cloneDeep(schemas[pageCursor]));
-    const s = cloneDeep(schemas);
-    s[pageCursor] = newSchemas;
-    this.setState({ schemas: s }, () => {
-      cb && cb();
-    });
-  };
-
-  handleChangeFontName = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { template } = this.state;
-    const fontName = e.target.value;
-    this.setState({ template: Object.assign(template, { fontName }) });
-  };
-
-  downloadBasePdf = (pdfName: string) => {
-    const { template } = this.state;
-    const pdfBlob = b64toBlob(template.basePdf as string);
-    fileSave(pdfBlob, `${pdfName}.pdf`);
+    const _schemas = cloneDeep(schemas);
+    _schemas[pageCursor] = newSchemas;
+    this.setState(
+      {
+        template: Object.assign(fmtTemplate(template, _schemas), { pages: template.pages }),
+        schemas: _schemas,
+      },
+      () => cb && cb()
+    );
   };
 
   onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
     const { schemas, pageCursor } = this.state;
     const _schemas = cloneDeep(schemas);
-    const schema = _schemas[pageCursor];
-    const movedSchema = arrayMove(schema, arg.oldIndex, arg.newIndex);
-    _schemas[pageCursor] = movedSchema;
-    this.setState({ schemas: _schemas });
+    const movedSchema = arrayMove(_schemas[pageCursor], arg.oldIndex, arg.newIndex);
+    this.commitSchemas(movedSchema);
   };
 
   onEdit = (id: string) => {
@@ -328,34 +313,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
 
   onMouseLeave = () => {
     this.setState({ focusElementId: '' });
-  };
-
-  previewPdf = () => {
-    const { lang } = this.props;
-    if (isIos()) {
-      alert(i18n(lang, 'previewWarnMsg'));
-      return;
-    }
-    this.setState({ processing: true });
-    labelmake({
-      inputs: [
-        this.state.schemas.reduce((acc, cur) => {
-          cur.forEach((c) => {
-            acc[c.key] = c.data;
-          });
-          return acc;
-        }, {} as { [key: string]: string }),
-      ],
-      template: fmtTemplate(this.state.template, this.state.schemas),
-    })
-      .then((pdf) => {
-        const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-        window.open(URL.createObjectURL(blob));
-      })
-      .catch(() => {
-        alert(i18n(lang, 'previewErrMsg'));
-      })
-      .then(() => this.setState({ processing: false }));
   };
 
   processAndSetBasePdf = async (basePdf: string) => {
@@ -392,25 +349,8 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       focusElementId: '',
       pageCursor: 0,
       schemas,
-      pages,
-      template: Object.assign(template, { basePdf }),
+      template: Object.assign(template, { basePdf, pages }),
     });
-  };
-
-  changeBasePdf = (file: File) => {
-    readFile(file, 'dataURL').then(async (basePdf) => {
-      this.processAndSetBasePdf(basePdf as string);
-    });
-  };
-
-  loadJsonTemplate = (file: File) => {
-    fmtTemplateFromJson(file)
-      .then((template) => {
-        const schemas = sortSchemas(template, template.schemas.length);
-        this.setState({ template, schemas });
-        this.changeBasePdf(blob2File(b64toBlob(template.basePdf as string), ''));
-      })
-      .catch(alert);
   };
 
   saveTemplateWithProcessing = async (template: Template) => {
@@ -420,8 +360,18 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     return tmplt;
   };
 
+  updateTemplate = async (template: Template) => {
+    const schemas = sortSchemas(template, template.schemas.length);
+    this.setState(
+      { template: Object.assign(template, { pages: this.state.template.pages }), schemas },
+      () => {
+        this.processAndSetBasePdf(template.basePdf as string);
+      }
+    );
+  };
+
   render() {
-    const { processing, template, focusElementId, activeElements, schemas, pageCursor, pages } =
+    const { processing, template, focusElementId, activeElements, schemas, pageCursor } =
       this.state;
     const { lang, EditorCtl } = this.props;
     const activeSchema = this.getLastActiveSchema();
@@ -430,13 +380,8 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
         <EditorCtl
           processing={processing}
           template={template}
-          schemas={schemas}
-          changeBasePdf={this.changeBasePdf}
-          previewPdf={this.previewPdf}
-          downloadBasePdf={this.downloadBasePdf}
           saveTemplate={this.saveTemplateWithProcessing}
-          loadJsonTemplate={this.loadJsonTemplate}
-          handleChangeFontName={this.handleChangeFontName}
+          updateTemplate={this.updateTemplate}
         />
         <div ref={(node) => (this.prevWrapRef = node)} className={`${styles.wrapper}`}>
           <Sidebar
@@ -457,7 +402,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
           />
           <Preview
             pageCursor={pageCursor}
-            pages={pages}
+            pages={template.pages}
             activeElements={activeElements}
             focusElementId={focusElementId}
             template={template}

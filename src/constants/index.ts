@@ -9,6 +9,8 @@ import qrcode from '../img/barcodeExamples/qrcode.png';
 import upca from '../img/barcodeExamples/upca.png';
 import upce from '../img/barcodeExamples/upce.png';
 
+export const lang = 'en';
+
 export const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,
   japanpost,
