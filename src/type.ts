@@ -13,6 +13,8 @@ export type Template = _Template & {
   columns: string[];
 };
 
+export type TemplateWithPages = Template & { pages: { size: PageSize; image: string }[] };
+
 export type Schema = TemplateSchema & {
   id: string;
   key: string;
@@ -29,21 +31,11 @@ export interface TemplateEditorProp {
 }
 
 export interface TemplateEditorCtlProp {
-  // --------base start------------
   processing: boolean;
   template: Template;
-  schemas: Schema[][];
-  // editorにsetStateする処理として抽象化したPropを追加するか下記で行う
-  [prop: string]: any;
-  changeBasePdf: (file: File) => void; // TODO editorにsetStateする処理として抽象化
-  downloadBasePdf: (pdfName: string) => void;
   saveTemplate: (template: Template) => Promise<Template>;
-  // --------base end------------
-  previewPdf?: () => void;
-  loadJsonTemplate?: (file: File) => void; // TODO editorにsetStateする処理として抽象化
-  handleChangeFontName?: (event: React.ChangeEvent<HTMLSelectElement>) => void; // TODO editorにsetStateする処理として抽象化
-  preview?: boolean;
-  togglePreview?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  updateTemplate: (template: Template) => void;
+  [prop: string]: any;
 }
 
 export interface GuidesInterface {

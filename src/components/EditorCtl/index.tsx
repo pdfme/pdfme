@@ -1,21 +1,61 @@
 import * as styles from './index.module.scss';
+import labelmake from 'labelmake';
+import { i18n } from '../../i18n';
+import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../utils';
+import { lang } from '../../constants';
 import visibility from '../../img/visibility.svg';
 import save from '../../img/save.svg';
 import pdf from '../../img/pdf.svg';
 import download from '../../img/download_bk.svg';
 import { TemplateEditorCtlProp } from '../../type';
-import { fmtTemplate } from '../../utils/';
 
 const EditorCtl = ({
   processing,
   template,
-  schemas,
-  changeBasePdf,
   saveTemplate,
-  previewPdf,
-  downloadBasePdf,
-  loadJsonTemplate,
+  updateTemplate,
 }: TemplateEditorCtlProp) => {
+  const previewPdf = () => {
+    if (isIos()) {
+      alert(i18n(lang, 'previewWarnMsg'));
+      return;
+    }
+    const schemas = sortSchemas(template, template.schemas.length);
+    labelmake({
+      inputs: [
+        schemas.reduce((acc, cur) => {
+          cur.forEach((c) => {
+            acc[c.key] = c.data;
+          });
+          return acc;
+        }, {} as { [key: string]: string }),
+      ],
+      template: fmtTemplate(template, schemas),
+    })
+      .then((pdf) => {
+        const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+        window.open(URL.createObjectURL(blob));
+      })
+      .catch(() => {
+        alert(i18n(lang, 'previewErrMsg'));
+      });
+  };
+
+  const changeBasePdf = (file: File) => {
+    readFile(file, 'dataURL').then(async (basePdf) => {
+      template.basePdf = basePdf;
+      updateTemplate(template);
+    });
+  };
+
+  const loadJsonTemplate = (file: File) => {
+    fmtTemplateFromJson(file)
+      .then((template) => {
+        updateTemplate(template);
+      })
+      .catch(alert);
+  };
+
   return (
     <>
       <div className={`${styles.wrapper}`}>
@@ -24,10 +64,6 @@ const EditorCtl = ({
             <button disabled={processing} onClick={previewPdf}>
               <img src={visibility} alt={'Preview'} />
               Preview
-            </button>
-            <button disabled={processing} onClick={() => downloadBasePdf('basePdf')}>
-              <img src={pdf} alt={'Download Base PDF'} />
-              Download Base PDF
             </button>
             <button disabled={processing}>
               <img src={pdf} alt={'Change Base PDF'} />
@@ -58,10 +94,7 @@ const EditorCtl = ({
                 }}
               />
             </button>
-            <button
-              disabled={processing}
-              onClick={() => saveTemplate(fmtTemplate(template, schemas))}
-            >
+            <button disabled={processing} onClick={() => saveTemplate(template)}>
               <img src={save} alt={'Get Template as Json'} />
               Save
             </button>

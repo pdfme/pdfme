@@ -1,4 +1,4 @@
-import { PageSize, Template, TemplateSchema, Schema } from '../type';
+import { PageSize, Template, TemplateWithPages, TemplateSchema, Schema } from '../type';
 import { blankPdf } from '../constants';
 import { nanoid } from 'nanoid';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -90,7 +90,7 @@ export const fileSave = (data: Blob | string, name: string) => {
     : saveAs(data, name);
 };
 
-export const arrayMove = (array: any[], from: number, to: number) => {
+export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   array = array.slice();
   const startIndex = to < 0 ? array.length + to : to;
   const item = array.splice(from, 1)[0];
@@ -433,13 +433,14 @@ export const destroyShortCuts = () => {
   hotkeys.unbind();
 };
 
-export const getInitialTemplate = (): Template => {
+export const getInitialTemplate = (): TemplateWithPages => {
   return {
     sampledata: [],
     schemas: [],
     columns: [],
     basePdf: blankPdf,
     fontName: '',
+    pages: [],
   };
 };
 
