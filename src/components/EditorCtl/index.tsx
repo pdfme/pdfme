@@ -3,10 +3,10 @@ import labelmake from 'labelmake';
 import { i18n } from '../../i18n';
 import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../utils';
 import { lang } from '../../constants';
-import visibility from '../../img/visibility.svg';
-import save from '../../img/save.svg';
-import pdf from '../../img/pdf.svg';
-import download from '../../img/download_bk.svg';
+import visibility from '../../images/visibility.svg';
+import save from '../../images/save.svg';
+import pdf from '../../images/pdf.svg';
+import download from '../../images/download_bk.svg';
 import { TemplateEditorCtlProp } from '../../type';
 
 const EditorCtl = ({

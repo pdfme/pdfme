@@ -1,5 +1,5 @@
-import { PageSize, Template, TemplateWithPages, TemplateSchema, Schema } from '../type';
-import { blankPdf } from '../constants';
+import { PageSize, Template, TemplateWithPages, TemplateSchema, Schema } from './type';
+import { blankPdf } from './constants';
 import { nanoid } from 'nanoid';
 import * as pdfjsLib from 'pdfjs-dist';
 // @ts-ignore
