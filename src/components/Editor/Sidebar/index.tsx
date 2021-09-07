@@ -6,13 +6,13 @@ import { readFiles } from '../../../utils';
 import { i18n } from '../../../i18n';
 import { inputTypeList } from '../../../constants';
 import Divider from '../../Divider';
-import backIcon from '../../../img/back.svg';
-import forwardIcon from '../../../img/forward.svg';
-import infoIcon from '../../../img/info.svg';
-import createIcon from '../../../img/create.svg';
-import dragIcon from '../../../img/drag.svg';
-import warningIcon from '../../../img/warning.svg';
-import deleteIcon from '../../../img/delete.svg';
+import backIcon from '../../../images/back.svg';
+import forwardIcon from '../../../images/forward.svg';
+import infoIcon from '../../../images/info.svg';
+import createIcon from '../../../images/create.svg';
+import dragIcon from '../../../images/drag.svg';
+import warningIcon from '../../../images/warning.svg';
+import deleteIcon from '../../../images/delete.svg';
 
 const isTouchable = () => true;
 
