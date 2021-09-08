@@ -21,16 +21,10 @@ const EditorCtl = ({
       return;
     }
     const schemas = sortSchemas(template, template.schemas.length);
+    const fmtdTemplate = fmtTemplate(template, schemas);
     labelmake({
-      inputs: [
-        schemas.reduce((acc, cur) => {
-          cur.forEach((c) => {
-            acc[c.key] = c.data;
-          });
-          return acc;
-        }, {} as { [key: string]: string }),
-      ],
-      template: fmtTemplate(template, schemas),
+      inputs: fmtdTemplate.sampledata,
+      template: fmtdTemplate,
     })
       .then((pdf) => {
         const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
