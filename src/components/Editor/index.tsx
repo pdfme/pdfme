@@ -175,8 +175,10 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       save: () => {
         this.setState({ processing: true });
         const { template } = this.state;
+        const _template = cloneDeep<any>(template);
+        delete _template.pages;
         const { saveTemplate } = this.props;
-        saveTemplate(template).then(() => this.setState({ processing: false }));
+        saveTemplate(_template).then(() => this.setState({ processing: false }));
       },
     });
 
@@ -355,7 +357,9 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
 
   saveTemplateWithProcessing = async (template: Template) => {
     this.setState({ processing: true });
-    const tmplt = await this.props.saveTemplate(template);
+    const _template = cloneDeep<any>(template);
+    delete _template.pages;
+    const tmplt = await this.props.saveTemplate(_template);
     this.setState({ processing: false });
     return tmplt;
   };
