@@ -2,6 +2,9 @@
 
 labelmake's [template design & code generator tool](https://labelmake.jp/javascript-pdf-generator-library/template-design/) has been cut out as a UI library. 
 
+![](./assets/screenShot.png)
+
+
 That is labelmake-editor.
 
 
@@ -57,4 +60,10 @@ open http://localhost:8080/
 
 ```
 npm run build
+```
+
+## Storybook
+
+```
+npm run storybook
 ```
