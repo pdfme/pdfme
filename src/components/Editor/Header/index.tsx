@@ -1,20 +1,15 @@
 import * as styles from './index.module.scss';
 import labelmake from 'labelmake';
-import { i18n } from '../../i18n';
-import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../utils';
-import { lang } from '../../constants';
-import visibility from '../../images/visibility.svg';
-import save from '../../images/save.svg';
-import pdf from '../../images/pdf.svg';
-import download from '../../images/download_bk.svg';
-import { TemplateEditorCtlProp } from '../../type';
+import { i18n } from '../../../i18n';
+import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../../utils';
+import { lang } from '../../../constants';
+import visibility from '../../../images/visibility.svg';
+import save from '../../../images/save.svg';
+import pdf from '../../../images/pdf.svg';
+import download from '../../../images/download_bk.svg';
+import { EditorHeaderProp } from '../../../type';
 
-const EditorCtl = ({
-  processing,
-  template,
-  saveTemplate,
-  updateTemplate,
-}: TemplateEditorCtlProp) => {
+const Header = ({ processing, template, saveTemplate, updateTemplate }: EditorHeaderProp) => {
   const previewPdf = () => {
     if (isIos()) {
       alert(i18n(lang, 'previewWarnMsg'));
@@ -99,4 +94,4 @@ const EditorCtl = ({
   );
 };
 
-export default EditorCtl;
+export default Header;

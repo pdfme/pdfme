@@ -6,7 +6,7 @@ import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema, Template, PageSize } from '../../../type';
-import { round, flatten } from '../../../utils';
+import { round, flatten, getFontFamily } from '../../../utils';
 import { barcodeList, zoom, barcodeExampleImageObj } from '../../../constants';
 
 const SELECTABLE = 'selectable';
@@ -15,10 +15,6 @@ const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
 
 const rulerHeight = 30;
-
-const getFontFamily = () => {
-  return 'Helvetica, Arial, sans-serif';
-};
 
 interface Props {
   pageCursor: number;
@@ -38,7 +34,7 @@ interface State {
   isPressShiftKey: boolean;
 }
 
-export default class Preview extends Component<Props, State> {
+export default class Main extends Component<Props, State> {
   private wrapRef: HTMLDivElement | null = null;
   private verticalGuides: GuidesInterface[] = [];
   private horizontalGuides: GuidesInterface[] = [];

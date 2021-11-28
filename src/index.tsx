@@ -1,35 +1,65 @@
-import Editor from './components/Editor';
-import defaultEditorCtl from './components/EditorCtl';
+import EditorComponents from './components/Editor';
+import PreviewComponents from './components/Preview';
+import EditorHeader from './components/Editor/Header';
 import ReactDOM from 'react-dom';
-import { Template, TemplateEditorCtlProp } from './type';
+import { PageSize, Template, EditorHeaderProp } from './type';
 import { blankPdf, lang } from './constants';
 
-let _domContainer: HTMLElement | null = null;
+let _editorDomContainer: HTMLElement | null = null;
+let _previewDomContainer: HTMLElement | null = null;
 
-const init = (
-  domContainer: HTMLElement,
-  fetchTemplate: () => Promise<Template>,
-  saveTemplate: (template: Template) => Promise<Template>,
-  customEditorCtl?: React.ComponentType<TemplateEditorCtlProp>
-) => {
-  _domContainer = domContainer;
-  ReactDOM.render(
-    <Editor
-      lang={lang}
-      fetchTemplate={fetchTemplate}
-      saveTemplate={saveTemplate}
-      EditorCtl={customEditorCtl || defaultEditorCtl}
-    />,
-    domContainer
-  );
+const Editor = {
+  init: (
+    domContainer: HTMLElement,
+    fetchTemplate: () => Promise<Template>,
+    saveTemplate: (template: Template) => Promise<Template>,
+    customHeader?: React.ComponentType<EditorHeaderProp>
+  ) => {
+    _editorDomContainer = domContainer;
+    ReactDOM.render(
+      <EditorComponents
+        lang={lang}
+        fetchTemplate={fetchTemplate}
+        saveTemplate={saveTemplate}
+        Header={customHeader || EditorHeader}
+      />,
+      domContainer
+    );
+  },
+  destroy: () => {
+    if (_editorDomContainer) {
+      ReactDOM.unmountComponentAtNode(_editorDomContainer);
+      _editorDomContainer = null;
+    }
+  },
 };
 
-const destroy = () => {
-  if (_domContainer) {
-    ReactDOM.unmountComponentAtNode(_domContainer);
-    _domContainer = null;
-  }
+const Preview = {
+  init: (
+    domContainer: HTMLElement,
+    template: Template,
+    inputs: { [key: string]: string }[],
+    size: PageSize,
+    changeInput?: (arg: { index: number; value: string; key: string }) => void
+  ) => {
+    _previewDomContainer = domContainer;
+    ReactDOM.render(
+      <PreviewComponents
+        template={template}
+        inputs={inputs}
+        size={size}
+        changeInput={changeInput}
+      />,
+      domContainer
+    );
+  },
+  destroy: () => {
+    if (_previewDomContainer) {
+      ReactDOM.unmountComponentAtNode(_previewDomContainer);
+      _previewDomContainer = null;
+    }
+  },
 };
 
-export default { destroy, init, blankPdf };
-export { destroy, init, blankPdf };
+export default { Editor, Preview, blankPdf };
+export { Editor, Preview, blankPdf };

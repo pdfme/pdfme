@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import LabelmakeEditor from '../index';
+import { Editor, blankPdf } from '../index';
 
 export const Simple = () => {
   useEffect(() => {
@@ -16,7 +16,7 @@ export const Simple = () => {
             },
           ],
           fontName: '',
-          basePdf: LabelmakeEditor.blankPdf,
+          basePdf: blankPdf,
           schemas: [
             {
               field1: {
@@ -48,7 +48,7 @@ export const Simple = () => {
       return Promise.resolve(t);
     };
 
-    LabelmakeEditor.init(domContainer, fetchTemplate, saveTemplate);
+    Editor.init(domContainer, fetchTemplate, saveTemplate);
   });
   return (
     <article>

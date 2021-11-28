@@ -2,7 +2,7 @@ import { Component } from 'react';
 import * as styles from './index.module.scss';
 import { Template, Schema, TemplateWithPages, TemplateEditorProp } from '../../type';
 import Sidebar from './Sidebar';
-import Preview from './Preview';
+import Main from './Main';
 import { zoom } from '../../constants';
 import { i18n } from '../../i18n';
 import {
@@ -43,7 +43,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   private copiedSchemas: Schema[] | null = null;
   private past: Schema[][] = [];
   private future: Schema[][] = [];
-  private prevWrapRef: HTMLDivElement | null = null;
+  private wrapRef: HTMLDivElement | null = null;
 
   state: State = {
     processing: false,
@@ -193,7 +193,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
 
       const scroll = window.pageYOffset * scale;
-      const top = (this.prevWrapRef ? this.prevWrapRef.getBoundingClientRect().top : 0) + scroll;
+      const top = (this.wrapRef ? this.wrapRef.getBoundingClientRect().top : 0) + scroll;
       const pageHeights = pageSizes.reduce((acc, cur, i) => {
         let value = cur.height * zoom * scale;
         if (i === 0) {
@@ -377,17 +377,17 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   render() {
     const { processing, template, focusElementId, activeElements, schemas, pageCursor } =
       this.state;
-    const { lang, EditorCtl } = this.props;
+    const { lang, Header } = this.props;
     const activeSchema = this.getLastActiveSchema();
     return (
       <>
-        <EditorCtl
+        <Header
           processing={processing}
           template={template}
           saveTemplate={this.saveTemplateWithProcessing}
           updateTemplate={this.updateTemplate}
         />
-        <div ref={(node) => (this.prevWrapRef = node)} className={`${styles.wrapper}`}>
+        <div ref={(node) => (this.wrapRef = node)} className={`${styles.wrapper}`}>
           <Sidebar
             lang={lang}
             pageCursor={pageCursor}
@@ -404,7 +404,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
             addSchema={this.addSchema}
             removeSchema={this.removeSchema}
           />
-          <Preview
+          <Main
             pageCursor={pageCursor}
             pages={template.pages}
             activeElements={activeElements}

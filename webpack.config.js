@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const FILENAME = pkg.name + (isProduction ? '.min' : '');
 
 const BANNER = [
-    'labelmake editor',
+    'labelmake ui',
     '@version ' + pkg.version + ' | ' + new Date().toDateString(),
     '@author ' + pkg.author,
     '@license ' + pkg.license
@@ -36,7 +36,7 @@ const config = {
     },
     entry: './src/index.tsx',
     output: {
-        library: 'LabelmakeEditor',
+        library: 'LabelmakeUi',
         libraryTarget: 'umd',
         libraryExport: 'default',
         path: path.join(__dirname, 'dist'),

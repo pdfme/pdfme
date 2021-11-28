@@ -27,10 +27,10 @@ export interface TemplateEditorProp {
   lang: Lang;
   fetchTemplate: () => Promise<Template>;
   saveTemplate: (template: Template) => Promise<Template>;
-  EditorCtl: React.ComponentType<TemplateEditorCtlProp>;
+  Header: React.ComponentType<EditorHeaderProp>;
 }
 
-export interface TemplateEditorCtlProp {
+export interface EditorHeaderProp {
   processing: boolean;
   template: Template;
   saveTemplate: (template: Template) => Promise<Template>;

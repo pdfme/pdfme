@@ -1,3 +1,5 @@
+<!-- TODO how to import(namespace is unclear),destroy method -->
+
 import { Meta } from '@storybook/addon-docs';
 import LinkTo from '@storybook/addon-links/react';
 import ScreenShot from './ScreenShot.png';
@@ -11,12 +13,17 @@ import ScreenShot from './ScreenShot.png';
 
 <img src={ScreenShot} />
 
-
 ## How to use -> <LinkTo kind="sample--simple">Here's a simple sample</LinkTo>
 
 LabelmakeEditor has init method.
+
 ```ts
-const init: (domContainer: HTMLElement, fetchTemplate: () => Promise<Template>, saveTemplate: (template: Template) => Promise<Template>, customEditorCtl?: ComponentType<TemplateEditorCtlProp> | undefined) => void
+const init: (
+  domContainer: HTMLElement,
+  fetchTemplate: () => Promise<Template>,
+  saveTemplate: (template: Template) => Promise<Template>,
+  customHeader?: ComponentType<EditorHeaderProp> | undefined
+) => void;
 ```
 
 Expands the editor to the `domContainer`.  
