@@ -1,11 +1,11 @@
-# labelmake-editor
+# labelmake-ui
 
 labelmake's [template design & code generator tool](https://labelmake.jp/javascript-pdf-generator-library/template-design/) has been cut out as a UI library. 
 
 ![](./assets/screenShot.png)
 
 
-That is labelmake-editor.
+That is labelmake-ui.
 
 
 ## Check example

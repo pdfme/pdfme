@@ -1,12 +1,12 @@
 {
-  "name": "labelmake-editor",
+  "name": "labelmake-ui",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/labelmake-editor.min.jp",
+  "main": "dist/labelmake-ui.min.jp",
   "typings": "dist/types/index.d.ts",
   "engines": {
-    "node": "14.x"
-  },
+    "node": ">=14" 
+   },
   "scripts": {
     "develop": "DEV_SERVER=true webpack-dev-server --hot --mode development",
     "clean": "rimraf dist",
