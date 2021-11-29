@@ -1,5 +1,5 @@
-// TODO ここのコンパイルエラーの修正から
 import React, { useState, useCallback, useEffect } from 'react';
+import * as styles from './index.module.scss';
 import { Template, PageSize } from '../../type';
 import { barcodeList, barcodeExampleImageObj, zoom } from '../../constants';
 import {
@@ -90,7 +90,7 @@ const LabelEditorPreview = ({
   const editable = Boolean(changeInput);
 
   return (
-    <div style={{ position: 'relative', background: 'rgb(74, 74, 74)' }}>
+    <div style={{ ...size, position: 'relative', background: 'rgb(74, 74, 74)' }}>
       {/* TODO Must consider external font */}
       {/* <Helmet>
         <link
@@ -106,7 +106,6 @@ const LabelEditorPreview = ({
       />
       <div
         style={{
-          ...size,
           display: isOpen ? 'flex' : 'none',
           alignItems: 'center',
           justifyContent: 'center',
@@ -127,17 +126,14 @@ const LabelEditorPreview = ({
                 style={{
                   fontFamily: getFontFamily(template.fontName),
                   backgroundColor: '#fff',
+                  border: '1px solid #999', 
                   position: 'absolute',
                   ...paper,
                 }}
               >
                 {template.schemas.map((schema, index) => (
                   <div key={JSON.stringify(schema)}>
-                    <img
-                      style={{ border: '1px solid #999' }}
-                      src={backgrounds[index] || ''}
-                      alt="background"
-                    />
+                    <img {...size} src={backgrounds[index] || ''} alt="background" />
                     {Object.entries(schema || {}).map((entry) => {
                       const [key, s] = entry;
                       const tabIndex = (template.columns.findIndex((c) => c === key) || 0) + 100;

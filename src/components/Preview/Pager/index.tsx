@@ -1,3 +1,4 @@
+import * as styles from './index.module.scss';
 import left from '../../../images/left.svg';
 import right from '../../../images/right.svg';
 import doubleLeft from '../../../images/double-left.svg';
