@@ -1,5 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, ChangeEvent } from 'react';
 import * as styles from './index.module.scss';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 import { Template, PageSize } from '../../type';
 import { barcodeList, barcodeExampleImageObj, zoom } from '../../constants';
 import {
@@ -126,14 +128,14 @@ const LabelEditorPreview = ({
                 style={{
                   fontFamily: getFontFamily(template.fontName),
                   backgroundColor: '#fff',
-                  border: '1px solid #999', 
+                  border: '1px solid #999',
                   position: 'absolute',
                   ...paper,
                 }}
               >
                 {template.schemas.map((schema, index) => (
                   <div key={JSON.stringify(schema)}>
-                    <img {...size} src={backgrounds[index] || ''} alt="background" />
+                    <img {...paper} src={backgrounds[index] || ''} alt="background" />
                     {Object.entries(schema || {}).map((entry) => {
                       const [key, s] = entry;
                       const tabIndex = (template.columns.findIndex((c) => c === key) || 0) + 100;
@@ -143,176 +145,177 @@ const LabelEditorPreview = ({
                           ? inputs[pageCursor][key]
                           : '';
                       return (
-                        <div
-                          key={key}
-                          data-tooltip={key ? key.replace(/^{\d+}/, '') : null}
-                          className="has-tooltip-arrow"
-                          style={{
-                            position: 'absolute',
-                            height: +s.height * zoom,
-                            width: +s.width * zoom,
-                            top: +s.position.y * zoom + index * paperHeight,
-                            left: +s.position.x * zoom,
-                            border: `1px dashed ${editable ? '#4af' : '#777'}`,
-                            backgroundColor:
-                              s.type === 'text' && s.backgroundColor
-                                ? s.backgroundColor
-                                : 'transparent',
-                          }}
-                        >
-                          {s.type === 'text' && (
-                            <textarea
-                              disabled={!editable}
-                              placeholder={template.sampledata[0][key] || ''}
-                              tabIndex={tabIndex}
-                              className="nofocus placeholder-gray"
+                        <div key={key}>
+                          <Tippy delay={0} interactive content={key}>
+                            <div
                               style={{
-                                resize: 'none',
-                                fontFamily: 'inherit',
-                                height: s.height * zoom,
-                                width: (s.width + (s.characterSpacing || 0) * 0.75) * zoom, // 横幅を伸ばす1ポイントは0.75ピクセル
-                                textAlign: s.alignment,
-                                fontSize: s.fontSize + 'pt',
-                                letterSpacing: s.characterSpacing + 'pt',
-                                fontFeatureSettings: `"palt"`,
-                                lineHeight: s.lineHeight + 'em',
-                                whiteSpace: 'pre-line',
-                                wordBreak: 'break-all',
-                                background: 'transparent',
-                                border: 'none',
-                                color: s.fontColor || '#000',
+                                position: 'absolute',
+                                height: +s.height * zoom,
+                                width: +s.width * zoom,
+                                top: +s.position.y * zoom + index * paperHeight,
+                                left: +s.position.x * zoom,
+                                border: `1px dashed ${editable ? '#4af' : '#777'}`,
+                                backgroundColor:
+                                  s.type === 'text' && s.backgroundColor
+                                    ? s.backgroundColor
+                                    : 'transparent',
                               }}
-                              onChange={(e) => {
-                                changeInput &&
-                                  changeInput({
-                                    index: pageCursor,
-                                    key: key,
-                                    value: e.target.value,
-                                  });
-                              }}
-                              value={value}
-                            ></textarea>
-                          )}
-                          {s.type === 'image' && (
-                            <div>
-                              {value ? (
-                                <div style={{ margin: '0 auto' }}>
-                                  {editable && (
-                                    <button
-                                      tabIndex={tabIndex}
+                            >
+                              {s.type === 'text' && (
+                                <textarea
+                                  disabled={!editable}
+                                  placeholder={template.sampledata[0][key] || ''}
+                                  tabIndex={tabIndex}
+                                  className="nofocus placeholder-gray"
+                                  style={{
+                                    resize: 'none',
+                                    fontFamily: 'inherit',
+                                    height: s.height * zoom,
+                                    width: (s.width + (s.characterSpacing || 0) * 0.75) * zoom, // 横幅を伸ばす1ポイントは0.75ピクセル
+                                    textAlign: s.alignment,
+                                    fontSize: s.fontSize + 'pt',
+                                    letterSpacing: s.characterSpacing + 'pt',
+                                    fontFeatureSettings: `"palt"`,
+                                    lineHeight: s.lineHeight + 'em',
+                                    whiteSpace: 'pre-line',
+                                    wordBreak: 'break-all',
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: s.fontColor || '#000',
+                                  }}
+                                  onChange={(e) => {
+                                    changeInput &&
+                                      changeInput({
+                                        index: pageCursor,
+                                        key: key,
+                                        value: e.target.value,
+                                      });
+                                  }}
+                                  value={value}
+                                ></textarea>
+                              )}
+                              {s.type === 'image' && (
+                                <div>
+                                  {value ? (
+                                    <div style={{ margin: '0 auto' }}>
+                                      {editable && (
+                                        <button
+                                          tabIndex={tabIndex}
+                                          style={{
+                                            position: 'absolute',
+                                            background: '#ff4400',
+                                          }}
+                                          className="delete"
+                                          aria-label="close"
+                                          onClick={() =>
+                                            changeInput &&
+                                            changeInput({
+                                              index: pageCursor,
+                                              key: key,
+                                              value: '',
+                                            })
+                                          }
+                                        />
+                                      )}
+                                      <img
+                                        style={{
+                                          width: s.width * zoom,
+                                          height: s.height * zoom,
+                                          borderRadius: 0,
+                                        }}
+                                        src={value}
+                                      />
+                                    </div>
+                                  ) : (
+                                    <label
                                       style={{
-                                        position: 'absolute',
-                                        background: '#ff4400',
+                                        height: +s.height * zoom,
+                                        width: (+s.width + (s.characterSpacing || 0) * 0.75) * zoom,
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
                                       }}
-                                      className="delete"
-                                      aria-label="close"
-                                      onClick={() =>
-                                        changeInput &&
+                                    >
+                                      {editable && (
+                                        <>
+                                          <input
+                                            tabIndex={tabIndex}
+                                            style={{ display: 'none' }}
+                                            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                                              const files = event.target.files;
+                                              readFiles(files, 'dataURL').then((result) => {
+                                                changeInput &&
+                                                  changeInput({
+                                                    index: pageCursor,
+                                                    key: key,
+                                                    value: result as string,
+                                                  });
+                                              });
+                                            }}
+                                            type="file"
+                                            accept="image/jpeg, image/png"
+                                          />
+                                          <span>選択</span>
+                                        </>
+                                      )}
+                                    </label>
+                                  )}
+                                </div>
+                              )}
+                              {barcodeList.includes(s.type) && (
+                                <div
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                >
+                                  <input
+                                    disabled={!editable}
+                                    tabIndex={tabIndex}
+                                    placeholder={template.sampledata[0][key] || ''}
+                                    className="nofocus placeholder-gray"
+                                    style={{
+                                      textAlign: 'center',
+                                      position: 'absolute',
+                                      zIndex: 2,
+                                      fontSize: 'inherit',
+                                      height: +s.height * zoom,
+                                      width: (+s.width + (s.characterSpacing || 0) * 0.75) * zoom,
+                                      background:
+                                        editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
+                                      border: 'none',
+                                    }}
+                                    value={value}
+                                    onChange={(e) => {
+                                      changeInput &&
                                         changeInput({
                                           index: pageCursor,
                                           key: key,
-                                          value: '',
-                                        })
-                                      }
-                                    />
-                                  )}
-                                  <img
-                                    style={{
-                                      width: s.width * zoom,
-                                      height: s.height * zoom,
-                                      borderRadius: 0,
+                                          value: e.target.value,
+                                        });
                                     }}
-                                    src={value}
                                   />
-                                </div>
-                              ) : (
-                                <label
-                                  style={{
-                                    height: +s.height * zoom,
-                                    width: (+s.width + (s.characterSpacing || 0) * 0.75) * zoom,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  {editable && (
-                                    <>
-                                      <input
-                                        tabIndex={tabIndex}
-                                        style={{ display: 'none' }}
-                                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                          const files = event.target.files;
-                                          readFiles(files, 'dataURL').then((result) => {
-                                            changeInput &&
-                                              changeInput({
-                                                index: pageCursor,
-                                                key: key,
-                                                value: result as string,
-                                              });
-                                          });
+                                  {value &&
+                                    (validateBarcodeInput(s.type, value) ? (
+                                      <img
+                                        src={barcodeExampleImageObj[s.type]}
+                                        style={{
+                                          position: 'absolute',
+                                          width: '100%',
+                                          height: '100%',
+                                          borderRadius: 0,
                                         }}
-                                        type="file"
-                                        accept="image/jpeg, image/png"
                                       />
-                                      <span>選択</span>
-                                    </>
-                                  )}
-                                </label>
+                                    ) : (
+                                      <BarcodeError />
+                                    ))}
+                                </div>
                               )}
                             </div>
-                          )}
-                          {barcodeList.includes(s.type) && (
-                            <div
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <input
-                                disabled={!editable}
-                                tabIndex={tabIndex}
-                                placeholder={template.sampledata[0][key] || ''}
-                                className="nofocus placeholder-gray"
-                                style={{
-                                  textAlign: 'center',
-                                  position: 'absolute',
-                                  zIndex: 2,
-                                  fontSize: 'inherit',
-                                  height: +s.height * zoom,
-                                  width: (+s.width + (s.characterSpacing || 0) * 0.75) * zoom,
-                                  background:
-                                    editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
-                                  border: 'none',
-                                }}
-                                value={value}
-                                onChange={(e) => {
-                                  changeInput &&
-                                    changeInput({
-                                      index: pageCursor,
-                                      key: key,
-                                      value: e.target.value,
-                                    });
-                                }}
-                              />
-                              {value &&
-                                (validateBarcodeInput(s.type, value) ? (
-                                  <img
-                                    src={barcodeExampleImageObj[s.type]}
-                                    style={{
-                                      position: 'absolute',
-                                      width: '100%',
-                                      height: '100%',
-                                      borderRadius: 0,
-                                    }}
-                                  />
-                                ) : (
-                                  <BarcodeError />
-                                ))}
-                            </div>
-                          )}
+                          </Tippy>
                         </div>
                       );
                     })}

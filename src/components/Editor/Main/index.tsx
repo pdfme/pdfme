@@ -341,11 +341,7 @@ export default class Main extends Component<Props, State> {
                     </div>
                     {schemas[index].map((s) => (
                       <div key={s.id}>
-                        <Tippy
-                          delay={0}
-                          interactive
-                          content={s.key.replace(/^{\d+}/, '') ? s.key.replace(/^{\d+}/, '') : ''}
-                        >
+                        <Tippy delay={0} interactive content={s.key}>
                           <div
                             className={`${SELECTABLE}`}
                             onMouseEnter={() => onMouseEnter(s.id)}
