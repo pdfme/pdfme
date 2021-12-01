@@ -1,1 +1,65 @@
-// TODO 実装
+.barcodeError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  p {
+    color: white;
+    background: red;
+    padding: 0.25rem;
+    font-size: 12pt;
+    font-weight: bold;
+    border-radius: 3px;
+  }
+}
+
+.barcodeWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barcodeImage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+.previewWrapper {
+  align-items: center;
+  justify-content: center;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  margin: 0 auto;
+}
+
+.paper {
+  background-color: #fff;
+  border: 1px solid #999;
+  position: absolute;
+}
+
+.nofocus:focus {
+  outline: none;
+}
+
+.placeholder-gray::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: rgb(230, 230, 230);
+  opacity: 1; /* Firefox */
+}
+
+.imageLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dltBtn {
+  position: absolute;
+  left: 0;
+  top: 0;
+}

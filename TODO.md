@@ -4,10 +4,13 @@
 - プレビューの横幅がおかしい？横いっぱいになる->ok
 - public/index.htmlの微調整->ok
 - tooltipの微調整->ok
-- prevewのscssの微調整
+- prevewのscssの微調整->ok
+- 多言語化 既存のi18nはreact contextに変更する->doing
+
 
 ---ここまでで labelmake-uiへprevewコンポーネントを移植する #1407 ---
 
+- TODO Editor/Mainと共通化
 - Editorのinitにsizeを追加する
 - fetchTemplateはtemplateで良くない？
 - initの返り値はインスタンスにしてそのインスタンスに対してdestroyする方が自然？

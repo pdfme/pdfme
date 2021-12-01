@@ -40,7 +40,7 @@ const Preview = {
     template: Template,
     inputs: { [key: string]: string }[],
     size: PageSize,
-    changeInput?: (arg: { index: number; value: string; key: string }) => void
+    onChangeInput?: (arg: { index: number; value: string; key: string }) => void
   ) => {
     _previewDomContainer = domContainer;
     ReactDOM.render(
@@ -48,7 +48,7 @@ const Preview = {
         template={template}
         inputs={inputs}
         size={size}
-        changeInput={changeInput}
+        onChangeInput={onChangeInput}
       />,
       domContainer
     );

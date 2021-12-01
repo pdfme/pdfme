@@ -1,1 +1,19 @@
-// TODO 実装
+.wrapper {
+  position: absolute;
+  right: 0;
+  z-index: 1;
+  background-color: #777777bd;
+  padding: 0.5rem;
+}
+
+.leftBtn {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.rightBtn {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}

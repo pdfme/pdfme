@@ -8,9 +8,11 @@
   <body style="margin: 0">
     <div>
       <button onclick="previewInit()">Init preview</button>
+      <button onclick="editablePreviewInit()">Init editable preview</button>
       <button onclick="editorInit()">Init editor</button>
       /
       <button onclick="previewDestroy()">Destroy preview</button>
+      <button onclick="editablePreviewDestroy()">Destroy editable preview</button>
       <button onclick="editorDestroy()">Destroy editor</button>
     </div>
     <div id="app"></div>
@@ -54,28 +56,51 @@
 
       const inited = 'inited';
       const preview = 'preview';
+      const editablePreview = 'editablePreview';
       const editor = 'editor';
 
       window.onload = function () {
         const item = localStorage.getItem(inited);
         if (item === preview) previewInit();
+        if (item === editablePreview) editablePreviewInit();
         if (item === editor) editorInit();
       };
 
       function previewInit() {
-        localStorage.setItem(inited, 'preview');
+        localStorage.setItem(inited, preview);
         LabelmakeUi.Preview.init(
           domContainer,
           getTemplate(),
-          [{ field1: 'ああ', field2: 'いいいい' }],
+          [
+            { field1: 'ああ1', field2: 'いいいい1' },
+            { field1: 'ああ2', field2: 'いいいい2' },
+          ],
           {
-            height: 500,
-            width: 500,
+            height: 1000,
+            width: 1200,
+          }
+        );
+      }
+      function editablePreviewInit() {
+        localStorage.setItem(inited, editablePreview);
+        LabelmakeUi.Preview.init(
+          domContainer,
+          getTemplate(),
+          [
+            { field1: 'ああ1', field2: 'いいいい1' },
+            { field1: 'ああ2', field2: '' },
+          ],
+          {
+            height: 1000,
+            width: 1200,
+          },
+          ({ index, value, key }) => {
+            console.log('index', index, 'value', value, 'key', key);
           }
         );
       }
       function editorInit() {
-        localStorage.setItem(inited, 'editor');
+        localStorage.setItem(inited, editor);
         const fetchTemplate = () => new Promise((r) => r(getTemplate()));
         const saveTemplate = (t) => {
           return new Promise((resolve) => {
@@ -97,6 +122,9 @@
 
       function previewDestroy() {
         LabelmakeUi.Preview.destroy();
+      }
+      function editablePreviewDestroy() {
+        previewDestroy();
       }
       function editorDestroy() {
         LabelmakeUi.Editor.destroy();

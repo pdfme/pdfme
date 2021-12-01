@@ -17,26 +17,8 @@ import {
 import Pager from './Pager';
 
 const BarcodeError = () => (
-  <div
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-    }}
-  >
-    <p
-      style={{
-        color: 'white',
-        background: 'red',
-        padding: '0.25rem',
-        fontSize: '12pt',
-        fontWeight: 'bold',
-        borderRadius: 3,
-      }}
-    >
-      ERROR
-    </p>
+  <div className={styles.barcodeError}>
+    <p>ERROR</p>
   </div>
 );
 
@@ -44,12 +26,12 @@ const LabelEditorPreview = ({
   template,
   inputs,
   size,
-  changeInput,
+  onChangeInput,
 }: {
   template: Template;
   inputs: { [key: string]: string }[];
   size: PageSize;
-  changeInput?: (arg: { index: number; value: string; key: string }) => void;
+  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
 }) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState<PageSize>(getA4());
@@ -89,7 +71,8 @@ const LabelEditorPreview = ({
   const paperWidth = pageSize.width * zoom;
   const paper = { width: paperWidth, height: paperHeight };
   const isOpen = size.width !== 0;
-  const editable = Boolean(changeInput);
+  const editable = Boolean(onChangeInput);
+  const input = inputs[pageCursor];
 
   return (
     <div style={{ ...size, position: 'relative', background: 'rgb(74, 74, 74)' }}>
@@ -106,32 +89,13 @@ const LabelEditorPreview = ({
         pageNum={inputs.length}
         setPageCursor={setPageCursor}
       />
-      <div
-        style={{
-          display: isOpen ? 'flex' : 'none',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflowY: 'scroll',
-          scrollbarWidth: 'none',
-          margin: '0 auto',
-        }}
-      >
+      <div className={styles.previewWrapper} style={{ display: isOpen ? 'flex' : 'none' }}>
         <div style={{ width: paperWidth * scale, height: paperHeight * scale }}>
-          <div
-            style={{
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left',
-            }}
-          >
+          <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
             <div style={{ position: 'relative', ...paper }}>
               <div
-                style={{
-                  fontFamily: getFontFamily(template.fontName),
-                  backgroundColor: '#fff',
-                  border: '1px solid #999',
-                  position: 'absolute',
-                  ...paper,
-                }}
+                className={styles.paper}
+                style={{ fontFamily: getFontFamily(template.fontName) }}
               >
                 {template.schemas.map((schema, index) => (
                   <div key={JSON.stringify(schema)}>
@@ -139,11 +103,7 @@ const LabelEditorPreview = ({
                     {Object.entries(schema || {}).map((entry) => {
                       const [key, s] = entry;
                       const tabIndex = (template.columns.findIndex((c) => c === key) || 0) + 100;
-
-                      const value =
-                        inputs[pageCursor] && inputs[pageCursor][key]
-                          ? inputs[pageCursor][key]
-                          : '';
+                      const value = input && input[key] ? input[key] : '';
                       return (
                         <div key={key}>
                           <Tippy delay={0} interactive content={key}>
@@ -161,12 +121,13 @@ const LabelEditorPreview = ({
                                     : 'transparent',
                               }}
                             >
+                              {/* TODO Editor/Mainと共通化 */}
                               {s.type === 'text' && (
                                 <textarea
                                   disabled={!editable}
                                   placeholder={template.sampledata[0][key] || ''}
                                   tabIndex={tabIndex}
-                                  className="nofocus placeholder-gray"
+                                  className={`${styles.nofocus} ${styles.placeholderGray}`}
                                   style={{
                                     resize: 'none',
                                     fontFamily: 'inherit',
@@ -184,8 +145,8 @@ const LabelEditorPreview = ({
                                     color: s.fontColor || '#000',
                                   }}
                                   onChange={(e) => {
-                                    changeInput &&
-                                      changeInput({
+                                    onChangeInput &&
+                                      onChangeInput({
                                         index: pageCursor,
                                         key: key,
                                         value: e.target.value,
@@ -195,27 +156,26 @@ const LabelEditorPreview = ({
                                 ></textarea>
                               )}
                               {s.type === 'image' && (
+                                // {/* TODO Editor/Mainと共通化 */}
                                 <div>
                                   {value ? (
                                     <div style={{ margin: '0 auto' }}>
                                       {editable && (
                                         <button
                                           tabIndex={tabIndex}
-                                          style={{
-                                            position: 'absolute',
-                                            background: '#ff4400',
-                                          }}
-                                          className="delete"
+                                          className={styles.dltBtn}
                                           aria-label="close"
                                           onClick={() =>
-                                            changeInput &&
-                                            changeInput({
+                                            onChangeInput &&
+                                            onChangeInput({
                                               index: pageCursor,
                                               key: key,
                                               value: '',
                                             })
                                           }
-                                        />
+                                        >
+                                          x
+                                        </button>
                                       )}
                                       <img
                                         style={{
@@ -228,12 +188,10 @@ const LabelEditorPreview = ({
                                     </div>
                                   ) : (
                                     <label
+                                      className={styles.imageLabel}
                                       style={{
                                         height: +s.height * zoom,
                                         width: (+s.width + (s.characterSpacing || 0) * 0.75) * zoom,
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
                                       }}
                                     >
                                       {editable && (
@@ -244,8 +202,8 @@ const LabelEditorPreview = ({
                                             onChange={(event: ChangeEvent<HTMLInputElement>) => {
                                               const files = event.target.files;
                                               readFiles(files, 'dataURL').then((result) => {
-                                                changeInput &&
-                                                  changeInput({
+                                                onChangeInput &&
+                                                  onChangeInput({
                                                     index: pageCursor,
                                                     key: key,
                                                     value: result as string,
@@ -255,6 +213,7 @@ const LabelEditorPreview = ({
                                             type="file"
                                             accept="image/jpeg, image/png"
                                           />
+                                          {/* TODO 多言語化 */}
                                           <span>選択</span>
                                         </>
                                       )}
@@ -263,20 +222,13 @@ const LabelEditorPreview = ({
                                 </div>
                               )}
                               {barcodeList.includes(s.type) && (
-                                <div
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                  }}
-                                >
+                                // {/* TODO Editor/Mainと共通化 */}
+                                <div className={styles.barcodeWrapper}>
                                   <input
                                     disabled={!editable}
                                     tabIndex={tabIndex}
                                     placeholder={template.sampledata[0][key] || ''}
-                                    className="nofocus placeholder-gray"
+                                    className={`${styles.nofocus} ${styles.placeholderGray}`}
                                     style={{
                                       textAlign: 'center',
                                       position: 'absolute',
@@ -290,8 +242,8 @@ const LabelEditorPreview = ({
                                     }}
                                     value={value}
                                     onChange={(e) => {
-                                      changeInput &&
-                                        changeInput({
+                                      onChangeInput &&
+                                        onChangeInput({
                                           index: pageCursor,
                                           key: key,
                                           value: e.target.value,
@@ -301,13 +253,8 @@ const LabelEditorPreview = ({
                                   {value &&
                                     (validateBarcodeInput(s.type, value) ? (
                                       <img
+                                        className={styles.barcodeImage}
                                         src={barcodeExampleImageObj[s.type]}
-                                        style={{
-                                          position: 'absolute',
-                                          width: '100%',
-                                          height: '100%',
-                                          borderRadius: 0,
-                                        }}
                                       />
                                     ) : (
                                       <BarcodeError />
