@@ -4,7 +4,9 @@ import EditorHeader from './components/Editor/Header';
 import ReactDOM from 'react-dom';
 import { PageSize, Template, EditorHeaderProp } from './type';
 import { blankPdf, lang } from './constants';
+import { I18nContext, curriedI18n } from './i18n';
 
+// このように変数にすると1ページ内で複数のeditor,previewインスタンスを作成できない
 let _editorDomContainer: HTMLElement | null = null;
 let _previewDomContainer: HTMLElement | null = null;
 
@@ -16,13 +18,16 @@ const Editor = {
     customHeader?: React.ComponentType<EditorHeaderProp>
   ) => {
     _editorDomContainer = domContainer;
+    const i18n = curriedI18n(lang);
+
     ReactDOM.render(
-      <EditorComponents
-        lang={lang}
-        fetchTemplate={fetchTemplate}
-        saveTemplate={saveTemplate}
-        Header={customHeader || EditorHeader}
-      />,
+      <I18nContext.Provider value={i18n}>
+        <EditorComponents
+          fetchTemplate={fetchTemplate}
+          saveTemplate={saveTemplate}
+          Header={customHeader || EditorHeader}
+        />
+      </I18nContext.Provider>,
       domContainer
     );
   },
@@ -43,13 +48,17 @@ const Preview = {
     onChangeInput?: (arg: { index: number; value: string; key: string }) => void
   ) => {
     _previewDomContainer = domContainer;
+    const i18n = curriedI18n(lang);
+
     ReactDOM.render(
-      <PreviewComponents
-        template={template}
-        inputs={inputs}
-        size={size}
-        onChangeInput={onChangeInput}
-      />,
+      <I18nContext.Provider value={i18n}>
+        <PreviewComponents
+          template={template}
+          inputs={inputs}
+          size={size}
+          onChangeInput={onChangeInput}
+        />
+      </I18nContext.Provider>,
       domContainer
     );
   },

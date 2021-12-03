@@ -1,18 +1,19 @@
+import { useContext } from 'react';
 import * as styles from './index.module.scss';
 import labelmake from 'labelmake';
-import { i18n } from '../../../i18n';
 import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../../utils';
-import { lang } from '../../../constants';
 import visibility from '../../../images/visibility.svg';
 import save from '../../../images/save.svg';
 import pdf from '../../../images/pdf.svg';
 import download from '../../../images/download_bk.svg';
 import { EditorHeaderProp } from '../../../type';
+import { I18nContext } from '../../../i18n';
 
 const Header = ({ processing, template, saveTemplate, updateTemplate }: EditorHeaderProp) => {
+  const i18n = useContext(I18nContext);
   const previewPdf = () => {
     if (isIos()) {
-      alert(i18n(lang, 'previewWarnMsg'));
+      alert(i18n('previewWarnMsg'));
       return;
     }
     const schemas = sortSchemas(template, template.schemas.length);
@@ -26,7 +27,7 @@ const Header = ({ processing, template, saveTemplate, updateTemplate }: EditorHe
         window.open(URL.createObjectURL(blob));
       })
       .catch(() => {
-        alert(i18n(lang, 'previewErrMsg'));
+        alert(i18n('previewErrMsg'));
       });
   };
 

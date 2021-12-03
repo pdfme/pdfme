@@ -24,7 +24,6 @@ export type Schema = TemplateSchema & {
 export type Lang = 'en' | 'ja';
 
 export interface TemplateEditorProp {
-  lang: Lang;
   fetchTemplate: () => Promise<Template>;
   saveTemplate: (template: Template) => Promise<Template>;
   Header: React.ComponentType<EditorHeaderProp>;

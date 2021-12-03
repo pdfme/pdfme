@@ -4,7 +4,7 @@ import { Template, Schema, TemplateWithPages, TemplateEditorProp } from '../../t
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { zoom } from '../../constants';
-import { i18n } from '../../i18n';
+import { I18nContext } from '../../i18n';
 import {
   uuid,
   set,
@@ -238,7 +238,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   };
 
   addSchema = () => {
-    const { lang } = this.props;
     const { pageCursor, template, schemas } = this.state;
     const s = getInitialSchema();
     const paper = document.getElementById(`paper-${pageCursor}`);
@@ -246,7 +245,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     const headerHeight = 53;
     s.position.y = rectTop - headerHeight > 0 ? 0 : template.pages[pageCursor].size.height / 2;
     s.data = 'text';
-    s.key = `${i18n(lang, 'field')}${schemas[pageCursor].length + 1}`;
+    s.key = `${this.context('field')}${schemas[pageCursor].length + 1}`;
     this.commitSchemas(schemas[pageCursor].concat(s), () => {
       this.setActiveElements([document.getElementById(s.id)!]);
     });
@@ -377,7 +376,7 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   render() {
     const { processing, template, focusElementId, activeElements, schemas, pageCursor } =
       this.state;
-    const { lang, Header } = this.props;
+    const { Header } = this.props;
     const activeSchema = this.getLastActiveSchema();
     return (
       <>
@@ -389,7 +388,6 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
         />
         <div ref={(node) => (this.wrapRef = node)} className={`${styles.wrapper}`}>
           <Sidebar
-            lang={lang}
             pageCursor={pageCursor}
             activeElement={activeElements[activeElements.length - 1]}
             schemas={schemas[pageCursor]}
@@ -422,4 +420,5 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
   }
 }
 
+TemplateEditor.contextType = I18nContext;
 export default TemplateEditor;

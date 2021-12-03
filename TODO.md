@@ -5,12 +5,12 @@
 - public/index.htmlの微調整->ok
 - tooltipの微調整->ok
 - prevewのscssの微調整->ok
-- 多言語化 既存のi18nはreact contextに変更する->doing
-
+- 多言語化 既存のi18nはreact contextに変更する->ok
 
 ---ここまでで labelmake-uiへprevewコンポーネントを移植する #1407 ---
 
-- TODO Editor/Mainと共通化
+- 全て関数コンポーネントにする
+- TODO PreviewをEditor/Mainと共通化
 - Editorのinitにsizeを追加する
 - fetchTemplateはtemplateで良くない？
 - initの返り値はインスタンスにしてそのインスタンスに対してdestroyする方が自然？

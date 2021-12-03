@@ -1,3 +1,6 @@
+import { createContext } from 'react';
+import { Lang } from './type';
+
 type DictEn = typeof dictEn;
 
 const dictEn = {
@@ -20,6 +23,11 @@ const dictEn = {
   previewWarnMsg: 'Preview is not available on iOS devices.',
   previewErrMsg:
     'An error occurred during the PDF creation process. (Characters that are not in the Helvetica font are not available)',
+  goToFirst: 'Go to first',
+  goToPrevious: 'Back',
+  goToNext: 'Next',
+  goToEnd: 'Go to end',
+  select: 'Select',
 };
 
 const dictJa: { [key in keyof DictEn]: string } = {
@@ -42,7 +50,15 @@ const dictJa: { [key in keyof DictEn]: string } = {
   previewWarnMsg: 'iOS端末ではプレビューができません。',
   previewErrMsg:
     'PDF作成処理でエラーが発生しました。お手数ですがコンタクトからお問い合わせください。',
+  goToFirst: '最初に戻る',
+  goToPrevious: '1つ戻る',
+  goToNext: '1つ進む',
+  goToEnd: '最後に進む',
+  select: '選択',
 };
 
-export const i18n = (lang: 'en' | 'ja', key: keyof DictEn) =>
-  lang === 'en' ? dictEn[key] : dictJa[key];
+const i18n = (lang: Lang, key: keyof DictEn) => (lang === 'en' ? dictEn[key] : dictJa[key]);
+
+export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);
+
+export const I18nContext = createContext(curriedI18n('en'));

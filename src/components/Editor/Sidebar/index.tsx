@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { Schema, Lang } from '../../../type';
+import { Schema } from '../../../type';
 import { readFiles } from '../../../utils';
-import { i18n } from '../../../i18n';
+import { I18nContext } from '../../../i18n';
 import { inputTypeList } from '../../../constants';
 import Divider from '../../Divider';
 import backIcon from '../../../images/back.svg';
@@ -24,7 +24,6 @@ const DragHandle = SortableHandle(({ disabled }: { disabled: boolean }) => (
 
 const SortableItem = SortableElement(
   ({
-    lang,
     schemas,
     schema,
     focusElementId,
@@ -33,7 +32,6 @@ const SortableItem = SortableElement(
     onMouseEnter,
     onMouseLeave,
   }: {
-    lang: Lang;
     schemas: Schema[];
     schema: Schema;
     focusElementId: string;
@@ -42,6 +40,8 @@ const SortableItem = SortableElement(
     onMouseEnter: (id: string) => void;
     onMouseLeave: () => void;
   }) => {
+    const i18n = useContext(I18nContext);
+
     const sc = schema;
     let status: '' | 'is-warning' | 'is-danger' = '';
     if (!sc.key) {
@@ -54,11 +54,11 @@ const SortableItem = SortableElement(
 
     const getTitle = () => {
       if (status === 'is-warning') {
-        return i18n(lang, 'plsInputName');
+        return i18n('plsInputName');
       } else if (status === 'is-danger') {
-        return i18n(lang, 'fieldMustUniq');
+        return i18n('fieldMustUniq');
       } else {
-        return i18n(lang, 'edit');
+        return i18n('edit');
       }
     };
     return (
@@ -90,7 +90,7 @@ const SortableItem = SortableElement(
                   width={15}
                   style={{ marginRight: '0.5rem' }}
                 />
-                {status === 'is-warning' ? i18n(lang, 'noKeyName') : sc.key}
+                {status === 'is-warning' ? i18n('noKeyName') : sc.key}
               </span>
             )}
           </span>
@@ -110,7 +110,6 @@ const SortableItem = SortableElement(
 
 const SortableList = SortableContainer(
   ({
-    lang,
     schemas,
     onEdit,
     onDelete,
@@ -118,7 +117,6 @@ const SortableList = SortableContainer(
     onMouseLeave,
     focusElementId,
   }: {
-    lang: Lang;
     schemas: Schema[];
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
@@ -130,7 +128,6 @@ const SortableList = SortableContainer(
       {schemas.map((s, i) => (
         <SortableItem
           disabled={!isTouchable()}
-          lang={lang}
           focusElementId={focusElementId}
           index={i}
           key={s.id}
@@ -147,7 +144,6 @@ const SortableList = SortableContainer(
 );
 
 const Sidebar = ({
-  lang,
   pageCursor,
   activeElement,
   activeSchema,
@@ -162,7 +158,6 @@ const Sidebar = ({
   changeSchema,
   addSchema,
 }: {
-  lang: Lang;
   pageCursor: number;
   activeElement: HTMLElement | null;
   activeSchema: Schema;
@@ -177,6 +172,7 @@ const Sidebar = ({
   changeSchema: (obj: Array<{ key: string; value: string; schemaId: string }>) => void;
   addSchema: () => void;
 }) => {
+  const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
   const sidebarWidth = 300;
   const top = 25;
@@ -197,13 +193,12 @@ const Sidebar = ({
         <aside style={{ display: activeElement ? 'none' : 'block' }}>
           <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
             <h3 style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
-              {i18n(lang, 'fieldsList')}({pageCursor + 1}P)
+              {i18n('fieldsList')}({pageCursor + 1}P)
             </h3>
           </div>
           <Divider />
           {schemas.length > 0 ? (
             <SortableList
-              lang={lang}
               focusElementId={focusElementId}
               helperClass={styles.sortableHelper}
               useDragHandle={true}
@@ -219,7 +214,7 @@ const Sidebar = ({
           ) : (
             <p style={{ alignItems: 'center', display: 'flex' }}>
               <img src={infoIcon} style={{ marginRight: '0.5rem' }} alt="Info icon" />
-              {i18n(lang, 'plsAddNewField')}
+              {i18n('plsAddNewField')}
             </p>
           )}
 
@@ -231,7 +226,7 @@ const Sidebar = ({
               <img src={backIcon} width={15} alt="Back icon" />
             </button>
             <h3 style={{ fontWeight: 'bold' }}>
-              {i18n(lang, 'editField')}({pageCursor + 1}P)
+              {i18n('editField')}({pageCursor + 1}P)
             </h3>
             <button
               style={{ padding: 5, margin: 5 }}
@@ -245,7 +240,7 @@ const Sidebar = ({
           <Divider />
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div>
-              <label style={{ marginBottom: 0 }}>{i18n(lang, 'type')}</label>
+              <label style={{ marginBottom: 0 }}>{i18n('type')}</label>
               <select
                 style={{ width: '100%' }}
                 onChange={(e) =>
@@ -268,8 +263,8 @@ const Sidebar = ({
             </div>
             <div style={{ width: '100%' }}>
               <label style={{ marginBottom: 0 }}>
-                {i18n(lang, 'fieldName')}
-                <u style={{ fontSize: '0.7rem' }}>({i18n(lang, 'requireAndUniq')})</u>
+                {i18n('fieldName')}
+                <u style={{ fontSize: '0.7rem' }}>({i18n('requireAndUniq')})</u>
               </label>
               <input
                 onChange={(e) =>
@@ -291,7 +286,7 @@ const Sidebar = ({
           <Divider />
           <div>
             <div>
-              <p style={{ marginBottom: 0 }}>{i18n(lang, 'posAndSize')}</p>
+              <p style={{ marginBottom: 0 }}>{i18n('posAndSize')}</p>
               <div className={styles.flx}>
                 <div className={styles.inputSet}>
                   <label style={{ width: 17 }}>X:</label>
@@ -372,7 +367,7 @@ const Sidebar = ({
             <Divider />
             {activeSchema.type === 'text' && (
               <>
-                <p style={{ marginBottom: 0 }}>{i18n(lang, 'style')}</p>
+                <p style={{ marginBottom: 0 }}>{i18n('style')}</p>
                 <div className={styles.flx} style={{ marginBottom: '0.25rem' }}>
                   <div style={{ width: '50%' }}>
                     <div>
@@ -514,7 +509,7 @@ const Sidebar = ({
               </>
             )}
             <div>
-              <label style={{ marginBottom: 0 }}>{i18n(lang, 'inputExample')}</label>
+              <label style={{ marginBottom: 0 }}>{i18n('inputExample')}</label>
               {activeSchema.type === 'image' ? (
                 <div style={{ position: 'relative' }}>
                   {activeSchema.data ? (
@@ -582,7 +577,7 @@ const Sidebar = ({
 
         <div className={styles.addBtn}>
           <button style={{ padding: '0.5rem' }} onClick={addSchema}>
-            <strong>{i18n(lang, 'addNewField')}</strong>
+            <strong>{i18n('addNewField')}</strong>
           </button>
         </div>
       </div>

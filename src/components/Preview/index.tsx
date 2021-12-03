@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, ChangeEvent } from 'react';
+import { useState, useCallback, useEffect, ChangeEvent, useContext } from 'react';
 import * as styles from './index.module.scss';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
@@ -15,6 +15,7 @@ import {
   validateBarcodeInput,
 } from '../../utils';
 import Pager from './Pager';
+import { I18nContext } from '../../i18n';
 
 const BarcodeError = () => (
   <div className={styles.barcodeError}>
@@ -33,6 +34,7 @@ const LabelEditorPreview = ({
   size: PageSize;
   onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
 }) => {
+  const i18n = useContext(I18nContext);
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSize, setPageSize] = useState<PageSize>(getA4());
   const [scale, setScale] = useState(0);
@@ -213,8 +215,7 @@ const LabelEditorPreview = ({
                                             type="file"
                                             accept="image/jpeg, image/png"
                                           />
-                                          {/* TODO 多言語化 */}
-                                          <span>選択</span>
+                                          <span>{i18n('select')}</span>
                                         </>
                                       )}
                                     </label>
