@@ -16,12 +16,7 @@ import {
 } from '../../utils';
 import Pager from './Pager';
 import { I18nContext } from '../../i18n';
-
-const BarcodeError = () => (
-  <div className={styles.barcodeError}>
-    <p>ERROR</p>
-  </div>
-);
+import BarcodeError from '../BarcodeError';
 
 const LabelEditorPreview = ({
   template,
