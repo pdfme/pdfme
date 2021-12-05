@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { Template, Schema, TemplateWithPages, TemplateEditorProp } from '../../type';
 import Sidebar from './Sidebar';
@@ -30,57 +30,73 @@ const fmtValue = (key: string, value: string) => {
   return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
 };
 
-interface State {
-  processing: boolean;
-  template: TemplateWithPages;
-  schemas: Schema[][];
-  pageCursor: number;
-  focusElementId: string;
-  activeElements: HTMLElement[];
-}
+const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorProp) => {
+  const i18n = useContext(I18nContext);
 
-class TemplateEditor extends Component<TemplateEditorProp, State> {
-  private copiedSchemas: Schema[] | null = null;
-  private past: Schema[][] = [];
-  private future: Schema[][] = [];
-  private wrapRef: HTMLDivElement | null = null;
+  const copiedSchemas = useRef<Schema[] | null>(null);
+  const past = useRef<Schema[][]>([]);
+  const future = useRef<Schema[][]>([]);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-  state: State = {
-    processing: false,
-    template: getInitialTemplate(),
-    focusElementId: '',
-    activeElements: [],
-    schemas: [[]] as Schema[][],
-    pageCursor: 0,
-  };
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [template, setTemplate] = useState<TemplateWithPages>(getInitialTemplate());
+  const [focusElementId, setFocusElementId] = useState<string>('');
+  const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
+  const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
+  const [pageCursor, setPageCursor] = useState<number>(0);
 
-  componentDidMount() {
-    this.initEvents();
+  const onScroll = debounce(() => {
+    const pageSizes = template.pages.map((p) => p.size);
+    if (!pageSizes[0]) {
+      return;
+    }
+    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const paperWidth = pageSizes[0].width * zoom;
+    const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
 
-    this.props
-      .fetchTemplate()
-      .then(async (template) => {
-        this.setState(
-          {
-            template: Object.assign(template, { pages: [] }),
-            schemas: sortSchemas(template, template.schemas.length),
-          },
-          () => this.processAndSetBasePdf(template.basePdf as string)
-        );
-      })
-      .catch(console.error);
-  }
+    const scroll = window.pageYOffset * scale;
+    const top = (wrapRef.current ? wrapRef.current.getBoundingClientRect().top : 0) + scroll;
+    const pageHeights = pageSizes.reduce((acc, cur, i) => {
+      let value = cur.height * zoom * scale;
+      if (i === 0) {
+        value += top - value / 2;
+      } else {
+        value += acc[i - 1];
+      }
+      return acc.concat(value);
+    }, [] as number[]);
+    let _pageCursor = 0;
+    pageHeights.forEach((ph, i) => {
+      if (scroll > ph) {
+        _pageCursor = i + 1 >= pageHeights.length ? pageHeights.length - 1 : i + 1;
+      }
+    });
+    if (_pageCursor !== pageCursor) {
+      setPageCursor(_pageCursor);
+      onEditEnd();
+    }
+  }, 100);
 
-  componentWillUnmount() {
-    this.destroyEvents();
-  }
+  useEffect(() => {
+    initEvents();
+    fetchTemplate().then(updateTemplate).catch(console.error);
+    return destroyEvents;
+  }, []);
 
-  initEvents = () => {
+  const initEvents = () => {
+    const timeTavel = (mode: 'undo' | 'redo') => {
+      const isUndo = mode === 'redo';
+      if ((isUndo ? past : future).current.length <= 0) return;
+      (isUndo ? future : past).current.push(cloneDeep(schemas[pageCursor]));
+      const s = cloneDeep(schemas);
+      s[pageCursor] = (isUndo ? past : future).current.pop()!;
+      setSchemas(s);
+      onEditEnd();
+    };
     initShortCuts({
       move: (command, isShift) => {
-        const { template, pageCursor } = this.state;
         const ps = template.pages[pageCursor].size;
-        const activeSchemas = this.getActiveSchemas();
+        const activeSchemas = getActiveSchemas();
         const arg = activeSchemas.map((as) => {
           let key: 'x' | 'y' = 'x';
           let value = 0;
@@ -115,29 +131,24 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
             schemaId: as.id,
           };
         });
-        this.changeSchema(arg);
+        changeSchema(arg);
       },
       remove: () => {
-        const activeSchemaIds = this.getActiveSchemas().map((s) => s.id);
-        const { schemas, pageCursor } = this.state;
-        this.commitSchemas(
-          schemas[pageCursor].filter((schema) => !activeSchemaIds.includes(schema.id)),
-          () => this.setState({ activeElements: [] })
-        );
+        const activeSchemaIds = getActiveSchemas().map((s) => s.id);
+        removeSchemas(activeSchemaIds);
       },
       esc: () => {
-        this.onEditEnd();
+        onEditEnd();
       },
       copy: () => {
-        const activeSchemas = this.getActiveSchemas();
+        const activeSchemas = getActiveSchemas();
         if (activeSchemas.length === 0) return;
-        this.copiedSchemas = activeSchemas;
+        copiedSchemas.current = activeSchemas;
       },
       paste: () => {
-        if (!this.copiedSchemas || this.copiedSchemas.length === 0) return;
-        const { template, pageCursor } = this.state;
+        if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
         const ps = template.pages[pageCursor].size;
-        const _schemas = this.copiedSchemas.map((cs) => {
+        const _schemas = copiedSchemas.current.map((cs) => {
           const { height, width, position: p } = cs;
           const position = {
             x: p.x + 10 > ps.width - width ? ps.width - width : p.x + 10,
@@ -150,117 +161,50 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
           schema.key = schema.key + ' copy';
           return schema;
         });
-
-        const { schemas } = this.state;
-        this.commitSchemas(schemas[pageCursor].concat(_schemas));
-        this.setActiveElements(_schemas.map((s) => document.getElementById(s.id)!));
-        this.copiedSchemas = _schemas;
+        commitSchemas(schemas[pageCursor].concat(_schemas));
+        setActiveElements(_schemas.map((s) => document.getElementById(s.id)!));
+        copiedSchemas.current = _schemas;
       },
-      redo: () => {
-        if (this.future.length <= 0) return;
-        const { schemas, pageCursor } = this.state;
-        this.past.push(cloneDeep(schemas[pageCursor]));
-        const s = cloneDeep(schemas);
-        s[pageCursor] = this.future.pop()!;
-        this.setState({ activeElements: [], schemas: s });
-      },
-      undo: () => {
-        if (this.past.length <= 0) return;
-        const { schemas, pageCursor } = this.state;
-        this.future.push(cloneDeep(schemas[pageCursor]));
-        const s = cloneDeep(schemas);
-        s[pageCursor] = this.past.pop()!;
-        this.setState({ activeElements: [], schemas: s });
-      },
+      redo: () => timeTavel('redo'),
+      undo: () => timeTavel('undo'),
       save: () => {
-        this.setState({ processing: true });
-        const { template } = this.state;
+        setProcessing(true);
         const _template = cloneDeep<any>(template);
         delete _template.pages;
-        const { saveTemplate } = this.props;
-        saveTemplate(_template).then(() => this.setState({ processing: false }));
+        saveTemplate(_template).then(() => setProcessing(false));
       },
     });
-
-    window.onscroll = debounce(() => {
-      const { template } = this.state;
-      const pageSizes = template.pages.map((p) => p.size);
-      if (!pageSizes[0]) {
-        return;
-      }
-      const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-      const paperWidth = pageSizes[0].width * zoom;
-      const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
-
-      const scroll = window.pageYOffset * scale;
-      const top = (this.wrapRef ? this.wrapRef.getBoundingClientRect().top : 0) + scroll;
-      const pageHeights = pageSizes.reduce((acc, cur, i) => {
-        let value = cur.height * zoom * scale;
-        if (i === 0) {
-          value += top - value / 2;
-        } else {
-          value += acc[i - 1];
-        }
-        return acc.concat(value);
-      }, [] as number[]);
-      let pageCursor = 0;
-      pageHeights.forEach((ph, i) => {
-        if (scroll > ph) {
-          pageCursor = i + 1 >= pageHeights.length ? pageHeights.length - 1 : i + 1;
-        }
-      });
-      if (pageCursor !== this.state.pageCursor) {
-        this.setState({ pageCursor }, () => this.onEditEnd());
-      }
-    }, 100);
+    window.addEventListener('scroll', onScroll);
   };
 
-  destroyEvents = () => {
+  const destroyEvents = () => {
     destroyShortCuts();
-    window.onscroll = () => {};
+    window.removeEventListener('scroll', onScroll);
   };
 
-  getActiveSchemas = () => {
-    const { activeElements, pageCursor, schemas } = this.state;
+  const getActiveSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
     return schemas[pageCursor].filter((s) => ids.includes(s.id));
   };
 
-  getLastActiveSchema = () => {
-    const { activeElements, pageCursor, schemas } = this.state;
-    if (activeElements.length === 0) return getInitialSchema();
-    const last = activeElements[activeElements.length - 1];
-    return schemas[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
-  };
-
-  setActiveElements = (targets: HTMLElement[]) => {
-    this.setState({ activeElements: targets });
-  };
-
-  addSchema = () => {
-    const { pageCursor, template, schemas } = this.state;
+  const addSchema = () => {
     const s = getInitialSchema();
     const paper = document.getElementById(`paper-${pageCursor}`);
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     const headerHeight = 53;
     s.position.y = rectTop - headerHeight > 0 ? 0 : template.pages[pageCursor].size.height / 2;
     s.data = 'text';
-    s.key = `${this.context('field')}${schemas[pageCursor].length + 1}`;
-    this.commitSchemas(schemas[pageCursor].concat(s), () => {
-      this.setActiveElements([document.getElementById(s.id)!]);
-    });
+    s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
+    commitSchemas(schemas[pageCursor].concat(s));
+    setActiveElements([document.getElementById(s.id)!]);
   };
 
-  removeSchema = (id: string) => {
-    const { schemas, pageCursor } = this.state;
-    this.commitSchemas(
-      schemas[pageCursor].filter((schema) => schema.id !== id),
-      () => this.setState({ activeElements: [] })
-    );
+  const removeSchemas = (ids: string[]) => {
+    commitSchemas(schemas[pageCursor].filter((schema) => !ids.includes(schema.id)));
+    onEditEnd();
   };
 
-  changeSchema = (obj: { key: string; value: string; schemaId: string }[]) => {
-    const { schemas, pageCursor } = this.state;
+  const changeSchema = (obj: { key: string; value: string; schemaId: string }[]) => {
     const newSchemas = obj.reduce((acc, { key, value, schemaId }) => {
       const tgt = acc.find((s) => s.id === schemaId)!;
       // Assign to reference
@@ -275,58 +219,42 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
       }
       return acc;
     }, cloneDeep(schemas[pageCursor]));
-    this.commitSchemas(newSchemas);
+    commitSchemas(newSchemas);
   };
 
-  commitSchemas = (newSchemas: Schema[], cb?: Function) => {
-    const { schemas, pageCursor, template } = this.state;
-    this.future = [];
-    this.past.push(cloneDeep(schemas[pageCursor]));
+  const commitSchemas = (newSchemas: Schema[]) => {
+    future.current = [];
+    past.current.push(cloneDeep(schemas[pageCursor]));
     const _schemas = cloneDeep(schemas);
     _schemas[pageCursor] = newSchemas;
-    this.setState(
-      {
-        template: Object.assign(fmtTemplate(template, _schemas), { pages: template.pages }),
-        schemas: _schemas,
-      },
-      () => cb && cb()
-    );
+    setTemplate(Object.assign(fmtTemplate(template, _schemas), { pages: template.pages }));
+    setSchemas(_schemas);
   };
 
-  onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const { schemas, pageCursor } = this.state;
+  const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
     const _schemas = cloneDeep(schemas);
     const movedSchema = arrayMove(_schemas[pageCursor], arg.oldIndex, arg.newIndex);
-    this.commitSchemas(movedSchema);
+    commitSchemas(movedSchema);
   };
 
-  onEdit = (id: string) => {
-    this.setActiveElements([document.getElementById(id)!]);
-  };
+  const onEdit = (id: string) => setActiveElements([document.getElementById(id)!]);
 
-  onEditEnd = () => {
-    this.setState({ activeElements: [] });
-  };
+  const onEditEnd = () => setActiveElements([]);
 
-  onMouseEnter = (id: string) => {
-    this.setState({ focusElementId: id });
-  };
+  const onMouseEnter = (id: string) => setFocusElementId(id);
 
-  onMouseLeave = () => {
-    this.setState({ focusElementId: '' });
-  };
+  const onMouseLeave = () => setFocusElementId('');
 
-  processAndSetBasePdf = async (basePdf: string) => {
-    const { template } = this.state;
-    const pdfBlob = b64toBlob(basePdf as string);
+  const updateTemplate = async (newTemplate: Template) => {
+    const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
+    const basePdf = newTemplate.basePdf as string;
+    const pdfBlob = b64toBlob(basePdf);
     const pageSizes = await getPdfPageSizes(pdfBlob);
     const images = await pdf2Pngs(pdfBlob, pageSizes[0].width * zoom);
-    const schemas = (
-      this.state.schemas.length < pageSizes.length
-        ? this.state.schemas.concat(
-            new Array(pageSizes.length - this.state.schemas.length).fill(cloneDeep([]))
-          )
-        : this.state.schemas.slice(0, images.length)
+    const _schemas = (
+      newSchemas.length < pageSizes.length
+        ? newSchemas.concat(new Array(pageSizes.length - newSchemas.length).fill(cloneDeep([])))
+        : newSchemas.slice(0, images.length)
     ).map((schema, i) => {
       Object.values(schema).forEach((value) => {
         const { width, height } = pageSizes[i];
@@ -345,80 +273,71 @@ class TemplateEditor extends Component<TemplateEditorProp, State> {
     });
     const pages = pageSizes.map((size, i) => ({ size, image: images[i] }));
 
-    this.setState({
-      activeElements: [],
-      focusElementId: '',
-      pageCursor: 0,
-      schemas,
-      template: Object.assign(template, { basePdf, pages }),
-    });
+    setSchemas(_schemas);
+    setTemplate(Object.assign(template, { basePdf, pages }));
+
+    onEditEnd();
+    setFocusElementId('');
+    setPageCursor(0);
+    window.scroll({ top: 0, behavior: 'smooth' });
   };
 
-  saveTemplateWithProcessing = async (template: Template) => {
-    this.setState({ processing: true });
+  const saveTemplateWithProcessing = async (template: Template) => {
+    setProcessing(true);
     const _template = cloneDeep<any>(template);
     delete _template.pages;
-    const tmplt = await this.props.saveTemplate(_template);
-    this.setState({ processing: false });
+    const tmplt = await saveTemplate(_template);
+    setProcessing(false);
     return tmplt;
   };
 
-  updateTemplate = async (template: Template) => {
-    const schemas = sortSchemas(template, template.schemas.length);
-    this.setState(
-      { template: Object.assign(template, { pages: this.state.template.pages }), schemas },
-      () => {
-        this.processAndSetBasePdf(template.basePdf as string);
-      }
-    );
+  const getLastActiveSchema = () => {
+    if (activeElements.length === 0) return getInitialSchema();
+    const last = activeElements[activeElements.length - 1];
+    return schemas[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
   };
 
-  render() {
-    const { processing, template, focusElementId, activeElements, schemas, pageCursor } =
-      this.state;
-    const { Header } = this.props;
-    const activeSchema = this.getLastActiveSchema();
-    return (
-      <>
-        <Header
-          processing={processing}
-          template={template}
-          saveTemplate={this.saveTemplateWithProcessing}
-          updateTemplate={this.updateTemplate}
-        />
-        <div ref={(node) => (this.wrapRef = node)} className={`${styles.wrapper}`}>
-          <Sidebar
-            pageCursor={pageCursor}
-            activeElement={activeElements[activeElements.length - 1]}
-            schemas={schemas[pageCursor]}
-            focusElementId={focusElementId}
-            activeSchema={activeSchema}
-            changeSchema={this.changeSchema}
-            onSortEnd={this.onSortEnd}
-            onEdit={this.onEdit}
-            onEditEnd={this.onEditEnd}
-            onMouseEnter={this.onMouseEnter}
-            onMouseLeave={this.onMouseLeave}
-            addSchema={this.addSchema}
-            removeSchema={this.removeSchema}
-          />
-          <Main
-            pageCursor={pageCursor}
-            pages={template.pages}
-            activeElements={activeElements}
-            focusElementId={focusElementId}
-            template={template}
-            schemas={schemas}
-            changeSchema={this.changeSchema}
-            onMouseEnter={this.onMouseEnter}
-            onMouseLeave={this.onMouseLeave}
-            onSelectSchemas={this.setActiveElements}
-          />
-        </div>
-      </>
-    );
-  }
-}
+  const activeSchema = getLastActiveSchema();
 
-TemplateEditor.contextType = I18nContext;
+  return (
+    <>
+      <Header
+        processing={processing}
+        template={template}
+        saveTemplate={saveTemplateWithProcessing}
+        updateTemplate={updateTemplate}
+      />
+      <div ref={wrapRef} className={`${styles.wrapper}`}>
+        <Sidebar
+          pageCursor={pageCursor}
+          activeElement={activeElements[activeElements.length - 1]}
+          schemas={schemas[pageCursor]}
+          focusElementId={focusElementId}
+          activeSchema={activeSchema}
+          changeSchema={changeSchema}
+          onSortEnd={onSortEnd}
+          onEdit={onEdit}
+          onEditEnd={onEditEnd}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          addSchema={addSchema}
+          removeSchema={(id) => removeSchemas([id])}
+        />
+        <Main
+          pageCursor={pageCursor}
+          pages={template.pages}
+          activeElements={activeElements}
+          focusElementId={focusElementId}
+          template={template}
+          schemas={schemas}
+          changeSchema={changeSchema}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+          onSelectSchemas={setActiveElements}
+        />
+      </div>
+    </>
+  );
+};
+
 export default TemplateEditor;
