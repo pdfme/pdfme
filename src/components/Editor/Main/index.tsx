@@ -55,24 +55,17 @@ const Main = ({
       setIsPressShiftKey(false);
     }
   };
-  const onResizeWindow = debounce(() => {
-    moveable.current && moveable.current.updateRect();
-    verticalGuides.current[pageCursor] && verticalGuides.current[pageCursor].resize();
-    horizontalGuides.current[pageCursor] && horizontalGuides.current[pageCursor].resize();
-  }, 100);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
 
   const initEvents = () => {
     window.addEventListener('keydown', onKeydown);
     window.addEventListener('keyup', onKeyup);
-    window.addEventListener('resize', onResizeWindow);
   };
 
   const destroyEvents = () => {
     window.removeEventListener('keydown', onKeydown);
     window.removeEventListener('keyup', onKeyup);
-    window.removeEventListener('resize', onResizeWindow);
   };
 
   useEffect(() => {

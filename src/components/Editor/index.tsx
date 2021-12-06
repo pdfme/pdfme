@@ -29,11 +29,6 @@ const fmtValue = (key: string, value: string) => {
   return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
 };
 
-// TODO テスト&不具合
-//  - 複数枚数のテンプレート
-//   - 複数枚テンプレートを読み込んだ時にスクロールの処理がうまくいかない？
-//     - schemaを変更したら動くことがわかった
-
 const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditorProp) => {
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
@@ -63,15 +58,12 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   );
 
   const onScroll = debounce(() => {
-    if (!pageSizes[0]) {
+    if (!pageSizes[0] || !wrapRef.current) {
       return;
     }
-    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-    const paperWidth = pageSizes[0].width * zoom;
-    const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
 
-    const scroll = wrapRef.current ? window.pageYOffset : 0 * scale;
-    const top = (wrapRef.current ? wrapRef.current.getBoundingClientRect().top : 0) + scroll;
+    const scroll = wrapRef.current.scrollTop;
+    const top = wrapRef.current.getBoundingClientRect().top;
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
       let value = cur.height * zoom * scale;
       if (i === 0) {
@@ -93,7 +85,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   }, 100);
 
   const initEvents = () => {
-    window.addEventListener('scroll', onScroll);
+    wrapRef.current && wrapRef.current.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
       return schemas[pageCursor].filter((s) => ids.includes(s.id));
@@ -176,7 +168,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   };
 
   const destroyEvents = () => {
-    window.removeEventListener('scroll', onScroll);
+    wrapRef.current && wrapRef.current.removeEventListener('scroll', onScroll);
     destroyShortCuts();
   };
 
@@ -187,7 +179,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   useEffect(() => {
     initEvents();
     return destroyEvents;
-  }, [activeElements, schemas, template, size]);
+  }, [activeElements, schemas, template, size, pageSizes]);
 
   const addSchema = () => {
     const s = getInitialSchema();
@@ -272,7 +264,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     });
     setSchemas(_schemas);
     onEditEnd(), setFocusElementId(''), setPageCursor(0);
-    window.scroll({ top: 0, behavior: 'smooth' });
+    wrapRef.current && wrapRef.current.scroll({ top: 0, behavior: 'smooth' });
   };
 
   const saveTemplateWithProcessing = async (template: Template) => {
@@ -293,7 +285,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const activeSchema = getLastActiveSchema();
 
   return (
-    <div className={`${styles.root}`} style={{ ...size }}>
+    <div ref={wrapRef} className={`${styles.root}`} style={{ ...size }}>
       <div ref={headerRef}>
         <Header
           processing={processing}
@@ -302,7 +294,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           updateTemplate={updateTemplate}
         />
       </div>
-      <div ref={wrapRef} className={`${styles.wrapper}`}>
+      <div className={`${styles.wrapper}`}>
         <Sidebar
           pageCursor={pageCursor}
           activeElement={activeElements[activeElements.length - 1]}
