@@ -321,9 +321,8 @@ export const fmtTemplateFromJson = (file: File) => {
   });
 };
 
-type Command = 'up' | 'down' | 'left' | 'right';
 export const initShortCuts = (arg: {
-  move: (command: Command, isShift: boolean) => void;
+  move: (command: 'up' | 'down' | 'left' | 'right', isShift: boolean) => void;
   remove: () => void;
   esc: () => void;
   copy: () => void;

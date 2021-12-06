@@ -76,8 +76,8 @@
             { field1: 'ああ2', field2: 'いいいい2' },
           ],
           {
-            height: 1000,
-            width: 1200,
+            height: window.innerHeight,
+            width: window.innerWidth,
           }
         );
       }
@@ -91,8 +91,8 @@
             { field1: 'ああ2', field2: '' },
           ],
           {
-            height: 1000,
-            width: 1200,
+            height: window.innerHeight,
+            width: window.innerWidth,
           },
           ({ index, value, key }) => {
             console.log('index', index, 'value', value, 'key', key);
@@ -104,6 +104,7 @@
         const fetchTemplate = () => new Promise((r) => r(getTemplate()));
         const saveTemplate = (t) => {
           return new Promise((resolve) => {
+            console.log(t);
             const blob = new Blob([JSON.stringify(t)], {
               type: 'application/json',
             });
@@ -113,7 +114,6 @@
             link.download = `template.json`;
             link.click();
             URL.revokeObjectURL(url);
-            console.log(t);
             resolve(t);
           });
         };

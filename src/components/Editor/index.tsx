@@ -72,26 +72,23 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
       }
     });
     if (_pageCursor !== pageCursor) {
-      setPageCursor(_pageCursor);
-      onEditEnd();
+      setPageCursor(_pageCursor), onEditEnd();
     }
   }, 100);
 
-  useEffect(() => {
-    initEvents();
-    fetchTemplate().then(updateTemplate).catch(console.error);
-    return destroyEvents;
-  }, []);
-
+  // TODO ここのイベントがうまく動かない getActiveSchemasの値がactiveElementsはずっと変わらない
   const initEvents = () => {
+    const getActiveSchemas = () => {
+      const ids = activeElements.map((ae) => ae.id);
+      return schemas[pageCursor].filter((s) => ids.includes(s.id));
+    };
     const timeTavel = (mode: 'undo' | 'redo') => {
       const isUndo = mode === 'redo';
       if ((isUndo ? past : future).current.length <= 0) return;
       (isUndo ? future : past).current.push(cloneDeep(schemas[pageCursor]));
       const s = cloneDeep(schemas);
       s[pageCursor] = (isUndo ? past : future).current.pop()!;
-      setSchemas(s);
-      onEditEnd();
+      setSchemas(s), onEditEnd();
     };
     initShortCuts({
       move: (command, isShift) => {
@@ -125,21 +122,12 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
           } else {
             value = value > ps.height - height ? ps.height - height : value;
           }
-          return {
-            key: 'position.' + key,
-            value: String(value),
-            schemaId: as.id,
-          };
+          return { key: `position.${key}`, value: String(value), schemaId: as.id };
         });
         changeSchema(arg);
       },
-      remove: () => {
-        const activeSchemaIds = getActiveSchemas().map((s) => s.id);
-        removeSchemas(activeSchemaIds);
-      },
-      esc: () => {
-        onEditEnd();
-      },
+      remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
+      esc: onEditEnd,
       copy: () => {
         const activeSchemas = getActiveSchemas();
         if (activeSchemas.length === 0) return;
@@ -154,10 +142,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
             x: p.x + 10 > ps.width - width ? ps.width - width : p.x + 10,
             y: p.y + 10 > ps.height - height ? ps.height - height : p.y + 10,
           };
-          const schema = Object.assign(cloneDeep(cs), {
-            id: uuid(),
-            position,
-          });
+          const schema = Object.assign(cloneDeep(cs), { id: uuid(), position });
           schema.key = schema.key + ' copy';
           return schema;
         });
@@ -168,10 +153,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
       redo: () => timeTavel('redo'),
       undo: () => timeTavel('undo'),
       save: () => {
-        setProcessing(true);
-        const _template = cloneDeep<any>(template);
-        delete _template.pages;
-        saveTemplate(_template).then(() => setProcessing(false));
+        setProcessing(true), saveTemplate({ ...template }).then(() => setProcessing(false));
       },
     });
     window.addEventListener('scroll', onScroll);
@@ -182,10 +164,14 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     window.removeEventListener('scroll', onScroll);
   };
 
-  const getActiveSchemas = () => {
-    const ids = activeElements.map((ae) => ae.id);
-    return schemas[pageCursor].filter((s) => ids.includes(s.id));
-  };
+  useEffect(() => {
+    fetchTemplate().then(updateTemplate).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    initEvents();
+    return destroyEvents;
+  }, [activeElements]);
 
   const addSchema = () => {
     const s = getInitialSchema();
@@ -196,7 +182,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     s.data = 'text';
     s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
     commitSchemas(schemas[pageCursor].concat(s));
-    setActiveElements([document.getElementById(s.id)!]);
+    setTimeout(() => setActiveElements([document.getElementById(s.id)!]));
   };
 
   const removeSchemas = (ids: string[]) => {
@@ -276,9 +262,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     setSchemas(_schemas);
     setTemplate(Object.assign(template, { basePdf, pages }));
 
-    onEditEnd();
-    setFocusElementId('');
-    setPageCursor(0);
+    onEditEnd(), setFocusElementId(''), setPageCursor(0);
     window.scroll({ top: 0, behavior: 'smooth' });
   };
 

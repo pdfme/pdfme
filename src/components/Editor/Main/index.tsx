@@ -51,7 +51,7 @@ const Main = ({
     }
   };
   const onKeyup = (e: KeyboardEvent) => {
-    if (e.shiftKey) {
+    if (e.key === 'Shift') {
       setIsPressShiftKey(false);
     }
   };
@@ -82,6 +82,10 @@ const Main = ({
     setDisplay();
     return destroyEvents;
   }, []);
+
+  useEffect(() => {
+    moveable.current && moveable.current.updateRect();
+  }, [schemas]);
 
   useEffect(() => {
     setDisplay();
