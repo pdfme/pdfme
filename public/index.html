@@ -54,6 +54,8 @@
         ],
       });
 
+      const getSize = () => ({ height: 500, width: 500 });
+
       const inited = 'inited';
       const preview = 'preview';
       const editablePreview = 'editablePreview';
@@ -75,10 +77,7 @@
             { field1: 'ああ1', field2: 'いいいい1' },
             { field1: 'ああ2', field2: 'いいいい2' },
           ],
-          {
-            height: window.innerHeight,
-            width: window.innerWidth,
-          }
+          getSize()
         );
       }
       function editablePreviewInit() {
@@ -90,10 +89,7 @@
             { field1: 'ああ1', field2: 'いいいい1' },
             { field1: 'ああ2', field2: '' },
           ],
-          {
-            height: window.innerHeight,
-            width: window.innerWidth,
-          },
+          getSize(),
           ({ index, value, key }) => {
             console.log('index', index, 'value', value, 'key', key);
           }
@@ -101,7 +97,6 @@
       }
       function editorInit() {
         localStorage.setItem(inited, editor);
-        const fetchTemplate = () => new Promise((r) => r(getTemplate()));
         const saveTemplate = (t) => {
           return new Promise((resolve) => {
             console.log(t);
@@ -117,7 +112,7 @@
             resolve(t);
           });
         };
-        LabelmakeUi.Editor.init(domContainer, fetchTemplate, saveTemplate);
+        LabelmakeUi.Editor.init(domContainer, getTemplate(), saveTemplate, getSize());
       }
 
       function previewDestroy() {

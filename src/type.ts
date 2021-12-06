@@ -13,8 +13,6 @@ export type Template = _Template & {
   columns: string[];
 };
 
-export type TemplateWithPages = Template & { pages: { size: PageSize; image: string }[] };
-
 export type Schema = TemplateSchema & {
   id: string;
   key: string;
@@ -24,8 +22,9 @@ export type Schema = TemplateSchema & {
 export type Lang = 'en' | 'ja';
 
 export interface TemplateEditorProp {
-  fetchTemplate: () => Promise<Template>;
+  template: Template;
   saveTemplate: (template: Template) => Promise<Template>;
+  size: PageSize;
   Header: React.ComponentType<EditorHeaderProp>;
 }
 
@@ -35,6 +34,13 @@ export interface EditorHeaderProp {
   saveTemplate: (template: Template) => Promise<Template>;
   updateTemplate: (template: Template) => void;
   [prop: string]: any;
+}
+
+export interface PreviewProp {
+  template: Template;
+  inputs: { [key: string]: string }[];
+  size: PageSize;
+  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
 }
 
 export interface GuidesInterface {

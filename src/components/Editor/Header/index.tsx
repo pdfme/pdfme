@@ -39,11 +39,7 @@ const Header = ({ processing, template, saveTemplate, updateTemplate }: EditorHe
   };
 
   const loadJsonTemplate = (file: File) => {
-    fmtTemplateFromJson(file)
-      .then((template) => {
-        updateTemplate(template);
-      })
-      .catch(alert);
+    fmtTemplateFromJson(file).then(updateTemplate).catch(alert);
   };
 
   return (

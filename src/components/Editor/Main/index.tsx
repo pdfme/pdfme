@@ -5,22 +5,20 @@ import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
-import { GuidesInterface, Schema, Template, PageSize } from '../../../type';
+import { GuidesInterface, Schema, PageSize } from '../../../type';
 import { round, flatten, getFontFamily, debounce } from '../../../utils';
-import { barcodeList, zoom, barcodeExampleImageObj } from '../../../constants';
+import { barcodeList, zoom, rulerHeight, barcodeExampleImageObj } from '../../../constants';
 
 const SELECTABLE = 'selectable';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
-
-const rulerHeight = 30;
-
 interface Props {
   pageCursor: number;
-  pages: { size: PageSize; image: string }[];
+  scale: number;
+  backgrounds: string[];
+  pageSizes: PageSize[];
   activeElements: HTMLElement[];
-  template: Template;
   schemas: Schema[][];
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
@@ -31,7 +29,9 @@ interface Props {
 
 const Main = ({
   pageCursor,
-  pages,
+  scale,
+  backgrounds,
+  pageSizes,
   activeElements,
   schemas,
   onSelectSchemas,
@@ -56,13 +56,11 @@ const Main = ({
     }
   };
   const onResizeWindow = debounce(() => {
-    setDisplay();
     moveable.current && moveable.current.updateRect();
     verticalGuides.current[pageCursor] && verticalGuides.current[pageCursor].resize();
     horizontalGuides.current[pageCursor] && horizontalGuides.current[pageCursor].resize();
   }, 100);
 
-  const [scale, setScale] = useState(0);
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
 
   const initEvents = () => {
@@ -79,28 +77,12 @@ const Main = ({
 
   useEffect(() => {
     initEvents();
-    setDisplay();
     return destroyEvents;
   }, []);
 
   useEffect(() => {
     moveable.current && moveable.current.updateRect();
-  }, [schemas]);
-
-  useEffect(() => {
-    setDisplay();
-    moveable.current && moveable.current.updateRect();
-  }, [pages]);
-
-  const setDisplay = async () => {
-    const pageSize = pages[0]?.size;
-    if (!pageSize) {
-      return;
-    }
-    const paperWidth = pageSize.width * zoom + rulerHeight;
-    const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-    setScale(width / paperWidth > 1 ? 1 : width / paperWidth);
-  };
+  }, [schemas, pageSizes, backgrounds]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
     target!.style.left = (left < 0 ? 0 : left) + 'px';
@@ -166,14 +148,13 @@ const Main = ({
     changeSchema(flatten(arg));
   };
 
-  const images = pages.map((p) => p.image);
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
     guides[index].getGuides().map((g) => g * zoom + rulerHeight);
 
   return (
     <div ref={wrapRef}>
-      {images.map((bgi, index) => {
-        const pageSize = pages[index].size;
+      {backgrounds.map((background, index) => {
+        const pageSize = pageSizes[index];
         if (!pageSize) {
           return null;
         }
@@ -181,7 +162,7 @@ const Main = ({
         const paperWidth = pageSize.width * zoom;
         return (
           <div
-            key={bgi.slice(-10) + index}
+            key={background.slice(-10) + index}
             style={{
               width: paperWidth * scale,
               height: paperHeight * scale,
@@ -214,12 +195,7 @@ const Main = ({
               }}
             />
 
-            <div
-              style={{
-                transform: `scale(${scale})`,
-                transformOrigin: 'top left',
-              }}
-            >
+            <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
               {pageCursor !== index && (
                 <div
                   style={{
@@ -330,7 +306,7 @@ const Main = ({
                       height: paperHeight,
                     }}
                   >
-                    <img className={styles.paperImage} src={bgi} alt="background" />
+                    <img className={styles.paperImage} src={background} alt="background" />
                   </div>
                   {schemas[index].map((s) => (
                     <div key={s.id}>

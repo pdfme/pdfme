@@ -1,9 +1,9 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Template, Schema, TemplateWithPages, TemplateEditorProp } from '../../type';
+import { Template, Schema, TemplateEditorProp } from '../../type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { zoom } from '../../constants';
+import { zoom, rulerHeight } from '../../constants';
 import { I18nContext } from '../../i18n';
 import {
   uuid,
@@ -13,40 +13,56 @@ import {
   round,
   b64toBlob,
   arrayMove,
-  pdf2Pngs,
   getPdfPageSizes,
   fmtTemplate,
   sortSchemas,
   getInitialSchema,
   initShortCuts,
   destroyShortCuts,
-  getInitialTemplate,
   getSampleByType,
   getKeepRaitoHeightByWidth,
 } from '../../utils';
+import { useUiPreProcessor } from '../../hooks';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];
   return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
 };
 
-const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorProp) => {
-  const i18n = useContext(I18nContext);
+// TODO テスト&不具合
+//  - 複数枚数のテンプレート
+//   - 複数枚テンプレートを読み込んだ時にスクロールの処理がうまくいかない？
+//     - schemaを変更したら動くことがわかった
 
+const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditorProp) => {
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const basePdf = useRef('');
+
+  const i18n = useContext(I18nContext);
+
+  const { backgrounds, pageSizes, scale } = useUiPreProcessor({
+    template,
+    size,
+    basePdf: basePdf.current,
+    offset: rulerHeight + (headerRef.current?.clientHeight || 0),
+  });
 
   const [processing, setProcessing] = useState<boolean>(false);
-  const [template, setTemplate] = useState<TemplateWithPages>(getInitialTemplate());
-  const [focusElementId, setFocusElementId] = useState<string>('');
+  const [focusElementId, setFocusElementId] = useState('');
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
-  const [pageCursor, setPageCursor] = useState<number>(0);
+  const [pageCursor, setPageCursor] = useState(0);
+
+  const modifiedTemplate = fmtTemplate(
+    Object.assign(template, { basePdf: basePdf.current ? basePdf.current : template.basePdf }),
+    schemas
+  );
 
   const onScroll = debounce(() => {
-    const pageSizes = template.pages.map((p) => p.size);
     if (!pageSizes[0]) {
       return;
     }
@@ -54,7 +70,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     const paperWidth = pageSizes[0].width * zoom;
     const scale = width / paperWidth > 1 ? 1 : width / paperWidth;
 
-    const scroll = window.pageYOffset * scale;
+    const scroll = wrapRef.current ? window.pageYOffset : 0 * scale;
     const top = (wrapRef.current ? wrapRef.current.getBoundingClientRect().top : 0) + scroll;
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
       let value = cur.height * zoom * scale;
@@ -76,14 +92,14 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     }
   }, 100);
 
-  // TODO ここのイベントがうまく動かない getActiveSchemasの値がactiveElementsはずっと変わらない
   const initEvents = () => {
+    window.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
       return schemas[pageCursor].filter((s) => ids.includes(s.id));
     };
     const timeTavel = (mode: 'undo' | 'redo') => {
-      const isUndo = mode === 'redo';
+      const isUndo = mode === 'undo';
       if ((isUndo ? past : future).current.length <= 0) return;
       (isUndo ? future : past).current.push(cloneDeep(schemas[pageCursor]));
       const s = cloneDeep(schemas);
@@ -92,7 +108,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     };
     initShortCuts({
       move: (command, isShift) => {
-        const ps = template.pages[pageCursor].size;
+        const ps = pageSizes[pageCursor];
         const activeSchemas = getActiveSchemas();
         const arg = activeSchemas.map((as) => {
           let key: 'x' | 'y' = 'x';
@@ -135,7 +151,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
       },
       paste: () => {
         if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
-        const ps = template.pages[pageCursor].size;
+        const ps = pageSizes[pageCursor];
         const _schemas = copiedSchemas.current.map((cs) => {
           const { height, width, position: p } = cs;
           const position = {
@@ -153,32 +169,32 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
       redo: () => timeTavel('redo'),
       undo: () => timeTavel('undo'),
       save: () => {
-        setProcessing(true), saveTemplate({ ...template }).then(() => setProcessing(false));
+        setProcessing(true);
+        saveTemplate(modifiedTemplate).then(() => setProcessing(false));
       },
     });
-    window.addEventListener('scroll', onScroll);
   };
 
   const destroyEvents = () => {
-    destroyShortCuts();
     window.removeEventListener('scroll', onScroll);
+    destroyShortCuts();
   };
 
   useEffect(() => {
-    fetchTemplate().then(updateTemplate).catch(console.error);
+    updateTemplate(template);
   }, []);
 
   useEffect(() => {
     initEvents();
     return destroyEvents;
-  }, [activeElements]);
+  }, [activeElements, schemas, template, size]);
 
   const addSchema = () => {
     const s = getInitialSchema();
     const paper = document.getElementById(`paper-${pageCursor}`);
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     const headerHeight = 53;
-    s.position.y = rectTop - headerHeight > 0 ? 0 : template.pages[pageCursor].size.height / 2;
+    s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
     s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
     commitSchemas(schemas[pageCursor].concat(s));
@@ -213,13 +229,11 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
     past.current.push(cloneDeep(schemas[pageCursor]));
     const _schemas = cloneDeep(schemas);
     _schemas[pageCursor] = newSchemas;
-    setTemplate(Object.assign(fmtTemplate(template, _schemas), { pages: template.pages }));
     setSchemas(_schemas);
   };
 
   const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const _schemas = cloneDeep(schemas);
-    const movedSchema = arrayMove(_schemas[pageCursor], arg.oldIndex, arg.newIndex);
+    const movedSchema = arrayMove(cloneDeep(schemas[pageCursor]), arg.oldIndex, arg.newIndex);
     commitSchemas(movedSchema);
   };
 
@@ -233,14 +247,13 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
 
   const updateTemplate = async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
-    const basePdf = newTemplate.basePdf as string;
-    const pdfBlob = b64toBlob(basePdf);
+    basePdf.current = newTemplate.basePdf as string;
+    const pdfBlob = b64toBlob(newTemplate.basePdf as string);
     const pageSizes = await getPdfPageSizes(pdfBlob);
-    const images = await pdf2Pngs(pdfBlob, pageSizes[0].width * zoom);
     const _schemas = (
       newSchemas.length < pageSizes.length
         ? newSchemas.concat(new Array(pageSizes.length - newSchemas.length).fill(cloneDeep([])))
-        : newSchemas.slice(0, images.length)
+        : newSchemas.slice(0, pageSizes.length)
     ).map((schema, i) => {
       Object.values(schema).forEach((value) => {
         const { width, height } = pageSizes[i];
@@ -257,11 +270,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
       });
       return schema;
     });
-    const pages = pageSizes.map((size, i) => ({ size, image: images[i] }));
-
     setSchemas(_schemas);
-    setTemplate(Object.assign(template, { basePdf, pages }));
-
     onEditEnd(), setFocusElementId(''), setPageCursor(0);
     window.scroll({ top: 0, behavior: 'smooth' });
   };
@@ -284,13 +293,15 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
   const activeSchema = getLastActiveSchema();
 
   return (
-    <>
-      <Header
-        processing={processing}
-        template={template}
-        saveTemplate={saveTemplateWithProcessing}
-        updateTemplate={updateTemplate}
-      />
+    <div className={`${styles.root}`} style={{ ...size }}>
+      <div ref={headerRef}>
+        <Header
+          processing={processing}
+          template={modifiedTemplate}
+          saveTemplate={saveTemplateWithProcessing}
+          updateTemplate={updateTemplate}
+        />
+      </div>
       <div ref={wrapRef} className={`${styles.wrapper}`}>
         <Sidebar
           pageCursor={pageCursor}
@@ -309,10 +320,11 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
         />
         <Main
           pageCursor={pageCursor}
-          pages={template.pages}
+          scale={scale}
+          pageSizes={pageSizes}
+          backgrounds={backgrounds}
           activeElements={activeElements}
           focusElementId={focusElementId}
-          template={template}
           schemas={schemas}
           changeSchema={changeSchema}
           onMouseEnter={onMouseEnter}
@@ -320,7 +332,7 @@ const TemplateEditor = ({ fetchTemplate, saveTemplate, Header }: TemplateEditorP
           onSelectSchemas={setActiveElements}
         />
       </div>
-    </>
+    </div>
   );
 };
 

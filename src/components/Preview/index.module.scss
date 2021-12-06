@@ -13,18 +13,19 @@
   border-radius: 0;
 }
 
+.wrapper {
+  position: relative;
+  background: rgb(74, 74, 74);
+}
+
 .previewWrapper {
-  align-items: center;
-  justify-content: center;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  margin: 0 auto;
+  //
 }
 
 .paper {
-  background-color: #fff;
-  border: 1px solid #999;
   position: absolute;
+  position: relative;
+  margin: 0px auto;
 }
 
 .nofocus:focus {

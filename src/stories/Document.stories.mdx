@@ -20,7 +20,7 @@ LabelmakeEditor has init method.
 ```ts
 const init: (
   domContainer: HTMLElement,
-  fetchTemplate: () => Promise<Template>,
+  template: () => Promise<Template>,
   saveTemplate: (template: Template) => Promise<Template>,
   customHeader?: ComponentType<EditorHeaderProp> | undefined
 ) => void;

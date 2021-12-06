@@ -25,10 +25,18 @@ const Pager = ({
       style={{ display: !isOpen || pageNum === 1 ? 'none' : 'block' }}
     >
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <button className={styles.leftBtn} onClick={() => setPageCursor(0)}>
+        <button
+          className={styles.leftBtn}
+          disabled={pageCursor <= 0}
+          onClick={() => setPageCursor(0)}
+        >
           <img src={doubleLeft} alt={i18n('goToFirst')} style={{ width: 20 }} />
         </button>
-        <button className={styles.leftBtn} onClick={() => setPageCursor(pageCursor - 1)}>
+        <button
+          className={styles.leftBtn}
+          disabled={pageCursor <= 0}
+          onClick={() => setPageCursor(pageCursor - 1)}
+        >
           <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
         </button>
         <strong style={{ color: 'white' }}>

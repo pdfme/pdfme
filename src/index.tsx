@@ -13,8 +13,9 @@ let _previewDomContainer: HTMLElement | null = null;
 const Editor = {
   init: (
     domContainer: HTMLElement,
-    fetchTemplate: () => Promise<Template>,
+    template: Template,
     saveTemplate: (template: Template) => Promise<Template>,
+    size: PageSize,
     customHeader?: React.ComponentType<EditorHeaderProp>
   ) => {
     _editorDomContainer = domContainer;
@@ -23,8 +24,9 @@ const Editor = {
     ReactDOM.render(
       <I18nContext.Provider value={i18n}>
         <EditorComponents
-          fetchTemplate={fetchTemplate}
+          template={template}
           saveTemplate={saveTemplate}
+          size={size}
           Header={customHeader || EditorHeader}
         />
       </I18nContext.Provider>,

@@ -1,4 +1,4 @@
-import { PageSize, Template, TemplateWithPages, TemplateSchema, Schema } from './type';
+import { PageSize, Template, TemplateSchema, Schema } from './type';
 import { blankPdf, barcodeList } from './constants';
 import { nanoid } from 'nanoid';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -430,17 +430,6 @@ export const initShortCuts = (arg: {
 
 export const destroyShortCuts = () => {
   hotkeys.unbind();
-};
-
-export const getInitialTemplate = (): TemplateWithPages => {
-  return {
-    sampledata: [],
-    schemas: [],
-    columns: [],
-    basePdf: blankPdf,
-    fontName: '',
-    pages: [],
-  };
 };
 
 export const getSampleByType = (type: string) => {

@@ -12,6 +12,7 @@ $desktop: 960px + (2 * $gap) !default;
   padding-bottom: 0.75rem;
   display: flex;
   justify-content: flex-end;
+  background: #7e7e7e;
   .desktopFlex {
     align-items: center;
     width: 100%;
