@@ -44,6 +44,7 @@ const Main = ({
   changeSchemas,
 }: Props) => {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
@@ -75,7 +76,10 @@ const Main = ({
 
   useEffect(() => {
     moveable.current && moveable.current.updateRect();
-  }, [schemas, pageSizes, backgrounds, editing]);
+    if (activeElements.length === 0) {
+      setEditing(false);
+    }
+  }, [schemas, activeElements]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
     target!.style.left = (left < 0 ? 0 : left) + 'px';
@@ -148,12 +152,7 @@ const Main = ({
     changeSchemas([{ key: 'data', value, schemaId }]);
 
   return (
-    <div
-      ref={wrapRef}
-      onClick={() => setEditing(false)}
-      // TODO もとに戻す
-      style={{ backgroundColor: editing ? 'red' : 'transparent' }}
-    >
+    <div ref={wrapRef} onClick={() => setEditing(false)}>
       {backgrounds.map((background, index) => {
         const pageSize = pageSizes[index];
         if (!pageSize) {
@@ -256,13 +255,22 @@ const Main = ({
                       }}
                       onResizeEnd={onResizeEnd}
                       onResizeGroupEnd={onResizeEnds}
-                      onClick={(e) => setEditing(e.isDouble)}
+                      onClick={(e) => {
+                        setEditing(e.isDouble);
+                        if (e.isDouble && inputRef.current) {
+                          const ic = inputRef.current;
+                          ic.disabled = false;
+                          ic.focus();
+                          if (ic.type !== 'file') {
+                            ic.setSelectionRange(ic.value.length, ic.value.length);
+                          }
+                        }
+                      }}
                     />
                   )}
                 <Guides
                   zoom={zoom}
                   style={{
-                    display: pageCursor === index ? 'inherit' : 'none',
                     position: 'absolute',
                     top: 0,
                     left: rulerHeight,
@@ -277,7 +285,6 @@ const Main = ({
                 <Guides
                   zoom={zoom}
                   style={{
-                    display: pageCursor === index ? 'inherit' : 'none',
                     position: 'absolute',
                     top: rulerHeight,
                     left: 0,
@@ -322,11 +329,8 @@ const Main = ({
                             className={`${SELECTABLE}`}
                             onMouseEnter={() => onMouseEnter(s.id)}
                             onMouseLeave={() => onMouseLeave()}
-                            onClick={(e) => {
-                              if (editable) {
-                                // TODO ここで子要素にフォーカスさせたい
-                                e.stopPropagation();
-                              }
+                            onClick={() => {
+                              editing && onSelectSchemas([]);
                             }}
                             id={s.id}
                             // TODO このスタイルは共通化できそう
@@ -346,9 +350,12 @@ const Main = ({
                           >
                             {s.type === 'text' && (
                               <TextSchema
+                                {...{
+                                  [editable ? 'ref' : '']:
+                                    inputRef as React.RefObject<HTMLTextAreaElement>,
+                                }}
                                 schema={s}
                                 value={s.data}
-                                pageCursor={pageCursor}
                                 editable={editable}
                                 placeholder={''}
                                 tabIndex={0}
@@ -357,9 +364,12 @@ const Main = ({
                             )}
                             {s.type === 'image' && (
                               <ImageSchema
+                                {...{
+                                  [editable ? 'ref' : '']:
+                                    inputRef as React.RefObject<HTMLInputElement>,
+                                }}
                                 schema={s}
                                 value={s.data}
-                                pageCursor={pageCursor}
                                 editable={editable}
                                 placeholder={''}
                                 tabIndex={0}
@@ -368,9 +378,12 @@ const Main = ({
                             )}
                             {barcodeList.includes(s.type) && (
                               <BarcodeSchema
+                                {...{
+                                  [editable ? 'ref' : '']:
+                                    inputRef as React.RefObject<HTMLInputElement>,
+                                }}
                                 schema={s}
                                 value={s.data}
-                                pageCursor={pageCursor}
                                 editable={editable}
                                 placeholder={''}
                                 tabIndex={0}

@@ -90,7 +90,6 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
                           <TextSchema
                             schema={s}
                             value={value}
-                            pageCursor={pageCursor}
                             editable={editable}
                             placeholder={template.sampledata[0][key] || ''}
                             tabIndex={tabIndex}
@@ -101,7 +100,6 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
                           <ImageSchema
                             schema={s}
                             value={value}
-                            pageCursor={pageCursor}
                             editable={editable}
                             placeholder={template.sampledata[0][key] || ''}
                             tabIndex={tabIndex}
@@ -112,7 +110,6 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
                           <BarcodeSchema
                             schema={s}
                             value={value}
-                            pageCursor={pageCursor}
                             editable={editable}
                             placeholder={template.sampledata[0][key] || ''}
                             tabIndex={tabIndex}

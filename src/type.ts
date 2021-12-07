@@ -8,6 +8,15 @@ export type PageSize = _PageSize;
 
 export type TemplateSchema = _TemplateSchema;
 
+export type SchemaUIProp = {
+  schema: TemplateSchema;
+  value: string;
+  editable: boolean;
+  placeholder: string;
+  tabIndex: number;
+  onChange: (value: string) => void;
+};
+
 export type Template = _Template & {
   sampledata: { [key: string]: string }[];
   columns: string[];
