@@ -7,7 +7,10 @@ import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema, PageSize } from '../../../type';
 import { round, flatten, getFontFamily } from '../../../utils';
-import { barcodeList, zoom, rulerHeight, barcodeExampleImageObj } from '../../../constants';
+import { barcodeList, zoom, rulerHeight } from '../../../constants';
+import TextSchema from '../../TextSchema';
+import ImageSchema from '../../ImageSchema';
+import BarcodeSchema from '../../BarcodeSchema';
 
 const SELECTABLE = 'selectable';
 
@@ -24,7 +27,7 @@ interface Props {
   onMouseLeave: () => void;
   onSelectSchemas: (targets: HTMLElement[]) => void;
   focusElementId: string;
-  changeSchema: (obj: { key: string; value: string; schemaId: string }[]) => void;
+  changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
 }
 
 const Main = ({
@@ -38,7 +41,7 @@ const Main = ({
   onMouseEnter,
   onMouseLeave,
   focusElementId,
-  changeSchema,
+  changeSchemas,
 }: Props) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
@@ -46,17 +49,14 @@ const Main = ({
   const moveable = useRef<any>(null);
 
   const onKeydown = (e: KeyboardEvent) => {
-    if (e.shiftKey) {
-      setIsPressShiftKey(true);
-    }
+    if (e.shiftKey) setIsPressShiftKey(true);
   };
   const onKeyup = (e: KeyboardEvent) => {
-    if (e.key === 'Shift') {
-      setIsPressShiftKey(false);
-    }
+    if (e.key === 'Shift') setIsPressShiftKey(false);
   };
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const initEvents = () => {
     window.addEventListener('keydown', onKeydown);
@@ -75,7 +75,7 @@ const Main = ({
 
   useEffect(() => {
     moveable.current && moveable.current.updateRect();
-  }, [schemas, pageSizes, backgrounds]);
+  }, [schemas, pageSizes, backgrounds, editing]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
     target!.style.left = (left < 0 ? 0 : left) + 'px';
@@ -101,7 +101,7 @@ const Main = ({
 
   const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { top, left } = target.style;
-    changeSchema([
+    changeSchemas([
       { key: 'position.y', value: fmt(top), schemaId: target.id },
       { key: 'position.x', value: fmt(left), schemaId: target.id },
     ]);
@@ -109,7 +109,7 @@ const Main = ({
 
   const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { width, height, top, left } = target.style;
-    changeSchema([
+    changeSchemas([
       { key: 'width', value: fmt(width), schemaId: target.id },
       { key: 'height', value: fmt(height), schemaId: target.id },
       { key: 'position.y', value: fmt(top), schemaId: target.id },
@@ -125,7 +125,7 @@ const Main = ({
         { key: 'position.x', value: fmt(left), schemaId: target.id },
       ];
     });
-    changeSchema(flatten(arg));
+    changeSchemas(flatten(arg));
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -138,14 +138,22 @@ const Main = ({
         { key: 'position.x', value: fmt(left), schemaId: target.id },
       ];
     });
-    changeSchema(flatten(arg));
+    changeSchemas(flatten(arg));
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
     guides[index].getGuides().map((g) => g * zoom + rulerHeight);
 
+  const handleChangeInput = ({ value, schemaId }: { value: string; schemaId: string }) =>
+    changeSchemas([{ key: 'data', value, schemaId }]);
+
   return (
-    <div ref={wrapRef}>
+    <div
+      ref={wrapRef}
+      onClick={() => setEditing(false)}
+      // TODO もとに戻す
+      style={{ backgroundColor: editing ? 'red' : 'transparent' }}
+    >
       {backgrounds.map((background, index) => {
         const pageSize = pageSizes[index];
         if (!pageSize) {
@@ -153,6 +161,8 @@ const Main = ({
         }
         const paperHeight = pageSize.height * zoom;
         const paperWidth = pageSize.width * zoom;
+        const paperAndRulerWidth = paperWidth + rulerHeight;
+        const paperAndRulerHeight = paperHeight + rulerHeight;
         return (
           <div
             key={background.slice(-10) + index}
@@ -164,37 +174,39 @@ const Main = ({
               left: (-rulerHeight * scale) / 2,
             }}
           >
-            <Selecto
-              container={wrapRef.current}
-              selectFromInside={false}
-              continueSelect={false}
-              selectByClick={true}
-              preventDefault
-              selectableTargets={[`.${SELECTABLE}`]}
-              hitRate={0}
-              onDragStart={(e) => {
-                const inputEvent = e.inputEvent;
-                const target = inputEvent.target;
-                if (
-                  (inputEvent.type === 'touchstart' && e.isTrusted) ||
-                  (moveable.current && moveable.current.isMoveableElement(target))
-                ) {
+            {!editing && (
+              <Selecto
+                container={wrapRef.current}
+                selectFromInside={false}
+                continueSelect={isPressShiftKey}
+                selectByClick={true}
+                preventDefault
+                selectableTargets={[`.${SELECTABLE}`]}
+                hitRate={0}
+                onDragStart={(e) => {
+                  const inputEvent = e.inputEvent;
+                  const target = inputEvent.target;
+                  if (
+                    (inputEvent.type === 'touchstart' && e.isTrusted) ||
+                    (moveable.current && moveable.current.isMoveableElement(target))
+                  ) {
+                    e.stop();
+                  }
+                }}
+                onSelect={(e: any) => {
                   e.stop();
-                }
-              }}
-              onSelect={(e: any) => {
-                e.stop();
-                onSelectSchemas(e.selected as HTMLElement[]);
-              }}
-            />
+                  onSelectSchemas(e.selected as HTMLElement[]);
+                }}
+              />
+            )}
 
             <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
               {pageCursor !== index && (
                 <div
                   style={{
                     position: 'absolute',
-                    width: paperWidth + rulerHeight,
-                    height: paperHeight,
+                    width: paperAndRulerWidth,
+                    height: paperAndRulerHeight,
                     zIndex: 100,
                     background: '#9e9e9e94',
                   }}
@@ -202,27 +214,26 @@ const Main = ({
               )}
               <div
                 style={{
-                  width: paperWidth + rulerHeight,
-                  height: paperHeight + rulerHeight,
+                  width: paperAndRulerWidth,
+                  height: paperAndRulerHeight,
                   position: 'relative',
                   background: '#333',
                 }}
               >
-                {pageCursor === index &&
+                {!editing &&
+                  pageCursor === index &&
                   activeElements.length !== 0 &&
                   horizontalGuides.current[index] &&
                   verticalGuides.current[index] && (
                     <Moveable
-                      ref={(e: any) => {
-                        moveable.current = e;
-                      }}
+                      ref={moveable}
                       target={activeElements}
                       style={{ zIndex: 1 }}
                       bounds={{
                         left: 0,
                         top: 0,
-                        bottom: paperHeight + rulerHeight,
-                        right: paperWidth + rulerHeight,
+                        bottom: paperAndRulerHeight,
+                        right: paperAndRulerWidth,
                       }}
                       snappable
                       snapCenter
@@ -245,6 +256,7 @@ const Main = ({
                       }}
                       onResizeEnd={onResizeEnd}
                       onResizeGroupEnd={onResizeEnds}
+                      onClick={(e) => setEditing(e.isDouble)}
                     />
                   )}
                 <Guides
@@ -301,83 +313,75 @@ const Main = ({
                   >
                     <img className={styles.paperImage} src={background} alt="background" />
                   </div>
-                  {(schemas[index] || []).map((s) => (
-                    <div key={s.id}>
-                      <Tippy delay={0} interactive content={s.key}>
-                        <div
-                          className={`${SELECTABLE}`}
-                          onMouseEnter={() => onMouseEnter(s.id)}
-                          onMouseLeave={() => onMouseLeave()}
-                          id={s.id}
-                          style={{
-                            display: 'block',
-                            position: 'absolute',
-                            height: +s.height * zoom,
-                            width: +s.width * zoom,
-                            top: +s.position.y * zoom,
-                            left: +s.position.x * zoom,
-                            border:
-                              focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
-                            backgroundColor:
-                              s.type === 'text' && s.backgroundColor
-                                ? s.backgroundColor
-                                : 'transparent',
-                          }}
-                        >
-                          {s.type === 'text' && (
-                            <div
-                              style={{
-                                textAlign: s.alignment,
-                                fontSize: s.fontSize + 'pt',
-                                letterSpacing: s.characterSpacing + 'pt',
-                                lineHeight: s.lineHeight + 'em',
-                                whiteSpace: 'pre-line',
-                                wordBreak: 'break-all',
-                                color: s.fontColor || '#000',
-                              }}
-                            >
-                              {/*  Set the letterSpacing of the last character to 0. */}
-                              {s.data.split('').map((l, i) => (
-                                <span
-                                  key={i}
-                                  style={{
-                                    letterSpacing: String(s.data).length === i + 1 ? 0 : 'inherit',
-                                  }}
-                                >
-                                  {l}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {s.type === 'image' && (
-                            <img
-                              alt={s.key}
-                              style={{
-                                width: s.width * zoom,
-                                height: s.height * zoom - 2,
-                                borderRadius: 0,
-                              }}
-                              src={s.data}
-                            />
-                          )}
-                          {barcodeList.includes(s.type) && (
-                            <div className={styles.barcodeWrap}>
-                              {s.data ? (
-                                <>
-                                  <p className={styles.example}>Example</p>
-                                  <img
-                                    alt="barcode"
-                                    className={styles.barcodeImg}
-                                    src={barcodeExampleImageObj[s.type]}
-                                  />
-                                </>
-                              ) : null}
-                            </div>
-                          )}
-                        </div>
-                      </Tippy>
-                    </div>
-                  ))}
+                  {(schemas[index] || []).map((s) => {
+                    const editable = editing && activeElements.map((ae) => ae.id).includes(s.id);
+                    return (
+                      <div key={s.id}>
+                        <Tippy delay={0} interactive content={s.key}>
+                          <div
+                            className={`${SELECTABLE}`}
+                            onMouseEnter={() => onMouseEnter(s.id)}
+                            onMouseLeave={() => onMouseLeave()}
+                            onClick={(e) => {
+                              if (editable) {
+                                // TODO ここで子要素にフォーカスさせたい
+                                e.stopPropagation();
+                              }
+                            }}
+                            id={s.id}
+                            // TODO このスタイルは共通化できそう
+                            style={{
+                              position: 'absolute',
+                              height: +s.height * zoom,
+                              width: +s.width * zoom,
+                              top: +s.position.y * zoom,
+                              left: +s.position.x * zoom,
+                              border:
+                                focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
+                              backgroundColor:
+                                s.type === 'text' && s.backgroundColor
+                                  ? s.backgroundColor
+                                  : 'transparent',
+                            }}
+                          >
+                            {s.type === 'text' && (
+                              <TextSchema
+                                schema={s}
+                                value={s.data}
+                                pageCursor={pageCursor}
+                                editable={editable}
+                                placeholder={''}
+                                tabIndex={0}
+                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                              />
+                            )}
+                            {s.type === 'image' && (
+                              <ImageSchema
+                                schema={s}
+                                value={s.data}
+                                pageCursor={pageCursor}
+                                editable={editable}
+                                placeholder={''}
+                                tabIndex={0}
+                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                              />
+                            )}
+                            {barcodeList.includes(s.type) && (
+                              <BarcodeSchema
+                                schema={s}
+                                value={s.data}
+                                pageCursor={pageCursor}
+                                editable={editable}
+                                placeholder={''}
+                                tabIndex={0}
+                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                              />
+                            )}
+                          </div>
+                        </Tippy>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

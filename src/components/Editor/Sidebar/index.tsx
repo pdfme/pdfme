@@ -26,7 +26,7 @@ const Sidebar = ({
   removeSchema,
   onMouseEnter,
   onMouseLeave,
-  changeSchema,
+  changeSchemas,
   addSchema,
 }: {
   pageCursor: number;
@@ -40,7 +40,7 @@ const Sidebar = ({
   removeSchema: (id: string) => void;
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
-  changeSchema: (obj: { key: string; value: string; schemaId: string }[]) => void;
+  changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
   addSchema: () => void;
 }) => {
   const i18n = useContext(I18nContext);
@@ -115,7 +115,7 @@ const Sidebar = ({
               <select
                 style={{ width: '100%' }}
                 onChange={(e) =>
-                  changeSchema([
+                  changeSchemas([
                     {
                       key: 'type',
                       value: e.target.value,
@@ -139,7 +139,7 @@ const Sidebar = ({
               </label>
               <input
                 onChange={(e) =>
-                  changeSchema([
+                  changeSchemas([
                     {
                       key: 'key',
                       value: e.target.value,
@@ -165,7 +165,7 @@ const Sidebar = ({
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
-                      changeSchema([
+                      changeSchemas([
                         {
                           key: 'position.x',
                           value: String(+e.target.value),
@@ -183,7 +183,7 @@ const Sidebar = ({
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
-                      changeSchema([
+                      changeSchemas([
                         {
                           key: 'position.y',
                           value: String(+e.target.value),
@@ -203,7 +203,7 @@ const Sidebar = ({
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
-                      changeSchema([
+                      changeSchemas([
                         {
                           key: 'width',
                           value: String(+e.target.value),
@@ -221,7 +221,7 @@ const Sidebar = ({
                     style={{ width: 70 }}
                     type="number"
                     onChange={(e) =>
-                      changeSchema([
+                      changeSchemas([
                         {
                           key: 'height',
                           value: String(+e.target.value),
@@ -246,7 +246,7 @@ const Sidebar = ({
                       <select
                         style={{ width: '100%' }}
                         onChange={(e) =>
-                          changeSchema([
+                          changeSchemas([
                             {
                               key: 'alignment',
                               value: e.target.value,
@@ -265,7 +265,7 @@ const Sidebar = ({
                       <label>FontSize(pt)</label>
                       <input
                         onChange={(e) =>
-                          changeSchema([
+                          changeSchemas([
                             {
                               key: 'fontSize',
                               value: e.target.value,
@@ -282,7 +282,7 @@ const Sidebar = ({
                       <div style={{ display: 'flex' }}>
                         <input
                           onChange={(e) =>
-                            changeSchema([
+                            changeSchemas([
                               {
                                 key: 'fontColor',
                                 value: e.target.value,
@@ -296,7 +296,7 @@ const Sidebar = ({
                         />
                         <button
                           onClick={() =>
-                            changeSchema([
+                            changeSchemas([
                               {
                                 key: 'fontColor',
                                 value: '',
@@ -315,7 +315,7 @@ const Sidebar = ({
                       <label>CharacterSpacing(pt):</label>
                       <input
                         onChange={(e) =>
-                          changeSchema([
+                          changeSchemas([
                             {
                               key: 'characterSpacing',
                               value: e.target.value,
@@ -331,7 +331,7 @@ const Sidebar = ({
                       <label>LineHeight(em)</label>
                       <input
                         onChange={(e) =>
-                          changeSchema([
+                          changeSchemas([
                             {
                               key: 'lineHeight',
                               value: e.target.value,
@@ -348,7 +348,7 @@ const Sidebar = ({
                       <div style={{ display: 'flex' }}>
                         <input
                           onChange={(e) =>
-                            changeSchema([
+                            changeSchemas([
                               {
                                 key: 'backgroundColor',
                                 value: e.target.value,
@@ -362,7 +362,7 @@ const Sidebar = ({
                         />
                         <button
                           onClick={() =>
-                            changeSchema([
+                            changeSchemas([
                               {
                                 key: 'backgroundColor',
                                 value: '',
@@ -389,7 +389,7 @@ const Sidebar = ({
                         className={`${styles.dltBtn}`}
                         aria-label="close"
                         onClick={() =>
-                          changeSchema([
+                          changeSchemas([
                             {
                               key: 'data',
                               value: '',
@@ -408,7 +408,7 @@ const Sidebar = ({
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const files = e.target.files;
                           readFiles(files, 'dataURL').then((result) => {
-                            changeSchema([
+                            changeSchemas([
                               {
                                 key: 'data',
                                 value: result as string,
@@ -427,7 +427,7 @@ const Sidebar = ({
                 <textarea
                   rows={6}
                   onChange={(e) =>
-                    changeSchema([
+                    changeSchemas([
                       {
                         key: 'data',
                         value: e.target.value,

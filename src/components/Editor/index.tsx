@@ -56,7 +56,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const modifiedTemplate = fmtTemplate(
     Object.assign(template, { basePdf: basePdf.current ? basePdf.current : template.basePdf }),
     schemas
-  );
+  )
 
   const onScroll = debounce(() => {
     if (!pageSizes[0] || !wrapRef.current) {
@@ -133,7 +133,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           }
           return { key: `position.${key}`, value: String(value), schemaId: as.id };
         });
-        changeSchema(arg);
+        changeSchemas(arg);
       },
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
@@ -201,8 +201,8 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     onEditEnd();
   };
 
-  const changeSchema = (obj: { key: string; value: string; schemaId: string }[]) => {
-    const newSchemas = obj.reduce((acc, { key, value, schemaId }) => {
+  const changeSchemas = (objs: { key: string; value: string; schemaId: string }[]) => {
+    const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
       const tgt = acc.find((s) => s.id === schemaId)!;
       // Assign to reference
       set(tgt, key, fmtValue(key, value));
@@ -304,7 +304,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           schemas={schemas[pageCursor]}
           focusElementId={focusElementId}
           activeSchema={activeSchema}
-          changeSchema={changeSchema}
+          changeSchemas={changeSchemas}
           onSortEnd={onSortEnd}
           onEdit={onEdit}
           onEditEnd={onEditEnd}
@@ -321,7 +321,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           activeElements={activeElements}
           focusElementId={focusElementId}
           schemas={schemas}
-          changeSchema={changeSchema}
+          changeSchemas={changeSchemas}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           onSelectSchemas={setActiveElements}
