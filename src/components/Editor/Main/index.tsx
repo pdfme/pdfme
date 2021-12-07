@@ -6,7 +6,7 @@ import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema, PageSize } from '../../../type';
-import { round, flatten, getFontFamily, debounce } from '../../../utils';
+import { round, flatten, getFontFamily } from '../../../utils';
 import { barcodeList, zoom, rulerHeight, barcodeExampleImageObj } from '../../../constants';
 
 const SELECTABLE = 'selectable';

@@ -14,135 +14,6 @@ import dragIcon from '../../../images/drag.svg';
 import warningIcon from '../../../images/warning.svg';
 import deleteIcon from '../../../images/delete.svg';
 
-const isTouchable = () => true;
-
-const DragHandle = SortableHandle(({ disabled }: { disabled: boolean }) => (
-  <button disabled={disabled} style={{ padding: 5, margin: 5, cursor: 'grab' }}>
-    <img src={dragIcon} width={15} alt="Drag icon" />
-  </button>
-));
-
-const SortableItem = SortableElement(
-  ({
-    schemas,
-    schema,
-    focusElementId,
-    onEdit,
-    onDelete,
-    onMouseEnter,
-    onMouseLeave,
-  }: {
-    schemas: Schema[];
-    schema: Schema;
-    focusElementId: string;
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
-    onMouseEnter: (id: string) => void;
-    onMouseLeave: () => void;
-  }) => {
-    const i18n = useContext(I18nContext);
-
-    const sc = schema;
-    let status: '' | 'is-warning' | 'is-danger' = '';
-    if (!sc.key) {
-      status = 'is-warning';
-    } else if (schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)) {
-      status = 'is-danger';
-    }
-
-    const touchable = isTouchable();
-
-    const getTitle = () => {
-      if (status === 'is-warning') {
-        return i18n('plsInputName');
-      } else if (status === 'is-danger') {
-        return i18n('fieldMustUniq');
-      } else {
-        return i18n('edit');
-      }
-    };
-    return (
-      <div
-        key={sc.id}
-        className={styles.flx}
-        style={{
-          border: focusElementId === sc.id ? '1px solid #d42802' : '1px solid transparent',
-        }}
-        onMouseEnter={() => onMouseEnter(sc.id)}
-        onMouseLeave={() => onMouseLeave()}
-      >
-        <DragHandle disabled={!touchable} />
-        <button
-          disabled={!touchable}
-          className={`${status}`}
-          style={{ padding: 5, margin: 5, width: '100%', display: 'flex', alignItems: 'center' }}
-          onClick={() => onEdit(sc.id)}
-          title={getTitle()}
-        >
-          <span className={`${styles.keyLabel}`}>
-            {status === '' ? (
-              sc.key
-            ) : (
-              <span className={styles.warning}>
-                <img
-                  alt="Warning icon"
-                  src={warningIcon}
-                  width={15}
-                  style={{ marginRight: '0.5rem' }}
-                />
-                {status === 'is-warning' ? i18n('noKeyName') : sc.key}
-              </span>
-            )}
-          </span>
-          <img alt="Create icon" src={createIcon} width={15} />
-        </button>
-        <button
-          disabled={!touchable}
-          style={{ padding: 5, margin: 5 }}
-          onClick={() => onDelete(sc.id)}
-        >
-          <img alt="Delete icon" src={deleteIcon} width={15} />
-        </button>
-      </div>
-    );
-  }
-);
-
-const SortableList = SortableContainer(
-  ({
-    schemas,
-    onEdit,
-    onDelete,
-    onMouseEnter,
-    onMouseLeave,
-    focusElementId,
-  }: {
-    schemas: Schema[];
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
-    onMouseEnter: (id: string) => void;
-    onMouseLeave: () => void;
-    focusElementId: string;
-  }) => (
-    <div style={{ maxHeight: 350, overflowY: 'auto' }}>
-      {schemas.map((s, i) => (
-        <SortableItem
-          disabled={!isTouchable()}
-          focusElementId={focusElementId}
-          index={i}
-          key={s.id}
-          schemas={schemas}
-          schema={s}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
-        />
-      ))}
-    </div>
-  )
-);
-
 const Sidebar = ({
   pageCursor,
   activeElement,
@@ -169,7 +40,7 @@ const Sidebar = ({
   removeSchema: (id: string) => void;
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
-  changeSchema: (obj: Array<{ key: string; value: string; schemaId: string }>) => void;
+  changeSchema: (obj: { key: string; value: string; schemaId: string }[]) => void;
   addSchema: () => void;
 }) => {
   const i18n = useContext(I18nContext);
@@ -584,5 +455,134 @@ const Sidebar = ({
     </div>
   );
 };
+
+const isTouchable = () => true;
+
+const DragHandle = SortableHandle(({ disabled }: { disabled: boolean }) => (
+  <button disabled={disabled} style={{ padding: 5, margin: 5, cursor: 'grab' }}>
+    <img src={dragIcon} width={15} alt="Drag icon" />
+  </button>
+));
+
+const SortableItem = SortableElement(
+  ({
+    schemas,
+    schema,
+    focusElementId,
+    onEdit,
+    onDelete,
+    onMouseEnter,
+    onMouseLeave,
+  }: {
+    schemas: Schema[];
+    schema: Schema;
+    focusElementId: string;
+    onEdit: (id: string) => void;
+    onDelete: (id: string) => void;
+    onMouseEnter: (id: string) => void;
+    onMouseLeave: () => void;
+  }) => {
+    const i18n = useContext(I18nContext);
+
+    const sc = schema;
+    let status: '' | 'is-warning' | 'is-danger' = '';
+    if (!sc.key) {
+      status = 'is-warning';
+    } else if (schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)) {
+      status = 'is-danger';
+    }
+
+    const touchable = isTouchable();
+
+    const getTitle = () => {
+      if (status === 'is-warning') {
+        return i18n('plsInputName');
+      } else if (status === 'is-danger') {
+        return i18n('fieldMustUniq');
+      } else {
+        return i18n('edit');
+      }
+    };
+    return (
+      <div
+        key={sc.id}
+        className={styles.flx}
+        style={{
+          border: focusElementId === sc.id ? '1px solid #d42802' : '1px solid transparent',
+        }}
+        onMouseEnter={() => onMouseEnter(sc.id)}
+        onMouseLeave={() => onMouseLeave()}
+      >
+        <DragHandle disabled={!touchable} />
+        <button
+          disabled={!touchable}
+          className={`${status}`}
+          style={{ padding: 5, margin: 5, width: '100%', display: 'flex', alignItems: 'center' }}
+          onClick={() => onEdit(sc.id)}
+          title={getTitle()}
+        >
+          <span className={`${styles.keyLabel}`}>
+            {status === '' ? (
+              sc.key
+            ) : (
+              <span className={styles.warning}>
+                <img
+                  alt="Warning icon"
+                  src={warningIcon}
+                  width={15}
+                  style={{ marginRight: '0.5rem' }}
+                />
+                {status === 'is-warning' ? i18n('noKeyName') : sc.key}
+              </span>
+            )}
+          </span>
+          <img alt="Create icon" src={createIcon} width={15} />
+        </button>
+        <button
+          disabled={!touchable}
+          style={{ padding: 5, margin: 5 }}
+          onClick={() => onDelete(sc.id)}
+        >
+          <img alt="Delete icon" src={deleteIcon} width={15} />
+        </button>
+      </div>
+    );
+  }
+);
+
+const SortableList = SortableContainer(
+  ({
+    schemas,
+    onEdit,
+    onDelete,
+    onMouseEnter,
+    onMouseLeave,
+    focusElementId,
+  }: {
+    schemas: Schema[];
+    onEdit: (id: string) => void;
+    onDelete: (id: string) => void;
+    onMouseEnter: (id: string) => void;
+    onMouseLeave: () => void;
+    focusElementId: string;
+  }) => (
+    <div style={{ maxHeight: 350, overflowY: 'auto' }}>
+      {schemas.map((s, i) => (
+        <SortableItem
+          disabled={!isTouchable()}
+          focusElementId={focusElementId}
+          index={i}
+          key={s.id}
+          schemas={schemas}
+          schema={s}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
+        />
+      ))}
+    </div>
+  )
+);
 
 export default Sidebar;

@@ -183,8 +183,10 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   const addSchema = () => {
     const s = getInitialSchema();
+    // TODO ここでpaperへdocument.getElementByIでアクセスしたくない
     const paper = document.getElementById(`paper-${pageCursor}`);
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
+    // TODO マジックナンバー
     const headerHeight = 53;
     s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
