@@ -7,6 +7,9 @@
   </head>
   <body style="margin: 0">
     <div>
+      <button onclick="saveTemplateByAPI()">saveTemplateByAPI</button>
+      <button onclick="getTemplateFromLocalStorage()">getTemplateFromLocalStorage</button>
+      /
       <button onclick="previewInit()">Init preview</button>
       <button onclick="editablePreviewInit()">Init editable preview</button>
       <button onclick="editorInit()">Init editor</button>
@@ -18,7 +21,7 @@
     <div id="app"></div>
     <script>
       const domContainer = document.getElementById('app');
-      const getTemplate = () => ({
+      const getSampleTemplate = () => ({
         columns: ['field1', 'field2'],
         sampledata: [
           {
@@ -60,18 +63,51 @@
       const editablePreview = 'editablePreview';
       const editor = 'editor';
 
-      window.onload = function () {
+      function init() {
         const item = localStorage.getItem(inited);
-        if (item === preview) previewInit();
-        if (item === editablePreview) editablePreviewInit();
-        if (item === editor) editorInit();
-      };
+        if (item === preview) previewDestroy(), previewInit();
+        if (item === editablePreview) editablePreviewDestroy(), editablePreviewInit();
+        if (item === editor) editorDestroy(), editorInit();
+      }
+
+      window.onload = init;
+
+      function saveTemplateByAPI() {
+        fetch('https://api.labelmake.jp/v1/templates?team=labelmake', {
+          method: 'GET',
+          headers: {
+            'X-Labelmake-API-Token': '',
+          },
+        })
+          .then((response) => response.json())
+          .then((json) => {
+            alert('saved');
+            localStorage.setItem('templates', JSON.stringify(json));
+          });
+      }
+
+      function getTemplateFromLocalStorage() {
+        const input = window.prompt('enter index');
+        const templates = JSON.parse(localStorage.getItem('templates'));
+        let template = null;
+        if (isNaN(input)) {
+          template = templates.find((t) => t.id === input);
+        } else {
+          template = templates[input];
+        }
+        if (!template) {
+          alert('invalid input');
+          return;
+        }
+        localStorage.setItem('template', JSON.stringify(template));
+        init();
+      }
 
       function previewInit() {
         localStorage.setItem(inited, preview);
         LabelmakeUi.Preview.init(
           domContainer,
-          getTemplate(),
+          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
           [
             { field1: 'ああ1', field2: 'いいいい1' },
             { field1: 'ああ2', field2: 'いいいい2' },
@@ -83,7 +119,7 @@
         localStorage.setItem(inited, editablePreview);
         LabelmakeUi.Preview.init(
           domContainer,
-          getTemplate(),
+          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
           [
             { field1: 'ああ1', field2: 'いいいい1' },
             { field1: 'ああ2', field2: '' },
@@ -111,7 +147,12 @@
             resolve(t);
           });
         };
-        LabelmakeUi.Editor.init(domContainer, getTemplate(), saveTemplate, getSize());
+        LabelmakeUi.Editor.init(
+          domContainer,
+          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
+          saveTemplate,
+          getSize()
+        );
       }
 
       function previewDestroy() {

@@ -481,6 +481,7 @@ const blob2Base64 = (blob: Blob) => {
 
 export const getB64BasePdf = async (template: Template) => {
   const basePdf = template.basePdf;
+  // TODO 相対パスに対応していない
   if (typeof basePdf === 'string' && basePdf.startsWith('http')) {
     const blob = await fetch(basePdf).then((res) => res.blob());
     const base64 = (await blob2Base64(blob)) as string;

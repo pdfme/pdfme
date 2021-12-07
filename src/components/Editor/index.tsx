@@ -21,6 +21,7 @@ import {
   destroyShortCuts,
   getSampleByType,
   getKeepRaitoHeightByWidth,
+  getB64BasePdf,
 } from '../../utils';
 import { useUiPreProcessor } from '../../hooks';
 
@@ -241,8 +242,8 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   const updateTemplate = async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
-    basePdf.current = newTemplate.basePdf as string;
-    const pdfBlob = b64toBlob(newTemplate.basePdf as string);
+    basePdf.current = await getB64BasePdf(newTemplate);
+    const pdfBlob = b64toBlob(basePdf.current);
     const pageSizes = await getPdfPageSizes(pdfBlob);
     const _schemas = (
       newSchemas.length < pageSizes.length

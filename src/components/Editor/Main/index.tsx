@@ -301,7 +301,7 @@ const Main = ({
                   >
                     <img className={styles.paperImage} src={background} alt="background" />
                   </div>
-                  {schemas[index].map((s) => (
+                  {(schemas[index] || []).map((s) => (
                     <div key={s.id}>
                       <Tippy delay={0} interactive content={s.key}>
                         <div
