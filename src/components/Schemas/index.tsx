@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { MouseEvent, forwardRef } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { zoom, selectableClassName, barcodeList } from '../../libs/constants';
@@ -8,10 +8,9 @@ import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
 
 type Props = SchemaUIProp & {
-  topOffset: number;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => void;
   border: string;
 };
 
@@ -23,7 +22,6 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
       placeholder,
       tabIndex,
       onChange,
-      topOffset,
       onMouseEnter,
       onMouseLeave,
       onClick,
@@ -37,13 +35,13 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
           className={selectableClassName}
           onMouseEnter={() => onMouseEnter && onMouseEnter()}
           onMouseLeave={() => onMouseLeave && onMouseLeave()}
-          onClick={() => onClick && onClick()}
+          onClick={(e) => onClick && onClick(e)}
           id={schema.id}
           style={{
             position: 'absolute',
             height: +schema.height * zoom,
             width: +schema.width * zoom,
-            top: +schema.position.y * zoom + topOffset,
+            top: +schema.position.y * zoom,
             left: +schema.position.x * zoom,
             border,
             backgroundColor:

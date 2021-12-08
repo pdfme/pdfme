@@ -7,12 +7,10 @@ import { useContext } from 'react';
 import { I18nContext } from '../../../libs/i18n';
 
 const Pager = ({
-  isOpen,
   pageCursor,
   pageNum,
   setPageCursor,
 }: {
-  isOpen: boolean;
   pageCursor: number;
   pageNum: number;
   setPageCursor: (page: number) => void;
@@ -20,10 +18,7 @@ const Pager = ({
   const i18n = useContext(I18nContext);
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{ display: !isOpen || pageNum === 1 ? 'none' : 'block' }}
-    >
+    <div className={styles.wrapper}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <button
           className={styles.leftBtn}

@@ -1,6 +1,4 @@
 import { useRef, useState, useEffect } from 'react';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
 import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
@@ -150,54 +148,65 @@ const Main = ({
     changeSchemas([{ key: 'data', value, schemaId }]);
 
   return (
-    <div ref={wrapRef} onClick={() => setEditing(false)}>
-      {backgrounds.map((background, index) => {
-        const pageSize = pageSizes[index];
-        if (!pageSize) {
-          return null;
-        }
-        const paperHeight = pageSize.height * zoom;
-        const paperWidth = pageSize.width * zoom;
-        const paperAndRulerWidth = paperWidth + rulerHeight;
-        const paperAndRulerHeight = paperHeight + rulerHeight;
-        return (
-          <div
-            key={background.slice(-10) + index}
-            style={{
-              width: paperWidth * scale,
-              height: paperHeight * scale,
-              position: 'relative',
-              margin: '0 auto',
-              left: (-rulerHeight * scale) / 2,
-            }}
-          >
-            {!editing && (
-              <Selecto
-                container={wrapRef.current}
-                selectFromInside={false}
-                continueSelect={isPressShiftKey}
-                selectByClick={true}
-                preventDefault
-                selectableTargets={[`.${selectableClassName}`]}
-                hitRate={0}
-                onDragStart={(e) => {
-                  const inputEvent = e.inputEvent;
-                  const target = inputEvent.target;
-                  if (
-                    (inputEvent.type === 'touchstart' && e.isTrusted) ||
-                    (moveable.current && moveable.current.isMoveableElement(target))
-                  ) {
+    <div
+      ref={wrapRef}
+      onClick={() => {
+        setEditing(false);
+      }}
+      style={{ fontFamily: getFontFamily() }}
+    >
+      <div
+        style={{
+          transform: `scale(${scale})`,
+          transformOrigin: 'top center',
+        }}
+      >
+        {schemas.map((schema, index) => {
+          const pageSize = pageSizes[index];
+          if (!pageSize) {
+            return null;
+          }
+          const paperHeight = pageSize.height * zoom;
+          const paperWidth = pageSize.width * zoom;
+          const paper = { width: paperWidth, height: paperHeight };
+          const paperAndRulerWidth = paperWidth + rulerHeight;
+          const paperAndRulerHeight = paperHeight + rulerHeight;
+          return (
+            <div
+              key={JSON.stringify(schema)}
+              style={{
+                margin: `0 auto`,
+                position: 'relative',
+                background: '#333',
+                ...paper,
+              }}
+            >
+              {!editing && (
+                <Selecto
+                  container={wrapRef.current}
+                  selectFromInside={false}
+                  continueSelect={isPressShiftKey}
+                  selectByClick={true}
+                  preventDefault
+                  selectableTargets={[`.${selectableClassName}`]}
+                  hitRate={0}
+                  onDragStart={(e) => {
+                    const inputEvent = e.inputEvent;
+                    const target = inputEvent.target;
+                    if (
+                      (inputEvent.type === 'touchstart' && e.isTrusted) ||
+                      (moveable.current && moveable.current.isMoveableElement(target))
+                    ) {
+                      e.stop();
+                    }
+                  }}
+                  onSelect={(e: any) => {
                     e.stop();
-                  }
-                }}
-                onSelect={(e: any) => {
-                  e.stop();
-                  onSelectSchemas(e.selected as HTMLElement[]);
-                }}
-              />
-            )}
+                    onSelectSchemas(e.selected as HTMLElement[]);
+                  }}
+                />
+              )}
 
-            <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}>
               {pageCursor !== index && (
                 <div
                   style={{
@@ -209,141 +218,118 @@ const Main = ({
                   }}
                 />
               )}
-              <div
+              {!editing &&
+                pageCursor === index &&
+                activeElements.length !== 0 &&
+                horizontalGuides.current[index] &&
+                verticalGuides.current[index] && (
+                  <Moveable
+                    ref={moveable}
+                    target={activeElements}
+                    style={{ zIndex: 1 }}
+                    bounds={{
+                      left: 0,
+                      top: 0,
+                      bottom: paperAndRulerHeight,
+                      right: paperAndRulerWidth,
+                    }}
+                    snappable
+                    snapCenter
+                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                    draggable
+                    resizable
+                    keepRatio={isPressShiftKey}
+                    throttleDrag={1}
+                    throttleResize={1}
+                    onDrag={onDrag}
+                    onDragGroup={({ events }) => {
+                      events.forEach(onDrag);
+                    }}
+                    onDragEnd={onDragEnd}
+                    onDragGroupEnd={onDragEnds}
+                    onResize={onResize}
+                    onResizeGroup={({ events }) => {
+                      events.forEach(onResize);
+                    }}
+                    onResizeEnd={onResizeEnd}
+                    onResizeGroupEnd={onResizeEnds}
+                    onClick={() => {
+                      setEditing(true);
+                      if (inputRef.current) {
+                        const ic = inputRef.current;
+                        ic.disabled = false;
+                        ic.focus();
+                        if (ic.type !== 'file') {
+                          ic.setSelectionRange(ic.value.length, ic.value.length);
+                        }
+                      }
+                    }}
+                  />
+                )}
+              <Guides
+                zoom={zoom}
                 style={{
-                  width: paperAndRulerWidth,
-                  height: paperAndRulerHeight,
-                  position: 'relative',
-                  background: '#333',
+                  position: 'absolute',
+                  top: 0,
+                  left: rulerHeight,
+                  height: rulerHeight,
+                  width: paperWidth,
+                }}
+                type="horizontal"
+                ref={(e) => {
+                  horizontalGuides.current[index] = e!;
+                }}
+              />
+              <Guides
+                zoom={zoom}
+                style={{
+                  position: 'absolute',
+                  top: rulerHeight,
+                  left: 0,
+                  height: paperHeight,
+                  width: rulerHeight,
+                }}
+                type="vertical"
+                ref={(e) => {
+                  verticalGuides.current[index] = e!;
+                }}
+              />
+
+              <div
+                id={`paper-${index}`}
+                style={{
+                  position: 'absolute',
+                  top: rulerHeight,
+                  left: rulerHeight,
                 }}
               >
-                {!editing &&
-                  pageCursor === index &&
-                  activeElements.length !== 0 &&
-                  horizontalGuides.current[index] &&
-                  verticalGuides.current[index] && (
-                    <Moveable
-                      ref={moveable}
-                      target={activeElements}
-                      style={{ zIndex: 1 }}
-                      bounds={{
-                        left: 0,
-                        top: 0,
-                        bottom: paperAndRulerHeight,
-                        right: paperAndRulerWidth,
-                      }}
-                      snappable
-                      snapCenter
-                      horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                      verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                      draggable
-                      resizable
-                      keepRatio={isPressShiftKey}
-                      throttleDrag={1}
-                      throttleResize={1}
-                      onDrag={onDrag}
-                      onDragGroup={({ events }) => {
-                        events.forEach(onDrag);
-                      }}
-                      onDragEnd={onDragEnd}
-                      onDragGroupEnd={onDragEnds}
-                      onResize={onResize}
-                      onResizeGroup={({ events }) => {
-                        events.forEach(onResize);
-                      }}
-                      onResizeEnd={onResizeEnd}
-                      onResizeGroupEnd={onResizeEnds}
+                <img {...paper} src={backgrounds[index] || ''} alt="background" />
+                {(schema || []).map((s) => {
+                  return (
+                    <Schema
+                      key={s.id}
+                      schema={s}
+                      editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
+                      placeholder={''}
+                      tabIndex={0}
+                      onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                      onMouseEnter={() => onMouseEnter(s.id)}
+                      onMouseLeave={() => onMouseLeave()}
                       onClick={(e) => {
-                        setEditing(true);
-                        if (inputRef.current) {
-                          const ic = inputRef.current;
-                          ic.disabled = false;
-                          ic.focus();
-                          if (ic.type !== 'file') {
-                            ic.setSelectionRange(ic.value.length, ic.value.length);
-                          }
-                        }
+                        e.stopPropagation();
+                        editing && onSelectSchemas([]);
                       }}
+                      border={focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af'}
+                      ref={inputRef}
                     />
-                  )}
-                <Guides
-                  zoom={zoom}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: rulerHeight,
-                    height: rulerHeight,
-                    width: paperWidth,
-                  }}
-                  type="horizontal"
-                  ref={(e) => {
-                    horizontalGuides.current[index] = e!;
-                  }}
-                />
-                <Guides
-                  zoom={zoom}
-                  style={{
-                    position: 'absolute',
-                    top: rulerHeight,
-                    left: 0,
-                    height: paperHeight,
-                    width: rulerHeight,
-                  }}
-                  type="vertical"
-                  ref={(e) => {
-                    verticalGuides.current[index] = e!;
-                  }}
-                />
-
-                <div
-                  id={`paper-${index}`}
-                  style={{
-                    fontFamily: getFontFamily(),
-                    backgroundColor: '#fff',
-                    position: 'absolute',
-                    top: rulerHeight,
-                    left: rulerHeight,
-                    width: paperWidth,
-                    height: paperHeight,
-                  }}
-                >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: paperWidth,
-                      height: paperHeight,
-                    }}
-                  >
-                    <img className={styles.paperImage} src={background} alt="background" />
-                  </div>
-                  {(schemas[index] || []).map((s) => {
-                    const editable = editing && activeElements.map((ae) => ae.id).includes(s.id);
-                    return (
-                      <Schema
-                        key={s.id}
-                        schema={s}
-                        editable={editable}
-                        placeholder={''}
-                        tabIndex={0}
-                        onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
-                        // TODO topOffsetは親要素で指定すれば不要になるはず
-                        topOffset={0}
-                        onMouseEnter={() => onMouseEnter(s.id)}
-                        onMouseLeave={() => onMouseLeave()}
-                        onClick={() => editing && onSelectSchemas([])}
-                        border={focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af'}
-                        ref={inputRef}
-                      />
-                    );
-                  })}
-                </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
