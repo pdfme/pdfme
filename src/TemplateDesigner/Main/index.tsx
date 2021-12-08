@@ -1,13 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
-import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten, getFontFamily } from '../../libs/utils';
-import { zoom, rulerHeight, selectableClassName } from '../../libs/constants';
+import { zoom, rulerHeight } from '../../libs/constants';
 import Schema from '../../components/Schemas';
-
+import Guides from '../Guides';
+import { getSelectoOpt, getMoveableOpt } from './options';
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
 interface Props {
@@ -183,13 +183,9 @@ const Main = ({
             >
               {!editing && (
                 <Selecto
+                  {...getSelectoOpt()}
                   container={wrapRef.current}
-                  selectFromInside={false}
                   continueSelect={isPressShiftKey}
-                  selectByClick={true}
-                  preventDefault
-                  selectableTargets={[`.${selectableClassName}`]}
-                  hitRate={0}
                   onDragStart={(e) => {
                     const inputEvent = e.inputEvent;
                     const target = inputEvent.target;
@@ -224,24 +220,18 @@ const Main = ({
                 horizontalGuides.current[index] &&
                 verticalGuides.current[index] && (
                   <Moveable
+                    {...getMoveableOpt()}
                     ref={moveable}
                     target={activeElements}
-                    style={{ zIndex: 1 }}
                     bounds={{
                       left: 0,
                       top: 0,
                       bottom: paperAndRulerHeight,
                       right: paperAndRulerWidth,
                     }}
-                    snappable
-                    snapCenter
                     horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                     verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                    draggable
-                    resizable
                     keepRatio={isPressShiftKey}
-                    throttleDrag={1}
-                    throttleResize={1}
                     onDrag={onDrag}
                     onDragGroup={({ events }) => {
                       events.forEach(onDrag);
@@ -268,30 +258,11 @@ const Main = ({
                   />
                 )}
               <Guides
-                zoom={zoom}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: rulerHeight,
-                  height: rulerHeight,
-                  width: paperWidth,
-                }}
-                type="horizontal"
-                ref={(e) => {
+                paper={paper}
+                horizontalRef={(e) => {
                   horizontalGuides.current[index] = e!;
                 }}
-              />
-              <Guides
-                zoom={zoom}
-                style={{
-                  position: 'absolute',
-                  top: rulerHeight,
-                  left: 0,
-                  height: paperHeight,
-                  width: rulerHeight,
-                }}
-                type="vertical"
-                ref={(e) => {
+                verticalRef={(e) => {
                   verticalGuides.current[index] = e!;
                 }}
               />
