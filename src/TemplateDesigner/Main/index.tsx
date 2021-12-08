@@ -5,12 +5,12 @@ import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
-import { GuidesInterface, Schema, PageSize } from '../../../type';
-import { round, flatten, getFontFamily } from '../../../utils';
-import { barcodeList, zoom, rulerHeight } from '../../../constants';
-import TextSchema from '../../TextSchema';
-import ImageSchema from '../../ImageSchema';
-import BarcodeSchema from '../../BarcodeSchema';
+import { GuidesInterface, Schema, PageSize } from '../../libs/type';
+import { round, flatten, getFontFamily } from '../../libs/utils';
+import { barcodeList, zoom, rulerHeight } from '../../libs/constants';
+import TextSchema from '../../components/Schemas/TextSchema';
+import ImageSchema from '../../components/Schemas/ImageSchema';
+import BarcodeSchema from '../../components/Schemas/BarcodeSchema';
 
 const SELECTABLE = 'selectable';
 
@@ -82,6 +82,9 @@ const Main = ({
   }, [schemas, activeElements]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
+    // TODO ドラッグ時にスケールのせいで値がちゃんと設定されない
+    // editorのサイズが小さい時にドラッグで思ったように動かない #1434
+    console.log(scale)
     target!.style.left = (left < 0 ? 0 : left) + 'px';
     target!.style.top = (top < 0 ? 0 : top) + 'px';
   };

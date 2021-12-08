@@ -1,18 +1,18 @@
 import { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { Schema } from '../../../type';
-import { readFiles } from '../../../utils';
-import { I18nContext } from '../../../i18n';
-import { inputTypeList } from '../../../constants';
-import Divider from '../../Divider';
-import backIcon from '../../../images/back.svg';
-import forwardIcon from '../../../images/forward.svg';
-import infoIcon from '../../../images/info.svg';
-import createIcon from '../../../images/create.svg';
-import dragIcon from '../../../images/drag.svg';
-import warningIcon from '../../../images/warning.svg';
-import deleteIcon from '../../../images/delete.svg';
+import { Schema } from '../../libs/type';
+import { readFiles } from '../../libs/utils';
+import { I18nContext } from '../../libs/i18n';
+import { inputTypeList } from '../../libs/constants';
+import Divider from '../../components/Divider';
+import backIcon from '../../assets/back.svg';
+import forwardIcon from '../../assets/forward.svg';
+import infoIcon from '../../assets/info.svg';
+import createIcon from '../../assets/create.svg';
+import dragIcon from '../../assets/drag.svg';
+import warningIcon from '../../assets/warning.svg';
+import deleteIcon from '../../assets/delete.svg';
 
 const Sidebar = ({
   pageCursor,

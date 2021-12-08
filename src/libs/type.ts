@@ -34,10 +34,10 @@ export interface TemplateEditorProp {
   template: Template;
   saveTemplate: (template: Template) => Promise<Template>;
   size: PageSize;
-  Header: React.ComponentType<EditorHeaderProp>;
+  Header: React.ComponentType<TemplateDesignerHeaderProp>;
 }
 
-export interface EditorHeaderProp {
+export interface TemplateDesignerHeaderProp {
   processing: boolean;
   template: Template;
   saveTemplate: (template: Template) => Promise<Template>;

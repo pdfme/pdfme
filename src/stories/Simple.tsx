@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { Template } from '../type';
-import { Editor, blankPdf } from '../index';
+import { Template } from '../libs/type';
+import { TemplateDesigner, blankPdf } from '../index';
 
 export const Simple = () => {
   useEffect(() => {
@@ -46,7 +46,7 @@ export const Simple = () => {
       return Promise.resolve(t);
     };
 
-    Editor.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
+    TemplateDesigner.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
   });
   return (
     <article>

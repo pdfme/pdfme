@@ -1,10 +1,10 @@
 import { useRef, useState, useEffect, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Template, Schema, TemplateEditorProp } from '../../type';
+import { Template, Schema, TemplateEditorProp } from '../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { zoom, rulerHeight } from '../../constants';
-import { I18nContext } from '../../i18n';
+import { zoom, rulerHeight } from '../libs/constants';
+import { I18nContext } from '../libs/i18n';
 import {
   uuid,
   set,
@@ -22,8 +22,8 @@ import {
   getSampleByType,
   getKeepRaitoHeightByWidth,
   getB64BasePdf,
-} from '../../utils';
-import { useUiPreProcessor } from '../../hooks';
+} from '../libs/utils';
+import { useUiPreProcessor } from '../libs/hooks';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];

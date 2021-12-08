@@ -148,7 +148,7 @@
             resolve(t);
           });
         };
-        LabelmakeUi.Editor.init(
+        LabelmakeUi.TemplateDesigner.init(
           domContainer,
           JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
           saveTemplate,
@@ -163,7 +163,7 @@
         previewDestroy();
       }
       function editorDestroy() {
-        LabelmakeUi.Editor.destroy();
+        LabelmakeUi.TemplateDesigner.destroy();
       }
     </script>
   </body>

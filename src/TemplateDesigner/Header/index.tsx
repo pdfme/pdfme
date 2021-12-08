@@ -1,15 +1,15 @@
 import { useContext } from 'react';
 import * as styles from './index.module.scss';
 import labelmake from 'labelmake';
-import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../../utils';
-import visibility from '../../../images/visibility.svg';
-import save from '../../../images/save.svg';
-import pdf from '../../../images/pdf.svg';
-import download from '../../../images/download_bk.svg';
-import { EditorHeaderProp } from '../../../type';
-import { I18nContext } from '../../../i18n';
+import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../libs/utils';
+import visibility from '../../assets/visibility.svg';
+import save from '../../assets/save.svg';
+import pdf from '../../assets/pdf.svg';
+import download from '../../assets/download_bk.svg';
+import { TemplateDesignerHeaderProp } from '../../libs/type';
+import { I18nContext } from '../../libs/i18n';
 
-const Header = ({ processing, template, saveTemplate, updateTemplate }: EditorHeaderProp) => {
+const Header = ({ processing, template, saveTemplate, updateTemplate }: TemplateDesignerHeaderProp) => {
   const i18n = useContext(I18nContext);
   const previewPdf = () => {
     if (isIos()) {

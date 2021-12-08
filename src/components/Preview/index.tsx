@@ -2,14 +2,14 @@ import { useState } from 'react';
 import * as styles from './index.module.scss';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
-import { PreviewProp } from '../../type';
-import { barcodeList, zoom, rulerHeight } from '../../constants';
-import { getFontFamily } from '../../utils';
+import { PreviewProp } from '../../libs/type';
+import { barcodeList, zoom, rulerHeight } from '../../libs/constants';
+import { getFontFamily } from '../../libs/utils';
 import Pager from './Pager';
-import TextSchema from '../TextSchema';
-import ImageSchema from '../ImageSchema';
-import BarcodeSchema from '../BarcodeSchema';
-import { useUiPreProcessor } from '../../hooks';
+import TextSchema from '../Schemas/TextSchema';
+import ImageSchema from '../Schemas/ImageSchema';
+import BarcodeSchema from '../Schemas/BarcodeSchema';
+import { useUiPreProcessor } from '../../libs/hooks';
 
 const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewProp) => {
   const offset = rulerHeight;

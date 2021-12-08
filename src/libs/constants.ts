@@ -1,13 +1,13 @@
-import ean8 from './images/barcodeExamples/ean8.png';
-import ean13 from './images/barcodeExamples/ean13.png';
-import code39 from './images/barcodeExamples/code39.png';
-import code128 from './images/barcodeExamples/code128.png';
-import nw7 from './images/barcodeExamples/nw7.png';
-import itf14 from './images/barcodeExamples/itf14.png';
-import japanpost from './images/barcodeExamples/japanpost.png';
-import qrcode from './images/barcodeExamples/qrcode.png';
-import upca from './images/barcodeExamples/upca.png';
-import upce from './images/barcodeExamples/upce.png';
+import ean8 from '../assets/barcodeExamples/ean8.png';
+import ean13 from '../assets/barcodeExamples/ean13.png';
+import code39 from '../assets/barcodeExamples/code39.png';
+import code128 from '../assets/barcodeExamples/code128.png';
+import nw7 from '../assets/barcodeExamples/nw7.png';
+import itf14 from '../assets/barcodeExamples/itf14.png';
+import japanpost from '../assets/barcodeExamples/japanpost.png';
+import qrcode from '../assets/barcodeExamples/qrcode.png';
+import upca from '../assets/barcodeExamples/upca.png';
+import upce from '../assets/barcodeExamples/upce.png';
 
 export const lang = 'en';
 

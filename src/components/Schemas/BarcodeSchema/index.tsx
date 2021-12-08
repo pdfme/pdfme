@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 import * as styles from './index.module.scss';
-import { zoom, barcodeExampleImageObj } from '../../constants';
-import { validateBarcodeInput } from '../../utils';
-import { SchemaUIProp, TemplateSchema } from '../../type';
+import { zoom, barcodeExampleImageObj } from '../../../libs/constants';
+import { validateBarcodeInput } from '../../../libs/utils';
+import { SchemaUIProp, TemplateSchema } from '../../../libs/type';
 
 const SampleBarcode = ({ schema }: { schema: TemplateSchema }) => (
   <img

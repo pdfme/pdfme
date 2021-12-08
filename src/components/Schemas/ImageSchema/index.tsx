@@ -1,9 +1,9 @@
 import { forwardRef, ChangeEvent, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { zoom } from '../../constants';
-import { readFiles } from '../../utils';
-import { SchemaUIProp } from '../../type';
-import { I18nContext } from '../../i18n';
+import { zoom } from '../../../libs/constants';
+import { readFiles } from '../../../libs/utils';
+import { SchemaUIProp } from '../../../libs/type';
+import { I18nContext } from '../../../libs/i18n';
 
 const ImageSchema = forwardRef<HTMLInputElement, SchemaUIProp>(
   ({ schema, value, editable, placeholder, tabIndex, onChange }, ref) => {

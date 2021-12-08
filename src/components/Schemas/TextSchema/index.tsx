@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import * as styles from './index.module.scss';
-import { zoom } from '../../constants';
-import { SchemaUIProp } from '../../type';
+import { zoom } from '../../../libs/constants';
+import { SchemaUIProp } from '../../../libs/type';
 
 const TextSchema = forwardRef<HTMLTextAreaElement, SchemaUIProp>(
   ({ schema, value, editable, placeholder, tabIndex, onChange }, ref) => (
