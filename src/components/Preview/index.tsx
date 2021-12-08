@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import * as styles from './index.module.scss';
 import { PreviewProp } from '../../libs/type';
-import { zoom, rulerHeight } from '../../libs/constants';
+import { rulerHeight } from '../../libs/constants';
 import { getFontFamily } from '../../libs/utils';
 import Pager from './Pager';
 import Schema from '../Schemas';
+import Paper from '../../components/Paper';
 import { useUiPreProcessor } from '../../libs/hooks';
 
 const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewProp) => {
@@ -24,6 +25,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
 
   const editable = Boolean(onChangeInput);
   const input = inputs[pageCursor];
+  const schemas = template.schemas;
 
   return (
     <div
@@ -31,53 +33,31 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
       style={{ fontFamily: getFontFamily(template.fontName), ...size }}
     >
       <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
-      <div
-        style={{
-          transform: `scale(${scale})`,
-          transformOrigin: 'top center',
-        }}
-      >
-        {template.schemas.map((schema, index) => {
-          const pageSize = pageSizes[index];
-          if (!pageSize) {
-            return null;
-          }
-          const paperHeight = pageSize.height * zoom;
-          const paperWidth = pageSize.width * zoom;
-          const paper = { width: paperWidth, height: paperHeight };
-          return (
-            <div
-              key={JSON.stringify(schema)}
-              style={{
-                margin: `0 auto`,
-                position: 'relative',
-                background: '#333',
-                ...paper,
-              }}
-            >
-              <img {...paper} src={backgrounds[index] || ''} alt="background" />
-              {Object.entries(schema || {}).map((entry) => {
-                const [key, s] = entry;
-                return (
-                  <Schema
-                    key={key}
-                    schema={Object.assign(s, {
-                      key,
-                      id: key,
-                      data: input && input[key] ? input[key] : '',
-                    })}
-                    editable={editable}
-                    placeholder={template.sampledata[0][key] || ''}
-                    tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
-                    onChange={(value) => handleChangeInput({ key, value })}
-                    border={editable ? '1px dashed #4af' : 'transparent'}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
+      <Paper
+        scale={scale}
+        schemas={schemas}
+        pageSizes={pageSizes}
+        backgrounds={backgrounds}
+        render={({ schema, paperSize, background }) => (
+          <>
+            <img {...paperSize} src={background} alt="background" />
+            {Object.entries(schema).map((entry) => {
+              const [key, s] = entry;
+              return (
+                <Schema
+                  key={key}
+                  schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
+                  editable={editable}
+                  placeholder={template.sampledata[0][key] || ''}
+                  tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
+                  onChange={(value) => handleChangeInput({ key, value })}
+                  border={editable ? '1px dashed #4af' : 'transparent'}
+                />
+              );
+            })}
+          </>
+        )}
+      />
     </div>
   );
 };

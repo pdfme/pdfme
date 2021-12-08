@@ -5,6 +5,7 @@ import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten, getFontFamily } from '../../libs/utils';
 import { zoom, rulerHeight } from '../../libs/constants';
+import Paper from '../../components/Paper';
 import Schema from '../../components/Schemas';
 import Guides from '../Guides';
 import { getSelectoOpt, getMoveableOpt } from './options';
@@ -148,19 +149,9 @@ const Main = ({
     changeSchemas([{ key: 'data', value, schemaId }]);
 
   return (
-    <div
-      ref={wrapRef}
-      onClick={() => {
-        setEditing(false);
-      }}
-      style={{ fontFamily: getFontFamily() }}
-    >
-      <div
-        style={{
-          transform: `scale(${scale})`,
-          transformOrigin: 'top center',
-        }}
-      >
+    <div ref={wrapRef} onClick={() => setEditing(false)} style={{ fontFamily: getFontFamily() }}>
+      {/* TOOD ここから共通化 */}
+      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
         {schemas.map((schema, index) => {
           const pageSize = pageSizes[index];
           if (!pageSize) {
@@ -169,8 +160,6 @@ const Main = ({
           const paperHeight = pageSize.height * zoom;
           const paperWidth = pageSize.width * zoom;
           const paper = { width: paperWidth, height: paperHeight };
-          const paperAndRulerWidth = paperWidth + rulerHeight;
-          const paperAndRulerHeight = paperHeight + rulerHeight;
           return (
             <div
               key={JSON.stringify(schema)}
@@ -181,6 +170,7 @@ const Main = ({
                 ...paper,
               }}
             >
+              {/* TOOD ここまで共通化 */}
               {!editing && (
                 <Selecto
                   {...getSelectoOpt()}
@@ -207,8 +197,8 @@ const Main = ({
                 <div
                   style={{
                     position: 'absolute',
-                    width: paperAndRulerWidth,
-                    height: paperAndRulerHeight,
+                    width: paperWidth + rulerHeight,
+                    height: paperHeight + rulerHeight,
                     zIndex: 100,
                     background: '#9e9e9e94',
                   }}
@@ -226,8 +216,8 @@ const Main = ({
                     bounds={{
                       left: 0,
                       top: 0,
-                      bottom: paperAndRulerHeight,
-                      right: paperAndRulerWidth,
+                      bottom: paperHeight + rulerHeight,
+                      right: paperWidth + rulerHeight,
                     }}
                     horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                     verticalGuidelines={getGuideLines(verticalGuides.current, index)}
