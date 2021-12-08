@@ -5,14 +5,10 @@ import Selecto from 'react-selecto';
 import Moveable, { OnDrag, OnResize } from 'react-moveable';
 import Guides from '@scena/react-guides';
 import * as styles from './index.module.scss';
-import { GuidesInterface, Schema, PageSize } from '../../libs/type';
+import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten, getFontFamily } from '../../libs/utils';
-import { barcodeList, zoom, rulerHeight } from '../../libs/constants';
-import TextSchema from '../../components/Schemas/TextSchema';
-import ImageSchema from '../../components/Schemas/ImageSchema';
-import BarcodeSchema from '../../components/Schemas/BarcodeSchema';
-
-const SELECTABLE = 'selectable';
+import { zoom, rulerHeight, selectableClassName } from '../../libs/constants';
+import Schema from '../../components/Schemas';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
@@ -22,7 +18,7 @@ interface Props {
   backgrounds: string[];
   pageSizes: PageSize[];
   activeElements: HTMLElement[];
-  schemas: Schema[][];
+  schemas: SchemaType[][];
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
   onSelectSchemas: (targets: HTMLElement[]) => void;
@@ -84,7 +80,6 @@ const Main = ({
   const onDrag = ({ target, left, top }: OnDrag) => {
     // TODO ドラッグ時にスケールのせいで値がちゃんと設定されない
     // editorのサイズが小さい時にドラッグで思ったように動かない #1434
-    console.log(scale)
     target!.style.left = (left < 0 ? 0 : left) + 'px';
     target!.style.top = (top < 0 ? 0 : top) + 'px';
   };
@@ -183,7 +178,7 @@ const Main = ({
                 continueSelect={isPressShiftKey}
                 selectByClick={true}
                 preventDefault
-                selectableTargets={[`.${SELECTABLE}`]}
+                selectableTargets={[`.${selectableClassName}`]}
                 hitRate={0}
                 onDragStart={(e) => {
                   const inputEvent = e.inputEvent;
@@ -259,8 +254,8 @@ const Main = ({
                       onResizeEnd={onResizeEnd}
                       onResizeGroupEnd={onResizeEnds}
                       onClick={(e) => {
-                        setEditing(e.isDouble);
-                        if (e.isDouble && inputRef.current) {
+                        setEditing(true);
+                        if (inputRef.current) {
                           const ic = inputRef.current;
                           ic.disabled = false;
                           ic.focus();
@@ -326,76 +321,21 @@ const Main = ({
                   {(schemas[index] || []).map((s) => {
                     const editable = editing && activeElements.map((ae) => ae.id).includes(s.id);
                     return (
-                      <div key={s.id}>
-                        <Tippy delay={0} interactive content={s.key}>
-                          <div
-                            className={`${SELECTABLE}`}
-                            onMouseEnter={() => onMouseEnter(s.id)}
-                            onMouseLeave={() => onMouseLeave()}
-                            onClick={() => {
-                              editing && onSelectSchemas([]);
-                            }}
-                            id={s.id}
-                            // TODO このスタイルは共通化できそう
-                            style={{
-                              position: 'absolute',
-                              height: +s.height * zoom,
-                              width: +s.width * zoom,
-                              top: +s.position.y * zoom,
-                              left: +s.position.x * zoom,
-                              border:
-                                focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af',
-                              backgroundColor:
-                                s.type === 'text' && s.backgroundColor
-                                  ? s.backgroundColor
-                                  : 'transparent',
-                            }}
-                          >
-                            {s.type === 'text' && (
-                              <TextSchema
-                                {...{
-                                  [editable ? 'ref' : '']:
-                                    inputRef as React.RefObject<HTMLTextAreaElement>,
-                                }}
-                                schema={s}
-                                value={s.data}
-                                editable={editable}
-                                placeholder={''}
-                                tabIndex={0}
-                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
-                              />
-                            )}
-                            {s.type === 'image' && (
-                              <ImageSchema
-                                {...{
-                                  [editable ? 'ref' : '']:
-                                    inputRef as React.RefObject<HTMLInputElement>,
-                                }}
-                                schema={s}
-                                value={s.data}
-                                editable={editable}
-                                placeholder={''}
-                                tabIndex={0}
-                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
-                              />
-                            )}
-                            {barcodeList.includes(s.type) && (
-                              <BarcodeSchema
-                                {...{
-                                  [editable ? 'ref' : '']:
-                                    inputRef as React.RefObject<HTMLInputElement>,
-                                }}
-                                schema={s}
-                                value={s.data}
-                                editable={editable}
-                                placeholder={''}
-                                tabIndex={0}
-                                onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
-                              />
-                            )}
-                          </div>
-                        </Tippy>
-                      </div>
+                      <Schema
+                        key={s.id}
+                        schema={s}
+                        editable={editable}
+                        placeholder={''}
+                        tabIndex={0}
+                        onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                        // TODO topOffsetは親要素で指定すれば不要になるはず
+                        topOffset={0}
+                        onMouseEnter={() => onMouseEnter(s.id)}
+                        onMouseLeave={() => onMouseLeave()}
+                        onClick={() => editing && onSelectSchemas([])}
+                        border={focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af'}
+                        ref={inputRef}
+                      />
                     );
                   })}
                 </div>

@@ -6,8 +6,9 @@ import { SchemaUIProp } from '../../../libs/type';
 import { I18nContext } from '../../../libs/i18n';
 
 const ImageSchema = forwardRef<HTMLInputElement, SchemaUIProp>(
-  ({ schema, value, editable, placeholder, tabIndex, onChange }, ref) => {
+  ({ schema, editable, placeholder, tabIndex, onChange }, ref) => {
     const i18n = useContext(I18nContext);
+    const value = schema.data;
     return (
       <div>
         {value ? (

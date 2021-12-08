@@ -25,6 +25,7 @@ export const barcodeExampleImageObj: { [key: string]: string } = {
 };
 export const zoom = 3.7795275591;
 export const rulerHeight = 30;
+export const selectableClassName = 'selectable';
 export const barcodeList = [
   'qrcode',
   'japanpost',

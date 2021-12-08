@@ -9,8 +9,7 @@ export type PageSize = _PageSize;
 export type TemplateSchema = _TemplateSchema;
 
 export type SchemaUIProp = {
-  schema: TemplateSchema;
-  value: string;
+  schema: Schema;
   editable: boolean;
   placeholder: string;
   tabIndex: number;

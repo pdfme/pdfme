@@ -6,9 +6,7 @@ import { PreviewProp } from '../../libs/type';
 import { barcodeList, zoom, rulerHeight } from '../../libs/constants';
 import { getFontFamily } from '../../libs/utils';
 import Pager from './Pager';
-import TextSchema from '../Schemas/TextSchema';
-import ImageSchema from '../Schemas/ImageSchema';
-import BarcodeSchema from '../Schemas/BarcodeSchema';
+import Schema from '../Schemas';
 import { useUiPreProcessor } from '../../libs/hooks';
 
 const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewProp) => {
@@ -68,57 +66,17 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
                 const tabIndex = (template.columns.findIndex((c) => c === key) || 0) + 100;
                 const value = input && input[key] ? input[key] : '';
                 return (
-                  <div key={key}>
-                    {/* TODO ここごとコンポーネント化できるのでは？ */}
-                    <Tippy delay={0} interactive content={key}>
-                      <div
-                        // TODO このスタイルは共通化できそう
-                        style={{
-                          position: 'absolute',
-                          height: +s.height * zoom,
-                          width: +s.width * zoom,
-                          top: +s.position.y * zoom + index * paperHeight,
-                          left: +s.position.x * zoom,
-                          border: `1px dashed ${editable ? '#4af' : 'transparent'}`,
-                          backgroundColor:
-                            s.type === 'text' && s.backgroundColor
-                              ? s.backgroundColor
-                              : 'transparent',
-                        }}
-                      >
-                        {s.type === 'text' && (
-                          <TextSchema
-                            schema={s}
-                            value={value}
-                            editable={editable}
-                            placeholder={template.sampledata[0][key] || ''}
-                            tabIndex={tabIndex}
-                            onChange={(value) => handleChangeInput({ key, value })}
-                          />
-                        )}
-                        {s.type === 'image' && (
-                          <ImageSchema
-                            schema={s}
-                            value={value}
-                            editable={editable}
-                            placeholder={template.sampledata[0][key] || ''}
-                            tabIndex={tabIndex}
-                            onChange={(value) => handleChangeInput({ key, value })}
-                          />
-                        )}
-                        {barcodeList.includes(s.type) && (
-                          <BarcodeSchema
-                            schema={s}
-                            value={value}
-                            editable={editable}
-                            placeholder={template.sampledata[0][key] || ''}
-                            tabIndex={tabIndex}
-                            onChange={(value) => handleChangeInput({ key, value })}
-                          />
-                        )}
-                      </div>
-                    </Tippy>
-                  </div>
+                  <Schema
+                    key={key}
+                    schema={Object.assign(s, { key, id: key, data: value })}
+                    editable={editable}
+                    placeholder={template.sampledata[0][key] || ''}
+                    tabIndex={tabIndex}
+                    onChange={(value) => handleChangeInput({ key, value })}
+                    border={editable ? '1px dashed #4af' : 'transparent'}
+                    // TODO topOffsetは親要素で指定すれば不要になるはず
+                    topOffset={index * paperHeight}
+                  />
                 );
               })}
             </div>

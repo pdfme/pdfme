@@ -30,40 +30,43 @@ const BarcodeError = () => (
 );
 
 const BarcodeSchema = forwardRef<HTMLInputElement, SchemaUIProp>(
-  ({ schema, value, editable, placeholder, tabIndex, onChange }, ref) => (
-    <div className={styles.barcodeWrapper}>
-      <input
-        ref={ref}
-        disabled={!editable}
-        tabIndex={tabIndex}
-        placeholder={placeholder}
-        className={`${styles.placeholderGray}`}
-        style={{
-          textAlign: 'center',
-          position: 'absolute',
-          zIndex: 2,
-          fontSize: 'inherit',
-          height: +schema.height * zoom,
-          width: (+schema.width + (schema.characterSpacing || 0) * 0.75) * zoom,
-          background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
-          border: 'none',
-        }}
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-      />
-      {value ? (
-        validateBarcodeInput(schema.type, value) ? (
-          <SampleBarcode schema={schema} />
+  ({ schema, editable, placeholder, tabIndex, onChange }, ref) => {
+    const value = schema.data;
+    return (
+      <div className={styles.barcodeWrapper}>
+        <input
+          ref={ref}
+          disabled={!editable}
+          tabIndex={tabIndex}
+          placeholder={placeholder}
+          className={`${styles.placeholderGray}`}
+          style={{
+            textAlign: 'center',
+            position: 'absolute',
+            zIndex: 2,
+            fontSize: 'inherit',
+            height: +schema.height * zoom,
+            width: (+schema.width + (schema.characterSpacing || 0) * 0.75) * zoom,
+            background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
+            border: 'none',
+          }}
+          value={value}
+          onChange={(e) => {
+            onChange(e.target.value);
+          }}
+        />
+        {value ? (
+          validateBarcodeInput(schema.type, value) ? (
+            <SampleBarcode schema={schema} />
+          ) : (
+            <BarcodeError />
+          )
         ) : (
-          <BarcodeError />
-        )
-      ) : (
-        <SampleBarcode schema={schema} />
-      )}
-    </div>
-  )
+          <SampleBarcode schema={schema} />
+        )}
+      </div>
+    );
+  }
 );
 
 export default BarcodeSchema;

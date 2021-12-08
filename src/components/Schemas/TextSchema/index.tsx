@@ -4,7 +4,7 @@ import { zoom } from '../../../libs/constants';
 import { SchemaUIProp } from '../../../libs/type';
 
 const TextSchema = forwardRef<HTMLTextAreaElement, SchemaUIProp>(
-  ({ schema, value, editable, placeholder, tabIndex, onChange }, ref) => (
+  ({ schema, editable, placeholder, tabIndex, onChange }, ref) => (
     // TODO スクロールバーを消す
     <textarea
       ref={ref}
@@ -29,7 +29,7 @@ const TextSchema = forwardRef<HTMLTextAreaElement, SchemaUIProp>(
         color: schema.fontColor || '#000',
       }}
       onChange={(e) => onChange(e.target.value)}
-      value={value}
+      value={schema.data}
     ></textarea>
   )
 );
