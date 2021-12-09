@@ -48,7 +48,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   });
 
   const [processing, setProcessing] = useState<boolean>(false);
-  const [focusElementId, setFocusElementId] = useState('');
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   // TODO 名前変更 schemasはschemasListにしてschemas[pageCursor]をschemasにした方が良さそう
   const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
@@ -237,10 +236,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   const onEditEnd = () => setActiveElements([]);
 
-  const onMouseEnter = (id: string) => setFocusElementId(id);
-
-  const onMouseLeave = () => setFocusElementId('');
-
   const updateTemplate = async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
     basePdf.current = await getB64BasePdf(newTemplate);
@@ -267,7 +262,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       return schema;
     });
     setSchemas(_schemas);
-    onEditEnd(), setFocusElementId(''), setPageCursor(0);
+    onEditEnd(), setPageCursor(0);
     wrapRef.current && wrapRef.current.scroll({ top: 0, behavior: 'smooth' });
   };
 
@@ -303,14 +298,11 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           pageCursor={pageCursor}
           activeElement={activeElements[activeElements.length - 1]}
           schemas={schemas[pageCursor]}
-          focusElementId={focusElementId}
           activeSchema={activeSchema}
           changeSchemas={changeSchemas}
           onSortEnd={onSortEnd}
           onEdit={onEdit}
           onEditEnd={onEditEnd}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
           addSchema={addSchema}
           removeSchema={(id) => removeSchemas([id])}
         />
@@ -320,7 +312,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           activeElements={activeElements}
-          focusElementId={focusElementId}
           schemas={schemas.map((s) =>
             s.reduce(
               (acc, cur) => Object.assign(acc, { [cur.key]: cur }),
@@ -328,8 +319,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
             )
           )}
           changeSchemas={changeSchemas}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
           setActiveElements={setActiveElements}
         />
       </div>

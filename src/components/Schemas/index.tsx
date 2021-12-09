@@ -1,4 +1,4 @@
-import { MouseEvent, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { zoom, selectableClassName, barcodeList } from '../../libs/constants';
@@ -8,22 +8,15 @@ import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
 
 type Props = SchemaUIProp & {
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
   border: string;
 };
 
 const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
-  (
-    { schema, editable, placeholder, tabIndex, onChange, onMouseEnter, onMouseLeave, border },
-    ref
-  ) => (
+  ({ schema, editable, placeholder, tabIndex, onChange, border }, ref) => (
     <div>
       <Tippy delay={0} interactive content={schema.key}>
         <div
           className={selectableClassName}
-          onMouseEnter={() => onMouseEnter && onMouseEnter()}
-          onMouseLeave={() => onMouseLeave && onMouseLeave()}
           id={schema.id}
           style={{
             position: 'absolute',

@@ -23,10 +23,7 @@ interface Props {
   pageSizes: PageSize[];
   activeElements: HTMLElement[];
   schemas: { [key: string]: SchemaType }[];
-  onMouseEnter: (id: string) => void;
-  onMouseLeave: () => void;
   setActiveElements: (targets: HTMLElement[]) => void;
-  focusElementId: string;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
 }
 
@@ -38,9 +35,6 @@ const Main = ({
   activeElements,
   schemas,
   setActiveElements,
-  onMouseEnter,
-  onMouseLeave,
-  focusElementId,
   changeSchemas,
 }: Props) => {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -80,6 +74,25 @@ const Main = ({
     target.style.top = (top < 0 ? 0 : top) + 'px';
   };
 
+  const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+    const { top, left } = target.style;
+    changeSchemas([
+      { key: 'position.y', value: fmt(top), schemaId: target.id },
+      { key: 'position.x', value: fmt(left), schemaId: target.id },
+    ]);
+  };
+
+  const onDragEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
+    const arg = targets.map((target) => {
+      const { top, left } = target.style;
+      return [
+        { key: 'position.y', value: fmt(top), schemaId: target.id },
+        { key: 'position.x', value: fmt(left), schemaId: target.id },
+      ];
+    });
+    changeSchemas(flatten(arg));
+  };
+
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
     const s = target!.style;
@@ -98,14 +111,6 @@ const Main = ({
     Object.assign(s, obj);
   };
 
-  const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
-    const { top, left } = target.style;
-    changeSchemas([
-      { key: 'position.y', value: fmt(top), schemaId: target.id },
-      { key: 'position.x', value: fmt(left), schemaId: target.id },
-    ]);
-  };
-
   const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { width, height, top, left } = target.style;
     changeSchemas([
@@ -114,17 +119,6 @@ const Main = ({
       { key: 'position.y', value: fmt(top), schemaId: target.id },
       { key: 'position.x', value: fmt(left), schemaId: target.id },
     ]);
-  };
-
-  const onDragEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
-    const arg = targets.map((target) => {
-      const { top, left } = target.style;
-      return [
-        { key: 'position.y', value: fmt(top), schemaId: target.id },
-        { key: 'position.x', value: fmt(left), schemaId: target.id },
-      ];
-    });
-    changeSchemas(flatten(arg));
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -176,6 +170,8 @@ const Main = ({
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         render={({ index, schema, paperSize }) => {
+          const ps = paperSize;
+          const rh = rulerHeight;
           return (
             <>
               {pageCursor !== index ? (
@@ -185,12 +181,7 @@ const Main = ({
                   {...getMoveableOpt()}
                   ref={moveable}
                   target={activeElements || []}
-                  bounds={{
-                    left: 0,
-                    top: 0,
-                    bottom: paperSize.height + rulerHeight,
-                    right: paperSize.width + rulerHeight,
-                  }}
+                  bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
                   horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                   verticalGuidelines={getGuideLines(verticalGuides.current, index)}
                   keepRatio={isPressShiftKey}
@@ -217,7 +208,7 @@ const Main = ({
                 />
               )}
               <Guides
-                paperSize={paperSize}
+                paperSize={ps}
                 horizontalRef={(e) => (horizontalGuides.current[index] = e!)}
                 verticalRef={(e) => (verticalGuides.current[index] = e!)}
               />
@@ -231,9 +222,7 @@ const Main = ({
                       placeholder={''}
                       tabIndex={0}
                       onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
-                      onMouseEnter={() => onMouseEnter(s.id)}
-                      onMouseLeave={() => onMouseLeave()}
-                      border={focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af'}
+                      border={'1px dashed #4af'}
                       ref={inputRef}
                     />
                   </div>

@@ -19,27 +19,22 @@ const Sidebar = ({
   activeElement,
   activeSchema,
   schemas,
-  focusElementId,
   onSortEnd,
   onEdit,
   onEditEnd,
   removeSchema,
-  onMouseEnter,
-  onMouseLeave,
   changeSchemas,
   addSchema,
 }: {
   pageCursor: number;
   activeElement: HTMLElement | null;
   activeSchema: Schema;
+  // TODO ここのschemasの方は他のコンポーネントと違うので他のコンポーネントと合わせたい
   schemas: Schema[];
-  focusElementId: string;
   onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   removeSchema: (id: string) => void;
-  onMouseEnter: (id: string) => void;
-  onMouseLeave: () => void;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
   addSchema: () => void;
 }) => {
@@ -70,7 +65,6 @@ const Sidebar = ({
           <Divider />
           {schemas.length > 0 ? (
             <SortableList
-              focusElementId={focusElementId}
               helperClass={styles.sortableHelper}
               useDragHandle={true}
               axis="y"
@@ -79,8 +73,6 @@ const Sidebar = ({
               onSortEnd={onSortEnd}
               onEdit={onEdit}
               onDelete={removeSchema}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
             />
           ) : (
             <p style={{ alignItems: 'center', display: 'flex' }}>
@@ -468,19 +460,13 @@ const SortableItem = SortableElement(
   ({
     schemas,
     schema,
-    focusElementId,
     onEdit,
     onDelete,
-    onMouseEnter,
-    onMouseLeave,
   }: {
     schemas: Schema[];
     schema: Schema;
-    focusElementId: string;
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
-    onMouseEnter: (id: string) => void;
-    onMouseLeave: () => void;
   }) => {
     const i18n = useContext(I18nContext);
 
@@ -504,15 +490,7 @@ const SortableItem = SortableElement(
       }
     };
     return (
-      <div
-        key={sc.id}
-        className={styles.flx}
-        style={{
-          border: focusElementId === sc.id ? '1px solid #d42802' : '1px solid transparent',
-        }}
-        onMouseEnter={() => onMouseEnter(sc.id)}
-        onMouseLeave={() => onMouseLeave()}
-      >
+      <div key={sc.id} className={styles.flx}>
         <DragHandle disabled={!touchable} />
         <button
           disabled={!touchable}
@@ -555,30 +533,21 @@ const SortableList = SortableContainer(
     schemas,
     onEdit,
     onDelete,
-    onMouseEnter,
-    onMouseLeave,
-    focusElementId,
   }: {
     schemas: Schema[];
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
-    onMouseEnter: (id: string) => void;
-    onMouseLeave: () => void;
-    focusElementId: string;
   }) => (
     <div style={{ maxHeight: 350, overflowY: 'auto' }}>
       {schemas.map((s, i) => (
         <SortableItem
           disabled={!isTouchable()}
-          focusElementId={focusElementId}
           index={i}
           key={s.id}
           schemas={schemas}
           schema={s}
           onEdit={onEdit}
           onDelete={onDelete}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
         />
       ))}
     </div>
