@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, RefObject } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { zoom, selectableClassName, barcodeList } from '../../libs/constants';
@@ -33,7 +33,7 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
         >
           {schema.type === 'text' && (
             <TextSchema
-              {...{ [editable ? 'ref' : '']: ref as React.RefObject<HTMLTextAreaElement> }}
+              {...{ [editable ? 'ref' : '']: ref as RefObject<HTMLTextAreaElement> }}
               schema={schema}
               editable={editable}
               placeholder={placeholder}
@@ -43,7 +43,7 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
           )}
           {schema.type === 'image' && (
             <ImageSchema
-              {...{ [editable ? 'ref' : '']: ref as React.RefObject<HTMLInputElement> }}
+              {...{ [editable ? 'ref' : '']: ref as RefObject<HTMLInputElement> }}
               schema={schema}
               editable={editable}
               placeholder={placeholder}
@@ -53,7 +53,7 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
           )}
           {barcodeList.includes(schema.type) && (
             <BarcodeSchema
-              {...{ [editable ? 'ref' : '']: ref as React.RefObject<HTMLInputElement> }}
+              {...{ [editable ? 'ref' : '']: ref as RefObject<HTMLInputElement> }}
               schema={schema}
               editable={editable}
               placeholder={placeholder}

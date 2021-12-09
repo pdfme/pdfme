@@ -1,14 +1,14 @@
 import { useRef, useState, useEffect } from 'react';
-import Selecto from 'react-selecto';
-import Moveable, { OnDrag, OnResize } from 'react-moveable';
+import { OnDrag, OnResize } from 'react-moveable';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten, getFontFamily } from '../../libs/utils';
 import { zoom, rulerHeight } from '../../libs/constants';
 import Paper from '../../components/Paper';
 import Schema from '../../components/Schemas';
-import Guides from '../Guides';
-import { getSelectoOpt, getMoveableOpt } from './options';
+import Selecto from './Selecto';
+import Moveable from './Moveable';
+import Guides from './Guides';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
@@ -69,7 +69,7 @@ const Main = ({
   }, []);
 
   useEffect(() => {
-    moveable.current && moveable.current.updateRect();
+    moveable.current?.updateRect();
   }, [schemas]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
@@ -156,15 +156,13 @@ const Main = ({
       }}
       style={{ fontFamily: getFontFamily() }}
     >
-      {/* // TODO 外部関数化してoption.tsは解体 */}
       <Selecto
-        {...getSelectoOpt()}
         container={wrapRef.current}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
           if (
             (e.inputEvent.type === 'touchstart' && e.isTrusted) ||
-            (moveable.current && moveable.current.isMoveableElement(e.inputEvent.target))
+            moveable.current?.isMoveableElement(e.inputEvent.target)
           ) {
             e.stop();
           }
@@ -186,20 +184,14 @@ const Main = ({
             <>
               <Guides
                 paperSize={ps}
-                horizontalRef={(e) => {
-                  e && (horizontalGuides.current[index] = e);
-                }}
-                verticalRef={(e) => {
-                  e && (verticalGuides.current[index] = e);
-                }}
+                horizontalRef={(e) => e && (horizontalGuides.current[index] = e)}
+                verticalRef={(e) => e && (verticalGuides.current[index] = e)}
               />
               {pageCursor !== index ? (
                 <Mask {...ps} />
               ) : (
-                // TODO 外部関数化してoption.tsは解体
                 !editing && (
                   <Moveable
-                    {...getMoveableOpt()}
                     ref={moveable}
                     target={activeElements}
                     bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
@@ -207,15 +199,9 @@ const Main = ({
                     verticalGuidelines={getGuideLines(verticalGuides.current, index)}
                     keepRatio={isPressShiftKey}
                     onDrag={onDrag}
-                    onDragGroup={({ events }) => {
-                      events.forEach(onDrag);
-                    }}
                     onDragEnd={onDragEnd}
                     onDragGroupEnd={onDragEnds}
                     onResize={onResize}
-                    onResizeGroup={({ events }) => {
-                      events.forEach(onResize);
-                    }}
                     onResizeEnd={onResizeEnd}
                     onResizeGroupEnd={onResizeEnds}
                     onClick={onClickMoveable}

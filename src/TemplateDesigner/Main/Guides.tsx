@@ -1,7 +1,7 @@
 import { LegacyRef } from 'react';
 import Guides from '@scena/react-guides';
-import { PageSize } from '../libs/type';
-import { zoom, rulerHeight } from '../libs/constants';
+import { PageSize } from '../../libs/type';
+import { zoom, rulerHeight } from '../../libs/constants';
 
 const _Guides = ({
   paperSize,
