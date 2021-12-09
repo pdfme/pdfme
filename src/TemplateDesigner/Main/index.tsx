@@ -69,7 +69,6 @@ const Main = ({
   }, []);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
-    if (!target) return;
     target.style.left = (left < 0 ? 0 : left) + 'px';
     target.style.top = (top < 0 ? 0 : top) + 'px';
   };
@@ -83,13 +82,10 @@ const Main = ({
   };
 
   const onDragEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
-    const arg = targets.map((target) => {
-      const { top, left } = target.style;
-      return [
-        { key: 'position.y', value: fmt(top), schemaId: target.id },
-        { key: 'position.x', value: fmt(left), schemaId: target.id },
-      ];
-    });
+    const arg = targets.map((target) => [
+      { key: 'position.y', value: fmt(target.style.top), schemaId: target.id },
+      { key: 'position.x', value: fmt(target.style.left), schemaId: target.id },
+    ]);
     changeSchemas(flatten(arg));
   };
 
@@ -122,23 +118,29 @@ const Main = ({
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
-    const arg = targets.map((target) => {
-      const { width, height, top, left } = target.style;
-      return [
-        { key: 'width', value: fmt(width), schemaId: target.id },
-        { key: 'height', value: fmt(height), schemaId: target.id },
-        { key: 'position.y', value: fmt(top), schemaId: target.id },
-        { key: 'position.x', value: fmt(left), schemaId: target.id },
-      ];
-    });
+    const arg = targets.map((target) => [
+      { key: 'width', value: fmt(target.style.width), schemaId: target.id },
+      { key: 'height', value: fmt(target.style.height), schemaId: target.id },
+      { key: 'position.y', value: fmt(target.style.top), schemaId: target.id },
+      { key: 'position.x', value: fmt(target.style.left), schemaId: target.id },
+    ]);
     changeSchemas(flatten(arg));
   };
 
-  const getGuideLines = (guides: GuidesInterface[], index: number) =>
-    guides[index] && guides[index].getGuides().map((g) => g * zoom + rulerHeight);
+  // TODO ここがおかしい
+  const getGuideLines = (guides: GuidesInterface[], index: number) => {
+    console.log(guides[index] && guides[index].getGuides().map((g) => g * zoom), 'getGuideLines');
+    return guides[index] && guides[index].getGuides().map((g) => g * zoom);
+  };
 
-  const handleChangeInput = ({ value, schemaId }: { value: string; schemaId: string }) =>
-    changeSchemas([{ key: 'data', value, schemaId }]);
+  const onClickMoveable = () => {
+    setEditing(true);
+    const ic = inputRef.current;
+    if (!ic) return;
+    ic.disabled = false;
+    ic.focus();
+    if (ic.type !== 'file') ic.setSelectionRange(ic.value.length, ic.value.length);
+  };
 
   return (
     <div
@@ -154,8 +156,12 @@ const Main = ({
         container={wrapRef.current}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
-          if (e.inputEvent.type === 'touchstart' && e.isTrusted) {
-            moveable.current && moveable.current.isMoveableElement(e.inputEvent.target);
+          if (
+            e.inputEvent.type === 'touchstart' &&
+            e.isTrusted &&
+            moveable.current &&
+            moveable.current.isMoveableElement(e.inputEvent.target)
+          ) {
             e.stop();
           }
         }}
@@ -174,13 +180,22 @@ const Main = ({
           const rh = rulerHeight;
           return (
             <>
+              <Guides
+                paperSize={ps}
+                horizontalRef={(e) => {
+                  e && (horizontalGuides.current[index] = e);
+                }}
+                verticalRef={(e) => {
+                  e && (verticalGuides.current[index] = e);
+                }}
+              />
               {pageCursor !== index ? (
-                <Mask {...paperSize} />
+                <Mask {...ps} />
               ) : (
                 <Moveable
                   {...getMoveableOpt()}
                   ref={moveable}
-                  target={activeElements || []}
+                  target={activeElements}
                   bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
                   horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                   verticalGuidelines={getGuideLines(verticalGuides.current, index)}
@@ -197,21 +212,9 @@ const Main = ({
                   }}
                   onResizeEnd={onResizeEnd}
                   onResizeGroupEnd={onResizeEnds}
-                  onClick={() => {
-                    setEditing(true);
-                    const ic = inputRef.current;
-                    if (!ic) return;
-                    ic.disabled = false;
-                    ic.focus();
-                    if (ic.type !== 'file') ic.setSelectionRange(ic.value.length, ic.value.length);
-                  }}
+                  onClick={onClickMoveable}
                 />
               )}
-              <Guides
-                paperSize={ps}
-                horizontalRef={(e) => (horizontalGuides.current[index] = e!)}
-                verticalRef={(e) => (verticalGuides.current[index] = e!)}
-              />
               {Object.entries(schema).map((entry) => {
                 const [key, s] = entry as [string, SchemaType];
                 return (
@@ -221,7 +224,7 @@ const Main = ({
                       editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
                       placeholder={''}
                       tabIndex={0}
-                      onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
+                      onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: s.id }])}
                       border={'1px dashed #4af'}
                       ref={inputRef}
                     />
