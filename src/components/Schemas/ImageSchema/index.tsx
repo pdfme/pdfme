@@ -1,6 +1,6 @@
 import { forwardRef, ChangeEvent, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { zoom } from '../../../libs/constants';
+import { zoom, imageExample } from '../../../libs/constants';
 import { readFiles } from '../../../libs/utils';
 import { SchemaUIProp } from '../../../libs/type';
 import { I18nContext } from '../../../libs/i18n';
@@ -32,7 +32,7 @@ const ImageSchema = forwardRef<HTMLInputElement, SchemaUIProp>(
               src={value}
             />
           </div>
-        ) : (
+        ) : editable ? (
           <label
             className={styles.imageLabel}
             style={{
@@ -40,40 +40,36 @@ const ImageSchema = forwardRef<HTMLInputElement, SchemaUIProp>(
               width: (+schema.width + (schema.characterSpacing || 0) * 0.75) * zoom,
             }}
           >
-            {editable && (
-              <>
-                <input
-                  ref={ref}
-                  tabIndex={tabIndex}
-                  style={{ display: 'none' }}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    const files = event.target.files;
-                    readFiles(files, 'dataURL').then((result) => {
-                      onChange(result as string);
-                    });
-                  }}
-                  type="file"
-                  accept="image/jpeg, image/png"
-                />
-                <span style={{ zIndex: 1 }}>{i18n('select')}</span>
-              </>
-            )}
-            <div>
-              <img
-                style={{
-                  position: 'absolute',
-                  opacity: 0.5,
-                  top: 0,
-                  left: 0,
-                  width: schema.width * zoom,
-                  height: schema.height * zoom,
-                  backgroundImage: `url(${placeholder})`,
-                  backgroundPosition: 'center',
-                  backgroundSize: 'cover',
-                }}
-              />
-            </div>
+            <input
+              ref={ref}
+              tabIndex={tabIndex}
+              style={{ display: 'none' }}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                const files = event.target.files;
+                readFiles(files, 'dataURL').then((result) => {
+                  onChange(result as string);
+                });
+              }}
+              type="file"
+              accept="image/jpeg, image/png"
+            />
+            <span style={{ zIndex: 1 }}>{i18n('select')}</span>
           </label>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              opacity: 0.5,
+              top: 0,
+              left: 0,
+              width: schema.width * zoom,
+              height: schema.height * zoom,
+              backgroundImage: `url(${placeholder || imageExample})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          ></div>
         )}
       </div>
     );

@@ -94,7 +94,6 @@ const Main = ({
   };
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
-    console.log(target, direction);
     if (!target) return;
     const s = target.style;
     const newLeft = Number(fmt4Num(s.left)) + (Number(fmt4Num(s.width)) - width);
@@ -141,7 +140,11 @@ const Main = ({
     if (!ic) return;
     ic.disabled = false;
     ic.focus();
-    if (ic.type !== 'file') ic.setSelectionRange(ic.value.length, ic.value.length);
+    if (ic.type !== 'file') {
+      ic.setSelectionRange(ic.value.length, ic.value.length);
+    } else {
+      ic.click();
+    }
   };
 
   return (
@@ -153,6 +156,7 @@ const Main = ({
       }}
       style={{ fontFamily: getFontFamily() }}
     >
+      {/* // TODO 外部関数化してoption.tsは解体 */}
       <Selecto
         {...getSelectoOpt()}
         container={wrapRef.current}
@@ -192,28 +196,31 @@ const Main = ({
               {pageCursor !== index ? (
                 <Mask {...ps} />
               ) : (
-                <Moveable
-                  {...getMoveableOpt()}
-                  ref={moveable}
-                  target={activeElements}
-                  bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
-                  horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                  verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                  keepRatio={isPressShiftKey}
-                  onDrag={onDrag}
-                  onDragGroup={({ events }) => {
-                    events.forEach(onDrag);
-                  }}
-                  onDragEnd={onDragEnd}
-                  onDragGroupEnd={onDragEnds}
-                  onResize={onResize}
-                  onResizeGroup={({ events }) => {
-                    events.forEach(onResize);
-                  }}
-                  onResizeEnd={onResizeEnd}
-                  onResizeGroupEnd={onResizeEnds}
-                  onClick={onClickMoveable}
-                />
+                // TODO 外部関数化してoption.tsは解体
+                !editing && (
+                  <Moveable
+                    {...getMoveableOpt()}
+                    ref={moveable}
+                    target={activeElements}
+                    bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
+                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                    keepRatio={isPressShiftKey}
+                    onDrag={onDrag}
+                    onDragGroup={({ events }) => {
+                      events.forEach(onDrag);
+                    }}
+                    onDragEnd={onDragEnd}
+                    onDragGroupEnd={onDragEnds}
+                    onResize={onResize}
+                    onResizeGroup={({ events }) => {
+                      events.forEach(onResize);
+                    }}
+                    onResizeEnd={onResizeEnd}
+                    onResizeGroupEnd={onResizeEnds}
+                    onClick={onClickMoveable}
+                  />
+                )
               )}
               {Object.entries(schema).map((entry) => {
                 const [key, s] = entry as [string, SchemaType];

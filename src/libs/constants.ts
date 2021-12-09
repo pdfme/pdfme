@@ -8,6 +8,7 @@ import japanpost from '../assets/barcodeExamples/japanpost.png';
 import qrcode from '../assets/barcodeExamples/qrcode.png';
 import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
+import _imageExample from '../assets/imageExample.png';
 
 export const lang = 'en';
 
@@ -23,6 +24,7 @@ export const barcodeExampleImageObj: { [key: string]: string } = {
   upca,
   upce,
 };
+export const imageExample = _imageExample;
 export const zoom = 3.7795275591;
 export const rulerHeight = 30;
 export const selectableClassName = 'selectable';
