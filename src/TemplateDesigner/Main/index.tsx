@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
-import { round, flatten, getFontFamily } from '../../libs/utils';
+import { round, flatten } from '../../libs/utils';
 import { zoom, rulerHeight } from '../../libs/constants';
 import Paper from '../../components/Paper';
 import Schema from '../../components/Schemas';
@@ -154,7 +154,7 @@ const Main = ({
         e.stopPropagation();
         setEditing(false);
       }}
-      style={{ fontFamily: getFontFamily() }}
+      style={{ width: '100%', height: '100%' }}
     >
       <Selecto
         container={wrapRef.current}

@@ -17,11 +17,8 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
 
   const [pageCursor, setPageCursor] = useState(0);
 
-  const handleChangeInput = ({ key, value }: { key: string; value: string }) => {
-    if (onChange) {
-      onChange({ index: pageCursor, key, value });
-    }
-  };
+  const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
+    onChange && onChange({ index: pageCursor, key, value });
 
   const editable = Boolean(onChange);
   const input = inputs[pageCursor];
@@ -32,29 +29,31 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
       className={styles.wrapper}
       style={{ fontFamily: getFontFamily(template.fontName), ...size }}
     >
-      <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
-      <Paper
-        scale={scale}
-        schemas={schemas}
-        pageSizes={pageSizes}
-        backgrounds={backgrounds}
-        render={({ schema }) =>
-          Object.entries(schema).map((entry) => {
-            const [key, s] = entry;
-            return (
-              <Schema
-                key={key}
-                schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
-                editable={editable}
-                placeholder={template.sampledata[0][key] || ''}
-                tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
-                onChange={(value) => handleChangeInput({ key, value })}
-                border={editable ? '1px dashed #4af' : 'transparent'}
-              />
-            );
-          })
-        }
-      />
+      <div style={{ width: '100%', height: '100%' }}>
+        <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
+        <Paper
+          scale={scale}
+          schemas={schemas}
+          pageSizes={pageSizes}
+          backgrounds={backgrounds}
+          render={({ schema }) =>
+            Object.entries(schema).map((entry) => {
+              const [key, s] = entry;
+              return (
+                <Schema
+                  key={key}
+                  schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
+                  editable={editable}
+                  placeholder={template.sampledata[0][key] || ''}
+                  tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
+                  onChange={(value) => handleChangeInput({ key, value })}
+                  border={editable ? '1px dashed #4af' : 'transparent'}
+                />
+              );
+            })
+          }
+        />
+      </div>
     </div>
   );
 };

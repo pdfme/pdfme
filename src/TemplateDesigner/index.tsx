@@ -6,6 +6,7 @@ import Main from './Main';
 import { zoom, rulerHeight } from '../libs/constants';
 import { I18nContext } from '../libs/i18n';
 import {
+  getFontFamily,
   uuid,
   set,
   cloneDeep,
@@ -284,7 +285,13 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const activeSchema = getLastActiveSchema();
 
   return (
-    <div ref={wrapRef} className={`${styles.root}`} style={{ ...size }}>
+    // TODO これはもはやコンポーネントにできるのでは？ LabelEditorPreviewと共通化
+    <div
+      ref={wrapRef}
+      className={`${styles.wrapper}`}
+      style={{ fontFamily: getFontFamily(template.fontName), ...size }}
+    >
+      {/* TODO このrefはHeaderからのforwardRefにするべき */}
       <div ref={headerRef}>
         <Header
           processing={processing}
@@ -293,7 +300,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           updateTemplate={updateTemplate}
         />
       </div>
-      <div className={`${styles.wrapper}`}>
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <Sidebar
           pageCursor={pageCursor}
           activeElement={activeElements[activeElements.length - 1]}

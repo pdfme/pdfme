@@ -41,7 +41,7 @@ const Sidebar = ({
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
   const sidebarWidth = 300;
-  const top = 25;
+  const top = 0;
   const right = open ? sidebarWidth + 18 : 0;
   return (
     <div style={{ position: 'sticky', top, zIndex: 29 }}>
