@@ -10,9 +10,7 @@ const Paper = ({
   render,
 }: {
   scale: number;
-  schemas: {
-    [key: string]: Schema | TemplateSchema;
-  }[];
+  schemas: { [key: string]: Schema | TemplateSchema }[];
   pageSizes: PageSize[];
   backgrounds: string[];
   render: ({
@@ -21,9 +19,7 @@ const Paper = ({
     paperSize,
   }: {
     index: number;
-    schema: {
-      [key: string]: Schema | TemplateSchema;
-    };
+    schema: { [key: string]: Schema | TemplateSchema };
     paperSize: PageSize;
   }) => ReactNode;
 }) => (
@@ -38,18 +34,18 @@ const Paper = ({
       return (
         <div
           key={index}
-          style={{ margin: `${rulerHeight}px auto`, position: 'relative', ...paperSize }}
+          id={`paper-${index}`}
+          style={{
+            margin: `${rulerHeight * scale}px auto`,
+            position: 'relative',
+            backgroundImage: `url(${background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            ...paperSize,
+          }}
         >
-          <div id={`paper-${index}`}>{render({ index, schema, paperSize })}</div>
-          <div
-            style={{
-              backgroundImage: `url(${background})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              ...paperSize,
-            }}
-          />
+          <div>{render({ index, schema, paperSize })}</div>
         </div>
       );
     })}

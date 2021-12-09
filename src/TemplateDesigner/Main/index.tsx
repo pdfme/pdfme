@@ -68,6 +68,10 @@ const Main = ({
     return destroyEvents;
   }, []);
 
+  useEffect(() => {
+    moveable.current && moveable.current.updateRect();
+  }, [schemas]);
+
   const onDrag = ({ target, left, top }: OnDrag) => {
     target.style.left = (left < 0 ? 0 : left) + 'px';
     target.style.top = (top < 0 ? 0 : top) + 'px';
@@ -90,8 +94,9 @@ const Main = ({
   };
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
+    console.log(target, direction);
     if (!target) return;
-    const s = target!.style;
+    const s = target.style;
     const newLeft = Number(fmt4Num(s.left)) + (Number(fmt4Num(s.width)) - width);
     const newTop = Number(fmt4Num(s.top)) + (Number(fmt4Num(s.height)) - height);
     const obj: any = { width: `${width}px`, height: `${height}px` };
@@ -127,11 +132,8 @@ const Main = ({
     changeSchemas(flatten(arg));
   };
 
-  // TODO ここがおかしい
-  const getGuideLines = (guides: GuidesInterface[], index: number) => {
-    console.log(guides[index] && guides[index].getGuides().map((g) => g * zoom), 'getGuideLines');
-    return guides[index] && guides[index].getGuides().map((g) => g * zoom);
-  };
+  const getGuideLines = (guides: GuidesInterface[], index: number) =>
+    guides[index] && guides[index].getGuides().map((g) => g * zoom);
 
   const onClickMoveable = () => {
     setEditing(true);
@@ -218,17 +220,16 @@ const Main = ({
               {Object.entries(schema).map((entry) => {
                 const [key, s] = entry as [string, SchemaType];
                 return (
-                  <div key={key}>
-                    <Schema
-                      schema={s}
-                      editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
-                      placeholder={''}
-                      tabIndex={0}
-                      onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: s.id }])}
-                      border={'1px dashed #4af'}
-                      ref={inputRef}
-                    />
-                  </div>
+                  <Schema
+                    key={key}
+                    schema={s}
+                    editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
+                    placeholder={''}
+                    tabIndex={0}
+                    onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: s.id }])}
+                    border={'1px dashed #4af'}
+                    ref={inputRef}
+                  />
                 );
               })}
             </>
