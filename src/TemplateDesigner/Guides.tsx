@@ -4,23 +4,33 @@ import { PageSize } from '../libs/type';
 import { zoom, rulerHeight } from '../libs/constants';
 
 const _Guides = ({
-  paper,
+  paperSize,
   horizontalRef,
   verticalRef,
 }: {
-  paper: PageSize;
+  paperSize: PageSize;
   horizontalRef: LegacyRef<Guides> | undefined;
   verticalRef: LegacyRef<Guides> | undefined;
 }) => (
   <>
+    <div
+      style={{
+        width: rulerHeight,
+        height: rulerHeight,
+        position: 'absolute',
+        top: -rulerHeight,
+        left: -rulerHeight,
+        background: '#333',
+      }}
+    ></div>
     <Guides
       zoom={zoom}
       style={{
         position: 'absolute',
-        top: 0,
-        left: rulerHeight,
+        top: -rulerHeight,
+        left: 0,
         height: rulerHeight,
-        width: paper.width,
+        width: paperSize.width,
       }}
       type="horizontal"
       ref={horizontalRef}
@@ -29,9 +39,9 @@ const _Guides = ({
       zoom={zoom}
       style={{
         position: 'absolute',
-        top: rulerHeight,
-        left: 0,
-        height: paper.height,
+        top: 0,
+        left: -rulerHeight,
+        height: paperSize.height,
         width: rulerHeight,
       }}
       type="vertical"

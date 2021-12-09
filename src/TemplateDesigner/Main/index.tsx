@@ -9,18 +9,23 @@ import Paper from '../../components/Paper';
 import Schema from '../../components/Schemas';
 import Guides from '../Guides';
 import { getSelectoOpt, getMoveableOpt } from './options';
+
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
+
+const Mask = ({ width, height }: PageSize) => (
+  <div className={styles.mask} style={{ width, height }} />
+);
 interface Props {
   pageCursor: number;
   scale: number;
   backgrounds: string[];
   pageSizes: PageSize[];
   activeElements: HTMLElement[];
-  schemas: SchemaType[][];
+  schemas: { [key: string]: SchemaType }[];
   onMouseEnter: (id: string) => void;
   onMouseLeave: () => void;
-  onSelectSchemas: (targets: HTMLElement[]) => void;
+  setActiveElements: (targets: HTMLElement[]) => void;
   focusElementId: string;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
 }
@@ -32,7 +37,7 @@ const Main = ({
   pageSizes,
   activeElements,
   schemas,
-  onSelectSchemas,
+  setActiveElements,
   onMouseEnter,
   onMouseLeave,
   focusElementId,
@@ -69,21 +74,14 @@ const Main = ({
     return destroyEvents;
   }, []);
 
-  useEffect(() => {
-    moveable.current && moveable.current.updateRect();
-    if (activeElements.length === 0) {
-      setEditing(false);
-    }
-  }, [schemas, activeElements]);
-
   const onDrag = ({ target, left, top }: OnDrag) => {
-    // TODO ドラッグ時にスケールのせいで値がちゃんと設定されない
-    // editorのサイズが小さい時にドラッグで思ったように動かない #1434
-    target!.style.left = (left < 0 ? 0 : left) + 'px';
-    target!.style.top = (top < 0 ? 0 : top) + 'px';
+    if (!target) return;
+    target.style.left = (left < 0 ? 0 : left) + 'px';
+    target.style.top = (top < 0 ? 0 : top) + 'px';
   };
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
+    if (!target) return;
     const s = target!.style;
     const newLeft = Number(fmt4Num(s.left)) + (Number(fmt4Num(s.width)) - width);
     const newTop = Number(fmt4Num(s.top)) + (Number(fmt4Num(s.height)) - height);
@@ -143,133 +141,91 @@ const Main = ({
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
-    guides[index].getGuides().map((g) => g * zoom + rulerHeight);
+    guides[index] && guides[index].getGuides().map((g) => g * zoom + rulerHeight);
 
   const handleChangeInput = ({ value, schemaId }: { value: string; schemaId: string }) =>
     changeSchemas([{ key: 'data', value, schemaId }]);
 
   return (
-    <div ref={wrapRef} onClick={() => setEditing(false)} style={{ fontFamily: getFontFamily() }}>
-      {/* TOOD ここから共通化 */}
-      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-        {schemas.map((schema, index) => {
-          const pageSize = pageSizes[index];
-          if (!pageSize) {
-            return null;
+    <div
+      ref={wrapRef}
+      onClick={(e) => {
+        e.stopPropagation();
+        setEditing(false);
+      }}
+      style={{ fontFamily: getFontFamily() }}
+    >
+      <Selecto
+        {...getSelectoOpt()}
+        container={wrapRef.current}
+        continueSelect={isPressShiftKey}
+        onDragStart={(e) => {
+          if (e.inputEvent.type === 'touchstart' && e.isTrusted) {
+            moveable.current && moveable.current.isMoveableElement(e.inputEvent.target);
+            e.stop();
           }
-          const paperHeight = pageSize.height * zoom;
-          const paperWidth = pageSize.width * zoom;
-          const paper = { width: paperWidth, height: paperHeight };
+        }}
+        onSelect={(e: any) => {
+          e.stop();
+          setActiveElements(e.selected as HTMLElement[]);
+        }}
+      />
+      <Paper
+        scale={scale}
+        schemas={schemas}
+        pageSizes={pageSizes}
+        backgrounds={backgrounds}
+        render={({ index, schema, paperSize }) => {
           return (
-            <div
-              key={JSON.stringify(schema)}
-              style={{
-                margin: `0 auto`,
-                position: 'relative',
-                background: '#333',
-                ...paper,
-              }}
-            >
-              {/* TOOD ここまで共通化 */}
-              {!editing && (
-                <Selecto
-                  {...getSelectoOpt()}
-                  container={wrapRef.current}
-                  continueSelect={isPressShiftKey}
-                  onDragStart={(e) => {
-                    const inputEvent = e.inputEvent;
-                    const target = inputEvent.target;
-                    if (
-                      (inputEvent.type === 'touchstart' && e.isTrusted) ||
-                      (moveable.current && moveable.current.isMoveableElement(target))
-                    ) {
-                      e.stop();
-                    }
+            <>
+              {pageCursor !== index ? (
+                <Mask {...paperSize} />
+              ) : (
+                <Moveable
+                  {...getMoveableOpt()}
+                  ref={moveable}
+                  target={activeElements || []}
+                  bounds={{
+                    left: 0,
+                    top: 0,
+                    bottom: paperSize.height + rulerHeight,
+                    right: paperSize.width + rulerHeight,
                   }}
-                  onSelect={(e: any) => {
-                    e.stop();
-                    onSelectSchemas(e.selected as HTMLElement[]);
+                  horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                  verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                  keepRatio={isPressShiftKey}
+                  onDrag={onDrag}
+                  onDragGroup={({ events }) => {
+                    events.forEach(onDrag);
                   }}
-                />
-              )}
-
-              {pageCursor !== index && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    width: paperWidth + rulerHeight,
-                    height: paperHeight + rulerHeight,
-                    zIndex: 100,
-                    background: '#9e9e9e94',
+                  onDragEnd={onDragEnd}
+                  onDragGroupEnd={onDragEnds}
+                  onResize={onResize}
+                  onResizeGroup={({ events }) => {
+                    events.forEach(onResize);
+                  }}
+                  onResizeEnd={onResizeEnd}
+                  onResizeGroupEnd={onResizeEnds}
+                  onClick={() => {
+                    setEditing(true);
+                    const ic = inputRef.current;
+                    if (!ic) return;
+                    ic.disabled = false;
+                    ic.focus();
+                    if (ic.type !== 'file') ic.setSelectionRange(ic.value.length, ic.value.length);
                   }}
                 />
               )}
-              {!editing &&
-                pageCursor === index &&
-                activeElements.length !== 0 &&
-                horizontalGuides.current[index] &&
-                verticalGuides.current[index] && (
-                  <Moveable
-                    {...getMoveableOpt()}
-                    ref={moveable}
-                    target={activeElements}
-                    bounds={{
-                      left: 0,
-                      top: 0,
-                      bottom: paperHeight + rulerHeight,
-                      right: paperWidth + rulerHeight,
-                    }}
-                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                    keepRatio={isPressShiftKey}
-                    onDrag={onDrag}
-                    onDragGroup={({ events }) => {
-                      events.forEach(onDrag);
-                    }}
-                    onDragEnd={onDragEnd}
-                    onDragGroupEnd={onDragEnds}
-                    onResize={onResize}
-                    onResizeGroup={({ events }) => {
-                      events.forEach(onResize);
-                    }}
-                    onResizeEnd={onResizeEnd}
-                    onResizeGroupEnd={onResizeEnds}
-                    onClick={() => {
-                      setEditing(true);
-                      if (inputRef.current) {
-                        const ic = inputRef.current;
-                        ic.disabled = false;
-                        ic.focus();
-                        if (ic.type !== 'file') {
-                          ic.setSelectionRange(ic.value.length, ic.value.length);
-                        }
-                      }
-                    }}
-                  />
-                )}
               <Guides
-                paper={paper}
-                horizontalRef={(e) => {
-                  horizontalGuides.current[index] = e!;
-                }}
-                verticalRef={(e) => {
-                  verticalGuides.current[index] = e!;
-                }}
+                paperSize={paperSize}
+                horizontalRef={(e) => (horizontalGuides.current[index] = e!)}
+                verticalRef={(e) => (verticalGuides.current[index] = e!)}
               />
-
-              <div
-                id={`paper-${index}`}
-                style={{
-                  position: 'absolute',
-                  top: rulerHeight,
-                  left: rulerHeight,
-                }}
-              >
-                <img {...paper} src={backgrounds[index] || ''} alt="background" />
-                {(schema || []).map((s) => {
-                  return (
+              {Object.entries(schema).map((entry) => {
+                const [key, s] = entry as [string, SchemaType];
+                return (
+                  <div key={key}>
                     <Schema
-                      key={s.id}
                       schema={s}
                       editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
                       placeholder={''}
@@ -277,20 +233,16 @@ const Main = ({
                       onChange={(value) => handleChangeInput({ value, schemaId: s.id })}
                       onMouseEnter={() => onMouseEnter(s.id)}
                       onMouseLeave={() => onMouseLeave()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        editing && onSelectSchemas([]);
-                      }}
                       border={focusElementId === s.id ? '1px solid #d42802' : '1px dashed #4af'}
                       ref={inputRef}
                     />
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
+                );
+              })}
+            </>
           );
-        })}
-      </div>
+        }}
+      />
     </div>
   );
 };

@@ -50,13 +50,14 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const [processing, setProcessing] = useState<boolean>(false);
   const [focusElementId, setFocusElementId] = useState('');
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
+  // TODO 名前変更 schemasはschemasListにしてschemas[pageCursor]をschemasにした方が良さそう
   const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
   const modifiedTemplate = fmtTemplate(
     Object.assign(template, { basePdf: basePdf.current ? basePdf.current : template.basePdf }),
     schemas
-  )
+  );
 
   const onScroll = debounce(() => {
     if (!pageSizes[0] || !wrapRef.current) {
@@ -320,11 +321,16 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           backgrounds={backgrounds}
           activeElements={activeElements}
           focusElementId={focusElementId}
-          schemas={schemas}
+          schemas={schemas.map((s) =>
+            s.reduce(
+              (acc, cur) => Object.assign(acc, { [cur.key]: cur }),
+              {} as { [key: string]: Schema }
+            )
+          )}
           changeSchemas={changeSchemas}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
-          onSelectSchemas={setActiveElements}
+          setActiveElements={setActiveElements}
         />
       </div>
     </div>

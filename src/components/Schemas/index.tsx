@@ -10,23 +10,12 @@ import BarcodeSchema from './BarcodeSchema';
 type Props = SchemaUIProp & {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  onClick?: (e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>) => void;
   border: string;
 };
 
 const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
   (
-    {
-      schema,
-      editable,
-      placeholder,
-      tabIndex,
-      onChange,
-      onMouseEnter,
-      onMouseLeave,
-      onClick,
-      border,
-    },
+    { schema, editable, placeholder, tabIndex, onChange, onMouseEnter, onMouseLeave, border },
     ref
   ) => (
     <div>
@@ -35,7 +24,6 @@ const Schema = forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(
           className={selectableClassName}
           onMouseEnter={() => onMouseEnter && onMouseEnter()}
           onMouseLeave={() => onMouseLeave && onMouseLeave()}
-          onClick={(e) => onClick && onClick(e)}
           id={schema.id}
           style={{
             position: 'absolute',

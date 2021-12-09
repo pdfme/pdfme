@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import { zoom } from '../libs/constants';
-import { TemplateSchema, PageSize } from '../libs/type';
+import { zoom, rulerHeight } from '../libs/constants';
+import { TemplateSchema, Schema, PageSize } from '../libs/type';
 
 const Paper = ({
   scale,
@@ -11,7 +11,7 @@ const Paper = ({
 }: {
   scale: number;
   schemas: {
-    [key: string]: TemplateSchema;
+    [key: string]: Schema | TemplateSchema;
   }[];
   pageSizes: PageSize[];
   backgrounds: string[];
@@ -19,14 +19,12 @@ const Paper = ({
     index,
     schema,
     paperSize,
-    background,
   }: {
     index: number;
     schema: {
-      [key: string]: TemplateSchema;
+      [key: string]: Schema | TemplateSchema;
     };
     paperSize: PageSize;
-    background: string;
   }) => ReactNode;
 }) => (
   <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
@@ -36,13 +34,22 @@ const Paper = ({
         return null;
       }
       const paperSize = { width: pageSize.width * zoom, height: pageSize.height * zoom };
-      const background = backgrounds[index];
+      const background = backgrounds[index] || '';
       return (
         <div
           key={JSON.stringify(schema)}
-          style={{ margin: `0 auto`, position: 'relative', background: '#333', ...paperSize }}
+          style={{ margin: `${rulerHeight}px auto`, position: 'relative', ...paperSize }}
         >
-          {render({ index, schema, paperSize, background })}
+          <div id={`paper-${index}`}>{render({ index, schema, paperSize })}</div>
+          <div
+            style={{
+              backgroundImage: `url(${background})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              ...paperSize,
+            }}
+          />
         </div>
       );
     })}
