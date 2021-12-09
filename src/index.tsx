@@ -1,4 +1,5 @@
 import TemplateDesignerComponent from './TemplateDesigner';
+// TODO components/Previewではなく、./Form, ./Viewerを使う
 import PreviewComponents from './components/Preview';
 import TemplateDesignerHeader from './TemplateDesigner/Header';
 import ReactDOM from 'react-dom';
@@ -47,7 +48,7 @@ const Preview = {
     template: Template,
     inputs: { [key: string]: string }[],
     size: PageSize,
-    onChangeInput?: (arg: { index: number; value: string; key: string }) => void
+    onChange?: (arg: { index: number; value: string; key: string }) => void
   ) => {
     _previewDomContainer = domContainer;
     const i18n = curriedI18n(lang);
@@ -58,7 +59,7 @@ const Preview = {
           template={template}
           inputs={inputs}
           size={size}
-          onChangeInput={onChangeInput}
+          onChange={onChange}
         />
       </I18nContext.Provider>,
       domContainer

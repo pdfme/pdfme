@@ -48,7 +48,7 @@ export interface PreviewProp {
   template: Template;
   inputs: { [key: string]: string }[];
   size: PageSize;
-  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
+  onChange?: (arg: { index: number; value: string; key: string }) => void;
 }
 
 export interface GuidesInterface {

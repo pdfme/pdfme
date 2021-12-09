@@ -8,7 +8,7 @@ import Schema from '../Schemas';
 import Paper from '../../components/Paper';
 import { useUiPreProcessor } from '../../libs/hooks';
 
-const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewProp) => {
+const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) => {
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,
@@ -18,12 +18,12 @@ const LabelEditorPreview = ({ template, inputs, size, onChangeInput }: PreviewPr
   const [pageCursor, setPageCursor] = useState(0);
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) => {
-    if (onChangeInput) {
-      onChangeInput({ index: pageCursor, key, value });
+    if (onChange) {
+      onChange({ index: pageCursor, key, value });
     }
   };
 
-  const editable = Boolean(onChangeInput);
+  const editable = Boolean(onChange);
   const input = inputs[pageCursor];
   const schemas = template.schemas;
 
