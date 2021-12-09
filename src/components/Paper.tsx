@@ -37,7 +37,7 @@ const Paper = ({
       const background = backgrounds[index] || '';
       return (
         <div
-          key={JSON.stringify(schema)}
+          key={index}
           style={{ margin: `${rulerHeight}px auto`, position: 'relative', ...paperSize }}
         >
           <div id={`paper-${index}`}>{render({ index, schema, paperSize })}</div>
