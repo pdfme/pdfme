@@ -159,10 +159,8 @@ const Main = ({
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
           if (
-            e.inputEvent.type === 'touchstart' &&
-            e.isTrusted &&
-            moveable.current &&
-            moveable.current.isMoveableElement(e.inputEvent.target)
+            (e.inputEvent.type === 'touchstart' && e.isTrusted) ||
+            (moveable.current && moveable.current.isMoveableElement(e.inputEvent.target))
           ) {
             e.stop();
           }
