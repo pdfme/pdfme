@@ -5,13 +5,12 @@ import { SchemaUIProp } from '../../../libs/type';
 
 const TextSchema = forwardRef<HTMLTextAreaElement, SchemaUIProp>(
   ({ schema, editable, placeholder, tabIndex, onChange }, ref) => (
-    // TODO スクロールバーを消す
     <textarea
       ref={ref}
       disabled={!editable}
       placeholder={placeholder}
       tabIndex={tabIndex}
-      className={`${styles.placeholderGray}`}
+      className={`${styles.placeholderGray} `}
       style={{
         resize: 'none',
         fontFamily: 'inherit',

@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import * as styles from './index.module.scss';
 import { PreviewProp } from '../../libs/type';
 import { rulerHeight } from '../../libs/constants';
-import { getFontFamily } from '../../libs/utils';
 import Pager from './Pager';
+import Root from '../Root';
+import Paper from '../Paper';
 import Schema from '../Schemas';
-import Paper from '../../components/Paper';
 import { useUiPreProcessor } from '../../libs/hooks';
 
 const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) => {
@@ -25,10 +24,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
   const schemas = template.schemas;
 
   return (
-    <div
-      className={styles.wrapper}
-      style={{ fontFamily: getFontFamily(template.fontName), ...size }}
-    >
+    <Root template={template} size={size}>
       <div style={{ width: '100%', height: '100%' }}>
         <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
         <Paper
@@ -54,7 +50,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
           }
         />
       </div>
-    </div>
+    </Root>
   );
 };
 

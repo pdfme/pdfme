@@ -1,12 +1,10 @@
 import { useRef, useState, useEffect, useContext } from 'react';
-import * as styles from './index.module.scss';
 import { Template, Schema, TemplateEditorProp } from '../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { zoom, rulerHeight } from '../libs/constants';
 import { I18nContext } from '../libs/i18n';
 import {
-  getFontFamily,
   uuid,
   set,
   cloneDeep,
@@ -25,6 +23,7 @@ import {
   getB64BasePdf,
 } from '../libs/utils';
 import { useUiPreProcessor } from '../libs/hooks';
+import Root from '../components/Root';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];
@@ -35,7 +34,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const basePdf = useRef('');
 
@@ -60,12 +59,12 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   );
 
   const onScroll = debounce(() => {
-    if (!pageSizes[0] || !wrapRef.current) {
+    if (!pageSizes[0] || !rootRef.current) {
       return;
     }
 
-    const scroll = wrapRef.current.scrollTop;
-    const top = wrapRef.current.getBoundingClientRect().top;
+    const scroll = rootRef.current.scrollTop;
+    const top = rootRef.current.getBoundingClientRect().top;
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
       let value = cur.height * zoom * scale;
       if (i === 0) {
@@ -87,7 +86,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   }, 100);
 
   const initEvents = () => {
-    wrapRef.current && wrapRef.current.addEventListener('scroll', onScroll);
+    rootRef.current && rootRef.current.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
       return schemas[pageCursor].filter((s) => ids.includes(s.id));
@@ -170,7 +169,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   };
 
   const destroyEvents = () => {
-    wrapRef.current && wrapRef.current.removeEventListener('scroll', onScroll);
+    rootRef.current && rootRef.current.removeEventListener('scroll', onScroll);
     destroyShortCuts();
   };
 
@@ -186,10 +185,10 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const addSchema = () => {
     const s = getInitialSchema();
     // TODO ここでpaperへdocument.getElementByIでアクセスしたくない
+    // Paperからfowardrefを生やしてそれでアクセスするようにする
     const paper = document.getElementById(`paper-${pageCursor}`);
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    // TODO マジックナンバー
-    const headerHeight = 53;
+    const headerHeight = headerRef.current?.clientHeight || 0;
     s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
     s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
@@ -264,7 +263,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     });
     setSchemas(_schemas);
     onEditEnd(), setPageCursor(0);
-    wrapRef.current && wrapRef.current.scroll({ top: 0, behavior: 'smooth' });
+    rootRef.current && rootRef.current.scroll({ top: 0, behavior: 'smooth' });
   };
 
   const saveTemplateWithProcessing = async (template: Template) => {
@@ -285,21 +284,14 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const activeSchema = getLastActiveSchema();
 
   return (
-    // TODO これはもはやコンポーネントにできるのでは？ LabelEditorPreviewと共通化
-    <div
-      ref={wrapRef}
-      className={`${styles.wrapper}`}
-      style={{ fontFamily: getFontFamily(template.fontName), ...size }}
-    >
-      {/* TODO このrefはHeaderからのforwardRefにするべき */}
-      <div ref={headerRef}>
-        <Header
-          processing={processing}
-          template={modifiedTemplate}
-          saveTemplate={saveTemplateWithProcessing}
-          updateTemplate={updateTemplate}
-        />
-      </div>
+    <Root ref={rootRef} size={size} template={template}>
+      <Header
+        ref={headerRef}
+        processing={processing}
+        template={modifiedTemplate}
+        saveTemplate={saveTemplateWithProcessing}
+        updateTemplate={updateTemplate}
+      />
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         <Sidebar
           pageCursor={pageCursor}
@@ -329,7 +321,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           setActiveElements={setActiveElements}
         />
       </div>
-    </div>
+    </Root>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { forwardRef, useContext } from 'react';
 import * as styles from './index.module.scss';
 import labelmake from 'labelmake';
 import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../libs/utils';
@@ -9,42 +9,41 @@ import download from '../../assets/download_bk.svg';
 import { TemplateDesignerHeaderProp } from '../../libs/type';
 import { I18nContext } from '../../libs/i18n';
 
-const Header = ({ processing, template, saveTemplate, updateTemplate }: TemplateDesignerHeaderProp) => {
-  const i18n = useContext(I18nContext);
-  const previewPdf = () => {
-    if (isIos()) {
-      alert(i18n('previewWarnMsg'));
-      return;
-    }
-    const schemas = sortSchemas(template, template.schemas.length);
-    const fmtdTemplate = fmtTemplate(template, schemas);
-    labelmake({
-      inputs: fmtdTemplate.sampledata,
-      template: fmtdTemplate,
-    })
-      .then((pdf) => {
-        const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-        window.open(URL.createObjectURL(blob));
+const Header = forwardRef<HTMLDivElement, TemplateDesignerHeaderProp>(
+  ({ processing, template, saveTemplate, updateTemplate }, ref) => {
+    const i18n = useContext(I18nContext);
+    const previewPdf = () => {
+      if (isIos()) {
+        alert(i18n('previewWarnMsg'));
+        return;
+      }
+      const schemas = sortSchemas(template, template.schemas.length);
+      const fmtdTemplate = fmtTemplate(template, schemas);
+      labelmake({
+        inputs: fmtdTemplate.sampledata,
+        template: fmtdTemplate,
       })
-      .catch(() => {
-        alert(i18n('previewErrMsg'));
+        .then((pdf) => {
+          const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+          window.open(URL.createObjectURL(blob));
+        })
+        .catch(() => {
+          alert(i18n('previewErrMsg'));
+        });
+    };
+
+    const changeBasePdf = (file: File) => {
+      readFile(file, 'dataURL').then(async (basePdf) => {
+        template.basePdf = basePdf;
+        updateTemplate(template);
       });
-  };
+    };
 
-  const changeBasePdf = (file: File) => {
-    readFile(file, 'dataURL').then(async (basePdf) => {
-      template.basePdf = basePdf;
-      updateTemplate(template);
-    });
-  };
-
-  const loadJsonTemplate = (file: File) => {
-    fmtTemplateFromJson(file).then(updateTemplate).catch(alert);
-  };
-
-  return (
-    <>
-      <div className={`${styles.wrapper}`}>
+    const loadJsonTemplate = (file: File) => {
+      fmtTemplateFromJson(file).then(updateTemplate).catch(alert);
+    };
+    return (
+      <div ref={ref} className={`${styles.wrapper}`}>
         <div className={`${styles.desktopFlex}`}>
           <div style={{ display: 'flex', marginTop: '0.75rem', justifyContent: 'flex-end' }}>
             <button disabled={processing} onClick={previewPdf}>
@@ -62,9 +61,7 @@ const Header = ({ processing, template, saveTemplate, updateTemplate }: Template
                     changeBasePdf(e.target.files[0]);
                   }
                 }}
-                onClick={(e) => {
-                  e.currentTarget.value = '';
-                }}
+                onClick={(e) => (e.currentTarget.value = '')}
               />
             </button>
             <button disabled={processing}>
@@ -87,8 +84,8 @@ const Header = ({ processing, template, saveTemplate, updateTemplate }: Template
           </div>
         </div>
       </div>
-    </>
-  );
-};
+    );
+  }
+);
 
 export default Header;

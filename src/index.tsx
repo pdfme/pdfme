@@ -17,6 +17,7 @@ const TemplateDesigner = {
     template: Template,
     saveTemplate: (template: Template) => Promise<Template>,
     size: PageSize,
+    // TODO Headerはカスタムできる仕様をやめる
     customHeader?: React.ComponentType<TemplateDesignerHeaderProp>
   ) => {
     _editorDomContainer = domContainer;
