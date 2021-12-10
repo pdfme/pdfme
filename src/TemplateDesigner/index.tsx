@@ -41,11 +41,13 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   const i18n = useContext(I18nContext);
 
+  const headerHeight = headerRef.current?.clientHeight || 0;
+
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,
     basePdf: basePdf.current,
-    offset: rulerHeight + (headerRef.current?.clientHeight || 0),
+    offset: rulerHeight + headerHeight,
   });
 
   const [processing, setProcessing] = useState<boolean>(false);
@@ -187,7 +189,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     const s = getInitialSchema();
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    const headerHeight = headerRef.current?.clientHeight || 0;
     s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
     s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
@@ -291,7 +292,12 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
         saveTemplate={saveTemplateWithProcessing}
         updateTemplate={updateTemplate}
       />
-      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <div
+        style={{
+          position: 'relative',
+          height: size.height - headerHeight - rulerHeight,
+        }}
+      >
         <Sidebar
           pageCursor={pageCursor}
           activeElement={activeElements[activeElements.length - 1]}

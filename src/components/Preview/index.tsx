@@ -25,7 +25,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
 
   return (
     <Root template={template} size={size}>
-      <div style={{ width: '100%', height: '100%' }}>
+      <div style={{ height: size.height - rulerHeight * scale, display: 'flex' }}>
         <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
         <Paper
           scale={scale}

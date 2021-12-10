@@ -1,6 +1,5 @@
 import { MutableRefObject, useRef, useState, useEffect } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten } from '../../libs/utils';
 import { zoom, rulerHeight } from '../../libs/constants';
@@ -9,13 +8,11 @@ import Schema from '../../components/Schemas';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
+import Mask from './Mask';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
 
-const Mask = ({ width, height }: PageSize) => (
-  <div className={styles.mask} style={{ width, height }} />
-);
 interface Props {
   pageCursor: number;
   scale: number;
@@ -156,7 +153,7 @@ const Main = ({
         e.stopPropagation();
         setEditing(false);
       }}
-      style={{ width: '100%', height: '100%' }}
+      style={{ height: 'inherit' }}
     >
       <Selecto
         container={wrapRef.current}
@@ -181,23 +178,25 @@ const Main = ({
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         render={({ index, schema, paperSize }) => {
-          const ps = paperSize;
-          const rh = rulerHeight;
+          const psrh = {
+            width: paperSize.width + rulerHeight,
+            height: paperSize.height + rulerHeight,
+          };
           return (
             <>
               <Guides
-                paperSize={ps}
+                paperSize={paperSize}
                 horizontalRef={(e) => e && (horizontalGuides.current[index] = e)}
                 verticalRef={(e) => e && (verticalGuides.current[index] = e)}
               />
               {pageCursor !== index ? (
-                <Mask {...ps} />
+                <Mask {...psrh} scale={scale} />
               ) : (
                 !editing && (
                   <Moveable
                     ref={moveable}
                     target={activeElements}
-                    bounds={{ left: 0, top: 0, bottom: ps.height + rh, right: ps.width + rh }}
+                    bounds={{ left: 0, top: 0, bottom: psrh.height, right: psrh.width }}
                     horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                     verticalGuidelines={getGuideLines(verticalGuides.current, index)}
                     keepRatio={isPressShiftKey}
