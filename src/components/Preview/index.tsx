@@ -24,32 +24,30 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
   const schemas = template.schemas;
 
   return (
-    <Root template={template} size={size}>
-      <div style={{ height: size.height - rulerHeight * scale, display: 'flex' }}>
-        <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
-        <Paper
-          scale={scale}
-          schemas={schemas}
-          pageSizes={pageSizes}
-          backgrounds={backgrounds}
-          render={({ schema }) =>
-            Object.entries(schema).map((entry) => {
-              const [key, s] = entry;
-              return (
-                <Schema
-                  key={key}
-                  schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
-                  editable={editable}
-                  placeholder={template.sampledata[0][key] || ''}
-                  tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
-                  onChange={(value) => handleChangeInput({ key, value })}
-                  border={editable ? '1px dashed #4af' : 'transparent'}
-                />
-              );
-            })
-          }
-        />
-      </div>
+    <Root template={template} size={size} scale={scale}>
+      <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
+      <Paper
+        scale={scale}
+        schemas={schemas}
+        pageSizes={pageSizes}
+        backgrounds={backgrounds}
+        render={({ schema }) =>
+          Object.entries(schema).map((entry) => {
+            const [key, s] = entry;
+            return (
+              <Schema
+                key={key}
+                schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
+                editable={editable}
+                placeholder={template.sampledata[0][key] || ''}
+                tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
+                onChange={(value) => handleChangeInput({ key, value })}
+                border={editable ? '1px dashed #4af' : 'transparent'}
+              />
+            );
+          })
+        }
+      />
     </Root>
   );
 };

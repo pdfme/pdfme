@@ -35,6 +35,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
   const basePdf = useRef('');
@@ -284,7 +285,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const activeSchema = getLastActiveSchema();
 
   return (
-    <Root ref={rootRef} size={size} template={template}>
+    <Root ref={rootRef} size={size} template={template} scale={scale}>
       <Header
         ref={headerRef}
         processing={processing}
@@ -292,41 +293,37 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
         saveTemplate={saveTemplateWithProcessing}
         updateTemplate={updateTemplate}
       />
-      <div
-        style={{
-          position: 'relative',
-          height: size.height - headerHeight - rulerHeight,
-        }}
-      >
-        <Sidebar
-          pageCursor={pageCursor}
-          activeElement={activeElements[activeElements.length - 1]}
-          schemas={schemas[pageCursor]}
-          activeSchema={activeSchema}
-          changeSchemas={changeSchemas}
-          onSortEnd={onSortEnd}
-          onEdit={onEdit}
-          onEditEnd={onEditEnd}
-          addSchema={addSchema}
-          removeSchema={(id) => removeSchemas([id])}
-        />
-        <Main
-          pageCursor={pageCursor}
-          scale={scale}
-          pageSizes={pageSizes}
-          backgrounds={backgrounds}
-          activeElements={activeElements}
-          schemas={schemas.map((s) =>
-            s.reduce(
-              (acc, cur) => Object.assign(acc, { [cur.key]: cur }),
-              {} as { [key: string]: Schema }
-            )
-          )}
-          changeSchemas={changeSchemas}
-          setActiveElements={setActiveElements}
-          paperRefs={paperRefs}
-        />
-      </div>
+      <Sidebar
+        height={mainRef.current ? mainRef.current.scrollHeight : 0}
+        pageCursor={pageCursor}
+        activeElement={activeElements[activeElements.length - 1]}
+        schemas={schemas[pageCursor]}
+        activeSchema={activeSchema}
+        changeSchemas={changeSchemas}
+        onSortEnd={onSortEnd}
+        onEdit={onEdit}
+        onEditEnd={onEditEnd}
+        addSchema={addSchema}
+        removeSchema={(id) => removeSchemas([id])}
+      />
+      <Main
+        ref={mainRef}
+        height={size.height - headerHeight - rulerHeight}
+        pageCursor={pageCursor}
+        scale={scale}
+        pageSizes={pageSizes}
+        backgrounds={backgrounds}
+        activeElements={activeElements}
+        schemas={schemas.map((s) =>
+          s.reduce(
+            (acc, cur) => Object.assign(acc, { [cur.key]: cur }),
+            {} as { [key: string]: Schema }
+          )
+        )}
+        changeSchemas={changeSchemas}
+        setActiveElements={setActiveElements}
+        paperRefs={paperRefs}
+      />
     </Root>
   );
 };
