@@ -1,14 +1,16 @@
-import { ReactNode } from 'react';
+import { MutableRefObject, ReactNode } from 'react';
 import { zoom, rulerHeight } from '../libs/constants';
 import { TemplateSchema, Schema, PageSize } from '../libs/type';
 
 const Paper = ({
+  paperRefs,
   scale,
   schemas,
   pageSizes,
   backgrounds,
   render,
 }: {
+  paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
   schemas: { [key: string]: Schema | TemplateSchema }[];
   pageSizes: PageSize[];
@@ -34,7 +36,11 @@ const Paper = ({
       return (
         <div
           key={index}
-          id={`paper-${index}`}
+          ref={(e) => {
+            if (e && paperRefs) {
+              paperRefs.current[index] = e;
+            }
+          }}
           style={{
             margin: `${rulerHeight * scale}px auto`,
             position: 'relative',

@@ -36,6 +36,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const future = useRef<Schema[][]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const paperRefs = useRef<HTMLDivElement[]>([]);
   const basePdf = useRef('');
 
   const i18n = useContext(I18nContext);
@@ -184,9 +185,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   const addSchema = () => {
     const s = getInitialSchema();
-    // TODO ここでpaperへdocument.getElementByIでアクセスしたくない
-    // Paperからfowardrefを生やしてそれでアクセスするようにする
-    const paper = document.getElementById(`paper-${pageCursor}`);
+    const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     const headerHeight = headerRef.current?.clientHeight || 0;
     s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
@@ -319,6 +318,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           )}
           changeSchemas={changeSchemas}
           setActiveElements={setActiveElements}
+          paperRefs={paperRefs}
         />
       </div>
     </Root>

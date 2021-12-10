@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { MutableRefObject, useRef, useState, useEffect } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
 import * as styles from './index.module.scss';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
@@ -25,6 +25,7 @@ interface Props {
   schemas: { [key: string]: SchemaType }[];
   setActiveElements: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
+  paperRefs: MutableRefObject<HTMLDivElement[]>;
 }
 
 const Main = ({
@@ -36,6 +37,7 @@ const Main = ({
   schemas,
   setActiveElements,
   changeSchemas,
+  paperRefs,
 }: Props) => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
@@ -173,6 +175,7 @@ const Main = ({
         }}
       />
       <Paper
+        paperRefs={paperRefs}
         scale={scale}
         schemas={schemas}
         pageSizes={pageSizes}
