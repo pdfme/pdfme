@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { PreviewProp } from '../../libs/type';
 import { rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
@@ -21,7 +21,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
 
   const editable = Boolean(onChange);
   const input = inputs[pageCursor];
-  const schemas = template.schemas;
+  const { schemas } = template;
 
   return (
     <Root template={template} size={size} scale={scale}>
@@ -34,6 +34,7 @@ const LabelEditorPreview = ({ template, inputs, size, onChange }: PreviewProp) =
         render={({ schema }) =>
           Object.entries(schema).map((entry) => {
             const [key, s] = entry;
+
             return (
               <Schema
                 key={key}

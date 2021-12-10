@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Template } from '../libs/type';
 import { TemplateDesigner, blankPdf } from '../index';
 
@@ -43,11 +43,13 @@ export const Simple = () => {
     });
     const saveTemplate = (t: any) => {
       console.log(t);
+
       return Promise.resolve(t);
     };
 
     TemplateDesigner.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
   });
+
   return (
     <article>
       <div id="app"></div>

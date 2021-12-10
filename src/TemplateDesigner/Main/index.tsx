@@ -1,4 +1,4 @@
-import { MutableRefObject, useRef, useState, useEffect, forwardRef } from 'react';
+import React, { MutableRefObject, useRef, useState, useEffect, forwardRef } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
 import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
 import { round, flatten } from '../../libs/utils';
@@ -69,6 +69,7 @@ const Main = forwardRef<HTMLDivElement, Props>(
 
     useEffect(() => {
       initEvents();
+
       return destroyEvents;
     }, []);
 
@@ -77,8 +78,8 @@ const Main = forwardRef<HTMLDivElement, Props>(
     }, [schemas]);
 
     const onDrag = ({ target, left, top }: OnDrag) => {
-      target.style.left = (left < 0 ? 0 : left) + 'px';
-      target.style.top = (top < 0 ? 0 : top) + 'px';
+      target.style.left = `${left < 0 ? 0 : left}px`;
+      target.style.top = `${top < 0 ? 0 : top}px`;
     };
 
     const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
@@ -187,6 +188,7 @@ const Main = forwardRef<HTMLDivElement, Props>(
               width: paperSize.width + rulerHeight,
               height: paperSize.height + rulerHeight,
             };
+
             return (
               <>
                 <Guides
@@ -217,6 +219,7 @@ const Main = forwardRef<HTMLDivElement, Props>(
                 )}
                 {Object.entries(schema).map((entry) => {
                   const [key, s] = entry as [string, SchemaType];
+
                   return (
                     <Schema
                       key={key}

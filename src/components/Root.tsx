@@ -1,12 +1,11 @@
-import { forwardRef, ReactNode } from 'react';
+import React, { forwardRef, ReactNode, Ref } from 'react';
 import { getFontFamily } from '../libs/utils';
 import { rulerHeight } from '../libs/constants';
 import { PageSize, Template } from '../libs/type';
 
-const Root = forwardRef<
-  HTMLDivElement,
-  { template: Template; size: PageSize; scale: number; children: ReactNode }
->(({ size, scale, children, template }, ref) => (
+type Props = { template: Template; size: PageSize; scale: number; children: ReactNode };
+
+const Root = ({ size, scale, children, template }: Props, ref: Ref<HTMLDivElement>) => (
   <div
     ref={ref}
     style={{
@@ -19,6 +18,6 @@ const Root = forwardRef<
   >
     <div style={{ height: size.height - rulerHeight * scale }}>{children}</div>
   </div>
-));
+);
 
-export default Root;
+export default forwardRef<HTMLDivElement, Props>(Root);

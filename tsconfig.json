@@ -2,7 +2,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "target": "es5",
-    "jsx": "react-jsx",
+    "jsx": "react",
     "esModuleInterop": true,
     "declaration": true,
     "declarationDir": "dist/types",

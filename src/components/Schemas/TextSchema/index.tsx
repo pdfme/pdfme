@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import * as styles from './index.module.scss';
 import { zoom } from '../../../libs/constants';
 import { SchemaUIProp } from '../../../libs/type';
@@ -17,10 +17,10 @@ const TextSchema = forwardRef<HTMLTextAreaElement, SchemaUIProp>(
         height: schema.height * zoom,
         width: (schema.width + (schema.characterSpacing || 0) * 0.75) * zoom, // 横幅を伸ばす1ポイントは0.75ピクセル
         textAlign: schema.alignment,
-        fontSize: schema.fontSize + 'pt',
-        letterSpacing: schema.characterSpacing + 'pt',
+        fontSize: `${schema.fontSize}pt`,
+        letterSpacing: `${schema.characterSpacing}pt`,
         fontFeatureSettings: `"palt"`,
-        lineHeight: schema.lineHeight + 'em',
+        lineHeight: `${schema.lineHeight}em`,
         whiteSpace: 'pre-line',
         wordBreak: 'break-all',
         background: 'transparent',

@@ -54,6 +54,7 @@ export const blob2File = (theBlob: Blob, fileName: string): File => {
   const b: any = theBlob;
   b.lastModifiedDate = new Date();
   b.name = fileName;
+
   return theBlob as File;
 };
 
@@ -62,9 +63,11 @@ export const round = (number: number, precision: number) => {
     if (reverseShift) {
       precision = -precision;
     }
-    const numArray = ('' + number).split('e');
-    return +(numArray[0] + 'e' + (numArray[1] ? +numArray[1] + precision : precision));
+    const numArray = `${number}`.split('e');
+
+    return Number(`${numArray[0]}e${numArray[1] ? Number(numArray[1]) + precision : precision}`);
   };
+
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
 
@@ -75,12 +78,14 @@ export const b64toBlob = (base64: string) => {
   for (let i = 0; i < byteString.length; i++) {
     buffer[i] = byteString.charCodeAt(i);
   }
+
   return new Blob([buffer.buffer], { type: mimeType });
 };
 
 export const isIos = () => {
   const parser = new UAParser();
   const os = parser.getOS().name;
+
   return os === 'iOS';
 };
 
@@ -95,18 +100,21 @@ export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   const startIndex = to < 0 ? array.length + to : to;
   const item = array.splice(from, 1)[0];
   array.splice(startIndex, 0, item);
+
   return array;
 };
 
 const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
+
   return parseFloat(String(pt)) * mmRatio;
 };
 
 export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
+
   return Promise.all(
     new Array(pdfDoc.numPages).fill('').map((_, i) => {
       return new Promise<PageSize>(async (r) =>
@@ -114,6 +122,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
           await pdfDoc.getPage(i + 1).then((page) => {
             const { height, width } = page.getViewport({ scale: 1 });
             URL.revokeObjectURL(url);
+
             return { height: pt2mm(height), width: pt2mm(width) };
           })
         )
@@ -125,6 +134,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
 const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg') => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
+
   return Promise.all(
     new Array(pdfDoc.numPages).fill('').map((_, i) => {
       return new Promise<string>(async (r) =>
@@ -137,6 +147,7 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg
             const viewport = page.getViewport({ scale: scaleRequired });
             canvas.height = viewport.height;
             URL.revokeObjectURL(url);
+
             return page
               .render({ canvasContext, viewport })
               .promise.then(() => canvas.toDataURL(`image/${imagetype}`));
@@ -159,6 +170,7 @@ export const fmtTemplate = (template: Template, schemas: Schema[][]): Template =
         cur.forEach((c) => {
           acc[c.key] = c.data;
         });
+
         return acc;
       }, {} as { [key: string]: string }),
     ],
@@ -173,10 +185,12 @@ export const fmtTemplate = (template: Template, schemas: Schema[][]): Template =
         // @ts-ignore
         delete cur.data;
         acc[k] = cur;
+
         return acc;
       }, {} as { [key: string]: TemplateSchema })
     ),
   };
+
   return schemaAddedTemplate;
 };
 
@@ -188,10 +202,12 @@ export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
             .sort((a, b) => {
               const aIndex = template.columns.findIndex((c) => c === a[0]);
               const bIndex = template.columns.findIndex((c) => c === b[0]);
+
               return aIndex > bIndex ? 1 : -1;
             })
             .map((e) => {
               const [key, value] = e;
+
               return Object.assign(value, {
                 key,
                 data: template.sampledata[0][key],
@@ -200,6 +216,7 @@ export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
             })
         : []
     );
+
     return acc;
   }, [] as Schema[][]);
 
@@ -229,12 +246,14 @@ const tempalteDataTest = (template: Template) => {
     template.sampledata.length > 0
       ? Object.entries(template.sampledata[0]).every((entry) => {
           const [key, value] = entry;
+
           return typeof key === 'string' && typeof value === 'string';
         })
       : true;
   const schemas = template.schemas.map((schema) =>
     Object.entries(schema).every((entry) => {
       const [key, value] = entry;
+
       return (
         isEmptyObj({ [key]: value }) ||
         (typeof key === 'string' &&
@@ -255,6 +274,7 @@ const tempalteDataTest = (template: Template) => {
   );
   const fontName = typeof template.fontName === 'string';
   const basePdf = typeof template.basePdf === 'string';
+
   return (
     sampledata &&
     schemas &&
@@ -310,11 +330,11 @@ export const fmtTemplateFromJson = (file: File) => {
       }
       if (tempalteDataTest(templateFromJson)) {
         return Promise.resolve(templateFromJson);
-      } else {
-        return Promise.reject(
-          "Invalid template data: This Template can't load. invalid template data."
-        );
       }
+
+      return Promise.reject(
+        "Invalid template data: This Template can't load. invalid template data."
+      );
     } catch (e) {
       return Promise.reject("Invalid template data: This Template can't load. invalid JSON.");
     }
@@ -445,6 +465,7 @@ export const getSampleByType = (type: string) => {
     upca: '416000336108',
     upce: '00123457',
   };
+
   return defaultValue[type] ? defaultValue[type] : '';
 };
 
@@ -461,6 +482,7 @@ export const getKeepRaitoHeightByWidth = (type: string, width: number) => {
     upca: 0.4,
     upce: 0.5,
   };
+
   return width * (raito[type] ? raito[type] : 1);
 };
 
@@ -480,15 +502,16 @@ const blob2Base64 = (blob: Blob) => {
 };
 
 export const getB64BasePdf = async (template: Template) => {
-  const basePdf = template.basePdf;
+  const { basePdf } = template;
   // TODO 相対パスに対応していない
   if (typeof basePdf === 'string' && basePdf.startsWith('http')) {
     const blob = await fetch(basePdf).then((res) => res.blob());
     const base64 = (await blob2Base64(blob)) as string;
+
     return base64;
-  } else {
-    return basePdf as string;
   }
+
+  return basePdf as string;
 };
 
 // TODO Import from labelmake library and use
@@ -499,49 +522,66 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
     // 漢字を含まない500文字以下
     const regexp =
       /([\u{3005}\u{3007}\u{303b}\u{3400}-\u{9FFF}\u{F900}-\u{FAFF}\u{20000}-\u{2FFFF}][\u{E0100}-\u{E01EF}\u{FE00}-\u{FE02}]?)/mu;
+
     return !regexp.test(input) && input.length < 500;
-  } else if (type === 'japanpost') {
+  }
+  if (type === 'japanpost') {
     // 郵便番号は数字(0-9)のみ。住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
     const regexp = /^(\d{7})(\d|[A-Z]|-)+$/;
+
     return regexp.test(input);
-  } else if (type === 'ean13') {
+  }
+  if (type === 'ean13') {
     // 有効文字は数値(0-9)のみ。チェックデジットを含まない12桁orチェックデジットを含む13桁。
     const regexp = /^\d{12}$|^\d{13}$/;
+
     return regexp.test(input);
-  } else if (type === 'ean8') {
+  }
+  if (type === 'ean8') {
     // 有効文字は数値(0-9)のみ。チェックデジットを含まない7桁orチェックデジットを含む8桁。
     const regexp = /^\d{7}$|^\d{8}$/;
+
     return regexp.test(input);
-  } else if (type === 'code39') {
+  }
+  if (type === 'code39') {
     // 有効文字は数字(0-9)。アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペース。
     const regexp = /^(\d|[A-Z]|\-|\.|\$|\/|\+|\%|\s)+$/;
+
     return regexp.test(input);
-  } else if (type === 'code128') {
+  }
+  if (type === 'code128') {
     // 有効文字は漢字、ひらがな、カタカナ以外。
     // https://qiita.com/graminume/items/2ac8dd9c32277fa9da64
-    return input.match(
+    return !input.match(
       /([\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]|[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜])+/
-    )
-      ? false
-      : true;
-  } else if (type === 'nw7') {
+    );
+  }
+  if (type === 'nw7') {
     // 有効文字はNW-7は数字(0-9)と記号(-.$:/+)。
     // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
     const regexp = /^[A-Da-d]([0-9\-\.\$\:\/\+])+[A-Da-d]$/;
+
     return regexp.test(input);
-  } else if (type === 'itf14') {
+  }
+  if (type === 'itf14') {
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁。
     const regexp = /^\d{13}$|^\d{14}$/;
+
     return regexp.test(input);
-  } else if (type === 'upca') {
+  }
+  if (type === 'upca') {
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
     const regexp = /^\d{11}$|^\d{12}$/;
+
     return regexp.test(input);
-  } else if (type === 'upce') {
+  }
+  if (type === 'upce') {
     // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
     // チェックデジットを含まない7桁orチェックデジットを含む8桁。
     const regexp = /^0(\d{6}$|\d{7}$)/;
+
     return regexp.test(input);
   }
+
   return false;
 };

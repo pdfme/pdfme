@@ -5,8 +5,8 @@
   "main": "dist/labelmake-ui.min.jp",
   "typings": "dist/types/index.d.ts",
   "engines": {
-    "node": ">=14" 
-   },
+    "node": ">=14"
+  },
   "scripts": {
     "develop": "DEV_SERVER=true webpack-dev-server --hot --mode development",
     "clean": "rimraf dist",
@@ -50,6 +50,7 @@
     "eslint-loader": "^4.0.2",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^2.2.0",
     "node-sass": "^6.0.1",

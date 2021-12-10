@@ -1,3 +1,4 @@
+import React from 'react';
 import TemplateDesignerComponent from './TemplateDesigner';
 // TODO components/Previewではなく、./Form, ./Viewerを使う
 import PreviewComponents from './components/Preview';
@@ -56,12 +57,7 @@ const Preview = {
 
     ReactDOM.render(
       <I18nContext.Provider value={i18n}>
-        <PreviewComponents
-          template={template}
-          inputs={inputs}
-          size={size}
-          onChange={onChange}
-        />
+        <PreviewComponents template={template} inputs={inputs} size={size} onChange={onChange} />
       </I18nContext.Provider>,
       domContainer
     );

@@ -1,4 +1,4 @@
-import { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext } from 'react';
 import * as styles from './index.module.scss';
 import labelmake from 'labelmake';
 import { isIos, fmtTemplate, sortSchemas, readFile, fmtTemplateFromJson } from '../../libs/utils';
@@ -15,6 +15,7 @@ const Header = forwardRef<HTMLDivElement, TemplateDesignerHeaderProp>(
     const previewPdf = () => {
       if (isIos()) {
         alert(i18n('previewWarnMsg'));
+
         return;
       }
       const schemas = sortSchemas(template, template.schemas.length);
@@ -27,7 +28,7 @@ const Header = forwardRef<HTMLDivElement, TemplateDesignerHeaderProp>(
           const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
           window.open(URL.createObjectURL(blob));
         })
-        .catch(() => {
+        ['catch'](() => {
           alert(i18n('previewErrMsg'));
         });
     };
@@ -40,8 +41,9 @@ const Header = forwardRef<HTMLDivElement, TemplateDesignerHeaderProp>(
     };
 
     const loadJsonTemplate = (file: File) => {
-      fmtTemplateFromJson(file).then(updateTemplate).catch(alert);
+      fmtTemplateFromJson(file).then(updateTemplate)['catch'](alert);
     };
+
     return (
       <div ref={ref} className={`${styles.wrapper}`}>
         <div className={`${styles.desktopFlex}`}>

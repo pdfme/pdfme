@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode } from 'react';
+import React, { MutableRefObject, ReactNode } from 'react';
 import { zoom, rulerHeight } from '../libs/constants';
 import { TemplateSchema, Schema, PageSize } from '../libs/type';
 
@@ -29,10 +29,12 @@ const Paper = ({
     {schemas.map((schema, index) => {
       const pageSize = pageSizes[index];
       if (!pageSize) {
+        // TODO 待ちが長い場合があるので読み込み中の表示が必要
         return null;
       }
       const paperSize = { width: pageSize.width * zoom, height: pageSize.height * zoom };
       const background = backgrounds[index] || '';
+
       return (
         <div
           key={index}

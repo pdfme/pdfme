@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { b64toBlob, pdf2Pngs, getPdfPageSizes, getB64BasePdf, getA4 } from './utils';
 import { Template, PageSize } from './type';
 import { zoom } from './constants';
@@ -45,6 +45,7 @@ export const useUiPreProcessor = ({
         setBackgrounds(data.backgrounds);
       }
     });
+
     return () => {
       isMounted = false;
     };

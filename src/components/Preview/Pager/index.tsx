@@ -1,9 +1,9 @@
+import React, { useContext } from 'react';
 import * as styles from './index.module.scss';
 import left from '../../../assets/left.svg';
 import right from '../../../assets/right.svg';
 import doubleLeft from '../../../assets/double-left.svg';
 import doubleRight from '../../../assets/double-right.svg';
-import { useContext } from 'react';
 import { I18nContext } from '../../../libs/i18n';
 
 const Pager = ({

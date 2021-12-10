@@ -1,3 +1,4 @@
+import React from 'react';
 import { rulerHeight } from '../../libs/constants';
 import { PageSize } from '../../libs/type';
 

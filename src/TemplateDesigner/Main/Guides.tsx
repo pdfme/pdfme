@@ -1,4 +1,4 @@
-import { LegacyRef } from 'react';
+import React, { Ref } from 'react';
 import Guides from '@scena/react-guides';
 import { PageSize } from '../../libs/type';
 import { zoom, rulerHeight } from '../../libs/constants';
@@ -9,8 +9,8 @@ const _Guides = ({
   verticalRef,
 }: {
   paperSize: PageSize;
-  horizontalRef: LegacyRef<Guides> | undefined;
-  verticalRef: LegacyRef<Guides> | undefined;
+  horizontalRef: Ref<Guides> | undefined;
+  verticalRef: Ref<Guides> | undefined;
 }) => (
   <>
     <div

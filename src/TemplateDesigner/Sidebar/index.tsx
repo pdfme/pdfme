@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { Schema } from '../../libs/type';
@@ -45,6 +45,7 @@ const Sidebar = ({
   const sidebarWidth = 300;
   const top = 0;
   const right = open ? sidebarWidth + 18 : 0;
+
   return (
     <div style={{ position: 'absolute', height, width: '100%' }}>
       <div style={{ position: 'sticky', top, zIndex: 29 }}>
@@ -163,7 +164,7 @@ const Sidebar = ({
                         changeSchemas([
                           {
                             key: 'position.x',
-                            value: String(+e.target.value),
+                            value: String(Number(e.target.value)),
                             schemaId: activeSchema.id,
                           },
                         ])
@@ -181,7 +182,7 @@ const Sidebar = ({
                         changeSchemas([
                           {
                             key: 'position.y',
-                            value: String(+e.target.value),
+                            value: String(Number(e.target.value)),
                             schemaId: activeSchema.id,
                           },
                         ])
@@ -201,7 +202,7 @@ const Sidebar = ({
                         changeSchemas([
                           {
                             key: 'width',
-                            value: String(+e.target.value),
+                            value: String(Number(e.target.value)),
                             schemaId: activeSchema.id,
                           },
                         ])
@@ -219,7 +220,7 @@ const Sidebar = ({
                         changeSchemas([
                           {
                             key: 'height',
-                            value: String(+e.target.value),
+                            value: String(Number(e.target.value)),
                             schemaId: activeSchema.id,
                           },
                         ])
@@ -405,7 +406,7 @@ const Sidebar = ({
                       <label>
                         <input
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            const files = e.target.files;
+                            const { files } = e.target;
                             readFiles(files, 'dataURL').then((result) => {
                               changeSchemas([
                                 {
@@ -491,12 +492,14 @@ const SortableItem = SortableElement(
     const getTitle = () => {
       if (status === 'is-warning') {
         return i18n('plsInputName');
-      } else if (status === 'is-danger') {
-        return i18n('fieldMustUniq');
-      } else {
-        return i18n('edit');
       }
+      if (status === 'is-danger') {
+        return i18n('fieldMustUniq');
+      }
+
+      return i18n('edit');
     };
+
     return (
       <div key={sc.id} className={styles.flx}>
         <DragHandle disabled={!touchable} />

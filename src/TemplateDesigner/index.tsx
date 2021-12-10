@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, Schema, TemplateEditorProp } from '../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
@@ -27,6 +27,7 @@ import Root from '../components/Root';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];
+
   return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
 };
 
@@ -68,7 +69,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     }
 
     const scroll = rootRef.current.scrollTop;
-    const top = rootRef.current.getBoundingClientRect().top;
+    const { top } = rootRef.current.getBoundingClientRect();
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
       let value = cur.height * zoom * scale;
       if (i === 0) {
@@ -76,6 +77,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       } else {
         value += acc[i - 1];
       }
+
       return acc.concat(value);
     }, [] as number[]);
     let _pageCursor = 0;
@@ -93,6 +95,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     rootRef.current && rootRef.current.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
+
       return schemas[pageCursor].filter((s) => ids.includes(s.id));
     };
     const timeTavel = (mode: 'undo' | 'redo') => {
@@ -115,19 +118,19 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           switch (command) {
             case 'up': {
               key = 'y';
-              value = round(position['y'] - num, 2);
+              value = round(position.y - num, 2);
               break;
             }
             case 'down': {
               key = 'y';
-              value = round(position['y'] + num, 2);
+              value = round(position.y + num, 2);
               break;
             }
             case 'left':
-              value = round(position['x'] - num, 2);
+              value = round(position.x - num, 2);
               break;
             case 'right':
-              value = round(position['x'] + num, 2);
+              value = round(position.x + num, 2);
               break;
           }
           if (key === 'x') {
@@ -135,6 +138,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           } else {
             value = value > ps.height - height ? ps.height - height : value;
           }
+
           return { key: `position.${key}`, value: String(value), schemaId: as.id };
         });
         changeSchemas(arg);
@@ -156,7 +160,8 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
             y: p.y + 10 > ps.height - height ? ps.height - height : p.y + 10,
           };
           const schema = Object.assign(cloneDeep(cs), { id: uuid(), position });
-          schema.key = schema.key + ' copy';
+          schema.key = `${schema.key} copy`;
+
           return schema;
         });
         commitSchemas(schemas[pageCursor].concat(_schemas));
@@ -183,6 +188,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   useEffect(() => {
     initEvents();
+
     return destroyEvents;
   }, [activeElements, schemas, template, size, pageSizes]);
 
@@ -215,6 +221,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           set(tgt, 'height', getKeepRaitoHeightByWidth(value, tgt.width));
         }
       }
+
       return acc;
     }, cloneDeep(schemas[pageCursor]));
     commitSchemas(newSchemas);
@@ -260,6 +267,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
           value.position.y += diff;
         }
       });
+
       return schema;
     });
     setSchemas(_schemas);
@@ -273,12 +281,14 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     delete _template.pages;
     const tmplt = await saveTemplate(_template);
     setProcessing(false);
+
     return tmplt;
   };
 
   const getLastActiveSchema = () => {
     if (activeElements.length === 0) return getInitialSchema();
     const last = activeElements[activeElements.length - 1];
+
     return schemas[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
   };
 
