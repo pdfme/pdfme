@@ -47,7 +47,7 @@ export const Simple = () => {
       return Promise.resolve(t);
     };
 
-    TemplateDesigner.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
+    // TemplateDesigner.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
   });
 
   return (

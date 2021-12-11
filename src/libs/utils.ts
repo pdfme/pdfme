@@ -232,6 +232,7 @@ const isEmpty = (obj: { [key: string]: TemplateSchema }) => {
   return !Object.keys(obj).length;
 };
 
+/* eslint complexity: ["error", 12]*/
 const tempalteDataTest = (template: Template) => {
   const sampledata =
     template.sampledata.length > 0
@@ -389,6 +390,7 @@ export const initShortCuts = (arg: {
     saveMac,
   ];
 
+  /* eslint complexity: ["error", 22]*/
   hotkeys(keys.join(), (e, handler) => {
     e.preventDefault();
     switch (handler.shortcut) {

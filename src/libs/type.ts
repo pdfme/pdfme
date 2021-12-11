@@ -29,26 +29,17 @@ export type Schema = TemplateSchema & {
 
 export type Lang = 'en' | 'ja';
 
-export interface TemplateEditorProp {
+interface BaseProps {
   template: Template;
-  saveTemplate: (template: Template) => Promise<Template>;
   size: PageSize;
-  Header: React.ComponentType<TemplateDesignerHeaderProp>;
 }
 
-export interface TemplateDesignerHeaderProp {
-  processing: boolean;
-  template: Template;
-  saveTemplate: (template: Template) => Promise<Template>;
-  updateTemplate: (template: Template) => void;
-  [prop: string]: any;
+export interface TemplateEditorProp extends BaseProps {
+  saveTemplate: (template: Template) => void;
 }
 
-export interface PreviewProp {
-  template: Template;
+export interface PreviewProp extends BaseProps {
   inputs: { [key: string]: string }[];
-  size: PageSize;
-  onChange?: (arg: { index: number; value: string; key: string }) => void;
 }
 
 export interface GuidesInterface {

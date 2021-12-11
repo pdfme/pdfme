@@ -78,35 +78,31 @@ const moveCommandToChangeSchemasArg = (props: {
   });
 };
 
-const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditorProp) => {
+const TemplateEditor = ({ template, saveTemplate, size }: TemplateEditorProp) => {
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
   const basePdf = useRef('');
 
   const i18n = useContext(I18nContext);
 
-  const headerHeight = headerRef.current?.clientHeight || 0;
-
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,
     basePdf: basePdf.current,
-    offset: rulerHeight + headerHeight,
+    offset: rulerHeight,
   });
 
-  const [processing, setProcessing] = useState<boolean>(false);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   // TODO 名前変更 schemasはschemasListにしてschemas[pageCursor]をschemasにした方が良さそう
   const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
   const modifiedTemplate = fmtTemplate(
-    Object.assign(template, { basePdf: basePdf.current ? basePdf.current : template.basePdf }),
+    Object.assign(template, { basePdf: basePdf.current || template.basePdf }),
     schemas
   );
 
@@ -233,8 +229,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       redo: () => timeTavel('redo'),
       undo: () => timeTavel('undo'),
       save: () => {
-        setProcessing(true);
-        saveTemplate(modifiedTemplate).then(() => setProcessing(false));
+        saveTemplate(modifiedTemplate);
       },
     });
   }, [
@@ -301,7 +296,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     const s = getInitialSchema();
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
+    s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
     s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
     commitSchemas(schemas[pageCursor].concat(s));
@@ -311,14 +306,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
   const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
     const movedSchema = arrayMove(cloneDeep(schemas[pageCursor]), arg.oldIndex, arg.newIndex);
     commitSchemas(movedSchema);
-  };
-
-  const saveTemplateWithProcessing = async (t: Template) => {
-    setProcessing(true);
-    const tmplt = await saveTemplate(t);
-    setProcessing(false);
-
-    return tmplt;
   };
 
   const getLastActiveSchema = () => {
@@ -332,13 +319,6 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
 
   return (
     <Root ref={rootRef} size={size} template={template} scale={scale}>
-      <Header
-        ref={headerRef}
-        processing={processing}
-        template={modifiedTemplate}
-        saveTemplate={saveTemplateWithProcessing}
-        updateTemplate={updateTemplate}
-      />
       <Sidebar
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         pageCursor={pageCursor}
@@ -354,7 +334,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       />
       <Main
         ref={mainRef}
-        height={size.height - headerHeight - rulerHeight}
+        height={size.height - rulerHeight}
         pageCursor={pageCursor}
         scale={scale}
         pageSizes={pageSizes}

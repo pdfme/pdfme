@@ -64,107 +64,21 @@
       const editor = 'editor';
 
       function init() {
-        const item = localStorage.getItem(inited);
-        if (item === preview) previewDestroy(), previewInit();
-        if (item === editablePreview) editablePreviewDestroy(), editablePreviewInit();
-        if (item === editor) editorDestroy(), editorInit();
+        const editor = new LabelmakeUi.TemplateDesigner({
+          domContainer,
+          template: getSampleTemplate(),
+          saveTemplate: (t) => {
+            console.log('saveTemplate', t);
+          },
+          size: getSize(),
+        });
+
+        // setTimeout(() => {
+        //   editor.destroy();
+        // }, 2000);
       }
 
       window.onload = init;
-
-      function saveTemplateByAPI() {
-        fetch('https://api.labelmake.jp/v1/templates?team=labelmake', {
-          method: 'GET',
-          headers: {
-            'X-Labelmake-API-Token': 'c02ee5a0-2590-11ec-bcde-1b4557d524f3',
-          },
-        })
-          .then((response) => response.json())
-          .then((json) => {
-            alert('saved');
-            localStorage.setItem('templates', JSON.stringify(json));
-          });
-      }
-
-      function getTemplateFromLocalStorage() {
-        const input = window.prompt('enter index');
-        const templates = JSON.parse(localStorage.getItem('templates'));
-        let template = null;
-        if (isNaN(input)) {
-          template = templates.find((t) => t.id === input);
-        } else {
-          template = templates[input];
-        }
-        if (!template) {
-          alert('invalid input');
-          return;
-        }
-        localStorage.setItem('template', JSON.stringify(template));
-        init();
-      }
-
-      function previewInit() {
-        localStorage.setItem(inited, preview);
-        LabelmakeUi.Preview.init(
-          domContainer,
-          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
-          [
-            { field1: 'ああ1', field2: 'いいいい1' },
-            { field1: 'ああ2', field2: 'いいいい2' },
-          ],
-          getSize()
-        );
-      }
-      function editablePreviewInit() {
-        localStorage.setItem(inited, editablePreview);
-        LabelmakeUi.Preview.init(
-          domContainer,
-          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
-          [
-            { field1: 'ああ1', field2: 'いいいい1' },
-            { field1: 'ああ2', field2: '' },
-          ],
-          getSize(),
-          ({ index, value, key }) => {
-            console.log('index', index, 'value', value, 'key', key);
-          }
-        );
-      }
-      function editorInit() {
-        localStorage.setItem(inited, editor);
-        const saveTemplate = (t) => {
-          localStorage.setItem('template', JSON.stringify(t));
-          return new Promise((resolve) => {
-            console.log(t);
-            const blob = new Blob([JSON.stringify(t)], {
-              type: 'application/json',
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `template.json`;
-            link.click();
-            URL.revokeObjectURL(url);
-            resolve(t);
-          });
-        };
-        LabelmakeUi.TemplateDesigner.init(
-          domContainer,
-          JSON.parse(localStorage.getItem('template')) || getSampleTemplate(),
-          saveTemplate,
-          getSize()
-        );
-      }
-
-      function previewDestroy() {
-        LabelmakeUi.Preview.destroy();
-      }
-      function editablePreviewDestroy() {
-        previewDestroy();
-      }
-      function editorDestroy() {
-        LabelmakeUi.TemplateDesigner.destroy();
-      }
     </script>
   </body>
 </html>
