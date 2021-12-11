@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, Ref } from 'react';
 import Moveable, {
   OnDrag,
   OnResize,
@@ -15,65 +15,64 @@ type Props = {
   horizontalGuidelines: number[];
   verticalGuidelines: number[];
   keepRatio: boolean;
-  onDrag: ((e: OnDrag) => any) & (({ target, left, top }: OnDrag) => void);
-  onDragEnd: ((e: OnDragEnd) => any) & (({ target }: { target: HTMLElement | SVGElement }) => void);
-  onDragGroupEnd: ((e: OnDragGroupEnd) => any) &
-    (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
-  onResize: ((e: OnResize) => any) & (({ target, width, height, direction }: OnResize) => void);
-  onResizeEnd: ((e: OnResizeEnd) => any) &
+  onDrag: ((e: OnDrag) => void) & (({ target, left, top }: OnDrag) => void);
+  onDragEnd: ((e: OnDragEnd) => void) &
     (({ target }: { target: HTMLElement | SVGElement }) => void);
-  onResizeGroupEnd: ((e: OnResizeGroupEnd) => any) &
+  onDragGroupEnd: ((e: OnDragGroupEnd) => void) &
     (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
-  onClick: ((e: OnClick) => any) & (() => void);
+  onResize: ((e: OnResize) => void) & (({ target, width, height, direction }: OnResize) => void);
+  onResizeEnd: ((e: OnResizeEnd) => void) &
+    (({ target }: { target: HTMLElement | SVGElement }) => void);
+  onResizeGroupEnd: ((e: OnResizeGroupEnd) => void) &
+    (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
+  onClick: ((e: OnClick) => void) & (() => void);
 };
 
-const _Moveable = forwardRef<any, Props>(
-  (
-    {
-      target,
-      bounds,
-      horizontalGuidelines,
-      verticalGuidelines,
-      keepRatio,
-      onDrag,
-      onDragEnd,
-      onDragGroupEnd,
-      onResize,
-      onResizeEnd,
-      onResizeGroupEnd,
-      onClick,
-    },
-    ref
-  ) => (
-    <Moveable
-      style={{ zIndex: 1 }}
-      snappable={true}
-      snapCenter={true}
-      draggable={true}
-      resizable={true}
-      throttleDrag={1}
-      throttleResize={1}
-      ref={ref}
-      target={target}
-      bounds={bounds}
-      horizontalGuidelines={horizontalGuidelines}
-      verticalGuidelines={verticalGuidelines}
-      keepRatio={keepRatio}
-      onDrag={onDrag}
-      onDragGroup={({ events }) => {
-        events.forEach(onDrag);
-      }}
-      onDragEnd={onDragEnd}
-      onDragGroupEnd={onDragGroupEnd}
-      onResize={onResize}
-      onResizeGroup={({ events }) => {
-        events.forEach(onResize);
-      }}
-      onResizeEnd={onResizeEnd}
-      onResizeGroupEnd={onResizeGroupEnd}
-      onClick={onClick}
-    />
-  )
+const _Moveable = (
+  {
+    target,
+    bounds,
+    horizontalGuidelines,
+    verticalGuidelines,
+    keepRatio,
+    onDrag,
+    onDragEnd,
+    onDragGroupEnd,
+    onResize,
+    onResizeEnd,
+    onResizeGroupEnd,
+    onClick,
+  }: Props,
+  ref: Ref<any>
+) => (
+  <Moveable
+    style={{ zIndex: 1 }}
+    snappable={true}
+    snapCenter={true}
+    draggable={true}
+    resizable={true}
+    throttleDrag={1}
+    throttleResize={1}
+    ref={ref}
+    target={target}
+    bounds={bounds}
+    horizontalGuidelines={horizontalGuidelines}
+    verticalGuidelines={verticalGuidelines}
+    keepRatio={keepRatio}
+    onDrag={onDrag}
+    onDragGroup={({ events }) => {
+      events.forEach(onDrag);
+    }}
+    onDragEnd={onDragEnd}
+    onDragGroupEnd={onDragGroupEnd}
+    onResize={onResize}
+    onResizeGroup={({ events }) => {
+      events.forEach(onResize);
+    }}
+    onResizeEnd={onResizeEnd}
+    onResizeGroupEnd={onResizeGroupEnd}
+    onClick={onClick}
+  />
 );
 
-export default _Moveable;
+export default forwardRef<any, Props>(_Moveable);

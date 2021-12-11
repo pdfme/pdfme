@@ -16,7 +16,7 @@ const TemplateDesigner = {
   init: (
     domContainer: HTMLElement,
     template: Template,
-    saveTemplate: (template: Template) => Promise<Template>,
+    saveTemplate: (t: Template) => Promise<Template>,
     size: PageSize,
     // TODO Headerはカスタムできる仕様をやめる
     customHeader?: React.ComponentType<TemplateDesignerHeaderProp>

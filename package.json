@@ -33,7 +33,6 @@
     "@storybook/manager-webpack5": "^6.3.7",
     "@storybook/react": "^6.3.7",
     "@types/debounce": "^1.2.0",
-    "@types/file-saver": "^2.0.3",
     "@types/lodash.set": "^4.3.6",
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.19",
@@ -80,7 +79,6 @@
   "dependencies": {
     "@tippyjs/react": "^4.2.5",
     "debounce": "^1.2.1",
-    "file-saver": "^2.0.5",
     "hotkeys-js": "^3.8.7",
     "labelmake": "^2.0.19",
     "lodash.set": "^4.3.2",

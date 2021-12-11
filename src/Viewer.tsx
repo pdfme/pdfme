@@ -1,3 +1,4 @@
+import React from 'react';
 import { PageSize, Template } from './libs/type';
 import Preview from './components/Preview';
 

@@ -24,8 +24,8 @@ const FilledImage = ({
   </div>
 );
 
-const BlankImage = (props: SchemaUIProp & { ref: Ref<HTMLInputElement> }) => {
-  const { editable, placeholder, tabIndex, schema, onChange, ref } = props;
+const BlankImage = (props: SchemaUIProp & { inputRef: Ref<HTMLInputElement> }) => {
+  const { editable, placeholder, tabIndex, schema, onChange, inputRef } = props;
   const i18n = useContext(I18nContext);
 
   return editable ? (
@@ -37,7 +37,7 @@ const BlankImage = (props: SchemaUIProp & { ref: Ref<HTMLInputElement> }) => {
       }}
     >
       <input
-        ref={ref}
+        ref={inputRef}
         tabIndex={tabIndex}
         style={{ display: 'none' }}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +68,6 @@ const BlankImage = (props: SchemaUIProp & { ref: Ref<HTMLInputElement> }) => {
 };
 
 const ImageSchema = (props: SchemaUIProp, ref: Ref<HTMLInputElement>) =>
-  props.schema.data ? <FilledImage {...props} /> : <BlankImage {...props} ref={ref} />;
+  props.schema.data ? <FilledImage {...props} /> : <BlankImage {...props} inputRef={ref} />;
 
 export default forwardRef<HTMLInputElement, SchemaUIProp>(ImageSchema);

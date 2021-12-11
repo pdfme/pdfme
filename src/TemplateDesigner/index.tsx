@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useContext } from 'react';
-import { Template, Schema, TemplateEditorProp } from '../libs/type';
+import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
+import { Template, Schema, TemplateEditorProp, PageSize } from '../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { zoom, rulerHeight } from '../libs/constants';
@@ -19,7 +19,7 @@ import {
   initShortCuts,
   destroyShortCuts,
   getSampleByType,
-  getKeepRaitoHeightByWidth,
+  getKeepRatioHeightByWidth,
   getB64BasePdf,
 } from '../libs/utils';
 import { useUiPreProcessor } from '../libs/hooks';
@@ -27,8 +27,55 @@ import Root from '../components/Root';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];
+  const v = Number(value) < 0 ? 0 : Number(value);
 
-  return skip.includes(key) ? value : Number(value) < 0 ? 0 : Number(value);
+  return skip.includes(key) ? value : v;
+};
+
+const moveCommandToChangeSchemasArg = (props: {
+  command: 'up' | 'down' | 'left' | 'right';
+  activeSchemas: Schema[];
+  isShift: boolean;
+  pageSize: PageSize;
+}) => {
+  const { command, activeSchemas, isShift, pageSize } = props;
+  const key = command === 'up' || command === 'down' ? 'y' : 'x';
+  const num = isShift ? 0.1 : 1;
+
+  const getValue = (as: Schema) => {
+    let value = 0;
+    const { position } = as;
+    switch (command) {
+      case 'up':
+        value = round(position.y - num, 2);
+        break;
+      case 'down':
+        value = round(position.y + num, 2);
+        break;
+      case 'left':
+        value = round(position.x - num, 2);
+        break;
+      case 'right':
+        value = round(position.x + num, 2);
+        break;
+      default:
+        break;
+    }
+
+    return value;
+  };
+
+  return activeSchemas.map((as) => {
+    let value = getValue(as);
+    const { width, height } = as;
+    if (key === 'x') {
+      value = value > pageSize.width - width ? round(pageSize.width - width, 2) : value;
+    } else {
+      value = value > pageSize.height - height ? round(pageSize.height - height, 2) : value;
+    }
+
+    return { key: `position.${key}`, value: String(value), schemaId: as.id };
+  });
 };
 
 const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditorProp) => {
@@ -63,6 +110,8 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
     schemas
   );
 
+  const onEditEnd = () => setActiveElements([]);
+
   const onScroll = debounce(() => {
     if (!pageSizes[0] || !rootRef.current) {
       return;
@@ -87,12 +136,54 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       }
     });
     if (_pageCursor !== pageCursor) {
-      setPageCursor(_pageCursor), onEditEnd();
+      setPageCursor(_pageCursor);
+      onEditEnd();
     }
   }, 100);
 
-  const initEvents = () => {
-    rootRef.current && rootRef.current.addEventListener('scroll', onScroll);
+  const commitSchemas = useCallback(
+    (newSchemas: Schema[]) => {
+      future.current = [];
+      past.current.push(cloneDeep(schemas[pageCursor]));
+      const _schemas = cloneDeep(schemas);
+      _schemas[pageCursor] = newSchemas;
+      setSchemas(_schemas);
+    },
+    [schemas, pageCursor]
+  );
+
+  const removeSchemas = useCallback(
+    (ids: string[]) => {
+      commitSchemas(schemas[pageCursor].filter((schema) => !ids.includes(schema.id)));
+      onEditEnd();
+    },
+    [schemas, pageCursor, commitSchemas]
+  );
+
+  const changeSchemas = useCallback(
+    (objs: { key: string; value: string; schemaId: string }[]) => {
+      const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
+        const tgt = acc.find((s) => s.id === schemaId)!;
+        // Assign to reference
+        set(tgt, key, fmtValue(key, value));
+        if (key === 'type') {
+          // set default value, text or barcode
+          set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(value));
+          // For barcodes, adjust the height to get the correct ratio.
+          if (value !== 'text' && value !== 'image') {
+            set(tgt, 'height', getKeepRatioHeightByWidth(value, tgt.width));
+          }
+        }
+
+        return acc;
+      }, cloneDeep(schemas[pageCursor]));
+      commitSchemas(newSchemas);
+    },
+    [commitSchemas, pageCursor, schemas]
+  );
+
+  const initEvents = useCallback(() => {
+    rootRef.current?.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
 
@@ -104,43 +195,14 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       (isUndo ? future : past).current.push(cloneDeep(schemas[pageCursor]));
       const s = cloneDeep(schemas);
       s[pageCursor] = (isUndo ? past : future).current.pop()!;
-      setSchemas(s), onEditEnd();
+      setSchemas(s);
+      onEditEnd();
     };
     initShortCuts({
       move: (command, isShift) => {
-        const ps = pageSizes[pageCursor];
+        const pageSize = pageSizes[pageCursor];
         const activeSchemas = getActiveSchemas();
-        const arg = activeSchemas.map((as) => {
-          let key: 'x' | 'y' = 'x';
-          let value = 0;
-          const num = isShift ? 0.1 : 1;
-          const { position, height, width } = as;
-          switch (command) {
-            case 'up': {
-              key = 'y';
-              value = round(position.y - num, 2);
-              break;
-            }
-            case 'down': {
-              key = 'y';
-              value = round(position.y + num, 2);
-              break;
-            }
-            case 'left':
-              value = round(position.x - num, 2);
-              break;
-            case 'right':
-              value = round(position.x + num, 2);
-              break;
-          }
-          if (key === 'x') {
-            value = value > ps.width - width ? ps.width - width : value;
-          } else {
-            value = value > ps.height - height ? ps.height - height : value;
-          }
-
-          return { key: `position.${key}`, value: String(value), schemaId: as.id };
-        });
+        const arg = moveCommandToChangeSchemasArg({ command, activeSchemas, pageSize, isShift });
         changeSchemas(arg);
       },
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
@@ -175,87 +237,36 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
         saveTemplate(modifiedTemplate).then(() => setProcessing(false));
       },
     });
-  };
+  }, [
+    activeElements,
+    changeSchemas,
+    commitSchemas,
+    modifiedTemplate,
+    onScroll,
+    pageCursor,
+    pageSizes,
+    removeSchemas,
+    saveTemplate,
+    schemas,
+  ]);
 
-  const destroyEvents = () => {
-    rootRef.current && rootRef.current.removeEventListener('scroll', onScroll);
+  const destroyEvents = useCallback(() => {
+    rootRef.current?.removeEventListener('scroll', onScroll);
     destroyShortCuts();
-  };
+  }, [onScroll]);
 
-  useEffect(() => {
-    updateTemplate(template);
-  }, []);
-
-  useEffect(() => {
-    initEvents();
-
-    return destroyEvents;
-  }, [activeElements, schemas, template, size, pageSizes]);
-
-  const addSchema = () => {
-    const s = getInitialSchema();
-    const paper = paperRefs.current[pageCursor];
-    const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
-    s.data = 'text';
-    s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
-    commitSchemas(schemas[pageCursor].concat(s));
-    setTimeout(() => setActiveElements([document.getElementById(s.id)!]));
-  };
-
-  const removeSchemas = (ids: string[]) => {
-    commitSchemas(schemas[pageCursor].filter((schema) => !ids.includes(schema.id)));
-    onEditEnd();
-  };
-
-  const changeSchemas = (objs: { key: string; value: string; schemaId: string }[]) => {
-    const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
-      const tgt = acc.find((s) => s.id === schemaId)!;
-      // Assign to reference
-      set(tgt, key, fmtValue(key, value));
-      if (key === 'type') {
-        // set default value, text or barcode
-        set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(value));
-        // For barcodes, adjust the height to get the correct ratio.
-        if (value !== 'text' && value !== 'image') {
-          set(tgt, 'height', getKeepRaitoHeightByWidth(value, tgt.width));
-        }
-      }
-
-      return acc;
-    }, cloneDeep(schemas[pageCursor]));
-    commitSchemas(newSchemas);
-  };
-
-  const commitSchemas = (newSchemas: Schema[]) => {
-    future.current = [];
-    past.current.push(cloneDeep(schemas[pageCursor]));
-    const _schemas = cloneDeep(schemas);
-    _schemas[pageCursor] = newSchemas;
-    setSchemas(_schemas);
-  };
-
-  const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const movedSchema = arrayMove(cloneDeep(schemas[pageCursor]), arg.oldIndex, arg.newIndex);
-    commitSchemas(movedSchema);
-  };
-
-  const onEdit = (id: string) => setActiveElements([document.getElementById(id)!]);
-
-  const onEditEnd = () => setActiveElements([]);
-
-  const updateTemplate = async (newTemplate: Template) => {
+  const updateTemplate = useCallback(async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
     basePdf.current = await getB64BasePdf(newTemplate);
     const pdfBlob = b64toBlob(basePdf.current);
-    const pageSizes = await getPdfPageSizes(pdfBlob);
+    const _pageSizes = await getPdfPageSizes(pdfBlob);
     const _schemas = (
-      newSchemas.length < pageSizes.length
-        ? newSchemas.concat(new Array(pageSizes.length - newSchemas.length).fill(cloneDeep([])))
-        : newSchemas.slice(0, pageSizes.length)
+      newSchemas.length < _pageSizes.length
+        ? newSchemas.concat(new Array(_pageSizes.length - newSchemas.length).fill(cloneDeep([])))
+        : newSchemas.slice(0, _pageSizes.length)
     ).map((schema, i) => {
       Object.values(schema).forEach((value) => {
-        const { width, height } = pageSizes[i];
+        const { width, height } = _pageSizes[i];
         const xEdge = value.position.x + value.width;
         const yEdge = value.position.y + value.height;
         if (width < xEdge) {
@@ -271,15 +282,40 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
       return schema;
     });
     setSchemas(_schemas);
-    onEditEnd(), setPageCursor(0);
-    rootRef.current && rootRef.current.scroll({ top: 0, behavior: 'smooth' });
+    onEditEnd();
+    setPageCursor(0);
+    rootRef.current?.scroll({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  useEffect(() => {
+    updateTemplate(template);
+  }, [template, updateTemplate]);
+
+  useEffect(() => {
+    initEvents();
+
+    return destroyEvents;
+  }, [initEvents, destroyEvents]);
+
+  const addSchema = () => {
+    const s = getInitialSchema();
+    const paper = paperRefs.current[pageCursor];
+    const rectTop = paper ? paper.getBoundingClientRect().top : 0;
+    s.position.y = rectTop - headerHeight > 0 ? 0 : pageSizes[pageCursor].height / 2;
+    s.data = 'text';
+    s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
+    commitSchemas(schemas[pageCursor].concat(s));
+    setTimeout(() => setActiveElements([document.getElementById(s.id)!]));
   };
 
-  const saveTemplateWithProcessing = async (template: Template) => {
+  const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
+    const movedSchema = arrayMove(cloneDeep(schemas[pageCursor]), arg.oldIndex, arg.newIndex);
+    commitSchemas(movedSchema);
+  };
+
+  const saveTemplateWithProcessing = async (t: Template) => {
     setProcessing(true);
-    const _template = cloneDeep<any>(template);
-    delete _template.pages;
-    const tmplt = await saveTemplate(_template);
+    const tmplt = await saveTemplate(t);
     setProcessing(false);
 
     return tmplt;
@@ -311,7 +347,7 @@ const TemplateEditor = ({ template, saveTemplate, Header, size }: TemplateEditor
         activeSchema={activeSchema}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
-        onEdit={onEdit}
+        onEdit={(id: string) => setActiveElements([document.getElementById(id)!])}
         onEditEnd={onEditEnd}
         addSchema={addSchema}
         removeSchema={(id) => removeSchemas([id])}

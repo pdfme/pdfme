@@ -10,8 +10,8 @@ const _Selecto = ({
 }: {
   container: HTMLElement | null;
   continueSelect: boolean;
-  onDragStart: (e: _OnDragStart) => any;
-  onSelect: (e: _OnSelect) => any;
+  onDragStart: (e: _OnDragStart) => void;
+  onSelect: (e: _OnSelect) => void;
 }) => (
   <Selecto
     selectFromInside={false}

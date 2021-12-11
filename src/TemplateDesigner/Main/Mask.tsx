@@ -2,7 +2,7 @@ import React from 'react';
 import { rulerHeight } from '../../libs/constants';
 import { PageSize } from '../../libs/type';
 
-const Mask = ({ width, height, scale }: PageSize & { scale: number }) => (
+const Mask = ({ width, height }: PageSize) => (
   <div
     style={{
       position: 'absolute',
@@ -11,7 +11,7 @@ const Mask = ({ width, height, scale }: PageSize & { scale: number }) => (
       zIndex: 100,
       background: 'rgba(158, 158, 158, 0.58)',
       width,
-      height: height - (rulerHeight * scale) / 2,
+      height,
     }}
   />
 );

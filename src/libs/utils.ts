@@ -7,7 +7,6 @@ import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
 import { debounce as _debounce } from 'debounce';
-import { saveAs } from 'file-saver';
 import { UAParser } from 'ua-parser-js';
 import hotkeys from 'hotkeys-js';
 
@@ -15,20 +14,6 @@ export const uuid = nanoid;
 export const set = _set;
 export const debounce = _debounce;
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
-
-export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && files !== null) {
-        r(e.target.result);
-      }
-    });
-    if (files !== null && files[0]) {
-      readFile(files[0], type).then((data) => r(data));
-    }
-  });
-};
 
 export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
@@ -50,6 +35,20 @@ export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuf
   });
 };
 
+export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
+  return new Promise<string | ArrayBuffer>((r) => {
+    const fileReader = new FileReader();
+    fileReader.addEventListener('load', (e) => {
+      if (e && e.target && e.target.result && files !== null) {
+        r(e.target.result);
+      }
+    });
+    if (files !== null && files[0]) {
+      readFile(files[0], type).then((data) => r(data));
+    }
+  });
+};
+
 export const blob2File = (theBlob: Blob, fileName: string): File => {
   const b: any = theBlob;
   b.lastModifiedDate = new Date();
@@ -58,24 +57,24 @@ export const blob2File = (theBlob: Blob, fileName: string): File => {
   return theBlob as File;
 };
 
+const shift = (number: number, precision: number, reverseShift: boolean) => {
+  if (reverseShift) {
+    precision = -precision;
+  }
+  const numArray = `${number}`.split('e');
+
+  return Number(`${numArray[0]}e${numArray[1] ? Number(numArray[1]) + precision : precision}`);
+};
+
 export const round = (number: number, precision: number) => {
-  const shift = (number: number, precision: number, reverseShift: boolean) => {
-    if (reverseShift) {
-      precision = -precision;
-    }
-    const numArray = `${number}`.split('e');
-
-    return Number(`${numArray[0]}e${numArray[1] ? Number(numArray[1]) + precision : precision}`);
-  };
-
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
 
 export const b64toBlob = (base64: string) => {
   const byteString = atob(base64.split(',')[1]);
-  const mimeType = base64.match(/(:)([a-z/]+)(;)/)![2];
+  const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
   const buffer = new Uint8Array(byteString.length);
-  for (let i = 0; i < byteString.length; i++) {
+  for (let i = 0; i < byteString.length; i += 1) {
     buffer[i] = byteString.charCodeAt(i);
   }
 
@@ -89,16 +88,10 @@ export const isIos = () => {
   return os === 'iOS';
 };
 
-export const fileSave = (data: Blob | string, name: string) => {
-  isIos()
-    ? window.open(URL.createObjectURL(typeof data === 'string' ? b64toBlob(data) : data))
-    : saveAs(data, name);
-};
-
 export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   array = array.slice();
   const startIndex = to < 0 ? array.length + to : to;
-  const item = array.splice(from, 1)[0];
+  const [item] = array.splice(from, 1);
   array.splice(startIndex, 0, item);
 
   return array;
@@ -115,50 +108,51 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
 
-  return Promise.all(
-    new Array(pdfDoc.numPages).fill('').map((_, i) => {
-      return new Promise<PageSize>(async (r) =>
-        r(
-          await pdfDoc.getPage(i + 1).then((page) => {
-            const { height, width } = page.getViewport({ scale: 1 });
-            URL.revokeObjectURL(url);
+  const promises = Promise.all(
+    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
+      const pageSize = await pdfDoc.getPage(i + 1).then((page) => {
+        const { height, width } = page.getViewport({ scale: 1 });
 
-            return { height: pt2mm(height), width: pt2mm(width) };
-          })
-        )
-      );
+        return { height: pt2mm(height), width: pt2mm(width) };
+      });
+
+      return pageSize;
     })
   );
+
+  URL.revokeObjectURL(url);
+
+  return promises;
 };
 
 const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg') => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
 
-  return Promise.all(
-    new Array(pdfDoc.numPages).fill('').map((_, i) => {
-      return new Promise<string>(async (r) =>
-        r(
-          await pdfDoc.getPage(i + 1).then((page) => {
-            const canvas = document.createElement('canvas');
-            canvas.width = width * 2;
-            const canvasContext = canvas.getContext('2d')!;
-            const scaleRequired = canvas.width / page.getViewport({ scale: 1 }).width;
-            const viewport = page.getViewport({ scale: scaleRequired });
-            canvas.height = viewport.height;
-            URL.revokeObjectURL(url);
+  const promises = Promise.all(
+    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
+      const image = await pdfDoc.getPage(i + 1).then((page) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width * 2;
+        const canvasContext = canvas.getContext('2d')!;
+        const scaleRequired = canvas.width / page.getViewport({ scale: 1 }).width;
+        const viewport = page.getViewport({ scale: scaleRequired });
+        canvas.height = viewport.height;
 
-            return page
-              .render({ canvasContext, viewport })
-              .promise.then(() => canvas.toDataURL(`image/${imagetype}`));
-          })
-        )
-      );
+        return page
+          .render({ canvasContext, viewport })
+          .promise.then(() => canvas.toDataURL(`image/${imagetype}`));
+      });
+
+      return image;
     })
   );
+  URL.revokeObjectURL(url);
+
+  return promises;
 };
 
-export const pdf2Pngs = async (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
+export const pdf2Pngs = (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
 
 export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
   const _schemas = cloneDeep(schemas);
@@ -224,10 +218,7 @@ export const getInitialSchema = (): Schema => ({
   id: uuid(),
   key: '',
   type: 'text',
-  position: {
-    x: 0,
-    y: 0,
-  },
+  position: { x: 0, y: 0 },
   width: 35,
   height: 7,
   alignment: 'left',
@@ -237,7 +228,7 @@ export const getInitialSchema = (): Schema => ({
   data: '',
 });
 
-const isEmptyObj = (obj: Object) => {
+const isEmpty = (obj: { [key: string]: TemplateSchema }) => {
   return !Object.keys(obj).length;
 };
 
@@ -255,7 +246,7 @@ const tempalteDataTest = (template: Template) => {
       const [key, value] = entry;
 
       return (
-        isEmptyObj({ [key]: value }) ||
+        isEmpty({ [key]: value }) ||
         (typeof key === 'string' &&
           typeof value.type === 'string' &&
           typeof value.position.x === 'number' &&
@@ -444,6 +435,8 @@ export const initShortCuts = (arg: {
       case saveMac:
         arg.save();
         break;
+      default:
+        break;
     }
   });
 };
@@ -469,7 +462,7 @@ export const getSampleByType = (type: string) => {
   return defaultValue[type] ? defaultValue[type] : '';
 };
 
-export const getKeepRaitoHeightByWidth = (type: string, width: number) => {
+export const getKeepRatioHeightByWidth = (type: string, width: number) => {
   const raito: { [key: string]: number } = {
     qrcode: 1,
     japanpost: 0.09,
