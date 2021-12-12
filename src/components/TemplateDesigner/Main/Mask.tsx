@@ -1,6 +1,6 @@
 import React from 'react';
-import { rulerHeight } from '../../libs/constants';
-import { PageSize } from '../../libs/type';
+import { rulerHeight } from '../../../libs/constants';
+import { PageSize } from '../../../libs/type';
 
 const Mask = ({ width, height }: PageSize) => (
   <div

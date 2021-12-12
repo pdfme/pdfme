@@ -43,7 +43,7 @@ const config = {
     historyApiFallback: false,
     host: '0.0.0.0',
   },
-  entry: './src/index.tsx',
+  entry: './src/index.ts',
   output: {
     library: 'LabelmakeUi',
     libraryTarget: 'umd',

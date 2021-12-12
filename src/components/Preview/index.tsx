@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PreviewProp } from '../../libs/type';
+import { PreviewUIProp } from '../../libs/type';
 import { rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
 import Root from '../Root';
@@ -7,7 +7,7 @@ import Paper from '../Paper';
 import Schema from '../Schemas';
 import { useUiPreProcessor } from '../../libs/hooks';
 
-const Preview = ({ template, inputs, size, onChange }: PreviewProp) => {
+const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,
@@ -17,9 +17,9 @@ const Preview = ({ template, inputs, size, onChange }: PreviewProp) => {
   const [pageCursor, setPageCursor] = useState(0);
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
-    onChange && onChange({ index: pageCursor, key, value });
+    onChangeInput && onChangeInput({ index: pageCursor, key, value });
 
-  const editable = Boolean(onChange);
+  const editable = Boolean(onChangeInput);
   const input = inputs[pageCursor];
   const { schemas } = template;
 

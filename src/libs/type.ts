@@ -3,6 +3,9 @@ import type {
   Template as _Template,
   PageSize as _PageSize,
 } from 'labelmake/dist/types/type';
+import ReactDOM from 'react-dom';
+import { curriedI18n } from './i18n';
+import { destroyedErrMsg } from './constants';
 
 export type PageSize = _PageSize;
 
@@ -29,24 +32,81 @@ export type Schema = TemplateSchema & {
 
 export type Lang = 'en' | 'ja';
 
-interface BaseProps {
-  template: Template;
-  size: PageSize;
-}
-
-export interface TemplateDesignerProp extends BaseProps {
-  saveTemplate: (template: Template) => void;
-}
-
-export interface PreviewProp extends BaseProps {
-  inputs: { [key: string]: string }[];
-  onChange?: (arg: { index: number; value: string; key: string }) => void;
-}
-
 export interface GuidesInterface {
   getGuides(): number[];
   scroll(pos: number): void;
   scrollGuides(pos: number): void;
   loadGuides(guides: number[]): void;
   resize(): void;
+}
+
+interface UIBaseProps {
+  template: Template;
+  size: PageSize;
+}
+
+export interface TemplateDesignerProp extends UIBaseProps {
+  saveTemplate: (template: Template) => void;
+}
+
+export type UIProps = { lang?: 'en' | 'ja'; domContainer: HTMLElement };
+
+export abstract class BaseUIClass {
+  protected domContainer: HTMLElement | null;
+
+  protected template: Template;
+
+  protected size: PageSize;
+
+  private lang: 'en' | 'ja' = 'en';
+
+  constructor(props: UIBaseProps & UIProps) {
+    const { domContainer, template, size, lang } = props;
+    this.domContainer = domContainer;
+    this.template = template;
+    this.size = size;
+    this.lang = lang || 'en';
+  }
+
+  protected getI18n() {
+    return curriedI18n(this.lang);
+  }
+
+  public destroy() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.domContainer = null;
+  }
+
+  protected abstract render(): void;
+}
+
+export interface PreviewUIProp extends UIBaseProps {
+  inputs: { [key: string]: string }[];
+  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
+}
+export abstract class PreviewUI extends BaseUIClass {
+  protected inputs: { [key: string]: string }[];
+
+  constructor(props: PreviewUIProp & UIProps) {
+    const { domContainer, template, size, lang, inputs } = props;
+    super({ domContainer, template, size, lang });
+
+    this.inputs = inputs;
+    this.render();
+  }
+
+  public getInputs() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+
+    return this.inputs;
+  }
+
+  public setInputs(inputs: { [key: string]: string }[]) {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    this.inputs = inputs;
+    this.render();
+  }
+
+  protected abstract render(): void;
 }

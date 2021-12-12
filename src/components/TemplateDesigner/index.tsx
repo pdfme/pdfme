@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { Template, Schema, TemplateDesignerProp, PageSize } from '../libs/type';
+import { Template, Schema, TemplateDesignerProp, PageSize } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { zoom, rulerHeight } from '../libs/constants';
-import { I18nContext } from '../libs/i18n';
+import { zoom, rulerHeight } from '../../libs/constants';
+import { I18nContext } from '../../libs/i18n';
 import {
   uuid,
   set,
@@ -21,9 +21,9 @@ import {
   getSampleByType,
   getKeepRatioHeightByWidth,
   getB64BasePdf,
-} from '../libs/utils';
-import { useUiPreProcessor } from '../libs/hooks';
-import Root from '../components/Root';
+} from '../../libs/utils';
+import { useUiPreProcessor } from '../../libs/hooks';
+import Root from '../Root';
 
 const fmtValue = (key: string, value: string) => {
   const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];

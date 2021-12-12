@@ -1,6 +1,6 @@
 import React from 'react';
 import Selecto, { OnDragStart as _OnDragStart, OnSelect as _OnSelect } from 'react-selecto';
-import { selectableClassName } from '../../libs/constants';
+import { selectableClassName } from '../../../libs/constants';
 
 const _Selecto = ({
   container,

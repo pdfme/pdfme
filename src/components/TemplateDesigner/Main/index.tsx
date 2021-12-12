@@ -8,11 +8,11 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { GuidesInterface, Schema as SchemaType, PageSize } from '../../libs/type';
-import { round, flatten } from '../../libs/utils';
-import { zoom, rulerHeight } from '../../libs/constants';
-import Paper from '../../components/Paper';
-import Schema from '../../components/Schemas';
+import { GuidesInterface, Schema as SchemaType, PageSize } from '../../../libs/type';
+import { round, flatten } from '../../../libs/utils';
+import { zoom, rulerHeight } from '../../../libs/constants';
+import Paper from '../../Paper';
+import Schema from '../../Schemas';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';

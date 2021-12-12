@@ -10,6 +10,8 @@ import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
 import _imageExample from '../assets/imageExample.png';
 
+export const destroyedErrMsg = 'this instance is already destroyed';
+
 export const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,
   japanpost,

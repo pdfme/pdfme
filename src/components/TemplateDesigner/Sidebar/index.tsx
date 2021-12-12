@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Schema } from '../../libs/type';
-import { I18nContext } from '../../libs/i18n';
-import backIcon from '../../assets/back.svg';
-import forwardIcon from '../../assets/forward.svg';
+import { Schema } from '../../../libs/type';
+import { I18nContext } from '../../../libs/i18n';
+import backIcon from '../../../assets/back.svg';
+import forwardIcon from '../../../assets/forward.svg';
 import ListView from './ListView';
 import DetailView from './DetailView';
 

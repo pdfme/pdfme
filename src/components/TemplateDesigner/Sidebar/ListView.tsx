@@ -5,15 +5,15 @@ import {
   SortableElement as sortableElement,
   SortableHandle as sortableHandle,
 } from 'react-sortable-hoc';
-import { Schema } from '../../libs/type';
-import { I18nContext } from '../../libs/i18n';
-import Divider from '../../components/Divider';
-import infoIcon from '../../assets/info.svg';
-import createIcon from '../../assets/create.svg';
-import dragIcon from '../../assets/drag.svg';
-import warningIcon from '../../assets/warning.svg';
-import deleteIcon from '../../assets/delete.svg';
-import { SidebarProps } from './';
+import { Schema } from '../../../libs/type';
+import { I18nContext } from '../../../libs/i18n';
+import Divider from '../../Divider';
+import infoIcon from '../../../assets/info.svg';
+import createIcon from '../../../assets/create.svg';
+import dragIcon from '../../../assets/drag.svg';
+import warningIcon from '../../../assets/warning.svg';
+import deleteIcon from '../../../assets/delete.svg';
+import { SidebarProps } from '.';
 
 const isTouchable = () => true;
 

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import * as styles from './index.module.scss';
-import { readFiles } from '../../libs/utils';
-import { I18nContext } from '../../libs/i18n';
-import { inputTypeList } from '../../libs/constants';
-import Divider from '../../components/Divider';
-import backIcon from '../../assets/back.svg';
-import deleteIcon from '../../assets/delete.svg';
-import { SidebarProps } from './';
+import { readFiles } from '../../../libs/utils';
+import { I18nContext } from '../../../libs/i18n';
+import { inputTypeList } from '../../../libs/constants';
+import Divider from '../../Divider';
+import backIcon from '../../../assets/back.svg';
+import deleteIcon from '../../../assets/delete.svg';
+import { SidebarProps } from '.';
 
 const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
   const { changeSchemas, activeSchema } = props;
