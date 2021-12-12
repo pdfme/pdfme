@@ -18,8 +18,8 @@ import { SidebarProps } from '.';
 const isTouchable = () => true;
 
 const DragHandle = sortableHandle(() => (
-  <button style={{ padding: 5, margin: 5, cursor: 'grab' }}>
-    <img src={dragIcon} width={15} alt="Drag icon" />
+  <button style={{ padding: 0 }}>
+    <img style={{ padding: 5, cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
 
