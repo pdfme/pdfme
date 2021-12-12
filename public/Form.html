@@ -27,7 +27,11 @@
           domContainer,
           template: getTemplate(),
           size,
-          inputs: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
+          inputs: [
+            { ふりがな: 'たなか', 名前: '田中' },
+            { ふりがな: 'やまもと', 名前: '山本' },
+            { ふりがな: 'さとう', 名前: '佐藤' },
+          ],
           onChangeInput: console.log,
         });
       }

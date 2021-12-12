@@ -1,9 +1,11 @@
 .wrapper {
-  position: absolute;
-  right: 0;
+  position: fixed;
+  top: 45%;
   z-index: 1;
   background-color: #777777bd;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .leftBtn {

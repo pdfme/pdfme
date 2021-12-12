@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PreviewUIProp } from '../../libs/type';
 import { rulerHeight } from '../../libs/constants';
-import Pager from './Pager';
+import UnitPager from './UnitPager';
 import Root from '../Root';
 import Paper from '../Paper';
 import Schema from '../Schemas';
@@ -14,18 +14,18 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
     offset: rulerHeight,
   });
 
-  const [pageCursor, setPageCursor] = useState(0);
+  const [unitCursor, setUnitCursor] = useState(0);
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
-    onChangeInput && onChangeInput({ index: pageCursor, key, value });
+    onChangeInput && onChangeInput({ index: unitCursor, key, value });
 
   const editable = Boolean(onChangeInput);
-  const input = inputs[pageCursor];
+  const input = inputs[unitCursor];
   const { schemas } = template;
 
   return (
     <Root template={template} size={size} scale={scale}>
-      <Pager pageCursor={pageCursor} pageNum={inputs.length} setPageCursor={setPageCursor} />
+      <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
       <Paper
         scale={scale}
         schemas={schemas}
