@@ -7,29 +7,21 @@
   </head>
   <body style="margin: 0">
     <div>
-      <button onclick="saveTemplateByAPI()">saveTemplateByAPI</button>
-      <button onclick="getTemplateFromLocalStorage()">getTemplateFromLocalStorage</button>
+      <button onclick="init()">init</button>
       /
-      <button onclick="previewInit()">Init preview</button>
-      <button onclick="editablePreviewInit()">Init editable preview</button>
-      <button onclick="editorInit()">Init editor</button>
+      <button onclick="destroy()">destroy</button>
       /
-      <button onclick="previewDestroy()">Destroy preview</button>
-      <button onclick="editablePreviewDestroy()">Destroy editable preview</button>
-      <button onclick="editorDestroy()">Destroy editor</button>
+      <button onclick="saveTemplate()">saveTemplate</button>
+      /
+      <button onclick="updateTemplate()">updateTemplate</button>
     </div>
     <div id="app"></div>
     <script>
-      const getSize = () => ({ height: 900, width: 900 });
+      const size = { height: 900, width: 900 };
       const domContainer = document.getElementById('app');
       const getSampleTemplate = () => ({
         columns: ['field1', 'field2'],
-        sampledata: [
-          {
-            field1: 'bb',
-            field2: 'aaaaaaaaaaaa',
-          },
-        ],
+        sampledata: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
         fontName: '',
         basePdf: LabelmakeUi.blankPdf,
         schemas: [
@@ -58,24 +50,27 @@
         ],
       });
 
-      const inited = 'inited';
-      const preview = 'preview';
-      const editablePreview = 'editablePreview';
-      const editor = 'editor';
+      let editor = null;
 
       function init() {
-        const editor = new LabelmakeUi.TemplateDesigner({
+        editor = new LabelmakeUi.TemplateDesigner({
           domContainer,
           template: getSampleTemplate(),
-          saveTemplate: (t) => {
-            console.log('saveTemplate', t);
-          },
-          size: getSize(),
+          saveTemplate: (t) => console.log('saveTemplate', t),
+          size,
         });
+      }
 
-        // setTimeout(() => {
-        //   editor.destroy();
-        // }, 2000);
+      function destroy() {
+        editor.destroy();
+      }
+
+      function saveTemplate() {
+        editor.saveTemplate();
+      }
+
+      function updateTemplate() {
+        editor.updateTemplate(getSampleTemplate());
       }
 
       window.onload = init;

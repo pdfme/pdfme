@@ -3,81 +3,64 @@ import TemplateDesignerComponent from './TemplateDesigner';
 // TODO components/Previewではなく、./Form, ./Viewerを使う
 import PreviewComponents from './components/Preview';
 import ReactDOM from 'react-dom';
-import { PageSize, Template } from './libs/type';
-import { blankPdf, lang } from './libs/constants';
+import { TemplateDesignerProp, PageSize, Template } from './libs/type';
+import { blankPdf } from './libs/constants';
 import { I18nContext, curriedI18n } from './libs/i18n';
 
 // このように変数にすると1ページ内で複数のeditor,previewインスタンスを作成できない
-// let _editorDomContainer: HTMLElement | null = null;
-let _previewDomContainer: HTMLElement | null = null;
+// let _previewDomContainer: HTMLElement | null = null;
 
-// const TemplateDesigner = {
-//   init: (
-//     domContainer: HTMLElement,
-//     template: Template,
-//     saveTemplate: (t: Template) => void,
-//     size: PageSize
-//   ) => {
-//     _editorDomContainer = domContainer;
-//     const i18n = curriedI18n(lang);
-
-//     ReactDOM.render(
-//       <I18nContext.Provider value={i18n}>
-//         <TemplateDesignerComponent template={template} saveTemplate={saveTemplate} size={size} />
-//       </I18nContext.Provider>,
-//       domContainer
-//     );
-//   },
-//   destroy: () => {
-//     if (_editorDomContainer) {
-//       ReactDOM.unmountComponentAtNode(_editorDomContainer);
-//       _editorDomContainer = null;
-//     }
-//   },
-// };
-
+const destroyedErrMsg = 'Template Designer is already destroyed';
 class TemplateDesigner {
-  private domContainer: HTMLElement;
+  private domContainer: HTMLElement | null;
 
   private template: Template;
 
-  private saveTemplate: (t: Template) => void;
+  private saveTemplateCallback: (t: Template) => void;
 
   private size: PageSize;
 
-  constructor({
-    domContainer,
-    template,
-    saveTemplate,
-    size,
-  }: {
-    domContainer: HTMLElement;
-    template: Template;
-    saveTemplate: (t: Template) => void;
-    size: PageSize;
-  }) {
+  private lang: 'en' | 'ja' = 'en';
+
+  constructor(props: TemplateDesignerProp & { lang?: 'en' | 'ja'; domContainer: HTMLElement }) {
+    const { domContainer, template, saveTemplate, size, lang } = props;
     this.domContainer = domContainer;
     this.template = template;
-    this.saveTemplate = saveTemplate;
+    this.saveTemplateCallback = saveTemplate;
     this.size = size;
+    this.lang = lang || 'en';
     this.render();
   }
 
   public destroy() {
-    if (!this.domContainer) return;
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
     ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.domContainer = null;
+  }
+
+  public saveTemplate() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    this.saveTemplateCallback(this.template);
+  }
+
+  public updateTemplate(template: Template) {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    this.template = template;
+    this.render();
   }
 
   private render() {
-    if (!this.domContainer) return;
-    const i18n = curriedI18n(lang);
-
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    const i18n = curriedI18n(this.lang);
     ReactDOM.render(
       <I18nContext.Provider value={i18n}>
         <TemplateDesignerComponent
           template={this.template}
-          saveTemplate={this.saveTemplate}
+          saveTemplate={this.saveTemplateCallback}
           size={this.size}
+          onChangeTemplate={(template) => {
+            this.template = template;
+          }}
         />
       </I18nContext.Provider>,
       this.domContainer
@@ -85,30 +68,30 @@ class TemplateDesigner {
   }
 }
 
-const Preview = {
-  init: (
-    domContainer: HTMLElement,
-    template: Template,
-    inputs: { [key: string]: string }[],
-    size: PageSize
-  ) => {
-    _previewDomContainer = domContainer;
-    const i18n = curriedI18n(lang);
+// const Preview = {
+//   init: (
+//     domContainer: HTMLElement,
+//     template: Template,
+//     inputs: { [key: string]: string }[],
+//     size: PageSize
+//   ) => {
+//     _previewDomContainer = domContainer;
+//     const i18n = curriedI18n(lang);
 
-    ReactDOM.render(
-      <I18nContext.Provider value={i18n}>
-        <PreviewComponents template={template} inputs={inputs} size={size} />
-      </I18nContext.Provider>,
-      domContainer
-    );
-  },
-  destroy: () => {
-    if (_previewDomContainer) {
-      ReactDOM.unmountComponentAtNode(_previewDomContainer);
-      _previewDomContainer = null;
-    }
-  },
-};
+//     ReactDOM.render(
+//       <I18nContext.Provider value={i18n}>
+//         <PreviewComponents template={template} inputs={inputs} size={size} />
+//       </I18nContext.Provider>,
+//       domContainer
+//     );
+//   },
+//   destroy: () => {
+//     if (_previewDomContainer) {
+//       ReactDOM.unmountComponentAtNode(_previewDomContainer);
+//       _previewDomContainer = null;
+//     }
+//   },
+// };
 
-export default { TemplateDesigner, Preview, blankPdf };
-export { TemplateDesigner, Preview, blankPdf };
+export default { TemplateDesigner, blankPdf };
+export { TemplateDesigner, blankPdf };

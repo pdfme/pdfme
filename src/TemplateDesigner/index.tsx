@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { Template, Schema, TemplateEditorProp, PageSize } from '../libs/type';
+import { Template, Schema, TemplateDesignerProp, PageSize } from '../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { zoom, rulerHeight } from '../libs/constants';
@@ -78,7 +78,12 @@ const moveCommandToChangeSchemasArg = (props: {
   });
 };
 
-const TemplateEditor = ({ template, saveTemplate, size }: TemplateEditorProp) => {
+const TemplateEditor = ({
+  template,
+  saveTemplate,
+  size,
+  onChangeTemplate,
+}: TemplateDesignerProp & { onChangeTemplate: (t: Template) => void }) => {
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);
@@ -144,8 +149,9 @@ const TemplateEditor = ({ template, saveTemplate, size }: TemplateEditorProp) =>
       const _schemas = cloneDeep(schemas);
       _schemas[pageCursor] = newSchemas;
       setSchemas(_schemas);
+      onChangeTemplate(modifiedTemplate);
     },
-    [schemas, pageCursor]
+    [schemas, pageCursor, modifiedTemplate, onChangeTemplate]
   );
 
   const removeSchemas = useCallback(

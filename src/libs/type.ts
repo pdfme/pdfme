@@ -34,12 +34,13 @@ interface BaseProps {
   size: PageSize;
 }
 
-export interface TemplateEditorProp extends BaseProps {
+export interface TemplateDesignerProp extends BaseProps {
   saveTemplate: (template: Template) => void;
 }
 
 export interface PreviewProp extends BaseProps {
   inputs: { [key: string]: string }[];
+  onChange?: (arg: { index: number; value: string; key: string }) => void;
 }
 
 export interface GuidesInterface {
