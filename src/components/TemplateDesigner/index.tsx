@@ -2,13 +2,12 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { Template, Schema, TemplateDesignerProp, PageSize } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { zoom, rulerHeight } from '../../libs/constants';
+import { rulerHeight } from '../../libs/constants';
 import { I18nContext } from '../../libs/i18n';
 import {
   uuid,
   set,
   cloneDeep,
-  debounce,
   round,
   b64toBlob,
   arrayMove,
@@ -22,7 +21,7 @@ import {
   getKeepRatioHeightByWidth,
   getB64BasePdf,
 } from '../../libs/utils';
-import { useUiPreProcessor } from '../../libs/hooks';
+import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 
 const fmtValue = (key: string, value: string) => {
@@ -90,14 +89,12 @@ const TemplateEditor = ({
   const rootRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
-  const basePdf = useRef('');
 
   const i18n = useContext(I18nContext);
 
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,
-    basePdf: basePdf.current,
     offset: rulerHeight,
   });
 
@@ -106,41 +103,20 @@ const TemplateEditor = ({
   const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
-  const modifiedTemplate = fmtTemplate(
-    Object.assign(template, { basePdf: basePdf.current || template.basePdf }),
-    schemas
-  );
-
   const onEditEnd = () => setActiveElements([]);
 
-  const onScroll = debounce(() => {
-    if (!pageSizes[0] || !rootRef.current) {
-      return;
-    }
-
-    const scroll = rootRef.current.scrollTop;
-    const { top } = rootRef.current.getBoundingClientRect();
-    const pageHeights = pageSizes.reduce((acc, cur, i) => {
-      let value = cur.height * zoom * scale;
-      if (i === 0) {
-        value += top - value / 2;
-      } else {
-        value += acc[i - 1];
-      }
-
-      return acc.concat(value);
-    }, [] as number[]);
-    let _pageCursor = 0;
-    pageHeights.forEach((ph, i) => {
-      if (scroll > ph) {
-        _pageCursor = i + 1 >= pageHeights.length ? pageHeights.length - 1 : i + 1;
-      }
-    });
-    if (_pageCursor !== pageCursor) {
-      setPageCursor(_pageCursor);
+  useScrollPageCursor({
+    rootRef,
+    pageSizes,
+    scale,
+    pageCursor,
+    onChangePageCursor: (p) => {
+      setPageCursor(p);
       onEditEnd();
-    }
-  }, 100);
+    },
+  });
+
+  const modifiedTemplate = fmtTemplate(template, schemas);
 
   const commitSchemas = useCallback(
     (newSchemas: Schema[]) => {
@@ -185,7 +161,6 @@ const TemplateEditor = ({
   );
 
   const initEvents = useCallback(() => {
-    rootRef.current?.addEventListener('scroll', onScroll);
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
 
@@ -243,7 +218,6 @@ const TemplateEditor = ({
     changeSchemas,
     commitSchemas,
     modifiedTemplate,
-    onScroll,
     pageCursor,
     pageSizes,
     removeSchemas,
@@ -252,14 +226,13 @@ const TemplateEditor = ({
   ]);
 
   const destroyEvents = useCallback(() => {
-    rootRef.current?.removeEventListener('scroll', onScroll);
     destroyShortCuts();
-  }, [onScroll]);
+  }, []);
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
-    basePdf.current = await getB64BasePdf(newTemplate);
-    const pdfBlob = b64toBlob(basePdf.current);
+    const basePdf = await getB64BasePdf(newTemplate);
+    const pdfBlob = b64toBlob(basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
     const _schemas = (
       newSchemas.length < _pageSizes.length

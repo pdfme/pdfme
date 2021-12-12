@@ -1,0 +1,21 @@
+.wrapper {
+  position: fixed;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.leftBtn {
+  display: flex;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.rightBtn {
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}

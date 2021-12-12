@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { PreviewUIProp } from '../../libs/type';
-import { rulerHeight } from '../../libs/constants';
+import { zoom, rulerHeight } from '../../libs/constants';
+import Pager from './Pager';
 import UnitPager from './UnitPager';
 import Root from '../Root';
 import Paper from '../Paper';
 import Schema from '../Schemas';
-import { useUiPreProcessor } from '../../libs/hooks';
+import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
@@ -14,7 +15,18 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
     offset: rulerHeight,
   });
 
+  const rootRef = useRef<HTMLDivElement>(null);
+
   const [unitCursor, setUnitCursor] = useState(0);
+  const [pageCursor, setPageCursor] = useState(0);
+
+  useScrollPageCursor({
+    rootRef,
+    pageSizes,
+    scale,
+    pageCursor,
+    onChangePageCursor: (p) => setPageCursor(p),
+  });
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, key, value });
@@ -24,8 +36,20 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
   const { schemas } = template;
 
   return (
-    <Root template={template} size={size} scale={scale}>
+    <Root ref={rootRef} template={template} size={size} scale={scale}>
       <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
+      <Pager
+        pageCursor={pageCursor}
+        pageNum={schemas.length}
+        setPageCursor={(p) => {
+          // TODO ここから 3ページ以上のPDFでテストする
+          if (!rootRef.current) return;
+          rootRef.current.scrollTop = pageSizes
+            .slice(0, p)
+            .reduce((acc, cur) => acc + cur.height * zoom * scale + rulerHeight, 0);
+          setPageCursor(p);
+        }}
+      />
       <Paper
         scale={scale}
         schemas={schemas}
