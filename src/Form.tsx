@@ -1,11 +1,7 @@
 import React from 'react';
-import { PageSize, Template } from './libs/type';
+import { PreviewProp } from './libs/type';
 import Preview from './components/Preview';
 
-const Form = (props: {
-  template: Template;
-  inputs: { [key: string]: string }[];
-  size: PageSize;
-}) => <Preview {...props} />;
+const Form = (props: PreviewProp) => <Preview {...props} />;
 
 export default Form;

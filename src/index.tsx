@@ -1,34 +1,31 @@
 import React from 'react';
 import TemplateDesignerComponent from './TemplateDesigner';
-// TODO components/Previewではなく、./Form, ./Viewerを使う
-import PreviewComponents from './components/Preview';
+import ViewerComponent from './Viewer';
+import FormComponent from './Form';
 import ReactDOM from 'react-dom';
-import { TemplateDesignerProp, PageSize, Template } from './libs/type';
+import { TemplateDesignerProp, PreviewProp, PageSize, Template } from './libs/type';
 import { blankPdf } from './libs/constants';
 import { I18nContext, curriedI18n } from './libs/i18n';
 
-// このように変数にすると1ページ内で複数のeditor,previewインスタンスを作成できない
-// let _previewDomContainer: HTMLElement | null = null;
-
-const destroyedErrMsg = 'Template Designer is already destroyed';
+const destroyedErrMsg = 'already destroyed';
 class TemplateDesigner {
   private domContainer: HTMLElement | null;
 
   private template: Template;
 
-  private saveTemplateCallback: (t: Template) => void;
-
   private size: PageSize;
 
   private lang: 'en' | 'ja' = 'en';
 
+  private saveTemplateCallback: (t: Template) => void;
+
   constructor(props: TemplateDesignerProp & { lang?: 'en' | 'ja'; domContainer: HTMLElement }) {
-    const { domContainer, template, saveTemplate, size, lang } = props;
+    const { domContainer, template, size, lang, saveTemplate } = props;
     this.domContainer = domContainer;
     this.template = template;
-    this.saveTemplateCallback = saveTemplate;
     this.size = size;
     this.lang = lang || 'en';
+    this.saveTemplateCallback = saveTemplate;
     this.render();
   }
 
@@ -68,30 +65,115 @@ class TemplateDesigner {
   }
 }
 
-// const Preview = {
-//   init: (
-//     domContainer: HTMLElement,
-//     template: Template,
-//     inputs: { [key: string]: string }[],
-//     size: PageSize
-//   ) => {
-//     _previewDomContainer = domContainer;
-//     const i18n = curriedI18n(lang);
+class Viewer {
+  private domContainer: HTMLElement | null;
 
-//     ReactDOM.render(
-//       <I18nContext.Provider value={i18n}>
-//         <PreviewComponents template={template} inputs={inputs} size={size} />
-//       </I18nContext.Provider>,
-//       domContainer
-//     );
-//   },
-//   destroy: () => {
-//     if (_previewDomContainer) {
-//       ReactDOM.unmountComponentAtNode(_previewDomContainer);
-//       _previewDomContainer = null;
-//     }
-//   },
-// };
+  private template: Template;
 
-export default { TemplateDesigner, blankPdf };
-export { TemplateDesigner, blankPdf };
+  private size: PageSize;
+
+  private lang: 'en' | 'ja' = 'en';
+
+  private inputs: { [key: string]: string }[];
+
+  constructor(props: PreviewProp & { lang?: 'en' | 'ja'; domContainer: HTMLElement }) {
+    const { domContainer, template, size, lang, inputs } = props;
+    this.domContainer = domContainer;
+    this.template = template;
+    this.size = size;
+    this.lang = lang || 'en';
+    this.inputs = inputs;
+    this.render();
+  }
+
+  public getInputs() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+
+    return this.inputs;
+  }
+
+  public setInputs(inputs: { [key: string]: string }[]) {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    this.inputs = inputs;
+    this.render();
+  }
+
+  public destroy() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.domContainer = null;
+  }
+
+  private render() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    const i18n = curriedI18n(this.lang);
+    ReactDOM.render(
+      <I18nContext.Provider value={i18n}>
+        <ViewerComponent template={this.template} size={this.size} inputs={this.inputs} />
+      </I18nContext.Provider>,
+      this.domContainer
+    );
+  }
+}
+
+class Form {
+  private domContainer: HTMLElement | null;
+
+  private template: Template;
+
+  private size: PageSize;
+
+  private lang: 'en' | 'ja' = 'en';
+
+  private inputs: { [key: string]: string }[];
+
+  constructor(props: PreviewProp & { lang?: 'en' | 'ja'; domContainer: HTMLElement }) {
+    const { domContainer, template, size, lang, inputs } = props;
+    this.domContainer = domContainer;
+    this.template = template;
+    this.size = size;
+    this.lang = lang || 'en';
+    this.inputs = inputs;
+    this.render();
+  }
+
+  public getInputs() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+
+    return this.inputs;
+  }
+
+  public setInputs(inputs: { [key: string]: string }[]) {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    this.inputs = inputs;
+    this.render();
+  }
+
+  public destroy() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.domContainer = null;
+  }
+
+  private render() {
+    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    const i18n = curriedI18n(this.lang);
+    ReactDOM.render(
+      <I18nContext.Provider value={i18n}>
+        <FormComponent
+          template={this.template}
+          size={this.size}
+          inputs={this.inputs}
+          onChange={({ index, value, key }: { index: number; value: string; key: string }) => {
+            this.inputs[index][key] = value;
+            this.render();
+          }}
+        />
+      </I18nContext.Provider>,
+      this.domContainer
+    );
+  }
+}
+
+export default { TemplateDesigner, Viewer, Form, blankPdf };
+export { TemplateDesigner, Viewer, Form, blankPdf };

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Webpack App</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body style="margin: 0">
+    <div>
+      <button onclick="init()">init</button>
+      /
+      <button onclick="destroy()">destroy</button>
+      /
+      <button onclick="getInputs()">getInputs</button>
+      /
+      <button onclick="setInputs()">setInputs</button>
+    </div>
+    <div id="app"></div>
+    <script>
+      const size = { height: 900, width: 900 };
+      const domContainer = document.getElementById('app');
+      const getSampleTemplate = () => ({
+        columns: ['field1', 'field2'],
+        sampledata: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
+        fontName: '',
+        basePdf: LabelmakeUi.blankPdf,
+        schemas: [
+          {
+            field1: {
+              type: 'text',
+              position: { x: 20, y: 20 },
+              width: 100,
+              height: 15,
+              alignment: 'left',
+              fontSize: 30,
+              characterSpacing: 0,
+              lineHeight: 1,
+            },
+            field2: {
+              type: 'text',
+              position: { x: 20, y: 35 },
+              width: 100,
+              height: 40,
+              alignment: 'left',
+              fontSize: 20,
+              characterSpacing: 0,
+              lineHeight: 1,
+            },
+          },
+        ],
+      });
+
+      let editor = null;
+
+      function init() {
+        editor = new LabelmakeUi.Viewer({
+          domContainer,
+          template: getSampleTemplate(),
+          size,
+          inputs: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
+        });
+      }
+
+      function destroy() {
+        editor.destroy();
+      }
+
+      function getInputs() {
+        console.log(editor.getInputs());
+      }
+
+      function setInputs() {
+        editor.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
+      }
+
+      window.onload = init;
+    </script>
+  </body>
+</html>

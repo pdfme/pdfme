@@ -17,6 +17,8 @@ const Pager = ({
 }) => {
   const i18n = useContext(I18nContext);
 
+  if (pageNum <= 1) return <></>;
+
   return (
     <div className={styles.wrapper}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
