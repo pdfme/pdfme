@@ -37,7 +37,7 @@ const Paper = ({
 
       return (
         <div
-          key={index}
+          key={index + JSON.stringify(paperSize)}
           ref={(e) => {
             if (e && paperRefs) {
               paperRefs.current[index] = e;
