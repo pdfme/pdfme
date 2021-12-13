@@ -16,6 +16,11 @@
       <button onclick="saveTemplate()">saveTemplate</button>
       /
       <button onclick="updateTemplate()">updateTemplate</button>
+      /
+      <label>
+        loadTemplate
+        <input type="file" accept="application/json" onchange="loadTemplate(this.files[0])" />
+      </label>
     </div>
     <div id="app"></div>
     <script src="./index.js"></script>
@@ -44,6 +49,14 @@
 
       function updateTemplate() {
         editor.updateTemplate(getSampleTemplate());
+      }
+
+      function loadTemplate(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          editor.updateTemplate(JSON.parse(reader.result));
+        };
+        reader.readAsText(file);
       }
 
       window.onload = init;

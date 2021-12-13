@@ -62,7 +62,7 @@ export const useScrollPageCursor = ({
     const scroll = rootRef.current.scrollTop;
     const { top } = rootRef.current.getBoundingClientRect();
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
-      let value = cur.height * zoom * scale + rulerHeight;
+      let value = (cur.height * zoom + rulerHeight) * scale;
       if (i === 0) {
         value += top - value / 2;
       } else {

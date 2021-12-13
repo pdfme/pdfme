@@ -42,11 +42,10 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
         pageCursor={pageCursor}
         pageNum={schemas.length}
         setPageCursor={(p) => {
-          // TODO ここから 3ページ以上のPDFでテストする
           if (!rootRef.current) return;
           rootRef.current.scrollTop = pageSizes
             .slice(0, p)
-            .reduce((acc, cur) => acc + cur.height * zoom * scale + rulerHeight, 0);
+            .reduce((acc, cur) => acc + (cur.height * zoom + rulerHeight) * scale, 0);
           setPageCursor(p);
         }}
       />
