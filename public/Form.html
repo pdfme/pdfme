@@ -16,6 +16,8 @@
       <button onclick="getInputs()">getInputs</button>
       /
       <button onclick="setInputs()">setInputs</button>
+      /
+      <button onclick="generate()">generate</button>
     </div>
     <div id="app"></div>
     <script src="./index.js"></script>
@@ -46,6 +48,15 @@
 
       function setInputs() {
         editor.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
+      }
+
+      function generate() {
+        LabelmakeUi.generate({ inputs: editor.getInputs(), template: getTemplate() }).then(
+          (pdf) => {
+            const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+            window.open(URL.createObjectURL(blob));
+          }
+        );
       }
 
       window.onload = init;

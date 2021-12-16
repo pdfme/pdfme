@@ -9,6 +9,7 @@ import qrcode from '../assets/barcodeExamples/qrcode.png';
 import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
 import _imageExample from '../assets/imageExample.png';
+import { BarCodeType } from './type';
 
 export const destroyedErrMsg = 'this instance is already destroyed';
 
@@ -28,11 +29,11 @@ export const imageExample = _imageExample;
 export const zoom = 3.7795275591;
 export const rulerHeight = 30;
 export const selectableClassName = 'selectable';
-export const barcodeList = [
+export const barcodeList: BarCodeType[] = [
   'qrcode',
-  'japanpost',
   'ean13',
   'ean8',
+  'japanpost',
   'code39',
   'code128',
   'nw7',

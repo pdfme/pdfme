@@ -43,7 +43,7 @@ const Schema = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) 
     <Wapper {...props}>
       {props.schema.type === 'text' && <TextSchema {...r} {...props} />}
       {props.schema.type === 'image' && <ImageSchema {...r} {...props} />}
-      {barcodeList.includes(props.schema.type) && <BarcodeSchema {...r} {...props} />}
+      {(barcodeList as string[]).includes(props.schema.type) && <BarcodeSchema {...r} {...props} />}
     </Wapper>
   );
 };

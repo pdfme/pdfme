@@ -1,15 +1,74 @@
-import type {
-  TemplateSchema as _TemplateSchema,
-  Template as _Template,
-  PageSize as _PageSize,
-} from 'labelmake/dist/types/type';
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg } from './constants';
 
-export type PageSize = _PageSize;
+type TemplateType =
+  | 'text'
+  | 'image'
+  | 'qrcode'
+  | 'japanpost'
+  | 'ean13'
+  | 'ean8'
+  | 'code39'
+  | 'code128'
+  | 'nw7'
+  | 'itf14'
+  | 'upca'
+  | 'upce';
 
-export type TemplateSchema = _TemplateSchema;
+export type BarCodeType = Exclude<TemplateType, 'text' | 'image'>;
+
+export type Alignment = 'left' | 'right' | 'center';
+
+export interface PageSize {
+  height: number;
+  width: number;
+}
+
+interface SubsetFont {
+  data: string | Uint8Array | ArrayBuffer;
+  subset: boolean;
+}
+
+interface Font {
+  [key: string]: string | Uint8Array | ArrayBuffer | SubsetFont;
+}
+
+export interface Args {
+  inputs: { [key: string]: string }[];
+  template: Template;
+  font?: Font;
+  splitThreshold?: number;
+}
+
+export const isPageSize = (args: PageSize | string | Uint8Array | ArrayBuffer): args is PageSize =>
+  typeof args === 'object' && 'width' in args;
+
+export const isSubsetFont = (v: string | Uint8Array | ArrayBuffer | SubsetFont): v is SubsetFont =>
+  typeof v === 'object' && !!v && 'data' in v;
+
+export interface Template {
+  schemas: { [key: string]: TemplateSchema }[];
+  basePdf: PageSize | string | Uint8Array | ArrayBuffer;
+  fontName?: string;
+  sampledata: { [key: string]: string }[];
+  columns: string[];
+}
+
+export interface TemplateSchema {
+  type: TemplateType;
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+  rotate?: number;
+  alignment?: Alignment;
+  fontSize?: number;
+  fontName?: string;
+  fontColor?: string;
+  backgroundColor?: string;
+  characterSpacing?: number;
+  lineHeight?: number;
+}
 
 export type SchemaUIProp = {
   schema: Schema;
@@ -17,11 +76,6 @@ export type SchemaUIProp = {
   placeholder: string;
   tabIndex: number;
   onChange: (value: string) => void;
-};
-
-export type Template = _Template & {
-  sampledata: { [key: string]: string }[];
-  columns: string[];
 };
 
 export type Schema = TemplateSchema & {

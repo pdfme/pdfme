@@ -2471,6 +2471,13 @@
     mkdirp "^1.0.4"
     path-browserify "^1.0.1"
 
+"@types/bwip-js@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@types/bwip-js/-/bwip-js-2.1.1.tgz#9171ddbb1877913d12e89cdefd23d2f4d59189d4"
+  integrity sha512-Y9zuCLtplGGsFC/gFeAzAixW5I6B8/4u/ySlOljsbeznocmF/VlRtDR+5KgWcL4cLnajkIwBkioB7c0oOXL1Uw==
+  dependencies:
+    "@types/node" "*"
+
 "@types/color-convert@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/color-convert/-/color-convert-2.0.0.tgz#8f5ee6b9e863dcbee5703f5a517ffb13d3ea4e22"
@@ -5316,11 +5323,6 @@ encodeurl@~1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
   integrity sha1-rT/0yG7C0CkyL1oCw6mmBslbP1k=
 
-encoding-japanese@^1.0.30:
-  version "1.0.30"
-  resolved "https://registry.yarnpkg.com/encoding-japanese/-/encoding-japanese-1.0.30.tgz#537c4d62881767925d601acb4c79fb14db81703a"
-  integrity sha512-bd/DFLAoJetvv7ar/KIpE3CNO8wEuyrt9Xuw6nSMiZ+Vrz/Q21BPsMHvARL2Wz6IKHKXgb+DWZqtRg1vql9cBg==
-
 end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   version "1.4.4"
   resolved "https://registry.yarnpkg.com/end-of-stream/-/end-of-stream-1.4.4.tgz#5ae64a5f45057baf3626ec14da0ca5e4b2431eb0"
@@ -7908,16 +7910,6 @@ known-css-properties@^0.21.0:
   resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.21.0.tgz#15fbd0bbb83447f3ce09d8af247ed47c68ede80d"
   integrity sha512-sZLUnTqimCkvkgRS+kbPlYW5o8q5w1cu+uIisKpEWkj31I8mx8kNG162DwRav8Zirkva6N5uoFsm9kzK4mUXjw==
 
-labelmake@^2.0.19:
-  version "2.0.21"
-  resolved "https://registry.yarnpkg.com/labelmake/-/labelmake-2.0.21.tgz#19072c27f0dd1f8f9b5b2d39a59f8bdaf17f4a26"
-  integrity sha512-IZMxPBWE+u7SXeslcYHhNm68u2UAIltU7KFBLSqn5VZ5MqKoF7PW7amtFtkFeOP0u4Su8ceGJTBrCBNmM1UL3g==
-  dependencies:
-    "@pdf-lib/fontkit" "^1.1.1"
-    bwip-js "^3.0.4"
-    encoding-japanese "^1.0.30"
-    pdf-lib "^1.16.0"
-
 lazy-universal-dotenv@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/lazy-universal-dotenv/-/lazy-universal-dotenv-3.0.1.tgz#a6c8938414bca426ab8c9463940da451a911db38"
@@ -9311,7 +9303,7 @@ pbkdf2@^3.0.3:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-pdf-lib@^1.16.0:
+pdf-lib@^1.17.1:
   version "1.17.1"
   resolved "https://registry.yarnpkg.com/pdf-lib/-/pdf-lib-1.17.1.tgz#9e7dd21261a0c1fb17992580885b39e7d08f451f"
   integrity sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==

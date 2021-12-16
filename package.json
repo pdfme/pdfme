@@ -77,12 +77,15 @@
     "react-dom": "^17.0.2"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "@tippyjs/react": "^4.2.5",
+    "@types/bwip-js": "^2.1.1",
+    "bwip-js": "^3.0.4",
     "debounce": "^1.2.1",
     "hotkeys-js": "^3.8.7",
-    "labelmake": "^2.0.19",
     "lodash.set": "^4.3.2",
     "nanoid": "^3.1.25",
+    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^2.9.359",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
