@@ -12,6 +12,8 @@
     "clean": "rimraf dist",
     "build": "NODE_ENV=production webpack --mode production",
     "lint": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --coverage --watch",
     "lint:watch": "tsc -w --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
@@ -32,7 +34,10 @@
     "@storybook/builder-webpack5": "^6.3.7",
     "@storybook/manager-webpack5": "^6.3.7",
     "@storybook/react": "^6.3.7",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
     "@types/debounce": "^1.2.0",
+    "@types/jest": "^27.0.3",
     "@types/lodash.set": "^4.3.6",
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.19",
@@ -51,6 +56,7 @@
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "html-webpack-plugin": "^5.3.2",
+    "jest": "^27.4.5",
     "mini-css-extract-plugin": "^2.2.0",
     "node-sass": "^6.0.1",
     "postcss-loader": "^6.1.1",
@@ -63,6 +69,7 @@
     "stylelint-config-recommended": "^5.0.0",
     "stylelint-scss": "^3.20.1",
     "stylelint-webpack-plugin": "^3.0.1",
+    "ts-jest": "^27.1.2",
     "ts-loader": "^9.2.5",
     "ts-prune": "^0.10.0",
     "typescript": "^4.3.5",
@@ -94,5 +101,29 @@
     "react-sortable-hoc": "^2.0.0",
     "ua-parser-js": "^0.7.28",
     "worker-loader": "^3.0.8"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assetsTransformer.js",
+      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.tsx$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/*.test.ts",
+      "**/*.test.tsx"
+    ]
   }
 }
