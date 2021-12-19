@@ -12,9 +12,9 @@
     "clean": "rimraf dist",
     "build": "NODE_ENV=production webpack --mode production",
     "lint": "tsc --noEmit",
+    "lint:watch": "tsc -w --noEmit",
     "test": "jest",
     "test:watch": "jest --coverage --watch",
-    "lint:watch": "tsc -w --noEmit",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "prune": "ts-prune src"
@@ -25,6 +25,27 @@
   ],
   "author": "hand-dot",
   "license": "SEE LICENSE IN LICENSE.txt",
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@tippyjs/react": "^4.2.5",
+    "@types/bwip-js": "^2.1.1",
+    "bwip-js": "^3.0.4",
+    "hotkeys-js": "^3.8.7",
+    "lodash.set": "^4.3.2",
+    "nanoid": "^3.1.25",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^2.9.359",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-moveable": "^0.29.0",
+    "react-selecto": "^1.12.0",
+    "react-sortable-hoc": "^2.0.0",
+    "worker-loader": "^3.0.8"
+  },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@scena/react-guides": "^0.16.0",
@@ -61,6 +82,7 @@
     "jsqr": "^1.4.0",
     "mini-css-extract-plugin": "^2.2.0",
     "node-sass": "^6.0.1",
+    "pdf2json": "^2.0.0",
     "pngjs": "^6.0.0",
     "postcss-loader": "^6.1.1",
     "postcss-prefixer": "^2.1.3",
@@ -81,27 +103,6 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.0.0"
-  },
-  "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
-  },
-  "dependencies": {
-    "@pdf-lib/fontkit": "^1.1.1",
-    "@tippyjs/react": "^4.2.5",
-    "@types/bwip-js": "^2.1.1",
-    "bwip-js": "^3.0.4",
-    "hotkeys-js": "^3.8.7",
-    "lodash.set": "^4.3.2",
-    "nanoid": "^3.1.25",
-    "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^2.9.359",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-moveable": "^0.29.0",
-    "react-selecto": "^1.12.0",
-    "react-sortable-hoc": "^2.0.0",
-    "worker-loader": "^3.0.8"
   },
   "jest": {
     "moduleNameMapper": {

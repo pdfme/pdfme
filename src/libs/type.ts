@@ -51,8 +51,8 @@ export interface Template {
   schemas: { [key: string]: TemplateSchema }[];
   basePdf: PageSize | string | Uint8Array | ArrayBuffer;
   fontName?: string;
-  sampledata: { [key: string]: string }[];
-  columns: string[];
+  sampledata?: { [key: string]: string }[];
+  columns?: string[];
 }
 
 // TODO 画像やバーコードにはfontColorが使えないので無駄なプロパティ。typeで制御したい。

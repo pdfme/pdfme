@@ -63,8 +63,8 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
                 key={key}
                 schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
                 editable={editable}
-                placeholder={template.sampledata[0][key] || ''}
-                tabIndex={(template.columns.findIndex((c) => c === key) || 0) + 100}
+                placeholder={template.sampledata ? template.sampledata[0][key] : ''}
+                tabIndex={((template.columns ?? []).findIndex((c) => c === key) || 0) + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
                 border={editable ? '1px dashed #4af' : 'transparent'}
               />

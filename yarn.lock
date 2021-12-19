@@ -3553,6 +3553,11 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-1.6.0.tgz#2c275aa05c895eccebbfc34cfb223c6e8bd591a2"
   integrity sha512-ZkVeqEmRpBV2GHvjjUZqEai2PpUbuq8Bqd//vEYsp63J8WyexI8ppCqVS3Zs0QADf6aWuPdU+0XsPI647PVlQA==
 
+"@xmldom/xmldom@^0.7.5":
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.5.tgz#09fa51e356d07d0be200642b0e4f91d8e6dd408d"
+  integrity sha512-V3BIhmY36fXZ1OtVcI9W+FxQqxVLsPKcNjWigIaa81dLC9IolJl5Mt4Cvhmr0flUnjSpTdrbMTSbXqYqV5dT6A==
+
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"
@@ -10471,6 +10476,13 @@ pdf-lib@^1.17.1:
     "@pdf-lib/upng" "^1.0.1"
     pako "^1.0.11"
     tslib "^1.11.1"
+
+pdf2json@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/pdf2json/-/pdf2json-2.0.0.tgz#6112b70456c57ecd78bc57f4eecfe423aef6b2d0"
+  integrity sha512-+FZy7GSvLOLc+zksg0SoMvXqIqcku5lBlEPuYJJkhMWB2x6yfthzEhhSbZc20UheClMPagH/+NXnMRbvQMQR1w==
+  dependencies:
+    "@xmldom/xmldom" "^0.7.5"
 
 pdfjs-dist@*, pdfjs-dist@^2.9.359:
   version "2.10.377"

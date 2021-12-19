@@ -175,17 +175,18 @@ export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
       template.schemas[i]
         ? Object.entries(template.schemas[i])
             .sort((a, b) => {
-              const aIndex = template.columns.findIndex((c) => c === a[0]);
-              const bIndex = template.columns.findIndex((c) => c === b[0]);
+              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
+              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
 
               return aIndex > bIndex ? 1 : -1;
             })
             .map((e) => {
               const [key, value] = e;
+              const data = template.sampledata ? template.sampledata[0][key] : '';
 
               return Object.assign(value, {
                 key,
-                data: template.sampledata[0][key],
+                data,
                 id: uuid(),
               });
             })
@@ -211,53 +212,6 @@ export const getInitialSchema = (): Schema => ({
 
 const isEmpty = (obj: { [key: string]: TemplateSchema }) => {
   return !Object.keys(obj).length;
-};
-
-/* eslint complexity: ["error", 12]*/
-const tempalteDataTest = (template: Template) => {
-  const sampledata =
-    template.sampledata.length > 0
-      ? Object.entries(template.sampledata[0]).every((entry) => {
-          const [key, value] = entry;
-
-          return typeof key === 'string' && typeof value === 'string';
-        })
-      : true;
-  const schemas = template.schemas.map((schema) =>
-    Object.entries(schema).every((entry) => {
-      const [key, value] = entry;
-
-      return (
-        isEmpty({ [key]: value }) ||
-        (typeof key === 'string' &&
-          typeof value.type === 'string' &&
-          typeof value.position.x === 'number' &&
-          typeof value.position.y === 'number' &&
-          typeof value.width === 'number' &&
-          typeof value.height === 'number' &&
-          ['left', 'right', 'center'].includes(value.alignment || '') &&
-          typeof value.fontSize === 'number' &&
-          typeof value.characterSpacing === 'number' &&
-          typeof value.lineHeight === 'number')
-      );
-    })
-  );
-  const columns = template.columns.every(
-    (column) => typeof column === 'string' && typeof column === 'string'
-  );
-  const fontName = typeof template.fontName === 'string';
-  const basePdf = typeof template.basePdf === 'string';
-
-  return (
-    sampledata &&
-    schemas &&
-    columns &&
-    basePdf &&
-    fontName &&
-    template.schemas
-      .map((schema) => Object.keys(schema).length)
-      .reduce((acc, cur) => acc + cur, 0) === template.columns.length
-  );
 };
 
 export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
