@@ -10,7 +10,16 @@ import {
   TransformationMatrix,
 } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { uniq, hex2rgb, mm2pt, calcX, calcY, getSplittedLines, createBarCode } from './libs/utils';
+import {
+  uniq,
+  hex2rgb,
+  mm2pt,
+  calcX,
+  calcY,
+  getSplittedLines,
+  createBarCode,
+  getB64BasePdf,
+} from './libs/utils';
 import { Args, isPageSize, isSubsetFont } from './libs/type';
 import { barcodeList } from './libs/constants';
 
@@ -71,7 +80,8 @@ const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) =>
     trimBox: { x: number; y: number; width: number; height: number };
   }[] = [];
   if (!isPageSize(basePdf)) {
-    const embedPdf = await PDFDocument.load(basePdf);
+    const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(template) : basePdf;
+    const embedPdf = await PDFDocument.load(willLoadPdf);
     const embedPdfPages = embedPdf.getPages();
     embedPdfBoxes = embedPdfPages.map((p) => {
       const mediaBox = p.getMediaBox();
@@ -89,10 +99,10 @@ const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) =>
 
     embeddedPages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
-  for (let i = 0; i < inputs.length; i++) {
+  for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
-    for (let j = 0; j < (isBlank ? schemas : embeddedPages).length; j++) {
+    for (let j = 0; j < (isBlank ? schemas : embeddedPages).length; j += 1) {
       const embeddedPage = embeddedPages[j];
       const pageWidth = isPageSize(basePdf) ? mm2pt(basePdf.width) : embeddedPage.width;
       const pageHeight = isPageSize(basePdf) ? mm2pt(basePdf.height) : embeddedPage.height;
@@ -105,7 +115,7 @@ const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) =>
         page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
       }
       if (!schemas[j]) continue;
-      for (let l = 0; l < keys.length; l++) {
+      for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
         const schema = schemas[j][key];
         const input = inputObj[key];

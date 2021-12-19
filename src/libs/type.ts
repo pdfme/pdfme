@@ -18,7 +18,7 @@ type TemplateType =
 
 export type BarCodeType = Exclude<TemplateType, 'text' | 'image'>;
 
-export type Alignment = 'left' | 'right' | 'center';
+type Alignment = 'left' | 'right' | 'center';
 
 export interface PageSize {
   height: number;
@@ -55,6 +55,7 @@ export interface Template {
   columns: string[];
 }
 
+// TODO 画像やバーコードにはfontColorが使えないので無駄なプロパティ。typeで制御したい。
 export interface TemplateSchema {
   type: TemplateType;
   position: { x: number; y: number };

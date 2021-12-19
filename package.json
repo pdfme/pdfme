@@ -88,7 +88,6 @@
     "@tippyjs/react": "^4.2.5",
     "@types/bwip-js": "^2.1.1",
     "bwip-js": "^3.0.4",
-    "debounce": "^1.2.1",
     "hotkeys-js": "^3.8.7",
     "lodash.set": "^4.3.2",
     "nanoid": "^3.1.25",
@@ -99,7 +98,6 @@
     "react-moveable": "^0.29.0",
     "react-selecto": "^1.12.0",
     "react-sortable-hoc": "^2.0.0",
-    "ua-parser-js": "^0.7.28",
     "worker-loader": "^3.0.8"
   },
   "jest": {

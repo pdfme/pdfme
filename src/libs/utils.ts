@@ -6,17 +6,14 @@ import * as pdfjsLib from 'pdfjs-dist';
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
-import { debounce as _debounce } from 'debounce';
-import { UAParser } from 'ua-parser-js';
 import hotkeys from 'hotkeys-js';
 import { PageSize, Template, TemplateSchema, Schema, BarCodeType } from './type';
 
 export const uuid = nanoid;
 export const set = _set;
-export const debounce = _debounce;
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
-export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
+const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
     fileReader.addEventListener('load', (e) => {
@@ -50,14 +47,6 @@ export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'ar
   });
 };
 
-export const blob2File = (theBlob: Blob, fileName: string): File => {
-  const b: any = theBlob;
-  b.lastModifiedDate = new Date();
-  b.name = fileName;
-
-  return theBlob as File;
-};
-
 const shift = (number: number, precision: number, reverseShift: boolean) => {
   if (reverseShift) {
     precision = -precision;
@@ -80,13 +69,6 @@ export const b64toBlob = (base64: string) => {
   }
 
   return new Blob([buffer.buffer], { type: mimeType });
-};
-
-export const isIos = () => {
-  const parser = new UAParser();
-  const os = parser.getOS().name;
-
-  return os === 'iOS';
 };
 
 export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
@@ -281,58 +263,6 @@ const tempalteDataTest = (template: Template) => {
 };
 
 export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
-
-export const fmtTemplateFromJson = (file: File) => {
-  return readFile(file, 'text').then((jsonStr) => {
-    try {
-      const templateFromJson: Template = JSON.parse(jsonStr as string);
-      templateFromJson.fontName = '';
-      const flatSchemaLength = templateFromJson.schemas
-        .map((schema) => Object.keys(schema).length)
-        .reduce((acc, cur) => acc + cur, 0);
-      // columns
-      if (!templateFromJson.columns || flatSchemaLength !== templateFromJson.columns.length) {
-        templateFromJson.columns = flatten(
-          templateFromJson.schemas.map((schema) => Object.keys(schema))
-        );
-      }
-      // sampledata
-      if (
-        !templateFromJson.sampledata ||
-        !Array.isArray(templateFromJson.sampledata) ||
-        !templateFromJson.sampledata[0] ||
-        flatSchemaLength !== Object.keys(templateFromJson.sampledata[0]).length
-      ) {
-        templateFromJson.sampledata = [
-          templateFromJson.schemas.reduce(
-            (acc, cur) =>
-              Object.assign(
-                acc,
-                Object.keys(cur).reduce(
-                  (a, c) => Object.assign(a, { [c]: '' }),
-                  {} as { [key: string]: string }
-                )
-              ),
-            {} as { [key: string]: string }
-          ),
-        ];
-      }
-      // basePdf
-      if (!templateFromJson.basePdf || typeof templateFromJson.basePdf !== 'string') {
-        templateFromJson.basePdf = blankPdf;
-      }
-      if (tempalteDataTest(templateFromJson)) {
-        return Promise.resolve(templateFromJson);
-      }
-
-      return Promise.reject(
-        "Invalid template data: This Template can't load. invalid template data."
-      );
-    } catch (e) {
-      return Promise.reject("Invalid template data: This Template can't load. invalid JSON.");
-    }
-  });
-};
 
 export const initShortCuts = (arg: {
   move: (command: 'up' | 'down' | 'left' | 'right', isShift: boolean) => void;
@@ -655,11 +585,11 @@ export const calcY = (y: number, height: number, itemHeight: number) =>
 type IsOverEval = (testString: string) => boolean;
 /**
  * Incrementally check the current line for it's real length
- * and return the position where it exceeds the bbox width.
+ * and return the position where it exceeds the box width.
  *
  * return `null` to indicate if inputLine is shorter as the available bbox
  */
-export const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
+const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
   for (let i = 0; i <= inputLine.length; i += 1) {
     if (isOverEval(inputLine.substr(0, i))) {
       return i;
@@ -671,7 +601,7 @@ export const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
 
 /**
  * Get position of the split. Split the exceeding line at
- * the last whitepsace bevor it exceeds the bounding box width.
+ * the last whitespace over it exceeds the bounding box width.
  */
 const getSplitPosition = (inputLine: string, isOverEval: IsOverEval) => {
   const overPos = getOverPosition(inputLine, isOverEval);
@@ -683,14 +613,14 @@ const getSplitPosition = (inputLine: string, isOverEval: IsOverEval) => {
   while (inputLine[overPosTmp] !== ' ' && overPosTmp >= 0) overPosTmp -= 1;
   /**
    * for very long lines with no whitespace use the original overPos and
-   * split one char bevor so we do not overfill the bbox
+   * split one char over so we do not overfill the box
    */
 
   return overPosTmp > 0 ? overPosTmp : overPos - 1;
 };
 
 /**
- * recursivly split the line at getSplitPosition.
+ * recursively split the line at getSplitPosition.
  * If there is some leftover, split the rest again in the same manner.
  */
 export const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] => {
