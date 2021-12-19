@@ -10,16 +10,8 @@ import {
   TransformationMatrix,
 } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import {
-  uniq,
-  hex2rgb,
-  mm2pt,
-  calcX,
-  calcY,
-  getSplittedLines,
-  createBarCode,
-  getB64BasePdf,
-} from './libs/utils';
+import { uniq, hex2rgb, mm2pt, calcX, calcY, getSplittedLines, getB64BasePdf } from './libs/utils';
+import { createBarCode } from './libs/barcode';
 import { Args, isPageSize, isSubsetFont } from './libs/type';
 import { barcodeList } from './libs/constants';
 
