@@ -5,7 +5,7 @@ import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
 import hotkeys from 'hotkeys-js';
-import { PageSize, Template, TemplateSchema, Schema } from './type';
+import { PageSize, Template, TemplateSchema, Schema, BasePdf } from './type';
 
 export const uuid = nanoid;
 export const set = _set;
@@ -379,8 +379,7 @@ const blob2Base64 = (blob: Blob) => {
   });
 };
 
-export const getB64BasePdf = async (template: Template) => {
-  const { basePdf } = template;
+export const getB64BasePdf = async (basePdf: BasePdf) => {
   // TODO 相対パスに対応していない
   if (typeof basePdf === 'string' && basePdf.startsWith('http')) {
     const blob = await fetch(basePdf).then((res) => res.blob());

@@ -13,7 +13,7 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
   const [scale, setScale] = useState(0);
 
   const init = useCallback(async () => {
-    const _basePdf = await getB64BasePdf(template);
+    const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
     const paperWidth = _pageSizes[0].width * zoom;

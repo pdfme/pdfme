@@ -30,7 +30,7 @@ interface SubsetFont {
   subset: boolean;
 }
 
-interface Font {
+export interface Font {
   [key: string]: string | Uint8Array | ArrayBuffer | SubsetFont;
 }
 
@@ -47,9 +47,11 @@ export const isPageSize = (args: PageSize | string | Uint8Array | ArrayBuffer): 
 export const isSubsetFont = (v: string | Uint8Array | ArrayBuffer | SubsetFont): v is SubsetFont =>
   typeof v === 'object' && !!v && 'data' in v;
 
+export type Schemas = { [key: string]: TemplateSchema }[];
+export type BasePdf = PageSize | string | Uint8Array | ArrayBuffer;
 export interface Template {
-  schemas: { [key: string]: TemplateSchema }[];
-  basePdf: PageSize | string | Uint8Array | ArrayBuffer;
+  schemas: Schemas;
+  basePdf: BasePdf;
   fontName?: string;
   sampledata?: { [key: string]: string }[];
   columns?: string[];

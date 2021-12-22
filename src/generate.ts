@@ -12,25 +12,33 @@ import {
 import fontkit from '@pdf-lib/fontkit';
 import { uniq, hex2rgb, mm2pt, calcX, calcY, getSplittedLines, getB64BasePdf } from './libs/utils';
 import { createBarCode } from './libs/barcode';
-import { Args, isPageSize, isSubsetFont } from './libs/type';
+import { Args, isPageSize, isSubsetFont, Schemas, Font, BasePdf } from './libs/type';
 import { barcodeList } from './libs/constants';
 
-const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) => {
-  if (inputs.length < 1) {
-    throw Error('inputs should be more than one length');
-  }
+type EmbedPdfBox = {
+  mediaBox: { x: number; y: number; width: number; height: number };
+  bleedBox: { x: number; y: number; width: number; height: number };
+  trimBox: { x: number; y: number; width: number; height: number };
+};
 
-  const fontNamesInSchemas = uniq(
-    template.schemas
+const getFontNamesInSchemas = (schemas: Schemas) =>
+  uniq(
+    schemas
       .map((s) => Object.values(s).map((v) => v.fontName))
       .reduce((acc, val) => acc.concat(val), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
 
+const checkFont = (arg: {
+  font?: Font;
+  templateFontName: string | undefined;
+  fontNamesInSchemas: string[];
+}) => {
+  const { font, templateFontName, fontNamesInSchemas } = arg;
   if (font) {
     const fontNames = Object.keys(font);
-    if (template.fontName && !fontNames.includes(template.fontName)) {
-      throw Error(`${template.fontName} of template.fontName is not found in font`);
+    if (templateFontName && !fontNames.includes(templateFontName)) {
+      throw Error(`${templateFontName} of template.fontName is not found in font`);
     }
     if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
       throw Error(
@@ -40,66 +48,102 @@ const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) =>
       );
     }
   }
+};
 
-  const pdfDoc = await PDFDocument.create();
-  pdfDoc.registerFontkit(fontkit);
-  const isUseMyfont = font && (template.fontName || fontNamesInSchemas.length > 0);
-  const fontValues = isUseMyfont
-    ? await Promise.all(
-        Object.values(font!).map((v) =>
-          pdfDoc.embedFont(isSubsetFont(v) ? v.data : v, {
-            subset: isSubsetFont(v) ? v.subset : true,
-          })
-        )
-      )
-    : [];
-  const fontObj = isUseMyfont
-    ? Object.keys(font!).reduce(
+const embedFont = ({ pdfDoc, font }: { pdfDoc: PDFDocument; font: Font | undefined }) => {
+  return Promise.all(
+    Object.values(font ?? {}).map((v) =>
+      pdfDoc.embedFont(isSubsetFont(v) ? v.data : v, {
+        subset: isSubsetFont(v) ? v.subset : true,
+      })
+    )
+  );
+};
+
+const getFontObj = async (arg: {
+  pdfDoc: PDFDocument;
+  isUseMyfont: boolean;
+  font: Font | undefined;
+}) => {
+  const { pdfDoc, isUseMyfont, font } = arg;
+  const fontValues = isUseMyfont ? await embedFont({ pdfDoc, font }) : [];
+
+  return isUseMyfont
+    ? Object.keys(font ?? {}).reduce(
         (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
         {} as { [key: string]: PDFFont }
       )
     : {
         [StandardFonts.Helvetica]: await pdfDoc.embedFont(StandardFonts.Helvetica),
       };
+};
 
-  const inputImageCache: { [key: string]: PDFImage } = {};
-  const { basePdf, schemas } = template;
+const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: { pdfDoc: PDFDocument; basePdf: BasePdf }) => {
+  const { pdfDoc, basePdf } = arg;
   const isBlank = isPageSize(basePdf);
   let embeddedPages: PDFEmbeddedPage[] = [];
-  let embedPdfBoxes: {
-    mediaBox: { x: number; y: number; width: number; height: number };
-    bleedBox: { x: number; y: number; width: number; height: number };
-    trimBox: { x: number; y: number; width: number; height: number };
-  }[] = [];
-  if (!isPageSize(basePdf)) {
-    const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(template) : basePdf;
+  let embedPdfBoxes: EmbedPdfBox[] = [];
+  if (!isBlank) {
+    const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(basePdf) : basePdf;
     const embedPdf = await PDFDocument.load(willLoadPdf);
     const embedPdfPages = embedPdf.getPages();
+
     embedPdfBoxes = embedPdfPages.map((p) => {
       const mediaBox = p.getMediaBox();
       const bleedBox = p.getBleedBox();
       const trimBox = p.getTrimBox();
+
       return { mediaBox, bleedBox, trimBox };
     });
+
     const boundingBoxes = embedPdfPages.map((p) => {
       const { x, y, width, height } = p.getMediaBox();
+
       return { left: x, bottom: y, right: width, top: height + y };
     });
+
     const transformationMatrices = embedPdfPages.map(
       () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
     );
 
     embeddedPages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
+
+  return { embeddedPages, embedPdfBoxes };
+};
+
+const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) => {
+  if (inputs.length < 1) {
+    throw Error('inputs should be more than one length');
+  }
+
+  const { basePdf, schemas } = template;
+
+  const fontNamesInSchemas = getFontNamesInSchemas(schemas);
+
+  checkFont({ font, templateFontName: template.fontName, fontNamesInSchemas });
+  const isUseMyfont = !!font && (!!template.fontName || fontNamesInSchemas.length > 0);
+
+  const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const fontObj = await getFontObj({ pdfDoc, isUseMyfont, font });
+
+  const inputImageCache: { [key: string]: PDFImage } = {};
+
+  const { embeddedPages, embedPdfBoxes } = await getEmbeddedPagesAndEmbedPdfBoxes({
+    pdfDoc,
+    basePdf,
+  });
+
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
-    for (let j = 0; j < (isBlank ? schemas : embeddedPages).length; j += 1) {
+    for (let j = 0; j < (isPageSize(basePdf) ? schemas : embeddedPages).length; j += 1) {
       const embeddedPage = embeddedPages[j];
       const pageWidth = isPageSize(basePdf) ? mm2pt(basePdf.width) : embeddedPage.width;
       const pageHeight = isPageSize(basePdf) ? mm2pt(basePdf.height) : embeddedPage.height;
       const page = pdfDoc.addPage([pageWidth, pageHeight]);
-      if (!isBlank) {
+      if (!isPageSize(basePdf)) {
         page.drawPage(embeddedPage);
         const { mediaBox: mb, bleedBox: bb, trimBox: tb } = embedPdfBoxes[j];
         page.setMediaBox(mb.x, mb.y, mb.width, mb.height);
@@ -207,7 +251,9 @@ const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) =>
   const author = 'pdfme (https://github.com/hand-dot/pdfme)';
   pdfDoc.setProducer(author);
   pdfDoc.setCreator(author);
-  return await pdfDoc.save();
+
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
 };
 
 export default generate;

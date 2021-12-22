@@ -23,7 +23,7 @@ const getTmpPath = (fileName: string) => getPath('tmp', fileName);
 const getAssertPath = (fileName: string) => getPath('assert', fileName);
 
 describe('check validation', () => {
-  test(`missing font in template.fontName`, async () => {
+  test(`inputs length is 0`, async () => {
     const inputs: { [key: string]: string }[] = [];
     const template: Template = {
       basePdf: { height: 297, width: 210 },

@@ -231,7 +231,7 @@ const TemplateEditor = ({
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
     const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
-    const basePdf = await getB64BasePdf(newTemplate);
+    const basePdf = await getB64BasePdf(newTemplate.basePdf);
     const pdfBlob = b64toBlob(basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
     const _schemas = (
