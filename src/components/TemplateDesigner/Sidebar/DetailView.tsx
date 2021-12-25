@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import * as styles from './index.module.scss';
-import { readFiles } from '../../../libs/utils';
+import { readFiles } from '../../../libs/ui';
 import { I18nContext } from '../../../libs/i18n';
 import { inputTypeList } from '../../../libs/constants';
 import Divider from '../../Divider';

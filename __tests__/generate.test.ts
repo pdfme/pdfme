@@ -1,16 +1,18 @@
-import * as fs from 'fs';
+import { writeFileSync, readFileSync, readdir, unlink } from 'fs';
+import * as path from 'path';
 import generate from '../src/generate';
-const PDFParser = require('pdf2json');
 import templateData from './templates';
 import { Template } from '../src/libs/type';
+const PDFParser = require('pdf2json');
 
 const font: any = {
-  SauceHanSansJP: fs.readFileSync(__dirname + `/fonts/SauceHanSansJP.ttf`),
-  SauceHanSerifJP: fs.readFileSync(__dirname + `/fonts/SauceHanSerifJP.ttf`),
+  SauceHanSansJP: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
+  SauceHanSerifJP: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
 };
 
 const getPdf = (pdfFilePath: string) => {
   const pdfParser = new PDFParser();
+
   return new Promise((resolve, reject) => {
     pdfParser.on('pdfParser_dataError', reject);
     pdfParser.on('pdfParser_dataReady', resolve);
@@ -18,7 +20,7 @@ const getPdf = (pdfFilePath: string) => {
   });
 };
 
-const getPath = (dir: string, fileName: string) => __dirname + `/${dir}/${fileName}`;
+const getPath = (dir: string, fileName: string) => path.join(__dirname, `/${dir}/${fileName}`);
 const getTmpPath = (fileName: string) => getPath('tmp', fileName);
 const getAssertPath = (fileName: string) => getPath('assert', fileName);
 
@@ -105,14 +107,14 @@ describe('check validation', () => {
 
 describe('generate integrate test', () => {
   afterAll(() => {
-    const dir = __dirname + '/tmp';
-    fs.readdir(dir, (err: any, files: any) => {
+    const dir = path.join(__dirname, '/tmp');
+    readdir(dir, (err: any, files: any) => {
       if (err) {
         throw err;
       }
       files.forEach((file: any) => {
         if (file !== '.gitkeep') {
-          fs.unlink(`${dir}/${file}`, (err: any) => {
+          unlink(`${dir}/${file}`, (err: any) => {
             if (err) {
               throw err;
             }
@@ -121,9 +123,10 @@ describe('generate integrate test', () => {
       });
     });
   });
+
   describe('use labelmake.jp template', () => {
     const entries = Object.entries(templateData);
-    for (let l = 0; l < entries.length; l++) {
+    for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
       test(`snapshot ${key}`, async () => {
         const inputs = template.sampledata!;
@@ -138,7 +141,7 @@ describe('generate integrate test', () => {
         expect(hrend[0]).toBeLessThanOrEqual(1);
         const tmpFile = getTmpPath(`${key}.pdf`);
         const assertFile = getAssertPath(`${key}.pdf`);
-        fs.writeFileSync(tmpFile, pdf);
+        writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
         expect(a.Pages).toEqual(e.Pages);
@@ -165,7 +168,7 @@ describe('generate integrate test', () => {
       const pdf = await generate({ inputs, template });
       const tmpFile = getTmpPath(`nofont.pdf`);
       const assertFile = getAssertPath(`nofont.pdf`);
-      fs.writeFileSync(tmpFile, pdf);
+      writeFileSync(tmpFile, pdf);
       const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
       const [a, e] = res;
       expect(a.Pages).toEqual(e.Pages);
@@ -191,7 +194,7 @@ describe('generate integrate test', () => {
         const pdf = await generate({ inputs, template });
         const tmpFile = getTmpPath(`fontColor.pdf`);
         const assertFile = getAssertPath(`fontColor.pdf`);
-        fs.writeFileSync(tmpFile, pdf);
+        writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
         expect(a.Pages).toEqual(e.Pages);
@@ -228,38 +231,22 @@ describe('generate integrate test', () => {
           template,
           font: {
             SauceHanSansJP: {
-              data: fs.readFileSync(__dirname + `/fonts/SauceHanSansJP.ttf`),
+              data: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
               subset: false,
             },
             SauceHanSerifJP: {
-              data: fs.readFileSync(__dirname + `/fonts/SauceHanSerifJP.ttf`),
+              data: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
               subset: false,
             },
           },
         });
         const tmpFile = getTmpPath(`fontSubset.pdf`);
         const assertFile = getAssertPath(`fontSubset.pdf`);
-        fs.writeFileSync(tmpFile, pdf);
+        writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
         expect(a.Pages).toEqual(e.Pages);
       }, 10000);
     });
-
-    // describe.only("base bug", () => {
-    //   test(`check splitedLine`, async () => {
-    //     await generate({
-    //       inputs: [
-    //         {
-    //           "{1}[お届け先]住所":
-    //             "東京都港区六本木住友不動産住友不動産六本木グランドタワー37",
-    //         },
-    //       ],
-    //       template: templateData.シンプルラベル24面BASE,
-    //       font,
-    //     });
-    //     expect(1).toEqual(2);
-    //   });
-    // });
   });
 });

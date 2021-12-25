@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom';
+import { PDFImage } from 'pdf-lib';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg } from './constants';
 
@@ -18,8 +19,11 @@ type TemplateType =
 
 export type BarCodeType = Exclude<TemplateType, 'text' | 'image'>;
 
-type Alignment = 'left' | 'right' | 'center';
+export type Alignment = 'left' | 'right' | 'center';
 
+export interface InputImageCache {
+  [key: string]: PDFImage;
+}
 export interface PageSize {
   height: number;
   width: number;

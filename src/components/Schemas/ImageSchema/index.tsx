@@ -1,7 +1,7 @@
 import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom, imageExample } from '../../../libs/constants';
-import { readFiles } from '../../../libs/utils';
+import { readFiles } from '../../../libs/ui';
 import { SchemaUIProp } from '../../../libs/type';
 import { I18nContext } from '../../../libs/i18n';
 

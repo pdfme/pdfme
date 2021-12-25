@@ -5,6 +5,14 @@ module.exports = {
     es6: true,
     node: true,
   },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'], // Your TypeScript files extension
+      parserOptions: {
+        project: ['./tsconfig.json'], // Specify it only for TypeScript files
+      },
+    },
+  ],
   parser: '@typescript-eslint/parser',
   plugins: ['prettier', 'react', 'react-hooks', '@typescript-eslint'],
   rules: {

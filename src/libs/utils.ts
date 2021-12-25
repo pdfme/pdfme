@@ -1,49 +1,14 @@
 import { nanoid } from 'nanoid';
-import * as pdfjsLib from 'pdfjs-dist';
-// @ts-ignore
-import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import _set from 'lodash.set';
-import hotkeys from 'hotkeys-js';
 import { PageSize, Template, TemplateSchema, Schema, BasePdf } from './type';
 
 export const uuid = nanoid;
+
 export const set = _set;
+
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
-const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && file !== null) {
-        r(e.target.result);
-      }
-    });
-    if (file !== null) {
-      if (type === 'text') {
-        fileReader.readAsText(file);
-      } else if (type === 'dataURL') {
-        fileReader.readAsDataURL(file);
-      } else if (type === 'arrayBuffer') {
-        fileReader.readAsArrayBuffer(file);
-      }
-    }
-  });
-};
-
-export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && files !== null) {
-        r(e.target.result);
-      }
-    });
-    if (files !== null && files[0]) {
-      readFile(files[0], type).then((data) => r(data));
-    }
-  });
-};
+export const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
 const shift = (number: number, precision: number, reverseShift: boolean) => {
   if (reverseShift) {
@@ -78,62 +43,21 @@ export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   return array;
 };
 
-const pt2mm = (pt: number) => {
+export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
+
+export const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
 
   return parseFloat(String(pt)) * mmRatio;
 };
 
-export const getPdfPageSizes = async (pdfBlob: Blob) => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
+export const mm2pt = (mm: number): number => {
+  // https://www.ddc.co.jp/words/archives/20090701114500.html
+  const ptRatio = 2.8346;
 
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      const pageSize = await pdfDoc.getPage(i + 1).then((page) => {
-        const { height, width } = page.getViewport({ scale: 1 });
-
-        return { height: pt2mm(height), width: pt2mm(width) };
-      });
-
-      return pageSize;
-    })
-  );
-
-  URL.revokeObjectURL(url);
-
-  return promises;
+  return parseFloat(String(mm)) * ptRatio;
 };
-
-const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg') => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
-
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      const image = await pdfDoc.getPage(i + 1).then((page) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = width * 2;
-        const canvasContext = canvas.getContext('2d')!;
-        const scaleRequired = canvas.width / page.getViewport({ scale: 1 }).width;
-        const viewport = page.getViewport({ scale: scaleRequired });
-        canvas.height = viewport.height;
-
-        return page
-          .render({ canvasContext, viewport })
-          .promise.then(() => canvas.toDataURL(`image/${imagetype}`));
-      });
-
-      return image;
-    })
-  );
-  URL.revokeObjectURL(url);
-
-  return promises;
-};
-
-export const pdf2Pngs = (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
 
 export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
   const _schemas = cloneDeep(schemas);
@@ -210,126 +134,6 @@ export const getInitialSchema = (): Schema => ({
   data: '',
 });
 
-const isEmpty = (obj: { [key: string]: TemplateSchema }) => {
-  return !Object.keys(obj).length;
-};
-
-export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
-
-export const initShortCuts = (arg: {
-  move: (command: 'up' | 'down' | 'left' | 'right', isShift: boolean) => void;
-  remove: () => void;
-  esc: () => void;
-  copy: () => void;
-  paste: () => void;
-  redo: () => void;
-  undo: () => void;
-  save: () => void;
-}) => {
-  const up = 'up';
-  const shiftUp = 'shift+up';
-  const down = 'down';
-  const shiftDown = 'shift+down';
-  const left = 'left';
-  const shiftLeft = 'shift+left';
-  const right = 'right';
-  const shiftRight = 'shift+right';
-
-  const rmWin = 'backspace';
-  const rmMac = 'delete';
-  const esc = 'esc';
-  const copyWin = 'ctrl+c';
-  const copyMac = 'command+c';
-  const pasteWin = 'ctrl+v';
-  const pasteMac = 'command+v';
-  const redoWin = 'ctrl+y';
-  const redoMac = 'shift+command+z';
-  const undoWin = 'ctrl+z';
-  const undoMac = 'command+z';
-  const saveWin = 'ctrl+s';
-  const saveMac = 'command+s';
-
-  const keys = [
-    up,
-    shiftUp,
-    down,
-    shiftDown,
-    left,
-    shiftLeft,
-    right,
-    shiftRight,
-    rmMac,
-    rmWin,
-    esc,
-    copyWin,
-    copyMac,
-    pasteWin,
-    pasteMac,
-    redoWin,
-    redoMac,
-    undoWin,
-    undoMac,
-    saveWin,
-    saveMac,
-  ];
-
-  /* eslint complexity: ["error", 22]*/
-  hotkeys(keys.join(), (e, handler) => {
-    e.preventDefault();
-    switch (handler.shortcut) {
-      case up:
-      case shiftUp:
-        arg.move('up', hotkeys.shift);
-        break;
-      case down:
-      case shiftDown:
-        arg.move('down', hotkeys.shift);
-        break;
-      case left:
-      case shiftLeft:
-        arg.move('left', hotkeys.shift);
-        break;
-      case right:
-      case shiftRight:
-        arg.move('right', hotkeys.shift);
-        break;
-      case rmWin:
-      case rmMac:
-        arg.remove();
-        break;
-      case esc:
-        arg.esc();
-        break;
-      case copyWin:
-      case copyMac:
-        arg.copy();
-        break;
-      case pasteWin:
-      case pasteMac:
-        arg.paste();
-        break;
-      case redoWin:
-      case redoMac:
-        arg.redo();
-        break;
-      case undoWin:
-      case undoMac:
-        arg.undo();
-        break;
-      case saveWin:
-      case saveMac:
-        arg.save();
-        break;
-      default:
-        break;
-    }
-  });
-};
-
-export const destroyShortCuts = () => {
-  hotkeys.unbind();
-};
-
 export const getSampleByType = (type: string) => {
   const defaultValue: { [key: string]: string } = {
     qrcode: 'https://labelmake.jp/',
@@ -389,102 +193,4 @@ export const getB64BasePdf = async (basePdf: BasePdf) => {
   }
 
   return basePdf as string;
-};
-
-export const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
-
-export const hex2rgb = (hex: string) => {
-  if (hex.slice(0, 1) === '#') hex = hex.slice(1);
-  if (hex.length === 3)
-    hex =
-      hex.slice(0, 1) +
-      hex.slice(0, 1) +
-      hex.slice(1, 2) +
-      hex.slice(1, 2) +
-      hex.slice(2, 3) +
-      hex.slice(2, 3);
-
-  return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((str) => parseInt(str, 16));
-};
-
-export const mm2pt = (mm: number): number => {
-  // https://www.ddc.co.jp/words/archives/20090701114500.html
-  const ptRatio = 2.8346;
-
-  return parseFloat(String(mm)) * ptRatio;
-};
-
-export const calcX = (
-  x: number,
-  alignment: 'left' | 'right' | 'center',
-  boxWidth: number,
-  textWidth: number
-) => {
-  let addition = 0;
-  if (alignment === 'center') {
-    addition = (boxWidth - textWidth) / 2;
-  } else if (alignment === 'right') {
-    addition = boxWidth - textWidth;
-  }
-
-  return mm2pt(x) + addition;
-};
-
-export const calcY = (y: number, height: number, itemHeight: number) =>
-  height - mm2pt(y) - itemHeight;
-
-type IsOverEval = (testString: string) => boolean;
-/**
- * Incrementally check the current line for it's real length
- * and return the position where it exceeds the box width.
- *
- * return `null` to indicate if inputLine is shorter as the available bbox
- */
-const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
-  for (let i = 0; i <= inputLine.length; i += 1) {
-    if (isOverEval(inputLine.substr(0, i))) {
-      return i;
-    }
-  }
-
-  return null;
-};
-
-/**
- * Get position of the split. Split the exceeding line at
- * the last whitespace over it exceeds the bounding box width.
- */
-const getSplitPosition = (inputLine: string, isOverEval: IsOverEval) => {
-  const overPos = getOverPosition(inputLine, isOverEval);
-  /**
-   * if input line is shorter as the available space. We split at the end of the line
-   */
-  if (overPos === null) return inputLine.length;
-  let overPosTmp = overPos;
-  while (inputLine[overPosTmp] !== ' ' && overPosTmp >= 0) overPosTmp -= 1;
-  /**
-   * for very long lines with no whitespace use the original overPos and
-   * split one char over so we do not overfill the box
-   */
-
-  return overPosTmp > 0 ? overPosTmp : overPos - 1;
-};
-
-/**
- * recursively split the line at getSplitPosition.
- * If there is some leftover, split the rest again in the same manner.
- */
-export const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] => {
-  const splitPos = getSplitPosition(inputLine, isOverEval);
-  const splittedLine = inputLine.substr(0, splitPos);
-  const rest = inputLine.slice(splitPos).trimLeft();
-  /**
-   * end recursion if there is no rest, return single splitted line in an array
-   * so we can join them over the recursion
-   */
-  if (rest.length === 0) {
-    return [splittedLine];
-  }
-
-  return [splittedLine, ...getSplittedLines(rest, isOverEval)];
 };

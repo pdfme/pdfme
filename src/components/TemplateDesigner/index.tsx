@@ -11,16 +11,15 @@ import {
   round,
   b64toBlob,
   arrayMove,
-  getPdfPageSizes,
   fmtTemplate,
   sortSchemas,
   getInitialSchema,
-  initShortCuts,
-  destroyShortCuts,
   getSampleByType,
   getKeepRatioHeightByWidth,
   getB64BasePdf,
 } from '../../libs/utils';
+import { getPdfPageSizes } from '../../libs/pdfjs';
+import { initShortCuts, destroyShortCuts } from '../../libs/ui';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 
