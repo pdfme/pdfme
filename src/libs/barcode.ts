@@ -68,7 +68,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   return false;
 };
 
-export const createBarCode = async ({
+export const createBarCode = ({
   type,
   input,
   width,
@@ -76,27 +76,22 @@ export const createBarCode = async ({
   backgroundColor,
 }: {
   type: BarCodeType;
-  input: string | null;
+  input: string;
   width: number;
   height: number;
   backgroundColor?: string;
-}): Promise<Buffer | null> => {
-  if (input && validateBarcodeInput(type, input)) {
-    const bwipjsArg: ToBufferOptions = {
-      bcid: type === 'nw7' ? 'rationalizedCodabar' : type,
-      text: input,
-      scale: 5,
-      width,
-      height,
-      includetext: true,
-    };
-    if (backgroundColor) {
-      bwipjsArg.backgroundcolor = backgroundColor;
-    }
-    const buffer = await bwipjs.toBuffer(bwipjsArg).catch(() => null);
-
-    return buffer;
+}): Promise<Buffer> => {
+  const bwipjsArg: ToBufferOptions = {
+    bcid: type === 'nw7' ? 'rationalizedCodabar' : type,
+    text: input,
+    scale: 5,
+    width,
+    height,
+    includetext: true,
+  };
+  if (backgroundColor) {
+    bwipjsArg.backgroundcolor = backgroundColor;
   }
 
-  return null;
+  return bwipjs.toBuffer(bwipjsArg);
 };
