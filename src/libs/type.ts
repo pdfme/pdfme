@@ -36,6 +36,7 @@ export const isSubsetFont = (v: FontValue): v is SubsetFont =>
 
 type FontValue = string | Uint8Array | ArrayBuffer | SubsetFont;
 
+// TODO  Fontの型とUIPropsのfontは共通化させたいのと、複数を配列で持つようにする？
 export interface Font {
   [key: string]: FontValue;
 }
@@ -47,6 +48,7 @@ export type BasePdf = PageSize | string | Uint8Array | ArrayBuffer;
 export const isPageSize = (arg: BasePdf): arg is PageSize =>
   typeof arg === 'object' && 'width' in arg;
 
+// TODO 下手にtemplateにfontNameを持たせずにoptionで管理する？
 export interface Template {
   schemas: Schemas;
   basePdf: BasePdf;

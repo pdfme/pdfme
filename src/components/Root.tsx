@@ -8,8 +8,6 @@ type Props = { size: PageSize; scale: number; children: ReactNode };
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);
 
-  console.log('Root', font);
-
   return (
     <div
       ref={ref}

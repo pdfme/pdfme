@@ -40,3 +40,9 @@ const getSampleTemplate = () => ({
 const getTemplate = () => {
   return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
 };
+
+const getFont = async () => {
+  // TODO { label: defaultFontLabel, value: defaultFontValue } の形じゃないのが若干統一感がない
+  const SauceHanSansJP = await fetch('/SauceHanSansJP.ttf').then((res) => res.arrayBuffer());
+  return { 'Noto Sans JP': SauceHanSansJP };
+};

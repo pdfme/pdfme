@@ -11,6 +11,7 @@ interface UIBaseProps {
 export type UIProps = {
   domContainer: HTMLElement;
   lang?: 'en' | 'ja';
+  // TODO type.tsのFontと共通化させたいのと、複数のFontに対応したい
   font?: { label: string; value: string };
 };
 

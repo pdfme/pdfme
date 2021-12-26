@@ -28,10 +28,10 @@
     <div id="app"></div>
     <script src="./index.js"></script>
     <script>
-      let editor = null;
+      let form = null;
 
       function init() {
-        editor = new LabelmakeUi.Form({
+        form = new LabelmakeUi.Form({
           domContainer,
           template: getTemplate(),
           size,
@@ -46,25 +46,27 @@
       }
 
       function destroy() {
-        editor.destroy();
+        form.destroy();
       }
 
       function getInputs() {
-        console.log(editor.getInputs());
+        console.log(form.getInputs());
       }
 
       function setInputs() {
-        editor.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
+        form.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
       }
 
-      function generate() {
-        // TODO ここから fontでnotosansを読み込ませる
-        LabelmakeUi.generate({ inputs: editor.getInputs(), template: getTemplate() }).then(
-          (pdf) => {
-            const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-            window.open(URL.createObjectURL(blob));
-          }
-        );
+      async function generate() {
+        const font = await getFont();
+        LabelmakeUi.generate({
+          inputs: form.getInputs(),
+          template: getTemplate(),
+          options: { font },
+        }).then((pdf) => {
+          const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+          window.open(URL.createObjectURL(blob));
+        });
       }
 
       window.onload = init;

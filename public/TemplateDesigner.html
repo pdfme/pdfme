@@ -69,12 +69,11 @@
         reader.readAsText(file);
       }
 
-      function generate() {
-        // TODO ここから fontでnotosansを読み込ませる
+      async function generate() {
+        const font = await getFont();
         const template = getTemplate();
         const inputs = template.sampledata;
-
-        LabelmakeUi.generate({ inputs, template }).then((pdf) => {
+        LabelmakeUi.generate({ inputs, template, options: { font } }).then((pdf) => {
           const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
           window.open(URL.createObjectURL(blob));
         });
