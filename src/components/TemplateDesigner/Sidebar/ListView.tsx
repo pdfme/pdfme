@@ -6,7 +6,7 @@ import {
   SortableHandle as sortableHandle,
 } from 'react-sortable-hoc';
 import { Schema } from '../../../libs/type';
-import { I18nContext } from '../../../libs/i18n';
+import { I18nContext } from '../../../libs/contexts';
 import Divider from '../../Divider';
 import infoIcon from '../../../assets/info.svg';
 import createIcon from '../../../assets/create.svg';

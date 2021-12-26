@@ -13,6 +13,18 @@ import { BarCodeType } from './type';
 
 export const destroyedErrMsg = 'this instance is already destroyed';
 
+export const defaultFontLabel = 'Helvetica';
+export const defaultFontValue = 'Helvetica';
+export const defaultFont = { label: defaultFontLabel, value: defaultFontValue };
+
+export const imageExample = _imageExample;
+
+export const zoom = 3.7795275591;
+
+export const rulerHeight = 30;
+
+export const selectableClassName = 'selectable';
+
 export const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,
   japanpost,
@@ -25,10 +37,7 @@ export const barcodeExampleImageObj: { [key: string]: string } = {
   upca,
   upce,
 };
-export const imageExample = _imageExample;
-export const zoom = 3.7795275591;
-export const rulerHeight = 30;
-export const selectableClassName = 'selectable';
+
 export const barcodeList: BarCodeType[] = [
   'qrcode',
   'ean13',
@@ -41,6 +50,7 @@ export const barcodeList: BarCodeType[] = [
   'upca',
   'upce',
 ];
+
 export const inputTypeList = ['text', 'image'].concat(barcodeList);
 
 export const blankPdf =

@@ -4,7 +4,7 @@ import left from '../../../assets/left.svg';
 import right from '../../../assets/right.svg';
 import doubleLeft from '../../../assets/double-left.svg';
 import doubleRight from '../../../assets/double-right.svg';
-import { I18nContext } from '../../../libs/i18n';
+import { I18nContext } from '../../../libs/contexts';
 
 type Props = {
   pageCursor: number;

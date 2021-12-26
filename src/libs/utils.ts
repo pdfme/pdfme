@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import _set from 'lodash.set';
 import { PageSize, Template, TemplateSchema, Schema, BasePdf } from './type';
+import { defaultFontValue } from './constants';
 
 export const uuid = nanoid;
 
@@ -59,11 +60,15 @@ export const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * ptRatio;
 };
 
-export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
+export const fmtTemplate = (
+  template: Template,
+  schemas: Schema[][],
+  templateFont: { label: string; value: string }
+): Template => {
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
-    fontName: template.fontName,
+    fontName: templateFont.value === defaultFontValue ? '' : templateFont.value,
     sampledata: [
       _schemas.reduce((acc, cur) => {
         cur.forEach((c) => {
@@ -167,9 +172,6 @@ export const getKeepRatioHeightByWidth = (type: string, width: number) => {
 
   return width * (raito[type] ? raito[type] : 1);
 };
-
-// TODO Must consider font
-export const getFontFamily = (fontName?: string) => 'Helvetica, Arial, sans-serif';
 
 export const getA4 = (): PageSize => ({ height: 297, width: 210 });
 

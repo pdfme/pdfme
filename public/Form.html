@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <title>Webpack App</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body style="margin: 0">
     <div>
@@ -35,6 +41,7 @@
             { ふりがな: 'さとう', 名前: '佐藤' },
           ],
           onChangeInput: console.log,
+          font: { label: 'Noto Sans JP', value: 'Noto Sans JP' },
         });
       }
 
@@ -51,6 +58,7 @@
       }
 
       function generate() {
+        // TODO ここから fontでnotosansを読み込ませる
         LabelmakeUi.generate({ inputs: editor.getInputs(), template: getTemplate() }).then(
           (pdf) => {
             const blob = new Blob([pdf.buffer], { type: 'application/pdf' });

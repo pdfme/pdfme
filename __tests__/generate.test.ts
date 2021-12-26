@@ -40,13 +40,12 @@ describe('check validation', () => {
         },
       ],
     };
-    await generate({ inputs, template, font })
-      .then(() => {
-        fail();
-      })
-      .catch((e) => {
-        expect(e.message).toEqual('inputs should be more than one length');
-      });
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('inputs should be more than one length');
+    }
   });
   test(`missing font in template.fontName`, async () => {
     const inputs = [{ a: 'test' }];
@@ -64,13 +63,12 @@ describe('check validation', () => {
         },
       ],
     };
-    await generate({ inputs, template, font })
-      .then(() => {
-        fail();
-      })
-      .catch((e) => {
-        expect(e.message).toEqual('dummyFont of template.fontName is not found in font');
-      });
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('dummyFont of template.fontName is not found in font');
+    }
   });
   test(`missing font in template.schemas`, async () => {
     const inputs = [{ a: 'test' }];
@@ -95,35 +93,36 @@ describe('check validation', () => {
         },
       ],
     };
-    await generate({ inputs, template, font })
-      .then(() => {
-        fail();
-      })
-      .catch((e) => {
-        expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font');
-      });
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font');
+    }
   });
 });
 
 describe('generate integrate test', () => {
   afterAll(() => {
     const dir = path.join(__dirname, '/tmp');
+    const unLinkFile = (file: any) => {
+      if (file !== '.gitkeep') {
+        unlink(`${dir}/${file}`, (e: any) => {
+          if (e) {
+            throw e;
+          }
+        });
+      }
+    };
     readdir(dir, (err: any, files: any) => {
       if (err) {
         throw err;
       }
-      files.forEach((file: any) => {
-        if (file !== '.gitkeep') {
-          unlink(`${dir}/${file}`, (err: any) => {
-            if (err) {
-              throw err;
-            }
-          });
-        }
-      });
+      files.forEach(unLinkFile);
     });
   });
 
+  // TODO このテストは遅いので並列実装するようにする
   describe('use labelmake.jp template', () => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
@@ -131,16 +130,15 @@ describe('generate integrate test', () => {
       test(`snapshot ${key}`, async () => {
         const inputs = template.sampledata!;
         const hrstart = process.hrtime();
-        const pdf = await generate({
-          inputs,
-          template,
-          font,
-          splitThreshold: 0,
-        });
+
+        const pdf = await generate({ inputs, template, options: { font, splitThreshold: 0 } });
+
         const hrend = process.hrtime(hrstart);
         expect(hrend[0]).toBeLessThanOrEqual(1);
+
         const tmpFile = getTmpPath(`${key}.pdf`);
         const assertFile = getAssertPath(`${key}.pdf`);
+
         writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
@@ -229,14 +227,16 @@ describe('generate integrate test', () => {
         const pdf = await generate({
           inputs,
           template,
-          font: {
-            SauceHanSansJP: {
-              data: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
-              subset: false,
-            },
-            SauceHanSerifJP: {
-              data: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
-              subset: false,
+          options: {
+            font: {
+              SauceHanSansJP: {
+                data: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
+                subset: false,
+              },
+              SauceHanSerifJP: {
+                data: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
+                subset: false,
+              },
             },
           },
         });

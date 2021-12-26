@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { Template, Schema, TemplateDesignerProp, PageSize } from '../../libs/type';
+import { Template, Schema, PageSize } from '../../libs/type';
+import { TemplateDesignerProp } from '../../libs/class';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
-import { I18nContext } from '../../libs/i18n';
+import { I18nContext, FontContext } from '../../libs/contexts';
 import {
   uuid,
   set,
@@ -90,6 +91,7 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
+  const templateFont = useContext(FontContext);
 
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
@@ -115,7 +117,7 @@ const TemplateEditor = ({
     },
   });
 
-  const modifiedTemplate = fmtTemplate(template, schemas);
+  const modifiedTemplate = fmtTemplate(template, schemas, templateFont);
 
   const commitSchemas = useCallback(
     (newSchemas: Schema[]) => {
@@ -296,7 +298,7 @@ const TemplateEditor = ({
   const activeSchema = getLastActiveSchema();
 
   return (
-    <Root ref={rootRef} size={size} template={template} scale={scale}>
+    <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         pageCursor={pageCursor}

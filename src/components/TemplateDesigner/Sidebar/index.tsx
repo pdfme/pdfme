@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { Schema } from '../../../libs/type';
-import { I18nContext } from '../../../libs/i18n';
+import { I18nContext } from '../../../libs/contexts';
 import backIcon from '../../../assets/back.svg';
 import forwardIcon from '../../../assets/forward.svg';
 import ListView from './ListView';

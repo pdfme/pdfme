@@ -1,16 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BaseUIClass, TemplateDesignerProp, Template, UIProps } from './libs/type';
+import { Template } from './libs/type';
+import { BaseUIClass, TemplateDesignerProp, UIProps } from './libs/class';
 import { destroyedErrMsg } from './libs/constants';
-import { I18nContext } from './libs/i18n';
+import { I18nContext, FontContext } from './libs/contexts';
 import TemplateDesignerComponent from './components/TemplateDesigner';
 
 class TemplateDesigner extends BaseUIClass {
   private saveTemplateCallback: (t: Template) => void;
 
   constructor(props: TemplateDesignerProp & UIProps) {
-    const { domContainer, template, size, lang, saveTemplate } = props;
-    super({ domContainer, template, size, lang });
+    const { domContainer, template, size, lang, font, saveTemplate } = props;
+    super({ domContainer, template, size, lang, font });
 
     this.saveTemplateCallback = saveTemplate;
     this.render();
@@ -31,14 +32,16 @@ class TemplateDesigner extends BaseUIClass {
     if (!this.domContainer) throw new Error(destroyedErrMsg);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
-        <TemplateDesignerComponent
-          template={this.template}
-          saveTemplate={this.saveTemplateCallback}
-          size={this.size}
-          onChangeTemplate={(template) => {
-            this.template = template;
-          }}
-        />
+        <FontContext.Provider value={this.getFont()}>
+          <TemplateDesignerComponent
+            template={this.template}
+            saveTemplate={this.saveTemplateCallback}
+            size={this.size}
+            onChangeTemplate={(template) => {
+              this.template = template;
+            }}
+          />
+        </FontContext.Provider>
       </I18nContext.Provider>,
       this.domContainer
     );

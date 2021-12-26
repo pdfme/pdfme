@@ -4,6 +4,12 @@
     <meta charset="utf-8" />
     <title>Webpack App</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body style="margin: 0">
     <div>
@@ -16,6 +22,8 @@
       <button onclick="saveTemplate()">saveTemplate</button>
       /
       <button onclick="updateTemplate()">updateTemplate</button>
+      /
+      <button onclick="generate()">generate</button>
       /
       <label>
         loadTemplate
@@ -31,11 +39,13 @@
         editor = new LabelmakeUi.TemplateDesigner({
           domContainer,
           template: getTemplate(),
-          size,
           saveTemplate: (t) => {
-            alert('saved');
-            localStorage.setItem('template', JSON.stringify(t));
+            console.log({ ...t, basePdf: 'skip...' });
+            const tj = JSON.stringify(t, null, 2);
+            localStorage.setItem('template', tj);
           },
+          size,
+          font: { label: 'Noto Sans JP', value: 'Noto Sans JP' },
         });
       }
 
@@ -57,6 +67,17 @@
           editor.updateTemplate(JSON.parse(reader.result));
         };
         reader.readAsText(file);
+      }
+
+      function generate() {
+        // TODO ここから fontでnotosansを読み込ませる
+        const template = getTemplate();
+        const inputs = template.sampledata;
+
+        LabelmakeUi.generate({ inputs, template }).then((pdf) => {
+          const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+          window.open(URL.createObjectURL(blob));
+        });
       }
 
       window.onload = init;

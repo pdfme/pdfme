@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { Args, Template, Font, isPageSize, InputImageCache } from './libs/type';
+import { GenerateArg, Template, Font, isPageSize, InputImageCache } from './libs/type';
 import {
   checkInputs,
   checkFont,
@@ -45,14 +45,15 @@ const postProcessing = (pdfDoc: PDFDocument) => {
   pdfDoc.setCreator(author);
 };
 
-const generate = async ({ inputs, template, font, splitThreshold = 3 }: Args) => {
-  const inputImageCache: InputImageCache = {};
+const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
   const { basePdf, schemas } = template;
+  const { font, splitThreshold = 3 } = options;
 
   const preArg = { inputs, template, font };
   const preRes = await preprocessing(preArg);
   const { pdfDoc, fontObj, embeddedPages, embedPdfBoxes, isUseMyFont } = preRes;
 
+  const inputImageCache: InputImageCache = {};
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);

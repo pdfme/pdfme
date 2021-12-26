@@ -3,7 +3,7 @@ import * as styles from './index.module.scss';
 import { zoom, imageExample } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
 import { SchemaUIProp } from '../../../libs/type';
-import { I18nContext } from '../../../libs/i18n';
+import { I18nContext } from '../../../libs/contexts';
 
 const FilledImage = ({
   editable,

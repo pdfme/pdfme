@@ -1,4 +1,3 @@
-import { createContext } from 'react';
 import { Lang } from './type';
 
 type DictEn = typeof dictEn;
@@ -60,5 +59,3 @@ const dictJa: { [key in keyof DictEn]: string } = {
 const i18n = (lang: Lang, key: keyof DictEn) => (lang === 'en' ? dictEn[key] : dictJa[key]);
 
 export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);
-
-export const I18nContext = createContext(curriedI18n('en'));

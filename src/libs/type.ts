@@ -1,7 +1,4 @@
-import ReactDOM from 'react-dom';
 import { PDFImage } from 'pdf-lib';
-import { curriedI18n } from './i18n';
-import { destroyedErrMsg } from './constants';
 
 type TemplateType =
   | 'text'
@@ -34,25 +31,22 @@ interface SubsetFont {
   subset: boolean;
 }
 
-export interface Font {
-  [key: string]: string | Uint8Array | ArrayBuffer | SubsetFont;
-}
-
-export interface Args {
-  inputs: { [key: string]: string }[];
-  template: Template;
-  font?: Font;
-  splitThreshold?: number;
-}
-
-export const isPageSize = (args: PageSize | string | Uint8Array | ArrayBuffer): args is PageSize =>
-  typeof args === 'object' && 'width' in args;
-
-export const isSubsetFont = (v: string | Uint8Array | ArrayBuffer | SubsetFont): v is SubsetFont =>
+export const isSubsetFont = (v: FontValue): v is SubsetFont =>
   typeof v === 'object' && !!v && 'data' in v;
 
+type FontValue = string | Uint8Array | ArrayBuffer | SubsetFont;
+
+export interface Font {
+  [key: string]: FontValue;
+}
+
 export type Schemas = { [key: string]: TemplateSchema }[];
+
 export type BasePdf = PageSize | string | Uint8Array | ArrayBuffer;
+
+export const isPageSize = (arg: BasePdf): arg is PageSize =>
+  typeof arg === 'object' && 'width' in arg;
+
 export interface Template {
   schemas: Schemas;
   basePdf: BasePdf;
@@ -101,73 +95,8 @@ export interface GuidesInterface {
   resize(): void;
 }
 
-interface UIBaseProps {
-  template: Template;
-  size: PageSize;
-}
-
-export interface TemplateDesignerProp extends UIBaseProps {
-  saveTemplate: (template: Template) => void;
-}
-
-export type UIProps = { lang?: 'en' | 'ja'; domContainer: HTMLElement };
-
-export abstract class BaseUIClass {
-  protected domContainer: HTMLElement | null;
-
-  protected template: Template;
-
-  protected size: PageSize;
-
-  private lang: 'en' | 'ja' = 'en';
-
-  constructor(props: UIBaseProps & UIProps) {
-    const { domContainer, template, size, lang } = props;
-    this.domContainer = domContainer;
-    this.template = template;
-    this.size = size;
-    this.lang = lang || 'en';
-  }
-
-  protected getI18n() {
-    return curriedI18n(this.lang);
-  }
-
-  public destroy() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
-    ReactDOM.unmountComponentAtNode(this.domContainer);
-    this.domContainer = null;
-  }
-
-  protected abstract render(): void;
-}
-
-export interface PreviewUIProp extends UIBaseProps {
+export interface GenerateArg {
   inputs: { [key: string]: string }[];
-  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
-}
-export abstract class PreviewUI extends BaseUIClass {
-  protected inputs: { [key: string]: string }[];
-
-  constructor(props: PreviewUIProp & UIProps) {
-    const { domContainer, template, size, lang, inputs } = props;
-    super({ domContainer, template, size, lang });
-
-    this.inputs = inputs;
-    this.render();
-  }
-
-  public getInputs() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
-
-    return this.inputs;
-  }
-
-  public setInputs(inputs: { [key: string]: string }[]) {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
-    this.inputs = inputs;
-    this.render();
-  }
-
-  protected abstract render(): void;
+  template: Template;
+  options?: { font?: Font; splitThreshold?: number };
 }

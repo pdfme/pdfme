@@ -1,23 +1,29 @@
-import React, { forwardRef, ReactNode, Ref } from 'react';
-import { getFontFamily } from '../libs/utils';
+import React, { useContext, forwardRef, ReactNode, Ref } from 'react';
 import { rulerHeight } from '../libs/constants';
-import { PageSize, Template } from '../libs/type';
+import { PageSize } from '../libs/type';
+import { FontContext } from '../libs/contexts';
 
-type Props = { template: Template; size: PageSize; scale: number; children: ReactNode };
+type Props = { size: PageSize; scale: number; children: ReactNode };
 
-const Root = ({ size, scale, children, template }: Props, ref: Ref<HTMLDivElement>) => (
-  <div
-    ref={ref}
-    style={{
-      fontFamily: getFontFamily(template.fontName),
-      position: 'relative',
-      background: 'rgb(74, 74, 74)',
-      overflowY: 'auto',
-      ...size,
-    }}
-  >
-    <div style={{ height: size.height - rulerHeight * scale }}>{children}</div>
-  </div>
-);
+const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
+  const font = useContext(FontContext);
+
+  console.log('Root', font);
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        fontFamily: `'${font.value}'`,
+        position: 'relative',
+        background: 'rgb(74, 74, 74)',
+        overflowY: 'auto',
+        ...size,
+      }}
+    >
+      <div style={{ height: size.height - rulerHeight * scale }}>{children}</div>
+    </div>
+  );
+};
 
 export default forwardRef<HTMLDivElement, Props>(Root);

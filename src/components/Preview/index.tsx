@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { PreviewUIProp } from '../../libs/type';
+import { PreviewUIProp } from '../../libs/class';
 import { zoom, rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
 import UnitPager from './UnitPager';
@@ -36,7 +36,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
   const { schemas } = template;
 
   return (
-    <Root ref={rootRef} template={template} size={size} scale={scale}>
+    <Root ref={rootRef} size={size} scale={scale}>
       <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
       <Pager
         pageCursor={pageCursor}

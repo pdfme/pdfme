@@ -22,7 +22,7 @@ import {
   InputImageCache,
   Alignment,
 } from './type';
-import { barcodeList } from './constants';
+import { barcodeList, defaultFontLabel, defaultFontValue } from './constants';
 
 type EmbedPdfBox = {
   mediaBox: { x: number; y: number; width: number; height: number };
@@ -92,7 +92,7 @@ export const getFontObj = async (arg: {
         {} as { [key: string]: PDFFont }
       )
     : {
-        [StandardFonts.Helvetica]: await pdfDoc.embedFont(StandardFonts.Helvetica),
+        [defaultFontLabel]: await pdfDoc.embedFont(defaultFontValue),
       };
 };
 
