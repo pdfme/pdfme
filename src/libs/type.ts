@@ -26,15 +26,19 @@ export interface PageSize {
   width: number;
 }
 
+type FontData = string | Uint8Array | ArrayBuffer;
+
 interface SubsetFont {
-  data: string | Uint8Array | ArrayBuffer;
+  data: FontData;
   subset: boolean;
+  // TODO default をbooleanで持たせる？
 }
 
 export const isSubsetFont = (v: FontValue): v is SubsetFont =>
   typeof v === 'object' && !!v && 'data' in v;
 
-type FontValue = string | Uint8Array | ArrayBuffer | SubsetFont;
+// TODO 下手にFontData | SubsetFontで持つよりも、Template.fontNameを駆逐したいのでFontDataで持たせる？
+type FontValue = FontData | SubsetFont;
 
 // TODO  Fontの型とUIPropsのfontは共通化させたいのと、複数を配列で持つようにする？
 export interface Font {

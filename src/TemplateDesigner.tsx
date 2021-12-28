@@ -10,8 +10,8 @@ class TemplateDesigner extends BaseUIClass {
   private saveTemplateCallback: (t: Template) => void;
 
   constructor(props: TemplateDesignerProp & UIProps) {
-    const { domContainer, template, size, lang, font, saveTemplate } = props;
-    super({ domContainer, template, size, lang, font });
+    const { domContainer, template, size, saveTemplate, options } = props;
+    super({ domContainer, template, size, options });
 
     this.saveTemplateCallback = saveTemplate;
     this.render();

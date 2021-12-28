@@ -44,7 +44,7 @@ export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
   return array;
 };
 
-export const flatten = <T>(arr: any[]): T[] => [].concat(...arr);
+export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 
 export const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
@@ -128,6 +128,7 @@ export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
 export const getInitialSchema = (): Schema => ({
   id: uuid(),
   key: '',
+  data: '',
   type: 'text',
   position: { x: 0, y: 0 },
   width: 35,
@@ -136,7 +137,6 @@ export const getInitialSchema = (): Schema => ({
   fontSize: 12,
   characterSpacing: 0,
   lineHeight: 1,
-  data: '',
 });
 
 export const getSampleByType = (type: string) => {

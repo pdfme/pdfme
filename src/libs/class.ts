@@ -10,9 +10,18 @@ interface UIBaseProps {
 
 export type UIProps = {
   domContainer: HTMLElement;
-  lang?: 'en' | 'ja';
-  // TODO type.tsのFontと共通化させたいのと、複数のFontに対応したい
-  font?: { label: string; value: string };
+  options?: {
+    lang?: 'en' | 'ja';
+    // TODO type.tsのFontと共通化させたいのと、複数のFontに対応したい
+    font?: { label: string; value: string };
+    // {
+    //   [key: string]: {
+    //     value: string;
+    //     index: number;
+    //     defalut: boolean;
+    //   };
+    // }
+  };
 };
 
 export abstract class BaseUIClass {
@@ -27,7 +36,8 @@ export abstract class BaseUIClass {
   private font: { label: string; value: string } = defaultFont;
 
   constructor(props: UIBaseProps & UIProps) {
-    const { domContainer, template, size, lang, font } = props;
+    const { domContainer, template, size, options } = props;
+    const { lang, font } = options || {};
     this.domContainer = domContainer;
     this.template = template;
     this.size = size;
@@ -56,12 +66,21 @@ export abstract class BaseUIClass {
   protected abstract render(): void;
 }
 
+export interface TemplateDesignerProp extends UIBaseProps {
+  saveTemplate: (template: Template) => void;
+}
+
+export interface PreviewUIProp extends UIBaseProps {
+  inputs: { [key: string]: string }[];
+  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
+}
+
 export abstract class PreviewUI extends BaseUIClass {
   protected inputs: { [key: string]: string }[];
 
   constructor(props: PreviewUIProp & UIProps) {
-    const { domContainer, template, size, lang, inputs, font } = props;
-    super({ domContainer, template, size, lang, font });
+    const { domContainer, template, size, inputs, options } = props;
+    super({ domContainer, template, size, options });
 
     this.inputs = inputs;
     this.render();
@@ -80,13 +99,4 @@ export abstract class PreviewUI extends BaseUIClass {
   }
 
   protected abstract render(): void;
-}
-
-export interface TemplateDesignerProp extends UIBaseProps {
-  saveTemplate: (template: Template) => void;
-}
-
-export interface PreviewUIProp extends UIBaseProps {
-  inputs: { [key: string]: string }[];
-  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
 }
