@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
-import { destroyedErrMsg, defaultFont } from './constants';
-import { Template, PageSize } from './type';
+import { destroyedErrMsg, defaultFont, defaultLang } from './constants';
+import { Template, PageSize, Lang } from './type';
 
 interface UIBaseProps {
   template: Template;
@@ -11,7 +11,7 @@ interface UIBaseProps {
 export type UIProps = {
   domContainer: HTMLElement;
   options?: {
-    lang?: 'en' | 'ja';
+    lang?: Lang;
     // TODO type.tsのFontと共通化させたいのと、複数のFontに対応したい
     font?: { label: string; value: string };
     // {
@@ -31,7 +31,7 @@ export abstract class BaseUIClass {
 
   protected size: PageSize;
 
-  private lang: 'en' | 'ja' = 'en';
+  private lang: Lang = defaultLang;
 
   private font: { label: string; value: string } = defaultFont;
 

@@ -14,8 +14,12 @@ import { BarCodeType } from './type';
 export const destroyedErrMsg = 'this instance is already destroyed';
 
 export const defaultFontLabel = 'Helvetica';
+
 export const defaultFontValue = 'Helvetica';
+
 export const defaultFont = { label: defaultFontLabel, value: defaultFontValue };
+
+export const defaultLang = 'en';
 
 export const imageExample = _imageExample;
 
