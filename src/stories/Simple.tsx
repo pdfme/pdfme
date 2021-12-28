@@ -14,7 +14,6 @@ export const Simple = () => {
           field2: 'aaaaaaaaaaaa',
         },
       ],
-      fontName: '',
       basePdf: blankPdf,
       schemas: [
         {

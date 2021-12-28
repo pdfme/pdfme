@@ -2,13 +2,22 @@ import { writeFileSync, readFileSync, readdir, unlink } from 'fs';
 import * as path from 'path';
 import generate from '../src/generate';
 import templateData from './templates';
-import { Template } from '../src/libs/type';
+import { Template, Font } from '../src/libs/type';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
 
-const font: any = {
-  SauceHanSansJP: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
-  SauceHanSerifJP: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
-};
+const SauceHanSansJPData = readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`));
+const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`));
+
+const getFont = (): Font => ({
+  SauceHanSansJP: {
+    default: true,
+    data: SauceHanSansJPData,
+  },
+  SauceHanSerifJP: {
+    data: SauceHanSerifJPData,
+  },
+});
 
 const getPdf = (pdfFilePath: string) => {
   const pdfParser = new PDFParser();
@@ -41,16 +50,15 @@ describe('check validation', () => {
       ],
     };
     try {
-      await generate({ inputs, template, options: { font } });
+      await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual('inputs should be more than one length');
     }
   });
-  test(`missing font in template.fontName`, async () => {
+  test(`missing default font`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
-      fontName: 'dummyFont',
       basePdf: { height: 297, width: 210 },
       schemas: [
         {
@@ -63,17 +71,22 @@ describe('check validation', () => {
         },
       ],
     };
+    const font = getFont();
+    font.SauceHanSansJP['default'] = false;
+    font.SauceHanSerifJP['default'] = false;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('dummyFont of template.fontName is not found in font');
+      expect(e.message).toEqual(
+        'default flag is not found in font. Only one of the default flag needs to be true'
+      );
+      font.SauceHanSansJP['default'] = true;
     }
   });
   test(`missing font in template.schemas`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
-      fontName: 'SauceHanSansJP',
       basePdf: { height: 297, width: 210 },
       schemas: [
         {
@@ -94,7 +107,7 @@ describe('check validation', () => {
       ],
     };
     try {
-      await generate({ inputs, template, options: { font } });
+      await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font');
@@ -127,11 +140,28 @@ describe('generate integrate test', () => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
+      // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        const inputs = template.sampledata!;
+        const inputs = template.sampledata || [];
+        // @ts-ignore
+        const defaultFontName = template.fontName;
+
+        const font = getFont();
+        font.SauceHanSansJP['default'] = false;
+        font.SauceHanSerifJP['default'] = false;
+
+        font[defaultFontName]['default'] = true;
+
         const hrstart = process.hrtime();
 
-        const pdf = await generate({ inputs, template, options: { font, splitThreshold: 0 } });
+        const pdf = await generate({
+          inputs,
+          template,
+          options: {
+            font,
+            splitThreshold: 0,
+          },
+        });
 
         const hrend = process.hrtime(hrstart);
         expect(hrend[0]).toBeLessThanOrEqual(1);
@@ -230,11 +260,12 @@ describe('generate integrate test', () => {
           options: {
             font: {
               SauceHanSansJP: {
-                data: readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`)),
+                data: SauceHanSansJPData,
+                default: true,
                 subset: false,
               },
               SauceHanSerifJP: {
-                data: readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`)),
+                data: SauceHanSerifJPData,
                 subset: false,
               },
             },

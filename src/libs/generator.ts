@@ -13,7 +13,6 @@ import { uniq, getB64BasePdf, mm2pt } from './utils';
 import { createBarCode, validateBarcodeInput } from './barcode';
 import {
   isPageSize,
-  isSubsetFont,
   TemplateSchema,
   Schemas,
   Font,
@@ -46,10 +45,12 @@ export const checkFont = (arg: {
 }) => {
   const { font, defaultFontName, fontNamesInSchemas } = arg;
   if (font) {
-    const fontNames = Object.keys(font);
-    if (defaultFontName && !fontNames.includes(defaultFontName)) {
-      throw Error(`${defaultFontName} of template.fontName is not found in font`);
+    if (!defaultFontName) {
+      throw Error(
+        `default flag is not found in font. Only one of the default flag needs to be true`
+      );
     }
+    const fontNames = Object.keys(font);
     if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
       throw Error(
         `${fontNamesInSchemas
@@ -64,15 +65,15 @@ export const getFontNamesInSchemas = (schemas: Schemas) =>
   uniq(
     schemas
       .map((s) => Object.values(s).map((v) => v.fontName))
-      .reduce((acc, val) => acc.concat(val), [] as (string | undefined)[])
+      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
 
 const embedFont = ({ pdfDoc, font }: { pdfDoc: PDFDocument; font: Font | undefined }) => {
   return Promise.all(
     Object.values(font ?? {}).map((v) =>
-      pdfDoc.embedFont(isSubsetFont(v) ? v.data : v, {
-        subset: isSubsetFont(v) ? v.subset : true,
+      pdfDoc.embedFont(v.data, {
+        subset: typeof v.subset === 'undefined' ? true : v.subset,
       })
     )
   );
@@ -442,3 +443,13 @@ export const drawEmbeddedPage = (arg: {
     page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
   }
 };
+
+// TODO defaultが複数ある場合にエラーを出す テストも書く
+export const getDefaultFontName = (font: Font | undefined) =>
+  font
+    ? Object.entries(font).reduce((acc, cur) => {
+        const [fontName, fontValue] = cur;
+
+        return !acc && fontValue['default'] ? fontName : acc;
+      }, '')
+    : '';

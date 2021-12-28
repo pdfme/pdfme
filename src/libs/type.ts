@@ -1,6 +1,6 @@
 import { PDFImage } from 'pdf-lib';
 
-type TemplateType =
+type TemplateSchemaType =
   | 'text'
   | 'image'
   | 'qrcode'
@@ -14,7 +14,7 @@ type TemplateType =
   | 'upca'
   | 'upce';
 
-export type BarCodeType = Exclude<TemplateType, 'text' | 'image'>;
+export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
 
 export type Alignment = 'left' | 'right' | 'center';
 
@@ -26,21 +26,12 @@ export interface PageSize {
   width: number;
 }
 
-type FontData = string | Uint8Array | ArrayBuffer;
-
-interface SubsetFont {
-  data: FontData;
-  subset: boolean;
-  // TODO default をbooleanで持たせる？
+interface FontValue {
+  data: string | Uint8Array | ArrayBuffer;
+  subset?: boolean;
+  default?: boolean;
 }
 
-export const isSubsetFont = (v: FontValue): v is SubsetFont =>
-  typeof v === 'object' && !!v && 'data' in v;
-
-// TODO 下手にFontData | SubsetFontで持つよりも、Template.fontNameを駆逐したいのでFontDataで持たせる？
-type FontValue = FontData | SubsetFont;
-
-// TODO  Fontの型とUIPropsのfontは共通化させたいのと、複数を配列で持つようにする？
 export interface Font {
   [key: string]: FontValue;
 }
@@ -52,18 +43,16 @@ export type BasePdf = PageSize | string | Uint8Array | ArrayBuffer;
 export const isPageSize = (arg: BasePdf): arg is PageSize =>
   typeof arg === 'object' && 'width' in arg;
 
-// TODO 下手にtemplateにfontNameを持たせずにoptionで管理する？
 export interface Template {
   schemas: Schemas;
   basePdf: BasePdf;
-  fontName?: string;
   sampledata?: { [key: string]: string }[];
   columns?: string[];
 }
 
 // TODO 画像やバーコードにはfontColorが使えないので無駄なプロパティ。typeで制御したい。
 export interface TemplateSchema {
-  type: TemplateType;
+  type: TemplateSchemaType;
   position: { x: number; y: number };
   width: number;
   height: number;

@@ -10,6 +10,7 @@ import {
   drawInputByTemplateSchema,
   getPageSize,
   drawEmbeddedPage,
+  getDefaultFontName,
 } from './libs/generator';
 
 const preprocessing = async (arg: {
@@ -20,8 +21,8 @@ const preprocessing = async (arg: {
   const { inputs, template, font } = arg;
   checkInputs(inputs);
 
-  const { basePdf, schemas, fontName } = template;
-  const defaultFontName = fontName ?? '';
+  const { basePdf, schemas } = template;
+  const defaultFontName = getDefaultFontName(font);
   const fontNamesInSchemas = getFontNamesInSchemas(schemas);
 
   checkFont({ font, defaultFontName, fontNamesInSchemas });
@@ -49,8 +50,7 @@ const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
   const { basePdf, schemas } = template;
   const { font, splitThreshold = 3 } = options;
 
-  const preArg = { inputs, template, font };
-  const preRes = await preprocessing(preArg);
+  const preRes = await preprocessing({ inputs, template, font });
   const { pdfDoc, fontObj, embeddedPages, embedPdfBoxes, isUseMyFont } = preRes;
 
   const inputImageCache: InputImageCache = {};
@@ -68,7 +68,7 @@ const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const defaultFontName = template.fontName ?? '';
+        const defaultFontName = getDefaultFontName(font);
         const textSchemaSetting = { isUseMyFont, fontObj, defaultFontName, splitThreshold };
 
         // eslint-disable-next-line no-await-in-loop

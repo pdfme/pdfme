@@ -68,7 +68,6 @@ export const fmtTemplate = (
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
-    fontName: templateFont.value === defaultFontValue ? '' : templateFont.value,
     sampledata: [
       _schemas.reduce((acc, cur) => {
         cur.forEach((c) => {

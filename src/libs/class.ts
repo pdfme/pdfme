@@ -8,20 +8,19 @@ interface UIBaseProps {
   size: PageSize;
 }
 
+// TODO この方に合わせるようにUIのfont周りの型を変更する必要がある
+interface FontValue {
+  value: string;
+  index: number;
+  default?: boolean;
+}
+interface Font {
+  [label: string]: FontValue;
+}
+
 export type UIProps = {
   domContainer: HTMLElement;
-  options?: {
-    lang?: Lang;
-    // TODO type.tsのFontと共通化させたいのと、複数のFontに対応したい
-    font?: { label: string; value: string };
-    // {
-    //   [key: string]: {
-    //     value: string;
-    //     index: number;
-    //     defalut: boolean;
-    //   };
-    // }
-  };
+  options?: { lang?: Lang; font?: Font };
 };
 
 export abstract class BaseUIClass {
