@@ -1,27 +1,14 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, defaultFont, defaultLang } from './constants';
-import { Template, PageSize, Lang } from './type';
+import { Template, PageSize, Lang, Font } from './type';
 
-interface UIBaseProps {
+export interface UIProps {
+  domContainer: HTMLElement;
   template: Template;
   size: PageSize;
-}
-
-// TODO この方に合わせるようにUIのfont周りの型を変更する必要がある
-interface FontValue {
-  value: string;
-  index: number;
-  default?: boolean;
-}
-interface Font {
-  [label: string]: FontValue;
-}
-
-export type UIProps = {
-  domContainer: HTMLElement;
   options?: { lang?: Lang; font?: Font };
-};
+}
 
 export abstract class BaseUIClass {
   protected domContainer: HTMLElement | null;
@@ -32,9 +19,10 @@ export abstract class BaseUIClass {
 
   private lang: Lang = defaultLang;
 
-  private font: { label: string; value: string } = defaultFont;
+  private font: Font = defaultFont;
 
-  constructor(props: UIBaseProps & UIProps) {
+  constructor(props: UIProps) {
+    // TODO ここから ここでランタイムの型チェックをしたい
     const { domContainer, template, size, options } = props;
     const { lang, font } = options || {};
     this.domContainer = domContainer;
@@ -65,11 +53,11 @@ export abstract class BaseUIClass {
   protected abstract render(): void;
 }
 
-export interface TemplateDesignerProp extends UIBaseProps {
+export interface TemplateDesignerProp extends Omit<UIProps, 'domContainer'> {
   saveTemplate: (template: Template) => void;
 }
 
-export interface PreviewUIProp extends UIBaseProps {
+export interface PreviewUIProp extends Omit<UIProps, 'domContainer'> {
   inputs: { [key: string]: string }[];
   onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
 }

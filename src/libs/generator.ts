@@ -6,7 +6,6 @@ import {
   rgb,
   degrees,
   setCharacterSpacing,
-  StandardFonts,
   TransformationMatrix,
 } from 'pdf-lib';
 import { uniq, getB64BasePdf, mm2pt } from './utils';
@@ -21,7 +20,7 @@ import {
   InputImageCache,
   Alignment,
 } from './type';
-import { barcodeList, defaultFontLabel, defaultFontValue } from './constants';
+import { barcodeList, defaultFontValue, defaultFontLabel } from './constants';
 
 type EmbedPdfBox = {
   mediaBox: { x: number; y: number; width: number; height: number };
@@ -29,35 +28,9 @@ type EmbedPdfBox = {
   trimBox: { x: number; y: number; width: number; height: number };
 };
 
-interface FontObj {
-  [key: string]: PDFFont;
-}
-
 export const checkInputs = (inputs: { [key: string]: string }[]) => {
   if (inputs.length < 1) {
     throw Error('inputs should be more than one length');
-  }
-};
-export const checkFont = (arg: {
-  font?: Font;
-  defaultFontName: string | undefined;
-  fontNamesInSchemas: string[];
-}) => {
-  const { font, defaultFontName, fontNamesInSchemas } = arg;
-  if (font) {
-    if (!defaultFontName) {
-      throw Error(
-        `default flag is not found in font. Only one of the default flag needs to be true`
-      );
-    }
-    const fontNames = Object.keys(font);
-    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-      throw Error(
-        `${fontNamesInSchemas
-          .filter((f) => !fontNames.includes(f))
-          .join()} of template.schemas is not found in font`
-      );
-    }
   }
 };
 
@@ -69,33 +42,56 @@ export const getFontNamesInSchemas = (schemas: Schemas) =>
       .filter(Boolean) as string[]
   );
 
-const embedFont = ({ pdfDoc, font }: { pdfDoc: PDFDocument; font: Font | undefined }) => {
-  return Promise.all(
-    Object.values(font ?? {}).map((v) =>
+export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
+  const { font, fontNamesInSchemas } = arg;
+  if (font) {
+    const fontNames = Object.keys(font);
+    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
+      throw Error(
+        `${fontNamesInSchemas
+          .filter((f) => !fontNames.includes(f))
+          .join()} of template.schemas is not found in font`
+      );
+    }
+
+    const fontValues = Object.values(font);
+    const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
+    if (defaultFontNum === 0) {
+      throw Error(`default flag is not found in font. true default flag must be only one.`);
+    }
+    if (defaultFontNum > 1) {
+      throw Error(
+        `${defaultFontNum} default flags found in font. true default flag must be only one.`
+      );
+    }
+  }
+};
+
+export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font | undefined }) => {
+  const { pdfDoc, font } = arg;
+  const actualFont = font ?? ({ [defaultFontLabel]: { data: defaultFontValue } } as Font);
+  const fontValues = await Promise.all(
+    Object.values(actualFont).map((v) =>
       pdfDoc.embedFont(v.data, {
         subset: typeof v.subset === 'undefined' ? true : v.subset,
       })
     )
   );
+
+  return Object.keys(actualFont).reduce(
+    (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
+    {} as { [key: string]: PDFFont }
+  );
 };
 
-export const getFontObj = async (arg: {
-  pdfDoc: PDFDocument;
-  isUseMyFont: boolean;
-  font: Font | undefined;
-}) => {
-  const { pdfDoc, isUseMyFont, font } = arg;
-  const fontValues = isUseMyFont ? await embedFont({ pdfDoc, font }) : [];
+export const getDefaultFontName = (font: Font | undefined) =>
+  font
+    ? Object.entries(font).reduce((acc, cur) => {
+        const [fontName, fontValue] = cur;
 
-  return isUseMyFont
-    ? Object.keys(font ?? {}).reduce(
-        (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
-        {} as { [key: string]: PDFFont }
-      )
-    : {
-        [defaultFontLabel]: await pdfDoc.embedFont(defaultFontValue),
-      };
-};
+        return !acc && fontValue['default'] ? fontName : acc;
+      }, '')
+    : defaultFontValue;
 
 export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
   pdfDoc: PDFDocument;
@@ -161,6 +157,7 @@ const hex2RgbColor = (hexString: string) => {
 };
 
 const getFontProp = (schema: TemplateSchema) => {
+  // TODO デフォルトの値は utils/getInitialSchema と共有したい
   const size = schema.fontSize || 13;
   const color = hex2RgbColor(schema.fontColor || '#000');
   const alignment = schema.alignment || 'left';
@@ -257,28 +254,29 @@ const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] =
   return [splittedLine, ...getSplittedLines(rest, isOverEval)];
 };
 
+interface TextSchemaSetting {
+  fontObj: {
+    [key: string]: PDFFont;
+  };
+  defaultFontName: string;
+  splitThreshold: number;
+}
+
 const drawInputByTextSchema = (arg: {
   input: string;
   templateSchema: TemplateSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: {
-    isUseMyFont: boolean;
-    fontObj: FontObj;
-    defaultFontName: string;
-    splitThreshold: number;
-  };
+  textSchemaSetting: TextSchemaSetting;
 }) => {
   const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
-  const { isUseMyFont, fontObj, defaultFontName, splitThreshold } = textSchemaSetting;
+  const { fontObj, defaultFontName, splitThreshold } = textSchemaSetting;
   if (templateSchema.type !== 'text') {
     throw Error(`drawInputByTextSchema can't use ${templateSchema.type} type schema`);
   }
 
-  const fontValue = isUseMyFont
-    ? fontObj[templateSchema.fontName ? templateSchema.fontName : defaultFontName]
-    : fontObj[StandardFonts.Helvetica];
+  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : defaultFontName];
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
@@ -325,6 +323,9 @@ const drawInputByTextSchema = (arg: {
   });
 };
 
+const getCacheKey = (templateSchema: TemplateSchema, input: string) =>
+  `${templateSchema.type}${input}`;
+
 const drawInputByImageSchema = async (arg: {
   input: string;
   templateSchema: TemplateSchema;
@@ -346,7 +347,7 @@ const drawInputByImageSchema = async (arg: {
     width,
     height,
   };
-  const inputImageCacheKey = `${templateSchema.type}${input}`;
+  const inputImageCacheKey = getCacheKey(templateSchema, input);
   let image = inputImageCache[inputImageCacheKey];
   if (!image) {
     const isPng = input.startsWith('data:image/png;');
@@ -378,8 +379,8 @@ const drawInputByBarcodeSchema = async (arg: {
     width,
     height,
   };
-  const inputImageCacheKey = `${templateSchema.type}${input}`;
-  let image = inputImageCache[inputImageCacheKey];
+  const inputBarcodeCacheKey = getCacheKey(templateSchema, input);
+  let image = inputImageCache[inputBarcodeCacheKey];
   if (!image && validateBarcodeInput(templateSchema.type as BarCodeType, input)) {
     const imageBuf = await createBarCode({
       ...{ ...templateSchema, type: templateSchema.type as BarCodeType },
@@ -389,7 +390,7 @@ const drawInputByBarcodeSchema = async (arg: {
       image = await pdfDoc.embedPng(imageBuf);
     }
   }
-  inputImageCache[inputImageCacheKey] = image;
+  inputImageCache[inputBarcodeCacheKey] = image;
   page.drawImage(image, opt);
 };
 
@@ -399,12 +400,7 @@ export const drawInputByTemplateSchema = async (arg: {
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: {
-    isUseMyFont: boolean;
-    fontObj: FontObj;
-    defaultFontName: string;
-    splitThreshold: number;
-  };
+  textSchemaSetting: TextSchemaSetting;
   inputImageCache: InputImageCache;
 }) => {
   const { templateSchema, input } = arg;
@@ -443,13 +439,3 @@ export const drawEmbeddedPage = (arg: {
     page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
   }
 };
-
-// TODO defaultが複数ある場合にエラーを出す テストも書く
-export const getDefaultFontName = (font: Font | undefined) =>
-  font
-    ? Object.entries(font).reduce((acc, cur) => {
-        const [fontName, fontValue] = cur;
-
-        return !acc && fontValue['default'] ? fontName : acc;
-      }, '')
-    : '';

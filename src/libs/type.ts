@@ -28,12 +28,13 @@ export interface PageSize {
 
 interface FontValue {
   data: string | Uint8Array | ArrayBuffer;
-  subset?: boolean;
-  default?: boolean;
+  default?: boolean; // default is must be true only one
+  subset?: boolean; // this value is used by generate.
+  index?: number; // this value is used by TemplateDesigner.
 }
 
 export interface Font {
-  [key: string]: FontValue;
+  [label: string]: FontValue;
 }
 
 export type Schemas = { [key: string]: TemplateSchema }[];

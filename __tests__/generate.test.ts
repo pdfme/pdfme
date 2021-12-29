@@ -79,9 +79,35 @@ describe('check validation', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'default flag is not found in font. Only one of the default flag needs to be true'
+        'default flag is not found in font. true default flag must be only one.'
       );
-      font.SauceHanSansJP['default'] = true;
+    }
+  });
+  test(`too many default font`, async () => {
+    const inputs = [{ a: 'test' }];
+    const template: Template = {
+      basePdf: { height: 297, width: 210 },
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    const font = getFont();
+    font.SauceHanSansJP['default'] = true;
+    font.SauceHanSerifJP['default'] = true;
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual(
+        '2 default flags found in font. true default flag must be only one.'
+      );
     }
   });
   test(`missing font in template.schemas`, async () => {

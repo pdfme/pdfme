@@ -5,12 +5,12 @@ import {
   checkInputs,
   checkFont,
   getFontNamesInSchemas,
-  getFontObj,
   getEmbeddedPagesAndEmbedPdfBoxes,
   drawInputByTemplateSchema,
   getPageSize,
   drawEmbeddedPage,
   getDefaultFontName,
+  embedAndGetFontObj,
 } from './libs/generator';
 
 const preprocessing = async (arg: {
@@ -22,22 +22,19 @@ const preprocessing = async (arg: {
   checkInputs(inputs);
 
   const { basePdf, schemas } = template;
-  const defaultFontName = getDefaultFontName(font);
   const fontNamesInSchemas = getFontNamesInSchemas(schemas);
-
-  checkFont({ font, defaultFontName, fontNamesInSchemas });
+  checkFont({ font, fontNamesInSchemas });
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const isUseMyFont = Boolean(font) && (Boolean(defaultFontName) || fontNamesInSchemas.length > 0);
-
-  const fontObj = await getFontObj({ pdfDoc, isUseMyFont, font });
+  const defaultFontName = getDefaultFontName(font);
+  const fontObj = await embedAndGetFontObj({ pdfDoc, font });
 
   const pagesAndBoxes = await getEmbeddedPagesAndEmbedPdfBoxes({ pdfDoc, basePdf });
   const { embeddedPages, embedPdfBoxes } = pagesAndBoxes;
 
-  return { pdfDoc, fontObj, embeddedPages, embedPdfBoxes, isUseMyFont };
+  return { pdfDoc, fontObj, defaultFontName, embeddedPages, embedPdfBoxes };
 };
 
 const postProcessing = (pdfDoc: PDFDocument) => {
@@ -51,7 +48,7 @@ const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
   const { font, splitThreshold = 3 } = options;
 
   const preRes = await preprocessing({ inputs, template, font });
-  const { pdfDoc, fontObj, embeddedPages, embedPdfBoxes, isUseMyFont } = preRes;
+  const { pdfDoc, fontObj, defaultFontName, embeddedPages, embedPdfBoxes } = preRes;
 
   const inputImageCache: InputImageCache = {};
   for (let i = 0; i < inputs.length; i += 1) {
@@ -68,8 +65,7 @@ const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const defaultFontName = getDefaultFontName(font);
-        const textSchemaSetting = { isUseMyFont, fontObj, defaultFontName, splitThreshold };
+        const textSchemaSetting = { fontObj, defaultFontName, splitThreshold };
 
         // eslint-disable-next-line no-await-in-loop
         await drawInputByTemplateSchema({

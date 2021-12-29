@@ -42,7 +42,6 @@ const getTemplate = () => {
 };
 
 const getFont = async () => {
-  // TODO { label: defaultFontLabel, value: defaultFontValue } の形じゃないのが若干統一感がない
   const SauceHanSansJP = await fetch('/SauceHanSansJP.ttf').then((res) => res.arrayBuffer());
-  return { 'Noto Sans JP': SauceHanSansJP };
+  return { 'Noto Sans JP': { data: SauceHanSansJP, default: true } };
 };

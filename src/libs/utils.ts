@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid';
 import _set from 'lodash.set';
 import { PageSize, Template, TemplateSchema, Schema, BasePdf } from './type';
-import { defaultFontValue } from './constants';
 
 export const uuid = nanoid;
 
@@ -60,11 +59,7 @@ export const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * ptRatio;
 };
 
-export const fmtTemplate = (
-  template: Template,
-  schemas: Schema[][],
-  templateFont: { label: string; value: string }
-): Template => {
+export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
   const _schemas = cloneDeep(schemas);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,

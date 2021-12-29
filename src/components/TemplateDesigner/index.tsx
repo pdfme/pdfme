@@ -4,7 +4,7 @@ import { TemplateDesignerProp } from '../../libs/class';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
-import { I18nContext, FontContext } from '../../libs/contexts';
+import { I18nContext } from '../../libs/contexts';
 import {
   uuid,
   set,
@@ -91,7 +91,6 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
-  const templateFont = useContext(FontContext);
 
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
@@ -117,7 +116,7 @@ const TemplateEditor = ({
     },
   });
 
-  const modifiedTemplate = fmtTemplate(template, schemas, templateFont);
+  const modifiedTemplate = fmtTemplate(template, schemas);
 
   const commitSchemas = useCallback(
     (newSchemas: Schema[]) => {

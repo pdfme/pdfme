@@ -1,3 +1,4 @@
+import { StandardFonts } from 'pdf-lib';
 import ean8 from '../assets/barcodeExamples/ean8.png';
 import ean13 from '../assets/barcodeExamples/ean13.png';
 import code39 from '../assets/barcodeExamples/code39.png';
@@ -9,15 +10,17 @@ import qrcode from '../assets/barcodeExamples/qrcode.png';
 import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
 import _imageExample from '../assets/imageExample.png';
-import { BarCodeType } from './type';
+import { BarCodeType, Font } from './type';
 
 export const destroyedErrMsg = 'this instance is already destroyed';
 
-export const defaultFontLabel = 'Helvetica';
+export const defaultFontLabel = StandardFonts.Helvetica as string;
 
-export const defaultFontValue = 'Helvetica';
+export const defaultFontValue = StandardFonts.Helvetica as string;
 
-export const defaultFont = { label: defaultFontLabel, value: defaultFontValue };
+export const defaultFont: Font = {
+  [defaultFontLabel]: { data: defaultFontValue, default: true, index: 0 },
+};
 
 export const defaultLang = 'en';
 
