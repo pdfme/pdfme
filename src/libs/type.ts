@@ -1,87 +1,10 @@
+/* eslint dot-notation: "off"*/
 import { PDFImage } from 'pdf-lib';
-
-type TemplateSchemaType =
-  | 'text'
-  | 'image'
-  | 'qrcode'
-  | 'japanpost'
-  | 'ean13'
-  | 'ean8'
-  | 'code39'
-  | 'code128'
-  | 'nw7'
-  | 'itf14'
-  | 'upca'
-  | 'upce';
-
-export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
-
-export type Alignment = 'left' | 'right' | 'center';
+import { z } from 'zod';
 
 export interface InputImageCache {
   [key: string]: PDFImage;
 }
-export interface PageSize {
-  height: number;
-  width: number;
-}
-
-interface FontValue {
-  data: string | Uint8Array | ArrayBuffer;
-  default?: boolean; // default is must be true only one
-  subset?: boolean; // this value is used by generate.
-  index?: number; // this value is used by TemplateDesigner.
-}
-
-export interface Font {
-  [label: string]: FontValue;
-}
-
-export type Schemas = { [key: string]: TemplateSchema }[];
-
-export type BasePdf = PageSize | string | Uint8Array | ArrayBuffer;
-
-export const isPageSize = (arg: BasePdf): arg is PageSize =>
-  typeof arg === 'object' && 'width' in arg;
-
-export interface Template {
-  schemas: Schemas;
-  basePdf: BasePdf;
-  sampledata?: { [key: string]: string }[];
-  columns?: string[];
-}
-
-// TODO 画像やバーコードにはfontColorが使えないので無駄なプロパティ。typeで制御したい。
-export interface TemplateSchema {
-  type: TemplateSchemaType;
-  position: { x: number; y: number };
-  width: number;
-  height: number;
-  rotate?: number;
-  alignment?: Alignment;
-  fontSize?: number;
-  fontName?: string;
-  fontColor?: string;
-  backgroundColor?: string;
-  characterSpacing?: number;
-  lineHeight?: number;
-}
-
-export type SchemaUIProp = {
-  schema: Schema;
-  editable: boolean;
-  placeholder: string;
-  tabIndex: number;
-  onChange: (value: string) => void;
-};
-
-export type Schema = TemplateSchema & {
-  id: string;
-  key: string;
-  data: string;
-};
-
-export type Lang = 'en' | 'ja';
 
 export interface GuidesInterface {
   getGuides(): number[];
@@ -91,24 +14,133 @@ export interface GuidesInterface {
   resize(): void;
 }
 
-export interface GenerateArg {
-  inputs: { [key: string]: string }[];
-  template: Template;
-  options?: { font?: Font; splitThreshold?: number };
-}
+export type SchemaUIProps = {
+  schema: Schema;
+  editable: boolean;
+  placeholder: string;
+  tabIndex: number;
+  onChange: (value: string) => void;
+};
 
-export interface UIProps {
-  domContainer: HTMLElement;
-  template: Template;
-  size: PageSize;
-  options?: { lang?: Lang; font?: Font };
-}
+const langValues = ['en', 'ja'] as const;
+const Lang = z.enum(langValues);
+export type Lang = z.infer<typeof Lang>;
 
-export interface TemplateDesignerProp extends Omit<UIProps, 'domContainer'> {
-  saveTemplate: (template: Template) => void;
-}
+const templateSchemaType = [
+  'text',
+  'image',
+  'qrcode',
+  'japanpost',
+  'ean13',
+  'ean8',
+  'code39',
+  'code128',
+  'nw7',
+  'itf14',
+  'upca',
+  'upce',
+] as const;
+const TemplateSchemaType = z.enum(templateSchemaType);
+type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
 
-export interface PreviewUIProp extends Omit<UIProps, 'domContainer'> {
-  inputs: { [key: string]: string }[];
-  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
-}
+export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
+
+const alignmentType = ['left', 'right', 'center'] as const;
+const Alignment = z.enum(alignmentType);
+export type Alignment = z.infer<typeof Alignment>;
+
+const PageSize = z.object({ height: z.number(), width: z.number() });
+export type PageSize = z.infer<typeof PageSize>;
+export const isPageSize = (arg: BasePdf): arg is PageSize =>
+  typeof arg === 'object' && 'width' in arg;
+
+const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
+const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
+const Data = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
+
+const Font = z.record(
+  z.object({
+    data: Data,
+    default: z.boolean().optional(),
+    subset: z.boolean().optional(),
+    index: z.number().optional(),
+  })
+);
+export type Font = z.infer<typeof Font>;
+
+const BasePdf = z.union([PageSize, Data]);
+export type BasePdf = z.infer<typeof BasePdf>;
+
+const TemplateSchema = z.object({
+  type: TemplateSchemaType,
+  position: z.object({ x: z.number(), y: z.number() }),
+  width: z.number(),
+  height: z.number(),
+  rotate: z.number().optional(),
+  alignment: Alignment.optional(),
+  // TODO 画像やバーコードには無駄なプロパティ。typeでそれぞれを分けたい。
+  fontSize: z.number().optional(),
+  fontName: z.string().optional(),
+  fontColor: z.string().optional(),
+  backgroundColor: z.string().optional(),
+  characterSpacing: z.number().optional(),
+  lineHeight: z.number().optional(),
+});
+export type TemplateSchema = z.infer<typeof TemplateSchema>;
+
+const Schemas = z.array(z.record(TemplateSchema));
+export type Schemas = z.infer<typeof Schemas>;
+
+const Template = z.object({
+  schemas: Schemas,
+  basePdf: BasePdf,
+  sampledata: z.array(z.record(z.string())).optional(),
+  columns: z.array(z.string()).optional(),
+});
+export type Template = z.infer<typeof Template>;
+
+// TODO 名前が適当すぎる。ひどい 混乱の元。これはUIだけで使われる
+const Schema = z.intersection(
+  TemplateSchema,
+  z.object({ id: z.string(), key: z.string(), data: z.string() })
+);
+export type Schema = z.infer<typeof Schema>;
+
+const Inputs = z.array(z.record(z.string()));
+
+const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
+export const UIProps = z.object({
+  domContainer: HTMLElementSchema,
+  template: Template,
+  size: PageSize,
+  options: z.object({ lang: Lang.optional(), font: Font.optional() }).optional(),
+});
+export type UIProps = z.infer<typeof UIProps>;
+
+// --------------------------------------------------
+
+export const GenerateProps = z.object({
+  inputs: Inputs,
+  template: Template,
+  options: z.object({ font: Font.optional(), splitThreshold: z.number().optional() }).optional(),
+});
+export type GenerateProps = z.infer<typeof GenerateProps>;
+
+export const PreviewProps = UIProps.extend({
+  inputs: Inputs,
+  onChangeInput: z
+    .function()
+    .args(z.object({ index: z.number(), value: z.string(), key: z.string() }))
+    .returns(z.void())
+    .optional(),
+});
+export type PreviewProps = z.infer<typeof PreviewProps>;
+const PreviewReactProps = PreviewProps.omit({ domContainer: true });
+export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
+
+export const TemplateDesignerProps = UIProps.extend({
+  saveTemplate: z.function().args(Template).returns(z.void()),
+});
+export type TemplateDesignerProps = z.infer<typeof TemplateDesignerProps>;
+const TemplateDesignerReactProps = TemplateDesignerProps.omit({ domContainer: true });
+export type TemplateDesignerReactProps = z.infer<typeof TemplateDesignerReactProps>;

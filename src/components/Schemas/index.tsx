@@ -2,12 +2,12 @@ import React, { forwardRef, RefObject, Ref, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { zoom, selectableClassName, barcodeList } from '../../libs/constants';
-import { SchemaUIProp, Schema } from '../../libs/type';
+import { SchemaUIProps, Schema } from '../../libs/type';
 import TextSchema from './TextSchema';
 import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
 
-type Props = SchemaUIProp & { border: string };
+type Props = SchemaUIProps & { border: string };
 
 const getBgc = (schema: Schema) =>
   schema.type === 'text' && schema.backgroundColor ? schema.backgroundColor : 'transparent';

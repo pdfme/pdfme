@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PreviewUI } from './libs/class';
-import { PreviewUIProp, UIProps } from './libs/type';
+import { PreviewProps } from './libs/type';
 import { destroyedErrMsg } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
@@ -9,7 +9,8 @@ import Preview from './components/Preview';
 class Form extends PreviewUI {
   private onChangeInputCallback?: (arg: { index: number; value: string; key: string }) => void;
 
-  constructor(props: PreviewUIProp & UIProps) {
+  constructor(props: PreviewProps) {
+    PreviewProps.parse(props);
     const { domContainer, template, size, inputs, onChangeInput, options } = props;
     super({ domContainer, template, size, inputs, options });
 

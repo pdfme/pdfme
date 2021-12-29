@@ -8,12 +8,11 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
-import { uniq, getB64BasePdf, mm2pt } from './utils';
+import { getB64BasePdf, mm2pt } from './utils';
 import { createBarCode, validateBarcodeInput } from './barcode';
 import {
   isPageSize,
   TemplateSchema,
-  Schemas,
   Font,
   BasePdf,
   BarCodeType,
@@ -34,39 +33,6 @@ export const checkInputs = (inputs: { [key: string]: string }[]) => {
   }
 };
 
-export const getFontNamesInSchemas = (schemas: Schemas) =>
-  uniq(
-    schemas
-      .map((s) => Object.values(s).map((v) => v.fontName))
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
-      .filter(Boolean) as string[]
-  );
-
-export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
-  const { font, fontNamesInSchemas } = arg;
-  if (font) {
-    const fontNames = Object.keys(font);
-    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-      throw Error(
-        `${fontNamesInSchemas
-          .filter((f) => !fontNames.includes(f))
-          .join()} of template.schemas is not found in font`
-      );
-    }
-
-    const fontValues = Object.values(font);
-    const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
-    if (defaultFontNum === 0) {
-      throw Error(`default flag is not found in font. true default flag must be only one.`);
-    }
-    if (defaultFontNum > 1) {
-      throw Error(
-        `${defaultFontNum} default flags found in font. true default flag must be only one.`
-      );
-    }
-  }
-};
-
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font | undefined }) => {
   const { pdfDoc, font } = arg;
   const actualFont = font ?? ({ [defaultFontLabel]: { data: defaultFontValue } } as Font);
@@ -83,15 +49,6 @@ export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font 
     {} as { [key: string]: PDFFont }
   );
 };
-
-export const getDefaultFontName = (font: Font | undefined) =>
-  font
-    ? Object.entries(font).reduce((acc, cur) => {
-        const [fontName, fontValue] = cur;
-
-        return !acc && fontValue['default'] ? fontName : acc;
-      }, '')
-    : defaultFontValue;
 
 export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
   pdfDoc: PDFDocument;

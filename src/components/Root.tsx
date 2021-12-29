@@ -2,6 +2,7 @@ import React, { useContext, forwardRef, ReactNode, Ref } from 'react';
 import { rulerHeight } from '../libs/constants';
 import { PageSize } from '../libs/type';
 import { FontContext } from '../libs/contexts';
+import { getDefaultFontName } from '../libs/utils';
 
 type Props = { size: PageSize; scale: number; children: ReactNode };
 
@@ -12,7 +13,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     <div
       ref={ref}
       style={{
-        fontFamily: `'${font.value}'`,
+        fontFamily: `'${font[getDefaultFontName(font)].data}'`,
         position: 'relative',
         background: 'rgb(74, 74, 74)',
         overflowY: 'auto',

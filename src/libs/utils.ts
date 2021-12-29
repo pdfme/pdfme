@@ -1,6 +1,7 @@
 import { nanoid } from 'nanoid';
 import _set from 'lodash.set';
-import { PageSize, Template, TemplateSchema, Schema, BasePdf } from './type';
+import { PageSize, Template, TemplateSchema, Schema, Schemas, BasePdf, Font } from './type';
+import { defaultFontValue } from './constants';
 
 export const uuid = nanoid;
 
@@ -190,3 +191,45 @@ export const getB64BasePdf = async (basePdf: BasePdf) => {
 
   return basePdf as string;
 };
+
+export const getFontNamesInSchemas = (schemas: Schemas) =>
+  uniq(
+    schemas
+      .map((s) => Object.values(s).map((v) => v.fontName))
+      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
+      .filter(Boolean) as string[]
+  );
+
+export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
+  const { font, fontNamesInSchemas } = arg;
+  if (font) {
+    const fontNames = Object.keys(font);
+    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
+      throw Error(
+        `${fontNamesInSchemas
+          .filter((f) => !fontNames.includes(f))
+          .join()} of template.schemas is not found in font`
+      );
+    }
+
+    const fontValues = Object.values(font);
+    const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
+    if (defaultFontNum === 0) {
+      throw Error(`default flag is not found in font. true default flag must be only one.`);
+    }
+    if (defaultFontNum > 1) {
+      throw Error(
+        `${defaultFontNum} default flags found in font. true default flag must be only one.`
+      );
+    }
+  }
+};
+
+export const getDefaultFontName = (font: Font | undefined) =>
+  font
+    ? Object.entries(font).reduce((acc, cur) => {
+        const [fontName, fontValue] = cur;
+
+        return !acc && fontValue['default'] ? fontName : acc;
+      }, '')
+    : defaultFontValue;

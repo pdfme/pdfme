@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { TemplateDesignerProp, Template, Schema, PageSize } from '../../libs/type';
+import { TemplateDesignerReactProps, Template, Schema, PageSize } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
@@ -81,7 +81,7 @@ const TemplateEditor = ({
   saveTemplate,
   size,
   onChangeTemplate,
-}: TemplateDesignerProp & { onChangeTemplate: (t: Template) => void }) => {
+}: TemplateDesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
   const copiedSchemas = useRef<Schema[] | null>(null);
   const past = useRef<Schema[][]>([]);
   const future = useRef<Schema[][]>([]);

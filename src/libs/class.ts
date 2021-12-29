@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, defaultFont, defaultLang } from './constants';
-import { Template, PageSize, Lang, Font, UIProps, PreviewUIProp } from './type';
+import { Template, PageSize, Lang, Font, UIProps, PreviewProps } from './type';
+import { checkFont, getFontNamesInSchemas } from './utils';
 
 export abstract class BaseUIClass {
   protected domContainer: HTMLElement | null;
@@ -15,7 +16,8 @@ export abstract class BaseUIClass {
   private font: Font = defaultFont;
 
   constructor(props: UIProps) {
-    // TODO ここから ここでランタイムの型チェックをしたい
+    UIProps.parse(props);
+
     const { domContainer, template, size, options } = props;
     const { lang, font } = options || {};
     this.domContainer = domContainer;
@@ -25,6 +27,10 @@ export abstract class BaseUIClass {
       this.lang = lang;
     }
     if (font) {
+      // TODO ここから
+      // またデフォルトフォントのチェックも行う必要がある。これはBaseUIClassでやるべき
+      const fontNamesInSchemas = getFontNamesInSchemas(template.schemas);
+      checkFont({ font, fontNamesInSchemas });
       this.font = font;
     }
   }
@@ -48,7 +54,8 @@ export abstract class BaseUIClass {
 export abstract class PreviewUI extends BaseUIClass {
   protected inputs: { [key: string]: string }[];
 
-  constructor(props: PreviewUIProp & UIProps) {
+  constructor(props: PreviewProps) {
+    PreviewProps.parse(props);
     const { domContainer, template, size, inputs, options } = props;
     super({ domContainer, template, size, options });
 

@@ -1,17 +1,15 @@
 import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { GenerateArg, Template, Font, isPageSize, InputImageCache } from './libs/type';
+import { GenerateProps, Template, Font, isPageSize, InputImageCache } from './libs/type';
 import {
   checkInputs,
-  checkFont,
-  getFontNamesInSchemas,
   getEmbeddedPagesAndEmbedPdfBoxes,
   drawInputByTemplateSchema,
   getPageSize,
   drawEmbeddedPage,
-  getDefaultFontName,
   embedAndGetFontObj,
 } from './libs/generator';
+import { checkFont, getFontNamesInSchemas, getDefaultFontName } from './libs/utils';
 
 const preprocessing = async (arg: {
   inputs: { [key: string]: string }[];
@@ -43,9 +41,12 @@ const postProcessing = (pdfDoc: PDFDocument) => {
   pdfDoc.setCreator(author);
 };
 
-const generate = async ({ inputs, template, options = {} }: GenerateArg) => {
-  const { basePdf, schemas } = template;
+const generate = async (props: GenerateProps) => {
+  GenerateProps.parse(props);
+  const { inputs, template, options = {} } = props;
+  // TODO ref 著者、フォントなどオプションのデフォルト値は引数で入れる #1457
   const { font, splitThreshold = 3 } = options;
+  const { basePdf, schemas } = template;
 
   const preRes = await preprocessing({ inputs, template, font });
   const { pdfDoc, fontObj, defaultFontName, embeddedPages, embedPdfBoxes } = preRes;

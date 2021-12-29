@@ -1,10 +1,10 @@
 import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom } from '../../../libs/constants';
-import { SchemaUIProp } from '../../../libs/type';
+import { SchemaUIProps } from '../../../libs/type';
 
 const TextSchema = (
-  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProp,
+  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,
   ref: Ref<HTMLTextAreaElement>
 ) => (
   <textarea
@@ -34,4 +34,4 @@ const TextSchema = (
   ></textarea>
 );
 
-export default forwardRef<HTMLTextAreaElement, SchemaUIProp>(TextSchema);
+export default forwardRef<HTMLTextAreaElement, SchemaUIProps>(TextSchema);

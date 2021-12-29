@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { PreviewUIProp } from '../../libs/type';
+import { PreviewReactProps } from '../../libs/type';
 import { zoom, rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
 import UnitPager from './UnitPager';
@@ -8,7 +8,7 @@ import Paper from '../Paper';
 import Schema from '../Schemas';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 
-const Preview = ({ template, inputs, size, onChangeInput }: PreviewUIProp) => {
+const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const { backgrounds, pageSizes, scale } = useUiPreProcessor({
     template,
     size,

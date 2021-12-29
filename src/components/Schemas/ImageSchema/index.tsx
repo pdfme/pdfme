@@ -2,7 +2,7 @@ import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom, imageExample } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
-import { SchemaUIProp } from '../../../libs/type';
+import { SchemaUIProps } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 
 const FilledImage = ({
@@ -10,7 +10,7 @@ const FilledImage = ({
   tabIndex,
   schema,
   onChange,
-}: Omit<SchemaUIProp, 'placeholder'>) => (
+}: Omit<SchemaUIProps, 'placeholder'>) => (
   <div style={{ margin: '0 auto' }}>
     {editable && (
       <button tabIndex={tabIndex} className={styles.dltBtn} onClick={() => onChange('')}>
@@ -24,7 +24,7 @@ const FilledImage = ({
   </div>
 );
 
-const BlankImage = (props: SchemaUIProp & { inputRef: Ref<HTMLInputElement> }) => {
+const BlankImage = (props: SchemaUIProps & { inputRef: Ref<HTMLInputElement> }) => {
   const { editable, placeholder, tabIndex, schema, onChange, inputRef } = props;
   const i18n = useContext(I18nContext);
 
@@ -67,7 +67,7 @@ const BlankImage = (props: SchemaUIProp & { inputRef: Ref<HTMLInputElement> }) =
   );
 };
 
-const ImageSchema = (props: SchemaUIProp, ref: Ref<HTMLInputElement>) =>
+const ImageSchema = (props: SchemaUIProps, ref: Ref<HTMLInputElement>) =>
   props.schema.data ? <FilledImage {...props} /> : <BlankImage {...props} inputRef={ref} />;
 
-export default forwardRef<HTMLInputElement, SchemaUIProp>(ImageSchema);
+export default forwardRef<HTMLInputElement, SchemaUIProps>(ImageSchema);

@@ -2,7 +2,7 @@ import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom, barcodeExampleImageObj, barcodeList } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
-import { SchemaUIProp, TemplateSchema, BarCodeType } from '../../../libs/type';
+import { SchemaUIProps, TemplateSchema, BarCodeType } from '../../../libs/type';
 
 const SampleBarcode = ({ schema }: { schema: TemplateSchema }) => (
   <img
@@ -38,7 +38,7 @@ const ErrorOrSampleBarcode = ({ schema, value }: { schema: TemplateSchema; value
   );
 
 const BarcodeSchema = (
-  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProp,
+  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,
   ref: Ref<HTMLInputElement>
 ) => {
   const value = schema.data;
@@ -73,4 +73,4 @@ const BarcodeSchema = (
   );
 };
 
-export default forwardRef<HTMLInputElement, SchemaUIProp>(BarcodeSchema);
+export default forwardRef<HTMLInputElement, SchemaUIProps>(BarcodeSchema);
