@@ -96,3 +96,19 @@ export interface GenerateArg {
   template: Template;
   options?: { font?: Font; splitThreshold?: number };
 }
+
+export interface UIProps {
+  domContainer: HTMLElement;
+  template: Template;
+  size: PageSize;
+  options?: { lang?: Lang; font?: Font };
+}
+
+export interface TemplateDesignerProp extends Omit<UIProps, 'domContainer'> {
+  saveTemplate: (template: Template) => void;
+}
+
+export interface PreviewUIProp extends Omit<UIProps, 'domContainer'> {
+  inputs: { [key: string]: string }[];
+  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
+}

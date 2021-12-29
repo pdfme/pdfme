@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { PreviewUIProp } from '../../libs/class';
+import { PreviewUIProp } from '../../libs/type';
 import { zoom, rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
 import UnitPager from './UnitPager';

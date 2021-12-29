@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PreviewUIProp, PreviewUI, UIProps } from './libs/class';
+import { PreviewUI } from './libs/class';
+import { PreviewUIProp, UIProps } from './libs/type';
 import { destroyedErrMsg } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template } from './libs/type';
-import { BaseUIClass, TemplateDesignerProp, UIProps } from './libs/class';
+import { Template, TemplateDesignerProp, UIProps } from './libs/type';
+import { BaseUIClass } from './libs/class';
 import { destroyedErrMsg } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import TemplateDesignerComponent from './components/TemplateDesigner';

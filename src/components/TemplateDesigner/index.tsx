@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { Template, Schema, PageSize } from '../../libs/type';
-import { TemplateDesignerProp } from '../../libs/class';
+import { TemplateDesignerProp, Template, Schema, PageSize } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';

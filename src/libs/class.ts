@@ -1,14 +1,7 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, defaultFont, defaultLang } from './constants';
-import { Template, PageSize, Lang, Font } from './type';
-
-export interface UIProps {
-  domContainer: HTMLElement;
-  template: Template;
-  size: PageSize;
-  options?: { lang?: Lang; font?: Font };
-}
+import { Template, PageSize, Lang, Font, UIProps, PreviewUIProp } from './type';
 
 export abstract class BaseUIClass {
   protected domContainer: HTMLElement | null;
@@ -52,16 +45,6 @@ export abstract class BaseUIClass {
 
   protected abstract render(): void;
 }
-
-export interface TemplateDesignerProp extends Omit<UIProps, 'domContainer'> {
-  saveTemplate: (template: Template) => void;
-}
-
-export interface PreviewUIProp extends Omit<UIProps, 'domContainer'> {
-  inputs: { [key: string]: string }[];
-  onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
-}
-
 export abstract class PreviewUI extends BaseUIClass {
   protected inputs: { [key: string]: string }[];
 
