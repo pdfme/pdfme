@@ -2,10 +2,18 @@ import React, { forwardRef, RefObject, Ref, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { zoom, selectableClassName, barcodeList } from '../../libs/constants';
-import { SchemaUIProps, Schema } from '../../libs/type';
+import { Schema } from '../../libs/type';
 import TextSchema from './TextSchema';
 import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
+
+export type SchemaUIProps = {
+  schema: Schema;
+  editable: boolean;
+  placeholder: string;
+  tabIndex: number;
+  onChange: (value: string) => void;
+};
 
 type Props = SchemaUIProps & { border: string };
 

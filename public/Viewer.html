@@ -10,6 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body style="margin: 0">
     <div>
@@ -36,9 +40,7 @@
           template: getTemplate(),
           size,
           inputs: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
-          options: {
-            font: { 'Noto Sans JP': { data: 'Noto Sans JP', default: true } },
-          },
+          options: { font: getFontForUI() },
         });
       }
 
@@ -55,7 +57,7 @@
       }
 
       async function generate() {
-        const font = await getFont();
+        const font = await getFontForGenerator();
         LabelmakeUi.generate({
           inputs: viewer.getInputs(),
           template: getTemplate(),

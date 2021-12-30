@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { GuidesInterface, Schema as SchemaType, PageSize } from '../../../libs/type';
+import { Schema as SchemaType, PageSize } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
 import { zoom, rulerHeight } from '../../../libs/constants';
 import Paper from '../../Paper';
@@ -21,6 +21,14 @@ import Mask from './Mask';
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
+
+interface GuidesInterface {
+  getGuides(): number[];
+  scroll(pos: number): void;
+  scrollGuides(pos: number): void;
+  loadGuides(guides: number[]): void;
+  resize(): void;
+}
 
 interface Props {
   height: number;

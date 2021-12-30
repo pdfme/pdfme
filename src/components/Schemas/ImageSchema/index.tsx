@@ -2,7 +2,7 @@ import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom, imageExample } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
-import { SchemaUIProps } from '../../../libs/type';
+import { SchemaUIProps } from '../';
 import { I18nContext } from '../../../libs/contexts';
 
 const FilledImage = ({

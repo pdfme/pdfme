@@ -6,27 +6,11 @@ export interface InputImageCache {
   [key: string]: PDFImage;
 }
 
-export interface GuidesInterface {
-  getGuides(): number[];
-  scroll(pos: number): void;
-  scrollGuides(pos: number): void;
-  loadGuides(guides: number[]): void;
-  resize(): void;
-}
-
-export type SchemaUIProps = {
-  schema: Schema;
-  editable: boolean;
-  placeholder: string;
-  tabIndex: number;
-  onChange: (value: string) => void;
-};
-
-const langValues = ['en', 'ja'] as const;
-const Lang = z.enum(langValues);
+const langs = ['en', 'ja'] as const;
+const Lang = z.enum(langs);
 export type Lang = z.infer<typeof Lang>;
 
-const templateSchemaType = [
+const templateSchemas = [
   'text',
   'image',
   'qrcode',
@@ -40,13 +24,13 @@ const templateSchemaType = [
   'upca',
   'upce',
 ] as const;
-const TemplateSchemaType = z.enum(templateSchemaType);
+const TemplateSchemaType = z.enum(templateSchemas);
 type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
 
 export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
 
-const alignmentType = ['left', 'right', 'center'] as const;
-const Alignment = z.enum(alignmentType);
+const alignments = ['left', 'center', 'right'] as const;
+const Alignment = z.enum(alignments);
 export type Alignment = z.infer<typeof Alignment>;
 
 const PageSize = z.object({ height: z.number(), width: z.number() });
@@ -113,11 +97,11 @@ export const UIProps = z.object({
   domContainer: HTMLElementSchema,
   template: Template,
   size: PageSize,
-  options: z.object({ lang: Lang.optional(), font: Font.optional() }).optional(),
+  options: z.object({ font: Font.optional(), lang: Lang.optional() }).optional(),
 });
 export type UIProps = z.infer<typeof UIProps>;
 
-// --------------------------------------------------
+// -------------------generate-------------------
 
 export const GenerateProps = z.object({
   inputs: Inputs,
@@ -125,6 +109,8 @@ export const GenerateProps = z.object({
   options: z.object({ font: Font.optional(), splitThreshold: z.number().optional() }).optional(),
 });
 export type GenerateProps = z.infer<typeof GenerateProps>;
+
+// -----------------Form, Viewer-----------------
 
 export const PreviewProps = UIProps.extend({
   inputs: Inputs,
@@ -137,6 +123,8 @@ export const PreviewProps = UIProps.extend({
 export type PreviewProps = z.infer<typeof PreviewProps>;
 const PreviewReactProps = PreviewProps.omit({ domContainer: true });
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
+
+// ---------------TemplateDesigner---------------
 
 export const TemplateDesignerProps = UIProps.extend({
   saveTemplate: z.function().args(Template).returns(z.void()),

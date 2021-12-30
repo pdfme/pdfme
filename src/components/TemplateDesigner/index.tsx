@@ -24,7 +24,16 @@ import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 
 const fmtValue = (key: string, value: string) => {
-  const skip = ['id', 'key', 'type', 'data', 'alignment', 'fontColor', 'backgroundColor'];
+  const skip = [
+    'id',
+    'key',
+    'type',
+    'data',
+    'alignment',
+    'fontColor',
+    'fontName',
+    'backgroundColor',
+  ];
   const v = Number(value) < 0 ? 0 : Number(value);
 
   return skip.includes(key) ? value : v;

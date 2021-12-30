@@ -10,6 +10,10 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body style="margin: 0">
     <div>
@@ -45,9 +49,7 @@
             localStorage.setItem('template', tj);
           },
           size,
-          options: {
-            font: { 'Noto Sans JP': { data: 'Noto Sans JP', default: true } },
-          },
+          options: { font: getFontForUI() },
         });
       }
 
@@ -72,7 +74,7 @@
       }
 
       async function generate() {
-        const font = await getFont();
+        const font = await getFontForGenerator();
         const template = getTemplate();
         const inputs = template.sampledata;
         LabelmakeUi.generate({ inputs, template, options: { font } }).then((pdf) => {

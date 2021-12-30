@@ -41,7 +41,16 @@ const getTemplate = () => {
   return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
 };
 
-const getFont = async () => {
+const getFontForGenerator = async () => {
   const SauceHanSansJP = await fetch('/SauceHanSansJP.ttf').then((res) => res.arrayBuffer());
-  return { 'Noto Sans JP': { data: SauceHanSansJP, default: true } };
+  const SauceHanSerifJP = await fetch('/SauceHanSerifJP.ttf').then((res) => res.arrayBuffer());
+  return {
+    'Noto Sans JP': { data: SauceHanSansJP, default: true },
+    'Noto Serif JP': { data: SauceHanSerifJP },
+  };
 };
+
+const getFontForUI = () => ({
+  'Noto Sans JP': { data: 'Noto Sans JP', default: true },
+  'Noto Serif JP': { data: 'Noto Serif JP' },
+});

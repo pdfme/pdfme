@@ -27,8 +27,6 @@ export abstract class BaseUIClass {
       this.lang = lang;
     }
     if (font) {
-      // TODO ここから
-      // またデフォルトフォントのチェックも行う必要がある。これはBaseUIClassでやるべき
       const fontNamesInSchemas = getFontNamesInSchemas(template.schemas);
       checkFont({ font, fontNamesInSchemas });
       this.font = font;

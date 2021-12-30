@@ -4,6 +4,9 @@ import { PageSize } from '../libs/type';
 import { FontContext } from '../libs/contexts';
 import { getDefaultFontName } from '../libs/utils';
 
+// TODO dataにBinary font dataを入れることでFontFaceを使うことができるかもしれないそっちの方がgenerateと同じフォントを使えるのでいいかも
+// というか同じfontのオブジェクトを使えるようにする方が絶対使いやすい
+// https://developer.mozilla.org/en-US/docs/Web/API/FontFace/FontFace
 type Props = { size: PageSize; scale: number; children: ReactNode };
 
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
