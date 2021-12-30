@@ -58,7 +58,7 @@ const config = {
         use: 'ts-loader',
       },
       {
-        test: /\.(png|jpg|svg|gif)$/i,
+        test: /\.(png|jpg|svg|gif|ttf)$/i,
         use: ['url-loader'],
       },
       {

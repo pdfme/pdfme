@@ -1,22 +1,35 @@
-import React, { useContext, forwardRef, ReactNode, Ref } from 'react';
+import type {} from 'css-font-loading-module';
+import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { rulerHeight } from '../libs/constants';
 import { PageSize } from '../libs/type';
 import { FontContext } from '../libs/contexts';
 import { getDefaultFontName } from '../libs/utils';
 
-// TODO dataにBinary font dataを入れることでFontFaceを使うことができるかもしれないそっちの方がgenerateと同じフォントを使えるのでいいかも
-// というか同じfontのオブジェクトを使えるようにする方が絶対使いやすい
-// https://developer.mozilla.org/en-US/docs/Web/API/FontFace/FontFace
 type Props = { size: PageSize; scale: number; children: ReactNode };
 
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);
 
+  // TODO これはcustomhookにしてTemplateDesigner/Main/indexで呼び出すべき
+  useEffect(() => {
+    const fontFaces = Object.entries(font).map((entry) => {
+      const [key, value] = entry;
+      const fontFace = new FontFace(key, value.data);
+
+      return fontFace.load();
+    });
+    Promise.all(fontFaces).then((loadedFontFaces) => {
+      loadedFontFaces.forEach((loadedFontFace) => {
+        document.fonts.add(loadedFontFace);
+      });
+    });
+  }, [font]);
+
   return (
     <div
       ref={ref}
       style={{
-        fontFamily: `'${font[getDefaultFontName(font)].data}'`,
+        fontFamily: `'${getDefaultFontName(font)}'`,
         position: 'relative',
         background: 'rgb(74, 74, 74)',
         overflowY: 'auto',

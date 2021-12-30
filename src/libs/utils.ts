@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid';
+import base64url from 'base64url';
 import _set from 'lodash.set';
 import { PageSize, Template, TemplateSchema, Schema, Schemas, BasePdf, Font } from './type';
-import { defaultFontValue } from './constants';
+import { DEFAULT_FONT_NAME } from './constants';
 
 export const uuid = nanoid;
 
@@ -24,15 +25,25 @@ export const round = (number: number, precision: number) => {
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
 
-export const b64toBlob = (base64: string) => {
-  const byteString = atob(base64.split(',')[1]);
-  const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
-  const buffer = new Uint8Array(byteString.length);
-  for (let i = 0; i < byteString.length; i += 1) {
-    buffer[i] = byteString.charCodeAt(i);
+export const b64toUint8Array = (base64: string) => {
+  if (typeof window !== 'undefined') {
+    const byteString = window.atob(base64.split(',')[1]);
+    const unit8arr = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i += 1) {
+      unit8arr[i] = byteString.charCodeAt(i);
+    }
+
+    return unit8arr;
   }
 
-  return new Blob([buffer.buffer], { type: mimeType });
+  return new Uint8Array(base64url.toBuffer(base64));
+};
+
+export const b64toBlob = (base64: string) => {
+  const uniy8Array = b64toUint8Array(base64);
+  const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
+
+  return new Blob([uniy8Array.buffer], { type: mimeType });
 };
 
 export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
@@ -201,6 +212,7 @@ export const getFontNamesInSchemas = (schemas: Schemas) =>
   );
 
 export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
+  // TODO fontNamesInSchemasに値が設定されているがfontにないケースはエラーにする必要がある
   const { font, fontNamesInSchemas } = arg;
   if (font) {
     const fontNames = Object.keys(font);
@@ -232,4 +244,4 @@ export const getDefaultFontName = (font: Font | undefined) =>
 
         return !acc && fontValue['default'] ? fontName : acc;
       }, '')
-    : defaultFontValue;
+    : DEFAULT_FONT_NAME;

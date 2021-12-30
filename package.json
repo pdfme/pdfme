@@ -33,6 +33,7 @@
     "@pdf-lib/fontkit": "^1.1.1",
     "@tippyjs/react": "^4.2.5",
     "@types/bwip-js": "^2.1.1",
+    "base64url": "^3.0.1",
     "bwip-js": "^3.0.4",
     "hotkeys-js": "^3.8.7",
     "lodash.set": "^4.3.2",
@@ -58,6 +59,7 @@
     "@storybook/react": "^6.3.7",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@types/css-font-loading-module": "^0.0.7",
     "@types/debounce": "^1.2.0",
     "@types/jest": "^27.0.3",
     "@types/lodash.set": "^4.3.6",
@@ -107,8 +109,9 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/assetsTransformer.js",
-      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js"
+      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/assetsTransformer.js",
+      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js",
+      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
     },
     "moduleFileExtensions": [
       "js",

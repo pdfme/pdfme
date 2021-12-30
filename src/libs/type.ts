@@ -40,7 +40,7 @@ export const isPageSize = (arg: BasePdf): arg is PageSize =>
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
-const Data = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
+const Data = z.union([ArrayBufferSchema, Uint8ArraySchema]);
 
 const Font = z.record(
   z.object({
@@ -52,7 +52,7 @@ const Font = z.record(
 );
 export type Font = z.infer<typeof Font>;
 
-const BasePdf = z.union([PageSize, Data]);
+const BasePdf = z.union([z.string(), PageSize, Data]);
 export type BasePdf = z.infer<typeof BasePdf>;
 
 const TemplateSchema = z.object({

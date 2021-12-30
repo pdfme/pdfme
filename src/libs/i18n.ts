@@ -1,5 +1,5 @@
 import { Lang } from './type';
-import { defaultLang } from './constants';
+import { DEFAULT_LANG } from './constants';
 
 type DictEn = typeof dictEn;
 
@@ -57,6 +57,6 @@ const dictJa: { [key in keyof DictEn]: string } = {
   select: '選択',
 };
 
-const i18n = (lang: Lang, key: keyof DictEn) => (lang === defaultLang ? dictEn[key] : dictJa[key]);
+const i18n = (lang: Lang, key: keyof DictEn) => (lang === DEFAULT_LANG ? dictEn[key] : dictJa[key]);
 
 export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);

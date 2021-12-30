@@ -4,16 +4,6 @@
     <meta charset="utf-8" />
     <title>Webpack App</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body style="margin: 0">
     <div>
@@ -30,17 +20,20 @@
       <button onclick="generate()">generate</button>
     </div>
     <div id="app"></div>
-    <script src="./index.js"></script>
+    <script src="./helper.js"></script>
     <script>
       let viewer = null;
 
-      function init() {
+      async function init() {
+        const font = await getFont();
         viewer = new LabelmakeUi.Viewer({
           domContainer,
           template: getTemplate(),
           size,
           inputs: [{ field1: 'bb', field2: 'aaaaaaaaaaaa' }],
-          options: { font: getFontForUI() },
+          options: {
+            font,
+          },
         });
       }
 
@@ -57,11 +50,13 @@
       }
 
       async function generate() {
-        const font = await getFontForGenerator();
+        const font = await getFont();
         LabelmakeUi.generate({
           inputs: viewer.getInputs(),
           template: getTemplate(),
-          options: { font },
+          options: {
+            font,
+          },
         }).then((pdf) => {
           const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
           window.open(URL.createObjectURL(blob));

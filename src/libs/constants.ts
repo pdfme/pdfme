@@ -10,19 +10,19 @@ import qrcode from '../assets/barcodeExamples/qrcode.png';
 import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
 import _imageExample from '../assets/imageExample.png';
-import { BarCodeType, Font } from './type';
+import { b64toUint8Array } from './utils';
+import Helvetica from '../assets/Helvetica.ttf';
+import { BarCodeType, Font, Lang } from './type';
 
 export const destroyedErrMsg = 'this instance is already destroyed';
 
-export const defaultFontLabel = StandardFonts.Helvetica as string;
+export const DEFAULT_FONT_NAME = StandardFonts.Helvetica as string;
 
-export const defaultFontValue = StandardFonts.Helvetica as string;
+export const getDefaultFont = (): Font => ({
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), default: true, index: 0 },
+});
 
-export const defaultFont: Font = {
-  [defaultFontLabel]: { data: defaultFontValue, default: true, index: 0 },
-};
-
-export const defaultLang = 'en';
+export const DEFAULT_LANG: Lang = 'en' as const;
 
 export const imageExample = _imageExample;
 

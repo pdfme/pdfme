@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
-import { destroyedErrMsg, defaultFont, defaultLang } from './constants';
+import { destroyedErrMsg, getDefaultFont, DEFAULT_LANG } from './constants';
 import { Template, PageSize, Lang, Font, UIProps, PreviewProps } from './type';
 import { checkFont, getFontNamesInSchemas } from './utils';
 
@@ -11,9 +11,9 @@ export abstract class BaseUIClass {
 
   protected size: PageSize;
 
-  private lang: Lang = defaultLang;
+  private lang: Lang = DEFAULT_LANG;
 
-  private font: Font = defaultFont;
+  private font: Font = getDefaultFont();
 
   constructor(props: UIProps) {
     UIProps.parse(props);

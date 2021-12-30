@@ -19,7 +19,7 @@ import {
   InputImageCache,
   Alignment,
 } from './type';
-import { barcodeList, defaultFontValue, defaultFontLabel } from './constants';
+import { barcodeList, getDefaultFont } from './constants';
 
 type EmbedPdfBox = {
   mediaBox: { x: number; y: number; width: number; height: number };
@@ -35,7 +35,7 @@ export const checkInputs = (inputs: { [key: string]: string }[]) => {
 
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font | undefined }) => {
   const { pdfDoc, font } = arg;
-  const actualFont = font ?? ({ [defaultFontLabel]: { data: defaultFontValue } } as Font);
+  const actualFont = font ?? getDefaultFont();
   const fontValues = await Promise.all(
     Object.values(actualFont).map((v) =>
       pdfDoc.embedFont(v.data, {
