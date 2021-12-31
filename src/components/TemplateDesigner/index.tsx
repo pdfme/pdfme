@@ -4,20 +4,15 @@ import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
 import { I18nContext } from '../../libs/contexts';
+import { uuid, set, cloneDeep, round, b64toBlob, arrayMove } from '../../libs/utils';
 import {
-  uuid,
-  set,
-  cloneDeep,
-  round,
-  b64toBlob,
-  arrayMove,
   fmtTemplate,
   sortSchemas,
   getInitialSchema,
   getSampleByType,
   getKeepRatioHeightByWidth,
   getB64BasePdf,
-} from '../../libs/utils';
+} from '../../libs/helper';
 import { getPdfPageSizes } from '../../libs/pdfjs';
 import { initShortCuts, destroyShortCuts } from '../../libs/ui';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';

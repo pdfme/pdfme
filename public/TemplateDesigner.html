@@ -41,7 +41,7 @@
           },
           size,
           options: {
-            // font,
+            font,
           },
         });
       }
@@ -74,7 +74,7 @@
           inputs,
           template,
           options: {
-            // font,
+            font,
           },
         }).then((pdf) => {
           const blob = new Blob([pdf.buffer], { type: 'application/pdf' });

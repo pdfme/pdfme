@@ -3,7 +3,7 @@ import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react'
 import { rulerHeight } from '../libs/constants';
 import { PageSize } from '../libs/type';
 import { FontContext } from '../libs/contexts';
-import { getDefaultFontName } from '../libs/utils';
+import { getDefaultFontName } from '../libs/helper';
 
 type Props = { size: PageSize; scale: number; children: ReactNode };
 

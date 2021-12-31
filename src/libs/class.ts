@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, DEFAULT_LANG } from './constants';
 import { Template, PageSize, Lang, Font, UIProps, PreviewProps } from './type';
-import { getDefaultFont, checkFont, getFontNamesInSchemas } from './utils';
+import { getDefaultFont, checkProps } from './helper';
 
 export abstract class BaseUIClass {
   protected domContainer: HTMLElement | null;
@@ -16,7 +16,7 @@ export abstract class BaseUIClass {
   private font: Font = getDefaultFont();
 
   constructor(props: UIProps) {
-    UIProps.parse(props);
+    checkProps(props, UIProps);
 
     const { domContainer, template, size, options } = props;
     const { lang, font } = options || {};
@@ -27,8 +27,6 @@ export abstract class BaseUIClass {
       this.lang = lang;
     }
     if (font) {
-      const fontNamesInSchemas = getFontNamesInSchemas(template.schemas);
-      checkFont({ font, fontNamesInSchemas });
       this.font = font;
     }
   }
@@ -53,11 +51,10 @@ export abstract class PreviewUI extends BaseUIClass {
   protected inputs: { [key: string]: string }[];
 
   constructor(props: PreviewProps) {
-    PreviewProps.parse(props);
-    const { domContainer, template, size, inputs, options } = props;
-    super({ domContainer, template, size, options });
+    super({ ...props });
+    checkProps(props, PreviewProps);
 
-    this.inputs = inputs;
+    this.inputs = props.inputs;
     this.render();
   }
 

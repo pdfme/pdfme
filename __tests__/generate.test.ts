@@ -54,7 +54,11 @@ describe('check validation', () => {
       await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('inputs should be more than one length');
+      expect(e.message).toEqual(`Invalid argument:
+--------------------------
+ERROR POSITION: inputs
+ERROR MESSAGE: Should have at least 1 items
+--------------------------`);
     }
   });
   test(`missing default font`, async () => {

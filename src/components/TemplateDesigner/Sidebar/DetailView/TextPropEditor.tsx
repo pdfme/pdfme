@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
 import { I18nContext, FontContext } from '../../../../libs/contexts';
 import { SidebarProps } from '../';
-import { getDefaultFontName } from '../../../../libs/utils';
+import { getDefaultFontName } from '../../../../libs/helper';
 
 const NumberInputSet = (props: {
   label: string;

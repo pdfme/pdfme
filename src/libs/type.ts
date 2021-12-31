@@ -84,29 +84,36 @@ const Template = z.object({
 export type Template = z.infer<typeof Template>;
 
 // TODO 名前が適当すぎる。ひどい 混乱の元。これはUIだけで使われる
-const Schema = z.intersection(
-  TemplateSchema,
-  z.object({ id: z.string(), key: z.string(), data: z.string() })
-);
+const Schema = TemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() });
 export type Schema = z.infer<typeof Schema>;
 
-const Inputs = z.array(z.record(z.string()));
+// ---------------------------------------------
+
+const Inputs = z.array(z.record(z.string())).min(1);
+
+const CommonOptions = z.object({ font: Font.optional() });
+export type CommonOptions = z.infer<typeof CommonOptions>;
+
+const CommonProps = z.object({ template: Template, options: CommonOptions.optional() });
+export type CommonProps = z.infer<typeof CommonProps>;
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
-export const UIProps = z.object({
+export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
-  template: Template,
   size: PageSize,
-  options: z.object({ font: Font.optional(), lang: Lang.optional() }).optional(),
+  options: CommonOptions.extend({
+    lang: Lang.optional(),
+  }).optional(),
 });
 export type UIProps = z.infer<typeof UIProps>;
 
 // -------------------generate-------------------
 
-export const GenerateProps = z.object({
+export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
-  template: Template,
-  options: z.object({ font: Font.optional(), splitThreshold: z.number().optional() }).optional(),
+  options: CommonOptions.extend({
+    splitThreshold: z.number().optional(),
+  }).optional(),
 });
 export type GenerateProps = z.infer<typeof GenerateProps>;
 

@@ -194,6 +194,7 @@ describe('createBarCode', () => {
       ['タイ語', 'สวัสดีปีใหม่', 'สวัสดีปีใหม่'],
     ];
     for (const t of tests) {
+      // eslint-disable-next-line no-loop-func
       test(`${t[0]}: ${t[1]}`, async () => {
         const buffer = (await createBarCode({
           type: 'qrcode',

@@ -38,7 +38,8 @@ const getSampleTemplate = () => ({
 });
 
 const getTemplate = () => {
-  return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
+  return getSampleTemplate();
+  // return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
 };
 
 const getFont = async () => {

@@ -2,14 +2,13 @@ import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { GenerateProps, Template, Font, isPageSize, InputImageCache } from './libs/type';
 import {
-  checkInputs,
   getEmbeddedPagesAndEmbedPdfBoxes,
   drawInputByTemplateSchema,
   getPageSize,
   drawEmbeddedPage,
   embedAndGetFontObj,
 } from './libs/generator';
-import { getDefaultFont, checkFont, getFontNamesInSchemas, getDefaultFontName } from './libs/utils';
+import { getDefaultFont, getDefaultFontName, checkProps } from './libs/helper';
 import { TOOL_NAME } from './libs/constants';
 
 const preprocessing = async (arg: {
@@ -17,12 +16,9 @@ const preprocessing = async (arg: {
   template: Template;
   font: Font;
 }) => {
-  const { inputs, template, font } = arg;
-  checkInputs(inputs);
+  const { template, font } = arg;
 
-  const { basePdf, schemas } = template;
-  const fontNamesInSchemas = getFontNamesInSchemas(schemas);
-  checkFont({ font, fontNamesInSchemas });
+  const { basePdf } = template;
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
@@ -42,7 +38,7 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 };
 
 const generate = async (props: GenerateProps) => {
-  GenerateProps.parse(props);
+  checkProps(props, GenerateProps);
   const { inputs, template, options = {} } = props;
   const { font = getDefaultFont(), splitThreshold = 3 } = options;
   const { basePdf, schemas } = template;

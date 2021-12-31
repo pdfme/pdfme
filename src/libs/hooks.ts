@@ -1,5 +1,6 @@
 import { RefObject, useState, useCallback, useEffect } from 'react';
-import { b64toBlob, getB64BasePdf, getA4 } from './utils';
+import { b64toBlob } from './utils';
+import { getB64BasePdf, getA4 } from './helper';
 import { pdf2Pngs, getPdfPageSizes } from '../libs/pdfjs';
 import { Template, PageSize } from './type';
 import { rulerHeight, zoom } from './constants';

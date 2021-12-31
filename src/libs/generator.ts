@@ -8,7 +8,8 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
-import { getB64BasePdf, mm2pt } from './utils';
+import { mm2pt } from './utils';
+import { getB64BasePdf } from './helper';
 import { createBarCode, validateBarcodeInput } from './barcode';
 import {
   isPageSize,
@@ -31,12 +32,6 @@ type EmbedPdfBox = {
   mediaBox: { x: number; y: number; width: number; height: number };
   bleedBox: { x: number; y: number; width: number; height: number };
   trimBox: { x: number; y: number; width: number; height: number };
-};
-
-export const checkInputs = (inputs: { [key: string]: string }[]) => {
-  if (inputs.length < 1) {
-    throw Error('inputs should be more than one length');
-  }
 };
 
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
@@ -368,9 +363,8 @@ export const drawInputByTemplateSchema = async (arg: {
   textSchemaSetting: TextSchemaSetting;
   inputImageCache: InputImageCache;
 }) => {
-  const { templateSchema, input } = arg;
-  if (!templateSchema) return;
-  if (!input) return;
+  const { templateSchema } = arg;
+  if (!arg.templateSchema) return;
 
   if (templateSchema.type === 'text') {
     drawInputByTextSchema(arg);

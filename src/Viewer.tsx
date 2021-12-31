@@ -8,9 +8,7 @@ import Preview from './components/Preview';
 
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
-    PreviewProps.parse(props);
-    const { domContainer, template, size, inputs, options } = props;
-    super({ domContainer, template, size, inputs, options });
+    super({ ...props });
   }
 
   render() {
