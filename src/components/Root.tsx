@@ -3,14 +3,13 @@ import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react'
 import { rulerHeight } from '../libs/constants';
 import { PageSize } from '../libs/type';
 import { FontContext } from '../libs/contexts';
-import { getDefaultFontName } from '../libs/helper';
+import Spinner from './Spinner';
 
 type Props = { size: PageSize; scale: number; children: ReactNode };
 
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);
 
-  // TODO これはcustomhookにしてTemplateDesigner/Main/indexで呼び出すべき
   useEffect(() => {
     const fontFaces = Object.entries(font).map((entry) => {
       const [key, value] = entry;
@@ -29,14 +28,29 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     <div
       ref={ref}
       style={{
-        fontFamily: `'${getDefaultFontName(font)}'`,
         position: 'relative',
         background: 'rgb(74, 74, 74)',
         overflowY: 'auto',
         ...size,
       }}
     >
-      <div style={{ height: size.height - rulerHeight * scale }}>{children}</div>
+      <div style={{ height: size.height - rulerHeight * scale }}>
+        {scale === 0 ? (
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Spinner />
+          </div>
+        ) : (
+          children
+        )}
+      </div>
     </div>
   );
 };

@@ -1,15 +1,6 @@
 import { z } from 'zod';
 import Helvetica from '../assets/Helvetica.ttf';
-import {
-  PageSize,
-  Template,
-  TemplateSchema,
-  Schema,
-  Schemas,
-  BasePdf,
-  Font,
-  CommonProps,
-} from './type';
+import { Template, TemplateSchema, Schema, Schemas, BasePdf, Font, CommonProps } from './type';
 import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
@@ -126,8 +117,6 @@ export const getKeepRatioHeightByWidth = (type: string, width: number) => {
 
   return width * (raito[type] ? raito[type] : 1);
 };
-
-export const getA4 = (): PageSize => ({ height: 297, width: 210 });
 
 const blob2Base64 = (blob: Blob) => {
   return new Promise<string | ArrayBuffer>((r) => {

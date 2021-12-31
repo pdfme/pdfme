@@ -1,6 +1,6 @@
 import { RefObject, useState, useCallback, useEffect } from 'react';
 import { b64toBlob } from './utils';
-import { getB64BasePdf, getA4 } from './helper';
+import { getB64BasePdf } from './helper';
 import { pdf2Pngs, getPdfPageSizes } from '../libs/pdfjs';
 import { Template, PageSize } from './type';
 import { rulerHeight, zoom } from './constants';
@@ -11,7 +11,7 @@ type UiPreProcessorProps = { template: Template; size: PageSize; offset?: number
 
 export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
-  const [pageSizes, setPageSizes] = useState<PageSize[]>([getA4()]);
+  const [pageSizes, setPageSizes] = useState<PageSize[]>([]);
   const [scale, setScale] = useState(0);
 
   const init = useCallback(async () => {

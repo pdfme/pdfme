@@ -38,15 +38,14 @@ const getSampleTemplate = () => ({
 });
 
 const getTemplate = () => {
-  return getSampleTemplate();
-  // return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
+  return JSON.parse(localStorage.getItem('template')) || getSampleTemplate();
 };
 
 const getFont = async () => {
   const SauceHanSansJP = await fetch('/SauceHanSansJP.ttf').then((res) => res.arrayBuffer());
   const SauceHanSerifJP = await fetch('/SauceHanSerifJP.ttf').then((res) => res.arrayBuffer());
   return {
-    'Noto Sans JP': { data: SauceHanSansJP, default: true },
-    'Noto Serif JP': { data: SauceHanSerifJP, default: false },
+    'Noto Sans JP': { data: SauceHanSansJP, default: false },
+    'Noto Serif JP': { data: SauceHanSerifJP, default: true },
   };
 };
