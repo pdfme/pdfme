@@ -24,7 +24,11 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
               >
                 x
               </button>
-              <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
+              <img
+                style={{ maxHeight: 180, width: '100%' }}
+                src={activeSchema.data}
+                alt="Input Example"
+              />
             </div>
           ) : (
             <label>
