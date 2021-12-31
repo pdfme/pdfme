@@ -213,6 +213,8 @@ export const getFontNamesInSchemas = (schemas: Schemas) =>
 
 export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
   // TODO fontNamesInSchemasに値が設定されているがfontにないケースはエラーにする必要がある
+  // fontに1つオブジェクトが入っていない場合にはフラグ立ってなくてもエラーにしない方がよさそう
+  // defaultのフラグではなくて、fallbackにする？
   const { font, fontNamesInSchemas } = arg;
   if (font) {
     const fontNames = Object.keys(font);

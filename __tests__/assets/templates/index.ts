@@ -1,4 +1,4 @@
-import { Template } from '../../src/libs/type';
+import { Template } from '../../../src/libs/type';
 const レターパック = require('./レターパック.json') as Template;
 const レターパック_credit = require('./レターパック_credit.json') as Template;
 const レターパックライト = require('./レターパックライト.json') as Template;

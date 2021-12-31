@@ -1,13 +1,13 @@
 import { writeFileSync, readFileSync, readdir, unlink } from 'fs';
 import * as path from 'path';
 import generate from '../src/generate';
-import templateData from './templates';
+import templateData from './assets/templates';
 import { Template, Font } from '../src/libs/type';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
 
-const SauceHanSansJPData = readFileSync(path.join(__dirname, `/fonts/SauceHanSansJP.ttf`));
-const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/fonts/SauceHanSerifJP.ttf`));
+const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
+const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 
 const getFont = (): Font => ({
   SauceHanSansJP: {
@@ -29,9 +29,10 @@ const getPdf = (pdfFilePath: string) => {
   });
 };
 
-const getPath = (dir: string, fileName: string) => path.join(__dirname, `/${dir}/${fileName}`);
-const getTmpPath = (fileName: string) => getPath('tmp', fileName);
-const getAssertPath = (fileName: string) => getPath('assert', fileName);
+const getPdfPath = (dir: string, fileName: string) =>
+  path.join(__dirname, `assets/pdfs/${dir}/${fileName}`);
+const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
+const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);
 
 describe('check validation', () => {
   test(`inputs length is 0`, async () => {
@@ -143,7 +144,7 @@ describe('check validation', () => {
 
 describe('generate integrate test', () => {
   afterAll(() => {
-    const dir = path.join(__dirname, '/tmp');
+    const dir = path.join(__dirname, 'assets/pdfs/tmp');
     const unLinkFile = (file: any) => {
       if (file !== '.gitkeep') {
         unlink(`${dir}/${file}`, (e: any) => {
@@ -192,8 +193,8 @@ describe('generate integrate test', () => {
         const hrend = process.hrtime(hrstart);
         expect(hrend[0]).toBeLessThanOrEqual(1);
 
-        const tmpFile = getTmpPath(`${key}.pdf`);
-        const assertFile = getAssertPath(`${key}.pdf`);
+        const tmpFile = getPdfTmpPath(`${key}.pdf`);
+        const assertFile = getPdfAssertPath(`${key}.pdf`);
 
         writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
@@ -220,8 +221,8 @@ describe('generate integrate test', () => {
         ],
       };
       const pdf = await generate({ inputs, template });
-      const tmpFile = getTmpPath(`nofont.pdf`);
-      const assertFile = getAssertPath(`nofont.pdf`);
+      const tmpFile = getPdfTmpPath(`nofont.pdf`);
+      const assertFile = getPdfAssertPath(`nofont.pdf`);
       writeFileSync(tmpFile, pdf);
       const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
       const [a, e] = res;
@@ -246,8 +247,8 @@ describe('generate integrate test', () => {
           ],
         };
         const pdf = await generate({ inputs, template });
-        const tmpFile = getTmpPath(`fontColor.pdf`);
-        const assertFile = getAssertPath(`fontColor.pdf`);
+        const tmpFile = getPdfTmpPath(`fontColor.pdf`);
+        const assertFile = getPdfAssertPath(`fontColor.pdf`);
         writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
@@ -297,8 +298,8 @@ describe('generate integrate test', () => {
             },
           },
         });
-        const tmpFile = getTmpPath(`fontSubset.pdf`);
-        const assertFile = getAssertPath(`fontSubset.pdf`);
+        const tmpFile = getPdfTmpPath(`fontSubset.pdf`);
+        const assertFile = getPdfAssertPath(`fontSubset.pdf`);
         writeFileSync(tmpFile, pdf);
         const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
         const [a, e] = res;
