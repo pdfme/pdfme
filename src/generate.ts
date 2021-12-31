@@ -9,12 +9,13 @@ import {
   drawEmbeddedPage,
   embedAndGetFontObj,
 } from './libs/generator';
-import { checkFont, getFontNamesInSchemas, getDefaultFontName } from './libs/utils';
+import { getDefaultFont, checkFont, getFontNamesInSchemas, getDefaultFontName } from './libs/utils';
+import { TOOL_NAME } from './libs/constants';
 
 const preprocessing = async (arg: {
   inputs: { [key: string]: string }[];
   template: Template;
-  font: Font | undefined;
+  font: Font;
 }) => {
   const { inputs, template, font } = arg;
   checkInputs(inputs);
@@ -36,16 +37,14 @@ const preprocessing = async (arg: {
 };
 
 const postProcessing = (pdfDoc: PDFDocument) => {
-  const author = 'pdfme (https://github.com/hand-dot/pdfme)';
-  pdfDoc.setProducer(author);
-  pdfDoc.setCreator(author);
+  pdfDoc.setProducer(TOOL_NAME);
+  pdfDoc.setCreator(TOOL_NAME);
 };
 
 const generate = async (props: GenerateProps) => {
   GenerateProps.parse(props);
   const { inputs, template, options = {} } = props;
-  // TODO ref 著者、フォントなどオプションのデフォルト値は引数で入れる #1457
-  const { font, splitThreshold = 3 } = options;
+  const { font = getDefaultFont(), splitThreshold = 3 } = options;
   const { basePdf, schemas } = template;
 
   const preRes = await preprocessing({ inputs, template, font });

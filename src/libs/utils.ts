@@ -1,8 +1,15 @@
 import { nanoid } from 'nanoid';
 import base64url from 'base64url';
 import _set from 'lodash.set';
+import Helvetica from '../assets/Helvetica.ttf';
 import { PageSize, Template, TemplateSchema, Schema, Schemas, BasePdf, Font } from './type';
-import { DEFAULT_FONT_NAME } from './constants';
+import {
+  DEFAULT_FONT_NAME,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_ALIGNMENT,
+  DEFAULT_LINE_HEIGHT,
+  DEFAULT_CHARACTER_SPACING,
+} from './constants';
 
 export const uuid = nanoid;
 
@@ -25,7 +32,7 @@ export const round = (number: number, precision: number) => {
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
 
-export const b64toUint8Array = (base64: string) => {
+const b64toUint8Array = (base64: string) => {
   if (typeof window !== 'undefined') {
     const byteString = window.atob(base64.split(',')[1]);
     const unit8arr = new Uint8Array(byteString.length);
@@ -139,10 +146,10 @@ export const getInitialSchema = (): Schema => ({
   position: { x: 0, y: 0 },
   width: 35,
   height: 7,
-  alignment: 'left',
-  fontSize: 12,
-  characterSpacing: 0,
-  lineHeight: 1,
+  alignment: DEFAULT_ALIGNMENT,
+  fontSize: DEFAULT_FONT_SIZE,
+  characterSpacing: DEFAULT_CHARACTER_SPACING,
+  lineHeight: DEFAULT_LINE_HEIGHT,
 });
 
 export const getSampleByType = (type: string) => {
@@ -211,39 +218,46 @@ export const getFontNamesInSchemas = (schemas: Schemas) =>
       .filter(Boolean) as string[]
   );
 
-export const checkFont = (arg: { font?: Font; fontNamesInSchemas: string[] }) => {
+export const getDefaultFont = (): Font => ({
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), default: true, index: 0 },
+});
+
+export const checkFont = (arg: { font: Font; fontNamesInSchemas: string[] }) => {
   // TODO fontNamesInSchemasに値が設定されているがfontにないケースはエラーにする必要がある
   // fontに1つオブジェクトが入っていない場合にはフラグ立ってなくてもエラーにしない方がよさそう
   // defaultのフラグではなくて、fallbackにする？
   const { font, fontNamesInSchemas } = arg;
-  if (font) {
-    const fontNames = Object.keys(font);
-    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-      throw Error(
-        `${fontNamesInSchemas
-          .filter((f) => !fontNames.includes(f))
-          .join()} of template.schemas is not found in font`
-      );
-    }
+  const fontNames = Object.keys(font);
+  if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
+    throw Error(
+      `${fontNamesInSchemas
+        .filter((f) => !fontNames.includes(f))
+        .join()} of template.schemas is not found in font`
+    );
+  }
 
-    const fontValues = Object.values(font);
-    const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
-    if (defaultFontNum === 0) {
-      throw Error(`default flag is not found in font. true default flag must be only one.`);
-    }
-    if (defaultFontNum > 1) {
-      throw Error(
-        `${defaultFontNum} default flags found in font. true default flag must be only one.`
-      );
-    }
+  const fontValues = Object.values(font);
+  const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
+  if (defaultFontNum === 0) {
+    throw Error(`default flag is not found in font. true default flag must be only one.`);
+  }
+  if (defaultFontNum > 1) {
+    throw Error(
+      `${defaultFontNum} default flags found in font. true default flag must be only one.`
+    );
   }
 };
 
-export const getDefaultFontName = (font: Font | undefined) =>
-  font
-    ? Object.entries(font).reduce((acc, cur) => {
-        const [fontName, fontValue] = cur;
+export const getDefaultFontName = (font: Font) => {
+  const initial = '';
+  const defaultFontName = Object.entries(font).reduce((acc, cur) => {
+    const [fontName, fontValue] = cur;
 
-        return !acc && fontValue['default'] ? fontName : acc;
-      }, '')
-    : DEFAULT_FONT_NAME;
+    return !acc && fontValue['default'] ? fontName : acc;
+  }, initial);
+  if (defaultFontName === initial) {
+    throw Error(`default flag is not found in font. true default flag must be only one.`);
+  }
+
+  return defaultFontName;
+};

@@ -10,19 +10,23 @@ import qrcode from '../assets/barcodeExamples/qrcode.png';
 import upca from '../assets/barcodeExamples/upca.png';
 import upce from '../assets/barcodeExamples/upce.png';
 import _imageExample from '../assets/imageExample.png';
-import { b64toUint8Array } from './utils';
-import Helvetica from '../assets/Helvetica.ttf';
-import { BarCodeType, Font, Lang } from './type';
+import { BarCodeType, Lang } from './type';
+
+// TODO: 小文字と大文字が混在している。inputTypeList,barcodeListは本当に必要か考える
+// 本当に使い回すような定数以外が入っているがおかしい
 
 export const destroyedErrMsg = 'this instance is already destroyed';
 
+export const TOOL_NAME = 'pdfme (https://github.com/hand-dot/pdfme)' as const;
+
 export const DEFAULT_FONT_NAME = StandardFonts.Helvetica as string;
 
-export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), default: true, index: 0 },
-});
-
 export const DEFAULT_LANG: Lang = 'en' as const;
+
+export const DEFAULT_FONT_SIZE = 13;
+export const DEFAULT_ALIGNMENT = 'left';
+export const DEFAULT_LINE_HEIGHT = 1;
+export const DEFAULT_CHARACTER_SPACING = 0;
 
 export const imageExample = _imageExample;
 

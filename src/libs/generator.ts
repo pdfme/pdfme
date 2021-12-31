@@ -19,7 +19,13 @@ import {
   InputImageCache,
   Alignment,
 } from './type';
-import { barcodeList, getDefaultFont } from './constants';
+import {
+  barcodeList,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_ALIGNMENT,
+  DEFAULT_LINE_HEIGHT,
+  DEFAULT_CHARACTER_SPACING,
+} from './constants';
 
 type EmbedPdfBox = {
   mediaBox: { x: number; y: number; width: number; height: number };
@@ -33,18 +39,17 @@ export const checkInputs = (inputs: { [key: string]: string }[]) => {
   }
 };
 
-export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font | undefined }) => {
+export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
   const { pdfDoc, font } = arg;
-  const actualFont = font ?? getDefaultFont();
   const fontValues = await Promise.all(
-    Object.values(actualFont).map((v) =>
+    Object.values(font).map((v) =>
       pdfDoc.embedFont(v.data, {
         subset: typeof v.subset === 'undefined' ? true : v.subset,
       })
     )
   );
 
-  return Object.keys(actualFont).reduce(
+  return Object.keys(font).reduce(
     (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
     {} as { [key: string]: PDFFont }
   );
@@ -107,19 +112,23 @@ const hex2rgb = (hex: string) => {
   return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((str) => parseInt(str, 16));
 };
 
-const hex2RgbColor = (hexString: string) => {
-  const [r, g, b] = hex2rgb(hexString);
+const hex2RgbColor = (hexString: string | undefined) => {
+  if (hexString) {
+    const [r, g, b] = hex2rgb(hexString);
 
-  return rgb(r / 255, g / 255, b / 255);
+    return rgb(r / 255, g / 255, b / 255);
+  }
+
+  // eslint-disable-next-line no-undefined
+  return undefined;
 };
 
 const getFontProp = (schema: TemplateSchema) => {
-  // TODO デフォルトの値は utils/getInitialSchema と共有したい
-  const size = schema.fontSize || 13;
-  const color = hex2RgbColor(schema.fontColor || '#000');
-  const alignment = schema.alignment || 'left';
-  const lineHeight = schema.lineHeight || 1;
-  const characterSpacing = schema.characterSpacing || 0;
+  const size = schema.fontSize || DEFAULT_FONT_SIZE;
+  const color = hex2RgbColor(schema.fontColor);
+  const alignment = schema.alignment || DEFAULT_ALIGNMENT;
+  const lineHeight = schema.lineHeight || DEFAULT_LINE_HEIGHT;
+  const characterSpacing = schema.characterSpacing || DEFAULT_CHARACTER_SPACING;
 
   return { size, color, alignment, lineHeight, characterSpacing };
 };
@@ -143,16 +152,15 @@ const drawBackgroundColor = (arg: {
   pageHeight: number;
 }) => {
   const { templateSchema, page, pageHeight } = arg;
-  if (templateSchema.backgroundColor) {
-    const { width, height } = getSchemaSizeAndRotate(templateSchema);
-    page.drawRectangle({
-      x: calcX(templateSchema.position.x, 'left', width, width),
-      y: calcY(templateSchema.position.y, pageHeight, height),
-      width,
-      height,
-      color: hex2RgbColor(templateSchema.backgroundColor),
-    });
-  }
+  const { width, height } = getSchemaSizeAndRotate(templateSchema);
+  const color = hex2RgbColor(templateSchema.backgroundColor);
+  page.drawRectangle({
+    x: calcX(templateSchema.position.x, 'left', width, width),
+    y: calcY(templateSchema.position.y, pageHeight, height),
+    width,
+    height,
+    color,
+  });
 };
 
 type IsOverEval = (testString: string) => boolean;
