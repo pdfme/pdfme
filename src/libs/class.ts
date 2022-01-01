@@ -51,7 +51,7 @@ export abstract class PreviewUI extends BaseUIClass {
   protected inputs: { [key: string]: string }[];
 
   constructor(props: PreviewProps) {
-    super({ ...props });
+    super(props);
     checkProps(props, PreviewProps);
 
     this.inputs = props.inputs;

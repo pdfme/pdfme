@@ -10,7 +10,7 @@ class Form extends PreviewUI {
   private onChangeInputCallback?: (arg: { index: number; value: string; key: string }) => void;
 
   constructor(props: PreviewProps) {
-    super({ ...props });
+    super(props);
 
     if (props.onChangeInput) {
       this.onChangeInputCallback = props.onChangeInput;

@@ -68,7 +68,7 @@
 
       async function generate() {
         const font = await getFont();
-        const template = getTemplate();
+        const template = editor.getTemplate();
         const inputs = template.sampledata;
         LabelmakeUi.generate({
           inputs,

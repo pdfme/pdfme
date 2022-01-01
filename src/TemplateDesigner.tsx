@@ -11,7 +11,7 @@ class TemplateDesigner extends BaseUIClass {
   private saveTemplateCallback: (t: Template) => void;
 
   constructor(props: TemplateDesignerProps) {
-    super({ ...props });
+    super(props);
     checkProps(props, TemplateDesignerProps);
 
     this.saveTemplateCallback = props.saveTemplate;
@@ -19,18 +19,24 @@ class TemplateDesigner extends BaseUIClass {
   }
 
   public saveTemplate() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     this.saveTemplateCallback(this.template);
   }
 
+  public getTemplate() {
+    if (!this.domContainer) throw Error(destroyedErrMsg);
+
+    return this.template;
+  }
+
   public updateTemplate(template: Template) {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     this.template = template;
     this.render();
   }
 
   render() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>

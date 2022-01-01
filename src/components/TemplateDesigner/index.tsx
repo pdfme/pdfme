@@ -128,9 +128,9 @@ const TemplateEditor = ({
       const _schemas = cloneDeep(schemas);
       _schemas[pageCursor] = newSchemas;
       setSchemas(_schemas);
-      onChangeTemplate(modifiedTemplate);
+      onChangeTemplate(fmtTemplate(template, _schemas));
     },
-    [schemas, pageCursor, modifiedTemplate, onChangeTemplate]
+    [template, schemas, pageCursor, onChangeTemplate]
   );
 
   const removeSchemas = useCallback(
