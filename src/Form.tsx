@@ -18,7 +18,7 @@ class Form extends PreviewUI {
   }
 
   render() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>

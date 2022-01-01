@@ -40,10 +40,7 @@ const canvasPdf = require('./canvasPdf.json') as Template;
 
 export default {
   test: {
-    sampledata: [
-      { a: 'a1', b: 'b1', c: 'c1' },
-      { a: 'a2', b: 'b2', c: 'c2' },
-    ],
+    sampledata: [{ a: 'a1', b: 'b1', c: 'c1' }],
     schemas: [
       {
         a: {

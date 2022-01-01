@@ -58,22 +58,26 @@ export const initShortCuts = (arg: {
   ];
 
   /* eslint complexity: ["error", 22]*/
-  hotkeys(keys.join(), (_, handler) => {
+  hotkeys(keys.join(), (e, handler) => {
     switch (handler.shortcut) {
       case up:
       case shiftUp:
+        e.preventDefault();
         arg.move('up', hotkeys.shift);
         break;
       case down:
       case shiftDown:
+        e.preventDefault();
         arg.move('down', hotkeys.shift);
         break;
       case left:
       case shiftLeft:
+        e.preventDefault();
         arg.move('left', hotkeys.shift);
         break;
       case right:
       case shiftRight:
+        e.preventDefault();
         arg.move('right', hotkeys.shift);
         break;
       case rmWin:
@@ -101,6 +105,7 @@ export const initShortCuts = (arg: {
         break;
       case saveWin:
       case saveMac:
+        e.preventDefault();
         arg.save();
         break;
       default:

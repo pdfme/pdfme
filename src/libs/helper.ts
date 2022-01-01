@@ -166,20 +166,8 @@ const getFontNamesInSchemas = (schemas: Schemas) =>
       .filter(Boolean) as string[]
   );
 
-const checkFont = (arg: { font: Font; fontNamesInSchemas: string[] }) => {
-  // TODO fontNamesInSchemasに値が設定されているがfontにないケースはエラーにする必要がある
-  // fontに1つオブジェクトが入っていない場合にはフラグ立ってなくてもエラーにしない方がよさそう
-  // defaultのフラグではなくて、fallbackにする？
-  const { font, fontNamesInSchemas } = arg;
-  const fontNames = Object.keys(font);
-  if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-    throw Error(
-      `${fontNamesInSchemas
-        .filter((f) => !fontNames.includes(f))
-        .join()} of template.schemas is not found in font`
-    );
-  }
-
+export const checkFont = (arg: { font: Font; schemas: Schemas }) => {
+  const { font, schemas } = arg;
   const fontValues = Object.values(font);
   const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
   if (defaultFontNum === 0) {
@@ -188,6 +176,16 @@ const checkFont = (arg: { font: Font; fontNamesInSchemas: string[] }) => {
   if (defaultFontNum > 1) {
     throw Error(
       `${defaultFontNum} default flags found in font. true default flag must be only one.`
+    );
+  }
+
+  const fontNamesInSchemas = getFontNamesInSchemas(schemas);
+  const fontNames = Object.keys(font);
+  if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
+    throw Error(
+      `${fontNamesInSchemas
+        .filter((f) => !fontNames.includes(f))
+        .join()} of template.schemas is not found in font.`
     );
   }
 };
@@ -213,7 +211,7 @@ ${message}`);
   const { schemas } = commonProps.template;
   const font = commonProps.options?.font;
   if (font) {
-    checkFont({ font, fontNamesInSchemas: getFontNamesInSchemas(schemas) });
+    checkFont({ font, schemas });
   }
 };
 

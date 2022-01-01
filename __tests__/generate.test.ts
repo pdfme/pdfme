@@ -141,7 +141,7 @@ ERROR MESSAGE: Should have at least 1 items
       await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font');
+      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
     }
   });
 });
@@ -173,7 +173,7 @@ describe('generate integrate test', () => {
       const [key, template] = entries[l];
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        const inputs = template.sampledata || [];
+        const inputs = template.sampledata!;
         // @ts-ignore
         const defaultFontName = template.fontName;
 

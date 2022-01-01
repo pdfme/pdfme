@@ -40,7 +40,7 @@ export abstract class BaseUIClass {
   }
 
   public destroy() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     ReactDOM.unmountComponentAtNode(this.domContainer);
     this.domContainer = null;
   }
@@ -59,13 +59,13 @@ export abstract class PreviewUI extends BaseUIClass {
   }
 
   public getInputs() {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
 
     return this.inputs;
   }
 
   public setInputs(inputs: { [key: string]: string }[]) {
-    if (!this.domContainer) throw new Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(destroyedErrMsg);
     this.inputs = inputs;
     this.render();
   }
