@@ -128,13 +128,18 @@ const blob2Base64 = (blob: Blob) => {
   });
 };
 
-export const getB64BasePdf = async (basePdf: BasePdf) => {
-  // TODO 相対パスに対応していない
-  if (typeof basePdf === 'string' && basePdf.startsWith('http')) {
-    const blob = await fetch(basePdf).then((res) => res.blob());
-    const base64 = (await blob2Base64(blob)) as string;
+export const getB64BasePdf = (basePdf: BasePdf) => {
+  const needFetchFromNetwork =
+    typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');
+  if (needFetchFromNetwork) {
+    return fetch(basePdf)
+      .then((res) => res.blob())
+      .then(async (blob) => {
+        const base64 = (await blob2Base64(blob)) as string;
 
-    return base64;
+        return base64;
+      })
+      ['catch'](() => basePdf);
   }
 
   return basePdf as string;
