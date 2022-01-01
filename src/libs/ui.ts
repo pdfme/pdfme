@@ -58,8 +58,7 @@ export const initShortCuts = (arg: {
   ];
 
   /* eslint complexity: ["error", 22]*/
-  hotkeys(keys.join(), (e, handler) => {
-    e.preventDefault();
+  hotkeys(keys.join(), (_, handler) => {
     switch (handler.shortcut) {
       case up:
       case shiftUp:
