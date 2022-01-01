@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, DEFAULT_LANG } from './constants';
 import { Template, PageSize, Lang, Font, UIProps, PreviewProps } from './type';
-import { getDefaultFont, checkProps } from './helper';
+import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from './helper';
 
 export abstract class BaseUIClass {
   protected domContainer: HTMLElement | null;
@@ -21,7 +21,7 @@ export abstract class BaseUIClass {
     const { domContainer, template, size, options } = props;
     const { lang, font } = options || {};
     this.domContainer = domContainer;
-    this.template = template;
+    this.template = generateColumnsAndSampledataIfNeeded(template);
     this.size = size;
     if (lang) {
       this.lang = lang;

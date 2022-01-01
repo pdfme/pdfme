@@ -8,7 +8,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
 } from './constants';
-import { cloneDeep, uuid, uniq, b64toUint8Array } from './utils';
+import { cloneDeep, uuid, uniq, b64toUint8Array, flatten } from './utils';
 
 export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
   const _schemas = cloneDeep(schemas);
@@ -215,4 +215,40 @@ ${message}`);
   if (font) {
     checkFont({ font, fontNamesInSchemas: getFontNamesInSchemas(schemas) });
   }
+};
+
+export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
+  const { schemas, columns, sampledata } = template;
+
+  const flatSchemaLength = schemas
+    .map((schema) => Object.keys(schema).length)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  const neetColumns = !columns || flatSchemaLength !== columns.length;
+
+  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
+
+  // columns
+  if (neetColumns) {
+    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
+  }
+
+  // sampledata
+  if (needSampledata) {
+    template.sampledata = [
+      schemas.reduce(
+        (acc, cur) =>
+          Object.assign(
+            acc,
+            Object.keys(cur).reduce(
+              (a, c) => Object.assign(a, { [c]: '' }),
+              {} as { [key: string]: string }
+            )
+          ),
+        {} as { [key: string]: string }
+      ),
+    ];
+  }
+
+  return template;
 };

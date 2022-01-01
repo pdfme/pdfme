@@ -78,7 +78,7 @@ export type Schemas = z.infer<typeof Schemas>;
 const Template = z.object({
   schemas: Schemas,
   basePdf: BasePdf,
-  sampledata: z.array(z.record(z.string())).optional(),
+  sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
 });
 export type Template = z.infer<typeof Template>;
