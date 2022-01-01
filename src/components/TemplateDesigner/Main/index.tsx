@@ -199,11 +199,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         render={({ index, schema, paperSize }) => {
-          const psrh = {
-            width: paperSize.width + rulerHeight,
-            height: paperSize.height + rulerHeight,
-          };
-
           return (
             <>
               <Guides
@@ -220,13 +215,16 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                 }}
               />
               {pageCursor !== index ? (
-                <Mask {...psrh} />
+                <Mask
+                  width={paperSize.width + rulerHeight}
+                  height={paperSize.height + rulerHeight}
+                />
               ) : (
                 !editing && (
                   <Moveable
                     ref={moveable}
                     target={activeElements}
-                    bounds={{ left: 0, top: 0, bottom: psrh.height, right: psrh.width }}
+                    bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
                     horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                     verticalGuidelines={getGuideLines(verticalGuides.current, index)}
                     keepRatio={isPressShiftKey}
