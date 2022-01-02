@@ -218,7 +218,7 @@ interface TextSchemaSetting {
   fontObj: {
     [key: string]: PDFFont;
   };
-  defaultFontName: string;
+  fallbackFontName: string;
   splitThreshold: number;
 }
 
@@ -231,12 +231,12 @@ const drawInputByTextSchema = (arg: {
   textSchemaSetting: TextSchemaSetting;
 }) => {
   const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
-  const { fontObj, defaultFontName, splitThreshold } = textSchemaSetting;
+  const { fontObj, fallbackFontName, splitThreshold } = textSchemaSetting;
   if (templateSchema.type !== 'text') {
     throw Error(`drawInputByTextSchema can't use ${templateSchema.type} type schema`);
   }
 
-  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : defaultFontName];
+  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 

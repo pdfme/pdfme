@@ -7,7 +7,7 @@ const sansData = readFileSync(path.join(__dirname, `../assets/fonts/SauceHanSans
 const serifData = readFileSync(path.join(__dirname, `../assets/fonts/SauceHanSerifJP.ttf`));
 
 const getSampleFont = (): Font => ({
-  SauceHanSansJP: { default: true, data: sansData },
+  SauceHanSansJP: { fallback: true, data: sansData },
   SauceHanSerifJP: { data: serifData },
 });
 
@@ -55,7 +55,7 @@ describe('checkFont test', () => {
     }
   });
 
-  test('success test: fontName in Schemas(default font)', () => {
+  test('success test: fontName in Schemas(fallback font)', () => {
     try {
       checkFont({ schemas: getSampleSchemas(), font: getSampleFont() });
       expect.anything();
@@ -64,10 +64,10 @@ describe('checkFont test', () => {
     }
   });
 
-  test('success test: fontName in Schemas(not default font)', () => {
+  test('success test: fontName in Schemas(not fallback font)', () => {
     const getFont = (): Font => ({
       SauceHanSansJP: { data: sansData },
-      SauceHanSerifJP: { default: true, data: serifData },
+      SauceHanSerifJP: { fallback: true, data: serifData },
     });
 
     try {
@@ -78,7 +78,7 @@ describe('checkFont test', () => {
     }
   });
 
-  test('fail test: no default font', () => {
+  test('fail test: no fallback font', () => {
     const getFont = (): Font => ({
       SauceHanSansJP: { data: sansData },
       SauceHanSerifJP: { data: serifData },
@@ -89,15 +89,15 @@ describe('checkFont test', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'default flag is not found in font. true default flag must be only one.'
+        'fallback flag is not found in font. true fallback flag must be only one.'
       );
     }
   });
 
-  test('fail test: too many default font', () => {
+  test('fail test: too many fallback font', () => {
     const getFont = (): Font => ({
-      SauceHanSansJP: { data: sansData, default: true },
-      SauceHanSerifJP: { data: serifData, default: true },
+      SauceHanSansJP: { data: sansData, fallback: true },
+      SauceHanSerifJP: { data: serifData, fallback: true },
     });
 
     try {
@@ -105,7 +105,7 @@ describe('checkFont test', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        '2 default flags found in font. true default flag must be only one.'
+        '2 fallback flags found in font. true fallback flag must be only one.'
       );
     }
   });

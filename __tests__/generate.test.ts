@@ -11,7 +11,7 @@ const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/Sau
 
 const getFont = (): Font => ({
   SauceHanSansJP: {
-    default: true,
+    fallback: true,
     data: SauceHanSansJPData,
   },
   SauceHanSerifJP: {
@@ -61,7 +61,7 @@ ERROR MESSAGE: Should have at least 1 items
 --------------------------`);
     }
   });
-  test(`missing default font`, async () => {
+  test(`missing fallback font`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
       basePdf: { height: 297, width: 210 },
@@ -77,18 +77,18 @@ ERROR MESSAGE: Should have at least 1 items
       ],
     };
     const font = getFont();
-    font.SauceHanSansJP.default = false;
-    font.SauceHanSerifJP.default = false;
+    font.SauceHanSansJP.fallback = false;
+    font.SauceHanSerifJP.fallback = false;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'default flag is not found in font. true default flag must be only one.'
+        'fallback flag is not found in font. true fallback flag must be only one.'
       );
     }
   });
-  test(`too many default font`, async () => {
+  test(`too many fallback font`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
       basePdf: { height: 297, width: 210 },
@@ -104,14 +104,14 @@ ERROR MESSAGE: Should have at least 1 items
       ],
     };
     const font = getFont();
-    font.SauceHanSansJP.default = true;
-    font.SauceHanSerifJP.default = true;
+    font.SauceHanSansJP.fallback = true;
+    font.SauceHanSerifJP.fallback = true;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        '2 default flags found in font. true default flag must be only one.'
+        '2 fallback flags found in font. true fallback flag must be only one.'
       );
     }
   });
@@ -175,13 +175,13 @@ describe('generate integrate test', () => {
       test(`snapshot ${key}`, async () => {
         const inputs = template.sampledata!;
         // @ts-ignore
-        const defaultFontName = template.fontName;
+        const fallbackFontName = template.fontName;
 
         const font = getFont();
-        font.SauceHanSansJP.default = false;
-        font.SauceHanSerifJP.default = false;
+        font.SauceHanSansJP.fallback = false;
+        font.SauceHanSerifJP.fallback = false;
 
-        font[defaultFontName].default = true;
+        font[fallbackFontName].fallback = true;
 
         const hrstart = process.hrtime();
 
@@ -292,7 +292,7 @@ describe('generate integrate test', () => {
             font: {
               SauceHanSansJP: {
                 data: SauceHanSansJPData,
-                default: true,
+                fallback: true,
                 subset: false,
               },
               SauceHanSerifJP: {

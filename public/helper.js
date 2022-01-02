@@ -46,7 +46,7 @@ const getFont = async () => {
   const SauceHanSansJP = await fetch('/SauceHanSansJP.ttf').then((res) => res.arrayBuffer());
   const SauceHanSerifJP = await fetch('/SauceHanSerifJP.ttf').then((res) => res.arrayBuffer());
   return {
-    'Noto Sans JP': { data: SauceHanSansJP, default: false },
-    'Noto Serif JP': { data: SauceHanSerifJP, default: true },
+    'Noto Sans JP': { data: SauceHanSansJP, fallback: false },
+    'Noto Serif JP': { data: SauceHanSerifJP, fallback: true },
   };
 };

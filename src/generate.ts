@@ -8,7 +8,7 @@ import {
   drawEmbeddedPage,
   embedAndGetFontObj,
 } from './libs/generator';
-import { getDefaultFont, getDefaultFontName, checkProps } from './libs/helper';
+import { getDefaultFont, getFallbackFontName, checkProps } from './libs/helper';
 import { TOOL_NAME } from './libs/constants';
 
 const preprocessing = async (arg: {
@@ -23,13 +23,13 @@ const preprocessing = async (arg: {
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const defaultFontName = getDefaultFontName(font);
+  const fallbackFontName = getFallbackFontName(font);
   const fontObj = await embedAndGetFontObj({ pdfDoc, font });
 
   const pagesAndBoxes = await getEmbeddedPagesAndEmbedPdfBoxes({ pdfDoc, basePdf });
   const { embeddedPages, embedPdfBoxes } = pagesAndBoxes;
 
-  return { pdfDoc, fontObj, defaultFontName, embeddedPages, embedPdfBoxes };
+  return { pdfDoc, fontObj, fallbackFontName, embeddedPages, embedPdfBoxes };
 };
 
 const postProcessing = (pdfDoc: PDFDocument) => {
@@ -44,7 +44,7 @@ const generate = async (props: GenerateProps) => {
   const { basePdf, schemas } = template;
 
   const preRes = await preprocessing({ inputs, template, font });
-  const { pdfDoc, fontObj, defaultFontName, embeddedPages, embedPdfBoxes } = preRes;
+  const { pdfDoc, fontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
 
   const inputImageCache: InputImageCache = {};
   for (let i = 0; i < inputs.length; i += 1) {
@@ -61,7 +61,7 @@ const generate = async (props: GenerateProps) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const textSchemaSetting = { fontObj, defaultFontName, splitThreshold };
+        const textSchemaSetting = { fontObj, fallbackFontName, splitThreshold };
 
         // eslint-disable-next-line no-await-in-loop
         await drawInputByTemplateSchema({

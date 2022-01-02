@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
 import { I18nContext, FontContext } from '../../../../libs/contexts';
 import { SidebarProps } from '../';
-import { getDefaultFontName } from '../../../../libs/helper';
+import { getFallbackFontName } from '../../../../libs/helper';
 
 const NumberInputSet = (props: {
   label: string;
@@ -65,7 +65,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
   const alignments = ['left', 'center', 'right'];
   const i18n = useContext(I18nContext);
   const font = useContext(FontContext);
-  const defaultFontName = getDefaultFontName(font);
+  const fallbackFontName = getFallbackFontName(font);
 
   if (activeSchema.type !== 'text') return <></>;
 
@@ -76,7 +76,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
       <div className={styles.flx}>
         <SelectSet
           label={'FontName'}
-          value={activeSchema.fontName || defaultFontName}
+          value={activeSchema.fontName || fallbackFontName}
           options={Object.keys(font)}
           onChange={(e) => {
             changeSchemas([{ key: 'fontName', value: e.target.value, schemaId: activeSchema.id }]);

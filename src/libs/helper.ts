@@ -147,22 +147,22 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
   return basePdf as string;
 };
 
-export const getDefaultFontName = (font: Font) => {
+export const getFallbackFontName = (font: Font) => {
   const initial = '';
-  const defaultFontName = Object.entries(font).reduce((acc, cur) => {
+  const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
     const [fontName, fontValue] = cur;
 
-    return !acc && fontValue.default ? fontName : acc;
+    return !acc && fontValue.fallback ? fontName : acc;
   }, initial);
-  if (defaultFontName === initial) {
-    throw Error(`default flag is not found in font. true default flag must be only one.`);
+  if (fallbackFontName === initial) {
+    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
   }
 
-  return defaultFontName;
+  return fallbackFontName;
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), default: true, index: 0 },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true, index: 0 },
 });
 
 const getFontNamesInSchemas = (schemas: Schemas) =>
@@ -176,13 +176,13 @@ const getFontNamesInSchemas = (schemas: Schemas) =>
 export const checkFont = (arg: { font: Font; schemas: Schemas }) => {
   const { font, schemas } = arg;
   const fontValues = Object.values(font);
-  const defaultFontNum = fontValues.reduce((acc, cur) => (cur.default ? acc + 1 : acc), 0);
-  if (defaultFontNum === 0) {
-    throw Error(`default flag is not found in font. true default flag must be only one.`);
+  const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
+  if (fallbackFontNum === 0) {
+    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
   }
-  if (defaultFontNum > 1) {
+  if (fallbackFontNum > 1) {
     throw Error(
-      `${defaultFontNum} default flags found in font. true default flag must be only one.`
+      `${fallbackFontNum} fallback flags found in font. true fallback flag must be only one.`
     );
   }
 

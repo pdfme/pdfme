@@ -2,7 +2,7 @@ import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { FontContext } from '../libs/contexts';
 import { zoom, rulerHeight } from '../libs/constants';
 import { TemplateSchema, Schema, PageSize } from '../libs/type';
-import { getDefaultFontName } from '../libs/helper';
+import { getFallbackFontName } from '../libs/helper';
 
 const Paper = ({
   paperRefs,
@@ -48,7 +48,7 @@ const Paper = ({
               }
             }}
             style={{
-              fontFamily: `'${getDefaultFontName(font)}'`,
+              fontFamily: `'${getFallbackFontName(font)}'`,
               margin: `${rulerHeight * scale}px auto`,
               position: 'relative',
               backgroundImage: `url(${background})`,
