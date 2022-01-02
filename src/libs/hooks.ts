@@ -36,6 +36,7 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
       setScale(data.scale);
       setBackgrounds(data.backgrounds);
     });
+    // TODO ここでエラーハンドリングするべき
   }, [init]);
 
   return { backgrounds, pageSizes, scale };

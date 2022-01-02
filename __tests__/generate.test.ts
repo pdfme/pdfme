@@ -77,8 +77,8 @@ ERROR MESSAGE: Should have at least 1 items
       ],
     };
     const font = getFont();
-    font.SauceHanSansJP['default'] = false;
-    font.SauceHanSerifJP['default'] = false;
+    font.SauceHanSansJP.default = false;
+    font.SauceHanSerifJP.default = false;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
@@ -104,8 +104,8 @@ ERROR MESSAGE: Should have at least 1 items
       ],
     };
     const font = getFont();
-    font.SauceHanSansJP['default'] = true;
-    font.SauceHanSerifJP['default'] = true;
+    font.SauceHanSansJP.default = true;
+    font.SauceHanSerifJP.default = true;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
@@ -178,10 +178,10 @@ describe('generate integrate test', () => {
         const defaultFontName = template.fontName;
 
         const font = getFont();
-        font.SauceHanSansJP['default'] = false;
-        font.SauceHanSerifJP['default'] = false;
+        font.SauceHanSansJP.default = false;
+        font.SauceHanSerifJP.default = false;
 
-        font[defaultFontName]['default'] = true;
+        font[defaultFontName].default = true;
 
         const hrstart = process.hrtime();
 

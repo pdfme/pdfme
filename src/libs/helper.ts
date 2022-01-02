@@ -139,7 +139,7 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
 
         return base64;
       })
-      ['catch'](() => basePdf);
+      .catch(() => basePdf);
   }
 
   return basePdf as string;
@@ -150,7 +150,7 @@ export const getDefaultFontName = (font: Font) => {
   const defaultFontName = Object.entries(font).reduce((acc, cur) => {
     const [fontName, fontValue] = cur;
 
-    return !acc && fontValue['default'] ? fontName : acc;
+    return !acc && fontValue.default ? fontName : acc;
   }, initial);
   if (defaultFontName === initial) {
     throw Error(`default flag is not found in font. true default flag must be only one.`);
@@ -174,7 +174,7 @@ const getFontNamesInSchemas = (schemas: Schemas) =>
 export const checkFont = (arg: { font: Font; schemas: Schemas }) => {
   const { font, schemas } = arg;
   const fontValues = Object.values(font);
-  const defaultFontNum = fontValues.reduce((acc, cur) => (cur['default'] ? acc + 1 : acc), 0);
+  const defaultFontNum = fontValues.reduce((acc, cur) => (cur.default ? acc + 1 : acc), 0);
   if (defaultFontNum === 0) {
     throw Error(`default flag is not found in font. true default flag must be only one.`);
   }

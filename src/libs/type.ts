@@ -45,6 +45,7 @@ const Data = z.union([ArrayBufferSchema, Uint8ArraySchema]);
 const Font = z.record(
   z.object({
     data: Data,
+    // TODO fallbackにする
     default: z.boolean().optional(),
     subset: z.boolean().optional(),
     index: z.number().optional(),

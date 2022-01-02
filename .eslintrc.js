@@ -17,6 +17,7 @@ module.exports = {
   plugins: ['prettier', 'react', 'react-hooks', '@typescript-eslint'],
   rules: {
     'no-use-before-define': 'off',
+    'dot-notation': 'warn',
     '@typescript-eslint/no-use-before-define': ['error'],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
