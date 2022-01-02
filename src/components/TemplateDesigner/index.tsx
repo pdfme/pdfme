@@ -12,6 +12,7 @@ import {
   getSampleByType,
   getKeepRatioHeightByWidth,
   getB64BasePdf,
+  getUniqSchemaKey,
 } from '../../libs/helper';
 import { getPdfPageSizes } from '../../libs/pdfjs';
 import { initShortCuts, destroyShortCuts } from '../../libs/ui';
@@ -186,8 +187,7 @@ const TemplateEditor = ({
         const arg = moveCommandToChangeSchemasArg({ command, activeSchemas, pageSize, isShift });
         changeSchemas(arg);
       },
-      remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
-      esc: onEditEnd,
+
       copy: () => {
         const activeSchemas = getActiveSchemas();
         if (activeSchemas.length === 0) return;
@@ -195,27 +195,29 @@ const TemplateEditor = ({
       },
       paste: () => {
         if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
-        const ps = pageSizes[pageCursor];
-        const _schemas = copiedSchemas.current.map((cs) => {
+        const schema = schemas[pageCursor];
+        const stackUniqSchemaKeys: string[] = [];
+        const pasteSchemas = copiedSchemas.current.map((cs) => {
+          const id = uuid();
+          const key = getUniqSchemaKey({ copiedSchemaKey: cs.key, schema, stackUniqSchemaKeys });
           const { height, width, position: p } = cs;
+          const ps = pageSizes[pageCursor];
           const position = {
             x: p.x + 10 > ps.width - width ? ps.width - width : p.x + 10,
             y: p.y + 10 > ps.height - height ? ps.height - height : p.y + 10,
           };
-          const schema = Object.assign(cloneDeep(cs), { id: uuid(), position });
-          schema.key = `${schema.key} copy`;
 
-          return schema;
+          return Object.assign(cloneDeep(cs), { id, key, position });
         });
-        commitSchemas(schemas[pageCursor].concat(_schemas));
-        setActiveElements(_schemas.map((s) => document.getElementById(s.id)!));
-        copiedSchemas.current = _schemas;
+        commitSchemas(schemas[pageCursor].concat(pasteSchemas));
+        setActiveElements(pasteSchemas.map((s) => document.getElementById(s.id)!));
+        copiedSchemas.current = pasteSchemas;
       },
       redo: () => timeTavel('redo'),
       undo: () => timeTavel('undo'),
-      save: () => {
-        saveTemplate(modifiedTemplate);
-      },
+      save: () => saveTemplate(modifiedTemplate),
+      remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
+      esc: onEditEnd,
     });
   }, [
     activeElements,

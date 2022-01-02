@@ -11,6 +11,7 @@ import { OnDrag, OnResize } from 'react-moveable';
 import { Schema as SchemaType, PageSize } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
 import { zoom, rulerHeight } from '../../../libs/constants';
+import { usePrevious } from '../../../libs/hooks';
 import Paper from '../../Paper';
 import Schema from '../../Schemas';
 import Selecto from './Selecto';
@@ -63,6 +64,8 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
 
+  const prevSchemas = usePrevious(schemas);
+
   const onKeydown = (e: KeyboardEvent) => {
     if (e.shiftKey) setIsPressShiftKey(true);
   };
@@ -87,8 +90,19 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [initEvents, destroyEvents]);
 
   useEffect(() => {
-    moveable.current?.updateRect();
-  }, [schemas]);
+    if (prevSchemas === null) {
+      moveable.current?.updateRect();
+
+      return;
+    }
+
+    const prevSchemaKeys = Object.keys(prevSchemas[pageCursor]);
+    const schemaKeys = Object.keys(schemas[pageCursor]);
+
+    if (prevSchemaKeys.join() === schemaKeys.join()) {
+      moveable.current?.updateRect();
+    }
+  }, [pageCursor, schemas, prevSchemas]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
     target.style.left = `${left < 0 ? 0 : left}px`;

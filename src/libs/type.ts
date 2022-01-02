@@ -84,7 +84,11 @@ const Template = z.object({
 export type Template = z.infer<typeof Template>;
 
 // TODO 名前が適当すぎる。ひどい 混乱の元。これはUIだけで使われる
-const Schema = TemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() });
+const Schema = TemplateSchema.extend({
+  id: z.string(),
+  key: z.string(),
+  data: z.string(),
+});
 export type Schema = z.infer<typeof Schema>;
 
 // ---------------------------------------------

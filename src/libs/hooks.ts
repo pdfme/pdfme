@@ -1,9 +1,18 @@
-import { RefObject, useState, useCallback, useEffect } from 'react';
+import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
 import { b64toBlob } from './utils';
 import { getB64BasePdf } from './helper';
 import { pdf2Pngs, getPdfPageSizes } from '../libs/pdfjs';
 import { Template, PageSize } from './type';
 import { rulerHeight, zoom } from './constants';
+
+export const usePrevious = <T>(value: T) => {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    ref.current = value;
+  });
+
+  return ref.current;
+};
 
 const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
 

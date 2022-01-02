@@ -257,3 +257,41 @@ export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
 
   return template;
 };
+
+const extractOriginalKey = (key: string) => key.replace(/ copy$| copy [0-9]*$/, '');
+
+export const getUniqSchemaKey = (arg: {
+  copiedSchemaKey: string;
+  schema: Schema[];
+  stackUniqSchemaKeys: string[];
+}) => {
+  const { copiedSchemaKey, schema, stackUniqSchemaKeys } = arg;
+  const schemaKeys = schema.map((s) => s.key).concat(stackUniqSchemaKeys);
+  const tmp: { [originalKey: string]: number } = schemaKeys.reduce(
+    (acc, cur) => Object.assign(acc, { originalKey: cur, copiedNum: 0 }),
+    {}
+  );
+  schemaKeys
+    .filter((key) => / copy$| copy [0-9]*$/.test(key))
+    .forEach((key) => {
+      const originalKey = extractOriginalKey(key);
+      const match = key.match(/[0-9]*$/);
+      const copiedNum = match && match[0] ? Number(match[0]) : 1;
+      if ((tmp[originalKey] ?? 0) < copiedNum) {
+        tmp[originalKey] = copiedNum;
+      }
+    });
+
+  const originalKey = extractOriginalKey(copiedSchemaKey);
+  if (tmp[originalKey]) {
+    const copiedNum = tmp[originalKey];
+    const uniqKey = `${originalKey} copy ${copiedNum + 1}`;
+    stackUniqSchemaKeys.push(uniqKey);
+
+    return uniqKey;
+  }
+  const uniqKey = `${copiedSchemaKey} copy`;
+  stackUniqSchemaKeys.push(uniqKey);
+
+  return uniqKey;
+};
