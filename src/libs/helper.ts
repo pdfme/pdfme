@@ -118,11 +118,15 @@ export const getKeepRatioHeightByWidth = (type: string, width: number) => {
   return width * (raito[type] ? raito[type] : 1);
 };
 
-const blob2Base64 = (blob: Blob) => {
-  return new Promise<string | ArrayBuffer>((r) => {
+const blob2Base64Pdf = (blob: Blob) => {
+  return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      r(reader.result as string);
+      if ((reader.result as string).startsWith('data:application/pdf;')) {
+        resolve(reader.result as string);
+      } else {
+        reject(Error('template.basePdf must be pdf data.'));
+      }
     };
     reader.readAsDataURL(blob);
   });
@@ -134,12 +138,10 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
   if (needFetchFromNetwork) {
     return fetch(basePdf)
       .then((res) => res.blob())
-      .then(async (blob) => {
-        const base64 = (await blob2Base64(blob)) as string;
-
-        return base64;
-      })
-      .catch(() => basePdf);
+      .then(blob2Base64Pdf)
+      .catch((e: Error) => {
+        throw e;
+      });
   }
 
   return basePdf as string;

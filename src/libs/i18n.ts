@@ -28,6 +28,7 @@ const dictEn = {
   goToNext: 'Next',
   goToEnd: 'Go to end',
   select: 'Select',
+  errorOccurred: 'An error occurred.',
 };
 
 const dictJa: { [key in keyof DictEn]: string } = {
@@ -55,6 +56,7 @@ const dictJa: { [key in keyof DictEn]: string } = {
   goToNext: '1つ進む',
   goToEnd: '最後に進む',
   select: '選択',
+  errorOccurred: 'エラーが発生しました',
 };
 
 const i18n = (lang: Lang, key: keyof DictEn) => (lang === DEFAULT_LANG ? dictEn[key] : dictJa[key]);

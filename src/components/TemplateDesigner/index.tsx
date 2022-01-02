@@ -17,6 +17,7 @@ import { getPdfPageSizes } from '../../libs/pdfjs';
 import { initShortCuts, destroyShortCuts } from '../../libs/ui';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
+import Error from '../Error';
 
 const fmtValue = (key: string, value: string) => {
   const skip = [
@@ -95,7 +96,7 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
 
-  const { backgrounds, pageSizes, scale } = useUiPreProcessor({
+  const { backgrounds, pageSizes, scale, error } = useUiPreProcessor({
     template,
     size,
     offset: rulerHeight,
@@ -298,6 +299,10 @@ const TemplateEditor = ({
   };
 
   const activeSchema = getLastActiveSchema();
+
+  if (error) {
+    return <Error size={size} error={error} />;
+  }
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>

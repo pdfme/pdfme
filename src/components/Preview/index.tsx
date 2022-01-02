@@ -4,12 +4,13 @@ import { zoom, rulerHeight } from '../../libs/constants';
 import Pager from './Pager';
 import UnitPager from './UnitPager';
 import Root from '../Root';
+import Error from '../Error';
 import Paper from '../Paper';
 import Schema from '../Schemas';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
-  const { backgrounds, pageSizes, scale } = useUiPreProcessor({
+  const { backgrounds, pageSizes, scale, error } = useUiPreProcessor({
     template,
     size,
     offset: rulerHeight,
@@ -34,6 +35,10 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   const editable = Boolean(onChangeInput);
   const input = inputs[unitCursor];
   const { schemas } = template;
+
+  if (error) {
+    return <Error size={size} error={error} />;
+  }
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>

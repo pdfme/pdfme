@@ -13,6 +13,7 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSizes, setPageSizes] = useState<PageSize[]>([]);
   const [scale, setScale] = useState(0);
+  const [error, setError] = useState<Error | null>(null);
 
   const init = useCallback(async () => {
     const _basePdf = await getB64BasePdf(template.basePdf);
@@ -31,15 +32,19 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
   }, [template, size, offset]);
 
   useEffect(() => {
-    init().then((data) => {
-      setPageSizes(data.pageSizes);
-      setScale(data.scale);
-      setBackgrounds(data.backgrounds);
-    });
-    // TODO ここでエラーハンドリングするべき
+    init()
+      .then((data) => {
+        setPageSizes(data.pageSizes);
+        setScale(data.scale);
+        setBackgrounds(data.backgrounds);
+      })
+      .catch((e: Error) => {
+        console.error(e);
+        setError(e);
+      });
   }, [init]);
 
-  return { backgrounds, pageSizes, scale };
+  return { backgrounds, pageSizes, scale, error };
 };
 
 type ScrollPageCursorProps = {
