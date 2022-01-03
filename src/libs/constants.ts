@@ -28,13 +28,13 @@ export const DEFAULT_ALIGNMENT = 'left';
 export const DEFAULT_LINE_HEIGHT = 1;
 export const DEFAULT_CHARACTER_SPACING = 0;
 
-export const imageExample = _imageExample;
-
 export const zoom = 3.7795275591;
 
 export const rulerHeight = 30;
 
 export const selectableClassName = 'selectable';
+
+export const imageExample = _imageExample;
 
 export const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,

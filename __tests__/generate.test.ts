@@ -166,7 +166,7 @@ describe('generate integrate test', () => {
     });
   });
 
-  // TODO このテストは遅いので並列実装するようにする
+  // TODO このテストは遅いので並列実装するようにする Promise.allで何とかいけないか
   describe('use labelmake.jp template', () => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
@@ -174,14 +174,12 @@ describe('generate integrate test', () => {
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
         const inputs = template.sampledata!;
-        // @ts-ignore
-        const fallbackFontName = template.fontName;
 
         const font = getFont();
         font.SauceHanSansJP.fallback = false;
         font.SauceHanSerifJP.fallback = false;
-
-        font[fallbackFontName].fallback = true;
+        // @ts-ignore
+        font[template.fontName].fallback = true;
 
         const hrstart = process.hrtime();
 
