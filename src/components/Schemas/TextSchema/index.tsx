@@ -3,6 +3,7 @@ import * as styles from './index.module.scss';
 import { zoom } from '../../../libs/constants';
 import { SchemaUIProps } from '../';
 
+// TODO レタースペーシングでPDFとズレる
 const TextSchema = (
   { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,
   ref: Ref<HTMLTextAreaElement>

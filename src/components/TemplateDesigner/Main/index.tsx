@@ -71,6 +71,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
   const onKeyup = (e: KeyboardEvent) => {
     if (e.key === 'Shift') setIsPressShiftKey(false);
+    if (e.key === 'Escape' || e.key === 'Esc') setEditing(false);
   };
 
   const initEvents = useCallback(() => {
@@ -192,14 +193,26 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       style={{ height: props.height }}
     >
       <Selecto
-        container={null}
+        container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
+          const { inputEvent } = e;
           if (
-            (e.inputEvent.type === 'touchstart' && e.isTrusted) ||
-            moveable.current?.isMoveableElement(e.inputEvent.target)
+            (inputEvent.type === 'touchstart' && e.isTrusted) ||
+            moveable.current?.isMoveableElement(inputEvent.target)
           ) {
             e.stop();
+          }
+          // @ts-ignore
+          const { selectedTargets } = e.currentTarget;
+          if (selectedTargets.length !== 0) {
+            setActiveElements(selectedTargets);
+
+            return;
+          }
+
+          if (paperRefs.current[pageCursor] === inputEvent.target) {
+            setActiveElements([]);
           }
         }}
         onSelect={(e) => {

@@ -1,8 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { SidebarProps } from '../';
 import { I18nContext } from '../../../../libs/contexts';
 import { inputTypeList } from '../../../../libs/constants';
+import { usePrevious } from '../../../../libs/hooks';
 
+// TODO クリックで選択中のmoveableを切り替えるとkeyがおかしくなる
 const TypeAndKeyEditor = (
   props: Pick<SidebarProps, 'schemas' | 'changeSchemas' | 'activeSchema'>
 ) => {
@@ -10,21 +12,45 @@ const TypeAndKeyEditor = (
   const i18n = useContext(I18nContext);
 
   const [activeSchemaKey, setActiveSchemaKey] = useState(activeSchema.key);
-  const [focusing, setFocusing] = useState(false);
+  const prevActiveSchema = usePrevious(activeSchema);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // TODO ここがおかしい
-  // 結局同じ項目設定できている
-  useEffect(() => {
-    setActiveSchemaKey(activeSchema.key);
-    if (inputRef.current) {
-      inputRef.current.blur();
-      setFocusing(false);
+  const getHasSameKey = useCallback(() => {
+    const schemaKeys = schemas.map((s) => s.key);
+    const index = schemaKeys.indexOf(activeSchema.key);
+    if (index > -1) {
+      schemaKeys.splice(index, 1);
     }
-  }, [activeSchema]);
 
-  const schemaKeys = schemas.map((s) => s.key);
+    return schemaKeys.includes(activeSchemaKey);
+  }, [schemas, activeSchemaKey, activeSchema]);
+
+  const isKeyError = getHasSameKey() || !activeSchemaKey;
+
+  const checkAndCommitKey = useCallback(() => {
+    const { activeElement } = document;
+    const focusing = activeElement === inputRef.current;
+    if (!focusing && isKeyError) {
+      alert(i18n(activeSchemaKey ? 'fieldNameMustBeUniq' : 'fieldNameIsRequired'));
+      inputRef.current?.focus();
+
+      return;
+    }
+
+    if (activeSchemaKey !== activeSchema.key) {
+      changeSchemas([{ key: 'key', value: activeSchemaKey, schemaId: activeSchema.id }]);
+    }
+  }, [activeSchema, activeSchemaKey, isKeyError, changeSchemas, i18n]);
+
+  useEffect(() => {
+    // TODO ここが動く時におかしい
+    if (prevActiveSchema?.id !== activeSchema.id) {
+      setActiveSchemaKey(activeSchema.key);
+    }
+  }, [activeSchema, prevActiveSchema]);
+
+  useEffect(() => checkAndCommitKey, [activeSchema, activeSchemaKey]);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -49,22 +75,12 @@ const TypeAndKeyEditor = (
           {i18n('fieldName')}
           <u style={{ fontSize: '0.7rem' }}>({i18n('requireAndUniq')})</u>
         </label>
+
         <input
           ref={inputRef}
-          onChange={(e) => {
-            setActiveSchemaKey(e.target.value);
-          }}
-          onBlur={() => {
-            if (!focusing && schemaKeys.includes(activeSchemaKey) && inputRef.current) {
-              alert(i18n('fieldNameMustBeUniq'));
-              inputRef.current.focus();
-              setFocusing(true);
-            } else {
-              changeSchemas([{ key: 'key', value: activeSchemaKey, schemaId: activeSchema.id }]);
-              setFocusing(false);
-            }
-          }}
-          style={{ backgroundColor: activeSchema.key ? '#fff' : '#ffa19b' }}
+          onChange={(e) => setActiveSchemaKey(e.target.value)}
+          onBlur={checkAndCommitKey}
+          style={{ backgroundColor: isKeyError ? '#ffa19b' : '#fff' }}
           value={activeSchemaKey}
         />
       </div>

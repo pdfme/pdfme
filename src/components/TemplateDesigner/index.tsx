@@ -316,7 +316,12 @@ const TemplateEditor = ({
         activeSchema={activeSchema}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
-        onEdit={(id: string) => setActiveElements([document.getElementById(id)!])}
+        onEdit={(id: string) => {
+          const editingElem = document.getElementById(id);
+          if (editingElem) {
+            setActiveElements([editingElem]);
+          }
+        }}
         onEditEnd={onEditEnd}
         addSchema={addSchema}
         removeSchema={(id) => removeSchemas([id])}
