@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Schema } from '../../../libs/type';
+import { Schema, PageSize } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import backIcon from '../../../assets/back.svg';
 import forwardIcon from '../../../assets/forward.svg';
@@ -10,6 +10,7 @@ import DetailView from './DetailView';
 export type SidebarProps = {
   height: number;
   pageCursor: number;
+  pageSizes: PageSize[];
   activeElement: HTMLElement | null;
   activeSchema: Schema;
   // TODO ここのschemasの方は他のコンポーネントと違うので他のコンポーネントと合わせたい

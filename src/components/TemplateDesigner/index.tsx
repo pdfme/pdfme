@@ -144,6 +144,8 @@ const TemplateEditor = ({
   );
 
   const changeSchemas = useCallback(
+    // TOOD valueがstringで矯正されているのがおかしい。
+    // numberも受け取れるようにしてfmtValueを使わなくていいようにした
     (objs: { key: string; value: string; schemaId: string }[]) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
@@ -311,6 +313,7 @@ const TemplateEditor = ({
       <Sidebar
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         pageCursor={pageCursor}
+        pageSizes={pageSizes}
         activeElement={activeElements[activeElements.length - 1]}
         schemas={schemas[pageCursor]}
         activeSchema={activeSchema}

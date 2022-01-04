@@ -13,7 +13,13 @@ import TypeAndKeyEditor from './TypeAndKeyEditor';
 const DetailView = (
   props: Pick<
     SidebarProps,
-    'schemas' | 'pageCursor' | 'changeSchemas' | 'activeSchema' | 'onEditEnd' | 'removeSchema'
+    | 'schemas'
+    | 'pageCursor'
+    | 'pageSizes'
+    | 'changeSchemas'
+    | 'activeSchema'
+    | 'onEditEnd'
+    | 'removeSchema'
   >
 ) => {
   const { activeSchema, pageCursor, onEditEnd, removeSchema } = props;
