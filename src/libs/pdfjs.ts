@@ -25,7 +25,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
   return promises;
 };
 
-const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg') => {
+const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg') => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
 
@@ -41,7 +41,7 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imagetype: 'png' | 'jpeg
 
         return page
           .render({ canvasContext, viewport })
-          .promise.then(() => canvas.toDataURL(`image/${imagetype}`));
+          .promise.then(() => canvas.toDataURL(`image/${imageType}`));
       });
 
       return image;
