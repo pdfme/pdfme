@@ -19,7 +19,9 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     });
     Promise.all(fontFaces).then((loadedFontFaces) => {
       loadedFontFaces.forEach((loadedFontFace) => {
-        document.fonts.add(loadedFontFace);
+        if (document.fonts && document.fonts.add) {
+          document.fonts.add(loadedFontFace);
+        }
       });
     });
   }, [font]);

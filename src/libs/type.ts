@@ -96,7 +96,7 @@ export type Schema = z.infer<typeof Schema>;
 const Inputs = z.array(z.record(z.string())).min(1);
 
 const CommonOptions = z.object({ font: Font.optional() });
-export type CommonOptions = z.infer<typeof CommonOptions>;
+type CommonOptions = z.infer<typeof CommonOptions>;
 
 const CommonProps = z.object({ template: Template, options: CommonOptions.optional() });
 export type CommonProps = z.infer<typeof CommonProps>;

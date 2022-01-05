@@ -25,13 +25,17 @@ export const round = (number: number, precision: number) => {
 
 export const b64toUint8Array = (base64: string) => {
   if (typeof window !== 'undefined') {
-    const byteString = window.atob(base64.split(',')[1]);
-    const unit8arr = new Uint8Array(byteString.length);
-    for (let i = 0; i < byteString.length; i += 1) {
-      unit8arr[i] = byteString.charCodeAt(i);
-    }
+    try {
+      const byteString = window.atob(base64.split(',')[1]);
+      const unit8arr = new Uint8Array(byteString.length);
+      for (let i = 0; i < byteString.length; i += 1) {
+        unit8arr[i] = byteString.charCodeAt(i);
+      }
 
-    return unit8arr;
+      return unit8arr;
+    } catch {
+      return new Uint8Array(base64url.toBuffer(base64));
+    }
   }
 
   return new Uint8Array(base64url.toBuffer(base64));

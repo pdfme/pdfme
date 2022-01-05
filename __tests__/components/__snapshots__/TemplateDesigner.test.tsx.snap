@@ -1,0 +1,336 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TemplateDesigner snapshot 1`] = `
+<div
+  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+>
+  <div
+    style="height: 1170px;"
+  >
+    <div
+      style="position: absolute; height: 0px; width: 100%;"
+    >
+      <div
+        style="position: sticky; top: 0px; z-index: 29;"
+      >
+        <button
+          class="undefined"
+          style="right: 318px; top: 0px; position: absolute;"
+        >
+          <img
+            alt="Toggle icon"
+            src="[object Object]"
+            width="15"
+          />
+        </button>
+        <div
+          style="width: 300px; display: block; top: 0px;"
+        >
+          <aside>
+            <div
+              style="height: 40px; display: flex; align-items: center;"
+            >
+              <h3
+                style="text-align: center; width: 100%; font-weight: bold;"
+              >
+                List of Fields
+                (
+                1
+                P)
+              </h3>
+            </div>
+            <div
+              style="margin-top: 0.25rem; margin-bottom: 0.25rem; border-bottom: 1px solid #eee;"
+            />
+            <div
+              style="max-height: 350px; overflow-y: auto;"
+            >
+              <div>
+                <button
+                  style="padding: 0px;"
+                >
+                  <img
+                    alt="Drag icon"
+                    src="[object Object]"
+                    style="padding: 5px; cursor: grab;"
+                    width="15"
+                  />
+                </button>
+                <button
+                  class=""
+                  style="padding: 5px; margin: 5px; width: 100%; display: flex; align-items: center;"
+                  title="Edit"
+                >
+                  <span
+                    class="undefined"
+                  >
+                    field1
+                  </span>
+                  <img
+                    alt="Create icon"
+                    src="[object Object]"
+                    width="15"
+                  />
+                </button>
+                <button
+                  style="padding: 5px; margin: 5px;"
+                >
+                  <img
+                    alt="Delete icon"
+                    src="[object Object]"
+                    width="15"
+                  />
+                </button>
+              </div>
+              <div>
+                <button
+                  style="padding: 0px;"
+                >
+                  <img
+                    alt="Drag icon"
+                    src="[object Object]"
+                    style="padding: 5px; cursor: grab;"
+                    width="15"
+                  />
+                </button>
+                <button
+                  class=""
+                  style="padding: 5px; margin: 5px; width: 100%; display: flex; align-items: center;"
+                  title="Edit"
+                >
+                  <span
+                    class="undefined"
+                  >
+                    field2
+                  </span>
+                  <img
+                    alt="Create icon"
+                    src="[object Object]"
+                    width="15"
+                  />
+                </button>
+                <button
+                  style="padding: 5px; margin: 5px;"
+                >
+                  <img
+                    alt="Delete icon"
+                    src="[object Object]"
+                    width="15"
+                  />
+                </button>
+              </div>
+            </div>
+            <div
+              style="margin-top: 0.25rem; margin-bottom: 0.25rem; border-bottom: 1px solid #eee;"
+            />
+          </aside>
+          <div>
+            <button
+              style="padding: 0.5rem;"
+            >
+              <strong>
+                Add new field
+              </strong>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      style="height: 1170px;"
+    >
+      <div
+        class="selecto-selection rCS154w68a"
+      />
+      <div
+        style="transform: scale(1); transform-origin: top center;"
+      >
+        <div
+          style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+        >
+          <div>
+            <div
+              style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
+            />
+            <div
+              class="scena-manager scena-horizontal  rCS1dv2ewo"
+              data-styled-id="rCS1dv2ewo"
+              style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px;"
+            >
+              <div
+                class="scena-guide-origin"
+              />
+              <canvas
+                height="0"
+                style="width: 100%; height: 100%;"
+                width="0"
+              />
+              <div
+                class="scena-guides"
+                style="transform: translateY(0px);"
+              >
+                <div
+                  class="scena-guide scena-adder"
+                />
+              </div>
+            </div>
+            <div
+              class="scena-manager scena-vertical  rCS1dv2ewo"
+              data-styled-id="rCS1dv2ewo"
+              style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px;"
+            >
+              <div
+                class="scena-guide-origin"
+              />
+              <canvas
+                height="0"
+                style="width: 100%; height: 100%;"
+                width="0"
+              />
+              <div
+                class="scena-guides"
+                style="transform: translateX(0px);"
+              >
+                <div
+                  class="scena-guide scena-adder"
+                />
+              </div>
+            </div>
+            <div
+              class="moveable-control-box    rCSuehiy8"
+              data-able-draggable="true"
+              data-able-origin="true"
+              data-able-padding="true"
+              data-able-resizable="true"
+              data-able-snappable="true"
+              data-styled-id="rCSuehiy8"
+              style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px;"
+            >
+              <div
+                class="moveable-control moveable-direction moveable-n "
+                data-direction="n"
+                data-rotation="0"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-w "
+                data-direction="w"
+                data-rotation="90"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-s "
+                data-direction="s"
+                data-rotation="0"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-e "
+                data-direction="e"
+                data-rotation="90"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-nw "
+                data-direction="nw"
+                data-rotation="135"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-ne "
+                data-direction="ne"
+                data-rotation="45"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-sw "
+                data-direction="sw"
+                data-rotation="45"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-direction moveable-se "
+                data-direction="se"
+                data-rotation="135"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-control moveable-origin"
+                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+              />
+              <div
+                class="moveable-line moveable-direction "
+                data-direction=""
+                data-line-index="0"
+                data-rotation="-1"
+                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              />
+              <div
+                class="moveable-line moveable-direction "
+                data-direction=""
+                data-line-index="1"
+                data-rotation="-1"
+                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              />
+              <div
+                class="moveable-line moveable-direction "
+                data-direction=""
+                data-line-index="2"
+                data-rotation="-1"
+                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              />
+              <div
+                class="moveable-line moveable-direction "
+                data-direction=""
+                data-line-index="3"
+                data-rotation="-1"
+                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              />
+            </div>
+            <div>
+              <div
+                aria-expanded="false"
+                class="selectable"
+                id="2"
+                style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              >
+                <div
+                  style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+                >
+                  <span
+                    style="letter-spacing: inherit;"
+                  >
+                    b
+                  </span>
+                  <span
+                    style="letter-spacing: 0;"
+                  >
+                    b
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                aria-expanded="false"
+                class="selectable"
+                id="3"
+                style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              >
+                <div
+                  style="margin: 0px auto;"
+                >
+                  <img
+                    src="aaaaaaaaaaaa"
+                    style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

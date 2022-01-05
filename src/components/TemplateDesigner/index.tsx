@@ -266,7 +266,9 @@ const TemplateEditor = ({
     setSchemas(_schemas);
     onEditEnd();
     setPageCursor(0);
-    rootRef.current?.scroll({ top: 0, behavior: 'smooth' });
+    if (rootRef.current?.scroll) {
+      rootRef.current.scroll({ top: 0, behavior: 'smooth' });
+    }
   }, []);
 
   useEffect(() => {

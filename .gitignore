@@ -5,4 +5,4 @@ node_modules
 dist
 storybook-static/
 coverage/**
-__tests__/tmp/*.pdf
+__tests__/assets/pdfs/tmp/*.pdf
