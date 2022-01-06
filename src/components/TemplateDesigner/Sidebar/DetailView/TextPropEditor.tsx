@@ -97,14 +97,18 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           label={'FontSize(pt)'}
           value={activeSchema.fontSize}
           onChange={(e) =>
-            changeSchemas([{ key: 'fontSize', value: e.target.value, schemaId: activeSchema.id }])
+            changeSchemas([
+              { key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id },
+            ])
           }
         />
         <NumberInputSet
           label={'LineHeight(em)'}
           value={activeSchema.lineHeight}
           onChange={(e) =>
-            changeSchemas([{ key: 'lineHeight', value: e.target.value, schemaId: activeSchema.id }])
+            changeSchemas([
+              { key: 'lineHeight', value: Number(e.target.value), schemaId: activeSchema.id },
+            ])
           }
         />
 
@@ -113,7 +117,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           value={activeSchema.characterSpacing}
           onChange={(e) =>
             changeSchemas([
-              { key: 'characterSpacing', value: e.target.value, schemaId: activeSchema.id },
+              { key: 'characterSpacing', value: Number(e.target.value), schemaId: activeSchema.id },
             ])
           }
         />
