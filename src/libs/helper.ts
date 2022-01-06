@@ -4,7 +4,6 @@ import {
   Template,
   TemplateSchema,
   Schema,
-  Schemas,
   BasePdf,
   Font,
   CommonProps,
@@ -148,7 +147,7 @@ export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true, index: 0 },
 });
 
-const getFontNamesInSchemas = (schemas: Schemas) =>
+const getFontNamesInSchemas = (schemas: { [key: string]: TemplateSchema }[]) =>
   uniq(
     schemas
       .map((s) => Object.values(s).map((v) => (isTextTemplateSchema(v) ? v.fontName : '')))
@@ -156,8 +155,11 @@ const getFontNamesInSchemas = (schemas: Schemas) =>
       .filter(Boolean) as string[]
   );
 
-export const checkFont = (arg: { font: Font; schemas: Schemas }) => {
-  const { font, schemas } = arg;
+export const checkFont = (arg: { font: Font; template: Template }) => {
+  const {
+    font,
+    template: { schemas },
+  } = arg;
   const fontValues = Object.values(font);
   const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
   if (fallbackFontNum === 0) {
@@ -198,10 +200,10 @@ ${message}`);
     }
   }
   const commonProps = data as CommonProps;
-  const { schemas } = commonProps.template;
-  const font = commonProps.options?.font;
+  const { template, options } = commonProps;
+  const font = options?.font;
   if (font) {
-    checkFont({ font, schemas });
+    checkFont({ font, template });
   }
 };
 

@@ -1,8 +1,10 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import { uuid } from '../../src/libs/utils';
-import { Font, Schemas, Schema, TemplateSchema } from '../../src/libs/type';
+import { BLANK_PDF } from '../../src/libs/constants';
+import { Font, Schema, Template, TemplateSchema } from '../../src/libs/type';
 import { checkFont, getUniqSchemaKey } from '../../src/libs/helper';
+import { blankPdf } from '../../src';
 
 const sansData = readFileSync(path.join(__dirname, `../assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `../assets/fonts/SauceHanSerifJP.ttf`));
@@ -12,44 +14,50 @@ const getSampleFont = (): Font => ({
   SauceHanSerifJP: { data: serifData },
 });
 
-const getSampleSchemas = (): Schemas => [
-  {
-    a: {
-      type: 'text',
-      fontName: 'SauceHanSansJP',
-      position: { x: 0, y: 0 },
-      width: 100,
-      height: 100,
+const getTemplate = (): Template => ({
+  basePdf: BLANK_PDF,
+  schemas: [
+    {
+      a: {
+        type: 'text',
+        fontName: 'SauceHanSansJP',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
+      b: {
+        type: 'text',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
     },
-    b: {
-      type: 'text',
-      position: { x: 0, y: 0 },
-      width: 100,
-      height: 100,
-    },
-  },
-];
+  ],
+});
 
 describe('checkFont test', () => {
   test('success test: no fontName in Schemas', () => {
-    const getSchemas = (): Schemas => [
-      {
-        a: {
-          type: 'text',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
+    const _getTemplate = (): Template => ({
+      basePdf: blankPdf,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+          b: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
         },
-        b: {
-          type: 'text',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
-        },
-      },
-    ];
+      ],
+    });
     try {
-      checkFont({ schemas: getSchemas(), font: getSampleFont() });
+      checkFont({ template: _getTemplate(), font: getSampleFont() });
       expect.anything();
     } catch (e) {
       fail();
@@ -58,7 +66,7 @@ describe('checkFont test', () => {
 
   test('success test: fontName in Schemas(fallback font)', () => {
     try {
-      checkFont({ schemas: getSampleSchemas(), font: getSampleFont() });
+      checkFont({ template: getTemplate(), font: getSampleFont() });
       expect.anything();
     } catch (e) {
       fail();
@@ -72,7 +80,7 @@ describe('checkFont test', () => {
     });
 
     try {
-      checkFont({ schemas: getSampleSchemas(), font: getFont() });
+      checkFont({ template: getTemplate(), font: getFont() });
       expect.anything();
     } catch (e) {
       fail();
@@ -86,7 +94,7 @@ describe('checkFont test', () => {
     });
 
     try {
-      checkFont({ schemas: getSampleSchemas(), font: getFont() });
+      checkFont({ template: getTemplate(), font: getFont() });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
@@ -102,7 +110,7 @@ describe('checkFont test', () => {
     });
 
     try {
-      checkFont({ schemas: getSampleSchemas(), font: getFont() });
+      checkFont({ template: getTemplate(), font: getFont() });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
@@ -112,26 +120,29 @@ describe('checkFont test', () => {
   });
 
   test('fail test: fontName in Schemas not found in font(single)', () => {
-    const getSchemas = (): Schemas => [
-      {
-        a: {
-          type: 'text',
-          fontName: 'SauceHanSansJP2',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
+    const _getTemplate = (): Template => ({
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            fontName: 'SauceHanSansJP2',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+          b: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
         },
-        b: {
-          type: 'text',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
-        },
-      },
-    ];
+      ],
+    });
 
     try {
-      checkFont({ schemas: getSchemas(), font: getSampleFont() });
+      checkFont({ template: _getTemplate(), font: getSampleFont() });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
@@ -139,27 +150,30 @@ describe('checkFont test', () => {
   });
 
   test('fail test: fontName in Schemas not found in font(single)', () => {
-    const getSchemas = (): Schemas => [
-      {
-        a: {
-          type: 'text',
-          fontName: 'SauceHanSansJP2',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
+    const _getTemplate = (): Template => ({
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            fontName: 'SauceHanSansJP2',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+          b: {
+            type: 'text',
+            fontName: 'SauceHanSerifJP2',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
         },
-        b: {
-          type: 'text',
-          fontName: 'SauceHanSerifJP2',
-          position: { x: 0, y: 0 },
-          width: 100,
-          height: 100,
-        },
-      },
-    ];
+      ],
+    });
 
     try {
-      checkFont({ schemas: getSchemas(), font: getSampleFont() });
+      checkFont({ template: _getTemplate(), font: getSampleFont() });
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(

@@ -94,11 +94,8 @@ export const isBarcodeTemplateSchema = (arg: CommonTemplateSchema): arg is Barco
 const TemplateSchema = z.union([TextTemplateSchema, ImageTemplateSchema, BarcodeTemplateSchema]);
 export type TemplateSchema = z.infer<typeof TemplateSchema>;
 
-const Schemas = z.array(z.record(TemplateSchema));
-export type Schemas = z.infer<typeof Schemas>;
-
 const Template = z.object({
-  schemas: Schemas,
+  schemas: z.array(z.record(TemplateSchema)),
   basePdf: BasePdf,
   sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
