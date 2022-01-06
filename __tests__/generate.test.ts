@@ -167,7 +167,7 @@ describe('generate integrate test', () => {
     });
   });
 
-  // TODO このテストは遅いので並列実装するようにする Promise.allで何とかいけないか
+  // TODO Slow test... need speed up, use Promise.all?
   describe('use labelmake.jp template', () => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
