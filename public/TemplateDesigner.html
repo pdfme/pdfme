@@ -31,7 +31,7 @@
 
       async function init() {
         const font = await getFont();
-        editor = new LabelmakeUi.TemplateDesigner({
+        editor = new LabelmakeUI.TemplateDesigner({
           domContainer,
           template: getTemplate(),
           saveTemplate: (t) => {
@@ -70,7 +70,7 @@
         const font = await getFont();
         const template = editor.getTemplate();
         const inputs = template.sampledata;
-        LabelmakeUi.generate({
+        LabelmakeUI.generate({
           inputs,
           template,
           options: {

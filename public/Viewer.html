@@ -26,7 +26,7 @@
 
       async function init() {
         const font = await getFont();
-        viewer = new LabelmakeUi.Viewer({
+        viewer = new LabelmakeUI.Viewer({
           domContainer,
           template: getTemplate(),
           size,
@@ -51,7 +51,7 @@
 
       async function generate() {
         const font = await getFont();
-        LabelmakeUi.generate({
+        LabelmakeUI.generate({
           inputs: viewer.getInputs(),
           template: getTemplate(),
           options: {

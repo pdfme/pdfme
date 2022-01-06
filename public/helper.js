@@ -9,7 +9,7 @@ const getSampleTemplate = () => ({
       field2: 'aaaaaaaaaaaa',
     },
   ],
-  basePdf: LabelmakeUi.blankPdf,
+  basePdf: LabelmakeUI.blankPdf,
   // basePdf: '/DeliveryNote.pdf',
   schemas: [
     {

@@ -9,10 +9,10 @@ import { I18nContext, FontContext } from '../../src/libs/contexts';
 import { curriedI18n } from '../../src/libs/i18n';
 import { getDefaultFont } from '../../src/libs/helper';
 import { SELECTABLE_CLASSNAME } from '../../src/libs/constants';
-import { setupUiMock, getSampleTemplate } from '../assets/helper';
+import { setupUIMock, getSampleTemplate } from '../assets/helper';
 
 test('TemplateDesigner snapshot', async () => {
-  setupUiMock();
+  setupUIMock();
   let container: HTMLElement = document.createElement('a');
   act(() => {
     const { container: c } = render(

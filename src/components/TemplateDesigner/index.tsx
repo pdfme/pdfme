@@ -14,7 +14,7 @@ import {
   templateSchemas2SchemasList,
 } from '../../libs/helper';
 import { initShortCuts, destroyShortCuts } from '../../libs/ui';
-import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
+import { useUIPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 import Error from '../Error';
 
@@ -79,7 +79,7 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
 
-  const { backgrounds, pageSizes, scale, error } = useUiPreProcessor({
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
     template,
     size,
     offset: RULER_HEIGHT,

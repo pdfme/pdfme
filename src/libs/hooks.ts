@@ -16,9 +16,9 @@ export const usePrevious = <T>(value: T) => {
 
 const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
 
-type UiPreProcessorProps = { template: Template; size: Size; offset?: number };
+type UIPreProcessorProps = { template: Template; size: Size; offset?: number };
 
-export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessorProps) => {
+export const useUIPreProcessor = ({ template, size, offset = 0 }: UIPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);

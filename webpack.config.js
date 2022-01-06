@@ -45,7 +45,7 @@ const config = {
   },
   entry: './src/index.ts',
   output: {
-    library: 'LabelmakeUi',
+    library: 'LabelmakeUI',
     libraryTarget: 'umd',
     libraryExport: 'default',
     path: path.join(__dirname, 'dist'),

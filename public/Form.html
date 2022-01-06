@@ -26,7 +26,7 @@
 
       async function init() {
         const font = await getFont();
-        form = new LabelmakeUi.Form({
+        form = new LabelmakeUI.Form({
           domContainer,
           template: getTemplate(),
           size,
@@ -52,7 +52,7 @@
 
       async function generate() {
         const font = await getFont();
-        LabelmakeUi.generate({
+        LabelmakeUI.generate({
           inputs: form.getInputs(),
           template: getTemplate(),
           options: {

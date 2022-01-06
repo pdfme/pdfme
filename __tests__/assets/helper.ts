@@ -4,10 +4,10 @@ import { getPdfPageSizes, pdf2Pngs } from '../../src/libs/pdfjs';
 import { BLANK_PDF } from '../../src/libs/constants';
 import { Template } from '../../src/libs/type';
 
-export const setupUiMock = () => {
+export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
   const pageSizes = [{ height: 297, width: 210 }];
-  const mock = jest.spyOn(hooks, 'useUiPreProcessor');
+  const mock = jest.spyOn(hooks, 'useUIPreProcessor');
   mock.mockImplementation(() => ({ backgrounds, pageSizes, scale: 1, error: null }));
   (getPdfPageSizes as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(pageSizes));
   (pdf2Pngs as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(backgrounds));
