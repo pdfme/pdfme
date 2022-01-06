@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { TemplateDesignerReactProps, Template, Schema, PageSize } from '../../libs/type';
+import { TemplateDesignerReactProps, Template, Schema, Size } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
@@ -38,7 +38,7 @@ const moveCommandToChangeSchemasArg = (props: {
   command: 'up' | 'down' | 'left' | 'right';
   activeSchemas: Schema[];
   isShift: boolean;
-  pageSize: PageSize;
+  pageSize: Size;
 }) => {
   const { command, activeSchemas, isShift, pageSize } = props;
   const key = command === 'up' || command === 'down' ? 'y' : 'x';

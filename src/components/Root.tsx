@@ -1,11 +1,11 @@
 import type {} from 'css-font-loading-module';
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { rulerHeight } from '../libs/constants';
-import { PageSize } from '../libs/type';
+import { Size } from '../libs/type';
 import { FontContext } from '../libs/contexts';
 import Spinner from './Spinner';
 
-type Props = { size: PageSize; scale: number; children: ReactNode };
+type Props = { size: Size; scale: number; children: ReactNode };
 
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);

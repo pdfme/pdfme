@@ -2,7 +2,7 @@ import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
 import { b64toBlob } from './utils';
 import { getB64BasePdf } from './helper';
 import { pdf2Pngs, getPdfPageSizes } from '../libs/pdfjs';
-import { Template, PageSize } from './type';
+import { Template, Size } from './type';
 import { rulerHeight, zoom } from './constants';
 
 export const usePrevious = <T>(value: T) => {
@@ -16,11 +16,11 @@ export const usePrevious = <T>(value: T) => {
 
 const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
 
-type UiPreProcessorProps = { template: Template; size: PageSize; offset?: number };
+type UiPreProcessorProps = { template: Template; size: Size; offset?: number };
 
 export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
-  const [pageSizes, setPageSizes] = useState<PageSize[]>([]);
+  const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
@@ -58,7 +58,7 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
 
 type ScrollPageCursorProps = {
   rootRef: RefObject<HTMLDivElement>;
-  pageSizes: PageSize[];
+  pageSizes: Size[];
   scale: number;
   pageCursor: number;
   onChangePageCursor: (page: number) => void;

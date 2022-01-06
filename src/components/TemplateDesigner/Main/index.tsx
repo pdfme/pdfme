@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { Schema, PageSize } from '../../../libs/type';
+import { Schema, Size } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
 import { zoom, rulerHeight } from '../../../libs/constants';
 import { usePrevious } from '../../../libs/hooks';
@@ -37,7 +37,7 @@ interface Props {
   schemasList: Schema[][];
   scale: number;
   backgrounds: string[];
-  pageSizes: PageSize[];
+  pageSizes: Size[];
   activeElements: HTMLElement[];
   setActiveElements: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;

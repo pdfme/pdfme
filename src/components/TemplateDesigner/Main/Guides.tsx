@@ -1,6 +1,6 @@
 import React, { Ref } from 'react';
 import Guides from '@scena/react-guides';
-import { PageSize } from '../../../libs/type';
+import { Size } from '../../../libs/type';
 import { zoom, rulerHeight } from '../../../libs/constants';
 
 const _Guides = ({
@@ -8,7 +8,7 @@ const _Guides = ({
   horizontalRef,
   verticalRef,
 }: {
-  paperSize: PageSize;
+  paperSize: Size;
   horizontalRef: Ref<Guides> | undefined;
   verticalRef: Ref<Guides> | undefined;
 }) => (

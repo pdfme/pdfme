@@ -10,6 +10,9 @@ const langs = ['en', 'ja'] as const;
 const Lang = z.enum(langs);
 export type Lang = z.infer<typeof Lang>;
 
+const Size = z.object({ height: z.number(), width: z.number() });
+export type Size = z.infer<typeof Size>;
+
 const templateSchemas = [
   'text',
   'image',
@@ -32,10 +35,6 @@ export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
 const alignments = ['left', 'center', 'right'] as const;
 const Alignment = z.enum(alignments);
 export type Alignment = z.infer<typeof Alignment>;
-
-// TODO pagesizeはsizeで良くない？
-const PageSize = z.object({ height: z.number(), width: z.number() });
-export type PageSize = z.infer<typeof PageSize>;
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
@@ -103,7 +102,7 @@ export type CommonProps = z.infer<typeof CommonProps>;
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
 export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
-  size: PageSize,
+  size: Size,
   options: CommonOptions.extend({
     lang: Lang.optional(),
   }).optional(),

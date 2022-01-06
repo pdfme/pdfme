@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { destroyedErrMsg, DEFAULT_LANG } from './constants';
-import { Template, PageSize, Lang, Font, UIProps, PreviewProps } from './type';
+import { Template, Size, Lang, Font, UIProps, PreviewProps } from './type';
 import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from './helper';
 
 export abstract class BaseUIClass {
@@ -9,7 +9,7 @@ export abstract class BaseUIClass {
 
   protected template: Template;
 
-  protected size: PageSize;
+  protected size: Size;
 
   private lang: Lang = DEFAULT_LANG;
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { rulerHeight } from '../../../libs/constants';
-import { PageSize } from '../../../libs/type';
+import { Size } from '../../../libs/type';
 
-const Mask = ({ width, height }: PageSize) => (
+const Mask = ({ width, height }: Size) => (
   <div
     style={{
       position: 'absolute',

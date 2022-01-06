@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { I18nContext } from '../libs/contexts';
-import { PageSize } from '../libs/type';
+import { Size } from '../libs/type';
 
-const Error = ({ size, error }: { size: PageSize; error: Error }) => {
+const Error = ({ size, error }: { size: Size; error: Error }) => {
   const i18n = useContext(I18nContext);
 
   return (

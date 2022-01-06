@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Schema, PageSize } from '../../../libs/type';
+import { Schema, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import backIcon from '../../../assets/back.svg';
 import forwardIcon from '../../../assets/forward.svg';
@@ -10,7 +10,7 @@ import DetailView from './DetailView';
 export type SidebarProps = {
   height: number;
   pageCursor: number;
-  pageSizes: PageSize[];
+  pageSizes: Size[];
   activeElement: HTMLElement | null;
   activeSchema: Schema;
   schemas: Schema[];
