@@ -148,145 +148,145 @@ exports[`TemplateDesigner snapshot 1`] = `
         <div
           style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
         >
-          <div>
+          <div
+            style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
+          />
+          <div
+            class="scena-manager scena-horizontal  rCS1dv2ewo"
+            data-styled-id="rCS1dv2ewo"
+            style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px;"
+          >
             <div
-              style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
+              class="scena-guide-origin"
+            />
+            <canvas
+              height="0"
+              style="width: 100%; height: 100%;"
+              width="0"
             />
             <div
-              class="scena-manager scena-horizontal  rCS1dv2ewo"
-              data-styled-id="rCS1dv2ewo"
-              style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px;"
+              class="scena-guides"
+              style="transform: translateY(0px);"
             >
               <div
-                class="scena-guide-origin"
+                class="scena-guide scena-adder"
               />
-              <canvas
-                height="0"
-                style="width: 100%; height: 100%;"
-                width="0"
-              />
-              <div
-                class="scena-guides"
-                style="transform: translateY(0px);"
-              >
-                <div
-                  class="scena-guide scena-adder"
-                />
-              </div>
             </div>
+          </div>
+          <div
+            class="scena-manager scena-vertical  rCS1dv2ewo"
+            data-styled-id="rCS1dv2ewo"
+            style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px;"
+          >
             <div
-              class="scena-manager scena-vertical  rCS1dv2ewo"
-              data-styled-id="rCS1dv2ewo"
-              style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px;"
-            >
-              <div
-                class="scena-guide-origin"
-              />
-              <canvas
-                height="0"
-                style="width: 100%; height: 100%;"
-                width="0"
-              />
-              <div
-                class="scena-guides"
-                style="transform: translateX(0px);"
-              >
-                <div
-                  class="scena-guide scena-adder"
-                />
-              </div>
-            </div>
+              class="scena-guide-origin"
+            />
+            <canvas
+              height="0"
+              style="width: 100%; height: 100%;"
+              width="0"
+            />
             <div
-              class="moveable-control-box    rCSuehiy8"
-              data-able-draggable="true"
-              data-able-origin="true"
-              data-able-padding="true"
-              data-able-resizable="true"
-              data-able-snappable="true"
-              data-styled-id="rCSuehiy8"
-              style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px;"
+              class="scena-guides"
+              style="transform: translateX(0px);"
             >
               <div
-                class="moveable-control moveable-direction moveable-n "
-                data-direction="n"
-                data-rotation="0"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-w "
-                data-direction="w"
-                data-rotation="90"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-s "
-                data-direction="s"
-                data-rotation="0"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-e "
-                data-direction="e"
-                data-rotation="90"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-nw "
-                data-direction="nw"
-                data-rotation="135"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-ne "
-                data-direction="ne"
-                data-rotation="45"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-sw "
-                data-direction="sw"
-                data-rotation="45"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-direction moveable-se "
-                data-direction="se"
-                data-rotation="135"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-control moveable-origin"
-                style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
-              />
-              <div
-                class="moveable-line moveable-direction "
-                data-direction=""
-                data-line-index="0"
-                data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
-              />
-              <div
-                class="moveable-line moveable-direction "
-                data-direction=""
-                data-line-index="1"
-                data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
-              />
-              <div
-                class="moveable-line moveable-direction "
-                data-direction=""
-                data-line-index="2"
-                data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
-              />
-              <div
-                class="moveable-line moveable-direction "
-                data-direction=""
-                data-line-index="3"
-                data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+                class="scena-guide scena-adder"
               />
             </div>
+          </div>
+          <div
+            class="moveable-control-box    rCSuehiy8"
+            data-able-draggable="true"
+            data-able-origin="true"
+            data-able-padding="true"
+            data-able-resizable="true"
+            data-able-snappable="true"
+            data-styled-id="rCSuehiy8"
+            style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px;"
+          >
+            <div
+              class="moveable-control moveable-direction moveable-n "
+              data-direction="n"
+              data-rotation="0"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-w "
+              data-direction="w"
+              data-rotation="90"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-s "
+              data-direction="s"
+              data-rotation="0"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-e "
+              data-direction="e"
+              data-rotation="90"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-nw "
+              data-direction="nw"
+              data-rotation="135"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-ne "
+              data-direction="ne"
+              data-rotation="45"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-sw "
+              data-direction="sw"
+              data-rotation="45"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-direction moveable-se "
+              data-direction="se"
+              data-rotation="135"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-control moveable-origin"
+              style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
+            />
+            <div
+              class="moveable-line moveable-direction "
+              data-direction=""
+              data-line-index="0"
+              data-rotation="-1"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+            />
+            <div
+              class="moveable-line moveable-direction "
+              data-direction=""
+              data-line-index="1"
+              data-rotation="-1"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+            />
+            <div
+              class="moveable-line moveable-direction "
+              data-direction=""
+              data-line-index="2"
+              data-rotation="-1"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+            />
+            <div
+              class="moveable-line moveable-direction "
+              data-direction=""
+              data-line-index="3"
+              data-rotation="-1"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+            />
+          </div>
+          <div>
             <div>
               <div
                 aria-expanded="false"
@@ -310,6 +310,8 @@ exports[`TemplateDesigner snapshot 1`] = `
                 </div>
               </div>
             </div>
+          </div>
+          <div>
             <div>
               <div
                 aria-expanded="false"
