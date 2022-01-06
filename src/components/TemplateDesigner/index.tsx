@@ -18,22 +18,6 @@ import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 import Error from '../Error';
 
-const fmtValue = (key: string, value: string) => {
-  const skip = [
-    'id',
-    'key',
-    'type',
-    'data',
-    'alignment',
-    'fontColor',
-    'fontName',
-    'backgroundColor',
-  ];
-  const v = Number(value) < 0 ? 0 : Number(value);
-
-  return skip.includes(key) ? value : v;
-};
-
 const moveCommandToChangeSchemasArg = (props: {
   command: 'up' | 'down' | 'left' | 'right';
   activeSchemas: Schema[];
@@ -141,19 +125,17 @@ const TemplateEditor = ({
   );
 
   const changeSchemas = useCallback(
-    // TODO valueがstringで矯正されているのがおかしい。
-    // numberも受け取れるようにしてfmtValueを使わなくていいようにした
-    (objs: { key: string; value: string; schemaId: string }[]) => {
+    (objs: { key: string; value: string | number; schemaId: string }[]) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
         // Assign to reference
-        set(tgt, key, fmtValue(key, value));
+        set(tgt, key, value);
         if (key === 'type') {
           // set default value, text or barcode
-          set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(value));
+          set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(String(value)));
           // For barcodes, adjust the height to get the correct ratio.
           if (value !== 'text' && value !== 'image') {
-            set(tgt, 'height', getKeepRatioHeightByWidth(value, tgt.width));
+            set(tgt, 'height', getKeepRatioHeightByWidth(String(value), tgt.width));
           }
         }
 

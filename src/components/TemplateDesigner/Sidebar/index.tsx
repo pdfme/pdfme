@@ -18,7 +18,7 @@ export type SidebarProps = {
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   removeSchema: (id: string) => void;
-  changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
+  changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
   addSchema: () => void;
 };
 
