@@ -1,6 +1,7 @@
 /* eslint dot-notation: "off"*/
 import { PDFImage } from 'pdf-lib';
 import { z } from 'zod';
+
 export interface InputImageCache {
   [key: string]: PDFImage;
 }
@@ -32,8 +33,8 @@ const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
-export const templateSchemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
-const SchemaType = z.enum(templateSchemaTypes);
+export const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
+const SchemaType = z.enum(schemaTypes);
 
 const CommonSchema = z.object({
   type: SchemaType,
