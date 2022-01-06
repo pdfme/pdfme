@@ -60,7 +60,7 @@ const moveCommandToChangeSchemasArg = (props: {
       value = value > pageSize.height - height ? round(pageSize.height - height, 2) : value;
     }
 
-    return { key: `position.${key}`, value: String(value), schemaId: as.id };
+    return { key: `position.${key}`, value, schemaId: as.id };
   });
 };
 

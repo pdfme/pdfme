@@ -21,7 +21,7 @@ const PositionAndSizeEditor = (
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (activeSchema.width + value < pageSize.width) {
+              if (value >= 0 && activeSchema.width + value < pageSize.width) {
                 changeSchemas([{ key: 'position.x', value, schemaId: activeSchema.id }]);
               }
             }}
@@ -36,7 +36,7 @@ const PositionAndSizeEditor = (
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (activeSchema.height + value < pageSize.height) {
+              if (value >= 0 && activeSchema.height + value < pageSize.height) {
                 changeSchemas([{ key: 'position.y', value, schemaId: activeSchema.id }]);
               }
             }}
@@ -53,7 +53,7 @@ const PositionAndSizeEditor = (
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (activeSchema.position.x + value < pageSize.width) {
+              if (value >= 0 && activeSchema.position.x + value < pageSize.width) {
                 changeSchemas([{ key: 'width', value, schemaId: activeSchema.id }]);
               }
             }}
@@ -68,7 +68,7 @@ const PositionAndSizeEditor = (
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
-              if (activeSchema.position.y + value < pageSize.height) {
+              if (value >= 0 && activeSchema.position.y + value < pageSize.height) {
                 changeSchemas([{ key: 'height', value, schemaId: activeSchema.id }]);
               }
             }}
