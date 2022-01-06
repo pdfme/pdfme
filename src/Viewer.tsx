@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { PreviewUI } from './libs/class';
 import { PreviewProps } from './libs/type';
-import { destroyedErrMsg } from './libs/constants';
+import { DESTROYED_ERR_MSG } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
 
@@ -12,7 +12,7 @@ class Viewer extends PreviewUI {
   }
 
   render() {
-    if (!this.domContainer) throw Error(destroyedErrMsg);
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>

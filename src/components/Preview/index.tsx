@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { PreviewReactProps, Schema } from '../../libs/type';
-import { zoom, rulerHeight } from '../../libs/constants';
+import { ZOOM, RULER_HEIGHT } from '../../libs/constants';
 import { templateSchemas2SchemasList } from '../../libs/helper';
 import Pager from './Pager';
 import UnitPager from './UnitPager';
@@ -14,7 +14,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   const { backgrounds, pageSizes, scale, error } = useUiPreProcessor({
     template,
     size,
-    offset: rulerHeight,
+    offset: RULER_HEIGHT,
   });
 
   const rootRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
           if (!rootRef.current) return;
           rootRef.current.scrollTop = pageSizes
             .slice(0, p)
-            .reduce((acc, cur) => acc + (cur.height * zoom + rulerHeight) * scale, 0);
+            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
           setPageCursor(p);
         }}
       />

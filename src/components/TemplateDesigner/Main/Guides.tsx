@@ -1,7 +1,7 @@
 import React, { Ref } from 'react';
 import Guides from '@scena/react-guides';
 import { Size } from '../../../libs/type';
-import { zoom, rulerHeight } from '../../../libs/constants';
+import { ZOOM, RULER_HEIGHT } from '../../../libs/constants';
 
 const _Guides = ({
   paperSize,
@@ -15,34 +15,34 @@ const _Guides = ({
   <>
     <div
       style={{
-        width: rulerHeight,
-        height: rulerHeight,
+        width: RULER_HEIGHT,
+        height: RULER_HEIGHT,
         position: 'absolute',
-        top: -rulerHeight,
-        left: -rulerHeight,
+        top: -RULER_HEIGHT,
+        left: -RULER_HEIGHT,
         background: '#333',
       }}
     ></div>
     <Guides
-      zoom={zoom}
+      zoom={ZOOM}
       style={{
         position: 'absolute',
-        top: -rulerHeight,
+        top: -RULER_HEIGHT,
         left: 0,
-        height: rulerHeight,
+        height: RULER_HEIGHT,
         width: paperSize.width,
       }}
       type="horizontal"
       ref={horizontalRef}
     />
     <Guides
-      zoom={zoom}
+      zoom={ZOOM}
       style={{
         position: 'absolute',
         top: 0,
-        left: -rulerHeight,
+        left: -RULER_HEIGHT,
         height: paperSize.height,
-        width: rulerHeight,
+        width: RULER_HEIGHT,
       }}
       type="vertical"
       ref={verticalRef}

@@ -1,9 +1,10 @@
 import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
 import * as styles from './index.module.scss';
-import { zoom, imageExample } from '../../../libs/constants';
+import { ZOOM } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
 import { SchemaUIProps } from '../SchemaUI';
 import { I18nContext } from '../../../libs/contexts';
+import imageExample from '../../../assets/imageExample.png';
 
 const FilledImage = ({
   editable,
@@ -18,7 +19,7 @@ const FilledImage = ({
       </button>
     )}
     <img
-      style={{ width: schema.width * zoom, height: schema.height * zoom, borderRadius: 0 }}
+      style={{ width: schema.width * ZOOM, height: schema.height * ZOOM, borderRadius: 0 }}
       src={schema.data}
     />
   </div>
@@ -32,8 +33,8 @@ const BlankImage = (props: SchemaUIProps & { inputRef: Ref<HTMLInputElement> }) 
     <label
       className={styles.imageLabel}
       style={{
-        height: Number(schema.height) * zoom,
-        width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * zoom,
+        height: Number(schema.height) * ZOOM,
+        width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * ZOOM,
       }}
     >
       <input
@@ -56,8 +57,8 @@ const BlankImage = (props: SchemaUIProps & { inputRef: Ref<HTMLInputElement> }) 
         opacity: 0.5,
         top: 0,
         left: 0,
-        width: schema.width * zoom,
-        height: schema.height * zoom,
+        width: schema.width * ZOOM,
+        height: schema.height * ZOOM,
         backgroundImage: `url(${placeholder || imageExample})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',

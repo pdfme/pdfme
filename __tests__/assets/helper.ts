@@ -1,7 +1,7 @@
 import { uuid } from '../../src/libs/utils';
 import * as hooks from '../../src/libs/hooks';
 import { getPdfPageSizes, pdf2Pngs } from '../../src/libs/pdfjs';
-import { blankPdf } from '../../src/libs/constants';
+import { BLANK_PDF } from '../../src/libs/constants';
 import { Template } from '../../src/libs/type';
 
 export const setupUiMock = () => {
@@ -30,7 +30,7 @@ export const getSampleTemplate = (): Template => ({
       field2: 'aaaaaaaaaaaa',
     },
   ],
-  basePdf: blankPdf,
+  basePdf: BLANK_PDF,
   schemas: [
     {
       field1: {

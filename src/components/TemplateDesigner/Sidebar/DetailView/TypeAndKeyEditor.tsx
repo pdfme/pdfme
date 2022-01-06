@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { SidebarProps } from '../';
 import { I18nContext } from '../../../../libs/contexts';
-import { inputTypeList } from '../../../../libs/constants';
+import { templateSchemaTypes } from '../../../../libs/type';
 import { usePrevious } from '../../../../libs/hooks';
 
 // TODO クリックで選択中のmoveableを切り替えるとkeyがおかしくなる
@@ -63,7 +63,7 @@ const TypeAndKeyEditor = (
           }
           value={activeSchema.type}
         >
-          {inputTypeList.map((b) => (
+          {templateSchemaTypes.map((b) => (
             <option key={b} value={b}>
               {b}
             </option>

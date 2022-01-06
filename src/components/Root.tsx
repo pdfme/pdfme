@@ -1,6 +1,6 @@
 import type {} from 'css-font-loading-module';
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
-import { rulerHeight } from '../libs/constants';
+import { RULER_HEIGHT } from '../libs/constants';
 import { Size } from '../libs/type';
 import { FontContext } from '../libs/contexts';
 import Spinner from './Spinner';
@@ -36,7 +36,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
         ...size,
       }}
     >
-      <div style={{ height: size.height - rulerHeight * scale }}>
+      <div style={{ height: size.height - RULER_HEIGHT * scale }}>
         {scale === 0 ? (
           <div
             style={{

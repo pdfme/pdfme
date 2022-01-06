@@ -1,6 +1,6 @@
 import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
-import { zoom } from '../../../libs/constants';
+import { ZOOM } from '../../../libs/constants';
 import { SchemaUIProps } from '../SchemaUI';
 
 const TextSchema = (
@@ -10,8 +10,8 @@ const TextSchema = (
   const style: React.CSSProperties = {
     resize: 'none',
     fontFamily: schema.fontName || 'inherit',
-    height: schema.height * zoom,
-    width: schema.width * zoom,
+    height: schema.height * ZOOM,
+    width: schema.width * ZOOM,
     textAlign: schema.alignment,
     fontSize: `${schema.fontSize}pt`,
     letterSpacing: `${schema.characterSpacing}pt`,

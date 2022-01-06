@@ -8,7 +8,7 @@ import TemplateDesigner from '../../src/components/TemplateDesigner';
 import { I18nContext, FontContext } from '../../src/libs/contexts';
 import { curriedI18n } from '../../src/libs/i18n';
 import { getDefaultFont } from '../../src/libs/helper';
-import { selectableClassName } from '../../src/libs/constants';
+import { SELECTABLE_CLASSNAME } from '../../src/libs/constants';
 import { setupUiMock, getSampleTemplate } from '../assets/helper';
 
 test('TemplateDesigner snapshot', async () => {
@@ -30,6 +30,6 @@ test('TemplateDesigner snapshot', async () => {
     container = c;
   });
 
-  await waitFor(() => Boolean(container?.getElementsByClassName(selectableClassName)));
+  await waitFor(() => Boolean(container?.getElementsByClassName(SELECTABLE_CLASSNAME)));
   expect(container.firstChild).toMatchSnapshot();
 });

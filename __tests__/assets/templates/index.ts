@@ -1,5 +1,5 @@
 import { Template } from '../../../src/libs/type';
-import { blankPdf } from '../../../src/libs/constants';
+import { BLANK_PDF } from '../../../src/libs/constants';
 /* eslint global-require: off*/
 /* eslint @typescript-eslint/no-var-requires: off*/
 const レターパック = require('./レターパック.json') as Template;
@@ -65,7 +65,7 @@ export default {
         },
       },
     ],
-    basePdf: blankPdf,
+    basePdf: BLANK_PDF,
     fontName: 'SauceHanSansJP',
   } as Template,
   宛名8面,

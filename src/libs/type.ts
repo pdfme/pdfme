@@ -13,9 +13,7 @@ export type Lang = z.infer<typeof Lang>;
 const Size = z.object({ height: z.number(), width: z.number() });
 export type Size = z.infer<typeof Size>;
 
-const templateSchemas = [
-  'text',
-  'image',
+export const barcodeSchemaTypes = [
   'qrcode',
   'japanpost',
   'ean13',
@@ -27,10 +25,14 @@ const templateSchemas = [
   'upca',
   'upce',
 ] as const;
-const TemplateSchemaType = z.enum(templateSchemas);
-type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
+const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
+export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
-export type BarCodeType = Exclude<TemplateSchemaType, 'text' | 'image'>;
+const notBarcodeSchemaTypes = ['text', 'image'] as const;
+
+export const templateSchemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
+const TemplateSchemaType = z.enum(templateSchemaTypes);
+export type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
 
 const alignments = ['left', 'center', 'right'] as const;
 const Alignment = z.enum(alignments);

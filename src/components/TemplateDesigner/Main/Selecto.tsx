@@ -1,6 +1,6 @@
 import React from 'react';
 import Selecto, { OnDragStart as _OnDragStart, OnSelect as _OnSelect } from 'react-selecto';
-import { selectableClassName } from '../../../libs/constants';
+import { SELECTABLE_CLASSNAME } from '../../../libs/constants';
 
 const _Selecto = ({
   container,
@@ -18,7 +18,7 @@ const _Selecto = ({
     selectByClick={true}
     preventDefault={true}
     hitRate={0}
-    selectableTargets={[`.${selectableClassName}`]}
+    selectableTargets={[`.${SELECTABLE_CLASSNAME}`]}
     container={container}
     continueSelect={continueSelect}
     onDragStart={onDragStart}

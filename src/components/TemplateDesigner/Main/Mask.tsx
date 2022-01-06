@@ -1,13 +1,13 @@
 import React from 'react';
-import { rulerHeight } from '../../../libs/constants';
+import { RULER_HEIGHT } from '../../../libs/constants';
 import { Size } from '../../../libs/type';
 
 const Mask = ({ width, height }: Size) => (
   <div
     style={{
       position: 'absolute',
-      top: -rulerHeight,
-      left: -rulerHeight,
+      top: -RULER_HEIGHT,
+      left: -RULER_HEIGHT,
       zIndex: 100,
       background: 'rgba(158, 158, 158, 0.58)',
       width,

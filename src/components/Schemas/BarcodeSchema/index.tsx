@@ -1,14 +1,39 @@
 import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
-import { zoom, barcodeExampleImageObj, barcodeList } from '../../../libs/constants';
+import { ZOOM } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
-import { TemplateSchema, BarCodeType } from '../../../libs/type';
+import { TemplateSchema, BarCodeType, barcodeSchemaTypes } from '../../../libs/type';
 import { SchemaUIProps } from '../SchemaUI';
+import ean8 from '../../../assets/barcodeExamples/ean8.png';
+import ean13 from '../../../assets/barcodeExamples/ean13.png';
+import code39 from '../../../assets/barcodeExamples/code39.png';
+import code128 from '../../../assets/barcodeExamples/code128.png';
+import nw7 from '../../../assets/barcodeExamples/nw7.png';
+import itf14 from '../../../assets/barcodeExamples/itf14.png';
+import japanpost from '../../../assets/barcodeExamples/japanpost.png';
+import qrcode from '../../../assets/barcodeExamples/qrcode.png';
+import upca from '../../../assets/barcodeExamples/upca.png';
+import upce from '../../../assets/barcodeExamples/upce.png';
+
+const barcodeTypes = barcodeSchemaTypes.map((t) => t as string);
+
+const barcodeExampleImageObj: { [key: string]: string } = {
+  qrcode,
+  japanpost,
+  ean13,
+  ean8,
+  code39,
+  code128,
+  nw7,
+  itf14,
+  upca,
+  upce,
+};
 
 const SampleBarcode = ({ schema }: { schema: TemplateSchema }) => (
   <img
     className={styles.barcodeImage}
-    style={{ width: schema.width * zoom, height: schema.height * zoom }}
+    style={{ width: schema.width * ZOOM, height: schema.height * ZOOM }}
     src={barcodeExampleImageObj[schema.type]}
   />
 );
@@ -31,8 +56,7 @@ const ErrorBarcode = () => (
 );
 
 const ErrorOrSampleBarcode = ({ schema, value }: { schema: TemplateSchema; value: string }) =>
-  (barcodeList as string[]).includes(schema.type) &&
-  validateBarcodeInput(schema.type as BarCodeType, value) ? (
+  barcodeTypes.includes(schema.type) && validateBarcodeInput(schema.type as BarCodeType, value) ? (
     <SampleBarcode schema={schema} />
   ) : (
     <ErrorBarcode />
@@ -57,8 +81,8 @@ const BarcodeSchema = (
           position: 'absolute',
           zIndex: 2,
           fontSize: 'inherit',
-          height: Number(schema.height) * zoom,
-          width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * zoom,
+          height: Number(schema.height) * ZOOM,
+          width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * ZOOM,
           background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
           border: 'none',
         }}

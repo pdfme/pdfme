@@ -3,7 +3,7 @@ import * as path from 'path';
 import generate from '../src/generate';
 import templateData from './assets/templates';
 import { Template, Font } from '../src/libs/type';
-import { blankPdf } from '../src/libs/constants';
+import { BLANK_PDF } from '../src/libs/constants';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
 
@@ -39,7 +39,7 @@ describe('check validation', () => {
   test(`inputs length is 0`, async () => {
     const inputs: { [key: string]: string }[] = [];
     const template: Template = {
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -65,7 +65,7 @@ ERROR MESSAGE: Should have at least 1 items
   test(`missing fallback font`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -92,7 +92,7 @@ ERROR MESSAGE: Should have at least 1 items
   test(`too many fallback font`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -119,7 +119,7 @@ ERROR MESSAGE: Should have at least 1 items
   test(`missing font in template.schemas`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -148,24 +148,24 @@ ERROR MESSAGE: Should have at least 1 items
 });
 
 describe('generate integrate test', () => {
-  // afterAll(() => {
-  //   const dir = path.join(__dirname, 'assets/pdfs/tmp');
-  //   const unLinkFile = (file: any) => {
-  //     if (file !== '.gitkeep') {
-  //       unlink(`${dir}/${file}`, (e: any) => {
-  //         if (e) {
-  //           throw e;
-  //         }
-  //       });
-  //     }
-  //   };
-  //   readdir(dir, (err: any, files: any) => {
-  //     if (err) {
-  //       throw err;
-  //     }
-  //     files.forEach(unLinkFile);
-  //   });
-  // });
+  afterAll(() => {
+    const dir = path.join(__dirname, 'assets/pdfs/tmp');
+    const unLinkFile = (file: any) => {
+      if (file !== '.gitkeep') {
+        unlink(`${dir}/${file}`, (e: any) => {
+          if (e) {
+            throw e;
+          }
+        });
+      }
+    };
+    readdir(dir, (err: any, files: any) => {
+      if (err) {
+        throw err;
+      }
+      files.forEach(unLinkFile);
+    });
+  });
 
   // TODO このテストは遅いので並列実装するようにする Promise.allで何とかいけないか
   describe('use labelmake.jp template', () => {
@@ -211,7 +211,7 @@ describe('generate integrate test', () => {
     test(`sample`, async () => {
       const inputs = [{ a: 'here is Helvetica' }];
       const template: Template = {
-        basePdf: blankPdf,
+        basePdf: BLANK_PDF,
         schemas: [
           {
             a: {
@@ -236,7 +236,7 @@ describe('generate integrate test', () => {
       test(`sample`, async () => {
         const inputs = [{ name: 'here is purple color' }];
         const template: Template = {
-          basePdf: blankPdf,
+          basePdf: BLANK_PDF,
           schemas: [
             {
               name: {
@@ -263,7 +263,7 @@ describe('generate integrate test', () => {
       test(`sample`, async () => {
         const inputs = [{ field1: 'SauceHanSansJP', field2: 'SauceHanSerifJP' }];
         const template: Template = {
-          basePdf: blankPdf,
+          basePdf: BLANK_PDF,
           schemas: [
             {
               field1: {

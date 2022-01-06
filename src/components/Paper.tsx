@@ -1,6 +1,6 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { FontContext } from '../libs/contexts';
-import { zoom, rulerHeight } from '../libs/constants';
+import { ZOOM, RULER_HEIGHT } from '../libs/constants';
 import { Schema, Size } from '../libs/type';
 import { getFallbackFontName } from '../libs/helper';
 
@@ -31,7 +31,7 @@ const Paper = ({
     <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
       {backgrounds.map((background, paperIndex) => {
         const pageSize = pageSizes[paperIndex];
-        const paperSize = { width: pageSize.width * zoom, height: pageSize.height * zoom };
+        const paperSize = { width: pageSize.width * ZOOM, height: pageSize.height * ZOOM };
 
         return (
           <div
@@ -43,7 +43,7 @@ const Paper = ({
             }}
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
-              margin: `${rulerHeight * scale}px auto`,
+              margin: `${RULER_HEIGHT * scale}px auto`,
               position: 'relative',
               backgroundImage: `url(${background})`,
               backgroundSize: 'cover',

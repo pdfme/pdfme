@@ -3,7 +3,7 @@ import { b64toBlob } from './utils';
 import { getB64BasePdf } from './helper';
 import { pdf2Pngs, getPdfPageSizes } from '../libs/pdfjs';
 import { Template, Size } from './type';
-import { rulerHeight, zoom } from './constants';
+import { RULER_HEIGHT, ZOOM } from './constants';
 
 export const usePrevious = <T>(value: T) => {
   const ref = useRef<T | null>(null);
@@ -28,8 +28,8 @@ export const useUiPreProcessor = ({ template, size, offset = 0 }: UiPreProcessor
     const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
-    const paperWidth = _pageSizes[0].width * zoom;
-    const paperHeight = _pageSizes[0].height * zoom;
+    const paperWidth = _pageSizes[0].width * ZOOM;
+    const paperHeight = _pageSizes[0].height * ZOOM;
     const _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
 
     const _scale = Math.min(
@@ -79,7 +79,7 @@ export const useScrollPageCursor = ({
     const scroll = rootRef.current.scrollTop;
     const { top } = rootRef.current.getBoundingClientRect();
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
-      let value = (cur.height * zoom + rulerHeight) * scale;
+      let value = (cur.height * ZOOM + RULER_HEIGHT) * scale;
       if (i === 0) {
         value += top - value / 2;
       } else {

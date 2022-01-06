@@ -11,9 +11,16 @@ import {
 import { mm2pt } from './utils';
 import { getB64BasePdf } from './helper';
 import { createBarCode, validateBarcodeInput } from './barcode';
-import { TemplateSchema, Font, BasePdf, BarCodeType, InputImageCache, Alignment } from './type';
 import {
-  barcodeList,
+  TemplateSchema,
+  Font,
+  BasePdf,
+  BarCodeType,
+  InputImageCache,
+  Alignment,
+  barcodeSchemaTypes,
+} from './type';
+import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
@@ -315,7 +322,9 @@ const drawInputByBarcodeSchema = async (arg: {
   inputImageCache: InputImageCache;
 }) => {
   const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
-  const inValidSchemaType = !(barcodeList as string[]).includes(templateSchema.type);
+  const inValidSchemaType = !barcodeSchemaTypes
+    .map((t) => t as string)
+    .includes(templateSchema.type);
   if (inValidSchemaType) {
     throw Error(`drawInputByBarcodeSchema can't use ${templateSchema.type} type schema`);
   }
@@ -359,7 +368,7 @@ export const drawInputByTemplateSchema = async (arg: {
     drawInputByTextSchema(arg);
   } else if (templateSchema.type === 'image') {
     await drawInputByImageSchema(arg);
-  } else if (barcodeList.includes(templateSchema.type)) {
+  } else if (barcodeSchemaTypes.includes(templateSchema.type)) {
     await drawInputByBarcodeSchema(arg);
   }
 };

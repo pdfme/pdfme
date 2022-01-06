@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { TemplateDesignerReactProps, Template, Schema, Size } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { rulerHeight } from '../../libs/constants';
+import { RULER_HEIGHT } from '../../libs/constants';
 import { I18nContext } from '../../libs/contexts';
 import { uuid, set, cloneDeep, round, arrayMove } from '../../libs/utils';
 import {
@@ -98,7 +98,7 @@ const TemplateEditor = ({
   const { backgrounds, pageSizes, scale, error } = useUiPreProcessor({
     template,
     size,
-    offset: rulerHeight,
+    offset: RULER_HEIGHT,
   });
 
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -141,7 +141,7 @@ const TemplateEditor = ({
   );
 
   const changeSchemas = useCallback(
-    // TOOD valueがstringで矯正されているのがおかしい。
+    // TODO valueがstringで矯正されているのがおかしい。
     // numberも受け取れるようにしてfmtValueを使わなくていいようにした
     (objs: { key: string; value: string; schemaId: string }[]) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
@@ -306,7 +306,7 @@ const TemplateEditor = ({
       />
       <Main
         ref={mainRef}
-        height={size.height - rulerHeight}
+        height={size.height - RULER_HEIGHT}
         pageCursor={pageCursor}
         scale={scale}
         pageSizes={pageSizes}

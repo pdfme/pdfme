@@ -10,7 +10,7 @@ import React, {
 import { OnDrag, OnResize } from 'react-moveable';
 import { Schema, Size } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
-import { zoom, rulerHeight } from '../../../libs/constants';
+import { ZOOM, RULER_HEIGHT } from '../../../libs/constants';
 import { usePrevious } from '../../../libs/hooks';
 import Paper from '../../Paper';
 import SchemaUI from '../../Schemas/SchemaUI';
@@ -20,7 +20,7 @@ import Guides from './Guides';
 import Mask from './Mask';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
-const fmt = (prop: string) => String(round(fmt4Num(prop) / zoom, 2));
+const fmt = (prop: string) => String(round(fmt4Num(prop) / ZOOM, 2));
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 
 interface GuidesInterface {
@@ -168,7 +168,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
-    guides[index] && guides[index].getGuides().map((g) => g * zoom);
+    guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
   const onClickMoveable = () => {
     setEditing(true);
@@ -241,7 +241,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
               }}
             />
             {pageCursor !== index ? (
-              <Mask width={paperSize.width + rulerHeight} height={paperSize.height + rulerHeight} />
+              <Mask width={paperSize.width + RULER_HEIGHT} height={paperSize.height + RULER_HEIGHT} />
             ) : (
               !editing && (
                 <Moveable
