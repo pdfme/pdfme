@@ -2,12 +2,7 @@ import React, { forwardRef, RefObject, Ref, ReactNode } from 'react';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../libs/constants';
-import {
-  SchemaForUI,
-  isTextTemplateSchema,
-  isImageTemplateSchema,
-  isBarcodeTemplateSchema,
-} from '../../libs/type';
+import { SchemaForUI, isTextSchema, isImageSchema, isBarcodeSchema } from '../../libs/type';
 import TextSchema from './TextSchema';
 import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
@@ -55,9 +50,9 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
 
   return (
     <Wrapper {...props}>
-      {isTextTemplateSchema(schema) && <TextSchema {...r} {...props} schema={schema} />}
-      {isImageTemplateSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
-      {isBarcodeTemplateSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />}
+      {isTextSchema(schema) && <TextSchema {...r} {...props} schema={schema} />}
+      {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
+      {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />}
     </Wrapper>
   );
 };

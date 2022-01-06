@@ -3,11 +3,11 @@ import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
 import { SchemaUIProps } from '../SchemaUI';
-import { ImageTemplateSchema } from '../../../libs/type';
+import { ImageSchema } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import imageExample from '../../../assets/imageExample.png';
 
-type Props = SchemaUIProps & { schema: ImageTemplateSchema };
+type Props = SchemaUIProps & { schema: ImageSchema };
 
 const FilledImage = ({ editable, tabIndex, schema, onChange }: Omit<Props, 'placeholder'>) => (
   <div style={{ margin: '0 auto' }}>

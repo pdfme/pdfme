@@ -2,7 +2,7 @@ import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
-import { BarCodeType, barcodeSchemaTypes, BarcodeTemplateSchema } from '../../../libs/type';
+import { BarCodeType, BarcodeSchema } from '../../../libs/type';
 import { SchemaUIProps } from '../SchemaUI';
 import ean8 from '../../../assets/barcodeExamples/ean8.png';
 import ean13 from '../../../assets/barcodeExamples/ean13.png';
@@ -15,9 +15,7 @@ import qrcode from '../../../assets/barcodeExamples/qrcode.png';
 import upca from '../../../assets/barcodeExamples/upca.png';
 import upce from '../../../assets/barcodeExamples/upce.png';
 
-type Props = SchemaUIProps & { schema: BarcodeTemplateSchema };
-
-const barcodeTypes = barcodeSchemaTypes.map((t) => t as string);
+type Props = SchemaUIProps & { schema: BarcodeSchema };
 
 const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,
@@ -32,7 +30,7 @@ const barcodeExampleImageObj: { [key: string]: string } = {
   upce,
 };
 
-const SampleBarcode = ({ schema }: { schema: BarcodeTemplateSchema }) => (
+const SampleBarcode = ({ schema }: { schema: BarcodeSchema }) => (
   <img
     className={styles.barcodeImage}
     style={{ width: schema.width * ZOOM, height: schema.height * ZOOM }}
@@ -57,14 +55,8 @@ const ErrorBarcode = () => (
   </div>
 );
 
-const ErrorOrSampleBarcode = ({
-  schema,
-  value,
-}: {
-  schema: BarcodeTemplateSchema;
-  value: string;
-}) =>
-  barcodeTypes.includes(schema.type) && validateBarcodeInput(schema.type as BarCodeType, value) ? (
+const ErrorOrSampleBarcode = ({ schema, value }: { schema: BarcodeSchema; value: string }) =>
+  validateBarcodeInput(schema.type as BarCodeType, value) ? (
     <SampleBarcode schema={schema} />
   ) : (
     <ErrorBarcode />

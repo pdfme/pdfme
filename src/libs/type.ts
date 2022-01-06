@@ -12,6 +12,10 @@ export type Lang = z.infer<typeof Lang>;
 const Size = z.object({ height: z.number(), width: z.number() });
 export type Size = z.infer<typeof Size>;
 
+const alignments = ['left', 'center', 'right'] as const;
+const Alignment = z.enum(alignments);
+export type Alignment = z.infer<typeof Alignment>;
+
 export const barcodeSchemaTypes = [
   'qrcode',
   'japanpost',
@@ -29,12 +33,49 @@ export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
 export const templateSchemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
-const TemplateSchemaType = z.enum(templateSchemaTypes);
-type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
+const SchemaType = z.enum(templateSchemaTypes);
 
-const alignments = ['left', 'center', 'right'] as const;
-const Alignment = z.enum(alignments);
-export type Alignment = z.infer<typeof Alignment>;
+const CommonSchema = z.object({
+  type: SchemaType,
+  position: z.object({ x: z.number(), y: z.number() }),
+  width: z.number(),
+  height: z.number(),
+  rotate: z.number().optional(),
+});
+type CommonSchema = z.infer<typeof CommonSchema>;
+
+const TextSchema = CommonSchema.extend({
+  type: z.literal(SchemaType.Enum.text),
+  alignment: Alignment.optional(),
+  fontSize: z.number().optional(),
+  fontName: z.string().optional(),
+  fontColor: z.string().optional(),
+  backgroundColor: z.string().optional(),
+  characterSpacing: z.number().optional(),
+  lineHeight: z.number().optional(),
+});
+export type TextSchema = z.infer<typeof TextSchema>;
+export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
+
+const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
+export type ImageSchema = z.infer<typeof ImageSchema>;
+export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
+
+const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
+export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
+export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>
+  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
+
+const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
+export type Schema = z.infer<typeof Schema>;
+
+const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
+const SchemaForUI = z.union([
+  TextSchema.merge(SchemaForUIAdditionalInfo),
+  ImageSchema.merge(SchemaForUIAdditionalInfo),
+  BarcodeSchema.merge(SchemaForUIAdditionalInfo),
+]);
+export type SchemaForUI = z.infer<typeof SchemaForUI>;
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
@@ -53,56 +94,8 @@ export type Font = z.infer<typeof Font>;
 const BasePdf = z.union([z.string(), Data]);
 export type BasePdf = z.infer<typeof BasePdf>;
 
-const CommonTemplateSchema = z.object({
-  type: TemplateSchemaType,
-  position: z.object({ x: z.number(), y: z.number() }),
-  width: z.number(),
-  height: z.number(),
-  rotate: z.number().optional(),
-});
-type CommonTemplateSchema = z.infer<typeof CommonTemplateSchema>;
-
-const TextTemplateSchema = CommonTemplateSchema.extend({
-  type: z.literal(TemplateSchemaType.Enum.text),
-  alignment: Alignment.optional(),
-  fontSize: z.number().optional(),
-  fontName: z.string().optional(),
-  fontColor: z.string().optional(),
-  backgroundColor: z.string().optional(),
-  characterSpacing: z.number().optional(),
-  lineHeight: z.number().optional(),
-});
-export type TextTemplateSchema = z.infer<typeof TextTemplateSchema>;
-export const isTextTemplateSchema = (arg: CommonTemplateSchema): arg is TextTemplateSchema =>
-  arg.type === 'text';
-
-const ImageTemplateSchema = CommonTemplateSchema.extend({
-  type: z.literal(TemplateSchemaType.Enum.image),
-});
-export type ImageTemplateSchema = z.infer<typeof ImageTemplateSchema>;
-export const isImageTemplateSchema = (arg: CommonTemplateSchema): arg is ImageTemplateSchema =>
-  arg.type === 'image';
-
-const BarcodeTemplateSchema = CommonTemplateSchema.extend({
-  type: BarcodeSchemaType,
-});
-export type BarcodeTemplateSchema = z.infer<typeof BarcodeTemplateSchema>;
-export const isBarcodeTemplateSchema = (arg: CommonTemplateSchema): arg is BarcodeTemplateSchema =>
-  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
-
-// TODO TemplateSchemaはSchemaにする
-const TemplateSchema = z.union([TextTemplateSchema, ImageTemplateSchema, BarcodeTemplateSchema]);
-export type TemplateSchema = z.infer<typeof TemplateSchema>;
-
-const SchemaForUI = z.union([
-  TextTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-  ImageTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-  BarcodeTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-]);
-export type SchemaForUI = z.infer<typeof SchemaForUI>;
-
 const Template = z.object({
-  schemas: z.array(z.record(TemplateSchema)),
+  schemas: z.array(z.record(Schema)),
   basePdf: BasePdf,
   sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),

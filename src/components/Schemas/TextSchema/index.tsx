@@ -2,9 +2,9 @@ import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { SchemaUIProps } from '../SchemaUI';
-import { TextTemplateSchema } from '../../../libs/type';
+import { TextSchema } from '../../../libs/type';
 
-type Props = SchemaUIProps & { schema: TextTemplateSchema };
+type Props = SchemaUIProps & { schema: TextSchema };
 
 const TextSchema = (
   { schema, editable, placeholder, tabIndex, onChange }: Props,

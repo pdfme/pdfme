@@ -2,12 +2,12 @@ import { z } from 'zod';
 import Helvetica from '../assets/Helvetica.ttf';
 import {
   Template,
-  TemplateSchema,
+  Schema,
   SchemaForUI,
   BasePdf,
   Font,
   CommonProps,
-  isTextTemplateSchema,
+  isTextSchema,
 } from './type';
 import {
   DEFAULT_FONT_NAME,
@@ -45,7 +45,7 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         acc[k] = cur;
 
         return acc;
-      }, {} as { [key: string]: TemplateSchema })
+      }, {} as { [key: string]: Schema })
     ),
   };
 
@@ -147,10 +147,10 @@ export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true, index: 0 },
 });
 
-const getFontNamesInSchemas = (schemas: { [key: string]: TemplateSchema }[]) =>
+const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => (isTextTemplateSchema(v) ? v.fontName : '')))
+      .map((s) => Object.values(s).map((v) => (isTextSchema(v) ? v.fontName : '')))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );

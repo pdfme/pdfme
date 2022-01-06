@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { uuid } from '../../src/libs/utils';
 import { BLANK_PDF } from '../../src/libs/constants';
-import { Font, SchemaForUI, Template, TemplateSchema } from '../../src/libs/type';
+import { Font, SchemaForUI, Template, Schema } from '../../src/libs/type';
 import { checkFont, getUniqSchemaKey } from '../../src/libs/helper';
 import { blankPdf } from '../../src';
 
@@ -184,7 +184,7 @@ describe('checkFont test', () => {
 });
 
 describe('getUniqSchemaKey test', () => {
-  const getSchema = (): TemplateSchema => ({
+  const getSchema = (): Schema => ({
     type: 'text',
     position: { x: 0, y: 0 },
     width: 100,

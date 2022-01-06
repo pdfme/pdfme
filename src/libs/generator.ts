@@ -12,19 +12,18 @@ import { mm2pt } from './utils';
 import { getB64BasePdf } from './helper';
 import { createBarCode, validateBarcodeInput } from './barcode';
 import {
-  TemplateSchema,
-  TextTemplateSchema,
-  isTextTemplateSchema,
-  ImageTemplateSchema,
-  isImageTemplateSchema,
-  BarcodeTemplateSchema,
-  isBarcodeTemplateSchema,
+  Schema,
+  TextSchema,
+  isTextSchema,
+  ImageSchema,
+  isImageSchema,
+  BarcodeSchema,
+  isBarcodeSchema,
   Font,
   BasePdf,
   BarCodeType,
   InputImageCache,
   Alignment,
-  barcodeSchemaTypes,
 } from './type';
 import {
   DEFAULT_FONT_SIZE,
@@ -87,7 +86,7 @@ export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
   return { embeddedPages, embedPdfBoxes };
 };
 
-const getSchemaSizeAndRotate = (schema: TemplateSchema) => {
+const getSchemaSizeAndRotate = (schema: Schema) => {
   const width = mm2pt(schema.width);
   const height = mm2pt(schema.height);
   const rotate = degrees(schema.rotate ? schema.rotate : 0);
@@ -120,7 +119,7 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const getFontProp = (schema: TextTemplateSchema) => {
+const getFontProp = (schema: TextSchema) => {
   const size = schema.fontSize || DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor);
   const alignment = schema.alignment || DEFAULT_ALIGNMENT;
@@ -144,7 +143,7 @@ const calcX = (x: number, alignment: Alignment, boxWidth: number, textWidth: num
 const calcY = (y: number, height: number, itemHeight: number) => height - mm2pt(y) - itemHeight;
 
 const drawBackgroundColor = (arg: {
-  templateSchema: TextTemplateSchema;
+  templateSchema: TextSchema;
   page: PDFPage;
   pageHeight: number;
 }) => {
@@ -226,7 +225,7 @@ interface TextSchemaSetting {
 
 const drawInputByTextSchema = (arg: {
   input: string;
-  templateSchema: TextTemplateSchema;
+  templateSchema: TextSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
@@ -234,9 +233,6 @@ const drawInputByTextSchema = (arg: {
 }) => {
   const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
   const { fontObj, fallbackFontName, splitThreshold } = textSchemaSetting;
-  if (templateSchema.type !== 'text') {
-    throw Error(`drawInputByTextSchema can't use ${templateSchema.type} type schema`);
-  }
 
   const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
 
@@ -285,21 +281,17 @@ const drawInputByTextSchema = (arg: {
   });
 };
 
-const getCacheKey = (templateSchema: TemplateSchema, input: string) =>
-  `${templateSchema.type}${input}`;
+const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
 
 const drawInputByImageSchema = async (arg: {
   input: string;
-  templateSchema: ImageTemplateSchema;
+  templateSchema: ImageSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
   const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
-  if (templateSchema.type !== 'image') {
-    throw Error(`drawInputByImageSchema can't use ${templateSchema.type} type schema`);
-  }
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const opt = {
@@ -321,19 +313,13 @@ const drawInputByImageSchema = async (arg: {
 
 const drawInputByBarcodeSchema = async (arg: {
   input: string;
-  templateSchema: BarcodeTemplateSchema;
+  templateSchema: BarcodeSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
   const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
-  const inValidSchemaType = !barcodeSchemaTypes
-    .map((t) => t as string)
-    .includes(templateSchema.type);
-  if (inValidSchemaType) {
-    throw Error(`drawInputByBarcodeSchema can't use ${templateSchema.type} type schema`);
-  }
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const opt = {
@@ -360,7 +346,7 @@ const drawInputByBarcodeSchema = async (arg: {
 
 export const drawInputByTemplateSchema = async (arg: {
   input: string;
-  templateSchema: TemplateSchema;
+  templateSchema: Schema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
@@ -369,14 +355,14 @@ export const drawInputByTemplateSchema = async (arg: {
 }) => {
   if (!arg.templateSchema) return;
 
-  if (isTextTemplateSchema(arg.templateSchema)) {
-    const templateSchema = arg.templateSchema as TextTemplateSchema;
+  if (isTextSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as TextSchema;
     drawInputByTextSchema({ ...arg, templateSchema });
-  } else if (isImageTemplateSchema(arg.templateSchema)) {
-    const templateSchema = arg.templateSchema as ImageTemplateSchema;
+  } else if (isImageSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as ImageSchema;
     await drawInputByImageSchema({ ...arg, templateSchema });
-  } else if (isBarcodeTemplateSchema(arg.templateSchema)) {
-    const templateSchema = arg.templateSchema as BarcodeTemplateSchema;
+  } else if (isBarcodeSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as BarcodeSchema;
     await drawInputByBarcodeSchema({ ...arg, templateSchema });
   }
 };
