@@ -53,9 +53,19 @@ const Paper = ({
             }}
           >
             {renderPaper && renderPaper({ paperSize, index: paperIndex })}
-            {schemasList[paperIndex].map((schema, schemaIndex) => (
-              <div key={schema.id}>{renderSchema({ schema, index: schemaIndex })}</div>
-            ))}
+            {schemasList[paperIndex].map((schema, schemaIndex) => {
+              return (
+                <div key={schema.id}>
+                  {renderSchema({
+                    schema,
+                    index:
+                      paperIndex === 0
+                        ? schemaIndex
+                        : schemaIndex + schemasList[paperIndex - 1].length,
+                  })}
+                </div>
+              );
+            })}
           </div>
         );
       })}
