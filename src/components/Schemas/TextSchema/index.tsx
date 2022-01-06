@@ -1,7 +1,7 @@
 import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { zoom } from '../../../libs/constants';
-import { SchemaUIProps } from '../';
+import { SchemaUIProps } from '../SchemaUI';
 
 const TextSchema = (
   { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,

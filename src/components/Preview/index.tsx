@@ -66,7 +66,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
       />
       <Paper
         scale={scale}
-        schemas={schemasList[pageCursor]}
+        schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         renderSchema={({ schema, index }) => {
@@ -79,7 +79,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
               schema={Object.assign(schema, { key, id: key, data })}
               editable={editable}
               placeholder={template.sampledata ? template.sampledata[0][key] : ''}
-              tabIndex={index}
+              tabIndex={index + 100}
               onChange={(value) => handleChangeInput({ key, value })}
               border={editable ? '1px dashed #4af' : 'transparent'}
             />

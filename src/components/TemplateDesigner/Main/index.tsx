@@ -8,12 +8,12 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { Schema as SchemaType, PageSize } from '../../../libs/type';
+import { Schema, PageSize } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
 import { zoom, rulerHeight } from '../../../libs/constants';
 import { usePrevious } from '../../../libs/hooks';
 import Paper from '../../Paper';
-import Schema from '../../Schemas';
+import SchemaUI from '../../Schemas/SchemaUI';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
@@ -34,11 +34,11 @@ interface GuidesInterface {
 interface Props {
   height: number;
   pageCursor: number;
+  schemasList: Schema[][];
   scale: number;
   backgrounds: string[];
   pageSizes: PageSize[];
   activeElements: HTMLElement[];
-  schemas: { [key: string]: SchemaType }[];
   setActiveElements: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
@@ -51,7 +51,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     backgrounds,
     pageSizes,
     activeElements,
-    schemas,
+    schemasList,
     setActiveElements,
     changeSchemas,
     paperRefs,
@@ -64,7 +64,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
 
-  const prevSchemas = usePrevious(schemas);
+  const prevSchemas = usePrevious(schemasList[pageCursor]);
 
   const onKeydown = (e: KeyboardEvent) => {
     if (e.shiftKey) setIsPressShiftKey(true);
@@ -97,13 +97,13 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       return;
     }
 
-    const prevSchemaKeys = Object.keys(prevSchemas[pageCursor]);
-    const schemaKeys = Object.keys(schemas[pageCursor]);
+    const prevSchemaKeys = Object.keys(prevSchemas[pageCursor] || {});
+    const schemaKeys = Object.keys(schemasList[pageCursor] || {});
 
     if (prevSchemaKeys.join() === schemaKeys.join()) {
       moveable.current?.updateRect();
     }
-  }, [pageCursor, schemas, prevSchemas]);
+  }, [pageCursor, schemasList, prevSchemas]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
     target.style.left = `${left < 0 ? 0 : left}px`;
@@ -176,10 +176,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (!ic) return;
     ic.disabled = false;
     ic.focus();
-    if (ic.type !== 'file') {
-      ic.setSelectionRange(ic.value.length, ic.value.length);
-    } else {
+    if (ic.type === 'file') {
       ic.click();
+    } else {
+      ic.setSelectionRange(ic.value.length, ic.value.length);
     }
   };
 
@@ -222,68 +222,57 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       <Paper
         paperRefs={paperRefs}
         scale={scale}
-        schemas={schemas}
+        schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
-        render={({ index, schema, paperSize }) => {
-          return (
-            <>
-              <Guides
-                paperSize={paperSize}
-                horizontalRef={(e) => {
-                  if (e) {
-                    horizontalGuides.current[index] = e;
-                  }
-                }}
-                verticalRef={(e) => {
-                  if (e) {
-                    verticalGuides.current[index] = e;
-                  }
-                }}
-              />
-              {pageCursor !== index ? (
-                <Mask
-                  width={paperSize.width + rulerHeight}
-                  height={paperSize.height + rulerHeight}
+        renderPaper={({ index, paperSize }) => (
+          <>
+            <Guides
+              paperSize={paperSize}
+              horizontalRef={(e) => {
+                if (e) {
+                  horizontalGuides.current[index] = e;
+                }
+              }}
+              verticalRef={(e) => {
+                if (e) {
+                  verticalGuides.current[index] = e;
+                }
+              }}
+            />
+            {pageCursor !== index ? (
+              <Mask width={paperSize.width + rulerHeight} height={paperSize.height + rulerHeight} />
+            ) : (
+              !editing && (
+                <Moveable
+                  ref={moveable}
+                  target={activeElements}
+                  bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
+                  horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                  verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                  keepRatio={isPressShiftKey}
+                  onDrag={onDrag}
+                  onDragEnd={onDragEnd}
+                  onDragGroupEnd={onDragEnds}
+                  onResize={onResize}
+                  onResizeEnd={onResizeEnd}
+                  onResizeGroupEnd={onResizeEnds}
+                  onClick={onClickMoveable}
                 />
-              ) : (
-                !editing && (
-                  <Moveable
-                    ref={moveable}
-                    target={activeElements}
-                    bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
-                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                    keepRatio={isPressShiftKey}
-                    onDrag={onDrag}
-                    onDragEnd={onDragEnd}
-                    onDragGroupEnd={onDragEnds}
-                    onResize={onResize}
-                    onResizeEnd={onResizeEnd}
-                    onResizeGroupEnd={onResizeEnds}
-                    onClick={onClickMoveable}
-                  />
-                )
-              )}
-              {Object.entries(schema).map((entry) => {
-                const [key, s] = entry as [string, SchemaType];
-
-                return (
-                  <Schema
-                    key={key}
-                    schema={s}
-                    editable={editing && activeElements.map((ae) => ae.id).includes(s.id)}
-                    placeholder={''}
-                    tabIndex={0}
-                    onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: s.id }])}
-                    border={'1px dashed #4af'}
-                    ref={inputRef}
-                  />
-                );
-              })}
-            </>
-          );
-        }}
+              )
+            )}
+          </>
+        )}
+        renderSchema={({ schema }) => (
+          <SchemaUI
+            key={schema.key}
+            schema={schema}
+            editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
+            onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: schema.id }])}
+            border={'1px dashed #4af'}
+            ref={inputRef}
+          />
+        )}
       />
     </div>
   );

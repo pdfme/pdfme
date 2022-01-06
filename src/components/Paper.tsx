@@ -7,7 +7,7 @@ import { getFallbackFontName } from '../libs/helper';
 const Paper = ({
   paperRefs,
   scale,
-  schemas,
+  schemasList,
   pageSizes,
   backgrounds,
   renderPaper,
@@ -15,7 +15,7 @@ const Paper = ({
 }: {
   paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
-  schemas: Schema[];
+  schemasList: Schema[][];
   pageSizes: PageSize[];
   backgrounds: string[];
   renderPaper?: (arg: { index: number; paperSize: PageSize }) => ReactNode;
@@ -23,7 +23,7 @@ const Paper = ({
 }) => {
   const font = useContext(FontContext);
 
-  if (pageSizes.length !== backgrounds.length) {
+  if (pageSizes.length !== backgrounds.length || pageSizes.length !== schemasList.length) {
     return null;
   }
 
@@ -53,7 +53,7 @@ const Paper = ({
             }}
           >
             {renderPaper && renderPaper({ paperSize, index: paperIndex })}
-            {schemas.map((schema, schemaIndex) => (
+            {schemasList[paperIndex].map((schema, schemaIndex) => (
               <div key={schema.id}>{renderSchema({ schema, index: schemaIndex })}</div>
             ))}
           </div>

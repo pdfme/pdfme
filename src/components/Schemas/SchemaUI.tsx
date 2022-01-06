@@ -10,9 +10,9 @@ import BarcodeSchema from './BarcodeSchema';
 export type SchemaUIProps = {
   schema: Schema;
   editable: boolean;
-  placeholder: string;
-  tabIndex: number;
   onChange: (value: string) => void;
+  tabIndex?: number;
+  placeholder?: string;
 };
 
 type Props = SchemaUIProps & { border: string };
