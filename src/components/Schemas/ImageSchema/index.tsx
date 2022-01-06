@@ -3,15 +3,13 @@ import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { readFiles } from '../../../libs/ui';
 import { SchemaUIProps } from '../SchemaUI';
+import { ImageTemplateSchema } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import imageExample from '../../../assets/imageExample.png';
 
-const FilledImage = ({
-  editable,
-  tabIndex,
-  schema,
-  onChange,
-}: Omit<SchemaUIProps, 'placeholder'>) => (
+type Props = SchemaUIProps & { schema: ImageTemplateSchema };
+
+const FilledImage = ({ editable, tabIndex, schema, onChange }: Omit<Props, 'placeholder'>) => (
   <div style={{ margin: '0 auto' }}>
     {editable && (
       <button tabIndex={tabIndex} className={styles.dltBtn} onClick={() => onChange('')}>
@@ -25,17 +23,14 @@ const FilledImage = ({
   </div>
 );
 
-const BlankImage = (props: SchemaUIProps & { inputRef: Ref<HTMLInputElement> }) => {
+const BlankImage = (props: Props & { inputRef: Ref<HTMLInputElement> }) => {
   const { editable, placeholder, tabIndex, schema, onChange, inputRef } = props;
   const i18n = useContext(I18nContext);
 
   return editable ? (
     <label
       className={styles.imageLabel}
-      style={{
-        height: Number(schema.height) * ZOOM,
-        width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * ZOOM,
-      }}
+      style={{ height: Number(schema.height) * ZOOM, width: Number(schema.width) * ZOOM }}
     >
       <input
         ref={inputRef}
@@ -68,7 +63,7 @@ const BlankImage = (props: SchemaUIProps & { inputRef: Ref<HTMLInputElement> }) 
   );
 };
 
-const ImageSchema = (props: SchemaUIProps, ref: Ref<HTMLInputElement>) =>
+const ImageSchema = (props: Props, ref: Ref<HTMLInputElement>) =>
   props.schema.data ? <FilledImage {...props} /> : <BlankImage {...props} inputRef={ref} />;
 
-export default forwardRef<HTMLInputElement, SchemaUIProps>(ImageSchema);
+export default forwardRef<HTMLInputElement, Props>(ImageSchema);

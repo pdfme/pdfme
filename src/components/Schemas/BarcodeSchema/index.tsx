@@ -2,7 +2,7 @@ import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
-import { TemplateSchema, BarCodeType, barcodeSchemaTypes } from '../../../libs/type';
+import { BarCodeType, barcodeSchemaTypes, BarcodeTemplateSchema } from '../../../libs/type';
 import { SchemaUIProps } from '../SchemaUI';
 import ean8 from '../../../assets/barcodeExamples/ean8.png';
 import ean13 from '../../../assets/barcodeExamples/ean13.png';
@@ -14,6 +14,8 @@ import japanpost from '../../../assets/barcodeExamples/japanpost.png';
 import qrcode from '../../../assets/barcodeExamples/qrcode.png';
 import upca from '../../../assets/barcodeExamples/upca.png';
 import upce from '../../../assets/barcodeExamples/upce.png';
+
+type Props = SchemaUIProps & { schema: BarcodeTemplateSchema };
 
 const barcodeTypes = barcodeSchemaTypes.map((t) => t as string);
 
@@ -30,7 +32,7 @@ const barcodeExampleImageObj: { [key: string]: string } = {
   upce,
 };
 
-const SampleBarcode = ({ schema }: { schema: TemplateSchema }) => (
+const SampleBarcode = ({ schema }: { schema: BarcodeTemplateSchema }) => (
   <img
     className={styles.barcodeImage}
     style={{ width: schema.width * ZOOM, height: schema.height * ZOOM }}
@@ -55,7 +57,13 @@ const ErrorBarcode = () => (
   </div>
 );
 
-const ErrorOrSampleBarcode = ({ schema, value }: { schema: TemplateSchema; value: string }) =>
+const ErrorOrSampleBarcode = ({
+  schema,
+  value,
+}: {
+  schema: BarcodeTemplateSchema;
+  value: string;
+}) =>
   barcodeTypes.includes(schema.type) && validateBarcodeInput(schema.type as BarCodeType, value) ? (
     <SampleBarcode schema={schema} />
   ) : (
@@ -63,7 +71,7 @@ const ErrorOrSampleBarcode = ({ schema, value }: { schema: TemplateSchema; value
   );
 
 const BarcodeSchema = (
-  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,
+  { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLInputElement>
 ) => {
   const value = schema.data;
@@ -82,7 +90,7 @@ const BarcodeSchema = (
           zIndex: 2,
           fontSize: 'inherit',
           height: Number(schema.height) * ZOOM,
-          width: (Number(schema.width) + (schema.characterSpacing || 0) * 0.75) * ZOOM,
+          width: Number(schema.width) * ZOOM,
           background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
           border: 'none',
         }}
@@ -98,4 +106,4 @@ const BarcodeSchema = (
   );
 };
 
-export default forwardRef<HTMLInputElement, SchemaUIProps>(BarcodeSchema);
+export default forwardRef<HTMLInputElement, Props>(BarcodeSchema);

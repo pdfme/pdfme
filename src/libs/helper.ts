@@ -1,6 +1,15 @@
 import { z } from 'zod';
 import Helvetica from '../assets/Helvetica.ttf';
-import { Template, TemplateSchema, Schema, Schemas, BasePdf, Font, CommonProps } from './type';
+import {
+  Template,
+  TemplateSchema,
+  Schema,
+  Schemas,
+  BasePdf,
+  Font,
+  CommonProps,
+  isTextTemplateSchema,
+} from './type';
 import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
@@ -142,7 +151,7 @@ export const getDefaultFont = (): Font => ({
 const getFontNamesInSchemas = (schemas: Schemas) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => v.fontName))
+      .map((s) => Object.values(s).map((v) => (isTextTemplateSchema(v) ? v.fontName : '')))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );

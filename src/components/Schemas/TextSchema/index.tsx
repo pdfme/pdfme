@@ -2,9 +2,12 @@ import React, { forwardRef, Ref } from 'react';
 import * as styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { SchemaUIProps } from '../SchemaUI';
+import { TextTemplateSchema } from '../../../libs/type';
+
+type Props = SchemaUIProps & { schema: TextTemplateSchema };
 
 const TextSchema = (
-  { schema, editable, placeholder, tabIndex, onChange }: SchemaUIProps,
+  { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
   const style: React.CSSProperties = {
@@ -51,4 +54,4 @@ const TextSchema = (
   );
 };
 
-export default forwardRef<HTMLTextAreaElement, SchemaUIProps>(TextSchema);
+export default forwardRef<HTMLTextAreaElement, Props>(TextSchema);

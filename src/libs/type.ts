@@ -29,10 +29,9 @@ const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
-
 export const templateSchemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
 const TemplateSchemaType = z.enum(templateSchemaTypes);
-export type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
+type TemplateSchemaType = z.infer<typeof TemplateSchemaType>;
 
 const alignments = ['left', 'center', 'right'] as const;
 const Alignment = z.enum(alignments);
@@ -55,14 +54,18 @@ export type Font = z.infer<typeof Font>;
 const BasePdf = z.union([z.string(), Data]);
 export type BasePdf = z.infer<typeof BasePdf>;
 
-const TemplateSchema = z.object({
+const CommonTemplateSchema = z.object({
   type: TemplateSchemaType,
   position: z.object({ x: z.number(), y: z.number() }),
   width: z.number(),
   height: z.number(),
   rotate: z.number().optional(),
+});
+type CommonTemplateSchema = z.infer<typeof CommonTemplateSchema>;
+
+const TextTemplateSchema = CommonTemplateSchema.extend({
+  type: z.literal(TemplateSchemaType.Enum.text),
   alignment: Alignment.optional(),
-  // TODO 画像やバーコードには無駄なプロパティ。typeでそれぞれを分けたい。
   fontSize: z.number().optional(),
   fontName: z.string().optional(),
   fontColor: z.string().optional(),
@@ -70,6 +73,25 @@ const TemplateSchema = z.object({
   characterSpacing: z.number().optional(),
   lineHeight: z.number().optional(),
 });
+export type TextTemplateSchema = z.infer<typeof TextTemplateSchema>;
+export const isTextTemplateSchema = (arg: CommonTemplateSchema): arg is TextTemplateSchema =>
+  arg.type === 'text';
+
+const ImageTemplateSchema = CommonTemplateSchema.extend({
+  type: z.literal(TemplateSchemaType.Enum.image),
+});
+export type ImageTemplateSchema = z.infer<typeof ImageTemplateSchema>;
+export const isImageTemplateSchema = (arg: CommonTemplateSchema): arg is ImageTemplateSchema =>
+  arg.type === 'image';
+
+const BarcodeTemplateSchema = CommonTemplateSchema.extend({
+  type: BarcodeSchemaType,
+});
+export type BarcodeTemplateSchema = z.infer<typeof BarcodeTemplateSchema>;
+export const isBarcodeTemplateSchema = (arg: CommonTemplateSchema): arg is BarcodeTemplateSchema =>
+  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
+
+const TemplateSchema = z.union([TextTemplateSchema, ImageTemplateSchema, BarcodeTemplateSchema]);
 export type TemplateSchema = z.infer<typeof TemplateSchema>;
 
 const Schemas = z.array(z.record(TemplateSchema));
@@ -84,11 +106,11 @@ const Template = z.object({
 export type Template = z.infer<typeof Template>;
 
 // TODO 名前が適当すぎる。ひどい 混乱の元。これはUIだけで使われる
-const Schema = TemplateSchema.extend({
-  id: z.string(),
-  key: z.string(),
-  data: z.string(),
-});
+const Schema = z.union([
+  TextTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+  ImageTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+  BarcodeTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+]);
 export type Schema = z.infer<typeof Schema>;
 
 // ---------------------------------------------
@@ -105,9 +127,7 @@ const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v inst
 export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
   size: Size,
-  options: CommonOptions.extend({
-    lang: Lang.optional(),
-  }).optional(),
+  options: CommonOptions.extend({ lang: Lang.optional() }).optional(),
 });
 export type UIProps = z.infer<typeof UIProps>;
 
@@ -115,9 +135,7 @@ export type UIProps = z.infer<typeof UIProps>;
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
-  options: CommonOptions.extend({
-    splitThreshold: z.number().optional(),
-  }).optional(),
+  options: CommonOptions.extend({ splitThreshold: z.number().optional() }).optional(),
 });
 export type GenerateProps = z.infer<typeof GenerateProps>;
 

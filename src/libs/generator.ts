@@ -13,6 +13,12 @@ import { getB64BasePdf } from './helper';
 import { createBarCode, validateBarcodeInput } from './barcode';
 import {
   TemplateSchema,
+  TextTemplateSchema,
+  isTextTemplateSchema,
+  ImageTemplateSchema,
+  isImageTemplateSchema,
+  BarcodeTemplateSchema,
+  isBarcodeTemplateSchema,
   Font,
   BasePdf,
   BarCodeType,
@@ -114,7 +120,7 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const getFontProp = (schema: TemplateSchema) => {
+const getFontProp = (schema: TextTemplateSchema) => {
   const size = schema.fontSize || DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor);
   const alignment = schema.alignment || DEFAULT_ALIGNMENT;
@@ -138,7 +144,7 @@ const calcX = (x: number, alignment: Alignment, boxWidth: number, textWidth: num
 const calcY = (y: number, height: number, itemHeight: number) => height - mm2pt(y) - itemHeight;
 
 const drawBackgroundColor = (arg: {
-  templateSchema: TemplateSchema;
+  templateSchema: TextTemplateSchema;
   page: PDFPage;
   pageHeight: number;
 }) => {
@@ -220,7 +226,7 @@ interface TextSchemaSetting {
 
 const drawInputByTextSchema = (arg: {
   input: string;
-  templateSchema: TemplateSchema;
+  templateSchema: TextTemplateSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
@@ -284,7 +290,7 @@ const getCacheKey = (templateSchema: TemplateSchema, input: string) =>
 
 const drawInputByImageSchema = async (arg: {
   input: string;
-  templateSchema: TemplateSchema;
+  templateSchema: ImageTemplateSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
@@ -315,7 +321,7 @@ const drawInputByImageSchema = async (arg: {
 
 const drawInputByBarcodeSchema = async (arg: {
   input: string;
-  templateSchema: TemplateSchema;
+  templateSchema: BarcodeTemplateSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
@@ -361,15 +367,17 @@ export const drawInputByTemplateSchema = async (arg: {
   textSchemaSetting: TextSchemaSetting;
   inputImageCache: InputImageCache;
 }) => {
-  const { templateSchema } = arg;
   if (!arg.templateSchema) return;
 
-  if (templateSchema.type === 'text') {
-    drawInputByTextSchema(arg);
-  } else if (templateSchema.type === 'image') {
-    await drawInputByImageSchema(arg);
-  } else if (barcodeSchemaTypes.includes(templateSchema.type)) {
-    await drawInputByBarcodeSchema(arg);
+  if (isTextTemplateSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as TextTemplateSchema;
+    drawInputByTextSchema({ ...arg, templateSchema });
+  } else if (isImageTemplateSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as ImageTemplateSchema;
+    await drawInputByImageSchema({ ...arg, templateSchema });
+  } else if (isBarcodeTemplateSchema(arg.templateSchema)) {
+    const templateSchema = arg.templateSchema as BarcodeTemplateSchema;
+    await drawInputByBarcodeSchema({ ...arg, templateSchema });
   }
 };
 
