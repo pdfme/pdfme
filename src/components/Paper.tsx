@@ -1,7 +1,7 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { FontContext } from '../libs/contexts';
 import { ZOOM, RULER_HEIGHT } from '../libs/constants';
-import { Schema, Size } from '../libs/type';
+import { SchemaForUI, Size } from '../libs/type';
 import { getFallbackFontName } from '../libs/helper';
 
 const Paper = ({
@@ -15,11 +15,11 @@ const Paper = ({
 }: {
   paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
-  schemasList: Schema[][];
+  schemasList: SchemaForUI[][];
   pageSizes: Size[];
   backgrounds: string[];
   renderPaper?: (arg: { index: number; paperSize: Size }) => ReactNode;
-  renderSchema: (arg: { index: number; schema: Schema }) => ReactNode;
+  renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
 }) => {
   const font = useContext(FontContext);
 

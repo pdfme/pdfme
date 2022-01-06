@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { TemplateDesignerReactProps, Template, Schema, Size } from '../../libs/type';
+import { TemplateDesignerReactProps, Template, SchemaForUI, Size } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { RULER_HEIGHT } from '../../libs/constants';
@@ -20,7 +20,7 @@ import Error from '../Error';
 
 const moveCommandToChangeSchemasArg = (props: {
   command: 'up' | 'down' | 'left' | 'right';
-  activeSchemas: Schema[];
+  activeSchemas: SchemaForUI[];
   isShift: boolean;
   pageSize: Size;
 }) => {
@@ -28,7 +28,7 @@ const moveCommandToChangeSchemasArg = (props: {
   const key = command === 'up' || command === 'down' ? 'y' : 'x';
   const num = isShift ? 0.1 : 1;
 
-  const getValue = (as: Schema) => {
+  const getValue = (as: SchemaForUI) => {
     let value = 0;
     const { position } = as;
     switch (command) {
@@ -70,9 +70,9 @@ const TemplateEditor = ({
   size,
   onChangeTemplate,
 }: TemplateDesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
-  const copiedSchemas = useRef<Schema[] | null>(null);
-  const past = useRef<Schema[][]>([]);
-  const future = useRef<Schema[][]>([]);
+  const copiedSchemas = useRef<SchemaForUI[] | null>(null);
+  const past = useRef<SchemaForUI[][]>([]);
+  const future = useRef<SchemaForUI[][]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
@@ -86,7 +86,7 @@ const TemplateEditor = ({
   });
 
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
-  const [schemasList, setSchemasList] = useState<Schema[][]>([[]] as Schema[][]);
+  const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
   const onEditEnd = () => setActiveElements([]);
@@ -105,7 +105,7 @@ const TemplateEditor = ({
   const modifiedTemplate = fmtTemplate(template, schemasList);
 
   const commitSchemas = useCallback(
-    (newSchemas: Schema[]) => {
+    (newSchemas: SchemaForUI[]) => {
       future.current = [];
       past.current.push(cloneDeep(schemasList[pageCursor]));
       const _schemasList = cloneDeep(schemasList);

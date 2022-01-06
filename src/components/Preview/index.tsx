@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { PreviewReactProps, Schema } from '../../libs/type';
+import { PreviewReactProps, SchemaForUI } from '../../libs/type';
 import { ZOOM, RULER_HEIGHT } from '../../libs/constants';
 import { templateSchemas2SchemasList } from '../../libs/helper';
 import Pager from './Pager';
@@ -21,7 +21,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
-  const [schemasList, setSchemasList] = useState<Schema[][]>([[]] as Schema[][]);
+  const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
   const init = useCallback(async () => {
     const sl = await templateSchemas2SchemasList(template);

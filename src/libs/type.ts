@@ -1,7 +1,6 @@
 /* eslint dot-notation: "off"*/
 import { PDFImage } from 'pdf-lib';
 import { z } from 'zod';
-
 export interface InputImageCache {
   [key: string]: PDFImage;
 }
@@ -91,8 +90,16 @@ export type BarcodeTemplateSchema = z.infer<typeof BarcodeTemplateSchema>;
 export const isBarcodeTemplateSchema = (arg: CommonTemplateSchema): arg is BarcodeTemplateSchema =>
   barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
 
+// TODO TemplateSchemaはSchemaにする
 const TemplateSchema = z.union([TextTemplateSchema, ImageTemplateSchema, BarcodeTemplateSchema]);
 export type TemplateSchema = z.infer<typeof TemplateSchema>;
+
+const SchemaForUI = z.union([
+  TextTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+  ImageTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+  BarcodeTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
+]);
+export type SchemaForUI = z.infer<typeof SchemaForUI>;
 
 const Template = z.object({
   schemas: z.array(z.record(TemplateSchema)),
@@ -101,14 +108,6 @@ const Template = z.object({
   columns: z.array(z.string()).optional(),
 });
 export type Template = z.infer<typeof Template>;
-
-// TODO 名前が適当すぎる。ひどい 混乱の元。これはUIだけで使われる
-const Schema = z.union([
-  TextTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-  ImageTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-  BarcodeTemplateSchema.extend({ id: z.string(), key: z.string(), data: z.string() }),
-]);
-export type Schema = z.infer<typeof Schema>;
 
 // ---------------------------------------------
 

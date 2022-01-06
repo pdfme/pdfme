@@ -5,7 +5,7 @@ import {
   SortableElement as sortableElement,
   SortableHandle as sortableHandle,
 } from 'react-sortable-hoc';
-import { Schema } from '../../../libs/type';
+import { SchemaForUI } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import Divider from '../../Divider';
 import infoIcon from '../../../assets/info.svg';
@@ -30,8 +30,8 @@ const SortableItem = sortableElement(
     onEdit,
     onDelete,
   }: {
-    schemas: Schema[];
-    schema: Schema;
+    schemas: SchemaForUI[];
+    schema: SchemaForUI;
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
   }) => {
@@ -103,7 +103,7 @@ const SortableList = sortableContainer(
     onEdit,
     onDelete,
   }: {
-    schemas: Schema[];
+    schemas: SchemaForUI[];
     onEdit: (id: string) => void;
     onDelete: (id: string) => void;
   }) => {

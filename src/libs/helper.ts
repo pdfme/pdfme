@@ -3,7 +3,7 @@ import Helvetica from '../assets/Helvetica.ttf';
 import {
   Template,
   TemplateSchema,
-  Schema,
+  SchemaForUI,
   BasePdf,
   Font,
   CommonProps,
@@ -19,7 +19,7 @@ import {
 import { cloneDeep, uuid, uniq, b64toUint8Array, flatten, b64toBlob } from './utils';
 import { getPdfPageSizes } from './pdfjs';
 
-export const fmtTemplate = (template: Template, schemasList: Schema[][]): Template => {
+export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
   const _schemasList = cloneDeep(schemasList);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
@@ -52,7 +52,7 @@ export const fmtTemplate = (template: Template, schemasList: Schema[][]): Templa
   return schemaAddedTemplate;
 };
 
-export const getInitialSchema = (): Schema => ({
+export const getInitialSchema = (): SchemaForUI => ({
   id: uuid(),
   key: '',
   data: '',
@@ -247,7 +247,7 @@ const extractOriginalKey = (key: string) => key.replace(/ copy$| copy [0-9]*$/, 
 
 export const getUniqSchemaKey = (arg: {
   copiedSchemaKey: string;
-  schema: Schema[];
+  schema: SchemaForUI[];
   stackUniqSchemaKeys: string[];
 }) => {
   const { copiedSchemaKey, schema, stackUniqSchemaKeys } = arg;
@@ -281,7 +281,7 @@ export const getUniqSchemaKey = (arg: {
   return uniqKey;
 };
 
-const sortSchemasList = (template: Template, pageNum: number): Schema[][] =>
+const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =>
   new Array(pageNum).fill('').reduce((acc, _, i) => {
     acc.push(
       template.schemas[i]
@@ -306,7 +306,7 @@ const sortSchemasList = (template: Template, pageNum: number): Schema[][] =>
     );
 
     return acc;
-  }, [] as Schema[][]);
+  }, [] as SchemaForUI[][]);
 
 export const templateSchemas2SchemasList = async (template: Template) => {
   const sortedSchemasList = sortSchemasList(template, template.schemas.length);

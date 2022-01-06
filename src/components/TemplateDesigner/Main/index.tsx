@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { Schema, Size } from '../../../libs/type';
+import { SchemaForUI, Size } from '../../../libs/type';
 import { round, flatten } from '../../../libs/utils';
 import { ZOOM, RULER_HEIGHT } from '../../../libs/constants';
 import { usePrevious } from '../../../libs/hooks';
@@ -34,7 +34,7 @@ interface GuidesInterface {
 interface Props {
   height: number;
   pageCursor: number;
-  schemasList: Schema[][];
+  schemasList: SchemaForUI[][];
   scale: number;
   backgrounds: string[];
   pageSizes: Size[];

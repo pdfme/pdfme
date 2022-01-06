@@ -3,7 +3,7 @@ import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../libs/constants';
 import {
-  Schema,
+  SchemaForUI,
   isTextTemplateSchema,
   isImageTemplateSchema,
   isBarcodeTemplateSchema,
@@ -13,7 +13,7 @@ import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
 
 export interface SchemaUIProps {
-  schema: Schema;
+  schema: SchemaForUI;
   editable: boolean;
   onChange: (value: string) => void;
   tabIndex?: number;
@@ -22,7 +22,7 @@ export interface SchemaUIProps {
 
 type Props = SchemaUIProps & { border: string };
 
-const getBgc = (schema: Schema) =>
+const getBgc = (schema: SchemaForUI) =>
   schema.type === 'text' && schema.backgroundColor ? schema.backgroundColor : 'transparent';
 
 const Wrapper = ({ children, border, schema }: Props & { children: ReactNode }) => (

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
-import { Schema, Size } from '../../../libs/type';
+import { SchemaForUI, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import backIcon from '../../../assets/back.svg';
 import forwardIcon from '../../../assets/forward.svg';
@@ -12,8 +12,8 @@ export type SidebarProps = {
   pageCursor: number;
   pageSizes: Size[];
   activeElement: HTMLElement | null;
-  activeSchema: Schema;
-  schemas: Schema[];
+  activeSchema: SchemaForUI;
+  schemas: SchemaForUI[];
   onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
