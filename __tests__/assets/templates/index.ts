@@ -1,6 +1,8 @@
 import { Template } from '../../../src/libs/type';
+import { blankPdf } from '../../../src/libs/constants';
+/* eslint global-require: off*/
+/* eslint @typescript-eslint/no-var-requires: off*/
 const レターパック = require('./レターパック.json') as Template;
-const レターパック_credit = require('./レターパック_credit.json') as Template;
 const レターパックライト = require('./レターパックライト.json') as Template;
 const レターパックプラス = require('./レターパックプラス.json') as Template;
 const 宛名8面 = require('./宛名8面.json') as Template;
@@ -49,8 +51,6 @@ export default {
           width: 10,
           height: 10,
         },
-      },
-      {
         b: {
           type: 'text',
           position: { x: 10, y: 10 },
@@ -65,7 +65,7 @@ export default {
         },
       },
     ],
-    basePdf: { height: 297, width: 210 },
+    basePdf: blankPdf,
     fontName: 'SauceHanSansJP',
   } as Template,
   宛名8面,
@@ -77,7 +77,6 @@ export default {
   装飾なしラベル24面中央揃え,
   郵便はがき横書き,
   レターパック,
-  レターパック_credit,
   レターパックライト,
   レターパックプラス,
   スマートレター,

@@ -33,10 +33,9 @@ const alignments = ['left', 'center', 'right'] as const;
 const Alignment = z.enum(alignments);
 export type Alignment = z.infer<typeof Alignment>;
 
+// TODO pagesizeはsizeで良くない？
 const PageSize = z.object({ height: z.number(), width: z.number() });
 export type PageSize = z.infer<typeof PageSize>;
-export const isPageSize = (arg: BasePdf): arg is PageSize =>
-  typeof arg === 'object' && 'width' in arg;
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
@@ -52,7 +51,7 @@ const Font = z.record(
 );
 export type Font = z.infer<typeof Font>;
 
-const BasePdf = z.union([z.string(), PageSize, Data]);
+const BasePdf = z.union([z.string(), Data]);
 export type BasePdf = z.infer<typeof BasePdf>;
 
 const TemplateSchema = z.object({

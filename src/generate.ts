@@ -1,10 +1,9 @@
 import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { GenerateProps, Template, Font, isPageSize, InputImageCache } from './libs/type';
+import { GenerateProps, Template, Font, InputImageCache } from './libs/type';
 import {
   getEmbeddedPagesAndEmbedPdfBoxes,
   drawInputByTemplateSchema,
-  getPageSize,
   drawEmbeddedPage,
   embedAndGetFontObj,
 } from './libs/generator';
@@ -41,7 +40,7 @@ const generate = async (props: GenerateProps) => {
   checkProps(props, GenerateProps);
   const { inputs, template, options = {} } = props;
   const { font = getDefaultFont(), splitThreshold = 3 } = options;
-  const { basePdf, schemas } = template;
+  const { schemas } = template;
 
   const preRes = await preprocessing({ inputs, template, font });
   const { pdfDoc, fontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
@@ -50,12 +49,14 @@ const generate = async (props: GenerateProps) => {
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
-    for (let j = 0; j < (isPageSize(basePdf) ? schemas : embeddedPages).length; j += 1) {
+    for (let j = 0; j < embeddedPages.length; j += 1) {
       const embeddedPage = embeddedPages[j];
+      const { width: pageWidth, height: pageHeight } = embeddedPage;
       const embedPdfBox = embedPdfBoxes[j];
-      const { pageWidth, pageHeight } = getPageSize({ embeddedPage, basePdf });
+
       const page = pdfDoc.addPage([pageWidth, pageHeight]);
-      drawEmbeddedPage({ page, basePdf, embeddedPage, embedPdfBox });
+
+      drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
         const schema = schemas[j];

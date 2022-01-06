@@ -11,15 +11,7 @@ import {
 import { mm2pt } from './utils';
 import { getB64BasePdf } from './helper';
 import { createBarCode, validateBarcodeInput } from './barcode';
-import {
-  isPageSize,
-  TemplateSchema,
-  Font,
-  BasePdf,
-  BarCodeType,
-  InputImageCache,
-  Alignment,
-} from './type';
+import { TemplateSchema, Font, BasePdf, BarCodeType, InputImageCache, Alignment } from './type';
 import {
   barcodeList,
   DEFAULT_FONT_SIZE,
@@ -55,32 +47,29 @@ export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
   basePdf: BasePdf;
 }) => {
   const { pdfDoc, basePdf } = arg;
-  const isBlank = isPageSize(basePdf);
   let embeddedPages: PDFEmbeddedPage[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
-  if (!isBlank) {
-    const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(basePdf) : basePdf;
-    const embedPdf = await PDFDocument.load(willLoadPdf);
-    const embedPdfPages = embedPdf.getPages();
+  const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(basePdf) : basePdf;
+  const embedPdf = await PDFDocument.load(willLoadPdf);
+  const embedPdfPages = embedPdf.getPages();
 
-    embedPdfBoxes = embedPdfPages.map((p) => ({
-      mediaBox: p.getMediaBox(),
-      bleedBox: p.getBleedBox(),
-      trimBox: p.getTrimBox(),
-    }));
+  embedPdfBoxes = embedPdfPages.map((p) => ({
+    mediaBox: p.getMediaBox(),
+    bleedBox: p.getBleedBox(),
+    trimBox: p.getTrimBox(),
+  }));
 
-    const boundingBoxes = embedPdfPages.map((p) => {
-      const { x, y, width, height } = p.getMediaBox();
+  const boundingBoxes = embedPdfPages.map((p) => {
+    const { x, y, width, height } = p.getMediaBox();
 
-      return { left: x, bottom: y, right: width, top: height + y };
-    });
+    return { left: x, bottom: y, right: width, top: height + y };
+  });
 
-    const transformationMatrices = embedPdfPages.map(
-      () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
-    );
+  const transformationMatrices = embedPdfPages.map(
+    () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
+  );
 
-    embeddedPages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
-  }
+  embeddedPages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
 
   return { embeddedPages, embedPdfBoxes };
 };
@@ -375,26 +364,15 @@ export const drawInputByTemplateSchema = async (arg: {
   }
 };
 
-export const getPageSize = (arg: { embeddedPage: PDFEmbeddedPage; basePdf: BasePdf }) => {
-  const { embeddedPage, basePdf } = arg;
-  const pageWidth = isPageSize(basePdf) ? mm2pt(basePdf.width) : embeddedPage.width;
-  const pageHeight = isPageSize(basePdf) ? mm2pt(basePdf.height) : embeddedPage.height;
-
-  return { pageWidth, pageHeight };
-};
-
 export const drawEmbeddedPage = (arg: {
   page: PDFPage;
-  basePdf: BasePdf;
   embeddedPage: PDFEmbeddedPage;
   embedPdfBox: EmbedPdfBox;
 }) => {
-  const { page, basePdf, embeddedPage, embedPdfBox } = arg;
-  if (!isPageSize(basePdf)) {
-    page.drawPage(embeddedPage);
-    const { mediaBox: mb, bleedBox: bb, trimBox: tb } = embedPdfBox;
-    page.setMediaBox(mb.x, mb.y, mb.width, mb.height);
-    page.setBleedBox(bb.x, bb.y, bb.width, bb.height);
-    page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
-  }
+  const { page, embeddedPage, embedPdfBox } = arg;
+  page.drawPage(embeddedPage);
+  const { mediaBox: mb, bleedBox: bb, trimBox: tb } = embedPdfBox;
+  page.setMediaBox(mb.x, mb.y, mb.width, mb.height);
+  page.setBleedBox(bb.x, bb.y, bb.width, bb.height);
+  page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
 };
