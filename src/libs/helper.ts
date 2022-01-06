@@ -1,14 +1,6 @@
 import { z } from 'zod';
 import Helvetica from '../assets/Helvetica.ttf';
-import {
-  Template,
-  Schema,
-  SchemaForUI,
-  BasePdf,
-  Font,
-  CommonProps,
-  isTextSchema,
-} from './type';
+import { Template, Schema, SchemaForUI, BasePdf, Font, CommonProps, isTextSchema } from './type';
 import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
@@ -186,6 +178,7 @@ export const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
   try {
     zodSchema.parse(data);
   } catch (e) {
+    console.log(e);
     if (e instanceof z.ZodError) {
       const messages = e.issues.map(
         (issue) => `ERROR POSITION: ${issue.path.join('.')}
