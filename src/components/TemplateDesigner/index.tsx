@@ -4,17 +4,15 @@ import Sidebar from './Sidebar';
 import Main from './Main';
 import { rulerHeight } from '../../libs/constants';
 import { I18nContext } from '../../libs/contexts';
-import { uuid, set, cloneDeep, round, b64toBlob, arrayMove } from '../../libs/utils';
+import { uuid, set, cloneDeep, round, arrayMove } from '../../libs/utils';
 import {
   fmtTemplate,
-  sortSchemas,
   getInitialSchema,
   getSampleByType,
   getKeepRatioHeightByWidth,
-  getB64BasePdf,
   getUniqSchemaKey,
+  templateSchemas2SchemasList,
 } from '../../libs/helper';
-import { getPdfPageSizes } from '../../libs/pdfjs';
 import { initShortCuts, destroyShortCuts } from '../../libs/ui';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
@@ -104,8 +102,7 @@ const TemplateEditor = ({
   });
 
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
-  // TODO 名前変更 schemasはschemasListにしてschemas[pageCursor]をschemasにした方が良さそう
-  const [schemas, setSchemas] = useState<Schema[][]>([[]] as Schema[][]);
+  const [schemasList, setSchemasList] = useState<Schema[][]>([[]] as Schema[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
   const onEditEnd = () => setActiveElements([]);
@@ -121,26 +118,26 @@ const TemplateEditor = ({
     },
   });
 
-  const modifiedTemplate = fmtTemplate(template, schemas);
+  const modifiedTemplate = fmtTemplate(template, schemasList);
 
   const commitSchemas = useCallback(
     (newSchemas: Schema[]) => {
       future.current = [];
-      past.current.push(cloneDeep(schemas[pageCursor]));
-      const _schemas = cloneDeep(schemas);
-      _schemas[pageCursor] = newSchemas;
-      setSchemas(_schemas);
-      onChangeTemplate(fmtTemplate(template, _schemas));
+      past.current.push(cloneDeep(schemasList[pageCursor]));
+      const _schemasList = cloneDeep(schemasList);
+      _schemasList[pageCursor] = newSchemas;
+      setSchemasList(_schemasList);
+      onChangeTemplate(fmtTemplate(template, _schemasList));
     },
-    [template, schemas, pageCursor, onChangeTemplate]
+    [template, schemasList, pageCursor, onChangeTemplate]
   );
 
   const removeSchemas = useCallback(
     (ids: string[]) => {
-      commitSchemas(schemas[pageCursor].filter((schema) => !ids.includes(schema.id)));
+      commitSchemas(schemasList[pageCursor].filter((schema) => !ids.includes(schema.id)));
       onEditEnd();
     },
-    [schemas, pageCursor, commitSchemas]
+    [schemasList, pageCursor, commitSchemas]
   );
 
   const changeSchemas = useCallback(
@@ -161,25 +158,25 @@ const TemplateEditor = ({
         }
 
         return acc;
-      }, cloneDeep(schemas[pageCursor]));
+      }, cloneDeep(schemasList[pageCursor]));
       commitSchemas(newSchemas);
     },
-    [commitSchemas, pageCursor, schemas]
+    [commitSchemas, pageCursor, schemasList]
   );
 
   const initEvents = useCallback(() => {
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
 
-      return schemas[pageCursor].filter((s) => ids.includes(s.id));
+      return schemasList[pageCursor].filter((s) => ids.includes(s.id));
     };
     const timeTavel = (mode: 'undo' | 'redo') => {
       const isUndo = mode === 'undo';
       if ((isUndo ? past : future).current.length <= 0) return;
-      (isUndo ? future : past).current.push(cloneDeep(schemas[pageCursor]));
-      const s = cloneDeep(schemas);
+      (isUndo ? future : past).current.push(cloneDeep(schemasList[pageCursor]));
+      const s = cloneDeep(schemasList);
       s[pageCursor] = (isUndo ? past : future).current.pop()!;
-      setSchemas(s);
+      setSchemasList(s);
       onEditEnd();
     };
     initShortCuts({
@@ -197,7 +194,7 @@ const TemplateEditor = ({
       },
       paste: () => {
         if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
-        const schema = schemas[pageCursor];
+        const schema = schemasList[pageCursor];
         const stackUniqSchemaKeys: string[] = [];
         const pasteSchemas = copiedSchemas.current.map((cs) => {
           const id = uuid();
@@ -211,7 +208,7 @@ const TemplateEditor = ({
 
           return Object.assign(cloneDeep(cs), { id, key, position });
         });
-        commitSchemas(schemas[pageCursor].concat(pasteSchemas));
+        commitSchemas(schemasList[pageCursor].concat(pasteSchemas));
         setActiveElements(pasteSchemas.map((s) => document.getElementById(s.id)!));
         copiedSchemas.current = pasteSchemas;
       },
@@ -230,7 +227,7 @@ const TemplateEditor = ({
     pageSizes,
     removeSchemas,
     saveTemplate,
-    schemas,
+    schemasList,
   ]);
 
   const destroyEvents = useCallback(() => {
@@ -238,32 +235,8 @@ const TemplateEditor = ({
   }, []);
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
-    const newSchemas = sortSchemas(newTemplate, newTemplate.schemas.length);
-    const basePdf = await getB64BasePdf(newTemplate.basePdf);
-    const pdfBlob = b64toBlob(basePdf);
-    const _pageSizes = await getPdfPageSizes(pdfBlob);
-    const _schemas = (
-      newSchemas.length < _pageSizes.length
-        ? newSchemas.concat(new Array(_pageSizes.length - newSchemas.length).fill(cloneDeep([])))
-        : newSchemas.slice(0, _pageSizes.length)
-    ).map((schema, i) => {
-      Object.values(schema).forEach((value) => {
-        const { width, height } = _pageSizes[i];
-        const xEdge = value.position.x + value.width;
-        const yEdge = value.position.y + value.height;
-        if (width < xEdge) {
-          const diff = xEdge - width;
-          value.position.x += diff;
-        }
-        if (height < yEdge) {
-          const diff = yEdge - height;
-          value.position.y += diff;
-        }
-      });
-
-      return schema;
-    });
-    setSchemas(_schemas);
+    const sl = await templateSchemas2SchemasList(newTemplate);
+    setSchemasList(sl);
     onEditEnd();
     setPageCursor(0);
     if (rootRef.current?.scroll) {
@@ -287,13 +260,13 @@ const TemplateEditor = ({
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
-    s.key = `${i18n('field')}${schemas[pageCursor].length + 1}`;
-    commitSchemas(schemas[pageCursor].concat(s));
+    s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
+    commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => setActiveElements([document.getElementById(s.id)!]));
   };
 
   const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const movedSchema = arrayMove(cloneDeep(schemas[pageCursor]), arg.oldIndex, arg.newIndex);
+    const movedSchema = arrayMove(cloneDeep(schemasList[pageCursor]), arg.oldIndex, arg.newIndex);
     commitSchemas(movedSchema);
   };
 
@@ -301,7 +274,7 @@ const TemplateEditor = ({
     if (activeElements.length === 0) return getInitialSchema();
     const last = activeElements[activeElements.length - 1];
 
-    return schemas[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
+    return schemasList[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
   };
 
   const activeSchema = getLastActiveSchema();
@@ -317,7 +290,7 @@ const TemplateEditor = ({
         pageCursor={pageCursor}
         pageSizes={pageSizes}
         activeElement={activeElements[activeElements.length - 1]}
-        schemas={schemas[pageCursor]}
+        schemas={schemasList[pageCursor]}
         activeSchema={activeSchema}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
@@ -339,12 +312,7 @@ const TemplateEditor = ({
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         activeElements={activeElements}
-        schemas={schemas.map((s) =>
-          s.reduce(
-            (acc, cur) => Object.assign(acc, { [cur.key]: cur }),
-            {} as { [key: string]: Schema }
-          )
-        )}
+        schemas={schemasList[pageCursor]}
         changeSchemas={changeSchemas}
         setActiveElements={setActiveElements}
         paperRefs={paperRefs}

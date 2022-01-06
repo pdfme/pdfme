@@ -3,7 +3,7 @@ import * as styles from './index.module.scss';
 import { zoom, barcodeExampleImageObj, barcodeList } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
 import { TemplateSchema, BarCodeType } from '../../../libs/type';
-import { SchemaUIProps } from '../';
+import { SchemaUIProps } from '../SchemaUI';
 
 const SampleBarcode = ({ schema }: { schema: TemplateSchema }) => (
   <img

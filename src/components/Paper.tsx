@@ -1,7 +1,7 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { FontContext } from '../libs/contexts';
 import { zoom, rulerHeight } from '../libs/constants';
-import { TemplateSchema, Schema, PageSize } from '../libs/type';
+import { Schema, PageSize } from '../libs/type';
 import { getFallbackFontName } from '../libs/helper';
 
 const Paper = ({
@@ -10,41 +10,35 @@ const Paper = ({
   schemas,
   pageSizes,
   backgrounds,
-  render,
+  renderPaper,
+  renderSchema,
 }: {
   paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
-  schemas: { [key: string]: Schema | TemplateSchema }[];
+  schemas: Schema[];
   pageSizes: PageSize[];
   backgrounds: string[];
-  render: ({
-    index,
-    schema,
-    paperSize,
-  }: {
-    index: number;
-    schema: { [key: string]: Schema | TemplateSchema };
-    paperSize: PageSize;
-  }) => ReactNode;
+  renderPaper?: (arg: { index: number; paperSize: PageSize }) => ReactNode;
+  renderSchema: (arg: { index: number; schema: Schema }) => ReactNode;
 }) => {
   const font = useContext(FontContext);
 
+  if (pageSizes.length !== backgrounds.length) {
+    return null;
+  }
+
   return (
     <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-      {schemas.map((schema, index) => {
-        const pageSize = pageSizes[index];
-        if (!pageSize) {
-          return null;
-        }
+      {backgrounds.map((background, paperIndex) => {
+        const pageSize = pageSizes[paperIndex];
         const paperSize = { width: pageSize.width * zoom, height: pageSize.height * zoom };
-        const background = backgrounds[index] || '';
 
         return (
           <div
-            key={index + JSON.stringify(paperSize)}
+            key={paperIndex + JSON.stringify(paperSize)}
             ref={(e) => {
               if (e && paperRefs) {
-                paperRefs.current[index] = e;
+                paperRefs.current[paperIndex] = e;
               }
             }}
             style={{
@@ -58,7 +52,10 @@ const Paper = ({
               ...paperSize,
             }}
           >
-            <div>{render({ index, schema, paperSize })}</div>
+            {renderPaper && renderPaper({ paperSize, index: paperIndex })}
+            {schemas.map((schema, schemaIndex) => (
+              <div key={schema.id}>{renderSchema({ schema, index: schemaIndex })}</div>
+            ))}
           </div>
         );
       })}

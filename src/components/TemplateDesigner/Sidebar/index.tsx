@@ -13,7 +13,6 @@ export type SidebarProps = {
   pageSizes: PageSize[];
   activeElement: HTMLElement | null;
   activeSchema: Schema;
-  // TODO ここのschemasの方は他のコンポーネントと違うので他のコンポーネントと合わせたい
   schemas: Schema[];
   onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;

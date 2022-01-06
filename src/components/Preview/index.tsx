@@ -1,12 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { PreviewReactProps } from '../../libs/type';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
+import { PreviewReactProps, Schema } from '../../libs/type';
 import { zoom, rulerHeight } from '../../libs/constants';
+import { templateSchemas2SchemasList } from '../../libs/helper';
 import Pager from './Pager';
 import UnitPager from './UnitPager';
 import Root from '../Root';
 import Error from '../Error';
 import Paper from '../Paper';
-import Schema from '../Schemas';
+import SchemaUI from '../Schemas/SchemaUI';
 import { useUiPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
@@ -20,6 +21,16 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
+  const [schemasList, setSchemasList] = useState<Schema[][]>([[]] as Schema[][]);
+
+  const init = useCallback(async () => {
+    const sl = await templateSchemas2SchemasList(template);
+    setSchemasList(sl);
+  }, [template]);
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   useScrollPageCursor({
     rootRef,
@@ -34,7 +45,6 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   const editable = Boolean(onChangeInput);
   const input = inputs[unitCursor];
-  const { schemas } = template;
 
   if (error) {
     return <Error size={size} error={error} />;
@@ -45,7 +55,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
       <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
       <Pager
         pageCursor={pageCursor}
-        pageNum={schemas.length}
+        pageNum={schemasList.length}
         setPageCursor={(p) => {
           if (!rootRef.current) return;
           rootRef.current.scrollTop = pageSizes
@@ -56,26 +66,25 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
       />
       <Paper
         scale={scale}
-        schemas={schemas}
+        schemas={schemasList[pageCursor]}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
-        render={({ schema }) =>
-          Object.entries(schema).map((entry) => {
-            const [key, s] = entry;
+        renderSchema={({ schema, index }) => {
+          const { key } = schema;
+          const data = input[key] ? input[key] : '';
 
-            return (
-              <Schema
-                key={key}
-                schema={Object.assign(s, { key, id: key, data: input[key] ? input[key] : '' })}
-                editable={editable}
-                placeholder={template.sampledata ? template.sampledata[0][key] : ''}
-                tabIndex={((template.columns ?? []).findIndex((c) => c === key) || 0) + 100}
-                onChange={(value) => handleChangeInput({ key, value })}
-                border={editable ? '1px dashed #4af' : 'transparent'}
-              />
-            );
-          })
-        }
+          return (
+            <SchemaUI
+              key={key}
+              schema={Object.assign(schema, { key, id: key, data })}
+              editable={editable}
+              placeholder={template.sampledata ? template.sampledata[0][key] : ''}
+              tabIndex={index}
+              onChange={(value) => handleChangeInput({ key, value })}
+              border={editable ? '1px dashed #4af' : 'transparent'}
+            />
+          );
+        }}
       />
     </Root>
   );

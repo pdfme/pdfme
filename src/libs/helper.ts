@@ -8,14 +8,15 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
 } from './constants';
-import { cloneDeep, uuid, uniq, b64toUint8Array, flatten } from './utils';
+import { cloneDeep, uuid, uniq, b64toUint8Array, flatten, b64toBlob } from './utils';
+import { getPdfPageSizes } from './pdfjs';
 
-export const fmtTemplate = (template: Template, schemas: Schema[][]): Template => {
-  const _schemas = cloneDeep(schemas);
+export const fmtTemplate = (template: Template, schemasList: Schema[][]): Template => {
+  const _schemasList = cloneDeep(schemasList);
   const schemaAddedTemplate: Template = {
     basePdf: template.basePdf,
     sampledata: [
-      _schemas.reduce((acc, cur) => {
+      _schemasList.reduce((acc, cur) => {
         cur.forEach((c) => {
           acc[c.key] = c.data;
         });
@@ -23,8 +24,8 @@ export const fmtTemplate = (template: Template, schemas: Schema[][]): Template =
         return acc;
       }, {} as { [key: string]: string }),
     ],
-    columns: _schemas.reduce((acc, cur) => acc.concat(cur.map((s) => s.key)), [] as string[]),
-    schemas: _schemas.map((_schema) =>
+    columns: _schemasList.reduce((acc, cur) => acc.concat(cur.map((s) => s.key)), [] as string[]),
+    schemas: _schemasList.map((_schema) =>
       _schema.reduce((acc, cur) => {
         const k = cur.key;
         // @ts-ignore
@@ -42,33 +43,6 @@ export const fmtTemplate = (template: Template, schemas: Schema[][]): Template =
 
   return schemaAddedTemplate;
 };
-
-export const sortSchemas = (template: Template, pageNum: number): Schema[][] =>
-  new Array(pageNum).fill('').reduce((acc, _, i) => {
-    acc.push(
-      template.schemas[i]
-        ? Object.entries(template.schemas[i])
-            .sort((a, b) => {
-              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
-              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
-
-              return aIndex > bIndex ? 1 : -1;
-            })
-            .map((e) => {
-              const [key, value] = e;
-              const data = template.sampledata ? template.sampledata[0][key] : '';
-
-              return Object.assign(value, {
-                key,
-                data,
-                id: uuid(),
-              });
-            })
-        : []
-    );
-
-    return acc;
-  }, [] as Schema[][]);
 
 export const getInitialSchema = (): Schema => ({
   id: uuid(),
@@ -294,4 +268,63 @@ export const getUniqSchemaKey = (arg: {
   stackUniqSchemaKeys.push(uniqKey);
 
   return uniqKey;
+};
+
+const sortSchemasList = (template: Template, pageNum: number): Schema[][] =>
+  new Array(pageNum).fill('').reduce((acc, _, i) => {
+    acc.push(
+      template.schemas[i]
+        ? Object.entries(template.schemas[i])
+            .sort((a, b) => {
+              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
+              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
+
+              return aIndex > bIndex ? 1 : -1;
+            })
+            .map((e) => {
+              const [key, value] = e;
+              const data = template.sampledata ? template.sampledata[0][key] : '';
+
+              return Object.assign(value, {
+                key,
+                data,
+                id: uuid(),
+              });
+            })
+        : []
+    );
+
+    return acc;
+  }, [] as Schema[][]);
+
+export const templateSchemas2SchemasList = async (template: Template) => {
+  const sortedSchemasList = sortSchemasList(template, template.schemas.length);
+  const basePdf = await getB64BasePdf(template.basePdf);
+  const pdfBlob = b64toBlob(basePdf);
+  const pageSizes = await getPdfPageSizes(pdfBlob);
+  const ssl = sortedSchemasList.length;
+  const psl = pageSizes.length;
+  const schemasList = (
+    ssl < psl
+      ? sortedSchemasList.concat(new Array(psl - ssl).fill(cloneDeep([])))
+      : sortedSchemasList.slice(0, pageSizes.length)
+  ).map((schema, i) => {
+    Object.values(schema).forEach((value) => {
+      const { width, height } = pageSizes[i];
+      const xEdge = value.position.x + value.width;
+      const yEdge = value.position.y + value.height;
+      if (width < xEdge) {
+        const diff = xEdge - width;
+        value.position.x += diff;
+      }
+      if (height < yEdge) {
+        const diff = yEdge - height;
+        value.position.y += diff;
+      }
+    });
+
+    return schema;
+  });
+
+  return schemasList;
 };

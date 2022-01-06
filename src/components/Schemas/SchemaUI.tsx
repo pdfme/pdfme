@@ -42,7 +42,7 @@ const Wapper = ({ children, border, schema }: Props & { children: ReactNode }) =
   </div>
 );
 
-const Schema = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {
+const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {
   const r = {
     [props.editable ? 'ref' : '']: ref as RefObject<HTMLTextAreaElement | HTMLInputElement>,
   };
@@ -55,4 +55,4 @@ const Schema = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) 
     </Wapper>
   );
 };
-export default forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(Schema);
+export default forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(SchemaUI);

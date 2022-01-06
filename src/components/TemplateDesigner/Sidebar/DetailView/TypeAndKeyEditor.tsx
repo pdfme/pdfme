@@ -50,7 +50,7 @@ const TypeAndKeyEditor = (
     }
   }, [activeSchema, prevActiveSchema]);
 
-  useEffect(() => checkAndCommitKey, [activeSchema, activeSchemaKey]);
+  // useEffect(() => checkAndCommitKey, [activeSchema, activeSchemaKey]);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
