@@ -1,4 +1,4 @@
-const size = { height: 1200, width: 1200 };
+const size = { height: 800, width: 1000 };
 const domContainer = document.getElementById('app');
 
 const getSampleTemplate = () => ({

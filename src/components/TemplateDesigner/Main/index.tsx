@@ -217,12 +217,8 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             setActiveElements([]);
           }
 
-          // @ts-ignore
-          const sts: HTMLElement[] = e.currentTarget.selectedTargets;
           if (inputEvent.target.id === DELETE_BTN_ID) {
-            removeSchemas(sts.map((st) => st.id));
-          } else {
-            setActiveElements(sts);
+            removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
         onSelect={(e) => {
