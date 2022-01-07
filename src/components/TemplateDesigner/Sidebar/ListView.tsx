@@ -85,11 +85,7 @@ const SortableItem = sortableElement(
           </span>
           <img alt="Create icon" src={createIcon} width={15} />
         </button>
-        <button
-          disabled={!touchable}
-          style={{ padding: 5, margin: 5 }}
-          onClick={() => onDelete(sc.id)}
-        >
+        <button disabled={!touchable} style={{ padding: 5 }} onClick={() => onDelete(sc.id)}>
           <img alt="Delete icon" src={deleteIcon} width={15} />
         </button>
       </div>

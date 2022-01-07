@@ -25,6 +25,21 @@ const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 
+const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
+  const top = Math.min(...aes.map(({ style }) => fmt4Num(style.top)));
+  const left = Math.max(...aes.map(({ style }) => fmt4Num(style.left) + fmt4Num(style.width))) + 10;
+
+  return (
+    <button
+      id={DELETE_BTN_ID}
+      className={`${styles.dltBtn}`}
+      style={{ position: 'absolute', top, left }}
+    >
+      x
+    </button>
+  );
+};
+
 interface GuidesInterface {
   getGuides(): number[];
   scroll(pos: number): void;
@@ -48,18 +63,9 @@ interface Props {
 }
 
 const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
-  const {
-    pageCursor,
-    scale,
-    backgrounds,
-    pageSizes,
-    activeElements,
-    schemasList,
-    setActiveElements,
-    changeSchemas,
-    removeSchemas,
-    paperRefs,
-  } = props;
+  const { pageCursor, scale, backgrounds, pageSizes, activeElements, schemasList } = props;
+  const { setActiveElements, changeSchemas, removeSchemas, paperRefs } = props;
+
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
@@ -109,7 +115,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     }
   }, [pageCursor, schemasList, prevSchemas]);
 
-  // TODO ここもchangeSchemasした方がいいかも
   const onDrag = ({ target, left, top }: OnDrag) => {
     target.style.left = `${left < 0 ? 0 : left}px`;
     target.style.top = `${top < 0 ? 0 : top}px`;
@@ -124,9 +129,30 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   const onDragEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
-    const arg = targets.map((target) => [
-      { key: 'position.y', value: fmt(target.style.top), schemaId: target.id },
-      { key: 'position.x', value: fmt(target.style.left), schemaId: target.id },
+    const arg = targets.map(({ style: { top, left }, id }) => [
+      { key: 'position.y', value: fmt(top), schemaId: id },
+      { key: 'position.x', value: fmt(left), schemaId: id },
+    ]);
+    changeSchemas(flatten(arg));
+  };
+
+  const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+    const { id, style } = target;
+    const { width, height, top, left } = style;
+    changeSchemas([
+      { key: 'width', value: fmt(width), schemaId: id },
+      { key: 'height', value: fmt(height), schemaId: id },
+      { key: 'position.y', value: fmt(top), schemaId: id },
+      { key: 'position.x', value: fmt(left), schemaId: id },
+    ]);
+  };
+
+  const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
+    const arg = targets.map(({ style: { width, height, top, left }, id }) => [
+      { key: 'width', value: fmt(width), schemaId: id },
+      { key: 'height', value: fmt(height), schemaId: id },
+      { key: 'position.y', value: fmt(top), schemaId: id },
+      { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
     changeSchemas(flatten(arg));
   };
@@ -150,26 +176,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       obj.left = `${newLeft}px`;
     }
     Object.assign(s, obj);
-  };
-
-  const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
-    const { width, height, top, left } = target.style;
-    changeSchemas([
-      { key: 'width', value: fmt(width), schemaId: target.id },
-      { key: 'height', value: fmt(height), schemaId: target.id },
-      { key: 'position.y', value: fmt(top), schemaId: target.id },
-      { key: 'position.x', value: fmt(left), schemaId: target.id },
-    ]);
-  };
-
-  const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
-    const arg = targets.map((target) => [
-      { key: 'width', value: fmt(target.style.width), schemaId: target.id },
-      { key: 'height', value: fmt(target.style.height), schemaId: target.id },
-      { key: 'position.y', value: fmt(target.style.top), schemaId: target.id },
-      { key: 'position.x', value: fmt(target.style.left), schemaId: target.id },
-    ]);
-    changeSchemas(flatten(arg));
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
@@ -232,22 +238,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         renderPaper={({ index, paperSize }) => (
           <>
             {!editing && activeElements.length > 0 && (
-              <button
-                id={DELETE_BTN_ID}
-                className={`${styles.dltBtn}`}
-                style={{
-                  position: 'absolute',
-                  top: Math.min(...activeElements.map(({ style }) => fmt4Num(style.top))),
-                  left:
-                    Math.max(
-                      ...activeElements.map(
-                        ({ style }) => fmt4Num(style.left) + fmt4Num(style.width)
-                      )
-                    ) + 10,
-                }}
-              >
-                x
-              </button>
+              <DeleteButton activeElements={activeElements} />
             )}
             <Guides
               paperSize={paperSize}
