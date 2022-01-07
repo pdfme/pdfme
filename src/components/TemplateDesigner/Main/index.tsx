@@ -20,7 +20,7 @@ import Guides from './Guides';
 import Mask from './Mask';
 
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
-const fmt = (prop: string) => String(round(fmt4Num(prop) / ZOOM, 2));
+const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 
 interface GuidesInterface {
@@ -40,7 +40,7 @@ interface Props {
   pageSizes: Size[];
   activeElements: HTMLElement[];
   setActiveElements: (targets: HTMLElement[]) => void;
-  changeSchemas: (objs: { key: string; value: string; schemaId: string }[]) => void;
+  changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
 }
 

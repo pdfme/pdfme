@@ -178,7 +178,6 @@ export const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
   try {
     zodSchema.parse(data);
   } catch (e) {
-    console.log(e);
     if (e instanceof z.ZodError) {
       const messages = e.issues.map(
         (issue) => `ERROR POSITION: ${issue.path.join('.')}
