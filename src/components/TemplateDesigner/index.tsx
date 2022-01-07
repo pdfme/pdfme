@@ -296,6 +296,7 @@ const TemplateEditor = ({
         activeElements={activeElements}
         schemasList={schemasList}
         changeSchemas={changeSchemas}
+        removeSchemas={removeSchemas}
         setActiveElements={setActiveElements}
         paperRefs={paperRefs}
       />

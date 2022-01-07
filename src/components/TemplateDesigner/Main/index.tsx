@@ -7,9 +7,10 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
+import * as styles from './index.module.scss';
 import { OnDrag, OnResize } from 'react-moveable';
 import { SchemaForUI, Size } from '../../../libs/type';
-import { round, flatten } from '../../../libs/utils';
+import { round, flatten, uuid } from '../../../libs/utils';
 import { ZOOM, RULER_HEIGHT } from '../../../libs/constants';
 import { usePrevious } from '../../../libs/hooks';
 import Paper from '../../Paper';
@@ -19,6 +20,7 @@ import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
 
+const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
@@ -41,6 +43,7 @@ interface Props {
   activeElements: HTMLElement[];
   setActiveElements: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
+  removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
 }
 
@@ -54,6 +57,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     schemasList,
     setActiveElements,
     changeSchemas,
+    removeSchemas,
     paperRefs,
   } = props;
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
@@ -105,6 +109,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     }
   }, [pageCursor, schemasList, prevSchemas]);
 
+  // TODO ここもchangeSchemasした方がいいかも
   const onDrag = ({ target, left, top }: OnDrag) => {
     target.style.left = `${left < 0 ? 0 : left}px`;
     target.style.top = `${top < 0 ? 0 : top}px`;
@@ -197,22 +202,21 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
           const { inputEvent } = e;
-          if (
-            (inputEvent.type === 'touchstart' && e.isTrusted) ||
-            moveable.current?.isMoveableElement(inputEvent.target)
-          ) {
+          const isMoveableElement = moveable.current?.isMoveableElement(inputEvent.target);
+          if ((inputEvent.type === 'touchstart' && e.isTrusted) || isMoveableElement) {
             e.stop();
-          }
-          // @ts-ignore
-          const { selectedTargets } = e.currentTarget;
-          if (selectedTargets.length !== 0) {
-            setActiveElements(selectedTargets);
-
-            return;
           }
 
           if (paperRefs.current[pageCursor] === inputEvent.target) {
             setActiveElements([]);
+          }
+
+          // @ts-ignore
+          const sts: HTMLElement[] = e.currentTarget.selectedTargets;
+          if (inputEvent.target.id === DELETE_BTN_ID) {
+            removeSchemas(sts.map((st) => st.id));
+          } else {
+            setActiveElements(sts);
           }
         }}
         onSelect={(e) => {
@@ -227,6 +231,24 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         backgrounds={backgrounds}
         renderPaper={({ index, paperSize }) => (
           <>
+            {!editing && activeElements.length > 0 && (
+              <button
+                id={DELETE_BTN_ID}
+                className={`${styles.dltBtn}`}
+                style={{
+                  position: 'absolute',
+                  top: Math.min(...activeElements.map(({ style }) => fmt4Num(style.top))),
+                  left:
+                    Math.max(
+                      ...activeElements.map(
+                        ({ style }) => fmt4Num(style.left) + fmt4Num(style.width)
+                      )
+                    ) + 10,
+                }}
+              >
+                x
+              </button>
+            )}
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {
