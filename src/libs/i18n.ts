@@ -6,9 +6,8 @@ type DictEn = typeof dictEn;
 const dictEn = {
   field: 'field',
   fieldName: 'Name',
-  requireAndUniq: 'Required+Unique',
-  fieldNameMustBeUniq: 'Name must be unique',
-  fieldNameIsRequired: 'Name is Required',
+  require: 'Required',
+  uniq: 'Unique',
   posAndSize: 'Position,Size',
   style: 'Style',
   inputExample: 'Input Example',
@@ -36,9 +35,8 @@ const dictEn = {
 const dictJa: { [key in keyof DictEn]: string } = {
   field: '入力項目',
   fieldName: '項目名',
-  requireAndUniq: '必須+他の項目名と同一不可',
-  fieldNameIsRequired: '項目名は必須入力です',
-  fieldNameMustBeUniq: '項目名は他の項目名と同一不可です',
+  require: '必須',
+  uniq: '他の項目名と同一不可',
   posAndSize: '位置,サイズ',
   style: 'スタイル',
   inputExample: '記入例',
