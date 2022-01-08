@@ -55,6 +55,7 @@ interface Props {
   scale: number;
   backgrounds: string[];
   pageSizes: Size[];
+  size: Size;
   activeElements: HTMLElement[];
   setActiveElements: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
@@ -63,7 +64,7 @@ interface Props {
 }
 
 const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
-  const { pageCursor, scale, backgrounds, pageSizes, activeElements, schemasList } = props;
+  const { pageCursor, scale, backgrounds, pageSizes, size, activeElements, schemasList } = props;
   const { setActiveElements, changeSchemas, removeSchemas, paperRefs } = props;
 
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
@@ -228,6 +229,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       <Paper
         paperRefs={paperRefs}
         scale={scale}
+        size={size}
         schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}

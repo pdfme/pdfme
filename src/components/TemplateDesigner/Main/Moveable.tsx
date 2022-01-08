@@ -47,10 +47,10 @@ const _Moveable = (
 ) => (
   <Moveable
     style={{ zIndex: 1 }}
-    snappable={true}
-    snapCenter={true}
-    draggable={true}
-    resizable={true}
+    snappable
+    snapCenter
+    draggable
+    resizable
     throttleDrag={1}
     throttleResize={1}
     ref={ref}

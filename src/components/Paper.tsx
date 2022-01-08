@@ -7,6 +7,7 @@ import { getFallbackFontName } from '../libs/helper';
 const Paper = ({
   paperRefs,
   scale,
+  size,
   schemasList,
   pageSizes,
   backgrounds,
@@ -15,6 +16,7 @@ const Paper = ({
 }: {
   paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
+  size: Size;
   schemasList: SchemaForUI[][];
   pageSizes: Size[];
   backgrounds: string[];
@@ -27,8 +29,15 @@ const Paper = ({
     return null;
   }
 
+  const topPageWidth = pageSizes[0].width;
+
   return (
-    <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+    <div
+      style={{
+        transform: `scale(${scale})`,
+        transformOrigin: size.width <= topPageWidth * ZOOM * scale ? `left top` : `center top`,
+      }}
+    >
       {backgrounds.map((background, paperIndex) => {
         const pageSize = pageSizes[paperIndex];
         const paperSize = { width: pageSize.width * ZOOM, height: pageSize.height * ZOOM };

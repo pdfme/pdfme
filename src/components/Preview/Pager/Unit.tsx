@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import * as styles from './index.module.scss';
-import left from '../../../assets/left.svg';
-import right from '../../../assets/right.svg';
-import doubleLeft from '../../../assets/double-left.svg';
-import doubleRight from '../../../assets/double-right.svg';
+import left from '../../../assets/icons/left.svg';
+import right from '../../../assets/icons/right.svg';
+import doubleLeft from '../../../assets/icons/double-left.svg';
+import doubleRight from '../../../assets/icons/double-right.svg';
 import { I18nContext } from '../../../libs/contexts';
 
 type Props = {
@@ -20,7 +20,7 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
   return (
     <>
       {unitCursor > 0 && (
-        <div className={styles.wrapper} style={{ left: 0 }}>
+        <div className={styles.unitWrapper} style={{ left: -3 }}>
           <button
             className={styles.leftBtn}
             disabled={unitCursor <= 0}
@@ -41,7 +41,7 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
         </div>
       )}
       {unitCursor + 1 < unitNum && (
-        <div className={styles.wrapper} style={{ right: 0 }}>
+        <div className={styles.unitWrapper} style={{ right: -3 }}>
           <strong style={{ color: 'white' }}>
             {unitCursor + 1}/{unitNum}
           </strong>

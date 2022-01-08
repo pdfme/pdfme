@@ -2,8 +2,8 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { PreviewReactProps, SchemaForUI } from '../../libs/type';
 import { ZOOM, RULER_HEIGHT } from '../../libs/constants';
 import { templateSchemas2SchemasList } from '../../libs/helper';
-import Pager from './Pager';
-import UnitPager from './UnitPager';
+import PagePager from './Pager/Page';
+import UnitPager from './Pager/Unit';
 import Root from '../Root';
 import Error from '../Error';
 import Paper from '../Paper';
@@ -53,7 +53,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   return (
     <Root ref={rootRef} size={size} scale={scale}>
       <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
-      <Pager
+      <PagePager
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
@@ -66,6 +66,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
       />
       <Paper
         scale={scale}
+        size={size}
         schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}

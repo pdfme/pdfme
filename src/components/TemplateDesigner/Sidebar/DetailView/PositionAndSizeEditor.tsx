@@ -1,6 +1,5 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import * as styles from '../index.module.scss';
-import { I18nContext } from '../../../../libs/contexts';
 import { SidebarProps } from '../';
 
 const PositionAndSizeEditor = (
@@ -8,11 +7,9 @@ const PositionAndSizeEditor = (
 ) => {
   const { changeSchemas, activeSchema, pageSizes, pageCursor } = props;
   const pageSize = pageSizes[pageCursor];
-  const i18n = useContext(I18nContext);
 
   return (
     <div>
-      <p style={{ marginBottom: 0 }}>{i18n('posAndSize')}</p>
       <div className={styles.flx}>
         <div className={styles.inputSet}>
           <label style={{ width: 17 }}>X:</label>

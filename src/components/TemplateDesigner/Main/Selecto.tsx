@@ -15,8 +15,8 @@ const _Selecto = ({
 }) => (
   <Selecto
     selectFromInside={false}
-    selectByClick={true}
-    preventDefault={true}
+    selectByClick
+    preventDefault
     hitRate={0}
     selectableTargets={[`.${SELECTABLE_CLASSNAME}`]}
     container={container}

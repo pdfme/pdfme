@@ -291,6 +291,7 @@ const TemplateEditor = ({
         height={size.height - RULER_HEIGHT}
         pageCursor={pageCursor}
         scale={scale}
+        size={size}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         activeElements={activeElements}

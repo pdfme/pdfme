@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
-import backIcon from '../../../assets/back.svg';
-import forwardIcon from '../../../assets/forward.svg';
+import backIcon from '../../../assets/icons/back.svg';
+import forwardIcon from '../../../assets/icons/forward.svg';
 import ListView from './ListView';
 import DetailView from './DetailView';
 

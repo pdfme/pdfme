@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
 import { I18nContext } from '../../../../libs/contexts';
 import Divider from '../../../Divider';
-import backIcon from '../../../../assets/back.svg';
-import deleteIcon from '../../../../assets/delete.svg';
+import backIcon from '../../../../assets/icons/back.svg';
+import deleteIcon from '../../../../assets/icons/delete.svg';
 import { SidebarProps } from '../';
 import TextPropEditor from './TextPropEditor';
 import ExampleInputEditor from './ExampleInputEditor';
@@ -43,7 +43,12 @@ const DetailView = (
       <Divider />
       <PositionAndSizeEditor {...props} />
       <Divider />
-      {activeSchema.type === 'text' && <TextPropEditor {...props} />}
+      {activeSchema.type === 'text' && (
+        <>
+          <TextPropEditor {...props} />
+          <Divider />
+        </>
+      )}
       <ExampleInputEditor {...props} />
     </aside>
   );

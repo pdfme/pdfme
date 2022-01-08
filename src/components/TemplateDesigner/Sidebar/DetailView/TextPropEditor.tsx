@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
-import { I18nContext, FontContext } from '../../../../libs/contexts';
+import { FontContext } from '../../../../libs/contexts';
 import { SidebarProps } from '../';
 import { getFallbackFontName } from '../../../../libs/helper';
 
@@ -63,7 +63,6 @@ const SelectSet = (props: {
 const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
   const { changeSchemas, activeSchema } = props;
   const alignments = ['left', 'center', 'right'];
-  const i18n = useContext(I18nContext);
   const font = useContext(FontContext);
   const fallbackFontName = getFallbackFontName(font);
 
@@ -71,8 +70,6 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
 
   return (
     <>
-      <p style={{ marginBottom: 0 }}>{i18n('style')}</p>
-
       <div className={styles.flx}>
         <SelectSet
           label={'FontName'}

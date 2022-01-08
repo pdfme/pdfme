@@ -1,4 +1,4 @@
-.wrapper {
+.pageWrapper {
   position: fixed;
   bottom: 0;
   z-index: 1;
@@ -6,16 +6,47 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #777777e6;
+    border-radius: 3px;
+    padding: 0.5rem;
+  }
+}
+
+.unitWrapper {
+  position: fixed;
+  top: 45%;
+  z-index: 1;
+  background-color: #777777bd;
+  border-radius: 3px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
 }
 
 .leftBtn {
+  cursor: pointer;
+  border: none;
+  background: none;
   display: flex;
   align-items: center;
   margin-right: 0.5rem;
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .rightBtn {
+  cursor: pointer;
+  border: none;
+  background: none;
   display: flex;
   align-items: center;
   margin-left: 0.5rem;
+  &:disabled {
+    cursor: not-allowed;
+  }
 }

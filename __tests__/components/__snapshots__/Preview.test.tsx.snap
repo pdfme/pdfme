@@ -2,13 +2,13 @@
 
 exports[`Preview(as Form) snapshot 1`] = `
 <div
-  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
     style="height: 1170px;"
   >
     <div
-      style="transform: scale(1); transform-origin: top center;"
+      style="transform: scale(1); transform-origin: center top;"
     >
       <div
         style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
@@ -64,13 +64,13 @@ exports[`Preview(as Form) snapshot 1`] = `
 
 exports[`Preview(as Viewer) snapshot 1`] = `
 <div
-  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
     style="height: 1170px;"
   >
     <div
-      style="transform: scale(1); transform-origin: top center;"
+      style="transform: scale(1); transform-origin: center top;"
     >
       <div
         style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"

@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import * as styles from './index.module.scss';
-import left from '../../../assets/left.svg';
-import right from '../../../assets/right.svg';
-import doubleLeft from '../../../assets/double-left.svg';
-import doubleRight from '../../../assets/double-right.svg';
+import left from '../../../assets/icons/left.svg';
+import right from '../../../assets/icons/right.svg';
+import doubleLeft from '../../../assets/icons/double-left.svg';
+import doubleRight from '../../../assets/icons/double-right.svg';
 import { I18nContext } from '../../../libs/contexts';
 
 type Props = {
@@ -18,15 +18,8 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
   if (pageNum <= 1) return <></>;
 
   return (
-    <div className={styles.wrapper}>
-      <div
-        style={{
-          background: '#777777bd',
-          padding: '0.5rem',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+    <div className={`${styles.pageWrapper}`}>
+      <div>
         <button
           className={styles.leftBtn}
           disabled={pageCursor <= 0}

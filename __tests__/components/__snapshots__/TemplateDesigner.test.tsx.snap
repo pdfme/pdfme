@@ -2,7 +2,7 @@
 
 exports[`TemplateDesigner snapshot 1`] = `
 <div
-  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
     style="height: 1170px;"
@@ -40,7 +40,7 @@ exports[`TemplateDesigner snapshot 1`] = `
               </h3>
             </div>
             <div
-              style="margin-top: 0.25rem; margin-bottom: 0.25rem; border-bottom: 1px solid #eee;"
+              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #eee;"
             />
             <div
               style="max-height: 350px; overflow-y: auto;"
@@ -73,7 +73,7 @@ exports[`TemplateDesigner snapshot 1`] = `
                   />
                 </button>
                 <button
-                  style="padding: 5px; margin: 5px;"
+                  style="padding: 5px;"
                 >
                   <img
                     alt="Delete icon"
@@ -110,7 +110,7 @@ exports[`TemplateDesigner snapshot 1`] = `
                   />
                 </button>
                 <button
-                  style="padding: 5px; margin: 5px;"
+                  style="padding: 5px;"
                 >
                   <img
                     alt="Delete icon"
@@ -121,7 +121,7 @@ exports[`TemplateDesigner snapshot 1`] = `
               </div>
             </div>
             <div
-              style="margin-top: 0.25rem; margin-bottom: 0.25rem; border-bottom: 1px solid #eee;"
+              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #eee;"
             />
           </aside>
           <div>
@@ -143,7 +143,7 @@ exports[`TemplateDesigner snapshot 1`] = `
         class="selecto-selection rCS154w68a"
       />
       <div
-        style="transform: scale(1); transform-origin: top center;"
+        style="transform: scale(1); transform-origin: center top;"
       >
         <div
           style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"

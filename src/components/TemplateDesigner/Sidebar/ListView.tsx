@@ -8,11 +8,11 @@ import {
 import { SchemaForUI } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import Divider from '../../Divider';
-import infoIcon from '../../../assets/info.svg';
-import createIcon from '../../../assets/create.svg';
-import dragIcon from '../../../assets/drag.svg';
-import warningIcon from '../../../assets/warning.svg';
-import deleteIcon from '../../../assets/delete.svg';
+import infoIcon from '../../../assets/icons/info.svg';
+import createIcon from '../../../assets/icons/create.svg';
+import dragIcon from '../../../assets/icons/drag.svg';
+import warningIcon from '../../../assets/icons/warning.svg';
+import deleteIcon from '../../../assets/icons/delete.svg';
 import { SidebarProps } from '.';
 
 const isTouchable = () => true;
@@ -146,7 +146,7 @@ const ListView = (
       <Divider />
       <SortableList
         helperClass={styles.sortableHelper}
-        useDragHandle={true}
+        useDragHandle
         axis="y"
         lockAxis="y"
         schemas={schemas}

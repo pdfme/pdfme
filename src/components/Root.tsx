@@ -30,6 +30,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     <div
       ref={ref}
       style={{
+        fontFamily: 'Arial, Helvetica, sans-serif',
         position: 'relative',
         background: 'rgb(74, 74, 74)',
         overflowY: 'auto',
@@ -37,21 +38,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
       }}
     >
       <div style={{ height: size.height - RULER_HEIGHT * scale }}>
-        {scale === 0 ? (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Spinner />
-          </div>
-        ) : (
-          children
-        )}
+        {scale === 0 ? <Spinner /> : children}
       </div>
     </div>
   );
