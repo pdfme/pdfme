@@ -9,15 +9,13 @@ import DetailView from './DetailView';
 
 export type SidebarProps = {
   height: number;
-  pageCursor: number;
-  pageSizes: Size[];
+  pageSize: Size;
   activeElement: HTMLElement | null;
   activeSchema: SchemaForUI;
   schemas: SchemaForUI[];
   onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
-  removeSchema: (id: string) => void;
   changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
   addSchema: () => void;
 };
@@ -27,7 +25,7 @@ const Sidebar = (props: SidebarProps) => {
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
-  const sidebarWidth = 300;
+  const sidebarWidth = 260;
   const top = 0;
   const right = open ? sidebarWidth + 18 : 0;
 

@@ -4,7 +4,9 @@ import { I18nContext } from '../../../../libs/contexts';
 import { schemaTypes } from '../../../../libs/type';
 
 const ErrorLabel = ({ isError, msg }: { isError: boolean; msg: string }) => (
-  <span style={{ color: isError ? '#ffa19b' : '#fff', fontWeight: isError ? 'bold' : 'inherit' }}>
+  <span
+    style={{ color: isError ? '#ffa19b' : 'inherit', fontWeight: isError ? 'bold' : 'inherit' }}
+  >
     {msg}
   </span>
 );
@@ -62,7 +64,11 @@ const TypeAndKeyEditor = (
           onChange={(e) =>
             changeSchemas([{ key: 'key', value: e.target.value, schemaId: activeSchema.id }])
           }
-          style={{ backgroundColor: hasSameKey || blankKey ? '#ffa19b' : '#fff' }}
+          style={{
+            borderRadius: 2,
+            border: '1px solid #767676',
+            backgroundColor: hasSameKey || blankKey ? '#ffa19b' : '#fff',
+          }}
           value={activeSchema.key}
         />
       </div>

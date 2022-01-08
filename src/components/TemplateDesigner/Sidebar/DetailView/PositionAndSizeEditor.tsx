@@ -3,16 +3,15 @@ import * as styles from '../index.module.scss';
 import { SidebarProps } from '../';
 
 const PositionAndSizeEditor = (
-  props: Pick<SidebarProps, 'pageSizes' | 'pageCursor' | 'changeSchemas' | 'activeSchema'>
+  props: Pick<SidebarProps, 'pageSize' | 'changeSchemas' | 'activeSchema'>
 ) => {
-  const { changeSchemas, activeSchema, pageSizes, pageCursor } = props;
-  const pageSize = pageSizes[pageCursor];
+  const { changeSchemas, activeSchema, pageSize } = props;
 
   return (
     <div>
       <div className={styles.flx}>
         <div className={styles.inputSet}>
-          <label style={{ width: 17 }}>X:</label>
+          <label style={{ width: 17 }}>X</label>
           <input
             style={{ width: 70 }}
             type="number"
@@ -24,10 +23,10 @@ const PositionAndSizeEditor = (
             }}
             value={activeSchema.position.x}
           />
-          <span>mm</span>
+          <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
         <div className={styles.inputSet}>
-          <label style={{ width: 17 }}>Y:</label>
+          <label style={{ width: 17 }}>Y</label>
           <input
             style={{ width: 70 }}
             type="number"
@@ -39,12 +38,12 @@ const PositionAndSizeEditor = (
             }}
             value={activeSchema.position.y}
           />
-          <span>mm</span>
+          <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
       </div>
       <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
         <div className={styles.inputSet}>
-          <label style={{ width: 17 }}>W:</label>
+          <label style={{ width: 17 }}>W</label>
           <input
             style={{ width: 70 }}
             type="number"
@@ -56,10 +55,10 @@ const PositionAndSizeEditor = (
             }}
             value={activeSchema.width}
           />
-          <span>mm</span>
+          <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
         <div className={styles.inputSet}>
-          <label style={{ width: 17 }}>H:</label>
+          <label style={{ width: 17 }}>H</label>
           <input
             style={{ width: 70 }}
             type="number"
@@ -71,7 +70,7 @@ const PositionAndSizeEditor = (
             }}
             value={activeSchema.height}
           />
-          <span>mm</span>
+          <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
       </div>
     </div>

@@ -5,15 +5,16 @@ import { SidebarProps } from '../';
 import { getFallbackFontName } from '../../../../libs/helper';
 
 const NumberInputSet = (props: {
+  width: string;
   label: string;
   value: number | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, value, onChange } = props;
+  const { label, value, width, onChange } = props;
 
   return (
-    <div style={{ width: '33%' }}>
-      <label>{label}:</label>
+    <div style={{ width }}>
+      <label>{label}</label>
       <input style={{ width: '100%' }} onChange={onChange} value={value} type="number" />
     </div>
   );
@@ -28,8 +29,8 @@ const ColorInputSet = (props: {
   const { label, value, onChange, onClear } = props;
 
   return (
-    <div style={{ width: '50%' }}>
-      <label>{label}:</label>
+    <div style={{ width: '45%' }}>
+      <label>{label}</label>
       <div style={{ display: 'flex' }}>
         <input onChange={onChange} value={value} type="color" style={{ width: '100%' }} />
         <button onClick={onClear}>X</button>
@@ -47,7 +48,7 @@ const SelectSet = (props: {
   const { label, value, options, onChange } = props;
 
   return (
-    <div style={{ width: '50%' }}>
+    <div style={{ width: '45%' }}>
       <label>{label}:</label>
       <select style={{ width: '100%' }} onChange={onChange} value={value}>
         {options.map((o) => (
@@ -91,6 +92,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
       </div>
       <div className={styles.flx}>
         <NumberInputSet
+          width="30%"
           label={'FontSize(pt)'}
           value={activeSchema.fontSize}
           onChange={(e) =>
@@ -100,6 +102,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           }
         />
         <NumberInputSet
+          width="30%"
           label={'LineHeight(em)'}
           value={activeSchema.lineHeight}
           onChange={(e) =>
@@ -110,6 +113,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
         />
 
         <NumberInputSet
+          width="40%"
           label={'CharacterSpacing(pt)'}
           value={activeSchema.characterSpacing}
           onChange={(e) =>

@@ -15,7 +15,7 @@ exports[`TemplateDesigner snapshot 1`] = `
       >
         <button
           class="undefined"
-          style="right: 318px; top: 0px; position: absolute;"
+          style="right: 278px; top: 0px; position: absolute;"
         >
           <img
             alt="Toggle icon"
@@ -24,30 +24,27 @@ exports[`TemplateDesigner snapshot 1`] = `
           />
         </button>
         <div
-          style="width: 300px; display: block; top: 0px;"
+          style="width: 260px; display: block; top: 0px;"
         >
           <aside>
             <div
               style="height: 40px; display: flex; align-items: center;"
             >
-              <h3
+              <p
                 style="text-align: center; width: 100%; font-weight: bold;"
               >
                 List of Fields
-                (
-                1
-                P)
-              </h3>
+              </p>
             </div>
             <div
-              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #eee;"
+              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
             <div
               style="max-height: 350px; overflow-y: auto;"
             >
               <div>
                 <button
-                  style="padding: 0px;"
+                  style="padding: 0px; background: none;"
                 >
                   <img
                     alt="Drag icon"
@@ -58,7 +55,7 @@ exports[`TemplateDesigner snapshot 1`] = `
                 </button>
                 <button
                   class=""
-                  style="padding: 5px; margin: 5px; width: 100%; display: flex; align-items: center;"
+                  style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
                   title="Edit"
                 >
                   <span
@@ -66,25 +63,11 @@ exports[`TemplateDesigner snapshot 1`] = `
                   >
                     field1
                   </span>
-                  <img
-                    alt="Create icon"
-                    src="[object Object]"
-                    width="15"
-                  />
-                </button>
-                <button
-                  style="padding: 5px;"
-                >
-                  <img
-                    alt="Delete icon"
-                    src="[object Object]"
-                    width="15"
-                  />
                 </button>
               </div>
               <div>
                 <button
-                  style="padding: 0px;"
+                  style="padding: 0px; background: none;"
                 >
                   <img
                     alt="Drag icon"
@@ -95,7 +78,7 @@ exports[`TemplateDesigner snapshot 1`] = `
                 </button>
                 <button
                   class=""
-                  style="padding: 5px; margin: 5px; width: 100%; display: flex; align-items: center;"
+                  style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
                   title="Edit"
                 >
                   <span
@@ -103,25 +86,11 @@ exports[`TemplateDesigner snapshot 1`] = `
                   >
                     field2
                   </span>
-                  <img
-                    alt="Create icon"
-                    src="[object Object]"
-                    width="15"
-                  />
-                </button>
-                <button
-                  style="padding: 5px;"
-                >
-                  <img
-                    alt="Delete icon"
-                    src="[object Object]"
-                    width="15"
-                  />
                 </button>
               </div>
             </div>
             <div
-              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #eee;"
+              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
           </aside>
           <div>

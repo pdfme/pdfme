@@ -4,16 +4,7 @@ import { ZOOM, RULER_HEIGHT } from '../libs/constants';
 import { SchemaForUI, Size } from '../libs/type';
 import { getFallbackFontName } from '../libs/helper';
 
-const Paper = ({
-  paperRefs,
-  scale,
-  size,
-  schemasList,
-  pageSizes,
-  backgrounds,
-  renderPaper,
-  renderSchema,
-}: {
+const Paper = (porps: {
   paperRefs?: MutableRefObject<HTMLDivElement[]>;
   scale: number;
   size: Size;
@@ -23,6 +14,8 @@ const Paper = ({
   renderPaper?: (arg: { index: number; paperSize: Size }) => ReactNode;
   renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
 }) => {
+  const { paperRefs, scale, size, schemasList, pageSizes, backgrounds, renderPaper, renderSchema } =
+    porps;
   const font = useContext(FontContext);
 
   if (pageSizes.length !== backgrounds.length || pageSizes.length !== schemasList.length) {

@@ -9,32 +9,21 @@ import { SchemaForUI } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import Divider from '../../Divider';
 import infoIcon from '../../../assets/icons/info.svg';
-import createIcon from '../../../assets/icons/create.svg';
 import dragIcon from '../../../assets/icons/drag.svg';
 import warningIcon from '../../../assets/icons/warning.svg';
-import deleteIcon from '../../../assets/icons/delete.svg';
 import { SidebarProps } from '.';
 
 const isTouchable = () => true;
 
 const DragHandle = sortableHandle(() => (
-  <button style={{ padding: 0 }}>
+  <button style={{ padding: 0, background: 'none', border: 'none' }}>
     <img style={{ padding: 5, cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
 
 const SortableItem = sortableElement(
-  ({
-    schemas,
-    schema,
-    onEdit,
-    onDelete,
-  }: {
-    schemas: SchemaForUI[];
-    schema: SchemaForUI;
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
-  }) => {
+  (props: { schemas: SchemaForUI[]; schema: SchemaForUI; onEdit: (id: string) => void }) => {
+    const { schemas, schema, onEdit } = props;
     const i18n = useContext(I18nContext);
 
     const sc = schema;
@@ -64,7 +53,16 @@ const SortableItem = sortableElement(
         <button
           disabled={!touchable}
           className={`${status}`}
-          style={{ padding: 5, margin: 5, width: '100%', display: 'flex', alignItems: 'center' }}
+          style={{
+            padding: 5,
+            margin: 5,
+            width: '100%',
+            display: 'flex',
+            background: 'none',
+            border: 'none',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
@@ -83,10 +81,6 @@ const SortableItem = sortableElement(
               </span>
             )}
           </span>
-          <img alt="Create icon" src={createIcon} width={15} />
-        </button>
-        <button disabled={!touchable} style={{ padding: 5 }} onClick={() => onDelete(sc.id)}>
-          <img alt="Delete icon" src={deleteIcon} width={15} />
         </button>
       </div>
     );
@@ -94,15 +88,7 @@ const SortableItem = sortableElement(
 );
 
 const SortableList = sortableContainer(
-  ({
-    schemas,
-    onEdit,
-    onDelete,
-  }: {
-    schemas: SchemaForUI[];
-    onEdit: (id: string) => void;
-    onDelete: (id: string) => void;
-  }) => {
+  ({ schemas, onEdit }: { schemas: SchemaForUI[]; onEdit: (id: string) => void }) => {
     const i18n = useContext(I18nContext);
 
     return (
@@ -116,7 +102,6 @@ const SortableList = sortableContainer(
               schemas={schemas}
               schema={s}
               onEdit={onEdit}
-              onDelete={onDelete}
             />
           ))
         ) : (
@@ -130,18 +115,16 @@ const SortableList = sortableContainer(
   }
 );
 
-const ListView = (
-  props: Pick<SidebarProps, 'pageCursor' | 'schemas' | 'onSortEnd' | 'onEdit' | 'removeSchema'>
-) => {
-  const { pageCursor, schemas, onSortEnd, onEdit, removeSchema } = props;
+const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit'>) => {
+  const { schemas, onSortEnd, onEdit } = props;
   const i18n = useContext(I18nContext);
 
   return (
     <aside>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-        <h3 style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
-          {i18n('fieldsList')}({pageCursor + 1}P)
-        </h3>
+        <p style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
+          {i18n('fieldsList')}
+        </p>
       </div>
       <Divider />
       <SortableList
@@ -152,7 +135,6 @@ const ListView = (
         schemas={schemas}
         onSortEnd={onSortEnd}
         onEdit={onEdit}
-        onDelete={removeSchema}
       />
       <Divider />
     </aside>

@@ -269,8 +269,7 @@ const TemplateEditor = ({
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
-        pageCursor={pageCursor}
-        pageSizes={pageSizes}
+        pageSize={pageSizes[pageCursor]}
         activeElement={activeElements[activeElements.length - 1]}
         schemas={schemasList[pageCursor]}
         activeSchema={activeSchema}
@@ -284,7 +283,6 @@ const TemplateEditor = ({
         }}
         onEditEnd={onEditEnd}
         addSchema={addSchema}
-        removeSchema={(id) => removeSchemas([id])}
       />
       <Main
         ref={mainRef}

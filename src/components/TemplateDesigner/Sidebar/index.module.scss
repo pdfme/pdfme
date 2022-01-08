@@ -1,6 +1,6 @@
 .sideBar {
-  background: #444;
-  color: #fff;
+  background: #ffffffed;
+  color: #333;
   border: 1px solid #777;
   height: 544px;
   padding: 0.5rem;
@@ -10,13 +10,13 @@
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 }
 
 .keyLabel {
   margin-right: 1rem;
-  width: 160px;
+  width: 180px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -45,12 +45,6 @@
   align-items: center;
 }
 
-.dltBtn {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
 .addBtn {
   display: flex;
   justify-content: space-around;
@@ -59,7 +53,6 @@
   left: 0;
   bottom: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #fff;
 }
 
 .sortableHelper {
