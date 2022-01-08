@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { TemplateDesignerReactProps, Template, SchemaForUI, Size } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { RULER_HEIGHT } from '../../libs/constants';
+import { RULER_HEIGHT, ZOOM } from '../../libs/constants';
 import { I18nContext } from '../../libs/contexts';
 import { uuid, set, cloneDeep, round, arrayMove } from '../../libs/utils';
 import {
@@ -269,6 +269,7 @@ const TemplateEditor = ({
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
+        size={size}
         pageSize={pageSizes[pageCursor]}
         activeElement={activeElements[activeElements.length - 1]}
         schemas={schemasList[pageCursor]}
@@ -286,7 +287,7 @@ const TemplateEditor = ({
       />
       <Main
         ref={mainRef}
-        height={size.height - RULER_HEIGHT}
+        height={size.height - RULER_HEIGHT * ZOOM}
         pageCursor={pageCursor}
         scale={scale}
         size={size}

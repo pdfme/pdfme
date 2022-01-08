@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import * as styles from './index.module.scss';
 import { SchemaForUI, Size } from '../../../libs/type';
+import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
 import { I18nContext } from '../../../libs/contexts';
 import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
@@ -9,6 +10,7 @@ import DetailView from './DetailView';
 
 export type SidebarProps = {
   height: number;
+  size: Size;
   pageSize: Size;
   activeElement: HTMLElement | null;
   activeSchema: SchemaForUI;
@@ -21,7 +23,7 @@ export type SidebarProps = {
 };
 
 const Sidebar = (props: SidebarProps) => {
-  const { height, addSchema } = props;
+  const { height, size, addSchema } = props;
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
@@ -41,7 +43,12 @@ const Sidebar = (props: SidebarProps) => {
         </button>
         <div
           className={styles.sideBar}
-          style={{ width: sidebarWidth, display: open ? 'block' : 'none', top }}
+          style={{
+            width: sidebarWidth,
+            height: size.height - RULER_HEIGHT * ZOOM,
+            display: open ? 'block' : 'none',
+            top,
+          }}
         >
           {props.activeElement ? <DetailView {...props} /> : <ListView {...props} />}
           <div className={styles.addBtn}>

@@ -5,8 +5,9 @@ import {
   SortableElement as sortableElement,
   SortableHandle as sortableHandle,
 } from 'react-sortable-hoc';
-import { SchemaForUI } from '../../../libs/type';
+import { SchemaForUI, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
+import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
 import Divider from '../../Divider';
 import infoIcon from '../../../assets/icons/info.svg';
 import dragIcon from '../../../assets/icons/drag.svg';
@@ -88,11 +89,20 @@ const SortableItem = sortableElement(
 );
 
 const SortableList = sortableContainer(
-  ({ schemas, onEdit }: { schemas: SchemaForUI[]; onEdit: (id: string) => void }) => {
+  ({
+    schemas,
+    onEdit,
+    size,
+  }: {
+    schemas: SchemaForUI[];
+    onEdit: (id: string) => void;
+    size: Size;
+  }) => {
     const i18n = useContext(I18nContext);
 
     return (
-      <div style={{ maxHeight: 350, overflowY: 'auto' }}>
+      // TODO ここを伸ばす
+      <div style={{ maxHeight: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
         {schemas.length > 0 ? (
           schemas.map((s, i) => (
             <SortableItem
@@ -115,8 +125,8 @@ const SortableList = sortableContainer(
   }
 );
 
-const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit'>) => {
-  const { schemas, onSortEnd, onEdit } = props;
+const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit' | 'size'>) => {
+  const { schemas, onSortEnd, onEdit, size } = props;
   const i18n = useContext(I18nContext);
 
   return (
@@ -128,6 +138,7 @@ const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit'>)
       </div>
       <Divider />
       <SortableList
+        size={size}
         helperClass={styles.sortableHelper}
         useDragHandle
         axis="y"
