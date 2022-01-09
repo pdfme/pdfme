@@ -15,7 +15,6 @@ exports[`TemplateDesigner snapshot 1`] = `
       >
         <button
           class="undefined"
-          style="right: 278px; top: 0px; position: absolute;"
         >
           <img
             alt="Toggle icon"
@@ -24,7 +23,7 @@ exports[`TemplateDesigner snapshot 1`] = `
           />
         </button>
         <div
-          style="width: 260px; display: block; top: 0px;"
+          style="width: 260px; height: 1086.614173227px; display: block; top: 0px;"
         >
           <aside>
             <div
@@ -40,53 +39,61 @@ exports[`TemplateDesigner snapshot 1`] = `
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
             <div
-              style="max-height: 350px; overflow-y: auto;"
+              style="max-height: 961.614173227px; overflow-y: auto;"
             >
-              <div>
-                <button
-                  style="padding: 0px; background: none;"
-                >
-                  <img
-                    alt="Drag icon"
-                    src="[object Object]"
-                    style="padding: 5px; cursor: grab;"
-                    width="15"
-                  />
-                </button>
-                <button
-                  class=""
-                  style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
-                  title="Edit"
-                >
-                  <span
-                    class="undefined"
+              <div
+                style="border: 1px solid transparent;"
+              >
+                <div>
+                  <button
+                    style="padding: 0px; background: none;"
                   >
-                    field1
-                  </span>
-                </button>
+                    <img
+                      alt="Drag icon"
+                      src="[object Object]"
+                      style="padding: 5px; cursor: grab;"
+                      width="15"
+                    />
+                  </button>
+                  <button
+                    class=""
+                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    title="Edit"
+                  >
+                    <span
+                      class="undefined"
+                    >
+                      field1
+                    </span>
+                  </button>
+                </div>
               </div>
-              <div>
-                <button
-                  style="padding: 0px; background: none;"
-                >
-                  <img
-                    alt="Drag icon"
-                    src="[object Object]"
-                    style="padding: 5px; cursor: grab;"
-                    width="15"
-                  />
-                </button>
-                <button
-                  class=""
-                  style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
-                  title="Edit"
-                >
-                  <span
-                    class="undefined"
+              <div
+                style="border: 1px solid transparent;"
+              >
+                <div>
+                  <button
+                    style="padding: 0px; background: none;"
                   >
-                    field2
-                  </span>
-                </button>
+                    <img
+                      alt="Drag icon"
+                      src="[object Object]"
+                      style="padding: 5px; cursor: grab;"
+                      width="15"
+                    />
+                  </button>
+                  <button
+                    class=""
+                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    title="Edit"
+                  >
+                    <span
+                      class="undefined"
+                    >
+                      field2
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
             <div
@@ -95,7 +102,7 @@ exports[`TemplateDesigner snapshot 1`] = `
           </aside>
           <div>
             <button
-              style="padding: 0.5rem;"
+              style="padding: 0.5rem; color: rgb(255, 255, 255); background: rgb(24, 160, 251); border-radius: 3px; cursor: pointer;"
             >
               <strong>
                 Add new field
@@ -106,7 +113,7 @@ exports[`TemplateDesigner snapshot 1`] = `
       </div>
     </div>
     <div
-      style="height: 1170px;"
+      style="height: 1086.614173227px;"
     >
       <div
         class="selecto-selection rCS154w68a"
@@ -256,46 +263,42 @@ exports[`TemplateDesigner snapshot 1`] = `
             />
           </div>
           <div>
-            <div>
+            <div
+              aria-expanded="false"
+              class="selectable"
+              id="2"
+              style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            >
               <div
-                aria-expanded="false"
-                class="selectable"
-                id="2"
-                style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+                style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
               >
-                <div
-                  style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+                <span
+                  style="letter-spacing: inherit;"
                 >
-                  <span
-                    style="letter-spacing: inherit;"
-                  >
-                    b
-                  </span>
-                  <span
-                    style="letter-spacing: 0;"
-                  >
-                    b
-                  </span>
-                </div>
+                  b
+                </span>
+                <span
+                  style="letter-spacing: 0;"
+                >
+                  b
+                </span>
               </div>
             </div>
           </div>
           <div>
-            <div>
+            <div
+              aria-expanded="false"
+              class="selectable"
+              id="3"
+              style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            >
               <div
-                aria-expanded="false"
-                class="selectable"
-                id="3"
-                style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+                style="margin: 0px auto;"
               >
-                <div
-                  style="margin: 0px auto;"
-                >
-                  <img
-                    src="aaaaaaaaaaaa"
-                    style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
-                  />
-                </div>
+                <img
+                  src="aaaaaaaaaaaa"
+                  style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+                />
               </div>
             </div>
           </div>

@@ -50,6 +50,8 @@ interface GuidesInterface {
 
 interface Props {
   height: number;
+  hoveringSchemaId: string | null;
+  onChangeHoveringSchemaId: (id: string | null) => void;
   pageCursor: number;
   schemasList: SchemaForUI[][];
   scale: number;
@@ -57,15 +59,24 @@ interface Props {
   pageSizes: Size[];
   size: Size;
   activeElements: HTMLElement[];
-  setActiveElements: (targets: HTMLElement[]) => void;
+  onEdit: (targets: HTMLElement[]) => void;
   changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
 }
 
 const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
-  const { pageCursor, scale, backgrounds, pageSizes, size, activeElements, schemasList } = props;
-  const { setActiveElements, changeSchemas, removeSchemas, paperRefs } = props;
+  const {
+    pageCursor,
+    scale,
+    backgrounds,
+    pageSizes,
+    size,
+    activeElements,
+    schemasList,
+    hoveringSchemaId,
+  } = props;
+  const { onEdit, changeSchemas, removeSchemas, onChangeHoveringSchemaId, paperRefs } = props;
 
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
@@ -215,7 +226,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           }
 
           if (paperRefs.current[pageCursor] === inputEvent.target) {
-            setActiveElements([]);
+            onEdit([]);
           }
 
           if (inputEvent.target.id === DELETE_BTN_ID) {
@@ -223,7 +234,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           }
         }}
         onSelect={(e) => {
-          setActiveElements(e.selected as HTMLElement[]);
+          onEdit(e.selected as HTMLElement[]);
         }}
       />
       <Paper
@@ -281,9 +292,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           <SchemaUI
             key={schema.key}
             schema={schema}
+            onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
             onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: schema.id }])}
-            border={'1px dashed #4af'}
+            border={hoveringSchemaId === schema.id ? '2px solid #18a0fb' : '1px dashed #4af'}
             ref={inputRef}
           />
         )}

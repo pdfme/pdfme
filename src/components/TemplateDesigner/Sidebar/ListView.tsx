@@ -88,29 +88,36 @@ const SortableItem = sortableElement(
 );
 
 const SortableList = sortableContainer(
-  ({
-    schemas,
-    onEdit,
-    size,
-  }: {
+  (props: {
     schemas: SchemaForUI[];
     onEdit: (id: string) => void;
     size: Size;
+    hoveringSchemaId: string | null;
+    onChangeHoveringSchemaId: (id: string | null) => void;
   }) => {
+    const { schemas, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
     const i18n = useContext(I18nContext);
 
     return (
       <div style={{ maxHeight: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
         {schemas.length > 0 ? (
           schemas.map((s, i) => (
-            <SortableItem
-              disabled={!isTouchable()}
-              index={i}
+            <div
               key={s.id}
-              schemas={schemas}
-              schema={s}
-              onEdit={onEdit}
-            />
+              style={{
+                border: `1px solid ${s.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
+              }}
+              onMouseEnter={() => onChangeHoveringSchemaId(s.id)}
+              onMouseLeave={() => onChangeHoveringSchemaId(null)}
+            >
+              <SortableItem
+                disabled={!isTouchable()}
+                index={i}
+                schemas={schemas}
+                schema={s}
+                onEdit={onEdit}
+              />
+            </div>
           ))
         ) : (
           <p style={{ textAlign: 'center' }}>{i18n('plsAddNewField')}</p>
@@ -120,8 +127,13 @@ const SortableList = sortableContainer(
   }
 );
 
-const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit' | 'size'>) => {
-  const { schemas, onSortEnd, onEdit, size } = props;
+const ListView = (
+  props: Pick<
+    SidebarProps,
+    'schemas' | 'onSortEnd' | 'onEdit' | 'size' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
+  >
+) => {
+  const { schemas, onSortEnd, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const i18n = useContext(I18nContext);
 
   return (
@@ -134,6 +146,8 @@ const ListView = (props: Pick<SidebarProps, 'schemas' | 'onSortEnd' | 'onEdit' |
       <Divider />
       <SortableList
         size={size}
+        hoveringSchemaId={hoveringSchemaId}
+        onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         helperClass={styles.sortableHelper}
         useDragHandle
         axis="y"

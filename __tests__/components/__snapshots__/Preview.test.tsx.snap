@@ -14,45 +14,41 @@ exports[`Preview(as Form) snapshot 1`] = `
         style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
       >
         <div>
-          <div>
-            <div
-              aria-expanded="false"
-              class="selectable"
-              id="field1"
-              style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+          <div
+            aria-expanded="false"
+            class="selectable"
+            id="field1"
+            style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+          >
+            <textarea
+              class="undefined "
+              placeholder="bb"
+              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+              tabindex="100"
             >
-              <textarea
-                class="undefined "
-                placeholder="bb"
-                style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
-                tabindex="100"
-              >
-                field1
-              </textarea>
-            </div>
+              field1
+            </textarea>
           </div>
         </div>
         <div>
-          <div>
+          <div
+            aria-expanded="false"
+            class="selectable"
+            id="field2"
+            style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+          >
             <div
-              aria-expanded="false"
-              class="selectable"
-              id="field2"
-              style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              style="margin: 0px auto;"
             >
-              <div
-                style="margin: 0px auto;"
+              <button
+                tabindex="101"
               >
-                <button
-                  tabindex="101"
-                >
-                  x
-                </button>
-                <img
-                  src="field2"
-                  style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
-                />
-              </div>
+                x
+              </button>
+              <img
+                src="field2"
+                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+              />
             </div>
           </div>
         </div>
@@ -76,66 +72,62 @@ exports[`Preview(as Viewer) snapshot 1`] = `
         style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
       >
         <div>
-          <div>
+          <div
+            aria-expanded="false"
+            class="selectable"
+            id="field1"
+            style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent; background-color: transparent;"
+          >
             <div
-              aria-expanded="false"
-              class="selectable"
-              id="field1"
-              style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent; background-color: transparent;"
+              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
             >
-              <div
-                style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+              <span
+                style="letter-spacing: inherit;"
               >
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  f
-                </span>
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  i
-                </span>
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  e
-                </span>
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  l
-                </span>
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  d
-                </span>
-                <span
-                  style="letter-spacing: 0;"
-                >
-                  1
-                </span>
-              </div>
+                f
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                i
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                e
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                l
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                d
+              </span>
+              <span
+                style="letter-spacing: 0;"
+              >
+                1
+              </span>
             </div>
           </div>
         </div>
         <div>
-          <div>
+          <div
+            aria-expanded="false"
+            class="selectable"
+            id="field2"
+            style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent; background-color: transparent;"
+          >
             <div
-              aria-expanded="false"
-              class="selectable"
-              id="field2"
-              style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent; background-color: transparent;"
+              style="margin: 0px auto;"
             >
-              <div
-                style="margin: 0px auto;"
-              >
-                <img
-                  src="field2"
-                  style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
-                />
-              </div>
+              <img
+                src="field2"
+                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+              />
             </div>
           </div>
         </div>

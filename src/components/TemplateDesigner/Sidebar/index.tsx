@@ -10,6 +10,8 @@ import DetailView from './DetailView';
 
 export type SidebarProps = {
   height: number;
+  hoveringSchemaId: string | null;
+  onChangeHoveringSchemaId: (id: string | null) => void;
   size: Size;
   pageSize: Size;
   activeElement: HTMLElement | null;

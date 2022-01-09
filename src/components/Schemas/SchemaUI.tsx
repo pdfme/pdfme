@@ -15,31 +15,39 @@ export interface SchemaUIProps {
   placeholder?: string;
 }
 
-type Props = SchemaUIProps & { border: string };
+type Props = SchemaUIProps & {
+  border: string;
+  onChangeHoveringSchemaId?: (id: string | null) => void;
+};
 
 const getBgc = (schema: SchemaForUI) =>
   schema.type === 'text' && schema.backgroundColor ? schema.backgroundColor : 'transparent';
 
-const Wrapper = ({ children, border, schema }: Props & { children: ReactNode }) => (
-  <div>
-    <Tippy delay={0} interactive content={schema.key}>
-      <div
-        className={SELECTABLE_CLASSNAME}
-        id={schema.id}
-        style={{
-          position: 'absolute',
-          height: schema.height * ZOOM,
-          width: schema.width * ZOOM,
-          top: schema.position.y * ZOOM,
-          left: schema.position.x * ZOOM,
-          border,
-          backgroundColor: getBgc(schema),
-        }}
-      >
-        {children}
-      </div>
-    </Tippy>
-  </div>
+const Wrapper = ({
+  children,
+  border,
+  onChangeHoveringSchemaId,
+  schema,
+}: Props & { children: ReactNode }) => (
+  <Tippy delay={0} interactive content={schema.key}>
+    <div
+      onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
+      onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
+      className={SELECTABLE_CLASSNAME}
+      id={schema.id}
+      style={{
+        position: 'absolute',
+        height: schema.height * ZOOM,
+        width: schema.width * ZOOM,
+        top: schema.position.y * ZOOM,
+        left: schema.position.x * ZOOM,
+        border,
+        backgroundColor: getBgc(schema),
+      }}
+    >
+      {children}
+    </div>
+  </Tippy>
 );
 
 const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {

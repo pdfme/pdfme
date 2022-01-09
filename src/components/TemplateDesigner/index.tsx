@@ -85,11 +85,20 @@ const TemplateEditor = ({
     offset: RULER_HEIGHT,
   });
 
+  const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
 
-  const onEditEnd = () => setActiveElements([]);
+  const onEdit = (targets: HTMLElement[]) => {
+    setActiveElements(targets);
+    setHoveringSchemaId(null);
+  };
+
+  const onEditEnd = () => {
+    setActiveElements([]);
+    setHoveringSchemaId(null);
+  };
 
   useScrollPageCursor({
     rootRef,
@@ -191,7 +200,7 @@ const TemplateEditor = ({
           return Object.assign(cloneDeep(cs), { id, key, position });
         });
         commitSchemas(schemasList[pageCursor].concat(pasteSchemas));
-        setActiveElements(pasteSchemas.map((s) => document.getElementById(s.id)!));
+        onEdit(pasteSchemas.map((s) => document.getElementById(s.id)!));
         copiedSchemas.current = pasteSchemas;
       },
       redo: () => timeTavel('redo'),
@@ -244,12 +253,16 @@ const TemplateEditor = ({
     s.data = 'text';
     s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
     commitSchemas(schemasList[pageCursor].concat(s));
-    setTimeout(() => setActiveElements([document.getElementById(s.id)!]));
+    setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };
 
   const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
     const movedSchema = arrayMove(cloneDeep(schemasList[pageCursor]), arg.oldIndex, arg.newIndex);
     commitSchemas(movedSchema);
+  };
+
+  const onChangeHoveringSchemaId = (id: string | null) => {
+    setHoveringSchemaId(id);
   };
 
   const getLastActiveSchema = () => {
@@ -268,6 +281,8 @@ const TemplateEditor = ({
   return (
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
+        hoveringSchemaId={hoveringSchemaId}
+        onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         size={size}
         pageSize={pageSizes[pageCursor]}
@@ -279,7 +294,7 @@ const TemplateEditor = ({
         onEdit={(id: string) => {
           const editingElem = document.getElementById(id);
           if (editingElem) {
-            setActiveElements([editingElem]);
+            onEdit([editingElem]);
           }
         }}
         onEditEnd={onEditEnd}
@@ -287,6 +302,9 @@ const TemplateEditor = ({
       />
       <Main
         ref={mainRef}
+        paperRefs={paperRefs}
+        hoveringSchemaId={hoveringSchemaId}
+        onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={size.height - RULER_HEIGHT * ZOOM}
         pageCursor={pageCursor}
         scale={scale}
@@ -297,8 +315,7 @@ const TemplateEditor = ({
         schemasList={schemasList}
         changeSchemas={changeSchemas}
         removeSchemas={removeSchemas}
-        setActiveElements={setActiveElements}
-        paperRefs={paperRefs}
+        onEdit={onEdit}
       />
     </Root>
   );
