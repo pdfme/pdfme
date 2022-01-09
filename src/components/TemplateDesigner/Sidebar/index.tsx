@@ -52,7 +52,17 @@ const Sidebar = (props: SidebarProps) => {
         >
           {props.activeElement ? <DetailView {...props} /> : <ListView {...props} />}
           <div className={styles.addBtn}>
-            <button style={{ padding: '0.5rem' }} onClick={addSchema}>
+            <button
+              style={{
+                padding: '0.5rem',
+                color: '#fff',
+                background: '#18a0fb',
+                border: 'none',
+                borderRadius: 3,
+                cursor: 'pointer',
+              }}
+              onClick={addSchema}
+            >
               <strong>{i18n('addNewField')}</strong>
             </button>
           </div>
