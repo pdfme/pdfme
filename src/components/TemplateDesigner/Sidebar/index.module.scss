@@ -27,9 +27,14 @@
 }
 
 .tglBtn {
-  padding: 5px;
-  border: 1px solid #999;
   position: absolute;
+  top: 1rem;
+  right: 0.5rem;
+  z-index: 100;
+  border: none;
+  border-radius: 3px;
+  padding: 0.5rem;
+  cursor: pointer;
 }
 
 .flx {

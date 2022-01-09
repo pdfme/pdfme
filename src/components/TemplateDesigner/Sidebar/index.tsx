@@ -29,16 +29,11 @@ const Sidebar = (props: SidebarProps) => {
   const [open, setOpen] = useState(true);
   const sidebarWidth = 260;
   const top = 0;
-  const right = open ? sidebarWidth + 18 : 0;
 
   return (
     <div style={{ position: 'absolute', height, width: '100%' }}>
       <div style={{ position: 'sticky', top, zIndex: 29 }}>
-        <button
-          className={`${styles.tglBtn}`}
-          style={{ right, top, position: 'absolute' }}
-          onClick={() => setOpen(!open)}
-        >
+        <button className={`${styles.tglBtn}`} onClick={() => setOpen(!open)}>
           <img src={open ? forwardIcon : backIcon} width={15} alt="Toggle icon" />
         </button>
         <div

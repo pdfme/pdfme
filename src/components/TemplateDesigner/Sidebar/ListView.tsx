@@ -9,7 +9,6 @@ import { SchemaForUI, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
 import Divider from '../../Divider';
-import infoIcon from '../../../assets/icons/info.svg';
 import dragIcon from '../../../assets/icons/drag.svg';
 import warningIcon from '../../../assets/icons/warning.svg';
 import { SidebarProps } from '.';
@@ -101,7 +100,6 @@ const SortableList = sortableContainer(
     const i18n = useContext(I18nContext);
 
     return (
-      // TODO ここを伸ばす
       <div style={{ maxHeight: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
         {schemas.length > 0 ? (
           schemas.map((s, i) => (
@@ -115,10 +113,7 @@ const SortableList = sortableContainer(
             />
           ))
         ) : (
-          <p style={{ alignItems: 'center', display: 'flex' }}>
-            <img src={infoIcon} style={{ marginRight: '0.5rem' }} alt="Info icon" />
-            {i18n('plsAddNewField')}
-          </p>
+          <p style={{ textAlign: 'center' }}>{i18n('plsAddNewField')}</p>
         )}
       </div>
     );
