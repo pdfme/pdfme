@@ -70,16 +70,18 @@
         const font = await getFont();
         const template = editor.getTemplate();
         const inputs = template.sampledata;
-        pdfme.generate({
-          inputs,
-          template,
-          options: {
-            font,
-          },
-        }).then((pdf) => {
-          const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-          window.open(URL.createObjectURL(blob));
-        });
+        pdfme
+          .generate({
+            inputs,
+            template,
+            options: {
+              font,
+            },
+          })
+          .then((pdf) => {
+            const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+            window.open(URL.createObjectURL(blob));
+          });
       }
 
       window.onload = init;
