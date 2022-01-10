@@ -6,7 +6,7 @@ export const Simple = () => {
   useEffect(() => {
     const domContainer = document.getElementById('app');
     if (!domContainer) return;
-    const getTemplate = (): Template => ({
+    const template: Template = {
       columns: ['field1', 'field2'],
       sampledata: [
         {
@@ -39,14 +39,19 @@ export const Simple = () => {
           },
         },
       ],
-    });
+    };
+
     const saveTemplate = (t: any) => {
       console.log(t);
 
       return Promise.resolve(t);
     };
 
-    // TemplateDesigner.init(domContainer, getTemplate(), saveTemplate, { height: 500, width: 500 });
+    const size = { height: 500, width: 500 };
+
+    const editor = new TemplateDesigner({ domContainer, template, saveTemplate, size });
+
+    console.log(editor);
   });
 
   return (

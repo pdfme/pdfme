@@ -36,9 +36,6 @@ This function takes four arguments.
 - domContainer: The HTML element to attach
 - fetchTemplate: Function to fetch the template when the editor is initialized.
 - saveTemplate: Callback function called when the editor is saved.
-- customHeader(option): Allows you to customize the UI in the red box below.
-
-![](./assets/customHeader.png)
 
 ---
 

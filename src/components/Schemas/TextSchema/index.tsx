@@ -6,7 +6,7 @@ import { TextSchema } from '../../../libs/type';
 
 type Props = SchemaUIProps & { schema: TextSchema };
 
-const TextSchema = (
+const TextSchemaUI = (
   { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
@@ -54,4 +54,4 @@ const TextSchema = (
   );
 };
 
-export default forwardRef<HTMLTextAreaElement, Props>(TextSchema);
+export default forwardRef<HTMLTextAreaElement, Props>(TextSchemaUI);

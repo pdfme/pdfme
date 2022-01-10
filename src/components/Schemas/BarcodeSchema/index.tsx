@@ -62,7 +62,7 @@ const ErrorOrSampleBarcode = ({ schema, value }: { schema: BarcodeSchema; value:
     <ErrorBarcode />
   );
 
-const BarcodeSchema = (
+const BarcodeSchemaUI = (
   { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLInputElement>
 ) => {
@@ -98,4 +98,4 @@ const BarcodeSchema = (
   );
 };
 
-export default forwardRef<HTMLInputElement, Props>(BarcodeSchema);
+export default forwardRef<HTMLInputElement, Props>(BarcodeSchemaUI);

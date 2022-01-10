@@ -63,7 +63,7 @@ const BlankImage = (props: Props & { inputRef: Ref<HTMLInputElement> }) => {
   );
 };
 
-const ImageSchema = (props: Props, ref: Ref<HTMLInputElement>) =>
+const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) =>
   props.schema.data ? <FilledImage {...props} /> : <BlankImage {...props} inputRef={ref} />;
 
-export default forwardRef<HTMLInputElement, Props>(ImageSchema);
+export default forwardRef<HTMLInputElement, Props>(ImageSchemaUI);

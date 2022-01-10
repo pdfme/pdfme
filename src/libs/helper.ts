@@ -60,7 +60,7 @@ export const getInitialSchema = (): SchemaForUI => ({
 
 export const getSampleByType = (type: string) => {
   const defaultValue: { [key: string]: string } = {
-    qrcode: 'https://labelmake.jp/',
+    qrcode: 'https://pdfme.com/',
     japanpost: '6540123789-A-K-Z',
     ean13: '2112345678900',
     ean8: '02345673',
