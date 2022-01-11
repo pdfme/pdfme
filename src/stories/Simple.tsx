@@ -47,9 +47,11 @@ export const Simple = () => {
       return Promise.resolve(t);
     };
 
-    const size = { height: 500, width: 500 };
-
-    const editor = new TemplateDesigner({ domContainer, template, saveTemplate, size });
+    const editor = new TemplateDesigner({
+      domContainer,
+      template,
+      saveTemplate,
+    });
 
     console.log(editor);
   });
@@ -57,7 +59,7 @@ export const Simple = () => {
   // TODO HRMしたのでreactのコンポーネントを呼び出す
   return (
     <article>
-      <div id="app"></div>
+      <div id="app" style={{ width: 500, height: 500 }}></div>
     </article>
   );
 };

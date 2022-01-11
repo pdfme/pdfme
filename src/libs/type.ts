@@ -111,7 +111,6 @@ export type CommonProps = z.infer<typeof CommonProps>;
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
 export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
-  size: Size,
   options: CommonOptions.extend({ lang: Lang.optional() }).optional(),
 });
 export type UIProps = z.infer<typeof UIProps>;
@@ -135,7 +134,7 @@ export const PreviewProps = UIProps.extend({
     .optional(),
 });
 export type PreviewProps = z.infer<typeof PreviewProps>;
-const PreviewReactProps = PreviewProps.omit({ domContainer: true });
+const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({ size: Size });
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
 
 // ---------------TemplateDesigner---------------
@@ -144,5 +143,7 @@ export const TemplateDesignerProps = UIProps.extend({
   saveTemplate: z.function().args(Template).returns(z.void()),
 });
 export type TemplateDesignerProps = z.infer<typeof TemplateDesignerProps>;
-const TemplateDesignerReactProps = TemplateDesignerProps.omit({ domContainer: true });
+const TemplateDesignerReactProps = TemplateDesignerProps.omit({ domContainer: true }).extend({
+  size: Size,
+});
 export type TemplateDesignerReactProps = z.infer<typeof TemplateDesignerReactProps>;

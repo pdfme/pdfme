@@ -29,7 +29,6 @@
         form = new pdfme.Form({
           domContainer,
           template: getTemplate(),
-          size,
           inputs: [
             { field1: 'bb', field2: 'aaaaaaaaaaaa' },
             { field1: 'bb', field2: 'aaaaaaaaaaaa' },
@@ -56,16 +55,18 @@
 
       async function generate() {
         const font = await getFont();
-        pdfme.generate({
-          inputs: form.getInputs(),
-          template: getTemplate(),
-          options: {
-            font,
-          },
-        }).then((pdf) => {
-          const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-          window.open(URL.createObjectURL(blob));
-        });
+        pdfme
+          .generate({
+            inputs: form.getInputs(),
+            template: getTemplate(),
+            options: {
+              font,
+            },
+          })
+          .then((pdf) => {
+            const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+            window.open(URL.createObjectURL(blob));
+          });
       }
 
       window.onload = init;

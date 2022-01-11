@@ -9,7 +9,7 @@ export abstract class BaseUIClass {
 
   protected template: Template;
 
-  protected size: Size;
+  protected size: Size = { height: 0, width: 0 };
 
   private lang: Lang = DEFAULT_LANG;
 
@@ -18,11 +18,14 @@ export abstract class BaseUIClass {
   constructor(props: UIProps) {
     checkProps(props, UIProps);
 
-    const { domContainer, template, size, options } = props;
+    const { domContainer, template, options } = props;
     const { lang, font } = options || {};
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(template);
-    this.size = size;
+    this.size = {
+      height: domContainer.offsetHeight || window.innerHeight,
+      width: domContainer.offsetWidth || window.innerWidth,
+    };
     if (lang) {
       this.lang = lang;
     }
