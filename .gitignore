@@ -3,6 +3,5 @@
 node_modules
 .cache
 dist
-storybook-static/
 coverage/**
 __tests__/assets/pdfs/tmp/*.pdf
