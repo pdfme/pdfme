@@ -136,7 +136,7 @@ export const getFallbackFontName = (font: Font) => {
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true, index: 0 },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true },
 });
 
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>

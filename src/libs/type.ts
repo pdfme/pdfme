@@ -83,12 +83,7 @@ const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instan
 const Data = z.union([ArrayBufferSchema, Uint8ArraySchema]);
 
 const Font = z.record(
-  z.object({
-    data: Data,
-    fallback: z.boolean().optional(),
-    subset: z.boolean().optional(),
-    index: z.number().optional(),
-  })
+  z.object({ data: Data, fallback: z.boolean().optional(), subset: z.boolean().optional() })
 );
 export type Font = z.infer<typeof Font>;
 

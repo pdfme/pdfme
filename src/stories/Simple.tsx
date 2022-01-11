@@ -47,7 +47,7 @@ export const Simple = () => {
       return Promise.resolve(t);
     };
 
-    const size = { height: 900, width: 900 };
+    const size = { height: 500, width: 500 };
 
     const editor = new TemplateDesigner({ domContainer, template, saveTemplate, size });
 
