@@ -15,6 +15,15 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
+  private setSize = () => {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    this.size = {
+      height: this.domContainer.offsetHeight || window.innerHeight,
+      width: this.domContainer.offsetWidth || window.innerWidth,
+    };
+    this.render();
+  };
+
   constructor(props: UIProps) {
     checkProps(props, UIProps);
 
@@ -22,10 +31,9 @@ export abstract class BaseUIClass {
     const { lang, font } = options || {};
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(template);
-    this.size = {
-      height: domContainer.offsetHeight || window.innerHeight,
-      width: domContainer.offsetWidth || window.innerWidth,
-    };
+    this.setSize();
+    window.addEventListener('resize', this.setSize);
+
     if (lang) {
       this.lang = lang;
     }
@@ -46,6 +54,7 @@ export abstract class BaseUIClass {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.unmountComponentAtNode(this.domContainer);
     this.domContainer = null;
+    window.removeEventListener('resize', this.setSize);
   }
 
   protected abstract render(): void;

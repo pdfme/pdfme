@@ -29,7 +29,7 @@ const Sidebar = (props: SidebarProps) => {
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
-  const sidebarWidth = 260;
+  const sidebarWidth = 300;
   const top = 0;
 
   return (

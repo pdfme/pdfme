@@ -25,7 +25,6 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
   },
   extends: [
-    'tui/es6',
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'plugin:react/recommended',
