@@ -17,18 +17,8 @@ const alignments = ['left', 'center', 'right'] as const;
 const Alignment = z.enum(alignments);
 export type Alignment = z.infer<typeof Alignment>;
 
-export const barcodeSchemaTypes = [
-  'qrcode',
-  'japanpost',
-  'ean13',
-  'ean8',
-  'code39',
-  'code128',
-  'nw7',
-  'itf14',
-  'upca',
-  'upce',
-] as const;
+// prettier-ignore
+export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce'] as const;
 const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
