@@ -35,7 +35,7 @@ const CommonSchema = z.object({
 });
 type CommonSchema = z.infer<typeof CommonSchema>;
 
-const TextSchema = CommonSchema.extend({
+export const TextSchema = CommonSchema.extend({
   type: z.literal(SchemaType.Enum.text),
   alignment: Alignment.optional(),
   fontSize: z.number().optional(),
@@ -48,16 +48,16 @@ const TextSchema = CommonSchema.extend({
 export type TextSchema = z.infer<typeof TextSchema>;
 export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
 
-const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
+export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
 export type ImageSchema = z.infer<typeof ImageSchema>;
 export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
 
-const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
+export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
 export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>
   barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
 
-const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
+export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 export type Schema = z.infer<typeof Schema>;
 
 const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
@@ -80,15 +80,13 @@ export type Font = z.infer<typeof Font>;
 const BasePdf = z.union([z.string(), Data]);
 export type BasePdf = z.infer<typeof BasePdf>;
 
-const Template = z.object({
+export const Template = z.object({
   schemas: z.array(z.record(Schema)),
   basePdf: BasePdf,
   sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
 });
 export type Template = z.infer<typeof Template>;
-
-// ---------------------------------------------
 
 const Inputs = z.array(z.record(z.string())).min(1);
 
@@ -98,20 +96,31 @@ type CommonOptions = z.infer<typeof CommonOptions>;
 const CommonProps = z.object({ template: Template, options: CommonOptions.optional() });
 export type CommonProps = z.infer<typeof CommonProps>;
 
-const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
-export const UIProps = CommonProps.extend({
-  domContainer: HTMLElementSchema,
-  options: CommonOptions.extend({ lang: Lang.optional() }).optional(),
-});
-export type UIProps = z.infer<typeof UIProps>;
-
 // -------------------generate-------------------
+
+export const GeneratorOptions = CommonOptions.extend({
+  splitThreshold: z.number().optional(),
+}).optional();
+export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
-  options: CommonOptions.extend({ splitThreshold: z.number().optional() }).optional(),
+  options: GeneratorOptions,
 });
 export type GenerateProps = z.infer<typeof GenerateProps>;
+
+// ---------------------------------------------
+
+export const UIOptions = CommonOptions.extend({ lang: Lang.optional() }).optional();
+export type UIOptions = z.infer<typeof UIOptions>;
+
+const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
+
+export const UIProps = CommonProps.extend({
+  domContainer: HTMLElementSchema,
+  options: UIOptions,
+});
+export type UIProps = z.infer<typeof UIProps>;
 
 // -----------------Form, Viewer-----------------
 
