@@ -18,7 +18,7 @@ const Alignment = z.enum(alignments);
 export type Alignment = z.infer<typeof Alignment>;
 
 // prettier-ignore
-export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce'] as const;
+const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce'] as const;
 const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 
@@ -111,7 +111,7 @@ export type GenerateProps = z.infer<typeof GenerateProps>;
 
 // ---------------------------------------------
 
-export const UIOptions = CommonOptions.extend({ lang: Lang.optional() }).optional();
+const UIOptions = CommonOptions.extend({ lang: Lang.optional() }).optional();
 export type UIOptions = z.infer<typeof UIOptions>;
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
