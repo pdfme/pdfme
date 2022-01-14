@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import * as styles from '../index.module.scss';
 import { readFiles } from '../../../../libs/ui';
 import { I18nContext } from '../../../../libs/contexts';
 import { SidebarProps } from '../';
@@ -16,7 +15,6 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
           {activeSchema.data ? (
             <div style={{ margin: '0 auto' }}>
               <button
-                className={`${styles.dltBtn}`}
                 aria-label="close"
                 onClick={() =>
                   changeSchemas([{ key: 'data', value: '', schemaId: activeSchema.id }])
