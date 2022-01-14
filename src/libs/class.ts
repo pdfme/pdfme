@@ -18,8 +18,8 @@ export abstract class BaseUIClass {
   private setSize = () => {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.size = {
-      height: this.domContainer.offsetHeight || window.innerHeight,
-      width: this.domContainer.offsetWidth || window.innerWidth,
+      height: this.domContainer.clientHeight || window.innerHeight,
+      width: this.domContainer.clientWidth || window.innerWidth,
     };
     this.render();
   };
@@ -32,8 +32,8 @@ export abstract class BaseUIClass {
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(template);
     this.size = {
-      height: this.domContainer.offsetHeight || window.innerHeight,
-      width: this.domContainer.offsetWidth || window.innerWidth,
+      height: this.domContainer.clientHeight || window.innerHeight,
+      width: this.domContainer.clientWidth || window.innerWidth,
     };
     window.addEventListener('resize', this.setSize);
 
@@ -51,6 +51,18 @@ export abstract class BaseUIClass {
 
   protected getFont() {
     return this.font;
+  }
+
+  public getTemplate() {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+
+    return this.template;
+  }
+
+  public updateTemplate(template: Template) {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    this.template = template;
+    this.render();
   }
 
   public destroy() {
