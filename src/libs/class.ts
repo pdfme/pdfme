@@ -31,7 +31,10 @@ export abstract class BaseUIClass {
     const { lang, font } = options || {};
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(template);
-    this.setSize();
+    this.size = {
+      height: this.domContainer.offsetHeight || window.innerHeight,
+      width: this.domContainer.offsetWidth || window.innerWidth,
+    };
     window.addEventListener('resize', this.setSize);
 
     if (lang) {
@@ -60,7 +63,7 @@ export abstract class BaseUIClass {
   protected abstract render(): void;
 }
 export abstract class PreviewUI extends BaseUIClass {
-  protected inputs: { [key: string]: string }[];
+  protected inputs: { [key: string]: string }[] = [{}];
 
   constructor(props: PreviewProps) {
     super(props);
