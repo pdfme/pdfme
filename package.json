@@ -9,11 +9,12 @@
   },
   "scripts": {
     "develop": "webpack-dev-server --mode development",
-    "clean": "rimraf dist",
     "build": "NODE_ENV=production webpack --mode production",
     "lint": "tsc --noEmit",
-    "lint:watch": "tsc -w --noEmit",
+    "doc": "cd site && npm run start",
     "test": "jest",
+    "clean": "rimraf dist",
+    "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src"
   },

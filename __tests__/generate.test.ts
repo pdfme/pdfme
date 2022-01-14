@@ -11,13 +11,8 @@ const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/Sauc
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 
 const getFont = (): Font => ({
-  SauceHanSansJP: {
-    fallback: true,
-    data: SauceHanSansJPData,
-  },
-  SauceHanSerifJP: {
-    data: SauceHanSerifJPData,
-  },
+  SauceHanSansJP: { fallback: true, data: SauceHanSansJPData },
+  SauceHanSerifJP: { data: SauceHanSerifJPData },
 });
 
 const getPdf = (pdfFilePath: string) => {
@@ -34,118 +29,6 @@ const getPdfPath = (dir: string, fileName: string) =>
   path.join(__dirname, `assets/pdfs/${dir}/${fileName}`);
 const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
 const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);
-
-describe('check validation', () => {
-  test(`inputs length is 0`, async () => {
-    const inputs: { [key: string]: string }[] = [];
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'text',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-        },
-      ],
-    };
-    try {
-      await generate({ inputs, template, options: { font: getFont() } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(`Invalid argument:
---------------------------
-ERROR POSITION: inputs
-ERROR MESSAGE: Should have at least 1 items
---------------------------`);
-    }
-  });
-  test(`missing fallback font`, async () => {
-    const inputs = [{ a: 'test' }];
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'text',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-        },
-      ],
-    };
-    const font = getFont();
-    font.SauceHanSansJP.fallback = false;
-    font.SauceHanSerifJP.fallback = false;
-    try {
-      await generate({ inputs, template, options: { font } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        'fallback flag is not found in font. true fallback flag must be only one.'
-      );
-    }
-  });
-  test(`too many fallback font`, async () => {
-    const inputs = [{ a: 'test' }];
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'text',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-        },
-      ],
-    };
-    const font = getFont();
-    font.SauceHanSansJP.fallback = true;
-    font.SauceHanSerifJP.fallback = true;
-    try {
-      await generate({ inputs, template, options: { font } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        '2 fallback flags found in font. true fallback flag must be only one.'
-      );
-    }
-  });
-  test(`missing font in template.schemas`, async () => {
-    const inputs = [{ a: 'test' }];
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'text',
-            fontName: 'SauceHanSansJP2',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-          b: {
-            type: 'text',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-        },
-      ],
-    };
-    try {
-      await generate({ inputs, template, options: { font: getFont() } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
-    }
-  });
-});
 
 describe('generate integrate test', () => {
   afterAll(() => {
@@ -309,5 +192,117 @@ describe('generate integrate test', () => {
         expect(a.Pages).toEqual(e.Pages);
       }, 10000);
     });
+  });
+});
+
+describe('check validation', () => {
+  test(`inputs length is 0`, async () => {
+    const inputs: { [key: string]: string }[] = [];
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    try {
+      await generate({ inputs, template, options: { font: getFont() } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual(`Invalid argument:
+--------------------------
+ERROR POSITION: inputs
+ERROR MESSAGE: Should have at least 1 items
+--------------------------`);
+    }
+  });
+  test(`missing fallback font`, async () => {
+    const inputs = [{ a: 'test' }];
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    const font = getFont();
+    font.SauceHanSansJP.fallback = false;
+    font.SauceHanSerifJP.fallback = false;
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual(
+        'fallback flag is not found in font. true fallback flag must be only one.'
+      );
+    }
+  });
+  test(`too many fallback font`, async () => {
+    const inputs = [{ a: 'test' }];
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    const font = getFont();
+    font.SauceHanSansJP.fallback = true;
+    font.SauceHanSerifJP.fallback = true;
+    try {
+      await generate({ inputs, template, options: { font } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual(
+        '2 fallback flags found in font. true fallback flag must be only one.'
+      );
+    }
+  });
+  test(`missing font in template.schemas`, async () => {
+    const inputs = [{ a: 'test' }];
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'text',
+            fontName: 'SauceHanSansJP2',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+          b: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    try {
+      await generate({ inputs, template, options: { font: getFont() } });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
+    }
   });
 });
