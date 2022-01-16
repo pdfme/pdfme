@@ -12,21 +12,9 @@ import { cloneDeep, uuid, uniq, b64toUint8Array, flatten, b64toBlob } from './ut
 import { getPdfPageSizes } from './pdfjs';
 
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
-  const _schemasList = cloneDeep(schemasList);
   const schemaAddedTemplate: Template = {
-    basePdf: template.basePdf,
-    sampledata: [
-      _schemasList.reduce((acc, cur) => {
-        cur.forEach((c) => {
-          acc[c.key] = c.data;
-        });
-
-        return acc;
-      }, {} as { [key: string]: string }),
-    ],
-    columns: _schemasList.reduce((acc, cur) => acc.concat(cur.map((s) => s.key)), [] as string[]),
-    schemas: _schemasList.map((_schema) =>
-      _schema.reduce((acc, cur) => {
+    schemas: cloneDeep(schemasList).map((schema) =>
+      schema.reduce((acc, cur) => {
         const k = cur.key;
         // @ts-ignore
         delete cur.id;
@@ -39,6 +27,20 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         return acc;
       }, {} as { [key: string]: Schema })
     ),
+    columns: cloneDeep(schemasList).reduce(
+      (acc, cur) => acc.concat(cur.map((s) => s.key)),
+      [] as string[]
+    ),
+    sampledata: [
+      cloneDeep(schemasList).reduce((acc, cur) => {
+        cur.forEach((c) => {
+          acc[c.key] = c.data;
+        });
+
+        return acc;
+      }, {} as { [key: string]: string }),
+    ],
+    basePdf: template.basePdf,
   };
 
   return schemaAddedTemplate;

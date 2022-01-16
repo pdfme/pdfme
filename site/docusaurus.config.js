@@ -16,10 +16,6 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'facebook', // Usually your GitHub org/user name.
   projectName: 'docusaurus', // Usually your repo name.
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'ja'],
-  },
   presets: [
     [
       'classic',
@@ -108,10 +104,6 @@ const config = {
             docId: 'intro',
             position: 'right',
             label: 'Docs',
-          },
-          {
-            type: 'localeDropdown',
-            position: 'right',
           },
           {
             href: 'https://github.com/facebook/docusaurus',

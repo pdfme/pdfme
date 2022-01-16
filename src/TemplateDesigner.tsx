@@ -8,7 +8,10 @@ import { I18nContext, FontContext } from './libs/contexts';
 import TemplateDesignerComponent from './components/TemplateDesigner';
 
 class TemplateDesigner extends BaseUIClass {
-  private saveTemplateCallback: (t: Template) => void;
+  private saveTemplateCallback!: (t: Template) => void;
+  private onChangeTemplateCallback: (t: Template) => void = () => {
+    ('nope');
+  };
 
   constructor(props: {
     template: Template;
@@ -28,6 +31,10 @@ class TemplateDesigner extends BaseUIClass {
     this.saveTemplateCallback(this.template);
   }
 
+  public onChangeTemplate(cb: (t: Template) => void) {
+    this.onChangeTemplateCallback = cb;
+  }
+
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
@@ -36,10 +43,11 @@ class TemplateDesigner extends BaseUIClass {
           <TemplateDesignerComponent
             template={this.template}
             saveTemplate={this.saveTemplateCallback}
-            size={this.size}
             onChangeTemplate={(template) => {
               this.template = template;
+              this.onChangeTemplateCallback(template);
             }}
+            size={this.size}
           />
         </FontContext.Provider>
       </I18nContext.Provider>,
