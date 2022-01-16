@@ -85,13 +85,13 @@ export default function Home(): JSX.Element {
     if (form.current) {
       form.current.updateTemplate(t);
       if (t.sampledata) {
-        form.current.setInputs(t.sampledata);
+        form.current.setInputs(JSON.parse(JSON.stringify(t.sampledata)));
       }
     }
     if (viewer.current) {
       viewer.current.updateTemplate(t);
       if (t.sampledata) {
-        viewer.current.setInputs(t.sampledata);
+        viewer.current.setInputs(JSON.parse(JSON.stringify(t.sampledata)));
       }
     }
   };
@@ -115,7 +115,7 @@ export default function Home(): JSX.Element {
       viewer.current = new Viewer({
         domContainer: viewerRef.current,
         template,
-        inputs: template.sampledata ?? [{}],
+        inputs: JSON.parse(JSON.stringify(template.sampledata)) ?? [{}],
       });
     }
 
@@ -123,7 +123,7 @@ export default function Home(): JSX.Element {
       form.current = new Form({
         domContainer: formRef.current,
         template,
-        inputs: template.sampledata ?? [{}],
+        inputs: JSON.parse(JSON.stringify(template.sampledata)) ?? [{}],
         onChangeInput: console.log,
       });
     }

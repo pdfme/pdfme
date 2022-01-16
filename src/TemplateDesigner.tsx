@@ -9,9 +9,7 @@ import TemplateDesignerComponent from './components/TemplateDesigner';
 
 class TemplateDesigner extends BaseUIClass {
   private saveTemplateCallback!: (t: Template) => void;
-  private onChangeTemplateCallback: (t: Template) => void = () => {
-    ('nope');
-  };
+  private onChangeTemplateCallback?: (t: Template) => void;
 
   constructor(props: {
     template: Template;
@@ -45,7 +43,9 @@ class TemplateDesigner extends BaseUIClass {
             saveTemplate={this.saveTemplateCallback}
             onChangeTemplate={(template) => {
               this.template = template;
-              this.onChangeTemplateCallback(template);
+              if (this.onChangeTemplateCallback) {
+                this.onChangeTemplateCallback(template);
+              }
             }}
             size={this.size}
           />

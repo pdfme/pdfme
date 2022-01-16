@@ -17,7 +17,7 @@ const isTouchable = () => true;
 
 const DragHandle = sortableHandle(() => (
   <button style={{ padding: 0, background: 'none', border: 'none' }}>
-    <img style={{ padding: 5, cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
+    <img style={{ cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
 
@@ -48,7 +48,7 @@ const SortableItem = sortableElement(
     };
 
     return (
-      <div key={sc.id} className={styles.flx}>
+      <div key={sc.id} className={styles.flx} style={{ paddingLeft: 5 }}>
         <DragHandle />
         <button
           disabled={!touchable}

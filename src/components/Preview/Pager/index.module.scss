@@ -34,7 +34,7 @@
   background: none;
   display: flex;
   align-items: center;
-  margin-right: 0.5rem;
+  padding-right: 0.5rem;
   &:disabled {
     cursor: not-allowed;
   }
@@ -46,7 +46,7 @@
   background: none;
   display: flex;
   align-items: center;
-  margin-left: 0.5rem;
+  padding-left: 0.5rem;
   &:disabled {
     cursor: not-allowed;
   }
