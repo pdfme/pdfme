@@ -52,18 +52,26 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>
-      <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
-      <PagePager
-        pageCursor={pageCursor}
-        pageNum={schemasList.length}
-        setPageCursor={(p) => {
-          if (!rootRef.current) return;
-          rootRef.current.scrollTop = pageSizes
-            .slice(0, p)
-            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
-          setPageCursor(p);
+      <div
+        style={{
+          height: pageSizes.reduce((acc, cur) => acc + cur.height * ZOOM, 0),
+          width: '100%',
+          position: 'absolute',
         }}
-      />
+      >
+        <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
+        <PagePager
+          pageCursor={pageCursor}
+          pageNum={schemasList.length}
+          setPageCursor={(p) => {
+            if (!rootRef.current) return;
+            rootRef.current.scrollTop = pageSizes
+              .slice(0, p)
+              .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
+            setPageCursor(p);
+          }}
+        />
+      </div>
       <Paper
         scale={scale}
         size={size}

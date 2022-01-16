@@ -9,7 +9,7 @@ import { generate, TemplateDesigner, Viewer, Form, blankPdf, Template } from '..
 import { Sandpack } from '@codesandbox/sandpack-react';
 require('@codesandbox/sandpack-react/dist/index.css');
 
-// TODO ページャーがfixedなので複数ある場合におかしくなる
+// TODO アイコンのサイズがおかしい
 
 const getTemplate = (): Template => ({
   schemas: [

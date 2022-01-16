@@ -1,6 +1,6 @@
 .pageWrapper {
-  position: fixed;
-  bottom: 0;
+  position: sticky;
+  top: 90%;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -17,7 +17,7 @@
 }
 
 .unitWrapper {
-  position: fixed;
+  position: sticky;
   top: 45%;
   z-index: 1;
   background-color: #777777bd;
@@ -25,6 +25,7 @@
   padding: 0.5rem;
   display: flex;
   align-items: center;
+  width: 100px;
 }
 
 .leftBtn {

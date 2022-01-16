@@ -37,7 +37,12 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
         ...size,
       }}
     >
-      <div style={{ height: size.height - RULER_HEIGHT * scale }}>
+      <div
+        style={{
+          width: size.width - RULER_HEIGHT * scale,
+          height: size.height - RULER_HEIGHT * scale,
+        }}
+      >
         {scale === 0 ? <Spinner /> : children}
       </div>
     </div>

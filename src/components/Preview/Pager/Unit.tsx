@@ -20,7 +20,7 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
   return (
     <>
       {unitCursor > 0 && (
-        <div className={styles.unitWrapper} style={{ left: -3 }}>
+        <div className={styles.unitWrapper} style={{ marginLeft: '1rem' }}>
           <button
             className={styles.leftBtn}
             disabled={unitCursor <= 0}
@@ -41,7 +41,7 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
         </div>
       )}
       {unitCursor + 1 < unitNum && (
-        <div className={styles.unitWrapper} style={{ right: -3 }}>
+        <div className={styles.unitWrapper} style={{ marginLeft: 'auto', marginRight: '1rem' }}>
           <strong style={{ color: 'white' }}>
             {unitCursor + 1}/{unitNum}
           </strong>
