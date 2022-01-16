@@ -83,6 +83,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
               tabIndex={index + 100}
               onChange={(value) => handleChangeInput({ key, value })}
               border={editable ? '1px dashed #4af' : 'transparent'}
+              hideTooltip={!editable}
             />
           );
         }}

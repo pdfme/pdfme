@@ -17,6 +17,7 @@ export interface SchemaUIProps {
 
 type Props = SchemaUIProps & {
   border: string;
+  hideTooltip?: boolean;
   onChangeHoveringSchemaId?: (id: string | null) => void;
 };
 
@@ -25,11 +26,12 @@ const getBgc = (schema: SchemaForUI) =>
 
 const Wrapper = ({
   children,
+  hideTooltip,
   border,
   onChangeHoveringSchemaId,
   schema,
 }: Props & { children: ReactNode }) => (
-  <Tippy delay={0} interactive content={schema.key}>
+  <Tippy disabled={hideTooltip} delay={0} interactive content={schema.key}>
     <div
       onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
       onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}

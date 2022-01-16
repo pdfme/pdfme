@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PreviewUI } from './libs/class';
-import { PreviewProps } from './libs/type';
+import { Template, UIOptions } from './libs/type';
 import { DESTROYED_ERR_MSG } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
@@ -13,22 +13,19 @@ class Form extends PreviewUI {
     key: string;
   }) => void;
 
-  constructor(props: PreviewProps) {
+  constructor(props: {
+    domContainer: HTMLElement;
+    template: Template;
+    inputs: { [key: string]: string }[];
+    onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
+    options?: UIOptions;
+  }) {
     super(props);
 
     if (props.onChangeInput) {
       this.onChangeInputCallback = props.onChangeInput;
     }
   }
-
-  private onChangeInput = (arg: { index: number; value: string; key: string }) => {
-    const { index, value, key } = arg;
-    if (this.onChangeInputCallback) {
-      this.onChangeInputCallback({ index, value, key });
-    }
-    this.inputs[index][key] = value;
-    this.render();
-  };
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
@@ -39,7 +36,14 @@ class Form extends PreviewUI {
             template={this.template}
             size={this.size}
             inputs={this.inputs}
-            onChangeInput={this.onChangeInput}
+            onChangeInput={(arg: { index: number; value: string; key: string }) => {
+              const { index, value, key } = arg;
+              if (this.onChangeInputCallback) {
+                this.onChangeInputCallback({ index, value, key });
+              }
+              this.inputs[index][key] = value;
+              this.render();
+            }}
           />
         </FontContext.Provider>
       </I18nContext.Provider>,

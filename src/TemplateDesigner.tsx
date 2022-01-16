@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, TemplateDesignerProps } from './libs/type';
+import { Template, TemplateDesignerProps, UIOptions } from './libs/type';
 import { checkProps } from './libs/helper';
 import { BaseUIClass } from './libs/class';
 import { DESTROYED_ERR_MSG } from './libs/constants';
@@ -10,7 +10,12 @@ import TemplateDesignerComponent from './components/TemplateDesigner';
 class TemplateDesigner extends BaseUIClass {
   private saveTemplateCallback: (t: Template) => void;
 
-  constructor(props: TemplateDesignerProps) {
+  constructor(props: {
+    template: Template;
+    domContainer: HTMLElement;
+    saveTemplate: (t: Template) => void;
+    options?: UIOptions;
+  }) {
     super(props);
     checkProps(props, TemplateDesignerProps);
 

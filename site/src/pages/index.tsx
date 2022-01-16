@@ -70,9 +70,9 @@ export default function Home(): JSX.Element {
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
 
-  const editor = useRef<any>(null);
-  const viewer = useRef<any>(null);
-  const form = useRef<any>(null);
+  const editor = useRef<TemplateDesigner>(null);
+  const viewer = useRef<Viewer>(null);
+  const form = useRef<Form>(null);
 
   const [template, setTemplate] = useState<Template>(getTemplate());
 

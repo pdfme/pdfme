@@ -147,7 +147,7 @@ const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
       .filter(Boolean) as string[]
   );
 
-export const checkFont = (arg: { font: Font; template: Template }) => {
+const checkFont = (arg: { font: Font; template: Template }) => {
   const {
     font,
     template: { schemas },

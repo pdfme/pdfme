@@ -93,33 +93,36 @@ const Inputs = z.array(z.record(z.string())).min(1);
 const CommonOptions = z.object({ font: Font.optional() });
 type CommonOptions = z.infer<typeof CommonOptions>;
 
-const CommonProps = z.object({ template: Template, options: CommonOptions.optional() }).strict();
+const CommonProps = z.object({
+  template: Template,
+  options: CommonOptions.optional(),
+});
 export type CommonProps = z.infer<typeof CommonProps>;
 
 // -------------------generate-------------------
 
 export const GeneratorOptions = CommonOptions.extend({
   splitThreshold: z.number().optional(),
-}).optional();
+});
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
-  options: GeneratorOptions,
+  options: GeneratorOptions.optional(),
 }).strict();
 export type GenerateProps = z.infer<typeof GenerateProps>;
 
 // ---------------------------------------------
 
-const UIOptions = CommonOptions.extend({ lang: Lang.optional() }).optional();
+const UIOptions = CommonOptions.extend({ lang: Lang.optional() });
 export type UIOptions = z.infer<typeof UIOptions>;
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
 
 export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
-  options: UIOptions,
-}).strict();
+  options: UIOptions.optional(),
+});
 export type UIProps = z.infer<typeof UIProps>;
 
 // -----------------Form, Viewer-----------------
