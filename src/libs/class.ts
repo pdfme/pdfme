@@ -5,17 +5,17 @@ import { Template, Size, Lang, Font, UIProps, PreviewProps } from './type';
 import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from './helper';
 
 export abstract class BaseUIClass {
-  protected domContainer: HTMLElement | null;
+  protected domContainer!: HTMLElement | null;
 
-  protected template: Template;
+  protected template!: Template;
 
-  protected size: Size = { height: 0, width: 0 };
+  protected size!: Size;
 
-  private lang: Lang = DEFAULT_LANG;
+  private readonly lang: Lang = DEFAULT_LANG;
 
-  private font: Font = getDefaultFont();
+  private readonly font: Font = getDefaultFont();
 
-  private setSize = () => {
+  private readonly setSize = () => {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
@@ -75,7 +75,7 @@ export abstract class BaseUIClass {
   protected abstract render(): void;
 }
 export abstract class PreviewUI extends BaseUIClass {
-  protected inputs: { [key: string]: string }[] = [{}];
+  protected inputs!: { [key: string]: string }[];
 
   constructor(props: PreviewProps) {
     super(props);

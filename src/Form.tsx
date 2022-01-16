@@ -7,7 +7,11 @@ import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
 
 class Form extends PreviewUI {
-  private onChangeInputCallback?: (arg: { index: number; value: string; key: string }) => void;
+  private readonly onChangeInputCallback?: (arg: {
+    index: number;
+    value: string;
+    key: string;
+  }) => void;
 
   constructor(props: PreviewProps) {
     super(props);
@@ -17,7 +21,16 @@ class Form extends PreviewUI {
     }
   }
 
-  render() {
+  private onChangeInput = (arg: { index: number; value: string; key: string }) => {
+    const { index, value, key } = arg;
+    if (this.onChangeInputCallback) {
+      this.onChangeInputCallback({ index, value, key });
+    }
+    this.inputs[index][key] = value;
+    this.render();
+  };
+
+  protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
@@ -26,14 +39,7 @@ class Form extends PreviewUI {
             template={this.template}
             size={this.size}
             inputs={this.inputs}
-            onChangeInput={(arg: { index: number; value: string; key: string }) => {
-              const { index, value, key } = arg;
-              if (this.onChangeInputCallback) {
-                this.onChangeInputCallback({ index, value, key });
-              }
-              this.inputs[index][key] = value;
-              this.render();
-            }}
+            onChangeInput={this.onChangeInput}
           />
         </FontContext.Provider>
       </I18nContext.Provider>,

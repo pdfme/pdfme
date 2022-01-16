@@ -23,19 +23,7 @@ class TemplateDesigner extends BaseUIClass {
     this.saveTemplateCallback(this.template);
   }
 
-  public getTemplate() {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-
-    return this.template;
-  }
-
-  public updateTemplate(template: Template) {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    this.template = template;
-    this.render();
-  }
-
-  render() {
+  protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>

@@ -11,7 +11,7 @@ class Viewer extends PreviewUI {
     super({ ...props });
   }
 
-  render() {
+  protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>

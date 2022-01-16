@@ -93,7 +93,7 @@ const Inputs = z.array(z.record(z.string())).min(1);
 const CommonOptions = z.object({ font: Font.optional() });
 type CommonOptions = z.infer<typeof CommonOptions>;
 
-const CommonProps = z.object({ template: Template, options: CommonOptions.optional() });
+const CommonProps = z.object({ template: Template, options: CommonOptions.optional() }).strict();
 export type CommonProps = z.infer<typeof CommonProps>;
 
 // -------------------generate-------------------
@@ -106,7 +106,7 @@ export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions,
-});
+}).strict();
 export type GenerateProps = z.infer<typeof GenerateProps>;
 
 // ---------------------------------------------
@@ -119,7 +119,7 @@ const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v inst
 export const UIProps = CommonProps.extend({
   domContainer: HTMLElementSchema,
   options: UIOptions,
-});
+}).strict();
 export type UIProps = z.infer<typeof UIProps>;
 
 // -----------------Form, Viewer-----------------
@@ -131,7 +131,7 @@ export const PreviewProps = UIProps.extend({
     .args(z.object({ index: z.number(), value: z.string(), key: z.string() }))
     .returns(z.void())
     .optional(),
-});
+}).strict();
 export type PreviewProps = z.infer<typeof PreviewProps>;
 const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({ size: Size });
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
@@ -140,7 +140,7 @@ export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
 
 export const TemplateDesignerProps = UIProps.extend({
   saveTemplate: z.function().args(Template).returns(z.void()),
-});
+}).strict();
 export type TemplateDesignerProps = z.infer<typeof TemplateDesignerProps>;
 const TemplateDesignerReactProps = TemplateDesignerProps.omit({ domContainer: true }).extend({
   size: Size,
