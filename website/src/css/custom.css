@@ -26,3 +26,19 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.enhancedAnchor {
+  margin-bottom: 20px;
+  margin-top: -20px;
+  padding-bottom: 0.5rem;
+  padding-top: 70px;
+}
+
+.sp-stack .sp-preview-container {
+  display: none !important;
+  height: 0px !important;
+}
+
+.navbar__brand {
+  font-size: 1.25rem;
+}

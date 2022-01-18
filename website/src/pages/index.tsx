@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import GitHubButton from 'react-github-btn';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
@@ -7,48 +8,101 @@ import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 import Divider from '../components/Divider';
 import GiveMeStar from '../components/GiveMeStar';
-import { generate, TemplateDesigner, Viewer, Form, blankPdf, Template } from '../../../src/index';
+import { generate, TemplateDesigner, Viewer, Form, Template } from '../../../src/index';
+import { examplePdfb64, dogPngb64 } from '../libs/sampleData';
 import { Sandpack } from '@codesandbox/sandpack-react';
 require('@codesandbox/sandpack-react/dist/index.css');
 
 const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
 
 const getTemplate = (): Template => ({
+  basePdf: examplePdfb64,
   schemas: [
     {
-      field1: {
+      name: {
         type: 'text',
-        position: { x: 20, y: 20 },
-        width: 100,
-        height: 15,
-        alignment: 'left',
-        fontSize: 30,
-        characterSpacing: 0,
-        lineHeight: 1,
+        position: {
+          x: 25.06,
+          y: 26.35,
+        },
+        width: 77.77,
+        height: 18.7,
+        fontSize: 36,
+        fontColor: '#14b351',
       },
-      field2: {
-        type: 'qrcode',
-        position: { x: 20, y: 35 },
-        width: 20,
-        height: 20,
+
+      photo: {
+        type: 'image',
+        position: {
+          x: 24.99,
+          y: 65.61,
+        },
+        width: 60.66,
+        height: 93.78,
       },
-      field3: {
+      age: {
+        type: 'text',
+        position: {
+          x: 36,
+          y: 179.46,
+        },
+        width: 43.38,
+        height: 6.12,
+        fontSize: 12,
+      },
+      sex: {
+        type: 'text',
+        position: {
+          x: 36,
+          y: 186.23,
+        },
+        width: 43.38,
+        height: 6.12,
+        fontSize: 12,
+      },
+      weight: {
+        type: 'text',
+        position: {
+          x: 40,
+          y: 192.99,
+        },
+        width: 43.38,
+        height: 6.12,
+        fontSize: 12,
+      },
+      breed: {
+        type: 'text',
+        position: {
+          x: 40,
+          y: 199.09,
+        },
+        width: 43.38,
+        height: 6.12,
+        fontSize: 12,
+      },
+      owner: {
         type: 'qrcode',
-        position: { x: 50, y: 135 },
-        width: 20,
-        height: 20,
+        position: {
+          x: 115.09,
+          y: 204.43,
+        },
+        width: 26.53,
+        height: 26.53,
       },
     },
   ],
-  columns: ['field1', 'field2', 'field3'],
   sampledata: [
     {
-      field1: 'bb',
-      field2: 'aaaaaaaaaaaa',
-      field3: 'test',
+      name: 'Pet Name',
+      photo: dogPngb64,
+      age: '4 years',
+      sex: 'Male',
+      weight: '33 pounds',
+      breed: 'Mutt',
+      owner: 'https://pdfme.com/',
     },
   ],
-  basePdf: blankPdf,
+  columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
 
 function HomepageHeader() {
@@ -57,21 +111,45 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <h1 className="hero__title">{siteConfig.title}</h1>
-        <p className="hero__subtitle">
-          TypeScript based PDF generator and React based UI. <br />
-          From PDF design and generation to forms and viewers, you can efficiently create the PDF
-          processing. <br />
-          Open source, developed by the community, and completely free to use under the MIT license!
-        </p>
-        <div className={styles.buttons}>
-          {/* TODO リンク */}
-          <Link className="button button--lg button--success" to="/docs/intro">
-            Get Started
-          </Link>
-          <Link className="button button--lg button--info" to="/docs/intro">
-            Playground
-          </Link>
+        <div className="row" style={{ alignItems: 'center', flexDirection: 'row-reverse' }}>
+          <div className="col col--6" style={{ textAlign: 'center' }}>
+            <img src="/img/logo.svg" alt="logo" width={300} className={styles.logo} />
+          </div>
+          <div className="col col--6">
+            <h1 className="hero__title">{siteConfig.title}</h1>
+            <p className="hero__subtitle">
+              TypeScript base PDF generator and React base UI. <br />
+              Open source, developed by the community, and completely free to use under the MIT
+              license!
+            </p>
+          </div>
+          <div className="col col--6">
+            <div style={{ paddingTop: '0.5rem', textAlign: 'center' }}>
+              <GitHubButton
+                // TODO 変更
+                href="https://github.com/hand-dot/labelmake"
+                data-size="large"
+                data-show-count={true}
+                aria-label="Star hand-dot/labelmake on GitHub"
+              >
+                Star
+              </GitHubButton>
+            </div>
+          </div>
+
+          <div className="col col--6">
+            <div className={styles.buttons}>
+              {/* TODO リンク */}
+              <Link className="button button--success" to="/docs/intro">
+                Get Started
+              </Link>
+              <div style={{ marginLeft: '1rem' }}></div>
+              <Link className="button button--info" to="/docs/intro">
+                Playground
+              </Link>
+              <div style={{ marginLeft: '1rem' }}></div>
+            </div>
+          </div>
         </div>
       </div>
     </header>
@@ -161,11 +239,11 @@ export default function Home(): JSX.Element {
         <HomepageFeatures />
         <div className="container">
           <div className="row">
-            <div className="col col--12 margin-vert--lg" style={{ textAlign: 'center' }}>
+            <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
 
-            <div className={clsx('col col--6')}>
+            <div className={clsx('col col--7')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
                 Template
@@ -174,23 +252,23 @@ export default function Home(): JSX.Element {
               <div className="card-demo">
                 <div className="card">
                   <div className="card__image">
-                    <img
-                      // https://excalidraw.com/ で画像を作る
-                      src={
-                        'https://images.unsplash.com/photo-1501619951397-5ba40d0f75da?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1655&amp;q=80'
-                      }
-                      alt="Image alt text"
-                      title="Logo Title Text 1"
-                    />
+                    <img src={'/img/template.png'} alt="Image alt text" title="Logo Title Text 1" />
                   </div>
                   <div className="card__body">
-                    <h4>Template is made of schemas and basePdf</h4>
+                    <h4>Template is made of basePdf and schemas</h4>
                     <small>
-                      {/* TODO templateの解説 */}
-                      テンプレートはpdfmeライブラリの中心となるデータ構造です。
+                      {/* テンプレートはpdfmeライブラリの中心となるデータ構造です。
                       理解しやすいJSONデータで、basePdfとschemasというプロパティを持っています。
                       JSONデータなのでコードエディタでも作成できますが、デザイナーでのGUIでも作成できます。
-                      一度作ったテンプレートは再利用可能で、ジェネレーター、フォーム、ビューアのそれぞれに利用できます。
+                      一度作ったテンプレートは再利用可能で、ジェネレーター、フォーム、ビューアのそれぞれに利用できます。 */}
+                      Templates are the core data structure of the pdfme library. It is JSON data
+                      that is easy to understand and has the properties basePdf and schemas.
+                      <br />
+                      Templates can be created in the code editor, but you can also create them in
+                      the Designer GUI.
+                      <br />
+                      Once templates are created, they are reusable and can be used in the
+                      generator, form, and viewer.
                     </small>
                   </div>
                   <div className="card__footer">
@@ -201,7 +279,7 @@ export default function Home(): JSX.Element {
                 </div>
               </div>
             </div>
-            <div className={clsx('col col--6')}>
+            <div className={clsx('col col--5')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
                 Generator
@@ -211,7 +289,7 @@ export default function Home(): JSX.Element {
               <div style={{ height: 820, overflow: 'scroll' }}>
                 <Sandpack
                   files={{
-                    'template.json': {
+                    'index.ts': {
                       code: `import { generate } from "pdfme";
 
 (async () => {
@@ -224,7 +302,16 @@ export default function Home(): JSX.Element {
     null,
     2
   )};
-  const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, '')};
+  
+  const inputs = ${JSON.stringify(
+    [
+      Object.assign(cloneDeep(template.sampledata[0]), {
+        photo: 'data:image/png;base64,iVBORw0...',
+      }),
+    ],
+    null,
+    2
+  )};
 
   const pdf = await generate({ template, inputs });
 
@@ -243,7 +330,6 @@ export default function Home(): JSX.Element {
                 />
               </div>
               <div>
-                {/* TODO PDF作成ボタンを追加 */}
                 <button
                   className="button button--lg button--primary button--block"
                   onClick={generatePDF}
@@ -253,7 +339,7 @@ export default function Home(): JSX.Element {
               </div>
             </div>
 
-            <div className="col col--12 margin-vert--lg" style={{ textAlign: 'center' }}>
+            <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
 
@@ -264,15 +350,19 @@ export default function Home(): JSX.Element {
                 <a className="hash-link" href="#designer" title="Direct link to heading"></a>
               </h2>
               <p>
-                {/* TODO 翻訳 */}
-                デザイナーはGoogle
+                {/* デザイナーはGoogle
                 SlideやパワーポイントなどのGUIを参考に、プログラマー以外でも使えるように作成しています。
-                コピーや貼り付け、Undo,Reduなどのショートカットやグループ選択などをサポートしています。
+                コピーや貼り付け、Undo,Reduなどのショートカットやグループ選択、ルーラーなどをサポートしています。 */}
+                The designer aims for the GUI feel of Google Slides, PowerPoint, etc., and has been
+                created so that it can be used by non-programmers.
+                <br />
+                It supports shortcuts such as Copy, Paste, Undo, Redo, Ruler, and group selection.
               </p>
             </div>
 
             <div className={clsx('col col--8')} ref={templateDesignerRef}></div>
             <div className={clsx('col col--4')}>
+              <p style={{ marginLeft: '1rem' }}>Out put template json object</p>
               <div
                 style={{
                   height: 800,
@@ -296,9 +386,9 @@ export default function Home(): JSX.Element {
               </div>
             </div>
             <div className={clsx('col col--12 margin-vert--lg')}>
-              <div style={{ textAlign: 'center' }}>
+              <div className="text--center">
                 <p>
-                  It can be easily integrated into your service.
+                  You can easily integrate into your app.
                   <br />
                 </p>
                 <Link className="button button--primary button--lg" to="/docs/intro">
@@ -306,7 +396,7 @@ export default function Home(): JSX.Element {
                 </Link>
               </div>
             </div>
-            <div className="col col--12 margin-vert--lg" style={{ textAlign: 'center' }}>
+            <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
 
@@ -320,29 +410,51 @@ export default function Home(): JSX.Element {
                 <div className="card">
                   <div className="card__image">
                     <img
-                      // TODO 使用例とスクリーンショット
-                      src={
-                        mode === 'form'
-                          ? 'https://images.unsplash.com/photo-1501619951397-5ba40d0f75da?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1655&amp;q=80'
-                          : 'https://images.unsplash.com/photo-1506624183912-c602f4a21ca7?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=60'
-                      }
+                      // TODO ここのformをgifにしたら見栄えが良くなるかも
+                      src={mode === 'form' ? '/img/form.png' : '/img/viewer.png'}
                       alt="Image alt text"
                       title="Logo Title Text 1"
                     />
                   </div>
                   <div className="card__body">
-                    <h4>{mode === 'form' ? 'Form' : 'Viewer'}</h4>
+                    <h4>
+                      <span
+                        style={{ cursor: 'pointer' }}
+                        className={`${mode === 'form' ? 'text--primary' : ''}`}
+                        onClick={() => setMode('form')}
+                      >
+                        Form
+                      </span>
+                      <span style={{ margin: '1rem' }}>/</span>
+                      <span
+                        style={{ cursor: 'pointer' }}
+                        className={`${mode === 'viewer' ? 'text--primary' : ''}`}
+                        onClick={() => setMode('viewer')}
+                      >
+                        Viewer
+                      </span>
+                    </h4>
                     <small>
-                      {/* TODO 説明 */}
                       {mode === 'form' ? (
                         <div>
-                          テンプレートを使用してinput部分をエンドユーザーに入力してもらうためのフォームを生成できます。
+                          {/* テンプレートを使用してinput部分をエンドユーザーに入力してもらうためのフォームを生成できます。
+                          <br />
+                          ユーザーが入力した値を使ってPDFを生成することが簡単に実現できます。 */}
+                          You can use the template to generate a form for the user to input.
+                          <br />
+                          Generating a PDF with the values entered by the user can be easily
+                          achieved.
                         </div>
                       ) : (
                         <div>
-                          テンプレートを使用してinput部分の入力を確認してもらうためのビューワーを生成できます。
+                          {/* テンプレートを使用してinput部分の入力を確認してもらうためのビューワーを生成できます。
                           <br />
-                          モバイルの場合にはiframeでのPDFの確認が行えず
+                          モバイルブラウザではiframeでのPDFの確認が行えませんが、Viewerを使うことで簡単に実現することができます。 */}
+                          You can use the template to generate a viewer for the user to check the
+                          input.
+                          <br />
+                          Mobile browsers cannot check PDFs in an iframe, but you can easily achieve
+                          this by using a viewer.
                         </div>
                       )}
                     </small>
@@ -372,9 +484,9 @@ export default function Home(): JSX.Element {
                 </li>
               </ul>
               {mode === 'form' ? (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
               ) : (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
               )}
               <div className="margin-vert--lg text--center">
                 <button className="button button--lg button--primary" onClick={generatePDF}>
@@ -384,12 +496,13 @@ export default function Home(): JSX.Element {
             </div>
           </div>
         </div>
-
-        <div className="col col--12 margin-vert--lg" style={{ textAlign: 'center' }}>
+        <div className="col col--12 margin-vert--lg text--center">
+          <Divider />
+        </div>
+        <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
           <GiveMeStar />
         </div>
       </main>
-
       <HomepageHeader />
     </Layout>
   );

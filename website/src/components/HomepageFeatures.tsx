@@ -4,14 +4,12 @@ import styles from './HomepageFeatures.module.css';
 
 type FeatureItem = {
   title: string;
-  image: string;
   description: JSX.Element;
 };
 
 const FeatureList: FeatureItem[] = [
   {
     title: 'Simple JSON template',
-    image: '/img/undraw_docusaurus_react.svg',
     description: (
       <>
         {/* テンプレートとは、Base PDFとしてPDFを背景に設置し、その上にスキーマを配置したJSONオブジェクトです。
@@ -24,7 +22,6 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'PDF Generator',
-    image: '/img/undraw_docusaurus_mountain.svg',
     description: (
       <>
         {/* nodeとブラウザの上で動きます。 テンプレートを使ってPDFを作成するため複雑な操作は不要。
@@ -38,7 +35,6 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Design, Form, Preview',
-    image: '/img/undraw_docusaurus_tree.svg',
     description: (
       <>
         {/* デザイナーで誰でも簡単にテンプレートが作成できます。
@@ -51,13 +47,10 @@ const FeatureList: FeatureItem[] = [
   },
 ];
 
-function Feature({ title, image, description }: FeatureItem) {
+function Feature({ title, description }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
-      <div className="text--center">
-        <img className={styles.featureSvg} alt={title} src={image} />
-      </div>
-      <div className="text--center padding-horiz--md">
+      <div className="padding-horiz--md">
         <h3>{title}</h3>
         <p>{description}</p>
       </div>

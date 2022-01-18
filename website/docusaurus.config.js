@@ -92,10 +92,6 @@ const config = {
     ({
       navbar: {
         title: 'pdfme',
-        logo: {
-          alt: 'pdfme Logo',
-          src: 'img/logo.svg',
-        },
         items: [
           {
             type: 'doc',
@@ -130,8 +126,8 @@ const config = {
                 href: 'https://discordapp.com/invite/docusaurus',
               },
               {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                label: 'Github',
+                href: 'https://github.com/hand-dot/pdfme',
               },
             ],
           },

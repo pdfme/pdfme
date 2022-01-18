@@ -4,6 +4,7 @@ import GitHubButton from 'react-github-btn';
 export default () => (
   <div style={{ margin: '0 auto', width: 'fit-content' }}>
     <div style={{ display: 'flex', maxWidth: 400 }}>
+      {/* TODO この画像がダークモードで汚い */}
       <img src={'/img/please-star.png'} alt="pleaseStar" style={{ width: '80%' }} />
       <img src={'/img/please-star-arrow.png'} alt="pleaseStarArrow" width="30" />
     </div>
