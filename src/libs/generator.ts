@@ -353,7 +353,7 @@ export const drawInputByTemplateSchema = async (arg: {
   textSchemaSetting: TextSchemaSetting;
   inputImageCache: InputImageCache;
 }) => {
-  if (!arg.templateSchema) return;
+  if (!arg.input || !arg.templateSchema) return;
 
   if (isTextSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as TextSchema;

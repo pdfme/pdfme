@@ -5,7 +5,7 @@ exports[`TemplateDesigner snapshot 1`] = `
   style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="height: 1170px;"
+    style="width: 1170px; height: 1170px;"
   >
     <div
       style="position: absolute; height: 0px; width: 100%;"
@@ -44,14 +44,16 @@ exports[`TemplateDesigner snapshot 1`] = `
               <div
                 style="border: 1px solid transparent;"
               >
-                <div>
+                <div
+                  style="padding-left: 5px;"
+                >
                   <button
                     style="padding: 0px; background: none;"
                   >
                     <img
                       alt="Drag icon"
                       src="[object Object]"
-                      style="padding: 5px; cursor: grab;"
+                      style="cursor: grab;"
                       width="15"
                     />
                   </button>
@@ -71,14 +73,16 @@ exports[`TemplateDesigner snapshot 1`] = `
               <div
                 style="border: 1px solid transparent;"
               >
-                <div>
+                <div
+                  style="padding-left: 5px;"
+                >
                   <button
                     style="padding: 0px; background: none;"
                   >
                     <img
                       alt="Drag icon"
                       src="[object Object]"
-                      style="padding: 5px; cursor: grab;"
+                      style="cursor: grab;"
                       width="15"
                     />
                   </button>

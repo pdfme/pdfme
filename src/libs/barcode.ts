@@ -1,6 +1,6 @@
 import bwipjs, { ToBufferOptions } from 'bwip-js';
 import { BarCodeType } from './type';
-
+import { b64toUint8Array } from './utils';
 export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   if (!input) return false;
   if (type === 'qrcode') {
@@ -68,7 +68,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   return false;
 };
 
-export const createBarCode = ({
+export const createBarCode = async ({
   type,
   input,
   width,
@@ -93,5 +93,16 @@ export const createBarCode = ({
     bwipjsArg.backgroundcolor = backgroundColor;
   }
 
-  return bwipjs.toBuffer(bwipjsArg);
+  let res: Buffer;
+
+  if (typeof window !== 'undefined' && bwipjs.toCanvas) {
+    const canvas = document.createElement('canvas');
+    bwipjs.toCanvas(canvas, bwipjsArg);
+    const dataUrl = canvas.toDataURL('image/png');
+    res = b64toUint8Array(dataUrl).buffer as Buffer;
+  } else {
+    res = await bwipjs.toBuffer(bwipjsArg);
+  }
+
+  return res;
 };

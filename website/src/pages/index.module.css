@@ -19,5 +19,7 @@
 .buttons {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  max-width: 550px;
+  margin: 0 auto;
 }

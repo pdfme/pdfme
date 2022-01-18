@@ -1,12 +1,12 @@
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import * as pdfjsLib from 'pdfjs-dist';
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import { pt2mm } from './utils';
 
 export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
+  const pdfDoc = await getDocument({ url }).promise;
 
   const promises = Promise.all(
     new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
@@ -27,7 +27,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
 
 const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg') => {
   const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await pdfjsLib.getDocument({ url }).promise;
+  const pdfDoc = await getDocument({ url }).promise;
 
   const promises = Promise.all(
     new Array(pdfDoc.numPages).fill('').map(async (_, i) => {

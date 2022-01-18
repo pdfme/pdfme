@@ -11,7 +11,7 @@
     "develop": "webpack-dev-server --mode development",
     "build": "NODE_ENV=production webpack --mode production",
     "lint": "tsc --noEmit",
-    "doc": "cd site && npm run start",
+    "doc": "cd website && npm run start",
     "test": "jest",
     "clean": "rimraf dist",
     "lint:watch": "tsc -w --noEmit",
