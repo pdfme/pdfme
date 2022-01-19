@@ -23,7 +23,7 @@
     "dist"
   ],
   "author": "hand-dot",
-  "license": "SEE LICENSE IN LICENSE.txt",
+  "license": "MIT",
   "peerDependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
@@ -31,7 +31,6 @@
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
     "@tippyjs/react": "^4.2.5",
-    "@types/bwip-js": "^3.0.0",
     "base64url": "^3.0.1",
     "bwip-js": "^3.0.4",
     "hotkeys-js": "^3.8.7",
@@ -52,6 +51,7 @@
     "@scena/react-guides": "^0.16.0",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
+    "@types/bwip-js": "^3.0.0",
     "@types/css-font-loading-module": "^0.0.7",
     "@types/debounce": "^1.2.0",
     "@types/jest": "^27.4.0",
