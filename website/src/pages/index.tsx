@@ -333,11 +333,17 @@ export default function Home(): JSX.Element {
               </div>
               <div>
                 <button
-                  className="button button--lg button--primary button--block"
+                  className="margin-vert--md button button--lg button--secondary button--block"
                   onClick={generatePDF}
                 >
                   Generate PDF
                 </button>
+                <Link
+                  className="margin-vert--md button button--primary button--lg button--block"
+                  to="/docs/intro"
+                >
+                  Learn more about the Generator
+                </Link>
               </div>
             </div>
 
@@ -491,7 +497,7 @@ export default function Home(): JSX.Element {
                 <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
               )}
               <div className="margin-vert--lg text--center">
-                <button className="button button--lg button--primary" onClick={generatePDF}>
+                <button className="button button--lg button--secondary" onClick={generatePDF}>
                   Generate PDF
                 </button>
               </div>
