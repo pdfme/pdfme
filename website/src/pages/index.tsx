@@ -7,11 +7,13 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 import Divider from '../components/Divider';
-import GiveMeStar from '../components/GiveMeStar';
 import { generate, TemplateDesigner, Viewer, Form, Template } from '../../../src/index';
 import { examplePdfb64, dogPngb64 } from '../libs/sampleData';
 import { Sandpack } from '@codesandbox/sandpack-react';
 require('@codesandbox/sandpack-react/dist/index.css');
+
+// TODO https://github.com/hand-dot/labelmake をpdfmeに置換する
+// TODO Template,Generator,Designer,Form / Viewerに対してページ内リンクを追加する
 
 const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
 
@@ -126,7 +128,6 @@ function HomepageHeader() {
           <div className="col col--6">
             <div style={{ paddingTop: '0.5rem', textAlign: 'center' }}>
               <GitHubButton
-                // TODO 変更
                 href="https://github.com/hand-dot/labelmake"
                 data-size="large"
                 data-show-count={true}
@@ -144,6 +145,7 @@ function HomepageHeader() {
                 Get Started
               </Link>
               <div style={{ marginLeft: '1rem' }}></div>
+              {/* TODO リンク */}
               <Link className="button button--info" to="/docs/intro">
                 Playground
               </Link>
@@ -391,6 +393,7 @@ export default function Home(): JSX.Element {
                   You can easily integrate into your app.
                   <br />
                 </p>
+                {/* TODO リンク */}
                 <Link className="button button--primary button--lg" to="/docs/intro">
                   Learn more about the Designer
                 </Link>
@@ -410,7 +413,6 @@ export default function Home(): JSX.Element {
                 <div className="card">
                   <div className="card__image">
                     <img
-                      // TODO ここのformをgifにしたら見栄えが良くなるかも
                       src={mode === 'form' ? '/img/form.png' : '/img/viewer.png'}
                       alt="Image alt text"
                       title="Logo Title Text 1"
@@ -500,10 +502,57 @@ export default function Home(): JSX.Element {
           <Divider />
         </div>
         <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
-          <GiveMeStar />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <img width={100} src={'/img/logo-mini2.png'} />
+            <div style={{ width: 'fit-content' }}>
+              <div style={{ display: 'flex', maxWidth: 400 }}>
+                <img src={'/img/please-star.png'} alt="pleaseStar" />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  margin: '0.8rem',
+                }}
+              >
+                <a
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: '10pt',
+                  }}
+                  href="https://github.com/hand-dot/labelmake"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img src={'/img/github-icon.svg'} alt="github" width={25} />
+                  <span style={{ marginLeft: '0.5rem' }}>
+                    https://github.com/hand-dot/labelmake
+                  </span>
+                </a>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div style={{ marginLeft: '0.5rem' }}>
+                    <GitHubButton
+                      href="https://github.com/hand-dot/labelmake"
+                      data-size="large"
+                      data-icon="octicon-star"
+                      data-show-count={true}
+                      aria-label="Star hand-dot/labelmake on GitHub"
+                    >
+                      Star
+                    </GitHubButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
-      <HomepageHeader />
     </Layout>
   );
 }
