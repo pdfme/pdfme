@@ -33,6 +33,15 @@ const config = {
   ],
   plugins: [
     'docusaurus-plugin-sass',
+    [
+      'docusaurus-plugin-typedoc',
+
+      // Plugin / TypeDoc options
+      {
+        entryPoints: ['../src/index.ts'],
+        tsconfig: '../tsconfig.json',
+      },
+    ],
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',

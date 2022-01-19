@@ -10,7 +10,7 @@ import {
   ImageSchema,
   BarcodeSchema,
   GeneratorOptions,
-  UIProps,
+  UIOptions,
 } from './libs/type';
 
 export default {
@@ -27,11 +27,11 @@ export {
   TextSchema,
   ImageSchema,
   BarcodeSchema,
-  GeneratorOptions,
-  UIProps,
   generate,
   TemplateDesigner,
   Viewer,
   Form,
+  GeneratorOptions,
+  UIOptions,
   BLANK_PDF as blankPdf,
 };

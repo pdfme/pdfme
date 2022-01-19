@@ -114,7 +114,7 @@ export type GenerateProps = z.infer<typeof GenerateProps>;
 
 // ---------------------------------------------
 
-const UIOptions = CommonOptions.extend({ lang: Lang.optional() });
+export const UIOptions = CommonOptions.extend({ lang: Lang.optional() });
 export type UIOptions = z.infer<typeof UIOptions>;
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
