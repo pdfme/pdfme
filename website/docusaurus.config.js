@@ -104,6 +104,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       hideableSidebar: true,
+      hideOnScroll: true,
       navbar: {
         title: 'pdfme',
         items: [
@@ -112,6 +113,16 @@ const config = {
             docId: 'getting-started',
             position: 'right',
             label: 'Docs',
+          },
+          {
+            to: '/template-design',
+            position: 'right',
+            label: 'Template Design & Code Generator',
+          },
+          {
+            to: '/help',
+            position: 'right',
+            label: 'Help',
           },
           {
             href: 'https://github.com/hand-dot/pdfme',
@@ -138,13 +149,18 @@ const config = {
                 label: 'API',
                 to: '/docs/api',
               },
+            ],
+          },
+          {
+            title: 'More',
+            items: [
               {
-                label: 'Help',
-                to: '/docs/help',
+                label: 'Template Design & Code Generator',
+                to: '/template-design',
               },
               {
-                label: 'Contribute',
-                to: '/docs/contribute',
+                label: 'Help',
+                to: '/help',
               },
             ],
           },

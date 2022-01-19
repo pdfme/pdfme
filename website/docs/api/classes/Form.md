@@ -41,7 +41,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[Form.tsx:16](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/Form.tsx#L16)
+[Form.tsx:16](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/Form.tsx#L16)
 
 ## Properties
 
@@ -55,7 +55,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[libs/class.ts:8](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L8)
+[libs/class.ts:8](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L8)
 
 ___
 
@@ -69,7 +69,7 @@ PreviewUI.inputs
 
 #### Defined in
 
-[libs/class.ts:78](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L78)
+[libs/class.ts:78](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L78)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[Form.tsx:10](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/Form.tsx#L10)
+[Form.tsx:10](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/Form.tsx#L10)
 
 ___
 
@@ -117,7 +117,7 @@ PreviewUI.size
 
 #### Defined in
 
-[libs/class.ts:12](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L12)
+[libs/class.ts:12](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L12)
 
 ___
 
@@ -140,7 +140,7 @@ PreviewUI.template
 
 #### Defined in
 
-[libs/class.ts:10](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L10)
+[libs/class.ts:10](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L10)
 
 ## Methods
 
@@ -158,7 +158,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[libs/class.ts:68](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L68)
+[libs/class.ts:68](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L68)
 
 ___
 
@@ -176,7 +176,7 @@ PreviewUI.getFont
 
 #### Defined in
 
-[libs/class.ts:52](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L52)
+[libs/class.ts:52](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L52)
 
 ___
 
@@ -206,7 +206,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[libs/class.ts:48](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L48)
+[libs/class.ts:48](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L48)
 
 ___
 
@@ -224,7 +224,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[libs/class.ts:88](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L88)
+[libs/class.ts:88](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L88)
 
 ___
 
@@ -249,7 +249,7 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[libs/class.ts:56](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L56)
+[libs/class.ts:56](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L56)
 
 ___
 
@@ -267,7 +267,7 @@ PreviewUI.render
 
 #### Defined in
 
-[Form.tsx:30](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/Form.tsx#L30)
+[Form.tsx:30](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/Form.tsx#L30)
 
 ___
 
@@ -291,7 +291,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[libs/class.ts:94](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L94)
+[libs/class.ts:94](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L94)
 
 ___
 
@@ -319,4 +319,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[libs/class.ts:62](https://github.com/hand-dot/labelmake-ui/blob/c1c62f2/src/libs/class.ts#L62)
+[libs/class.ts:62](https://github.com/hand-dot/labelmake-ui/blob/783d60a/src/libs/class.ts#L62)
