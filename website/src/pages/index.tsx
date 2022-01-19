@@ -141,12 +141,12 @@ function HomepageHeader() {
           <div className="col col--6">
             <div className={styles.buttons}>
               {/* TODO リンク */}
-              <Link className="button button--success" to="/docs/intro">
-                Get Started
+              <Link className="button button--success" to="/docs/getting-started">
+                Getting Started
               </Link>
               <div style={{ marginLeft: '1rem' }}></div>
               {/* TODO リンク */}
-              <Link className="button button--info" to="/docs/intro">
+              <Link className="button button--info" to="/docs/getting-started">
                 Playground
               </Link>
               <div style={{ marginLeft: '1rem' }}></div>
@@ -340,7 +340,7 @@ export default function Home(): JSX.Element {
                 </button>
                 <Link
                   className="margin-vert--md button button--primary button--lg button--block"
-                  to="/docs/intro"
+                  to="/docs/getting-started"
                 >
                   Learn more about the Generator
                 </Link>
@@ -400,7 +400,7 @@ export default function Home(): JSX.Element {
                   <br />
                 </p>
                 {/* TODO リンク */}
-                <Link className="button button--primary button--lg" to="/docs/intro">
+                <Link className="button button--primary button--lg" to="/docs/getting-started">
                   Learn more about the Designer
                 </Link>
               </div>

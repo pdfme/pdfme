@@ -38,6 +38,10 @@ const config = {
 
       // Plugin / TypeDoc options
       {
+        readme: 'none',
+        sidebar: {
+          position: 3,
+        },
         entryPoints: ['../src/index.ts'],
         tsconfig: '../tsconfig.json',
       },
@@ -99,12 +103,13 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      hideableSidebar: true,
       navbar: {
         title: 'pdfme',
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'getting-started',
             position: 'right',
             label: 'Docs',
           },
@@ -122,8 +127,24 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Docs',
-                to: '/docs/intro',
+                label: 'Getting Started',
+                to: '/docs/getting-started',
+              },
+              {
+                label: 'Guides',
+                to: '/docs/guides',
+              },
+              {
+                label: 'API',
+                to: '/docs/api',
+              },
+              {
+                label: 'Help',
+                to: '/docs/help',
+              },
+              {
+                label: 'Contribute',
+                to: '/docs/contribute',
               },
             ],
           },
