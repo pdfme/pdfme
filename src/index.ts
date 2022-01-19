@@ -1,5 +1,5 @@
 import generate from './generate';
-import TemplateDesigner from './TemplateDesigner';
+import Designer from './Designer';
 import Form from './Form';
 import Viewer from './Viewer';
 import { BLANK_PDF } from './libs/constants';
@@ -15,7 +15,7 @@ import {
 
 export default {
   generate,
-  TemplateDesigner,
+  Designer,
   Viewer,
   Form,
   blankPdf: BLANK_PDF,
@@ -28,7 +28,7 @@ export {
   ImageSchema,
   BarcodeSchema,
   generate,
-  TemplateDesigner,
+  Designer,
   Viewer,
   Form,
   GeneratorOptions,

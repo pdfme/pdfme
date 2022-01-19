@@ -4,21 +4,21 @@
 import React from 'react';
 import { render, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TemplateDesigner from '../../src/components/TemplateDesigner';
+import Designer from '../../src/components/Designer';
 import { I18nContext, FontContext } from '../../src/libs/contexts';
 import { curriedI18n } from '../../src/libs/i18n';
 import { getDefaultFont } from '../../src/libs/helper';
 import { SELECTABLE_CLASSNAME } from '../../src/libs/constants';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
 
-test('TemplateDesigner snapshot', async () => {
+test('Designer snapshot', async () => {
   setupUIMock();
   let container: HTMLElement = document.createElement('a');
   act(() => {
     const { container: c } = render(
       <I18nContext.Provider value={curriedI18n('en')}>
         <FontContext.Provider value={getDefaultFont()}>
-          <TemplateDesigner
+          <Designer
             template={getSampleTemplate()}
             saveTemplate={console.log}
             onChangeTemplate={console.log}

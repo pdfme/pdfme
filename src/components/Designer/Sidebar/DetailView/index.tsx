@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { I18nContext } from '../../../../libs/contexts';
 import Divider from '../../../Divider';
-import { SidebarProps } from '../';
+import { SidebarProps } from '..';
 import TextPropEditor from './TextPropEditor';
 import ExampleInputEditor from './ExampleInputEditor';
 import PositionAndSizeEditor from './PositionAndSizeEditor';

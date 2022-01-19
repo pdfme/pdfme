@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TemplateDesigner snapshot 1`] = `
+exports[`Designer snapshot 1`] = `
 <div
   style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >

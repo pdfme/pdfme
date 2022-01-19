@@ -139,13 +139,13 @@ export type PreviewProps = z.infer<typeof PreviewProps>;
 const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({ size: Size });
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
 
-// ---------------TemplateDesigner---------------
+// ---------------Designer---------------
 
-export const TemplateDesignerProps = UIProps.extend({
+export const DesignerProps = UIProps.extend({
   saveTemplate: z.function().args(Template).returns(z.void()),
 }).strict();
-export type TemplateDesignerProps = z.infer<typeof TemplateDesignerProps>;
-const TemplateDesignerReactProps = TemplateDesignerProps.omit({ domContainer: true }).extend({
+export type DesignerProps = z.infer<typeof DesignerProps>;
+const DesignerReactProps = DesignerProps.omit({ domContainer: true }).extend({
   size: Size,
 });
-export type TemplateDesignerReactProps = z.infer<typeof TemplateDesignerReactProps>;
+export type DesignerReactProps = z.infer<typeof DesignerReactProps>;

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { readFiles } from '../../../../libs/ui';
 import { I18nContext } from '../../../../libs/contexts';
-import { SidebarProps } from '../';
+import { SidebarProps } from '..';
 
 const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
   const { changeSchemas, activeSchema } = props;

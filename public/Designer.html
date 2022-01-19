@@ -31,7 +31,7 @@
 
       async function init() {
         const font = await getFont();
-        editor = new pdfme.TemplateDesigner({
+        editor = new pdfme.Designer({
           domContainer,
           template: getTemplate(),
           saveTemplate: (t) => {

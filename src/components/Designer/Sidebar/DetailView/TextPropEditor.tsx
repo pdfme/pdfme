@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
 import { FontContext } from '../../../../libs/contexts';
-import { SidebarProps } from '../';
+import { SidebarProps } from '..';
 import { getFallbackFontName } from '../../../../libs/helper';
 
 const NumberInputSet = (props: {

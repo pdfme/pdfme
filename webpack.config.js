@@ -26,8 +26,8 @@ const config = {
       entryOnly: true,
     }),
     new HtmlWebpackPlugin({
-      template: './public/TemplateDesigner.html',
-      filename: 'TemplateDesigner.html',
+      template: './public/Designer.html',
+      filename: 'Designer.html',
     }),
     new HtmlWebpackPlugin({
       template: './public/Viewer.html',

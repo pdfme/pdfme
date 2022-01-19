@@ -7,7 +7,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 import Divider from '../components/Divider';
-import { generate, TemplateDesigner, Viewer, Form, Template } from '../../../src/index';
+import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
 import { examplePdfb64, dogPngb64 } from '../libs/sampleData';
 import { Sandpack } from '@codesandbox/sandpack-react';
 require('@codesandbox/sandpack-react/dist/index.css');
@@ -161,11 +161,11 @@ function HomepageHeader() {
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
 
-  const templateDesignerRef = useRef<HTMLDivElement | null>(null);
+  const designerRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
 
-  const editor = useRef<TemplateDesigner | null>(null);
+  const designer = useRef<Designer | null>(null);
   const viewer = useRef<Viewer | null>(null);
   const form = useRef<Form | null>(null);
 
@@ -189,18 +189,18 @@ export default function Home(): JSX.Element {
   };
 
   useEffect(() => {
-    if (templateDesignerRef.current) {
-      editor.current = new TemplateDesigner({
-        domContainer: templateDesignerRef.current,
+    if (designerRef.current) {
+      designer.current = new Designer({
+        domContainer: designerRef.current,
         template,
         saveTemplate,
       });
 
-      editor.current.onChangeTemplate(() => {
-        editor.current.saveTemplate();
+      designer.current.onChangeTemplate(() => {
+        designer.current.saveTemplate();
       });
     }
-  }, [templateDesignerRef]);
+  }, [designerRef]);
 
   useEffect(() => {
     if (viewerRef.current) {
@@ -368,7 +368,7 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={clsx('col col--8')} ref={templateDesignerRef}></div>
+            <div className={clsx('col col--8')} ref={designerRef}></div>
             <div className={clsx('col col--4')}>
               <p style={{ marginLeft: '1rem' }}>Out put template json object</p>
               <div

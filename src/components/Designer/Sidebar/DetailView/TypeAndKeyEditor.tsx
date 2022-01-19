@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useCallback } from 'react';
-import { SidebarProps } from '../';
+import { SidebarProps } from '..';
 import { I18nContext } from '../../../../libs/contexts';
 import { schemaTypes } from '../../../../libs/type';
 

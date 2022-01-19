@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, TemplateDesignerProps, UIOptions } from './libs/type';
+import { Template, DesignerProps, UIOptions } from './libs/type';
 import { checkProps } from './libs/helper';
 import { BaseUIClass } from './libs/class';
 import { DESTROYED_ERR_MSG } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
-import TemplateDesignerComponent from './components/TemplateDesigner';
+import DesignerComponent from './components/Designer';
 
-class TemplateDesigner extends BaseUIClass {
+class Designer extends BaseUIClass {
   private saveTemplateCallback!: (t: Template) => void;
   private onChangeTemplateCallback?: (t: Template) => void;
 
@@ -18,7 +18,7 @@ class TemplateDesigner extends BaseUIClass {
     options?: UIOptions;
   }) {
     super(props);
-    checkProps(props, TemplateDesignerProps);
+    checkProps(props, DesignerProps);
 
     this.saveTemplateCallback = props.saveTemplate;
     this.render();
@@ -38,7 +38,7 @@ class TemplateDesigner extends BaseUIClass {
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>
-          <TemplateDesignerComponent
+          <DesignerComponent
             template={this.template}
             saveTemplate={this.saveTemplateCallback}
             onChangeTemplate={(template) => {
@@ -56,4 +56,4 @@ class TemplateDesigner extends BaseUIClass {
   }
 }
 
-export default TemplateDesigner;
+export default Designer;

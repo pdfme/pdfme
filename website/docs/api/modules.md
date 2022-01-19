@@ -8,8 +8,8 @@ custom_edit_url: null
 
 ## Classes
 
+- [Designer](classes/Designer)
 - [Form](classes/Form)
-- [TemplateDesigner](classes/TemplateDesigner)
 - [Viewer](classes/Viewer)
 
 ## Type aliases
@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[libs/type.ts:56](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L56)
+[libs/type.ts:56](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L56)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:107](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L107)
+[libs/type.ts:107](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L107)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:52](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L52)
+[libs/type.ts:52](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L52)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:61](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L61)
+[libs/type.ts:61](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L61)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:89](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L89)
+[libs/type.ts:89](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L89)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:48](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L48)
+[libs/type.ts:48](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L48)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:118](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L118)
+[libs/type.ts:118](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L118)
 
 ## Properties
 
@@ -92,8 +92,8 @@ ___
 
 | Name | Type |
 | :------ | :------ |
+| `Designer` | typeof [`Designer`](classes/Designer) |
 | `Form` | typeof [`Form`](classes/Form) |
-| `TemplateDesigner` | typeof [`TemplateDesigner`](classes/TemplateDesigner) |
 | `Viewer` | typeof [`Viewer`](classes/Viewer) |
 | `blankPdf` | `string` |
 | `generate` | (`props`: { `inputs`: `Record`<`string`, `string`\>[] ; `options`: `undefined` \| { font?: Record<string, { fallback?: boolean \| undefined; subset?: boolean \| undefined; data: ArrayBuffer \| Uint8Array; }\> \| undefined; splitThreshold?: number \| undefined; } ; `template`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { rotate?: number \| undefined; alignment?: "left" \| "center" \| "right" \| undefined; fontSize?: number \| undefined; fontName?: string \| undefined; fontColor?: string \| undefined; backgroundColor?: string \| undefined; ... 5 more ...; height: number; } \| { rotate?: number \| undefined; type: "image"; position: { x: number; y: number; }; width: number; height: number; } \| { rotate?: number \| undefined; type: "qrcode" \| "japanpost" \| "ean13" \| "ean8" \| "code39" \| "code128" \| "nw7" \| "itf14" \| "upca" \| "upce"; position: { x: number; y: number; }; width: number; height: number; }\>[]  }  }) => `Promise`<`Uint8Array`\> |
@@ -106,7 +106,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:55](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L55)
+[libs/type.ts:55](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L55)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:104](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L104)
+[libs/type.ts:104](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L104)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:51](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L51)
+[libs/type.ts:51](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L51)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:60](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L60)
+[libs/type.ts:60](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L60)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:83](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L83)
+[libs/type.ts:83](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L83)
 
 ___
 
@@ -156,7 +156,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:38](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L38)
+[libs/type.ts:38](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L38)
 
 ___
 
@@ -166,7 +166,7 @@ ___
 
 #### Defined in
 
-[libs/type.ts:117](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/type.ts#L117)
+[libs/type.ts:117](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/type.ts#L117)
 
 ___
 
@@ -176,7 +176,7 @@ ___
 
 #### Defined in
 
-[libs/constants.ts:23](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/libs/constants.ts#L23)
+[libs/constants.ts:23](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/libs/constants.ts#L23)
 
 ## Functions
 
@@ -203,4 +203,4 @@ ___
 
 #### Defined in
 
-[generate.ts:39](https://github.com/hand-dot/labelmake-ui/blob/4bfccb3/src/generate.ts#L39)
+[generate.ts:39](https://github.com/hand-dot/labelmake-ui/blob/7a6734d/src/generate.ts#L39)

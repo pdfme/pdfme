@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { TemplateDesignerReactProps, Template, SchemaForUI, Size } from '../../libs/type';
+import { DesignerReactProps, Template, SchemaForUI, Size } from '../../libs/type';
 import Sidebar from './Sidebar';
 import Main from './Main';
 import { RULER_HEIGHT, ZOOM } from '../../libs/constants';
@@ -69,7 +69,7 @@ const TemplateEditor = ({
   saveTemplate,
   size,
   onChangeTemplate,
-}: TemplateDesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
+}: DesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
   const copiedSchemas = useRef<SchemaForUI[] | null>(null);
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
