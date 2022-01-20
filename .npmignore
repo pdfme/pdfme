@@ -1,0 +1,9 @@
+__test__/
+dist/Designer.html
+dist/Form.html
+dist/Viewer.html
+coverage/
+assets/
+.DS_Store
+.github/
+.vscode/

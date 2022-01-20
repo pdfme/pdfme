@@ -7,8 +7,10 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 import Divider from '../components/Divider';
-import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
+import { generate, Designer, Viewer, Form, Template, blankPdf } from '../../../src/index';
 import { examplePdfb64, dogPngb64 } from '../libs/sampleData';
+// TODO https://github.com/FormidableLabs/prism-react-renderer に変えた方がいいかも
+// prism-react-renderer はすでに依存に入っている
 import { Sandpack } from '@codesandbox/sandpack-react';
 require('@codesandbox/sandpack-react/dist/index.css');
 

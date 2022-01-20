@@ -142,10 +142,6 @@ const config = {
                 to: '/docs/getting-started',
               },
               {
-                label: 'Guides',
-                to: '/docs/guides',
-              },
-              {
                 label: 'API',
                 to: '/docs/api',
               },
