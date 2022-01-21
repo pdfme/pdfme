@@ -7,6 +7,8 @@ type FeatureItem = {
   description: JSX.Element;
 };
 
+// TODO 読む気が失せる　もっと短くする
+
 const FeatureList: FeatureItem[] = [
   {
     title: 'Simple JSON template',

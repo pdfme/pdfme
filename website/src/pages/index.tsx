@@ -494,9 +494,9 @@ export default function Home(): JSX.Element {
                 </li>
               </ul>
               {mode === 'form' ? (
-                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
+                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
               ) : (
-                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
+                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
               )}
               <div className="margin-vert--lg text--center">
                 <button className="button button--lg button--secondary" onClick={generatePDF}>

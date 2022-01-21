@@ -147,18 +147,69 @@ const desinger = new Designer({ domContainer, template, saveTemplate });
 
 ![](/img/designer.gif)
 
-desinger インスタンスには下記のメソッドで操作を行うことができます。
+desinger インスタンスには下記のようなメソッドで操作を行うことができます。
 
-- saveTemplate
-- updateTemplate
-- getTemplate
-- onChangeTemplate
-- destroy
+- `saveTemplate`
+- `updateTemplate`
+- `getTemplate`
+- `onChangeTemplate`
+- `destroy`
 
 などのメソッドがあり、ユーザーの変更内容を保存したり、テンプレートを更新したりすることができます。
 
-[詳しくはこちらの API ドキュメントを参照ください。](/docs/api/classes/Designer#methods)
+[詳しくはこちらの Designer クラスの API ドキュメントを参照ください。](/docs/api/classes/Designer#methods)
 
-## Form
+## Form / Viewer
 
-## Viewer
+### Form
+
+テンプレート使ってフォームや、PDF ビューアーを作成することができます。
+
+Form はテンプレートをもとにユーザーに schemas の変動部分を入力してもらう UI を作成します。
+
+```ts
+import { Template, Form } from 'pdfme';
+
+const domContainer = document.getElementById('container');
+const template: Template = {
+  // skip...
+};
+const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
+
+form = new Form({ domContainer, template, inputs, onChangeInput: console.log });
+```
+
+![](/img/form.gif)
+
+form インスタンスには`getInputs`などのメソッドでユーザーの入力を取得することができます。
+取得したデータを`generate`の inputs として渡せば、ユーザーの入力を元にした PDF ファイルを作成することができます。
+
+<!-- TODO ここでformの入力からgenerateを使ってPDFを作成するコードを書く -->
+
+[詳しくはこちらの Form クラスの API ドキュメントを参照ください。](/docs/api/classes/Form#methods)
+
+---
+
+### Viewer
+
+Viewer は Generator で作成予定の PDF を確認するために使われます。特にモバイルブラウザで PDF ファイルのプレビューは問題でした。iframe でうまく表示されないためです。
+
+実際には Form を作成する段階で作成できた副産物ですが、Viewer を使うことで、ユーザーに作成予定の PDF ファイルのプレビューを表示することができます。
+
+![](/img/viewer.png)
+
+Viewer の使い方は、基本的に Form の使い方と同じです。
+
+```ts
+import { Template, Viewer } from 'pdfme';
+
+const domContainer = document.getElementById('container');
+const template: Template = {
+  // skip...
+};
+const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
+
+viewer = new Viewer({ domContainer, template, inputs, onChangeInput: console.log });
+```
+
+[詳しくはこちらの Viewer クラスの API ドキュメントを参照ください。](/docs/api/classes/Viewer#methods)
