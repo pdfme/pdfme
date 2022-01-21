@@ -127,25 +127,24 @@ export type UIProps = z.infer<typeof UIProps>;
 
 // -----------------Form, Viewer-----------------
 
-export const PreviewProps = UIProps.extend({
-  inputs: Inputs,
+export const PreviewProps = UIProps.extend({ inputs: Inputs }).strict();
+export type PreviewProps = z.infer<typeof PreviewProps>;
+const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({
   onChangeInput: z
     .function()
     .args(z.object({ index: z.number(), value: z.string(), key: z.string() }))
     .returns(z.void())
     .optional(),
-}).strict();
-export type PreviewProps = z.infer<typeof PreviewProps>;
-const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({ size: Size });
+  size: Size,
+});
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
 
 // ---------------Designer---------------
 
-export const DesignerProps = UIProps.extend({
-  saveTemplate: z.function().args(Template).returns(z.void()),
-}).strict();
+export const DesignerProps = UIProps.extend({}).strict();
 export type DesignerProps = z.infer<typeof DesignerProps>;
 const DesignerReactProps = DesignerProps.omit({ domContainer: true }).extend({
+  onSaveTemplate: z.function().args(Template).returns(z.void()),
   size: Size,
 });
 export type DesignerReactProps = z.infer<typeof DesignerReactProps>;

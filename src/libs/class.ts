@@ -1,8 +1,19 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
-import { Template, Size, Lang, Font, UIProps, PreviewProps } from './type';
+import { Template, Size, Lang, Font, UIProps, PreviewProps, UIOptions } from './type';
 import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from './helper';
+
+interface CommonConstructor {
+  domContainer: HTMLElement;
+  template: Template;
+  options?: UIOptions;
+}
+export type DesignerConstructor = CommonConstructor;
+
+export type PreviewUIConstructor = CommonConstructor & {
+  inputs: { [key: string]: string }[];
+};
 
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;
@@ -35,7 +46,7 @@ export abstract class BaseUIClass {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
     };
-    window.addEventListener('resize', this.setSize);
+    this.domContainer.addEventListener('resize', this.setSize);
 
     if (lang) {
       this.lang = lang;

@@ -1,19 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PreviewUI } from './libs/class';
-import { Template, UIOptions } from './libs/type';
+import { PreviewUI, PreviewUIConstructor } from './libs/class';
 import { DESTROYED_ERR_MSG } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
 
 class Viewer extends PreviewUI {
-  constructor(props: {
-    domContainer: HTMLElement;
-    template: Template;
-    inputs: { [key: string]: string }[];
-    options?: UIOptions;
-  }) {
-    super({ ...props });
+  constructor(props: PreviewUIConstructor) {
+    super(props);
   }
 
   protected render() {

@@ -7,7 +7,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
 import HomepageFeatures from '../components/HomepageFeatures';
 import Divider from '../components/Divider';
-import { generate, Designer, Viewer, Form, Template, blankPdf } from '../../../src/index';
+import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
 import { examplePdfb64, dogPngb64 } from '../libs/sampleData';
 // TODO https://github.com/FormidableLabs/prism-react-renderer に変えた方がいいかも
 // prism-react-renderer はすでに依存に入っている
@@ -174,7 +174,7 @@ export default function Home(): JSX.Element {
   const [template, setTemplate] = useState<Template>(getTemplate());
   const [mode, setMode] = useState<'viewer' | 'form'>('form');
 
-  const saveTemplate = (t: Template) => {
+  const onSaveTemplate = (t: Template) => {
     setTemplate(t);
     if (form.current) {
       form.current.updateTemplate(t);
@@ -195,8 +195,9 @@ export default function Home(): JSX.Element {
       designer.current = new Designer({
         domContainer: designerRef.current,
         template,
-        saveTemplate,
       });
+
+      designer.current.onSaveTemplate(onSaveTemplate);
 
       designer.current.onChangeTemplate(() => {
         designer.current.saveTemplate();
@@ -218,8 +219,9 @@ export default function Home(): JSX.Element {
         domContainer: formRef.current,
         template,
         inputs: cloneDeep(template.sampledata) ?? [{}],
-        onChangeInput: console.log,
       });
+
+      form.current.onChangeInput(console.log);
     }
   }, [viewerRef, formRef, mode]);
 

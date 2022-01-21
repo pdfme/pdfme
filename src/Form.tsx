@@ -1,30 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PreviewUI } from './libs/class';
-import { Template, UIOptions } from './libs/type';
+import { PreviewUI, PreviewUIConstructor } from './libs/class';
 import { DESTROYED_ERR_MSG } from './libs/constants';
 import { I18nContext, FontContext } from './libs/contexts';
 import Preview from './components/Preview';
 
 class Form extends PreviewUI {
-  private readonly onChangeInputCallback?: (arg: {
-    index: number;
-    value: string;
-    key: string;
-  }) => void;
+  private onChangeInputCallback?: (arg: { index: number; value: string; key: string }) => void;
 
-  constructor(props: {
-    domContainer: HTMLElement;
-    template: Template;
-    inputs: { [key: string]: string }[];
-    onChangeInput?: (arg: { index: number; value: string; key: string }) => void;
-    options?: UIOptions;
-  }) {
+  constructor(props: PreviewUIConstructor) {
     super(props);
+  }
 
-    if (props.onChangeInput) {
-      this.onChangeInputCallback = props.onChangeInput;
-    }
+  public onChangeInput(cb: (arg: { index: number; value: string; key: string }) => void) {
+    this.onChangeInputCallback = cb;
   }
 
   protected render() {

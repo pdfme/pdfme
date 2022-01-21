@@ -66,8 +66,8 @@ const moveCommandToChangeSchemasArg = (props: {
 
 const TemplateEditor = ({
   template,
-  saveTemplate,
   size,
+  onSaveTemplate,
   onChangeTemplate,
 }: DesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
   const copiedSchemas = useRef<SchemaForUI[] | null>(null);
@@ -205,7 +205,7 @@ const TemplateEditor = ({
       },
       redo: () => timeTavel('redo'),
       undo: () => timeTavel('undo'),
-      save: () => saveTemplate(modifiedTemplate),
+      save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
     });
@@ -217,7 +217,7 @@ const TemplateEditor = ({
     pageCursor,
     pageSizes,
     removeSchemas,
-    saveTemplate,
+    onSaveTemplate,
     schemasList,
   ]);
 

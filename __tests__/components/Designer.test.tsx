@@ -20,7 +20,7 @@ test('Designer snapshot', async () => {
         <FontContext.Provider value={getDefaultFont()}>
           <Designer
             template={getSampleTemplate()}
-            saveTemplate={console.log}
+            onSaveTemplate={console.log}
             onChangeTemplate={console.log}
             size={{ width: 1200, height: 1200 }}
           />
