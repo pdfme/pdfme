@@ -126,32 +126,49 @@ function HomepageHeader() {
               Open source, developed by the community, and completely free to use under the MIT
               license!
             </p>
-          </div>
-          <div className="col col--6">
-            <div style={{ paddingTop: '0.5rem', textAlign: 'center' }}>
-              <GitHubButton
-                href="https://github.com/hand-dot/labelmake"
-                data-size="large"
-                data-show-count={true}
-                aria-label="Star hand-dot/labelmake on GitHub"
-              >
-                Star
-              </GitHubButton>
+            <div className="admonition admonition-caution alert alert--warning">
+              <div className="admonition-heading">
+                <h5>
+                  <span className="admonition-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"
+                      ></path>
+                    </svg>
+                  </span>
+                  caution
+                </h5>
+              </div>
+              <div className="admonition-content">
+                <p>
+                  pdfme is now beta version. Please report any issues or suggestions from{' '}
+                  <Link to="/help">Help page</Link>
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="col col--6">
+          <div className="col col--12">
             <div className={styles.buttons}>
-              {/* TODO リンク */}
               <Link className="button button--success" to="/docs/getting-started">
                 Getting Started
               </Link>
-              <div style={{ marginLeft: '1rem' }}></div>
-              {/* TODO リンク */}
-              <Link className="button button--info" to="/docs/getting-started">
-                Playground
-              </Link>
-              <div style={{ marginLeft: '1rem' }}></div>
+              <span style={{ marginLeft: '1rem', height: 25 }}>
+                <GitHubButton
+                  href="https://github.com/hand-dot/labelmake"
+                  data-size="large"
+                  data-show-count={true}
+                  aria-label="Star hand-dot/labelmake on GitHub"
+                >
+                  Star
+                </GitHubButton>
+              </span>
             </div>
           </div>
         </div>
@@ -372,7 +389,9 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={clsx('col col--8')} ref={designerRef}></div>
+            <div className={clsx('col col--8')}>
+              <div ref={designerRef} />
+            </div>
             <div className={clsx('col col--4')}>
               <p style={{ marginLeft: '1rem' }}>Out put template json object</p>
               <div

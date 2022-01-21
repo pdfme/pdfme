@@ -106,7 +106,7 @@ const config = {
       hideableSidebar: true,
       hideOnScroll: true,
       navbar: {
-        title: 'pdfme',
+        title: 'pdfme(BETA)',
         items: [
           {
             type: 'doc',
@@ -163,10 +163,6 @@ const config = {
           {
             title: 'Community',
             items: [
-              {
-                label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
               {
                 label: 'Github',
                 href: 'https://github.com/hand-dot/pdfme',

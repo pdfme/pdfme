@@ -1,9 +1,9 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 
-function Hello() {
+function TemplateDesign() {
   return (
-    <Layout title="Hello">
+    <Layout title="Template Design">
       <div
         style={{
           display: 'flex',
@@ -19,4 +19,4 @@ function Hello() {
   );
 }
 
-export default Hello;
+export default TemplateDesign;

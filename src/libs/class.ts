@@ -46,7 +46,7 @@ export abstract class BaseUIClass {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
     };
-    this.domContainer.addEventListener('resize', this.setSize);
+    window.addEventListener('resize', this.setSize);
 
     if (lang) {
       this.lang = lang;
