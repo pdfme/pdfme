@@ -34,14 +34,15 @@
         editor = new pdfme.Designer({
           domContainer,
           template: getTemplate(),
-          saveTemplate: (t) => {
-            console.log({ ...t, basePdf: 'skip...' });
-            const tj = JSON.stringify(t, null, 2);
-            localStorage.setItem('template', tj);
-          },
           options: {
             font,
           },
+        });
+
+        editor.onSaveTemplate((t) => {
+          console.log({ ...t, basePdf: 'skip...' });
+          const tj = JSON.stringify(t, null, 2);
+          localStorage.setItem('template', tj);
         });
       }
 

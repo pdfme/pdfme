@@ -1,13 +1,18 @@
 import React, { useContext } from 'react';
 import * as styles from '../index.module.scss';
 import { FontContext } from '../../../../libs/contexts';
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_LINE_HEIGHT,
+  DEFAULT_CHARACTER_SPACING,
+} from '../../../../libs/constants';
 import { SidebarProps } from '..';
 import { getFallbackFontName } from '../../../../libs/helper';
 
 const NumberInputSet = (props: {
   width: string;
   label: string;
-  value: number | undefined;
+  value: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   const { label, value, width, onChange } = props;
@@ -74,7 +79,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
       <div className={styles.flx}>
         <SelectSet
           label={'FontName'}
-          value={activeSchema.fontName || fallbackFontName}
+          value={activeSchema.fontName ?? fallbackFontName}
           options={Object.keys(font)}
           onChange={(e) => {
             changeSchemas([{ key: 'fontName', value: e.target.value, schemaId: activeSchema.id }]);
@@ -83,7 +88,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
 
         <SelectSet
           label={'Alignment'}
-          value={activeSchema.alignment || 'left'}
+          value={activeSchema.alignment ?? 'left'}
           options={alignments}
           onChange={(e) =>
             changeSchemas([{ key: 'alignment', value: e.target.value, schemaId: activeSchema.id }])
@@ -94,7 +99,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
         <NumberInputSet
           width="30%"
           label={'FontSize(pt)'}
-          value={activeSchema.fontSize}
+          value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
           onChange={(e) =>
             changeSchemas([
               { key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id },
@@ -104,7 +109,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
         <NumberInputSet
           width="30%"
           label={'LineHeight(em)'}
-          value={activeSchema.lineHeight}
+          value={activeSchema.lineHeight ?? DEFAULT_LINE_HEIGHT}
           onChange={(e) =>
             changeSchemas([
               { key: 'lineHeight', value: Number(e.target.value), schemaId: activeSchema.id },
@@ -115,7 +120,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
         <NumberInputSet
           width="40%"
           label={'CharacterSpacing(pt)'}
-          value={activeSchema.characterSpacing}
+          value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
           onChange={(e) =>
             changeSchemas([
               { key: 'characterSpacing', value: Number(e.target.value), schemaId: activeSchema.id },
@@ -126,7 +131,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
       <div className={styles.flx} style={{ marginBottom: '0.25rem' }}>
         <ColorInputSet
           label={'FontColor'}
-          value={activeSchema.fontColor || '#000000'}
+          value={activeSchema.fontColor ?? '#000000'}
           onChange={(e) =>
             changeSchemas([{ key: 'fontColor', value: e.target.value, schemaId: activeSchema.id }])
           }
@@ -137,7 +142,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
 
         <ColorInputSet
           label={'Background'}
-          value={activeSchema.backgroundColor || '#ffffff'}
+          value={activeSchema.backgroundColor ?? '#ffffff'}
           onChange={(e) =>
             changeSchemas([
               { key: 'backgroundColor', value: e.target.value, schemaId: activeSchema.id },

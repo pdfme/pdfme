@@ -22,18 +22,7 @@ custom_edit_url: null
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `Object` |
-| `props.domContainer` | `HTMLElement` |
-| `props.inputs` | { [key: string]: `string`;  }[] |
-| `props.options?` | `Object` |
-| `props.options.font` | `undefined` \| `Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
-| `props.options.lang` | `undefined` \| ``"en"`` \| ``"ja"`` |
-| `props.template` | `Object` |
-| `props.template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
-| `props.template.columns` | `undefined` \| `string`[] |
-| `props.template.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] |
-| `props.template.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
-| `props.onChangeInput?` | (`arg`: { `index`: `number` ; `key`: `string` ; `value`: `string`  }) => `void` |
+| `props` | `PreviewUIConstructor` |
 
 #### Overrides
 
@@ -41,7 +30,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[Form.tsx:16](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/Form.tsx#L16)
+[Form.tsx:11](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/Form.tsx#L11)
 
 ## Properties
 
@@ -55,7 +44,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[libs/class.ts:8](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L8)
+[libs/class.ts:19](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L19)
 
 ___
 
@@ -69,13 +58,13 @@ PreviewUI.inputs
 
 #### Defined in
 
-[libs/class.ts:78](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L78)
+[libs/class.ts:89](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L89)
 
 ___
 
 ### onChangeInputCallback
 
-• `Private` `Optional` `Readonly` **onChangeInputCallback**: (`arg`: { `index`: `number` ; `key`: `string` ; `value`: `string`  }) => `void`
+• `Private` `Optional` **onChangeInputCallback**: (`arg`: { `index`: `number` ; `key`: `string` ; `value`: `string`  }) => `void`
 
 #### Type declaration
 
@@ -96,7 +85,7 @@ ___
 
 #### Defined in
 
-[Form.tsx:10](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/Form.tsx#L10)
+[Form.tsx:9](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/Form.tsx#L9)
 
 ___
 
@@ -117,7 +106,7 @@ PreviewUI.size
 
 #### Defined in
 
-[libs/class.ts:12](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L12)
+[libs/class.ts:23](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L23)
 
 ___
 
@@ -140,7 +129,7 @@ PreviewUI.template
 
 #### Defined in
 
-[libs/class.ts:10](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L10)
+[libs/class.ts:21](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L21)
 
 ## Methods
 
@@ -158,7 +147,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[libs/class.ts:68](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L68)
+[libs/class.ts:79](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L79)
 
 ___
 
@@ -176,7 +165,7 @@ PreviewUI.getFont
 
 #### Defined in
 
-[libs/class.ts:52](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L52)
+[libs/class.ts:63](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L63)
 
 ___
 
@@ -206,7 +195,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[libs/class.ts:48](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L48)
+[libs/class.ts:59](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L59)
 
 ___
 
@@ -224,7 +213,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[libs/class.ts:88](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L88)
+[libs/class.ts:99](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L99)
 
 ___
 
@@ -249,7 +238,27 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[libs/class.ts:56](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L56)
+[libs/class.ts:67](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L67)
+
+___
+
+### onChangeInput
+
+▸ **onChangeInput**(`cb`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `cb` | (`arg`: { `index`: `number` ; `key`: `string` ; `value`: `string`  }) => `void` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[Form.tsx:15](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/Form.tsx#L15)
 
 ___
 
@@ -267,7 +276,7 @@ PreviewUI.render
 
 #### Defined in
 
-[Form.tsx:30](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/Form.tsx#L30)
+[Form.tsx:19](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/Form.tsx#L19)
 
 ___
 
@@ -291,7 +300,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[libs/class.ts:94](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L94)
+[libs/class.ts:105](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L105)
 
 ___
 
@@ -319,4 +328,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[libs/class.ts:62](https://github.com/hand-dot/labelmake-ui/blob/3d45f3e/src/libs/class.ts#L62)
+[libs/class.ts:73](https://github.com/hand-dot/labelmake-ui/blob/7f928b4/src/libs/class.ts#L73)
