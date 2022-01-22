@@ -30,7 +30,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[Designer.tsx:14](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L14)
+[Designer.tsx:14](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -44,7 +44,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[libs/class.ts:19](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L19)
+[libs/class.ts:19](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L19)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:12](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L12)
+[Designer.tsx:12](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L12)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:11](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L11)
+[Designer.tsx:11](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L11)
 
 ___
 
@@ -121,7 +121,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[libs/class.ts:23](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L23)
+[libs/class.ts:23](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L23)
 
 ___
 
@@ -144,7 +144,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[libs/class.ts:21](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L21)
+[libs/class.ts:21](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L21)
 
 ## Methods
 
@@ -162,7 +162,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[libs/class.ts:79](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L79)
+[libs/class.ts:79](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L79)
 
 ___
 
@@ -180,7 +180,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[libs/class.ts:63](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L63)
+[libs/class.ts:63](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L63)
 
 ___
 
@@ -210,7 +210,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[libs/class.ts:59](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L59)
+[libs/class.ts:59](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L59)
 
 ___
 
@@ -235,7 +235,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[libs/class.ts:67](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L67)
+[libs/class.ts:67](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L67)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:32](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L32)
+[Designer.tsx:32](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L32)
 
 ___
 
@@ -275,7 +275,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:28](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L28)
+[Designer.tsx:28](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L28)
 
 ___
 
@@ -293,7 +293,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[Designer.tsx:36](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L36)
+[Designer.tsx:36](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L36)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:21](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/Designer.tsx#L21)
+[Designer.tsx:21](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/Designer.tsx#L21)
 
 ___
 
@@ -335,4 +335,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[libs/class.ts:73](https://github.com/hand-dot/labelmake-ui/blob/56180ca/src/libs/class.ts#L73)
+[libs/class.ts:73](https://github.com/hand-dot/labelmake-ui/blob/c768c0e/src/libs/class.ts#L73)

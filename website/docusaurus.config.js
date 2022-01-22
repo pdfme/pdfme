@@ -117,7 +117,7 @@ const config = {
           {
             to: '/template-design',
             position: 'right',
-            label: 'Template Design & Code Generator',
+            label: 'Template Design',
           },
           {
             to: '/help',
@@ -151,7 +151,7 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Template Design & Code Generator',
+                label: 'Template Design',
                 to: '/template-design',
               },
               {

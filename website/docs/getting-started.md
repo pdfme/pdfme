@@ -17,7 +17,7 @@ pdfme は PDF 作成を簡単にするために作成されました。特に下
 - 複数の種類の PDF 作成をしたい
 - パフォーマンスを落とさずに大量の PDF 作成が必要
 
-代表的な使用例として作者が運用しているサービス [https://labelmake.jp/](https://labelmake.jp/) では 100 を超えるテンプレートを保有し、月間 10 万を超える PDF ファイルを作成しています。
+代表的な使用例として作者が運用しているサービス [https://labelmake.jp/](https://labelmake.jp/) では 100 種類を超える種類の PDF が作成でき、月間 10 万を超える PDF ファイルを作成しています。
 
 ## 動作環境, インストール
 
@@ -213,8 +213,6 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 
 [詳しくはこちらの Form クラスの API ドキュメントを参照ください。](/docs/api/classes/Form#methods)
 
----
-
 ## Viewer
 
 Viewer は Generator で作成予定の PDF を確認するために使われます。特にモバイルブラウザで PDF ファイルのプレビューは問題でした。iframe でうまく表示されないためです。
@@ -238,3 +236,14 @@ viewer = new Viewer({ domContainer, template, inputs });
 ![](/img/viewer.png)
 
 [詳しくはこちらの Viewer クラスの API ドキュメントを参照ください。](/docs/api/classes/Viewer#methods)
+
+## 御礼
+
+- [pdf-lib](https://pdf-lib.js.org/): PDF 作成で使用
+- [PDF.js](https://mozilla.github.io/pdf.js/): PDF の表示で使用
+- [React](https://reactjs.org/): UI の作成で使用
+- [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): デザイナーの UI で使用
+- [bwip-js](https://github.com/metafloor/bwip-js): バーコードの作成で使用
+- [zod](https://github.com/colinhacks/zod): バリーデーションで使用
+
+これらのライブラリがなければ間違いなく pdfme は作れませんでした。これらのライブラリの開発者に感謝しています。
