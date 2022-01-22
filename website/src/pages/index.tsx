@@ -7,12 +7,9 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
+import Code from '../components/Code';
 import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
 import { getTemplate } from '../libs/helper';
-// TODO https://github.com/FormidableLabs/prism-react-renderer に変えた方がいいかも
-// prism-react-renderer はすでに依存に入っている
-import { Sandpack } from '@codesandbox/sandpack-react';
-require('@codesandbox/sandpack-react/dist/index.css');
 
 // TODO https://github.com/hand-dot/labelmake をpdfmeに置換する
 // TODO Template,Generator,Designer,Form / Viewerに対してページ内リンクを追加する
@@ -150,12 +147,10 @@ export default function Home(): JSX.Element {
                 Generator
                 <a className="hash-link" href="#generate" title="Direct link to heading"></a>
               </h2>
-              <p>Most simple generate example is like this.</p>
+              <p style={{ marginBottom: 0 }}>Most simple PDF generate example is like this.</p>
               <div style={{ height: 820, overflow: 'scroll' }}>
-                <Sandpack
-                  files={{
-                    'index.ts': {
-                      code: `import { generate } from "pdfme";
+                <Code
+                  code={`import { generate } from "pdfme";
 
 (async () => {
   const template = ${JSON.stringify(
@@ -182,17 +177,9 @@ export default function Home(): JSX.Element {
 
   const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   window.open(URL.createObjectURL(blob));
-})();
-`,
-                      active: true,
-                    },
-                  }}
-                  template="react"
-                  options={{
-                    editorHeight: 820,
-                    editorWidthPercentage: 100,
-                  }}
-                />
+})();`.trim()}
+                  language="typescript"
+                ></Code>
               </div>
               <div>
                 <button
@@ -235,7 +222,6 @@ export default function Home(): JSX.Element {
               <div ref={designerRef} />
             </div>
             <div className={clsx('col col--4')}>
-              <p style={{ marginLeft: '1rem' }}>Out put template json object</p>
               <div
                 style={{
                   height: 800,
@@ -243,19 +229,7 @@ export default function Home(): JSX.Element {
                   marginLeft: '1rem',
                 }}
               >
-                <Sandpack
-                  files={{
-                    'template.json': {
-                      code: JSON.stringify(template, null, 2),
-                      active: true,
-                    },
-                  }}
-                  template="react"
-                  options={{
-                    editorHeight: 800,
-                    editorWidthPercentage: 100,
-                  }}
-                />
+                <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
               </div>
             </div>
             <div className={clsx('col col--12 margin-vert--lg')}>

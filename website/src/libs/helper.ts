@@ -2,7 +2,6 @@ import { Template } from '../../../src/index';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getTemplate = (): Template => ({
-  basePdf: examplePdfb64,
   schemas: [
     {
       name: {
@@ -77,6 +76,7 @@ export const getTemplate = (): Template => ({
       },
     },
   ],
+  basePdf: examplePdfb64,
   sampledata: [
     {
       name: 'Pet Name',
