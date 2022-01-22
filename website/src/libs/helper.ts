@@ -90,3 +90,5 @@ export const getTemplate = (): Template => ({
   ],
   columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
+
+export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));

@@ -9,12 +9,10 @@ import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
 import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
-import { getTemplate } from '../libs/helper';
+import { getTemplate, cloneDeep } from '../libs/helper';
 
 // TODO https://github.com/hand-dot/labelmake をpdfmeに置換する
 // TODO Template,Generator,Designer,Form / Viewerに対してページ内リンクを追加する
-
-const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
