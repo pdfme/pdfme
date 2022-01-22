@@ -78,6 +78,7 @@ const SortableItem = sortableElement(
                   style={{ marginRight: '0.5rem' }}
                 />
                 {status === 'is-warning' ? i18n('noKeyName') : sc.key}
+                {status === 'is-danger' ? i18n('notUniq') : ''}
               </span>
             )}
           </span>

@@ -11,10 +11,11 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
     <div>
       <label style={{ marginBottom: 0 }}>{i18n('inputExample')}</label>
       {activeSchema.type === 'image' ? (
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', textAlign: 'center' }}>
           {activeSchema.data ? (
             <div style={{ margin: '0 auto' }}>
               <button
+                style={{ position: 'absolute', top: 0, left: 0 }}
                 aria-label="close"
                 onClick={() =>
                   changeSchemas([{ key: 'data', value: '', schemaId: activeSchema.id }])
@@ -22,11 +23,7 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
               >
                 x
               </button>
-              <img
-                style={{ maxHeight: 180, width: '100%' }}
-                src={activeSchema.data}
-                alt="Input Example"
-              />
+              <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
             </div>
           ) : (
             <label>
