@@ -156,7 +156,7 @@ const template: Template = {
   // skip...　Check the template section.
 };
 
-const desinger = new Designer({ domContainer, template });
+const designer = new Designer({ domContainer, template });
 ```
 
 上記のように Designer クラスをインスタンス化して、domContainer にテンプレートデザイナーを表示しています。  
@@ -164,7 +164,7 @@ const desinger = new Designer({ domContainer, template });
 
 ![](/img/designer.gif)
 
-desinger インスタンスには下記のようなメソッドで操作を行うことができます。
+designer インスタンスには下記のようなメソッドで操作を行うことができます。
 
 - `saveTemplate`
 - `updateTemplate`
@@ -192,7 +192,7 @@ const template: Template = {
 };
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
-form = new Form({ domContainer, template, inputs });
+const form = new Form({ domContainer, template, inputs });
 ```
 
 ![](/img/form.gif)
@@ -227,7 +227,7 @@ const template: Template = {
 };
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
-viewer = new Viewer({ domContainer, template, inputs });
+const viewer = new Viewer({ domContainer, template, inputs });
 ```
 
 ![](/img/viewer.png)

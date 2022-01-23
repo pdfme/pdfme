@@ -9,7 +9,7 @@ import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
 import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
-import { getTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
+import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
 // TODO https://github.com/hand-dot/labelmake をpdfmeに置換する
 
@@ -24,7 +24,7 @@ export default function Home(): JSX.Element {
   const viewer = useRef<Viewer | null>(null);
   const form = useRef<Form | null>(null);
 
-  const [template, setTemplate] = useState<Template>(getTemplate());
+  const [template, setTemplate] = useState<Template>(getSampleTemplate());
   const [mode, setMode] = useState<'viewer' | 'form'>('form');
 
   const onSaveTemplate = (t: Template) => {
@@ -149,7 +149,7 @@ export default function Home(): JSX.Element {
               </h2>
               <p style={{ marginBottom: 0 }}>Most simple PDF generate example is like this.</p>
               <div style={{ height: 820, overflow: 'scroll' }}>
-                <Code code={getGeneratorSampleCode(getTemplate())} language="typescript"></Code>
+                <Code code={getGeneratorSampleCode(getSampleTemplate())} language="typescript"></Code>
               </div>
               <div>
                 <button

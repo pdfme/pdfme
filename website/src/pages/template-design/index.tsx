@@ -14,12 +14,15 @@ import { generate, Designer, Template } from '../../../../src/index';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import {
-  getTemplate,
+  getSampleTemplate,
   cloneDeep,
   downloadJsonFile,
   readFile,
   getTemplateFromJsonFile,
   getGeneratorSampleCode,
+  getDesignerSampleCode,
+  getFormSampleCode,
+  getViewerSampleCode,
 } from '../../libs/helper';
 import Divider from '../../components/Divider';
 import Code from '../../components/Code';
@@ -75,9 +78,7 @@ const HowToUseButton = () => {
       </button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalBoxStyle}>
-          <div
-            style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll', padding: '1rem' }}
-          >
+          <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
             <ModalHead title="How to use" handleClose={handleClose} />
             <img src={'/img/designer.gif'} />
             <p>
@@ -148,6 +149,18 @@ const GetCodeButton = ({ template }: { template: Template }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const code = (() => {
+    if (mode === 'generator') {
+      return getGeneratorSampleCode(template);
+    } else if (mode === 'designer') {
+      return getDesignerSampleCode(template);
+    } else if (mode === 'form') {
+      return getFormSampleCode(template);
+    } else if (mode === 'viewer') {
+      return getViewerSampleCode(template);
+    }
+  })();
+
   return (
     <>
       <button
@@ -160,9 +173,7 @@ const GetCodeButton = ({ template }: { template: Template }) => {
       </button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalBoxStyle}>
-          <div
-            style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll', padding: '1rem' }}
-          >
+          <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
             <ModalHead title="Get Code" handleClose={handleClose} />
             <ul className="tabs tabs--block">
               {modes.map((m) => (
@@ -175,12 +186,9 @@ const GetCodeButton = ({ template }: { template: Template }) => {
                 </li>
               ))}
             </ul>
-            <div style={{ maxHeight: '100vh', overflow: 'scroll' }}>
-              {/* TODO 変更が反映されていない */}
-              {/* TODO 他のバリエーションのコードも追加する */}
-              <Code code={getGeneratorSampleCode(template)} language="typescript" />
+            <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
+              <Code code={code} language="typescript" />
             </div>
-            {/* TODO ここでコピーボタン */}
           </div>
         </Box>
       </Modal>
@@ -191,19 +199,20 @@ const GetCodeButton = ({ template }: { template: Template }) => {
 const TemplateDesign = () => {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
-
-  const template: Template = designer.current ? designer.current.getTemplate() : getTemplate();
+  const [template, setTemplate] = useState<Template>(getSampleTemplate());
 
   useEffect(() => {
     if (designerRef.current) {
       designer.current = new Designer({ domContainer: designerRef.current, template });
       designer.current.onSaveTemplate(downloadTemplate);
+      designer.current.onChangeTemplate(setTemplate);
     }
   }, [designerRef]);
 
   const changeBasePdf = (file: File) => {
     if (designer.current) {
       readFile(file, 'dataURL').then(async (basePdf: string) => {
+        // TODO updateTemplateでコールバックが発火しないので、発火するようにする
         designer.current.updateTemplate(Object.assign(cloneDeep(template), { basePdf }));
       });
     }
@@ -212,8 +221,8 @@ const TemplateDesign = () => {
   const loadTemplate = (file: File) => {
     if (designer.current) {
       getTemplateFromJsonFile(file)
-        .then((template) => {
-          designer.current.updateTemplate(template);
+        .then((t) => {
+          designer.current.updateTemplate(t);
         })
         .catch((e) => {
           alert(`Invalid template file.

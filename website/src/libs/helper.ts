@@ -2,7 +2,7 @@ import { Template } from '../../../src/index';
 import { checkProps } from '../../../src/libs/helper';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
-export const getTemplate = (): Template => ({
+export const getSampleTemplate = (): Template => ({
   schemas: [
     {
       name: {
@@ -138,16 +138,18 @@ export const getTemplateFromJsonFile = (file: File) => {
   });
 };
 
+const templateFmt4SampleCode = (template: Template) =>
+  JSON.stringify(
+    Object.assign(cloneDeep(template), { columns: undefined, sampledata: undefined }),
+    null,
+    2
+  );
+
 export const getGeneratorSampleCode = (template: Template) =>
   `import { generate } from "pdfme";
 
 (async () => {
-  const template = ${JSON.stringify(
-    Object.assign(cloneDeep(template), { columns: undefined, sampledata: undefined }),
-    null,
-    2
-  )};
-  
+  const template = ${templateFmt4SampleCode(template)};
   const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
   const pdf = await generate({ template, inputs });
@@ -159,3 +161,29 @@ export const getGeneratorSampleCode = (template: Template) =>
   const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   window.open(URL.createObjectURL(blob));
 })();`.trim();
+
+export const getDesignerSampleCode = (template: Template) =>
+  `import { Designer } from "pdfme";
+
+const domContainer = document.getElementById('container');
+const template = ${templateFmt4SampleCode(template)};
+
+const designer = new Designer({ domContainer, template });`.trim();
+
+export const getFormSampleCode = (template: Template) =>
+  `import { Form } from "pdfme";
+
+const domContainer = document.getElementById('container');
+const template = ${templateFmt4SampleCode(template)};
+const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+
+const form = new Form({ domContainer, template, inputs });`.trim();
+
+export const getViewerSampleCode = (template: Template) =>
+  `import { Viewer } from "pdfme";
+
+const domContainer = document.getElementById('container');
+const template = ${templateFmt4SampleCode(template)};
+const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+
+const viewer = new Viewer({ domContainer, template });`.trim();
