@@ -3,6 +3,7 @@ import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { Template, Size, Lang, Font, UIProps, PreviewProps, UIOptions } from './type';
 import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from './helper';
+import { debounce } from './utils';
 
 interface CommonConstructor {
   domContainer: HTMLElement;
@@ -26,14 +27,14 @@ export abstract class BaseUIClass {
 
   private readonly font: Font = getDefaultFont();
 
-  private readonly setSize = () => {
+  private readonly setSize = debounce(() => {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
     };
     this.render();
-  };
+  }, 100);
 
   constructor(props: UIProps) {
     checkProps(props, UIProps);

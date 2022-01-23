@@ -1,10 +1,13 @@
 import { nanoid } from 'nanoid';
 import base64url from 'base64url';
 import _set from 'lodash.set';
+import _debounce from 'lodash.debounce';
 
 export const uuid = nanoid;
 
 export const set = _set;
+
+export const debounce = _debounce;
 
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
