@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import {
@@ -8,74 +8,58 @@ import {
   FileDownloadOutlined,
   CodeOutlined,
   PreviewOutlined,
+  CloseOutlined,
 } from '@mui/icons-material';
 import { generate, Designer, Template } from '../../../../src/index';
-import { checkProps } from '../../../../src/libs/helper';
 import Layout from '@theme/Layout';
-import { getTemplate, cloneDeep } from '../../libs/helper';
+import Link from '@docusaurus/Link';
+import {
+  getTemplate,
+  cloneDeep,
+  downloadJsonFile,
+  readFile,
+  getTemplateFromJsonFile,
+  getGeneratorSampleCode,
+} from '../../libs/helper';
+import Divider from '../../components/Divider';
+import Code from '../../components/Code';
 
 const headerHeight = 60;
 const controllHeight = 60;
-
-const downloadJsonFile = (json: any, title: string) => {
-  const blob = new Blob([JSON.stringify(json)], {
-    type: 'application/json',
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${title}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
-};
-
-const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && file !== null) {
-        r(e.target.result);
-      }
-    });
-    if (file !== null) {
-      if (type === 'text') {
-        fileReader.readAsText(file);
-      } else if (type === 'dataURL') {
-        fileReader.readAsDataURL(file);
-      } else if (type === 'arrayBuffer') {
-        fileReader.readAsArrayBuffer(file);
-      }
-    }
-  });
-};
-
-const getTemplateFromJsonFile = (file: File) => {
-  return readFile(file, 'text').then((jsonStr) => {
-    const template: Template = JSON.parse(jsonStr as string);
-    try {
-      checkProps(template, Template);
-      return template;
-    } catch (e) {
-      throw e;
-    }
-  });
-};
 
 const modalBoxStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
   bgcolor: 'background.paper',
   border: '1px solid #eee',
   borderRadius: 1,
   boxShadow: 24,
-  p: 4,
 };
 
+const ModalHead = ({ title, handleClose }: { title: string; handleClose: () => void }) => (
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '1rem',
+    }}
+  >
+    <h2 style={{ marginBottom: 0 }}>{title}</h2>
+    <button
+      style={{ display: 'flex' }}
+      className="button button--sm button--link"
+      onClick={handleClose}
+    >
+      <CloseOutlined fontSize="small" />
+    </button>
+  </div>
+);
+
 const HowToUseButton = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -91,17 +75,76 @@ const HowToUseButton = () => {
       </button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalBoxStyle}>
-          {/* TODO 実装 */}
-          <h2>How to use</h2>
-          <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</p>
+          <div
+            style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll', padding: '1rem' }}
+          >
+            <ModalHead title="How to use" handleClose={handleClose} />
+            <img src={'/img/designer.gif'} />
+            <p>
+              The operation is based on Google Slides, etc., and you can use common keyboard
+              shortcuts.
+            </p>
+
+            <Divider />
+            <div>
+              <p style={{ margin: 0 }}>
+                <strong>Keyboard shortcuts</strong>
+                <br />
+                <span>For the currently selected entry (light blue frame dot)</span>
+              </p>
+              <ul>
+                <li>
+                  <span>
+                    Move 1mm(Hold down the <kbd>shift</kbd> to move 0.1 mm)
+                  </span>
+                  ＝ <kbd>↑</kbd> , <kbd>→</kbd> , <kbd>↓</kbd> , <kbd>←</kbd>
+                </li>
+                <li>
+                  <span>Copy</span> ＝ ( <kbd>ctrl</kbd>or<kbd>⌘</kbd>) +<kbd>c</kbd>
+                </li>
+                <li>
+                  <span>Paste</span>＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +<kbd>v</kbd>
+                </li>
+                <li>
+                  <span>Delete</span>＝ <kbd>backspace</kbd> or <kbd>delete</kbd>
+                </li>
+                <li>
+                  <span>Undo</span> ＝( <kbd>ctrl</kbd> or <kbd>⌘</kbd>) +<kbd>z</kbd>
+                </li>
+                <li>
+                  <span>Redo</span>＝ <kbd>ctrl</kbd> +<kbd>y</kbd>
+                  or <kbd>⌘</kbd> + <kbd>shift</kbd>+<kbd>z</kbd>
+                </li>
+              </ul>
+            </div>
+            <Divider />
+            <div>
+              <p style={{ margin: 0 }}>
+                <strong>About Template</strong>
+              </p>
+              <p>
+                Templates are the core data structure of the pdfme library. It is JSON data that is
+                easy to understand and has the properties basePdf and schemas.
+              </p>
+
+              <Link to="/docs/getting-started#template">
+                <button className="button button--lg button--primary button--block">
+                  Learn more about the Template
+                </button>
+              </Link>
+            </div>
+          </div>
         </Box>
       </Modal>
     </>
   );
 };
 
-const GetCodeButton = () => {
-  const [open, setOpen] = React.useState(false);
+const GetCodeButton = ({ template }: { template: Template }) => {
+  const modes = ['generator', 'designer', 'form', 'viewer'];
+
+  const [mode, setMode] = useState<typeof modes[number]>('generator');
+  const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
@@ -117,9 +160,28 @@ const GetCodeButton = () => {
       </button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalBoxStyle}>
-          {/* TODO 実装 */}
-          <h2>Get Code</h2>
-          <p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula.</p>
+          <div
+            style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'scroll', padding: '1rem' }}
+          >
+            <ModalHead title="Get Code" handleClose={handleClose} />
+            <ul className="tabs tabs--block">
+              {modes.map((m) => (
+                <li
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className={`tabs__item ${mode === m ? 'tabs__item--active' : ''}`}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </li>
+              ))}
+            </ul>
+            <div style={{ maxHeight: '100vh', overflow: 'scroll' }}>
+              {/* TODO 変更が反映されていない */}
+              {/* TODO 他のバリエーションのコードも追加する */}
+              <Code code={getGeneratorSampleCode(template)} language="typescript" />
+            </div>
+            {/* TODO ここでコピーボタン */}
+          </div>
         </Box>
       </Modal>
     </>
@@ -130,12 +192,11 @@ const TemplateDesign = () => {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
 
+  const template: Template = designer.current ? designer.current.getTemplate() : getTemplate();
+
   useEffect(() => {
     if (designerRef.current) {
-      designer.current = new Designer({
-        domContainer: designerRef.current,
-        template: getTemplate(),
-      });
+      designer.current = new Designer({ domContainer: designerRef.current, template });
       designer.current.onSaveTemplate(downloadTemplate);
     }
   }, [designerRef]);
@@ -143,9 +204,7 @@ const TemplateDesign = () => {
   const changeBasePdf = (file: File) => {
     if (designer.current) {
       readFile(file, 'dataURL').then(async (basePdf: string) => {
-        console.log('basePdf', basePdf);
-        const template = Object.assign(cloneDeep(designer.current.getTemplate()), { basePdf });
-        designer.current.updateTemplate(template);
+        designer.current.updateTemplate(Object.assign(cloneDeep(template), { basePdf }));
       });
     }
   };
@@ -165,19 +224,14 @@ ${e}`);
   };
 
   const downloadTemplate = () => {
-    if (designer.current) {
-      downloadJsonFile(designer.current.getTemplate(), 'template');
-    }
+    downloadJsonFile(template, 'template');
   };
 
   const generatePdf = async () => {
-    if (designer.current) {
-      const template = designer.current.getTemplate();
-      const inputs = template.sampledata ?? [];
-      const pdf = await generate({ template, inputs });
-      const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-      window.open(URL.createObjectURL(blob));
-    }
+    const inputs = template.sampledata ?? [];
+    const pdf = await generate({ template, inputs });
+    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+    window.open(URL.createObjectURL(blob));
   };
 
   return (
@@ -244,7 +298,7 @@ ${e}`);
             <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
             Download Template
           </button>
-          <GetCodeButton />
+          <GetCodeButton template={template} />
           <button
             style={{ display: 'flex', alignItems: 'center' }}
             onClick={generatePdf}

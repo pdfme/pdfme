@@ -100,6 +100,8 @@ A4 の空の PDF は `blankPdf` でインポートすることができます。
 
 テンプレートは[こちらのページ](/template-design)から作成できます。もしくは [Designer のセクション](/docs/getting-started#designer)からアプリケーションに組み込む方法をチェックしてください。
 
+[詳しくはこちらの Template 型の API ドキュメントを参照ください。](/docs/api/#template)
+
 ## Generator
 
 PDF 作成関数である `generate` はテンプレートと inputs を受け取って PDF を作成します。
@@ -118,7 +120,7 @@ const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 generate({ template, inputs }).then((pdf) => {
   console.log(pdf);
 
-  // ブラウザー
+  // Browser
   // const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   // window.open(URL.createObjectURL(blob));
 
@@ -154,15 +156,10 @@ const template: Template = {
   // skip...　Check the template section.
 };
 
-// 保存時に呼ばれるコールバック
-const saveTemplate = (t: Template) => {
-  console.log(t); // provide a modified template
-};
-
-const desinger = new Designer({ domContainer, template, saveTemplate });
+const desinger = new Designer({ domContainer, template });
 ```
 
-上記のように Designer クラスをインスタンス化して、domContainer にテンプレートデザイナーを表示しています。
+上記のように Designer クラスをインスタンス化して、domContainer にテンプレートデザイナーを表示しています。  
 下記のようにテンプレートを編集することができます。操作方法は Google Slides などを参考にしており、一般的なキーボードショートカットを使うことができます。
 
 ![](/img/designer.gif)

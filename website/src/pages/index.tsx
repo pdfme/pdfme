@@ -9,10 +9,9 @@ import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
 import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
-import { getTemplate, cloneDeep } from '../libs/helper';
+import { getTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
 // TODO https://github.com/hand-dot/labelmake をpdfmeに置換する
-// TODO Template,Generator,Designer,Form / Viewerに対してページ内リンクを追加する
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
@@ -132,9 +131,12 @@ export default function Home(): JSX.Element {
                     </small>
                   </div>
                   <div className="card__footer">
-                    <button className="button button--lg button--primary button--block">
+                    <Link
+                      className="button button--lg button--primary button--block"
+                      to="/docs/getting-started#template"
+                    >
                       Learn more about the Template
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -147,37 +149,7 @@ export default function Home(): JSX.Element {
               </h2>
               <p style={{ marginBottom: 0 }}>Most simple PDF generate example is like this.</p>
               <div style={{ height: 820, overflow: 'scroll' }}>
-                <Code
-                  code={`import { generate } from "pdfme";
-
-(async () => {
-  const template = ${JSON.stringify(
-    Object.assign(cloneDeep(getTemplate()), {
-      basePdf: 'data:application/pdf;base64,JVB...',
-      columns: undefined,
-      sampledata: undefined,
-    }),
-    null,
-    2
-  )};
-  
-  const inputs = ${JSON.stringify(
-    [
-      Object.assign(cloneDeep(template.sampledata[0]), {
-        photo: 'data:image/png;base64,iVBORw0...',
-      }),
-    ],
-    null,
-    2
-  )};
-
-  const pdf = await generate({ template, inputs });
-
-  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-  window.open(URL.createObjectURL(blob));
-})();`.trim()}
-                  language="typescript"
-                ></Code>
+                <Code code={getGeneratorSampleCode(getTemplate())} language="typescript"></Code>
               </div>
               <div>
                 <button
@@ -188,7 +160,7 @@ export default function Home(): JSX.Element {
                 </button>
                 <Link
                   className="margin-vert--md button button--primary button--lg button--block"
-                  to="/docs/getting-started"
+                  to="/docs/getting-started#generator"
                 >
                   Learn more about the Generator
                 </Link>
@@ -236,8 +208,10 @@ export default function Home(): JSX.Element {
                   You can easily integrate into your app.
                   <br />
                 </p>
-                {/* TODO リンク */}
-                <Link className="button button--primary button--lg" to="/docs/getting-started">
+                <Link
+                  className="button button--primary button--lg"
+                  to="/docs/getting-started#designer"
+                >
                   Learn more about the Designer
                 </Link>
               </div>
@@ -305,9 +279,12 @@ export default function Home(): JSX.Element {
                     </small>
                   </div>
                   <div className="card__footer">
-                    <button className="button button--lg button--primary button--block">
+                    <Link
+                      className="button button--primary button--lg"
+                      to={`/docs/getting-started#${mode}`}
+                    >
                       Learn more about the {mode === 'form' ? 'Form' : 'Viewer'}
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

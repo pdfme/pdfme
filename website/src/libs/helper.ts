@@ -1,4 +1,5 @@
 import { Template } from '../../../src/index';
+import { checkProps } from '../../../src/libs/helper';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getTemplate = (): Template => ({
@@ -92,3 +93,69 @@ export const getTemplate = (): Template => ({
 });
 
 export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
+
+export const downloadJsonFile = (json: any, title: string) => {
+  const blob = new Blob([JSON.stringify(json)], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${title}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
+  return new Promise<string | ArrayBuffer>((r) => {
+    const fileReader = new FileReader();
+    fileReader.addEventListener('load', (e) => {
+      if (e && e.target && e.target.result && file !== null) {
+        r(e.target.result);
+      }
+    });
+    if (file !== null) {
+      if (type === 'text') {
+        fileReader.readAsText(file);
+      } else if (type === 'dataURL') {
+        fileReader.readAsDataURL(file);
+      } else if (type === 'arrayBuffer') {
+        fileReader.readAsArrayBuffer(file);
+      }
+    }
+  });
+};
+
+export const getTemplateFromJsonFile = (file: File) => {
+  return readFile(file, 'text').then((jsonStr) => {
+    const template: Template = JSON.parse(jsonStr as string);
+    try {
+      checkProps(template, Template);
+      return template;
+    } catch (e) {
+      throw e;
+    }
+  });
+};
+
+export const getGeneratorSampleCode = (template: Template) =>
+  `import { generate } from "pdfme";
+
+(async () => {
+  const template = ${JSON.stringify(
+    Object.assign(cloneDeep(template), { columns: undefined, sampledata: undefined }),
+    null,
+    2
+  )};
+  
+  const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+
+  const pdf = await generate({ template, inputs });
+
+  // Node.js
+  // fs.writeFileSync(path.join(__dirname, 'test.pdf'), pdf);
+
+  // Browser
+  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+  window.open(URL.createObjectURL(blob));
+})();`.trim();
