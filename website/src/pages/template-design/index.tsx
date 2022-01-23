@@ -212,7 +212,6 @@ const TemplateDesign = () => {
   const changeBasePdf = (file: File) => {
     if (designer.current) {
       readFile(file, 'dataURL').then(async (basePdf: string) => {
-        // TODO updateTemplateでコールバックが発火しないので、発火するようにする
         designer.current.updateTemplate(Object.assign(cloneDeep(template), { basePdf }));
       });
     }

@@ -25,6 +25,15 @@ class Designer extends BaseUIClass {
     }
   }
 
+  public updateTemplate(template: Template) {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    this.template = template;
+    if (this.onChangeTemplateCallback) {
+      this.onChangeTemplateCallback(template);
+    }
+    this.render();
+  }
+
   public onSaveTemplate(cb: (t: Template) => void) {
     this.onSaveTemplateCallback = cb;
   }
