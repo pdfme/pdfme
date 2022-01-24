@@ -8,8 +8,8 @@ import { I18nContext, FontContext } from './libs/contexts';
 import DesignerComponent from './components/Designer';
 
 class Designer extends BaseUIClass {
-  private onSaveTemplateCallback?: (t: Template) => void;
-  private onChangeTemplateCallback?: (t: Template) => void;
+  private onSaveTemplateCallback?: (template: Template) => void;
+  private onChangeTemplateCallback?: (template: Template) => void;
 
   constructor(props: DesignerConstructor) {
     super(props);
@@ -34,11 +34,11 @@ class Designer extends BaseUIClass {
     this.render();
   }
 
-  public onSaveTemplate(cb: (t: Template) => void) {
+  public onSaveTemplate(cb: (template: Template) => void) {
     this.onSaveTemplateCallback = cb;
   }
 
-  public onChangeTemplate(cb: (t: Template) => void) {
+  public onChangeTemplate(cb: (template: Template) => void) {
     this.onChangeTemplateCallback = cb;
   }
 
