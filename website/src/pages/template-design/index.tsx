@@ -80,6 +80,7 @@ const HowToUseButton = () => {
         <Box sx={modalBoxStyle}>
           <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
             <ModalHead title="How to use" handleClose={handleClose} />
+            {/* TODO baespdfを変えて、　add new fieldから項目を追加してテンプレートを作成する旨を記載する */}
             <img src={'/img/designer.gif'} />
             <p>
               The operation is based on Google Slides, etc., and you can use common keyboard
@@ -150,7 +151,6 @@ const GetCodeButton = ({ template }: { template: Template }) => {
   const handleClose = () => setOpen(false);
 
   const code = (() => {
-    // TODO ここでkey,id, dataが表示されている
     if (mode === 'generator') {
       return getGeneratorSampleCode(template);
     } else if (mode === 'designer') {

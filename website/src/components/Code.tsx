@@ -5,15 +5,7 @@ import theme from 'prism-react-renderer/themes/nightOwl';
 const Code = ({ code, language }: { code: string; language: Language }) => (
   <Highlight {...defaultProps} theme={theme} code={code} language={language}>
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
-      <pre
-        className={className}
-        style={{
-          ...style,
-          textAlign: 'left',
-          padding: '0.5em',
-          overflow: 'scroll',
-        }}
-      >
+      <pre className={className} style={{ ...style }}>
         {tokens.map((line, i) => (
           <div
             {...getLineProps({ line, key: i })}

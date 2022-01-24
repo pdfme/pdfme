@@ -102,7 +102,7 @@ export default function Home(): JSX.Element {
               <Divider />
             </div>
 
-            <div className={clsx('col col--7')}>
+            <div className={clsx('col col--6')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
                 Template
@@ -116,15 +116,7 @@ export default function Home(): JSX.Element {
                   <div className="card__body">
                     <h4>Template is made of basePdf and schemas</h4>
                     <small>
-                      {/* テンプレートはpdfmeライブラリの中心となるデータ構造です。
-                      理解しやすいJSONデータで、basePdfとschemasというプロパティを持っています。
-                      JSONデータなのでコードエディタでも作成できますが、デザイナーでのGUIでも作成できます。
-                      一度作ったテンプレートは再利用可能で、ジェネレーター、フォーム、ビューアのそれぞれに利用できます。 */}
-                      Templates are the core data structure of the pdfme library. It is JSON data
-                      that is easy to understand and has the properties basePdf and schemas.
-                      <br />
-                      Templates can be created in the code editor, but you can also create them in
-                      the Designer GUI.
+                      Templates are the core data structure of the pdfme library.
                       <br />
                       Once templates are created, they are reusable and can be used in the
                       generator, form, and viewer.
@@ -141,14 +133,14 @@ export default function Home(): JSX.Element {
                 </div>
               </div>
             </div>
-            <div className={clsx('col col--5')}>
+            <div className={clsx('col col--6')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
                 Generator
                 <a className="hash-link" href="#generate" title="Direct link to heading"></a>
               </h2>
-              <p style={{ marginBottom: 0 }}>Most simple PDF generate example is like this.</p>
-              <div style={{ height: 820, overflow: 'scroll' }}>
+              <p style={{ marginBottom: 0 }}>PDF generate example code is like this.</p>
+              <div style={{ maxHeight: 580, overflow: 'scroll' }}>
                 <Code
                   code={getGeneratorSampleCode(getSampleTemplate())}
                   language="typescript"
@@ -181,28 +173,16 @@ export default function Home(): JSX.Element {
                 <a className="hash-link" href="#designer" title="Direct link to heading"></a>
               </h2>
               <p>
-                {/* デザイナーはGoogle
-                SlideやパワーポイントなどのGUIを参考に、プログラマー以外でも使えるように作成しています。
-                コピーや貼り付け、Undo,Reduなどのショートカットやグループ選択、ルーラーなどをサポートしています。 */}
-                The designer aims for the GUI feel of Google Slides, PowerPoint, etc., and has been
-                created so that it can be used by non-programmers.
-                <br />
-                It supports shortcuts such as Copy, Paste, Undo, Redo, Ruler, and group selection.
-                {/* TODO Template Design ページへのリンク*/}
+                You can easily create a template by using the designer. It supports shortcuts such
+                as Copy, Paste, Undo, Redo, Ruler, and group selection.
               </p>
             </div>
 
             <div className={clsx('col col--8')}>
-              <div ref={designerRef} />
+              <div style={{ height: 1000 }} ref={designerRef} />
             </div>
             <div className={clsx('col col--4')}>
-              <div
-                style={{
-                  height: 800,
-                  overflow: 'scroll',
-                  marginLeft: '1rem',
-                }}
-              >
+              <div style={{ height: 1000, overflow: 'auto' }}>
                 <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
               </div>
             </div>
@@ -234,7 +214,7 @@ export default function Home(): JSX.Element {
                 <div className="card">
                   <div className="card__image">
                     <img
-                      src={mode === 'form' ? '/img/form.png' : '/img/viewer.png'}
+                      src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
                       alt="Image alt text"
                       title="Logo Title Text 1"
                     />
@@ -260,9 +240,6 @@ export default function Home(): JSX.Element {
                     <small>
                       {mode === 'form' ? (
                         <div>
-                          {/* テンプレートを使用してinput部分をエンドユーザーに入力してもらうためのフォームを生成できます。
-                          <br />
-                          ユーザーが入力した値を使ってPDFを生成することが簡単に実現できます。 */}
                           You can use the template to generate a form for the user to input.
                           <br />
                           Generating a PDF with the values entered by the user can be easily
@@ -270,9 +247,6 @@ export default function Home(): JSX.Element {
                         </div>
                       ) : (
                         <div>
-                          {/* テンプレートを使用してinput部分の入力を確認してもらうためのビューワーを生成できます。
-                          <br />
-                          モバイルブラウザではiframeでのPDFの確認が行えませんが、Viewerを使うことで簡単に実現することができます。 */}
                           You can use the template to generate a viewer for the user to check the
                           input.
                           <br />
