@@ -13,12 +13,14 @@ pdfme is now beta version. Please report any issues or suggestions from [Help pa
 
 <!-- pdfme は PDF 作成を簡単にするために作成されました。特に下記のユースケースで非常に便利に使えます。 -->
 
+<!-- TODO デザインの目的も追加する -->
 pdfme was created to simplify PDF generation. It is especially useful for the following use cases.
 
 <!-- - デザインされた PDF を短いコードで作成したい
 - 複数の種類の PDF 作成をしたい
 - パフォーマンスを落とさずに大量の PDF 作成が必要 -->
 
+<!-- TODO PDFデザイン機能をアプリケーションに組み込む必要があるも追加 -->
 - Need to create a designed PDF with short code.
 - Need to create multiple varieties of PDFs.
 - Need to create a large number of PDFs without compromising performance
@@ -27,7 +29,7 @@ pdfme was created to simplify PDF generation. It is especially useful for the fo
 
 As a example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
 
-## Requirements, Installation
+## Installation
 
 <!-- 動作環境は`>=14`の node 環境で動作させて下さい。 -->
 
