@@ -302,7 +302,8 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
     return acc;
   }, [] as SchemaForUI[][]);
 
-export const templateSchemas2SchemasList = async (template: Template) => {
+export const templateSchemas2SchemasList = async (_template: Template) => {
+  const template = cloneDeep(_template);
   const sortedSchemasList = sortSchemasList(template, template.schemas.length);
   const basePdf = await getB64BasePdf(template.basePdf);
   const pdfBlob = b64toBlob(basePdf);
