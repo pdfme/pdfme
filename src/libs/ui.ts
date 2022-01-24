@@ -1,5 +1,52 @@
 import hotkeys from 'hotkeys-js';
 
+const up = 'up';
+const shiftUp = 'shift+up';
+const down = 'down';
+const shiftDown = 'shift+down';
+const left = 'left';
+const shiftLeft = 'shift+left';
+const right = 'right';
+const shiftRight = 'shift+right';
+
+const rmWin = 'backspace';
+const rmMac = 'delete';
+const esc = 'esc';
+const copyWin = 'ctrl+c';
+const copyMac = 'command+c';
+const pasteWin = 'ctrl+v';
+const pasteMac = 'command+v';
+const redoWin = 'ctrl+y';
+const redoMac = 'shift+command+z';
+const undoWin = 'ctrl+z';
+const undoMac = 'command+z';
+const saveWin = 'ctrl+s';
+const saveMac = 'command+s';
+
+const keys = [
+  up,
+  shiftUp,
+  down,
+  shiftDown,
+  left,
+  shiftLeft,
+  right,
+  shiftRight,
+  rmMac,
+  rmWin,
+  esc,
+  copyWin,
+  copyMac,
+  pasteWin,
+  pasteMac,
+  redoWin,
+  redoMac,
+  undoWin,
+  undoMac,
+  saveWin,
+  saveMac,
+];
+
 export const initShortCuts = (arg: {
   move: (command: 'up' | 'down' | 'left' | 'right', isShift: boolean) => void;
   remove: () => void;
@@ -10,54 +57,6 @@ export const initShortCuts = (arg: {
   undo: () => void;
   save: () => void;
 }) => {
-  const up = 'up';
-  const shiftUp = 'shift+up';
-  const down = 'down';
-  const shiftDown = 'shift+down';
-  const left = 'left';
-  const shiftLeft = 'shift+left';
-  const right = 'right';
-  const shiftRight = 'shift+right';
-
-  const rmWin = 'backspace';
-  const rmMac = 'delete';
-  const esc = 'esc';
-  const copyWin = 'ctrl+c';
-  const copyMac = 'command+c';
-  const pasteWin = 'ctrl+v';
-  const pasteMac = 'command+v';
-  const redoWin = 'ctrl+y';
-  const redoMac = 'shift+command+z';
-  const undoWin = 'ctrl+z';
-  const undoMac = 'command+z';
-  const saveWin = 'ctrl+s';
-  const saveMac = 'command+s';
-
-  const keys = [
-    up,
-    shiftUp,
-    down,
-    shiftDown,
-    left,
-    shiftLeft,
-    right,
-    shiftRight,
-    rmMac,
-    rmWin,
-    esc,
-    copyWin,
-    copyMac,
-    pasteWin,
-    pasteMac,
-    redoWin,
-    redoMac,
-    undoWin,
-    undoMac,
-    saveWin,
-    saveMac,
-  ];
-
-  /* eslint complexity: ["error", 22]*/
   hotkeys(keys.join(), (e, handler) => {
     switch (handler.shortcut) {
       case up:
@@ -115,7 +114,7 @@ export const initShortCuts = (arg: {
 };
 
 export const destroyShortCuts = () => {
-  hotkeys.unbind();
+  hotkeys.unbind(keys.join());
 };
 
 const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {

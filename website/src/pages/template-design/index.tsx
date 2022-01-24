@@ -150,6 +150,7 @@ const GetCodeButton = ({ template }: { template: Template }) => {
   const handleClose = () => setOpen(false);
 
   const code = (() => {
+    // TODO ここでkey,id, dataが表示されている
     if (mode === 'generator') {
       return getGeneratorSampleCode(template);
     } else if (mode === 'designer') {
@@ -207,6 +208,9 @@ const TemplateDesign = () => {
       designer.current.onSaveTemplate(downloadTemplate);
       designer.current.onChangeTemplate(setTemplate);
     }
+    return () => {
+      designer.current.destroy();
+    };
   }, [designerRef]);
 
   const changeBasePdf = (file: File) => {

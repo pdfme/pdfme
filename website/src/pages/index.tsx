@@ -149,7 +149,10 @@ export default function Home(): JSX.Element {
               </h2>
               <p style={{ marginBottom: 0 }}>Most simple PDF generate example is like this.</p>
               <div style={{ height: 820, overflow: 'scroll' }}>
-                <Code code={getGeneratorSampleCode(getSampleTemplate())} language="typescript"></Code>
+                <Code
+                  code={getGeneratorSampleCode(getSampleTemplate())}
+                  language="typescript"
+                ></Code>
               </div>
               <div>
                 <button
@@ -185,6 +188,7 @@ export default function Home(): JSX.Element {
                 created so that it can be used by non-programmers.
                 <br />
                 It supports shortcuts such as Copy, Paste, Undo, Redo, Ruler, and group selection.
+                {/* TODO Template Design ページへのリンク*/}
               </p>
             </div>
 
