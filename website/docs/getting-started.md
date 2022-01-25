@@ -6,7 +6,7 @@ sidebar_position: 1
 
 :::caution
 
-pdfme is now beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme/tree/main/website/docs/getting-started.md)
+pdfme is now beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
 :::
 
 ## Introduction

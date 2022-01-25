@@ -56,11 +56,12 @@ export default function HomepageHeader() {
                 Getting Started
               </Link>
               <span style={{ marginLeft: '1rem', height: 25 }}>
+                {/* TODO 変更する */}
                 <GitHubButton
-                  href="https://github.com/hand-dot/labelmake"
+                  href="https://github.com/hand-dot/pdfme-beta"
                   data-size="large"
                   data-show-count={true}
-                  aria-label="Star hand-dot/labelmake on GitHub"
+                  aria-label="Star hand-dot/pdfme-beta on GitHub"
                 >
                   Star
                 </GitHubButton>

@@ -30,7 +30,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[Designer.tsx:14](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L14)
+[Designer.tsx:14](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -44,27 +44,27 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[libs/class.ts:20](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L20)
+[libs/class.ts:20](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L20)
 
 ___
 
 ### onChangeTemplateCallback
 
-• `Private` `Optional` **onChangeTemplateCallback**: (`t`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void`
+• `Private` `Optional` **onChangeTemplateCallback**: (`template`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void`
 
 #### Type declaration
 
-▸ (`t`): `void`
+▸ (`template`): `void`
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `t` | `Object` |
-| `t.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
-| `t.columns` | `undefined` \| `string`[] |
-| `t.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] |
-| `t.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `template` | `Object` |
+| `template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
+| `template.columns` | `undefined` \| `string`[] |
+| `template.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] |
+| `template.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 ##### Returns
 
@@ -72,27 +72,27 @@ ___
 
 #### Defined in
 
-[Designer.tsx:12](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L12)
+[Designer.tsx:12](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L12)
 
 ___
 
 ### onSaveTemplateCallback
 
-• `Private` `Optional` **onSaveTemplateCallback**: (`t`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void`
+• `Private` `Optional` **onSaveTemplateCallback**: (`template`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void`
 
 #### Type declaration
 
-▸ (`t`): `void`
+▸ (`template`): `void`
 
 ##### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `t` | `Object` |
-| `t.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
-| `t.columns` | `undefined` \| `string`[] |
-| `t.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] |
-| `t.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `template` | `Object` |
+| `template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
+| `template.columns` | `undefined` \| `string`[] |
+| `template.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] |
+| `template.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 ##### Returns
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:11](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L11)
+[Designer.tsx:11](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L11)
 
 ___
 
@@ -121,7 +121,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[libs/class.ts:24](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L24)
+[libs/class.ts:24](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L24)
 
 ___
 
@@ -144,7 +144,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[libs/class.ts:22](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L22)
+[libs/class.ts:22](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L22)
 
 ## Methods
 
@@ -162,7 +162,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[libs/class.ts:80](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L80)
+[libs/class.ts:80](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L80)
 
 ___
 
@@ -180,7 +180,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[libs/class.ts:64](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L64)
+[libs/class.ts:64](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L64)
 
 ___
 
@@ -210,7 +210,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[libs/class.ts:60](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L60)
+[libs/class.ts:60](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L60)
 
 ___
 
@@ -235,7 +235,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[libs/class.ts:68](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/libs/class.ts#L68)
+[libs/class.ts:68](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/libs/class.ts#L68)
 
 ___
 
@@ -247,7 +247,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `cb` | (`t`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void` |
+| `cb` | (`template`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void` |
 
 #### Returns
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:41](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L41)
+[Designer.tsx:41](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L41)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `cb` | (`t`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void` |
+| `cb` | (`template`: { `basePdf`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `columns`: `undefined` \| `string`[] ; `sampledata`: `undefined` \| `Record`<`string`, `string`\>[] ; `schemas`: `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[]  }) => `void` |
 
 #### Returns
 
@@ -275,7 +275,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:37](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L37)
+[Designer.tsx:37](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L37)
 
 ___
 
@@ -293,7 +293,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[Designer.tsx:45](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L45)
+[Designer.tsx:45](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L45)
 
 ___
 
@@ -307,7 +307,7 @@ ___
 
 #### Defined in
 
-[Designer.tsx:21](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L21)
+[Designer.tsx:21](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L21)
 
 ___
 
@@ -335,4 +335,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[Designer.tsx:28](https://github.com/hand-dot/labelmake-ui/blob/4434ff8/src/Designer.tsx#L28)
+[Designer.tsx:28](https://github.com/hand-dot/pdfme-beta/blob/9f4f61c/src/Designer.tsx#L28)

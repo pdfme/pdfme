@@ -23,7 +23,7 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // TODO 変更する
-          editUrl: 'https://github.com/hand-dot/labelmake-ui/tree/main/website/',
+          editUrl: 'https://github.com/hand-dot/pdfme-beta/tree/main/website/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -125,7 +125,7 @@ const config = {
             label: 'Help',
           },
           {
-            href: 'https://github.com/hand-dot/pdfme',
+            href: 'https://github.com/hand-dot/pdfme-beta',
             label: 'GitHub',
             position: 'right',
           },
@@ -165,7 +165,7 @@ const config = {
             items: [
               {
                 label: 'Github',
-                href: 'https://github.com/hand-dot/pdfme',
+                href: 'https://github.com/hand-dot/pdfme-beta',
               },
             ],
           },
