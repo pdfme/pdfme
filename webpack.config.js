@@ -2,7 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const StyleLintPlugin = require('stylelint-webpack-plugin');
 const pkg = require('./package.json');
 const isProduction = process.env.NODE_ENV === 'production';
 const FILENAME = pkg.name + (isProduction ? '.min' : '');
@@ -19,8 +18,7 @@ const config = {
     extensions: ['.ts', '.tsx', '.js', '.scss', '.css', '.png', '.svg'],
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
-    new StyleLintPlugin(),
+    // new BundleAnalyzerPlugin(),
     new webpack.BannerPlugin({
       banner: BANNER,
       entryOnly: true,

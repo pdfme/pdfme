@@ -91,7 +91,7 @@
     "stylelint": "^14.2.0",
     "stylelint-config-recommended": "^6.0.0",
     "stylelint-scss": "^4.1.0",
-    "stylelint-webpack-plugin": "^3.0.1",
+    "stylelint-webpack-plugin": "^3.1.1",
     "ts-jest": "^27.1.2",
     "ts-loader": "^9.2.5",
     "ts-prune": "^0.10.3",
