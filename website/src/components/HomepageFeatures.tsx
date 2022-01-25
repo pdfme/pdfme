@@ -18,13 +18,13 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    title: 'Easy template editing',
+    title: 'Easy PDF template design',
     description: <>Anyone can easily create templates with the designer.</>,
   },
   {
-    title: 'Simple JSON Template',
+    title: 'Simple JSON template',
     description: (
-      <>JSON data that is easy to understand and has the properties basePdf and schemas.</>
+      <>Templates are JSON data that is easy to understand and handle.</>
     ),
   },
 ];

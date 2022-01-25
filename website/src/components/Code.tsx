@@ -7,13 +7,7 @@ const Code = ({ code, language }: { code: string; language: Language }) => (
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
       <pre className={className} style={{ ...style }}>
         {tokens.map((line, i) => (
-          <div
-            {...getLineProps({ line, key: i })}
-            style={{
-              lineHeight: '1.3em',
-              height: '1.3em',
-            }}
-          >
+          <div {...getLineProps({ line, key: i })} style={{ fontSize: 'small' }}>
             {line.map((token, key) => (
               <span {...getTokenProps({ token, key })} />
             ))}

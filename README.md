@@ -16,14 +16,10 @@ Open source, developed by the community, and completely free to use under the MI
 
 ## Introduction
 
-<!-- TODO デザインの目的も追加する -->
-
-pdfme was created to simplify PDF generation. It is especially useful for the following use cases.
-
-<!-- TODO PDFデザイン機能をアプリケーションに組み込む必要があるも追加 -->
+pdfme was created to simplify PDF generation and design. It is especially useful for the following use cases.
 
 - Need to create a designed PDF with short code.
-- Need to create multiple varieties of PDFs.
+- Need to integrate PDF design features into applications.
 - Need to create a large number of PDFs without compromising performance
 
 As a example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
@@ -165,7 +161,7 @@ const designer = new Designer({ domContainer, template });
 ```
 
 The Designer class is instantiated as shown above, and the template designer is displayed in the `domContainer`.  
-You can edit the template as shown below. The operation is based on Google Slides, etc., and you can use common keyboard shortcuts.
+You can edit the template as shown below. The operation is like Google Slides, etc., so you can use common keyboard shortcuts.
 
 ![](/website/static/img/designer.gif)
 

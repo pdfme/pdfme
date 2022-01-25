@@ -32,6 +32,7 @@ const controllHeight = 60;
 
 const modalBoxStyle = {
   position: 'absolute',
+  minWidth: '70%',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
@@ -80,14 +81,42 @@ const HowToUseButton = () => {
         <Box sx={modalBoxStyle}>
           <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
             <ModalHead title="How to use" handleClose={handleClose} />
-            {/* TODO baespdfを変えて、　add new fieldから項目を追加してテンプレートを作成する旨を記載する */}
-            <img src={'/img/designer.gif'} />
+            <div style={{ background: '#999' }}>
+              <img
+                src={'/img/designer.gif'}
+                style={{ width: 400, display: 'block', margin: '0 auto' }}
+              />
+            </div>
             <p>
-              The operation is based on Google Slides, etc., and you can use common keyboard
-              shortcuts.
+              The operation is like Google Slides, etc., so you can use common keyboard shortcuts.
             </p>
 
+            <p>
+              Let's Click{' '}
+              <label
+                style={{ display: 'inline-flex', alignItems: 'center' }}
+                className="button button--sm button--outline button--success"
+              >
+                <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                Change BasePDF
+              </label>{' '}
+              to change the background PDF, and click{' '}
+              <button
+                style={{
+                  padding: '0.5rem',
+                  color: 'rgb(255, 255, 255)',
+                  background: 'rgb(24, 160, 251)',
+                  border: 'none',
+                  borderRadius: 3,
+                  cursor: 'pointer',
+                }}
+              >
+                <strong>Add new field</strong>
+              </button>{' '}
+              in the sidebar to place the fields and create the template!
+            </p>
             <Divider />
+
             <div>
               <p style={{ margin: 0 }}>
                 <strong>Keyboard shortcuts</strong>
@@ -124,10 +153,7 @@ const HowToUseButton = () => {
               <p style={{ margin: 0 }}>
                 <strong>About Template</strong>
               </p>
-              <p>
-                Templates are the core data structure of the pdfme library. It is JSON data that is
-                easy to understand and has the properties basePdf and schemas.
-              </p>
+              <p>Templates are the core data structure of the pdfme library.</p>
 
               <Link to="/docs/getting-started#template">
                 <button className="button button--lg button--primary button--block">
@@ -142,65 +168,34 @@ const HowToUseButton = () => {
   );
 };
 
-const GetCodeButton = ({ template }: { template: Template }) => {
-  const modes = ['generator', 'designer', 'form', 'viewer'];
-
-  const [mode, setMode] = useState<typeof modes[number]>('generator');
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const code = (() => {
-    if (mode === 'generator') {
-      return getGeneratorSampleCode(template);
-    } else if (mode === 'designer') {
-      return getDesignerSampleCode(template);
-    } else if (mode === 'form') {
-      return getFormSampleCode(template);
-    } else if (mode === 'viewer') {
-      return getViewerSampleCode(template);
-    }
-  })();
-
-  return (
-    <>
-      <button
-        style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
-        className="button button--sm button--outline button--danger"
-        onClick={handleOpen}
-      >
-        <CodeOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-        Get Code
-      </button>
-      <Modal open={open} onClose={handleClose}>
-        <Box sx={modalBoxStyle}>
-          <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
-            <ModalHead title="Get Code" handleClose={handleClose} />
-            <ul className="tabs tabs--block">
-              {modes.map((m) => (
-                <li
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={`tabs__item ${mode === m ? 'tabs__item--active' : ''}`}
-                >
-                  {m.charAt(0).toUpperCase() + m.slice(1)}
-                </li>
-              ))}
-            </ul>
-            <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
-              <Code code={code} language="typescript" />
-            </div>
-          </div>
-        </Box>
-      </Modal>
-    </>
-  );
-};
-
 const TemplateDesign = () => {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [template, setTemplate] = useState<Template>(getSampleTemplate());
+  const [smallDisplay, setSmallDisplay] = useState(true);
+
+  const modes = ['generator', 'designer', 'form', 'viewer'];
+
+  const [codeMode, setCodeMode] = useState<typeof modes[number]>('generator');
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const handleCodeModalOpen = () => setCodeModalOpen(true);
+  const handleCodeModalClose = () => setCodeModalOpen(false);
+
+  const code = (() => {
+    if (codeMode === 'generator') {
+      return getGeneratorSampleCode(template);
+    } else if (codeMode === 'designer') {
+      return getDesignerSampleCode(template);
+    } else if (codeMode === 'form') {
+      return getFormSampleCode(template);
+    } else if (codeMode === 'viewer') {
+      return getViewerSampleCode(template);
+    }
+  })();
+
+  useEffect(() => {
+    setSmallDisplay(window.innerWidth < 900);
+  }, []);
 
   useEffect(() => {
     if (designerRef.current) {
@@ -260,66 +255,153 @@ ${e}`);
         <div>
           <HowToUseButton />
         </div>
-        <div style={{ display: 'flex' }}>
-          <label
-            style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
-            className="button button--sm button--outline button--success"
-          >
-            <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-            Change BasePDF
-            <input
-              style={{ display: 'none' }}
-              type="file"
-              accept="application/pdf"
-              onChange={(e) => {
-                if (e.target && e.target.files) {
-                  changeBasePdf(e.target.files[0]);
-                }
-              }}
-              onClick={(e) => {
-                e.currentTarget.value = '';
-              }}
-            />
-          </label>
 
-          <label
-            style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
-            className="button button--sm button--outline button--info"
-          >
-            <UploadFileOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-            Load Template
-            <input
-              style={{ display: 'none' }}
-              type="file"
-              accept="application/json"
-              onChange={(e) => {
-                if (e.target && e.target.files) {
-                  loadTemplate(e.target.files[0]);
-                }
-              }}
-              onClick={(e) => {
-                e.currentTarget.value = '';
-              }}
-            />
-          </label>
-          <button
-            style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
-            onClick={downloadTemplate}
-            className="button button--sm button--outline button--warning"
-          >
-            <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-            Download Template
-          </button>
-          <GetCodeButton template={template} />
-          <button
-            style={{ display: 'flex', alignItems: 'center' }}
-            onClick={generatePdf}
-            className="button button--sm button--outline button--secondary"
-          >
-            <PreviewOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-            Preview PDF
-          </button>
-        </div>
+        {smallDisplay ? (
+          <div className="dropdown dropdown--hoverable dropdown--right">
+            <button className="button button--sm button--outline button--primary">...</button>
+            <ul className="dropdown__menu">
+              <li>
+                <label style={{ display: 'flex', alignItems: 'center' }} className="dropdown__link">
+                  <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  Change BasePDF
+                  <input
+                    style={{ display: 'none' }}
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => {
+                      if (e.target && e.target.files) {
+                        changeBasePdf(e.target.files[0]);
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                </label>
+              </li>
+              <li>
+                <label style={{ display: 'flex', alignItems: 'center' }} className="dropdown__link">
+                  <UploadFileOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  Load Template
+                  <input
+                    style={{ display: 'none' }}
+                    type="file"
+                    accept="application/json"
+                    onChange={(e) => {
+                      if (e.target && e.target.files) {
+                        loadTemplate(e.target.files[0]);
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                </label>
+              </li>
+              <li>
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  onClick={downloadTemplate}
+                  className="dropdown__link"
+                >
+                  <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  Download Template
+                </div>
+              </li>
+              <li>
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  onClick={handleCodeModalOpen}
+                  className="dropdown__link"
+                >
+                  <CodeOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  Get Code
+                </div>
+              </li>
+              <li>
+                <div
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  onClick={generatePdf}
+                  className="dropdown__link"
+                >
+                  <PreviewOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  Preview PDF
+                </div>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <div style={{ display: 'flex' }}>
+            <label
+              style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
+              className="button button--sm button--outline button--success"
+            >
+              <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              Change BasePDF
+              <input
+                style={{ display: 'none' }}
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => {
+                  if (e.target && e.target.files) {
+                    changeBasePdf(e.target.files[0]);
+                  }
+                }}
+                onClick={(e) => {
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+
+            <label
+              style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
+              className="button button--sm button--outline button--info"
+            >
+              <UploadFileOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              Load Template
+              <input
+                style={{ display: 'none' }}
+                type="file"
+                accept="application/json"
+                onChange={(e) => {
+                  if (e.target && e.target.files) {
+                    loadTemplate(e.target.files[0]);
+                  }
+                }}
+                onClick={(e) => {
+                  e.currentTarget.value = '';
+                }}
+              />
+            </label>
+
+            <button
+              style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
+              onClick={downloadTemplate}
+              className="button button--sm button--outline button--warning"
+            >
+              <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              Download Template
+            </button>
+            <div style={{ marginRight: '1rem' }}>
+              <button
+                style={{ display: 'flex', alignItems: 'center' }}
+                className="button button--sm button--outline button--danger"
+                onClick={handleCodeModalOpen}
+              >
+                <CodeOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                Get Code
+              </button>
+            </div>
+            <button
+              style={{ display: 'flex', alignItems: 'center' }}
+              onClick={generatePdf}
+              className="button button--sm button--outline button--secondary"
+            >
+              <PreviewOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              Preview PDF
+            </button>
+          </div>
+        )}
       </div>
 
       <div
@@ -328,7 +410,29 @@ ${e}`);
           width: '100%',
           height: `calc(100vh - ${headerHeight + controllHeight}px)`,
         }}
-      ></div>
+      />
+
+      <Modal open={codeModalOpen} onClose={handleCodeModalClose}>
+        <Box sx={modalBoxStyle}>
+          <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
+            <ModalHead title="Get Code" handleClose={handleCodeModalClose} />
+            <ul className="tabs tabs--block">
+              {modes.map((m) => (
+                <li
+                  key={m}
+                  onClick={() => setCodeMode(m)}
+                  className={`tabs__item ${codeMode === m ? 'tabs__item--active' : ''}`}
+                >
+                  {m.charAt(0).toUpperCase() + m.slice(1)}
+                </li>
+              ))}
+            </ul>
+            <div style={{ maxHeight: '80vh', overflow: 'auto' }}>
+              <Code code={code} language="typescript" />
+            </div>
+          </div>
+        </Box>
+      </Modal>
     </Layout>
   );
 };
