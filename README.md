@@ -14,6 +14,14 @@ Open source, developed by the community, and completely free to use under the MI
   <img src="website/static/img/logo.svg" width="300"/>
 </p>
 
+## Features
+
+| Fast PDF Generator                                                                           | Easy PDF template design                              | Simple JSON template                                           |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
+| Works on node and browser. Use templates to generate PDF, Complex operations are not needed. | Anyone can easily create templates with the designer. | Templates are JSON data that is easy to understand and handle. |
+
+---
+
 ## Introduction
 
 pdfme was created to simplify PDF generation and design. It is especially useful for the following use cases.

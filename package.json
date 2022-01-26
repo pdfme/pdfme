@@ -2,8 +2,9 @@
   "name": "pdfme",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/pdfme.min.jp",
-  "typings": "dist/types/index.d.ts",
+  "main": "dist/pdfme.min.js",
+  "module": "dist/pdfme.min.js",
+  "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
