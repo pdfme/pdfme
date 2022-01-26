@@ -1,13 +1,34 @@
 import { nanoid } from 'nanoid';
 import base64url from 'base64url';
-import _set from 'lodash.set';
-import _debounce from 'lodash.debounce';
+// import _set from 'lodash.set';
+// import _debounce from 'lodash.debounce';
 
 export const uuid = nanoid;
 
-export const set = _set;
+export const set = <T extends object>(obj: T, path: string | string[], value: any) => {
+  path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
+  let src: any = obj;
+  path.forEach((key, index, array) => {
+    if (index == path.length - 1) {
+      src[key] = value;
+    } else {
+      if (!src.hasOwnProperty(key)) {
+        const next = array[index + 1];
+        src[key] = String(Number(next)) === next ? [] : {};
+      }
+      src = src[key];
+    }
+  });
+};
 
-export const debounce = _debounce;
+export const debounce = <T extends Function>(cb: T, wait = 20) => {
+  let h: null | ReturnType<typeof setTimeout> = null;
+  const callable = (...args: any) => {
+    if (h) clearTimeout(h);
+    h = setTimeout(() => cb(...args), wait);
+  };
+  return <T>(<any>callable);
+};
 
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
@@ -28,17 +49,13 @@ export const round = (number: number, precision: number) => {
 
 export const b64toUint8Array = (base64: string) => {
   if (typeof window !== 'undefined') {
-    try {
-      const byteString = window.atob(base64.split(',')[1]);
-      const unit8arr = new Uint8Array(byteString.length);
-      for (let i = 0; i < byteString.length; i += 1) {
-        unit8arr[i] = byteString.charCodeAt(i);
-      }
-
-      return unit8arr;
-    } catch {
-      return new Uint8Array(base64url.toBuffer(base64));
+    const byteString = window.atob(base64.split(',')[1] ? base64.split(',')[1] : base64);
+    const unit8arr = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i += 1) {
+      unit8arr[i] = byteString.charCodeAt(i);
     }
+
+    return unit8arr;
   }
 
   return new Uint8Array(base64url.toBuffer(base64));

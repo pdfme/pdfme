@@ -13,14 +13,6 @@ import {
   UIOptions,
 } from './libs/type';
 
-export default {
-  generate,
-  Designer,
-  Viewer,
-  Form,
-  blankPdf: BLANK_PDF,
-};
-
 export {
   Template,
   Schema,

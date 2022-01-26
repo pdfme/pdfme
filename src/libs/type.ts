@@ -70,19 +70,19 @@ export type SchemaForUI = z.infer<typeof SchemaForUI>;
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
-const Data = z.union([ArrayBufferSchema, Uint8ArraySchema]);
+// TOOD ここはfontもstringを含めたいのでstring入れちゃってもいい気がする
+const Data = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
 const Font = z.record(
   z.object({ data: Data, fallback: z.boolean().optional(), subset: z.boolean().optional() })
 );
 export type Font = z.infer<typeof Font>;
 
-const BasePdf = z.union([z.string(), Data]);
-export type BasePdf = z.infer<typeof BasePdf>;
+export type BasePdf = z.infer<typeof Data>;
 
 export const Template = z.object({
   schemas: z.array(z.record(Schema)),
-  basePdf: BasePdf,
+  basePdf: Data,
   sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
 });

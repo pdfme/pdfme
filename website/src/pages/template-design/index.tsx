@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useIsBrowser from '@docusaurus/useIsBrowser';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import {
@@ -10,7 +12,8 @@ import {
   PreviewOutlined,
   CloseOutlined,
 } from '@mui/icons-material';
-import { generate, Designer, Template } from '../../../../src/index';
+import { generate, Designer, Template } from '../../../../dist/index.es';
+
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import {
