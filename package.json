@@ -35,7 +35,6 @@
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
     "@scena/react-guides": "^0.16.0",
-    "@tippyjs/react": "^4.2.5",
     "bwip-js": "^3.0.4",
     "hotkeys-js": "^3.8.7",
     "pdf-lib": "^1.17.1",
