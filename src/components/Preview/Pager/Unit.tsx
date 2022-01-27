@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 import left from '../../../assets/icons/left.svg';
 import right from '../../../assets/icons/right.svg';
 import doubleLeft from '../../../assets/icons/double-left.svg';

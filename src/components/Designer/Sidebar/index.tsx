@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
 import { I18nContext } from '../../../libs/contexts';

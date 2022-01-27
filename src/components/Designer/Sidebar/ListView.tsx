@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 import {
   SortableContainer as sortableContainer,
   SortableElement as sortableElement,

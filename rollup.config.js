@@ -1,13 +1,13 @@
 import url from '@rollup/plugin-url';
-// import { terser } from 'rollup-plugin-terser';
+import { terser } from 'rollup-plugin-terser';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
-import injectProcessEnv from 'rollup-plugin-inject-process-env';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import postcss from 'rollup-plugin-postcss';
 import json from '@rollup/plugin-json';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
+import { base64 } from 'rollup-plugin-base64';
 
 const packageJson = require('./package.json');
 
@@ -26,15 +26,15 @@ export default {
     },
   ],
   plugins: [
+    postcss({ modules: true }),
     typescript({ useTsconfigDeclarationDir: true }),
     commonjs(),
+    nodeResolve({ module: true, browser: true }),
     json(),
-    postcss({ modules: true, sourceMap: true, extract: true, minimize: true }),
-    injectProcessEnv({ NODE_ENV: 'production' }),
-    nodeResolve({ module: true, jsnext: true, main: true, browser: true }),
-    url({ include: ['**/*.svg', '**/*.png', '**/*.jp(e)?g', '**/*.gif', '**/*.webp', '**/*.ttf'] }),
-    nodePolyfills(),
+    url(),
+    base64({ include: 'src/**/*.ttf' }),
     peerDepsExternal(),
-    // terser(),
+    replace({ 'process.env.NODE_ENV': JSON.stringify('production') }),
+    terser(),
   ],
 };

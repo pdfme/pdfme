@@ -68,7 +68,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   return false;
 };
 
-export const createBarCode = async ({
+export const createBarCode = ({
   type,
   input,
   width,
@@ -93,16 +93,11 @@ export const createBarCode = async ({
     bwipjsArg.backgroundcolor = backgroundColor;
   }
 
-  let res: Buffer;
-
-  if (typeof window !== 'undefined' && bwipjs.toCanvas) {
+  if (bwipjs.toCanvas) {
     const canvas = document.createElement('canvas');
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
-    res = b64toUint8Array(dataUrl).buffer as Buffer;
-  } else {
-    res = await bwipjs.toBuffer(bwipjsArg);
+    return Promise.resolve(b64toUint8Array(dataUrl).buffer as Buffer);
   }
-
-  return res;
+  return bwipjs.toBuffer(bwipjsArg);
 };

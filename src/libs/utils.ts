@@ -1,7 +1,4 @@
 import { nanoid } from 'nanoid';
-import base64url from 'base64url';
-// import _set from 'lodash.set';
-// import _debounce from 'lodash.debounce';
 
 export const uuid = nanoid;
 
@@ -58,7 +55,7 @@ export const b64toUint8Array = (base64: string) => {
     return unit8arr;
   }
 
-  return new Uint8Array(base64url.toBuffer(base64));
+  return new Uint8Array(Buffer.from(base64, 'base64'));
 };
 
 export const b64toBlob = (base64: string) => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 
 const Spinner = () => (
   <div className={styles.wrapper}>

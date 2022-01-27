@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import * as styles from '../index.module.scss';
+import styles from '../index.module.scss';
 import { FontContext } from '../../../../libs/contexts';
 import {
   DEFAULT_FONT_SIZE,

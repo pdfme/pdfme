@@ -1,5 +1,5 @@
 import React, { forwardRef, Ref } from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 import { ZOOM } from '../../../libs/constants';
 import { validateBarcodeInput } from '../../../libs/barcode';
 import { BarCodeType, BarcodeSchema } from '../../../libs/type';

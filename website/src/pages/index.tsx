@@ -8,7 +8,8 @@ import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
-import { generate, Designer, Viewer, Form, Template } from '../../../src/index';
+import { generate, Designer, Viewer, Form, Template } from '../../../dist/index.es';
+
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
 // TODO https://github.com/hand-dot/pdfme-beta をpdfmeに置換する

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-// import Helvetica from '../assets/Helvetica.ttf';
+import Helvetica from '../assets/Helvetica.ttf';
 import { Template, Schema, SchemaForUI, BasePdf, Font, CommonProps, isTextSchema } from './type';
 import {
   DEFAULT_FONT_NAME,
@@ -7,9 +7,8 @@ import {
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
-  HELVETICA,
 } from './constants';
-import { cloneDeep, uuid, uniq, flatten, b64toBlob } from './utils';
+import { cloneDeep, uuid, uniq, b64toUint8Array, flatten, b64toBlob } from './utils';
 import { getPdfPageSizes } from './pdfjs';
 
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
@@ -139,7 +138,7 @@ export const getFallbackFontName = (font: Font) => {
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: HELVETICA, fallback: true },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true },
 });
 
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>

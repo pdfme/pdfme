@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import * as styles from './index.module.scss';
+import styles from './index.module.scss';
 import { OnDrag, OnResize } from 'react-moveable';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { round, flatten, uuid } from '../../../libs/utils';
