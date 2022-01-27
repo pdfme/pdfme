@@ -172,6 +172,8 @@ const HowToUseButton = () => {
 };
 
 const TemplateDesign = () => {
+  const isBrowser = useIsBrowser();
+
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [template, setTemplate] = useState<Template>(getSampleTemplate());
@@ -201,7 +203,7 @@ const TemplateDesign = () => {
   }, []);
 
   useEffect(() => {
-    if (designerRef.current) {
+    if (designerRef.current && isBrowser) {
       designer.current = new Designer({ domContainer: designerRef.current, template });
       designer.current.onSaveTemplate(downloadTemplate);
       designer.current.onChangeTemplate(setTemplate);
@@ -407,13 +409,17 @@ ${e}`);
         )}
       </div>
 
-      <div
-        ref={designerRef}
-        style={{
-          width: '100%',
-          height: `calc(100vh - ${headerHeight + controllHeight}px)`,
-        }}
-      />
+      <BrowserOnly>
+        {() => (
+          <div
+            ref={designerRef}
+            style={{
+              width: '100%',
+              height: `calc(100vh - ${headerHeight + controllHeight}px)`,
+            }}
+          />
+        )}
+      </BrowserOnly>
 
       <Modal open={codeModalOpen} onClose={handleCodeModalClose}>
         <Box sx={modalBoxStyle}>

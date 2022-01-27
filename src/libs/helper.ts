@@ -111,7 +111,7 @@ const blob2Base64Pdf = (blob: Blob) => {
 export const getB64BasePdf = (basePdf: BasePdf) => {
   const needFetchFromNetwork =
     typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');
-  if (needFetchFromNetwork) {
+  if (typeof window !== 'undefined' && needFetchFromNetwork) {
     return fetch(basePdf)
       .then((res) => res.blob())
       .then(blob2Base64Pdf)

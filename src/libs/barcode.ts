@@ -1,4 +1,5 @@
 import bwipjs, { ToBufferOptions } from 'bwip-js';
+import Buffer from 'buffer';
 import { BarCodeType } from './type';
 import { b64toUint8Array } from './utils';
 export const validateBarcodeInput = (type: BarCodeType, input: string) => {
@@ -93,7 +94,7 @@ export const createBarCode = ({
     bwipjsArg.backgroundcolor = backgroundColor;
   }
 
-  if (bwipjs.toCanvas) {
+  if (typeof window !== 'undefined' && bwipjs.toCanvas) {
     const canvas = document.createElement('canvas');
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');

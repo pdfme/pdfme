@@ -1,5 +1,6 @@
 import url from '@rollup/plugin-url';
 import { terser } from 'rollup-plugin-terser';
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
@@ -15,11 +16,15 @@ const plugins = [
   postcss({ modules: true }),
   typescript({ useTsconfigDeclarationDir: true }),
   commonjs(),
+  nodePolyfills(),
   nodeResolve({ module: true, browser: true }),
   json(),
   url(),
   base64({ include: 'src/**/*.ttf' }),
-  replace({ 'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV) }),
+  replace({
+    preventAssignment: true,
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+  }),
 ];
 
 if (process.env.NODE_ENV === 'development') {

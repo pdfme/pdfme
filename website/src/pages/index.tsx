@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import useIsBrowser from '@docusaurus/useIsBrowser';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import GitHubButton from 'react-github-btn';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';
@@ -16,6 +18,7 @@ import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/he
 
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
+  const isBrowser = useIsBrowser();
 
   const designerRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +48,7 @@ export default function Home(): JSX.Element {
   };
 
   useEffect(() => {
-    if (designerRef.current) {
+    if (designerRef.current && isBrowser) {
       designer.current = new Designer({
         domContainer: designerRef.current,
         template,
@@ -60,7 +63,7 @@ export default function Home(): JSX.Element {
   }, [designerRef]);
 
   useEffect(() => {
-    if (viewerRef.current) {
+    if (viewerRef.current && isBrowser) {
       viewer.current = new Viewer({
         domContainer: viewerRef.current,
         template,
@@ -68,7 +71,7 @@ export default function Home(): JSX.Element {
       });
     }
 
-    if (formRef.current) {
+    if (formRef.current && isBrowser) {
       form.current = new Form({
         domContainer: formRef.current,
         template,
@@ -180,7 +183,7 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className={clsx('col col--8')}>
-              <div style={{ height: 1000 }} ref={designerRef} />
+              <BrowserOnly>{() => <div style={{ height: 1000 }} ref={designerRef} />}</BrowserOnly>
             </div>
             <div className={clsx('col col--4')}>
               <div style={{ height: 1000, overflow: 'auto' }}>
@@ -284,11 +287,24 @@ export default function Home(): JSX.Element {
                   Viewer
                 </li>
               </ul>
-              {mode === 'form' ? (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
-              ) : (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
-              )}
+              <BrowserOnly>
+                {() => (
+                  <>
+                    {mode === 'form' ? (
+                      <div
+                        style={{ height: 800, background: 'rgb(74, 74, 74)' }}
+                        ref={formRef}
+                      ></div>
+                    ) : (
+                      <div
+                        style={{ height: 800, background: 'rgb(74, 74, 74)' }}
+                        ref={viewerRef}
+                      ></div>
+                    )}
+                  </>
+                )}
+              </BrowserOnly>
+
               <div className="margin-vert--lg text--center">
                 <button className="button button--lg button--secondary" onClick={generatePDF}>
                   Generate PDF

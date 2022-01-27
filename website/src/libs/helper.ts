@@ -1,5 +1,4 @@
-import { Template } from '../../../src/index';
-import { checkProps } from '../../../src/libs/helper';
+import { Template, checkProps } from '../../../dist/index.es';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({

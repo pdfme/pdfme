@@ -12,6 +12,7 @@ import {
   GeneratorOptions,
   UIOptions,
 } from './libs/type';
+import { checkProps } from './libs/helper';
 
 export {
   Template,
@@ -19,11 +20,12 @@ export {
   TextSchema,
   ImageSchema,
   BarcodeSchema,
+  GeneratorOptions,
+  UIOptions,
+  checkProps,
   generate,
   Designer,
   Viewer,
   Form,
-  GeneratorOptions,
-  UIOptions,
   blankPdf,
 };

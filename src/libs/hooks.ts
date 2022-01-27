@@ -28,8 +28,8 @@ export const useUIPreProcessor = ({ template, size, offset = 0 }: UIPreProcessor
     const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
-    const paperWidth = _pageSizes[0].width * ZOOM;
-    const paperHeight = _pageSizes[0].height * ZOOM;
+    const paperWidth = _pageSizes[0] ? _pageSizes[0].width * ZOOM : 0;
+    const paperHeight = _pageSizes[0] ? _pageSizes[0].height * ZOOM : 0;
     const _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
 
     const _scale = Math.min(
