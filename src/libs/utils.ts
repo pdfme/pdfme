@@ -46,7 +46,9 @@ export const round = (number: number, precision: number) => {
 
 export const b64toUint8Array = (base64: string) => {
   if (typeof window !== 'undefined') {
-    const byteString = window.atob(base64.split(',')[1] ? base64.split(',')[1] : base64);
+    const byteString = window.atob(
+      base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64
+    );
     const unit8arr = new Uint8Array(byteString.length);
     for (let i = 0; i < byteString.length; i += 1) {
       unit8arr[i] = byteString.charCodeAt(i);

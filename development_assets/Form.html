@@ -20,13 +20,15 @@
       <button onclick="generate()">generate</button>
     </div>
     <div id="app"></div>
+    <!-- index.js is dist/index.js -->
+    <script src="./index.js"></script>
     <script src="./helper.js"></script>
     <script>
-      let viewer = null;
+      let form = null;
 
       async function init() {
         const font = await getFont();
-        viewer = new pdfme.Viewer({
+        form = new pdfme.Form({
           domContainer,
           template: getTemplate(),
           inputs: [
@@ -41,22 +43,22 @@
       }
 
       function destroy() {
-        viewer.destroy();
+        form.destroy();
       }
 
       function getInputs() {
-        console.log(viewer.getInputs());
+        console.log(form.getInputs());
       }
 
       function setInputs() {
-        viewer.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
+        form.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
       }
 
       async function generate() {
         const font = await getFont();
         pdfme
           .generate({
-            inputs: viewer.getInputs(),
+            inputs: form.getInputs(),
             template: getTemplate(),
             options: {
               font,
@@ -67,6 +69,7 @@
             window.open(URL.createObjectURL(blob));
           });
       }
+
       window.onload = init;
     </script>
   </body>

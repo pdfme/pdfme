@@ -13,51 +13,69 @@
       /
       <button onclick="destroy()">destroy</button>
       /
-      <button onclick="getInputs()">getInputs</button>
+      <button onclick="saveTemplate()">saveTemplate</button>
       /
-      <button onclick="setInputs()">setInputs</button>
+      <button onclick="updateTemplate()">updateTemplate</button>
       /
       <button onclick="generate()">generate</button>
+      /
+      <label>
+        loadTemplate
+        <input type="file" accept="application/json" onchange="loadTemplate(this.files[0])" />
+      </label>
     </div>
     <div id="app"></div>
+    <!-- index.js is dist/index.js -->
+    <script src="./index.js"></script>
     <script src="./helper.js"></script>
     <script>
-      let form = null;
+      let editor = null;
 
       async function init() {
         const font = await getFont();
-        form = new pdfme.Form({
+        editor = new pdfme.Designer({
           domContainer,
           template: getTemplate(),
-          inputs: [
-            { field1: 'bb', field2: 'aaaaaaaaaaaa' },
-            { field1: 'bb', field2: 'aaaaaaaaaaaa' },
-            { field1: 'bb', field2: 'aaaaaaaaaaaa' },
-          ],
           options: {
             font,
           },
         });
+
+        editor.onSaveTemplate((t) => {
+          console.log({ ...t, basePdf: 'skip...' });
+          const tj = JSON.stringify(t, null, 2);
+          localStorage.setItem('template', tj);
+        });
       }
 
       function destroy() {
-        form.destroy();
+        editor.destroy();
       }
 
-      function getInputs() {
-        console.log(form.getInputs());
+      function saveTemplate() {
+        editor.saveTemplate();
       }
 
-      function setInputs() {
-        form.setInputs([{ field1: 'wwwww', field2: 'wwwww' }]);
+      function updateTemplate() {
+        editor.updateTemplate(getSampleTemplate());
+      }
+
+      function loadTemplate(file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          editor.updateTemplate(JSON.parse(reader.result));
+        };
+        reader.readAsText(file);
       }
 
       async function generate() {
         const font = await getFont();
+        const template = editor.getTemplate();
+        const inputs = template.sampledata;
         pdfme
           .generate({
-            inputs: form.getInputs(),
-            template: getTemplate(),
+            inputs,
+            template,
             options: {
               font,
             },

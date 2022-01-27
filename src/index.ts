@@ -2,7 +2,7 @@ import generate from './generate';
 import Designer from './Designer';
 import Form from './Form';
 import Viewer from './Viewer';
-import { BLANK_PDF } from './libs/constants';
+import { BLANK_PDF as blankPdf } from './libs/constants';
 import {
   Template,
   Schema,
@@ -25,5 +25,5 @@ export {
   Form,
   GeneratorOptions,
   UIOptions,
-  BLANK_PDF as blankPdf,
+  blankPdf,
 };

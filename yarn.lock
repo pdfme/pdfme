@@ -4557,6 +4557,11 @@ mime-types@^2.1.12, mime-types@^2.1.18, mime-types@^2.1.27, mime-types@~2.1.19, 
   dependencies:
     mime-db "1.51.0"
 
+mime@>=2.4.6:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-3.0.0.tgz#b374550dca3a0c18443b0c950a6a58f1931cf7a7"
+  integrity sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==
+
 mime@^2.4.6:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.6.0.tgz#a2a682a95cd4d0cb1d6257e28f83da7e35800367"
@@ -4924,6 +4929,11 @@ only@~0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/only/-/only-0.0.2.tgz#2afde84d03e50b9a8edc444e30610a70295edfb4"
   integrity sha1-Kv3oTQPlC5qO3EROMGEKcCle37Q=
+
+opener@1:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/opener/-/opener-1.5.2.tgz#5d37e1f35077b9dcac4301372271afdeb2a13598"
+  integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
 optionator@^0.8.1:
   version "0.8.3"
@@ -5834,11 +5844,6 @@ rollup-plugin-base64@^1.0.1:
   dependencies:
     "@rollup/pluginutils" "^3.1.0"
 
-rollup-plugin-peer-deps-external@^2.2.4:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-peer-deps-external/-/rollup-plugin-peer-deps-external-2.2.4.tgz#8a420bbfd6dccc30aeb68c9bf57011f2f109570d"
-  integrity sha512-AWdukIM1+k5JDdAqV/Cxd+nejvno2FVLVeZ74NKggm3Q5s9cbbcOgUPGdbxPi4BXu7xGaZ8HG12F+thImYu/0g==
-
 rollup-plugin-postcss@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/rollup-plugin-postcss/-/rollup-plugin-postcss-4.0.2.tgz#15e9462f39475059b368ce0e49c800fa4b1f7050"
@@ -5857,6 +5862,14 @@ rollup-plugin-postcss@^4.0.2:
     rollup-pluginutils "^2.8.2"
     safe-identifier "^0.4.2"
     style-inject "^0.3.0"
+
+rollup-plugin-serve@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-serve/-/rollup-plugin-serve-1.1.0.tgz#0654a57021a21b903340c69940f7463706e8288d"
+  integrity sha512-pYkSsuA0/psKqhhictkJw1c2klya5b+LlCvipWqI9OE1aG2M97mRumZCbBlry5CMEOzYBBgSDgd1694sNbmyIw==
+  dependencies:
+    mime ">=2.4.6"
+    opener "1"
 
 rollup-plugin-terser@^7.0.2:
   version "7.0.2"

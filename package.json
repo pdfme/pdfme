@@ -20,7 +20,8 @@
     "zlib": false
   },
   "scripts": {
-    "build": "rollup -c",
+    "develop": "npm run clean && NODE_ENV=development rollup -w -c",
+    "build": "npm run clean && NODE_ENV=production rollup -c",
     "lint": "tsc --noEmit",
     "doc": "cd website && npm run start",
     "test": "jest",
@@ -94,8 +95,8 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.66.1",
     "rollup-plugin-base64": "^1.0.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.31.1",
     "sass-loader": "^12.1.0",
