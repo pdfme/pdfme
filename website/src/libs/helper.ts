@@ -1,4 +1,4 @@
-import { Template, checkProps } from '../../../dist/index.es';
+import { Template, checkProps } from 'pdfme';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({
