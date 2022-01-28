@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import useIsBrowser from '@docusaurus/useIsBrowser';
-import BrowserOnly from '@docusaurus/BrowserOnly';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import {
@@ -172,8 +170,6 @@ const HowToUseButton = () => {
 };
 
 const TemplateDesign = () => {
-  const isBrowser = useIsBrowser();
-
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [template, setTemplate] = useState<Template>(getSampleTemplate());
@@ -203,7 +199,7 @@ const TemplateDesign = () => {
   }, []);
 
   useEffect(() => {
-    if (designerRef.current && isBrowser) {
+    if (designerRef.current) {
       designer.current = new Designer({ domContainer: designerRef.current, template });
       designer.current.onSaveTemplate(downloadTemplate);
       designer.current.onChangeTemplate(setTemplate);
@@ -409,17 +405,13 @@ ${e}`);
         )}
       </div>
 
-      <BrowserOnly>
-        {() => (
-          <div
-            ref={designerRef}
-            style={{
-              width: '100%',
-              height: `calc(100vh - ${headerHeight + controllHeight}px)`,
-            }}
-          />
-        )}
-      </BrowserOnly>
+      <div
+        ref={designerRef}
+        style={{
+          width: '100%',
+          height: `calc(100vh - ${headerHeight + controllHeight}px)`,
+        }}
+      />
 
       <Modal open={codeModalOpen} onClose={handleCodeModalClose}>
         <Box sx={modalBoxStyle}>

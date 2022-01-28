@@ -16,8 +16,5 @@
     "sourceMap": true
   },
   "include": ["declaration.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.ttf"],
-  "exclude": ["node_modules", "dist"],
-  "paths": {
-    "crypto": ["node_modules/crypto-js"]
-  }
+  "exclude": ["node_modules", "dist"]
 }

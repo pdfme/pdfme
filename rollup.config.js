@@ -12,10 +12,12 @@ import serve from 'rollup-plugin-serve';
 
 const packageJson = require('./package.json');
 
+const isProd = process.env.NODE_ENV === 'production';
+const isDev = process.env.NODE_ENV === 'development';
+
 const plugins = [
   postcss({ modules: true }),
-  typescript({ useTsconfigDeclarationDir: true }),
-  commonjs(),
+  commonjs({ sourceMap: isProd }),
   nodePolyfills(),
   nodeResolve({ module: true, browser: true }),
   json(),
@@ -25,9 +27,10 @@ const plugins = [
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
   }),
+  typescript({ useTsconfigDeclarationDir: true, check: isProd }),
 ];
 
-if (process.env.NODE_ENV === 'development') {
+if (isDev) {
   plugins.push(
     serve({
       open: true,
@@ -38,15 +41,15 @@ if (process.env.NODE_ENV === 'development') {
   );
 }
 
-if (process.env.NODE_ENV === 'production') {
+if (isProd) {
   plugins.push(terser());
 }
 
 export default {
   input: 'src/index.ts',
   output: [
-    { file: packageJson.main, format: 'umd', name: 'pdfme', sourcemap: true },
-    { file: packageJson.module, format: 'esm', sourcemap: true },
+    { file: packageJson.main, format: 'umd', name: 'pdfme', sourcemap: isProd },
+    { file: packageJson.module, format: 'esm', sourcemap: isProd },
   ],
   plugins,
 };

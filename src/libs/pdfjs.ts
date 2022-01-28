@@ -1,6 +1,6 @@
 // @ts-ignore
-import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf';
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import { pt2mm } from './utils';
 
