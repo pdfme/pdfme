@@ -16,6 +16,7 @@ const BANNER = [
 const config = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.scss', '.css', '.png', '.svg'],
+    fallback: { buffer: require.resolve('buffer/') },
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
@@ -41,13 +42,14 @@ const config = {
     historyApiFallback: false,
     host: '0.0.0.0',
   },
-  entry: './src/index.ts',
+  entry: './src/index.js',
   output: {
-    library: 'pdfme',
-    libraryTarget: 'umd',
-    libraryExport: 'default',
-    path: path.join(__dirname, 'dist'),
-    filename: FILENAME + '.js',
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'pdfme.js',
+    library: {
+      name: 'pdfme',
+      type: 'umd',
+    },
   },
   module: {
     rules: [

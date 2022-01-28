@@ -2,8 +2,8 @@
   "name": "pdfme",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/pdfme.min.js",
-  "module": "dist/pdfme.min.js",
+  "main": "dist/pdfme.js",
+  "module": "src/index.js",
   "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=14"
@@ -67,6 +67,7 @@
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "babel-loader": "^8.2.2",
+    "buffer": "^6.0.3",
     "css-loader": "^6.2.0",
     "css-modules-typescript-loader": "^4.0.1",
     "eslint": "^8.6.0",

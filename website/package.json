@@ -15,8 +15,8 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.14",
-    "@docusaurus/preset-classic": "2.0.0-beta.14",
+    "@docusaurus/core": "^2.0.0-beta.15",
+    "@docusaurus/preset-classic": "^2.0.0-beta.15",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mdx-js/react": "^1.6.21",
@@ -24,6 +24,7 @@
     "@mui/material": "^5.3.0",
     "clsx": "^1.1.1",
     "docusaurus-plugin-sass": "^0.2.1",
+    "pdfme": "../",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -31,7 +32,7 @@
     "sass": "^1.47.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-beta.14",
+    "@docusaurus/module-type-aliases": "^2.0.0-beta.15",
     "@tsconfig/docusaurus": "^1.0.4",
     "docusaurus-plugin-typedoc": "^0.16.7",
     "typedoc": "^0.22.11",
