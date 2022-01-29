@@ -20,7 +20,7 @@ const config = {
     alias: { process: 'process/browser' },
   },
   plugins: [
-    // new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin(),
     new webpack.ProvidePlugin({
       process: 'process/browser',
     }),
@@ -64,34 +64,6 @@ const config = {
       {
         test: /\.(png|jpg|svg|gif|ttf)$/i,
         use: ['url-loader'],
-      },
-      {
-        test: /\.module\.scss$/,
-        use: [
-          {
-            loader: 'style-loader',
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: {
-                namedExport: true,
-              },
-            },
-          },
-          {
-            loader: 'sass-loader',
-          },
-        ],
-      },
-      {
-        test: /\.scss$/,
-        exclude: /\.module\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
       },
     ],
   },

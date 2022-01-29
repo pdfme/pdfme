@@ -1,6 +1,4 @@
 import React, { forwardRef, RefObject, Ref, ReactNode } from 'react';
-import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../libs/constants';
 import { SchemaForUI, isTextSchema, isImageSchema, isBarcodeSchema } from '../../libs/type';
 import TextSchema from './TextSchema';
@@ -17,7 +15,6 @@ export interface SchemaUIProps {
 
 type Props = SchemaUIProps & {
   border: string;
-  hideTooltip?: boolean;
   onChangeHoveringSchemaId?: (id: string | null) => void;
 };
 
@@ -26,30 +23,28 @@ const getBgc = (schema: SchemaForUI) =>
 
 const Wrapper = ({
   children,
-  hideTooltip,
   border,
   onChangeHoveringSchemaId,
   schema,
 }: Props & { children: ReactNode }) => (
-  <Tippy disabled={hideTooltip} delay={0} interactive content={schema.key}>
-    <div
-      onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
-      onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
-      className={SELECTABLE_CLASSNAME}
-      id={schema.id}
-      style={{
-        position: 'absolute',
-        height: schema.height * ZOOM,
-        width: schema.width * ZOOM,
-        top: schema.position.y * ZOOM,
-        left: schema.position.x * ZOOM,
-        border,
-        backgroundColor: getBgc(schema),
-      }}
-    >
-      {children}
-    </div>
-  </Tippy>
+  <div
+    title={schema.key}
+    onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
+    onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
+    className={SELECTABLE_CLASSNAME}
+    id={schema.id}
+    style={{
+      position: 'absolute',
+      height: schema.height * ZOOM,
+      width: schema.width * ZOOM,
+      top: schema.position.y * ZOOM,
+      left: schema.position.x * ZOOM,
+      border,
+      backgroundColor: getBgc(schema),
+    }}
+  >
+    {children}
+  </div>
 );
 
 const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {
