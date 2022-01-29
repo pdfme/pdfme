@@ -1,10 +1,17 @@
 import React, { useContext } from 'react';
-import * as styles from './index.module.scss';
 import left from '../../../assets/icons/left.svg';
 import right from '../../../assets/icons/right.svg';
 import doubleLeft from '../../../assets/icons/double-left.svg';
 import doubleRight from '../../../assets/icons/double-right.svg';
 import { I18nContext } from '../../../libs/contexts';
+
+const btnStyle: React.CSSProperties = {
+  cursor: 'pointer',
+  border: 'none',
+  background: 'none',
+  display: 'flex',
+  alignItems: 'center',
+};
 
 type Props = {
   pageCursor: number;
@@ -18,17 +25,36 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
   if (pageNum <= 1) return <></>;
 
   return (
-    <div className={`${styles.pageWrapper}`}>
-      <div>
+    <div
+      style={{
+        position: 'sticky',
+        top: '90%',
+        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#777777e6',
+          borderRadius: 3,
+          padding: '0.5rem',
+        }}
+      >
         <button
-          className={styles.leftBtn}
+          style={{ paddingLeft: '0.5rem', ...btnStyle }}
           disabled={pageCursor <= 0}
           onClick={() => setPageCursor(0)}
         >
           <img src={doubleLeft} alt={i18n('goToFirst')} style={{ width: 20 }} />
         </button>
         <button
-          className={styles.leftBtn}
+          style={{ paddingLeft: '0.5rem', ...btnStyle }}
           disabled={pageCursor <= 0}
           onClick={() => setPageCursor(pageCursor - 1)}
         >
@@ -38,14 +64,14 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
           {pageCursor + 1}/{pageNum}
         </strong>
         <button
-          className={styles.rightBtn}
+          style={{ paddingRight: '0.5rem', ...btnStyle }}
           disabled={pageCursor + 1 >= pageNum}
           onClick={() => setPageCursor(pageCursor + 1)}
         >
           <img src={right} alt={i18n('goToNext')} style={{ width: 20 }} />
         </button>
         <button
-          className={styles.rightBtn}
+          style={{ paddingRight: '0.5rem', ...btnStyle }}
           disabled={pageCursor + 1 >= pageNum}
           onClick={() => setPageCursor(pageNum - 1)}
         >

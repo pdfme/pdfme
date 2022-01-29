@@ -1,6 +1,11 @@
 import React from 'react';
-import * as styles from '../index.module.scss';
 import { SidebarProps } from '..';
+
+const inputSetStyle: React.CSSProperties = {
+  marginRight: '1rem',
+  display: 'flex',
+  alignItems: 'center',
+};
 
 const PositionAndSizeEditor = (
   props: Pick<SidebarProps, 'pageSize' | 'changeSchemas' | 'activeSchema'>
@@ -9,8 +14,14 @@ const PositionAndSizeEditor = (
 
   return (
     <div>
-      <div className={styles.flx}>
-        <div className={styles.inputSet}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <div style={inputSetStyle}>
           <label style={{ width: 17 }}>X</label>
           <input
             style={{ width: 70 }}
@@ -25,7 +36,7 @@ const PositionAndSizeEditor = (
           />
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
-        <div className={styles.inputSet}>
+        <div style={inputSetStyle}>
           <label style={{ width: 17 }}>Y</label>
           <input
             style={{ width: 70 }}
@@ -41,8 +52,15 @@ const PositionAndSizeEditor = (
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
       </div>
-      <div className={styles.flx} style={{ marginTop: '0.25rem' }}>
-        <div className={styles.inputSet}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginTop: '0.25rem',
+        }}
+      >
+        <div style={inputSetStyle}>
           <label style={{ width: 17 }}>W</label>
           <input
             style={{ width: 70 }}
@@ -57,7 +75,7 @@ const PositionAndSizeEditor = (
           />
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
-        <div className={styles.inputSet}>
+        <div style={inputSetStyle}>
           <label style={{ width: 17 }}>H</label>
           <input
             style={{ width: 70 }}

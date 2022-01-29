@@ -1,10 +1,29 @@
 import React, { useContext } from 'react';
-import * as styles from './index.module.scss';
 import left from '../../../assets/icons/left.svg';
 import right from '../../../assets/icons/right.svg';
 import doubleLeft from '../../../assets/icons/double-left.svg';
 import doubleRight from '../../../assets/icons/double-right.svg';
 import { I18nContext } from '../../../libs/contexts';
+
+const buttonWrapStyle: React.CSSProperties = {
+  position: 'sticky',
+  top: '45%',
+  zIndex: 1,
+  backgroundColor: '#777777bd',
+  borderRadius: 3,
+  padding: '0.5rem',
+  display: 'flex',
+  alignItems: 'center',
+  width: 100,
+};
+
+const btnStyle: React.CSSProperties = {
+  cursor: 'pointer',
+  border: 'none',
+  background: 'none',
+  display: 'flex',
+  alignItems: 'center',
+};
 
 type Props = {
   unitCursor: number;
@@ -20,16 +39,16 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
   return (
     <>
       {unitCursor > 0 && (
-        <div className={styles.unitWrapper} style={{ marginLeft: '1rem' }}>
+        <div style={{ marginLeft: '1rem', ...buttonWrapStyle }}>
           <button
-            className={styles.leftBtn}
+            style={{ paddingLeft: '0.5rem', ...btnStyle }}
             disabled={unitCursor <= 0}
             onClick={() => setUnitCursor(0)}
           >
             <img src={doubleLeft} alt={i18n('goToFirst')} style={{ width: 20 }} />
           </button>
           <button
-            className={styles.leftBtn}
+            style={{ paddingLeft: '0.5rem', ...btnStyle }}
             disabled={unitCursor <= 0}
             onClick={() => setUnitCursor(unitCursor - 1)}
           >
@@ -41,19 +60,19 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
         </div>
       )}
       {unitCursor + 1 < unitNum && (
-        <div className={styles.unitWrapper} style={{ marginLeft: 'auto', marginRight: '1rem' }}>
+        <div style={{ marginLeft: 'auto', marginRight: '1rem', ...buttonWrapStyle }}>
           <strong style={{ color: 'white' }}>
             {unitCursor + 1}/{unitNum}
           </strong>
           <button
-            className={styles.rightBtn}
+            style={{ paddingRight: '0.5rem', ...btnStyle }}
             disabled={unitCursor + 1 >= unitNum}
             onClick={() => setUnitCursor(unitCursor + 1)}
           >
             <img src={right} alt={i18n('goToNext')} style={{ width: 20 }} />
           </button>
           <button
-            className={styles.rightBtn}
+            style={{ paddingRight: '0.5rem', ...btnStyle }}
             disabled={unitCursor + 1 >= unitNum}
             onClick={() => setUnitCursor(unitNum - 1)}
           >

@@ -1,8 +1,7 @@
 import React, { forwardRef, Ref } from 'react';
-import * as styles from './index.module.scss';
-import { ZOOM } from '../../../libs/constants';
-import { SchemaUIProps } from '../SchemaUI';
-import { TextSchema } from '../../../libs/type';
+import { ZOOM } from '../../libs/constants';
+import { SchemaUIProps } from './SchemaUI';
+import { TextSchema } from '../../libs/type';
 
 type Props = SchemaUIProps & { schema: TextSchema };
 
@@ -32,7 +31,6 @@ const TextSchemaUI = (
       ref={ref}
       placeholder={placeholder}
       tabIndex={tabIndex}
-      className={`${styles.placeholderGray} `}
       style={style}
       onChange={(e) => onChange(e.target.value)}
       value={schema.data}

@@ -94,15 +94,17 @@ export const getSampleTemplate = (): Template => ({
 export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
 
 export const downloadJsonFile = (json: any, title: string) => {
-  const blob = new Blob([JSON.stringify(json)], {
-    type: 'application/json',
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${title}.json`;
-  link.click();
-  URL.revokeObjectURL(url);
+  if (typeof window !== 'undefined') {
+    const blob = new Blob([JSON.stringify(json)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${title}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 };
 
 export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {

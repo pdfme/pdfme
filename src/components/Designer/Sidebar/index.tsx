@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-import * as styles from './index.module.scss';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
 import { I18nContext } from '../../../libs/contexts';
@@ -35,20 +34,51 @@ const Sidebar = (props: SidebarProps) => {
   return (
     <div style={{ position: 'absolute', height, width: '100%' }}>
       <div style={{ position: 'sticky', top, zIndex: 29 }}>
-        <button className={`${styles.tglBtn}`} onClick={() => setOpen(!open)}>
+        <button
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '0.5rem',
+            zIndex: 100,
+            border: 'none',
+            borderRadius: 3,
+            padding: '0.5rem',
+            cursor: 'pointer',
+            background: '#eee',
+          }}
+          onClick={() => setOpen(!open)}
+        >
           <img src={open ? forwardIcon : backIcon} width={15} alt="Toggle icon" />
         </button>
         <div
-          className={styles.sideBar}
           style={{
             width: sidebarWidth,
             height: size.height - RULER_HEIGHT * ZOOM,
             display: open ? 'block' : 'none',
             top,
+            right: 0,
+            position: 'absolute',
+            background: '#ffffffed',
+            color: '#333',
+            border: '1px solid #eee',
+            padding: '0.5rem',
+            overflowY: 'auto',
+            fontFamily: "'Open Sans', sans-serif",
+            fontWeight: 400,
           }}
         >
           {props.activeElement ? <DetailView {...props} /> : <ListView {...props} />}
-          <div className={styles.addBtn}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-around',
+              position: 'absolute',
+              width: '100%',
+              left: 0,
+              bottom: '1rem',
+              paddingTop: '1rem',
+            }}
+          >
             <button
               style={{
                 padding: '0.5rem',

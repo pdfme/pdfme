@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import * as styles from './index.module.scss';
 import {
   SortableContainer as sortableContainer,
   SortableElement as sortableElement,
@@ -16,7 +15,7 @@ import { SidebarProps } from '.';
 const isTouchable = () => true;
 
 const DragHandle = sortableHandle(() => (
-  <button style={{ padding: 0, background: 'none', border: 'none' }}>
+  <button style={{ padding: 0, background: 'none', border: 'none', display: 'flex' }}>
     <img style={{ cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
@@ -48,7 +47,15 @@ const SortableItem = sortableElement(
     };
 
     return (
-      <div key={sc.id} className={styles.flx} style={{ paddingLeft: 5 }}>
+      <div
+        key={sc.id}
+        style={{
+          paddingLeft: 5,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <DragHandle />
         <button
           disabled={!touchable}
@@ -66,11 +73,19 @@ const SortableItem = sortableElement(
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
         >
-          <span className={`${styles.keyLabel}`}>
+          <span
+            style={{
+              marginRight: '1rem',
+              width: 180,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+            }}
+          >
             {status === '' ? (
               sc.key
             ) : (
-              <span className={styles.warning}>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
                 <img
                   alt="Warning icon"
                   src={warningIcon}
@@ -149,7 +164,6 @@ const ListView = (
         size={size}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-        helperClass={styles.sortableHelper}
         useDragHandle
         axis="y"
         lockAxis="y"

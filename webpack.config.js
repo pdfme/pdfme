@@ -3,8 +3,8 @@ const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const pkg = require('./package.json');
+
 const isProduction = process.env.NODE_ENV === 'production';
-const FILENAME = pkg.name + (isProduction ? '.min' : '');
 
 const BANNER = [
   'pdfme',
@@ -14,12 +14,16 @@ const BANNER = [
 ].join('\n');
 
 const config = {
+  optimization: { minimize: isProduction },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.scss', '.css', '.png', '.svg'],
-    fallback: { buffer: require.resolve('buffer/') },
+    alias: { process: 'process/browser' },
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
     new webpack.BannerPlugin({
       banner: BANNER,
       entryOnly: true,
@@ -42,12 +46,12 @@ const config = {
     historyApiFallback: false,
     host: '0.0.0.0',
   },
-  entry: './src/index.js',
+  entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'pdfme.js',
+    filename: `${pkg.name}.js`,
     library: {
-      name: 'pdfme',
+      name: pkg.name,
       type: 'umd',
     },
   },

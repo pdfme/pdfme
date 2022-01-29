@@ -1,18 +1,25 @@
 import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
-import * as styles from './index.module.scss';
-import { ZOOM } from '../../../libs/constants';
-import { readFiles } from '../../../libs/ui';
-import { SchemaUIProps } from '../SchemaUI';
-import { ImageSchema } from '../../../libs/type';
-import { I18nContext } from '../../../libs/contexts';
-import imageExample from '../../../assets/imageExample.png';
+import { ZOOM } from '../../libs/constants';
+import { readFiles } from '../../libs/ui';
+import { SchemaUIProps } from './SchemaUI';
+import { ImageSchema } from '../../libs/type';
+import { I18nContext } from '../../libs/contexts';
+import imageExample from '../../assets/imageExample.png';
 
 type Props = SchemaUIProps & { schema: ImageSchema };
 
 const FilledImage = ({ editable, tabIndex, schema, onChange }: Omit<Props, 'placeholder'>) => (
   <div style={{ margin: '0 auto' }}>
     {editable && (
-      <button tabIndex={tabIndex} className={styles.dltBtn} onClick={() => onChange('')}>
+      <button
+        tabIndex={tabIndex}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+        }}
+        onClick={() => onChange('')}
+      >
         x
       </button>
     )}
@@ -29,8 +36,13 @@ const BlankImage = (props: Props & { inputRef: Ref<HTMLInputElement> }) => {
 
   return editable ? (
     <label
-      className={styles.imageLabel}
-      style={{ height: Number(schema.height) * ZOOM, width: Number(schema.width) * ZOOM }}
+      style={{
+        height: Number(schema.height) * ZOOM,
+        width: Number(schema.width) * ZOOM,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
     >
       <input
         ref={inputRef}

@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import * as styles from '../index.module.scss';
 import { FontContext } from '../../../../libs/contexts';
 import {
   DEFAULT_FONT_SIZE,
@@ -76,7 +75,13 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
 
   return (
     <>
-      <div className={styles.flx}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <SelectSet
           label={'FontName'}
           value={activeSchema.fontName ?? fallbackFontName}
@@ -95,7 +100,13 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           }
         />
       </div>
-      <div className={styles.flx}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <NumberInputSet
           width="30%"
           label={'FontSize(pt)'}
@@ -128,7 +139,14 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           }
         />
       </div>
-      <div className={styles.flx} style={{ marginBottom: '0.25rem' }}>
+      <div
+        style={{
+          marginBottom: '0.25rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <ColorInputSet
           label={'FontColor'}
           value={activeSchema.fontColor ?? '#000000'}

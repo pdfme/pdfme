@@ -12,14 +12,7 @@ import {
   GeneratorOptions,
   UIOptions,
 } from './libs/type';
-
-export default {
-  generate,
-  Designer,
-  Viewer,
-  Form,
-  blankPdf: BLANK_PDF,
-};
+import { checkProps } from './libs/helper';
 
 export {
   Template,
@@ -27,11 +20,12 @@ export {
   TextSchema,
   ImageSchema,
   BarcodeSchema,
+  GeneratorOptions,
+  UIOptions,
   generate,
   Designer,
   Viewer,
   Form,
-  GeneratorOptions,
-  UIOptions,
+  checkProps,
   BLANK_PDF as blankPdf,
 };

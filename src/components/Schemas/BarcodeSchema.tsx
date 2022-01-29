@@ -1,19 +1,18 @@
 import React, { forwardRef, Ref } from 'react';
-import * as styles from './index.module.scss';
-import { ZOOM } from '../../../libs/constants';
-import { validateBarcodeInput } from '../../../libs/barcode';
-import { BarCodeType, BarcodeSchema } from '../../../libs/type';
-import { SchemaUIProps } from '../SchemaUI';
-import ean8 from '../../../assets/barcodeExamples/ean8.png';
-import ean13 from '../../../assets/barcodeExamples/ean13.png';
-import code39 from '../../../assets/barcodeExamples/code39.png';
-import code128 from '../../../assets/barcodeExamples/code128.png';
-import nw7 from '../../../assets/barcodeExamples/nw7.png';
-import itf14 from '../../../assets/barcodeExamples/itf14.png';
-import japanpost from '../../../assets/barcodeExamples/japanpost.png';
-import qrcode from '../../../assets/barcodeExamples/qrcode.png';
-import upca from '../../../assets/barcodeExamples/upca.png';
-import upce from '../../../assets/barcodeExamples/upce.png';
+import { ZOOM } from '../../libs/constants';
+import { validateBarcodeInput } from '../../libs/barcode';
+import { BarCodeType, BarcodeSchema } from '../../libs/type';
+import { SchemaUIProps } from './SchemaUI';
+import ean8 from '../../assets/barcodeExamples/ean8.png';
+import ean13 from '../../assets/barcodeExamples/ean13.png';
+import code39 from '../../assets/barcodeExamples/code39.png';
+import code128 from '../../assets/barcodeExamples/code128.png';
+import nw7 from '../../assets/barcodeExamples/nw7.png';
+import itf14 from '../../assets/barcodeExamples/itf14.png';
+import japanpost from '../../assets/barcodeExamples/japanpost.png';
+import qrcode from '../../assets/barcodeExamples/qrcode.png';
+import upca from '../../assets/barcodeExamples/upca.png';
+import upce from '../../assets/barcodeExamples/upce.png';
 
 type Props = SchemaUIProps & { schema: BarcodeSchema };
 
@@ -32,8 +31,13 @@ const barcodeExampleImageObj: { [key: string]: string } = {
 
 const SampleBarcode = ({ schema }: { schema: BarcodeSchema }) => (
   <img
-    className={styles.barcodeImage}
-    style={{ width: schema.width * ZOOM, height: schema.height * ZOOM }}
+    style={{
+      width: schema.width * ZOOM,
+      height: schema.height * ZOOM,
+      position: 'absolute',
+      borderRadius: 0,
+      opacity: 0.5,
+    }}
     src={barcodeExampleImageObj[schema.type]}
   />
 );
@@ -69,13 +73,20 @@ const BarcodeSchemaUI = (
   const value = schema.data;
 
   return (
-    <div className={styles.barcodeWrapper}>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <input
         ref={ref}
         disabled={!editable}
         tabIndex={tabIndex}
         placeholder={placeholder}
-        className={`${styles.placeholderGray}`}
         style={{
           textAlign: 'center',
           position: 'absolute',

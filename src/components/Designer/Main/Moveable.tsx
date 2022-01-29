@@ -47,7 +47,7 @@ const _Moveable = (
 ) => (
   <Moveable
     style={{ zIndex: 1 }}
-    rootContainer={document.body}
+    rootContainer={document ? document.body : undefined}
     snappable
     snapCenter
     draggable

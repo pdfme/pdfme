@@ -2,6 +2,7 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const path = require('path');
+const webpack = require('webpack');
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
@@ -49,44 +50,26 @@ const config = {
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',
-        configureWebpack(config) {
-          const r = config.module.rules.find(
+        configureWebpack(config, isServer) {
+          const fontRule = config.module.rules.find(
             (r) => r.test.toString() === /\.(woff|woff2|eot|ttf|otf)$/.toString()
           );
           // Remove ttf rule
-          r.test = /\.(woff|woff2|eot|otf)$/;
+          fontRule.test = /\.(woff|woff2|eot|otf)$/;
 
-          // Remove existing sass rule
-          config.module.rules = config.module.rules.filter(
-            (r) => r.test.toString() !== /\.s[ca]ss$/.toString()
-          );
-
-          return {
+          const newConfig = {
+            plugins: [
+              new webpack.ProvidePlugin({
+                Buffer: ['buffer', 'Buffer'],
+                process: 'process/browser',
+              }),
+            ],
             module: {
               rules: [
                 // Add ttf rule. Because we use Helvetica.ttf as data from src/libs/helper #getDefaultFont.
                 {
                   test: /\.ttf$/,
                   use: ['url-loader'],
-                },
-                // Add sass rule for src/
-                {
-                  test: /\.module\.scss$/,
-                  include: path.resolve(__dirname, '../src'),
-                  use: [
-                    { loader: 'style-loader' },
-                    {
-                      loader: 'css-loader',
-                      options: { modules: { namedExport: true } },
-                    },
-                    { loader: 'sass-loader' },
-                  ],
-                },
-                {
-                  test: /\.scss$/,
-                  exclude: /\.module\.scss$/,
-                  include: path.resolve(__dirname, '../src'),
-                  use: ['style-loader', 'css-loader', 'sass-loader'],
                 },
                 // Add svg rule for src/
                 {
@@ -96,6 +79,15 @@ const config = {
               ],
             },
           };
+          if (isServer) {
+            newConfig.resolve = {
+              alias: {
+                canvas: false,
+              },
+            };
+          }
+
+          return newConfig;
         },
       };
     },

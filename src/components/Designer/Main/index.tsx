@@ -7,7 +7,6 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import * as styles from './index.module.scss';
 import { OnDrag, OnResize } from 'react-moveable';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { round, flatten, uuid } from '../../../libs/utils';
@@ -32,8 +31,17 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
   return (
     <button
       id={DELETE_BTN_ID}
-      className={`${styles.dltBtn}`}
-      style={{ position: 'absolute', top, left }}
+      style={{
+        position: 'absolute',
+        top,
+        left,
+        cursor: 'pointer',
+        color: 'white',
+        border: 'none',
+        fontWeight: 'bold',
+        borderRadius: 3,
+        background: 'rgb(68, 170, 255)',
+      }}
     >
       x
     </button>
