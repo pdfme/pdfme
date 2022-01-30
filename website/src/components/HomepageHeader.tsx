@@ -18,7 +18,7 @@ export default function HomepageHeader() {
           <div className="col col--6">
             <h1 className="hero__title">{siteConfig.title}</h1>
             <p className="hero__subtitle">
-              TypeScript base PDF generator and React base UI. <br />
+              A TypeScript based PDF generator library, made with React.<br />
               Open source, developed by the community, and completely free to use under the MIT
               license!
             </p>
@@ -43,7 +43,7 @@ export default function HomepageHeader() {
               </div>
               <div className="admonition-content">
                 <p>
-                  pdfme is now beta version. Please report any issues or suggestions from{' '}
+                  pdfme is now in beta version. Please report any issues or suggestions from{' '}
                   <Link to="/help">Help page</Link>
                 </p>
               </div>

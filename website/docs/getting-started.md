@@ -6,18 +6,18 @@ sidebar_position: 1
 
 :::caution
 
-pdfme is now beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
+pdfme is now in beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
 :::
 
 ## Introduction
 
-pdfme was created to simplify PDF generation and design. It is especially useful for the following use cases.
+pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:
 
 - Need to create a designed PDF with short code.
-- Need to integrate PDF design features into applications.
+- Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
 
-As a example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
+As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
 
 ## Installation
 
@@ -48,8 +48,8 @@ import { Template, generate, Designer, Form, Viewer } from 'pdfme';
 
 ## Template
 
-The core of pdfme's library is Template. All objects use Template.  
-A template can be divided into two parts: fixed and variable. They are called basePdf and schemas.
+The core of pdfme library are Templates. Templates are used everywhere.  
+A template can be divided into two parts: a fixed part and a variable part. We call them basePdf and schema.
 The following image is a good illustration of a template.
 
 ![](/img/template.png)
