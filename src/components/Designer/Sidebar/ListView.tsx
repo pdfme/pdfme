@@ -1,9 +1,5 @@
 import React, { useContext } from 'react';
-import {
-  SortableContainer as sortableContainer,
-  SortableElement as sortableElement,
-  SortableHandle as sortableHandle,
-} from 'react-sortable-hoc';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { SchemaForUI, Size } from '../../../libs/type';
 import { I18nContext } from '../../../libs/contexts';
 import { RULER_HEIGHT, ZOOM } from '../../../libs/constants';
@@ -14,13 +10,13 @@ import { SidebarProps } from '.';
 
 const isTouchable = () => true;
 
-const DragHandle = sortableHandle(() => (
+const DragHandle = SortableHandle(() => (
   <button style={{ padding: 0, background: 'none', border: 'none', display: 'flex' }}>
     <img style={{ cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
   </button>
 ));
 
-const SortableItem = sortableElement(
+const SortableItem = SortableElement(
   (props: { schemas: SchemaForUI[]; schema: SchemaForUI; onEdit: (id: string) => void }) => {
     const { schemas, schema, onEdit } = props;
     const i18n = useContext(I18nContext);
@@ -103,7 +99,7 @@ const SortableItem = sortableElement(
   }
 );
 
-const SortableList = sortableContainer(
+const SortableList = SortableContainer(
   (props: {
     schemas: SchemaForUI[];
     onEdit: (id: string) => void;
@@ -164,6 +160,11 @@ const ListView = (
         size={size}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+        updateBeforeSortStart={(node: any) => {
+          if (node.node.style) {
+            node.node.style.zIndex = '9999';
+          }
+        }}
         useDragHandle
         axis="y"
         lockAxis="y"
