@@ -39,6 +39,7 @@ const 労働条件通知書 = require('./労働条件通知書.json') as Templat
 const z97mmx210mm = require('./z97mmx210mm.json') as Template;
 const barcodes = require('./barcodes.json') as Template;
 const canvasPdf = require('./canvasPdf.json') as Template;
+const background = require('./background.json') as Template;
 
 export default {
   test: {
@@ -105,4 +106,5 @@ export default {
   z97mmx210mm,
   barcodes,
   canvasPdf,
+  background,
 };

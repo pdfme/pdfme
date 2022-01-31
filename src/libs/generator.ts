@@ -148,6 +148,7 @@ const drawBackgroundColor = (arg: {
   pageHeight: number;
 }) => {
   const { templateSchema, page, pageHeight } = arg;
+  if (!templateSchema.backgroundColor) return;
   const { width, height } = getSchemaSizeAndRotate(templateSchema);
   const color = hex2RgbColor(templateSchema.backgroundColor);
   page.drawRectangle({

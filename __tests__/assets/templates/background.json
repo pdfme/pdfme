@@ -1,0 +1,835 @@
+{
+  "id": "0d0050f0-e377-11eb-9f1b-577526b1de8f",
+  "name": "A-one 12面(72312) 宛名",
+  "description": "[A-one エーワン ラベルシール 12面 22シート 72312](https://amzn.to/2wZvuR1)に対応した書式です。    12面の宛名ラベルを作成できます。  <u>印刷サイズ:A4(210mmx297mm)</u>",
+  "tags": ["サービス連携"],
+  "photo": "https://firebasestorage.googleapis.com/v0/b/labelmake-a43f2.appspot.com/o/templates%2Fphoto%2F0d0050f0-e377-11eb-9f1b-577526b1de8f.png?alt=media&token=c3195c45-a4bf-408a-a6d9-fab1dfceb19d",
+  "basePdf": "data:application/pdf;base64,JVBERi0xLjcKJeLjz9MKNSAwIG9iago8PAovRmlsdGVyIC9GbGF0ZURlY29kZQovTGVuZ3RoIDM4Cj4+CnN0cmVhbQp4nCvkMlAwUDC1NNUzMVGwMDHUszRSKErlCtfiyuMK5AIAXQ8GCgplbmRzdHJlYW0KZW5kb2JqCjQgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL01lZGlhQm94IFswIDAgNTk1LjQ0IDg0MS45Ml0KL1Jlc291cmNlcyA8PAo+PgovQ29udGVudHMgNSAwIFIKL1BhcmVudCAyIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovVHlwZSAvUGFnZXMKL0tpZHMgWzQgMCBSXQovQ291bnQgMQo+PgplbmRvYmoKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL3RyYXBwZWQgKGZhbHNlKQovQ3JlYXRvciAoU2VyaWYgQWZmaW5pdHkgRGVzaWduZXIgMS4xMC40KQovVGl0bGUgKFVudGl0bGVkLnBkZikKL0NyZWF0aW9uRGF0ZSAoRDoyMDIyMDEwNjE0MDg1OCswOScwMCcpCi9Qcm9kdWNlciAoaUxvdmVQREYpCi9Nb2REYXRlIChEOjIwMjIwMTA2MDUwOTA5WikKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL1NpemUgNwovUm9vdCAxIDAgUgovSW5mbyAzIDAgUgovSUQgWzwyODhCM0VENTAyOEU0MDcyNERBNzNCOUE0Nzk4OUEwQT4gPEY1RkJGNjg4NkVERDZBQUNBNDRCNEZDRjBBRDUxRDlDPl0KL1R5cGUgL1hSZWYKL1cgWzEgMiAyXQovRmlsdGVyIC9GbGF0ZURlY29kZQovSW5kZXggWzAgN10KL0xlbmd0aCAzNgo+PgpzdHJlYW0KeJxjYGD4/5+RUZmBgZHhFZBgDAGxakAEP5BgEmFgAABlRwQJCmVuZHN0cmVhbQplbmRvYmoKc3RhcnR4cmVmCjUzMgolJUVPRgo=",
+  "fontName": "SauceHanSansJP",
+  "columns": [
+    "{1}[お届け先]郵便番号",
+    "{1}[お届け先]住所",
+    "{1}[お届け先]氏名",
+    "{1}**credit**",
+    "{2}[お届け先]郵便番号",
+    "{2}[お届け先]住所",
+    "{2}[お届け先]氏名",
+    "{2}**credit**",
+    "{3}[お届け先]郵便番号",
+    "{3}[お届け先]住所",
+    "{3}[お届け先]氏名",
+    "{3}**credit**",
+    "{4}[お届け先]郵便番号",
+    "{4}[お届け先]住所",
+    "{4}[お届け先]氏名",
+    "{4}**credit**",
+    "{5}[お届け先]郵便番号",
+    "{5}[お届け先]住所",
+    "{5}[お届け先]氏名",
+    "{5}**credit**",
+    "{6}[お届け先]郵便番号",
+    "{6}[お届け先]住所",
+    "{6}[お届け先]氏名",
+    "{6}**credit**",
+    "{7}[お届け先]郵便番号",
+    "{7}[お届け先]住所",
+    "{7}[お届け先]氏名",
+    "{7}**credit**",
+    "{8}[お届け先]郵便番号",
+    "{8}[お届け先]住所",
+    "{8}[お届け先]氏名",
+    "{8}**credit**",
+    "{9}[お届け先]郵便番号",
+    "{9}[お届け先]住所",
+    "{9}[お届け先]氏名",
+    "{9}**credit**",
+    "{10}[お届け先]郵便番号",
+    "{10}[お届け先]住所",
+    "{10}[お届け先]氏名",
+    "{10}**credit**",
+    "{11}[お届け先]郵便番号",
+    "{11}[お届け先]住所",
+    "{11}[お届け先]氏名",
+    "{11}**credit**",
+    "{12}[お届け先]郵便番号",
+    "{12}[お届け先]住所",
+    "{12}[お届け先]氏名",
+    "{12}**credit**"
+  ],
+  "sampledata": [
+    {
+      "{12}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{10}[お届け先]郵便番号": "1234567",
+      "{5}[お届け先]氏名": "東京都 出得太",
+      "{5}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{8}[お届け先]氏名": "東京都 出得太",
+      "{8}[お届け先]郵便番号": "1234567",
+      "{7}[お届け先]氏名": "東京都 出得太",
+      "{11}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{9}[お届け先]郵便番号": "1234567",
+      "{3}[お届け先]郵便番号": "1234567",
+      "{2}[お届け先]郵便番号": "1234567",
+      "{3}[お届け先]氏名": "東京都 出得太",
+      "{6}[お届け先]郵便番号": "1234567",
+      "{2}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{9}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{6}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{8}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{9}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{2}[お届け先]氏名": "東京都 出得太",
+      "{10}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{4}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{12}[お届け先]氏名": "東京都 出得太",
+      "{7}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{11}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{6}[お届け先]氏名": "東京都 出得太",
+      "{12}[お届け先]郵便番号": "1234567",
+      "{11}[お届け先]氏名": "東京都 出得太",
+      "{1}[お届け先]氏名": "東京都 出得太",
+      "{7}[お届け先]郵便番号": "1234567",
+      "{5}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{3}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{10}[お届け先]氏名": "東京都 出得太",
+      "{11}[お届け先]郵便番号": "1234567",
+      "{12}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{9}[お届け先]氏名": "東京都 出得太",
+      "{7}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{1}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{1}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{8}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{10}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{4}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{6}**credit**": "このラベルは labelmake.jp で作成されました",
+      "{5}[お届け先]郵便番号": "1234567",
+      "{3}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
+      "{4}[お届け先]氏名": "東京都 出得太",
+      "{4}[お届け先]郵便番号": "1234567",
+      "{1}[お届け先]郵便番号": "1234567",
+      "{2}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号"
+    }
+  ],
+  "schemas": [
+    {
+      "{9}[お届け先]住所": {
+        "type": "text",
+        "lineHeight": 0.9,
+        "fontSize": 14.5,
+        "backgroundColor": "",
+        "position": {
+          "x": 111.1,
+          "y": 118.8
+        },
+        "characterSpacing": 0,
+        "alignment": "left",
+        "width": 77.8,
+        "height": 14.49,
+        "fontColor": ""
+      },
+      "{1}[お届け先]住所": {
+        "lineHeight": 0.9,
+        "characterSpacing": 0,
+        "width": 77.8,
+        "height": 14.49,
+        "alignment": "left",
+        "fontSize": 14.5,
+        "type": "text",
+        "position": {
+          "y": 34.01,
+          "x": 23.5
+        },
+        "backgroundColor": "",
+        "fontColor": ""
+      },
+      "{7}[お届け先]氏名": {
+        "alignment": "left",
+        "fontSize": 14.5,
+        "fontColor": "",
+        "width": 77.8,
+        "position": {
+          "x": 111.1,
+          "y": 48.5
+        },
+        "backgroundColor": "",
+        "type": "text",
+        "characterSpacing": 0,
+        "lineHeight": 0.85,
+        "height": 10
+      },
+      "{11}[お届け先]住所": {
+        "fontSize": 14.5,
+        "type": "text",
+        "width": 77.8,
+        "characterSpacing": 0,
+        "position": {
+          "y": 203.5,
+          "x": 111.1
+        },
+        "backgroundColor": "",
+        "alignment": "left",
+        "lineHeight": 0.9,
+        "height": 14.49,
+        "fontColor": ""
+      },
+      "{7}[お届け先]住所": {
+        "height": 15.02,
+        "alignment": "left",
+        "fontColor": "",
+        "type": "text",
+        "backgroundColor": "",
+        "characterSpacing": 0,
+        "position": {
+          "y": 33.74,
+          "x": 111.1
+        },
+        "width": 77.8,
+        "lineHeight": 0.9,
+        "fontSize": 14.5
+      },
+      "{3}**credit**": {
+        "backgroundColor": "#c8c8c8",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "position": {
+          "y": 139.91,
+          "x": 48.43
+        },
+        "height": 3.02,
+        "type": "text",
+        "fontSize": 7,
+        "fontColor": "#000000",
+        "width": 52.45,
+        "alignment": "center"
+      },
+      "{10}[お届け先]氏名": {
+        "fontColor": "",
+        "alignment": "left",
+        "position": {
+          "y": 175.4,
+          "x": 111.1
+        },
+        "type": "text",
+        "fontSize": 14.5,
+        "lineHeight": 0.85,
+        "width": 77.8,
+        "height": 10,
+        "characterSpacing": 0,
+        "backgroundColor": ""
+      },
+      "{4}**credit**": {
+        "type": "text",
+        "fontColor": "#000000",
+        "width": 52.45,
+        "characterSpacing": 0,
+        "alignment": "center",
+        "backgroundColor": "#c8c8c8",
+        "position": {
+          "y": 182.24,
+          "x": 48.56
+        },
+        "fontSize": 7,
+        "height": 3.02,
+        "lineHeight": 1
+      },
+      "{4}[お届け先]氏名": {
+        "backgroundColor": "",
+        "lineHeight": 0.85,
+        "alignment": "left",
+        "height": 10,
+        "characterSpacing": 0,
+        "fontColor": "",
+        "type": "text",
+        "position": {
+          "y": 175.4,
+          "x": 23.5
+        },
+        "width": 77.8,
+        "fontSize": 14.5
+      },
+      "{5}**credit**": {
+        "characterSpacing": 0,
+        "backgroundColor": "#c8c8c8",
+        "type": "text",
+        "lineHeight": 1,
+        "position": {
+          "x": 48.43,
+          "y": 225.23
+        },
+        "height": 3.02,
+        "fontSize": 7,
+        "fontColor": "#000000",
+        "alignment": "center",
+        "width": 52.45
+      },
+      "{6}**credit**": {
+        "width": 52.45,
+        "alignment": "center",
+        "position": {
+          "y": 267.11,
+          "x": 48.56
+        },
+        "backgroundColor": "#c8c8c8",
+        "type": "text",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "fontSize": 7,
+        "height": 3.02
+      },
+      "{6}[お届け先]住所": {
+        "backgroundColor": "",
+        "width": 77.8,
+        "lineHeight": 0.9,
+        "height": 14.49,
+        "characterSpacing": 0,
+        "fontColor": "",
+        "position": {
+          "y": 246.1,
+          "x": 23.5
+        },
+        "type": "text",
+        "alignment": "left",
+        "fontSize": 14.5
+      },
+      "{7}[お届け先]郵便番号": {
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "position": {
+          "x": 111.1,
+          "y": 28.5
+        },
+        "type": "text",
+        "height": 6.03,
+        "fontColor": "",
+        "backgroundColor": "",
+        "width": 77.8,
+        "alignment": "left",
+        "fontSize": 14.5
+      },
+      "{3}[お届け先]氏名": {
+        "width": 77.8,
+        "alignment": "left",
+        "height": 10,
+        "characterSpacing": 0,
+        "position": {
+          "x": 23.5,
+          "y": 133.1
+        },
+        "backgroundColor": "",
+        "fontSize": 14.5,
+        "fontColor": "",
+        "lineHeight": 0.85,
+        "type": "text"
+      },
+      "{7}**credit**": {
+        "characterSpacing": 0,
+        "backgroundColor": "#c8c8c8",
+        "height": 3.02,
+        "lineHeight": 1,
+        "alignment": "center",
+        "type": "text",
+        "fontColor": "#000000",
+        "position": {
+          "x": 136.42,
+          "y": 54.89
+        },
+        "width": 52.45,
+        "fontSize": 7
+      },
+      "{8}[お届け先]住所": {
+        "backgroundColor": "",
+        "width": 77.8,
+        "height": 14.22,
+        "alignment": "left",
+        "fontColor": "",
+        "characterSpacing": 0,
+        "position": {
+          "y": 76.8,
+          "x": 111.1
+        },
+        "type": "text",
+        "lineHeight": 0.9,
+        "fontSize": 14.5
+      },
+      "{2}**credit**": {
+        "fontColor": "#000000",
+        "alignment": "center",
+        "position": {
+          "y": 98.03,
+          "x": 48.56
+        },
+        "backgroundColor": "#c8c8c8",
+        "lineHeight": 1,
+        "type": "text",
+        "height": 3.02,
+        "characterSpacing": 0,
+        "width": 52.45,
+        "fontSize": 7
+      },
+      "{12}[お届け先]住所": {
+        "width": 77.8,
+        "fontColor": "",
+        "characterSpacing": 0,
+        "height": 14.49,
+        "alignment": "left",
+        "position": {
+          "y": 246,
+          "x": 111.1
+        },
+        "backgroundColor": "",
+        "type": "text",
+        "lineHeight": 0.9,
+        "fontSize": 14.5
+      },
+      "{1}[お届け先]郵便番号": {
+        "type": "text",
+        "width": 77.8,
+        "fontColor": "",
+        "position": {
+          "y": 28.5,
+          "x": 23.5
+        },
+        "lineHeight": 1,
+        "fontSize": 14.5,
+        "height": 6.03,
+        "alignment": "left",
+        "backgroundColor": "",
+        "characterSpacing": 0
+      },
+      "{4}[お届け先]郵便番号": {
+        "height": 6.03,
+        "fontSize": 14.5,
+        "type": "text",
+        "width": 77.8,
+        "backgroundColor": "",
+        "alignment": "left",
+        "characterSpacing": 0,
+        "position": {
+          "y": 155.4,
+          "x": 23.5
+        },
+        "fontColor": "",
+        "lineHeight": 1
+      },
+      "{11}[お届け先]郵便番号": {
+        "alignment": "left",
+        "lineHeight": 1,
+        "position": {
+          "y": 197.7,
+          "x": 111.1
+        },
+        "type": "text",
+        "width": 77.8,
+        "height": 6.03,
+        "fontColor": "",
+        "characterSpacing": 0,
+        "backgroundColor": "",
+        "fontSize": 14.5
+      },
+      "{10}**credit**": {
+        "characterSpacing": 0,
+        "fontSize": 7,
+        "height": 3.02,
+        "fontColor": "#000000",
+        "position": {
+          "y": 181.83,
+          "x": 136.51
+        },
+        "lineHeight": 1,
+        "alignment": "center",
+        "width": 52.45,
+        "type": "text",
+        "backgroundColor": "#c8c8c8"
+      },
+      "{6}[お届け先]氏名": {
+        "alignment": "left",
+        "backgroundColor": "",
+        "type": "text",
+        "height": 10,
+        "position": {
+          "x": 23.5,
+          "y": 260
+        },
+        "characterSpacing": 0,
+        "fontSize": 14.5,
+        "fontColor": "",
+        "width": 77.8,
+        "lineHeight": 0.85
+      },
+      "{12}[お届け先]氏名": {
+        "backgroundColor": "",
+        "lineHeight": 0.85,
+        "height": 10,
+        "position": {
+          "x": 111.1,
+          "y": 260
+        },
+        "width": 77.8,
+        "type": "text",
+        "alignment": "left",
+        "fontColor": "",
+        "characterSpacing": 0,
+        "fontSize": 14.5
+      },
+      "{9}[お届け先]郵便番号": {
+        "backgroundColor": "",
+        "width": 77.8,
+        "fontSize": 14.5,
+        "lineHeight": 1,
+        "alignment": "left",
+        "position": {
+          "x": 111.1,
+          "y": 113.1
+        },
+        "height": 6.03,
+        "characterSpacing": 0,
+        "fontColor": "",
+        "type": "text"
+      },
+      "{11}**credit**": {
+        "fontColor": "#000000",
+        "backgroundColor": "#c8c8c8",
+        "position": {
+          "y": 225.01,
+          "x": 136.35
+        },
+        "lineHeight": 1,
+        "fontSize": 7,
+        "alignment": "center",
+        "type": "text",
+        "height": 3.02,
+        "characterSpacing": 0,
+        "width": 52.45
+      },
+      "{10}[お届け先]住所": {
+        "alignment": "left",
+        "backgroundColor": "",
+        "position": {
+          "y": 161,
+          "x": 111.1
+        },
+        "lineHeight": 0.9,
+        "fontSize": 14.5,
+        "height": 14.49,
+        "fontColor": "",
+        "type": "text",
+        "width": 77.8,
+        "characterSpacing": 0
+      },
+      "{12}**credit**": {
+        "characterSpacing": 0,
+        "position": {
+          "y": 266.89,
+          "x": 136.38
+        },
+        "width": 52.45,
+        "height": 3.02,
+        "fontSize": 7,
+        "lineHeight": 1,
+        "fontColor": "#000000",
+        "backgroundColor": "#c8c8c8",
+        "alignment": "center",
+        "type": "text"
+      },
+      "{8}**credit**": {
+        "height": 3.02,
+        "fontColor": "#000000",
+        "type": "text",
+        "width": 52.45,
+        "lineHeight": 1,
+        "alignment": "center",
+        "characterSpacing": 0,
+        "backgroundColor": "#c8c8c8",
+        "fontSize": 7,
+        "position": {
+          "x": 136.45,
+          "y": 98.15
+        }
+      },
+      "{9}[お届け先]氏名": {
+        "characterSpacing": 0,
+        "alignment": "left",
+        "type": "text",
+        "width": 77.8,
+        "fontSize": 14.5,
+        "height": 10,
+        "position": {
+          "y": 133.1,
+          "x": 111.1
+        },
+        "backgroundColor": "",
+        "lineHeight": 0.85,
+        "fontColor": ""
+      },
+      "{2}[お届け先]住所": {
+        "height": 13.96,
+        "type": "text",
+        "characterSpacing": 0,
+        "width": 77.8,
+        "fontSize": 14.5,
+        "position": {
+          "y": 76.8,
+          "x": 23.5
+        },
+        "backgroundColor": "",
+        "fontColor": "",
+        "alignment": "left",
+        "lineHeight": 0.9
+      },
+      "{5}[お届け先]住所": {
+        "backgroundColor": "",
+        "width": 77.8,
+        "height": 14.49,
+        "fontSize": 14.5,
+        "lineHeight": 0.9,
+        "fontColor": "",
+        "type": "text",
+        "characterSpacing": 0,
+        "alignment": "left",
+        "position": {
+          "y": 203.5,
+          "x": 23.5
+        }
+      },
+      "{1}[お届け先]氏名": {
+        "type": "text",
+        "lineHeight": 0.85,
+        "height": 10,
+        "backgroundColor": "",
+        "fontColor": "",
+        "width": 77.8,
+        "alignment": "left",
+        "characterSpacing": 0,
+        "fontSize": 14.5,
+        "position": {
+          "y": 48.5,
+          "x": 23.5
+        }
+      },
+      "{11}[お届け先]氏名": {
+        "characterSpacing": 0,
+        "width": 77.8,
+        "alignment": "left",
+        "lineHeight": 0.85,
+        "height": 10,
+        "backgroundColor": "",
+        "type": "text",
+        "fontSize": 14.5,
+        "position": {
+          "x": 111.1,
+          "y": 217.7
+        },
+        "fontColor": ""
+      },
+      "{6}[お届け先]郵便番号": {
+        "position": {
+          "y": 240,
+          "x": 23.5
+        },
+        "backgroundColor": "",
+        "width": 77.8,
+        "fontColor": "",
+        "characterSpacing": 0,
+        "height": 6.03,
+        "fontSize": 14.5,
+        "alignment": "left",
+        "type": "text",
+        "lineHeight": 1
+      },
+      "{1}**credit**": {
+        "position": {
+          "x": 48.43,
+          "y": 55.57
+        },
+        "height": 3.02,
+        "fontColor": "#000000",
+        "fontSize": 7,
+        "characterSpacing": 0,
+        "alignment": "center",
+        "backgroundColor": "#c8c8c8",
+        "width": 52.45,
+        "lineHeight": 1,
+        "type": "text"
+      },
+      "{2}[お届け先]郵便番号": {
+        "fontColor": "",
+        "alignment": "left",
+        "position": {
+          "y": 70.8,
+          "x": 23.5
+        },
+        "height": 6.03,
+        "type": "text",
+        "backgroundColor": "",
+        "width": 77.8,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontSize": 14.5
+      },
+      "{5}[お届け先]氏名": {
+        "height": 10,
+        "fontColor": "",
+        "lineHeight": 0.85,
+        "fontSize": 14.5,
+        "width": 77.8,
+        "alignment": "left",
+        "type": "text",
+        "characterSpacing": 0,
+        "backgroundColor": "",
+        "position": {
+          "y": 217.7,
+          "x": 23.5
+        }
+      },
+      "{10}[お届け先]郵便番号": {
+        "alignment": "left",
+        "backgroundColor": "",
+        "width": 77.8,
+        "type": "text",
+        "position": {
+          "y": 155.4,
+          "x": 111.1
+        },
+        "fontSize": 14.5,
+        "characterSpacing": 0,
+        "height": 6.03,
+        "fontColor": "",
+        "lineHeight": 1
+      },
+      "{8}[お届け先]郵便番号": {
+        "fontColor": "",
+        "height": 6.03,
+        "fontSize": 14.5,
+        "position": {
+          "y": 70.8,
+          "x": 111.1
+        },
+        "type": "text",
+        "alignment": "left",
+        "width": 77.8,
+        "characterSpacing": 0,
+        "backgroundColor": "",
+        "lineHeight": 1
+      },
+      "{5}[お届け先]郵便番号": {
+        "characterSpacing": 0,
+        "backgroundColor": "",
+        "position": {
+          "x": 23.5,
+          "y": 197.7
+        },
+        "alignment": "left",
+        "fontColor": "",
+        "height": 6.03,
+        "lineHeight": 1,
+        "fontSize": 14.5,
+        "width": 77.8,
+        "type": "text"
+      },
+      "{2}[お届け先]氏名": {
+        "fontColor": "",
+        "alignment": "left",
+        "position": {
+          "x": 23.5,
+          "y": 90.8
+        },
+        "width": 77.8,
+        "height": 10,
+        "backgroundColor": "",
+        "fontSize": 14.5,
+        "type": "text",
+        "characterSpacing": 0,
+        "lineHeight": 0.85
+      },
+      "{12}[お届け先]郵便番号": {
+        "characterSpacing": 0,
+        "backgroundColor": "",
+        "alignment": "left",
+        "fontColor": "",
+        "type": "text",
+        "lineHeight": 1,
+        "fontSize": 14.5,
+        "height": 6.03,
+        "position": {
+          "x": 111.1,
+          "y": 240
+        },
+        "width": 77.8
+      },
+      "{3}[お届け先]郵便番号": {
+        "fontColor": "",
+        "characterSpacing": 0,
+        "fontSize": 14.5,
+        "lineHeight": 1,
+        "position": {
+          "x": 23.5,
+          "y": 113.1
+        },
+        "alignment": "left",
+        "type": "text",
+        "width": 77.8,
+        "backgroundColor": "",
+        "height": 6.03
+      },
+      "{8}[お届け先]氏名": {
+        "fontColor": "",
+        "backgroundColor": "",
+        "characterSpacing": 0,
+        "position": {
+          "x": 111.1,
+          "y": 90.8
+        },
+        "width": 77.8,
+        "lineHeight": 0.85,
+        "alignment": "left",
+        "type": "text",
+        "fontSize": 14.5,
+        "height": 10
+      },
+      "{4}[お届け先]住所": {
+        "type": "text",
+        "backgroundColor": "",
+        "height": 14.49,
+        "fontColor": "",
+        "width": 77.8,
+        "fontSize": 14.5,
+        "alignment": "left",
+        "position": {
+          "x": 23.5,
+          "y": 161.2
+        },
+        "lineHeight": 0.9,
+        "characterSpacing": 0
+      },
+      "{9}**credit**": {
+        "backgroundColor": "#c8c8c8",
+        "alignment": "center",
+        "position": {
+          "y": 140.03,
+          "x": 136.48
+        },
+        "type": "text",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "height": 3.02,
+        "fontColor": "#000000",
+        "fontSize": 7,
+        "width": 52.45
+      },
+      "{3}[お届け先]住所": {
+        "height": 14.49,
+        "alignment": "left",
+        "type": "text",
+        "position": {
+          "x": 23.5,
+          "y": 118.8
+        },
+        "lineHeight": 0.9,
+        "width": 77.8,
+        "fontColor": "",
+        "fontSize": 14.5,
+        "backgroundColor": "",
+        "characterSpacing": 0
+      }
+    }
+  ]
+}
