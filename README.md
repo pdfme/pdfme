@@ -1,6 +1,7 @@
 <!--
     このドキュメントはほとんど website/docs/getting-started.md のコピーです
     画像のパスは /img/image.png から /website/static/img/image.png に置換してください
+    リンクは / を https://pdfme.com/ に置換してください
  -->
 
 # PDFME

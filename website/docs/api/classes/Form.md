@@ -30,7 +30,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[Form.tsx:11](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/Form.tsx#L11)
+[Form.tsx:11](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/Form.tsx#L11)
 
 ## Properties
 
@@ -44,7 +44,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[libs/class.ts:20](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L20)
+[libs/class.ts:20](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L20)
 
 ___
 
@@ -58,7 +58,7 @@ PreviewUI.inputs
 
 #### Defined in
 
-[libs/class.ts:90](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L90)
+[libs/class.ts:90](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L90)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[Form.tsx:9](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/Form.tsx#L9)
+[Form.tsx:9](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/Form.tsx#L9)
 
 ___
 
@@ -106,7 +106,7 @@ PreviewUI.size
 
 #### Defined in
 
-[libs/class.ts:24](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L24)
+[libs/class.ts:24](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L24)
 
 ___
 
@@ -129,7 +129,7 @@ PreviewUI.template
 
 #### Defined in
 
-[libs/class.ts:22](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L22)
+[libs/class.ts:22](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L22)
 
 ## Methods
 
@@ -147,7 +147,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[libs/class.ts:80](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L80)
+[libs/class.ts:80](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L80)
 
 ___
 
@@ -165,7 +165,7 @@ PreviewUI.getFont
 
 #### Defined in
 
-[libs/class.ts:64](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L64)
+[libs/class.ts:64](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L64)
 
 ___
 
@@ -195,7 +195,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[libs/class.ts:60](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L60)
+[libs/class.ts:60](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L60)
 
 ___
 
@@ -213,7 +213,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[libs/class.ts:100](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L100)
+[libs/class.ts:100](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L100)
 
 ___
 
@@ -238,7 +238,7 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[libs/class.ts:68](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L68)
+[libs/class.ts:68](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L68)
 
 ___
 
@@ -258,7 +258,7 @@ ___
 
 #### Defined in
 
-[Form.tsx:15](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/Form.tsx#L15)
+[Form.tsx:15](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/Form.tsx#L15)
 
 ___
 
@@ -276,7 +276,7 @@ PreviewUI.render
 
 #### Defined in
 
-[Form.tsx:19](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/Form.tsx#L19)
+[Form.tsx:19](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/Form.tsx#L19)
 
 ___
 
@@ -300,7 +300,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[libs/class.ts:106](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L106)
+[libs/class.ts:106](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L106)
 
 ___
 
@@ -328,4 +328,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[libs/class.ts:74](https://github.com/hand-dot/pdfme-beta/blob/c97d2b9/src/libs/class.ts#L74)
+[libs/class.ts:74](https://github.com/hand-dot/pdfme-beta/blob/9ebb9f1/src/libs/class.ts#L74)
