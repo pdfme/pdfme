@@ -1,0 +1,7 @@
+{
+    "name": "@pdfme/common",
+    "version": "1.0.0",
+    "dependencies": {
+        "zod": "^3.11.6"
+    }
+}

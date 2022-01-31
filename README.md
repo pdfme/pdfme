@@ -40,7 +40,7 @@ The operating requirements should be the node environment `>=14`.
 Installation can be done with the following command.
 
 ```
-npm i pdfme
+npm i @pdfme
 ```
 
 The following type, function and classes are available in pdfme.

@@ -1,4 +1,4 @@
-import { Template, checkTemplate } from 'pdfme';
+import { Template, checkTemplate } from '@pdfme/core';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({

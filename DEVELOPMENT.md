@@ -42,6 +42,6 @@ If you need open website and development library, you need yarn link.
 ```
 $ yarn link
 $ cd website
-$ yarn link pdfme
+$ yarn link @pdfme
 ```
 

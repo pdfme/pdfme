@@ -1,0 +1,84 @@
+{
+  "name": "@pdfme/ui",
+  "version": "1.0.0",
+  "author": "hand-dot",
+  "license": "MIT",
+  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
+  "homepage": "https://pdfme.com",
+  "repository": "git@github.com:hand-dot/pdfme-beta.git",
+  "bugs": {
+    "url": "https://github.com/hand-dot/pdfme-beta/issues"
+  },
+  "main": "dist/@pdfme/ui.js",
+  "module": "src/index.ts",
+  "types": "dist/types/index.d.ts",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "develop": "webpack-dev-server --mode development",
+    "build": "NODE_ENV=production webpack --mode production",
+    "lint": "tsc --noEmit",
+    "test": "jest",
+    "clean": "rimraf dist",
+    "lint:watch": "tsc -w --noEmit",
+    "test:watch": "jest --coverage --watch",
+    "prune": "ts-prune src"
+  },
+  "peerDependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "dependencies": {
+    "@scena/react-guides": "^0.16.0",
+    "hotkeys-js": "^3.8.7",
+    "pdfjs-dist": "^2.12.313",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-moveable": "^0.30.3",
+    "react-selecto": "^1.12.0",
+    "react-sortable-hoc": "^2.0.0",
+    "worker-loader": "^3.0.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@types/css-font-loading-module": "^0.0.7",
+    "@types/pdfjs-dist": "^2.7.4",
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.9",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "html-webpack-plugin": "^5.3.2",
+    "jest-canvas-mock": "^2.3.1",
+    "process": "^0.11.10"
+  },
+  "jest": {
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/assetsTransformer.js",
+      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js",
+      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "tsx"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.tsx$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/*.test.ts",
+      "**/*.test.tsx"
+    ]
+  }
+}
