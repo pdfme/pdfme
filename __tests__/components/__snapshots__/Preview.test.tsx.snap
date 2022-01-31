@@ -18,13 +18,12 @@ exports[`Preview(as Form) snapshot 1`] = `
       >
         <div>
           <div
-            aria-expanded="false"
             class="selectable"
             id="field1"
             style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            title="field1"
           >
             <textarea
-              class="undefined "
               placeholder="bb"
               style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
               tabindex="100"
@@ -35,15 +34,16 @@ exports[`Preview(as Form) snapshot 1`] = `
         </div>
         <div>
           <div
-            aria-expanded="false"
             class="selectable"
             id="field2"
             style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            title="field2"
           >
             <div
               style="margin: 0px auto;"
             >
               <button
+                style="position: absolute; left: 0px; top: 0px;"
                 tabindex="101"
               >
                 x
@@ -79,10 +79,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       >
         <div>
           <div
-            aria-expanded="false"
             class="selectable"
             id="field1"
             style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent; background-color: transparent;"
+            title="field1"
           >
             <div
               style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
@@ -122,10 +122,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
         </div>
         <div>
           <div
-            aria-expanded="false"
             class="selectable"
             id="field2"
             style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent; background-color: transparent;"
+            title="field2"
           >
             <div
               style="margin: 0px auto;"

@@ -40,7 +40,7 @@
         });
 
         editor.onSaveTemplate((t) => {
-          console.log({ ...t, basePdf: 'skip...' });
+          console.log({ ...t });
           const tj = JSON.stringify(t, null, 2);
           localStorage.setItem('template', tj);
         });

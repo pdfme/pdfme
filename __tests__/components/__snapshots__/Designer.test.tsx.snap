@@ -14,7 +14,7 @@ exports[`Designer snapshot 1`] = `
         style="position: sticky; top: 0px; z-index: 29;"
       >
         <button
-          class="undefined"
+          style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 3px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238);"
         >
           <img
             alt="Toggle icon"
@@ -23,7 +23,7 @@ exports[`Designer snapshot 1`] = `
           />
         </button>
         <div
-          style="width: 300px; height: 1086.614173227px; display: block; top: 0px;"
+          style="width: 300px; height: 1086.614173227px; display: block; top: 0px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.929); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.5rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400;"
         >
           <aside>
             <div
@@ -45,10 +45,10 @@ exports[`Designer snapshot 1`] = `
                 style="border: 1px solid transparent;"
               >
                 <div
-                  style="padding-left: 5px;"
+                  style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
                 >
                   <button
-                    style="padding: 0px; background: none;"
+                    style="padding: 0px; background: none; display: flex;"
                   >
                     <img
                       alt="Drag icon"
@@ -63,7 +63,7 @@ exports[`Designer snapshot 1`] = `
                     title="Edit"
                   >
                     <span
-                      class="undefined"
+                      style="margin-right: 1rem; width: 180px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                     >
                       field1
                     </span>
@@ -74,10 +74,10 @@ exports[`Designer snapshot 1`] = `
                 style="border: 1px solid transparent;"
               >
                 <div
-                  style="padding-left: 5px;"
+                  style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
                 >
                   <button
-                    style="padding: 0px; background: none;"
+                    style="padding: 0px; background: none; display: flex;"
                   >
                     <img
                       alt="Drag icon"
@@ -92,7 +92,7 @@ exports[`Designer snapshot 1`] = `
                     title="Edit"
                   >
                     <span
-                      class="undefined"
+                      style="margin-right: 1rem; width: 180px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                     >
                       field2
                     </span>
@@ -104,7 +104,9 @@ exports[`Designer snapshot 1`] = `
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
           </aside>
-          <div>
+          <div
+            style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
+          >
             <button
               style="padding: 0.5rem; color: rgb(255, 255, 255); background: rgb(24, 160, 251); border-radius: 3px; cursor: pointer;"
             >
@@ -268,10 +270,10 @@ exports[`Designer snapshot 1`] = `
           </div>
           <div>
             <div
-              aria-expanded="false"
               class="selectable"
               id="2"
               style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              title="field1"
             >
               <div
                 style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
@@ -291,10 +293,10 @@ exports[`Designer snapshot 1`] = `
           </div>
           <div>
             <div
-              aria-expanded="false"
               class="selectable"
               id="3"
               style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              title="field2"
             >
               <div
                 style="margin: 0px auto;"

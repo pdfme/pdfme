@@ -74,7 +74,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
   if (activeSchema.type !== 'text') return <></>;
 
   return (
-    <>
+    <div style={{ fontSize: '0.7rem' }}>
       <div
         style={{
           display: 'flex',
@@ -171,7 +171,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           }
         />
       </div>
-    </>
+    </div>
   );
 };
 
