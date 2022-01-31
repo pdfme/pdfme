@@ -1,4 +1,4 @@
-import { Template, checkProps } from 'pdfme';
+import { Template, checkTemplate } from 'pdfme';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({
@@ -131,7 +131,7 @@ export const getTemplateFromJsonFile = (file: File) => {
   return readFile(file, 'text').then((jsonStr) => {
     const template: Template = JSON.parse(jsonStr as string);
     try {
-      checkProps(template, Template);
+      checkTemplate(template);
       return template;
     } catch (e) {
       throw e;

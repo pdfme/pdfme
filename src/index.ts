@@ -14,6 +14,8 @@ import {
 } from './libs/type';
 import { checkProps } from './libs/helper';
 
+const checkTemplate = (data: unknown) => checkProps(data, Template);
+
 export {
   Template,
   Schema,
@@ -26,6 +28,6 @@ export {
   Designer,
   Viewer,
   Form,
-  checkProps,
+  checkTemplate,
   BLANK_PDF as blankPdf,
 };
