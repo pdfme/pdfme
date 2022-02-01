@@ -14,7 +14,6 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "yarn workspaces foreach test",
     "common:build": "yarn workspace @pdfme/common build",
     "common:develop": "yarn workspace @pdfme/common develop",
     "common:lint": "yarn workspace @pdfme/common lint",

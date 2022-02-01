@@ -11,7 +11,7 @@
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "@types/jest"],
     "typeRoots": ["node_modules/@types"],
     "sourceMap": true
   },

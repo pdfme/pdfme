@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import Helvetica from './Helvetica.ttf';
+import Helvetica from './assets/Helvetica.ttf';
 import { Template, Schema, SchemaForUI, BasePdf, Font, CommonProps, isTextSchema } from './type';
 import {
   DEFAULT_FONT_NAME,
@@ -202,7 +202,6 @@ ${message}`);
 
 export const checkTemplate = (data: unknown) => checkProps(data, Template);
 
-
 export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
   const { schemas, columns, sampledata } = template;
 
@@ -276,4 +275,3 @@ export const getUniqSchemaKey = (arg: {
 
   return uniqKey;
 };
-
