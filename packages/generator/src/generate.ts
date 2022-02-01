@@ -1,15 +1,22 @@
 import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { GenerateProps, Template, Font } from '../../common/src/type';
+import {
+  GenerateProps,
+  Template,
+  Font,
+  getDefaultFont,
+  getFallbackFontName,
+  checkGenerateProps,
+} from '@pdfme/common';
+
 import {
   getEmbeddedPagesAndEmbedPdfBoxes,
   drawInputByTemplateSchema,
   drawEmbeddedPage,
   embedAndGetFontObj,
-  InputImageCache
+  InputImageCache,
 } from './helper';
-import { getDefaultFont, getFallbackFontName, checkProps } from '../../common/src/helper';
-import { TOOL_NAME } from '../../common/src/constants';
+import { TOOL_NAME } from './constants';
 
 const preprocessing = async (arg: {
   inputs: { [key: string]: string }[];
@@ -38,7 +45,7 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 };
 
 const generate = async (props: GenerateProps) => {
-  checkProps(props, GenerateProps);
+  checkGenerateProps(props);
   const { inputs, template, options = {} } = props;
   const { font = getDefaultFont(), splitThreshold = 3 } = options;
   const { schemas } = template;

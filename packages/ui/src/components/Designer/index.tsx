@@ -1,67 +1,27 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI, Size } from '../../../../common/src/type';
+import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
 import Sidebar from './Sidebar';
 import Main from './Main';
-import { RULER_HEIGHT, ZOOM } from '../../../../common/src/constants';
-import { uuid, set, cloneDeep, round, arrayMove } from '../../../../common/src/utils';
+import { ZOOM, RULER_HEIGHT } from '../../constants';
+import { I18nContext } from '../../contexts';
 import {
+  uuid,
+  set,
+  arrayMove,
+  cloneDeep,
+  initShortCuts,
+  destroyShortCuts,
+  templateSchemas2SchemasList,
   fmtTemplate,
   getInitialSchema,
   getSampleByType,
   getKeepRatioHeightByWidth,
   getUniqSchemaKey,
-} from '../../../../common/src/helper';
-import { I18nContext } from '../../libs/contexts';
-import { initShortCuts, destroyShortCuts,  templateSchemas2SchemasList } from '../../libs/helper';
-import { useUIPreProcessor, useScrollPageCursor } from '../../libs/hooks';
+  moveCommandToChangeSchemasArg,
+} from '../../helper';
+import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
 import Root from '../Root';
 import Error from '../Error';
-
-const moveCommandToChangeSchemasArg = (props: {
-  command: 'up' | 'down' | 'left' | 'right';
-  activeSchemas: SchemaForUI[];
-  isShift: boolean;
-  pageSize: Size;
-}) => {
-  const { command, activeSchemas, isShift, pageSize } = props;
-  const key = command === 'up' || command === 'down' ? 'y' : 'x';
-  const num = isShift ? 0.1 : 1;
-
-  const getValue = (as: SchemaForUI) => {
-    let value = 0;
-    const { position } = as;
-    switch (command) {
-      case 'up':
-        value = round(position.y - num, 2);
-        break;
-      case 'down':
-        value = round(position.y + num, 2);
-        break;
-      case 'left':
-        value = round(position.x - num, 2);
-        break;
-      case 'right':
-        value = round(position.x + num, 2);
-        break;
-      default:
-        break;
-    }
-
-    return value;
-  };
-
-  return activeSchemas.map((as) => {
-    let value = getValue(as);
-    const { width, height } = as;
-    if (key === 'x') {
-      value = value > pageSize.width - width ? round(pageSize.width - width, 2) : value;
-    } else {
-      value = value > pageSize.height - height ? round(pageSize.height - height, 2) : value;
-    }
-
-    return { key: `position.${key}`, value, schemaId: as.id };
-  });
-};
 
 const TemplateEditor = ({
   template,

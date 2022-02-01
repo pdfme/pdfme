@@ -1,14 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { PreviewUI, PreviewUIConstructor } from './libs/class';
-import { DESTROYED_ERR_MSG } from '../../common/src/constants';
-import { I18nContext, FontContext } from './libs/contexts';
+import { PreviewProps } from '@pdfme/common';
+import { PreviewUI } from './class';
+import { DESTROYED_ERR_MSG } from './constants';
+import { I18nContext, FontContext } from './contexts';
 import Preview from './components/Preview';
 
 class Form extends PreviewUI {
   private onChangeInputCallback?: (arg: { index: number; value: string; key: string }) => void;
 
-  constructor(props: PreviewUIConstructor) {
+  constructor(props: PreviewProps) {
     super(props);
   }
 

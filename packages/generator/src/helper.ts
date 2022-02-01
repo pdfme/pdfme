@@ -10,10 +10,10 @@ import {
   TransformationMatrix,
 } from 'pdf-lib';
 import bwipjs, { ToBufferOptions } from 'bwip-js';
-import { mm2pt, b64toUint8Array } from '../../common/src/utils';
-import { getB64BasePdf } from '../../common/src/helper';
-import { validateBarcodeInput } from '../../common/src/barcode';
 import {
+  getB64BasePdf,
+  b64toUint8Array,
+  validateBarcodeInput,
   Schema,
   TextSchema,
   isTextSchema,
@@ -25,13 +25,12 @@ import {
   BasePdf,
   BarCodeType,
   Alignment,
-} from '../../common/src/type';
-import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
-} from '../../common/src/constants';
+  DEFAULT_FONT_COLOR,
+} from '@pdfme/common';
 
 export interface InputImageCache {
   [key: string]: PDFImage;
@@ -130,6 +129,13 @@ export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
   return { embeddedPages, embedPdfBoxes };
 };
 
+const mm2pt = (mm: number): number => {
+  // https://www.ddc.co.jp/words/archives/20090701114500.html
+  const ptRatio = 2.8346;
+
+  return parseFloat(String(mm)) * ptRatio;
+};
+
 const getSchemaSizeAndRotate = (schema: Schema) => {
   const width = mm2pt(schema.width);
   const height = mm2pt(schema.height);
@@ -164,11 +170,11 @@ const hex2RgbColor = (hexString: string | undefined) => {
 };
 
 const getFontProp = (schema: TextSchema) => {
-  const size = schema.fontSize || DEFAULT_FONT_SIZE;
-  const color = hex2RgbColor(schema.fontColor);
-  const alignment = schema.alignment || DEFAULT_ALIGNMENT;
-  const lineHeight = schema.lineHeight || DEFAULT_LINE_HEIGHT;
-  const characterSpacing = schema.characterSpacing || DEFAULT_CHARACTER_SPACING;
+  const size = schema.fontSize ?? DEFAULT_FONT_SIZE;
+  const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
+  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
+  const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
+  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
 
   return { size, color, alignment, lineHeight, characterSpacing };
 };

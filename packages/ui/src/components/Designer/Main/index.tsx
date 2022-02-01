@@ -8,10 +8,10 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize } from 'react-moveable';
-import { SchemaForUI, Size } from '../../../../../common/src/type';
-import { round, flatten, uuid } from '../../../../../common/src/utils';
-import { ZOOM, RULER_HEIGHT } from '../../../../../common/src/constants';
-import { usePrevious } from '../../../libs/hooks';
+import { SchemaForUI, Size } from '@pdfme/common';
+import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { usePrevious } from '../../../hooks';
+import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
 import SchemaUI from '../../Schemas/SchemaUI';
 import Selecto from './Selecto';

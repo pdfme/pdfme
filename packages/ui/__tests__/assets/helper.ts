@@ -1,8 +1,6 @@
-import { uuid } from '../../../common/src/utils';
-import * as hooks from '../../src/libs/hooks';
-import { getPdfPageSizes, pdf2Pngs } from '../../src/libs/helper';
-import { blankPdf } from '../../../common/src/';
-import { Template } from '../../../common/src/type';
+import * as hooks from '../../src/hooks';
+import { uuid, getPdfPageSizes, pdf2Pngs } from '../../src/helper';
+import { BLANK_PDF, Template } from '@pdfme/common';
 
 export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
@@ -30,7 +28,7 @@ export const getSampleTemplate = (): Template => ({
       field2: 'aaaaaaaaaaaa',
     },
   ],
-  basePdf: blankPdf,
+  basePdf: BLANK_PDF,
   schemas: [
     {
       field1: {

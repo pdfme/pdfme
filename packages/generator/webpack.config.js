@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const pkg = require('./package.json');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -18,7 +18,7 @@ const config = {
     extensions: ['.ts'],
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new webpack.BannerPlugin({
       banner: BANNER,
       entryOnly: true,

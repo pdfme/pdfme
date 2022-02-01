@@ -1,19 +1,53 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
-import { DESTROYED_ERR_MSG, DEFAULT_LANG } from '../../../common/src/constants';
-import { Template, Size, Lang, Font, UIProps, PreviewProps, UIOptions } from '../../../common/src/type';
-import { getDefaultFont, checkProps, generateColumnsAndSampledataIfNeeded } from '../../../common/src/helper';
-import { debounce } from '../../../common/src/utils';
+import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
+import { debounce, flatten } from './helper';
+import {
+  Template,
+  Size,
+  Lang,
+  Font,
+  UIProps,
+  PreviewProps,
+  getDefaultFont,
+  checkUIProps,
+  checkPreviewProps,
+} from '@pdfme/common';
 
-interface CommonConstructor {
-  domContainer: HTMLElement;
-  template: Template;
-  options?: UIOptions;
-}
-export type DesignerConstructor = CommonConstructor;
+const generateColumnsAndSampledataIfNeeded = (template: Template) => {
+  const { schemas, columns, sampledata } = template;
 
-export type PreviewUIConstructor = CommonConstructor & {
-  inputs: { [key: string]: string }[];
+  const flatSchemaLength = schemas
+    .map((schema) => Object.keys(schema).length)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  const neetColumns = !columns || flatSchemaLength !== columns.length;
+
+  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
+
+  // columns
+  if (neetColumns) {
+    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
+  }
+
+  // sampledata
+  if (needSampledata) {
+    template.sampledata = [
+      schemas.reduce(
+        (acc, cur) =>
+          Object.assign(
+            acc,
+            Object.keys(cur).reduce(
+              (a, c) => Object.assign(a, { [c]: '' }),
+              {} as { [key: string]: string }
+            )
+          ),
+        {} as { [key: string]: string }
+      ),
+    ];
+  }
+
+  return template;
 };
 
 export abstract class BaseUIClass {
@@ -37,7 +71,7 @@ export abstract class BaseUIClass {
   }, 100);
 
   constructor(props: UIProps) {
-    checkProps(props, UIProps);
+    checkUIProps(props);
 
     const { domContainer, template, options } = props;
     const { lang, font } = options || {};
@@ -91,7 +125,7 @@ export abstract class PreviewUI extends BaseUIClass {
 
   constructor(props: PreviewProps) {
     super(props);
-    checkProps(props, PreviewProps);
+    checkPreviewProps(props);
 
     this.inputs = props.inputs;
     this.render();

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { readFiles } from '../../../../libs/helper';
-import { I18nContext } from '../../../../libs/contexts';
+import { readFiles } from '../../../../helper';
+import { I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 
 const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {

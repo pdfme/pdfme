@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
-import { FontContext } from '../../../../libs/contexts';
 import {
+  getFallbackFontName,
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
-} from '../../../../../../common/src/constants';
+} from '@pdfme/common';
+import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
-import { getFallbackFontName } from '../../../../../../common/src/helper';
 
 const NumberInputSet = (props: {
   width: string;

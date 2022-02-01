@@ -1,19 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, DesignerProps } from '../../common/src/type';
-import { checkProps } from '../../common/src/helper';
-import { BaseUIClass, DesignerConstructor } from './libs/class';
-import { DESTROYED_ERR_MSG } from '../../common/src/constants';
-import { I18nContext, FontContext } from './libs/contexts';
+import { Template, DesignerProps, checkDesignerProps } from '@pdfme/common';
+import { BaseUIClass } from './class';
+import { DESTROYED_ERR_MSG } from './constants';
+import { I18nContext, FontContext } from './contexts';
 import DesignerComponent from './components/Designer';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
 
-  constructor(props: DesignerConstructor) {
+  constructor(props: DesignerProps) {
     super(props);
-    checkProps(props, DesignerProps);
+    checkDesignerProps(props);
 
     this.render();
   }

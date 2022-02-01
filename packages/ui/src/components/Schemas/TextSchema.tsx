@@ -1,7 +1,14 @@
 import React, { forwardRef, Ref } from 'react';
-import { ZOOM } from '../../../../common/src/constants';
+import {
+  DEFAULT_FONT_SIZE,
+  DEFAULT_ALIGNMENT,
+  DEFAULT_LINE_HEIGHT,
+  DEFAULT_CHARACTER_SPACING,
+  DEFAULT_FONT_COLOR,
+  TextSchema,
+} from '@pdfme/common';
 import { SchemaUIProps } from './SchemaUI';
-import { TextSchema } from '../../../../common/src/type';
+import { ZOOM } from '../../constants';
 
 type Props = SchemaUIProps & { schema: TextSchema };
 
@@ -11,19 +18,19 @@ const TextSchemaUI = (
 ) => {
   const style: React.CSSProperties = {
     resize: 'none',
-    fontFamily: schema.fontName || 'inherit',
+    fontFamily: schema.fontName ?? 'inherit',
     height: schema.height * ZOOM,
     width: schema.width * ZOOM,
-    textAlign: schema.alignment,
-    fontSize: `${schema.fontSize}pt`,
-    letterSpacing: `${schema.characterSpacing}pt`,
+    textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
+    fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
+    letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     fontFeatureSettings: `"palt"`,
-    lineHeight: `${schema.lineHeight}em`,
+    lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',
     wordBreak: 'break-all',
     background: 'transparent',
     border: 'none',
-    color: schema.fontColor || '#000',
+    color: schema.fontColor ?? DEFAULT_FONT_COLOR,
   };
 
   return editable ? (

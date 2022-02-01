@@ -1,9 +1,9 @@
 import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
-import { readFiles } from '../../libs/helper';
+import { ImageSchema } from '@pdfme/common';
 import { SchemaUIProps } from './SchemaUI';
-import { I18nContext } from '../../libs/contexts';
-import { ZOOM } from '../../../../common/src/constants';
-import { ImageSchema } from '../../../../common/src/type';
+import { readFiles } from '../../helper';
+import { I18nContext } from '../../contexts';
+import { ZOOM } from '../../constants';
 import imageExample from '../../assets/imageExample.png';
 
 type Props = SchemaUIProps & { schema: ImageSchema };

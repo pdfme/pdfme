@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { SchemaForUI, Size } from '../../../../../common/src/type';
-import { RULER_HEIGHT, ZOOM } from '../../../../../common/src/constants';
-import { I18nContext } from '../../../libs/contexts';
+import { SchemaForUI, Size } from '@pdfme/common';
+import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { I18nContext } from '../../../contexts';
 import Divider from '../../Divider';
 import dragIcon from '../../../assets/icons/drag.svg';
 import warningIcon from '../../../assets/icons/warning.svg';

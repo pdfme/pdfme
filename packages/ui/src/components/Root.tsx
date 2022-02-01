@@ -1,8 +1,8 @@
 import type {} from 'css-font-loading-module';
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
-import { RULER_HEIGHT } from '../../../common/src/constants';
-import { Size } from '../../../common/src/type';
-import { FontContext } from '../libs/contexts';
+import { Size } from '@pdfme/common';
+import { RULER_HEIGHT } from '../constants';
+import { FontContext } from '../contexts';
 import Spinner from './Spinner';
 
 type Props = { size: Size; scale: number; children: ReactNode };

@@ -1,9 +1,8 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { uuid } from '../src/utils';
-import { Font, SchemaForUI, Template, Schema } from '../src/type';
-import { checkFont, getUniqSchemaKey } from '../src/helper';
-import { blankPdf } from '../src';
+import { Font, Template } from '../src/type';
+import { checkFont, validateBarcodeInput } from '../src/helper';
+import { BLANK_PDF } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -14,7 +13,7 @@ const getSampleFont = (): Font => ({
 });
 
 const getTemplate = (): Template => ({
-  basePdf: blankPdf,
+  basePdf: BLANK_PDF,
   schemas: [
     {
       a: {
@@ -37,7 +36,7 @@ const getTemplate = (): Template => ({
 describe('checkFont test', () => {
   test('success test: no fontName in Schemas', () => {
     const _getTemplate = (): Template => ({
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -120,7 +119,7 @@ describe('checkFont test', () => {
 
   test('fail test: fontName in Schemas not found in font(single)', () => {
     const _getTemplate = (): Template => ({
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -150,7 +149,7 @@ describe('checkFont test', () => {
 
   test('fail test: fontName in Schemas not found in font(single)', () => {
     const _getTemplate = (): Template => ({
-      basePdf: blankPdf,
+      basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
@@ -182,103 +181,178 @@ describe('checkFont test', () => {
   });
 });
 
-describe('getUniqSchemaKey test', () => {
-  const getSchema = (): Schema => ({
-    type: 'text',
-    position: { x: 0, y: 0 },
-    width: 100,
-    height: 100,
+describe('validateBarcodeInput test', () => {
+  test('qrcode', () => {
+    // 500文字以下
+    const type = 'qrcode';
+    const valid = 'https://www.google.com/';
+    const valid2 = '漢字を含む文字列';
+    const invalid2 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQI12NgYAAAAAMAASDVlMcAAAAASUVORK5CYIIiVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQ';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case1', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'b', data: 'b', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = [];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy');
+  test('japanpost', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/zip
+    // 郵便番号は数字(0-9)のみ、住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
+    const type = 'japanpost';
+    const valid1 = '10000131-3-2-503';
+    const valid2 = '10000131-3-2-B503';
+    const invalid1 = 'invalid';
+    const invalid2 = '10000131=3=2-503';
+    const invalid3 = '10000131=3=2-503';
+    const invalid4 = '10000131-3-2-b503';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case2', () => {
-    const copiedSchemaKey = 'a copy';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy', data: 'a', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = [];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 2');
+  test('ean13', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/jan
+    // 有効文字は数値(0-9)のみ。標準タイプはチェックデジットを含まない12桁orチェックデジットを含む13桁
+    const type = 'ean13';
+    const valid = '111111111111';
+    const valid2 = '1111111111111';
+    const invalid1 = '111';
+    const invalid2 = '111111111111111111111111';
+    const invalid3 = 'invalid';
+    const invalid4 = '11111a111111';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case3', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', data: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 2', data: 'a', ...getSchema() },
-    ];
-    const stackUniqSchemaKeys: string[] = [];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 3');
+  test('ean8', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/jan
+    // 有効文字は数値(0-9)のみ。短縮タイプはチェックデジットを含まない7桁orチェックデジットを含む8桁
+    const type = 'ean8';
+    const valid = '1111111';
+    const valid2 = '11111111';
+    const invalid1 = '111';
+    const invalid2 = '11111111111111111111';
+    const invalid3 = 'invalid';
+    const invalid4 = '111a111';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case4', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', data: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 2', data: 'a', ...getSchema() },
-    ];
-    const stackUniqSchemaKeys: string[] = ['a copy 3'];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 4');
+  test('code39', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/code39
+    // CODE39は数字(0-9)、アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペースに対応しています。
+    const type = 'code39';
+    const valid1 = '12345';
+    const valid2 = 'ABCDE';
+    const valid3 = '1A2B3C4D5G';
+    const valid4 = '1-A $2/B+3%C4D5G';
+    const invalid1 = '123a45';
+    const invalid2 = '1-A$2/B+3%C4=D5G';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case5', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', data: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 3', data: 'a', ...getSchema() },
-    ];
-    const stackUniqSchemaKeys: string[] = [];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 4');
+  test('code128', () => {
+    // https://www.keyence.co.jp/ss/products/autoid/codereader/basic_code128.jsp
+    // コンピュータのキーボードから打てる文字（漢字、ひらがな、カタカナ以外）可能
+    const type = 'code128';
+    const valid1 = '12345';
+    const valid2 = '1-A$2/B+3%C4=D5G';
+    const valid3 = '1-A$2/B+3%C4=D5Ga~';
+    const invalid1 = '1-A$2/B+3%C4=D5Gひらがな';
+    const invalid2 = '1-A$2/B+3%C4=D5G〜';
+    const invalid3 = '1ーA$2・B＋3%C4=D5G〜';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case6', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', data: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 3', data: 'a', ...getSchema() },
-    ];
-    const stackUniqSchemaKeys: string[] = ['a copy 4'];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 5');
+  test('nw7', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/nw7
+    // https://en.wikipedia.org/wiki/Codabar
+    // NW-7は数字(0-9)と記号(-.$:/+)に対応しています。
+    // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
+    const type = 'nw7';
+    const valid1 = 'A12345D';
+    const valid2 = 'A$2/+345D';
+    const valid3 = 'a4321D';
+    const invalid1 = 'A12345G';
+    const invalid2 = 'A12a45D';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case7', () => {
-    const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a', data: 'a', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = ['a copy 2', 'a copy 3', 'a copy 4'];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 5');
+  test('itf14', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/itf
+    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁
+    const type = 'itf14';
+    const valid = '1111111111111';
+    const valid2 = '11111111111111';
+    const invalid1 = '111';
+    const invalid2 = '11111111111111111111111111111';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case8', () => {
-    const copiedSchemaKey = 'a copy 2';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 2', data: 'a', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = ['a copy 3'];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 4');
+  test('upca', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/upc
+    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
+    const type = 'upca';
+    const valid = '12345678901';
+    const valid2 = '123456789012';
+    const invalid1 = '1234567890';
+    const invalid2 = '1234567890123';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
-
-  test('getUniqSchemaKey case9', () => {
-    const copiedSchemaKey = 'a copy 9';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 9', data: 'a', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = ['a copy 10'];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 11');
-  });
-
-  test('getUniqSchemaKey case10', () => {
-    const copiedSchemaKey = 'a copy 10';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 10', data: 'a', ...getSchema() }];
-    const stackUniqSchemaKeys: string[] = [];
-    const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
-    expect(uniqSchemaKey).toBe('a copy 11');
+  test('upce', () => {
+    // https://barcode-place.azurewebsites.net/Barcode/upc
+    // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
+    // チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    const type = 'upce';
+    const valid = '0111111';
+    const valid2 = '01111111';
+    const invalid1 = '1111111';
+    const invalid2 = '011111111';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
 });

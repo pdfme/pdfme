@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { I18nContext } from '../../../../libs/contexts';
+import { I18nContext } from '../../../../contexts';
 import Divider from '../../../Divider';
 import { SidebarProps } from '..';
 import TextPropEditor from './TextPropEditor';

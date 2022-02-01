@@ -1,97 +1,15 @@
 import { z } from 'zod';
 import Helvetica from './assets/Helvetica.ttf';
-import { Template, Schema, SchemaForUI, BasePdf, Font, CommonProps, isTextSchema } from './type';
+import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
 import {
-  DEFAULT_FONT_NAME,
-  DEFAULT_FONT_SIZE,
-  DEFAULT_ALIGNMENT,
-  DEFAULT_LINE_HEIGHT,
-  DEFAULT_CHARACTER_SPACING,
-} from './constants';
-import { cloneDeep, uuid, uniq, b64toUint8Array, flatten } from './utils';
+  Template as TemplateSchema,
+  PreviewProps as PreviewPropsSchema,
+  DesignerProps as DesignerPropsSchema,
+  GenerateProps as GeneratePropsSchema,
+  UIProps as UIPropsSchema,
+} from './schema';
 
-export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
-  const schemaAddedTemplate: Template = {
-    schemas: cloneDeep(schemasList).map((schema) =>
-      schema.reduce((acc, cur) => {
-        const k = cur.key;
-        // @ts-ignore
-        delete cur.id;
-        // @ts-ignore
-        delete cur.key;
-        // @ts-ignore
-        delete cur.data;
-        acc[k] = cur;
-
-        return acc;
-      }, {} as { [key: string]: Schema })
-    ),
-    columns: cloneDeep(schemasList).reduce(
-      (acc, cur) => acc.concat(cur.map((s) => s.key)),
-      [] as string[]
-    ),
-    sampledata: [
-      cloneDeep(schemasList).reduce((acc, cur) => {
-        cur.forEach((c) => {
-          acc[c.key] = c.data;
-        });
-
-        return acc;
-      }, {} as { [key: string]: string }),
-    ],
-    basePdf: template.basePdf,
-  };
-
-  return schemaAddedTemplate;
-};
-
-export const getInitialSchema = (): SchemaForUI => ({
-  id: uuid(),
-  key: '',
-  data: '',
-  type: 'text',
-  position: { x: 0, y: 0 },
-  width: 35,
-  height: 7,
-  alignment: DEFAULT_ALIGNMENT,
-  fontSize: DEFAULT_FONT_SIZE,
-  characterSpacing: DEFAULT_CHARACTER_SPACING,
-  lineHeight: DEFAULT_LINE_HEIGHT,
-});
-
-export const getSampleByType = (type: string) => {
-  const defaultValue: { [key: string]: string } = {
-    qrcode: 'https://pdfme.com/',
-    japanpost: '6540123789-A-K-Z',
-    ean13: '2112345678900',
-    ean8: '02345673',
-    code39: 'THIS IS CODE 39',
-    code128: 'This is Code 128!',
-    nw7: 'A0123456789B',
-    itf14: '04601234567893',
-    upca: '416000336108',
-    upce: '00123457',
-  };
-
-  return defaultValue[type] ? defaultValue[type] : '';
-};
-
-export const getKeepRatioHeightByWidth = (type: string, width: number) => {
-  const raito: { [key: string]: number } = {
-    qrcode: 1,
-    japanpost: 0.09,
-    ean13: 0.4,
-    ean8: 0.5,
-    code39: 0.5,
-    code128: 0.5,
-    nw7: 0.5,
-    itf14: 0.3,
-    upca: 0.4,
-    upce: 0.5,
-  };
-
-  return width * (raito[type] ? raito[type] : 1);
-};
+const DEFAULT_FONT_NAME = 'Helvetica';
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
@@ -122,6 +40,22 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
   return basePdf as string;
 };
 
+export const b64toUint8Array = (base64: string) => {
+  if (typeof window !== 'undefined') {
+    const byteString = window.atob(
+      base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64
+    );
+    const unit8arr = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i += 1) {
+      unit8arr[i] = byteString.charCodeAt(i);
+    }
+
+    return unit8arr;
+  }
+
+  return new Uint8Array(Buffer.from(base64, 'base64'));
+};
+
 export const getFallbackFontName = (font: Font) => {
   const initial = '';
   const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
@@ -139,6 +73,8 @@ export const getFallbackFontName = (font: Font) => {
 export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true },
 });
+
+const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
   uniq(
@@ -175,7 +111,7 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
   }
 };
 
-export const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
+const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
   try {
     zodSchema.parse(data);
   } catch (e) {
@@ -200,78 +136,75 @@ ${message}`);
   }
 };
 
-export const checkTemplate = (data: unknown) => checkProps(data, Template);
+export const checkTemplate = (data: unknown) => checkProps(data, TemplateSchema);
+export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
+export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
+export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
+export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
-export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
-  const { schemas, columns, sampledata } = template;
+export const validateBarcodeInput = (type: BarCodeType, input: string) => {
+  if (!input) return false;
+  if (type === 'qrcode') {
+    // 500文字以下
+    return input.length < 500;
+  }
+  if (type === 'japanpost') {
+    // 郵便番号は数字(0-9)のみ。住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
+    const regexp = /^(\d{7})(\d|[A-Z]|-)+$/;
 
-  const flatSchemaLength = schemas
-    .map((schema) => Object.keys(schema).length)
-    .reduce((acc, cur) => acc + cur, 0);
+    return regexp.test(input);
+  }
+  if (type === 'ean13') {
+    // 有効文字は数値(0-9)のみ。チェックデジットを含まない12桁orチェックデジットを含む13桁。
+    const regexp = /^\d{12}$|^\d{13}$/;
 
-  const neetColumns = !columns || flatSchemaLength !== columns.length;
+    return regexp.test(input);
+  }
+  if (type === 'ean8') {
+    // 有効文字は数値(0-9)のみ。チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    const regexp = /^\d{7}$|^\d{8}$/;
 
-  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
+    return regexp.test(input);
+  }
+  if (type === 'code39') {
+    // 有効文字は数字(0-9)。アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペース。
+    const regexp = /^(\d|[A-Z]|\-|\.|\$|\/|\+|\%|\s)+$/;
 
-  // columns
-  if (neetColumns) {
-    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
+    return regexp.test(input);
+  }
+  if (type === 'code128') {
+    // 有効文字は漢字、ひらがな、カタカナ以外。
+    // https://qiita.com/graminume/items/2ac8dd9c32277fa9da64
+    return !input.match(
+      /([\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]|[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜])+/
+    );
+  }
+  if (type === 'nw7') {
+    // 有効文字はNW-7は数字(0-9)と記号(-.$:/+)。
+    // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
+    const regexp = /^[A-Da-d]([0-9\-\.\$\:\/\+])+[A-Da-d]$/;
+
+    return regexp.test(input);
+  }
+  if (type === 'itf14') {
+    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁。
+    const regexp = /^\d{13}$|^\d{14}$/;
+
+    return regexp.test(input);
+  }
+  if (type === 'upca') {
+    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
+    const regexp = /^\d{11}$|^\d{12}$/;
+
+    return regexp.test(input);
+  }
+  if (type === 'upce') {
+    // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
+    // チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    const regexp = /^0(\d{6}$|\d{7}$)/;
+
+    return regexp.test(input);
   }
 
-  // sampledata
-  if (needSampledata) {
-    template.sampledata = [
-      schemas.reduce(
-        (acc, cur) =>
-          Object.assign(
-            acc,
-            Object.keys(cur).reduce(
-              (a, c) => Object.assign(a, { [c]: '' }),
-              {} as { [key: string]: string }
-            )
-          ),
-        {} as { [key: string]: string }
-      ),
-    ];
-  }
-
-  return template;
-};
-
-const extractOriginalKey = (key: string) => key.replace(/ copy$| copy [0-9]*$/, '');
-
-export const getUniqSchemaKey = (arg: {
-  copiedSchemaKey: string;
-  schema: SchemaForUI[];
-  stackUniqSchemaKeys: string[];
-}) => {
-  const { copiedSchemaKey, schema, stackUniqSchemaKeys } = arg;
-  const schemaKeys = schema.map((s) => s.key).concat(stackUniqSchemaKeys);
-  const tmp: { [originalKey: string]: number } = schemaKeys.reduce(
-    (acc, cur) => Object.assign(acc, { originalKey: cur, copiedNum: 0 }),
-    {}
-  );
-  schemaKeys
-    .filter((key) => / copy$| copy [0-9]*$/.test(key))
-    .forEach((key) => {
-      const originalKey = extractOriginalKey(key);
-      const match = key.match(/[0-9]*$/);
-      const copiedNum = match && match[0] ? Number(match[0]) : 1;
-      if ((tmp[originalKey] ?? 0) < copiedNum) {
-        tmp[originalKey] = copiedNum;
-      }
-    });
-
-  const originalKey = extractOriginalKey(copiedSchemaKey);
-  if (tmp[originalKey]) {
-    const copiedNum = tmp[originalKey];
-    const uniqKey = `${originalKey} copy ${copiedNum + 1}`;
-    stackUniqSchemaKeys.push(uniqKey);
-
-    return uniqKey;
-  }
-  const uniqKey = `${copiedSchemaKey} copy`;
-  stackUniqSchemaKeys.push(uniqKey);
-
-  return uniqKey;
+  return false;
 };

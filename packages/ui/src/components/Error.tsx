@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import { I18nContext } from '../libs/contexts';
-import { Size } from '../../../common/src/type';
+import { Size } from '@pdfme/common';
+import { I18nContext } from '../contexts';
 
 const Error = ({ size, error }: { size: Size; error: Error }) => {
   const i18n = useContext(I18nContext);

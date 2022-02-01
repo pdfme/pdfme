@@ -1,14 +1,14 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { PreviewReactProps, SchemaForUI } from '../../../../common/src/type';
-import { ZOOM, RULER_HEIGHT } from '../../../../common/src/constants';
+import { PreviewReactProps, SchemaForUI } from '@pdfme/common';
+import { ZOOM, RULER_HEIGHT } from '../../constants';
 import PagePager from './Pager/Page';
 import UnitPager from './Pager/Unit';
 import Root from '../Root';
 import Error from '../Error';
 import Paper from '../Paper';
 import SchemaUI from '../Schemas/SchemaUI';
-import { useUIPreProcessor, useScrollPageCursor } from '../../libs/hooks';
-import { templateSchemas2SchemasList } from '../../libs/helper';
+import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
+import { templateSchemas2SchemasList } from '../../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({

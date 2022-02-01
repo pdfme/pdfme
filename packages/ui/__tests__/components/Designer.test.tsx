@@ -5,10 +5,10 @@ import React from 'react';
 import { render, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Designer from '../../src/components/Designer';
-import { I18nContext, FontContext } from '../../src/libs/contexts';
-import { curriedI18n } from '../../src/libs/i18n';
-import { getDefaultFont } from '../../../common/src/helper';
-import { SELECTABLE_CLASSNAME } from '../../../common/src/constants';
+import { I18nContext, FontContext } from '../../src/contexts';
+import { curriedI18n } from '../../src/i18n';
+import { SELECTABLE_CLASSNAME } from '../../src/constants';
+import { getDefaultFont } from '@pdfme/common';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
 
 test('Designer snapshot', async () => {

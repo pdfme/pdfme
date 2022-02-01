@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { SchemaForUI, Size } from '../../../../../common/src/type';
-import { RULER_HEIGHT, ZOOM } from '../../../../../common/src/constants';
-import { I18nContext } from '../../../libs/contexts';
+import { SchemaForUI, Size } from '@pdfme/common';
+import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { I18nContext } from '../../../contexts';
 import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
 import ListView from './ListView';
