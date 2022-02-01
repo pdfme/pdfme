@@ -15,7 +15,7 @@ const BANNER = [
 const config = {
   optimization: { minimize: isProduction },
   resolve: {
-    extensions: ['.ts'],
+    extensions: ['.ts', '.js'],
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
@@ -33,6 +33,8 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: `${pkg.name}.js`,
+    libraryTarget: 'umd',
+    globalObject: 'this',
     library: {
       name: pkg.name,
       type: 'umd',

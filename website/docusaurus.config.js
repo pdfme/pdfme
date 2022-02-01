@@ -36,15 +36,32 @@ const config = {
     'docusaurus-plugin-sass',
     [
       'docusaurus-plugin-typedoc',
-
-      // Plugin / TypeDoc options
       {
+        id: 'generator',
+        out: 'generator',
         readme: 'none',
         sidebar: {
+          categoryLabel: 'generator',
           position: 3,
+          fullNames: true,
         },
-        entryPoints: ['../src/index.ts'],
-        tsconfig: '../tsconfig.json',
+        entryPoints: ['../packages/generator/src/index.ts'],
+        tsconfig: '../packages/generator/tsconfig.json',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        id: 'ui',
+        out: 'ui',
+        readme: 'none',
+        sidebar: {
+          categoryLabel: 'ui',
+          position: 4,
+          fullNames: true,
+        },
+        entryPoints: ['../packages/ui/src/index.ts'],
+        tsconfig: '../packages/ui/tsconfig.json',
       },
     ],
     function myPlugin() {
