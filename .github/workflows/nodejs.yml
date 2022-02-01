@@ -18,8 +18,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn
-    - run: common:test
-    - run: generator:test
-    - run: ui:test
+    - run: npm run common:test
+    - run: npm run generator:test
+    - run: npm run ui:test
       env:
         CI: true
