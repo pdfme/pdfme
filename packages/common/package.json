@@ -30,7 +30,7 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
+      "\\.(ttf)$": "<rootDir>../../fontTransformer.js"
     },
     "moduleFileExtensions": [
       "js",

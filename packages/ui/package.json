@@ -58,8 +58,8 @@
       "jest-canvas-mock"
     ],
     "moduleNameMapper": {
-      "\\.(png|svg)$": "<rootDir>/assetsTransformer.js",
-      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
+      "\\.(png|svg)$": "<rootDir>/../../assetsTransformer.js",
+      "\\.(ttf)$": "<rootDir>/../../fontTransformer.js"
     },
     "moduleFileExtensions": [
       "js",
