@@ -28,7 +28,7 @@ const blob2Base64Pdf = (blob: Blob) => {
 export const getB64BasePdf = (basePdf: BasePdf) => {
   const needFetchFromNetwork =
     typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');
-  if (needFetchFromNetwork) {
+  if (needFetchFromNetwork && typeof window !== 'undefined') {
     return fetch(basePdf)
       .then((res) => res.blob())
       .then(blob2Base64Pdf)
@@ -41,19 +41,18 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
 };
 
 export const b64toUint8Array = (base64: string) => {
-  if (typeof window !== 'undefined') {
-    const byteString = window.atob(
-      base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64
-    );
-    const unit8arr = new Uint8Array(byteString.length);
-    for (let i = 0; i < byteString.length; i += 1) {
-      unit8arr[i] = byteString.charCodeAt(i);
-    }
+  const data = base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64;
 
-    return unit8arr;
+  const byteString =
+    typeof window !== 'undefined'
+      ? window.atob(data)
+      : Buffer.from(data, 'base64').toString('binary');
+
+  const unit8arr = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i += 1) {
+    unit8arr[i] = byteString.charCodeAt(i);
   }
-
-  return new Uint8Array(Buffer.from(base64, 'base64'));
+  return unit8arr;
 };
 
 export const getFallbackFontName = (font: Font) => {

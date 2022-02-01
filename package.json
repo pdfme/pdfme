@@ -54,8 +54,5 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.7.2"
-  },
-  "resolutions": {
-    "jest": "^27.4.7"
   }
 }
