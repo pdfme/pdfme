@@ -7,7 +7,7 @@ import {
   drawEmbeddedPage,
   embedAndGetFontObj,
   InputImageCache
-} from './generator';
+} from './helper';
 import { getDefaultFont, getFallbackFontName, checkProps } from '../../common/src/helper';
 import { TOOL_NAME } from '../../common/src/constants';
 

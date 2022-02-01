@@ -1,4 +1,5 @@
 import { BarCodeType } from './type';
+
 export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   if (!input) return false;
   if (type === 'qrcode') {

@@ -18,9 +18,9 @@
   "scripts": {
     "develop": "webpack-dev-server --mode development",
     "build": "NODE_ENV=production webpack --mode production",
+    "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
-    "clean": "rimraf dist",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src"
@@ -58,8 +58,7 @@
       "jest-canvas-mock"
     ],
     "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/assetsTransformer.js",
-      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js",
+      "\\.(png|svg)$": "<rootDir>/assetsTransformer.js",
       "\\.(ttf)$": "<rootDir>/fontTransformer.js"
     },
     "moduleFileExtensions": [

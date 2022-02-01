@@ -12,7 +12,7 @@ import {
   getUniqSchemaKey,
 } from '../../../../common/src/helper';
 import { I18nContext } from '../../libs/contexts';
-import { initShortCuts, destroyShortCuts,  templateSchemas2SchemasList } from '../../libs/ui';
+import { initShortCuts, destroyShortCuts,  templateSchemas2SchemasList } from '../../libs/helper';
 import { useUIPreProcessor, useScrollPageCursor } from '../../libs/hooks';
 import Root from '../Root';
 import Error from '../Error';

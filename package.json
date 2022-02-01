@@ -14,10 +14,19 @@
     "packages/*"
   ],
   "scripts": {
+    "test": "yarn workspaces foreach test",
+    "common:build": "yarn workspace @pdfme/common build",
+    "common:develop": "yarn workspace @pdfme/common develop",
+    "common:lint": "yarn workspace @pdfme/common lint",
+    "common:test": "yarn workspace @pdfme/common test",
     "generator:build": "yarn workspace @pdfme/generator build",
     "generator:develop": "yarn workspace @pdfme/generator develop",
+    "generator:lint": "yarn workspace @pdfme/generator lint",
+    "generator:test": "yarn workspace @pdfme/generator test",
     "ui:build": "yarn workspace @pdfme/ui build",
-    "ui:develop": "yarn workspace @pdfme/ui develop"
+    "ui:develop": "yarn workspace @pdfme/ui develop",
+    "ui:lint": "yarn workspace @pdfme/ui lint",
+    "ui:test": "yarn workspace @pdfme/ui test"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
@@ -41,5 +50,8 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.7.2"
+  },
+  "resolutions": {
+    "jest": "^27.4.7"
   }
 }

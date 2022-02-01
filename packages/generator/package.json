@@ -9,7 +9,7 @@
   "bugs": {
     "url": "https://github.com/hand-dot/pdfme-beta/issues"
   },
-  "main": "dist/pdfme.js",
+  "main": "dist/@pdfme/generator.js",
   "module": "src/index.ts",
   "types": "dist/types/index.d.ts",
   "engines": {
@@ -18,9 +18,9 @@
   "scripts": {
     "develop": "webpack-dev-server --mode development",
     "build": "NODE_ENV=production webpack --mode production",
+    "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
-    "clean": "rimraf dist",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src"
@@ -36,5 +36,25 @@
     "jsqr": "^1.4.0",
     "pdf2json": "^2.0.0",
     "pngjs": "^6.0.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/*.test.ts"
+    ]
   }
 }

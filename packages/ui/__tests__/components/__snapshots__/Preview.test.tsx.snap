@@ -1,0 +1,144 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Preview(as Form) snapshot 1`] = `
+<div
+  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+>
+  <div
+    style="width: 1170px; height: 1170px;"
+  >
+    <div
+      style="height: 1122.5196850527px; width: 100%; position: absolute;"
+    />
+    <div
+      style="transform: scale(1); transform-origin: center top;"
+    >
+      <div
+        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+      >
+        <div>
+          <div
+            class="selectable"
+            id="field1"
+            style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            title="field1"
+          >
+            <textarea
+              placeholder="bb"
+              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+              tabindex="100"
+            >
+              field1
+            </textarea>
+          </div>
+        </div>
+        <div>
+          <div
+            class="selectable"
+            id="field2"
+            style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+            title="field2"
+          >
+            <div
+              style="margin: 0px auto;"
+            >
+              <button
+                style="position: absolute; left: 0px; top: 0px;"
+                tabindex="101"
+              >
+                x
+              </button>
+              <img
+                src="field2"
+                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Preview(as Viewer) snapshot 1`] = `
+<div
+  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+>
+  <div
+    style="width: 1170px; height: 1170px;"
+  >
+    <div
+      style="height: 1122.5196850527px; width: 100%; position: absolute;"
+    />
+    <div
+      style="transform: scale(1); transform-origin: center top;"
+    >
+      <div
+        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+      >
+        <div>
+          <div
+            class="selectable"
+            id="field1"
+            style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent; background-color: transparent;"
+            title="field1"
+          >
+            <div
+              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+            >
+              <span
+                style="letter-spacing: inherit;"
+              >
+                f
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                i
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                e
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                l
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                d
+              </span>
+              <span
+                style="letter-spacing: 0;"
+              >
+                1
+              </span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div
+            class="selectable"
+            id="field2"
+            style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent; background-color: transparent;"
+            title="field2"
+          >
+            <div
+              style="margin: 0px auto;"
+            >
+              <img
+                src="field2"
+                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

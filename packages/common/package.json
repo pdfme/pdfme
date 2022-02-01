@@ -1,7 +1,51 @@
 {
-    "name": "@pdfme/common",
-    "version": "1.0.0",
-    "dependencies": {
-        "zod": "^3.11.6"
-    }
+  "name": "@pdfme/common",
+  "version": "1.0.0",
+  "author": "hand-dot",
+  "license": "MIT",
+  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
+  "homepage": "https://pdfme.com",
+  "repository": "git@github.com:hand-dot/pdfme-beta.git",
+  "bugs": {
+    "url": "https://github.com/hand-dot/pdfme-beta/issues"
+  },
+  "main": "dist/@pdfme/common.js",
+  "module": "src/index.ts",
+  "types": "dist/types/index.d.ts",
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "develop": "webpack-dev-server --mode development",
+    "build": "NODE_ENV=production webpack --mode production",
+    "clean": "rimraf dist",
+    "lint": "tsc --noEmit",
+    "test": "jest",
+    "lint:watch": "tsc -w --noEmit",
+    "test:watch": "jest --coverage --watch",
+    "prune": "ts-prune src"
+  },
+  "dependencies": {
+    "zod": "^3.11.6"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/*.test.ts"
+    ]
+  }
 }

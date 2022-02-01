@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { readFiles } from '../../../../libs/ui';
+import { readFiles } from '../../../../libs/helper';
 import { I18nContext } from '../../../../libs/contexts';
 import { SidebarProps } from '..';
 

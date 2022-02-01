@@ -1,5 +1,5 @@
 import React, { forwardRef, ChangeEvent, useContext, Ref } from 'react';
-import { readFiles } from '../../libs/ui';
+import { readFiles } from '../../libs/helper';
 import { SchemaUIProps } from './SchemaUI';
 import { I18nContext } from '../../libs/contexts';
 import { ZOOM } from '../../../../common/src/constants';

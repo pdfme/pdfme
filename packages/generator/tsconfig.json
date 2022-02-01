@@ -2,7 +2,6 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "target": "es5",
-    "jsx": "react",
     "esModuleInterop": true,
     "declaration": true,
     "declarationDir": "dist/types",
@@ -16,6 +15,6 @@
     "sourceMap": true
   },
   "baseUrl": ".",
-  "include": ["declaration.d.ts", "src/**/*.ts", "src/**/*.tsx"],
+  "include": ["declaration.d.ts", "src/**/*.ts"],
   "exclude": ["node_modules"]
 }

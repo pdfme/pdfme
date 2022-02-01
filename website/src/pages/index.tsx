@@ -8,7 +8,7 @@ import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
-import { generate,  Template } from '@pdfme/core';
+import { generate,  Template } from '@pdfme/generator';
 import { Designer, Viewer, Form, } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 

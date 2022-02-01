@@ -8,7 +8,7 @@ import Error from '../Error';
 import Paper from '../Paper';
 import SchemaUI from '../Schemas/SchemaUI';
 import { useUIPreProcessor, useScrollPageCursor } from '../../libs/hooks';
-import { templateSchemas2SchemasList } from '../../libs/ui';
+import { templateSchemas2SchemasList } from '../../libs/helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({

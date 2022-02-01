@@ -1,7 +1,7 @@
 import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
 import { b64toBlob } from '../../../common/src/utils';
 import { getB64BasePdf } from '../../../common/src/helper';
-import { pdf2Pngs, getPdfPageSizes } from './ui';
+import { pdf2Pngs, getPdfPageSizes } from './helper';
 import { Template, Size } from '../../../common/src/type';
 import { RULER_HEIGHT, ZOOM } from '../../../common/src/constants';
 

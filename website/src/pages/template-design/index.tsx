@@ -10,7 +10,7 @@ import {
   PreviewOutlined,
   CloseOutlined,
 } from '@mui/icons-material';
-import { generate,  Template } from '@pdfme/core';
+import { generate,  Template } from '@pdfme/generator';
 import { Designer } from '@pdfme/ui';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
