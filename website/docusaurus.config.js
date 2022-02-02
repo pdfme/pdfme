@@ -38,7 +38,7 @@ const config = {
       'docusaurus-plugin-typedoc',
       {
         id: 'generator',
-        out: 'generator',
+        out: 'api/generator',
         readme: 'none',
         sidebar: {
           categoryLabel: 'generator',
@@ -53,7 +53,7 @@ const config = {
       'docusaurus-plugin-typedoc',
       {
         id: 'ui',
-        out: 'ui',
+        out: 'api/ui',
         readme: 'none',
         sidebar: {
           categoryLabel: 'ui',

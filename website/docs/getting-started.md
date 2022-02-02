@@ -21,35 +21,55 @@ As an example, the author's service [https://labelmake.jp/](https://labelmake.jp
 
 ## Installation
 
-The operating requirements should be the node environment `>=14`.
+The operating requirements should be the node environment `>=14`.  
+There are two packages in pdfme, generator and UI.
 
-Installation can be done with the following command.
+The package for generating PDF can be installed with the following command.
 
 ```
-npm i @pdfme
+npm i @pdfme/generator
+```
+
+The packages for using PDF designer, forms and viewers can be installed with the following commands.
+
+```
+npm i @pdfme/ui
 ```
 
 The following type, function and classes are available in pdfme.
 
-- [Template](/docs/getting-started#template)
+`@pdfme/generator`
+
 - [generate](/docs/getting-started#generator)
+- [Template](/docs/getting-started#template)
+
+`@pdfme/ui`
+
 - [Designer](/docs/getting-started#designer)
 - [Form](/docs/getting-started#form)
 - [Viewer](/docs/getting-started#viewer)
+- [Template](/docs/getting-started#template)
 
 If your environment uses webpack, import the necessary items as shown below.
 
 ```ts
-import { Template, generate, Designer, Form, Viewer } from 'pdfme';
+import { Template, generate } from '@pdfme/generator';
 ```
 
-**All objects use Template, which will be briefly explained in the next section.
+```ts
+import { Template, Designer, Form, Viewer } from '@pdfme/ui';
+```
+
+**All objects use `Template`, which will be briefly explained in the next section.
 **
 
 ## Template
 
-The core of pdfme library are Templates. Templates are used everywhere.  
-A template can be divided into two parts: a fixed part and a variable part. We call them basePdf and schema.
+The core of pdfme library are Templates.  
+Template Type can be imported by both `@pdfme/generator` or `@pdfme/ui`. Templates are used everywhere.
+
+A template can be divided into two parts: a fixed part and a variable part.  
+We call them basePdf and schema.
 The following image is a good illustration of a template.
 
 ![](/img/template.png)
@@ -57,7 +77,8 @@ The following image is a good illustration of a template.
 - **basePdf**: PDF data for the fixed part of the PDF to be generated.
 - **schemas**: Definition data for the variable part of the PDF to be generated.
 
-**basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`. A blank A4 PDF can be imported with `blankPdf`. You can use it to check how it works.
+**basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`.  
+A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it works.
 
 **schemas** currently has the following types of data available
 
@@ -68,11 +89,14 @@ The following image is a good illustration of a template.
 Let's take a look at some specific data.  
 (If you are using TypeScript, you can import the Template type.)
 
+### Sample Template
+
 ```ts
-import { Template, blankPdf } from 'pdfme';
+import { Template, BLANK_PDF } from '@pdfme/generator';
+// import { Template, BLANK_PDF } from '@pdfme/ui'; <- Template types and BLANK_PDF can also be imported from @pdfme/ui.
 
 const template: Template = {
-  basePdf: blankPdf,
+  basePdf: BLANK_PDF,
   schemas: [
     {
       a: {
@@ -106,10 +130,10 @@ You can create a template from [Template Design page](/template-design). Or, if 
 
 The PDF generator function, `generate`, takes 2 arguments of `template` and `inputs` for generate a PDF. It works both in Node.js and in the browser.
 
-The code to generate a PDF file using the [template created above](/docs/getting-started#template) is shown below.
+The code to generate a PDF file using the [template created above](/docs/getting-started#sample-template) is shown below.
 
 ```ts
-import { Template, generate } from 'pdfme';
+import { Template, generate } from '@pdfme/generator';
 
 const template: Template = {
   // skip...　Check the Template section.
@@ -136,7 +160,9 @@ Also, each element in the inputs array corresponds to a page in the PDF, you can
 
 [For more information, please refer to the API documentation of the generate function here](/docs/api/#generate).
 
-## Designer
+## UI
+
+### Designer
 
 The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.
 
@@ -145,7 +171,7 @@ You can design your own template from [Template Design page](/template-design), 
 Let's integrate the designer using the template created above as the default template.
 
 ```ts
-import { Template, Designer } from 'pdfme';
+import { Template, Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -171,14 +197,14 @@ The designer instance can be manipulated with the following methods.
 
 [For more information, please refer to the API documentation of the Designer class here](/docs/api/classes/Designer#methods).
 
-## Form
+### Form
 
 You can use templates to create forms and PDF viewers.
 
 The Form creates a UI for the user to enter schemas based on the template.
 
 ```ts
-import { Template, Form } from 'pdfme';
+import { Template, Form } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -205,7 +231,7 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 
 [For more information, please refer to the API documentation of the Form class here](/docs/api/classes/Form#methods).
 
-## Viewer
+### Viewer
 
 Viewing a PDF file in a mobile browser is a pain, because it doesn't display well in an iframe.
 
@@ -214,7 +240,7 @@ The Viewer is a byproduct of the Form development process, but it allows you to 
 Using the Viewer is basically the same as using the Form, except that user cannot edit it.
 
 ```ts
-import { Template, Viewer } from 'pdfme';
+import { Template, Viewer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {

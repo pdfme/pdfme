@@ -39,7 +39,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[ui/src/Designer.tsx:13](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L13)
+[ui/src/Designer.tsx:13](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L13)
 
 ## Properties
 
@@ -53,7 +53,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:54](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L54)
+[ui/src/class.ts:54](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L54)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:11](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L11)
+[ui/src/Designer.tsx:11](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L11)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:10](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L10)
+[ui/src/Designer.tsx:10](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L10)
 
 ___
 
@@ -130,7 +130,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -153,7 +153,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[ui/src/class.ts:56](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L56)
+[ui/src/class.ts:56](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L56)
 
 ## Methods
 
@@ -171,7 +171,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[ui/src/class.ts:114](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L114)
+[ui/src/class.ts:114](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L114)
 
 ___
 
@@ -189,7 +189,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[ui/src/class.ts:98](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L98)
+[ui/src/class.ts:98](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L98)
 
 ___
 
@@ -219,7 +219,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:94](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L94)
+[ui/src/class.ts:94](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L94)
 
 ___
 
@@ -244,7 +244,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:102](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/class.ts#L102)
+[ui/src/class.ts:102](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L102)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:40](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L40)
+[ui/src/Designer.tsx:40](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L40)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:36](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L36)
+[ui/src/Designer.tsx:36](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L36)
 
 ___
 
@@ -302,7 +302,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[ui/src/Designer.tsx:44](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L44)
+[ui/src/Designer.tsx:44](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L44)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:20](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L20)
+[ui/src/Designer.tsx:20](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L20)
 
 ___
 
@@ -344,4 +344,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[ui/src/Designer.tsx:27](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/ui/src/Designer.tsx#L27)
+[ui/src/Designer.tsx:27](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Designer.tsx#L27)

@@ -1,7 +1,7 @@
 ---
 id: "index"
 title: "@pdfme/generator"
-slug: "/generator/"
+slug: "/api/generator/"
 sidebar_label: "Exports"
 sidebar_position: 0.5
 custom_edit_url: null
@@ -374,7 +374,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:47](https://github.com/hand-dot/pdfme-beta/blob/810c72c/packages/generator/src/generate.ts#L47)
+[generator/src/generate.ts:47](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/generator/src/generate.ts#L47)
 
 ___
 

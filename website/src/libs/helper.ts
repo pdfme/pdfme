@@ -147,7 +147,7 @@ const templateFmt4SampleCode = (template: Template) =>
   );
 
 export const getGeneratorSampleCode = (template: Template) =>
-  `import { generate } from "pdfme";
+  `import { generate } from "@pdfme/generator";
 
 (async () => {
   const template = ${templateFmt4SampleCode(template)};
@@ -164,7 +164,7 @@ export const getGeneratorSampleCode = (template: Template) =>
 })();`.trim();
 
 export const getDesignerSampleCode = (template: Template) =>
-  `import { Designer } from "pdfme";
+  `import { Designer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
@@ -172,7 +172,7 @@ const template = ${templateFmt4SampleCode(template)};
 const designer = new Designer({ domContainer, template });`.trim();
 
 export const getFormSampleCode = (template: Template) =>
-  `import { Form } from "pdfme";
+  `import { Form } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
@@ -181,7 +181,7 @@ const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 const form = new Form({ domContainer, template, inputs });`.trim();
 
 export const getViewerSampleCode = (template: Template) =>
-  `import { Viewer } from "pdfme";
+  `import { Viewer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};

@@ -1,7 +1,7 @@
 ---
 id: "index"
 title: "@pdfme/ui"
-slug: "/ui/"
+slug: "/api/ui/"
 sidebar_label: "Exports"
 sidebar_position: 0.5
 custom_edit_url: null
