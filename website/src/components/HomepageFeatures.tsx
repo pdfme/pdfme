@@ -10,21 +10,22 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Fast PDF Generator',
+    title: 'A fast PDF Generator',
     description: (
       <>
-        Works on node and browser. Use templates to generate PDF, Complex operations are not needed.
+        No complex operations are needed. Just use templates to generate PDFs.
+        Works on node and the browser. 
       </>
     ),
   },
   {
-    title: 'Easy PDF template design',
-    description: <>Anyone can easily create templates with the designer.</>,
+    title: 'An easy PDF template editor',
+    description: <>Anyone can easily create templates with the designer (tool).</>,
   },
   {
-    title: 'Simple JSON template',
+    title: 'Templates as structured JSON Data',
     description: (
-      <>Templates are JSON data that is easy to understand and handle.</>
+      <>Templates are JSON data that are easy to understand and handle.</>
     ),
   },
 ];

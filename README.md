@@ -6,7 +6,7 @@
 
 # PDFME
 
-> pdfme is now beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
+> pdfme is now in beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
 
 TypeScript base PDF generator and React base UI.
 Open source, developed by the community, and completely free to use under the MIT license!
