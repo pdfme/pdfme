@@ -15,8 +15,9 @@
     "website"
   ],
   "scripts": {
+    "lint": "npm run common:lint && npm run ui:lint && npm run generator:lint",
     "build": "npm run common:build && npm run ui:build && npm run generator:build",
-    "linttest": "npm run common:lint && npm run common:test && npm run ui:lint && npm run ui:test && npm run generator:lint && npm run generator:test",
+    "test": "npm run common:test && npm run ui:test && npm run generator:test",
     "common:build": "yarn workspace @pdfme/common build",
     "common:develop": "yarn workspace @pdfme/common develop",
     "common:lint": "yarn workspace @pdfme/common lint",
