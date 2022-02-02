@@ -40,7 +40,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[ui/src/Form.tsx:12](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Form.tsx#L12)
+[ui/src/Form.tsx:12](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/Form.tsx#L12)
 
 ## Properties
 
@@ -54,7 +54,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:54](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L54)
+[ui/src/class.ts:54](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L54)
 
 ___
 
@@ -68,7 +68,7 @@ PreviewUI.inputs
 
 #### Defined in
 
-[ui/src/class.ts:124](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L124)
+[ui/src/class.ts:124](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L124)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[ui/src/Form.tsx:10](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Form.tsx#L10)
+[ui/src/Form.tsx:10](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/Form.tsx#L10)
 
 ___
 
@@ -116,7 +116,7 @@ PreviewUI.size
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -139,7 +139,7 @@ PreviewUI.template
 
 #### Defined in
 
-[ui/src/class.ts:56](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L56)
+[ui/src/class.ts:56](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L56)
 
 ## Methods
 
@@ -157,7 +157,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[ui/src/class.ts:114](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L114)
+[ui/src/class.ts:114](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L114)
 
 ___
 
@@ -175,7 +175,7 @@ PreviewUI.getFont
 
 #### Defined in
 
-[ui/src/class.ts:98](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L98)
+[ui/src/class.ts:98](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L98)
 
 ___
 
@@ -205,7 +205,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:94](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L94)
+[ui/src/class.ts:94](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L94)
 
 ___
 
@@ -223,7 +223,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[ui/src/class.ts:134](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L134)
+[ui/src/class.ts:134](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L134)
 
 ___
 
@@ -248,7 +248,7 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:102](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L102)
+[ui/src/class.ts:102](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L102)
 
 ___
 
@@ -268,7 +268,7 @@ ___
 
 #### Defined in
 
-[ui/src/Form.tsx:16](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Form.tsx#L16)
+[ui/src/Form.tsx:16](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/Form.tsx#L16)
 
 ___
 
@@ -286,7 +286,7 @@ PreviewUI.render
 
 #### Defined in
 
-[ui/src/Form.tsx:20](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/Form.tsx#L20)
+[ui/src/Form.tsx:20](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/Form.tsx#L20)
 
 ___
 
@@ -310,7 +310,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[ui/src/class.ts:140](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L140)
+[ui/src/class.ts:140](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L140)
 
 ___
 
@@ -338,4 +338,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[ui/src/class.ts:108](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/ui/src/class.ts#L108)
+[ui/src/class.ts:108](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/ui/src/class.ts#L108)

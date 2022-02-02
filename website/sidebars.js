@@ -23,6 +23,12 @@ const sidebars = {
       items: [
         {
           type: 'category',
+          label: '@pdfme/common',
+          link: { type: 'doc', id: 'api/common/index' },
+          items: ['api/common/index'],
+        },
+        {
+          type: 'category',
           label: '@pdfme/generator',
           link: { type: 'doc', id: 'api/generator/index' },
           items: ['api/generator/index'],

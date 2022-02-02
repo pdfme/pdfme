@@ -374,7 +374,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:47](https://github.com/hand-dot/pdfme-beta/blob/910f06c/packages/generator/src/generate.ts#L47)
+[generator/src/generate.ts:47](https://github.com/hand-dot/pdfme-beta/blob/d9f1a6d/packages/generator/src/generate.ts#L47)
 
 ___
 

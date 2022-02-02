@@ -1,12 +1,6 @@
-<!--
-    このドキュメントはほとんど website/docs/getting-started.md のコピーです
-    画像のパスは /img/image.png から /website/static/img/image.png に置換してください
-    リンクは / を https://pdfme.com/ に置換してください
- -->
-
 # PDFME
 
-> pdfme is now in beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
+> pdfme is now in beta version. Please report any issues or suggestions from [Help page](https://pdfme.com/help) or [edit this page.](https://github.com/hand-dot/pdfme-beta/tree/main/website/docs/getting-started.md)
 
 TypeScript base PDF generator and React base UI.
 Open source, developed by the community, and completely free to use under the MIT license!
@@ -23,47 +17,73 @@ Open source, developed by the community, and completely free to use under the MI
 
 ---
 
+<!--
+    This is a copy of website/docs/getting-started.md from below.
+  - Replace the image path: /img/image.png -> /website/static/img/image.png
+  - Replace the link: / -> https://pdfme.com/
+ -->
+
 ## Introduction
 
-pdfme was created to simplify PDF generation and design. It is especially useful for the following use cases.
+pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:
 
 - Need to create a designed PDF with short code.
-- Need to integrate PDF design features into applications.
+- Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
 
-As a example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
+As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
 
 ## Installation
 
-The operating requirements should be the node environment `>=14`.
+The operating requirements should be the node environment `>=14`.  
+There are two packages in pdfme, generator and UI.
 
-Installation can be done with the following command.
+The package for generating PDF can be installed with the following command.
 
 ```
-npm i @pdfme
+npm i @pdfme/generator
+```
+
+The packages for using PDF designer, forms and viewers can be installed with the following commands.
+
+```
+npm i @pdfme/ui
 ```
 
 The following type, function and classes are available in pdfme.
 
-- [Template](/docs/getting-started#template)
-- [generate](/docs/getting-started#generator)
-- [Designer](/docs/getting-started#designer)
-- [Form](/docs/getting-started#form)
-- [Viewer](/docs/getting-started#viewer)
+`@pdfme/generator`
+
+- [generate](https://pdfme.com/docs/getting-started#generator)
+- [Template](https://pdfme.com/docs/getting-started#template)
+
+`@pdfme/ui`
+
+- [Designer](https://pdfme.com/docs/getting-started#designer)
+- [Form](https://pdfme.com/docs/getting-started#form)
+- [Viewer](https://pdfme.com/docs/getting-started#viewer)
+- [Template](https://pdfme.com/docs/getting-started#template)
 
 If your environment uses webpack, import the necessary items as shown below.
 
 ```ts
-import { Template, generate, Designer, Form, Viewer } from 'pdfme';
+import { Template, generate } from '@pdfme/generator';
 ```
 
-**All objects use Template, which will be briefly explained in the next section.
+```ts
+import { Template, Designer, Form, Viewer } from '@pdfme/ui';
+```
+
+**All objects use `Template`, which will be briefly explained in the next section.
 **
 
 ## Template
 
-The core of pdfme's library is Template. All objects use Template.  
-A template can be divided into two parts: fixed and variable. They are called basePdf and schemas.
+The core of pdfme library are Templates.  
+Template Type can be imported by both `@pdfme/generator` or `@pdfme/ui`. Templates are used everywhere.
+
+A template can be divided into two parts: a fixed part and a variable part.  
+We call them basePdf and schema.
 The following image is a good illustration of a template.
 
 ![](/website/static/img/template.png)
@@ -71,7 +91,8 @@ The following image is a good illustration of a template.
 - **basePdf**: PDF data for the fixed part of the PDF to be generated.
 - **schemas**: Definition data for the variable part of the PDF to be generated.
 
-**basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`. A blank A4 PDF can be imported with `blankPdf`. You can use it to check how it works.
+**basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`.  
+A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it works.
 
 **schemas** currently has the following types of data available
 
@@ -82,11 +103,14 @@ The following image is a good illustration of a template.
 Let's take a look at some specific data.  
 (If you are using TypeScript, you can import the Template type.)
 
+### Sample Template
+
 ```ts
-import { Template, blankPdf } from 'pdfme';
+import { Template, BLANK_PDF } from '@pdfme/generator';
+// import { Template, BLANK_PDF } from '@pdfme/ui'; <- Template types and BLANK_PDF can also be imported from @pdfme/ui.
 
 const template: Template = {
-  basePdf: blankPdf,
+  basePdf: BLANK_PDF,
   schemas: [
     {
       a: {
@@ -112,18 +136,18 @@ const template: Template = {
 };
 ```
 
-[For more information, please refer to the API documentation of the Template type here](/docs/api/#template).
+[For more information, please refer to the API documentation of the Template type here](https://pdfme.com/docs/api/common/#template).
 
-You can create a template from [Template Design page](/template-design). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](/docs/getting-started#designer).
+You can create a template from [Template Design page](https://pdfme.com/template-design). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](https://pdfme.com/docs/getting-started#designer).
 
 ## Generator
 
 The PDF generator function, `generate`, takes 2 arguments of `template` and `inputs` for generate a PDF. It works both in Node.js and in the browser.
 
-The code to generate a PDF file using the [template created above](/docs/getting-started#template) is shown below.
+The code to generate a PDF file using the [template created above](https://pdfme.com/docs/getting-started#sample-template) is shown below.
 
 ```ts
-import { Template, generate } from 'pdfme';
+import { Template, generate } from '@pdfme/generator';
 
 const template: Template = {
   // skip...　Check the Template section.
@@ -148,18 +172,20 @@ You can create a PDF file like the below.
 
 Also, each element in the inputs array corresponds to a page in the PDF, you can create a multi-page PDF file by providing multiple elements of inputs.
 
-[For more information, please refer to the API documentation of the generate function here](/docs/api/#generate).
+[For more information, please refer to the API documentation of the generate function here](https://pdfme.com/docs/api/generator/#generate).
 
-## Designer
+## UI
+
+### Designer
 
 The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.
 
-You can design your own template from [Template Design page](/template-design), or you can integrate the designer into your application.
+You can design your own template from [Template Design page](https://pdfme.com/template-design), or you can integrate the designer into your application.
 
 Let's integrate the designer using the template created above as the default template.
 
 ```ts
-import { Template, Designer } from 'pdfme';
+import { Template, Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -183,16 +209,16 @@ The designer instance can be manipulated with the following methods.
 - `onSaveTemplate`
 - `destroy`
 
-[For more information, please refer to the API documentation of the Designer class here](/docs/api/classes/Designer#methods).
+[For more information, please refer to the API documentation of the Designer class here](https://pdfme.com/docs/api/ui/classes/Designer).
 
-## Form
+### Form
 
 You can use templates to create forms and PDF viewers.
 
 The Form creates a UI for the user to enter schemas based on the template.
 
 ```ts
-import { Template, Form } from 'pdfme';
+import { Template, Form } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -217,9 +243,9 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 });
 ```
 
-[For more information, please refer to the API documentation of the Form class here](/docs/api/classes/Form#methods).
+[For more information, please refer to the API documentation of the Form class here](https://pdfme.com/docs/api/ui/classes/Form).
 
-## Viewer
+### Viewer
 
 Viewing a PDF file in a mobile browser is a pain, because it doesn't display well in an iframe.
 
@@ -228,7 +254,7 @@ The Viewer is a byproduct of the Form development process, but it allows you to 
 Using the Viewer is basically the same as using the Form, except that user cannot edit it.
 
 ```ts
-import { Template, Viewer } from 'pdfme';
+import { Template, Viewer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -241,7 +267,7 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 ![](/website/static/img/viewer.png)
 
-[For more information, please refer to the API documentation of the Viewer class here](/docs/api/classes/Viewer#methods).
+[For more information, please refer to the API documentation of the Viewer class here](https://pdfme.com/docs/api/ui/classes/Viewer).
 
 ## Special Thanks
 

@@ -8,8 +8,8 @@ import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
-import { generate,  Template } from '@pdfme/generator';
-import { Designer, Viewer, Form, } from '@pdfme/ui';
+import { generate, Template } from '@pdfme/generator';
+import { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
 // TODO https://github.com/hand-dot/pdfme-beta をpdfmeに置換する
@@ -107,12 +107,12 @@ export default function Home(): JSX.Element {
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
                 Template
-                <a className="hash-link" href="#template" title="Direct link to heading"></a>
+                <a className="hash-link" href="#template"></a>
               </h2>
               <div className="card-demo">
                 <div className="card">
                   <div className="card__image">
-                    <img src={'/img/template.png'} alt="Image alt text" title="Logo Title Text 1" />
+                    <img src={'/img/template.png'} alt="Image alt text" />
                   </div>
                   <div className="card__body">
                     <h4>A template is made of a basePdf and the schema</h4>
@@ -136,9 +136,8 @@ export default function Home(): JSX.Element {
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
                 Generator
-                <a className="hash-link" href="#generate" title="Direct link to heading"></a>
+                <a className="hash-link" href="#generate"></a>
               </h2>
-              <p style={{ marginBottom: 0 }}>PDF generate example code is like this.</p>
               <div style={{ maxHeight: 580, overflow: 'scroll' }}>
                 <Code
                   code={getGeneratorSampleCode(getSampleTemplate())}
@@ -169,11 +168,11 @@ export default function Home(): JSX.Element {
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="designer"></a>
                 Designer
-                <a className="hash-link" href="#designer" title="Direct link to heading"></a>
+                <a className="hash-link" href="#designer"></a>
               </h2>
               <p>
-                You can easily create a template by using the designer (tool). It supports shortcuts such
-                as Copy, Paste, Undo, Redo, Ruler, and group selection.
+                You can easily create a template by using the designer (tool). It supports shortcuts
+                such as Copy, Paste, Undo, Redo, Ruler, and group selection.
               </p>
             </div>
 
@@ -207,7 +206,7 @@ export default function Home(): JSX.Element {
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="form-viewer"></a>
                 Form / Viewer
-                <a className="hash-link" href="#form-viewer" title="Direct link to heading"></a>
+                <a className="hash-link" href="#form-viewer"></a>
               </h2>
               <div className="card-demo">
                 <div className="card">
@@ -215,7 +214,6 @@ export default function Home(): JSX.Element {
                     <img
                       src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
                       alt="Image alt text"
-                      title="Logo Title Text 1"
                     />
                   </div>
                   <div className="card__body">
@@ -239,8 +237,8 @@ export default function Home(): JSX.Element {
                     <small>
                       {mode === 'form' ? (
                         <div>
-                          You can use a template to generate a form to input.
-                          It needs a moment for the user to input the form and generate a filled Pdf
+                          You can use a template to generate a form to input. It needs a moment for
+                          the user to input the form and generate a filled Pdf
                         </div>
                       ) : (
                         <div>

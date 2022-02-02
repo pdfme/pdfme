@@ -122,7 +122,7 @@ const template: Template = {
 };
 ```
 
-[For more information, please refer to the API documentation of the Template type here](/docs/api/#template).
+[For more information, please refer to the API documentation of the Template type here](/docs/api/common/#template).
 
 You can create a template from [Template Design page](/template-design). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](/docs/getting-started#designer).
 
@@ -158,7 +158,7 @@ You can create a PDF file like the below.
 
 Also, each element in the inputs array corresponds to a page in the PDF, you can create a multi-page PDF file by providing multiple elements of inputs.
 
-[For more information, please refer to the API documentation of the generate function here](/docs/api/#generate).
+[For more information, please refer to the API documentation of the generate function here](/docs/api/generator/#generate).
 
 ## UI
 
@@ -195,7 +195,7 @@ The designer instance can be manipulated with the following methods.
 - `onSaveTemplate`
 - `destroy`
 
-[For more information, please refer to the API documentation of the Designer class here](/docs/api/classes/Designer#methods).
+[For more information, please refer to the API documentation of the Designer class here](/docs/api/ui/classes/Designer).
 
 ### Form
 
@@ -229,7 +229,7 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 });
 ```
 
-[For more information, please refer to the API documentation of the Form class here](/docs/api/classes/Form#methods).
+[For more information, please refer to the API documentation of the Form class here](/docs/api/ui/classes/Form).
 
 ### Viewer
 
@@ -253,7 +253,7 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 ![](/img/viewer.png)
 
-[For more information, please refer to the API documentation of the Viewer class here](/docs/api/classes/Viewer#methods).
+[For more information, please refer to the API documentation of the Viewer class here](/docs/api/ui/classes/Viewer).
 
 ## Special Thanks
 

@@ -37,6 +37,21 @@ const config = {
     [
       'docusaurus-plugin-typedoc',
       {
+        id: 'common',
+        out: 'api/common',
+        readme: 'none',
+        sidebar: {
+          categoryLabel: 'common',
+          position: 2,
+          fullNames: true,
+        },
+        entryPoints: ['../packages/common/src/index.ts'],
+        tsconfig: '../packages/common/tsconfig.json',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
         id: 'generator',
         out: 'api/generator',
         readme: 'none',
@@ -149,10 +164,6 @@ const config = {
               {
                 label: 'Getting Started',
                 to: '/docs/getting-started',
-              },
-              {
-                label: 'API',
-                to: '/docs/api',
               },
             ],
           },
