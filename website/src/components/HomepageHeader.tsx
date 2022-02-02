@@ -18,7 +18,8 @@ export default function HomepageHeader() {
           <div className="col col--6">
             <h1 className="hero__title">{siteConfig.title}</h1>
             <p className="hero__subtitle">
-              A TypeScript based PDF generator library, made with React.<br />
+              A TypeScript based PDF generator library, made with React.
+              <br />
               Open source, developed by the community, and completely free to use under the MIT
               license!
             </p>
@@ -56,12 +57,11 @@ export default function HomepageHeader() {
                 Getting Started
               </Link>
               <span style={{ marginLeft: '1rem', height: 25 }}>
-                {/* TODO 変更する */}
                 <GitHubButton
-                  href="https://github.com/hand-dot/pdfme-beta"
+                  href="https://github.com/pdfme/pdfme"
                   data-size="large"
                   data-show-count={true}
-                  aria-label="Star hand-dot/pdfme-beta on GitHub"
+                  aria-label="Star pdfme on GitHub"
                 >
                   Star
                 </GitHubButton>

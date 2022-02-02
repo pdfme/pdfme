@@ -5,9 +5,9 @@
   "license": "MIT",
   "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
   "homepage": "https://pdfme.com",
-  "repository": "git@github.com:hand-dot/pdfme-beta.git",
+  "repository": "git@github.com:pdfme/pdfme.git",
   "bugs": {
-    "url": "https://github.com/hand-dot/pdfme-beta/issues"
+    "url": "https://github.com/pdfme/pdfme/issues"
   },
   "main": "dist/@pdfme/ui.js",
   "module": "src/index.ts",

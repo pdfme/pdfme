@@ -23,8 +23,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // TODO 変更する
-          editUrl: 'https://github.com/hand-dot/pdfme-beta/tree/main/website/',
+          editUrl: 'https://github.com/pdfme/pdfme/tree/main/website/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -149,7 +148,7 @@ const config = {
             label: 'Help',
           },
           {
-            href: 'https://github.com/hand-dot/pdfme-beta',
+            href: 'https://github.com/pdfme/pdfme',
             label: 'GitHub',
             position: 'right',
           },
@@ -185,7 +184,7 @@ const config = {
             items: [
               {
                 label: 'Github',
-                href: 'https://github.com/hand-dot/pdfme-beta',
+                href: 'https://github.com/pdfme/pdfme',
               },
             ],
           },

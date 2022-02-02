@@ -12,8 +12,6 @@ import { generate, Template } from '@pdfme/generator';
 import { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
-// TODO https://github.com/hand-dot/pdfme-beta をpdfmeに置換する
-
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
 
@@ -314,14 +312,12 @@ export default function Home(): JSX.Element {
                     alignItems: 'center',
                     fontSize: '10pt',
                   }}
-                  href="https://github.com/hand-dot/pdfme-beta"
+                  href="https://github.com/pdfme/pdfme"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <img src={'/img/github-icon.svg'} alt="github" width={25} />
-                  <span style={{ marginLeft: '0.5rem' }}>
-                    https://github.com/hand-dot/pdfme-beta
-                  </span>
+                  <span style={{ marginLeft: '0.5rem' }}>https://github.com/pdfme/pdfme</span>
                 </a>
                 <div
                   style={{
@@ -331,11 +327,11 @@ export default function Home(): JSX.Element {
                 >
                   <div style={{ marginLeft: '0.5rem' }}>
                     <GitHubButton
-                      href="https://github.com/hand-dot/pdfme-beta"
+                      href="https://github.com/pdfme/pdfme"
                       data-size="large"
                       data-icon="octicon-star"
                       data-show-count={true}
-                      aria-label="Star hand-dot/pdfme-beta on GitHub"
+                      aria-label="Star pdfme on GitHub"
                     >
                       Star
                     </GitHubButton>
