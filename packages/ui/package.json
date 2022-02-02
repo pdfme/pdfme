@@ -25,10 +25,6 @@
     "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src"
   },
-  "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
-  },
   "dependencies": {
     "@pdfme/common": "^1.0.0",
     "@scena/react-guides": "^0.16.0",
