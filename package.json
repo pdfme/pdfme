@@ -1,82 +1,50 @@
 {
-  "name": "pdfme",
+  "name": "root",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/pdfme.js",
-  "module": "src/index.ts",
-  "types": "dist/types/index.d.ts",
-  "engines": {
-    "node": ">=14"
-  },
-  "scripts": {
-    "develop": "webpack-dev-server --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
-    "lint": "tsc --noEmit",
-    "doc": "cd website && npm run start",
-    "test": "jest",
-    "clean": "rimraf dist",
-    "lint:watch": "tsc -w --noEmit",
-    "test:watch": "jest --coverage --watch",
-    "prune": "ts-prune src"
-  },
-  "files": [
-    "src",
-    "dist"
-  ],
+  "private": true,
   "author": "hand-dot",
   "license": "MIT",
-  "peerDependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
+  "homepage": "https://pdfme.com",
+  "repository": "git@github.com:hand-dot/pdfme-beta.git",
+  "bugs": {
+    "url": "https://github.com/hand-dot/pdfme-beta/issues"
   },
-  "dependencies": {
-    "@pdf-lib/fontkit": "^1.1.1",
-    "@scena/react-guides": "^0.16.0",
-    "bwip-js": "^3.0.4",
-    "hotkeys-js": "^3.8.7",
-    "pdf-lib": "^1.17.1",
-    "pdfjs-dist": "^2.12.313",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-moveable": "^0.30.3",
-    "react-selecto": "^1.12.0",
-    "react-sortable-hoc": "^2.0.0",
-    "worker-loader": "^3.0.8",
-    "zod": "^3.11.6"
+  "workspaces": [
+    "packages/*",
+    "website"
+  ],
+  "scripts": {
+    "lint": "npm run common:lint && npm run ui:lint && npm run generator:lint",
+    "build": "npm run common:build && npm run ui:build && npm run generator:build",
+    "test": "npm run common:test && npm run ui:test && npm run generator:test",
+    "common:build": "yarn workspace @pdfme/common build",
+    "common:develop": "yarn workspace @pdfme/common develop",
+    "common:lint": "yarn workspace @pdfme/common lint",
+    "common:test": "yarn workspace @pdfme/common test",
+    "generator:build": "yarn workspace @pdfme/generator build",
+    "generator:develop": "yarn workspace @pdfme/generator develop",
+    "generator:lint": "yarn workspace @pdfme/generator lint",
+    "generator:test": "yarn workspace @pdfme/generator test",
+    "ui:build": "yarn workspace @pdfme/ui build",
+    "ui:develop": "yarn workspace @pdfme/ui develop",
+    "ui:lint": "yarn workspace @pdfme/ui lint",
+    "ui:test": "yarn workspace @pdfme/ui test",
+    "website:build": "yarn workspace @pdfme/website build",
+    "website:develop": "yarn workspace @pdfme/website start",
+    "website:lint": "yarn workspace @pdfme/website typecheck"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@types/bwip-js": "^3.0.0",
-    "@types/css-font-loading-module": "^0.0.7",
     "@types/jest": "^27.4.0",
-    "@types/pdfjs-dist": "^2.7.4",
-    "@types/pngjs": "^6.0.1",
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.9",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "babel-loader": "^8.2.2",
-    "buffer": "^6.0.3",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-loader": "^4.0.2",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "html-webpack-plugin": "^5.3.2",
     "jest": "^27.4.7",
-    "jest-canvas-mock": "^2.3.1",
-    "jsqr": "^1.4.0",
-    "mini-css-extract-plugin": "^2.4.6",
-    "node-sass": "^7.0.1",
-    "pdf2json": "^2.0.0",
-    "pngjs": "^6.0.0",
-    "postcss-loader": "^6.1.1",
-    "postcss-prefixer": "^2.1.3",
     "prettier": "^2.3.2",
-    "process": "^0.11.10",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.1.2",
     "ts-loader": "^9.2.5",
@@ -87,33 +55,5 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.7.2"
-  },
-  "jest": {
-    "setupFiles": [
-      "jest-canvas-mock"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/assetsTransformer.js",
-      "\\.(css|scss)$": "<rootDir>/assetsTransformer.js",
-      "\\.(ttf)$": "<rootDir>/fontTransformer.js"
-    },
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "tsx"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest",
-      "^.+\\.tsx$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json"
-      }
-    },
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ]
   }
 }
