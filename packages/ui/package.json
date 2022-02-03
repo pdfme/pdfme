@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "author": "hand-dot",
   "license": "MIT",
   "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
@@ -26,7 +26,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/common": "^1.0.0-beta.1",
+    "@pdfme/common": "^1.0.0-beta.2",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",

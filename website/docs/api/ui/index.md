@@ -9,9 +9,9 @@ custom_edit_url: null
 
 ## Classes
 
-- [Designer](classes/Designer)
-- [Form](classes/Form)
-- [Viewer](classes/Viewer)
+- [Designer](/docs/api/ui/classes/Designer)
+- [Form](/docs/api/ui/classes/Form)
+- [Viewer](/docs/api/ui/classes/Viewer)
 
 ## Type aliases
 
