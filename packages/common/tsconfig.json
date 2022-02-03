@@ -3,6 +3,7 @@
     "noImplicitAny": true,
     "target": "es5",
     "esModuleInterop": true,
+    "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
     "module": "ES2015",

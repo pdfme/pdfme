@@ -1,20 +1,18 @@
 import Designer from './Designer';
 import Form from './Form';
 import Viewer from './Viewer';
-import {
-  BLANK_PDF,
+
+export { Designer, Viewer, Form };
+
+export type {
   Lang,
   Size,
   Alignment,
   SchemaType,
-  schemaTypes,
   BarCodeType,
   TextSchema,
-  isTextSchema,
   ImageSchema,
-  isImageSchema,
   BarcodeSchema,
-  isBarcodeSchema,
   Schema,
   SchemaForUI,
   Font,
@@ -26,9 +24,14 @@ import {
   UIOptions,
   UIProps,
   PreviewProps,
-  PreviewReactProps,
   DesignerProps,
-  DesignerReactProps,
+} from '@pdfme/common';
+
+export {
+  BLANK_PDF,
+  isTextSchema,
+  isImageSchema,
+  isBarcodeSchema,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
@@ -36,42 +39,3 @@ import {
   checkGenerateProps,
   validateBarcodeInput,
 } from '@pdfme/common';
-
-export {
-  Designer,
-  Viewer,
-  Form,
-  BLANK_PDF,
-  Lang,
-  Size,
-  Alignment,
-  SchemaType,
-  schemaTypes,
-  BarCodeType,
-  TextSchema,
-  isTextSchema,
-  ImageSchema,
-  isImageSchema,
-  BarcodeSchema,
-  isBarcodeSchema,
-  Schema,
-  SchemaForUI,
-  Font,
-  BasePdf,
-  Template,
-  CommonProps,
-  GeneratorOptions,
-  GenerateProps,
-  UIOptions,
-  UIProps,
-  PreviewProps,
-  PreviewReactProps,
-  DesignerProps,
-  DesignerReactProps,
-  checkTemplate,
-  checkUIProps,
-  checkPreviewProps,
-  checkDesignerProps,
-  checkGenerateProps,
-  validateBarcodeInput,
-};

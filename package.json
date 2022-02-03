@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "private": true,
   "author": "hand-dot",
   "license": "MIT",
@@ -15,29 +15,11 @@
     "website"
   ],
   "scripts": {
-    "clean": "npm run common:clean && npm run ui:clean && npm run generator:clean",
-    "lint": "npm run common:lint && npm run ui:lint && npm run generator:lint",
-    "build": "npm run clean && npm run common:build && npm run ui:build && npm run generator:build",
-    "test": "npm run common:test && npm run ui:test && npm run generator:test",
-    "common:clean": "yarn workspace @pdfme/common clean",
-    "common:build": "yarn workspace @pdfme/common build",
-    "common:develop": "yarn workspace @pdfme/common develop",
-    "common:lint": "yarn workspace @pdfme/common lint",
-    "common:test": "yarn workspace @pdfme/common test",
-    "generator:clean": "yarn workspace @pdfme/generator clean",
-    "generator:build": "yarn workspace @pdfme/generator build",
-    "generator:develop": "yarn workspace @pdfme/generator develop",
-    "generator:lint": "yarn workspace @pdfme/generator lint",
-    "generator:test": "yarn workspace @pdfme/generator test",
-    "ui:clean": "yarn workspace @pdfme/ui clean",
-    "ui:build": "yarn workspace @pdfme/ui build",
-    "ui:develop": "yarn workspace @pdfme/ui develop",
-    "ui:lint": "yarn workspace @pdfme/ui lint",
-    "ui:test": "yarn workspace @pdfme/ui test",
-    "website:clean": "yarn workspace @pdfme/website clear",
-    "website:build": "yarn workspace @pdfme/website build",
-    "website:develop": "yarn workspace @pdfme/website start",
-    "website:lint": "yarn workspace @pdfme/website typecheck"
+    "clean": "yarn workspaces foreach --no-private run clean",
+    "lint": "yarn workspaces foreach --no-private run lint",
+    "build": "yarn workspaces foreach --no-private run build",
+    "test": "yarn workspaces foreach --no-private run test",
+    "prerelease-publish": "npm run clean && npm run build && yarn workspaces foreach version prerelease && yarn workspaces foreach --no-private npm publish"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
@@ -60,5 +42,7 @@
     "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.8.0",
     "webpack-dev-server": "^4.7.2"
-  }
+  },
+  "packageManager": "yarn@3.1.1",
+  "stableVersion": "1.0.0-beta.3"
 }

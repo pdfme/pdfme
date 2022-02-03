@@ -27,20 +27,21 @@ import {
   DesignerReactProps,
 } from './schema';
 
+type CommonSchema = z.infer<typeof _CommonSchema>;
+export const schemaTypes = _schemaTypes;
+export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
+export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
+export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>
+  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
+
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;
 export type Alignment = z.infer<typeof Alignment>;
 export type SchemaType = z.infer<typeof SchemaType>;
-export const schemaTypes = _schemaTypes;
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 export type TextSchema = z.infer<typeof TextSchema>;
-type CommonSchema = z.infer<typeof _CommonSchema>;
-export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
 export type ImageSchema = z.infer<typeof ImageSchema>;
-export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
 export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
-export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>
-  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
 export type Schema = z.infer<typeof Schema>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;
 export type Font = z.infer<typeof Font>;

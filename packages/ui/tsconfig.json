@@ -4,6 +4,7 @@
     "target": "es5",
     "jsx": "react",
     "esModuleInterop": true,
+    "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
     "module": "ES2015",
