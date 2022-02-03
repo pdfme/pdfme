@@ -32,8 +32,7 @@ const config = {
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: `${pkg.name}.js`,
-    libraryTarget: 'umd',
+    filename: 'index.js',
     globalObject: 'this',
     library: {
       name: pkg.name,

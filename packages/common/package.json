@@ -9,7 +9,7 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/@pdfme/common.js",
+  "main": "dist/index.js",
   "module": "src/index.ts",
   "types": "dist/types/index.d.ts",
   "engines": {

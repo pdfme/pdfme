@@ -9,7 +9,7 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/@pdfme/ui.js",
+  "main": "dist/index.js",
   "module": "src/index.ts",
   "types": "dist/types/index.d.ts",
   "engines": {
@@ -26,7 +26,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/common": "^1.0.0-beta.2",
+    "@pdfme/common": "^1.0.0-beta",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",
