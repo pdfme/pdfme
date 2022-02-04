@@ -35,7 +35,6 @@ const config = {
     filename: 'index.js',
     globalObject: 'this',
     library: {
-      name: pkg.name,
       type: 'umd',
     },
   },

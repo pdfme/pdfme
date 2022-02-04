@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.7",
   "author": "hand-dot",
   "license": "MIT",
   "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
@@ -11,12 +11,12 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "types": "dist/types/ui/src/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "webpack-dev-server --mode development",
+    "develop": "webpack --watch --mode development",
     "build": "NODE_ENV=production webpack --mode production",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
@@ -26,7 +26,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/common": "^1.0.0-beta.5",
+    "@pdfme/common": "^1.0.0-beta.7",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",
@@ -46,7 +46,6 @@
     "@types/react-dom": "^17.0.9",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "html-webpack-plugin": "^5.3.2",
     "jest-canvas-mock": "^2.3.1",
     "process": "^0.11.10"
   },
@@ -79,6 +78,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "stableVersion": "1.0.0-beta.4"
+  }
 }

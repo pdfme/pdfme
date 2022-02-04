@@ -1,6 +1,2 @@
 __tests__/**
-dist/Designer.html
-dist/Form.html
-dist/Viewer.html
-public/**
 .DS_Store

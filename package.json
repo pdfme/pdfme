@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "1.0.0-beta.4",
+  "version": "1.0.0-beta.6",
   "private": true,
   "author": "hand-dot",
   "license": "MIT",
@@ -11,15 +11,14 @@
     "url": "https://github.com/pdfme/pdfme/issues"
   },
   "workspaces": [
-    "packages/*",
-    "website"
+    "packages/*"
   ],
   "scripts": {
     "clean": "yarn workspaces foreach --no-private run clean",
     "lint": "yarn workspaces foreach --no-private run lint",
     "build": "yarn workspaces foreach --no-private run build",
     "test": "yarn workspaces foreach --no-private run test",
-    "prerelease-publish": "npm run clean && npm run build && yarn workspaces foreach version prerelease && yarn workspaces foreach --no-private npm publish"
+    "prerelease-publish": "npm run clean && npm run build && yarn workspaces foreach version prerelease && yarn workspaces foreach version apply && yarn workspaces foreach --no-private npm publish"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
@@ -40,9 +39,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.51.1",
     "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.8.0",
-    "webpack-dev-server": "^4.7.2"
+    "webpack-cli": "^4.8.0"
   },
-  "packageManager": "yarn@3.1.1",
-  "stableVersion": "1.0.0-beta.3"
+  "packageManager": "yarn@3.1.1"
 }

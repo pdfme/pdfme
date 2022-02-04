@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/generator",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.7",
   "author": "hand-dot",
   "license": "MIT",
   "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
@@ -11,12 +11,12 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "types": "dist/types/generator/src/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "webpack-dev-server --mode development",
+    "develop": "webpack --watch --mode development",
     "build": "NODE_ENV=production webpack --mode production",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
-    "@pdfme/common": "^1.0.0-beta.5",
+    "@pdfme/common": "^1.0.0-beta.7",
     "bwip-js": "^3.0.4",
     "pdf-lib": "^1.17.1"
   },
@@ -60,6 +60,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "stableVersion": "1.0.0-beta.4"
+  }
 }

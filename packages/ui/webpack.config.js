@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const pkg = require('./package.json');
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -28,31 +27,14 @@ const config = {
       banner: BANNER,
       entryOnly: true,
     }),
-    new HtmlWebpackPlugin({
-      template: './public/Designer.html',
-      filename: 'Designer.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './public/Viewer.html',
-      filename: 'Viewer.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: './public/Form.html',
-      filename: 'Form.html',
-    }),
   ],
   devtool: 'source-map',
-  devServer: {
-    historyApiFallback: false,
-    host: '0.0.0.0',
-  },
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
     globalObject: 'this',
     library: {
-      name: pkg.name,
       type: 'umd',
     },
   },

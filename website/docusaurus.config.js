@@ -33,51 +33,51 @@ const config = {
     ],
   ],
   plugins: [
-    // [
-    //   'docusaurus-plugin-typedoc',
-    //   {
-    //     id: 'common',
-    //     out: 'api/common',
-    //     readme: 'none',
-    //     sidebar: {
-    //       categoryLabel: 'common',
-    //       position: 2,
-    //       fullNames: true,
-    //     },
-    //     entryPoints: ['../packages/common/src/index.ts'],
-    //     tsconfig: '../packages/common/tsconfig.json',
-    //   },
-    // ],
-    // [
-    //   'docusaurus-plugin-typedoc',
-    //   {
-    //     id: 'generator',
-    //     out: 'api/generator',
-    //     readme: 'none',
-    //     sidebar: {
-    //       categoryLabel: 'generator',
-    //       position: 3,
-    //       fullNames: true,
-    //     },
-    //     entryPoints: ['../packages/generator/src/index.ts'],
-    //     tsconfig: '../packages/generator/tsconfig.json',
-    //   },
-    // ],
-    // [
-    //   'docusaurus-plugin-typedoc',
-    //   {
-    //     id: 'ui',
-    //     out: 'api/ui',
-    //     readme: 'none',
-    //     sidebar: {
-    //       categoryLabel: 'ui',
-    //       position: 4,
-    //       fullNames: true,
-    //     },
-    //     entryPoints: ['../packages/ui/src/index.ts'],
-    //     tsconfig: '../packages/ui/tsconfig.json',
-    //   },
-    // ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        id: 'common',
+        out: 'api/common',
+        readme: 'none',
+        sidebar: {
+          categoryLabel: 'common',
+          position: 2,
+          fullNames: true,
+        },
+        entryPoints: ['../packages/common/src/index.ts'],
+        tsconfig: '../packages/common/tsconfig.json',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        id: 'generator',
+        out: 'api/generator',
+        readme: 'none',
+        sidebar: {
+          categoryLabel: 'generator',
+          position: 3,
+          fullNames: true,
+        },
+        entryPoints: ['../packages/generator/src/index.ts'],
+        tsconfig: '../packages/generator/tsconfig.json',
+      },
+    ],
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        id: 'ui',
+        out: 'api/ui',
+        readme: 'none',
+        sidebar: {
+          categoryLabel: 'ui',
+          position: 4,
+          fullNames: true,
+        },
+        entryPoints: ['../packages/ui/src/index.ts'],
+        tsconfig: '../packages/ui/tsconfig.json',
+      },
+    ],
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',

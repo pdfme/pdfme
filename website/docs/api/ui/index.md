@@ -9,9 +9,9 @@ custom_edit_url: null
 
 ## Classes
 
-- [Designer](/docs/api/ui/classes/Designer)
-- [Form](/docs/api/ui/classes/Form)
-- [Viewer](/docs/api/ui/classes/Viewer)
+- [Designer](classes/Designer.md)
+- [Form](classes/Form.md)
+- [Viewer](classes/Viewer.md)
 
 ## Type aliases
 
@@ -21,7 +21,7 @@ custom_edit_url: null
 
 #### Defined in
 
-common/dist/types/type.d.ts:5
+common/dist/types/type.d.ts:44
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:8
+common/dist/types/type.d.ts:46
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:39
+common/dist/types/type.d.ts:49
 
 ___
 
@@ -72,16 +72,6 @@ ___
 #### Defined in
 
 common/dist/types/type.d.ts:62
-
-___
-
-### DesignerReactProps
-
-Ƭ **DesignerReactProps**: `z.infer`<typeof `DesignerReactProps`\>
-
-#### Defined in
-
-common/dist/types/type.d.ts:63
 
 ___
 
@@ -121,7 +111,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:28
+common/dist/types/type.d.ts:48
 
 ___
 
@@ -131,7 +121,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:3
+common/dist/types/type.d.ts:42
 
 ___
 
@@ -142,16 +132,6 @@ ___
 #### Defined in
 
 common/dist/types/type.d.ts:60
-
-___
-
-### PreviewReactProps
-
-Ƭ **PreviewReactProps**: `z.infer`<typeof `PreviewReactProps`\>
-
-#### Defined in
-
-common/dist/types/type.d.ts:61
 
 ___
 
@@ -181,7 +161,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:6
+common/dist/types/type.d.ts:45
 
 ___
 
@@ -191,7 +171,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:4
+common/dist/types/type.d.ts:43
 
 ___
 
@@ -211,7 +191,7 @@ ___
 
 #### Defined in
 
-common/dist/types/type.d.ts:9
+common/dist/types/type.d.ts:47
 
 ___
 
@@ -242,16 +222,6 @@ common/dist/types/type.d.ts:59
 #### Defined in
 
 common/dist/types/constants.d.ts:6
-
-___
-
-### schemaTypes
-
-• **schemaTypes**: readonly [``"text"``, ``"image"``, ``"qrcode"``, ``"japanpost"``, ``"ean13"``, ``"ean8"``, ``"code39"``, ``"code128"``, ``"nw7"``, ``"itf14"``, ``"upca"``, ``"upce"``]
-
-#### Defined in
-
-common/dist/types/type.d.ts:7
 
 ## Functions
 
@@ -378,7 +348,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/type.d.ts:40
+common/dist/types/type.d.ts:32
 
 ___
 
@@ -405,7 +375,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/type.d.ts:29
+common/dist/types/type.d.ts:22
 
 ___
 
@@ -432,7 +402,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/type.d.ts:11
+common/dist/types/type.d.ts:5
 
 ___
 
