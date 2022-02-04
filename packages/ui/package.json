@@ -10,7 +10,7 @@
     "url": "https://github.com/pdfme/pdfme/issues"
   },
   "main": "dist/index.js",
-  "module": "src/index.ts",
+  "module": "dist/index.js",
   "types": "dist/types/ui/src/index.d.ts",
   "engines": {
     "node": ">=14"
