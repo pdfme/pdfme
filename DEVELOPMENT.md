@@ -1,15 +1,41 @@
-<!-- TODO translate -->
-npm link を使って ローカルでの開発を行なってください
-そのため packages/generator, packages/ui で npm link をしてください。
-そして、packages/common, packages/generator, packages/ui で npm run develop を行い、
-変更があれば distフォルダに出力されるようにします。
+Clone the repository , install dependency and use `npm link` for local development.  
+For this purpose, please do `npm link` in `packages/generator` and `packages/ui`.
 
-変更を確認するには 例えば npx create-react-app my-app で適当なアプリケーションを作成し、
-上記でnpm linkした packages/generator, packages/uiを  my-app に結びつけてください
-(!!これらを同時にlinkすることができない問題がある)
-npm link @pdfme/generator @pdfme/ui
+```cmd
+[in pdfme dir] $ npm i
+[in pdfme/packages/ui dir] $ npm link
+[in pdfme/packages/generator dir] $ npm link
+```
 
-npm ls で下記のように確認できます。
+Then, run `npm run develop` on `packages/common`, `packages/generator`, and `packages/ui`, and
+Make sure that any changes are output to the each packages's `dist` folder.
+
+```cmd
+[in pdfme/packages/common dir] $ npm run develop
+[in pdfme/packages/ui dir] $ npm run develop
+[in pdfme/packages/generator dir] $ npm run develop
+```
+
+To confirm the changes, for example, create a React application with `npx create-react-app my-app` in other folder and
+Install `@pdfme/generator` and `@pdfme/ui` with the following command.
+
+```cmd
+[in my-app dir] $ npm install --save @pdfme/generator @pdfme/ui
+```
+
+In addition, connect `packages/generator` and `packages/ui`, which you npm linked above, to my-app with the following command
+
+```cmd
+[in my-app dir] $ npm link @pdfme/generator @pdfme/ui
+```
+
+> If you don't want to prepare my-app by yourself, you can clone the following repository and use npm link @pdfme/generator @pdfme/ui to develop it.  
+> https://github.com/pdfme/pdfme-playground
+
+You can use `npm ls` to check if the `npm link` is configured correctly as follows.
+
+```cmd
+[in my-app dir] $ npm ls
 my-app@0.1.0 /Users/user/my-app
 ├── @pdfme/generator@npm:generator@1.0.0-beta.7 extraneous -> ./../../../pdfme/packages/generator
 ├── @pdfme/ui@npm:ui@1.0.0-beta.7 extraneous -> ./../../../pdfme/packages/ui
@@ -20,8 +46,8 @@ my-app@0.1.0 /Users/user/my-app
 ├── react-scripts@5.0.0
 ├── react@17.0.2
 └── web-vitals@2.1.4
+```
 
-これで packages/common, packages/generator, packages/ui の変更がmy-appで使用している
-@pdfme/generator, @pdfme/ui に反映されます。
+Now, changes in `packages/common`, `packages/generator`, and `packages/ui` will be reflected in my-app's @pdfme/generator and @pdfme/ui.
 
-my-appでnpm run start して、 packages/uiや@pdfme/generatorを書き換えれば my-appで変更を確認することができます
+If you run npm run start on my-app and rewrite `packages/common`, `packages/generator`, and `packages/ui`, you can confirm the changes on my-app
