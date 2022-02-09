@@ -170,7 +170,8 @@ export default function Home(): JSX.Element {
               </h2>
               <p>
                 You can easily create a template by using the designer (tool). It supports shortcuts
-                such as Copy, Paste, Undo, Redo, Ruler, and group selection.
+                such as <code>Copy</code>, <code>Paste</code>, <code>Undo</code>, <code>Redo</code>,{' '}
+                <code>Ruler</code>, and group selection.
               </p>
             </div>
 
@@ -294,7 +295,6 @@ export default function Home(): JSX.Element {
         </div>
         <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <img width={100} src={'/img/logo-mini2.png'} />
             <div style={{ width: 'fit-content' }}>
               <div style={{ display: 'flex', maxWidth: 400 }}>
                 <img src={'/img/please-star.png'} alt="pleaseStar" />

@@ -52,21 +52,21 @@ export default function HomepageHeader() {
           </div>
         </div>
         <div className="row row--no-gutters" style={{ alignItems: 'center' }}>
-          <div className="col col--2" style={{ marginTop: '1rem' }}>
-            <Link className="button button--success " to="/docs/getting-started">
+          <div className="col col--3" style={{ marginTop: '1rem' }}>
+            <Link className="button button--lg button--success " to="/docs/getting-started">
               Getting Started
             </Link>
           </div>
-          <div className="col col--2" style={{ marginTop: '1rem' }}>
+          <div className="col col--3" style={{ marginTop: '1rem' }}>
             <a
-              className="button button--info "
-              href="https://codesandbox.io/embed/github/pdfme/pdfme-playground/tree/main/?fontsize=14&hidenavigation=1&module=%2Fsrc%2FDesigner.tsx&theme=dark"
+              className="button button--lg button--info "
+              href="https://codesandbox.io/embed/github/pdfme/pdfme-playground/tree/main/?module=%2Fsrc%2FDesigner.tsx"
               target={'_blank'}
             >
               Playground
             </a>
           </div>
-          <div className="col col--8" style={{ height: 25, marginTop: '1rem' }}>
+          <div className="col col--6" style={{ height: 25, marginTop: '1rem' }}>
             <GitHubButton
               href="https://github.com/pdfme/pdfme"
               data-size="large"
