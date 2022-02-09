@@ -36,27 +36,20 @@ export interface InputImageCache {
   [key: string]: PDFImage;
 }
 
-export const createBarCode = async ({
-  type,
-  input,
-  width,
-  height,
-  backgroundColor,
-}: {
+const barCodeType2Bcid = (type: BarCodeType) => (type === 'nw7' ? 'rationalizedCodabar' : type);
+export const createBarCode = async (arg: {
   type: BarCodeType;
   input: string;
   width: number;
   height: number;
   backgroundColor?: string;
 }): Promise<Buffer> => {
-  const bwipjsArg: ToBufferOptions = {
-    bcid: type === 'nw7' ? 'rationalizedCodabar' : type,
-    text: input,
-    scale: 5,
-    width,
-    height,
-    includetext: true,
-  };
+  const { type, input, width, height, backgroundColor } = arg;
+  const bcid = barCodeType2Bcid(type);
+  const includetext = true;
+  const scale = 5;
+  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
+
   if (backgroundColor) {
     bwipjsArg.backgroundcolor = backgroundColor;
   }

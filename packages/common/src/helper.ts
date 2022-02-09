@@ -40,13 +40,18 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
   return basePdf as string;
 };
 
+const getByteString = (base64: string) => {
+  if (typeof window !== 'undefined' && window.atob) {
+    return window.atob(base64);
+  } else {
+    return Buffer.from(base64, 'base64').toString('binary');
+  }
+};
+
 export const b64toUint8Array = (base64: string) => {
   const data = base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64;
 
-  const byteString =
-    typeof window !== 'undefined'
-      ? window.atob(data)
-      : Buffer.from(data, 'base64').toString('binary');
+  const byteString = getByteString(data);
 
   const unit8arr = new Uint8Array(byteString.length);
   for (let i = 0; i < byteString.length; i += 1) {
