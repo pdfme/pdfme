@@ -81,43 +81,16 @@ const config = {
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',
-        configureWebpack(config, isServer) {
-          const fontRule = config.module.rules.find(
-            (r) => r.test.toString() === /\.(woff|woff2|eot|ttf|otf)$/.toString()
-          );
-          // Remove ttf rule
-          fontRule.test = /\.(woff|woff2|eot|otf)$/;
-
+        configureWebpack() {
           const newConfig = {
             plugins: [
               new webpack.ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
                 process: 'process/browser',
+                atob: 'atob',
               }),
             ],
-            module: {
-              rules: [
-                // Add ttf rule. Because we use Helvetica.ttf as data from src/libs/helper #getDefaultFont.
-                {
-                  test: /\.ttf$/,
-                  use: ['url-loader'],
-                },
-                // Add svg rule for src/
-                {
-                  test: /\.svg$/,
-                  use: ['url-loader'],
-                },
-              ],
-            },
           };
-          if (isServer) {
-            newConfig.resolve = {
-              alias: {
-                canvas: false,
-              },
-            };
-          }
-
           return newConfig;
         },
       };
