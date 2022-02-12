@@ -6,6 +6,5 @@ dist
 coverage/
 .yarn/cache/
 .yarn/install-state.gz
-.yarn/plugins/
 .yarn/versions/
 __tests__/assets/pdfs/tmp/*.pdf
