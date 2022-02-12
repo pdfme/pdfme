@@ -9,7 +9,8 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
-import bwipjs, { ToBufferOptions } from 'bwip-js';
+import bwipjsNode from 'bwip-js/dist/node-bwipjs';
+import bwipjsBrowser from 'bwip-js/dist/bwip-js';
 import {
   getB64BasePdf,
   b64toUint8Array,
@@ -48,7 +49,7 @@ export const createBarCode = async (arg: {
   const bcid = barCodeType2Bcid(type);
   const includetext = true;
   const scale = 5;
-  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
+  const bwipjsArg: any = { bcid, text: input, width, height, scale, includetext };
 
   if (backgroundColor) {
     bwipjsArg.backgroundcolor = backgroundColor;
@@ -56,13 +57,14 @@ export const createBarCode = async (arg: {
 
   let res: Buffer;
 
-  if (typeof window !== 'undefined' && bwipjs.toCanvas) {
+  if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
-    bwipjs.toCanvas(canvas, bwipjsArg);
+    bwipjsBrowser;
+    bwipjsBrowser.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = b64toUint8Array(dataUrl).buffer as Buffer;
   } else {
-    res = await bwipjs.toBuffer(bwipjsArg);
+    res = await bwipjsNode.toBuffer(bwipjsArg);
   }
 
   return res;

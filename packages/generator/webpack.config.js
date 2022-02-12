@@ -1,4 +1,5 @@
 const path = require('path');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const pkg = require('./package.json');
@@ -19,6 +20,7 @@ const config = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
+    new NodePolyfillPlugin(),
     new webpack.BannerPlugin({
       banner: BANNER,
       entryOnly: true,
