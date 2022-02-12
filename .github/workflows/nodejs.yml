@@ -17,14 +17,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: yarn
-      - run: npm run common:lint
-      - run: npm run generator:lint
-      - run: npm run ui:lint
-      - run: npm run common:build
-      - run: npm run generator:build
-      - run: npm run ui:build
-      - run: npm run common:test
-      - run: npm run generator:test
-      - run: npm run ui:test
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run test
         env:
           CI: true
