@@ -4,5 +4,8 @@ node_modules
 .cache
 dist
 coverage/
-.yarn/
+.yarn/cache/
+.yarn/install-state.gz
+.yarn/plugins/
+.yarn/versions/
 __tests__/assets/pdfs/tmp/*.pdf

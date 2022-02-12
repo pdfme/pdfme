@@ -37,10 +37,8 @@ export const TextSchema = CommonSchema.extend({
 });
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
-type ImageSchema = z.infer<typeof ImageSchema>;
 
 export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
-type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 
 export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
