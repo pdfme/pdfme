@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "target": "es5",
+    "target": "ES2015",
     "jsx": "react",
     "esModuleInterop": true,
     "isolatedModules": true,

@@ -17,11 +17,10 @@
     "packages/*"
   ],
   "scripts": {
-    "clean": "yarn workspaces foreach --no-private run clean",
-    "lint": "yarn workspaces foreach --no-private run lint",
-    "build": "yarn workspaces foreach --no-private run build",
-    "test": "yarn workspaces foreach --no-private run test",
-    "prerelease-publish": "npm run clean && npm run build && yarn workspaces foreach version prerelease && yarn workspaces foreach version apply && yarn workspaces foreach --no-private npm publish"
+    "clean": "npm run --workspaces clean",
+    "lint": "npm run --workspaces lint",
+    "build": "npm run --workspaces build",
+    "test": "npm run --workspaces test"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",

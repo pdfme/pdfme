@@ -2,7 +2,8 @@ Clone the repository , install dependency and use `npm link` for local developme
 For this purpose, please do `npm link` in `packages/generator` and `packages/ui`.
 
 ```cmd
-[in pdfme dir] $ npm i
+[in pdfme dir] $ npm install
+[in pdfme dir] $ npm run build
 [in pdfme/packages/ui dir] $ npm link
 [in pdfme/packages/generator dir] $ npm link
 ```
