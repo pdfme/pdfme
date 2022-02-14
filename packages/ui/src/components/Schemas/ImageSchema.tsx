@@ -26,12 +26,13 @@ const FilledImage = ({ editable, tabIndex, schema, onChange }: Omit<Props, 'plac
           cursor: 'pointer',
           borderRadius: 2,
           border: '1px solid #767676',
-          height: 29,
+          height: 20,
+          width: 20,
         }}
         aria-label="close"
         onClick={() => onChange('')}
       >
-        <img src={closeIcon} alt="Close icon" width={15} />
+        <img src={closeIcon} alt="Close icon" width={10} />
       </button>
     )}
     <img

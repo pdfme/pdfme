@@ -59,7 +59,7 @@ const ColorInputSet = (props: {
             cursor: 'pointer',
           }}
         >
-          <img src={closeIcon} width={15} alt="Close icon" />
+          <img src={closeIcon} width={10} alt="Close icon" />
         </button>
       </div>
     </div>

@@ -28,14 +28,15 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
                   cursor: 'pointer',
                   borderRadius: 2,
                   border: '1px solid #767676',
-                  height: 29,
+                  height: 20,
+                  width: 20,
                 }}
                 aria-label="close"
                 onClick={() =>
                   changeSchemas([{ key: 'data', value: '', schemaId: activeSchema.id }])
                 }
               >
-                <img src={closeIcon} alt="Close icon" width={15} />
+                <img src={closeIcon} alt="Close icon" width={10} />
               </button>
               <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
             </div>
