@@ -18,11 +18,12 @@ export default function HomepageHeader() {
           <div className="col col--6">
             <h1 className="hero__title">{siteConfig.title}</h1>
             <p className="hero__subtitle">
-              A TypeScript based PDF generator library, made with React.
+              A PDF generator library fully written in TypeScript coming with a React based UI template editor*.
               <br />
               Open source, developed by the community, and completely free to use under the MIT
               license!
             </p>
+            <strong>* The generator library and the UI editor can be used separately.</strong>
             <div className="admonition admonition-caution alert alert--warning">
               <div className="admonition-heading">
                 <h5>
