@@ -13,19 +13,19 @@ const FeatureList: FeatureItem[] = [
     title: 'A fast PDF Generator',
     description: (
       <>
-        No complex operations are needed. Just use templates to generate PDFs.
+        No complex operations are required. Just bring your favorite template and generate all the PDFs you need.
         Works on node and the browser. 
       </>
     ),
   },
   {
-    title: 'An easy PDF template editor',
-    description: <>Anyone can easily create templates with the designer (tool).</>,
+    title: 'Designer, an easy to use PDF template editor',
+    description: <>Anyone can easily create and modify templates using Designer (UI template editor).</>,
   },
   {
     title: 'Templates as structured JSON Data',
     description: (
-      <>Templates are JSON data that are easy to understand and handle.</>
+      <>Templates have a JSON document representation, which makes theme easy to understand and easy to work with.</>
     ),
   },
 ];

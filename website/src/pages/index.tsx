@@ -113,10 +113,10 @@ export default function Home(): JSX.Element {
                     <img src={'/img/template.png'} alt="Image alt text" />
                   </div>
                   <div className="card__body">
-                    <h4>A template is made of a basePdf and the schema</h4>
+                    <h4>A template is composed by a basePdf and a Schema</h4>
                     <small>
-                      Templates are the core data structure of pdfme. Once a template is created, it
-                      is reusable within the generator, the form, and the viewer.
+                      Templates are at the core of pdfme. In fact a template can be used with the
+                      Generator, the Form, and the Viewer.
                     </small>
                   </div>
                   <div className="card__footer">
@@ -169,9 +169,9 @@ export default function Home(): JSX.Element {
                 <a className="hash-link" href="#designer"></a>
               </h2>
               <p>
-                You can easily create a template by using the designer (tool). It supports shortcuts
-                such as <code>Copy</code>, <code>Paste</code>, <code>Undo</code>, <code>Redo</code>,{' '}
-                <code>Ruler</code>, and group selection.
+                A template can be easily created using Designer (UI template editor). It supports
+                shortcuts such as <code>Copy</code>, <code>Paste</code>, <code>Undo</code>,{' '}
+                <code>Redo</code>, <code>Ruler</code>, and group selection.
               </p>
             </div>
 
@@ -186,7 +186,7 @@ export default function Home(): JSX.Element {
             <div className={clsx('col col--12 margin-vert--lg')}>
               <div className="text--center">
                 <p>
-                  It's easy to integrate with your app.
+                  It's easy to integrate with an external app.
                   <br />
                 </p>
                 <Link
@@ -236,16 +236,15 @@ export default function Home(): JSX.Element {
                     <small>
                       {mode === 'form' ? (
                         <div>
-                          You can use a template to generate a form to input. It needs a moment for
-                          the user to input the form and generate a filled Pdf
+                          Starting from a template you can generate a fillable form. Then you will
+                          need a few seconds to generate a Pdf
                         </div>
                       ) : (
                         <div>
-                          You can use a template to generate a viewer for the user to check the
-                          input.
+                          You can always check the filled content by using the Viewer.
                           <br />
-                          Mobile browsers cannot check PDFs in an iframe, but you can easily achieve
-                          this by using a viewer.
+                          Mobile browsers doesn't allow a user to view a PDF from an iframe, for
+                          this reason the Viewer is the perfect solution for mobile users.
                         </div>
                       )}
                     </small>
