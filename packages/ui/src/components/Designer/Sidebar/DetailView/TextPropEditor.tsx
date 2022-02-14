@@ -4,9 +4,20 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
+  DEFAULT_FONT_COLOR,
 } from '@pdfme/common';
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
+import closeIcon from '../../../../assets/icons/close.svg';
+
+const inputStyle = {
+  width: '90%',
+  color: '#333',
+  background: 'none',
+  borderRadius: 2,
+  border: '1px solid #767676',
+};
+const selectStyle = inputStyle;
 
 const NumberInputSet = (props: {
   width: string;
@@ -19,7 +30,7 @@ const NumberInputSet = (props: {
   return (
     <div style={{ width }}>
       <label>{label}</label>
-      <input style={{ width: '100%' }} onChange={onChange} value={value} type="number" />
+      <input style={inputStyle} onChange={onChange} value={value} type="number" />
     </div>
   );
 };
@@ -36,8 +47,20 @@ const ColorInputSet = (props: {
     <div style={{ width: '45%' }}>
       <label>{label}</label>
       <div style={{ display: 'flex' }}>
-        <input onChange={onChange} value={value} type="color" style={{ width: '100%' }} />
-        <button onClick={onClear}>X</button>
+        <input onChange={onChange} value={value || '#ffffff'} type="color" style={inputStyle} />
+        <button
+          onClick={onClear}
+          style={{
+            display: 'flex',
+            background: 'none',
+            alignItems: 'center',
+            borderRadius: 2,
+            border: '1px solid #767676',
+            cursor: 'pointer',
+          }}
+        >
+          <img src={closeIcon} width={10} alt="Close icon" />
+        </button>
       </div>
     </div>
   );
@@ -54,7 +77,7 @@ const SelectSet = (props: {
   return (
     <div style={{ width: '45%' }}>
       <label>{label}:</label>
-      <select style={{ width: '100%' }} onChange={onChange} value={value}>
+      <select style={selectStyle} onChange={onChange} value={value}>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -80,6 +103,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          marginBottom: '0.25rem',
         }}
       >
         <SelectSet
@@ -105,6 +129,7 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          marginBottom: '0.25rem',
         }}
       >
         <NumberInputSet
@@ -154,7 +179,9 @@ const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchem
             changeSchemas([{ key: 'fontColor', value: e.target.value, schemaId: activeSchema.id }])
           }
           onClear={() =>
-            changeSchemas([{ key: 'fontColor', value: '', schemaId: activeSchema.id }])
+            changeSchemas([
+              { key: 'fontColor', value: DEFAULT_FONT_COLOR, schemaId: activeSchema.id },
+            ])
           }
         />
 

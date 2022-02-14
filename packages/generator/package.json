@@ -35,6 +35,7 @@
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
+    "@types/bwip-js": "^3.0.0",
     "@types/pngjs": "^6.0.1",
     "jsqr": "^1.4.0",
     "node-polyfill-webpack-plugin": "^1.1.4",

@@ -50,7 +50,7 @@ const ErrorBarcode = () => (
         padding: '0.25rem',
         fontSize: '12pt',
         fontWeight: 'bold',
-        borderRadius: 3,
+        borderRadius: 2,
       }}
     >
       ERROR
@@ -90,7 +90,8 @@ const BarcodeSchemaUI = (
           textAlign: 'center',
           position: 'absolute',
           zIndex: 2,
-          fontSize: 'inherit',
+          fontSize: '1rem',
+          color: '#000',
           height: Number(schema.height) * ZOOM,
           width: Number(schema.width) * ZOOM,
           background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',

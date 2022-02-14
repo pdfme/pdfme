@@ -10,7 +10,7 @@ const buttonWrapStyle: React.CSSProperties = {
   top: '45%',
   zIndex: 1,
   backgroundColor: '#777777bd',
-  borderRadius: 3,
+  borderRadius: 2,
   padding: '0.5rem',
   display: 'flex',
   alignItems: 'center',

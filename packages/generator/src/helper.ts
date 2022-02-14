@@ -9,6 +9,7 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
+import { ToBufferOptions } from "bwip-js";
 import bwipjsNode from 'bwip-js/dist/node-bwipjs';
 import bwipjsBrowser from 'bwip-js/dist/bwip-js';
 import {
@@ -49,7 +50,7 @@ export const createBarCode = async (arg: {
   const bcid = barCodeType2Bcid(type);
   const includetext = true;
   const scale = 5;
-  const bwipjsArg: any = { bcid, text: input, width, height, scale, includetext };
+  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
 
   if (backgroundColor) {
     bwipjsArg.backgroundcolor = backgroundColor;

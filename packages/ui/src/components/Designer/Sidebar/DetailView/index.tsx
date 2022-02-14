@@ -14,7 +14,7 @@ const DetailView = (
   const i18n = useContext(I18nContext);
 
   return (
-    <aside>
+    <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <p style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('editField')}
@@ -32,7 +32,7 @@ const DetailView = (
         </>
       )}
       <ExampleInputEditor {...props} />
-    </aside>
+    </div>
   );
 };
 

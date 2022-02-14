@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { readFiles } from '../../../../helper';
 import { I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
+import closeIcon from '../../../../assets/icons/close.svg';
 
 const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
   const { changeSchemas, activeSchema } = props;
@@ -9,25 +10,40 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
 
   return (
     <div>
-      <label style={{ marginBottom: 0 }}>{i18n('inputExample')}</label>
+      <label>{i18n('inputExample')}</label>
       {activeSchema.type === 'image' ? (
-        <div style={{ position: 'relative', textAlign: 'center' }}>
+        <div style={{ position: 'relative' }}>
           {activeSchema.data ? (
             <div style={{ margin: '0 auto' }}>
               <button
-                style={{ position: 'absolute', top: 0, left: 0 }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  color: '#333',
+                  background: '#f2f2f2',
+                  cursor: 'pointer',
+                  borderRadius: 2,
+                  border: '1px solid #767676',
+                  height: 20,
+                  width: 20,
+                }}
                 aria-label="close"
                 onClick={() =>
                   changeSchemas([{ key: 'data', value: '', schemaId: activeSchema.id }])
                 }
               >
-                x
+                <img src={closeIcon} alt="Close icon" width={10} />
               </button>
               <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
             </div>
           ) : (
             <label>
               <input
+                style={{ color: '#333', background: 'none' }}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const { files } = e.target;
                   readFiles(files, 'dataURL').then((result) => {
@@ -50,7 +66,10 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
           }
           style={{
             width: '100%',
-            backgroundColor: activeSchema.data ? '#fff' : '#ffa19b',
+            border: '1px solid #767676',
+            borderRadius: 2,
+            color: '#333',
+            background: activeSchema.data ? 'none' : '#ffa19b',
           }}
           value={activeSchema.data}
         />

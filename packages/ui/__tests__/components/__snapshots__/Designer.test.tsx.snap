@@ -8,13 +8,13 @@ exports[`Designer snapshot 1`] = `
     style="width: 1170px; height: 1170px;"
   >
     <div
-      style="position: absolute; height: 0px; width: 100%;"
+      style="position: absolute; right: 0px; z-index: 1; height: 0px; width: 300px;"
     >
       <div
-        style="position: sticky; top: 0px; z-index: 29;"
+        style="position: sticky; top: 0px; z-index: 29; font-size: 1rem;"
       >
         <button
-          style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 3px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238);"
+          style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238);"
         >
           <img
             alt="Toggle icon"
@@ -25,7 +25,7 @@ exports[`Designer snapshot 1`] = `
         <div
           style="width: 300px; height: 1086.614173227px; display: block; top: 0px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.929); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.5rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400;"
         >
-          <aside>
+          <div>
             <div
               style="height: 40px; display: flex; align-items: center;"
             >
@@ -39,10 +39,10 @@ exports[`Designer snapshot 1`] = `
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
             <div
-              style="max-height: 961.614173227px; overflow-y: auto;"
+              style="height: 961.614173227px; overflow-y: auto;"
             >
               <div
-                style="border: 1px solid transparent;"
+                style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
               >
                 <div
                   style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
@@ -59,11 +59,11 @@ exports[`Designer snapshot 1`] = `
                   </button>
                   <button
                     class=""
-                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer; font-size: 0.75rem;"
                     title="Edit"
                   >
                     <span
-                      style="margin-right: 1rem; width: 180px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                      style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                     >
                       field1
                     </span>
@@ -71,7 +71,7 @@ exports[`Designer snapshot 1`] = `
                 </div>
               </div>
               <div
-                style="border: 1px solid transparent;"
+                style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
               >
                 <div
                   style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
@@ -88,11 +88,11 @@ exports[`Designer snapshot 1`] = `
                   </button>
                   <button
                     class=""
-                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer; font-size: 0.75rem;"
                     title="Edit"
                   >
                     <span
-                      style="margin-right: 1rem; width: 180px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                      style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                     >
                       field2
                     </span>
@@ -103,12 +103,12 @@ exports[`Designer snapshot 1`] = `
             <div
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
-          </aside>
+          </div>
           <div
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
           >
             <button
-              style="padding: 0.5rem; color: rgb(255, 255, 255); background: rgb(24, 160, 251); border-radius: 3px; cursor: pointer;"
+              style="padding: 0.5rem; color: rgb(255, 255, 255); background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
             >
               <strong>
                 Add new field

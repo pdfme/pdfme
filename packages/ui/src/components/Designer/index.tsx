@@ -240,6 +240,7 @@ const TemplateEditor = ({
   return (
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
+        scale={scale}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={mainRef.current ? mainRef.current.scrollHeight : 0}

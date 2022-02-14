@@ -37,7 +37,13 @@ const TypeAndKeyEditor = (
       <div>
         <label style={{ marginBottom: 0 }}>{i18n('type')}</label>
         <select
-          style={{ width: '100%' }}
+          style={{
+            width: '100%',
+            border: '1px solid #767676',
+            borderRadius: 2,
+            color: '#333',
+            background: 'none',
+          }}
           onChange={(e) =>
             changeSchemas([{ key: 'type', value: e.target.value, schemaId: activeSchema.id }])
           }
@@ -50,7 +56,7 @@ const TypeAndKeyEditor = (
           ))}
         </select>
       </div>
-      <div style={{ width: '100%' }}>
+      <div>
         <label style={{ marginBottom: 0 }}>
           {i18n('fieldName')}
           <u style={{ fontSize: '0.7rem' }}>
@@ -65,9 +71,11 @@ const TypeAndKeyEditor = (
             changeSchemas([{ key: 'key', value: e.target.value, schemaId: activeSchema.id }])
           }
           style={{
-            borderRadius: 2,
+            width: '100%',
             border: '1px solid #767676',
-            backgroundColor: hasSameKey || blankKey ? '#ffa19b' : '#fff',
+            borderRadius: 2,
+            color: '#333',
+            background: hasSameKey || blankKey ? '#ffa19b' : 'none',
           }}
           value={activeSchema.key}
         />
