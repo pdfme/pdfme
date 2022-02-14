@@ -5,6 +5,7 @@ import { readFiles } from '../../helper';
 import { I18nContext } from '../../contexts';
 import { ZOOM } from '../../constants';
 import imageExample from '../../assets/imageExample.png';
+import closeIcon from '../../assets/icons/close.svg';
 
 type Props = SchemaUIProps & { schema: ImageSchema };
 
@@ -15,12 +16,22 @@ const FilledImage = ({ editable, tabIndex, schema, onChange }: Omit<Props, 'plac
         tabIndex={tabIndex}
         style={{
           position: 'absolute',
-          left: 0,
           top: 0,
+          left: 0,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: '#333',
+          background: '#f2f2f2',
+          cursor: 'pointer',
+          borderRadius: 2,
+          border: '1px solid #767676',
+          height: 29,
         }}
+        aria-label="close"
         onClick={() => onChange('')}
       >
-        x
+        <img src={closeIcon} alt="Close icon" width={15} />
       </button>
     )}
     <img
@@ -42,6 +53,7 @@ const BlankImage = (props: Props & { inputRef: Ref<HTMLInputElement> }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        color: '#333',
       }}
     >
       <input

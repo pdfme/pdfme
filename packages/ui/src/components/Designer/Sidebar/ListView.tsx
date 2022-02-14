@@ -73,6 +73,7 @@ const SortableItem = SortableElement(
             style={{
               marginRight: '1rem',
               width: 180,
+              color: '#333',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',

@@ -7,6 +7,14 @@ const inputSetStyle: React.CSSProperties = {
   alignItems: 'center',
 };
 
+const inputStyle: React.CSSProperties = {
+  width: 70,
+  border: '1px solid #767676',
+  borderRadius: 2,
+  color: '#333',
+  background: 'none',
+};
+
 const PositionAndSizeEditor = (
   props: Pick<SidebarProps, 'pageSize' | 'changeSchemas' | 'activeSchema'>
 ) => {
@@ -24,7 +32,7 @@ const PositionAndSizeEditor = (
         <div style={inputSetStyle}>
           <label style={{ width: 17 }}>X</label>
           <input
-            style={{ width: 70 }}
+            style={inputStyle}
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
@@ -39,7 +47,7 @@ const PositionAndSizeEditor = (
         <div style={inputSetStyle}>
           <label style={{ width: 17 }}>Y</label>
           <input
-            style={{ width: 70 }}
+            style={inputStyle}
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
@@ -63,7 +71,7 @@ const PositionAndSizeEditor = (
         <div style={inputSetStyle}>
           <label style={{ width: 17 }}>W</label>
           <input
-            style={{ width: 70 }}
+            style={inputStyle}
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);
@@ -78,7 +86,7 @@ const PositionAndSizeEditor = (
         <div style={inputSetStyle}>
           <label style={{ width: 17 }}>H</label>
           <input
-            style={{ width: 70 }}
+            style={inputStyle}
             type="number"
             onChange={(e) => {
               const value = Number(e.target.value);

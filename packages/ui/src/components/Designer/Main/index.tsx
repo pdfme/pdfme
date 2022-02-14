@@ -39,7 +39,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         color: 'white',
         border: 'none',
         fontWeight: 'bold',
-        borderRadius: 3,
+        borderRadius: 2,
         background: 'rgb(68, 170, 255)',
       }}
     >

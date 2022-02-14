@@ -42,7 +42,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
           alignItems: 'center',
           justifyContent: 'center',
           background: '#777777e6',
-          borderRadius: 3,
+          borderRadius: 2,
           padding: '0.5rem',
         }}
       >

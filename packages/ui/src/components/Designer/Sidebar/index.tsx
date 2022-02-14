@@ -41,7 +41,7 @@ const Sidebar = (props: SidebarProps) => {
             right: '0.5rem',
             zIndex: 100,
             border: 'none',
-            borderRadius: 3,
+            borderRadius: 2,
             padding: '0.5rem',
             cursor: 'pointer',
             background: '#eee',
@@ -85,7 +85,7 @@ const Sidebar = (props: SidebarProps) => {
                 color: '#fff',
                 background: '#18a0fb',
                 border: 'none',
-                borderRadius: 3,
+                borderRadius: 2,
                 cursor: 'pointer',
               }}
               onClick={addSchema}

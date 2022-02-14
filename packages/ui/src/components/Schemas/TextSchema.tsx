@@ -30,7 +30,7 @@ const TextSchemaUI = (
     wordBreak: 'break-all',
     background: 'transparent',
     border: 'none',
-    color: schema.fontColor ?? DEFAULT_FONT_COLOR,
+    color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
   };
 
   return editable ? (
