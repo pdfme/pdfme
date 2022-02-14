@@ -121,6 +121,8 @@ const SortableList = SortableContainer(
               key={s.id}
               style={{
                 border: `1px solid ${s.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
+                // Reasons for adapting transform
+                // https://github.com/clauderic/react-sortable-hoc/issues/386
                 width: SIDEBAR_WIDTH * scale,
                 transform: `scale(${1 - scale + 1})`,
                 transformOrigin: 'top left',
