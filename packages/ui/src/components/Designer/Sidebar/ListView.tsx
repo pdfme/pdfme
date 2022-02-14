@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
@@ -162,6 +162,7 @@ const ListView = (
   const { scale, schemas, onSortEnd, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } =
     props;
   const i18n = useContext(I18nContext);
+  const [sorting, setSorting] = useState(false);
 
   return (
     <div>
@@ -174,8 +175,8 @@ const ListView = (
       <SortableList
         scale={scale}
         size={size}
-        hoveringSchemaId={hoveringSchemaId}
-        onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+        hoveringSchemaId={sorting ? null : hoveringSchemaId}
+        onChangeHoveringSchemaId={(arg) => !sorting && onChangeHoveringSchemaId(arg)}
         updateBeforeSortStart={(node: any) => {
           if (node.node.style) {
             node.node.style.zIndex = '9999';
@@ -185,7 +186,11 @@ const ListView = (
         axis="y"
         lockAxis="y"
         schemas={schemas}
-        onSortEnd={onSortEnd}
+        onSortStart={() => setSorting(true)}
+        onSortEnd={(arg) => {
+          setSorting(false);
+          onSortEnd(arg);
+        }}
         onEdit={onEdit}
       />
       <Divider />
