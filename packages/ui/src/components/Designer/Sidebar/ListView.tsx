@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext } from '../../../contexts';
 import Divider from '../../Divider';
 import dragIcon from '../../../assets/icons/drag.svg';
@@ -65,6 +65,7 @@ const SortableItem = SortableElement(
             border: 'none',
             textAlign: 'left',
             cursor: 'pointer',
+            fontSize: '0.75rem',
           }}
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
@@ -102,23 +103,27 @@ const SortableItem = SortableElement(
 
 const SortableList = SortableContainer(
   (props: {
+    scale: number;
     schemas: SchemaForUI[];
     onEdit: (id: string) => void;
     size: Size;
     hoveringSchemaId: string | null;
     onChangeHoveringSchemaId: (id: string | null) => void;
   }) => {
-    const { schemas, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
+    const { scale, schemas, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
     const i18n = useContext(I18nContext);
 
     return (
-      <div style={{ maxHeight: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
+      <div style={{ height: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
         {schemas.length > 0 ? (
           schemas.map((s, i) => (
             <div
               key={s.id}
               style={{
                 border: `1px solid ${s.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
+                width: SIDEBAR_WIDTH * scale,
+                transform: `scale(${1 - scale + 1})`,
+                transformOrigin: 'top left',
               }}
               onMouseEnter={() => onChangeHoveringSchemaId(s.id)}
               onMouseLeave={() => onChangeHoveringSchemaId(null)}
@@ -143,14 +148,21 @@ const SortableList = SortableContainer(
 const ListView = (
   props: Pick<
     SidebarProps,
-    'schemas' | 'onSortEnd' | 'onEdit' | 'size' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
+    | 'scale'
+    | 'schemas'
+    | 'onSortEnd'
+    | 'onEdit'
+    | 'size'
+    | 'hoveringSchemaId'
+    | 'onChangeHoveringSchemaId'
   >
 ) => {
-  const { schemas, onSortEnd, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
+  const { scale, schemas, onSortEnd, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } =
+    props;
   const i18n = useContext(I18nContext);
 
   return (
-    <aside>
+    <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <p style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('fieldsList')}
@@ -158,6 +170,7 @@ const ListView = (
       </div>
       <Divider />
       <SortableList
+        scale={scale}
         size={size}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
@@ -174,7 +187,7 @@ const ListView = (
         onEdit={onEdit}
       />
       <Divider />
-    </aside>
+    </div>
   );
 };
 

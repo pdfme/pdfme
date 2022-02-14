@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext } from '../../../contexts';
 import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
@@ -8,6 +8,7 @@ import ListView from './ListView';
 import DetailView from './DetailView';
 
 export type SidebarProps = {
+  scale: number;
   height: number;
   hoveringSchemaId: string | null;
   onChangeHoveringSchemaId: (id: string | null) => void;
@@ -28,11 +29,12 @@ const Sidebar = (props: SidebarProps) => {
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
-  const sidebarWidth = 300;
   const top = 0;
 
   return (
-    <div style={{ position: 'absolute', height, width: '100%' }}>
+    <div
+      style={{ position: 'absolute', right: 0, zIndex: 1, height, width: open ? SIDEBAR_WIDTH : 0 }}
+    >
       <div style={{ position: 'sticky', top, zIndex: 29, fontSize: '1rem' }}>
         <button
           style={{
@@ -52,7 +54,7 @@ const Sidebar = (props: SidebarProps) => {
         </button>
         <div
           style={{
-            width: sidebarWidth,
+            width: SIDEBAR_WIDTH,
             height: size.height - RULER_HEIGHT * ZOOM,
             display: open ? 'block' : 'none',
             top,
