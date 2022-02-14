@@ -11,7 +11,7 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; right: 0px; z-index: 1; height: 0px; width: 300px;"
     >
       <div
-        style="position: sticky; top: 0px; z-index: 29; font-size: 1rem;"
+        style="position: sticky; top: 0px; z-index: 1; font-size: 1rem;"
       >
         <button
           style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238);"

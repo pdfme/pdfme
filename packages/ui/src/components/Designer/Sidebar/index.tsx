@@ -35,7 +35,7 @@ const Sidebar = (props: SidebarProps) => {
     <div
       style={{ position: 'absolute', right: 0, zIndex: 1, height, width: open ? SIDEBAR_WIDTH : 0 }}
     >
-      <div style={{ position: 'sticky', top, zIndex: 29, fontSize: '1rem' }}>
+      <div style={{ position: 'sticky', top, zIndex: 1, fontSize: '1rem' }}>
         <button
           style={{
             position: 'absolute',
