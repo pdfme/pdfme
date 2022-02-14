@@ -9,9 +9,9 @@ const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeS
 
   return (
     <div>
-      <label style={{ marginBottom: 0 }}>{i18n('inputExample')}</label>
+      <label>{i18n('inputExample')}</label>
       {activeSchema.type === 'image' ? (
-        <div style={{ position: 'relative', textAlign: 'center' }}>
+        <div style={{ position: 'relative' }}>
           {activeSchema.data ? (
             <div style={{ margin: '0 auto' }}>
               <button

@@ -90,7 +90,7 @@ const BarcodeSchemaUI = (
           textAlign: 'center',
           position: 'absolute',
           zIndex: 2,
-          fontSize: 'inherit',
+          fontSize: '1rem',
           height: Number(schema.height) * ZOOM,
           width: Number(schema.width) * ZOOM,
           background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
