@@ -40,11 +40,15 @@ exports[`Preview(as Form) snapshot 1`] = `
             title="field2"
           >
             <div
-              style="margin: 0px auto;"
+              style="width: 377.95275591px; height: 151.181102364px; opacity: 1; background-image: none; background-size: 377.95275591px 151.181102364px;"
             >
+              <img
+                src="field2"
+                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
+              />
               <button
                 aria-label="close"
-                style="position: absolute; top: 0px; left: 0px; display: flex; justify-content: center; align-items: center; color: rgb(51, 51, 51); background: rgb(242, 242, 242); cursor: pointer; border-radius: 2px; border: 1px solid #767676; height: 20px; width: 20px;"
+                style="position: absolute; top: 0px; left: 0px; z-index: 1; display: flex; justify-content: center; align-items: center; color: rgb(51, 51, 51); background: rgb(242, 242, 242); border-radius: 2px; border: 1px solid #767676; cursor: pointer; height: 20px; width: 20px;"
                 tabindex="101"
               >
                 <img
@@ -53,11 +57,17 @@ exports[`Preview(as Form) snapshot 1`] = `
                   width="10"
                 />
               </button>
-              <img
-                src="field2"
-                style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
-              />
             </div>
+            <label
+              style="display: flex; position: absolute; top: 50%; width: 100%; cursor: pointer;"
+            >
+              <input
+                accept="image/jpeg, image/png"
+                tabindex="101"
+                type="file"
+                value=""
+              />
+            </label>
           </div>
         </div>
       </div>
@@ -133,13 +143,23 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             title="field2"
           >
             <div
-              style="margin: 0px auto;"
+              style="width: 377.95275591px; height: 151.181102364px; opacity: 1; background-image: none; background-size: 377.95275591px 151.181102364px;"
             >
               <img
                 src="field2"
                 style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
               />
             </div>
+            <label
+              style="display: none; position: absolute; top: 50%; width: 100%; cursor: pointer;"
+            >
+              <input
+                accept="image/jpeg, image/png"
+                tabindex="101"
+                type="file"
+                value=""
+              />
+            </label>
           </div>
         </div>
       </div>

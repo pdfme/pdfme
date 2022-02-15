@@ -39,70 +39,74 @@ exports[`Designer snapshot 1`] = `
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
             <div
-              style="height: 961.614173227px; overflow-y: auto;"
+              style="font-size: 0.9rem;"
             >
               <div
-                style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
+                style="height: 961.614173227px; overflow-y: auto;"
               >
                 <div
-                  style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
+                  style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
                 >
-                  <button
-                    style="padding: 0px; background: none; display: flex;"
+                  <div
+                    style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
                   >
-                    <img
-                      alt="Drag icon"
-                      src="[object Object]"
-                      style="cursor: grab;"
-                      width="15"
-                    />
-                  </button>
-                  <button
-                    class=""
-                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer; font-size: 0.75rem;"
-                    title="Edit"
-                  >
-                    <span
-                      style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                    <button
+                      style="padding: 0px; background: none; display: flex;"
                     >
-                      field1
-                    </span>
-                  </button>
+                      <img
+                        alt="Drag icon"
+                        src="[object Object]"
+                        style="cursor: grab;"
+                        width="15"
+                      />
+                    </button>
+                    <button
+                      class=""
+                      style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                      title="Edit"
+                    >
+                      <span
+                        style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                      >
+                        field1
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div
+                  style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
+                >
+                  <div
+                    style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
+                  >
+                    <button
+                      style="padding: 0px; background: none; display: flex;"
+                    >
+                      <img
+                        alt="Drag icon"
+                        src="[object Object]"
+                        style="cursor: grab;"
+                        width="15"
+                      />
+                    </button>
+                    <button
+                      class=""
+                      style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                      title="Edit"
+                    >
+                      <span
+                        style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                      >
+                        field2
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div
-                style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
-              >
-                <div
-                  style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
-                >
-                  <button
-                    style="padding: 0px; background: none; display: flex;"
-                  >
-                    <img
-                      alt="Drag icon"
-                      src="[object Object]"
-                      style="cursor: grab;"
-                      width="15"
-                    />
-                  </button>
-                  <button
-                    class=""
-                    style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer; font-size: 0.75rem;"
-                    title="Edit"
-                  >
-                    <span
-                      style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                    >
-                      field2
-                    </span>
-                  </button>
-                </div>
-              </div>
+                style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
+              />
             </div>
-            <div
-              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
-            />
           </div>
           <div
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
@@ -299,13 +303,22 @@ exports[`Designer snapshot 1`] = `
               title="field2"
             >
               <div
-                style="margin: 0px auto;"
+                style="width: 377.95275591px; height: 151.181102364px; opacity: 1; background-image: none; background-size: 377.95275591px 151.181102364px;"
               >
                 <img
                   src="aaaaaaaaaaaa"
                   style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
                 />
               </div>
+              <label
+                style="display: none; position: absolute; top: 50%; width: 100%; cursor: pointer;"
+              >
+                <input
+                  accept="image/jpeg, image/png"
+                  type="file"
+                  value=""
+                />
+              </label>
             </div>
           </div>
         </div>
