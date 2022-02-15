@@ -27,7 +27,6 @@ const dictEn = {
   goToPrevious: 'Back',
   goToNext: 'Next',
   goToEnd: 'Go to end',
-  select: 'Select',
   errorOccurred: 'An error occurred.',
 };
 
@@ -55,7 +54,6 @@ const dictJa: { [key in keyof DictEn]: string } = {
   goToPrevious: '1つ戻る',
   goToNext: '1つ進む',
   goToEnd: '最後に進む',
-  select: '選択',
   errorOccurred: 'エラーが発生しました',
 };
 

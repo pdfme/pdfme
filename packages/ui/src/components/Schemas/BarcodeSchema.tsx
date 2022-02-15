@@ -13,8 +13,6 @@ import qrcode from '../../assets/barcodeExamples/qrcode.png';
 import upca from '../../assets/barcodeExamples/upca.png';
 import upce from '../../assets/barcodeExamples/upce.png';
 
-type Props = SchemaUIProps & { schema: BarcodeSchema };
-
 const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode,
   japanpost,
@@ -65,11 +63,29 @@ const ErrorOrSampleBarcode = ({ schema, value }: { schema: BarcodeSchema; value:
     <ErrorBarcode />
   );
 
+type Props = SchemaUIProps & { schema: BarcodeSchema };
+
 const BarcodeSchemaUI = (
   { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLInputElement>
 ) => {
   const value = schema.data;
+
+  const style: React.CSSProperties = {
+    textAlign: 'center',
+    position: 'absolute',
+    zIndex: 2,
+    fontSize: '1rem',
+    color: '#000',
+    height: Number(schema.height) * ZOOM,
+    width: Number(schema.width) * ZOOM,
+    background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
+    border: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'auto',
+  };
 
   return (
     <div
@@ -81,29 +97,27 @@ const BarcodeSchemaUI = (
         justifyContent: 'center',
       }}
     >
-      <input
-        ref={ref}
-        disabled={!editable}
-        tabIndex={tabIndex}
-        placeholder={placeholder}
-        style={{
-          textAlign: 'center',
-          position: 'absolute',
-          zIndex: 2,
-          fontSize: '1rem',
-          color: '#000',
-          height: Number(schema.height) * ZOOM,
-          width: Number(schema.width) * ZOOM,
-          background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
-          border: 'none',
-        }}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
+      {editable ? (
+        <input
+          ref={ref}
+          tabIndex={tabIndex}
+          placeholder={placeholder}
+          style={style}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <div style={style}>
+          <span>{value}</span>
+        </div>
+      )}
+
       {value ? (
         <ErrorOrSampleBarcode value={value} schema={schema} />
-      ) : (
+      ) : editable ? (
         <SampleBarcode schema={schema} />
+      ) : (
+        <ErrorBarcode />
       )}
     </div>
   );

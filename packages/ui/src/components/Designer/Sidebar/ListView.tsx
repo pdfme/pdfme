@@ -65,7 +65,6 @@ const SortableItem = SortableElement(
             border: 'none',
             textAlign: 'left',
             cursor: 'pointer',
-            fontSize: '0.75rem',
           }}
           onClick={() => onEdit(sc.id)}
           title={getTitle()}
@@ -172,28 +171,30 @@ const ListView = (
         </p>
       </div>
       <Divider />
-      <SortableList
-        scale={scale}
-        size={size}
-        hoveringSchemaId={sorting ? null : hoveringSchemaId}
-        onChangeHoveringSchemaId={(arg) => !sorting && onChangeHoveringSchemaId(arg)}
-        updateBeforeSortStart={(node: any) => {
-          if (node.node.style) {
-            node.node.style.zIndex = '9999';
-          }
-        }}
-        useDragHandle
-        axis="y"
-        lockAxis="y"
-        schemas={schemas}
-        onSortStart={() => setSorting(true)}
-        onSortEnd={(arg) => {
-          setSorting(false);
-          onSortEnd(arg);
-        }}
-        onEdit={onEdit}
-      />
-      <Divider />
+      <div style={{ fontSize: '0.9rem' }}>
+        <SortableList
+          scale={scale}
+          size={size}
+          hoveringSchemaId={sorting ? null : hoveringSchemaId}
+          onChangeHoveringSchemaId={(arg) => !sorting && onChangeHoveringSchemaId(arg)}
+          updateBeforeSortStart={(node: any) => {
+            if (node.node.style) {
+              node.node.style.zIndex = '9999';
+            }
+          }}
+          useDragHandle
+          axis="y"
+          lockAxis="y"
+          schemas={schemas}
+          onSortStart={() => setSorting(true)}
+          onSortEnd={(arg) => {
+            setSorting(false);
+            onSortEnd(arg);
+          }}
+          onEdit={onEdit}
+        />
+        <Divider />
+      </div>
     </div>
   );
 };

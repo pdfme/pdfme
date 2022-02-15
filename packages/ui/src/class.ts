@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
-import { debounce, flatten } from './helper';
+import { debounce, flatten, cloneDeep } from './helper';
 import {
   Template,
   Size,
@@ -76,7 +76,7 @@ export abstract class BaseUIClass {
     const { domContainer, template, options } = props;
     const { lang, font } = options || {};
     this.domContainer = domContainer;
-    this.template = generateColumnsAndSampledataIfNeeded(template);
+    this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
@@ -127,7 +127,7 @@ export abstract class PreviewUI extends BaseUIClass {
     super(props);
     checkPreviewProps(props);
 
-    this.inputs = props.inputs;
+    this.inputs = cloneDeep(props.inputs);
     this.render();
   }
 
