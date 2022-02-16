@@ -296,7 +296,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         )}
         renderSchema={({ schema }) => (
           <SchemaUI
-            key={schema.key}
+            key={schema.id}
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}

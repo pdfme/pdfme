@@ -107,7 +107,7 @@ export abstract class BaseUIClass {
 
   public updateTemplate(template: Template) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    this.template = template;
+    this.template = cloneDeep(template);
     this.render();
   }
 
@@ -128,7 +128,6 @@ export abstract class PreviewUI extends BaseUIClass {
     checkPreviewProps(props);
 
     this.inputs = cloneDeep(props.inputs);
-    this.render();
   }
 
   public getInputs() {
@@ -139,7 +138,7 @@ export abstract class PreviewUI extends BaseUIClass {
 
   public setInputs(inputs: { [key: string]: string }[]) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    this.inputs = inputs;
+    this.inputs = cloneDeep(inputs);
     this.render();
   }
 

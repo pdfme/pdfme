@@ -225,33 +225,6 @@ export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'ar
   });
 };
 
-const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =>
-  new Array(pageNum).fill('').reduce((acc, _, i) => {
-    acc.push(
-      template.schemas[i]
-        ? Object.entries(template.schemas[i])
-            .sort((a, b) => {
-              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
-              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
-
-              return aIndex > bIndex ? 1 : -1;
-            })
-            .map((e) => {
-              const [key, value] = e;
-              const data = template.sampledata ? template.sampledata[0][key] : '';
-
-              return Object.assign(value, {
-                key,
-                data,
-                id: uuid(),
-              });
-            })
-        : []
-    );
-
-    return acc;
-  }, [] as SchemaForUI[][]);
-
 const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
@@ -315,6 +288,33 @@ export const b64toBlob = (base64: string) => {
 
   return new Blob([uniy8Array.buffer], { type: mimeType });
 };
+
+const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =>
+  new Array(pageNum).fill('').reduce((acc, _, i) => {
+    acc.push(
+      template.schemas[i]
+        ? Object.entries(template.schemas[i])
+            .sort((a, b) => {
+              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
+              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
+
+              return aIndex > bIndex ? 1 : -1;
+            })
+            .map((e) => {
+              const [key, value] = e;
+              const data = template.sampledata ? template.sampledata[0][key] : '';
+
+              return Object.assign(value, {
+                key,
+                data,
+                id: uuid(),
+              });
+            })
+        : []
+    );
+
+    return acc;
+  }, [] as SchemaForUI[][]);
 
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);

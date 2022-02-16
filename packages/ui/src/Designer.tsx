@@ -5,6 +5,7 @@ import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants';
 import { I18nContext, FontContext } from './contexts';
 import DesignerComponent from './components/Designer';
+import { cloneDeep } from './helper';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
@@ -26,7 +27,7 @@ class Designer extends BaseUIClass {
 
   public updateTemplate(template: Template) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    this.template = template;
+    this.template = cloneDeep(template);
     if (this.onChangeTemplateCallback) {
       this.onChangeTemplateCallback(template);
     }

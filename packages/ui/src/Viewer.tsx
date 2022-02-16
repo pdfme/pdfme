@@ -9,6 +9,7 @@ import Preview from './components/Preview';
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
     super(props);
+    this.render();
   }
 
   protected render() {
