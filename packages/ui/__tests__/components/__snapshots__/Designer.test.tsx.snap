@@ -2,10 +2,10 @@
 
 exports[`Designer snapshot 1`] = `
 <div
-  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="width: 1170px; height: 1170px;"
+    style="margin: 0px auto; width: 1170px; height: 1170px;"
   >
     <div
       style="position: absolute; right: 0px; z-index: 1; height: 0px; width: 300px;"
@@ -132,7 +132,7 @@ exports[`Designer snapshot 1`] = `
         style="transform: scale(1); transform-origin: center top;"
       >
         <div
-          style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+          style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
             style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"

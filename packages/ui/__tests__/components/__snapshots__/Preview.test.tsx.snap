@@ -2,10 +2,10 @@
 
 exports[`Preview(as Form) snapshot 1`] = `
 <div
-  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="width: 1170px; height: 1170px;"
+    style="margin: 0px auto; width: 1170px; height: 1170px;"
   >
     <div
       style="height: 1122.5196850527px; width: 100%; position: absolute;"
@@ -14,12 +14,12 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="transform: scale(1); transform-origin: center top;"
     >
       <div
-        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
       >
         <div>
           <div
             class="selectable"
-            id="field1"
+            id="1"
             style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
             title="field1"
           >
@@ -35,7 +35,7 @@ exports[`Preview(as Form) snapshot 1`] = `
         <div>
           <div
             class="selectable"
-            id="field2"
+            id="2"
             style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
             title="field2"
           >
@@ -78,10 +78,10 @@ exports[`Preview(as Form) snapshot 1`] = `
 
 exports[`Preview(as Viewer) snapshot 1`] = `
 <div
-  style="font-family: Arial, Helvetica, sans-serif; position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
+  style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="width: 1170px; height: 1170px;"
+    style="margin: 0px auto; width: 1170px; height: 1170px;"
   >
     <div
       style="height: 1122.5196850527px; width: 100%; position: absolute;"
@@ -90,12 +90,12 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="transform: scale(1); transform-origin: center top;"
     >
       <div
-        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: cover; background-position: center; background-repeat: no-repeat; width: 793.700787411px; height: 1122.5196850527px;"
+        style="font-family: 'Helvetica'; margin: 30px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
       >
         <div>
           <div
             class="selectable"
-            id="field1"
+            id="1"
             style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent; background-color: transparent;"
             title="field1"
           >
@@ -138,7 +138,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
         <div>
           <div
             class="selectable"
-            id="field2"
+            id="2"
             style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent; background-color: transparent;"
             title="field2"
           >
