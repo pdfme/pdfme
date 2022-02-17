@@ -499,7 +499,7 @@ export const moveCommandToChangeSchemasArg = (props: {
         break;
     }
 
-    return value;
+    return value > 0 ? value : 0;
   };
 
   return activeSchemas.map((as) => {
