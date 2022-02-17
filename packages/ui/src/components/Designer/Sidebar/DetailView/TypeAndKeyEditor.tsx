@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useCallback } from 'react';
-import { schemaTypes } from '@pdfme/common';
+import { schemaTypes, SchemaForUI } from '@pdfme/common';
 import { SidebarProps } from '..';
 import { I18nContext } from '../../../../contexts';
 
@@ -12,7 +12,7 @@ const ErrorLabel = ({ isError, msg }: { isError: boolean; msg: string }) => (
 );
 
 const TypeAndKeyEditor = (
-  props: Pick<SidebarProps, 'schemas' | 'changeSchemas' | 'activeSchema'>
+  props: Pick<SidebarProps, 'schemas' | 'changeSchemas'> & { activeSchema: SchemaForUI }
 ) => {
   const { changeSchemas, activeSchema, schemas } = props;
   const i18n = useContext(I18nContext);

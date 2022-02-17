@@ -6,6 +6,7 @@ import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
 import ListView from './ListView';
 import DetailView from './DetailView';
+import { getInitialSchema } from '../../../helper';
 
 export type SidebarProps = {
   scale: number;
@@ -14,8 +15,7 @@ export type SidebarProps = {
   onChangeHoveringSchemaId: (id: string | null) => void;
   size: Size;
   pageSize: Size;
-  activeElement: HTMLElement | null;
-  activeSchema: SchemaForUI;
+  activeElements: HTMLElement[];
   schemas: SchemaForUI[];
   onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
   onEdit: (id: string) => void;
@@ -25,11 +25,20 @@ export type SidebarProps = {
 };
 
 const Sidebar = (props: SidebarProps) => {
-  const { height, size, addSchema } = props;
+  const { height, size, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
   const top = 0;
+
+  const getLastActiveSchema = () => {
+    if (activeElements.length === 0) return getInitialSchema();
+    const last = activeElements[activeElements.length - 1];
+
+    return schemas.find((s) => s.id === last.id) || getInitialSchema();
+  };
+
+  const activeSchema = getLastActiveSchema();
 
   return (
     <div
@@ -69,7 +78,11 @@ const Sidebar = (props: SidebarProps) => {
             fontWeight: 400,
           }}
         >
-          {props.activeElement ? <DetailView {...props} /> : <ListView {...props} />}
+          {activeElements.length === 0 ? (
+            <ListView {...props} />
+          ) : (
+            <DetailView {...props} activeSchema={activeSchema} />
+          )}
           <div
             style={{
               display: 'flex',

@@ -224,14 +224,7 @@ const TemplateEditor = ({
     setHoveringSchemaId(id);
   };
 
-  const getLastActiveSchema = () => {
-    if (activeElements.length === 0) return getInitialSchema();
-    const last = activeElements[activeElements.length - 1];
 
-    return schemasList[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
-  };
-
-  const activeSchema = getLastActiveSchema();
 
   if (error) {
     return <Error size={size} error={error} />;
@@ -246,9 +239,8 @@ const TemplateEditor = ({
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         size={size}
         pageSize={pageSizes[pageCursor]}
-        activeElement={activeElements[activeElements.length - 1]}
+        activeElements={activeElements}
         schemas={schemasList[pageCursor]}
-        activeSchema={activeSchema}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
         onEdit={(id: string) => {

@@ -121,16 +121,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [initEvents, destroyEvents]);
 
   useEffect(() => {
+    moveable.current?.updateRect();
     if (prevSchemas === null) {
-      moveable.current?.updateRect();
-
       return;
     }
 
-    const prevSchemaKeys = Object.keys(prevSchemas[pageCursor] || {});
-    const schemaKeys = Object.keys(schemasList[pageCursor] || {});
+    const prevSchemaKeys = JSON.stringify(prevSchemas[pageCursor] || {});
+    const schemaKeys = JSON.stringify(schemasList[pageCursor] || {});
 
-    if (prevSchemaKeys.join() === schemaKeys.join()) {
+    if (prevSchemaKeys === schemaKeys) {
       moveable.current?.updateRect();
     }
   }, [pageCursor, schemasList, prevSchemas]);

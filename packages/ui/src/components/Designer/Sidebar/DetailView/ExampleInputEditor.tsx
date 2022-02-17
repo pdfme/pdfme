@@ -1,10 +1,13 @@
 import React, { useContext } from 'react';
+import { SchemaForUI } from '@pdfme/common';
 import { readFiles } from '../../../../helper';
 import { I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import closeIcon from '../../../../assets/icons/close.svg';
 
-const ExampleInputEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
+const ExampleInputEditor = (
+  props: Pick<SidebarProps, 'changeSchemas'> & { activeSchema: SchemaForUI }
+) => {
   const { changeSchemas, activeSchema } = props;
   const i18n = useContext(I18nContext);
 
