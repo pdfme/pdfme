@@ -185,7 +185,13 @@ const ListView = (
           <textarea
             value={fieldNamesValue}
             onChange={(e) => setFieldNamesValue(e.target.value)}
-            style={{ height, width: '100%', fontSize: '1rem', lineHeight: '2rem' }}
+            style={{
+              height,
+              width: '100%',
+              fontSize: '1rem',
+              lineHeight: '2rem',
+              background: 'transparent',
+            }}
           ></textarea>
         </div>
       ) : (
