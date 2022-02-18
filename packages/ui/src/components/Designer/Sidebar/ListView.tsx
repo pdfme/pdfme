@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
-import { SchemaForUI, Size } from '@pdfme/common';
+import { SchemaForUI } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext } from '../../../contexts';
 import Divider from '../../Divider';
@@ -106,15 +106,15 @@ const SortableList = SortableContainer(
     scale: number;
     schemas: SchemaForUI[];
     onEdit: (id: string) => void;
-    size: Size;
+    height: number;
     hoveringSchemaId: string | null;
     onChangeHoveringSchemaId: (id: string | null) => void;
   }) => {
-    const { scale, schemas, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } = props;
+    const { scale, schemas, onEdit, height, hoveringSchemaId, onChangeHoveringSchemaId } = props;
     const i18n = useContext(I18nContext);
 
     return (
-      <div style={{ height: size.height - RULER_HEIGHT * ZOOM - 125, overflowY: 'auto' }}>
+      <div style={{ height, overflowY: 'auto' }}>
         {schemas.length > 0 ? (
           schemas.map((s, i) => (
             <div
@@ -155,12 +155,23 @@ const ListView = (
     | 'size'
     | 'hoveringSchemaId'
     | 'onChangeHoveringSchemaId'
+    | 'changeSchemas'
   >
 ) => {
-  const { scale, schemas, onSortEnd, onEdit, size, hoveringSchemaId, onChangeHoveringSchemaId } =
-    props;
+  const {
+    scale,
+    schemas,
+    onSortEnd,
+    onEdit,
+    size,
+    hoveringSchemaId,
+    onChangeHoveringSchemaId,
+    changeSchemas,
+  } = props;
   const i18n = useContext(I18nContext);
-
+  const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
+  const [fieldNamesValue, setFieldNamesValue] = useState('');
+  const height = size.height - RULER_HEIGHT * ZOOM - 135;
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
@@ -169,23 +180,77 @@ const ListView = (
         </p>
       </div>
       <Divider />
-      <SortableList
-        scale={scale}
-        size={size}
-        hoveringSchemaId={hoveringSchemaId}
-        onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-        updateBeforeSortStart={(node: any) => {
-          if (node.node.style) {
-            node.node.style.zIndex = '9999';
-          }
+      {isBulkUpdateFieldNamesMode ? (
+        <div>
+          <textarea
+            value={fieldNamesValue}
+            onChange={(e) => setFieldNamesValue(e.target.value)}
+            style={{ height, width: '100%', fontSize: '1rem', lineHeight: '2rem' }}
+          ></textarea>
+        </div>
+      ) : (
+        <SortableList
+          scale={scale}
+          height={height}
+          hoveringSchemaId={hoveringSchemaId}
+          onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+          updateBeforeSortStart={(node: any) => {
+            if (node.node.style) {
+              node.node.style.zIndex = '9999';
+            }
+          }}
+          useDragHandle
+          axis="y"
+          lockAxis="y"
+          schemas={schemas}
+          onSortEnd={onSortEnd}
+          onEdit={onEdit}
+        />
+      )}
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          cursor: 'pointer',
+          fontSize: '0.75rem',
         }}
-        useDragHandle
-        axis="y"
-        lockAxis="y"
-        schemas={schemas}
-        onSortEnd={onSortEnd}
-        onEdit={onEdit}
-      />
+      >
+        {isBulkUpdateFieldNamesMode ? (
+          <>
+            <u onClick={() => setIsBulkUpdateFieldNamesMode(false)}>{i18n('cancel')}</u>
+            <span style={{ margin: '0 1rem' }}>/</span>
+            <u
+              onClick={() => {
+                const fieldNames = fieldNamesValue.split('\n');
+                if (fieldNames.length !== schemas.length) {
+                  alert(i18n('errorBulkUpdateFieldName'));
+                } else {
+                  changeSchemas(
+                    fieldNames.map((name, index) => ({
+                      key: 'key',
+                      value: name,
+                      schemaId: schemas[index].id,
+                    }))
+                  );
+                  setIsBulkUpdateFieldNamesMode(false);
+                }
+              }}
+            >
+              {i18n('commitBulkUpdateFieldName')}
+            </u>
+          </>
+        ) : (
+          <u
+            onClick={() => {
+              setFieldNamesValue(schemas.map((s) => s.key).join('\n'));
+              setIsBulkUpdateFieldNamesMode(true);
+            }}
+          >
+            {i18n('bulkUpdateFieldName')}
+          </u>
+        )}
+      </div>
       <Divider />
     </div>
   );

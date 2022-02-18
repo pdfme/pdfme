@@ -4,6 +4,7 @@ import { DEFAULT_LANG } from './constants';
 type DictEn = typeof dictEn;
 
 const dictEn = {
+  cancel: 'Cancel',
   field: 'field',
   fieldName: 'Name',
   require: 'Required',
@@ -20,18 +21,20 @@ const dictEn = {
   addNewField: 'Add new field',
   editField: 'Edit Field',
   type: 'Type',
-  previewWarnMsg: 'Preview is not available on iOS devices.',
-  previewErrMsg:
-    'An error occurred during the PDF creation process. (Characters that are not in the Helvetica font are not available)',
   goToFirst: 'Go to first',
   goToPrevious: 'Back',
   goToNext: 'Next',
   goToEnd: 'Go to end',
   select: 'Select',
-  errorOccurred: 'An error occurred.',
+  errorOccurred: 'An error occurred',
+  errorBulkUpdateFieldName:
+    'Cannot commit the change because the number of items has been changed.',
+  commitBulkUpdateFieldName: 'Commit Changes',
+  bulkUpdateFieldName: 'Bulk update field names',
 };
 
 const dictJa: { [key in keyof DictEn]: string } = {
+  cancel: 'キャンセル',
   field: '入力項目',
   fieldName: '項目名',
   require: '必須',
@@ -48,15 +51,15 @@ const dictJa: { [key in keyof DictEn]: string } = {
   addNewField: '入力項目を追加',
   editField: '入力項目を編集',
   type: 'タイプ',
-  previewWarnMsg: 'iOS端末ではプレビューができません。',
-  previewErrMsg:
-    'PDF作成処理でエラーが発生しました。お手数ですがコンタクトからお問い合わせください。',
   goToFirst: '最初に戻る',
   goToPrevious: '1つ戻る',
   goToNext: '1つ進む',
   goToEnd: '最後に進む',
   select: '選択',
   errorOccurred: 'エラーが発生しました',
+  errorBulkUpdateFieldName: '項目数が変更されているため変更をコミットできません。',
+  commitBulkUpdateFieldName: '変更を反映',
+  bulkUpdateFieldName: '項目名を一括変更',
 };
 
 const i18n = (lang: Lang, key: keyof DictEn) => (lang === DEFAULT_LANG ? dictEn[key] : dictJa[key]);
