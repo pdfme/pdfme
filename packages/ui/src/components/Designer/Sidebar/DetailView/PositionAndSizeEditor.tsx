@@ -1,5 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { SchemaForUI } from '@pdfme/common';
+import { round } from '../../../../helper';
 import { SidebarProps } from '..';
 import alignVerticalTop from '../../../../assets/icons/align-vertical-top.svg';
 import alignVerticalCenter from '../../../../assets/icons/align-vertical-center.svg';
@@ -34,19 +35,19 @@ const PositionAndSizeEditor = (
 ) => {
   const { changeSchemas, schemas, activeSchema, activeElements, pageSize } = props;
 
-  const multiSelect = activeElements.length > 1;
-
   const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
     const aid = activeElements.map((e) => e.id);
     const ass = schemas.filter((s) => aid.includes(s.id));
 
     const isVertical = ['left', 'center', 'right'].includes(type);
     const isHorizontal = ['top', 'middle', 'bottom'].includes(type);
-    const tgt = isVertical ? 'x' : 'y';
-    const min = Math.min(...ass.map((as) => as.position[tgt]));
-    const max = Math.max(
-      ...ass.map((as) => as.position[tgt] + as[isVertical ? 'width' : 'height'])
-    );
+    const tgtPos = isVertical ? 'x' : 'y';
+    const tgtSize = isVertical ? 'width' : 'height';
+    const isSingle = ass.length === 1;
+    const root = pageSize[tgtSize];
+
+    const min = isSingle ? 0 : Math.min(...ass.map((as) => as.position[tgtPos]));
+    const max = isSingle ? root : Math.max(...ass.map((as) => as.position[tgtPos] + as[tgtSize]));
 
     let basePos = 0;
     let adjust = (_: number) => 0;
@@ -77,7 +78,7 @@ const PositionAndSizeEditor = (
 
     changeSchemas(
       ass.map((as) => {
-        const value = basePos - adjust(as[isVertical ? 'width' : 'height']);
+        const value = round(basePos - adjust(as[isVertical ? 'width' : 'height']), 2);
         return { key, value, schemaId: as.id };
       })
     );
@@ -86,22 +87,22 @@ const PositionAndSizeEditor = (
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('left')} src={alignHorizontalLeft} />
         </button>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('center')} src={alignHorizontalCenter} />
         </button>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('right')} src={alignHorizontalRight} />
         </button>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('top')} src={alignVerticalTop} />
         </button>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('middle')} src={alignVerticalCenter} />
         </button>
-        <button disabled={!multiSelect} style={buttonStyle}>
+        <button style={buttonStyle}>
           <img width={15} onClick={() => align('bottom')} src={alignVerticalBottom} />
         </button>
       </div>
