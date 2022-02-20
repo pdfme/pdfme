@@ -1,12 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { SchemaForUI } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
-import Divider from '../../Divider';
-import dragIcon from '../../../assets/icons/drag.svg';
-import warningIcon from '../../../assets/icons/warning.svg';
-import { SidebarProps } from '.';
+import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants';
+import { I18nContext } from '../../../../contexts';
+import Divider from '../../../Divider';
+import dragIcon from '../../../../assets/icons/drag.svg';
+import warningIcon from '../../../../assets/icons/warning.svg';
+import SelectableSortableContainer from './SelectableSortableContainer';
+import { SidebarProps } from '..';
 
 const isTouchable = () => true;
 
@@ -195,23 +196,31 @@ const ListView = (
           ></textarea>
         </div>
       ) : (
-        <SortableList
-          scale={scale}
+        <SelectableSortableContainer
           height={height}
+          schemas={schemas}
           hoveringSchemaId={hoveringSchemaId}
           onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-          updateBeforeSortStart={(node: any) => {
-            if (node.node.style) {
-              node.node.style.zIndex = '9999';
-            }
-          }}
-          useDragHandle
-          axis="y"
-          lockAxis="y"
-          schemas={schemas}
           onSortEnd={onSortEnd}
           onEdit={onEdit}
         />
+        // <SortableList
+        //   scale={scale}
+        //
+        //   hoveringSchemaId={hoveringSchemaId}
+        //   onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+        //   updateBeforeSortStart={(node: any) => {
+        //     if (node.node.style) {
+        //       node.node.style.zIndex = '9999';
+        //     }
+        //   }}
+        //   useDragHandle
+        //   axis="y"
+        //   lockAxis="y"
+        //   schemas={schemas}
+        //   onSortEnd={onSortEnd}
+        //   onEdit={onEdit}
+        // />
       )}
 
       <div
@@ -228,14 +237,14 @@ const ListView = (
             <span style={{ margin: '0 1rem' }}>/</span>
             <u
               onClick={() => {
-                const fieldNames = fieldNamesValue.split('\n');
-                if (fieldNames.length !== schemas.length) {
+                const names = fieldNamesValue.split('\n');
+                if (names.length !== schemas.length) {
                   alert(i18n('errorBulkUpdateFieldName'));
                 } else {
                   changeSchemas(
-                    fieldNames.map((name, index) => ({
+                    names.map((value, index) => ({
                       key: 'key',
-                      value: name,
+                      value,
                       schemaId: schemas[index].id,
                     }))
                   );
