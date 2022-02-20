@@ -25,7 +25,7 @@ type Props = {
     (({ target }: { target: HTMLElement | SVGElement }) => void);
   onResizeGroupEnd: ((e: OnResizeGroupEnd) => void) &
     (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
-  onClick: ((e: OnClick) => void) & (() => void);
+  onClick: (e: OnClick) => void;
 };
 
 const _Moveable = (

@@ -47,9 +47,7 @@ const Paper = (porps: {
               margin: `${RULER_HEIGHT * scale}px auto`,
               position: 'relative',
               backgroundImage: `url(${background})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
+              backgroundSize: `${paperSize.width}px ${paperSize.height}px`,
               ...paperSize,
             }}
           >

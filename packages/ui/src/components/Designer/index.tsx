@@ -99,11 +99,12 @@ const TemplateEditor = ({
         // Assign to reference
         set(tgt, key, value);
         if (key === 'type') {
+          const type = String(value);
           // set default value, text or barcode
-          set(tgt, 'data', value === 'text' ? 'text' : getSampleByType(String(value)));
+          set(tgt, 'data', getSampleByType(type));
           // For barcodes, adjust the height to get the correct ratio.
-          if (value !== 'text' && value !== 'image') {
-            set(tgt, 'height', getKeepRatioHeightByWidth(String(value), tgt.width));
+          if (value !== 'text') {
+            set(tgt, 'height', getKeepRatioHeightByWidth(type, tgt.width));
           }
         }
 

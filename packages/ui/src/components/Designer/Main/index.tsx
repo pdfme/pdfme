@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { OnDrag, OnResize } from 'react-moveable';
+import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -200,15 +200,13 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
-  const onClickMoveable = () => {
+  const onClickMoveable = (e: OnClick) => {
+    e.inputEvent.stopPropagation();
     setEditing(true);
     const ic = inputRef.current;
     if (!ic) return;
-    ic.disabled = false;
     ic.focus();
-    if (ic.type === 'file') {
-      ic.click();
-    } else {
+    if (ic.type !== 'file') {
       ic.setSelectionRange(ic.value.length, ic.value.length);
     }
   };
@@ -297,7 +295,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         )}
         renderSchema={({ schema }) => (
           <SchemaUI
-            key={schema.key}
+            key={schema.id}
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}

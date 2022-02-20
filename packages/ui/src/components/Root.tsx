@@ -29,16 +29,11 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <div
       ref={ref}
-      style={{
-        fontFamily: 'Arial, Helvetica, sans-serif',
-        position: 'relative',
-        background: 'rgb(74, 74, 74)',
-        overflowY: 'auto',
-        ...size,
-      }}
+      style={{ position: 'relative', background: 'rgb(74, 74, 74)', overflowY: 'auto', ...size }}
     >
       <div
         style={{
+          margin: '0 auto',
           width: size.width - RULER_HEIGHT * scale,
           height: size.height - RULER_HEIGHT * scale,
         }}

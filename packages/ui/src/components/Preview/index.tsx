@@ -80,12 +80,11 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
         backgrounds={backgrounds}
         renderSchema={({ schema, index }) => {
           const { key } = schema;
-          const data = input[key] ? input[key] : '';
-
+          const data = input[key] || '';
           return (
             <SchemaUI
-              key={key}
-              schema={Object.assign(schema, { key, id: key, data })}
+              key={schema.id}
+              schema={Object.assign(schema, { data })}
               editable={editable}
               placeholder={template.sampledata ? template.sampledata[0][key] : ''}
               tabIndex={index + 100}
