@@ -121,16 +121,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [initEvents, destroyEvents]);
 
   useEffect(() => {
+    moveable.current?.updateRect();
     if (prevSchemas === null) {
-      moveable.current?.updateRect();
-
       return;
     }
 
-    const prevSchemaKeys = Object.keys(prevSchemas[pageCursor] || {});
-    const schemaKeys = Object.keys(schemasList[pageCursor] || {});
+    const prevSchemaKeys = JSON.stringify(prevSchemas[pageCursor] || {});
+    const schemaKeys = JSON.stringify(schemasList[pageCursor] || {});
 
-    if (prevSchemaKeys.join() === schemaKeys.join()) {
+    if (prevSchemaKeys === schemaKeys) {
       moveable.current?.updateRect();
     }
   }, [pageCursor, schemasList, prevSchemas]);
@@ -239,8 +238,17 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
-        onSelect={(e) => {
-          onEdit(e.selected as HTMLElement[]);
+        onSelect={({ added, removed, selected, inputEvent }) => {
+          const isClick = inputEvent.type === 'mousedown';
+          let newActiveElements: HTMLElement[] = isClick ? (selected as HTMLElement[]) : [];
+          if (!isClick && added.length > 0) {
+            newActiveElements = activeElements.concat(added as HTMLElement[]);
+          }
+          if (!isClick && removed.length > 0) {
+            newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
+          }
+
+          onEdit(newActiveElements);
         }}
       />
       <Paper

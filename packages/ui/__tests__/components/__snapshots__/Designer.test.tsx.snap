@@ -39,19 +39,19 @@ exports[`Designer snapshot 1`] = `
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
             />
             <div
-              style="font-size: 0.9rem;"
+              style="height: 951.614173227px; overflow-y: auto;"
             >
-              <div
-                style="height: 961.614173227px; overflow-y: auto;"
+              <ul
+                style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
               >
-                <div
-                  style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
+                <li
+                  style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
-                    style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
+                    style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
-                      style="padding: 0px; background: none; display: flex;"
+                      style="padding: 0.5rem; background: none; display: flex;"
                     >
                       <img
                         alt="Drag icon"
@@ -60,27 +60,22 @@ exports[`Designer snapshot 1`] = `
                         width="15"
                       />
                     </button>
-                    <button
-                      class=""
-                      style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    <div
+                      style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                       title="Edit"
                     >
-                      <span
-                        style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                      >
-                        field1
-                      </span>
-                    </button>
+                      field1
+                    </div>
                   </div>
-                </div>
-                <div
-                  style="border: 1px solid transparent; width: 300px; transform: scale(1); transform-origin: top left;"
+                </li>
+                <li
+                  style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
-                    style="padding-left: 5px; display: flex; align-items: center; justify-content: space-between;"
+                    style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
-                      style="padding: 0px; background: none; display: flex;"
+                      style="padding: 0.5rem; background: none; display: flex;"
                     >
                       <img
                         alt="Drag icon"
@@ -89,24 +84,26 @@ exports[`Designer snapshot 1`] = `
                         width="15"
                       />
                     </button>
-                    <button
-                      class=""
-                      style="padding: 5px; margin: 5px; width: 100%; display: flex; background: none; text-align: left; cursor: pointer;"
+                    <div
+                      style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
                       title="Edit"
                     >
-                      <span
-                        style="margin-right: 1rem; width: 180px; color: rgb(51, 51, 51); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                      >
-                        field2
-                      </span>
-                    </button>
+                      field2
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div
-                style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
-              />
+                </li>
+              </ul>
             </div>
+            <div
+              style="display: flex; justify-content: flex-end; cursor: pointer; font-size: 0.75rem;"
+            >
+              <u>
+                Bulk update field names
+              </u>
+            </div>
+            <div
+              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
+            />
           </div>
           <div
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import {
+  SchemaForUI,
   getFallbackFontName,
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
@@ -88,7 +89,9 @@ const SelectSet = (props: {
   );
 };
 
-const TextPropEditor = (props: Pick<SidebarProps, 'changeSchemas' | 'activeSchema'>) => {
+const TextPropEditor = (
+  props: Pick<SidebarProps, 'changeSchemas'> & { activeSchema: SchemaForUI }
+) => {
   const { changeSchemas, activeSchema } = props;
   const alignments = ['left', 'center', 'right'];
   const font = useContext(FontContext);

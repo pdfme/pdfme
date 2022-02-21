@@ -29,6 +29,8 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
+    "@dnd-kit/core": "^5.0.1",
+    "@dnd-kit/sortable": "^6.0.0",
     "@pdfme/common": "^1.0.0-beta.7",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
@@ -37,7 +39,6 @@
     "react-dom": "^17.0.2",
     "react-moveable": "^0.30.3",
     "react-selecto": "^1.12.0",
-    "react-sortable-hoc": "^2.0.0",
     "worker-loader": "^3.0.8"
   },
   "devDependencies": {

@@ -105,3 +105,14 @@ export const useScrollPageCursor = ({
     };
   }, [rootRef, onScroll]);
 };
+
+export const useMountStatus = () => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsMounted(true), 500);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return isMounted;
+};

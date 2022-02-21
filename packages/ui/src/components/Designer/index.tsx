@@ -7,7 +7,6 @@ import { I18nContext } from '../../contexts';
 import {
   uuid,
   set,
-  arrayMove,
   cloneDeep,
   initShortCuts,
   destroyShortCuts,
@@ -216,23 +215,13 @@ const TemplateEditor = ({
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };
 
-  const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const movedSchema = arrayMove(cloneDeep(schemasList[pageCursor]), arg.oldIndex, arg.newIndex);
-    commitSchemas(movedSchema);
+  const onSortEnd = (sortedSchemas: SchemaForUI[]) => {
+    commitSchemas(sortedSchemas);
   };
 
   const onChangeHoveringSchemaId = (id: string | null) => {
     setHoveringSchemaId(id);
   };
-
-  const getLastActiveSchema = () => {
-    if (activeElements.length === 0) return getInitialSchema();
-    const last = activeElements[activeElements.length - 1];
-
-    return schemasList[pageCursor].find((s) => s.id === last.id) || getInitialSchema();
-  };
-
-  const activeSchema = getLastActiveSchema();
 
   if (error) {
     return <Error size={size} error={error} />;
@@ -241,22 +230,18 @@ const TemplateEditor = ({
   return (
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
-        scale={scale}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
         size={size}
         pageSize={pageSizes[pageCursor]}
-        activeElement={activeElements[activeElements.length - 1]}
+        activeElements={activeElements}
         schemas={schemasList[pageCursor]}
-        activeSchema={activeSchema}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
         onEdit={(id: string) => {
           const editingElem = document.getElementById(id);
-          if (editingElem) {
-            onEdit([editingElem]);
-          }
+          editingElem && onEdit([editingElem]);
         }}
         onEditEnd={onEditEnd}
         addSchema={addSchema}
