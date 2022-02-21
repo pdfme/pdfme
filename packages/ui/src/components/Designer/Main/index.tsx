@@ -239,6 +239,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           }
         }}
         onSelect={(e) => {
+          // TODO 範囲選択の時に順番がおかしい
+          console.log(e.added, 'e.added');
+          console.log(e.selected, 'e.selected');
           onEdit(e.selected as HTMLElement[]);
         }}
       />

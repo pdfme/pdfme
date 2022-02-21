@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   closestCorners,
@@ -18,27 +18,15 @@ import {
 import { SchemaForUI } from '@pdfme/common';
 import Item from './Item';
 import SelectableSortableItem from './SelectableSortableItem';
+import { SidebarProps } from '../';
 
-interface Props {
-  schemas: SchemaForUI[];
-  onEdit: (id: string) => void;
-  onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
-  height: number;
-  hoveringSchemaId: string | null;
-  onChangeHoveringSchemaId: (id: string | null) => void;
-}
-
-const SelectableSortableContainer = ({
-  schemas: initialSchemas,
-  // TODO 下記のpropsを使う実装
-  onEdit,
-  onSortEnd,
-  height,
-  hoveringSchemaId,
-  onChangeHoveringSchemaId,
-}: Props) => {
-  // TODO schemasは親のコンポーネントで管理したい
-  const [schemas, setSchemas] = useState<SchemaForUI[]>(initialSchemas);
+const SelectableSortableContainer = (
+  props: Pick<
+    SidebarProps,
+    'schemas' | 'onEdit' | 'onSortEnd' | 'height' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
+  >
+) => {
+  const { schemas, onEdit, onSortEnd, height, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const [selectedSchemas, setSelectedSchemas] = useState<SchemaForUI[]>([]);
   const [dragOverlaydItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -77,7 +65,7 @@ const SelectableSortableContainer = ({
           const newSelectedSchemas: SchemaForUI[] = [];
           setSelectedSchemas(newSelectedSchemas);
         } else if (selectedSchemas.length > 0) {
-          setSchemas((schemas) =>
+          onSortEnd(
             selectedSchemas.reduce((ret, selectedItem) => {
               if (selectedItem.id === active.id) {
                 return ret;
@@ -94,26 +82,24 @@ const SelectableSortableContainer = ({
         const overIndex = schemas.map((i) => i.id).indexOf(overId);
 
         if (selectedSchemas.length) {
-          setSchemas((schemas) => {
-            let newSchemas = [...schemas];
-            newSchemas = arrayMove(newSchemas, activeIndex, overIndex);
-            newSchemas.splice(
-              overIndex + 1,
-              0,
-              ...selectedSchemas.filter((item) => item.id !== activeId)
-            );
-            return newSchemas;
-          });
+          let newSchemas = [...schemas];
+          newSchemas = arrayMove(newSchemas, activeIndex, overIndex);
+          newSchemas.splice(
+            overIndex + 1,
+            0,
+            ...selectedSchemas.filter((item) => item.id !== activeId)
+          );
+          onSortEnd(newSchemas);
           setSelectedSchemas([]);
         } else if (activeIndex !== overIndex) {
-          setSchemas((schemas) => arrayMove(schemas, activeIndex, overIndex));
+          onSortEnd(arrayMove(schemas, activeIndex, overIndex));
         }
 
         setActiveId(null);
       }}
       onDragCancel={() => {
         if (dragOverlaydItems) {
-          setSchemas(dragOverlaydItems);
+          onSortEnd(dragOverlaydItems);
         }
 
         setActiveId(null);
@@ -122,32 +108,21 @@ const SelectableSortableContainer = ({
     >
       <div style={{ height, overflowY: 'auto' }}>
         <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
-          <ul
-            style={{
-              margin: 0,
-              padding: 0,
-              listStyle: 'none',
-              borderRadius: 5,
-            }}
-          >
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
             {schemas.map((schema) => (
-              <div
+              <SelectableSortableItem
                 key={schema.id}
                 style={{
                   border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
                 }}
+                schema={schema}
+                schemas={schemas}
+                isSelected={isItemSelected(schema.id) || activeId === schema.id}
+                onEdit={onEdit}
+                onSelect={onSelectionChanged}
                 onMouseEnter={() => onChangeHoveringSchemaId(schema.id)}
                 onMouseLeave={() => onChangeHoveringSchemaId(null)}
-              >
-                <SelectableSortableItem
-                  key={schema.id}
-                  schema={schema}
-                  schemas={schemas}
-                  isSelected={isItemSelected(schema.id)}
-                  onEdit={onEdit}
-                  onSelect={onSelectionChanged}
-                />
-              </div>
+              />
             ))}
           </ul>
         </SortableContext>

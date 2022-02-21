@@ -216,16 +216,13 @@ const TemplateEditor = ({
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };
 
-  const onSortEnd = (arg: { oldIndex: number; newIndex: number }) => {
-    const movedSchema = arrayMove(cloneDeep(schemasList[pageCursor]), arg.oldIndex, arg.newIndex);
-    commitSchemas(movedSchema);
+  const onSortEnd = (sortedSchemas: SchemaForUI[]) => {
+    commitSchemas(sortedSchemas);
   };
 
   const onChangeHoveringSchemaId = (id: string | null) => {
     setHoveringSchemaId(id);
   };
-
-
 
   if (error) {
     return <Error size={size} error={error} />;
@@ -234,7 +231,6 @@ const TemplateEditor = ({
   return (
     <Root ref={rootRef} size={size} scale={scale}>
       <Sidebar
-        scale={scale}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={mainRef.current ? mainRef.current.scrollHeight : 0}
@@ -246,9 +242,7 @@ const TemplateEditor = ({
         onSortEnd={onSortEnd}
         onEdit={(id: string) => {
           const editingElem = document.getElementById(id);
-          if (editingElem) {
-            onEdit([editingElem]);
-          }
+          editingElem && onEdit([editingElem]);
         }}
         onEditEnd={onEditEnd}
         addSchema={addSchema}

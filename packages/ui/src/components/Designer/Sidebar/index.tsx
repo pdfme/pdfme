@@ -9,7 +9,6 @@ import DetailView from './DetailView';
 import { getInitialSchema } from '../../../helper';
 
 export type SidebarProps = {
-  scale: number;
   height: number;
   hoveringSchemaId: string | null;
   onChangeHoveringSchemaId: (id: string | null) => void;
@@ -17,7 +16,7 @@ export type SidebarProps = {
   pageSize: Size;
   activeElements: HTMLElement[];
   schemas: SchemaForUI[];
-  onSortEnd: ({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) => void;
+  onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;

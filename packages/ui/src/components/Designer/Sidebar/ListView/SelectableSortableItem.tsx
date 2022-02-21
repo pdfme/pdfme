@@ -7,109 +7,70 @@ import { useMountStatus } from '../../../../hooks';
 
 interface Props {
   isSelected: boolean;
+  style?: React.CSSProperties;
   onSelect: (id: string, isShiftSelect: boolean) => void;
   onEdit: (id: string) => void;
   schema: SchemaForUI;
   schemas: SchemaForUI[];
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
-const SelectableSortableItem = ({ isSelected, onSelect, onEdit, schema, schemas }: Props) => {
+const SelectableSortableItem = ({
+  isSelected,
+  style,
+  onSelect,
+  onEdit,
+  schema,
+  schemas,
+  onMouseEnter,
+  onMouseLeave,
+}: Props) => {
   const i18n = useContext(I18nContext);
-  const { setNodeRef, listeners, isDragging, isSorting, over, overIndex, transform, transition } =
-    useSortable({ id: schema.id });
+  const { setNodeRef, listeners, isDragging, isSorting, transform, transition } = useSortable({
+    id: schema.id,
+  });
   const mounted = useMountStatus();
   const mountedWhileDragging = isDragging && !mounted;
 
-  const newlisteners = {
+  const newListeners = {
     ...listeners,
-    onClick: (event: any) => {
-      onSelect(schema.id, event.shiftKey);
-    },
+    onClick: (event: any) => onSelect(schema.id, event.shiftKey),
   };
 
-  const sc = schema;
-  let status: '' | 'is-warning' | 'is-danger' = '';
-  if (!sc.key) {
+  let status: undefined | 'is-warning' | 'is-danger';
+  if (!schema.key) {
     status = 'is-warning';
-  } else if (schemas.find((s) => sc.key && s.key === sc.key && s.id !== sc.id)) {
+  } else if (schemas.find((s) => schema.key && s.key === schema.key && s.id !== schema.id)) {
     status = 'is-danger';
   }
 
-  const getTitle = () => {
-    if (status === 'is-warning') {
-      return i18n('plsInputName');
-    }
-    if (status === 'is-danger') {
-      return i18n('fieldMustUniq');
-    }
+  let title = i18n('edit');
+  if (status === 'is-warning') {
+    title = i18n('plsInputName');
+  } else if (status === 'is-danger') {
+    title = i18n('fieldMustUniq');
+  }
 
-    return i18n('edit');
-  };
-
-  const style = isSelected
-    ? ({
-        color: '#fff',
-        background: '#18a0fb',
-        opacity: isSorting ? 0.5 : 1,
-      } as React.CSSProperties)
-    : {};
+  const selectedStyle = isSelected
+    ? { color: '#fff', background: '#18a0fb', opacity: isSorting || isDragging ? 0.5 : 1 }
+    : ({} as React.CSSProperties);
 
   return (
-    // TODO
-    //   <button
-    //   disabled={!touchable}
-    //   className={`${status}`}
-    //   style={{
-    //     padding: 5,
-    //     margin: 5,
-    //     width: '100%',
-    //     display: 'flex',
-    //     background: 'none',
-    //     border: 'none',
-    //     textAlign: 'left',
-    //     cursor: 'pointer',
-    //     fontSize: '0.75rem',
-    //   }}
-    //   onClick={() => onEdit(sc.id)}
-    //   title={getTitle()}
-    // >
-    //   <span
-    //     style={{
-    //       marginRight: '1rem',
-    //       width: 180,
-    //       color: '#333',
-    //       overflow: 'hidden',
-    //       whiteSpace: 'nowrap',
-    //       textOverflow: 'ellipsis',
-    //     }}
-    //   >
-    //     {status === '' ? (
-    //       sc.key
-    //     ) : (
-    //       <span style={{ display: 'flex', alignItems: 'center' }}>
-    //         <img
-    //           alt="Warning icon"
-    //           src={warningIcon}
-    //           width={15}
-    //           style={{ marginRight: '0.5rem' }}
-    //         />
-    //         {status === 'is-warning' ? i18n('noKeyName') : sc.key}
-    //         {status === 'is-danger' ? i18n('notUniq') : ''}
-    //       </span>
-    //     )}
-    //   </span>
-    // </button>
-
     <Item
       ref={setNodeRef}
-      onClick={() => onEdit(sc.id)}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      onClick={() => onEdit(schema.id)}
       value={schema.key}
+      status={status}
+      title={title}
+      style={{ ...selectedStyle, ...style }}
       dragging={isDragging}
       sorting={isSorting}
-      style={style}
       transition={transition}
       transform={transform}
       fadeIn={mountedWhileDragging}
-      listeners={newlisteners}
+      listeners={newListeners}
     />
   );
 };
