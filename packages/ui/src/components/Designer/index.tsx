@@ -167,6 +167,7 @@ const TemplateEditor = ({
       save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
+      selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),
     });
   }, [
     activeElements,
