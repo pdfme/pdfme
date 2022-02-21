@@ -122,12 +122,12 @@ const TemplateEditor = ({
     };
     const timeTavel = (mode: 'undo' | 'redo') => {
       const isUndo = mode === 'undo';
-      if ((isUndo ? past : future).current.length <= 0) return;
+      const stack = isUndo ? past : future;
+      if (stack.current.length <= 0) return;
       (isUndo ? future : past).current.push(cloneDeep(schemasList[pageCursor]));
       const s = cloneDeep(schemasList);
-      s[pageCursor] = (isUndo ? past : future).current.pop()!;
+      s[pageCursor] = stack.current.pop()!;
       setSchemasList(s);
-      onEditEnd();
     };
     initShortCuts({
       move: (command, isShift) => {
@@ -167,6 +167,7 @@ const TemplateEditor = ({
       save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
+      selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),
     });
   }, [
     activeElements,

@@ -6,7 +6,6 @@ import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
 import ListView from './ListView';
 import DetailView from './DetailView';
-import { getInitialSchema } from '../../../helper';
 
 export type SidebarProps = {
   height: number;
@@ -30,14 +29,15 @@ const Sidebar = (props: SidebarProps) => {
   const [open, setOpen] = useState(true);
   const top = 0;
 
-  const getLastActiveSchema = () => {
-    if (activeElements.length === 0) return getInitialSchema();
-    const last = activeElements[activeElements.length - 1];
-
-    return schemas.find((s) => s.id === last.id) || getInitialSchema();
+  const getActiveSchemas = () => {
+    const ids = activeElements.map((ae) => ae.id);
+    return schemas.filter((s) => ids.includes(s.id));
   };
 
-  const activeSchema = getLastActiveSchema();
+  const getLastActiveSchema = () => {
+    const activeSchemas = getActiveSchemas();
+    return activeSchemas[activeSchemas.length - 1];
+  };
 
   return (
     <div
@@ -77,10 +77,10 @@ const Sidebar = (props: SidebarProps) => {
             fontWeight: 400,
           }}
         >
-          {activeElements.length === 0 ? (
+          {getActiveSchemas().length === 0 ? (
             <ListView {...props} />
           ) : (
-            <DetailView {...props} activeSchema={activeSchema} />
+            <DetailView {...props} activeSchema={getLastActiveSchema()} />
           )}
           <div
             style={{

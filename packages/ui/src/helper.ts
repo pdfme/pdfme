@@ -87,6 +87,8 @@ const undoWin = 'ctrl+z';
 const undoMac = 'command+z';
 const saveWin = 'ctrl+s';
 const saveMac = 'command+s';
+const selectAllWin = 'ctrl+a';
+const selectAllMac = 'command+a';
 
 const keys = [
   up,
@@ -110,6 +112,8 @@ const keys = [
   undoMac,
   saveWin,
   saveMac,
+  selectAllWin,
+  selectAllMac,
 ];
 
 export const initShortCuts = (arg: {
@@ -121,6 +125,7 @@ export const initShortCuts = (arg: {
   redo: () => void;
   undo: () => void;
   save: () => void;
+  selectAll: () => void;
 }) => {
   hotkeys(keys.join(), (e, handler) => {
     switch (handler.shortcut) {
@@ -171,6 +176,11 @@ export const initShortCuts = (arg: {
       case saveMac:
         e.preventDefault();
         arg.save();
+        break;
+      case selectAllWin:
+      case selectAllMac:
+        e.preventDefault();
+        arg.selectAll();
         break;
       default:
         break;

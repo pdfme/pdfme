@@ -1,7 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { SchemaForUI } from '@pdfme/common';
 import { round } from '../../../../helper';
-import { ZOOM } from '../../../../constants';
 import { SidebarProps } from '..';
 import alignVerticalTop from '../../../../assets/icons/align-vertical-top.svg';
 import alignVerticalMiddle from '../../../../assets/icons/align-vertical-middle.svg';
@@ -39,8 +38,8 @@ const PositionAndSizeEditor = (
   const { changeSchemas, schemas, activeSchema, activeElements, pageSize } = props;
 
   const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
-    const aeids = activeElements.map((e) => e.id);
-    const ass = aeids.map((id) => schemas.find((s) => s.id === id)!);
+    const ids = activeElements.map((ae) => ae.id);
+    const ass = schemas.filter((s) => ids.includes(s.id));
 
     const isVertical = ['left', 'center', 'right'].includes(type);
     const tgtPos = isVertical ? 'x' : 'y';
@@ -72,8 +71,8 @@ const PositionAndSizeEditor = (
   };
 
   const distribute = (type: 'vertical' | 'horizontal') => {
-    const aeids = activeElements.map((e) => e.id);
-    const ass = aeids.map((id) => schemas.find((s) => s.id === id)!);
+    const ids = activeElements.map((ae) => ae.id);
+    const ass = schemas.filter((s) => ids.includes(s.id));
 
     const isVertical = type === 'vertical';
     const tgtPos = isVertical ? 'y' : 'x';

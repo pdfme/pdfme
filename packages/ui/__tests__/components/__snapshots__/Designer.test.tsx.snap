@@ -272,7 +272,7 @@ exports[`Designer snapshot 1`] = `
           <div>
             <div
               class="selectable"
-              id="2"
+              id="1"
               style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
               title="field1"
             >
@@ -295,7 +295,7 @@ exports[`Designer snapshot 1`] = `
           <div>
             <div
               class="selectable"
-              id="3"
+              id="2"
               style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
               title="field2"
             >
