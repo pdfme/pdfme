@@ -75,6 +75,7 @@ const Sidebar = (props: SidebarProps) => {
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
             fontWeight: 400,
+            textAlign: 'left',
           }}
         >
           {getActiveSchemas().length === 0 ? (

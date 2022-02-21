@@ -31,7 +31,7 @@
   "dependencies": {
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
-    "@pdfme/common": "^1.0.0-beta.7",
+    "@pdfme/common": "^1.0.0-beta.9",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",

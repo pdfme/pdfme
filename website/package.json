@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/website",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.9",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -22,8 +22,8 @@
     "@mdx-js/react": "^1.6.21",
     "@mui/icons-material": "^5.3.0",
     "@mui/material": "^5.3.0",
-    "@pdfme/generator": "^1.0.0-beta.7",
-    "@pdfme/ui": "^1.0.0-beta.7",
+    "@pdfme/generator": "^1.0.0-beta.9",
+    "@pdfme/ui": "^1.0.0-beta.9",
     "clsx": "^1.1.1",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.1",
