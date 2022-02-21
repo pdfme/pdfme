@@ -61,15 +61,6 @@ export const round = (number: number, precision: number) => {
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
 
-export const arrayMove = <T>(array: T[], from: number, to: number): T[] => {
-  array = array.slice();
-  const startIndex = to < 0 ? array.length + to : to;
-  const [item] = array.splice(from, 1);
-  array.splice(startIndex, 0, item);
-
-  return array;
-};
-
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);

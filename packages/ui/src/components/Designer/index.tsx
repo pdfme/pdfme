@@ -7,7 +7,6 @@ import { I18nContext } from '../../contexts';
 import {
   uuid,
   set,
-  arrayMove,
   cloneDeep,
   initShortCuts,
   destroyShortCuts,

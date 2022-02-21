@@ -238,11 +238,17 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
-        onSelect={(e) => {
-          // TODO 範囲選択の時に順番がおかしい
-          console.log(e.added, 'e.added');
-          console.log(e.selected, 'e.selected');
-          onEdit(e.selected as HTMLElement[]);
+        onSelect={({ added, removed, selected, inputEvent }) => {
+          const isClick = inputEvent.type === 'mousedown';
+          let newActiveElements: HTMLElement[] = isClick ? (selected as HTMLElement[]) : [];
+          if (!isClick && added.length > 0) {
+            newActiveElements = activeElements.concat(added as HTMLElement[]);
+          }
+          if (!isClick && removed.length > 0) {
+            newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
+          }
+
+          onEdit(newActiveElements);
         }}
       />
       <Paper
