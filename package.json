@@ -19,7 +19,7 @@
   "scripts": {
     "clean": "npm run --workspaces clean",
     "lint": "npm run --workspaces lint",
-    "build": "npm run --workspaces build",
+    "build": "npm run --workspaces clean && npm run --workspaces build",
     "test": "npm run --workspaces test"
   },
   "devDependencies": {

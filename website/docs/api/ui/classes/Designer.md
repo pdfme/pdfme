@@ -39,7 +39,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[ui/src/Designer.tsx:13](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L13)
+[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -53,7 +53,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:54](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L54)
+[ui/src/class.ts:54](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L54)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L11)
+[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L12)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:10](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L10)
+[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L11)
 
 ___
 
@@ -130,7 +130,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -153,7 +153,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[ui/src/class.ts:56](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L56)
+[ui/src/class.ts:56](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L56)
 
 ## Methods
 
@@ -171,7 +171,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[ui/src/class.ts:114](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L114)
+[ui/src/class.ts:114](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L114)
 
 ___
 
@@ -189,13 +189,13 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L98)
+[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L98)
 
 ___
 
 ### getI18n
 
-▸ `Protected` **getI18n**(): (`key`: ``"field"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"previewWarnMsg"`` \| ``"previewErrMsg"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"errorOccurred"``) => `string`
+▸ `Protected` **getI18n**(): (`key`: ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"``) => `string`
 
 #### Returns
 
@@ -207,7 +207,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `key` | ``"field"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"previewWarnMsg"`` \| ``"previewErrMsg"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"errorOccurred"`` |
+| `key` | ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"`` |
 
 ##### Returns
 
@@ -219,7 +219,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:94](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L94)
+[ui/src/class.ts:94](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L94)
 
 ___
 
@@ -244,7 +244,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/class.ts#L102)
+[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L102)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:40](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L40)
+[ui/src/Designer.tsx:41](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L41)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:36](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L36)
+[ui/src/Designer.tsx:37](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L37)
 
 ___
 
@@ -302,7 +302,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[ui/src/Designer.tsx:44](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L44)
+[ui/src/Designer.tsx:45](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L45)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:20](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L20)
+[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L21)
 
 ___
 
@@ -344,4 +344,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[ui/src/Designer.tsx:27](https://github.com/pdfme/pdfme/blob/5dddbbe/packages/ui/src/Designer.tsx#L27)
+[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L28)
