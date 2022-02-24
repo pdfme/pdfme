@@ -41,7 +41,7 @@ const SampleBarcode = ({ schema }: { schema: BarcodeSchema }) => (
 
 const ErrorBarcode = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-    <p
+    <span
       style={{
         color: 'white',
         background: 'red',
@@ -52,7 +52,7 @@ const ErrorBarcode = () => (
       }}
     >
       ERROR
-    </p>
+    </span>
   </div>
 );
 

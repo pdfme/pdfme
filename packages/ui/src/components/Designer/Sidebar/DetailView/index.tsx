@@ -19,9 +19,9 @@ const DetailView = (
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-        <p style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
+        <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('editField')}
-        </p>
+        </span>
       </div>
       <Divider />
       <div style={{ fontSize: '0.9rem' }}>

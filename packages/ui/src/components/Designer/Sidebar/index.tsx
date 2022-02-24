@@ -55,6 +55,7 @@ const Sidebar = (props: SidebarProps) => {
             padding: '0.5rem',
             cursor: 'pointer',
             background: '#eee',
+            width: 30,
           }}
           onClick={() => setOpen(!open)}
         >
@@ -76,6 +77,7 @@ const Sidebar = (props: SidebarProps) => {
             fontFamily: "'Open Sans', sans-serif",
             fontWeight: 400,
             textAlign: 'left',
+            boxSizing: 'content-box',
           }}
         >
           {getActiveSchemas().length === 0 ? (

@@ -17,13 +17,13 @@ const Error = ({ size, error }: { size: Size; error: Error }) => {
         ...size,
       }}
     >
-      <p style={{ color: '#fff', textAlign: 'center' }}>
+      <span style={{ color: '#fff', textAlign: 'center' }}>
         <span style={{ fontSize: 'large', fontWeight: 'bold', borderBottom: '1px solid #fff' }}>
           ERROR: {i18n('errorOccurred')}
         </span>
         <br />
         <span style={{ fontSize: 'small' }}>*{error.message}</span>
-      </p>
+      </span>
     </div>
   );
 };

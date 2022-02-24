@@ -33,9 +33,9 @@ const ListView = (
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-        <p style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
+        <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('fieldsList')}
-        </p>
+        </span>
       </div>
       <Divider />
       {isBulkUpdateFieldNamesMode ? (
