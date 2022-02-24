@@ -14,7 +14,7 @@ exports[`Designer snapshot 1`] = `
         style="position: sticky; top: 0px; z-index: 1; font-size: 1rem;"
       >
         <button
-          style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238);"
+          style="position: absolute; top: 1rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px;"
         >
           <img
             alt="Toggle icon"
@@ -23,17 +23,17 @@ exports[`Designer snapshot 1`] = `
           />
         </button>
         <div
-          style="width: 300px; height: 1086.614173227px; display: block; top: 0px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.929); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.5rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400; text-align: left;"
+          style="width: 300px; height: 1086.614173227px; display: block; top: 0px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.929); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.5rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400; text-align: left; box-sizing: content-box;"
         >
           <div>
             <div
               style="height: 40px; display: flex; align-items: center;"
             >
-              <p
+              <span
                 style="text-align: center; width: 100%; font-weight: bold;"
               >
                 List of Fields
-              </p>
+              </span>
             </div>
             <div
               style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
