@@ -109,9 +109,11 @@ exports[`Designer snapshot 1`] = `
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
           >
             <button
-              style="padding: 0.5rem; color: rgb(255, 255, 255); background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
+              style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
             >
-              <strong>
+              <strong
+                style="color: rgb(255, 255, 255);"
+              >
                 Add new field
               </strong>
             </button>
@@ -277,7 +279,7 @@ exports[`Designer snapshot 1`] = `
               title="field1"
             >
               <div
-                style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; font-feature-settings: \\"palt\\"; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+                style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
               >
                 <span
                   style="letter-spacing: inherit;"
