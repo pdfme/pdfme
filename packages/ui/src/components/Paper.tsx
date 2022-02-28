@@ -42,6 +42,15 @@ const Paper = (porps: {
                 paperRefs.current[paperIndex] = e;
               }
             }}
+            onClick={() => {
+              if (
+                document &&
+                document.hasFocus() &&
+                document.activeElement instanceof HTMLElement
+              ) {
+                document.activeElement.blur();
+              }
+            }}
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
               margin: `${RULER_HEIGHT * scale}px auto`,
