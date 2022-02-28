@@ -8,6 +8,7 @@ import {
   Lang,
   Font,
   UIProps,
+  UIOptions,
   PreviewProps,
   getDefaultFont,
   checkUIProps,
@@ -57,9 +58,9 @@ export abstract class BaseUIClass {
 
   protected size!: Size;
 
-  private readonly lang: Lang = DEFAULT_LANG;
+  private lang: Lang = DEFAULT_LANG;
 
-  private readonly font: Font = getDefaultFont();
+  private font: Font = getDefaultFont();
 
   private readonly setSize = debounce(() => {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
@@ -108,6 +109,18 @@ export abstract class BaseUIClass {
   public updateTemplate(template: Template) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.template = cloneDeep(template);
+    this.render();
+  }
+
+  public updateOptions(options: UIOptions) {
+    const { lang, font } = options || {};
+
+    if (lang) {
+      this.lang = lang;
+    }
+    if (font) {
+      this.font = font;
+    }
     this.render();
   }
 

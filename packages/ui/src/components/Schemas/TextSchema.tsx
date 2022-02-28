@@ -24,7 +24,6 @@ const TextSchemaUI = (
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
     fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
-    fontFeatureSettings: `"palt"`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',
     wordBreak: 'break-all',

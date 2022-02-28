@@ -48,10 +48,11 @@ const ListView = (
               height: height - 5,
               width: SIDEBAR_WIDTH,
               fontSize: '1rem',
-              lineHeight: '2.25rem',
+              lineHeight: '2.5rem',
               background: 'transparent',
               margin: 0,
-              padding: 0,
+              padding: '1rem',
+              boxSizing: 'border-box',
               fontFamily: 'inherit',
             }}
           ></textarea>

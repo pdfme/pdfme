@@ -95,6 +95,7 @@ const BarcodeSchemaUI = (
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        fontFamily: "'Open Sans', sans-serif",
       }}
     >
       {editable ? (

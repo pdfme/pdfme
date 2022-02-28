@@ -99,7 +99,6 @@ const Sidebar = (props: SidebarProps) => {
             <button
               style={{
                 padding: '0.5rem',
-                color: '#fff',
                 background: '#18a0fb',
                 border: 'none',
                 borderRadius: 2,
@@ -107,7 +106,7 @@ const Sidebar = (props: SidebarProps) => {
               }}
               onClick={addSchema}
             >
-              <strong>{i18n('addNewField')}</strong>
+              <strong style={{ color: '#fff' }}>{i18n('addNewField')}</strong>
             </button>
           </div>
         </div>

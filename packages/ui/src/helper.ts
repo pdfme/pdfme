@@ -352,6 +352,7 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
   const schemaAddedTemplate: Template = {
+    ...template,
     schemas: cloneDeep(schemasList).map((schema) =>
       schema.reduce((acc, cur) => {
         const k = cur.key;
