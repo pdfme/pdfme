@@ -1,6 +1,6 @@
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import hotkeys from 'hotkeys-js';
 import {
