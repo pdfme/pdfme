@@ -25,7 +25,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           >
             <textarea
               placeholder="bb"
-              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+              style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; outline: none; color: rgb(0, 0, 0);"
               tabindex="100"
             >
               field1
@@ -100,7 +100,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             title="field1"
           >
             <div
-              style="resize: none; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; color: rgb(0, 0, 0);"
+              style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; outline: none; color: rgb(0, 0, 0);"
             >
               <span
                 style="letter-spacing: inherit;"
