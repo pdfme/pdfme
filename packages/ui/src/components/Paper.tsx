@@ -42,8 +42,9 @@ const Paper = (porps: {
                 paperRefs.current[paperIndex] = e;
               }
             }}
-            onClick={() => {
+            onClick={(e) => {
               if (
+                e.currentTarget === e.target &&
                 document &&
                 document.hasFocus() &&
                 document.activeElement instanceof HTMLElement
