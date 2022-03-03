@@ -217,7 +217,7 @@ describe('check validation', () => {
       expect(e.message).toEqual(`Invalid argument:
 --------------------------
 ERROR POSITION: inputs
-ERROR MESSAGE: Should have at least 1 items
+ERROR MESSAGE: Array must contain at least 1 element(s)
 --------------------------`);
     }
   });
