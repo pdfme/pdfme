@@ -39,7 +39,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L14)
+[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -53,7 +53,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:54](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L54)
+[ui/src/class.ts:55](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L55)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L12)
+[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L12)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L11)
+[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L11)
 
 ___
 
@@ -130,7 +130,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:59](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L59)
 
 ___
 
@@ -153,7 +153,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[ui/src/class.ts:56](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L56)
+[ui/src/class.ts:57](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L57)
 
 ## Methods
 
@@ -171,7 +171,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[ui/src/class.ts:114](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L114)
+[ui/src/class.ts:127](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L127)
 
 ___
 
@@ -189,7 +189,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L98)
+[ui/src/class.ts:99](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L99)
 
 ___
 
@@ -219,7 +219,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:94](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L94)
+[ui/src/class.ts:95](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L95)
 
 ___
 
@@ -244,7 +244,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/class.ts#L102)
+[ui/src/class.ts:103](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L103)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:41](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L41)
+[ui/src/Designer.tsx:41](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L41)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:37](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L37)
+[ui/src/Designer.tsx:37](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L37)
 
 ___
 
@@ -302,7 +302,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[ui/src/Designer.tsx:45](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L45)
+[ui/src/Designer.tsx:45](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L45)
 
 ___
 
@@ -316,7 +316,33 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L21)
+[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L21)
+
+___
+
+### updateOptions
+
+▸ **updateOptions**(`options`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | `Object` |
+| `options.font?` | `Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
+| `options.lang?` | ``"en"`` \| ``"ja"`` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+BaseUIClass.updateOptions
+
+#### Defined in
+
+[ui/src/class.ts:115](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L115)
 
 ___
 
@@ -344,4 +370,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/8c98b46/packages/ui/src/Designer.tsx#L28)
+[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Designer.tsx#L28)
