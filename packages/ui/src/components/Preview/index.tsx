@@ -80,7 +80,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
         backgrounds={backgrounds}
         renderSchema={({ schema, index }) => {
           const { key } = schema;
-          const data = input[key] || '';
+          const data = (input && input[key]) || '';
           return (
             <SchemaUI
               key={schema.id}
