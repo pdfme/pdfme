@@ -2,6 +2,8 @@ import { z } from 'zod';
 import Helvetica from './assets/Helvetica.ttf';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
 import {
+  Inputs as InputsSchema,
+  UIOptions as UIOptionsSchema,
   Template as TemplateSchema,
   PreviewProps as PreviewPropsSchema,
   DesignerProps as DesignerPropsSchema,
@@ -140,6 +142,8 @@ ${message}`);
   }
 };
 
+export const checkInputs = (data: unknown) => checkProps(data, InputsSchema);
+export const checkUIOptions = (data: unknown) => checkProps(data, UIOptionsSchema);
 export const checkTemplate = (data: unknown) => checkProps(data, TemplateSchema);
 export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);

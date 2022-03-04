@@ -12,6 +12,9 @@ import {
   PreviewProps,
   getDefaultFont,
   checkUIProps,
+  checkTemplate,
+  checkInputs,
+  checkUIOptions,
   checkPreviewProps,
 } from '@pdfme/common';
 
@@ -107,12 +110,15 @@ export abstract class BaseUIClass {
   }
 
   public updateTemplate(template: Template) {
+    checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+
     this.template = cloneDeep(template);
     this.render();
   }
 
   public updateOptions(options: UIOptions) {
+    checkUIOptions(options);
     const { lang, font } = options || {};
 
     if (lang) {
@@ -151,6 +157,7 @@ export abstract class PreviewUI extends BaseUIClass {
 
   public setInputs(inputs: { [key: string]: string }[]) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    checkInputs(inputs);
     this.inputs = cloneDeep(inputs);
     this.render();
   }

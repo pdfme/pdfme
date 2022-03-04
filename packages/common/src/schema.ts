@@ -66,7 +66,7 @@ export const Template = z.object({
   columns: z.array(z.string()).optional(),
 });
 
-const Inputs = z.array(z.record(z.string())).min(1);
+export const Inputs = z.array(z.record(z.string())).min(1);
 
 const CommonOptions = z.object({ font: Font.optional() });
 
