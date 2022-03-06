@@ -29,7 +29,6 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "cdigit": "^3.1.2",
     "zod": "^3.11.6"
   },
   "jest": {

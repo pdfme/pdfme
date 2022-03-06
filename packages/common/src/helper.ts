@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { gtin } from 'cdigit';
 import Helvetica from './assets/Helvetica.ttf';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
 import {
@@ -151,11 +150,25 @@ export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewProp
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
+// GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {
   let passCheckDigit = true;
+
   if (input.length === checkDigitPos) {
-    passCheckDigit = gtin.validate(input);
+    const ds = input.slice(0, -1).replace(/[^0-9]/g, '');
+    let sum = 0;
+    let odd = 1;
+    for (let i = ds.length - 1; i > -1; i -= 1) {
+      sum += Number(ds[i]) * (odd ? 3 : 1);
+      odd ^= 1;
+      if (sum > 0xffffffffffff) {
+        // ~2^48 at max
+        sum %= 10;
+      }
+    }
+    passCheckDigit = String(10 - (sum % 10)).slice(-1) === input.slice(-1);
   }
+
   return passCheckDigit;
 };
 
