@@ -56,13 +56,19 @@ const ErrorBarcode = () => (
   </div>
 );
 
-const ErrorOrSampleBarcode = ({ schema, value }: { schema: BarcodeSchema; value: string }) =>
-  validateBarcodeInput(schema.type as BarCodeType, value) ? (
+const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
+  const { schema, value } = props;
+
+  if (value.length === 0) {
+    return null;
+  }
+
+  return validateBarcodeInput(schema.type as BarCodeType, value) ? (
     <SampleBarcode schema={schema} />
   ) : (
     <ErrorBarcode />
   );
-
+};
 type Props = SchemaUIProps & { schema: BarcodeSchema };
 
 const BarcodeSchemaUI = (
@@ -112,14 +118,7 @@ const BarcodeSchemaUI = (
           <span>{value}</span>
         </div>
       )}
-
-      {value ? (
-        <ErrorOrSampleBarcode value={value} schema={schema} />
-      ) : editable ? (
-        <SampleBarcode schema={schema} />
-      ) : (
-        <ErrorBarcode />
-      )}
+      <BarcodePreview value={value} schema={schema} />
     </div>
   );
 };
