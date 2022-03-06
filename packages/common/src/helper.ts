@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { gtin } from 'cdigit';
 import Helvetica from './assets/Helvetica.ttf';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
 import {
@@ -150,6 +151,14 @@ export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewProp
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
+const validateCheckDigit = (input: string, checkDigitPos: number) => {
+  let passCheckDigit = true;
+  if (input.length === checkDigitPos) {
+    passCheckDigit = gtin.validate(input);
+  }
+  return passCheckDigit;
+};
+
 export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   if (!input) return false;
   if (type === 'qrcode') {
@@ -166,13 +175,13 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
     // 有効文字は数値(0-9)のみ。チェックデジットを含まない12桁orチェックデジットを含む13桁。
     const regexp = /^\d{12}$|^\d{13}$/;
 
-    return regexp.test(input);
+    return regexp.test(input) && validateCheckDigit(input, 13);
   }
   if (type === 'ean8') {
     // 有効文字は数値(0-9)のみ。チェックデジットを含まない7桁orチェックデジットを含む8桁。
     const regexp = /^\d{7}$|^\d{8}$/;
 
-    return regexp.test(input);
+    return regexp.test(input) && validateCheckDigit(input, 8);
   }
   if (type === 'code39') {
     // 有効文字は数字(0-9)。アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペース。
@@ -198,20 +207,20 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁。
     const regexp = /^\d{13}$|^\d{14}$/;
 
-    return regexp.test(input);
+    return regexp.test(input) && validateCheckDigit(input, 14);
   }
   if (type === 'upca') {
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
     const regexp = /^\d{11}$|^\d{12}$/;
 
-    return regexp.test(input);
+    return regexp.test(input) && validateCheckDigit(input, 12);
   }
   if (type === 'upce') {
     // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
     // チェックデジットを含まない7桁orチェックデジットを含む8桁。
     const regexp = /^0(\d{6}$|\d{7}$)/;
 
-    return regexp.test(input);
+    return regexp.test(input) && validateCheckDigit(input, 8);
   }
 
   return false;

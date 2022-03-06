@@ -185,6 +185,7 @@ describe('validateBarcodeInput test', () => {
   test('qrcode', () => {
     // 500文字以下
     const type = 'qrcode';
+
     const valid = 'https://www.google.com/';
     const valid2 = '漢字を含む文字列';
     const invalid2 =
@@ -199,6 +200,7 @@ describe('validateBarcodeInput test', () => {
     // https://barcode-place.azurewebsites.net/Barcode/zip
     // 郵便番号は数字(0-9)のみ、住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
     const type = 'japanpost';
+
     const valid1 = '10000131-3-2-503';
     const valid2 = '10000131-3-2-B503';
     const invalid1 = 'invalid';
@@ -218,44 +220,65 @@ describe('validateBarcodeInput test', () => {
     // https://barcode-place.azurewebsites.net/Barcode/jan
     // 有効文字は数値(0-9)のみ。標準タイプはチェックデジットを含まない12桁orチェックデジットを含む13桁
     const type = 'ean13';
-    const valid = '111111111111';
-    const valid2 = '1111111111111';
+
+    const valid1 = '111111111111';
+    const valid2 = '1111111111116';
+    const valid3 = '2822224229221';
+    const valid4 = '3433333133331';
+    const valid5 = '8434244447413';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
+
     const invalid1 = '111';
     const invalid2 = '111111111111111111111111';
     const invalid3 = 'invalid';
     const invalid4 = '11111a111111';
+    const invalid5 = '1111111111111';
     const blank = '';
-    expect(validateBarcodeInput(type, valid)).toEqual(true);
-    expect(validateBarcodeInput(type, valid2)).toEqual(true);
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
     expect(validateBarcodeInput(type, invalid3)).toEqual(false);
     expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid5)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
   test('ean8', () => {
     // https://barcode-place.azurewebsites.net/Barcode/jan
     // 有効文字は数値(0-9)のみ。短縮タイプはチェックデジットを含まない7桁orチェックデジットを含む8桁
     const type = 'ean8';
-    const valid = '1111111';
-    const valid2 = '11111111';
+
+    const valid1 = '1111111';
+    const valid2 = '11111115';
+    const valid3 = '22222220';
+    const valid4 = '33333335';
+    const valid5 = '44444440';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
+
     const invalid1 = '111';
     const invalid2 = '11111111111111111111';
     const invalid3 = 'invalid';
     const invalid4 = '111a111';
+    const invalid5 = '44444441';
     const blank = '';
-    expect(validateBarcodeInput(type, valid)).toEqual(true);
-    expect(validateBarcodeInput(type, valid2)).toEqual(true);
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
     expect(validateBarcodeInput(type, invalid3)).toEqual(false);
     expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid5)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
   test('code39', () => {
     // https://barcode-place.azurewebsites.net/Barcode/code39
     // CODE39は数字(0-9)、アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペースに対応しています。
     const type = 'code39';
+
     const valid1 = '12345';
     const valid2 = 'ABCDE';
     const valid3 = '1A2B3C4D5G';
@@ -275,6 +298,7 @@ describe('validateBarcodeInput test', () => {
     // https://www.keyence.co.jp/ss/products/autoid/codereader/basic_code128.jsp
     // コンピュータのキーボードから打てる文字（漢字、ひらがな、カタカナ以外）可能
     const type = 'code128';
+
     const valid1 = '12345';
     const valid2 = '1-A$2/B+3%C4=D5G';
     const valid3 = '1-A$2/B+3%C4=D5Ga~';
@@ -296,6 +320,7 @@ describe('validateBarcodeInput test', () => {
     // NW-7は数字(0-9)と記号(-.$:/+)に対応しています。
     // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
     const type = 'nw7';
+
     const valid1 = 'A12345D';
     const valid2 = 'A$2/+345D';
     const valid3 = 'a4321D';
@@ -313,30 +338,50 @@ describe('validateBarcodeInput test', () => {
     // https://barcode-place.azurewebsites.net/Barcode/itf
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁
     const type = 'itf14';
-    const valid = '1111111111111';
-    const valid2 = '11111111111111';
+
+    const valid1 = '1111111111111';
+    const valid2 = '11111111111113';
+    const valid3 = '22222222222226';
+    const valid4 = '33333333333339';
+    const valid5 = '44444444444442';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
     const invalid1 = '111';
     const invalid2 = '11111111111111111111111111111';
+    const invalid3 = '11111111111112';
     const blank = '';
-    expect(validateBarcodeInput(type, valid)).toEqual(true);
-    expect(validateBarcodeInput(type, valid2)).toEqual(true);
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
   test('upca', () => {
     // https://barcode-place.azurewebsites.net/Barcode/upc
     // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
     const type = 'upca';
-    const valid = '12345678901';
+
+    const valid1 = '12345678901';
     const valid2 = '123456789012';
+    const valid3 = '123456789036';
+    const valid4 = '126456789013';
+    const valid5 = '123456759015';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
     const invalid1 = '1234567890';
     const invalid2 = '1234567890123';
+    const invalid3 = '123456789011';
+    const invalid4 = '126456789014';
     const blank = '';
-    expect(validateBarcodeInput(type, valid)).toEqual(true);
-    expect(validateBarcodeInput(type, valid2)).toEqual(true);
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid4)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
   test('upce', () => {
@@ -344,15 +389,26 @@ describe('validateBarcodeInput test', () => {
     // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
     // チェックデジットを含まない7桁orチェックデジットを含む8桁。
     const type = 'upce';
-    const valid = '0111111';
-    const valid2 = '01111111';
+
+    const valid1 = '0111111';
+    const valid2 = '01111118';
+    const valid3 = '01111125';
+    const valid4 = '01114126';
+    const valid5 = '01101126';
+    const blank = '';
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
     const invalid1 = '1111111';
     const invalid2 = '011111111';
-    const blank = '';
-    expect(validateBarcodeInput(type, valid)).toEqual(true);
-    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    const invalid3 = '01111128';
+    const invalid4 = '01114125';
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid3)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid4)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
 });
