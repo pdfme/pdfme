@@ -40,7 +40,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[ui/src/Viewer.tsx:10](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Viewer.tsx#L10)
+[ui/src/Viewer.tsx:10](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/Viewer.tsx#L10)
 
 ## Properties
 
@@ -54,7 +54,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:55](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L55)
+[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -68,7 +68,7 @@ PreviewUI.inputs
 
 #### Defined in
 
-[ui/src/class.ts:137](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L137)
+[ui/src/class.ts:143](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L143)
 
 ___
 
@@ -89,7 +89,7 @@ PreviewUI.size
 
 #### Defined in
 
-[ui/src/class.ts:59](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L59)
+[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L62)
 
 ___
 
@@ -112,7 +112,7 @@ PreviewUI.template
 
 #### Defined in
 
-[ui/src/class.ts:57](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L57)
+[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L60)
 
 ## Methods
 
@@ -130,7 +130,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[ui/src/class.ts:127](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L127)
+[ui/src/class.ts:133](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L133)
 
 ___
 
@@ -148,7 +148,7 @@ PreviewUI.getFont
 
 #### Defined in
 
-[ui/src/class.ts:99](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L99)
+[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L102)
 
 ___
 
@@ -178,7 +178,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:95](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L95)
+[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L98)
 
 ___
 
@@ -196,7 +196,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[ui/src/class.ts:146](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L146)
+[ui/src/class.ts:152](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L152)
 
 ___
 
@@ -221,7 +221,7 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:103](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L103)
+[ui/src/class.ts:106](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L106)
 
 ___
 
@@ -239,7 +239,7 @@ PreviewUI.render
 
 #### Defined in
 
-[ui/src/Viewer.tsx:15](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/Viewer.tsx#L15)
+[ui/src/Viewer.tsx:15](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/Viewer.tsx#L15)
 
 ___
 
@@ -263,7 +263,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[ui/src/class.ts:152](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L152)
+[ui/src/class.ts:158](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L158)
 
 ___
 
@@ -289,7 +289,7 @@ PreviewUI.updateOptions
 
 #### Defined in
 
-[ui/src/class.ts:115](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L115)
+[ui/src/class.ts:120](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L120)
 
 ___
 
@@ -317,4 +317,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[ui/src/class.ts:109](https://github.com/pdfme/pdfme/blob/908a9c6/packages/ui/src/class.ts#L109)
+[ui/src/class.ts:112](https://github.com/pdfme/pdfme/blob/ad0340d/packages/ui/src/class.ts#L112)

@@ -235,7 +235,7 @@ common/dist/types/constants.d.ts:6
 
 #### Defined in
 
-common/dist/types/helper.d.ts:13
+common/dist/types/helper.d.ts:15
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-common/dist/types/helper.d.ts:14
+common/dist/types/helper.d.ts:16
 
 ___
 
@@ -275,7 +275,7 @@ ___
 
 #### Defined in
 
-common/dist/types/helper.d.ts:12
+common/dist/types/helper.d.ts:14
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 #### Defined in
 
-common/dist/types/helper.d.ts:10
+common/dist/types/helper.d.ts:12
 
 ___
 
@@ -315,7 +315,7 @@ ___
 
 #### Defined in
 
-common/dist/types/helper.d.ts:11
+common/dist/types/helper.d.ts:13
 
 ___
 
@@ -344,7 +344,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:40](https://github.com/pdfme/pdfme/blob/908a9c6/packages/generator/src/generate.ts#L40)
+[generator/src/generate.ts:40](https://github.com/pdfme/pdfme/blob/ad0340d/packages/generator/src/generate.ts#L40)
 
 ___
 
@@ -446,4 +446,4 @@ ___
 
 #### Defined in
 
-common/dist/types/helper.d.ts:15
+common/dist/types/helper.d.ts:17

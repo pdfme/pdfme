@@ -4,11 +4,6 @@ sidebar_position: 1
 
 # Getting Started
 
-:::caution
-
-pdfme is now in beta version. Please report any issues or suggestions from [Help page](/help) or [edit this page.](https://github.com/pdfme/pdfme/tree/main/website/docs/getting-started.md)
-:::
-
 ## Introduction
 
 pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:

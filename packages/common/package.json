@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/common",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0",
   "author": "hand-dot",
   "license": "MIT",
   "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",

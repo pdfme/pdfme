@@ -102,7 +102,7 @@ const config = {
       hideableSidebar: true,
       hideOnScroll: true,
       navbar: {
-        title: 'pdfme(BETA)',
+        title: 'pdfme',
         items: [
           {
             type: 'doc',
