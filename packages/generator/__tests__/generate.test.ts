@@ -304,4 +304,39 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
       expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
     }
   });
+
+  test.only(`check digit error`, async () => {
+    const inputs = [{ a: 'worng text', b: 'worng text', c: 'worng text' }];
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        {
+          a: {
+            type: 'ean8',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+          },
+          b: {
+            type: 'ean13',
+            position: { x: 0, y: 100 },
+            width: 100,
+            height: 100,
+          },
+          c: {
+            type: 'nw7',
+            position: { x: 0, y: 200 },
+            width: 100,
+            height: 100,
+          },
+        },
+      ],
+    };
+    try {
+      await generate({ inputs, template });
+    } catch (e: any) {
+      fail();
+    }
+    expect(true).toEqual(true);
+  });
 });

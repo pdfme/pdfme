@@ -9,7 +9,7 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
-import { ToBufferOptions } from "bwip-js";
+import { ToBufferOptions } from 'bwip-js';
 import bwipjsNode from 'bwip-js/dist/node-bwipjs';
 import bwipjsBrowser from 'bwip-js/dist/bwip-js';
 import {
@@ -35,7 +35,7 @@ import {
 } from '@pdfme/common';
 
 export interface InputImageCache {
-  [key: string]: PDFImage;
+  [key: string]: PDFImage | undefined;
 }
 
 const barCodeType2Bcid = (type: BarCodeType) => (type === 'nw7' ? 'rationalizedCodabar' : type);
@@ -366,6 +366,7 @@ const drawInputByBarcodeSchema = async (arg: {
   inputImageCache: InputImageCache;
 }) => {
   const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
+  if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const opt = {
@@ -377,14 +378,13 @@ const drawInputByBarcodeSchema = async (arg: {
   };
   const inputBarcodeCacheKey = getCacheKey(templateSchema, input);
   let image = inputImageCache[inputBarcodeCacheKey];
-  if (!image && validateBarcodeInput(templateSchema.type as BarCodeType, input)) {
-    const imageBuf = await createBarCode({
-      ...{ ...templateSchema, type: templateSchema.type as BarCodeType },
-      input,
-    });
-    if (imageBuf) {
-      image = await pdfDoc.embedPng(imageBuf);
-    }
+  if (!image) {
+    const imageBuf = await createBarCode(
+      Object.assign(templateSchema, { type: templateSchema.type as BarCodeType, input })
+    );
+    image = await pdfDoc.embedPng(imageBuf);
+    console.log('image: ', image);
+    console.log('imageBuf: ', imageBuf);
   }
   inputImageCache[inputBarcodeCacheKey] = image;
   page.drawImage(image, opt);
