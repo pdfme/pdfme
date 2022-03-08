@@ -383,8 +383,6 @@ const drawInputByBarcodeSchema = async (arg: {
       Object.assign(templateSchema, { type: templateSchema.type as BarCodeType, input })
     );
     image = await pdfDoc.embedPng(imageBuf);
-    console.log('image: ', image);
-    console.log('imageBuf: ', imageBuf);
   }
   inputImageCache[inputBarcodeCacheKey] = image;
   page.drawImage(image, opt);
