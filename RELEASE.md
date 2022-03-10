@@ -1,4 +1,5 @@
 npm version x.x.x --workspaces  
+git commit -m "Update version to x.x.x"
 npm run build  
 npm publish --workspaces  
 git tag x.x.x
