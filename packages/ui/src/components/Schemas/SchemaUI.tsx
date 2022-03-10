@@ -18,9 +18,6 @@ type Props = SchemaUIProps & {
   onChangeHoveringSchemaId?: (id: string | null) => void;
 };
 
-const getBgc = (schema: SchemaForUI) =>
-  schema.type === 'text' && schema.backgroundColor ? schema.backgroundColor : 'transparent';
-
 const Wrapper = ({
   children,
   border,
@@ -40,7 +37,6 @@ const Wrapper = ({
       top: schema.position.y * ZOOM,
       left: schema.position.x * ZOOM,
       border,
-      backgroundColor: getBgc(schema),
     }}
   >
     {children}
