@@ -305,7 +305,7 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
     }
   });
 
-  test.only(`check digit error`, async () => {
+  test(`check digit error`, async () => {
     const inputs = [{ a: 'worng text', b: 'worng text', c: 'worng text' }];
     const template: Template = {
       basePdf: BLANK_PDF,

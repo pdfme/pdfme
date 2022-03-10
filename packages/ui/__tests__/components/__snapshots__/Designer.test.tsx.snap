@@ -275,11 +275,11 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="1"
-              style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              style="position: absolute; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af;"
               title="field1"
             >
               <div
-                style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; outline: none; color: rgb(0, 0, 0);"
+                style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; background: transparent; outline: none; color: rgb(0, 0, 0); background-color: transparent;"
               >
                 <span
                   style="letter-spacing: inherit;"
@@ -298,7 +298,7 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af; background-color: transparent;"
+              style="position: absolute; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af;"
               title="field2"
             >
               <div
