@@ -36,6 +36,7 @@ const Paper = (porps: {
 
         return (
           <div
+            id={`@pdfme/ui-paper${paperIndex}`}
             key={paperIndex + JSON.stringify(paperSize)}
             ref={(e) => {
               if (e && paperRefs) {
