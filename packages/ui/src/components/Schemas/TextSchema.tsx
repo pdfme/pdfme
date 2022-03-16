@@ -32,7 +32,6 @@ const TextSchemaUI = (
     wordBreak: 'break-all',
     background: 'transparent',
     border: 'none',
-    outline: 'none',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     backgroundColor: schema.data && schema.backgroundColor ? schema.backgroundColor : 'transparent',
   };
