@@ -5,10 +5,10 @@ exports[`Preview(as Form) snapshot 1`] = `
   style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="margin: 0px auto; width: 1170px; height: 1170px;"
+    style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="height: 1122.5196850527px; width: 100%; position: absolute;"
+      style="height: 304.93749999mm; width: 100%; top: 0px; position: absolute;"
     />
     <div
       style="transform: scale(1); transform-origin: center top;"
@@ -81,10 +81,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
   style="position: relative; background: rgb(74, 74, 74); overflow-y: auto; width: 1200px; height: 1200px;"
 >
   <div
-    style="margin: 0px auto; width: 1170px; height: 1170px;"
+    style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="height: 1122.5196850527px; width: 100%; position: absolute;"
+      style="height: 304.93749999mm; width: 100%; top: 0px; position: absolute;"
     />
     <div
       style="transform: scale(1); transform-origin: center top;"

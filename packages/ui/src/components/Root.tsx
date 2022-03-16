@@ -34,7 +34,6 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
       <div
         style={{
           margin: '0 auto',
-          width: size.width - RULER_HEIGHT * scale,
           height: size.height - RULER_HEIGHT * scale,
         }}
       >
