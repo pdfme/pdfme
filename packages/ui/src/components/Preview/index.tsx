@@ -8,7 +8,7 @@ import Error from '../Error';
 import Paper from '../Paper';
 import SchemaUI from '../Schemas/SchemaUI';
 import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
-import { templateSchemas2SchemasList } from '../../helper';
+import { templateSchemas2SchemasList, px2mm } from '../../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
@@ -54,8 +54,11 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
     <Root ref={rootRef} size={size} scale={scale}>
       <div
         style={{
-          height: pageSizes.reduce((acc, cur) => acc + cur.height * ZOOM, 0),
+          height:
+            pageSizes.reduce((acc, cur) => acc + (cur.height + px2mm(RULER_HEIGHT)) * scale, 0) +
+            'mm',
           width: '100%',
+          top: 0,
           position: 'absolute',
         }}
       >

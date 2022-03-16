@@ -233,6 +233,13 @@ const pt2mm = (pt: number) => {
   return parseFloat(String(pt)) * mmRatio;
 };
 
+export const px2mm = (px: number) => {
+  // http://www.unitconversion.org/typography/millimeters-to-pixels-y-conversion.html
+  const mmRatio = 0.264583333;
+
+  return parseFloat(String(px)) * mmRatio;
+};
+
 export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const url = URL.createObjectURL(pdfBlob);
   const pdfDoc = await getDocument({ url }).promise;
