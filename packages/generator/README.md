@@ -1,8 +1,5 @@
 # PDFME
 <p>
-  <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
-    <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet" />
-  </a>
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
@@ -17,6 +14,9 @@
   </a>
   <a href="https://pdfme.com/help#contribution">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
+  </a>
+  <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
+    <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet" />
   </a>
 </p>
 
