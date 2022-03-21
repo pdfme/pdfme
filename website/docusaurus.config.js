@@ -99,6 +99,10 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        id: 'support_us',
+        content: `⭐️  &nbsp; If you like pdfme, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme">GitHub</a>! &nbsp; ⭐️`,
+      },
       image: 'img/ogimage.png',
       hideableSidebar: true,
       hideOnScroll: true,

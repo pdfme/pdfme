@@ -42,16 +42,7 @@ export default function HomepageHeader() {
               Playground
             </a>
           </div>
-          <div className="col col--6" style={{ height: 25, marginTop: '1rem' }}>
-            <GitHubButton
-              href="https://github.com/pdfme/pdfme"
-              data-size="large"
-              data-show-count={true}
-              aria-label="Star pdfme on GitHub"
-            >
-              Star
-            </GitHubButton>
-          </div>
+          <div className="col col--6" />
         </div>
       </div>
     </header>
