@@ -3,7 +3,6 @@ import GitHubButton from 'react-github-btn';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
@@ -13,8 +12,6 @@ import { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
-
   const designerRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
@@ -89,8 +86,8 @@ export default function Home(): JSX.Element {
 
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />"
+      title={`Free and Open source PDF generator library!`}
+      description="Free and Open source PDF generator library fully written in TypeScript coming with a React based UI template editor."
     >
       <HomepageHeader />
       <main>
@@ -113,7 +110,7 @@ export default function Home(): JSX.Element {
                     <img src={'/img/template.png'} alt="Image alt text" />
                   </div>
                   <div className="card__body">
-                    <h4>A template is composed by a basePdf and a Schema</h4>
+                    <h3>A template is composed by a basePdf and a Schema</h3>
                     <small>
                       Templates are at the core of pdfme. In fact a template can be used with the
                       Generator, the Form, and the Viewer.
@@ -212,11 +209,11 @@ export default function Home(): JSX.Element {
                   <div className="card__image">
                     <img
                       src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
-                      alt="Image alt text"
+                      alt={`${mode === 'form' ? 'Form' : 'Viewer'} image`}
                     />
                   </div>
                   <div className="card__body">
-                    <h4>
+                    <h3>
                       <span
                         style={{ cursor: 'pointer' }}
                         className={`${mode === 'form' ? 'text--primary' : ''}`}
@@ -232,7 +229,7 @@ export default function Home(): JSX.Element {
                       >
                         Viewer
                       </span>
-                    </h4>
+                    </h3>
                     <small>
                       {mode === 'form' ? (
                         <div>

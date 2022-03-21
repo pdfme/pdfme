@@ -99,6 +99,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/ogimage.png',
       hideableSidebar: true,
       hideOnScroll: true,
       navbar: {
