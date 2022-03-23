@@ -1,7 +1,3 @@
----
-title: Help
----
-
 # Help
 
 If you have any bugs, or suggestions for the program or documentation, please see below.

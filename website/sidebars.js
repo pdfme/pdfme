@@ -17,6 +17,19 @@ const sidebars = {
     'getting-started',
     {
       type: 'category',
+      label: 'Guides',
+      collapsible: true,
+      collapsed: true,
+      items: [
+        {
+          type: 'doc',
+          label: 'Custom Font',
+          id: 'guides/custom-font',
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'API',
       collapsible: true,
       collapsed: true,
