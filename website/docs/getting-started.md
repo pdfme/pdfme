@@ -84,7 +84,7 @@ A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it 
 Let's take a look at some specific data.  
 (If you are using TypeScript, you can import the Template type.)
 
-### Sample Template
+### Minimal Template
 
 ```ts
 import { Template, BLANK_PDF } from '@pdfme/generator';
