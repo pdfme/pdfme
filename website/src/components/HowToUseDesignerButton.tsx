@@ -35,12 +35,20 @@ const HowToUseDesignerButton = () => {
       </button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={modalBoxStyle}>
-          <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
+          <div
+            style={{
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+              overflow: 'auto',
+              padding: '1rem',
+              backgroundColor: 'var(--ifm-navbar-background-color)',
+            }}
+          >
             <ModalHead title="How to use" handleClose={handleClose} />
             <div style={{ background: '#999' }}>
               <img
                 src={'/img/designer.gif'}
-                style={{ width: 400, display: 'block', margin: '0 auto' }}
+                style={{ width: 400, height: 384, display: 'block', margin: '0 auto' }}
               />
             </div>
             <p>

@@ -33,7 +33,15 @@ const DesignerCodeModal = ({
 }) => (
   <Modal open={open} onClose={handleClose}>
     <Box sx={modalBoxStyle}>
-      <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflow: 'auto', padding: '1rem' }}>
+      <div
+        style={{
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          overflow: 'auto',
+          padding: '1rem',
+          backgroundColor: 'var(--ifm-navbar-background-color)',
+        }}
+      >
         <ModalHead title="Get Code" handleClose={handleClose} />
         <ul className="tabs tabs--block">
           {modes.map((m) => (
