@@ -98,7 +98,7 @@ const config = {
   ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
       announcementBar: {
         id: 'support_us',
         content: `⭐️  &nbsp; If you like pdfme, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme">GitHub</a>! &nbsp; ⭐️`,
@@ -173,7 +173,12 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
-    }),
+      algolia: {
+        appId: 'V6YWG1D4SV',
+        apiKey: '873346e96f9110d660c39fd1edd7eb17',
+        indexName: 'pdfme',
+      },
+    },
 };
 
 module.exports = config;
