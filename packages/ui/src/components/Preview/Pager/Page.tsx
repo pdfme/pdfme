@@ -60,7 +60,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
         >
           <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
         </button>
-        <strong style={{ color: 'white' }}>
+        <strong style={{ color: 'white', fontSize: '0.9rem' }}>
           {pageCursor + 1}/{pageNum}
         </strong>
         <button

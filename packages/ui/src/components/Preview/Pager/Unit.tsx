@@ -14,7 +14,7 @@ const buttonWrapStyle: React.CSSProperties = {
   padding: '0.5rem',
   display: 'flex',
   alignItems: 'center',
-  width: 100,
+  width: 120,
 };
 
 const btnStyle: React.CSSProperties = {
@@ -54,14 +54,14 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
           >
             <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
           </button>
-          <strong style={{ color: 'white' }}>
+          <strong style={{ color: 'white', fontSize: '0.9rem' }}>
             {unitCursor + 1}/{unitNum}
           </strong>
         </div>
       )}
       {unitCursor + 1 < unitNum && (
         <div style={{ marginLeft: 'auto', marginRight: '1rem', ...buttonWrapStyle }}>
-          <strong style={{ color: 'white' }}>
+          <strong style={{ color: 'white', fontSize: '0.9rem' }}>
             {unitCursor + 1}/{unitNum}
           </strong>
           <button
