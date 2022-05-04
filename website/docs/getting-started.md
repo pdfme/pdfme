@@ -12,7 +12,7 @@ As an example, the author's service [https://labelmake.jp/](https://labelmake.jp
 
 ## Installation
 
-The operating requirements should be the node environment `>=14`.  
+The operating requirements should be the node environment `>=14`. *Please see the note at the end of this section for usage on Node.js <16.*    
 There are two packages in pdfme, generator and UI.
 
 The package for generating PDF can be installed with the following command.
@@ -53,6 +53,13 @@ import { Template, Designer, Form, Viewer } from '@pdfme/ui';
 
 **All objects use `Template`, which will be briefly explained in the next section.
 **
+
+This package transiently relies on the function `atob()` being present in the globl namespace. This function is an old WebAPI which Node.js [added for legacy reasons in v16.0 to the global namespace](https://nodejs.org/dist/latest-v16.x/docs/api/globals.html#atobdata). If you are still using Node.js v14 or v15 you need to ensure that there's a function "atob()" in your global object which you can do by adding this snippet somewhere before executing any code from '@pdfme/generator':
+```
+if (!global.atob) {
+    global.atob = (data) => Buffer.from(data, "base64");
+}
+```
 
 ## Template
 
