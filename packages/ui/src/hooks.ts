@@ -14,9 +14,9 @@ export const usePrevious = <T>(value: T) => {
 
 const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
 
-type UIPreProcessorProps = { template: Template; size: Size; offset?: number };
+type UIPreProcessorProps = { template: Template; size: Size; offset: number; zoomLevel: number };
 
-export const useUIPreProcessor = ({ template, size, offset = 0 }: UIPreProcessorProps) => {
+export const useUIPreProcessor = ({ template, size, offset, zoomLevel }: UIPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);
@@ -40,10 +40,8 @@ export const useUIPreProcessor = ({ template, size, offset = 0 }: UIPreProcessor
 
   useEffect(() => {
     init()
-      .then((data) => {
-        setPageSizes(data.pageSizes);
-        setScale(data.scale);
-        setBackgrounds(data.backgrounds);
+      .then(({ pageSizes, scale, backgrounds }) => {
+        setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
       })
       .catch((e: Error) => {
         console.error(e);
@@ -51,7 +49,7 @@ export const useUIPreProcessor = ({ template, size, offset = 0 }: UIPreProcessor
       });
   }, [init]);
 
-  return { backgrounds, pageSizes, scale, error };
+  return { backgrounds, pageSizes, scale: scale * zoomLevel, error };
 };
 
 type ScrollPageCursorProps = {

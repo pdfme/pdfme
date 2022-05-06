@@ -29,7 +29,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <div
       ref={ref}
-      style={{ position: 'relative', background: 'rgb(74, 74, 74)', overflowY: 'auto', ...size }}
+      style={{ position: 'relative', background: 'rgb(74, 74, 74)', overflow: 'auto', ...size }}
     >
       <div
         style={{

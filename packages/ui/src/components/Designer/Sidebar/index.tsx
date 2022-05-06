@@ -39,6 +39,7 @@ const Sidebar = (props: SidebarProps) => {
     return activeSchemas[activeSchemas.length - 1];
   };
 
+  // TODO positionをfixedにした方がいいかも
   return (
     <div
       style={{ position: 'absolute', right: 0, zIndex: 1, height, width: open ? SIDEBAR_WIDTH : 0 }}

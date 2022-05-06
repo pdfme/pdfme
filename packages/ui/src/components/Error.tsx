@@ -10,7 +10,7 @@ const Error = ({ size, error }: { size: Size; error: Error }) => {
       style={{
         position: 'relative',
         background: 'rgb(74, 74, 74)',
-        overflowY: 'auto',
+        overflow: 'auto',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

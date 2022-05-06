@@ -26,6 +26,8 @@ const dictEn = {
   goToNext: 'Next',
   goToEnd: 'Go to end',
   select: 'Select',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
   errorOccurred: 'An error occurred',
   errorBulkUpdateFieldName:
     'Cannot commit the change because the number of items has been changed.',
@@ -56,6 +58,8 @@ const dictJa: { [key in keyof DictEn]: string } = {
   goToNext: '1つ進む',
   goToEnd: '最後に進む',
   select: '選択',
+  zoomIn: '拡大',
+  zoomOut: '縮小',
   errorOccurred: 'エラーが発生しました',
   errorBulkUpdateFieldName: '項目数が変更されているため変更をコミットできません。',
   commitBulkUpdateFieldName: '変更を反映',

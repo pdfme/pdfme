@@ -1,27 +1,29 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { PreviewReactProps, SchemaForUI } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from '../../constants';
-import PagePager from './Pager/Page';
-import UnitPager from './Pager/Unit';
-import Root from '../Root';
-import Error from '../Error';
-import Paper from '../Paper';
-import SchemaUI from '../Schemas/SchemaUI';
-import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
-import { templateSchemas2SchemasList, px2mm } from '../../helper';
+import { ZOOM, RULER_HEIGHT } from '../constants';
+import UnitPager from './UnitPager';
+import Root from './Root';
+import Error from './Error';
+import CtlBar from './CtlBar';
+import Paper from './Paper';
+import SchemaUI from './Schemas/SchemaUI';
+import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
+import { templateSchemas2SchemasList, px2mm } from '../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
-    template,
-    size,
-    offset: RULER_HEIGHT,
-  });
-
   const rootRef = useRef<HTMLDivElement>(null);
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
+
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
+    template,
+    size,
+    offset: RULER_HEIGHT,
+    zoomLevel,
+  });
 
   const init = useCallback(async () => {
     const sl = await templateSchemas2SchemasList(template);
@@ -52,29 +54,21 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>
-      <div
-        style={{
-          height:
-            pageSizes.reduce((acc, cur) => acc + (cur.height + px2mm(RULER_HEIGHT)) * scale, 0) +
-            'mm',
-          width: '100%',
-          top: 0,
-          position: 'absolute',
+      <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
+      <CtlBar
+        pageCursor={pageCursor}
+        pageNum={schemasList.length}
+        setPageCursor={(p) => {
+          if (!rootRef.current) return;
+          rootRef.current.scrollTop = pageSizes
+            .slice(0, p)
+            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
+          setPageCursor(p);
         }}
-      >
-        <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
-        <PagePager
-          pageCursor={pageCursor}
-          pageNum={schemasList.length}
-          setPageCursor={(p) => {
-            if (!rootRef.current) return;
-            rootRef.current.scrollTop = pageSizes
-              .slice(0, p)
-              .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
-            setPageCursor(p);
-          }}
-        />
-      </div>
+        scale={scale}
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
+      />
       <Paper
         scale={scale}
         size={size}

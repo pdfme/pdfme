@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import left from '../../../assets/icons/left.svg';
-import right from '../../../assets/icons/right.svg';
-import doubleLeft from '../../../assets/icons/double-left.svg';
-import doubleRight from '../../../assets/icons/double-right.svg';
-import { I18nContext } from '../../../contexts';
+import left from '../assets/icons/left.svg';
+import right from '../assets/icons/right.svg';
+import doubleLeft from '../assets/icons/double-left.svg';
+import doubleRight from '../assets/icons/double-right.svg';
+import { I18nContext } from '../contexts';
 
 const buttonWrapStyle: React.CSSProperties = {
   position: 'sticky',
@@ -14,7 +14,8 @@ const buttonWrapStyle: React.CSSProperties = {
   padding: '0.5rem',
   display: 'flex',
   alignItems: 'center',
-  width: 120,
+  justifyContent: 'space-around',
+  width: 110,
 };
 
 const btnStyle: React.CSSProperties = {
@@ -37,7 +38,16 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
   if (unitNum <= 1) return <></>;
 
   return (
-    <>
+    <div
+      style={{
+        position: 'fixed',
+        width: '100%',
+        zIndex: 1,
+        top: '50%',
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
       {unitCursor > 0 && (
         <div style={{ marginLeft: '1rem', ...buttonWrapStyle }}>
           <button
@@ -80,7 +90,7 @@ const UnitPager = ({ unitCursor, unitNum, setUnitCursor }: Props) => {
           </button>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

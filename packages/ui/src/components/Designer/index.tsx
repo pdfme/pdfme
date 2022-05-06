@@ -7,6 +7,7 @@ import { I18nContext } from '../../contexts';
 import {
   uuid,
   set,
+  px2mm,
   cloneDeep,
   initShortCuts,
   destroyShortCuts,
@@ -21,6 +22,7 @@ import {
 import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
 import Root from '../Root';
 import Error from '../Error';
+import CtlBar from '../CtlBar';
 
 const TemplateEditor = ({
   template,
@@ -37,16 +39,18 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
-    template,
-    size,
-    offset: RULER_HEIGHT,
-  });
-
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
+    template,
+    size,
+    offset: RULER_HEIGHT,
+    zoomLevel,
+  });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -230,6 +234,21 @@ const TemplateEditor = ({
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>
+      <CtlBar
+        pageCursor={pageCursor}
+        pageNum={schemasList.length}
+        setPageCursor={(p) => {
+          if (!rootRef.current) return;
+          rootRef.current.scrollTop = pageSizes
+            .slice(0, p)
+            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
+          setPageCursor(p);
+          onEditEnd();
+        }}
+        scale={scale}
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
+      />
       <Sidebar
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
