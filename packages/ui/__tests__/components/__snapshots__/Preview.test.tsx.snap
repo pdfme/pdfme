@@ -8,7 +8,7 @@ exports[`Preview(as Form) snapshot 1`] = `
     style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="position: absolute; height: 1152.5196850527px; width: 1200px; min-height: 1152.5196850527px;"
+      style="position: absolute; height: 1200px; width: 1200px; min-height: 1200px;"
     >
       <div
         style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
@@ -118,7 +118,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
     style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="position: absolute; height: 1152.5196850527px; width: 1200px; min-height: 1152.5196850527px;"
+      style="position: absolute; height: 1200px; width: 1200px; min-height: 1200px;"
     >
       <div
         style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
