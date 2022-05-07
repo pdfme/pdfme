@@ -1,4 +1,4 @@
-npm version  x.x.x --workspaces  
+npm version x.x.x --workspaces  
 git add .  
 git commit -m "Update version to x.x.x"  
 npm run build  

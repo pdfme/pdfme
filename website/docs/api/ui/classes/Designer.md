@@ -39,7 +39,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L14)
+[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -53,7 +53,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L12)
+[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L12)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L11)
+[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L11)
 
 ___
 
@@ -130,7 +130,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L62)
+[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L62)
 
 ___
 
@@ -153,7 +153,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L60)
+[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L60)
 
 ## Methods
 
@@ -171,7 +171,7 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[ui/src/class.ts:133](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L133)
+[ui/src/class.ts:133](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L133)
 
 ___
 
@@ -189,7 +189,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L102)
+[ui/src/class.ts:102](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L102)
 
 ___
 
@@ -219,7 +219,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L98)
+[ui/src/class.ts:98](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L98)
 
 ___
 
@@ -244,7 +244,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:106](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L106)
+[ui/src/class.ts:106](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L106)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:42](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L42)
+[ui/src/Designer.tsx:42](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L42)
 
 ___
 
@@ -284,7 +284,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:38](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L38)
+[ui/src/Designer.tsx:38](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L38)
 
 ___
 
@@ -302,7 +302,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[ui/src/Designer.tsx:46](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L46)
+[ui/src/Designer.tsx:46](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L46)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L21)
+[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L21)
 
 ___
 
@@ -342,7 +342,7 @@ BaseUIClass.updateOptions
 
 #### Defined in
 
-[ui/src/class.ts:120](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/class.ts#L120)
+[ui/src/class.ts:120](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/class.ts#L120)
 
 ___
 
@@ -370,4 +370,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/1e80638/packages/ui/src/Designer.tsx#L28)
+[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/07669e8/packages/ui/src/Designer.tsx#L28)
