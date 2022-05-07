@@ -218,7 +218,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         e.stopPropagation();
         setEditing(false);
       }}
-      style={{ height: props.height }}
+      style={{ overflowX: 'auto' }}
     >
       <Selecto
         container={paperRefs.current[pageCursor]}
@@ -279,7 +279,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             {pageCursor !== index ? (
               <Mask
                 width={paperSize.width + RULER_HEIGHT}
-                height={paperSize.height + RULER_HEIGHT}
+                height={paperSize.height + RULER_HEIGHT * scale}
               />
             ) : (
               !editing && (

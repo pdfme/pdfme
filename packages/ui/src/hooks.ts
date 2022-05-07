@@ -14,9 +14,9 @@ export const usePrevious = <T>(value: T) => {
 
 const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
 
-type UIPreProcessorProps = { template: Template; size: Size; offset: number; zoomLevel: number };
+type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number };
 
-export const useUIPreProcessor = ({ template, size, offset, zoomLevel }: UIPreProcessorProps) => {
+export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);
@@ -32,11 +32,11 @@ export const useUIPreProcessor = ({ template, size, offset, zoomLevel }: UIPrePr
 
     const _scale = Math.min(
       getScale(size.width, paperWidth),
-      getScale(size.height - offset, paperHeight)
+      getScale(size.height - RULER_HEIGHT, paperHeight)
     );
 
     return { backgrounds: _backgrounds, pageSizes: _pageSizes, scale: _scale };
-  }, [template, size, offset]);
+  }, [template, size]);
 
   useEffect(() => {
     init()
@@ -53,7 +53,7 @@ export const useUIPreProcessor = ({ template, size, offset, zoomLevel }: UIPrePr
 };
 
 type ScrollPageCursorProps = {
-  rootRef: RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement>;
   pageSizes: Size[];
   scale: number;
   pageCursor: number;
@@ -61,19 +61,19 @@ type ScrollPageCursorProps = {
 };
 
 export const useScrollPageCursor = ({
-  rootRef,
+  ref,
   pageSizes,
   scale,
   pageCursor,
   onChangePageCursor,
 }: ScrollPageCursorProps) => {
   const onScroll = useCallback(() => {
-    if (!pageSizes[0] || !rootRef.current) {
+    if (!pageSizes[0] || !ref.current) {
       return;
     }
 
-    const scroll = rootRef.current.scrollTop;
-    const { top } = rootRef.current.getBoundingClientRect();
+    const scroll = ref.current.scrollTop;
+    const { top } = ref.current.getBoundingClientRect();
     const pageHeights = pageSizes.reduce((acc, cur, i) => {
       let value = (cur.height * ZOOM + RULER_HEIGHT) * scale;
       if (i === 0) {
@@ -93,15 +93,15 @@ export const useScrollPageCursor = ({
     if (_pageCursor !== pageCursor) {
       onChangePageCursor(_pageCursor);
     }
-  }, [onChangePageCursor, pageCursor, pageSizes, rootRef, scale]);
+  }, [onChangePageCursor, pageCursor, pageSizes, ref, scale]);
 
   useEffect(() => {
-    rootRef.current?.addEventListener('scroll', onScroll);
+    ref.current?.addEventListener('scroll', onScroll);
 
     return () => {
-      rootRef.current?.removeEventListener('scroll', onScroll);
+      ref.current?.removeEventListener('scroll', onScroll);
     };
-  }, [rootRef, onScroll]);
+  }, [ref, onScroll]);
 };
 
 export const useMountStatus = () => {

@@ -6,14 +6,15 @@ type Props = {
   pageCursor: number;
   pageNum: number;
   setPageCursor: (page: number) => void;
-  scale: number;
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
 };
 
+const barWidth = 220;
+
 const CtlBar = (props: Props) => {
-  const { pageCursor, pageNum, setPageCursor, scale, zoomLevel, setZoomLevel } = props;
-  const width = pageNum > 1 ? 200 : 100;
+  const { pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
+  const width = pageNum > 1 ? barWidth : barWidth / 2;
   return (
     <div
       style={{
@@ -34,11 +35,10 @@ const CtlBar = (props: Props) => {
       {pageNum > 1 && (
         <>
           <Pager pageCursor={pageCursor} pageNum={pageNum} setPageCursor={setPageCursor} />
-          <strong style={{ color: 'white', fontSize: '0.9rem', padding: '0 0.5rem' }}>|</strong>
+          <strong style={{ color: 'white', fontSize: '0.9rem', padding: 0 }}>|</strong>
         </>
       )}
-      {/* TODO 拡大した時に見ている場所がズレるのでscroll x を中央に持っていきたい */}
-      <Zoom scale={scale} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+      <Zoom zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
     </div>
   );
 };

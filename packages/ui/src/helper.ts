@@ -15,6 +15,7 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
+import { ZOOM, RULER_HEIGHT } from './constants';
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -526,4 +527,17 @@ export const moveCommandToChangeSchemasArg = (props: {
 
     return { key: `position.${key}`, value, schemaId: as.id };
   });
+};
+
+export const getPagesScrollTopByIndex = (
+  pageSizes: {
+    width: number;
+    height: number;
+  }[],
+  index: number,
+  scale: number
+) => {
+  return pageSizes
+    .slice(0, index)
+    .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
 };

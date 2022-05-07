@@ -27,7 +27,6 @@ const Sidebar = (props: SidebarProps) => {
 
   const i18n = useContext(I18nContext);
   const [open, setOpen] = useState(true);
-  const top = 0;
 
   const getActiveSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
@@ -39,12 +38,17 @@ const Sidebar = (props: SidebarProps) => {
     return activeSchemas[activeSchemas.length - 1];
   };
 
-  // TODO positionをfixedにした方がいいかも
   return (
     <div
-      style={{ position: 'absolute', right: 0, zIndex: 1, height, width: open ? SIDEBAR_WIDTH : 0 }}
+      style={{
+        position: 'absolute',
+        right: 0,
+        zIndex: 1,
+        height: height ? height : '100%',
+        width: open ? SIDEBAR_WIDTH : 0,
+      }}
     >
-      <div style={{ position: 'sticky', top, zIndex: 1, fontSize: '1rem' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 1, fontSize: '1rem' }}>
         <button
           style={{
             position: 'absolute',
@@ -67,7 +71,7 @@ const Sidebar = (props: SidebarProps) => {
             width: SIDEBAR_WIDTH,
             height: size.height - RULER_HEIGHT * ZOOM,
             display: open ? 'block' : 'none',
-            top,
+            top: RULER_HEIGHT / 2,
             right: 0,
             position: 'absolute',
             background: '#ffffffed',

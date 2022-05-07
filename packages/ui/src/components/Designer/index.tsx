@@ -7,7 +7,6 @@ import { I18nContext } from '../../contexts';
 import {
   uuid,
   set,
-  px2mm,
   cloneDeep,
   initShortCuts,
   destroyShortCuts,
@@ -18,6 +17,7 @@ import {
   getKeepRatioHeightByWidth,
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
+  getPagesScrollTopByIndex,
 } from '../../helper';
 import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
 import Root from '../Root';
@@ -33,7 +33,6 @@ const TemplateEditor = ({
   const copiedSchemas = useRef<SchemaForUI[] | null>(null);
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
-  const rootRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
@@ -45,12 +44,7 @@ const TemplateEditor = ({
   const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
-    template,
-    size,
-    offset: RULER_HEIGHT,
-    zoomLevel,
-  });
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -63,7 +57,7 @@ const TemplateEditor = ({
   };
 
   useScrollPageCursor({
-    rootRef,
+    ref: mainRef,
     pageSizes,
     scale,
     pageCursor,
@@ -194,8 +188,8 @@ const TemplateEditor = ({
     setSchemasList(sl);
     onEditEnd();
     setPageCursor(0);
-    if (rootRef.current?.scroll) {
-      rootRef.current.scroll({ top: 0, behavior: 'smooth' });
+    if (mainRef.current?.scroll) {
+      mainRef.current.scroll({ top: 0, behavior: 'smooth' });
     }
   }, []);
 
@@ -233,26 +227,29 @@ const TemplateEditor = ({
   }
 
   return (
-    <Root ref={rootRef} size={size} scale={scale}>
+    <Root size={size} scale={scale}>
       <CtlBar
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
-          if (!rootRef.current) return;
-          rootRef.current.scrollTop = pageSizes
-            .slice(0, p)
-            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
+          if (!mainRef.current) return;
+          mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
           setPageCursor(p);
           onEditEnd();
         }}
-        scale={scale}
         zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
+        setZoomLevel={(zoom) => {
+          if (mainRef.current) {
+            const paper = paperRefs.current[pageCursor];
+            mainRef.current.scrollLeft = paper.clientHeight / 2;
+          }
+          setZoomLevel(zoom);
+        }}
       />
       <Sidebar
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-        height={mainRef.current ? mainRef.current.scrollHeight : 0}
+        height={mainRef.current ? mainRef.current.clientHeight : 0}
         size={size}
         pageSize={pageSizes[pageCursor]}
         activeElements={activeElements}

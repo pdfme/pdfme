@@ -4,7 +4,7 @@ import { FontContext } from '../contexts';
 import { ZOOM, RULER_HEIGHT } from '../constants';
 
 const Paper = (porps: {
-  paperRefs?: MutableRefObject<HTMLDivElement[]>;
+  paperRefs: MutableRefObject<HTMLDivElement[]>;
   scale: number;
   size: Size;
   schemasList: SchemaForUI[][];
@@ -28,6 +28,7 @@ const Paper = (porps: {
       style={{
         transform: `scale(${scale})`,
         transformOrigin: size.width <= topPageWidth * ZOOM * scale ? `left top` : `center top`,
+        height: size.height,
       }}
     >
       {backgrounds.map((background, paperIndex) => {
@@ -39,7 +40,7 @@ const Paper = (porps: {
             id={`@pdfme/ui-paper${paperIndex}`}
             key={paperIndex + JSON.stringify(paperSize)}
             ref={(e) => {
-              if (e && paperRefs) {
+              if (e) {
                 paperRefs.current[paperIndex] = e;
               }
             }}

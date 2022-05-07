@@ -8,22 +8,18 @@ import CtlBar from './CtlBar';
 import Paper from './Paper';
 import SchemaUI from './Schemas/SchemaUI';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
-import { templateSchemas2SchemasList, px2mm } from '../helper';
+import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
+  const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
-    template,
-    size,
-    offset: RULER_HEIGHT,
-    zoomLevel,
-  });
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
 
   const init = useCallback(async () => {
     const sl = await templateSchemas2SchemasList(template);
@@ -35,7 +31,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   }, [init]);
 
   useScrollPageCursor({
-    rootRef,
+    ref: rootRef,
     pageSizes,
     scale,
     pageCursor,
@@ -60,16 +56,20 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
         pageNum={schemasList.length}
         setPageCursor={(p) => {
           if (!rootRef.current) return;
-          rootRef.current.scrollTop = pageSizes
-            .slice(0, p)
-            .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT) * scale, 0);
+          rootRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
           setPageCursor(p);
         }}
-        scale={scale}
         zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
+        setZoomLevel={(zoom) => {
+          if (rootRef.current) {
+            const paper = paperRefs.current[pageCursor];
+            rootRef.current.scrollLeft = Number(paper.style.width.replace('px', '')) / 2;
+          }
+          setZoomLevel(zoom);
+        }}
       />
       <Paper
+        paperRefs={paperRefs}
         scale={scale}
         size={size}
         schemasList={schemasList}
