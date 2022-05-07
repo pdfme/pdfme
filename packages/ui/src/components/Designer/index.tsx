@@ -229,13 +229,7 @@ const TemplateEditor = ({
   return (
     <Root size={size} scale={scale}>
       <CtlBar
-        size={{
-          height: pageSizes.reduce(
-            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
-            0
-          ),
-          width: size.width,
-        }}
+        size={{ ...size }}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
@@ -247,8 +241,7 @@ const TemplateEditor = ({
         zoomLevel={zoomLevel}
         setZoomLevel={(zoom) => {
           if (mainRef.current) {
-            const paper = paperRefs.current[pageCursor];
-            mainRef.current.scrollLeft = paper.clientHeight / 2;
+            mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pageCursor, scale);
           }
           setZoomLevel(zoom);
         }}

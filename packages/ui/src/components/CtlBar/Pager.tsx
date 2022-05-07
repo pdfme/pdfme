@@ -29,7 +29,11 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
       }}
     >
       <button
-        style={{ paddingLeft: '0.5rem', ...btnStyle }}
+        style={{
+          paddingLeft: '0.5rem',
+          ...btnStyle,
+          cursor: pageCursor <= 0 ? 'not-allowed' : 'pointer',
+        }}
         disabled={pageCursor <= 0}
         onClick={() => setPageCursor(pageCursor - 1)}
       >
@@ -39,7 +43,11 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
         {pageCursor + 1}/{pageNum}
       </strong>
       <button
-        style={{ paddingRight: '0.5rem', ...btnStyle }}
+        style={{
+          paddingRight: '0.5rem',
+          ...btnStyle,
+          cursor: pageCursor + 1 >= pageNum ? 'not-allowed' : 'pointer',
+        }}
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >

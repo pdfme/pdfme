@@ -6,9 +6,9 @@ import doubleRight from '../assets/icons/double-right.svg';
 import { I18nContext } from '../contexts';
 import { Size } from '@pdfme/common';
 
+const buttonHeight = 38;
 const buttonWrapStyle: React.CSSProperties = {
   position: 'sticky',
-  top: '45%',
   zIndex: 1,
   backgroundColor: '#777777bd',
   borderRadius: 2,
@@ -16,7 +16,9 @@ const buttonWrapStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-around',
+  boxSizing: 'border-box',
   width: 110,
+  height: buttonHeight,
 };
 
 const btnStyle: React.CSSProperties = {
@@ -46,13 +48,13 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
           position: 'sticky',
           width: '100%',
           zIndex: 1,
-          top: '50%',
+          top: `calc(50% - ${buttonHeight / 2}px)`,
           display: 'flex',
           alignItems: 'center',
         }}
       >
         {unitCursor > 0 && (
-          <div style={{ marginLeft: '1rem', ...buttonWrapStyle }}>
+          <div style={{ left: '1rem', marginLeft: '1rem', ...buttonWrapStyle }}>
             <button
               style={{ paddingLeft: '0.5rem', ...btnStyle }}
               disabled={unitCursor <= 0}
@@ -73,7 +75,9 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
           </div>
         )}
         {unitCursor + 1 < unitNum && (
-          <div style={{ marginLeft: 'auto', marginRight: '1rem', ...buttonWrapStyle }}>
+          <div
+            style={{ right: '1rem', marginLeft: 'auto', marginRight: '1rem', ...buttonWrapStyle }}
+          >
             <strong style={{ color: 'white', fontSize: '0.9rem' }}>
               {unitCursor + 1}/{unitNum}
             </strong>

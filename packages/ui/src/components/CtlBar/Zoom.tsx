@@ -12,8 +12,8 @@ const btnStyle: React.CSSProperties = {
 };
 
 const zoomStep = 0.25;
-const maxZoom = 3;
-const minZoom = 0;
+const maxZoom = 2;
+const minZoom = 0.25;
 
 type Props = {
   zoomLevel: number;

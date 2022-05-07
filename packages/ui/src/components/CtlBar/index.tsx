@@ -32,7 +32,6 @@ const CtlBar = (props: Props) => {
           background: '#777777e6',
           borderRadius: 2,
           padding: '0.5rem',
-          margin: '0 auto',
         }}
       >
         {pageNum > 1 && (

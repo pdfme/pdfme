@@ -48,28 +48,20 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
     return <Error size={size} error={error} />;
   }
 
+  const pageSizesHeightSum = pageSizes.reduce(
+    (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
+    0
+  );
+
+  const pageSizesMaxWidth = pageSizes.reduce(
+    (acc, cur) => Math.max(acc, cur.height * ZOOM * scale),
+    0
+  );
+
   return (
     <Root ref={rootRef} size={size} scale={scale}>
-      <UnitPager
-        size={{
-          height: pageSizes.reduce(
-            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
-            0
-          ),
-          width: size.width,
-        }}
-        unitCursor={unitCursor}
-        unitNum={inputs.length}
-        setUnitCursor={setUnitCursor}
-      />
       <CtlBar
-        size={{
-          height: pageSizes.reduce(
-            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
-            0
-          ),
-          width: size.width,
-        }}
+        size={{ height: pageSizesHeightSum, width: Math.max(size.width, pageSizesMaxWidth) }}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
@@ -80,12 +72,18 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
         zoomLevel={zoomLevel}
         setZoomLevel={(zoom) => {
           if (rootRef.current) {
-            const paper = paperRefs.current[pageCursor];
-            rootRef.current.scrollLeft = Number(paper.style.width.replace('px', '')) / 2;
+            rootRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pageCursor, scale);
           }
           setZoomLevel(zoom);
         }}
       />
+      <UnitPager
+        size={{ height: pageSizesHeightSum, width: Math.max(size.width, pageSizesMaxWidth) }}
+        unitCursor={unitCursor}
+        unitNum={inputs.length}
+        setUnitCursor={setUnitCursor}
+      />
+
       <Paper
         paperRefs={paperRefs}
         scale={scale}

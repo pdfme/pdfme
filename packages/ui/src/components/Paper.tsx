@@ -28,7 +28,7 @@ const Paper = (porps: {
       style={{
         transform: `scale(${scale})`,
         transformOrigin: size.width <= topPageWidth * ZOOM * scale ? `left top` : `center top`,
-        height: size.height,
+        ...size,
       }}
     >
       {backgrounds.map((background, paperIndex) => {
