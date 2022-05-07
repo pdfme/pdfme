@@ -18,7 +18,7 @@ const CtlBar = (props: Props) => {
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
   const width = pageNum > 1 ? barWidth : barWidth / 2;
   return (
-    <div style={{ position: 'absolute', ...size, minHeight: size.width }}>
+    <div style={{ position: 'absolute', ...size, minHeight: size.height }}>
       <div
         style={{
           display: 'flex',
