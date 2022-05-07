@@ -50,8 +50,26 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
 
   return (
     <Root ref={rootRef} size={size} scale={scale}>
-      <UnitPager unitCursor={unitCursor} unitNum={inputs.length} setUnitCursor={setUnitCursor} />
+      <UnitPager
+        size={{
+          height: pageSizes.reduce(
+            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
+            0
+          ),
+          width: size.width,
+        }}
+        unitCursor={unitCursor}
+        unitNum={inputs.length}
+        setUnitCursor={setUnitCursor}
+      />
       <CtlBar
+        size={{
+          height: pageSizes.reduce(
+            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
+            0
+          ),
+          width: size.width,
+        }}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {

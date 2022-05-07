@@ -8,35 +8,39 @@ exports[`Designer snapshot 1`] = `
     style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="display: flex; align-items: center; justify-content: center; position: fixed; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem; margin: 0px auto;"
+      style="position: absolute; height: 1152.5196850527px; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center;"
+        style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem; margin: 0px auto;"
       >
-        <button
-          style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+        <div
+          style="display: flex; align-items: center; justify-content: center;"
         >
-          <img
-            alt="Zoom out"
-            src="[object Object]"
-            style="width: 20px;"
-          />
-        </button>
-        <strong
-          style="color: white; font-size: 0.9rem;"
-        >
-          100
-          %
-        </strong>
-        <button
-          style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
-        >
-          <img
-            alt="Zoom in"
-            src="[object Object]"
-            style="width: 20px;"
-          />
-        </button>
+          <button
+            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+          >
+            <img
+              alt="Zoom out"
+              src="[object Object]"
+              style="width: 20px;"
+            />
+          </button>
+          <strong
+            style="color: white; font-size: 0.9rem;"
+          >
+            100
+            %
+          </strong>
+          <button
+            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+          >
+            <img
+              alt="Zoom in"
+              src="[object Object]"
+              style="width: 20px;"
+            />
+          </button>
+        </div>
       </div>
     </div>
     <div

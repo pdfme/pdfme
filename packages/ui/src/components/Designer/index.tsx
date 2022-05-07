@@ -229,6 +229,13 @@ const TemplateEditor = ({
   return (
     <Root size={size} scale={scale}>
       <CtlBar
+        size={{
+          height: pageSizes.reduce(
+            (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
+            0
+          ),
+          width: size.width,
+        }}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
