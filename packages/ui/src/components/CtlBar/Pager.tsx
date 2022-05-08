@@ -21,13 +21,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
   const i18n = useContext(I18nContext);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <button
         style={{
           paddingLeft: '0.5rem',
@@ -39,7 +33,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
       >
         <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
       </button>
-      <strong style={{ color: 'white', fontSize: '0.9rem' }}>
+      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 45, textAlign: 'center' }}>
         {pageCursor + 1}/{pageNum}
       </strong>
       <button

@@ -52,7 +52,7 @@ const Sidebar = (props: SidebarProps) => {
         <button
           style={{
             position: 'absolute',
-            top: '1rem',
+            top: '1.75rem',
             right: '0.5rem',
             zIndex: 100,
             border: 'none',

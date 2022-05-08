@@ -12,7 +12,7 @@ type Props = {
   setZoomLevel: (zoom: number) => void;
 };
 
-const barWidth = 220;
+const barWidth = 250;
 
 const CtlBar = (props: Props) => {
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;

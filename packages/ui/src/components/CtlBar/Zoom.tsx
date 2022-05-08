@@ -33,20 +33,22 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
           ...btnStyle,
           cursor: minZoom >= nextZoomOut ? 'not-allowed' : 'pointer',
         }}
-        onClick={() => setZoomLevel(nextZoomOut)}
         disabled={minZoom >= nextZoomOut}
+        onClick={() => setZoomLevel(nextZoomOut)}
       >
         <img src={remove} alt={i18n('zoomOut')} style={{ width: 20 }} />
       </button>
-      <strong style={{ color: 'white', fontSize: '0.9rem' }}>{Math.round(zoomLevel * 100)}%</strong>
+      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 45, textAlign: 'center' }}>
+        {Math.round(zoomLevel * 100)}%
+      </strong>
       <button
         style={{
           paddingRight: '0.5rem',
           ...btnStyle,
           cursor: maxZoom < nextZoomIn ? 'not-allowed' : 'pointer',
         }}
-        onClick={() => setZoomLevel(nextZoomIn)}
         disabled={maxZoom < nextZoomIn}
+        onClick={() => setZoomLevel(nextZoomIn)}
       >
         <img src={add} alt={i18n('zoomIn')} style={{ width: 20 }} />
       </button>

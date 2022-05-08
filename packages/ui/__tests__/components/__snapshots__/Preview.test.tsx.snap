@@ -11,7 +11,7 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="position: absolute; height: 1200px; width: 1200px; min-height: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
       >
         <div
           style="display: flex; align-items: center; justify-content: center;"
@@ -26,7 +26,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             />
           </button>
           <strong
-            style="color: white; font-size: 0.9rem;"
+            style="color: white; font-size: 0.9rem; min-width: 45px; text-align: center;"
           >
             100
             %
@@ -121,7 +121,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="position: absolute; height: 1200px; width: 1200px; min-height: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 55px); width: 110px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
       >
         <div
           style="display: flex; align-items: center; justify-content: center;"
@@ -136,7 +136,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             />
           </button>
           <strong
-            style="color: white; font-size: 0.9rem;"
+            style="color: white; font-size: 0.9rem; min-width: 45px; text-align: center;"
           >
             100
             %
