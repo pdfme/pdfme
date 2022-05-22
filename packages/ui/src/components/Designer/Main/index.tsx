@@ -277,10 +277,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
               }}
             />
             {pageCursor !== index ? (
-              <Mask
-                width={paperSize.width + RULER_HEIGHT}
-                height={paperSize.height + RULER_HEIGHT * scale}
-              />
+              <Mask width={paperSize.width + RULER_HEIGHT} height={paperSize.height} />
             ) : (
               !editing && (
                 <Moveable

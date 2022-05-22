@@ -56,7 +56,8 @@ const Paper = (porps: {
             }}
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
-              margin: `${RULER_HEIGHT * scale}px auto`,
+              top: `${RULER_HEIGHT}px`,
+              margin: '0 auto',
               position: 'relative',
               backgroundImage: `url(${background})`,
               backgroundSize: `${paperSize.width}px ${paperSize.height}px`,
