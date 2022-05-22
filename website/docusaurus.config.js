@@ -106,7 +106,11 @@ const config = {
         content: `⭐️  &nbsp; If you like pdfme, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme">GitHub</a>! &nbsp; ⭐️`,
       },
       image: 'img/ogimage.png',
-      hideableSidebar: true,
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
       hideOnScroll: true,
       navbar: {
         title: 'pdfme',
