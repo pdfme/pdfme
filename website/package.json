@@ -15,8 +15,9 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.0.0-beta.18",
-    "@docusaurus/preset-classic": "^2.0.0-beta.18",
+    "@docusaurus/core": "^2.0.0-beta.20",
+    "@docusaurus/plugin-google-gtag": "^2.0.0-beta.20",
+    "@docusaurus/preset-classic": "^2.0.0-beta.20",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mdx-js/react": "^1.6.21",
@@ -32,7 +33,7 @@
     "sass": "^1.47.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-beta.18",
+    "@docusaurus/module-type-aliases": "^2.0.0-beta.20",
     "@tsconfig/docusaurus": "^1.0.4",
     "atob": "^2.1.2",
     "buffer": "^6.0.3",
