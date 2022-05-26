@@ -59,7 +59,7 @@ export default function Home(): JSX.Element {
       viewer.current = new Viewer({
         domContainer: viewerRef.current,
         template,
-        inputs: cloneDeep(template.sampledata) ?? [{}],
+        inputs: cloneDeep(template.sampledata ?? [{}]),
       });
     }
 
@@ -67,7 +67,7 @@ export default function Home(): JSX.Element {
       form.current = new Form({
         domContainer: formRef.current,
         template,
-        inputs: cloneDeep(template.sampledata) ?? [{}],
+        inputs: cloneDeep(template.sampledata ?? [{}]),
       });
 
       form.current.onChangeInput(console.log);

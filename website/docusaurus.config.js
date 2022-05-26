@@ -13,7 +13,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'favicon.ico',
   organizationName: 'pdfme',
   projectName: 'pdfme',
   trailingSlash: false,
@@ -116,10 +116,21 @@ const config = {
         title: 'pdfme',
         items: [
           {
+            type: 'dropdown',
+            label: 'Demo apps',
+            position: 'right',
+            items: [
+              {
+                to: '/demo/online-certificate-generator',
+                label: 'Online Certificate Maker',
+              },
+            ],
+          },
+          {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
-            label: 'Docs',
+            label: 'Docs&Guides',
           },
           {
             to: '/template-design',
@@ -153,6 +164,10 @@ const config = {
           {
             title: 'More',
             items: [
+              {
+                label: 'Demo apps',
+                to: '/demo',
+              },
               {
                 label: 'Template Design',
                 to: '/template-design',

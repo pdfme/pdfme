@@ -1,0 +1,6 @@
+.inputBox {
+  display: inline-block;
+  height: 30px;
+  border: 1px dashed rgb(68, 170, 255);
+}
+
