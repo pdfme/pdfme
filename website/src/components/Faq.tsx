@@ -1,6 +1,10 @@
 import React from 'react';
 
-const Faq = ({ faqList }: { faqList: { question: string; answer: string }[] }) => (
+const Faq = ({
+  faqList,
+}: {
+  faqList: { question: string | JSX.Element; answer: string | JSX.Element }[];
+}) => (
   <>
     <h2>
       <a aria-hidden="true" className="anchor enhancedAnchor" id="faq"></a>
@@ -9,7 +13,7 @@ const Faq = ({ faqList }: { faqList: { question: string; answer: string }[] }) =
     </h2>
     <ul>
       {faqList.map((faq) => (
-        <li key={faq.answer + faq.question}>
+        <li key={String(faq.answer) + String(faq.question)}>
           <div>
             <h3>{faq.question}</h3>
             <blockquote>{faq.answer}</blockquote>

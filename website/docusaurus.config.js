@@ -116,15 +116,9 @@ const config = {
         title: 'pdfme',
         items: [
           {
-            type: 'dropdown',
-            label: 'Demo apps',
+            to: '/demo',
             position: 'right',
-            items: [
-              {
-                to: '/demo/online-certificate-generator',
-                label: 'Online Certificate Maker',
-              },
-            ],
+            label: 'Demo Apps',
           },
           {
             type: 'doc',
@@ -165,7 +159,7 @@ const config = {
             title: 'More',
             items: [
               {
-                label: 'Demo apps',
+                label: 'Demo Apps',
                 to: '/demo',
               },
               {

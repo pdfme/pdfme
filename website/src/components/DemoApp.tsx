@@ -6,6 +6,7 @@ import Layout from '@theme/Layout';
 import styles from './DemoApp.module.css';
 import { getFont } from '../libs/helper';
 import { useForm } from '../hooks';
+import { demoAppsSourceCodeUrl } from '../constants';
 import DemoAppHeader from './DemoAppHeader';
 import TemplateItem from './TemplateItem';
 import Faq from './Faq';
@@ -24,8 +25,15 @@ const faqList = [
   },
   {
     question: 'Can I access the source code?',
-    answer:
-      'Source code is available at https://github.com/pdfme/pdfme/tree/main/website/src/pages/demo .',
+    answer: (
+      <span>
+        Source code is available at{' '}
+        <a target="_blank" rel="noopener noreferrer" href={demoAppsSourceCodeUrl}>
+          {demoAppsSourceCodeUrl}
+        </a>
+        .
+      </span>
+    ),
   },
 ];
 

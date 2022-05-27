@@ -182,10 +182,7 @@ export default function Home(): JSX.Element {
             </div>
             <div className={clsx('col col--12 margin-vert--lg')}>
               <div className="text--center">
-                <p>
-                  It's easy to integrate with an external app.
-                  <br />
-                </p>
+                <p>It's easy to integrate with an external app.</p>
                 <Link
                   className="button button--primary button--lg"
                   to="/docs/getting-started#designer"
@@ -288,6 +285,17 @@ export default function Home(): JSX.Element {
         </div>
         <div className="col col--12 margin-vert--lg text--center">
           <Divider />
+        </div>
+        <div className={clsx('col col--12 margin-vert--lg')}>
+          <div className="text--center">
+            <p>
+              Let's check out applications that you can make with pdfme and how it works by actually
+              using it.
+            </p>
+            <Link className="button button--primary button--lg" to="/demo">
+              Check out the Demo Apps
+            </Link>
+          </div>
         </div>
         <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
