@@ -3,6 +3,8 @@ import clsx from 'clsx';
 import { FileDownloadOutlined } from '@mui/icons-material';
 import { generate, Template, BLANK_PDF, checkTemplate } from '@pdfme/generator';
 import Layout from '@theme/Layout';
+import Head from '@docusaurus/Head';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './DemoApp.module.css';
 import { getFont } from '../libs/helper';
 import { useForm } from '../hooks';
@@ -73,6 +75,9 @@ const DemoApp = (props: Props) => {
 
   return (
     <Layout title={title} description={description}>
+      <Head>
+        <meta property="og:image" content={useBaseUrl(thumbnail, { absolute: true })} />
+      </Head>
       <DemoAppHeader title={title} description={description} thumbnail={thumbnail} />
       <main>
         <section className="margin-vert--lg">
