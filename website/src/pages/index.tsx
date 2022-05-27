@@ -205,6 +205,7 @@ export default function Home(): JSX.Element {
                 <div className="card">
                   <div className="card__image">
                     <img
+                      loading="lazy"
                       src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
                       alt={`${mode === 'form' ? 'Form' : 'Viewer'} image`}
                     />

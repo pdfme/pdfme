@@ -20,7 +20,7 @@ export default (props: {
         }}
       >
         <div className="card shadow--md">
-          <div className="card__image text--center">
+          <div className="card__image text--center" onClick={() => onClick(id)}>
             <img src={imgUrl} width="100%" alt="Image alt text" title={`${id}'s image`} />
           </div>
           <div className="card__footer">
