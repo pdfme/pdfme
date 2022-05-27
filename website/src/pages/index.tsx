@@ -59,7 +59,7 @@ export default function Home(): JSX.Element {
       viewer.current = new Viewer({
         domContainer: viewerRef.current,
         template,
-        inputs: cloneDeep(template.sampledata) ?? [{}],
+        inputs: cloneDeep(template.sampledata ?? [{}]),
       });
     }
 
@@ -67,7 +67,7 @@ export default function Home(): JSX.Element {
       form.current = new Form({
         domContainer: formRef.current,
         template,
-        inputs: cloneDeep(template.sampledata) ?? [{}],
+        inputs: cloneDeep(template.sampledata ?? [{}]),
       });
 
       form.current.onChangeInput(console.log);
@@ -182,10 +182,7 @@ export default function Home(): JSX.Element {
             </div>
             <div className={clsx('col col--12 margin-vert--lg')}>
               <div className="text--center">
-                <p>
-                  It's easy to integrate with an external app.
-                  <br />
-                </p>
+                <p>It's easy to integrate with an external app.</p>
                 <Link
                   className="button button--primary button--lg"
                   to="/docs/getting-started#designer"
@@ -208,6 +205,7 @@ export default function Home(): JSX.Element {
                 <div className="card">
                   <div className="card__image">
                     <img
+                      loading="lazy"
                       src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
                       alt={`${mode === 'form' ? 'Form' : 'Viewer'} image`}
                     />
@@ -288,6 +286,17 @@ export default function Home(): JSX.Element {
         </div>
         <div className="col col--12 margin-vert--lg text--center">
           <Divider />
+        </div>
+        <div className={clsx('col col--12 margin-vert--lg')}>
+          <div className="text--center">
+            <p>
+              Let's check out applications that you can make with pdfme and how it works by actually
+              using it.
+            </p>
+            <Link className="button button--primary button--lg" to="/demo">
+              Check out the Demo Apps
+            </Link>
+          </div>
         </div>
         <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

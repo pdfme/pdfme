@@ -2,7 +2,6 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from './HomepageHeader.module.css';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import GitHubButton from 'react-github-btn';
 import Link from '@docusaurus/Link';
 
 export default function HomepageHeader() {
@@ -16,7 +15,9 @@ export default function HomepageHeader() {
             <img src="/img/logo.svg" alt="logo" width={300} className={styles.logo} />
           </div>
           <div className="col col--6">
-            <h1 className="hero__title">{siteConfig.title}</h1>
+            <h1 className="hero__title">
+              {siteConfig.title}: Free and Open source PDF generator!
+            </h1>
             <p className="hero__subtitle">
               A PDF generator library fully written in TypeScript coming with a React based UI
               template editor*.

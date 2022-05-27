@@ -13,7 +13,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'favicon.ico',
   organizationName: 'pdfme',
   projectName: 'pdfme',
   trailingSlash: false,
@@ -116,10 +116,15 @@ const config = {
         title: 'pdfme',
         items: [
           {
+            to: '/demo',
+            position: 'right',
+            label: 'Demo Apps',
+          },
+          {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
-            label: 'Docs',
+            label: 'Docs&Guides',
           },
           {
             to: '/template-design',
@@ -153,6 +158,10 @@ const config = {
           {
             title: 'More',
             items: [
+              {
+                label: 'Demo Apps',
+                to: '/demo',
+              },
               {
                 label: 'Template Design',
                 to: '/template-design',

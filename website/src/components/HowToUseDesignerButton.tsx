@@ -47,6 +47,7 @@ const HowToUseDesignerButton = () => {
             <ModalHead title="How to use" handleClose={handleClose} />
             <div style={{ background: '#999' }}>
               <img
+                loading="lazy"
                 src={'/img/designer.gif'}
                 style={{ width: 400, height: 384, display: 'block', margin: '0 auto' }}
               />

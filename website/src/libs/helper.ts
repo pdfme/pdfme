@@ -1,4 +1,4 @@
-import { Template, checkTemplate } from '@pdfme/generator';
+import { Template, Font, checkTemplate } from '@pdfme/generator';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({
@@ -188,3 +188,17 @@ const template = ${templateFmt4SampleCode(template)};
 const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
 const viewer = new Viewer({ domContainer, template });`.trim();
+
+const fonts = ['Roboto-Regular', 'PinyonScript-Regular'];
+export const getFont = () =>
+  Promise.all(
+    fonts.map((font) => fetch(`/fonts/${font}.ttf`).then((res) => res.arrayBuffer()))
+  ).then((buffers) =>
+    fonts.reduce(
+      (acc, cur, index) =>
+        Object.assign(acc, {
+          [cur]: { data: buffers[index], fallback: index === 0 },
+        }),
+      {} as Font
+    )
+  );
