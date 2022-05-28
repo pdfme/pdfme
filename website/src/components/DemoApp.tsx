@@ -97,6 +97,7 @@ const DemoApp = (props: Props) => {
                   {...props}
                   isSelected={selectedTemplateId === props.id}
                   onClick={(id) => {
+                    window.location.hash = '';
                     window.location.hash = '#form';
                     setSelectedTemplateId(id);
                   }}

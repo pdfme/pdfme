@@ -270,7 +270,7 @@
         "width": 165.96,
         "height": 23.67,
         "alignment": "left",
-        "fontSize": 13,
+        "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1
       },
@@ -280,7 +280,7 @@
         "width": 165.96,
         "height": 23.67,
         "alignment": "left",
-        "fontSize": 13,
+        "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1
       }
@@ -322,8 +322,8 @@
       "Price7": "$100",
       "Amount7": "$100",
       "Total": "$700",
-      "PaymentMethod": "+123-456-7890\nhello@pdfme.com\n123 Anywhere St., Any City, ST 12345",
-      "Note": "+123-456-7890\nhello@pdfme.com\n123 Anywhere St., Any City, ST 12345"
+      "PaymentMethod": "Bank Name: Thynk Unlimited Bank \nBank Account: 123-456-7890",
+      "Note": "Payment Terms Are Usually Stated on the Invoice. These May Specify That the Buyer Has a Maximum Number of Days in Which To Pay and Is Sometimes Offered\na Discount if Paid Before the Due Date. The Buyer Could Have Already Paid for the Products or Services Listed on the Invoice."
     }
   ],
   "columns": [

@@ -9,10 +9,6 @@ export const thumbnail = '/img/invoices.png';
 
 const templateItems = ['white', 'green', 'blue'].map((c) => ({
   id: `invoice_${c}`,
-  // TODO テンプレートを作成する
-  // - [x] white
-  // - [ ] blue Payment method:,Note:のサンプルデータが適当
-  // - [ ] green なんかデータがぶっ飛んだ
   jsonUrl: `/templates/invoice_${c}.json`,
   imgUrl: `/img/templates/invoice_${c}.webp`,
 }));
