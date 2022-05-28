@@ -6,11 +6,12 @@ export default (props: {
   jsonUrl: string;
   imgUrl: string;
   isSelected: boolean;
+  colNum: number;
   onClick: (id: string) => void;
 }) => {
-  const { isSelected, onClick, imgUrl, id } = props;
+  const { isSelected, onClick, imgUrl, id, colNum } = props;
   return (
-    <div className={clsx('col col--3')}>
+    <div className={clsx(`col col--${colNum}`)}>
       <div
         className="card-demo"
         style={{

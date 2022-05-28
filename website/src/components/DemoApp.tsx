@@ -93,6 +93,7 @@ const DemoApp = (props: Props) => {
               {templateItems.map((props, idx) => (
                 <TemplateItem
                   key={idx}
+                  colNum={12 / templateItems.length}
                   {...props}
                   isSelected={selectedTemplateId === props.id}
                   onClick={(id) => {

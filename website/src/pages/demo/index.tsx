@@ -8,13 +8,18 @@ import {
   description as description_certificate,
   thumbnail as thumbnail_certificate,
 } from './online-certificate-generator';
+import {
+  title as title_invoice,
+  description as description_invoice,
+  thumbnail as thumbnail_invoice,
+} from './online-invoice-generator';
 
 /*
 TODO
 - [x] certificate-generator
+- [ ] invoice-templates
 - [ ] barcode-qrcode-generator
 - [ ] address-label
-- [ ] invoice-templates
 */
 
 const apps = [
@@ -26,11 +31,11 @@ const apps = [
     developing: false,
   },
   {
-    title: 'Online Invoice Generator',
-    url: '',
-    thumbnail: '/img/under-development.png',
-    description: 'Comming soon...',
-    developing: true,
+    title: title_invoice,
+    url: '/demo/online-invoice-generator',
+    thumbnail: thumbnail_invoice,
+    description: description_invoice,
+    developing: false,
   },
   {
     title: 'Online Barcode, QRcode Generator',
