@@ -29,7 +29,7 @@ export const useForm = (props: {
   useEffect(() => {
     form.current?.updateTemplate(template);
     form.current?.setInputs([{}]);
-  }, [template]);
+  }, [template, form.current]);
 
   return form.current;
 };

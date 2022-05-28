@@ -37,6 +37,7 @@ const faqList = [
       </span>
     ),
   },
+  // TODO ラテン語系しか使えないことを書く
 ];
 
 const DemoApp = (props: Props) => {

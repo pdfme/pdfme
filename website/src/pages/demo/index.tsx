@@ -12,17 +12,29 @@ import {
   title as title_invoice,
   description as description_invoice,
   thumbnail as thumbnail_invoice,
-} from './online-invoice-generator';
+} from './free-invoice-generator';
+import {
+  title as title_barcode_qrcode,
+  description as description_barcode_qrcode,
+  thumbnail as thumbnail_barcode_qrcode,
+} from './barcode-qrcode-generator';
 
 /*
 TODO
+- [x] invoice-templates
 - [x] certificate-generator
-- [ ] invoice-templates
-- [ ] barcode-qrcode-generator
+- [x] barcode-qrcode-generator
 - [ ] address-label
 */
 
 const apps = [
+  {
+    title: title_invoice,
+    url: '/demo/free-invoice-generator',
+    thumbnail: thumbnail_invoice,
+    description: description_invoice,
+    developing: false,
+  },
   {
     title: title_certificate,
     url: '/demo/online-certificate-generator',
@@ -31,22 +43,15 @@ const apps = [
     developing: false,
   },
   {
-    title: title_invoice,
-    url: '/demo/online-invoice-generator',
-    thumbnail: thumbnail_invoice,
-    description: description_invoice,
+    title: title_barcode_qrcode,
+    url: '/demo/barcode-qrcode-generator',
+    thumbnail: thumbnail_barcode_qrcode,
+    description: description_barcode_qrcode,
     developing: false,
   },
   {
-    title: 'Online Barcode, QRcode Generator',
-    url: '',
-    thumbnail: '/img/under-development.png',
-    description: 'Comming soon...',
-    developing: true,
-  },
-  {
     title: 'Online Address labels Maker',
-    url: '',
+    url: '/demo/address-label',
     thumbnail: '/img/under-development.png',
     description: 'Comming soon...',
     developing: true,
