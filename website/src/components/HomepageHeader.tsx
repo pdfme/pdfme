@@ -15,9 +15,7 @@ export default function HomepageHeader() {
             <img src="/img/logo.svg" alt="logo" width={300} className={styles.logo} />
           </div>
           <div className="col col--6">
-            <h1 className="hero__title">
-              {siteConfig.title}: Free and Open source PDF generator!
-            </h1>
+            <h1 className="hero__title">{siteConfig.title}: Free and Open source PDF generator!</h1>
             <p className="hero__subtitle">
               A PDF generator library fully written in TypeScript coming with a React based UI
               template editor*.
@@ -32,6 +30,11 @@ export default function HomepageHeader() {
           <div className="col col--3" style={{ marginTop: '1rem' }}>
             <Link className="button button--lg button--success " to="/docs/getting-started">
               Getting Started
+            </Link>
+          </div>
+          <div className="col col--3" style={{ marginTop: '1rem' }}>
+            <Link className="button button--lg button--secondary " to="/demo">
+              Demo Apps
             </Link>
           </div>
           <div className="col col--3" style={{ marginTop: '1rem' }}>

@@ -7,6 +7,7 @@ import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
 import Code from '../components/Code';
+import GithubStar from '../components/GithubStar';
 import { generate, Template } from '@pdfme/generator';
 import { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
@@ -104,26 +105,24 @@ export default function Home(): JSX.Element {
                 Template
                 <a className="hash-link" href="#template"></a>
               </h2>
-              <div className="card-demo">
-                <div className="card">
-                  <div className="card__image">
-                    <img src={'/img/template.png'} alt="Image alt text" />
-                  </div>
-                  <div className="card__body">
-                    <h3>A template is composed by a basePdf and a Schema</h3>
-                    <small>
-                      Templates are at the core of pdfme. In fact a template can be used with the
-                      Generator, the Form, and the Viewer.
-                    </small>
-                  </div>
-                  <div className="card__footer">
-                    <Link
-                      className="button button--lg button--primary button--block"
-                      to="/docs/getting-started#template"
-                    >
-                      Learn more about Templates
-                    </Link>
-                  </div>
+              <div className="card">
+                <div className="card__image">
+                  <img src={'/img/template.png'} alt="Image alt text" />
+                </div>
+                <div className="card__body">
+                  <h3>A template is composed by a basePdf and a Schema</h3>
+                  <small>
+                    Templates are at the core of pdfme. In fact a template can be used with the
+                    Generator, the Form, and the Viewer.
+                  </small>
+                </div>
+                <div className="card__footer">
+                  <Link
+                    className="button button--lg button--primary button--block"
+                    to="/docs/getting-started#template"
+                  >
+                    Learn more about Templates
+                  </Link>
                 </div>
               </div>
             </div>
@@ -201,7 +200,7 @@ export default function Home(): JSX.Element {
                 Form / Viewer
                 <a className="hash-link" href="#form-viewer"></a>
               </h2>
-              <div className="card-demo">
+              <div>
                 <div className="card">
                   <div className="card__image">
                     <img
@@ -298,54 +297,7 @@ export default function Home(): JSX.Element {
             </Link>
           </div>
         </div>
-        <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ width: 'fit-content' }}>
-              <div style={{ display: 'flex', maxWidth: 400 }}>
-                <img src={'/img/please-star.png'} alt="pleaseStar" />
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  margin: '0.8rem',
-                }}
-              >
-                <a
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: '10pt',
-                  }}
-                  href="https://github.com/pdfme/pdfme"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img src={'/img/github-icon.svg'} alt="github" width={25} />
-                  <span style={{ marginLeft: '0.5rem' }}>https://github.com/pdfme/pdfme</span>
-                </a>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
-                  <div style={{ marginLeft: '0.5rem' }}>
-                    <GitHubButton
-                      href="https://github.com/pdfme/pdfme"
-                      data-size="large"
-                      data-icon="octicon-star"
-                      data-show-count={true}
-                      aria-label="Star pdfme on GitHub"
-                    >
-                      Star
-                    </GitHubButton>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <GithubStar />
       </main>
     </Layout>
   );

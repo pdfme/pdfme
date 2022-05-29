@@ -13,7 +13,6 @@ export default (props: {
   return (
     <div className={clsx(`col col--${colNum}`)}>
       <div
-        className="card-demo"
         style={{
           marginBottom: '1rem',
           borderRadius: 15,
