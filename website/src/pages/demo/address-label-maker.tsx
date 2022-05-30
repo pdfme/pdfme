@@ -1,5 +1,5 @@
 import React from 'react';
-import DemoApp from '../../components/DemoApp';
+import DemoAppGrid from '../../components/DemoAppGrid';
 
 export const title = 'Address Label Maker';
 export const description = `Address Label Maker is a web application that easy to use, completely free and unlimited use.
@@ -13,7 +13,7 @@ const templateItems = ['address_label_10', 'address_label_30', 'address_label_6'
 }));
 
 export default () => (
-  <DemoApp
+  <DemoAppGrid
     title={title}
     description={description}
     thumbnail={thumbnail}

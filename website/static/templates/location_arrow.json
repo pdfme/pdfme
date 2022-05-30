@@ -3,128 +3,128 @@
   "sampledata": [
     {
       "{1}text": "This is Code 128!",
-      "{1}CODE128": "This is Code 128!",
+      "{1}code128": "This is Code 128!",
       "{2}text": "This is Code 128!",
-      "{2}CODE128": "This is Code 128!",
+      "{2}code128": "This is Code 128!",
       "{3}text": "This is Code 128!",
-      "{3}CODE128": "This is Code 128!",
+      "{3}code128": "This is Code 128!",
       "{4}text": "This is Code 128!",
-      "{4}CODE128": "This is Code 128!",
+      "{4}code128": "This is Code 128!",
       "{5}text": "This is Code 128!",
-      "{5}CODE128": "This is Code 128!",
+      "{5}code128": "This is Code 128!",
       "{6}text": "This is Code 128!",
-      "{6}CODE128": "This is Code 128!",
+      "{6}code128": "This is Code 128!",
       "{7}text": "This is Code 128!",
-      "{7}CODE128": "This is Code 128!",
+      "{7}code128": "This is Code 128!",
       "{8}text": "This is Code 128!",
-      "{8}CODE128": "This is Code 128!",
+      "{8}code128": "This is Code 128!",
       "{9}text": "This is Code 128!",
-      "{9}CODE128": "This is Code 128!",
+      "{9}code128": "This is Code 128!",
       "{10}text": "This is Code 128!",
-      "{10}CODE128": "This is Code 128!",
+      "{10}code128": "This is Code 128!",
       "{11}text": "This is Code 128!",
-      "{11}CODE128": "This is Code 128!",
+      "{11}code128": "This is Code 128!",
       "{12}text": "This is Code 128!",
-      "{12}CODE128": "This is Code 128!",
+      "{12}code128": "This is Code 128!",
       "{13}text": "This is Code 128!",
-      "{13}CODE128": "This is Code 128!",
+      "{13}code128": "This is Code 128!",
       "{14}text": "This is Code 128!",
-      "{14}CODE128": "This is Code 128!",
+      "{14}code128": "This is Code 128!",
       "{15}text": "This is Code 128!",
-      "{15}CODE128": "This is Code 128!",
+      "{15}code128": "This is Code 128!",
       "{16}text": "This is Code 128!",
-      "{16}CODE128": "This is Code 128!",
+      "{16}code128": "This is Code 128!",
       "{17}text": "This is Code 128!",
-      "{17}CODE128": "This is Code 128!",
+      "{17}code128": "This is Code 128!",
       "{18}text": "This is Code 128!",
-      "{18}CODE128": "This is Code 128!",
+      "{18}code128": "This is Code 128!",
       "{19}text": "This is Code 128!",
-      "{19}CODE128": "This is Code 128!",
+      "{19}code128": "This is Code 128!",
       "{20}text": "This is Code 128!",
-      "{20}CODE128": "This is Code 128!",
+      "{20}code128": "This is Code 128!",
       "{21}text": "This is Code 128!",
-      "{21}CODE128": "This is Code 128!",
+      "{21}code128": "This is Code 128!",
       "{22}text": "This is Code 128!",
-      "{22}CODE128": "This is Code 128!",
+      "{22}code128": "This is Code 128!",
       "{23}text": "This is Code 128!",
-      "{23}CODE128": "This is Code 128!",
+      "{23}code128": "This is Code 128!",
       "{24}text": "This is Code 128!",
-      "{24}CODE128": "This is Code 128!",
+      "{24}code128": "This is Code 128!",
       "{25}text": "This is Code 128!",
-      "{25}CODE128": "This is Code 128!",
+      "{25}code128": "This is Code 128!",
       "{26}text": "This is Code 128!",
-      "{26}CODE128": "This is Code 128!",
+      "{26}code128": "This is Code 128!",
       "{27}text": "This is Code 128!",
-      "{27}CODE128": "This is Code 128!",
+      "{27}code128": "This is Code 128!",
       "{28}text": "This is Code 128!",
-      "{28}CODE128": "This is Code 128!",
+      "{28}code128": "This is Code 128!",
       "{29}text": "This is Code 128!",
-      "{29}CODE128": "This is Code 128!",
+      "{29}code128": "This is Code 128!",
       "{30}text": "This is Code 128!",
-      "{30}CODE128": "This is Code 128!"
+      "{30}code128": "This is Code 128!"
     }
   ],
   "columns": [
     "{1}text",
-    "{1}CODE128",
+    "{1}code128",
     "{2}text",
-    "{2}CODE128",
+    "{2}code128",
     "{3}text",
-    "{3}CODE128",
+    "{3}code128",
     "{4}text",
-    "{4}CODE128",
+    "{4}code128",
     "{5}text",
-    "{5}CODE128",
+    "{5}code128",
     "{6}text",
-    "{6}CODE128",
+    "{6}code128",
     "{7}text",
-    "{7}CODE128",
+    "{7}code128",
     "{8}text",
-    "{8}CODE128",
+    "{8}code128",
     "{9}text",
-    "{9}CODE128",
+    "{9}code128",
     "{10}text",
-    "{10}CODE128",
+    "{10}code128",
     "{11}text",
-    "{11}CODE128",
+    "{11}code128",
     "{12}text",
-    "{12}CODE128",
+    "{12}code128",
     "{13}text",
-    "{13}CODE128",
+    "{13}code128",
     "{14}text",
-    "{14}CODE128",
+    "{14}code128",
     "{15}text",
-    "{15}CODE128",
+    "{15}code128",
     "{16}text",
-    "{16}CODE128",
+    "{16}code128",
     "{17}text",
-    "{17}CODE128",
+    "{17}code128",
     "{18}text",
-    "{18}CODE128",
+    "{18}code128",
     "{19}text",
-    "{19}CODE128",
+    "{19}code128",
     "{20}text",
-    "{20}CODE128",
+    "{20}code128",
     "{21}text",
-    "{21}CODE128",
+    "{21}code128",
     "{22}text",
-    "{22}CODE128",
+    "{22}code128",
     "{23}text",
-    "{23}CODE128",
+    "{23}code128",
     "{24}text",
-    "{24}CODE128",
+    "{24}code128",
     "{25}text",
-    "{25}CODE128",
+    "{25}code128",
     "{26}text",
-    "{26}CODE128",
+    "{26}code128",
     "{27}text",
-    "{27}CODE128",
+    "{27}code128",
     "{28}text",
-    "{28}CODE128",
+    "{28}code128",
     "{29}text",
-    "{29}CODE128",
+    "{29}code128",
     "{30}text",
-    "{30}CODE128"
+    "{30}code128"
   ],
   "schemas": [
     {
@@ -141,7 +141,7 @@
         "height": 5.94,
         "alignment": "center"
       },
-      "{1}CODE128": {
+      "{1}code128": {
         "position": {
           "x": 34.3,
           "y": 33.12
@@ -167,7 +167,7 @@
           "x": 30.96
         }
       },
-      "{2}CODE128": {
+      "{2}code128": {
         "type": "code128",
         "characterSpacing": 0,
         "height": 13.15,
@@ -193,7 +193,7 @@
           "x": 30.96
         }
       },
-      "{3}CODE128": {
+      "{3}code128": {
         "position": {
           "y": 83.65,
           "x": 34.3
@@ -219,7 +219,7 @@
         "type": "text",
         "lineHeight": 0.9
       },
-      "{4}CODE128": {
+      "{4}code128": {
         "position": {
           "y": 109.37,
           "x": 34.3
@@ -245,7 +245,7 @@
         "fontSize": 14,
         "alignment": "center"
       },
-      "{5}CODE128": {
+      "{5}code128": {
         "characterSpacing": 0,
         "alignment": "left",
         "position": {
@@ -271,7 +271,7 @@
         "fontSize": 14,
         "height": 5.94
       },
-      "{6}CODE128": {
+      "{6}code128": {
         "width": 34.18,
         "position": {
           "y": 159.8,
@@ -297,7 +297,7 @@
         "height": 5.94,
         "lineHeight": 0.9
       },
-      "{7}CODE128": {
+      "{7}code128": {
         "characterSpacing": 0,
         "height": 13.15,
         "lineHeight": 1,
@@ -323,7 +323,7 @@
         "lineHeight": 0.9,
         "characterSpacing": 0
       },
-      "{8}CODE128": {
+      "{8}code128": {
         "alignment": "left",
         "characterSpacing": 0,
         "lineHeight": 1,
@@ -349,7 +349,7 @@
         },
         "characterSpacing": 0
       },
-      "{9}CODE128": {
+      "{9}code128": {
         "height": 13.15,
         "fontSize": 13,
         "width": 34.18,
@@ -375,7 +375,7 @@
         "alignment": "center",
         "type": "text"
       },
-      "{10}CODE128": {
+      "{10}code128": {
         "position": {
           "y": 261.35,
           "x": 34.3
@@ -401,7 +401,7 @@
         "alignment": "center",
         "width": 40.86
       },
-      "{11}CODE128": {
+      "{11}code128": {
         "characterSpacing": 0,
         "position": {
           "x": 91.78,
@@ -427,7 +427,7 @@
         "lineHeight": 0.9,
         "characterSpacing": 0
       },
-      "{12}CODE128": {
+      "{12}code128": {
         "alignment": "left",
         "type": "code128",
         "characterSpacing": 0,
@@ -453,7 +453,7 @@
         "fontSize": 14,
         "height": 5.94
       },
-      "{13}CODE128": {
+      "{13}code128": {
         "type": "code128",
         "lineHeight": 1,
         "alignment": "left",
@@ -479,7 +479,7 @@
         "characterSpacing": 0,
         "fontSize": 14
       },
-      "{14}CODE128": {
+      "{14}code128": {
         "width": 34.18,
         "alignment": "left",
         "height": 13.15,
@@ -505,7 +505,7 @@
         "lineHeight": 0.9,
         "characterSpacing": 0
       },
-      "{15}CODE128": {
+      "{15}code128": {
         "position": {
           "y": 134.51,
           "x": 91.78
@@ -531,7 +531,7 @@
         },
         "alignment": "center"
       },
-      "{16}CODE128": {
+      "{16}code128": {
         "height": 13.15,
         "fontSize": 13,
         "width": 34.18,
@@ -557,7 +557,7 @@
         "width": 40.86,
         "height": 5.94
       },
-      "{17}CODE128": {
+      "{17}code128": {
         "width": 34.18,
         "alignment": "left",
         "type": "code128",
@@ -583,7 +583,7 @@
           "x": 88.44
         }
       },
-      "{18}CODE128": {
+      "{18}code128": {
         "characterSpacing": 0,
         "alignment": "left",
         "fontSize": 13,
@@ -609,7 +609,7 @@
         "width": 40.86,
         "height": 5.94
       },
-      "{19}CODE128": {
+      "{19}code128": {
         "characterSpacing": 0,
         "lineHeight": 1,
         "position": {
@@ -635,7 +635,7 @@
         },
         "type": "text"
       },
-      "{20}CODE128": {
+      "{20}code128": {
         "lineHeight": 1,
         "type": "code128",
         "characterSpacing": 0,
@@ -661,7 +661,7 @@
         "alignment": "center",
         "type": "text"
       },
-      "{21}CODE128": {
+      "{21}code128": {
         "characterSpacing": 0,
         "type": "code128",
         "lineHeight": 1,
@@ -687,7 +687,7 @@
         "width": 40.86,
         "fontSize": 14
       },
-      "{22}CODE128": {
+      "{22}code128": {
         "position": {
           "x": 148.61,
           "y": 58.36
@@ -713,7 +713,7 @@
         "characterSpacing": 0,
         "lineHeight": 0.9
       },
-      "{23}CODE128": {
+      "{23}code128": {
         "characterSpacing": 0,
         "height": 13.15,
         "position": {
@@ -739,7 +739,7 @@
         "alignment": "center",
         "fontSize": 14
       },
-      "{24}CODE128": {
+      "{24}code128": {
         "fontSize": 13,
         "width": 34.18,
         "height": 13.15,
@@ -765,7 +765,7 @@
           "x": 145.27
         }
       },
-      "{25}CODE128": {
+      "{25}code128": {
         "characterSpacing": 0,
         "width": 34.18,
         "alignment": "left",
@@ -791,7 +791,7 @@
         "type": "text",
         "lineHeight": 0.9
       },
-      "{26}CODE128": {
+      "{26}code128": {
         "fontSize": 13,
         "height": 13.15,
         "width": 34.18,
@@ -817,7 +817,7 @@
         "height": 5.94,
         "width": 40.86
       },
-      "{27}CODE128": {
+      "{27}code128": {
         "fontSize": 13,
         "alignment": "left",
         "type": "code128",
@@ -843,7 +843,7 @@
         "alignment": "center",
         "characterSpacing": 0
       },
-      "{28}CODE128": {
+      "{28}code128": {
         "characterSpacing": 0,
         "height": 13.15,
         "fontSize": 13,
@@ -869,7 +869,7 @@
           "y": 225.86
         }
       },
-      "{29}CODE128": {
+      "{29}code128": {
         "position": {
           "x": 148.61,
           "y": 236.33
@@ -895,7 +895,7 @@
           "y": 251.27
         }
       },
-      "{30}CODE128": {
+      "{30}code128": {
         "type": "code128",
         "alignment": "left",
         "position": {

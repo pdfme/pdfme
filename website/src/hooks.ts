@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Form, Template } from '@pdfme/ui';
+import { Form, Viewer, Template } from '@pdfme/ui';
 import { getFont, cloneDeep } from './libs/helper';
 
 export const useForm = (props: {
@@ -21,10 +21,10 @@ export const useForm = (props: {
       });
     }
     return () => {
-      form.current.destroy();
+      form.current?.destroy();
       form.current = null;
     };
-  }, [formRef]);
+  }, [formRef.current]);
 
   useEffect(() => {
     form.current?.updateTemplate(template);
@@ -32,4 +32,36 @@ export const useForm = (props: {
   }, [template, form.current]);
 
   return form.current;
+};
+
+export const useViewer = (props: {
+  viewerRef: React.MutableRefObject<HTMLDivElement>;
+  template: Template;
+}) => {
+  const { viewerRef, template } = props;
+  const viewer = useRef<Viewer | null>(null);
+
+  useEffect(() => {
+    if (viewerRef.current) {
+      getFont().then((font) => {
+        viewer.current = new Viewer({
+          domContainer: viewerRef.current,
+          template,
+          inputs: cloneDeep(template.sampledata ?? [{}]),
+          options: { font },
+        });
+      });
+    }
+    return () => {
+      viewer.current?.destroy();
+      viewer.current = null;
+    };
+  }, [viewerRef.current]);
+
+  useEffect(() => {
+    viewer.current?.updateTemplate(template);
+    viewer.current?.setInputs([{}]);
+  }, [template, viewer.current]);
+
+  return viewer.current;
 };

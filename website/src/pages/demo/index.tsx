@@ -27,8 +27,6 @@ import {
   thumbnail as thumbnail_address_label,
 } from './address-label-maker';
 
-// TODO address-label, barcode-qrcodeでは一括編集モードみたいなのが欲しいかも
-
 const apps: {
   title: string;
   tags: ('ui/form' | 'ui/viewer' | 'ui/designer' | 'generator')[];
@@ -111,6 +109,17 @@ const Demo = () => (
                   </a>
                 </li>
               </ul>
+              <p>
+                If you need technical support, please contact the author via{' '}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={'https://www.linkedin.com/in/hand-dot/'}
+                >
+                  LinkedIn
+                </a>
+                .
+              </p>
             </div>
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />

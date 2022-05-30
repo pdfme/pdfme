@@ -202,3 +202,81 @@ export const getFont = () =>
       {} as Font
     )
   );
+
+const divide = <T>(ary: T[], n: number): T[][] => {
+  if (!Array.isArray(ary) || isNaN(n)) throw Error('Error: divide unexpected argument'); // eslint-disable-line
+  let idx = 0;
+  const results = [];
+  while (idx + n < ary.length) {
+    const result = ary.slice(idx, idx + n);
+    results.push(result);
+    idx += n;
+  }
+
+  const rest = ary.slice(idx, ary.length + 1);
+  results.push(rest);
+  return results;
+};
+
+const get = (obj: any, path: string | number, defaultValue?: any) => {
+  const travel = (regexp: RegExp) =>
+    String.prototype.split
+      .call(path, regexp)
+      .filter(Boolean)
+      .reduce((res, key) => (res !== null && res !== undefined ? res[key] : res), obj);
+  const result = travel(/[,[\]]+?/) || travel(/[,[\].]+?/);
+  return result === undefined || result === obj ? defaultValue : result;
+};
+
+const getLabelLengthInPage = (template: Template) => {
+  if (!isMultiLabel(template)) return 1;
+  const rowNums = template.columns.map((column) =>
+    Number(column.match(/^{\d+}/)![0].replace(/{|}/g, ''))
+  );
+  return Math.max(...rowNums);
+};
+
+const isMultiLabel = (template: Template) => {
+  if (template.columns.length === 0) return false;
+  const regex = RegExp(/^{\d+}.*/);
+  return regex.test(template.columns[0]);
+};
+
+export const normalizeDatas = (datas: { [key: string]: string }[], template: Template) => {
+  if (!isMultiLabel(template)) return datas;
+  const returnData = divide(datas, getLabelLengthInPage(template)).map((labelsInPage) =>
+    labelsInPage.reduce((obj, data, index) => {
+      Object.entries(data).forEach((entry) => {
+        const [key, value] = entry;
+        obj[`{${index + 1}}${key}`] = value; // eslint-disable-line
+      });
+      return obj;
+    }, {})
+  );
+  return returnData;
+};
+
+export const deNormalizeDatas = (datas: { [key: string]: string }[], template: Template) => {
+  if (!isMultiLabel(template)) return datas;
+  const result: any[] = [];
+  const labelLengthInPage = getLabelLengthInPage(template);
+  datas.forEach((data, _index) => {
+    const length = labelLengthInPage * _index;
+    Object.entries(data).forEach((entry) => {
+      let [key, value] = entry;
+      const prop = key.replace(/\{(\d+)\}/g, '');
+      const index =
+        Number(
+          key
+            .match(/\{(\d+)\}/g)?.[0]
+            .replace('{', '')
+            .replace('}', '')
+        ) - 1;
+      result[index + length] = {
+        ...get(result, index + length, {}),
+        [prop]: value,
+      };
+    });
+  });
+  return result;
+};

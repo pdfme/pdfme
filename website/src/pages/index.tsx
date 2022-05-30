@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import GitHubButton from 'react-github-btn';
 import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';

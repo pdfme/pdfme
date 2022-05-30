@@ -24,6 +24,18 @@ const faqList = [
       </span>
     ),
   },
+  {
+    question: 'Bug report',
+    answer: (
+      <span>
+        To report application bugs, please use{' '}
+        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/pdfme/pdfme/issues'}>
+          GitHub issue
+        </a>
+        .
+      </span>
+    ),
+  },
 ];
 
 export default () => (

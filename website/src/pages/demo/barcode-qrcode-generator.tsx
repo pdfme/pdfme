@@ -1,5 +1,5 @@
 import React from 'react';
-import DemoApp from '../../components/DemoApp';
+import DemoAppGrid from '../../components/DemoAppGrid';
 
 export const title = 'Barcode,QR Generator';
 export const description = `Barcode, QRcode Generator is a web application that easy to use, completely free and unlimited use.
@@ -13,7 +13,7 @@ const templateItems = ['qr_lines', 'qr_title', 'location_arrow', 'location_numbe
 }));
 
 export default () => (
-  <DemoApp
+  <DemoAppGrid
     title={title}
     description={description}
     thumbnail={thumbnail}
