@@ -1,7 +1,7 @@
 import React from 'react';
 import DemoApp from '../../components/DemoApp';
 
-export const title = 'Online Certificate Maker';
+export const title = 'Certificate Maker';
 export const description = `Online Certificate Maker is a web application that easy to use, completely free and unlimited use.
 No need sign up! no need to pay!`;
 export const thumbnail = '/img/certificates.png';

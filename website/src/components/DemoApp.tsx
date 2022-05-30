@@ -8,10 +8,9 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './DemoApp.module.css';
 import { getFont } from '../libs/helper';
 import { useForm } from '../hooks';
-import { demoAppsSourceCodeUrl } from '../constants';
 import DemoAppHeader from './DemoAppHeader';
 import TemplateItem from './TemplateItem';
-import Faq from './Faq';
+import DemoAppFaq from './DemoAppFaq';
 
 type Props = {
   title: string;
@@ -19,26 +18,6 @@ type Props = {
   thumbnail: string;
   templateItems: { id: string; jsonUrl: string; imgUrl: string }[];
 };
-
-const faqList = [
-  {
-    question: 'Can I use this for free?',
-    answer: 'Yes. Free and unlimited use.',
-  },
-  {
-    question: 'Can I access the source code?',
-    answer: (
-      <span>
-        Source code is available at{' '}
-        <a target="_blank" rel="noopener noreferrer" href={demoAppsSourceCodeUrl}>
-          {demoAppsSourceCodeUrl}
-        </a>
-        .
-      </span>
-    ),
-  },
-  // TODO ラテン語系しか使えないことを書く
-];
 
 const DemoApp = (props: Props) => {
   const { title, description, thumbnail, templateItems } = props;
@@ -62,6 +41,7 @@ const DemoApp = (props: Props) => {
   }, [selectedTemplateId]);
 
   const downloadPdf = async () => {
+    // TODO 作成にかかった時間を表示するようにする
     const inputs = form.getInputs() ?? [];
     const font = await getFont();
     const pdf = await generate({ template, inputs, options: { font } });
@@ -84,7 +64,7 @@ const DemoApp = (props: Props) => {
         <section className="margin-vert--lg">
           <div className="container">
             <div className="row">
-              <div className={clsx('col col--12')}>
+              <div className={'col col--12'}>
                 <h2>
                   <a aria-hidden="true" className="anchor enhancedAnchor" id="templates"></a>
                   Choose a Template
@@ -110,7 +90,7 @@ const DemoApp = (props: Props) => {
 
         <section style={{ background: 'rgb(74, 74, 74)' }}>
           <div className="container">
-            <div style={{ color: '#eee' }} className={clsx('col col--12')}>
+            <div style={{ color: '#eee' }} className={'col col--12'}>
               <h2 className="padding-top--lg">
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="form"></a>
                 Fill the Form
@@ -152,8 +132,8 @@ const DemoApp = (props: Props) => {
 
         <section className="margin-vert--lg">
           <div className="container">
-            <div className={clsx('col col--12')}>
-              <Faq faqList={faqList} />
+            <div className={'col col--12'}>
+              <DemoAppFaq />
             </div>
           </div>
         </section>

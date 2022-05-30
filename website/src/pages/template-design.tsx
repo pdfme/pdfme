@@ -20,13 +20,11 @@ import {
   getFormSampleCode,
   getViewerSampleCode,
 } from '../libs/helper';
-import ViewSourceCodeSnackbar from '../components/ViewSourceCodeSnackbar';
 import HowToUseDesignerButton from '../components/HowToUseDesignerButton';
 import DesignerCodeModal from '../components/DesignerCodeModal';
 
 const headerHeight = 60;
 const controllerHeight = 60;
-const sourceCode = 'https://github.com/pdfme/pdfme/blob/main/website/src/pages/template-design.tsx';
 
 const TemplateDesign = () => {
   const designerRef = useRef<HTMLDivElement | null>(null);
@@ -274,7 +272,6 @@ ${e}`);
         modes={modes}
         setCodeMode={setCodeMode}
       />
-      <ViewSourceCodeSnackbar link={sourceCode} />
     </Layout>
   );
 };

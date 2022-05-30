@@ -116,15 +116,15 @@ const config = {
         title: 'pdfme',
         items: [
           {
-            to: '/demo',
-            position: 'right',
-            label: 'Demo Apps',
-          },
-          {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
             label: 'Docs&Guides',
+          },
+          {
+            to: '/demo',
+            position: 'right',
+            label: 'Demo Apps',
           },
           {
             to: '/template-design',
