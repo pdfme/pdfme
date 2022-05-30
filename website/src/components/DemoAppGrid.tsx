@@ -100,7 +100,7 @@ const DemoApp = (props: Props) => {
                     datas={datas}
                     setDatas={(value) => {
                       setDatas(value);
-                      viewer.setInputs(normalizeDatas(value, template));
+                      viewer?.setInputs(normalizeDatas(value, template));
                     }}
                   />
                 </div>

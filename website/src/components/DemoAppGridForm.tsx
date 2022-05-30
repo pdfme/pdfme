@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReactGrid, Row, CellChange, DefaultCellTypes, Column, TextCell } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
+import { cloneDeep } from '../libs/helper';
 
 const getRows = (datas: { [key: string]: string }[]): Row[] => [
   {
@@ -35,20 +36,13 @@ const DemoAppGridForm = (props: {
 }) => {
   const { datas, setDatas } = props;
   const handleChanges = (changes: CellChange<TextCell>[]) => {
-    const newDatas = applyChangesToData(changes, datas);
-    setDatas(newDatas);
-  };
-
-  const applyChangesToData = (
-    changes: CellChange<TextCell>[],
-    prevDatas: { [key: string]: string }[]
-  ) => {
+    const _datas = cloneDeep(datas);
     changes.forEach((change) => {
       const index = change.rowId;
       const fieldName = change.columnId;
-      prevDatas[index][fieldName] = change.newCell.text;
+      _datas[index][fieldName] = change.newCell.text;
     });
-    return [...prevDatas];
+    setDatas(_datas);
   };
 
   return (

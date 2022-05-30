@@ -27,11 +27,11 @@ const DemoAppFormHeader = (props: Props) => {
           (Generated in: {pdfCreationTime === 0 ? '-' : Math.round(pdfCreationTime)}ms)
         </p>
         <div className={'text--center'} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button onClick={loadSampleData} className="button button--sm button--info">
+          <button onClick={loadSampleData} className="button button--info">
             Sample Data
           </button>
-          <span className="margin-horiz--sm">/</span>
-          <button onClick={downloadPdf} className="button button--sm button--success">
+          <span className="margin-horiz--md">/</span>
+          <button onClick={downloadPdf} className="button button--success">
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
               <span>Download</span>
