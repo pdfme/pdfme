@@ -26,4 +26,10 @@ const faqList = [
   },
 ];
 
-export default () => <Faq faqList={faqList} />;
+export default () => (
+  <div className="container">
+    <div className={'col col--12'}>
+      <Faq faqList={faqList} />
+    </div>
+  </div>
+);

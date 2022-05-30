@@ -1,4 +1,6 @@
 import React from 'react';
+import Head from '@docusaurus/Head';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import DemoAppCard from '../../components/DemoAppCard';
 import GithubStar from '../../components/GithubStar';
@@ -27,39 +29,58 @@ import {
 
 // TODO address-label, barcode-qrcodeでは一括編集モードみたいなのが欲しいかも
 
-const apps = [
+const apps: {
+  title: string;
+  tags: ('ui/form' | 'ui/viewer' | 'ui/designer' | 'generator')[];
+  url: string;
+  thumbnail: string;
+  description: string;
+}[] = [
   {
     title: title_invoice,
+    tags: ['ui/form', 'generator'],
     url: '/demo/free-invoice-generator',
     thumbnail: thumbnail_invoice,
     description: description_invoice,
   },
   {
     title: title_address_label,
+    tags: ['ui/viewer', 'generator'],
     url: '/demo/address-label-maker',
     thumbnail: thumbnail_address_label,
     description: description_address_label,
   },
   {
     title: title_certificate,
+    tags: ['ui/form', 'generator'],
     url: '/demo/online-certificate-maker',
     thumbnail: thumbnail_certificate,
     description: description_certificate,
   },
   {
     title: title_barcode_qrcode,
+    tags: ['ui/viewer', 'generator'],
     url: '/demo/barcode-qrcode-generator',
     thumbnail: thumbnail_barcode_qrcode,
     description: description_barcode_qrcode,
   },
+  {
+    title: 'Template Design',
+    tags: ['ui/designer', 'generator'],
+    url: '/template-design',
+    thumbnail: '/img/designer.png',
+    description: `The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.`,
+  },
 ];
 
-const title = 'Demo app to generate PDFs online';
+const title = 'Demo Apps to generate PDFs online';
 const description = `Let's check out applications that you can make with pdfme and how it works by actually using it.`;
 
 const Demo = () => (
   <Layout title={title} description={description}>
-    {/* TODO ogimageの設定 */}
+    <Head>
+      <meta property="og:image" content={useBaseUrl('/img/demoapps.png', { absolute: true })} />
+    </Head>
     <main>
       <section className="margin-vert--lg">
         <div className="container">
@@ -69,40 +90,27 @@ const Demo = () => (
               <p style={{ whiteSpace: 'pre-line' }}>{description}</p>
             </div>
             {apps.map((app) => (
-              <div key={app.title} className={'col col--3'}>
+              <div key={app.title} className={'col col--4 padding--md'}>
                 <DemoAppCard app={app} />
               </div>
             ))}
-            <div className={'col col--12 margin-top--md'}>
-              <p>
-                Source code can be accessed at{' '}
-                <a target="_blank" rel="noopener noreferrer" href={demoAppsSourceCodeUrl}>
-                  {demoAppsSourceCodeUrl}
-                </a>
-              </p>
-            </div>
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
-            {/* TODO どのdemoが何の機能に対応しているのか説明し、ドキュメントのリンクも貼る */}
-            {/* TODO DesignerもTemplate designerに飛ばす */}
-            <div className={'col col--3'}>
-              <DemoAppCard
-                app={{
-                  title: 'Template Design',
-                  url: '/template-design',
-                  thumbnail: '/img/designer.png',
-                  description: `The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.`,
-                }}
-              />
-            </div>
             <div className={'col col--12 margin-top--md'}>
-              <p>
-                Source code can be accessed at{' '}
-                <a target="_blank" rel="noopener noreferrer" href={templateDesignSourceCodeUrl}>
-                  {templateDesignSourceCodeUrl}
-                </a>
-              </p>
+              <p>Source code can be accessed at </p>
+              <ul>
+                <li>
+                  <a target="_blank" rel="noopener noreferrer" href={demoAppsSourceCodeUrl}>
+                    {demoAppsSourceCodeUrl}
+                  </a>
+                </li>
+                <li>
+                  <a target="_blank" rel="noopener noreferrer" href={templateDesignSourceCodeUrl}>
+                    {templateDesignSourceCodeUrl}
+                  </a>
+                </li>
+              </ul>
             </div>
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />
