@@ -52,7 +52,7 @@ const DemoAppGridForm = (props: {
   };
 
   return (
-    <div>
+    <div style={{ background: '#fff', color: '#333' }}>
       <ReactGrid
         stickyTopRows={1}
         rows={getRows(datas)}
