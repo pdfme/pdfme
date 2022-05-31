@@ -36,12 +36,18 @@ const faqList = [
       </span>
     ),
   },
+  {
+    question: 'Need technical support',
+    answer: (
+      <p>
+        If you need technical support, please contact the author via{' '}
+        <a target="_blank" rel="noopener noreferrer" href={'https://www.linkedin.com/in/hand-dot/'}>
+          LinkedIn
+        </a>
+        .
+      </p>
+    ),
+  },
 ];
 
-export default () => (
-  <div className="container">
-    <div className={'col col--12'}>
-      <Faq faqList={faqList} />
-    </div>
-  </div>
-);
+export default () => <Faq faqList={faqList} />;

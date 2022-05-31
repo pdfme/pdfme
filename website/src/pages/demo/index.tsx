@@ -3,9 +3,8 @@ import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import DemoAppCard from '../../components/DemoAppCard';
-import GithubStar from '../../components/GithubStar';
+import DemoAppFooter from '../../components/DemoAppFooter';
 import Divider from '../../components/Divider';
-import { demoAppsSourceCodeUrl, templateDesignSourceCodeUrl } from '../../constants';
 import {
   title as title_certificate,
   description as description_certificate,
@@ -95,36 +94,7 @@ const Demo = () => (
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
-            <div className={'col col--12 margin-top--md'}>
-              <p>Source code can be accessed at </p>
-              <ul>
-                <li>
-                  <a target="_blank" rel="noopener noreferrer" href={demoAppsSourceCodeUrl}>
-                    {demoAppsSourceCodeUrl}
-                  </a>
-                </li>
-                <li>
-                  <a target="_blank" rel="noopener noreferrer" href={templateDesignSourceCodeUrl}>
-                    {templateDesignSourceCodeUrl}
-                  </a>
-                </li>
-              </ul>
-              <p>
-                If you need technical support, please contact the author via{' '}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={'https://www.linkedin.com/in/hand-dot/'}
-                >
-                  LinkedIn
-                </a>
-                .
-              </p>
-            </div>
-            <div className="col col--12 margin-vert--lg text--center">
-              <Divider />
-            </div>
-            <GithubStar />
+            <DemoAppFooter />
           </div>
         </div>
       </section>

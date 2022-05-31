@@ -10,26 +10,20 @@ export const useForm = (props: {
   const form = useRef<Form | null>(null);
 
   useEffect(() => {
-    if (formRef.current) {
+    if (formRef.current && form.current === null) {
       getFont().then((font) => {
         form.current = new Form({
           domContainer: formRef.current,
           template,
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: [{}],
           options: { font },
         });
       });
+    } else {
+      form.current.updateTemplate(template);
+      form.current.setInputs([{}]);
     }
-    return () => {
-      form.current?.destroy();
-      form.current = null;
-    };
-  }, [formRef.current]);
-
-  useEffect(() => {
-    form.current?.updateTemplate(template);
-    form.current?.setInputs([{}]);
-  }, [template, form.current]);
+  }, [formRef.current, template]);
 
   return form.current;
 };
@@ -42,7 +36,7 @@ export const useViewer = (props: {
   const viewer = useRef<Viewer | null>(null);
 
   useEffect(() => {
-    if (viewerRef.current) {
+    if (viewerRef.current && viewer.current === null) {
       getFont().then((font) => {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
@@ -51,17 +45,11 @@ export const useViewer = (props: {
           options: { font },
         });
       });
+    } else {
+      viewer.current?.updateTemplate(template);
+      viewer.current?.setInputs([{}]);
     }
-    return () => {
-      viewer.current?.destroy();
-      viewer.current = null;
-    };
-  }, [viewerRef.current]);
-
-  useEffect(() => {
-    viewer.current?.updateTemplate(template);
-    viewer.current?.setInputs([{}]);
-  }, [template, viewer.current]);
+  }, [viewerRef.current, template]);
 
   return viewer.current;
 };

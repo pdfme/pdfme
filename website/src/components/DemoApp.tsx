@@ -8,7 +8,7 @@ import { useForm } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';
 import DemoAppFormHeader from './DemoAppFormHeader';
-import DemoAppFaq from './DemoAppFaq';
+import DemoAppFooter from './DemoAppFooter';
 
 type Props = {
   title: string;
@@ -40,7 +40,7 @@ const DemoApp = (props: Props) => {
   }, [selectedTemplateId]);
 
   const downloadPdf = async () => {
-    const inputs = form.getInputs() ?? [];
+    const inputs = form?.getInputs() ?? [{}];
     const font = await getFont();
 
     const t0 = performance.now();
@@ -53,7 +53,7 @@ const DemoApp = (props: Props) => {
   };
 
   const loadSampleData = () => {
-    form.setInputs(template.sampledata ?? []);
+    form?.setInputs(template.sampledata ?? []);
     alert('Sample Data loaded.\nPlease click "Download" button.');
   };
 
@@ -85,7 +85,7 @@ const DemoApp = (props: Props) => {
         </section>
 
         <section className="margin-vert--lg">
-          <DemoAppFaq />
+          <DemoAppFooter />
         </section>
       </main>
     </Layout>

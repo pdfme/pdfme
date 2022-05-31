@@ -9,7 +9,7 @@ import { useViewer } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';
 import DemoAppGridFormHeader from './DemoAppGridFormHeader';
-import DemoAppFaq from './DemoAppFaq';
+import DemoAppFooter from './DemoAppFooter';
 import DemoAppGridForm from './DemoAppGridForm';
 import Divider from './Divider';
 
@@ -48,7 +48,7 @@ const DemoApp = (props: Props) => {
   }, [selectedTemplateId]);
 
   const downloadPdf = async () => {
-    const inputs = viewer.getInputs() ?? [];
+    const inputs = viewer?.getInputs() ?? [{}];
     const font = await getFont();
 
     const t0 = performance.now();
@@ -114,7 +114,7 @@ const DemoApp = (props: Props) => {
         </section>
         <Divider />
         <section className="margin-vert--lg">
-          <DemoAppFaq />
+          <DemoAppFooter />
         </section>
         <Divider />
         <div className={'col col--12 margin-vert--lg'}>
