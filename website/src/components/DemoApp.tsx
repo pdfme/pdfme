@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { generate, Template, BLANK_PDF, checkTemplate } from '@pdfme/generator';
+import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -9,6 +10,8 @@ import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';
 import DemoAppFormHeader from './DemoAppFormHeader';
 import DemoAppFooter from './DemoAppFooter';
+import Divider from './Divider';
+
 
 type Props = {
   title: string;
@@ -87,6 +90,14 @@ const DemoApp = (props: Props) => {
         <section className="margin-vert--lg">
           <DemoAppFooter />
         </section>
+        <Divider />
+        <div className={'col col--12 margin-vert--lg'}>
+          <div className="text--center">
+            <Link className="button button--primary button--lg" to="/demo">
+              Check out the other Demo Apps
+            </Link>
+          </div>
+        </div>
       </main>
     </Layout>
   );

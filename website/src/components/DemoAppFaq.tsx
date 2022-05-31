@@ -5,7 +5,7 @@ import { demoAppsSourceCodeUrl } from '../constants';
 const faqList = [
   {
     question: 'Can I use this for free?',
-    answer: 'Yes. Free and unlimited use.',
+    answer: 'Yes. Free and unlimited.',
   },
   {
     question: 'The text on the pdf is garbled...',

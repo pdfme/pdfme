@@ -4,9 +4,10 @@ import { TwitterIcon, TwitterShareButton } from 'react-share';
 import DemoAppFaq from './DemoAppFaq';
 
 export default () => {
-  const url = location.protocol + '//' + location.host + location.pathname;
+  const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   useEffect(() => {
+    setUrl(window.location.protocol + '//' + window.location.host + window.location.pathname);
     setTitle(document.title);
   }, []);
   return (
