@@ -89,7 +89,7 @@ ${e}`);
   };
 
   const downloadTemplate = () => {
-    downloadJsonFile(template, 'template');
+    downloadJsonFile(designer.current.getTemplate(), 'template');
   };
 
   const generatePdf = async () => {
