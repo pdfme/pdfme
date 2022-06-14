@@ -85,7 +85,7 @@ const BarcodeSchemaUI = (
     color: '#000',
     height: Number(schema.height) * ZOOM,
     width: Number(schema.width) * ZOOM,
-    background: editable || value ? 'rgba(255, 255, 255, 0.8)' : 'none',
+    backgroundColor: editable || value ? 'rgb(242 244 255 / 75%)' : 'none',
     border: 'none',
     display: 'flex',
     alignItems: 'center',

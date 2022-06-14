@@ -30,10 +30,10 @@ const TextSchemaUI = (
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',
     wordBreak: 'break-all',
-    background: 'transparent',
     border: 'none',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
-    backgroundColor: schema.data && schema.backgroundColor ? schema.backgroundColor : 'transparent',
+    backgroundColor:
+      schema.data && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
   };
 
   return editable ? (
