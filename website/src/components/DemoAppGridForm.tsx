@@ -1,62 +1,37 @@
 import React from 'react';
-import { ReactGrid, Row, CellChange, DefaultCellTypes, Column, TextCell } from '@silevis/reactgrid';
-import '@silevis/reactgrid/styles.css';
-import { cloneDeep } from '../libs/helper';
+import { HotTable } from '@handsontable/react';
+import { registerAllModules } from 'handsontable/registry';
 
-const getRows = (datas: { [key: string]: string }[]): Row[] => [
-  {
-    rowId: 'header',
-    cells: [{ type: 'header', text: '' } as DefaultCellTypes].concat(
-      Object.keys(datas[0] || {}).map((key) => ({ type: 'header', text: key }))
-    ),
-  },
-  ...datas.map<Row>((data, idx) => ({
-    rowId: idx,
-    cells: [
-      {
-        type: 'text',
-        text: String(idx),
-        nonEditable: true,
-        style: {
-          background: 'rgba(128, 128, 128, 0.1)',
-        },
-      } as DefaultCellTypes,
-    ].concat(Object.keys(data).map((key) => ({ type: 'text', text: data[key] }))),
-  })),
-];
+registerAllModules();
 
-const getColumns = (datas: { [key: string]: string }[]) =>
-  [{ columnId: 'row', width: 40 } as Column].concat(
-    Object.keys(datas[0] || {}).map((key) => ({ columnId: key }))
-  );
-
-const DemoAppGridForm = (props: {
+const DemoAppGridForm = ({
+  datas,
+  setDatas,
+}: {
   datas: { [key: string]: string }[];
   setDatas: (value: { [key: string]: string }[]) => void;
 }) => {
-  const { datas, setDatas } = props;
-  const handleChanges = (changes: CellChange<TextCell>[]) => {
-    const _datas = cloneDeep(datas);
-    changes.forEach((change) => {
-      const index = change.rowId;
-      const fieldName = change.columnId;
-      _datas[index][fieldName] = change.newCell.text;
-    });
-    setDatas(_datas);
-  };
-
   return (
-    <div style={{ background: '#fff', color: '#333' }}>
-      <ReactGrid
-        stickyTopRows={1}
-        rows={getRows(datas)}
-        columns={getColumns(datas)}
-        onCellsChanged={handleChanges}
-        enableRangeSelection
-        enableColumnSelection
-        enableRowSelection
-      />
-    </div>
+    <HotTable
+      settings={{
+        afterChange: (changes) => {
+          if (!changes) return;
+          for (let i = 0; i < changes.length; i++) {
+            const change = changes[i];
+            const [row, column, _, nextValue] = change;
+            datas[row][column] = nextValue ?? '';
+          }
+          setDatas(datas);
+        },
+        colHeaders: datas[0] ? Object.keys(datas[0]) : [],
+        data: datas,
+        rowHeaders: true,
+        stretchH: 'all',
+        width: '100%',
+        height: 500,
+        licenseKey: 'non-commercial-and-evaluation',
+      }}
+    />
   );
 };
 

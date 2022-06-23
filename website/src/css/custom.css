@@ -5,6 +5,9 @@
  */
 
 /* You can override the default Infima variables here. */
+
+@import 'handsontable/dist/handsontable.full.css';
+
 :root {
   --ifm-color-primary: #25c2a0;
   --ifm-color-primary-dark: rgb(33, 175, 144);
@@ -42,4 +45,8 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .navbar__brand {
   font-size: 1.25rem;
+}
+
+table {
+  display: table;
 }
