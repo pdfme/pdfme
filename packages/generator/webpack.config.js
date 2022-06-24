@@ -19,6 +19,9 @@ const config = {
     extensions: ['.ts', '.js'],
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      atob: 'atob/node-atob.js',
+    }),
     // new BundleAnalyzerPlugin(),
     new NodePolyfillPlugin(),
     new webpack.BannerPlugin({
