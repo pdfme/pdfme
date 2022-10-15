@@ -74,6 +74,8 @@ export abstract class BaseUIClass {
     this.render();
   }, 100);
 
+  resizeObserver = new ResizeObserver(this.setSize);
+
   constructor(props: UIProps) {
     checkUIProps(props);
 
@@ -85,8 +87,7 @@ export abstract class BaseUIClass {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
     };
-    const resizeObserver = new ResizeObserver(this.setSize);
-    resizeObserver.observe(this.domContainer);
+    this.resizeObserver.observe(this.domContainer);
 
     if (lang) {
       this.lang = lang;
@@ -134,8 +135,8 @@ export abstract class BaseUIClass {
   public destroy() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;
-    window.removeEventListener('resize', this.setSize);
   }
 
   protected abstract render(): void;
