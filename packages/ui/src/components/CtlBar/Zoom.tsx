@@ -29,7 +29,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <button
         style={{
-          paddingRight: '0.5rem',
+          paddingLeft: '0.5rem',
           ...btnStyle,
           cursor: minZoom >= nextZoomOut ? 'not-allowed' : 'pointer',
         }}
@@ -38,7 +38,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
       >
         <img src={remove} alt={i18n('zoomOut')} style={{ width: 20 }} />
       </button>
-      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 45, textAlign: 'center' }}>
+      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 50, textAlign: 'center' }}>
         {Math.round(zoomLevel * 100)}%
       </strong>
       <button

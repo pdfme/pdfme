@@ -21,13 +21,11 @@ const Paper = (porps: {
     return null;
   }
 
-  const topPageWidth = pageSizes[0].width;
-
   return (
     <div
       style={{
         transform: `scale(${scale})`,
-        transformOrigin: size.width <= topPageWidth * ZOOM * scale ? `left top` : `center top`,
+        transformOrigin: 'center top',
         ...size,
       }}
     >
@@ -57,6 +55,7 @@ const Paper = (porps: {
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
               top: `${RULER_HEIGHT}px`,
+              left: paperSize.width > size.width ? `${(size.width - paperSize.width) / 2}px` : 0,
               margin: '0 auto',
               position: 'relative',
               backgroundImage: `url(${background})`,
