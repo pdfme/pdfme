@@ -47,7 +47,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
         style={{
           position: 'sticky',
           width: '100%',
-          zIndex: 1,
+          zIndex: 0,
           top: `calc(50% - ${buttonHeight / 2}px)`,
           display: 'flex',
           alignItems: 'center',
