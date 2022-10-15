@@ -8,7 +8,7 @@ exports[`Designer snapshot 1`] = `
     style="margin: 0px auto; height: 1170px;"
   >
     <div
-      style="position: absolute; width: 1200px; height: 1200px; min-height: 1200px;"
+      style="position: absolute; width: 100%; min-height: 1200px;"
     >
       <div
         style="display: flex; align-items: center; justify-content: center; position: sticky; z-index: 1; top: 90%; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
@@ -17,7 +17,7 @@ exports[`Designer snapshot 1`] = `
           style="display: flex; align-items: center; justify-content: center;"
         >
           <button
-            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
             <img
               alt="Zoom out"
@@ -26,7 +26,7 @@ exports[`Designer snapshot 1`] = `
             />
           </button>
           <strong
-            style="color: white; font-size: 0.9rem; min-width: 45px; text-align: center;"
+            style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
           >
             100
             %
@@ -168,7 +168,7 @@ exports[`Designer snapshot 1`] = `
       >
         <div
           id="@pdfme/ui-paper0"
-          style="font-family: 'Helvetica'; top: 30px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+          style="font-family: 'Helvetica'; top: 30px; left: 0px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
             style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
