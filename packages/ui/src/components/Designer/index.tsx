@@ -229,7 +229,7 @@ const TemplateEditor = ({
   return (
     <Root size={size} scale={scale}>
       <CtlBar
-        size={{ ...size }}
+        size={size}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
