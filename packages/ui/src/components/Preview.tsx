@@ -27,6 +27,12 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   }, [template]);
 
   useEffect(() => {
+    if (unitCursor > inputs.length - 1) {
+      setUnitCursor(inputs.length - 1);
+    }
+  }, [inputs]);
+
+  useEffect(() => {
     init();
   }, [init]);
 
