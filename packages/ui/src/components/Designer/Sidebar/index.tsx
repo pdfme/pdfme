@@ -69,7 +69,7 @@ const Sidebar = (props: SidebarProps) => {
         <div
           style={{
             width: SIDEBAR_WIDTH,
-            height: size.height - RULER_HEIGHT * ZOOM,
+            height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2,
             display: open ? 'block' : 'none',
             top: RULER_HEIGHT / 2,
             right: 0,

@@ -29,7 +29,7 @@ const ListView = (
   const i18n = useContext(I18nContext);
   const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
   const [fieldNamesValue, setFieldNamesValue] = useState('');
-  const height = size.height - RULER_HEIGHT * ZOOM - 135;
+  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
