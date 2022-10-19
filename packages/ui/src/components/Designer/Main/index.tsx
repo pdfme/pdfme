@@ -218,7 +218,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         e.stopPropagation();
         setEditing(false);
       }}
-      style={{ overflowX: 'auto' }}
+      style={{ overflow: 'overlay' }}
     >
       <Selecto
         container={paperRefs.current[pageCursor]}

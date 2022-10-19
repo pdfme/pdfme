@@ -29,16 +29,9 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   return (
     <div
       ref={ref}
-      style={{ position: 'relative', background: 'rgb(74, 74, 74)', overflow: 'auto', ...size }}
+      style={{ position: 'relative', background: 'rgb(74, 74, 74)', overflow: 'overlay', ...size }}
     >
-      <div
-        style={{
-          margin: '0 auto',
-          height: size.height - RULER_HEIGHT * scale,
-        }}
-      >
-        {scale === 0 ? <Spinner /> : children}
-      </div>
+      <div style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
     </div>
   );
 };
