@@ -33,8 +33,11 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
       id={DELETE_BTN_ID}
       style={{
         position: 'absolute',
+        zIndex: 1,
         top,
         left,
+        height: 24,
+        width: 24,
         cursor: 'pointer',
         color: 'white',
         border: 'none',
@@ -43,7 +46,16 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         background: 'rgb(68, 170, 255)',
       }}
     >
-      x
+      <svg
+        style={{ pointerEvents: 'none' }}
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
     </button>
   );
 };
