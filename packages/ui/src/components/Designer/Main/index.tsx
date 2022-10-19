@@ -44,6 +44,9 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         fontWeight: 'bold',
         borderRadius: 2,
         background: 'rgb(68, 170, 255)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <svg
@@ -51,10 +54,10 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        stroke-width="1.5"
+        strokeWidth="1.5"
         stroke="currentColor"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
   );

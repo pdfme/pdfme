@@ -12,7 +12,8 @@ export const usePrevious = <T>(value: T) => {
   return ref.current;
 };
 
-const getScale = (n: number, paper: number) => (n / paper > 1 ? 1 : n / paper);
+const getScale = (n: number, paper: number) =>
+  Math.floor((n / paper > 1 ? 1 : n / paper) * 100) / 100;
 
 type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number };
 
