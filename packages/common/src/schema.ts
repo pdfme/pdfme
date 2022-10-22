@@ -1,7 +1,7 @@
 /* eslint dot-notation: "off"*/
 import { z } from 'zod';
 
-const langs = ['en', 'ja'] as const;
+const langs = ['en', 'ja', 'ar'] as const;
 export const Lang = z.enum(langs);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
