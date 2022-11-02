@@ -118,7 +118,7 @@ const TemplateEditor = ({
 
       return schemasList[pageCursor].filter((s) => ids.includes(s.id));
     };
-    const timeTavel = (mode: 'undo' | 'redo') => {
+    const timeTravel = (mode: 'undo' | 'redo') => {
       const isUndo = mode === 'undo';
       const stack = isUndo ? past : future;
       if (stack.current.length <= 0) return;
@@ -160,8 +160,8 @@ const TemplateEditor = ({
         onEdit(pasteSchemas.map((s) => document.getElementById(s.id)!));
         copiedSchemas.current = pasteSchemas;
       },
-      redo: () => timeTavel('redo'),
-      undo: () => timeTavel('undo'),
+      redo: () => timeTravel('redo'),
+      undo: () => timeTravel('undo'),
       save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
