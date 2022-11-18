@@ -60,8 +60,8 @@ const template: Template = {
         width: 10, height: 10,
       },
       b: {
-        type: 'sans_serif',
-        fontName: 'serif',
+        type: 'text',
+        fontName: 'sans_serif',
         position: { x: 10, y: 10 },
         width: 10, height: 10,
       },
