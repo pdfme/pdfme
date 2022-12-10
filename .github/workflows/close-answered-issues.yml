@@ -1,0 +1,23 @@
+name: "Close answered issues"
+on:
+  schedule:
+    - cron: "00 10 * * *"
+  workflow_dispatch:
+env:
+  days-before-stale: 30
+  days-before-close: 7
+jobs:
+  mark-stale-and-close-for-answered:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v6
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: ${{ env.days-before-stale }}
+          days-before-close: ${{ env.days-before-close }}
+          days-before-pr-stale: -1
+          stale-issue-message: "This issue has been automatically marked as stale because it has been open ${{ env.days-before-stale }} days with no activity after answered. Remove stale label or comment or this issue will be closed in ${{ env.days-before-close }} days."
+          close-issue-message: "This issue was automatically closed because of stale in ${{ env.days-before-close }} days"
+          stale-issue-label: "stale"
+          only-labels: "answered"
+          close-issue-reason: "completed"
