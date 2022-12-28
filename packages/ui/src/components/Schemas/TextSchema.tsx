@@ -20,7 +20,7 @@ const TextSchemaUI = (
     padding: 0,
     resize: 'none',
     position: 'absolute',
-    fontFamily: `'${schema.fontName}'` ?? 'inherit',
+    fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     height: schema.height * ZOOM,
     // Increase the width by 1 point. (0.75 pixels)
     width: (schema.width + (schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING) * 0.75) * ZOOM,
