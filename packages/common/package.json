@@ -51,7 +51,7 @@
     },
     "globals": {
       "ts-jest": {
-        "tsconfig": "tsconfig.json"
+        "tsconfig": "tsconfig.esm.json"
       }
     },
     "testMatch": [
