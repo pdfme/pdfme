@@ -20,15 +20,17 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "develop": "tsc -w",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
@@ -40,9 +42,6 @@
     "zod": "^3.11.6"
   },
   "jest": {
-    "moduleNameMapper": {
-      "\\.(ttf)$": "<rootDir>../../fontTransformer.js"
-    },
     "moduleFileExtensions": [
       "js",
       "ts"

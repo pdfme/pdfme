@@ -20,16 +20,21 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "develop": "tsc -w",
+    "build": "npm run build:cjs && npm run build:esm && npm run copy",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
+    "copy": "npm run copyBarcodeExamples && npm run copyIcons",
+    "copyBarcodeExamples": "copyfiles src/assets/barcodeExamples/*.png dist/cjs && copyfiles src/assets/barcodeExamples/*.png dist/esm",
+    "copyIcons": "copyfiles src/assets/icons/*.svg dist/cjs && copyfiles src/assets/icons/*.svg dist/esm",
     "lint": "tsc --noEmit",
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
@@ -56,6 +61,7 @@
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.9",
+    "copyfiles": "^2.4.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest-canvas-mock": "^2.3.1",
@@ -66,8 +72,7 @@
       "jest-canvas-mock"
     ],
     "moduleNameMapper": {
-      "\\.(png|svg)$": "<rootDir>/../../assetsTransformer.js",
-      "\\.(ttf)$": "<rootDir>/../../fontTransformer.js"
+      "\\.(png|svg)$": "<rootDir>/../../assetsTransformer.js"
     },
     "moduleFileExtensions": [
       "js",
