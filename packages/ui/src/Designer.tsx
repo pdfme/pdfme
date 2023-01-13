@@ -1,5 +1,4 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
 import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
@@ -44,9 +43,8 @@ class Designer extends BaseUIClass {
   }
 
   protected render() {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    const root = createRoot(this.domContainer);
-    root.render(
+    if (!this.domContainer || !this.root) throw Error(DESTROYED_ERR_MSG);
+    this.root.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>
           <DesignerComponent

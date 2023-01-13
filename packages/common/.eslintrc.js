@@ -8,7 +8,7 @@ module.exports = {
     {
       files: ['*.ts'], // Your TypeScript files extension
       parserOptions: {
-        project: ['./tsconfig.json'], // Specify it only for TypeScript files
+        project: ['./tsconfig.esm.json'], // Specify it only for TypeScript files
       },
     },
   ],
@@ -26,6 +26,6 @@ module.exports = {
     parser: 'typescript-eslint-parser',
     ecmaVersion: 2018,
     sourceType: 'module',
-    project: 'tsconfig.json',
+    project: 'tsconfig.esm.json',
   },
 };
