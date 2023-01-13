@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { curriedI18n } from './i18n.js';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
 import { debounce, flatten, cloneDeep } from './helper.js';
@@ -84,10 +84,10 @@ export abstract class BaseUIClass {
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
     this.size = {
-      height: this.domContainer.clientHeight || window.innerHeight,
-      width: this.domContainer.clientWidth || window.innerWidth,
+      height: this.domContainer!.clientHeight || window.innerHeight,
+      width: this.domContainer!.clientWidth || window.innerWidth,
     };
-    this.resizeObserver.observe(this.domContainer);
+    this.resizeObserver.observe(this.domContainer!);
 
     if (lang) {
       this.lang = lang;
@@ -134,7 +134,9 @@ export abstract class BaseUIClass {
 
   public destroy() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.unmountComponentAtNode(this.domContainer);
+    const root = createRoot(this.domContainer);
+    root.unmount();
+
     this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;
   }

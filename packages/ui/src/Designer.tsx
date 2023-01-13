@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
 import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
@@ -45,7 +45,8 @@ class Designer extends BaseUIClass {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.render(
+    const root = createRoot(this.domContainer);
+    root.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>
           <DesignerComponent
@@ -65,8 +66,7 @@ class Designer extends BaseUIClass {
             size={this.size}
           />
         </FontContext.Provider>
-      </I18nContext.Provider>,
-      this.domContainer
+      </I18nContext.Provider>
     );
   }
 }
