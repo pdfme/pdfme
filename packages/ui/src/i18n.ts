@@ -1,5 +1,5 @@
 import { Lang } from '@pdfme/common';
-import { DEFAULT_LANG } from './constants';
+import { DEFAULT_LANG } from './constants.js';
 
 type DictEn = typeof dictEn;
 

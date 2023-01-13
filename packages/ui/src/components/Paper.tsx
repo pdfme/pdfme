@@ -1,7 +1,7 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { SchemaForUI, Size, getFallbackFontName } from '@pdfme/common';
-import { FontContext } from '../contexts';
-import { ZOOM, RULER_HEIGHT } from '../constants';
+import { FontContext } from '../contexts.js';
+import { ZOOM, RULER_HEIGHT } from '../constants.js';
 
 const Paper = (porps: {
   paperRefs: MutableRefObject<HTMLDivElement[]>;

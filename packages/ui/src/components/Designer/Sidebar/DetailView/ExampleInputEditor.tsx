@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { readFiles } from '../../../../helper';
-import { I18nContext } from '../../../../contexts';
+import { readFiles } from '../../../../helper.js';
+import { I18nContext } from '../../../../contexts.js';
 import { SidebarProps } from '..';
 import closeIcon from '../../../../assets/icons/close.svg';
 

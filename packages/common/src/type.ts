@@ -25,7 +25,7 @@ import {
   PreviewReactProps,
   DesignerProps,
   DesignerReactProps,
-} from './schema';
+} from './schema.js';
 
 type CommonSchema = z.infer<typeof _CommonSchema>;
 export const schemaTypes = _schemaTypes;

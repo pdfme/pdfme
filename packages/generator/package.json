@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/generator",
   "version": "1.0.18",
+  "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
   "keywords": [
@@ -23,6 +24,12 @@
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js"
+    }
+  },
   "engines": {
     "node": ">=14"
   },
@@ -49,7 +56,6 @@
     "@types/bwip-js": "^3.0.0",
     "@types/pngjs": "^6.0.1",
     "jsqr": "^1.4.0",
-    "node-polyfill-webpack-plugin": "^1.1.4",
     "pdf2json": "^2.0.0",
     "pngjs": "^6.0.0"
   },

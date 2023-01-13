@@ -3,7 +3,7 @@ import left from '../assets/icons/left.svg';
 import right from '../assets/icons/right.svg';
 import doubleLeft from '../assets/icons/double-left.svg';
 import doubleRight from '../assets/icons/double-right.svg';
-import { I18nContext } from '../contexts';
+import { I18nContext } from '../contexts.js';
 import { Size } from '@pdfme/common';
 
 const buttonHeight = 38;

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import left from '../../assets/icons/left.svg';
 import right from '../../assets/icons/right.svg';
-import { I18nContext } from '../../contexts';
+import { I18nContext } from '../../contexts.js';
 
 const btnStyle: React.CSSProperties = {
   cursor: 'pointer',

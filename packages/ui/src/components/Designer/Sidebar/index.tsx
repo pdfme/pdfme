@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants.js';
+import { I18nContext } from '../../../contexts.js';
 import backIcon from '../../../assets/icons/back.svg';
 import forwardIcon from '../../../assets/icons/forward.svg';
-import ListView from './ListView';
-import DetailView from './DetailView';
+import ListView from './ListView/index.js';
+import DetailView from './DetailView/index.js';
 
 export type SidebarProps = {
   height: number;

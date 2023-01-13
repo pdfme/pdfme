@@ -1,6 +1,6 @@
 import React from 'react';
 import { Size } from '@pdfme/common';
-import { RULER_HEIGHT } from '../../../constants';
+import { RULER_HEIGHT } from '../../../constants.js';
 
 const Mask = ({ width, height }: Size) => (
   <div

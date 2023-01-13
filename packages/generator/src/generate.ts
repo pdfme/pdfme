@@ -8,8 +8,8 @@ import {
   drawEmbeddedPage,
   embedAndGetFontObj,
   InputImageCache,
-} from './helper';
-import { TOOL_NAME } from './constants';
+} from './helper.js';
+import { TOOL_NAME } from './constants.js';
 
 const preprocessing = async (arg: {
   inputs: { [key: string]: string }[];

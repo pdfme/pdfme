@@ -1,8 +1,8 @@
-import React, { useState, forwardRef, ChangeEvent, useContext, Ref } from 'react';
+import React, { useState, forwardRef, ChangeEvent, Ref } from 'react';
 import { ImageSchema } from '@pdfme/common';
-import { SchemaUIProps } from './SchemaUI';
-import { readFiles } from '../../helper';
-import { ZOOM } from '../../constants';
+import { SchemaUIProps } from './SchemaUI.js';
+import { readFiles } from '../../helper.js';
+import { ZOOM } from '../../constants.js';
 import closeIcon from '../../assets/icons/close.svg';
 
 type Props = SchemaUIProps & { schema: ImageSchema };

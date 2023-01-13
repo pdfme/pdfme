@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { HELVETICA } from './constants';
-import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
+import { HELVETICA } from './constants.js';
+import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -9,7 +9,7 @@ import {
   DesignerProps as DesignerPropsSchema,
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
-} from './schema';
+} from './schema.js';
 
 const DEFAULT_FONT_NAME = 'Helvetica';
 

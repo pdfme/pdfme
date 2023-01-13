@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { round } from '../../../../helper';
-import { SidebarProps } from '..';
+import { round } from '../../../../helper.js';
+import { SidebarProps } from '../index.js';
 import alignVerticalTop from '../../../../assets/icons/align-vertical-top.svg';
 import alignVerticalMiddle from '../../../../assets/icons/align-vertical-middle.svg';
 import alignVerticalBottom from '../../../../assets/icons/align-vertical-bottom.svg';

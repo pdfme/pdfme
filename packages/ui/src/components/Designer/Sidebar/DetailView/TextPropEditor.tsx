@@ -7,7 +7,7 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
 } from '@pdfme/common';
-import { FontContext } from '../../../../contexts';
+import { FontContext } from '../../../../contexts.js';
 import { SidebarProps } from '..';
 import closeIcon from '../../../../assets/icons/close.svg';
 

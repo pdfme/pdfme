@@ -1,5 +1,5 @@
 // @ts-ignore
-import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import hotkeys from 'hotkeys-js';
@@ -15,7 +15,7 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from './constants';
+import { ZOOM, RULER_HEIGHT } from './constants.js';
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

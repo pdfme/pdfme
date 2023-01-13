@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
-import { I18nContext } from '../../../../contexts';
+import { I18nContext } from '../../../../contexts.js';
 import dragIcon from '../../../../assets/icons/drag.svg';
 import warningIcon from '../../../../assets/icons/warning.svg';
 

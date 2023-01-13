@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { I18nContext } from '../../contexts';
+import { I18nContext } from '../../contexts.js';
 import add from '../../assets/icons/add.svg';
 import remove from '../../assets/icons/remove.svg';
 

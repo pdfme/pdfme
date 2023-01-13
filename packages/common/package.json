@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/common",
   "version": "1.0.18",
+  "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
   "keywords": [
@@ -23,6 +24,12 @@
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js"
+    }
+  },
   "engines": {
     "node": ">=14"
   },
