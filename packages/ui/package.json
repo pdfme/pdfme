@@ -35,13 +35,12 @@
   },
   "scripts": {
     "develop": "tsc -w",
-    "build": "npm run build:cjs && npm run build:esm && npm run copy",
+    "build": "npm run build:cjs && npm run build:esm && npm run copy-images",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
-    "copy": "npm run copyBarcodeExamples && npm run copyIcons",
+    "copy-images": "npm run copyBarcodeExamples",
     "copyBarcodeExamples": "copyfiles src/assets/barcodeExamples/*.png dist/cjs && copyfiles src/assets/barcodeExamples/*.png dist/esm",
-    "copyIcons": "copyfiles src/assets/icons/*.svg dist/cjs && copyfiles src/assets/icons/*.svg dist/esm",
     "lint": "tsc --noEmit",
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
@@ -51,6 +50,7 @@
   "dependencies": {
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
+    "@heroicons/react": "^2.0.13",
     "@pdfme/common": "^1.0.0",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
@@ -79,7 +79,7 @@
       "jest-canvas-mock"
     ],
     "moduleNameMapper": {
-      "\\.(png|svg)$": "<rootDir>/../../assetsTransformer.js"
+      "\\.(png)$": "<rootDir>/../../assetsTransformer.js"
     },
     "moduleFileExtensions": [
       "js",

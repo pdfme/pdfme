@@ -1,8 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts.js';
-import dragIcon from '../../../../assets/icons/drag.svg';
-import warningIcon from '../../../../assets/icons/warning.svg';
+import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
   value: React.ReactNode;
@@ -73,7 +72,11 @@ const Item = React.memo(
               {...listeners}
               style={{ padding: '0.5rem', background: 'none', border: 'none', display: 'flex' }}
             >
-              <img style={{ cursor: 'grab' }} src={dragIcon} width={15} alt="Drag icon" />
+              <object style={{ cursor: 'grab' }} width={15}>
+                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="16" height="16">
+                  <path d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"></path>
+                </svg>
+              </object>
             </button>
             <div
               style={{
@@ -92,12 +95,7 @@ const Item = React.memo(
                 value
               ) : (
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <img
-                    alt="Warning icon"
-                    src={warningIcon}
-                    width={15}
-                    style={{ marginRight: '0.5rem' }}
-                  />
+                  <ExclamationTriangleIcon width={15} style={{ marginRight: '0.5rem' }} />
                   {status === 'is-warning' ? i18n('noKeyName') : value}
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>

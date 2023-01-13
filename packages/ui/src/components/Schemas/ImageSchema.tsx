@@ -3,7 +3,7 @@ import { ImageSchema } from '@pdfme/common';
 import { SchemaUIProps } from './SchemaUI.js';
 import { readFiles } from '../../helper.js';
 import { ZOOM } from '../../constants.js';
-import closeIcon from '../../assets/icons/close.svg';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 type Props = SchemaUIProps & { schema: ImageSchema };
 
@@ -55,7 +55,7 @@ const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
               onChange('');
             }}
           >
-            <img src={closeIcon} alt="Close icon" width={10} />
+            <XMarkIcon width={10} height={10} />
           </button>
         )}
       </div>
