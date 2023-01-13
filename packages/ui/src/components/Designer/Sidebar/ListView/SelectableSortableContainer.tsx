@@ -16,9 +16,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
-import Item from './Item';
-import SelectableSortableItem from './SelectableSortableItem';
-import { SidebarProps } from '../';
+import Item from './Item.js';
+import SelectableSortableItem from './SelectableSortableItem.js';
+import { SidebarProps } from '../index.js';
 
 const SelectableSortableContainer = (
   props: Pick<

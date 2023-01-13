@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
-import { I18nContext } from '../../../../contexts';
-import Item from './Item';
-import { useMountStatus } from '../../../../hooks';
+import { I18nContext } from '../../../../contexts.js';
+import Item from './Item.js';
+import { useMountStatus } from '../../../../hooks.js';
 
 interface Props {
   isSelected: boolean;

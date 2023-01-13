@@ -1,7 +1,5 @@
-import React, { useContext } from 'react';
-import { I18nContext } from '../../contexts';
-import add from '../../assets/icons/add.svg';
-import remove from '../../assets/icons/remove.svg';
+import React from 'react';
+import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 const btnStyle: React.CSSProperties = {
   cursor: 'pointer',
@@ -21,7 +19,6 @@ type Props = {
 };
 
 const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
-  const i18n = useContext(I18nContext);
   const nextZoomOut = zoomLevel - zoomStep;
   const nextZoomIn = zoomLevel + zoomStep;
 
@@ -36,7 +33,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
       >
-        <img src={remove} alt={i18n('zoomOut')} style={{ width: 20 }} />
+        <MinusIcon width={20} height={20} color={'#fff'} />
       </button>
       <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 50, textAlign: 'center' }}>
         {Math.round(zoomLevel * 100)}%
@@ -50,7 +47,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
       >
-        <img src={add} alt={i18n('zoomIn')} style={{ width: 20 }} />
+        <PlusIcon width={20} height={20} color={'#fff'} />
       </button>
     </div>
   );

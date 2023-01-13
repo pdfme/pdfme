@@ -1,9 +1,10 @@
-import React, { useContext } from 'react';
-import left from '../assets/icons/left.svg';
-import right from '../assets/icons/right.svg';
-import doubleLeft from '../assets/icons/double-left.svg';
-import doubleRight from '../assets/icons/double-right.svg';
-import { I18nContext } from '../contexts';
+import React from 'react';
+import {
+  ChevronLeftIcon,
+  ChevronDoubleLeftIcon,
+  ChevronRightIcon,
+  ChevronDoubleRightIcon,
+} from '@heroicons/react/24/outline';
 import { Size } from '@pdfme/common';
 
 const buttonHeight = 38;
@@ -38,8 +39,6 @@ type Props = {
 };
 
 const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
-  const i18n = useContext(I18nContext);
-
   if (unitNum <= 1) return <></>;
 
   return (
@@ -62,14 +61,14 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               disabled={unitCursor <= 0}
               onClick={() => setUnitCursor(0)}
             >
-              <img src={doubleLeft} alt={i18n('goToFirst')} style={{ width: 20 }} />
+              <ChevronDoubleLeftIcon width={20} height={20} color={'#fff'} />
             </button>
             <button
               style={{ paddingLeft: '0.5rem', ...btnStyle }}
               disabled={unitCursor <= 0}
               onClick={() => setUnitCursor(unitCursor - 1)}
             >
-              <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
+              <ChevronLeftIcon width={20} height={20} color={'#fff'} />
             </button>
             <strong style={{ color: 'white', fontSize: '0.9rem' }}>
               {unitCursor + 1}/{unitNum}
@@ -88,14 +87,14 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               disabled={unitCursor + 1 >= unitNum}
               onClick={() => setUnitCursor(unitCursor + 1)}
             >
-              <img src={right} alt={i18n('goToNext')} style={{ width: 20 }} />
+              <ChevronRightIcon width={20} height={20} color={'#fff'} />
             </button>
             <button
               style={{ paddingRight: '0.5rem', ...btnStyle }}
               disabled={unitCursor + 1 >= unitNum}
               onClick={() => setUnitCursor(unitNum - 1)}
             >
-              <img src={doubleRight} alt={i18n('goToFirst')} style={{ width: 20 }} />
+              <ChevronDoubleRightIcon width={20} height={20} color={'#fff'} />
             </button>
           </div>
         )}

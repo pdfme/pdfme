@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
-import { BaseUIClass } from './class';
-import { DESTROYED_ERR_MSG } from './constants';
-import { I18nContext, FontContext } from './contexts';
-import DesignerComponent from './components/Designer';
-import { cloneDeep } from './helper';
+import { BaseUIClass } from './class.js';
+import { DESTROYED_ERR_MSG } from './constants.js';
+import { I18nContext, FontContext } from './contexts.js';
+import DesignerComponent from './components/Designer/index.js';
+import { cloneDeep } from './helper.js';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;

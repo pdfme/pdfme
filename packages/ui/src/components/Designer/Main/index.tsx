@@ -9,15 +9,15 @@ import React, {
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from '../../../constants';
-import { usePrevious } from '../../../hooks';
-import { uuid, round, flatten } from '../../../helper';
-import Paper from '../../Paper';
-import SchemaUI from '../../Schemas/SchemaUI';
-import Selecto from './Selecto';
-import Moveable from './Moveable';
-import Guides from './Guides';
-import Mask from './Mask';
+import { ZOOM, RULER_HEIGHT } from '../../../constants.js';
+import { usePrevious } from '../../../hooks.js';
+import { uuid, round, flatten } from '../../../helper.js';
+import Paper from '../../Paper.js';
+import SchemaUI from '../../Schemas/SchemaUI.js';
+import Selecto from './Selecto.js';
+import Moveable from './Moveable.js';
+import Guides from './Guides.js';
+import Mask from './Mask.js';
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));

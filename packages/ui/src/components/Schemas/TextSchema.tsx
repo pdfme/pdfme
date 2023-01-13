@@ -7,8 +7,8 @@ import {
   DEFAULT_FONT_COLOR,
   TextSchema,
 } from '@pdfme/common';
-import { SchemaUIProps } from './SchemaUI';
-import { ZOOM } from '../../constants';
+import { SchemaUIProps } from './SchemaUI.js';
+import { ZOOM } from '../../constants.js';
 
 type Props = SchemaUIProps & { schema: TextSchema };
 

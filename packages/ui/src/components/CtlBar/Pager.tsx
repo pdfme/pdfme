@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import left from '../../assets/icons/left.svg';
-import right from '../../assets/icons/right.svg';
-import { I18nContext } from '../../contexts';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { I18nContext } from '../../contexts.js';
 
 const btnStyle: React.CSSProperties = {
   cursor: 'pointer',
@@ -31,7 +30,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
         disabled={pageCursor <= 0}
         onClick={() => setPageCursor(pageCursor - 1)}
       >
-        <img src={left} alt={i18n('goToPrevious')} style={{ width: 20 }} />
+        <ChevronLeftIcon width={20} height={20} color={'#fff'} />
       </button>
       <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 45, textAlign: 'center' }}>
         {pageCursor + 1}/{pageNum}
@@ -45,7 +44,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <img src={right} alt={i18n('goToNext')} style={{ width: 20 }} />
+        <ChevronRightIcon width={20} height={20} color={'#fff'} />
       </button>
     </div>
   );

@@ -1,11 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
-import backIcon from '../../../assets/icons/back.svg';
-import forwardIcon from '../../../assets/icons/forward.svg';
-import ListView from './ListView';
-import DetailView from './DetailView';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants.js';
+import { I18nContext } from '../../../contexts.js';
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import ListView from './ListView/index.js';
+import DetailView from './DetailView/index.js';
 
 export type SidebarProps = {
   height: number;
@@ -61,10 +60,15 @@ const Sidebar = (props: SidebarProps) => {
             cursor: 'pointer',
             background: '#eee',
             width: 30,
+            height: 30,
           }}
           onClick={() => setOpen(!open)}
         >
-          <img src={open ? forwardIcon : backIcon} width={15} alt="Toggle icon" />
+          {open ? (
+            <ArrowRightIcon width={15} height={15} />
+          ) : (
+            <ArrowLeftIcon width={15} height={15} />
+          )}
         </button>
         <div
           style={{

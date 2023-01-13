@@ -4,12 +4,12 @@
 import React from 'react';
 import { render, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Designer from '../../src/components/Designer';
-import { I18nContext, FontContext } from '../../src/contexts';
-import { curriedI18n } from '../../src/i18n';
-import { SELECTABLE_CLASSNAME } from '../../src/constants';
+import Designer from '../../src/components/Designer/index.js';
+import { I18nContext, FontContext } from '../../src/contexts.js';
+import { curriedI18n } from '../../src/i18n.js';
+import { SELECTABLE_CLASSNAME } from '../../src/constants.js';
 import { getDefaultFont } from '@pdfme/common';
-import { setupUIMock, getSampleTemplate } from '../assets/helper';
+import { setupUIMock, getSampleTemplate } from '../assets/helper.js';
 
 test('Designer snapshot', async () => {
   setupUIMock();

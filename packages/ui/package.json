@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.0.18",
+  "version": "1.1.0",
+  "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
   "keywords": [
@@ -20,16 +21,26 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js"
+    }
+  },
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "develop": "tsc -w",
+    "build": "npm run build:cjs && npm run build:esm && npm run copy-images",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
+    "copy-images": "npm run copyBarcodeExamples",
+    "copyBarcodeExamples": "copyfiles src/assets/barcodeExamples/*.png dist/cjs && copyfiles src/assets/barcodeExamples/*.png dist/esm",
     "lint": "tsc --noEmit",
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
@@ -39,6 +50,7 @@
   "dependencies": {
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
+    "@heroicons/react": "^2.0.13",
     "@pdfme/common": "^1.0.0",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
@@ -56,6 +68,7 @@
     "@types/pdfjs-dist": "^2.7.4",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.9",
+    "copyfiles": "^2.4.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest-canvas-mock": "^2.3.1",
@@ -66,9 +79,9 @@
       "jest-canvas-mock"
     ],
     "moduleNameMapper": {
-      "\\.(png|svg)$": "<rootDir>/../../assetsTransformer.js",
-      "\\.(ttf)$": "<rootDir>/../../fontTransformer.js"
+      "\\.(png)$": "<rootDir>/../../assetsTransformer.js"
     },
+    "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -80,7 +93,7 @@
     },
     "globals": {
       "ts-jest": {
-        "tsconfig": "tsconfig.json"
+        "tsconfig": "tsconfig.esm.json"
       }
     },
     "testMatch": [

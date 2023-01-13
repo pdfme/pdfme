@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import Helvetica from './assets/Helvetica.ttf';
-import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type';
+import { HELVETICA } from './constants.js';
+import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -9,7 +9,7 @@ import {
   DesignerProps as DesignerPropsSchema,
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
-} from './schema';
+} from './schema.js';
 
 const DEFAULT_FONT_NAME = 'Helvetica';
 
@@ -77,7 +77,7 @@ export const getFallbackFontName = (font: Font) => {
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Helvetica), fallback: true },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(HELVETICA), fallback: true },
 });
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));

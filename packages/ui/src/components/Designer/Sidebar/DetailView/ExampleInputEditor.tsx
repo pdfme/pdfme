@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { readFiles } from '../../../../helper';
-import { I18nContext } from '../../../../contexts';
+import { readFiles } from '../../../../helper.js';
+import { I18nContext } from '../../../../contexts.js';
 import { SidebarProps } from '..';
-import closeIcon from '../../../../assets/icons/close.svg';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 const ExampleInputEditor = (
   props: Pick<SidebarProps, 'changeSchemas'> & { activeSchema: SchemaForUI }
@@ -39,7 +39,7 @@ const ExampleInputEditor = (
                   changeSchemas([{ key: 'data', value: '', schemaId: activeSchema.id }])
                 }
               >
-                <img src={closeIcon} alt="Close icon" width={10} />
+                <XMarkIcon width={10} height={10} />
               </button>
               <img style={{ maxHeight: 180 }} src={activeSchema.data} alt="Input Example" />
             </div>

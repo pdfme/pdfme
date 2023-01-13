@@ -48,7 +48,7 @@ const config = {
           fullNames: true,
         },
         entryPoints: ['../packages/common/src/index.ts'],
-        tsconfig: '../packages/common/tsconfig.json',
+        tsconfig: '../packages/common/tsconfig.esm.json',
       },
     ],
     [
@@ -63,7 +63,7 @@ const config = {
           fullNames: true,
         },
         entryPoints: ['../packages/generator/src/index.ts'],
-        tsconfig: '../packages/generator/tsconfig.json',
+        tsconfig: '../packages/generator/tsconfig.esm.json',
       },
     ],
     [
@@ -78,7 +78,7 @@ const config = {
           fullNames: true,
         },
         entryPoints: ['../packages/ui/src/index.ts'],
-        tsconfig: '../packages/ui/tsconfig.json',
+        tsconfig: '../packages/ui/tsconfig.esm.json',
       },
     ],
     function myPlugin() {
@@ -87,6 +87,9 @@ const config = {
         configureWebpack() {
           const newConfig = {
             plugins: [
+              new webpack.IgnorePlugin({
+                resourceRegExp: /canvas/,
+              }),
               new webpack.ProvidePlugin({
                 Buffer: ['buffer', 'Buffer'],
                 process: 'process/browser',

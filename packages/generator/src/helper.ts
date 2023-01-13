@@ -9,9 +9,7 @@ import {
   setCharacterSpacing,
   TransformationMatrix,
 } from 'pdf-lib';
-import { ToBufferOptions } from 'bwip-js';
-import bwipjsNode from 'bwip-js/dist/node-bwipjs';
-import bwipjsBrowser from 'bwip-js/dist/bwip-js';
+import bwipjs, { ToBufferOptions } from 'bwip-js';
 import {
   getB64BasePdf,
   b64toUint8Array,
@@ -60,11 +58,11 @@ export const createBarCode = async (arg: {
 
   if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
-    bwipjsBrowser.toCanvas(canvas, bwipjsArg);
+    bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = b64toUint8Array(dataUrl).buffer as Buffer;
   } else {
-    res = await bwipjsNode.toBuffer(bwipjsArg);
+    res = await bwipjs.toBuffer(bwipjsArg);
   }
 
   return res;

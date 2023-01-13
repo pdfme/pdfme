@@ -19,11 +19,23 @@ exports[`Preview(as Form) snapshot 1`] = `
           <button
             style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom out"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19.5 12h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
           <strong
             style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
@@ -34,11 +46,23 @@ exports[`Preview(as Form) snapshot 1`] = `
           <button
             style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom in"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4.5v15m7.5-7.5h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
         </div>
       </div>
@@ -85,11 +109,22 @@ exports[`Preview(as Form) snapshot 1`] = `
                 style="position: absolute; top: 0px; left: 0px; z-index: 1; display: flex; justify-content: center; align-items: center; color: rgb(51, 51, 51); background: rgb(242, 242, 242); border-radius: 2px; border: 1px solid #767676; cursor: pointer; height: 20px; width: 20px;"
                 tabindex="101"
               >
-                <img
-                  alt="Close icon"
-                  src="[object Object]"
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  height="10"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  viewBox="0 0 24 24"
                   width="10"
-                />
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M6 18L18 6M6 6l12 12"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
               </button>
             </div>
             <label
@@ -129,11 +164,23 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           <button
             style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom out"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19.5 12h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
           <strong
             style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
@@ -144,11 +191,23 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           <button
             style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom in"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4.5v15m7.5-7.5h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
         </div>
       </div>

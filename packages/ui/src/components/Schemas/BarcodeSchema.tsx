@@ -1,7 +1,7 @@
 import React, { forwardRef, Ref } from 'react';
 import { validateBarcodeInput, BarCodeType, BarcodeSchema } from '@pdfme/common';
-import { ZOOM } from '../../constants';
-import { SchemaUIProps } from './SchemaUI';
+import { ZOOM } from '../../constants.js';
+import { SchemaUIProps } from './SchemaUI.js';
 import ean8 from '../../assets/barcodeExamples/ean8.png';
 import ean13 from '../../assets/barcodeExamples/ean13.png';
 import code39 from '../../assets/barcodeExamples/code39.png';

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { I18nContext } from '../../../../contexts';
-import Divider from '../../../Divider';
-import { SidebarProps } from '..';
-import TextPropEditor from './TextPropEditor';
-import ExampleInputEditor from './ExampleInputEditor';
-import PositionAndSizeEditor from './PositionAndSizeEditor';
-import TypeAndKeyEditor from './TypeAndKeyEditor';
+import { I18nContext } from '../../../../contexts.js';
+import Divider from '../../../Divider.js';
+import { SidebarProps } from '../index.js';
+import TextPropEditor from './TextPropEditor.js';
+import ExampleInputEditor from './ExampleInputEditor.js';
+import PositionAndSizeEditor from './PositionAndSizeEditor.js';
+import TypeAndKeyEditor from './TypeAndKeyEditor.js';
 
 const DetailView = (
   props: Pick<SidebarProps, 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements'> & {
