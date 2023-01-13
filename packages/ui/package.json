@@ -81,6 +81,7 @@
     "moduleNameMapper": {
       "\\.(png)$": "<rootDir>/../../assetsTransformer.js"
     },
+    "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
       "ts",

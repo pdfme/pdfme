@@ -49,6 +49,7 @@
     "zod": "^3.11.6"
   },
   "jest": {
+    "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
       "ts"

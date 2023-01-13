@@ -19,11 +19,23 @@ exports[`Designer snapshot 1`] = `
           <button
             style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom out"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19.5 12h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
           <strong
             style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
@@ -34,11 +46,23 @@ exports[`Designer snapshot 1`] = `
           <button
             style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
           >
-            <img
-              alt="Zoom in"
-              src="[object Object]"
-              style="width: 20px;"
-            />
+            <svg
+              aria-hidden="true"
+              color="#fff"
+              fill="none"
+              height="20"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              width="20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4.5v15m7.5-7.5h-15"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
         </div>
       </div>
@@ -50,13 +74,24 @@ exports[`Designer snapshot 1`] = `
         style="position: sticky; top: 0px; z-index: 1; font-size: 1rem;"
       >
         <button
-          style="position: absolute; top: 1.75rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px;"
+          style="position: absolute; top: 1.75rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px; height: 30px;"
         >
-          <img
-            alt="Toggle icon"
-            src="[object Object]"
+          <svg
+            aria-hidden="true"
+            fill="none"
+            height="15"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
             width="15"
-          />
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </button>
         <div
           style="width: 300px; height: 1155px; display: block; top: 15px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.929); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.5rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400; text-align: left; box-sizing: content-box;"
@@ -89,12 +124,21 @@ exports[`Designer snapshot 1`] = `
                     <button
                       style="padding: 0.5rem; background: none; display: flex;"
                     >
-                      <img
-                        alt="Drag icon"
-                        src="[object Object]"
+                      <object
                         style="cursor: grab;"
                         width="15"
-                      />
+                      >
+                        <svg
+                          aria-hidden="true"
+                          height="16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"
+                          />
+                        </svg>
+                      </object>
                     </button>
                     <div
                       style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
@@ -113,12 +157,21 @@ exports[`Designer snapshot 1`] = `
                     <button
                       style="padding: 0.5rem; background: none; display: flex;"
                     >
-                      <img
-                        alt="Drag icon"
-                        src="[object Object]"
+                      <object
                         style="cursor: grab;"
                         width="15"
-                      />
+                      >
+                        <svg
+                          aria-hidden="true"
+                          height="16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"
+                          />
+                        </svg>
+                      </object>
                     </button>
                     <div
                       style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"

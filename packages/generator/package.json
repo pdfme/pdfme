@@ -60,6 +60,7 @@
     "pngjs": "^6.0.0"
   },
   "jest": {
+    "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
       "ts"
