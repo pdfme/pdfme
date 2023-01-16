@@ -46,7 +46,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "zod": "^3.11.6"
+    "zod": "^3.20.2"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

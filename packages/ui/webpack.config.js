@@ -19,13 +19,8 @@ const config = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
-    new webpack.ProvidePlugin({
-      process: 'process/browser',
-    }),
-    new webpack.BannerPlugin({
-      banner: BANNER,
-      entryOnly: true,
-    }),
+    new webpack.ProvidePlugin({ process: 'process/browser' }),
+    new webpack.BannerPlugin({ banner: BANNER, entryOnly: true }),
   ],
   devtool: 'source-map',
   entry: './src/index.ts',
@@ -33,17 +28,8 @@ const config = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'index.js',
     globalObject: 'this',
-    library: {
-      type: 'umd',
-    },
+    library: { type: 'umd' },
   },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-      },
-    ],
-  },
+  module: { rules: [{ test: /\.tsx?$/, use: 'ts-loader' }] },
 };
 module.exports = config;
