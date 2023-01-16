@@ -53,8 +53,9 @@ const ColorInputSet = (props: {
           onClick={onClear}
           style={{
             display: 'flex',
-            background: 'none',
             alignItems: 'center',
+            justifyContent: 'center',
+            background: 'none',
             borderRadius: 2,
             border: '1px solid #767676',
             cursor: 'pointer',

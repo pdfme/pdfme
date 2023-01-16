@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
@@ -49,16 +50,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         justifyContent: 'center',
       }}
     >
-      <svg
-        style={{ pointerEvents: 'none' }}
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        strokeWidth="1.5"
-        stroke="currentColor"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
+      <XMarkIcon width={10} height={10} />
     </button>
   );
 };

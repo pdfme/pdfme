@@ -24,15 +24,15 @@ const ExampleInputEditor = (
                   top: 0,
                   left: 0,
                   display: 'flex',
-                  justifyContent: 'center',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   color: '#333',
                   background: '#f2f2f2',
                   cursor: 'pointer',
                   borderRadius: 2,
                   border: '1px solid #767676',
-                  height: 20,
-                  width: 20,
+                  height: 24,
+                  width: 24,
                 }}
                 aria-label="close"
                 onClick={() =>

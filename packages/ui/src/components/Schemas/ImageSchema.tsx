@@ -46,8 +46,8 @@ const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
               borderRadius: 2,
               border: '1px solid #767676',
               cursor: 'pointer',
-              height: 20,
-              width: 20,
+              height: 24,
+              width: 24,
             }}
             aria-label="close"
             onClick={() => {
