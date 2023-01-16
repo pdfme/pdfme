@@ -1,7 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { round } from '../../../../helper.js';
-import { SidebarProps } from '../index.js';
+import { round } from '../../../../helper';
+import { SidebarProps } from '../index';
 
 const inputSetStyle: CSSProperties = { marginRight: '1rem', display: 'flex', alignItems: 'center' };
 

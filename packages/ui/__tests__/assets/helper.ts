@@ -1,5 +1,5 @@
-import * as hooks from '../../src/hooks.js';
-import { uuid, getPdfPageSizes, pdf2Pngs } from '../../src/helper.js';
+import * as hooks from '../../src/hooks';
+import { uuid, getPdfPageSizes, pdf2Pngs } from '../../src/helper';
 import { BLANK_PDF, Template } from '@pdfme/common';
 
 export const setupUIMock = () => {

@@ -1,8 +1,7 @@
-import type {} from 'css-font-loading-module';
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { Size } from '@pdfme/common';
-import { FontContext } from '../contexts.js';
-import Spinner from './Spinner.js';
+import { FontContext } from '../contexts';
+import Spinner from './Spinner';
 
 type Props = { size: Size; scale: number; children: ReactNode };
 
@@ -18,7 +17,9 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     });
     Promise.all(fontFaces).then((loadedFontFaces) => {
       loadedFontFaces.forEach((loadedFontFace) => {
+        // @ts-ignore
         if (document && document.fonts && document.fonts.add) {
+          // @ts-ignore
           document.fonts.add(loadedFontFace);
         }
       });

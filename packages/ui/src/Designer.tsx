@@ -1,10 +1,11 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
-import { BaseUIClass } from './class.js';
-import { DESTROYED_ERR_MSG } from './constants.js';
-import { I18nContext, FontContext } from './contexts.js';
-import DesignerComponent from './components/Designer/index.js';
-import { cloneDeep } from './helper.js';
+import { BaseUIClass } from './class';
+import { DESTROYED_ERR_MSG } from './constants';
+import { I18nContext, FontContext } from './contexts';
+import DesignerComponent from './components/Designer/index';
+import { cloneDeep } from './helper';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
@@ -43,8 +44,8 @@ class Designer extends BaseUIClass {
   }
 
   protected render() {
-    if (!this.domContainer || !this.root) throw Error(DESTROYED_ERR_MSG);
-    this.root.render(
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>
           <DesignerComponent
@@ -64,7 +65,8 @@ class Designer extends BaseUIClass {
             size={this.size}
           />
         </FontContext.Provider>
-      </I18nContext.Provider>
+      </I18nContext.Provider>,
+      this.domContainer
     );
   }
 }

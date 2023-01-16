@@ -1,6 +1,6 @@
 import React from 'react';
-import Pager from './Pager.js';
-import Zoom from './Zoom.js';
+import Pager from './Pager';
+import Zoom from './Zoom';
 import { Size } from '@pdfme/common';
 
 type Props = {

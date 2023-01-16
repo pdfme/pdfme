@@ -32,7 +32,7 @@ custom_edit_url: null
 | `props.template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
 | `props.template.columns?` | `string`[] |
 | `props.template.sampledata?` | `Record`<`string`, `string`\>[] |
-| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 #### Overrides
 
@@ -40,7 +40,7 @@ PreviewUI.constructor
 
 #### Defined in
 
-[ui/src/Viewer.tsx:10](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/Viewer.tsx#L10)
+[ui/src/Viewer.tsx:10](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Viewer.tsx#L10)
 
 ## Properties
 
@@ -54,7 +54,7 @@ PreviewUI.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -68,7 +68,7 @@ PreviewUI.inputs
 
 #### Defined in
 
-[ui/src/class.ts:145](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L145)
+[ui/src/class.ts:146](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L146)
 
 ___
 
@@ -82,7 +82,7 @@ PreviewUI.resizeObserver
 
 #### Defined in
 
-[ui/src/class.ts:77](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L77)
+[ui/src/class.ts:77](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L77)
 
 ___
 
@@ -103,7 +103,7 @@ PreviewUI.size
 
 #### Defined in
 
-[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L62)
+[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L62)
 
 ___
 
@@ -118,7 +118,7 @@ ___
 | `basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
 | `columns?` | `string`[] |
 | `sampledata?` | `Record`<`string`, `string`\>[] |
-| `schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 #### Inherited from
 
@@ -126,7 +126,7 @@ PreviewUI.template
 
 #### Defined in
 
-[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L60)
+[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L60)
 
 ## Methods
 
@@ -144,7 +144,7 @@ PreviewUI.destroy
 
 #### Defined in
 
-[ui/src/class.ts:135](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L135)
+[ui/src/class.ts:135](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L135)
 
 ___
 
@@ -162,13 +162,13 @@ PreviewUI.getFont
 
 #### Defined in
 
-[ui/src/class.ts:104](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L104)
+[ui/src/class.ts:104](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L104)
 
 ___
 
 ### getI18n
 
-▸ `Protected` **getI18n**(): (`key`: ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"zoomIn"`` \| ``"zoomOut"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"``) => `string`
+▸ `Protected` **getI18n**(): (`key`: ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsInputName"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"``) => `string`
 
 #### Returns
 
@@ -180,7 +180,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `key` | ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsSelect"`` \| ``"plsInputName"`` \| ``"plsAddNewField"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"goToFirst"`` \| ``"goToPrevious"`` \| ``"goToNext"`` \| ``"goToEnd"`` \| ``"select"`` \| ``"zoomIn"`` \| ``"zoomOut"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"`` |
+| `key` | ``"field"`` \| ``"cancel"`` \| ``"fieldName"`` \| ``"require"`` \| ``"uniq"`` \| ``"inputExample"`` \| ``"edit"`` \| ``"plsInputName"`` \| ``"fieldMustUniq"`` \| ``"notUniq"`` \| ``"noKeyName"`` \| ``"fieldsList"`` \| ``"addNewField"`` \| ``"editField"`` \| ``"type"`` \| ``"errorOccurred"`` \| ``"errorBulkUpdateFieldName"`` \| ``"commitBulkUpdateFieldName"`` \| ``"bulkUpdateFieldName"`` |
 
 ##### Returns
 
@@ -192,7 +192,7 @@ PreviewUI.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:100](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L100)
+[ui/src/class.ts:100](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L100)
 
 ___
 
@@ -210,7 +210,7 @@ PreviewUI.getInputs
 
 #### Defined in
 
-[ui/src/class.ts:154](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L154)
+[ui/src/class.ts:155](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L155)
 
 ___
 
@@ -227,7 +227,7 @@ ___
 | `basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
 | `columns?` | `string`[] |
 | `sampledata?` | `Record`<`string`, `string`\>[] |
-| `schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 #### Inherited from
 
@@ -235,7 +235,7 @@ PreviewUI.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:108](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L108)
+[ui/src/class.ts:108](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L108)
 
 ___
 
@@ -253,7 +253,7 @@ PreviewUI.render
 
 #### Defined in
 
-[ui/src/Viewer.tsx:15](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/Viewer.tsx#L15)
+[ui/src/Viewer.tsx:15](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Viewer.tsx#L15)
 
 ___
 
@@ -277,7 +277,7 @@ PreviewUI.setInputs
 
 #### Defined in
 
-[ui/src/class.ts:160](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L160)
+[ui/src/class.ts:161](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L161)
 
 ___
 
@@ -303,7 +303,7 @@ PreviewUI.updateOptions
 
 #### Defined in
 
-[ui/src/class.ts:122](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L122)
+[ui/src/class.ts:122](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L122)
 
 ___
 
@@ -319,7 +319,7 @@ ___
 | `template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
 | `template.columns?` | `string`[] |
 | `template.sampledata?` | `Record`<`string`, `string`\>[] |
-| `template.schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
+| `template.schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` ; `width`: `number`  }\>[] |
 
 #### Returns
 
@@ -331,4 +331,4 @@ PreviewUI.updateTemplate
 
 #### Defined in
 
-[ui/src/class.ts:114](https://github.com/pdfme/pdfme/blob/57886f2/packages/ui/src/class.ts#L114)
+[ui/src/class.ts:114](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L114)

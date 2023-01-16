@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { I18nContext } from '../../contexts.js';
+import { I18nContext } from '../../contexts';
 
 const btnStyle: React.CSSProperties = {
   cursor: 'pointer',

@@ -1,10 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { SchemaForUI, Size } from '@pdfme/common';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants.js';
-import { I18nContext } from '../../../contexts.js';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
+import { I18nContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import ListView from './ListView/index.js';
-import DetailView from './DetailView/index.js';
+import ListView from './ListView/index';
+import DetailView from './DetailView/index';
 
 export type SidebarProps = {
   height: number;

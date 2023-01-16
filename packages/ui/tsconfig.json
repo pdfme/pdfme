@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "target": "ES2015",
+    "jsx": "react",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "module": "ES2015",
+    "lib": ["es6", "dom", "es2016", "es2017"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "types": ["node", "jest", "@types/jest"],
+    "typeRoots": ["node_modules/@types"],
+    "sourceMap": true
+  },
+  "baseUrl": ".",
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

@@ -78,7 +78,7 @@ const config = {
           fullNames: true,
         },
         entryPoints: ['../packages/ui/src/index.ts'],
-        tsconfig: '../packages/ui/tsconfig.esm.json',
+        tsconfig: '../packages/ui/tsconfig.json',
       },
     ],
     function myPlugin() {

@@ -1,6 +1,6 @@
-import Designer from './Designer.js';
-import Form from './Form.js';
-import Viewer from './Viewer.js';
+import Designer from './Designer';
+import Form from './Form';
+import Viewer from './Viewer';
 
 export { Designer, Viewer, Form };
 

@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
 import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
-import Sidebar from './Sidebar/index.js';
-import Main from './Main/index.js';
-import { ZOOM, RULER_HEIGHT } from '../../constants.js';
-import { I18nContext } from '../../contexts.js';
+import Sidebar from './Sidebar/index';
+import Main from './Main/index';
+import { ZOOM, RULER_HEIGHT } from '../../constants';
+import { I18nContext } from '../../contexts';
 import {
   uuid,
   set,
@@ -18,11 +18,11 @@ import {
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
   getPagesScrollTopByIndex,
-} from '../../helper.js';
-import { useUIPreProcessor, useScrollPageCursor } from '../../hooks.js';
-import Root from '../Root.js';
-import Error from '../Error.js';
-import CtlBar from '../CtlBar/index.js';
+} from '../../helper';
+import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
+import Root from '../Root';
+import Error from '../Error';
+import CtlBar from '../CtlBar/index';
 
 const TemplateEditor = ({
   template,

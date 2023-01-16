@@ -7,7 +7,7 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
 } from '@pdfme/common';
-import { FontContext } from '../../../../contexts.js';
+import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 

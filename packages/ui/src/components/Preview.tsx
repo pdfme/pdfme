@@ -1,14 +1,14 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { PreviewReactProps, SchemaForUI } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from '../constants.js';
-import UnitPager from './UnitPager.js';
-import Root from './Root.js';
-import Error from './Error.js';
-import CtlBar from './CtlBar/index.js';
-import Paper from './Paper.js';
-import SchemaUI from './Schemas/SchemaUI.js';
-import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
-import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper.js';
+import { ZOOM, RULER_HEIGHT } from '../constants';
+import UnitPager from './UnitPager';
+import Root from './Root';
+import Error from './Error';
+import CtlBar from './CtlBar/index';
+import Paper from './Paper';
+import SchemaUI from './Schemas/SchemaUI';
+import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
+import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
   const rootRef = useRef<HTMLDivElement>(null);

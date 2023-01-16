@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants.js';
-import { I18nContext } from '../../../../contexts.js';
-import Divider from '../../../Divider.js';
-import SelectableSortableContainer from './SelectableSortableContainer.js';
-import { SidebarProps } from '../index.js';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants';
+import { I18nContext } from '../../../../contexts';
+import Divider from '../../../Divider';
+import SelectableSortableContainer from './SelectableSortableContainer';
+import { SidebarProps } from '../index';
 
 const ListView = (
   props: Pick<

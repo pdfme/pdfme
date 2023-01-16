@@ -1,7 +1,7 @@
 import React, { forwardRef, Ref } from 'react';
 import { validateBarcodeInput, BarCodeType, BarcodeSchema } from '@pdfme/common';
-import { ZOOM } from '../../constants.js';
-import { SchemaUIProps } from './SchemaUI.js';
+import { ZOOM } from '../../constants';
+import { SchemaUIProps } from './SchemaUI';
 
 const barcodeExampleImageObj: { [key: string]: string } = {
   qrcode:

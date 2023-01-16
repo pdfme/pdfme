@@ -16,9 +16,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
-import Item from './Item.js';
-import SelectableSortableItem from './SelectableSortableItem.js';
-import { SidebarProps } from '../index.js';
+import Item from './Item';
+import SelectableSortableItem from './SelectableSortableItem';
+import { SidebarProps } from '../index';
 
 const SelectableSortableContainer = (
   props: Pick<
@@ -106,55 +106,59 @@ const SelectableSortableContainer = (
         setClonedItems(null);
       }}
     >
-      <div style={{ height, overflowY: 'auto' }}>
-        <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
-          <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
-            {schemas.map((schema) => (
-              <SelectableSortableItem
-                key={schema.id}
-                style={{
-                  border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
-                }}
-                schema={schema}
-                schemas={schemas}
-                isSelected={isItemSelected(schema.id) || activeId === schema.id}
-                onEdit={onEdit}
-                onSelect={onSelectionChanged}
-                onMouseEnter={() => onChangeHoveringSchemaId(schema.id)}
-                onMouseLeave={() => onChangeHoveringSchemaId(null)}
-              />
-            ))}
-          </ul>
-        </SortableContext>
-      </div>
-      {createPortal(
-        <DragOverlay adjustScale>
-          {activeId ? (
-            <>
-              <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                <Item
-                  value={schemas.find((schema) => schema.id === activeId)!.key}
-                  style={{ color: '#fff', background: '#18a0fb' }}
-                  dragOverlay
+      <>
+        <div style={{ height, overflowY: 'auto' }}>
+          <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
+              {schemas.map((schema) => (
+                <SelectableSortableItem
+                  key={schema.id}
+                  style={{
+                    border: `1px solid ${
+                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
+                    }`,
+                  }}
+                  schema={schema}
+                  schemas={schemas}
+                  isSelected={isItemSelected(schema.id) || activeId === schema.id}
+                  onEdit={onEdit}
+                  onSelect={onSelectionChanged}
+                  onMouseEnter={() => onChangeHoveringSchemaId(schema.id)}
+                  onMouseLeave={() => onChangeHoveringSchemaId(null)}
                 />
-              </ul>
-              <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                {selectedSchemas
-                  .filter((item) => item.id !== activeId)
-                  .map((item) => (
-                    <Item
-                      key={item.id}
-                      value={item.key}
-                      style={{ color: '#fff', background: '#18a0fb' }}
-                      dragOverlay
-                    />
-                  ))}
-              </ul>
-            </>
-          ) : null}
-        </DragOverlay>,
-        document.body
-      )}
+              ))}
+            </ul>
+          </SortableContext>
+        </div>
+        {createPortal(
+          <DragOverlay adjustScale>
+            {activeId ? (
+              <>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  <Item
+                    value={schemas.find((schema) => schema.id === activeId)!.key}
+                    style={{ color: '#fff', background: '#18a0fb' }}
+                    dragOverlay
+                  />
+                </ul>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  {selectedSchemas
+                    .filter((item) => item.id !== activeId)
+                    .map((item) => (
+                      <Item
+                        key={item.id}
+                        value={item.key}
+                        style={{ color: '#fff', background: '#18a0fb' }}
+                        dragOverlay
+                      />
+                    ))}
+                </ul>
+              </>
+            ) : null}
+          </DragOverlay>,
+          document.body
+        )}
+      </>
     </DndContext>
   );
 };

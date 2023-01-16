@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -21,23 +21,15 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js"
-    }
-  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=14"
   },
   "scripts": {
-    "develop": "tsc -w",
-    "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "develop": "webpack --watch --mode development",
+    "build": "NODE_ENV=production webpack --mode production",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
@@ -53,23 +45,24 @@
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
     "react-moveable": "^0.30.3",
-    "react-selecto": "^1.12.0",
-    "worker-loader": "^3.0.8"
+    "react-selecto": "^1.12.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
-    "@types/css-font-loading-module": "^0.0.7",
     "@types/pdfjs-dist": "^2.7.4",
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.10",
+    "@types/react": "^17.0.52",
+    "@types/react-dom": "^17.0.18",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest-canvas-mock": "^2.3.1",
-    "process": "^0.11.10"
+    "process": "^0.11.10",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "worker-loader": "^3.0.8"
   },
   "jest": {
     "setupFiles": [
@@ -90,7 +83,7 @@
     },
     "globals": {
       "ts-jest": {
-        "tsconfig": "tsconfig.esm.json"
+        "tsconfig": "tsconfig.json"
       }
     },
     "testMatch": [

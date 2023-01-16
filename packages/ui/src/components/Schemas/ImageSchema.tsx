@@ -1,8 +1,8 @@
 import React, { useState, forwardRef, ChangeEvent, Ref } from 'react';
 import { ImageSchema } from '@pdfme/common';
-import { SchemaUIProps } from './SchemaUI.js';
-import { readFiles } from '../../helper.js';
-import { ZOOM } from '../../constants.js';
+import { SchemaUIProps } from './SchemaUI';
+import { readFiles } from '../../helper';
+import { ZOOM } from '../../constants';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 type Props = SchemaUIProps & { schema: ImageSchema };

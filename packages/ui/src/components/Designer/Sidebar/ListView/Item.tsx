@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
-import { I18nContext } from '../../../../contexts.js';
+import { I18nContext } from '../../../../contexts';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface Props {
