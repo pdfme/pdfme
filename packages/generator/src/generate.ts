@@ -2,14 +2,10 @@ import { PDFDocument } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { GenerateProps, Template, Font } from '@pdfme/common';
 import { getDefaultFont, getFallbackFontName, checkGenerateProps } from '@pdfme/common';
-import {
-  getEmbeddedPagesAndEmbedPdfBoxes,
-  drawInputByTemplateSchema,
-  drawEmbeddedPage,
-  embedAndGetFontObj,
-  InputImageCache,
-} from './helper.js';
+import { getEmbeddedPagesAndEmbedPdfBoxes, embedAndGetFontObj } from './helper/index.js';
+import { drawInputByTemplateSchema, drawEmbeddedPage } from './helper/draw.js';
 import { TOOL_NAME } from './constants.js';
+import type { InputImageCache } from './type';
 
 const preprocessing = async (arg: {
   inputs: { [key: string]: string }[];

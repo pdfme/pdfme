@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { OnDrag, OnResize, OnClick } from 'react-moveable';
+import { OnDrag, OnResize, OnRotate, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
@@ -21,13 +21,16 @@ import Guides from './Guides';
 import Mask from './Mask';
 
 const DELETE_BTN_ID = uuid();
-const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
-const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
+const px2Num = (prop: string) => Number(prop.replace('px', ''));
+const transformRotate2Num = (transform: string) =>
+  Number(transform.match(/rotate\(([^deg)]*)deg\)/)?.[1]) || 0;
+const fmtPx = (prop: string) => round(px2Num(prop) / ZOOM, 2);
+const fmtDeg = (prop: string) => round(transformRotate2Num(prop), 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
-  const top = Math.min(...aes.map(({ style }) => fmt4Num(style.top)));
-  const left = Math.max(...aes.map(({ style }) => fmt4Num(style.left) + fmt4Num(style.width))) + 10;
+  const top = Math.min(...aes.map(({ style }) => px2Num(style.top)));
+  const left = Math.max(...aes.map(({ style }) => px2Num(style.left) + px2Num(style.width))) + 10;
 
   return (
     <button
@@ -149,15 +152,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { top, left } = target.style;
     changeSchemas([
-      { key: 'position.y', value: fmt(top), schemaId: target.id },
-      { key: 'position.x', value: fmt(left), schemaId: target.id },
+      { key: 'position.y', value: fmtPx(top), schemaId: target.id },
+      { key: 'position.x', value: fmtPx(left), schemaId: target.id },
     ]);
   };
 
   const onDragEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
     const arg = targets.map(({ style: { top, left }, id }) => [
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'position.y', value: fmtPx(top), schemaId: id },
+      { key: 'position.x', value: fmtPx(left), schemaId: id },
     ]);
     changeSchemas(flatten(arg));
   };
@@ -166,19 +169,19 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
-      { key: 'width', value: fmt(width), schemaId: id },
-      { key: 'height', value: fmt(height), schemaId: id },
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'width', value: fmtPx(width), schemaId: id },
+      { key: 'height', value: fmtPx(height), schemaId: id },
+      { key: 'position.y', value: fmtPx(top), schemaId: id },
+      { key: 'position.x', value: fmtPx(left), schemaId: id },
     ]);
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
     const arg = targets.map(({ style: { width, height, top, left }, id }) => [
-      { key: 'width', value: fmt(width), schemaId: id },
-      { key: 'height', value: fmt(height), schemaId: id },
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'width', value: fmtPx(width), schemaId: id },
+      { key: 'height', value: fmtPx(height), schemaId: id },
+      { key: 'position.y', value: fmtPx(top), schemaId: id },
+      { key: 'position.x', value: fmtPx(left), schemaId: id },
     ]);
     changeSchemas(flatten(arg));
   };
@@ -186,8 +189,8 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
     const s = target.style;
-    const newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
-    const newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
+    const newLeft = px2Num(s.left) + (px2Num(s.width) - width);
+    const newTop = px2Num(s.top) + (px2Num(s.height) - height);
     const obj: { top?: string; left?: string; width: string; height: string } = {
       width: `${width}px`,
       height: `${height}px`,
@@ -202,6 +205,25 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       obj.left = `${newLeft}px`;
     }
     Object.assign(s, obj);
+  };
+
+  const onRotate = ({ target, rotate }: OnRotate) => {
+    if (!target) return;
+    target.style.transform = `rotate(${rotate}deg)`;
+  };
+
+  const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+    const { id, style } = target;
+    const { transform } = style;
+    changeSchemas([{ key: 'rotate', value: fmtDeg(transform), schemaId: id }]);
+  };
+
+  const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
+    const arg = targets.map(({ style: { transform }, id }) => [
+      { key: 'rotate', value: fmtDeg(transform), schemaId: id },
+      { key: 'rotate', value: fmtDeg(transform), schemaId: id },
+    ]);
+    changeSchemas(flatten(arg));
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
@@ -300,6 +322,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                   onResize={onResize}
                   onResizeEnd={onResizeEnd}
                   onResizeGroupEnd={onResizeEnds}
+                  onRotate={onRotate}
+                  onRotateEnd={onRotateEnd}
+                  onRotateGroupEnd={onRotateEnds}
                   onClick={onClickMoveable}
                 />
               )

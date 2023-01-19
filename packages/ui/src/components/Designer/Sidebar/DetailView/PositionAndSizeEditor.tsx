@@ -258,6 +258,19 @@ const PositionAndSizeEditor = (
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
       </div>
+      <div style={inputSetStyle}>
+        <label style={{ width: 44 }}>Rotate</label>
+        <input
+          style={inputStyle}
+          type="number"
+          onChange={(e) => {
+            const value = Number(e.target.value || 0);
+            changeSchemas([{ key: 'rotate', value, schemaId: activeSchema.id }]);
+          }}
+          value={activeSchema.rotate || 0}
+        />
+        <span style={{ fontSize: '0.6rem' }}>deg</span>
+      </div>
     </div>
   );
 };
