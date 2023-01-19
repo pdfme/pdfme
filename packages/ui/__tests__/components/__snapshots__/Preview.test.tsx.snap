@@ -78,7 +78,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           <div
             class="selectable"
             id="1"
-            style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af;"
+            style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); border: 1px dashed #4af;"
             title="field1"
           >
             <textarea
@@ -94,7 +94,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           <div
             class="selectable"
             id="2"
-            style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af;"
+            style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); border: 1px dashed #4af;"
             title="field2"
           >
             <div
@@ -223,7 +223,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           <div
             class="selectable"
             id="1"
-            style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: transparent;"
+            style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); border: transparent;"
             title="field1"
           >
             <div
@@ -266,7 +266,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           <div
             class="selectable"
             id="2"
-            style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: transparent;"
+            style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); border: transparent;"
             title="field2"
           >
             <div

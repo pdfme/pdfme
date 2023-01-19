@@ -276,10 +276,24 @@ exports[`Designer snapshot 1`] = `
             data-able-origin="true"
             data-able-padding="true"
             data-able-resizable="true"
+            data-able-rotatable="true"
             data-able-snappable="true"
             data-styled-id="rCSuehiy8"
             style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px;"
           >
+            <div
+              class="moveable-rotation"
+              style="transform: translate(-50%) translate(0px, 0px) rotate(0rad);"
+            >
+              <div
+                class="moveable-line moveable-rotation-line"
+                style="transform: scaleX(1);"
+              />
+              <div
+                class="moveable-control moveable-rotation-control"
+                style="transform: translate(0.5px) scale(1);"
+              />
+            </div>
             <div
               class="moveable-control moveable-direction moveable-n "
               data-direction="n"
@@ -365,7 +379,7 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); border: 1px dashed #4af;"
               title="field1"
             >
               <div
@@ -388,7 +402,7 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); border: 1px dashed #4af;"
               title="field2"
             >
               <div

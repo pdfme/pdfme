@@ -11,7 +11,7 @@ import {
   BarCodeType,
 } from '@pdfme/common';
 import {
-  getSchemaSizeAndRotate,
+  getDrawOption,
   hex2RgbColor,
   calcX,
   calcY,
@@ -21,42 +21,27 @@ import {
 } from './index.js';
 import type { TextSchemaSetting, InputImageCache, EmbedPdfBox } from '../type';
 
-const drawBackgroundColor = (arg: {
-  templateSchema: TextSchema;
-  page: PDFPage;
-  pageHeight: number;
-}) => {
-  const { templateSchema, page, pageHeight } = arg;
-  if (!templateSchema.backgroundColor) return;
-  const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const color = hex2RgbColor(templateSchema.backgroundColor);
-  page.drawRectangle({
-    x: calcX(templateSchema.position.x, templateSchema.alignment || 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
-    width,
-    height,
-    color,
-    rotate,
-  });
-};
-
 const drawInputByTextSchema = (arg: {
   input: string;
-  templateSchema: TextSchema;
+  textSchema: TextSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
   textSchemaSetting: TextSchemaSetting;
 }) => {
-  const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
+  const { input, textSchema, page, pageHeight, textSchemaSetting } = arg;
   const { fontObj, fallbackFontName, splitThreshold } = textSchemaSetting;
 
-  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
+  const fontValue = fontObj[textSchema.fontName ? textSchema.fontName : fallbackFontName];
 
-  drawBackgroundColor({ templateSchema, page, pageHeight });
+  const opt = getDrawOption({ schema: textSchema, pageHeight });
 
-  const { width, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const { size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
+  if (textSchema.backgroundColor) {
+    page.drawRectangle({ ...opt, color: hex2RgbColor(textSchema.backgroundColor) });
+  }
+
+  const { width, rotate } = opt;
+  const { size, color, alignment, lineHeight, characterSpacing } = getFontProp(textSchema);
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
   let beforeLineOver = 0;
@@ -78,9 +63,9 @@ const drawInputByTextSchema = (arg: {
         fontValue.widthOfTextAtSize(splitedLine, size) +
         (splitedLine.length - 1) * characterSpacing;
       page.drawText(splitedLine, {
-        x: calcX(templateSchema.position.x, alignment, width, textWidth),
+        x: calcX(textSchema.position.x, alignment, width, textWidth),
         y:
-          calcY(templateSchema.position.y, pageHeight, size) -
+          calcY(textSchema.position.y, pageHeight, size) -
           lineHeight * size * (inputLineIndex + splitedLineIndex + beforeLineOver) -
           (lineHeight === 0 ? 0 : ((lineHeight - 1) * size) / 2),
         rotate,
@@ -98,64 +83,49 @@ const drawInputByTextSchema = (arg: {
   });
 };
 
-const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
+const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const drawInputByImageSchema = async (arg: {
   input: string;
-  templateSchema: ImageSchema;
+  imageSchema: ImageSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
-  const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
+  const { input, imageSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
 
-  const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const opt = {
-    x: calcX(templateSchema.position.x, 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
-    rotate,
-    width,
-    height,
-  };
-  const inputImageCacheKey = getCacheKey(templateSchema, input);
+  const inputImageCacheKey = getCacheKey(imageSchema, input);
   let image = inputImageCache[inputImageCacheKey];
   if (!image) {
     const isPng = input.startsWith('data:image/png;');
     image = await (isPng ? pdfDoc.embedPng(input) : pdfDoc.embedJpg(input));
   }
   inputImageCache[inputImageCacheKey] = image;
-  page.drawImage(image, opt);
+  page.drawImage(image, getDrawOption({ schema: imageSchema, pageHeight }));
 };
 
 const drawInputByBarcodeSchema = async (arg: {
   input: string;
-  templateSchema: BarcodeSchema;
+  barcodeSchema: BarcodeSchema;
   pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
-  const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
-  if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
+  const { input, barcodeSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
+  if (!validateBarcodeInput(barcodeSchema.type as BarCodeType, input)) return;
 
-  const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const opt = {
-    x: calcX(templateSchema.position.x, 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
-    rotate,
-    width,
-    height,
-  };
-  const inputBarcodeCacheKey = getCacheKey(templateSchema, input);
+  const inputBarcodeCacheKey = getCacheKey(barcodeSchema, input);
   let image = inputImageCache[inputBarcodeCacheKey];
   if (!image) {
     const imageBuf = await createBarCode(
-      Object.assign(templateSchema, { type: templateSchema.type as BarCodeType, input })
+      Object.assign(barcodeSchema, { type: barcodeSchema.type as BarCodeType, input })
     );
     image = await pdfDoc.embedPng(imageBuf);
   }
   inputImageCache[inputBarcodeCacheKey] = image;
-  page.drawImage(image, opt);
+
+  page.drawImage(image, getDrawOption({ schema: barcodeSchema, pageHeight }));
 };
 
 export const drawInputByTemplateSchema = async (arg: {
@@ -171,13 +141,13 @@ export const drawInputByTemplateSchema = async (arg: {
 
   if (isTextSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as TextSchema;
-    drawInputByTextSchema({ ...arg, templateSchema });
+    drawInputByTextSchema({ ...arg, textSchema: templateSchema });
   } else if (isImageSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as ImageSchema;
-    await drawInputByImageSchema({ ...arg, templateSchema });
+    await drawInputByImageSchema({ ...arg, imageSchema: templateSchema });
   } else if (isBarcodeSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as BarcodeSchema;
-    await drawInputByBarcodeSchema({ ...arg, templateSchema });
+    await drawInputByBarcodeSchema({ ...arg, barcodeSchema: templateSchema });
   }
 };
 

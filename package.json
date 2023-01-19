@@ -27,6 +27,7 @@
   "scripts": {
     "clean": "npm run --workspaces clean",
     "lint": "npm run --workspaces lint",
+    "prune": "npm run --workspaces prune",
     "build": "npm run --workspaces clean && npm run --workspaces build",
     "test": "npm run --workspaces test"
   },

@@ -14,6 +14,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  isTextSchema,
 } from '@pdfme/common';
 import type { EmbedPdfBox } from '../type';
 
@@ -104,18 +105,29 @@ const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * ptRatio;
 };
 
-export const getSchemaSizeAndRotate = (schema: Schema) => {
+export const getDrawOption = ({
+  schema,
+  pageHeight,
+}: {
+  schema: Schema | TextSchema;
+  pageHeight: number;
+}) => {
   const width = mm2pt(schema.width);
   const height = mm2pt(schema.height);
+
+  const x = calcX(
+    schema.position.x,
+    isTextSchema(schema) ? schema.alignment || 'left' : 'left',
+    width,
+    width
+  );
+  const y = calcY(schema.position.y, pageHeight, height);
+
+  // TODO ここから
   const rotate = degrees(schema.rotate ? schema.rotate : 0);
   rotate.angle = rotate.angle * -1;
 
-  // TODO This pdf-lib rotate origin is left top
-  // But pdfme/ui rotate origin is center
-  // So, I need to fix this
-  // Maybe It's effect to position.x and position.y.
-
-  return { width, height, rotate };
+  return { x, y, rotate, width, height };
 };
 
 const hex2rgb = (hex: string) => {
