@@ -105,27 +105,22 @@ const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * ptRatio;
 };
 
-export const getDrawOption = ({
-  schema,
-  pageHeight,
-}: {
-  schema: Schema | TextSchema;
-  pageHeight: number;
-}) => {
+export const getDrawOption = (arg: { schema: Schema | TextSchema; pageHeight: number }) => {
+  const { schema, pageHeight } = arg;
+
   const width = mm2pt(schema.width);
   const height = mm2pt(schema.height);
 
-  const x = calcX(
-    schema.position.x,
-    isTextSchema(schema) ? schema.alignment || 'left' : 'left',
-    width,
-    width
-  );
-  const y = calcY(schema.position.y, pageHeight, height);
-
-  // TODO ここから
   const rotate = degrees(schema.rotate ? schema.rotate : 0);
   rotate.angle = rotate.angle * -1;
+
+  const alignment = isTextSchema(schema) ? schema.alignment || 'left' : 'left';
+
+  const x = calcX(schema.position.x, alignment, width, width);
+  const y = calcY(schema.position.y, pageHeight, height);
+
+  // TODO adjust x, y by rotate angle
+  // because pdf-lib rotate from letf-top, but we rotate from center
 
   return { x, y, rotate, width, height };
 };
