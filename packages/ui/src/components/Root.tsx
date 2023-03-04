@@ -9,19 +9,20 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);
 
   useEffect(() => {
-    const fontFaces = Object.entries(font).map((entry) => {
-      const [key, value] = entry;
-      const fontFace = new FontFace(key, value.data);
+    if (!document || !document.fonts) return;
+    const fontFaces = Object.entries(font).map(
+      ([key, { data }]) =>
+        new FontFace(key, typeof data === 'string' ? `url(${data})` : data, {
+          display: 'swap',
+        })
+    );
+    // @ts-ignore
+    const newFontFaces = fontFaces.filter((fontFace) => !document.fonts.has(fontFace));
 
-      return fontFace.load();
-    });
-    Promise.all(fontFaces).then((loadedFontFaces) => {
+    Promise.all(newFontFaces.map((f) => f.load())).then((loadedFontFaces) => {
       loadedFontFaces.forEach((loadedFontFace) => {
         // @ts-ignore
-        if (document && document.fonts && document.fonts.add) {
-          // @ts-ignore
-          document.fonts.add(loadedFontFace);
-        }
+        document.fonts.add(loadedFontFace);
       });
     });
   }, [font]);

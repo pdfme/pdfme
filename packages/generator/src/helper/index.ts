@@ -53,11 +53,16 @@ export const createBarCode = async (arg: {
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
   const { pdfDoc, font } = arg;
   const fontValues = await Promise.all(
-    Object.values(font).map((v) =>
-      pdfDoc.embedFont(v.data, {
+    Object.values(font).map(async (v) => {
+      let font = v.data;
+      if (typeof v.data === 'string' && v.data.startsWith('http')) {
+        const url = v.data;
+        font = await fetch(url).then((res) => res.arrayBuffer());
+      }
+      return pdfDoc.embedFont(v.data, {
         subset: typeof v.subset === 'undefined' ? true : v.subset,
-      })
-    )
+      });
+    })
   );
 
   return Object.keys(font).reduce(
