@@ -51,13 +51,16 @@ export const SchemaForUI = z.union([
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
-const Data = z.union([ArrayBufferSchema, Uint8ArraySchema]);
 
 export const Font = z.record(
-  z.object({ data: Data, fallback: z.boolean().optional(), subset: z.boolean().optional() })
+  z.object({
+    data: z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]),
+    fallback: z.boolean().optional(),
+    subset: z.boolean().optional(),
+  })
 );
 
-export const BasePdf = z.union([z.string(), Data]);
+export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
 export const Template = z.object({
   schemas: z.array(z.record(Schema)),

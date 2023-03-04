@@ -77,11 +77,15 @@ type EmbedPdfBox = {
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
   const { pdfDoc, font } = arg;
   const fontValues = await Promise.all(
-    Object.values(font).map((v) =>
-      pdfDoc.embedFont(v.data, {
+    Object.values(font).map(async (v) => {
+      let fontData = v.data;
+      if (typeof fontData === 'string' && fontData.startsWith('http')) {
+        fontData = await fetch(fontData).then((res) => res.arrayBuffer());
+      }
+      return pdfDoc.embedFont(fontData, {
         subset: typeof v.subset === 'undefined' ? true : v.subset,
-      })
-    )
+      });
+    })
   );
 
   return Object.keys(font).reduce(
