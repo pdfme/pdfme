@@ -19,10 +19,12 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     // @ts-ignore
     const newFontFaces = fontFaces.filter((fontFace) => !document.fonts.has(fontFace));
 
-    Promise.all(newFontFaces.map((f) => f.load())).then((loadedFontFaces) => {
+    Promise.allSettled(newFontFaces.map((f) => f.load())).then((loadedFontFaces) => {
       loadedFontFaces.forEach((loadedFontFace) => {
-        // @ts-ignore
-        document.fonts.add(loadedFontFace);
+        if (loadedFontFace.status === 'fulfilled') {
+          // @ts-ignore
+          document.fonts.add(loadedFontFace.value);
+        }
       });
     });
   }, [font]);
