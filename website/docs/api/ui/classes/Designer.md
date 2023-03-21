@@ -25,7 +25,7 @@ custom_edit_url: null
 | `props` | `Object` |
 | `props.domContainer` | `HTMLElement` |
 | `props.options?` | `Object` |
-| `props.options.font?` | `Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
+| `props.options.font?` | `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
 | `props.options.lang?` | ``"en"`` \| ``"ja"`` |
 | `props.template` | `Object` |
 | `props.template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` |
@@ -39,7 +39,7 @@ BaseUIClass.constructor
 
 #### Defined in
 
-[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L14)
+[ui/src/Designer.tsx:14](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L14)
 
 ## Properties
 
@@ -53,7 +53,7 @@ BaseUIClass.domContainer
 
 #### Defined in
 
-[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L58)
+[ui/src/class.ts:58](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L58)
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L12)
+[ui/src/Designer.tsx:12](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L12)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L11)
+[ui/src/Designer.tsx:11](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L11)
 
 ___
 
@@ -123,7 +123,7 @@ BaseUIClass.resizeObserver
 
 #### Defined in
 
-[ui/src/class.ts:77](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L77)
+[ui/src/class.ts:77](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L77)
 
 ___
 
@@ -144,7 +144,7 @@ BaseUIClass.size
 
 #### Defined in
 
-[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L62)
+[ui/src/class.ts:62](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L62)
 
 ___
 
@@ -167,7 +167,7 @@ BaseUIClass.template
 
 #### Defined in
 
-[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L60)
+[ui/src/class.ts:60](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L60)
 
 ## Methods
 
@@ -185,17 +185,17 @@ BaseUIClass.destroy
 
 #### Defined in
 
-[ui/src/class.ts:135](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L135)
+[ui/src/class.ts:135](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L135)
 
 ___
 
 ### getFont
 
-▸ `Protected` **getFont**(): `Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\>
+▸ `Protected` **getFont**(): `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\>
 
 #### Returns
 
-`Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\>
+`Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\>
 
 #### Inherited from
 
@@ -203,7 +203,7 @@ BaseUIClass.getFont
 
 #### Defined in
 
-[ui/src/class.ts:104](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L104)
+[ui/src/class.ts:104](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L104)
 
 ___
 
@@ -233,7 +233,7 @@ BaseUIClass.getI18n
 
 #### Defined in
 
-[ui/src/class.ts:100](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L100)
+[ui/src/class.ts:100](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L100)
 
 ___
 
@@ -258,7 +258,7 @@ BaseUIClass.getTemplate
 
 #### Defined in
 
-[ui/src/class.ts:108](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L108)
+[ui/src/class.ts:108](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L108)
 
 ___
 
@@ -278,7 +278,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:42](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L42)
+[ui/src/Designer.tsx:42](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L42)
 
 ___
 
@@ -298,7 +298,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:38](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L38)
+[ui/src/Designer.tsx:38](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L38)
 
 ___
 
@@ -316,7 +316,7 @@ BaseUIClass.render
 
 #### Defined in
 
-[ui/src/Designer.tsx:46](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L46)
+[ui/src/Designer.tsx:46](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L46)
 
 ___
 
@@ -330,7 +330,7 @@ ___
 
 #### Defined in
 
-[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L21)
+[ui/src/Designer.tsx:21](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L21)
 
 ___
 
@@ -343,7 +343,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `options` | `Object` |
-| `options.font?` | `Record`<`string`, { `data`: `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
+| `options.font?` | `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
 | `options.lang?` | ``"en"`` \| ``"ja"`` |
 
 #### Returns
@@ -356,7 +356,7 @@ BaseUIClass.updateOptions
 
 #### Defined in
 
-[ui/src/class.ts:122](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/class.ts#L122)
+[ui/src/class.ts:122](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/class.ts#L122)
 
 ___
 
@@ -384,4 +384,4 @@ BaseUIClass.updateTemplate
 
 #### Defined in
 
-[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/836dcea/packages/ui/src/Designer.tsx#L28)
+[ui/src/Designer.tsx:28](https://github.com/pdfme/pdfme/blob/77445ea/packages/ui/src/Designer.tsx#L28)

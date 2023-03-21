@@ -23,8 +23,13 @@ const sidebars = {
       items: [
         {
           type: 'doc',
-          label: 'Custom Font',
-          id: 'guides/custom-font',
+          label: 'Custom Fonts',
+          id: 'guides/custom-fonts',
+        },
+        {
+          type: 'doc',
+          label: 'Tables with Dynamic Data',
+          id: 'guides/tables',
         },
       ],
     },

@@ -1,4 +1,4 @@
-# Custom Font
+# Custom Fonts
 
 pdfme uses the helvetica font by default, but you can use any font you like.
 
