@@ -39,7 +39,7 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
-  const { inputs, template, options = {} } = props;
+  const { inputs, template, options = {}, pdfSize } = props;
   const { font = getDefaultFont(), splitThreshold = 3 } = options;
   const { schemas } = template;
 
@@ -55,7 +55,7 @@ const generate = async (props: GenerateProps) => {
       const { width: pageWidth, height: pageHeight } = embeddedPage;
       const embedPdfBox = embedPdfBoxes[j];
 
-      const page = pdfDoc.addPage([pageWidth, pageHeight]);
+      const page = pdfDoc.addPage(pdfSize || [pageWidth, pageHeight]);
 
       drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
       for (let l = 0; l < keys.length; l += 1) {
@@ -71,7 +71,7 @@ const generate = async (props: GenerateProps) => {
           templateSchema,
           pdfDoc,
           page,
-          pageHeight,
+          pageHeight: pdfSize ? pdfSize[1] : pageHeight,
           textSchemaSetting,
           inputImageCache,
         });

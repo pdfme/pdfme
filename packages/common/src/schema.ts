@@ -87,6 +87,7 @@ export const GeneratorOptions = CommonOptions.extend({
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions.optional(),
+  pdfSize: z.tuple([z.number(), z.number()]).optional(),
 }).strict();
 
 // ---------------------------------------------
