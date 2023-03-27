@@ -5,3 +5,4 @@
 dist
 coverage/
 __tests__/assets/pdfs/tmp/*.pdf
+/my-app
