@@ -1,5 +1,5 @@
-import { PDFDocument } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+import { PDFDocument } from '@pdfme/pdf-lib';
+import * as fontkit from 'fontkit';
 import type { GenerateProps, Template, Font } from '@pdfme/common';
 import { getDefaultFont, getFallbackFontName, checkGenerateProps } from '@pdfme/common';
 import {

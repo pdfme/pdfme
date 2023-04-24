@@ -8,7 +8,7 @@ import {
   degrees,
   setCharacterSpacing,
   TransformationMatrix,
-} from 'pdf-lib';
+} from '@pdfme/pdf-lib';
 import bwipjs, { ToBufferOptions } from 'bwip-js';
 import {
   getB64BasePdf,

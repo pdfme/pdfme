@@ -46,11 +46,11 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdf-lib/fontkit": "^1.1.1",
     "@pdfme/common": "^1.0.0",
+    "@pdfme/pdf-lib": "^1.17.3",
     "atob": "^2.1.2",
     "bwip-js": "^3.2.2",
-    "pdf-lib": "^1.17.1"
+    "fontkit": "^2.0.2"
   },
   "devDependencies": {
     "@types/bwip-js": "^3.0.0",
