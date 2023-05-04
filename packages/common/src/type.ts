@@ -25,6 +25,7 @@ import {
   PreviewReactProps,
   DesignerProps,
   DesignerReactProps,
+  TextSchemaForUI,
 } from './schema.js';
 
 type CommonSchema = z.infer<typeof _CommonSchema>;
@@ -40,6 +41,7 @@ export type Alignment = z.infer<typeof Alignment>;
 export type SchemaType = z.infer<typeof SchemaType>;
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 export type TextSchema = z.infer<typeof TextSchema>;
+export type TextSchemaForUI = z.infer<typeof TextSchemaForUI>;
 export type ImageSchema = z.infer<typeof ImageSchema>;
 export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 export type Schema = z.infer<typeof Schema>;

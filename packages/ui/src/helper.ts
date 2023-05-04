@@ -15,6 +15,7 @@ import {
   SchemaForUI,
   Schema,
   Size,
+  TextSchemaForUI,
   DEFAULT_ALIGNMENT,
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -561,14 +562,8 @@ interface CalculateTextWidthInMm {
   ): number;
 }
 
-type ActiveSchema = Schema & {
-  fontSizeScalingMax?: number;
-  fontSizeScalingMin?: number;
-  characterSpacing?: number | undefined;
-};
-
 type ResizeFont = (
-  activeSchema: SchemaForUI,
+  activeSchema: TextSchemaForUI,
   fontData: {
     [fontName: string]: {
       data: string | ArrayBuffer | Uint8Array;
@@ -620,7 +615,7 @@ export const resizeFont: ResizeFont = async (activeSchema, fontData) => {
     width,
   } = activeSchema;
 
-  const customFont = fontData[fontName].data;
+  const customFont = fontData[fontName as string].data;
   const baseFontSizeInPixels = fontSize ?? DEFAULT_FONT_SIZE_IN_PIXELS;
   const minSizePercentage = fontSizeScalingMin ?? DEFAULT_FONT_SIZE_SCALING_MIN;
   const maxSizePercentage = fontSizeScalingMax ?? DEFAULT_FONT_SIZE_SCALING_MAX;
@@ -640,7 +635,7 @@ export const resizeFont: ResizeFont = async (activeSchema, fontData) => {
 
   let schemaFontSize = baseFontSizeInPixels;
   let dynamicFontSize = baseFontSizeInPixels;
-  let textWidthInMm = calculateTextWidthInMm(text, schemaFontSize, font, characterSpacing);
+  let textWidthInMm = calculateTextWidthInMm(text, schemaFontSize, font, characterSpacing as number);
 
   console.log(activeSchema);
 
@@ -648,14 +643,14 @@ export const resizeFont: ResizeFont = async (activeSchema, fontData) => {
   while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing);
+    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
   }
 
   // Increase the font size until it fills the container width
   while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < maxFontSize) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing);
+    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
   }
 
   // If the font size is still too large, shrink it down to the maximum size that fits

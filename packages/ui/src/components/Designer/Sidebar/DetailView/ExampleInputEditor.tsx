@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { SchemaForUI } from '@pdfme/common';
+import { SchemaForUI, TextSchemaForUI } from '@pdfme/common';
 import { readFiles, resizeFont } from '../../../../helper';
 import { FontContext, I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
@@ -69,12 +69,14 @@ const ExampleInputEditor = (
             changeSchemas([{ key: 'data', value: e.target.value, schemaId: activeSchema.id }]);
           }}
           onKeyUp={async () => {
-            console.log(activeSchema);
+            if (activeSchema.type !== 'text') {
+              return;
+            }
 
             changeSchemas([
               {
                 key: 'dynamicFontSize',
-                value: await resizeFont(activeSchema, fontData),
+                value: await resizeFont(activeSchema as TextSchemaForUI, fontData),
                 schemaId: activeSchema.id,
               },
             ]);

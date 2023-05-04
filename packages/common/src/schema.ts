@@ -46,6 +46,9 @@ export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
 export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
 const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
+
+export const TextSchemaForUI = TextSchema.merge(SchemaForUIAdditionalInfo);
+
 export const SchemaForUI = z.union([
   TextSchema.merge(SchemaForUIAdditionalInfo),
   ImageSchema.merge(SchemaForUIAdditionalInfo),
