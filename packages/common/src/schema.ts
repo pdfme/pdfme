@@ -36,6 +36,7 @@ export const TextSchema = CommonSchema.extend({
   lineHeight: z.number().optional(),
   fontSizeScalingMin: z.number().optional(),
   fontSizeScalingMax: z.number().optional(),
+  dynamicFontSize: z.number().optional(),
 });
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import { readFiles } from '../../../../helper';
-import { I18nContext } from '../../../../contexts';
+import { readFiles, resizeFont } from '../../../../helper';
+import { FontContext, I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -10,6 +10,7 @@ const ExampleInputEditor = (
 ) => {
   const { changeSchemas, activeSchema } = props;
   const i18n = useContext(I18nContext);
+  const fontData = useContext(FontContext);
 
   return (
     <div>
@@ -64,9 +65,20 @@ const ExampleInputEditor = (
       ) : (
         <textarea
           rows={6}
-          onChange={(e) =>
-            changeSchemas([{ key: 'data', value: e.target.value, schemaId: activeSchema.id }])
-          }
+          onChange={async (e) => {
+            changeSchemas([{ key: 'data', value: e.target.value, schemaId: activeSchema.id }]);
+          }}
+          onKeyUp={async () => {
+            console.log(activeSchema);
+
+            changeSchemas([
+              {
+                key: 'dynamicFontSize',
+                value: await resizeFont(activeSchema, fontData),
+                schemaId: activeSchema.id,
+              },
+            ]);
+          }}
           style={{
             width: '100%',
             border: '1px solid #767676',
