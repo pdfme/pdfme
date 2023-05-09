@@ -301,6 +301,7 @@ const TextPropEditor = (
                 schemaId: activeSchema.id,
               },
             ]);
+
           }}
         />
       </div>
