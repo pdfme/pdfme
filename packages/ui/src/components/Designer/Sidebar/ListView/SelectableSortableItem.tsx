@@ -71,6 +71,7 @@ const SelectableSortableItem = ({
       transform={transform}
       fadeIn={mountedWhileDragging}
       listeners={newListeners}
+      data-testid="selectable-sortable-item"
     />
   );
 };

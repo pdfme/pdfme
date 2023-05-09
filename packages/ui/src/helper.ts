@@ -3,8 +3,6 @@
 // 多分tree-shakingは動かないかもしれないけど、とりあえず動くようにするべき
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
-import { PDFFont, PDFDocument, StandardFonts } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import hotkeys from 'hotkeys-js';
@@ -15,7 +13,6 @@ import {
   SchemaForUI,
   Schema,
   Size,
-  TextSchemaForUI,
   DEFAULT_ALIGNMENT,
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -410,6 +407,7 @@ export const getInitialSchema = (): SchemaForUI => ({
   height: 7,
   alignment: DEFAULT_ALIGNMENT,
   fontSize: DEFAULT_FONT_SIZE,
+  dynamicFontSize: DEFAULT_FONT_SIZE,
   characterSpacing: DEFAULT_CHARACTER_SPACING,
   lineHeight: DEFAULT_LINE_HEIGHT,
 });
@@ -546,122 +544,4 @@ export const getPagesScrollTopByIndex = (
   return pageSizes
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
-};
-
-// TypeScript Types
-interface CalculateCharacterSpacing {
-  (textContent: string, textCharacterSpacing: number): number;
-}
-
-interface CalculateTextWidthInMm {
-  (
-    textContent: string,
-    textFontSize: number,
-    textFontFamily: PDFFont,
-    textCharacterSpacing: number
-  ): number;
-}
-
-type ResizeFont = (
-  activeSchema: TextSchemaForUI,
-  fontData: {
-    [fontName: string]: {
-      data: string | ArrayBuffer | Uint8Array;
-    };
-  }
-) => Promise<number>;
-
-// 01 - Character Spacing
-const calculateCharacterSpacing: CalculateCharacterSpacing = (
-  textContent,
-  textCharacterSpacing
-) => {
-  const numberOfCharacters = textContent.length;
-  const totalSpacing = (numberOfCharacters - 1) * textCharacterSpacing;
-
-  return totalSpacing;
-};
-
-// 02 - Calculate Text Content Width in MM
-const calculateTextWidthInMm: CalculateTextWidthInMm = (
-  textContent,
-  textFontSize,
-  textFontFamily,
-  textCharacterSpacing
-) => {
-  const characterSpacingWidth = calculateCharacterSpacing(textContent, textCharacterSpacing);
-  const textContentWidthInPt =
-    textFontFamily.widthOfTextAtSize(textContent, textFontSize) + characterSpacingWidth;
-  const textContentWidthInMm = textContentWidthInPt * 0.352778;
-
-  return textContentWidthInMm;
-};
-
-// 03 - Resize Fonts to Fit Width
-export const resizeFont: ResizeFont = async (activeSchema, fontData) => {
-  const DEFAULT_FONT_SIZE_IN_PIXELS = 18;
-  const DEFAULT_FONT_SIZE_SCALING_MIN = 100;
-  const DEFAULT_FONT_SIZE_SCALING_MAX = 100;
-  const DEFAULT_TOLERANCE = 0.5;
-  const DEFAULT_FONT_SIZE_ADJUSTMENT = 0.5;
-
-  const {
-    data: text,
-    fontName,
-    fontSize,
-    fontSizeScalingMax,
-    fontSizeScalingMin,
-    characterSpacing,
-    width,
-  } = activeSchema;
-
-  const customFont = fontData[fontName as string].data;
-  const baseFontSizeInPixels = fontSize ?? DEFAULT_FONT_SIZE_IN_PIXELS;
-  const minSizePercentage = fontSizeScalingMin ?? DEFAULT_FONT_SIZE_SCALING_MIN;
-  const maxSizePercentage = fontSizeScalingMax ?? DEFAULT_FONT_SIZE_SCALING_MAX;
-
-  const minFontSize = (minSizePercentage * baseFontSizeInPixels) / 100;
-  const maxFontSize = (maxSizePercentage * baseFontSizeInPixels) / 100;
-
-  const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit);
-
-  let font;
-  if (fontName === 'Helvetica') {
-    font = await doc.embedFont(StandardFonts.Helvetica);
-  } else {
-    font = await doc.embedFont(customFont);
-  }
-
-  let schemaFontSize = baseFontSizeInPixels;
-  let dynamicFontSize = baseFontSizeInPixels;
-  let textWidthInMm = calculateTextWidthInMm(text, schemaFontSize, font, characterSpacing as number);
-
-  console.log(activeSchema);
-
-  // Shrink the font size until it fits the container width
-  while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {
-    dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
-
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
-  }
-
-  // Increase the font size until it fills the container width
-  while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < maxFontSize) {
-    dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
-
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
-  }
-
-  // If the font size is still too large, shrink it down to the maximum size that fits
-  if (dynamicFontSize > maxFontSize) {
-    dynamicFontSize = maxFontSize;
-  }
-
-  // If the font size is still too small, enlarge it to the minimum size that fits
-  if (dynamicFontSize < minFontSize) {
-    dynamicFontSize = minFontSize;
-  }
-
-  return dynamicFontSize;
 };

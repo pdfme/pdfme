@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { SchemaForUI, TextSchemaForUI } from '@pdfme/common';
-import { readFiles, resizeFont } from '../../../../helper';
+import { readFiles } from '../../../../helper';
+import { calculateDynamicFontSize } from '../../../../helpers/calculateDynamicFontSize';
 import { FontContext, I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -76,7 +77,7 @@ const ExampleInputEditor = (
             changeSchemas([
               {
                 key: 'dynamicFontSize',
-                value: await resizeFont(activeSchema as TextSchemaForUI, fontData),
+                value: await calculateDynamicFontSize(activeSchema as TextSchemaForUI, fontData),
                 schemaId: activeSchema.id,
               },
             ]);

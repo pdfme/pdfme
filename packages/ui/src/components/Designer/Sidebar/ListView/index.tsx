@@ -38,6 +38,7 @@ const ListView = (
         </span>
       </div>
       <Divider />
+
       {isBulkUpdateFieldNamesMode ? (
         <div>
           <textarea

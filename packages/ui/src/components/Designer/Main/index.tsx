@@ -6,9 +6,10 @@ import React, {
   useEffect,
   forwardRef,
   useCallback,
+  useContext,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
-import { SchemaForUI, Size } from '@pdfme/common';
+import { SchemaForUI, Size, TextSchemaForUI } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -19,6 +20,8 @@ import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
+import { calculateDynamicFontSize } from '../../../helpers/calculateDynamicFontSize';
+import { FontContext } from '../../../contexts';
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -97,6 +100,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
+  const font = useContext(FontContext);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -162,7 +166,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
-  const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+  const onResizeEnd = async ({ target }: { target: HTMLElement | SVGElement }) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
@@ -170,6 +174,26 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       { key: 'height', value: fmt(height), schemaId: id },
       { key: 'position.y', value: fmt(top), schemaId: id },
       { key: 'position.x', value: fmt(left), schemaId: id },
+    ]);
+
+    // Get Current Schema and apply dynamic font size to active schema
+    const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
+
+    if (!targetSchema) return;
+
+    // Update the active schema width
+    targetSchema.width = fmt(width);
+
+    // Calculate the dynamic font size based on the new width value
+    const dynamicFontSize = await calculateDynamicFontSize(targetSchema as TextSchemaForUI, font);
+
+    // Update the dynamic font size in the active schema
+    changeSchemas([
+      {
+        key: 'dynamicFontSize',
+        value: dynamicFontSize,
+        schemaId: targetSchema.id,
+      },
     ]);
   };
 
@@ -312,7 +336,29 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
-            onChange={(value) => changeSchemas([{ key: 'data', value, schemaId: schema.id }])}
+            onChange={async (value) => {
+              if (schema.type === 'text') {
+                // Update the font scaling min value in the active schema
+                schema.data = value;
+
+                // Calculate the dynamic font size based on new font scaling min value
+                const dynamicFontSize = await calculateDynamicFontSize(
+                  schema as TextSchemaForUI,
+                  font
+                );
+
+                // Update the dynamic font size in the active schema
+                changeSchemas([
+                  {
+                    key: 'dynamicFontSize',
+                    value: dynamicFontSize,
+                    schemaId: schema.id,
+                  },
+                ]);
+              } else {
+                changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
+              }
+            }}
             border={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
             ref={inputRef}
           />

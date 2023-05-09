@@ -119,6 +119,7 @@ exports[`Designer snapshot 1`] = `
                   style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
+                    data-testid="selectable-sortable-item"
                     style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
@@ -152,6 +153,7 @@ exports[`Designer snapshot 1`] = `
                   style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
+                    data-testid="selectable-sortable-item"
                     style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
@@ -198,6 +200,7 @@ exports[`Designer snapshot 1`] = `
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
           >
             <button
+              data-testid="add-new-field-button"
               style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
             >
               <strong
@@ -224,6 +227,7 @@ exports[`Designer snapshot 1`] = `
           style="font-family: 'Helvetica'; top: 30px; left: 0px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
+            class="ruler-container"
             style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
           />
           <div
