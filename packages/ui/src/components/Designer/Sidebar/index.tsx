@@ -34,7 +34,6 @@ const Sidebar = (props: SidebarProps) => {
     const ids = activeElements.map((ae) => ae.id);
     const activeSchema = schemas.find((s) => ids.includes(s.id));
 
-    // Apply fallback font to pre-existing text schema that does not have a fontName
     if (activeSchema && activeSchema.type === 'text' && !activeSchema.fontName) {
       activeSchema.fontName = fallbackFont;
     }

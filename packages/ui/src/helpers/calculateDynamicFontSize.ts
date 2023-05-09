@@ -12,7 +12,6 @@ type DynamicFontSize = (
   }
 ) => Promise<number>;
 
-// 03 - Resize Fonts to Fit Width
 export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fontData) => {
   const DEFAULT_FONT_SIZE_IN_PIXELS = 18;
   const DEFAULT_FONT_SIZE_SCALING_MIN = 100;
@@ -57,26 +56,22 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     characterSpacing as number
   );
 
-  // Shrink the font size until it fits the container width
   while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
 
     textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
   }
 
-  // Increase the font size until it fills the container width
   while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < maxFontSize) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
 
     textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
   }
 
-  // If the font size is still too large, shrink it down to the maximum size that fits
   if (dynamicFontSize > maxFontSize) {
     dynamicFontSize = maxFontSize;
   }
 
-  // If the font size is still too small, enlarge it to the minimum size that fits
   if (dynamicFontSize < minFontSize) {
     dynamicFontSize = minFontSize;
   }

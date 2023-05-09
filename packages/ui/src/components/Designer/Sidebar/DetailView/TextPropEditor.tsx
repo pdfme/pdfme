@@ -155,16 +155,13 @@ const TextPropEditor = (
           testId="editor-text-font-family-select"
           options={Object.keys(font)}
           onChange={async (e) => {
-            // Update the font name value in the active schema
             activeSchema.fontName = e.target.value;
 
-            // Calculate the dynamic font size based on new font name value
             const dynamicFontSize = await calculateDynamicFontSize(
               activeSchema as TextSchemaForUI,
               font
             );
 
-            // Update the dynamic font size in the active schema
             changeSchemas([
               {
                 key: 'dynamicFontSize',
@@ -199,16 +196,13 @@ const TextPropEditor = (
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
           testId="editor-text-size-input"
           onChange={async (e) => {
-            // Update the font size in the active schema
             activeSchema.fontSize = Number(e.target.value);
 
-            // Calculate the dynamic font size based on new font size
             const dynamicFontSize = await calculateDynamicFontSize(
               activeSchema as TextSchemaForUI,
               font
             );
 
-            // Update the dynamic font size in the active schema
             changeSchemas([
               {
                 key: 'dynamicFontSize',
@@ -236,16 +230,13 @@ const TextPropEditor = (
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
           testId="editor-text-character-spacing-input"
           onChange={async (e) => {
-            // Update the character spacing value in the active schema
             activeSchema.characterSpacing = Number(e.target.value);
 
-            // Calculate the dynamic font size based on new character spacing value
             const dynamicFontSize = await calculateDynamicFontSize(
               activeSchema as TextSchemaForUI,
               font
             );
 
-            // Update the dynamic font size in the active schema
             changeSchemas([
               {
                 key: 'dynamicFontSize',
@@ -272,16 +263,13 @@ const TextPropEditor = (
           minNumber={0}
           maxNumber={100}
           onChange={async (e) => {
-            // Update the font scaling min value in the active schema
             activeSchema.fontSizeScalingMin = Number(e.target.value);
 
-            // Calculate the dynamic font size based on new font scaling min value
             const dynamicFontSize = await calculateDynamicFontSize(
               activeSchema as TextSchemaForUI,
               font
             );
 
-            // Update the dynamic font size in the active schema
             changeSchemas([
               {
                 key: 'dynamicFontSize',
@@ -299,16 +287,13 @@ const TextPropEditor = (
           testId="editor-text-scaling-max-input"
           minNumber={100}
           onChange={async (e) => {
-            // Update the font scaling max value in the active schema
             activeSchema.fontSizeScalingMax = Number(e.target.value);
 
-            // Calculate the dynamic font size based on new font scaling max value
             const dynamicFontSize = await calculateDynamicFontSize(
               activeSchema as TextSchemaForUI,
               font
             );
 
-            // Update the dynamic font size in the active schema
             changeSchemas([
               {
                 key: 'dynamicFontSize',

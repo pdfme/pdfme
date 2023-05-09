@@ -244,16 +244,13 @@ const PositionAndSizeEditor = (
 
               if (value >= 0 && activeSchema.position.x + value < pageSize.width) {
                 if (activeSchema.type === 'text') {
-                  // Update the width value in the active schema
                   activeSchema.width = value;
 
-                  // Calculate the dynamic font size based on new font scaling max value
                   const dynamicFontSize = await calculateDynamicFontSize(
                     activeSchema as TextSchemaForUI,
                     font
                   );
 
-                  // Update the dynamic font size in the active schema
                   changeSchemas([
                     {
                       key: 'dynamicFontSize',

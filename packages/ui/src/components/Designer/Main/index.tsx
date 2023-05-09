@@ -176,18 +176,14 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
 
-    // Get Current Schema and apply dynamic font size to active schema
     const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
 
     if (!targetSchema) return;
 
-    // Update the active schema width
     targetSchema.width = fmt(width);
 
-    // Calculate the dynamic font size based on the new width value
     const dynamicFontSize = await calculateDynamicFontSize(targetSchema as TextSchemaForUI, font);
 
-    // Update the dynamic font size in the active schema
     changeSchemas([
       {
         key: 'dynamicFontSize',
@@ -338,16 +334,13 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
             onChange={async (value) => {
               if (schema.type === 'text') {
-                // Update the font scaling min value in the active schema
                 schema.data = value;
 
-                // Calculate the dynamic font size based on new font scaling min value
                 const dynamicFontSize = await calculateDynamicFontSize(
                   schema as TextSchemaForUI,
                   font
                 );
 
-                // Update the dynamic font size in the active schema
                 changeSchemas([
                   {
                     key: 'dynamicFontSize',
