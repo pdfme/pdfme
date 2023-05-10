@@ -119,7 +119,6 @@ exports[`Designer snapshot 1`] = `
                   style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
-                    data-testid="selectable-sortable-item"
                     style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
@@ -153,7 +152,6 @@ exports[`Designer snapshot 1`] = `
                   style="transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
-                    data-testid="selectable-sortable-item"
                     style="display: flex; align-items: center; border: 1px solid transparent;"
                   >
                     <button
@@ -200,7 +198,6 @@ exports[`Designer snapshot 1`] = `
             style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
           >
             <button
-              data-testid="add-new-field-button"
               style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
             >
               <strong

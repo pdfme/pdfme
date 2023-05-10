@@ -123,7 +123,6 @@ const Sidebar = (props: SidebarProps) => {
                 cursor: 'pointer',
               }}
               onClick={addSchema}
-              data-testid="add-new-field-button"
             >
               <strong style={{ color: '#fff' }}>{i18n('addNewField')}</strong>
             </button>

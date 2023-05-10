@@ -264,7 +264,6 @@ const PositionAndSizeEditor = (
               }
             }}
             value={activeSchema.width}
-            data-testid="editor-input-width"
           />
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>

@@ -31,10 +31,9 @@ const NumberInputSet = (props: {
   value: number;
   minNumber?: number;
   maxNumber?: number;
-  testId?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, value, width, minNumber, maxNumber, testId, onChange } = props;
+  const { label, value, width, minNumber, maxNumber, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -49,7 +48,6 @@ const NumberInputSet = (props: {
         type="number"
         {...(minNumber && { min: minNumber })}
         {...(maxNumber && { max: maxNumber })}
-        {...(testId && { 'data-testid': testId })}
       />
     </div>
   );
@@ -58,11 +56,10 @@ const NumberInputSet = (props: {
 const ColorInputSet = (props: {
   label: string;
   value: string;
-  testId?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClear: () => void;
 }) => {
-  const { label, value, testId, onChange, onClear } = props;
+  const { label, value, onChange, onClear } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -76,7 +73,6 @@ const ColorInputSet = (props: {
           value={value || '#ffffff'}
           type="color"
           style={inputStyle}
-          {...(testId && { 'data-testid': testId })}
         />
         <button
           onClick={onClear}
@@ -89,7 +85,6 @@ const ColorInputSet = (props: {
             border: '1px solid #767676',
             cursor: 'pointer',
           }}
-          {...(testId && { 'data-testid': `${testId}-clear-button` })}
         >
           <XMarkIcon width={10} height={10} />
         </button>
@@ -102,10 +97,9 @@ const SelectSet = (props: {
   label: string;
   value: string;
   options: string[];
-  testId?: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
-  const { label, value, options, testId, onChange } = props;
+  const { label, value, options, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -117,10 +111,9 @@ const SelectSet = (props: {
         style={selectStyle}
         onChange={onChange}
         value={value}
-        {...(testId && { 'data-testId': testId })}
       >
         {options.map((o) => (
-          <option key={o} value={o} {...(testId && { 'data-testid': `${testId}-${o}` })}>
+          <option key={o} value={o}>
             {o}
           </option>
         ))}
@@ -152,7 +145,6 @@ const TextPropEditor = (
         <SelectSet
           label={'FontName'}
           value={activeSchema.fontName ?? fallbackFontName}
-          testId="editor-text-font-family-select"
           options={Object.keys(font)}
           onChange={async (e) => {
             activeSchema.fontName = e.target.value;
@@ -175,7 +167,6 @@ const TextPropEditor = (
         <SelectSet
           label={'Alignment'}
           value={activeSchema.alignment ?? 'left'}
-          testId="editor-text-alignment-select"
           options={alignments}
           onChange={(e) =>
             changeSchemas([{ key: 'alignment', value: e.target.value, schemaId: activeSchema.id }])
@@ -194,7 +185,6 @@ const TextPropEditor = (
           width="30%"
           label={'FontSize(pt)'}
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
-          testId="editor-text-size-input"
           onChange={async (e) => {
             activeSchema.fontSize = Number(e.target.value);
 
@@ -216,7 +206,6 @@ const TextPropEditor = (
           width="30%"
           label={'LineHeight(em)'}
           value={activeSchema.lineHeight ?? DEFAULT_LINE_HEIGHT}
-          testId="editor-text-line-height-input"
           onChange={(e) =>
             changeSchemas([
               { key: 'lineHeight', value: Number(e.target.value), schemaId: activeSchema.id },
@@ -228,7 +217,6 @@ const TextPropEditor = (
           width="40%"
           label={'CharacterSpacing(pt)'}
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
-          testId="editor-text-character-spacing-input"
           onChange={async (e) => {
             activeSchema.characterSpacing = Number(e.target.value);
 
@@ -259,7 +247,6 @@ const TextPropEditor = (
           width="45%"
           label={'Font Scaling Min(%)'}
           value={activeSchema.fontSizeScalingMin ?? DEFAULT_FONT_SIZE_SCALING_MIN}
-          testId="editor-text-scaling-min-input"
           minNumber={0}
           maxNumber={100}
           onChange={async (e) => {
@@ -284,7 +271,6 @@ const TextPropEditor = (
           width="45%"
           label={'Font Scaling Max(%)'}
           value={activeSchema.fontSizeScalingMax ?? DEFAULT_FONT_SIZE_SCALING_MAX}
-          testId="editor-text-scaling-max-input"
           minNumber={100}
           onChange={async (e) => {
             activeSchema.fontSizeScalingMax = Number(e.target.value);
@@ -301,7 +287,6 @@ const TextPropEditor = (
                 schemaId: activeSchema.id,
               },
             ]);
-
           }}
         />
       </div>
@@ -316,7 +301,6 @@ const TextPropEditor = (
         <ColorInputSet
           label={'FontColor'}
           value={activeSchema.fontColor ?? '#000000'}
-          testId="editor-text-color-input"
           onChange={(e) =>
             changeSchemas([{ key: 'fontColor', value: e.target.value, schemaId: activeSchema.id }])
           }
@@ -330,7 +314,6 @@ const TextPropEditor = (
         <ColorInputSet
           label={'Background'}
           value={activeSchema.backgroundColor ?? '#ffffff'}
-          testId="editor-text-background-color-input"
           onChange={(e) =>
             changeSchemas([
               { key: 'backgroundColor', value: e.target.value, schemaId: activeSchema.id },

@@ -90,7 +90,6 @@ const ExampleInputEditor = (
             background: activeSchema.data ? 'none' : '#ffa19b',
           }}
           value={activeSchema.data}
-          data-testid="editor-input-example"
         />
       )}
     </div>
