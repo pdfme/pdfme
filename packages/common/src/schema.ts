@@ -95,12 +95,6 @@ export const GenerateProps = CommonProps.extend({
   options: GeneratorOptions.optional(),
 }).strict();
 
-export const SchemaWithOptionalData = z.union([
-  TextSchema.merge(SchemaForUIAdditionalInfo),
-  ImageSchema.merge(SchemaForUIAdditionalInfo),
-  BarcodeSchema.merge(SchemaForUIAdditionalInfo),
-]);
-
 export const SchemaInputs = z.record(z.string());
 
 // ---------------------------------------------
