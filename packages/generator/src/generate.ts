@@ -1,16 +1,18 @@
-import { PDFDocument } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
-import {
-  calculateDynamicFontSize,
-  checkGenerateProps,
+import { PDFDocument } from '@pdfme/pdf-lib';
+import * as fontkit from 'fontkit';
+import type {
   Font,
   GenerateProps,
-  getDefaultFont,
-  getFallbackFontName,
   Schema,
   SchemaInputs,
   Template,
   TextSchemaWithData,
+} from '@pdfme/common';
+import {
+  calculateDynamicFontSize,
+  getDefaultFont,
+  getFallbackFontName,
+  checkGenerateProps,
 } from '@pdfme/common';
 import {
   getEmbeddedPagesAndEmbedPdfBoxes,
