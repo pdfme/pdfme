@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import {
+  calculateDynamicFontSize,
   SchemaForUI,
+  TextSchemaWithData,
   getFallbackFontName,
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
@@ -10,8 +12,6 @@ import {
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { calculateDynamicFontSize } from '../../../../helpers/calculateDynamicFontSize';
-import { TextSchemaForUI } from '@pdfme/common';
 
 const DEFAULT_FONT_SIZE_SCALING_MIN = 100;
 const DEFAULT_FONT_SIZE_SCALING_MAX = 100;
@@ -150,7 +150,7 @@ const TextPropEditor = (
             activeSchema.fontName = e.target.value;
 
             const dynamicFontSize = await calculateDynamicFontSize(
-              activeSchema as TextSchemaForUI,
+              activeSchema as TextSchemaWithData,
               font
             );
 
@@ -189,7 +189,7 @@ const TextPropEditor = (
             activeSchema.fontSize = Number(e.target.value);
 
             const dynamicFontSize = await calculateDynamicFontSize(
-              activeSchema as TextSchemaForUI,
+              activeSchema as TextSchemaWithData,
               font
             );
 
@@ -221,7 +221,7 @@ const TextPropEditor = (
             activeSchema.characterSpacing = Number(e.target.value);
 
             const dynamicFontSize = await calculateDynamicFontSize(
-              activeSchema as TextSchemaForUI,
+              activeSchema as TextSchemaWithData,
               font
             );
 
@@ -253,7 +253,7 @@ const TextPropEditor = (
             activeSchema.fontSizeScalingMin = Number(e.target.value);
 
             const dynamicFontSize = await calculateDynamicFontSize(
-              activeSchema as TextSchemaForUI,
+              activeSchema as TextSchemaWithData,
               font
             );
 
@@ -276,7 +276,7 @@ const TextPropEditor = (
             activeSchema.fontSizeScalingMax = Number(e.target.value);
 
             const dynamicFontSize = await calculateDynamicFontSize(
-              activeSchema as TextSchemaForUI,
+              activeSchema as TextSchemaWithData,
               font
             );
 

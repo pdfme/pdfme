@@ -12,6 +12,7 @@ import {
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,
@@ -25,7 +26,7 @@ import {
   PreviewReactProps,
   DesignerProps,
   DesignerReactProps,
-  TextSchemaForUI,
+  TextSchemaWithData,
 } from './schema.js';
 
 type CommonSchema = z.infer<typeof _CommonSchema>;
@@ -41,10 +42,11 @@ export type Alignment = z.infer<typeof Alignment>;
 export type SchemaType = z.infer<typeof SchemaType>;
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 export type TextSchema = z.infer<typeof TextSchema>;
-export type TextSchemaForUI = z.infer<typeof TextSchemaForUI>;
+export type TextSchemaWithData = z.infer<typeof TextSchemaWithData>;
 export type ImageSchema = z.infer<typeof ImageSchema>;
 export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 export type Schema = z.infer<typeof Schema>;
+export type SchemaInputs = z.infer<typeof SchemaInputs>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;
 export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;

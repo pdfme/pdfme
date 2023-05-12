@@ -1,10 +1,10 @@
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { TextSchemaForUI } from '@pdfme/common';
+import { TextSchemaWithData } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
 
 type DynamicFontSize = (
-  activeSchema: TextSchemaForUI,
+  activeSchema: TextSchemaWithData,
   fontData: {
     [fontName: string]: {
       data: string | ArrayBuffer | Uint8Array;
@@ -20,7 +20,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   const DEFAULT_FONT_SIZE_ADJUSTMENT = 0.5;
 
   const {
-    data: text,
+    data,
     fontName,
     fontSize,
     fontSizeScalingMax,
@@ -50,7 +50,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   let schemaFontSize = baseFontSizeInPixels;
   let dynamicFontSize = baseFontSizeInPixels;
   let textWidthInMm = calculateTextWidthInMm(
-    text,
+    data,
     schemaFontSize,
     font,
     characterSpacing as number
@@ -59,13 +59,13 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
+    textWidthInMm = calculateTextWidthInMm(data, dynamicFontSize, font, characterSpacing as number);
   }
 
   while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < maxFontSize) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(text, dynamicFontSize, font, characterSpacing as number);
+    textWidthInMm = calculateTextWidthInMm(data, dynamicFontSize, font, characterSpacing as number);
   }
 
   if (dynamicFontSize > maxFontSize) {

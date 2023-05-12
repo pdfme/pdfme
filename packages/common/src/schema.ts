@@ -45,9 +45,9 @@ export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
 
 export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
-const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
+export const TextSchemaWithData = TextSchema.extend({ data: z.string() });
 
-export const TextSchemaForUI = TextSchema.merge(SchemaForUIAdditionalInfo);
+const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
 
 export const SchemaForUI = z.union([
   TextSchema.merge(SchemaForUIAdditionalInfo),
@@ -94,6 +94,14 @@ export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions.optional(),
 }).strict();
+
+export const SchemaWithOptionalData = z.union([
+  TextSchema.merge(SchemaForUIAdditionalInfo),
+  ImageSchema.merge(SchemaForUIAdditionalInfo),
+  BarcodeSchema.merge(SchemaForUIAdditionalInfo),
+]);
+
+export const SchemaInputs = z.record(z.string());
 
 // ---------------------------------------------
 

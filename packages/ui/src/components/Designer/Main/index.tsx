@@ -9,7 +9,7 @@ import React, {
   useContext,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
-import { SchemaForUI, Size, TextSchemaForUI } from '@pdfme/common';
+import { calculateDynamicFontSize, SchemaForUI, Size, TextSchemaWithData } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -20,7 +20,6 @@ import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
-import { calculateDynamicFontSize } from '../../../helpers/calculateDynamicFontSize';
 import { FontContext } from '../../../contexts';
 
 const DELETE_BTN_ID = uuid();
@@ -182,7 +181,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
 
     targetSchema.width = fmt(width);
 
-    const dynamicFontSize = await calculateDynamicFontSize(targetSchema as TextSchemaForUI, font);
+    const dynamicFontSize = await calculateDynamicFontSize(
+      targetSchema as TextSchemaWithData,
+      font
+    );
 
     changeSchemas([
       {
@@ -337,7 +339,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                 schema.data = value;
 
                 const dynamicFontSize = await calculateDynamicFontSize(
-                  schema as TextSchemaForUI,
+                  schema as TextSchemaWithData,
                   font
                 );
 

@@ -15,10 +15,11 @@ import type {
   SchemaType,
   BarCodeType,
   TextSchema,
-  TextSchemaForUI,
+  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,
@@ -48,6 +49,7 @@ import {
   checkGenerateProps,
   validateBarcodeInput,
 } from './helper.js';
+import { calculateDynamicFontSize } from './helpers/calculateDynamicFontSize.js';
 
 export {
   DEFAULT_FONT_SIZE,
@@ -74,6 +76,7 @@ export {
   checkDesignerProps,
   checkGenerateProps,
   validateBarcodeInput,
+  calculateDynamicFontSize,
 };
 
 export type {
@@ -83,10 +86,11 @@ export type {
   SchemaType,
   BarCodeType,
   TextSchema,
-  TextSchemaForUI,
+  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,

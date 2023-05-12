@@ -1,8 +1,7 @@
 import React, { CSSProperties, useContext } from 'react';
-import { SchemaForUI, TextSchemaForUI } from '@pdfme/common';
+import { calculateDynamicFontSize, SchemaForUI, TextSchemaWithData } from '@pdfme/common';
 import { round } from '../../../../helper';
 import { SidebarProps } from '../index';
-import { calculateDynamicFontSize } from '../../../../helpers/calculateDynamicFontSize';
 import { FontContext } from '../../../../contexts';
 
 const inputSetStyle: CSSProperties = { marginRight: '1rem', display: 'flex', alignItems: 'center' };
@@ -247,7 +246,7 @@ const PositionAndSizeEditor = (
                   activeSchema.width = value;
 
                   const dynamicFontSize = await calculateDynamicFontSize(
-                    activeSchema as TextSchemaForUI,
+                    activeSchema as TextSchemaWithData,
                     font
                   );
 
