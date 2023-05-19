@@ -8,13 +8,12 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_FONT_SIZE_SCALING_MIN,
+  DEFAULT_FONT_SIZE_SCALING_MAX,
 } from '@pdfme/common';
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-
-const DEFAULT_FONT_SIZE_SCALING_MIN = 100;
-const DEFAULT_FONT_SIZE_SCALING_MAX = 100;
 
 const inputStyle = {
   width: '90%',
