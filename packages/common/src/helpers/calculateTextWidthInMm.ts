@@ -1,4 +1,4 @@
-import { PDFFont } from 'pdf-lib';
+import { PDFFont } from '@pdfme/pdf-lib';
 import { calculateCharacterSpacing } from './calculateCharacterSpacing';
 
 type CalculateTextWidthInMm = (

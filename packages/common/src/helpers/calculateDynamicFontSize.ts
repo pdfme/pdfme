@@ -1,7 +1,15 @@
-import { PDFDocument, StandardFonts } from 'pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+import { PDFDocument, StandardFonts } from '@pdfme/pdf-lib';
+import * as fontkit from 'fontkit';
 import { TextSchemaWithData } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
+import {
+  DEFAULT_FONT_NAME,
+  DEFAULT_FONT_SIZE_IN_PIXELS,
+  DEFAULT_FONT_SIZE_SCALING_MIN,
+  DEFAULT_FONT_SIZE_SCALING_MAX,
+  DEFAULT_TOLERANCE,
+  DEFAULT_FONT_SIZE_ADJUSTMENT,
+} from '../constants';
 
 type DynamicFontSize = (
   activeSchema: TextSchemaWithData,
@@ -13,12 +21,6 @@ type DynamicFontSize = (
 ) => Promise<number>;
 
 export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fontData) => {
-  const DEFAULT_FONT_SIZE_IN_PIXELS = 18;
-  const DEFAULT_FONT_SIZE_SCALING_MIN = 100;
-  const DEFAULT_FONT_SIZE_SCALING_MAX = 100;
-  const DEFAULT_TOLERANCE = 3;
-  const DEFAULT_FONT_SIZE_ADJUSTMENT = 0.5;
-
   const {
     data,
     fontName,
@@ -40,7 +42,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
 
   let font;
 
-  if (fontName === 'Helvetica') {
+  if (fontName === DEFAULT_FONT_NAME) {
     font = await doc.embedFont(StandardFonts.Helvetica);
   } else {
     const customFont = fontData[fontName as string].data;

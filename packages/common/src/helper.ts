@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { HELVETICA } from './constants.js';
+import { DEFAULT_FONT_NAME, HELVETICA } from './constants.js';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
 import {
   Inputs as InputsSchema,
@@ -10,8 +10,6 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema.js';
-
-const DEFAULT_FONT_NAME = 'Helvetica';
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {

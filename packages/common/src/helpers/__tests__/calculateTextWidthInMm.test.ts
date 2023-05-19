@@ -1,5 +1,5 @@
-import fontkit from '@pdf-lib/fontkit';
-import { PDFDocument, PDFFont, StandardFonts } from 'pdf-lib';
+import * as fontkit from 'fontkit';
+import { PDFDocument, PDFFont, StandardFonts } from '@pdfme/pdf-lib';
 import { calculateTextWidthInMm } from '../calculateTextWidthInMm';
 
 describe('calculateTextWidthInMm', () => {
@@ -7,6 +7,7 @@ describe('calculateTextWidthInMm', () => {
 
   beforeAll(async () => {
     const doc = await PDFDocument.create();
+
     doc.registerFontkit(fontkit);
     font = await doc.embedFont(StandardFonts.Helvetica);
   });
