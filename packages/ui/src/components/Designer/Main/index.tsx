@@ -180,6 +180,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (!targetSchema) return;
 
     targetSchema.width = fmt(width);
+    targetSchema.height = fmt(height);
+    targetSchema.position.y = fmt(top);
+    targetSchema.position.x = fmt(left);
 
     const dynamicFontSize = await calculateDynamicFontSize(
       targetSchema as TextSchemaWithData,

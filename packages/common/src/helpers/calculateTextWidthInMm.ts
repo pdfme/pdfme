@@ -1,5 +1,6 @@
 import { PDFFont } from '@pdfme/pdf-lib';
 import { calculateCharacterSpacing } from './calculateCharacterSpacing';
+import { DEFAULT_PT_TO_MM_RATIO } from '../constants';
 
 type CalculateTextWidthInMm = (
   textContent: string,
@@ -16,7 +17,7 @@ export const calculateTextWidthInMm: CalculateTextWidthInMm = (
 ) => {
   const characterSpacingWidth = calculateCharacterSpacing(textContent, textCharacterSpacing);
   const textContentWidthInPt = textFontFamily.widthOfTextAtSize(textContent, textFontSize) + characterSpacingWidth;
-  const textContentWidthInMm = textContentWidthInPt * 0.352778;
+  const textContentWidthInMm = textContentWidthInPt * DEFAULT_PT_TO_MM_RATIO;
 
   return textContentWidthInMm;
 };

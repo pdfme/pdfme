@@ -1,4 +1,4 @@
-import { PDFDocument, StandardFonts } from '@pdfme/pdf-lib';
+import { PDFDocument, PDFFont, StandardFonts } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import { TextSchemaWithData } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
@@ -40,7 +40,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
 
-  let font;
+  let font: PDFFont;
 
   if (fontName === DEFAULT_FONT_NAME) {
     font = await doc.embedFont(StandardFonts.Helvetica);
@@ -49,25 +49,77 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     font = await doc.embedFont(customFont);
   }
 
+  let textWidthInMm;
+  let textContent;
   let schemaFontSize = baseFontSizeInPixels;
   let dynamicFontSize = baseFontSizeInPixels;
-  let textWidthInMm = calculateTextWidthInMm(
-    data,
-    schemaFontSize,
-    font,
-    characterSpacing as number
-  );
+
+  // Detect if multiline text and get the width of each line in mm but only return the largest width
+  const textContentRows = data.split('\n');
+
+  const textContentRowMaxWidth = (
+    textContentRows: string[],
+    schemaFontSize: number,
+    font: PDFFont,
+    characterSpacing: number
+  ) => {
+    let textContentLargestRow = '';
+    let maxWidth = 0;
+
+    textContentRows.forEach((line) => {
+      const lineWidth = calculateTextWidthInMm(line, schemaFontSize, font, characterSpacing);
+
+      if (lineWidth > maxWidth) {
+        maxWidth = lineWidth;
+        textContentLargestRow = line;
+      }
+    });
+
+    return textContentLargestRow;
+  };
+
+  if (textContentRows.length > 1) {
+    const textContentLargestRow = textContentRowMaxWidth(
+      textContentRows,
+      schemaFontSize,
+      font,
+      characterSpacing as number
+    );
+
+    textWidthInMm = calculateTextWidthInMm(
+      textContentLargestRow,
+      schemaFontSize,
+      font,
+      characterSpacing as number
+    );
+
+    textContent = textContentLargestRow;
+  } else {
+    textWidthInMm = calculateTextWidthInMm(data, schemaFontSize, font, characterSpacing as number);
+
+    textContent = data;
+  }
 
   while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(data, dynamicFontSize, font, characterSpacing as number);
+    textWidthInMm = calculateTextWidthInMm(
+      textContent,
+      dynamicFontSize,
+      font,
+      characterSpacing as number
+    );
   }
 
   while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < maxFontSize) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
 
-    textWidthInMm = calculateTextWidthInMm(data, dynamicFontSize, font, characterSpacing as number);
+    textWidthInMm = calculateTextWidthInMm(
+      textContent,
+      dynamicFontSize,
+      font,
+      characterSpacing as number
+    );
   }
 
   if (dynamicFontSize > maxFontSize) {

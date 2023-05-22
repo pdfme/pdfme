@@ -132,7 +132,7 @@ const TextPropEditor = (
   if (activeSchema.type !== 'text') return <></>;
 
   return (
-    <section className="editor-section editor-section--text" style={{ fontSize: '0.7rem' }}>
+    <section style={{ fontSize: '0.7rem' }}>
       <div
         style={{
           display: 'flex',
