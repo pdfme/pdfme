@@ -1,5 +1,4 @@
 import { Lang } from '@pdfme/common';
-import { DEFAULT_LANG } from './constants';
 
 type DictEn = typeof dictEn;
 
@@ -48,6 +47,39 @@ const dictJa: { [key in keyof DictEn]: string } = {
   bulkUpdateFieldName: '項目名を一括変更',
 };
 
-const i18n = (lang: Lang, key: keyof DictEn) => (lang === DEFAULT_LANG ? dictEn[key] : dictJa[key]);
+const dictAr: { [key in keyof DictEn]: string } = {
+  cancel: 'إلغاء',
+  field: 'الحقل',
+  fieldName: 'اسم الحقل',
+  require: 'مطلوب',
+  uniq: 'يجب أن يكون فريداً',
+  inputExample: 'مثال',
+  edit: 'تعديل',
+  plsInputName: 'الرجاء إدخال الاسم',
+  fieldMustUniq: 'يجب أن يكون الحقل فريداً',
+  notUniq: '(غير فريد)',
+  noKeyName: 'لا يوجد اسم للحقل',
+  fieldsList: 'قائمة الحقول',
+  addNewField: 'إضافة حقل جديد',
+  editField: 'تعديل الحقل',
+  type: 'النوع',
+  errorOccurred: 'حدث خطأ',
+  errorBulkUpdateFieldName: 'لا يمكن تنفيذ التغيير لأنه تم تغيير عدد العناصر.',
+  commitBulkUpdateFieldName: 'تنفيذ التغييرات',
+  bulkUpdateFieldName: 'تغيير الأسماء',
+};
+
+const i18n = (lang: Lang, key: keyof DictEn) => {
+  switch (lang) {
+    case 'ar':
+      return dictAr[key];
+
+    case 'ja':
+      return dictJa[key];
+
+    default:
+      return dictEn[key];
+  }
+};
 
 export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);
