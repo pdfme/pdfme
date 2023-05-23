@@ -53,8 +53,6 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   let textContent;
   let schemaFontSize = baseFontSizeInPixels;
   let dynamicFontSize = baseFontSizeInPixels;
-
-  // Detect if multiline text and get the width of each line in mm but only return the largest width
   const textContentRows = data.split('\n');
 
   const textContentRowMaxWidth = (
