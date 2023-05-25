@@ -69,9 +69,7 @@ const ExampleInputEditor = (
             changeSchemas([{ key: 'data', value: e.target.value, schemaId: activeSchema.id }]);
           }}
           onKeyUp={async () => {
-            if (activeSchema.type !== 'text') {
-              return;
-            }
+            if (activeSchema.type !== 'text' || !activeSchema.dynamicFontSizingEnabled) return;
 
             changeSchemas([
               {

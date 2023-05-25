@@ -37,6 +37,7 @@ export const TextSchema = CommonSchema.extend({
   fontSizeScalingMin: z.number().optional(),
   fontSizeScalingMax: z.number().optional(),
   dynamicFontSize: z.number().optional(),
+  dynamicFontSizingEnabled: z.boolean().optional(),
 });
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });

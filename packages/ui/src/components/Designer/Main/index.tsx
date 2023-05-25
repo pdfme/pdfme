@@ -184,18 +184,20 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     targetSchema.position.y = fmt(top);
     targetSchema.position.x = fmt(left);
 
-    const dynamicFontSize = await calculateDynamicFontSize(
-      targetSchema as TextSchemaWithData,
-      font
-    );
+    if (targetSchema.type === 'text' && targetSchema.dynamicFontSizingEnabled) {
+      const dynamicFontSize = await calculateDynamicFontSize(
+        targetSchema as TextSchemaWithData,
+        font
+      );
 
-    changeSchemas([
-      {
-        key: 'dynamicFontSize',
-        value: dynamicFontSize,
-        schemaId: targetSchema.id,
-      },
-    ]);
+      changeSchemas([
+        {
+          key: 'dynamicFontSize',
+          value: dynamicFontSize,
+          schemaId: targetSchema.id,
+        },
+      ]);
+    }
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -338,7 +340,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
             onChange={async (value) => {
-              if (schema.type === 'text') {
+              if (schema.type === 'text' && schema.dynamicFontSizingEnabled) {
                 schema.data = value;
 
                 const dynamicFontSize = await calculateDynamicFontSize(

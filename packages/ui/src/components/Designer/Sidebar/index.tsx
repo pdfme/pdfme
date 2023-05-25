@@ -18,7 +18,9 @@ export type SidebarProps = {
   onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
-  changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
+  changeSchemas: (
+    objs: { key: string; value: string | number | boolean; schemaId: string }[]
+  ) => void;
   addSchema: () => void;
 };
 
@@ -34,8 +36,14 @@ const Sidebar = (props: SidebarProps) => {
     const ids = activeElements.map((ae) => ae.id);
     const activeSchema = schemas.find((s) => ids.includes(s.id));
 
-    if (activeSchema && activeSchema.type === 'text' && !activeSchema.fontName) {
-      activeSchema.fontName = fallbackFont;
+    if (activeSchema?.type === 'text') {
+      if (!activeSchema.fontName) {
+        activeSchema.fontName = fallbackFont;
+      }
+
+      if (!activeSchema.dynamicFontSizingEnabled) {
+        activeSchema.dynamicFontSizingEnabled = false;
+      }
     }
 
     return schemas.filter((s) => ids.includes(s.id));

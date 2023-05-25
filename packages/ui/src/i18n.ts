@@ -23,6 +23,8 @@ const dictEn = {
     'Cannot commit the change because the number of items has been changed.',
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
+  fontSizeMin: 'FontSize Min(pt)',
+  fontSizeMax: 'FontSize Max(pt)',
 };
 
 const dictJa: { [key in keyof DictEn]: string } = {
@@ -45,6 +47,8 @@ const dictJa: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: '項目数が変更されているため変更をコミットできません。',
   commitBulkUpdateFieldName: '変更を反映',
   bulkUpdateFieldName: '項目名を一括変更',
+  fontSizeMin: '最小フォントサイズ(ポイント)',
+  fontSizeMax: 'フォントサイズ最大(ポイント)',
 };
 
 const dictAr: { [key in keyof DictEn]: string } = {
@@ -67,6 +71,8 @@ const dictAr: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: 'لا يمكن تنفيذ التغيير لأنه تم تغيير عدد العناصر.',
   commitBulkUpdateFieldName: 'تنفيذ التغييرات',
   bulkUpdateFieldName: 'تغيير الأسماء',
+  fontSizeMin: 'حجم الخط الأدنى (نقطة)',
+  fontSizeMax: 'حجم الخط الأقصى (نقطة)',
 };
 
 const i18n = (lang: Lang, key: keyof DictEn) => {

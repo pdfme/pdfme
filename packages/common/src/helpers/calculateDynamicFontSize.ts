@@ -4,9 +4,7 @@ import { TextSchemaWithData } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
 import {
   DEFAULT_FONT_NAME,
-  DEFAULT_FONT_SIZE_IN_PIXELS,
-  DEFAULT_FONT_SIZE_SCALING_MIN,
-  DEFAULT_FONT_SIZE_SCALING_MAX,
+  DEFAULT_FONT_SIZE,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
 } from '../constants';
@@ -31,11 +29,9 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     width,
   } = activeSchema;
 
-  const baseFontSizeInPixels = fontSize ?? DEFAULT_FONT_SIZE_IN_PIXELS;
-  const minSizePercentage = fontSizeScalingMin ?? DEFAULT_FONT_SIZE_SCALING_MIN;
-  const maxSizePercentage = fontSizeScalingMax ?? DEFAULT_FONT_SIZE_SCALING_MAX;
-  const minFontSize = (minSizePercentage * baseFontSizeInPixels) / 100;
-  const maxFontSize = (maxSizePercentage * baseFontSizeInPixels) / 100;
+  const baseFontSize = fontSize ?? DEFAULT_FONT_SIZE;
+  const minFontSize = fontSizeScalingMin ?? DEFAULT_FONT_SIZE;
+  const maxFontSize = fontSizeScalingMax ?? DEFAULT_FONT_SIZE;
 
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
@@ -51,8 +47,8 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
 
   let textWidthInMm;
   let textContent;
-  let schemaFontSize = baseFontSizeInPixels;
-  let dynamicFontSize = baseFontSizeInPixels;
+  let schemaFontSize = baseFontSize;
+  let dynamicFontSize = baseFontSize;
   const textContentRows = data.split('\n');
 
   const textContentRowMaxWidth = (

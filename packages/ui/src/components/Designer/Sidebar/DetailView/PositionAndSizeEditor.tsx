@@ -242,7 +242,7 @@ const PositionAndSizeEditor = (
               const value = Number(e.target.value);
 
               if (value >= 0 && activeSchema.position.x + value < pageSize.width) {
-                if (activeSchema.type === 'text') {
+                if (activeSchema.type === 'text' && activeSchema.dynamicFontSizingEnabled) {
                   activeSchema.width = value;
 
                   const dynamicFontSize = await calculateDynamicFontSize(

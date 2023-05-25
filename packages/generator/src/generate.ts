@@ -39,8 +39,8 @@ const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; 
       if (schemaInputs[key] !== undefined) {
         value.data = schemaInputs[key];
         value.fontName ??= fallbackFontName;
-        value.fontSizeScalingMin ??= 100;
-        value.fontSizeScalingMax ??= 100;
+        value.fontSizeScalingMin ??= value.fontSize;
+        value.fontSizeScalingMax ??= value.fontSize;
         value.fontSize = await calculateDynamicFontSize(value as TextSchemaWithData, font);
       }
     }
