@@ -30,8 +30,9 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   } = activeSchema;
 
   const baseFontSize = fontSize ?? DEFAULT_FONT_SIZE;
-  const minFontSize = fontSizeScalingMin ?? DEFAULT_FONT_SIZE;
-  const maxFontSize = fontSizeScalingMax ?? DEFAULT_FONT_SIZE;
+  const minFontSize = fontSizeScalingMin ?? fontSize ?? DEFAULT_FONT_SIZE;
+  const maxFontSize = fontSizeScalingMax ?? fontSize ?? DEFAULT_FONT_SIZE;
+  const characterSpacingCount = characterSpacing ?? 0;
 
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
@@ -55,13 +56,13 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     textContentRows: string[],
     schemaFontSize: number,
     font: PDFFont,
-    characterSpacing: number
+    characterSpacingCount: number
   ) => {
     let textContentLargestRow = '';
     let maxWidth = 0;
 
     textContentRows.forEach((line) => {
-      const lineWidth = calculateTextWidthInMm(line, schemaFontSize, font, characterSpacing);
+      const lineWidth = calculateTextWidthInMm(line, schemaFontSize, font, characterSpacingCount);
 
       if (lineWidth > maxWidth) {
         maxWidth = lineWidth;
@@ -77,19 +78,24 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
       textContentRows,
       schemaFontSize,
       font,
-      characterSpacing as number
+      characterSpacingCount as number
     );
 
     textWidthInMm = calculateTextWidthInMm(
       textContentLargestRow,
       schemaFontSize,
       font,
-      characterSpacing as number
+      characterSpacingCount as number
     );
 
     textContent = textContentLargestRow;
   } else {
-    textWidthInMm = calculateTextWidthInMm(data, schemaFontSize, font, characterSpacing as number);
+    textWidthInMm = calculateTextWidthInMm(
+      data,
+      schemaFontSize,
+      font,
+      characterSpacingCount as number
+    );
 
     textContent = data;
   }
@@ -101,7 +107,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
       textContent,
       dynamicFontSize,
       font,
-      characterSpacing as number
+      characterSpacingCount as number
     );
   }
 
@@ -112,16 +118,8 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
       textContent,
       dynamicFontSize,
       font,
-      characterSpacing as number
+      characterSpacingCount as number
     );
-  }
-
-  if (dynamicFontSize > maxFontSize) {
-    dynamicFontSize = maxFontSize;
-  }
-
-  if (dynamicFontSize < minFontSize) {
-    dynamicFontSize = minFontSize;
   }
 
   return dynamicFontSize;

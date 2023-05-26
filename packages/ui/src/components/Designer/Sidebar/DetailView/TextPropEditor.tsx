@@ -154,11 +154,6 @@ const TextPropEditor = (
 
   if (activeSchema.type !== 'text') return <></>;
 
-  if (activeSchema.fontSize) {
-    console.log('Font Size in PT', activeSchema.fontSize);
-    console.log('Font Size in PX', activeSchema.fontSize * 1.333);
-  }
-
   const triggerDynamicFontSizing = async (activeSchema: SchemaForUI) => {
     const dynamicFontSize = await calculateDynamicFontSize(
       activeSchema as TextSchemaWithData,
@@ -317,6 +312,7 @@ const TextPropEditor = (
               triggerDynamicFontSizing(activeSchema);
             } else {
               const currentFontSize = Number(activeSchema.fontSize);
+
               changeSchemas([
                 {
                   key: 'dynamicFontSizingEnabled',
