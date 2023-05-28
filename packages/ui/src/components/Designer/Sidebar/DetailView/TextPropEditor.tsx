@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import {
+  calculateDynamicFontSize,
   SchemaForUI,
+  TextSchemaWithData,
   getFallbackFontName,
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
@@ -24,14 +26,26 @@ const NumberInputSet = (props: {
   width: string;
   label: string;
   value: number;
+  minNumber?: number;
+  maxNumber?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, value, width, onChange } = props;
+  const { label, value, width, minNumber, maxNumber, onChange } = props;
+  const formattedLabel = label.replace(/\s/g, '');
 
   return (
     <div style={{ width }}>
-      <label>{label}</label>
-      <input style={inputStyle} onChange={onChange} value={value} type="number" />
+      <label htmlFor={`input-${formattedLabel}`}>{label}</label>
+      <input
+        id={`input-${formattedLabel}`}
+        name={`input-${formattedLabel}`}
+        style={inputStyle}
+        onChange={onChange}
+        value={value}
+        type="number"
+        {...(minNumber && { min: minNumber })}
+        {...(maxNumber && { max: maxNumber })}
+      />
     </div>
   );
 };
@@ -43,12 +57,20 @@ const ColorInputSet = (props: {
   onClear: () => void;
 }) => {
   const { label, value, onChange, onClear } = props;
+  const formattedLabel = label.replace(/\s/g, '');
 
   return (
     <div style={{ width: '45%' }}>
-      <label>{label}</label>
+      <label htmlFor={`input-${formattedLabel}`}>{label}</label>
       <div style={{ display: 'flex' }}>
-        <input onChange={onChange} value={value || '#ffffff'} type="color" style={inputStyle} />
+        <input
+          id={`input-${formattedLabel}`}
+          name={`input-${formattedLabel}`}
+          onChange={onChange}
+          value={value || '#ffffff'}
+          type="color"
+          style={inputStyle}
+        />
         <button
           onClick={onClear}
           style={{
@@ -75,11 +97,18 @@ const SelectSet = (props: {
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
   const { label, value, options, onChange } = props;
+  const formattedLabel = label.replace(/\s/g, '');
 
   return (
     <div style={{ width: '45%' }}>
-      <label>{label}:</label>
-      <select style={selectStyle} onChange={onChange} value={value}>
+      <label htmlFor={`select-${formattedLabel}`}>{label}:</label>
+      <select
+        id={`select-${formattedLabel}`}
+        name={`select-${formattedLabel}`}
+        style={selectStyle}
+        onChange={onChange}
+        value={value}
+      >
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -87,6 +116,31 @@ const SelectSet = (props: {
         ))}
       </select>
     </div>
+  );
+};
+
+const CheckboxSet = (props: {
+  width: string;
+  spacing: string;
+  label: string;
+  onChange: () => void;
+  checked: boolean | undefined;
+}) => {
+  const { width, spacing, label, onChange, checked } = props;
+
+  return (
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
+        margin: `${spacing} 0`,
+        width: `${width}`,
+      }}
+    >
+      <input type="checkbox" checked={checked} onChange={onChange} />
+      {label}
+    </label>
   );
 };
 
@@ -100,8 +154,23 @@ const TextPropEditor = (
 
   if (activeSchema.type !== 'text') return <></>;
 
+  const triggerDynamicFontSizing = async (activeSchema: SchemaForUI) => {
+    const dynamicFontSize = await calculateDynamicFontSize(
+      activeSchema as TextSchemaWithData,
+      font
+    );
+
+    changeSchemas([
+      {
+        key: 'dynamicFontSize',
+        value: dynamicFontSize,
+        schemaId: activeSchema.id,
+      },
+    ]);
+  };
+
   return (
-    <div style={{ fontSize: '0.7rem' }}>
+    <section style={{ fontSize: '0.7rem' }}>
       <div
         style={{
           display: 'flex',
@@ -115,7 +184,18 @@ const TextPropEditor = (
           value={activeSchema.fontName ?? fallbackFontName}
           options={Object.keys(font)}
           onChange={(e) => {
-            changeSchemas([{ key: 'fontName', value: e.target.value, schemaId: activeSchema.id }]);
+            if (activeSchema.dynamicFontSizingEnabled) {
+              activeSchema.fontName = e.target.value;
+              triggerDynamicFontSizing(activeSchema);
+            } else {
+              changeSchemas([
+                {
+                  key: 'fontName',
+                  value: e.target.value,
+                  schemaId: activeSchema.id,
+                },
+              ]);
+            }
           }}
         />
 
@@ -140,11 +220,42 @@ const TextPropEditor = (
           width="30%"
           label={'FontSize(pt)'}
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
-          onChange={(e) =>
-            changeSchemas([
-              { key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id },
-            ])
-          }
+          onChange={(e) => {
+            const currentFontSize = Number(e.target.value);
+
+            if (activeSchema.dynamicFontSizingEnabled) {
+              activeSchema.fontSize = currentFontSize;
+
+              if (
+                activeSchema.fontSizeScalingMax &&
+                activeSchema.fontSizeScalingMax < currentFontSize
+              ) {
+                activeSchema.fontSizeScalingMax = currentFontSize;
+              }
+
+              if (
+                activeSchema.fontSizeScalingMin &&
+                activeSchema.fontSizeScalingMin > currentFontSize
+              ) {
+                activeSchema.fontSizeScalingMin = currentFontSize;
+              }
+
+              triggerDynamicFontSizing(activeSchema);
+            } else {
+              changeSchemas([
+                {
+                  key: 'fontSize',
+                  value: currentFontSize,
+                  schemaId: activeSchema.id,
+                },
+                {
+                  key: 'dynamicFontSize',
+                  value: currentFontSize,
+                  schemaId: activeSchema.id,
+                },
+              ]);
+            }
+          }}
         />
         <NumberInputSet
           width="30%"
@@ -161,12 +272,89 @@ const TextPropEditor = (
           width="40%"
           label={'CharacterSpacing(pt)'}
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
-          onChange={(e) =>
-            changeSchemas([
-              { key: 'characterSpacing', value: Number(e.target.value), schemaId: activeSchema.id },
-            ])
-          }
+          onChange={async (e) => {
+            const currentCharacterSpacing = Number(e.target.value);
+
+            if (activeSchema.dynamicFontSizingEnabled) {
+              activeSchema.characterSpacing = currentCharacterSpacing;
+              triggerDynamicFontSizing(activeSchema);
+            } else {
+              changeSchemas([
+                {
+                  key: 'characterSpacing',
+                  value: currentCharacterSpacing,
+                  schemaId: activeSchema.id,
+                },
+              ]);
+            }
+          }}
         />
+      </div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          marginBottom: '0.25rem',
+        }}
+      >
+        <CheckboxSet
+          width="100%"
+          spacing="5px"
+          label="Use dynamic font size"
+          checked={activeSchema.dynamicFontSizingEnabled}
+          onChange={() => {
+            const newCheckedState = !activeSchema.dynamicFontSizingEnabled;
+
+            if (newCheckedState) {
+              activeSchema.dynamicFontSizingEnabled = true;
+              triggerDynamicFontSizing(activeSchema);
+            } else {
+              const currentFontSize = Number(activeSchema.fontSize);
+
+              changeSchemas([
+                {
+                  key: 'dynamicFontSizingEnabled',
+                  value: newCheckedState,
+                  schemaId: activeSchema.id,
+                },
+                {
+                  key: 'dynamicFontSize',
+                  value: currentFontSize,
+                  schemaId: activeSchema.id,
+                },
+              ]);
+            }
+          }}
+        />
+
+        {activeSchema.dynamicFontSizingEnabled && (
+          <>
+            <NumberInputSet
+              width="45%"
+              label={'FontSize Min(pt)'}
+              value={activeSchema.fontSizeScalingMin ?? Number(activeSchema.fontSize)}
+              minNumber={0}
+              maxNumber={activeSchema.fontSize}
+              onChange={(e) => {
+                activeSchema.fontSizeScalingMin = Number(e.target.value);
+                triggerDynamicFontSizing(activeSchema);
+              }}
+            />
+
+            <NumberInputSet
+              width="45%"
+              label={'FontSize Max(pt)'}
+              value={activeSchema.fontSizeScalingMax ?? Number(activeSchema.fontSize)}
+              minNumber={activeSchema.fontSize}
+              onChange={(e) => {
+                activeSchema.fontSizeScalingMax = Number(e.target.value);
+                triggerDynamicFontSizing(activeSchema);
+              }}
+            />
+          </>
+        )}
       </div>
       <div
         style={{
@@ -202,7 +390,7 @@ const TextPropEditor = (
           }
         />
       </div>
-    </div>
+    </section>
   );
 };
 

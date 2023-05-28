@@ -1,7 +1,8 @@
-import React, { CSSProperties } from 'react';
-import { SchemaForUI } from '@pdfme/common';
+import React, { CSSProperties, useContext } from 'react';
+import { calculateDynamicFontSize, SchemaForUI, TextSchemaWithData } from '@pdfme/common';
 import { round } from '../../../../helper';
 import { SidebarProps } from '../index';
+import { FontContext } from '../../../../contexts';
 
 const inputSetStyle: CSSProperties = { marginRight: '1rem', display: 'flex', alignItems: 'center' };
 
@@ -37,6 +38,7 @@ const PositionAndSizeEditor = (
     activeSchema: SchemaForUI;
   }
 ) => {
+  const font = useContext(FontContext);
   const { changeSchemas, schemas, activeSchema, activeElements, pageSize } = props;
 
   const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
@@ -184,7 +186,7 @@ const PositionAndSizeEditor = (
   ];
 
   return (
-    <div>
+    <section>
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
         {layoutBtns.map((b) => (
           <button key={b.id} title={b.id} onClick={b.action} style={buttonStyle}>
@@ -228,14 +230,36 @@ const PositionAndSizeEditor = (
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={inputSetStyle}>
-          <label style={{ width: 17 }}>W</label>
+          <label htmlFor="input-width" style={{ width: 17 }}>
+            W
+          </label>
           <input
+            id="input-width"
+            name="input-width"
             style={inputStyle}
             type="number"
-            onChange={(e) => {
+            onChange={async (e) => {
               const value = Number(e.target.value);
+
               if (value >= 0 && activeSchema.position.x + value < pageSize.width) {
-                changeSchemas([{ key: 'width', value, schemaId: activeSchema.id }]);
+                if (activeSchema.type === 'text' && activeSchema.dynamicFontSizingEnabled) {
+                  activeSchema.width = value;
+
+                  const dynamicFontSize = await calculateDynamicFontSize(
+                    activeSchema as TextSchemaWithData,
+                    font
+                  );
+
+                  changeSchemas([
+                    {
+                      key: 'dynamicFontSize',
+                      value: dynamicFontSize,
+                      schemaId: activeSchema.id,
+                    },
+                  ]);
+                } else {
+                  changeSchemas([{ key: 'width', value, schemaId: activeSchema.id }]);
+                }
               }
             }}
             value={activeSchema.width}
@@ -243,8 +267,12 @@ const PositionAndSizeEditor = (
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
         <div style={inputSetStyle}>
-          <label style={{ width: 17 }}>H</label>
+          <label htmlFor="input-height" style={{ width: 17 }}>
+            H
+          </label>
           <input
+            id="input-height"
+            name="input-height"
             style={inputStyle}
             type="number"
             onChange={(e) => {
@@ -258,7 +286,7 @@ const PositionAndSizeEditor = (
           <span style={{ fontSize: '0.6rem' }}>mm</span>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

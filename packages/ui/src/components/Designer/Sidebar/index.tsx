@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
+import { I18nContext, FontContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
+import { getFallbackFontName } from '@pdfme/common';
 
 export type SidebarProps = {
   height: number;
@@ -17,7 +18,9 @@ export type SidebarProps = {
   onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
   onEdit: (id: string) => void;
   onEditEnd: () => void;
-  changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
+  changeSchemas: (
+    objs: { key: string; value: string | number | boolean; schemaId: string }[]
+  ) => void;
   addSchema: () => void;
 };
 
@@ -25,10 +28,24 @@ const Sidebar = (props: SidebarProps) => {
   const { height, size, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
+  const fonts = useContext(FontContext);
+  const fallbackFont = getFallbackFontName(fonts);
   const [open, setOpen] = useState(true);
 
   const getActiveSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
+    const activeSchema = schemas.find((s) => ids.includes(s.id));
+
+    if (activeSchema?.type === 'text') {
+      if (!activeSchema.fontName) {
+        activeSchema.fontName = fallbackFont;
+      }
+
+      if (!activeSchema.dynamicFontSizingEnabled) {
+        activeSchema.dynamicFontSizingEnabled = false;
+      }
+    }
+
     return schemas.filter((s) => ids.includes(s.id));
   };
 

@@ -25,7 +25,7 @@ const TextSchemaUI = (
     // Increase the width by 1 point. (0.75 pixels)
     width: (schema.width + (schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING) * 0.75) * ZOOM,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-    fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
+    fontSize: `${schema.dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',

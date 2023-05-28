@@ -14,9 +14,11 @@ import {
   Schema,
   Size,
   DEFAULT_ALIGNMENT,
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
+  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
 } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT } from './constants';
 
@@ -407,8 +409,13 @@ export const getInitialSchema = (): SchemaForUI => ({
   height: 7,
   alignment: DEFAULT_ALIGNMENT,
   fontSize: DEFAULT_FONT_SIZE,
+  fontName: DEFAULT_FONT_NAME,
+  dynamicFontSize: DEFAULT_FONT_SIZE,
+  dynamicFontSizingEnabled: DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   characterSpacing: DEFAULT_CHARACTER_SPACING,
   lineHeight: DEFAULT_LINE_HEIGHT,
+  fontSizeScalingMin: DEFAULT_FONT_SIZE,
+  fontSizeScalingMax: DEFAULT_FONT_SIZE,
 });
 
 export const getSampleByType = (type: string) => {

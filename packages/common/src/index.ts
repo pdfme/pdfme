@@ -1,9 +1,14 @@
 import {
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_TOLERANCE,
+  DEFAULT_FONT_SIZE_ADJUSTMENT,
+  DEFAULT_PT_TO_MM_RATIO,
+  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
   HELVETICA,
 } from './constants.js';
@@ -15,9 +20,11 @@ import type {
   SchemaType,
   BarCodeType,
   TextSchema,
+  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,
@@ -47,13 +54,19 @@ import {
   checkGenerateProps,
   validateBarcodeInput,
 } from './helper.js';
+import { calculateDynamicFontSize } from './helpers/calculateDynamicFontSize.js';
 
 export {
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_TOLERANCE,
+  DEFAULT_FONT_SIZE_ADJUSTMENT,
+  DEFAULT_PT_TO_MM_RATIO,
+  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
   HELVETICA,
   schemaTypes,
@@ -73,6 +86,7 @@ export {
   checkDesignerProps,
   checkGenerateProps,
   validateBarcodeInput,
+  calculateDynamicFontSize,
 };
 
 export type {
@@ -82,9 +96,11 @@ export type {
   SchemaType,
   BarCodeType,
   TextSchema,
+  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,

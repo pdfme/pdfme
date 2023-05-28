@@ -46,6 +46,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
+    "fontkit": "^2.0.2",
     "zod": "^3.20.2"
   },
   "jest": {

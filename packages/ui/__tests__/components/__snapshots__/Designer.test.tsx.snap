@@ -224,6 +224,7 @@ exports[`Designer snapshot 1`] = `
           style="font-family: 'Helvetica'; top: 30px; left: 0px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
+            class="ruler-container"
             style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
           />
           <div
