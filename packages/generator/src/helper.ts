@@ -14,6 +14,7 @@ import {
   getB64BasePdf,
   b64toUint8Array,
   validateBarcodeInput,
+  calculateDynamicFontSize,
   Schema,
   TextSchema,
   isTextSchema,
@@ -271,7 +272,7 @@ interface TextSchemaSetting {
   splitThreshold: number;
 }
 
-const drawInputByTextSchema = (arg: {
+const drawInputByTextSchema = async (arg: {
   input: string;
   templateSchema: TextSchema;
   pdfDoc: PDFDocument;
@@ -287,7 +288,13 @@ const drawInputByTextSchema = (arg: {
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const { size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
+  const { size: _size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
+
+  const size = templateSchema.dynamicFontSizingEnabled ?
+    await calculateDynamicFontSize(Object.assign(templateSchema, {
+      data: input,
+    }), fontValue) : _size;
+
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
   let beforeLineOver = 0;
@@ -403,7 +410,7 @@ export const drawInputByTemplateSchema = async (arg: {
 
   if (isTextSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as TextSchema;
-    drawInputByTextSchema({ ...arg, templateSchema });
+    await drawInputByTextSchema({ ...arg, templateSchema });
   } else if (isImageSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as ImageSchema;
     await drawInputByImageSchema({ ...arg, templateSchema });

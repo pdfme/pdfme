@@ -1,6 +1,7 @@
 import * as fontkit from 'fontkit';
-import { PDFDocument, PDFFont, StandardFonts } from '@pdfme/pdf-lib';
+import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
 import { calculateTextWidthInMm } from '../calculateTextWidthInMm';
+import { HELVETICA } from "../../constants"
 
 describe('calculateTextWidthInMm', () => {
   let font: PDFFont;
@@ -9,7 +10,7 @@ describe('calculateTextWidthInMm', () => {
     const doc = await PDFDocument.create();
 
     doc.registerFontkit(fontkit);
-    font = await doc.embedFont(StandardFonts.Helvetica);
+    font = await doc.embedFont(HELVETICA);
   });
 
   it('returns the correct width for a simple string', () => {

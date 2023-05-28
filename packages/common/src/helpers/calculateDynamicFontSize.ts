@@ -1,9 +1,8 @@
 import { PDFDocument, PDFFont, StandardFonts } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import { TextSchemaWithData } from '../type';
+import { TextSchemaWithData, Font } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
 import {
-  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
@@ -11,14 +10,10 @@ import {
 
 type DynamicFontSize = (
   activeSchema: TextSchemaWithData,
-  fontData: {
-    [fontName: string]: {
-      data: string | ArrayBuffer | Uint8Array;
-    };
-  }
+  font: Font | PDFFont
 ) => Promise<number>;
 
-export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fontData) => {
+export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, font) => {
   const {
     data,
     fontName,
@@ -37,13 +32,12 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   const doc = await PDFDocument.create();
   doc.registerFontkit(fontkit);
 
-  let font: PDFFont;
-
-  if (fontName === DEFAULT_FONT_NAME) {
-    font = await doc.embedFont(StandardFonts.Helvetica);
+  let pdfFont: PDFFont;
+  if (font instanceof PDFFont) {
+    pdfFont = font;
   } else {
-    const customFont = fontData[fontName as string].data;
-    font = await doc.embedFont(customFont);
+    const customFont = font[fontName as string].data;
+    pdfFont = await doc.embedFont(customFont);
   }
 
   let textWidthInMm;
@@ -77,14 +71,14 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     const textContentLargestRow = textContentRowMaxWidth(
       textContentRows,
       schemaFontSize,
-      font,
+      pdfFont,
       characterSpacingCount as number
     );
 
     textWidthInMm = calculateTextWidthInMm(
       textContentLargestRow,
       schemaFontSize,
-      font,
+      pdfFont,
       characterSpacingCount as number
     );
 
@@ -93,7 +87,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     textWidthInMm = calculateTextWidthInMm(
       data,
       schemaFontSize,
-      font,
+      pdfFont,
       characterSpacingCount as number
     );
 
@@ -106,7 +100,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     textWidthInMm = calculateTextWidthInMm(
       textContent,
       dynamicFontSize,
-      font,
+      pdfFont,
       characterSpacingCount as number
     );
   }
@@ -117,7 +111,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     textWidthInMm = calculateTextWidthInMm(
       textContent,
       dynamicFontSize,
-      font,
+      pdfFont,
       characterSpacingCount as number
     );
   }
