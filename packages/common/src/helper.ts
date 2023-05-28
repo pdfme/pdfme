@@ -235,6 +235,10 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
 
     return regexp.test(input) && validateCheckDigit(input, 8);
   }
+  if (type === 'gs1datamatrix') {
+    // 500文字以下
+    return input.length < 500;
+  }
 
   return false;
 };
