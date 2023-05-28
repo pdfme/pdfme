@@ -409,7 +409,6 @@ export const getInitialSchema = (): SchemaForUI => ({
   height: 7,
   alignment: DEFAULT_ALIGNMENT,
   fontSize: DEFAULT_FONT_SIZE,
-  fontName: DEFAULT_FONT_NAME,
   dynamicFontSize: DEFAULT_FONT_SIZE,
   dynamicFontSizingEnabled: DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   characterSpacing: DEFAULT_CHARACTER_SPACING,
