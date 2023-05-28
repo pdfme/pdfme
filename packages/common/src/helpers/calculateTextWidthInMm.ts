@@ -1,4 +1,4 @@
-import { PDFFont } from '@pdfme/pdf-lib';
+import type { PDFFont } from '@pdfme/pdf-lib';
 import { calculateCharacterSpacing } from './calculateCharacterSpacing';
 import { DEFAULT_PT_TO_MM_RATIO } from '../constants';
 
