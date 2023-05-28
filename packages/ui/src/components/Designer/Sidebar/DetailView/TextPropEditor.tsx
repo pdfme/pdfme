@@ -121,12 +121,11 @@ const SelectSet = (props: {
 
 const CheckboxSet = (props: {
   width: string;
-  spacing: string;
   label: string;
   onChange: () => void;
   checked: boolean | undefined;
 }) => {
-  const { width, spacing, label, onChange, checked } = props;
+  const { width, label, onChange, checked } = props;
 
   return (
     <label
@@ -134,7 +133,6 @@ const CheckboxSet = (props: {
         display: 'flex',
         alignItems: 'center',
         gap: '5px',
-        margin: `${spacing} 0`,
         width: `${width}`,
       }}
     >
@@ -301,7 +299,6 @@ const TextPropEditor = (
       >
         <CheckboxSet
           width="100%"
-          spacing="5px"
           label="Use dynamic font size"
           checked={activeSchema.dynamicFontSizingEnabled}
           onChange={() => {
