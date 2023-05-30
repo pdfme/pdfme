@@ -1,8 +1,9 @@
-import { PDFDocument, PDFFont, StandardFonts } from '@pdfme/pdf-lib';
+import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import { TextSchemaWithData, Font } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
 import {
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
@@ -29,14 +30,16 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   const maxFontSize = fontSizeScalingMax ?? fontSize ?? DEFAULT_FONT_SIZE;
   const characterSpacingCount = characterSpacing ?? 0;
 
-  const doc = await PDFDocument.create();
-  doc.registerFontkit(fontkit);
-
   let pdfFont: PDFFont;
   if (font instanceof PDFFont) {
     pdfFont = font;
   } else {
-    const customFont = font[fontName as string].data;
+    // TODO 
+    // It's possible to improve performance.
+    // Ideally, we'd like not to use PDFDocument. If that's not possible, we'll change to use cache.
+    const customFont = font[fontName || DEFAULT_FONT_NAME].data;
+    const doc = await PDFDocument.create();
+    doc.registerFontkit(fontkit);
     pdfFont = await doc.embedFont(customFont);
   }
 

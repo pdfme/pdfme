@@ -10,7 +10,7 @@ import {
   DEFAULT_PT_TO_MM_RATIO,
   DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
-  HELVETICA,
+  Roboto,
 } from './constants.js';
 import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
@@ -68,7 +68,7 @@ export {
   DEFAULT_PT_TO_MM_RATIO,
   DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
-  HELVETICA,
+  Roboto,
   schemaTypes,
   isTextSchema,
   isImageSchema,

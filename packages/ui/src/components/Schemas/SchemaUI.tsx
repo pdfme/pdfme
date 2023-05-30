@@ -14,13 +14,13 @@ export interface SchemaUIProps {
 }
 
 type Props = SchemaUIProps & {
-  border: string;
+  outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
 };
 
 const Wrapper = ({
   children,
-  border,
+  outline,
   onChangeHoveringSchemaId,
   schema,
 }: Props & { children: ReactNode }) => (
@@ -37,7 +37,7 @@ const Wrapper = ({
       width: schema.width * ZOOM,
       top: schema.position.y * ZOOM,
       left: schema.position.x * ZOOM,
-      border,
+      outline,
     }}
   >
     {children}

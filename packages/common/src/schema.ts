@@ -87,9 +87,7 @@ export const CommonProps = z.object({
 
 // -------------------generate-------------------
 
-export const GeneratorOptions = CommonOptions.extend({
-  splitThreshold: z.number().optional(),
-});
+export const GeneratorOptions = CommonOptions;
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,

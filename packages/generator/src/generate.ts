@@ -44,7 +44,7 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {} } = props;
-  const { font = getDefaultFont(), splitThreshold = 3 } = options;
+  const { font = getDefaultFont() } = options;
   const { schemas } = template;
 
   const preRes = await preprocessing({ inputs, template, font });
@@ -67,7 +67,7 @@ const generate = async (props: GenerateProps) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const textSchemaSetting = { fontObj, fallbackFontName, splitThreshold };
+        const textSchemaSetting = { fontObj, fallbackFontName };
 
         // eslint-disable-next-line no-await-in-loop
         await drawInputByTemplateSchema({

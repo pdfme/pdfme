@@ -22,14 +22,13 @@ const TextSchemaUI = (
     position: 'absolute',
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     height: schema.height * ZOOM,
-    // Increase the width by 1 point. (0.75 pixels)
-    width: (schema.width + (schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING) * 0.75) * ZOOM,
+    width: schema.width * ZOOM,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
     fontSize: `${schema.dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',
-    wordBreak: 'break-all',
+    wordBreak: 'break-word',
     border: 'none',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     backgroundColor:
@@ -47,17 +46,7 @@ const TextSchemaUI = (
     ></textarea>
   ) : (
     <div style={style}>
-      {/*  Set the letterSpacing of the last character to 0. */}
-      {schema.data.split('').map((l, i) => (
-        <span
-          key={i}
-          style={{
-            letterSpacing: String(schema.data).length === i + 1 ? 0 : 'inherit',
-          }}
-        >
-          {l}
-        </span>
-      ))}
+      {schema.data}
     </div>
   );
 };

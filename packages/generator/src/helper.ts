@@ -208,68 +208,11 @@ const drawBackgroundColor = (arg: {
   });
 };
 
-type IsOverEval = (testString: string) => boolean;
-/**
- * Incrementally check the current line for it's real length
- * and return the position where it exceeds the box width.
- *
- * return `null` to indicate if inputLine is shorter as the available bbox
- */
-const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
-  for (let i = 0; i <= inputLine.length; i += 1) {
-    if (isOverEval(inputLine.substr(0, i))) {
-      return i;
-    }
-  }
-
-  return null;
-};
-
-/**
- * Get position of the split. Split the exceeding line at
- * the last whitespace over it exceeds the bounding box width.
- */
-const getSplitPosition = (inputLine: string, isOverEval: IsOverEval) => {
-  const overPos = getOverPosition(inputLine, isOverEval);
-  /**
-   * if input line is shorter as the available space. We split at the end of the line
-   */
-  if (overPos === null) return inputLine.length;
-  let overPosTmp = overPos;
-  while (inputLine[overPosTmp] !== ' ' && overPosTmp >= 0) overPosTmp -= 1;
-  /**
-   * for very long lines with no whitespace use the original overPos and
-   * split one char over so we do not overfill the box
-   */
-
-  return overPosTmp > 0 ? overPosTmp : overPos - 1;
-};
-
-/**
- * recursively split the line at getSplitPosition.
- * If there is some leftover, split the rest again in the same manner.
- */
-const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] => {
-  const splitPos = getSplitPosition(inputLine, isOverEval);
-  const splittedLine = inputLine.substr(0, splitPos);
-  const rest = inputLine.slice(splitPos).trimLeft();
-  /**
-   * end recursion if there is no rest, return single splitted line in an array
-   * so we can join them over the recursion
-   */
-  if (rest.length === 0) {
-    return [splittedLine];
-  }
-
-  return [splittedLine, ...getSplittedLines(rest, isOverEval)];
-};
-
 interface TextSchemaSetting {
   fontObj: {
     [key: string]: PDFFont;
   };
   fallbackFontName: string;
-  splitThreshold: number;
 }
 
 const drawInputByTextSchema = async (arg: {
@@ -281,7 +224,7 @@ const drawInputByTextSchema = async (arg: {
   textSchemaSetting: TextSchemaSetting;
 }) => {
   const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
-  const { fontObj, fallbackFontName, splitThreshold } = textSchemaSetting;
+  const { fontObj, fallbackFontName } = textSchemaSetting;
 
   const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
 
@@ -297,42 +240,23 @@ const drawInputByTextSchema = async (arg: {
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
-  let beforeLineOver = 0;
-
   input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
-    const isOverEval = (testString: string) => {
-      const testStringWidth =
-        fontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
-      /**
-       * split if the difference is less then two pixel
-       * (found out / tested this threshold heuristically, most probably widthOfTextAtSize is unprecise)
-       **/
-
-      return width - testStringWidth <= splitThreshold;
-    };
-    const splitedLines = getSplittedLines(inputLine, isOverEval);
-    const drawLine = (splitedLine: string, splitedLineIndex: number) => {
-      const textWidth =
-        fontValue.widthOfTextAtSize(splitedLine, size) +
-        (splitedLine.length - 1) * characterSpacing;
-      page.drawText(splitedLine, {
-        x: calcX(templateSchema.position.x, alignment, width, textWidth),
-        y:
-          calcY(templateSchema.position.y, pageHeight, size) -
-          lineHeight * size * (inputLineIndex + splitedLineIndex + beforeLineOver) -
-          (lineHeight === 0 ? 0 : ((lineHeight - 1) * size) / 2),
-        rotate,
-        size,
-        color,
-        lineHeight: lineHeight * size,
-        maxWidth: width,
-        font: fontValue,
-        wordBreaks: [''],
-      });
-      if (splitedLines.length === splitedLineIndex + 1) beforeLineOver += splitedLineIndex;
-    };
-
-    splitedLines.forEach(drawLine);
+    const textWidth =
+      fontValue.widthOfTextAtSize(inputLine, size) +
+      (inputLine.length - 1) * characterSpacing;
+    page.drawText(inputLine, {
+      x: calcX(templateSchema.position.x, alignment, width, textWidth),
+      y:
+        calcY(templateSchema.position.y, pageHeight, size) -
+        lineHeight * size * (inputLineIndex) -
+        (lineHeight === 0 ? 0 : ((lineHeight - 1) * size) / 2),
+      rotate,
+      size,
+      color,
+      lineHeight: lineHeight * size,
+      maxWidth: width,
+      font: fontValue,
+    });
   });
 };
 

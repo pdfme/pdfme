@@ -221,7 +221,7 @@ exports[`Designer snapshot 1`] = `
       >
         <div
           id="@pdfme/ui-paper0"
-          style="font-family: 'Helvetica'; top: 30px; left: 0px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+          style="font-family: 'Roboto'; top: 30px; left: 0px; margin: 0px auto; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
             class="ruler-container"
@@ -366,22 +366,13 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; border: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; outline: 1px dashed #4af;"
               title="field1"
             >
               <div
-                style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-all; color: rgb(0, 0, 0);"
+                style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
               >
-                <span
-                  style="letter-spacing: inherit;"
-                >
-                  b
-                </span>
-                <span
-                  style="letter-spacing: 0;"
-                >
-                  b
-                </span>
+                bb
               </div>
             </div>
           </div>
@@ -389,7 +380,7 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; border: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; outline: 1px dashed #4af;"
               title="field2"
             >
               <div

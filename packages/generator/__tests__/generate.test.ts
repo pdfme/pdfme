@@ -118,10 +118,7 @@ describe('generate integrate test', () => {
         const pdf = await generate({
           inputs,
           template,
-          options: {
-            font,
-            splitThreshold: 0,
-          },
+          options: { font },
         });
 
         const hrend = process.hrtime(hrstart);
