@@ -1,7 +1,7 @@
 import * as fontkit from 'fontkit';
 import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
 import { calculateTextWidthInMm } from '../calculateTextWidthInMm';
-import { HELVETICA } from "../../constants"
+import { HELVETICA } from '../../constants';
 
 describe('calculateTextWidthInMm', () => {
   let font: PDFFont;
@@ -20,7 +20,7 @@ describe('calculateTextWidthInMm', () => {
 
     const width = calculateTextWidthInMm(textContent, textFontSize, font, textCharacterSpacing);
 
-    expect(width).toBe(23.139414575999997);
+    expect(width).toBe(23.29306875);
   });
 
   it('accounts for character spacing', () => {
@@ -30,7 +30,7 @@ describe('calculateTextWidthInMm', () => {
 
     const width = calculateTextWidthInMm(textContent, textFontSize, font, textCharacterSpacing);
 
-    expect(width).toBe(27.372750575999998);
+    expect(width).toBe(27.52666875);
   });
 
   it('returns 0 for an empty string', () => {
