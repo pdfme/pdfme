@@ -3,10 +3,13 @@ import * as fontkit from 'fontkit';
 import type {
   Font,
   GenerateProps,
+  Schema,
   SchemaInputs,
   Template,
+  TextSchemaWithData,
 } from '@pdfme/common';
 import {
+  calculateDynamicFontSize,
   getDefaultFont,
   getFallbackFontName,
   checkGenerateProps,
@@ -21,9 +24,36 @@ import {
 import { TOOL_NAME } from './constants.js';
 
 const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
-  const { template, font } = arg;
-  const { basePdf } = template;
+  const { template, font, inputs } = arg;
+  const { basePdf, schemas } = template;
   const fallbackFontName = getFallbackFontName(font);
+
+  const schemaFieldMapping = async (
+    schemaFields: Record<string, Schema & { data?: string }>,
+    schemaInputs: SchemaInputs,
+    fallbackFontName: string
+  ) => {
+    for (const [key, value] of Object.entries(schemaFields)) {
+      if (value.type !== 'text') continue;
+
+      if (schemaInputs[key] !== undefined) {
+        value.data = schemaInputs[key];
+        value.fontName ??= fallbackFontName;
+        value.fontSizeScalingMin ??= value.fontSize;
+        value.fontSizeScalingMax ??= value.fontSize;
+
+        if (value.dynamicFontSizingEnabled) {
+          value.fontSize = await calculateDynamicFontSize(value as TextSchemaWithData, font);
+        }
+      }
+    }
+
+    return schemaFields;
+  };
+
+  schemas.map((schema: Record<string, Schema>, index: number) => {
+    schemaFieldMapping(schema, inputs[index], fallbackFontName);
+  });
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
