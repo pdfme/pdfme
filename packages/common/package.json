@@ -34,7 +34,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "develop": "tsc -w",
+    "develop": "tsc -p tsconfig.esm.json -w",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",

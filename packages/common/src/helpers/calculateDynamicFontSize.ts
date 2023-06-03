@@ -14,6 +14,29 @@ type DynamicFontSize = (
   font: Font | PDFFont
 ) => Promise<number>;
 
+const textContentRowMaxWidth = (
+  textContentRows: string[],
+  schemaFontSize: number,
+  pdfFont: PDFFont,
+  characterSpacingCount: number
+) => {
+  let textContentLargestRow = '';
+  let maxWidth = 0;
+
+  textContentRows.forEach((line) => {
+    const lineWidth = calculateTextWidthInMm(line, schemaFontSize, pdfFont, characterSpacingCount);
+
+    if (lineWidth > maxWidth) {
+      maxWidth = lineWidth;
+      textContentLargestRow = line;
+    }
+  });
+
+  return textContentLargestRow;
+};
+
+const pdfFontCache: { [fontName: string]: PDFFont } = {};
+
 export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, font) => {
   const {
     data,
@@ -34,13 +57,17 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   if (font instanceof PDFFont) {
     pdfFont = font;
   } else {
-    // TODO 
-    // It's possible to improve performance.
-    // Ideally, we'd like not to use PDFDocument. If that's not possible, we'll change to use cache.
-    const customFont = font[fontName || DEFAULT_FONT_NAME].data;
-    const doc = await PDFDocument.create();
-    doc.registerFontkit(fontkit);
-    pdfFont = await doc.embedFont(customFont);
+    if (!pdfFontCache[fontName || DEFAULT_FONT_NAME]) {
+      let fontData = font[fontName || DEFAULT_FONT_NAME].data;
+      if (typeof fontData === 'string' && fontData.startsWith('http')) {
+        fontData = await fetch(fontData).then((res) => res.arrayBuffer());
+      }
+
+      const doc = await PDFDocument.create();
+      doc.registerFontkit(fontkit);
+      pdfFontCache[fontName || DEFAULT_FONT_NAME] = await doc.embedFont(fontData);
+    }
+    pdfFont = pdfFontCache[fontName || DEFAULT_FONT_NAME];
   }
 
   let textWidthInMm;
@@ -49,26 +76,7 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
   let dynamicFontSize = baseFontSize;
   const textContentRows = data.split('\n');
 
-  const textContentRowMaxWidth = (
-    textContentRows: string[],
-    schemaFontSize: number,
-    font: PDFFont,
-    characterSpacingCount: number
-  ) => {
-    let textContentLargestRow = '';
-    let maxWidth = 0;
 
-    textContentRows.forEach((line) => {
-      const lineWidth = calculateTextWidthInMm(line, schemaFontSize, font, characterSpacingCount);
-
-      if (lineWidth > maxWidth) {
-        maxWidth = lineWidth;
-        textContentLargestRow = line;
-      }
-    });
-
-    return textContentLargestRow;
-  };
 
   if (textContentRows.length > 1) {
     const textContentLargestRow = textContentRowMaxWidth(
