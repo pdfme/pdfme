@@ -23,7 +23,8 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
-  const init = useCallback(async () => {
+  const init = async (prop: { template: Template; size: Size; }) => {
+    const { template, size } = prop;
     const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);
     const _pageSizes = await getPdfPageSizes(pdfBlob);
@@ -37,18 +38,16 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
     );
 
     return { backgrounds: _backgrounds, pageSizes: _pageSizes, scale: _scale };
-  }, [template, size]);
-
+  };
   useEffect(() => {
-    init()
+    init({ template, size })
       .then(({ pageSizes, scale, backgrounds }) => {
         setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
       })
       .catch((e: Error) => {
-        console.error(e);
         setError(e);
       });
-  }, [init]);
+  }, [template, size]);
 
   return { backgrounds, pageSizes, scale: scale * zoomLevel, error };
 };
