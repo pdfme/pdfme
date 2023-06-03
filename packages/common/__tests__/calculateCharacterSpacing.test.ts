@@ -1,4 +1,4 @@
-import { calculateCharacterSpacing } from '../calculateCharacterSpacing';
+import { calculateCharacterSpacing } from '../src/helpers/calculateCharacterSpacing';
 
 describe('calculateCharacterSpacing', () => {
   it('returns 0 when text content is an empty string', () => {

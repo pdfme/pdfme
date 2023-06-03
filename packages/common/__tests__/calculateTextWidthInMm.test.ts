@@ -1,7 +1,7 @@
 import * as fontkit from 'fontkit';
 import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
-import { calculateTextWidthInMm } from '../calculateTextWidthInMm';
-import { Roboto } from '../../constants';
+import { calculateTextWidthInMm } from '../src/helpers/calculateTextWidthInMm';
+import { Roboto } from '../src/constants';
 
 describe('calculateTextWidthInMm', () => {
   let font: PDFFont;
