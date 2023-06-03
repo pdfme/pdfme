@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref } from 'react';
+import React, { useContext, forwardRef, Ref, useState, useEffect } from 'react';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
@@ -6,9 +6,12 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
   TextSchema,
+  calculateDynamicFontSize,
 } from '@pdfme/common';
 import { SchemaUIProps } from './SchemaUI';
 import { ZOOM } from '../../constants';
+import { FontContext } from '../../contexts';
+
 
 type Props = SchemaUIProps & { schema: TextSchema };
 
@@ -16,6 +19,17 @@ const TextSchemaUI = (
   { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
+  const font = useContext(FontContext);
+
+
+  const [dynamicFontSize, setDynamicFontSize] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    if (schema.dynamicFontSize && schema.data) {
+      calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(setDynamicFontSize)
+    }
+  }, [schema.data, schema.width, schema.fontName, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
+
   const style: React.CSSProperties = {
     padding: 0,
     resize: 'none',
@@ -24,7 +38,7 @@ const TextSchemaUI = (
     height: schema.height * ZOOM,
     width: schema.width * ZOOM,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-    fontSize: `${schema.dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
+    fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     whiteSpace: 'pre-line',

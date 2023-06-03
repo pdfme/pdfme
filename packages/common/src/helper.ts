@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_FONT_NAME, Roboto } from './constants.js';
+import { DEFAULT_FONT_NAME, DEFAULT_FONT_VALUE } from './constants.js';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
 import {
   Inputs as InputsSchema,
@@ -75,7 +75,7 @@ export const getFallbackFontName = (font: Font) => {
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(Roboto), fallback: true },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
 });
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));

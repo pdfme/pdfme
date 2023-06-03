@@ -1,6 +1,4 @@
-// TODO そもそもこのpdfjs-distはtscでビルドできない
-// 昔のpdfmeのソースからwebpackのビルドに戻す
-// 多分tree-shakingは動かないかもしれないけど、とりあえず動くようにするべき
+// TODO Update pdfjs-dist. (might be able to reduce the bundle size.)
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
@@ -14,7 +12,6 @@ import {
   Schema,
   Size,
   DEFAULT_ALIGNMENT,
-  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
@@ -375,8 +372,6 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         delete cur.key;
         // @ts-ignore
         delete cur.data;
-        // @ts-ignore
-        delete cur.dynamicFontSize;
         acc[k] = cur;
 
         return acc;
@@ -411,12 +406,8 @@ export const getInitialSchema = (): SchemaForUI => ({
   height: 7,
   alignment: DEFAULT_ALIGNMENT,
   fontSize: DEFAULT_FONT_SIZE,
-  dynamicFontSize: DEFAULT_FONT_SIZE,
-  dynamicFontSizingEnabled: DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   characterSpacing: DEFAULT_CHARACTER_SPACING,
   lineHeight: DEFAULT_LINE_HEIGHT,
-  fontSizeScalingMin: DEFAULT_FONT_SIZE,
-  fontSizeScalingMax: DEFAULT_FONT_SIZE,
 });
 
 export const getSampleByType = (type: string) => {

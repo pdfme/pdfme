@@ -1,7 +1,7 @@
 import * as fontkit from 'fontkit';
 import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
 import { calculateTextWidthInMm } from '../src/helpers/calculateTextWidthInMm';
-import { Roboto } from '../src/constants';
+import { DEFAULT_FONT_VALUE } from '../src/constants';
 
 describe('calculateTextWidthInMm', () => {
   let font: PDFFont;
@@ -10,7 +10,7 @@ describe('calculateTextWidthInMm', () => {
     const doc = await PDFDocument.create();
 
     doc.registerFontkit(fontkit);
-    font = await doc.embedFont(Roboto);
+    font = await doc.embedFont(DEFAULT_FONT_VALUE);
   });
 
   it('returns the correct width for a simple string', () => {

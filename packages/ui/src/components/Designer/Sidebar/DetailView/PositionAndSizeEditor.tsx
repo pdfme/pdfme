@@ -1,5 +1,5 @@
 import React, { CSSProperties, useContext } from 'react';
-import { calculateDynamicFontSize, SchemaForUI, TextSchemaWithData } from '@pdfme/common';
+import { SchemaForUI } from '@pdfme/common';
 import { round } from '../../../../helper';
 import { SidebarProps } from '../index';
 import { FontContext } from '../../../../contexts';
@@ -238,28 +238,10 @@ const PositionAndSizeEditor = (
             name="input-width"
             style={inputStyle}
             type="number"
-            onChange={async (e) => {
+            onChange={(e) => {
               const value = Number(e.target.value);
-
               if (value >= 0 && activeSchema.position.x + value < pageSize.width) {
-                if (activeSchema.type === 'text' && activeSchema.dynamicFontSizingEnabled) {
-                  activeSchema.width = value;
-
-                  const dynamicFontSize = await calculateDynamicFontSize(
-                    activeSchema as TextSchemaWithData,
-                    font
-                  );
-
-                  changeSchemas([
-                    {
-                      key: 'dynamicFontSize',
-                      value: dynamicFontSize,
-                      schemaId: activeSchema.id,
-                    },
-                  ]);
-                } else {
-                  changeSchemas([{ key: 'width', value, schemaId: activeSchema.id }]);
-                }
+                changeSchemas([{ key: 'width', value, schemaId: activeSchema.id }]);
               }
             }}
             value={activeSchema.width}

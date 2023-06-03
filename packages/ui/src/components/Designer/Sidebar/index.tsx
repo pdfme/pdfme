@@ -19,7 +19,12 @@ export type SidebarProps = {
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   changeSchemas: (
-    objs: { key: string; value: string | number | boolean; schemaId: string }[]
+    objs: {
+      key: string; value: undefined | string | number | {
+        min: number;
+        max: number;
+      }; schemaId: string
+    }[]
   ) => void;
   addSchema: () => void;
 };
@@ -39,10 +44,6 @@ const Sidebar = (props: SidebarProps) => {
     if (activeSchema?.type === 'text') {
       if (!activeSchema.fontName) {
         activeSchema.fontName = fallbackFont;
-      }
-
-      if (!activeSchema.dynamicFontSizingEnabled) {
-        activeSchema.dynamicFontSizingEnabled = false;
       }
     }
 

@@ -283,10 +283,8 @@ const drawInputByTextSchema = async (arg: {
   const { width, rotate } = getSchemaSizeAndRotate(templateSchema);
   const { size: _size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
 
-  const size = templateSchema.dynamicFontSizingEnabled ?
-    await calculateDynamicFontSize(Object.assign(templateSchema, {
-      data: input,
-    }), fontValue) : _size;
+  const size = templateSchema.dynamicFontSize ?
+    await calculateDynamicFontSize({ textSchema: templateSchema, font: fontValue, input }) : _size;
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 

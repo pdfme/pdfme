@@ -90,7 +90,7 @@ const TemplateEditor = ({
   );
 
   const changeSchemas = useCallback(
-    (objs: { key: string; value: string | number | boolean; schemaId: string }[]) => {
+    (objs: { key: string; value: undefined | string | number | { min: number, max: number }; schemaId: string }[]) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
         // Assign to reference

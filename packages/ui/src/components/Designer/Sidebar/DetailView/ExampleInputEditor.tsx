@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { calculateDynamicFontSize, SchemaForUI, TextSchemaWithData } from '@pdfme/common';
+import { SchemaForUI } from '@pdfme/common';
 import { readFiles } from '../../../../helper';
 import { FontContext, I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
@@ -67,17 +67,6 @@ const ExampleInputEditor = (
           rows={6}
           onChange={async (e) => {
             changeSchemas([{ key: 'data', value: e.target.value, schemaId: activeSchema.id }]);
-          }}
-          onKeyUp={async () => {
-            if (activeSchema.type !== 'text' || !activeSchema.dynamicFontSizingEnabled) return;
-
-            changeSchemas([
-              {
-                key: 'dynamicFontSize',
-                value: await calculateDynamicFontSize(activeSchema as TextSchemaWithData, fontData),
-                schemaId: activeSchema.id,
-              },
-            ]);
           }}
           style={{
             width: '100%',

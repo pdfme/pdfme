@@ -1,18 +1,16 @@
 import { PDFDocument, PDFFont } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import { TextSchemaWithData, Font } from '../type';
+import { TextSchema, Font } from '../type';
 import { calculateTextWidthInMm } from './calculateTextWidthInMm';
 import {
+  DEFAULT_FONT_VALUE,
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
 } from '../constants';
 
-type DynamicFontSize = (
-  activeSchema: TextSchemaWithData,
-  font: Font | PDFFont
-) => Promise<number>;
+
 
 const textContentRowMaxWidth = (
   textContentRows: string[],
@@ -35,46 +33,56 @@ const textContentRowMaxWidth = (
   return textContentLargestRow;
 };
 
-const pdfFontCache: { [fontName: string]: PDFFont } = {};
+const pdfFontCache: { [fontName: string]: PDFFont } = {
+};
 
-export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, font) => {
+export const calculateDynamicFontSize = async ({ textSchema, font, input }: {
+  textSchema: TextSchema,
+  font: Font | PDFFont,
+  input: string,
+}
+) => {
   const {
-    data,
     fontName,
     fontSize,
-    fontSizeScalingMax,
-    fontSizeScalingMin,
+    dynamicFontSize: dynamicFontSizeSetting,
     characterSpacing,
     width,
-  } = activeSchema;
+  } = textSchema;
+
+  if (!dynamicFontSizeSetting) {
+    return fontSize || DEFAULT_FONT_SIZE;
+  }
 
   const baseFontSize = fontSize ?? DEFAULT_FONT_SIZE;
-  const minFontSize = fontSizeScalingMin ?? fontSize ?? DEFAULT_FONT_SIZE;
-  const maxFontSize = fontSizeScalingMax ?? fontSize ?? DEFAULT_FONT_SIZE;
+  const minFontSize = dynamicFontSizeSetting.min ?? fontSize ?? DEFAULT_FONT_SIZE;
+  const maxFontSize = dynamicFontSizeSetting.max ?? fontSize ?? DEFAULT_FONT_SIZE;
   const characterSpacingCount = characterSpacing ?? 0;
 
   let pdfFont: PDFFont;
   if (font instanceof PDFFont) {
     pdfFont = font;
   } else {
-    if (!pdfFontCache[fontName || DEFAULT_FONT_NAME]) {
-      let fontData = font[fontName || DEFAULT_FONT_NAME].data;
+    const fontNameToUse = fontName || DEFAULT_FONT_NAME;
+
+    if (!pdfFontCache[fontNameToUse]) {
+      let fontData = font[fontNameToUse] ? font[fontNameToUse].data : DEFAULT_FONT_VALUE;
       if (typeof fontData === 'string' && fontData.startsWith('http')) {
         fontData = await fetch(fontData).then((res) => res.arrayBuffer());
       }
 
       const doc = await PDFDocument.create();
       doc.registerFontkit(fontkit);
-      pdfFontCache[fontName || DEFAULT_FONT_NAME] = await doc.embedFont(fontData);
+      pdfFontCache[fontNameToUse] = await doc.embedFont(fontData);
     }
-    pdfFont = pdfFontCache[fontName || DEFAULT_FONT_NAME];
+    pdfFont = pdfFontCache[fontNameToUse];
   }
 
   let textWidthInMm;
   let textContent;
   let schemaFontSize = baseFontSize;
   let dynamicFontSize = baseFontSize;
-  const textContentRows = data.split('\n');
+  const textContentRows = input.split('\n');
 
 
 
@@ -96,13 +104,13 @@ export const calculateDynamicFontSize: DynamicFontSize = async (activeSchema, fo
     textContent = textContentLargestRow;
   } else {
     textWidthInMm = calculateTextWidthInMm(
-      data,
+      input,
       schemaFontSize,
       pdfFont,
       characterSpacingCount as number
     );
 
-    textContent = data;
+    textContent = input;
   }
 
   while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > minFontSize) {

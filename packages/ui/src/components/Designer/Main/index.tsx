@@ -9,7 +9,7 @@ import React, {
   useContext,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
-import { calculateDynamicFontSize, SchemaForUI, Size, TextSchemaWithData } from '@pdfme/common';
+import { SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -183,21 +183,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     targetSchema.height = fmt(height);
     targetSchema.position.y = fmt(top);
     targetSchema.position.x = fmt(left);
-
-    if (targetSchema.type === 'text' && targetSchema.dynamicFontSizingEnabled) {
-      const dynamicFontSize = await calculateDynamicFontSize(
-        targetSchema as TextSchemaWithData,
-        font
-      );
-
-      changeSchemas([
-        {
-          key: 'dynamicFontSize',
-          value: dynamicFontSize,
-          schemaId: targetSchema.id,
-        },
-      ]);
-    }
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -340,24 +325,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
             onChange={async (value) => {
-              if (schema.type === 'text' && schema.dynamicFontSizingEnabled) {
-                schema.data = value;
-
-                const dynamicFontSize = await calculateDynamicFontSize(
-                  schema as TextSchemaWithData,
-                  font
-                );
-
-                changeSchemas([
-                  {
-                    key: 'dynamicFontSize',
-                    value: dynamicFontSize,
-                    schemaId: schema.id,
-                  },
-                ]);
-              } else {
-                changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
-              }
+              changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
             ref={inputRef}

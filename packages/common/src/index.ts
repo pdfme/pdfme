@@ -10,7 +10,7 @@ import {
   DEFAULT_PT_TO_MM_RATIO,
   DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
-  Roboto,
+  DEFAULT_FONT_VALUE,
 } from './constants.js';
 import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
@@ -20,7 +20,6 @@ import type {
   SchemaType,
   BarCodeType,
   TextSchema,
-  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,
@@ -68,7 +67,7 @@ export {
   DEFAULT_PT_TO_MM_RATIO,
   DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
-  Roboto,
+  DEFAULT_FONT_VALUE,
   schemaTypes,
   isTextSchema,
   isImageSchema,
@@ -96,7 +95,6 @@ export type {
   SchemaType,
   BarCodeType,
   TextSchema,
-  TextSchemaWithData,
   ImageSchema,
   BarcodeSchema,
   Schema,

@@ -34,16 +34,10 @@ export const TextSchema = CommonSchema.extend({
   backgroundColor: z.string().optional(),
   characterSpacing: z.number().optional(),
   lineHeight: z.number().optional(),
-  /*
-  TODO Change to the following property name.
-    "dynamicFontSize": {
-      "max": 100, 
-      "min": 10
-    },
-  */ 
-  fontSizeScalingMin: z.number().optional(),
-  fontSizeScalingMax: z.number().optional(),
-  dynamicFontSizingEnabled: z.boolean().optional(),
+  dynamicFontSize: z.object({
+    max: z.number(),
+    min: z.number(),
+  }).optional(),
 });
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
@@ -52,14 +46,12 @@ export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
 
 export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
-export const TextSchemaWithData = TextSchema.extend({ data: z.string() });
-
 const SchemaForUIAdditionalInfo = z.object({
   id: z.string(), key: z.string(), data: z.string(),
 });
 
 export const SchemaForUI = z.union([
-  TextSchema.extend({ dynamicFontSize: z.number().optional() }).merge(SchemaForUIAdditionalInfo),
+  TextSchema.merge(SchemaForUIAdditionalInfo),
   ImageSchema.merge(SchemaForUIAdditionalInfo),
   BarcodeSchema.merge(SchemaForUIAdditionalInfo),
 ]);

@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
 import {
-  calculateDynamicFontSize,
   SchemaForUI,
-  TextSchemaWithData,
   getFallbackFontName,
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
@@ -122,7 +120,7 @@ const SelectSet = (props: {
 const CheckboxSet = (props: {
   width: string;
   label: string;
-  onChange: () => void;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
   checked: boolean | undefined;
 }) => {
   const { width, label, onChange, checked } = props;
@@ -152,21 +150,6 @@ const TextPropEditor = (
 
   if (activeSchema.type !== 'text') return <></>;
 
-  const triggerDynamicFontSizing = async (activeSchema: SchemaForUI) => {
-    const dynamicFontSize = await calculateDynamicFontSize(
-      activeSchema as TextSchemaWithData,
-      font
-    );
-
-    changeSchemas([
-      {
-        key: 'dynamicFontSize',
-        value: dynamicFontSize,
-        schemaId: activeSchema.id,
-      },
-    ]);
-  };
-
   return (
     <section style={{ fontSize: '0.7rem' }}>
       <div
@@ -182,18 +165,9 @@ const TextPropEditor = (
           value={activeSchema.fontName ?? fallbackFontName}
           options={Object.keys(font)}
           onChange={(e) => {
-            if (activeSchema.dynamicFontSizingEnabled) {
-              activeSchema.fontName = e.target.value;
-              triggerDynamicFontSizing(activeSchema);
-            } else {
-              changeSchemas([
-                {
-                  key: 'fontName',
-                  value: e.target.value,
-                  schemaId: activeSchema.id,
-                },
-              ]);
-            }
+            changeSchemas([
+              { key: 'fontName', value: e.target.value, schemaId: activeSchema.id, },
+            ]);
           }}
         />
 
@@ -220,39 +194,9 @@ const TextPropEditor = (
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
           onChange={(e) => {
             const currentFontSize = Number(e.target.value);
-
-            if (activeSchema.dynamicFontSizingEnabled) {
-              activeSchema.fontSize = currentFontSize;
-
-              if (
-                activeSchema.fontSizeScalingMax &&
-                activeSchema.fontSizeScalingMax < currentFontSize
-              ) {
-                activeSchema.fontSizeScalingMax = currentFontSize;
-              }
-
-              if (
-                activeSchema.fontSizeScalingMin &&
-                activeSchema.fontSizeScalingMin > currentFontSize
-              ) {
-                activeSchema.fontSizeScalingMin = currentFontSize;
-              }
-
-              triggerDynamicFontSizing(activeSchema);
-            } else {
-              changeSchemas([
-                {
-                  key: 'fontSize',
-                  value: currentFontSize,
-                  schemaId: activeSchema.id,
-                },
-                {
-                  key: 'dynamicFontSize',
-                  value: currentFontSize,
-                  schemaId: activeSchema.id,
-                },
-              ]);
-            }
+            changeSchemas([
+              { key: 'fontSize', value: currentFontSize, schemaId: activeSchema.id, },
+            ]);
           }}
         />
         <NumberInputSet
@@ -272,19 +216,9 @@ const TextPropEditor = (
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
           onChange={async (e) => {
             const currentCharacterSpacing = Number(e.target.value);
-
-            if (activeSchema.dynamicFontSizingEnabled) {
-              activeSchema.characterSpacing = currentCharacterSpacing;
-              triggerDynamicFontSizing(activeSchema);
-            } else {
-              changeSchemas([
-                {
-                  key: 'characterSpacing',
-                  value: currentCharacterSpacing,
-                  schemaId: activeSchema.id,
-                },
-              ]);
-            }
+            changeSchemas([
+              { key: 'characterSpacing', value: currentCharacterSpacing, schemaId: activeSchema.id, },
+            ]);
           }}
         />
       </div>
@@ -300,54 +234,40 @@ const TextPropEditor = (
         <CheckboxSet
           width="100%"
           label="Use dynamic font size"
-          checked={activeSchema.dynamicFontSizingEnabled}
-          onChange={() => {
-            const newCheckedState = !activeSchema.dynamicFontSizingEnabled;
-
-            if (newCheckedState) {
-              activeSchema.dynamicFontSizingEnabled = true;
-              triggerDynamicFontSizing(activeSchema);
-            } else {
-              const currentFontSize = Number(activeSchema.fontSize);
-
-              changeSchemas([
-                {
-                  key: 'dynamicFontSizingEnabled',
-                  value: newCheckedState,
-                  schemaId: activeSchema.id,
-                },
-                {
-                  key: 'dynamicFontSize',
-                  value: currentFontSize,
-                  schemaId: activeSchema.id,
-                },
-              ]);
-            }
+          checked={Boolean(activeSchema.dynamicFontSize)}
+          onChange={(e) => {
+            changeSchemas([
+              {
+                key: 'dynamicFontSize', value: e.target.checked ? {
+                  min: activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                  max: activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                } : undefined, schemaId: activeSchema.id,
+              },
+            ]);
           }}
         />
 
-        {activeSchema.dynamicFontSizingEnabled && (
+        {activeSchema.dynamicFontSize && (
           <>
             <NumberInputSet
               width="45%"
               label={'FontSize Min(pt)'}
-              value={activeSchema.fontSizeScalingMin ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
               maxNumber={activeSchema.fontSize}
               onChange={(e) => {
-                activeSchema.fontSizeScalingMin = Number(e.target.value);
-                triggerDynamicFontSizing(activeSchema);
+                changeSchemas([{ key: 'dynamicFontSize.min', value: Number(e.target.value), schemaId: activeSchema.id }])
+
               }}
             />
 
             <NumberInputSet
               width="45%"
               label={'FontSize Max(pt)'}
-              value={activeSchema.fontSizeScalingMax ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
               minNumber={activeSchema.fontSize}
               onChange={(e) => {
-                activeSchema.fontSizeScalingMax = Number(e.target.value);
-                triggerDynamicFontSizing(activeSchema);
+                changeSchemas([{ key: 'dynamicFontSize.max', value: Number(e.target.value), schemaId: activeSchema.id }])
               }}
             />
           </>
