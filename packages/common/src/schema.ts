@@ -34,9 +34,15 @@ export const TextSchema = CommonSchema.extend({
   backgroundColor: z.string().optional(),
   characterSpacing: z.number().optional(),
   lineHeight: z.number().optional(),
+  /*
+  TODO Change to the following property name.
+    "dynamicFontSize": {
+      "max": 100, 
+      "min": 10
+    },
+  */ 
   fontSizeScalingMin: z.number().optional(),
   fontSizeScalingMax: z.number().optional(),
-  dynamicFontSize: z.number().optional(),
   dynamicFontSizingEnabled: z.boolean().optional(),
 });
 
@@ -48,10 +54,12 @@ export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
 export const TextSchemaWithData = TextSchema.extend({ data: z.string() });
 
-const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
+const SchemaForUIAdditionalInfo = z.object({
+  id: z.string(), key: z.string(), data: z.string(),
+});
 
 export const SchemaForUI = z.union([
-  TextSchema.merge(SchemaForUIAdditionalInfo),
+  TextSchema.extend({ dynamicFontSize: z.number().optional() }).merge(SchemaForUIAdditionalInfo),
   ImageSchema.merge(SchemaForUIAdditionalInfo),
   BarcodeSchema.merge(SchemaForUIAdditionalInfo),
 ]);
