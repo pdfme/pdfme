@@ -18,6 +18,12 @@
   <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
     <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet" />
   </a>
+    <a href="https://discord.gg/xWPTJbmgNV">
+    <img
+      src="https://img.shields.io/static/v1?label=discord&message=pdfme&color=566fbb&style=flat-square"
+      alt="Discord Badge"
+    />
+  </a>
 </p>
 
 TypeScript base PDF generator and React base UI.
