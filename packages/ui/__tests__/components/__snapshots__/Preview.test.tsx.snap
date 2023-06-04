@@ -229,7 +229,36 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <div
               style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
             >
-              field1
+              <span
+                style="letter-spacing: inherit;"
+              >
+                f
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                i
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                e
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                l
+              </span>
+              <span
+                style="letter-spacing: inherit;"
+              >
+                d
+              </span>
+              <span
+                style="letter-spacing: 0;"
+              >
+                1
+              </span>
             </div>
           </div>
         </div>

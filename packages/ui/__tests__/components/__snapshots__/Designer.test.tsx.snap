@@ -372,7 +372,16 @@ exports[`Designer snapshot 1`] = `
               <div
                 style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
               >
-                bb
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  b
+                </span>
+                <span
+                  style="letter-spacing: 0;"
+                >
+                  b
+                </span>
               </div>
             </div>
           </div>
