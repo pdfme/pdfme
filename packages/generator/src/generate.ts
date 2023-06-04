@@ -20,39 +20,6 @@ import {
 } from './helper.js';
 import { TOOL_NAME } from './constants.js';
 
-type FontData = {
-  fallback?: boolean;
-  subset?: boolean;
-  data: string | ArrayBuffer | Uint8Array;
-};
-
-function deepCopyFont(font: Record<string, FontData>): Record<string, FontData> {
-  const copiedFont: Record<string, FontData> = {};
-
-  for (const [key, value] of Object.entries(font)) {
-    copiedFont[key] = {
-      ...value,
-      data: deepCopy(value.data)
-    };
-  }
-
-  return copiedFont;
-}
-
-function deepCopy(data: string | ArrayBuffer | Uint8Array): string | ArrayBuffer | Uint8Array {
-  if (typeof data === 'string') {
-    // String is immutable in TypeScript, so just return it
-    return data;
-  } else if (data instanceof ArrayBuffer) {
-    // Create a new ArrayBuffer with the same content
-    return data.slice(0);
-  } else if (data instanceof Uint8Array) {
-    // Create a new Uint8Array with the same content
-    return new Uint8Array(data);
-  } else {
-    throw new Error('Unsupported data type');
-  }
-}
 const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
   const { template, font } = arg;
   const { basePdf } = template;
@@ -82,7 +49,7 @@ const generate = async (props: GenerateProps) => {
 
 
 
-  const preRes = await preprocessing({ inputs, template, font: deepCopyFont(font) });
+  const preRes = await preprocessing({ inputs, template, font });
   const { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
 
   const inputImageCache: InputImageCache = {};
@@ -102,7 +69,7 @@ const generate = async (props: GenerateProps) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const fontSetting = { font: deepCopyFont(font), pdfFontObj, fallbackFontName };
+        const fontSetting = { font, pdfFontObj, fallbackFontName };
 
         await drawInputByTemplateSchema({
           input,
