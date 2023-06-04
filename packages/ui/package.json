@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -41,7 +41,7 @@
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
     "@heroicons/react": "^2.0.13",
-    "@pdfme/common": "file:../common",
+    "@pdfme/common": "^1.2.1",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "^2.12.313",
