@@ -14,7 +14,6 @@ import {
   getB64BasePdf,
   b64toUint8Array,
   validateBarcodeInput,
-  calculateDynamicFontSize,
   Schema,
   TextSchema,
   isTextSchema,
@@ -31,6 +30,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  calculateDynamicFontSize,
 } from '@pdfme/common';
 
 export interface InputImageCache {
@@ -167,8 +167,8 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const getFontProp = (schema: TextSchema) => {
-  const size = schema.fontSize ?? DEFAULT_FONT_SIZE;
+const getFontProp = async ({ input, font, schema }: { input: string, font: Font, schema: TextSchema }) => {
+  const size = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
@@ -258,8 +258,9 @@ const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] =
   return [splittedLine, ...getSplittedLines(rest, isOverEval)];
 };
 
-interface TextSchemaSetting {
-  fontObj: {
+interface FontSetting {
+  font: Font;
+  pdfFontObj: {
     [key: string]: PDFFont;
   };
   fallbackFontName: string;
@@ -271,20 +272,17 @@ const drawInputByTextSchema = async (arg: {
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: TextSchemaSetting;
+  fontSetting: FontSetting;
 }) => {
-  const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
-  const { fontObj, fallbackFontName } = textSchemaSetting;
+  const { input, templateSchema, page, pageHeight, fontSetting } = arg;
+  const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
-  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
+  const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const { size: _size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
-
-  const size = templateSchema.dynamicFontSize ?
-    await calculateDynamicFontSize({ textSchema: templateSchema, font: fontValue, input }) : _size;
+  const { size, color, alignment, lineHeight, characterSpacing } = await getFontProp({ input, font, schema: templateSchema });
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
@@ -293,13 +291,13 @@ const drawInputByTextSchema = async (arg: {
   input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
     const isOverEval = (testString: string) => {
       const testStringWidth =
-        fontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
+        pdfFontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
       return width <= testStringWidth;
     };
     const splitedLines = getSplittedLines(inputLine, isOverEval);
     const drawLine = (splitedLine: string, splitedLineIndex: number) => {
       const textWidth =
-        fontValue.widthOfTextAtSize(splitedLine, size) +
+        pdfFontValue.widthOfTextAtSize(splitedLine, size) +
         (splitedLine.length - 1) * characterSpacing;
       page.drawText(splitedLine, {
         x: calcX(templateSchema.position.x, alignment, width, textWidth),
@@ -312,7 +310,7 @@ const drawInputByTextSchema = async (arg: {
         color,
         lineHeight: lineHeight * size,
         maxWidth: width,
-        font: fontValue,
+        font: pdfFontValue,
         wordBreaks: [''],
       });
       if (splitedLines.length === splitedLineIndex + 1) beforeLineOver += splitedLineIndex;
@@ -389,7 +387,7 @@ export const drawInputByTemplateSchema = async (arg: {
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: TextSchemaSetting;
+  fontSetting: FontSetting;
   inputImageCache: InputImageCache;
 }) => {
   if (!arg.input || !arg.templateSchema) return;

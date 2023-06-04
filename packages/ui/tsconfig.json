@@ -13,7 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": ["node", "jest", "@types/jest"],
-    "typeRoots": ["../node_modules/@types"],
+    "typeRoots": ["../node_modules/@types", "../common/dist/types/src/index.d.ts"],
     "sourceMap": true
   },
   "baseUrl": ".",

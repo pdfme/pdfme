@@ -46,6 +46,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "fontkit": "^2.0.2",
     "zod": "^3.20.2"
   },
@@ -69,5 +70,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "@types/fontkit": "^2.0.3"
   }
 }

@@ -20,6 +20,39 @@ import {
 } from './helper.js';
 import { TOOL_NAME } from './constants.js';
 
+type FontData = {
+  fallback?: boolean;
+  subset?: boolean;
+  data: string | ArrayBuffer | Uint8Array;
+};
+
+function deepCopyFont(font: Record<string, FontData>): Record<string, FontData> {
+  const copiedFont: Record<string, FontData> = {};
+
+  for (const [key, value] of Object.entries(font)) {
+    copiedFont[key] = {
+      ...value,
+      data: deepCopy(value.data)
+    };
+  }
+
+  return copiedFont;
+}
+
+function deepCopy(data: string | ArrayBuffer | Uint8Array): string | ArrayBuffer | Uint8Array {
+  if (typeof data === 'string') {
+    // String is immutable in TypeScript, so just return it
+    return data;
+  } else if (data instanceof ArrayBuffer) {
+    // Create a new ArrayBuffer with the same content
+    return data.slice(0);
+  } else if (data instanceof Uint8Array) {
+    // Create a new Uint8Array with the same content
+    return new Uint8Array(data);
+  } else {
+    throw new Error('Unsupported data type');
+  }
+}
 const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
   const { template, font } = arg;
   const { basePdf } = template;
@@ -28,12 +61,12 @@ const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);
 
-  const fontObj = await embedAndGetFontObj({ pdfDoc, font });
+  const pdfFontObj = await embedAndGetFontObj({ pdfDoc, font });
 
   const pagesAndBoxes = await getEmbeddedPagesAndEmbedPdfBoxes({ pdfDoc, basePdf });
   const { embeddedPages, embedPdfBoxes } = pagesAndBoxes;
 
-  return { pdfDoc, fontObj, fallbackFontName, embeddedPages, embedPdfBoxes };
+  return { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes };
 };
 
 const postProcessing = (pdfDoc: PDFDocument) => {
@@ -47,8 +80,10 @@ const generate = async (props: GenerateProps) => {
   const { font = getDefaultFont() } = options;
   const { schemas } = template;
 
-  const preRes = await preprocessing({ inputs, template, font });
-  const { pdfDoc, fontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
+
+
+  const preRes = await preprocessing({ inputs, template, font: deepCopyFont(font) });
+  const { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
 
   const inputImageCache: InputImageCache = {};
   for (let i = 0; i < inputs.length; i += 1) {
@@ -67,16 +102,15 @@ const generate = async (props: GenerateProps) => {
         const schema = schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const textSchemaSetting = { fontObj, fallbackFontName };
+        const fontSetting = { font: deepCopyFont(font), pdfFontObj, fallbackFontName };
 
-        // eslint-disable-next-line no-await-in-loop
         await drawInputByTemplateSchema({
           input,
           templateSchema,
           pdfDoc,
           page,
           pageHeight,
-          textSchemaSetting,
+          fontSetting,
           inputImageCache,
         });
       }

@@ -215,7 +215,7 @@ common/dist/types/src/type.d.ts:64
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:11
+common/dist/types/src/constants.d.ts:10
 
 ___
 
@@ -225,7 +225,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:12
+common/dist/types/src/constants.d.ts:11
 
 ## Functions
 
@@ -353,7 +353,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:44](https://github.com/pdfme/pdfme/blob/d883322/packages/generator/src/generate.ts#L44)
+[generator/src/generate.ts:77](https://github.com/pdfme/pdfme/blob/a0dff70/packages/generator/src/generate.ts#L77)
 
 ___
 

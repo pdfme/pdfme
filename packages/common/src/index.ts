@@ -8,7 +8,6 @@ import {
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
   DEFAULT_PT_TO_MM_RATIO,
-  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
@@ -53,7 +52,7 @@ import {
   checkGenerateProps,
   validateBarcodeInput,
 } from './helper.js';
-import { calculateDynamicFontSize } from './helpers/calculateDynamicFontSize.js';
+import { calculateDynamicFontSize } from './calculateDynamicFontSize.js';
 
 export {
   DEFAULT_FONT_NAME,
@@ -65,7 +64,6 @@ export {
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
   DEFAULT_PT_TO_MM_RATIO,
-  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
   schemaTypes,

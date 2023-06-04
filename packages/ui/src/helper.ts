@@ -15,7 +15,6 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
-  DEFAULT_DYNAMIC_FONT_SIZE_ENABLED,
 } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT } from './constants';
 
