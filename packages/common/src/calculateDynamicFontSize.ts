@@ -23,20 +23,34 @@ const calculateCharacterSpacing = (
   textCharacterSpacing: number
 ) => {
   const numberOfCharacters = textContent.length;
-  return numberOfCharacters <= 1 ? numberOfCharacters * textCharacterSpacing : (numberOfCharacters - 1) * textCharacterSpacing;
+  return (numberOfCharacters - 1) * textCharacterSpacing;
 };
 
 const calculateTextWidthInMm = (textContent: string, textWidth: number, textCharacterSpacing: number) =>
   (textWidth + calculateCharacterSpacing(textContent, textCharacterSpacing)) * DEFAULT_PT_TO_MM_RATIO;
 
-const textContentRowMaxWidth = (
-  textContentRows: string[],
-  textWidth: number,
-  characterSpacingCount: number
-) => textContentRows.reduce((maxRow, line) => {
-  const lineWidth = calculateTextWidthInMm(line, textWidth, characterSpacingCount);
-  return lineWidth > calculateTextWidthInMm(maxRow, textWidth, characterSpacingCount) ? line : maxRow;
-}, '');
+  const getLongestLine = (
+    textContentRows: string[],
+    fontKitFont: fontkit.Font,
+    fontSize: number,
+    characterSpacingCount: number
+  ) => {
+    let longestLine = '';
+    let maxLineWidth = 0;
+  
+    textContentRows.forEach((line) => {
+      const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize);
+      const lineWidth = calculateTextWidthInMm(line, textWidth, characterSpacingCount);
+  
+      if (lineWidth > maxLineWidth) {
+        longestLine = line;
+        maxLineWidth = lineWidth;
+      }
+    });
+  
+    return longestLine;
+  };
+  
 
 const fontKitFontCache: { [fontName: string]: fontkit.Font } = {};
 const createFontKitFont = async (font: Font, fontName: string = DEFAULT_FONT_NAME) => {
@@ -55,27 +69,32 @@ const createFontKitFont = async (font: Font, fontName: string = DEFAULT_FONT_NAM
   return fontKitFont;
 }
 
+const getTextContent = (input: string, fontKitFont: fontkit.Font, fontSize: number, characterSpacingCount: number): string => {
+  const textContentRows = input.split('\n');
+  return textContentRows.length > 1 ? getLongestLine(textContentRows, fontKitFont, fontSize, characterSpacingCount) : input;
+}
+
 export const calculateDynamicFontSize = async ({ textSchema, font, input }: { textSchema: TextSchema, font: Font, input: string }) => {
-  const { fontName, fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width } = textSchema;
-  if (!dynamicFontSizeSetting) return fontSize || DEFAULT_FONT_SIZE;
+  const { fontName, fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width } = textSchema;
+  const fontSize = _fontSize || DEFAULT_FONT_SIZE;
+  if (!dynamicFontSizeSetting) return fontSize;
 
   const characterSpacingCount = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const fontKitFont = await createFontKitFont(font, fontName);
-  const textWidth = widthOfTextAtSize(input, fontKitFont, fontSize || DEFAULT_FONT_SIZE);
-  const textContentRows = input.split('\n');
-  const textContent = textContentRows.length > 1 ? textContentRowMaxWidth(textContentRows, textWidth, characterSpacingCount) : input;
+  const textContent = getTextContent(input, fontKitFont, fontSize, characterSpacingCount);
+  const textWidth = widthOfTextAtSize(textContent, fontKitFont, fontSize);
 
-  let dynamicFontSize = fontSize ?? DEFAULT_FONT_SIZE;
+  let dynamicFontSize = fontSize;
   let textWidthInMm = calculateTextWidthInMm(textContent, textWidth, characterSpacingCount);
 
-  while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > (dynamicFontSizeSetting.min ?? fontSize ?? DEFAULT_FONT_SIZE)) {
+  while (textWidthInMm > width - DEFAULT_TOLERANCE && dynamicFontSize > dynamicFontSizeSetting.min) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
-    textWidthInMm = calculateTextWidthInMm(textContent, widthOfTextAtSize(input, fontKitFont, dynamicFontSize), characterSpacingCount);
+    textWidthInMm = calculateTextWidthInMm(textContent, widthOfTextAtSize(textContent, fontKitFont, dynamicFontSize), characterSpacingCount);
   }
 
-  while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < (dynamicFontSizeSetting.max ?? fontSize ?? DEFAULT_FONT_SIZE)) {
+  while (textWidthInMm < width - DEFAULT_TOLERANCE && dynamicFontSize < dynamicFontSizeSetting.max) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
-    textWidthInMm = calculateTextWidthInMm(textContent, widthOfTextAtSize(input, fontKitFont, dynamicFontSize), characterSpacingCount);
+    textWidthInMm = calculateTextWidthInMm(textContent, widthOfTextAtSize(textContent, fontKitFont, dynamicFontSize), characterSpacingCount);
   }
 
   return dynamicFontSize;

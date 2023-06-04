@@ -60,7 +60,17 @@ const TextSchemaUI = (
     ></textarea>
   ) : (
     <div style={style}>
-      {schema.data}
+      {/*  Set the letterSpacing of the last character to 0. */}
+      {schema.data.split('').map((l, i) => (
+        <span
+          key={i}
+          style={{
+            letterSpacing: String(schema.data).length === i + 1 ? 0 : 'inherit',
+          }}
+        >
+          {l}
+        </span>
+      ))}
     </div>
   );
 };
