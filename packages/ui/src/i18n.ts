@@ -69,8 +69,33 @@ const dictAr: { [key in keyof DictEn]: string } = {
   bulkUpdateFieldName: 'تغيير الأسماء',
 };
 
+const dictTh: { [key in keyof DictEn]: string } = {
+  cancel: 'ยกเลิก',
+  field: 'ฟิลด์',
+  fieldName: 'ชื่อฟิลด์',
+  require: 'จำเป็น',
+  uniq: 'ต้องไม่ซ้ำกัน',
+  inputExample: 'ตัวอย่าง',
+  edit: 'แก้ไข',
+  plsInputName: 'กรุณาใส่ชื่อ',
+  fieldMustUniq: 'ชื่อฟิลด์ต้องไม่ซ้ำกัน',
+  notUniq: '(ชื่อฟิลด์ซ้ำกัน)',
+  noKeyName: 'ไม่มีชื่อ',
+  fieldsList: 'รายการฟิลด์ทั้งหมด',
+  addNewField: 'เพิ่มฟิลด์ใหม่',
+  editField: 'แก้ไขฟิลด์',
+  type: 'ประเภท',
+  errorOccurred: 'เกิดข้อผิดพลาด',
+  errorBulkUpdateFieldName: 'ไม่สามารถยืนยันการแก้ไขได้เนื่องจากจำนวนรายการมีการเปลี่ยนแปลง',
+  commitBulkUpdateFieldName: 'ยืนยันการแก้ไข',
+  bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
+};
+
 const i18n = (lang: Lang, key: keyof DictEn) => {
   switch (lang) {
+    case 'th':
+      return dictTh[key];
+
     case 'ar':
       return dictAr[key];
 
