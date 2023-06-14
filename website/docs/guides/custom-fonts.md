@@ -1,6 +1,6 @@
 # Custom Fonts
 
-pdfme uses the helvetica font by default, but you can use any font you like.
+pdfme uses the [Roboto Regular 400](https://fonts.google.com/specimen/Roboto) font by default, but you can use any font you like.
 
 ## About Font type
 

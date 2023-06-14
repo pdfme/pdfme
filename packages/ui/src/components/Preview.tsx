@@ -103,7 +103,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
               placeholder={template.sampledata ? template.sampledata[0][key] : ''}
               tabIndex={index + 100}
               onChange={(value) => handleChangeInput({ key, value })}
-              border={editable ? '1px dashed #4af' : 'transparent'}
+              outline={editable ? '1px dashed #4af' : 'transparent'}
             />
           );
         }}

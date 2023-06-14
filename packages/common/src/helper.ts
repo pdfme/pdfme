@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { HELVETICA } from './constants.js';
+import { Buffer } from 'buffer';
+import { DEFAULT_FONT_NAME, DEFAULT_FONT_VALUE } from './constants.js';
 import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
 import {
   Inputs as InputsSchema,
@@ -10,8 +11,6 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema.js';
-
-const DEFAULT_FONT_NAME = 'Helvetica';
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
@@ -42,13 +41,7 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
   return basePdf as string;
 };
 
-const getByteString = (base64: string) => {
-  if (typeof window !== 'undefined' && window.atob) {
-    return window.atob(base64);
-  } else {
-    return Buffer.from(base64, 'base64').toString('binary');
-  }
-};
+const getByteString = (base64: string) => Buffer.from(base64, 'base64').toString('binary');
 
 export const b64toUint8Array = (base64: string) => {
   const data = base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64;
@@ -77,7 +70,7 @@ export const getFallbackFontName = (font: Font) => {
 };
 
 export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(HELVETICA), fallback: true },
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
 });
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));

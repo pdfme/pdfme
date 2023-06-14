@@ -1,7 +1,7 @@
 /* eslint dot-notation: "off"*/
 import { z } from 'zod';
 
-const langs = ['en', 'ja', 'ar'] as const;
+const langs = ['en', 'ja', 'ar', 'th'] as const;
 export const Lang = z.enum(langs);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
@@ -34,6 +34,10 @@ export const TextSchema = CommonSchema.extend({
   backgroundColor: z.string().optional(),
   characterSpacing: z.number().optional(),
   lineHeight: z.number().optional(),
+  dynamicFontSize: z.object({
+    max: z.number(),
+    min: z.number(),
+  }).optional(),
 });
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
@@ -42,7 +46,10 @@ export const BarcodeSchema = CommonSchema.extend({ type: BarcodeSchemaType });
 
 export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
 
-const SchemaForUIAdditionalInfo = z.object({ id: z.string(), key: z.string(), data: z.string() });
+const SchemaForUIAdditionalInfo = z.object({
+  id: z.string(), key: z.string(), data: z.string(),
+});
+
 export const SchemaForUI = z.union([
   TextSchema.merge(SchemaForUIAdditionalInfo),
   ImageSchema.merge(SchemaForUIAdditionalInfo),
@@ -80,14 +87,14 @@ export const CommonProps = z.object({
 
 // -------------------generate-------------------
 
-export const GeneratorOptions = CommonOptions.extend({
-  splitThreshold: z.number().optional(),
-});
+export const GeneratorOptions = CommonOptions;
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions.optional(),
 }).strict();
+
+export const SchemaInputs = z.record(z.string());
 
 // ---------------------------------------------
 

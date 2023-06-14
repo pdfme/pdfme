@@ -30,6 +30,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  calculateDynamicFontSize,
 } from '@pdfme/common';
 
 export interface InputImageCache {
@@ -166,8 +167,8 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const getFontProp = (schema: TextSchema) => {
-  const size = schema.fontSize ?? DEFAULT_FONT_SIZE;
+const getFontProp = async ({ input, font, schema }: { input: string, font: Font, schema: TextSchema }) => {
+  const size = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
@@ -208,15 +209,15 @@ const drawBackgroundColor = (arg: {
 };
 
 type IsOverEval = (testString: string) => boolean;
+
 /**
- * Incrementally check the current line for it's real length
- * and return the position where it exceeds the box width.
- *
- * return `null` to indicate if inputLine is shorter as the available bbox
+ * Incrementally checks the current line for its real length
+ * and returns the position where it exceeds the box width.
+ * Returns `null` to indicate if inputLine is shorter as the available bbox.
  */
 const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
-  for (let i = 0; i <= inputLine.length; i += 1) {
-    if (isOverEval(inputLine.substr(0, i))) {
+  for (let i = 0; i <= inputLine.length; i++) {
+    if (isOverEval(inputLine.slice(0, i))) {
       return i;
     }
   }
@@ -225,69 +226,64 @@ const getOverPosition = (inputLine: string, isOverEval: IsOverEval) => {
 };
 
 /**
- * Get position of the split. Split the exceeding line at
+ * Gets the position of the split. Splits the exceeding line at
  * the last whitespace over it exceeds the bounding box width.
  */
 const getSplitPosition = (inputLine: string, isOverEval: IsOverEval) => {
   const overPos = getOverPosition(inputLine, isOverEval);
-  /**
-   * if input line is shorter as the available space. We split at the end of the line
-   */
-  if (overPos === null) return inputLine.length;
-  let overPosTmp = overPos;
-  while (inputLine[overPosTmp] !== ' ' && overPosTmp >= 0) overPosTmp -= 1;
-  /**
-   * for very long lines with no whitespace use the original overPos and
-   * split one char over so we do not overfill the box
-   */
+  if (overPos === null) return inputLine.length;  // input line is shorter than the available space
 
+  let overPosTmp = overPos;
+  while (inputLine[overPosTmp] !== ' ' && overPosTmp >= 0) {
+    overPosTmp--;
+  }
+
+  // For very long lines with no whitespace use the original overPos
   return overPosTmp > 0 ? overPosTmp : overPos - 1;
 };
 
 /**
- * recursively split the line at getSplitPosition.
+ * Recursively splits the line at getSplitPosition.
  * If there is some leftover, split the rest again in the same manner.
  */
 const getSplittedLines = (inputLine: string, isOverEval: IsOverEval): string[] => {
   const splitPos = getSplitPosition(inputLine, isOverEval);
-  const splittedLine = inputLine.substr(0, splitPos);
-  const rest = inputLine.slice(splitPos).trimLeft();
-  /**
-   * end recursion if there is no rest, return single splitted line in an array
-   * so we can join them over the recursion
-   */
-  if (rest.length === 0) {
+  const splittedLine = inputLine.substring(0, splitPos);
+  const rest = inputLine.substring(splitPos).trimStart();
+
+  if (rest.length === 0) { // end recursion if there is no rest
     return [splittedLine];
   }
 
   return [splittedLine, ...getSplittedLines(rest, isOverEval)];
 };
 
-interface TextSchemaSetting {
-  fontObj: {
+interface FontSetting {
+  font: Font;
+  pdfFontObj: {
     [key: string]: PDFFont;
   };
   fallbackFontName: string;
-  splitThreshold: number;
 }
 
-const drawInputByTextSchema = (arg: {
+const drawInputByTextSchema = async (arg: {
   input: string;
   templateSchema: TextSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: TextSchemaSetting;
+  fontSetting: FontSetting;
 }) => {
-  const { input, templateSchema, page, pageHeight, textSchemaSetting } = arg;
-  const { fontObj, fallbackFontName, splitThreshold } = textSchemaSetting;
+  const { input, templateSchema, page, pageHeight, fontSetting } = arg;
+  const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
-  const fontValue = fontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
+  const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, rotate } = getSchemaSizeAndRotate(templateSchema);
-  const { size, color, alignment, lineHeight, characterSpacing } = getFontProp(templateSchema);
+  const { size, color, alignment, lineHeight, characterSpacing } = await getFontProp({ input, font, schema: templateSchema });
+
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
   let beforeLineOver = 0;
@@ -295,18 +291,13 @@ const drawInputByTextSchema = (arg: {
   input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
     const isOverEval = (testString: string) => {
       const testStringWidth =
-        fontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
-      /**
-       * split if the difference is less then two pixel
-       * (found out / tested this threshold heuristically, most probably widthOfTextAtSize is unprecise)
-       **/
-
-      return width - testStringWidth <= splitThreshold;
+        pdfFontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
+      return width <= testStringWidth;
     };
     const splitedLines = getSplittedLines(inputLine, isOverEval);
     const drawLine = (splitedLine: string, splitedLineIndex: number) => {
       const textWidth =
-        fontValue.widthOfTextAtSize(splitedLine, size) +
+        pdfFontValue.widthOfTextAtSize(splitedLine, size) +
         (splitedLine.length - 1) * characterSpacing;
       page.drawText(splitedLine, {
         x: calcX(templateSchema.position.x, alignment, width, textWidth),
@@ -319,7 +310,7 @@ const drawInputByTextSchema = (arg: {
         color,
         lineHeight: lineHeight * size,
         maxWidth: width,
-        font: fontValue,
+        font: pdfFontValue,
         wordBreaks: [''],
       });
       if (splitedLines.length === splitedLineIndex + 1) beforeLineOver += splitedLineIndex;
@@ -396,14 +387,14 @@ export const drawInputByTemplateSchema = async (arg: {
   pdfDoc: PDFDocument;
   page: PDFPage;
   pageHeight: number;
-  textSchemaSetting: TextSchemaSetting;
+  fontSetting: FontSetting;
   inputImageCache: InputImageCache;
 }) => {
   if (!arg.input || !arg.templateSchema) return;
 
   if (isTextSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as TextSchema;
-    drawInputByTextSchema({ ...arg, templateSchema });
+    await drawInputByTextSchema({ ...arg, templateSchema });
   } else if (isImageSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as ImageSchema;
     await drawInputByImageSchema({ ...arg, templateSchema });

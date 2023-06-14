@@ -12,6 +12,7 @@ import {
   ImageSchema,
   BarcodeSchema,
   Schema,
+  SchemaInputs,
   SchemaForUI,
   Font,
   BasePdf,
@@ -43,6 +44,7 @@ export type TextSchema = z.infer<typeof TextSchema>;
 export type ImageSchema = z.infer<typeof ImageSchema>;
 export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 export type Schema = z.infer<typeof Schema>;
+export type SchemaInputs = z.infer<typeof SchemaInputs>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;
 export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;

@@ -1,7 +1,7 @@
 import generate from './generate.js';
 import {
   BLANK_PDF,
-  HELVETICA,
+  DEFAULT_FONT_VALUE,
   isTextSchema,
   isImageSchema,
   isBarcodeSchema,
@@ -38,7 +38,7 @@ import type {
 export {
   generate,
   BLANK_PDF,
-  HELVETICA,
+  DEFAULT_FONT_VALUE,
   isTextSchema,
   isImageSchema,
   isBarcodeSchema,

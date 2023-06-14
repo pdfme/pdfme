@@ -14,6 +14,7 @@ const _Guides = ({
 }) => (
   <>
     <div
+      className="ruler-container"
       style={{
         width: RULER_HEIGHT,
         height: RULER_HEIGHT,

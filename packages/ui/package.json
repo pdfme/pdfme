@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "1.1.9",
+  "version": "1.2.3",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -41,10 +41,10 @@
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
     "@heroicons/react": "^2.0.13",
-    "@pdfme/common": "file:../common",
+    "@pdfme/common": "^1.2.1",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
-    "pdfjs-dist": "^2.12.313",
+    "pdfjs-dist": "2.12.313",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-moveable": "^0.30.3",
@@ -53,7 +53,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
-    "@types/pdfjs-dist": "^2.7.4",
+    "@types/pdfjs-dist": "^2.10.378",
     "@types/react": "^17.0.52",
     "@types/react-dom": "^17.0.18",
     "eslint-plugin-react": "^7.28.0",
@@ -61,12 +61,14 @@
     "jest-canvas-mock": "^2.3.1",
     "process": "^0.11.10",
     "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1",
-    "worker-loader": "^3.0.8"
+    "webpack-cli": "^5.0.1"
   },
   "jest": {
     "setupFiles": [
       "jest-canvas-mock"
+    ],
+    "setupFilesAfterEnv": [
+      "./__tests__/test-helpers.js"
     ],
     "moduleNameMapper": {
       "\\.(png)$": "<rootDir>/../../assetsTransformer.js"

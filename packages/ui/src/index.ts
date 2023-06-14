@@ -4,7 +4,7 @@ import Viewer from './Viewer';
 
 import {
   BLANK_PDF,
-  HELVETICA,
+  DEFAULT_FONT_VALUE,
   isTextSchema,
   isImageSchema,
   isBarcodeSchema,
@@ -44,7 +44,7 @@ export {
   Viewer,
   Form,
   BLANK_PDF,
-  HELVETICA,
+  DEFAULT_FONT_VALUE,
   isTextSchema,
   isImageSchema,
   isBarcodeSchema,
