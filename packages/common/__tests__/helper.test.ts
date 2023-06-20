@@ -411,4 +411,20 @@ describe('validateBarcodeInput test', () => {
     expect(validateBarcodeInput(type, invalid4)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
+  test('gs1datamatrix', () => {
+    // https://www.gs1.org/docs/barcodes/GS1_DataMatrix_Guideline.pdf
+    // find the GTIN application identifier, regex for "(01)" and the digits after it until 
+    // another "(" or end of string
+    const type = 'gs1datamatrix';
+
+    let valid = "(01)12244668801011(17)250712(10)22322SSD3";
+    let valid_12 = "(01)1224466880108(17)250712(10)22322SSD3";
+    let invalid_bad_checkdigit = "(01)12244668801014(17)250712(10)22322SSD3";
+
+    const blank = '';
+    expect(validateBarcodeInput(type, valid)).toEqual(true);
+    expect(validateBarcodeInput(type, valid_12)).toEqual(true);
+    expect(validateBarcodeInput(type, invalid_bad_checkdigit)).toEqual(false);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
+  });
 });

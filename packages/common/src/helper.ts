@@ -231,7 +231,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   if (type === 'gs1datamatrix') {
     let ret = false;
     // find the GTIN application identifier, regex for "(01)" and the digits after it until another "("
-    const regexp = /\((01)\)(\d*)(\()/;
+    const regexp = /\((01)\)(\d*)(\(|$)/;
     let res = input.match(regexp);
     if (
       res != null &&
