@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
+import { DesignerReactProps, Template, SchemaForUI, SchemaType } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
@@ -96,11 +96,11 @@ const TemplateEditor = ({
         // Assign to reference
         set(tgt, key, value);
         if (key === 'type') {
-          const type = String(value);
+          const type = String(value) as SchemaType;
           // set default value, text or barcode
           set(tgt, 'data', getSampleByType(type));
           // For barcodes, adjust the height to get the correct ratio.
-          if (value !== 'text') {
+          if (type !== 'text' && type !== 'image') {
             set(tgt, 'height', getKeepRatioHeightByWidth(type, tgt.width));
           }
         }

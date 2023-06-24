@@ -1,9 +1,9 @@
 import React, { forwardRef, Ref } from 'react';
-import { validateBarcodeInput, BarCodeType, BarcodeSchema } from '@pdfme/common';
+import { validateBarcodeInput, BarCodeType, BarcodeSchema, } from '@pdfme/common';
 import { ZOOM } from '../../constants';
 import { SchemaUIProps } from './SchemaUI';
 
-const barcodeExampleImageObj: { [key: string]: string } = {
+const barcodeExampleImageObj: { [K in BarCodeType]: string } = {
   qrcode:
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPoAAAD6AQMAAACyIsh+AAAABlBMVEVHcEwAAACfKoRRAAAAAXRSTlMAQObYZgAAAUBJREFUaN7t2UEOxCAIBVASD9Aj9eoeqQdowqiAYhsbTGb5u2gm9s2GIFBLrNdNnI+biI72y5YzAURBJpJlOstCuXVaLoAdUMOaLcCiWrwl/AD7QKJclwH+AUYNANgFtv0lyudFq/oA8A3mljQKwaJnAazAdKW6kpiWF8Aa2H7XRmSpmrQvZYAwGJteM7fV1drmr8QAO6A8c7Mms85KvSUBxIDkaw2r2/Ityu2fBBAHdavrwK75KkmrhQAgDFojv/qs1Da9gMQAcdCe+VlTIt8neYAoGNv/8Yr+rg8An0A6j9ykOWlfstETIAjcjO4z198AQsC/TlpsNXMB9sA4Cpbz4Es7Vc9qgCjox27a5pM73ZjP5QDCQFPVzt74FWqACJDYajVNGvQMEAfTJzOhbDVgrg8An+DxGXd8o9A2DxADPwiEPe8Jo46KAAAAAElFTkSuQmCC',
   japanpost:
