@@ -10,7 +10,7 @@ const alignments = ['left', 'center', 'right'] as const;
 export const Alignment = z.enum(alignments);
 
 // prettier-ignore
-export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce'] as const;
+export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
 export const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
 

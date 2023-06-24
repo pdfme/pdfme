@@ -228,6 +228,22 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
 
     return regexp.test(input) && validateCheckDigit(input, 8);
   }
+  if (type === 'gs1datamatrix') {
+    let ret = false;
+    // find the GTIN application identifier, regex for "(01)" and the digits after it until another "("
+    const regexp = /\((01)\)(\d*)(\(|$)/;
+    let res = input.match(regexp);
+    if (
+      res != null &&
+      res[1] === '01' &&
+      (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
+    ) {
+      let gtin = res[2];
+      ret = validateCheckDigit(gtin, gtin.length);
+    }
+
+    return ret;
+  }
 
   return false;
 };
