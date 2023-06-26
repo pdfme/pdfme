@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   SchemaForUI,
   getFallbackFontName,
@@ -150,6 +150,10 @@ const TextPropEditor = (
 
   if (activeSchema.type !== 'text') return <></>;
 
+  const [dynamicFontSizeEnabled, setDynamicFontSizeEnabled] = useState(
+    Boolean(activeSchema.dynamicFontSize)
+  );
+
   return (
     <section style={{ fontSize: '0.7rem' }}>
       <div
@@ -234,25 +238,31 @@ const TextPropEditor = (
         <CheckboxSet
           width="100%"
           label="Use dynamic font size"
-          checked={Boolean(activeSchema.dynamicFontSize)}
+          checked={dynamicFontSizeEnabled}
           onChange={(e) => {
+            setDynamicFontSizeEnabled(e.target.checked);
+
             changeSchemas([
               {
-                key: 'dynamicFontSize', value: e.target.checked ? {
-                  min: activeSchema.fontSize || DEFAULT_FONT_SIZE,
-                  max: activeSchema.fontSize || DEFAULT_FONT_SIZE,
-                } : undefined, schemaId: activeSchema.id,
+                key: 'dynamicFontSize',
+                value: dynamicFontSizeEnabled
+                  ? {
+                      min: activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                      max: activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                    }
+                  : undefined,
+                schemaId: activeSchema.id,
               },
             ]);
           }}
         />
 
-        {activeSchema.dynamicFontSize && (
+        {dynamicFontSizeEnabled && (
           <>
             <NumberInputSet
               width="45%"
               label={'FontSize Min(pt)'}
-              value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize?.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
               maxNumber={activeSchema.fontSize}
               onChange={(e) => {
@@ -264,7 +274,7 @@ const TextPropEditor = (
             <NumberInputSet
               width="45%"
               label={'FontSize Max(pt)'}
-              value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize?.max ?? Number(activeSchema.fontSize)}
               minNumber={activeSchema.fontSize}
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.max', value: Number(e.target.value), schemaId: activeSchema.id }])
