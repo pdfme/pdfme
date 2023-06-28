@@ -27,6 +27,8 @@ const TextSchemaUI = (
   useEffect(() => {
     if (schema.dynamicFontSize && schema.data) {
       calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(setDynamicFontSize)
+    } else {
+      setDynamicFontSize(undefined);
     }
   }, [schema.data, schema.width, schema.fontName, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
 
