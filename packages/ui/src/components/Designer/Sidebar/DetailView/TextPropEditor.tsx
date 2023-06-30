@@ -165,9 +165,7 @@ const TextPropEditor = (
           value={activeSchema.fontName ?? fallbackFontName}
           options={Object.keys(font)}
           onChange={(e) => {
-            changeSchemas([
-              { key: 'fontName', value: e.target.value, schemaId: activeSchema.id, },
-            ]);
+            changeSchemas([{ key: 'fontName', value: e.target.value, schemaId: activeSchema.id }]);
           }}
         />
 
@@ -194,8 +192,17 @@ const TextPropEditor = (
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
           onChange={(e) => {
             const currentFontSize = Number(e.target.value);
+            const dynamincFontSizeMinAdjust = activeSchema.dynamicFontSize && activeSchema.dynamicFontSize.min > currentFontSize;
+
             changeSchemas([
-              { key: 'fontSize', value: currentFontSize, schemaId: activeSchema.id, },
+              { key: 'fontSize', value: currentFontSize, schemaId: activeSchema.id },
+              ...(dynamincFontSizeMinAdjust
+                ? [{
+                      key: 'dynamicFontSize.min',
+                      value: currentFontSize,
+                      schemaId: activeSchema.id,
+                    }]
+                : []),
             ]);
           }}
         />
