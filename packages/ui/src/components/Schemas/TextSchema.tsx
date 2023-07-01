@@ -30,7 +30,7 @@ const TextSchemaUI = (
     } else {
       setDynamicFontSize(undefined);
     }
-  }, [schema.data, schema.width, schema.fontName, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
+  }, [schema.data, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
 
   const style: React.CSSProperties = {
     padding: 0,
