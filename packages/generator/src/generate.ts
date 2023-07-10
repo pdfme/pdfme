@@ -26,6 +26,7 @@ const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; 
   const fallbackFontName = getFallbackFontName(font);
 
   const pdfDoc = await PDFDocument.create();
+  // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
 
   const pdfFontObj = await embedAndGetFontObj({ pdfDoc, font });
@@ -46,8 +47,6 @@ const generate = async (props: GenerateProps) => {
   const { inputs, template, options = {} } = props;
   const { font = getDefaultFont() } = options;
   const { schemas } = template;
-
-
 
   const preRes = await preprocessing({ inputs, template, font });
   const { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
