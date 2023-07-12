@@ -11,6 +11,7 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema.js';
+import { Font as FontkitFont } from 'fontkit';
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
@@ -72,6 +73,20 @@ export const getFallbackFontName = (font: Font) => {
 export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
 });
+
+export const heightOfFontAtSize = (font: FontkitFont, size: number) => {
+  const { ascent, descent, bbox } = font;
+  const scale = 1000 / font.unitsPerEm;
+
+  const yTop = (ascent || bbox.maxY) * scale;
+  const yBottom = (descent || bbox.minY) * scale;
+
+  let height = yTop - yBottom;
+
+  height -= Math.abs(descent * scale) || 0;
+
+  return (height / 1000) * size;  
+};
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 

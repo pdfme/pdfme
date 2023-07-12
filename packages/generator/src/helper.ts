@@ -31,10 +31,10 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
   calculateDynamicFontSize,
+  heightOfFontAtSize,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import * as fontkit from 'fontkit';
-import { Font as FontkitFont } from 'fontkit';
 
 export interface InputImageCache {
   [key: string]: PDFImage | undefined;
@@ -178,20 +178,6 @@ const getFontProp = async ({ input, font, schema }: { input: string, font: Font,
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
 
   return { size, color, alignment, lineHeight, characterSpacing };
-};
-
-const heightOfFontAtSize = (font: FontkitFont, size: number) => {
-  const { ascent, descent, bbox } = font;
-  const scale = 1000 / font.unitsPerEm;
-
-  const yTop = (ascent || bbox.maxY) * scale;
-  const yBottom = (descent || bbox.minY) * scale;
-
-  let height = yTop - yBottom;
-
-  height -= Math.abs(descent * scale) || 0;
-
-  return (height / 1000) * size;
 };
 
 const calcX = (x: number, alignment: Alignment, boxWidth: number, textWidth: number) => {
