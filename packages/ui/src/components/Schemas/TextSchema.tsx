@@ -61,23 +61,23 @@ const TextSchemaUI = (
       Buffer.from(font[schema.fontName].data as ArrayBuffer)
     );
 
-    // Assume ascent and descent values obtained from Fontkit in font units
+    // Ascent and descent values obtained from Fontkit in font units
     const ascentInFontUnits = currentFont.ascent;
     const descentInFontUnits = currentFont.descent;
-    const fontSizeInPixels = schemaFontSize * DEFAULT_PT_TO_PX_RATIO;
+    const fontSizeInPx = schemaFontSize * DEFAULT_PT_TO_PX_RATIO;
 
     // Get the scaling factor for the font
     const scalingFactor = currentFont.unitsPerEm;
 
-    // Convert ascent and descent to pixel values
-    const ascentInPixels = (ascentInFontUnits / scalingFactor) * fontSizeInPixels;
-    const descentInPixels = (descentInFontUnits / scalingFactor) * fontSizeInPixels;
+    // Convert ascent and descent to px values
+    const ascentInPixels = (ascentInFontUnits / scalingFactor) * fontSizeInPx;
+    const descentInPixels = (descentInFontUnits / scalingFactor) * fontSizeInPx;
 
-    // Calculate the single line height in pixels
-    const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPixels);
+    // Calculate the single line height in px
+    const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPx);
 
-   // Calculate the top margin in em
-   fontAlignmentValue = ((singleLineHeight * fontSizeInPixels) - fontSizeInPixels) / 2;
+   // Calculate the top margin/padding in px
+   fontAlignmentValue = ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2;
   }
 
   return editable ? (
