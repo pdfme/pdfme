@@ -78,12 +78,6 @@ export const heightOfFontAtSize = (font: FontkitFont, size: number) => {
   let { ascent, descent, bbox } = font;
 
   const scale = 1000 / font.unitsPerEm;
-  const macOsFonts: string[] = ['Helvetica', 'Selectric'];
-
-  if (macOsFonts.includes(font.familyName)) {
-    ascent += Math.floor((ascent + descent) * 0.15)
-  }
-  
   const yTop = (ascent || bbox.maxY) * scale;
   const yBottom = (descent || bbox.minY) * scale;
 
