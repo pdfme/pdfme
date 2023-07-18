@@ -25,6 +25,7 @@ import {
   BasePdf,
   BarCodeType,
   Alignment,
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
@@ -32,6 +33,7 @@ import {
   DEFAULT_FONT_COLOR,
   calculateDynamicFontSize,
   heightOfFontAtSize,
+  getDefaultFont
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import * as fontkit from 'fontkit';
@@ -306,10 +308,14 @@ const drawInputByTextSchema = async (arg: {
 
     const drawLine = (line: string, lineIndex: number) => {
       const textWidth = pdfFontValue.widthOfTextAtSize(line, size) + (line.length - 1) * characterSpacing;
+      const fallbackFont = getDefaultFont();
+      let schemaFontData = fallbackFont[DEFAULT_FONT_NAME].data;
 
-      const fontkitFont = fontkit.create(
-        Buffer.from(font[templateSchema.fontName ?? fallbackFontName].data as ArrayBuffer)
-      );
+      if (templateSchema.fontName) {
+        schemaFontData = font[templateSchema.fontName].data;
+      }
+
+      const fontkitFont = fontkit.create(Buffer.from(schemaFontData as ArrayBuffer));
 
       const textHeight = heightOfFontAtSize(fontkitFont, size);
 
