@@ -13,7 +13,7 @@ import { SchemaUIProps } from './SchemaUI';
 import { ZOOM } from '../../constants';
 import { FontContext } from '../../contexts';
 import * as fontkit from 'fontkit';
-
+import { Buffer } from 'buffer/';
 
 type Props = SchemaUIProps & { schema: TextSchema };
 
@@ -58,9 +58,10 @@ const TextSchemaUI = (
 
   if (schema.fontName) {
     const currentFont = fontkit.create(
+      // @ts-ignore
       Buffer.from(font[schema.fontName].data as ArrayBuffer)
     );
-
+  
     // Ascent and descent values obtained from Fontkit in font units
     const ascentInFontUnits = currentFont.ascent;
     const descentInFontUnits = currentFont.descent;

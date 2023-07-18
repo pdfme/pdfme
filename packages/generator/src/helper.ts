@@ -305,11 +305,10 @@ const drawInputByTextSchema = async (arg: {
     const splitLines = getSplittedLines(inputLine, isOverEval);
 
     const drawLine = (line: string, lineIndex: number) => {
-      const textWidth =
-        pdfFontValue.widthOfTextAtSize(line, size) + (line.length - 1) * characterSpacing;
+      const textWidth = pdfFontValue.widthOfTextAtSize(line, size) + (line.length - 1) * characterSpacing;
 
       const fontkitFont = fontkit.create(
-        Buffer.from(font[templateSchema.fontName as string].data as ArrayBuffer)
+        Buffer.from(font[templateSchema.fontName ?? fallbackFontName].data as ArrayBuffer)
       );
 
       const textHeight = heightOfFontAtSize(fontkitFont, size);
