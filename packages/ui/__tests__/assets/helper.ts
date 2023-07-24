@@ -1,6 +1,6 @@
 import * as hooks from '../../src/hooks';
 import { uuid, getPdfPageSizes, pdf2Pngs } from '../../src/helper';
-import { BLANK_PDF, Template } from '@pdfme/common';
+import { BLANK_PDF, Template, buildPlaceholder } from '@pdfme/common';
 
 export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
@@ -33,6 +33,7 @@ export const getSampleTemplate = (): Template => ({
     {
       field1: {
         type: 'text',
+        content: buildPlaceholder('field1'),
         position: { x: 20, y: 20 },
         width: 100,
         height: 15,

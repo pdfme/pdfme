@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI, SchemaType } from '@pdfme/common';
+import { DesignerReactProps, Template, SchemaForUI, SchemaType, buildPlaceholder } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
@@ -93,6 +93,11 @@ const TemplateEditor = ({
     (objs: { key: string; value: undefined | string | number | { min: number, max: number }; schemaId: string }[]) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
+        if (key === 'key' && tgt.type === 'text') {
+          // Update the placeholder of the variable name within the content string to match the change
+          set(tgt, 'content', tgt.content ? tgt.content.replace(buildPlaceholder(tgt.key), buildPlaceholder(String(value))) : buildPlaceholder(String(value)));
+        }
+
         // Assign to reference
         set(tgt, key, value);
         if (key === 'type') {
@@ -204,12 +209,12 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const s = getInitialSchema();
+    let key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
+    const s = getInitialSchema(key);
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
     s.data = 'text';
-    s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };

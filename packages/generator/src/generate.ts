@@ -71,6 +71,7 @@ const generate = async (props: GenerateProps) => {
         const fontSetting = { font, pdfFontObj, fallbackFontName };
 
         await drawInputByTemplateSchema({
+          key,
           input,
           templateSchema,
           pdfDoc,

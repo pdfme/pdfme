@@ -4,6 +4,7 @@ type DictEn = typeof dictEn;
 
 const dictEn = {
   cancel: 'Cancel',
+  content: 'Content',
   field: 'field',
   fieldName: 'Name',
   require: 'Required',
@@ -27,6 +28,7 @@ const dictEn = {
 
 const dictJa: { [key in keyof DictEn]: string } = {
   cancel: 'キャンセル',
+  content: 'コンテンツ',
   field: '入力項目',
   fieldName: '項目名',
   require: '必須',
@@ -49,6 +51,7 @@ const dictJa: { [key in keyof DictEn]: string } = {
 
 const dictAr: { [key in keyof DictEn]: string } = {
   cancel: 'إلغاء',
+  content: 'محتوى',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
   require: 'مطلوب',
@@ -71,6 +74,7 @@ const dictAr: { [key in keyof DictEn]: string } = {
 
 const dictTh: { [key in keyof DictEn]: string } = {
   cancel: 'ยกเลิก',
+  content: 'เนื้อหา',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
   require: 'จำเป็น',

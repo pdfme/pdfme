@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
+import { Template, DesignerProps, checkDesignerProps, checkTemplate, migrateTemplate } from '@pdfme/common';
 import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants';
 import { I18nContext, FontContext } from './contexts';
@@ -29,6 +29,7 @@ class Designer extends BaseUIClass {
     checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.template = cloneDeep(template);
+    migrateTemplate(this.template);
     if (this.onChangeTemplateCallback) {
       this.onChangeTemplateCallback(template);
     }

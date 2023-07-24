@@ -48,6 +48,9 @@ import {
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
+  buildPlaceholder,
+  migrateTemplate,
+  substitutePlaceholdersInContent,
   validateBarcodeInput,
 } from './helper.js';
 import {
@@ -91,6 +94,9 @@ export {
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
+  migrateTemplate,
+  buildPlaceholder,
+  substitutePlaceholdersInContent,
   validateBarcodeInput,
   calculateDynamicFontSize,
 };

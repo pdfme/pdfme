@@ -7,6 +7,7 @@ import hotkeys from 'hotkeys-js';
 import {
   getB64BasePdf,
   b64toUint8Array,
+  buildPlaceholder,
   Template,
   SchemaForUI,
   Schema,
@@ -397,11 +398,12 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
   return schemaAddedTemplate;
 };
 
-export const getInitialSchema = (): SchemaForUI => ({
+export const getInitialSchema = (key: string): SchemaForUI => ({
   id: uuid(),
-  key: '',
+  key: key,
   data: '',
   type: 'text',
+  content: buildPlaceholder(key),
   position: { x: 0, y: 0 },
   width: 35,
   height: 7,

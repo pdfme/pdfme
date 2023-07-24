@@ -32,7 +32,8 @@ import {
   DEFAULT_FONT_COLOR,
   calculateDynamicFontSize,
   heightOfFontAtSize,
-  getFontKitFont
+  getFontKitFont,
+  substitutePlaceholdersInContent
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 
@@ -271,6 +272,7 @@ interface FontSetting {
 }
 
 const drawInputByTextSchema = async (arg: {
+  key: string;
   input: string;
   templateSchema: TextSchema;
   pdfDoc: PDFDocument;
@@ -278,7 +280,7 @@ const drawInputByTextSchema = async (arg: {
   pageHeight: number;
   fontSetting: FontSetting;
 }) => {
-  const { input, templateSchema, page, pageHeight, fontSetting } = arg;
+  const { key, input, templateSchema, page, pageHeight, fontSetting } = arg;
   const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
   const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
@@ -286,9 +288,10 @@ const drawInputByTextSchema = async (arg: {
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
+  const content = substitutePlaceholdersInContent(key, templateSchema.content, input);
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const { size, color, alignment, lineHeight, characterSpacing } = await getFontProp({
-    input,
+    input: content,
     font,
     schema: templateSchema,
   });
@@ -302,7 +305,7 @@ const drawInputByTextSchema = async (arg: {
       pdfFontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
     return width <= testStringWidth;
   };
-  input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
+  content.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
     const splitLines = getSplittedLines(inputLine, isOverEval);
 
     const drawLine = (line: string, lineIndex: number) => {
@@ -394,6 +397,7 @@ const drawInputByBarcodeSchema = async (arg: {
 };
 
 export const drawInputByTemplateSchema = async (arg: {
+  key: string;
   input: string;
   templateSchema: Schema;
   pdfDoc: PDFDocument;

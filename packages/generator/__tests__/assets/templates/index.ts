@@ -1,4 +1,4 @@
-import { Template, BLANK_PDF } from '@pdfme/common';
+import { Template, BLANK_PDF, buildPlaceholder } from '@pdfme/common';
 
 /* eslint global-require: off*/
 /* eslint @typescript-eslint/no-var-requires: off*/
@@ -48,18 +48,21 @@ export default {
       {
         a: {
           type: 'text',
+          content: buildPlaceholder('a'),
           position: { x: 0, y: 0 },
           width: 10,
           height: 10,
         },
         b: {
           type: 'text',
+          content: buildPlaceholder('b'),
           position: { x: 10, y: 10 },
           width: 10,
           height: 10,
         },
         c: {
           type: 'text',
+          content: buildPlaceholder('c'),
           position: { x: 20, y: 20 },
           width: 10,
           height: 10,

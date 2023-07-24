@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { BasePdf, CommonProps, BarCodeType, } from './type';
+import { BasePdf, CommonProps, BarCodeType, Template } from './type';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -87,6 +87,18 @@ export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
+
+// This could be expanded to consider a version number baked into the template in future?
+export const migrateTemplate = (template: Template) => {
+  template.schemas.forEach((schema) => {
+    Object.keys(schema).forEach((key) => {
+      const entry = schema[key];
+      if (entry.type === 'text' && !entry.hasOwnProperty('content')) {
+        entry.content = `{{${key}}}`;
+      }
+    });
+  });
+};
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {

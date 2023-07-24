@@ -7,6 +7,7 @@ import {
   DEFAULT_FONT_COLOR,
   TextSchema,
   calculateDynamicFontSize,
+  substitutePlaceholdersInContent,
   getFontKitFont,
   getFontAlignmentValue,
 } from '@pdfme/common';
@@ -25,9 +26,11 @@ const TextSchemaUI = (
   const [fontAlignmentValue, setFontAlignmentValue] = useState<number>(0);
 
 
+  const content = editable ? String(schema.content) : substitutePlaceholdersInContent(schema.key, schema.content, schema.data);
+
   useEffect(() => {
-    if (schema.dynamicFontSize && schema.data) {
-      calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(setDynamicFontSize)
+    if (schema.dynamicFontSize && content) {
+      calculateDynamicFontSize({ textSchema: schema, font, input: content }).then(setDynamicFontSize)
     } else {
       setDynamicFontSize(undefined);
     }
@@ -35,7 +38,7 @@ const TextSchemaUI = (
       const fav = getFontAlignmentValue(fontKitFont, dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE);
       setFontAlignmentValue(fav);
     });
-  }, [schema.data, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
+  }, [content, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
 
 
   const style: React.CSSProperties = {
@@ -56,7 +59,7 @@ const TextSchemaUI = (
     whiteSpace: 'pre-line',
     wordBreak: 'break-word',
     backgroundColor:
-      schema.data && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
+      content && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
     border: 'none',
   };
 
@@ -67,14 +70,14 @@ const TextSchemaUI = (
       tabIndex={tabIndex}
       style={style}
       onChange={(e) => onChange(e.target.value)}
-      value={schema.data}
+      value={content}
     ></textarea>
   ) : (
     <div style={{ ...style, height: schema.height * ZOOM, marginTop: 0, paddingTop: 0 }}>
       <div style={{ marginTop: style.marginTop, paddingTop: style.paddingTop }}>
         {/*  Set the letterSpacing of the last character to 0. */}
-        {schema.data.split('').map((l, i) => (
-          <span key={i} style={{ letterSpacing: String(schema.data).length === i + 1 ? 0 : 'inherit', }} >
+        {content.split('').map((l, i) => (
+          <span key={i} style={{ letterSpacing: String(content).length === i + 1 ? 0 : 'inherit', }} >
             {l}
           </span>
         ))}
