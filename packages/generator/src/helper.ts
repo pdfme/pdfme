@@ -284,6 +284,16 @@ const drawInputByTextSchema = async (arg: {
   const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
   const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
+  const fallbackFont = getDefaultFont();
+  let schemaFontData = fallbackFont[DEFAULT_FONT_NAME].data;
+
+  if (templateSchema.fontName) {
+    schemaFontData = font[templateSchema.fontName].data;
+  }
+
+  const fontkitFont = fontkit.create(Buffer.from(schemaFontData as ArrayBuffer));
+
+  console.log('Generator Updated', fontkitFont);
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
@@ -308,15 +318,6 @@ const drawInputByTextSchema = async (arg: {
 
     const drawLine = (line: string, lineIndex: number) => {
       const textWidth = pdfFontValue.widthOfTextAtSize(line, size) + (line.length - 1) * characterSpacing;
-      const fallbackFont = getDefaultFont();
-      let schemaFontData = fallbackFont[DEFAULT_FONT_NAME].data;
-
-      if (templateSchema.fontName) {
-        schemaFontData = font[templateSchema.fontName].data;
-      }
-
-      const fontkitFont = fontkit.create(Buffer.from(schemaFontData as ArrayBuffer));
-
       const textHeight = heightOfFontAtSize(fontkitFont, size);
 
       page.drawText(line, {
