@@ -293,8 +293,6 @@ const drawInputByTextSchema = async (arg: {
 
   const fontkitFont = fontkit.create(Buffer.from(schemaFontData as ArrayBuffer));
 
-  console.log('Generator Updated', fontkitFont);
-
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
