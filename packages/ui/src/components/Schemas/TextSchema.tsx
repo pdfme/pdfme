@@ -1,5 +1,6 @@
 import React, { useContext, forwardRef, Ref, useState, useEffect } from 'react';
 import {
+  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
@@ -7,7 +8,8 @@ import {
   DEFAULT_FONT_COLOR,
   DEFAULT_PT_TO_PX_RATIO,
   TextSchema,
-  calculateDynamicFontSize
+  calculateDynamicFontSize,
+  getDefaultFont,
 } from '@pdfme/common';
 import { SchemaUIProps } from './SchemaUI';
 import { ZOOM } from '../../constants';
@@ -22,7 +24,7 @@ const TextSchemaUI = (
   ref: Ref<HTMLTextAreaElement>
 ) => {
   const font = useContext(FontContext);
-
+  const fallbackFont = getDefaultFont();
   const [dynamicFontSize, setDynamicFontSize] = useState<number | undefined>(undefined);
 
   useEffect(() => {
@@ -55,32 +57,35 @@ const TextSchemaUI = (
 
   const schemaFontSize = dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE;
   let fontAlignmentValue = 0;
+  let schemaFontData = fallbackFont[DEFAULT_FONT_NAME].data;
 
   if (schema.fontName) {
-    const currentFont = fontkit.create(
-      // @ts-ignore
-      Buffer.from(font[schema.fontName].data as ArrayBuffer)
-    );
-  
-    // Ascent and descent values obtained from Fontkit in font units
-    const ascentInFontUnits = currentFont.ascent;
-    const descentInFontUnits = currentFont.descent;
-    const fontSizeInPx = schemaFontSize * DEFAULT_PT_TO_PX_RATIO;
-
-    // Get the scaling factor for the font
-    const scalingFactor = currentFont.unitsPerEm;
-
-    // Convert ascent and descent to px values
-    const ascentInPixels = (ascentInFontUnits / scalingFactor) * fontSizeInPx;
-    const descentInPixels = (descentInFontUnits / scalingFactor) * fontSizeInPx;
-
-    // Calculate the single line height in px
-    const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPx);
-
-   // Calculate the top margin/padding in px
-   fontAlignmentValue = ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2;
+    schemaFontData = font[schema.fontName].data;
   }
 
+  const currentFont = fontkit.create(
+    // @ts-ignore
+    Buffer.from(schemaFontData as ArrayBuffer)
+  );
+  
+  // Ascent and descent values obtained from Fontkit in font units
+  const ascentInFontUnits = currentFont.ascent;
+  const descentInFontUnits = currentFont.descent;
+  const fontSizeInPx = schemaFontSize * DEFAULT_PT_TO_PX_RATIO;
+
+  // Get the scaling factor for the font
+  const scalingFactor = currentFont.unitsPerEm;
+
+  // Convert ascent and descent to px values
+  const ascentInPixels = (ascentInFontUnits / scalingFactor) * fontSizeInPx;
+  const descentInPixels = (descentInFontUnits / scalingFactor) * fontSizeInPx;
+
+  // Calculate the single line height in px
+  const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPx);
+
+  // Calculate the top margin/padding in px
+  fontAlignmentValue = ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2;
+  
   return editable ? (
     <textarea
       ref={ref}
