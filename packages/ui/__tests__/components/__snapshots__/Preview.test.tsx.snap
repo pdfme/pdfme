@@ -83,7 +83,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           >
             <textarea
               placeholder="bb"
-              style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
+              style="position: absolute; top: 0px; padding: 3.436640624999999px 0px 0px 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-line; word-break: break-word; margin-top: 0px;"
               tabindex="100"
             >
               field1
@@ -227,38 +227,42 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             title="field1"
           >
             <div
-              style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
+              style="position: absolute; top: 0px; padding: 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-line; word-break: break-word;"
             >
-              <span
-                style="letter-spacing: inherit;"
+              <div
+                style="margin-top: 0px; padding-top: 3.436640624999999px;"
               >
-                f
-              </span>
-              <span
-                style="letter-spacing: inherit;"
-              >
-                i
-              </span>
-              <span
-                style="letter-spacing: inherit;"
-              >
-                e
-              </span>
-              <span
-                style="letter-spacing: inherit;"
-              >
-                l
-              </span>
-              <span
-                style="letter-spacing: inherit;"
-              >
-                d
-              </span>
-              <span
-                style="letter-spacing: 0;"
-              >
-                1
-              </span>
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  f
+                </span>
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  i
+                </span>
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  e
+                </span>
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  l
+                </span>
+                <span
+                  style="letter-spacing: inherit;"
+                >
+                  d
+                </span>
+                <span
+                  style="letter-spacing: 0;"
+                >
+                  1
+                </span>
+              </div>
             </div>
           </div>
         </div>

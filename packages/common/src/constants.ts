@@ -6,6 +6,7 @@ export const DEFAULT_CHARACTER_SPACING = 0;
 export const DEFAULT_FONT_COLOR = '#000';
 export const DEFAULT_TOLERANCE = 1;
 export const DEFAULT_FONT_SIZE_ADJUSTMENT = 0.25;
+export const DEFAULT_PT_TO_PX_RATIO = 1.333;
 export const DEFAULT_PT_TO_MM_RATIO = 0.3528;
 
 export const BLANK_PDF =
