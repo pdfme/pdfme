@@ -46,7 +46,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/common": "latest",
+    "@pdfme/common": "file:../common",
     "@pdfme/pdf-lib": "^1.17.3",
     "atob": "^2.1.2",
     "bwip-js": "^3.2.2",
