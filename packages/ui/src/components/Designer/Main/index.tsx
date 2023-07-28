@@ -110,7 +110,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (e.shiftKey) setIsPressShiftKey(true);
   };
   const onKeyup = (e: KeyboardEvent) => {
-    if (e.key === 'Shift') setIsPressShiftKey(false);
+    if (e.key === 'Shift' || !e.shiftKey) setIsPressShiftKey(false);
     if (e.key === 'Escape' || e.key === 'Esc') setEditing(false);
   };
 
@@ -197,11 +197,11 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const currentlyEditingThisTextSchema = (target: EventTarget | null) => {
     if (!target) return false;
-    if (target instanceof HTMLTextAreaElement)   {
+    if (target instanceof HTMLTextAreaElement) {
       return activeElements.map((ae) => ae.id).includes(target.parentElement?.id || '');
     }
     return false;
-  }
+  };
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
@@ -245,6 +245,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         e.stopPropagation();
         if (!currentlyEditingThisTextSchema(e.target)) {
           setEditing(false);
+        }
+        // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
+        if (!e.shiftKey) {
+          setIsPressShiftKey(false);
         }
       }}
       style={{ overflow: 'overlay' }}
