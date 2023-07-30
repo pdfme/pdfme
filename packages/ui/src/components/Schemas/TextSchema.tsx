@@ -31,8 +31,8 @@ const TextSchemaUI = (
     } else {
       setDynamicFontSize(undefined);
     }
-    getFontKitFont(schema, font).then(fontkit => {
-      const fav = getFontAlignmentValue(fontkit, dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE);
+    getFontKitFont(schema, font).then(fontKitFont => {
+      const fav = getFontAlignmentValue(fontKitFont, dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE);
       setFontAlignmentValue(fav);
     });
   }, [schema.data, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
@@ -60,7 +60,6 @@ const TextSchemaUI = (
     border: 'none',
   };
 
-
   return editable ? (
     <textarea
       ref={ref}
@@ -71,12 +70,7 @@ const TextSchemaUI = (
       value={schema.data}
     ></textarea>
   ) : (
-    <div style={{
-      ...style,
-      height: schema.height * ZOOM,
-      marginTop: 0,
-      paddingTop: 0,
-    }}>
+    <div style={{ ...style, height: schema.height * ZOOM, marginTop: 0, paddingTop: 0 }}>
       <div style={{ marginTop: style.marginTop, paddingTop: style.paddingTop }}>
         {/*  Set the letterSpacing of the last character to 0. */}
         {schema.data.split('').map((l, i) => (

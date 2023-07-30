@@ -28,6 +28,11 @@ export const getFallbackFontName = (font: Font) => {
   return fallbackFontName;
 };
 
+const getFallbackFont = (font: Font) => {
+  const fallbackFontName = getFallbackFontName(font);
+  return font[fallbackFontName];
+}
+
 export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
 });
@@ -145,12 +150,13 @@ export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
     return fontKitFontCache[fontName];
   }
 
-  let fontData = font[fontName]?.data || getDefaultFont().data;
+  const currentFont = font[fontName] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
+  let fontData = currentFont.data;
   if (typeof fontData === 'string') {
     fontData = fontData.startsWith('http') ? await fetch(fontData).then((res) => res.arrayBuffer()) : b64toUint8Array(fontData);
   }
 
-  const fontKitFont = fontkit.create(fontData instanceof Buffer ? fontData : Buffer.from(fontData as string));
+  const fontKitFont = fontkit.create(fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer));
   fontKitFontCache[fontName] = fontKitFont
 
   return fontKitFont;
