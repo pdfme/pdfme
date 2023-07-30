@@ -41,10 +41,6 @@ import type {
 import {
   getB64BasePdf,
   b64toUint8Array,
-  getFallbackFontName,
-  getDefaultFont,
-  heightOfFontAtSize,
-  checkFont,
   checkInputs,
   checkUIOptions,
   checkTemplate,
@@ -54,7 +50,12 @@ import {
   checkGenerateProps,
   validateBarcodeInput,
 } from './helper.js';
-import { calculateDynamicFontSize } from './calculateDynamicFontSize.js';
+import {
+  calculateDynamicFontSize, getFallbackFontName,
+  getDefaultFont,
+  heightOfFontAtSize,
+  checkFont,
+} from './font.js';
 
 export {
   DEFAULT_FONT_NAME,
