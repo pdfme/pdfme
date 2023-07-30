@@ -232,9 +232,9 @@ describe('calculateDynamicFontSize with Custom font', () => {
 
   it('should return smaller font size when dynamicFontSizeSetting is provided', async () => {
     const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あいうあいうあいうあいうあいうあいう' });
+    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あいうあいうあい' });
 
-    expect(result).toBe(15.5);
+    expect(result).toBe(16.5);
   });
 
   it('should return min font size when dynamicFontSizeSetting and long text are provided', async () => {

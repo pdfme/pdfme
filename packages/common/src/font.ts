@@ -1,5 +1,5 @@
 import * as fontkit from 'fontkit';
-import type { Font as FontkitFont } from 'fontkit';
+import type { Font as FontKitFont } from 'fontkit';
 import { Template, Schema, Font, isTextSchema, TextSchema } from './type';
 import { Buffer } from 'buffer';
 import {
@@ -9,7 +9,8 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
-  DEFAULT_PT_TO_MM_RATIO
+  DEFAULT_PT_TO_MM_RATIO,
+  DEFAULT_PT_TO_PX_RATIO,
 } from './constants';
 import { b64toUint8Array } from "."
 
@@ -68,8 +69,24 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
   }
 };
 
-export const heightOfFontAtSize = (fontKitFont: FontkitFont, size: number) => {
-  let { ascent, descent, bbox, unitsPerEm } = fontKitFont;
+export const getFontAlignmentValue = (fontKitFont: FontKitFont, fontSize: number) => {
+  const { ascent, descent, unitsPerEm } = fontKitFont;
+
+  const fontSizeInPx = fontSize * DEFAULT_PT_TO_PX_RATIO;
+
+  // Convert ascent and descent to px values
+  const ascentInPixels = (ascent / unitsPerEm) * fontSizeInPx;
+  const descentInPixels = (descent / unitsPerEm) * fontSizeInPx;
+
+  // Calculate the single line height in px
+  const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPx);
+
+  // Calculate the top margin/padding in px
+  return ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2
+}
+
+export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) => {
+  const { ascent, descent, bbox, unitsPerEm } = fontKitFont;
 
   const scale = 1000 / unitsPerEm;
   const yTop = (ascent || bbox.maxY) * scale;
@@ -78,10 +95,10 @@ export const heightOfFontAtSize = (fontKitFont: FontkitFont, size: number) => {
   let height = yTop - yBottom;
   height -= Math.abs(descent * scale) || 0;
 
-  return (height / 1000) * size;
+  return (height / 1000) * fontSize;
 };
 
-const widthOfTextAtSize = (input: string, fontKitFont: FontkitFont, fontSize: number) => {
+const widthOfTextAtSize = (input: string, fontKitFont: FontKitFont, fontSize: number) => {
   const { glyphs } = fontKitFont.layout(input);
   const scale = 1000 / fontKitFont.unitsPerEm;
   return glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) * (fontSize / 1000);
@@ -100,7 +117,7 @@ const calculateTextWidthInMm = (textContent: string, textWidth: number, textChar
 
 const getLongestLine = (
   textContentRows: string[],
-  fontKitFont: FontkitFont,
+  fontKitFont: FontKitFont,
   fontSize: number,
   characterSpacingCount: number
 ) => {
@@ -121,13 +138,14 @@ const getLongestLine = (
 };
 
 
-const fontKitFontCache: { [fontName: string]: FontkitFont } = {};
-const createFontKitFont = async (font: Font, fontName: string = DEFAULT_FONT_NAME) => {
+const fontKitFontCache: { [fontName: string]: FontKitFont } = {};
+export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
+  const fontName = textSchema.fontName || getFallbackFontName(font);
   if (fontKitFontCache[fontName]) {
     return fontKitFontCache[fontName];
   }
 
-  let fontData = font[fontName]?.data || DEFAULT_FONT_VALUE;
+  let fontData = font[fontName]?.data || getDefaultFont().data;
   if (typeof fontData === 'string') {
     fontData = fontData.startsWith('http') ? await fetch(fontData).then((res) => res.arrayBuffer()) : b64toUint8Array(fontData);
   }
@@ -138,18 +156,18 @@ const createFontKitFont = async (font: Font, fontName: string = DEFAULT_FONT_NAM
   return fontKitFont;
 }
 
-const getTextContent = (input: string, fontKitFont: FontkitFont, fontSize: number, characterSpacingCount: number): string => {
+const getTextContent = (input: string, fontKitFont: FontKitFont, fontSize: number, characterSpacingCount: number): string => {
   const textContentRows = input.split('\n');
   return textContentRows.length > 1 ? getLongestLine(textContentRows, fontKitFont, fontSize, characterSpacingCount) : input;
 }
 
 export const calculateDynamicFontSize = async ({ textSchema, font, input }: { textSchema: TextSchema, font: Font, input: string }) => {
-  const { fontName, fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width } = textSchema;
+  const { fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width } = textSchema;
   const fontSize = _fontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
 
   const characterSpacingCount = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const fontKitFont = await createFontKitFont(font, fontName);
+  const fontKitFont = await getFontKitFont(textSchema, font);
   const textContent = getTextContent(input, fontKitFont, fontSize, characterSpacingCount);
   const textWidth = widthOfTextAtSize(textContent, fontKitFont, fontSize);
 

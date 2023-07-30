@@ -25,7 +25,6 @@ import {
   BasePdf,
   BarCodeType,
   Alignment,
-  DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
@@ -33,10 +32,9 @@ import {
   DEFAULT_FONT_COLOR,
   calculateDynamicFontSize,
   heightOfFontAtSize,
-  getDefaultFont
+  getFontKitFont
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import * as fontkit from 'fontkit';
 
 export interface InputImageCache {
   [key: string]: PDFImage | undefined;
@@ -284,14 +282,7 @@ const drawInputByTextSchema = async (arg: {
   const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
   const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
-  const fallbackFont = getDefaultFont();
-  let schemaFontData = fallbackFont[DEFAULT_FONT_NAME].data;
-
-  if (templateSchema.fontName) {
-    schemaFontData = font[templateSchema.fontName].data;
-  }
-
-  const fontkitFont = fontkit.create(Buffer.from(schemaFontData as ArrayBuffer));
+  const fontKitFont = await getFontKitFont(templateSchema, font)
 
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
@@ -306,17 +297,17 @@ const drawInputByTextSchema = async (arg: {
 
   let beforeLineOver = 0;
 
+  const isOverEval = (testString: string) => {
+    const testStringWidth =
+      pdfFontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
+    return width <= testStringWidth;
+  };
   input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
-    const isOverEval = (testString: string) => {
-      const testStringWidth =
-        pdfFontValue.widthOfTextAtSize(testString, size) + (testString.length - 1) * characterSpacing;
-      return width <= testStringWidth;
-    };
     const splitLines = getSplittedLines(inputLine, isOverEval);
 
     const drawLine = (line: string, lineIndex: number) => {
       const textWidth = pdfFontValue.widthOfTextAtSize(line, size) + (line.length - 1) * characterSpacing;
-      const textHeight = heightOfFontAtSize(fontkitFont, size);
+      const textHeight = heightOfFontAtSize(fontKitFont, size);
 
       page.drawText(line, {
         x: calcX(templateSchema.position.x, alignment, width, textWidth),

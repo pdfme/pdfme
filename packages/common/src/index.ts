@@ -55,6 +55,8 @@ import {
   getDefaultFont,
   heightOfFontAtSize,
   checkFont,
+  getFontKitFont,
+  getFontAlignmentValue,
 } from './font.js';
 
 export {
@@ -80,6 +82,8 @@ export {
   getDefaultFont,
   heightOfFontAtSize,
   checkFont,
+  getFontKitFont,
+  getFontAlignmentValue,
   checkInputs,
   checkUIOptions,
   checkTemplate,
