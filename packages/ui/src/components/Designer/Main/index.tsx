@@ -195,6 +195,14 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
+  const currentlyEditingThisTextSchema = (target: EventTarget | null) => {
+    if (!target) return false;
+    if (target instanceof HTMLTextAreaElement)   {
+      return activeElements.map((ae) => ae.id).includes(target.parentElement?.id || '');
+    }
+    return false;
+  }
+
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
     const s = target.style;
@@ -235,7 +243,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       ref={ref}
       onClick={(e) => {
         e.stopPropagation();
-        setEditing(false);
+        if (!currentlyEditingThisTextSchema(e.target)) {
+          setEditing(false);
+        }
       }}
       style={{ overflow: 'overlay' }}
     >
