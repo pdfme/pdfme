@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { calculateDynamicFontSize, checkFont, getDefaultFont } from "../src/font"
+import { calculateDynamicFontSize, checkFont, getDefaultFont, buildPlaceholder } from "../src/font"
 import { Font, TextSchema, Template } from '../src/type';
 import { BLANK_PDF } from '../src';
 
@@ -18,6 +18,7 @@ const getTemplate = (): Template => ({
     {
       a: {
         type: 'text',
+        content: buildPlaceholder('a'),
         fontName: 'SauceHanSansJP',
         position: { x: 0, y: 0 },
         width: 100,
@@ -25,6 +26,7 @@ const getTemplate = (): Template => ({
       },
       b: {
         type: 'text',
+        content: buildPlaceholder('b'),
         position: { x: 0, y: 0 },
         width: 100,
         height: 100,
@@ -35,7 +37,13 @@ const getTemplate = (): Template => ({
 
 const getTextSchema = () => {
   const textSchema: TextSchema = {
-    position: { x: 0, y: 0 }, type: 'text', fontSize: 14, characterSpacing: 1, width: 50, height: 50
+    position: { x: 0, y: 0 },
+    content: buildPlaceholder('variable'),
+    type: 'text',
+    fontSize: 14,
+    characterSpacing: 1,
+    width: 50,
+    height: 50,
   };
   return textSchema
 }
@@ -48,12 +56,14 @@ describe('checkFont test', () => {
         {
           a: {
             type: 'text',
+            content: buildPlaceholder('a'),
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
           b: {
             type: 'text',
+            content: buildPlaceholder('b'),
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -131,6 +141,7 @@ describe('checkFont test', () => {
         {
           a: {
             type: 'text',
+            content: buildPlaceholder('a'),
             fontName: 'SauceHanSansJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -138,6 +149,7 @@ describe('checkFont test', () => {
           },
           b: {
             type: 'text',
+            content: buildPlaceholder('b'),
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -161,6 +173,7 @@ describe('checkFont test', () => {
         {
           a: {
             type: 'text',
+            content: buildPlaceholder('a'),
             fontName: 'SauceHanSansJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -168,6 +181,7 @@ describe('checkFont test', () => {
           },
           b: {
             type: 'text',
+            content: buildPlaceholder('b'),
             fontName: 'SauceHanSerifJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -251,4 +265,3 @@ describe('calculateDynamicFontSize with Custom font', () => {
     expect(result).toBe(20);
   });
 });
-

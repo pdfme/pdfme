@@ -11,6 +11,7 @@ import {
   UIProps as UIPropsSchema,
 } from './schema';
 import { checkFont } from "./font"
+import { PLACEHOLDER_MARKER_LEFT, PLACEHOLDER_MARKER_RIGHT } from './constants';
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
@@ -203,4 +204,25 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
   }
 
   return false;
+};
+
+export const buildPlaceholder = (fieldName: string) => {
+  return PLACEHOLDER_MARKER_LEFT + fieldName + PLACEHOLDER_MARKER_RIGHT;
+};
+
+export const substitutePlaceholdersInContent = (
+  fieldName: string,
+  content: string | undefined,
+  input: string
+) => {
+  if (!content) {
+    // Legacy schema with no content field, or content is empty
+    return input;
+  }
+
+  // Ensure we add escape characters for anything that could break the regex
+  const fieldNameForRegex = fieldName.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+  const regex = new RegExp('{{' + fieldNameForRegex + '}}', 'g');
+
+  return content.replace(regex, input);
 };
