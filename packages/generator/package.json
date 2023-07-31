@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/generator",
-  "version": "1.2.6",
+  "version": "2.0.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -31,7 +31,7 @@
     }
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "develop": "tsc -w",
