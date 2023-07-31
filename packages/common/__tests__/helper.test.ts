@@ -1,10 +1,33 @@
-import { TextSchema } from "../src";
+import {BLANK_PDF, Template, TextSchema} from "../src";
 import {
   buildPlaceholder,
   migrateTemplate,
   substitutePlaceholdersInContent,
   validateBarcodeInput,
 } from '../src/helper';
+
+const getTemplate = (): Template => ({
+  basePdf: BLANK_PDF,
+  schemas: [
+    {
+      a: {
+        type: 'text',
+        content: buildPlaceholder('a'),
+        fontName: 'SauceHanSansJP',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
+      b: {
+        type: 'text',
+        content: buildPlaceholder('b'),
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
+    },
+  ],
+});
 
 describe('validateBarcodeInput test', () => {
   test('qrcode', () => {

@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { calculateDynamicFontSize, checkFont, getDefaultFont, buildPlaceholder } from "../src/font"
+import { calculateDynamicFontSize, checkFont, getDefaultFont } from "../src/font"
+import { buildPlaceholder } from '../src/helper';
 import { Font, TextSchema, Template } from '../src/type';
 import { BLANK_PDF } from '../src';
 
