@@ -221,7 +221,7 @@ common/dist/types/src/type.d.ts:64
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:10
+common/dist/types/src/constants.d.ts:11
 
 ___
 
@@ -231,7 +231,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:11
+common/dist/types/src/constants.d.ts:12
 
 ## Functions
 
@@ -251,7 +251,7 @@ common/dist/types/src/constants.d.ts:11
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:15
+common/dist/types/src/helper.d.ts:9
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:16
+common/dist/types/src/helper.d.ts:10
 
 ___
 
@@ -291,7 +291,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:14
+common/dist/types/src/helper.d.ts:8
 
 ___
 
@@ -311,7 +311,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:12
+common/dist/types/src/helper.d.ts:6
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:13
+common/dist/types/src/helper.d.ts:7
 
 ___
 
@@ -349,7 +349,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -376,7 +376,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -403,7 +403,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -424,7 +424,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `input` | `string` |
 
 #### Returns
@@ -433,4 +433,4 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:17
+common/dist/types/src/helper.d.ts:11

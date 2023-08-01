@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[type.ts:40](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L40)
+[type.ts:40](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L40)
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 #### Defined in
 
-[type.ts:42](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L42)
+[type.ts:42](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L42)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[type.ts:45](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L45)
+[type.ts:45](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L45)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[type.ts:50](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L50)
+[type.ts:50](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L50)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[type.ts:52](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L52)
+[type.ts:52](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L52)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[type.ts:59](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L59)
+[type.ts:59](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L59)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[type.ts:60](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L60)
+[type.ts:60](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L60)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[type.ts:49](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L49)
+[type.ts:49](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L49)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[type.ts:54](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L54)
+[type.ts:54](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L54)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[type.ts:53](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L53)
+[type.ts:53](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L53)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-[type.ts:44](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L44)
+[type.ts:44](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L44)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 #### Defined in
 
-[type.ts:38](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L38)
+[type.ts:38](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L38)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 #### Defined in
 
-[type.ts:57](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L57)
+[type.ts:57](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L57)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[type.ts:58](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L58)
+[type.ts:58](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L58)
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 #### Defined in
 
-[type.ts:46](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L46)
+[type.ts:46](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L46)
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 #### Defined in
 
-[type.ts:48](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L48)
+[type.ts:48](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L48)
 
 ___
 
@@ -175,7 +175,7 @@ ___
 
 #### Defined in
 
-[type.ts:47](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L47)
+[type.ts:47](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L47)
 
 ___
 
@@ -185,7 +185,7 @@ ___
 
 #### Defined in
 
-[type.ts:41](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L41)
+[type.ts:41](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L41)
 
 ___
 
@@ -195,7 +195,7 @@ ___
 
 #### Defined in
 
-[type.ts:39](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L39)
+[type.ts:39](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L39)
 
 ___
 
@@ -205,7 +205,7 @@ ___
 
 #### Defined in
 
-[type.ts:51](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L51)
+[type.ts:51](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L51)
 
 ___
 
@@ -215,7 +215,7 @@ ___
 
 #### Defined in
 
-[type.ts:43](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L43)
+[type.ts:43](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L43)
 
 ___
 
@@ -225,7 +225,7 @@ ___
 
 #### Defined in
 
-[type.ts:55](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L55)
+[type.ts:55](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L55)
 
 ___
 
@@ -235,7 +235,7 @@ ___
 
 #### Defined in
 
-[type.ts:56](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L56)
+[type.ts:56](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L56)
 
 ## Variables
 
@@ -245,7 +245,7 @@ ___
 
 #### Defined in
 
-[constants.ts:11](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L11)
+[constants.ts:12](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L12)
 
 ___
 
@@ -255,7 +255,7 @@ ___
 
 #### Defined in
 
-[constants.ts:3](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L3)
+[constants.ts:3](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L3)
 
 ___
 
@@ -265,7 +265,7 @@ ___
 
 #### Defined in
 
-[constants.ts:5](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L5)
+[constants.ts:5](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L5)
 
 ___
 
@@ -275,7 +275,7 @@ ___
 
 #### Defined in
 
-[constants.ts:6](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L6)
+[constants.ts:6](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L6)
 
 ___
 
@@ -285,7 +285,7 @@ ___
 
 #### Defined in
 
-[constants.ts:1](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L1)
+[constants.ts:1](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L1)
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 #### Defined in
 
-[constants.ts:2](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L2)
+[constants.ts:2](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L2)
 
 ___
 
@@ -305,7 +305,7 @@ ___
 
 #### Defined in
 
-[constants.ts:8](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L8)
+[constants.ts:8](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L8)
 
 ___
 
@@ -315,7 +315,7 @@ ___
 
 #### Defined in
 
-[constants.ts:14](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L14)
+[constants.ts:15](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L15)
 
 ___
 
@@ -325,7 +325,7 @@ ___
 
 #### Defined in
 
-[constants.ts:4](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L4)
+[constants.ts:4](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L4)
 
 ___
 
@@ -335,7 +335,17 @@ ___
 
 #### Defined in
 
-[constants.ts:9](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L9)
+[constants.ts:10](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L10)
+
+___
+
+### DEFAULT\_PT\_TO\_PX\_RATIO
+
+• **DEFAULT\_PT\_TO\_PX\_RATIO**: ``1.333``
+
+#### Defined in
+
+[constants.ts:9](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L9)
 
 ___
 
@@ -345,17 +355,17 @@ ___
 
 #### Defined in
 
-[constants.ts:7](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/constants.ts#L7)
+[constants.ts:7](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/constants.ts#L7)
 
 ___
 
 ### schemaTypes
 
-• **schemaTypes**: readonly [``"text"``, ``"image"``, ``"qrcode"``, ``"japanpost"``, ``"ean13"``, ``"ean8"``, ``"code39"``, ``"code128"``, ``"nw7"``, ``"itf14"``, ``"upca"``, ``"upce"``] = `_schemaTypes`
+• **schemaTypes**: readonly [``"text"``, ``"image"``, ``"qrcode"``, ``"japanpost"``, ``"ean13"``, ``"ean8"``, ``"code39"``, ``"code128"``, ``"nw7"``, ``"itf14"``, ``"upca"``, ``"upce"``, ``"gs1datamatrix"``] = `_schemaTypes`
 
 #### Defined in
 
-[type.ts:32](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L32)
+[type.ts:32](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L32)
 
 ## Functions
 
@@ -375,7 +385,7 @@ ___
 
 #### Defined in
 
-[helper.ts:46](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L46)
+[helper.ts:46](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L46)
 
 ___
 
@@ -388,7 +398,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `__namedParameters` | `Object` |
-| `__namedParameters.font` | `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
+| `__namedParameters.font` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
 | `__namedParameters.input` | `string` |
 | `__namedParameters.textSchema` | `Object` |
 | `__namedParameters.textSchema.alignment` | `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` |
@@ -413,7 +423,7 @@ ___
 
 #### Defined in
 
-[calculateDynamicFontSize.ts:77](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/calculateDynamicFontSize.ts#L77)
+[font.ts:170](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L170)
 
 ___
 
@@ -433,7 +443,7 @@ ___
 
 #### Defined in
 
-[helper.ts:143](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L143)
+[helper.ts:88](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L88)
 
 ___
 
@@ -446,12 +456,12 @@ ___
 | Name | Type | Default value |
 | :------ | :------ | :------ |
 | `arg` | `Object` | `undefined` |
-| `arg.font` | `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> | `undefined` |
+| `arg.font` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> | `undefined` |
 | `arg.template` | `Object` | `undefined` |
-| `arg.template.basePdf` | `string` \| `ArrayBuffer` \| `Uint8Array` | `BasePdf` |
+| `arg.template.basePdf` | `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` | `BasePdf` |
 | `arg.template.columns` | `undefined` \| `string`[] | `undefined` |
 | `arg.template.sampledata` | `undefined` \| `Record`<`string`, `string`\>[] | `undefined` |
-| `arg.template.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `dynamicFontSize`: `undefined` \| { max: number; min: number; } ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` = BarcodeSchemaType; `width`: `number`  }\>[] | `undefined` |
+| `arg.template.schemas` | `Record`<`string`, { `alignment`: `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` ; `backgroundColor`: `undefined` \| `string` ; `characterSpacing`: `undefined` \| `number` ; `dynamicFontSize`: `undefined` \| { max: number; min: number; } ; `fontColor`: `undefined` \| `string` ; `fontName`: `undefined` \| `string` ; `fontSize`: `undefined` \| `number` ; `height`: `number` ; `lineHeight`: `undefined` \| `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { x: number; y: number; } ; `rotate`: `undefined` \| `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` = BarcodeSchemaType; `width`: `number`  }\>[] | `undefined` |
 
 #### Returns
 
@@ -459,7 +469,7 @@ ___
 
 #### Defined in
 
-[helper.ts:86](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L86)
+[font.ts:50](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L50)
 
 ___
 
@@ -479,7 +489,7 @@ ___
 
 #### Defined in
 
-[helper.ts:144](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L144)
+[helper.ts:89](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L89)
 
 ___
 
@@ -499,7 +509,7 @@ ___
 
 #### Defined in
 
-[helper.ts:138](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L138)
+[helper.ts:83](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L83)
 
 ___
 
@@ -519,7 +529,7 @@ ___
 
 #### Defined in
 
-[helper.ts:142](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L142)
+[helper.ts:87](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L87)
 
 ___
 
@@ -539,7 +549,7 @@ ___
 
 #### Defined in
 
-[helper.ts:140](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L140)
+[helper.ts:85](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L85)
 
 ___
 
@@ -559,7 +569,7 @@ ___
 
 #### Defined in
 
-[helper.ts:139](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L139)
+[helper.ts:84](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L84)
 
 ___
 
@@ -579,7 +589,7 @@ ___
 
 #### Defined in
 
-[helper.ts:141](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L141)
+[helper.ts:86](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L86)
 
 ___
 
@@ -599,21 +609,21 @@ ___
 
 #### Defined in
 
-[helper.ts:29](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L29)
+[helper.ts:29](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L29)
 
 ___
 
 ### getDefaultFont
 
-▸ `Const` **getDefaultFont**(): `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\>
+▸ `Const` **getDefaultFont**(): `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\>
 
 #### Returns
 
-`Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\>
+`Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\>
 
 #### Defined in
 
-[helper.ts:72](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L72)
+[font.ts:36](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L36)
 
 ___
 
@@ -625,7 +635,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `font` | `Record`<`string`, { `data`: `string` \| `ArrayBuffer` \| `Uint8Array` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
+| `font` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
 
 #### Returns
 
@@ -633,7 +643,85 @@ ___
 
 #### Defined in
 
-[helper.ts:58](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L58)
+[font.ts:17](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L17)
+
+___
+
+### getFontAlignmentValue
+
+▸ `Const` **getFontAlignmentValue**(`fontKitFont`, `fontSize`): `number`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `fontKitFont` | `Font` |
+| `fontSize` | `number` |
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[font.ts:77](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L77)
+
+___
+
+### getFontKitFont
+
+▸ `Const` **getFontKitFont**(`textSchema`, `font`): `Promise`<`Font`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `textSchema` | `Object` |
+| `textSchema.alignment` | `undefined` \| ``"left"`` \| ``"center"`` \| ``"right"`` |
+| `textSchema.backgroundColor` | `undefined` \| `string` |
+| `textSchema.characterSpacing` | `undefined` \| `number` |
+| `textSchema.dynamicFontSize` | `undefined` \| { `max`: `number` ; `min`: `number`  } |
+| `textSchema.fontColor` | `undefined` \| `string` |
+| `textSchema.fontName` | `undefined` \| `string` |
+| `textSchema.fontSize` | `undefined` \| `number` |
+| `textSchema.height` | `number` |
+| `textSchema.lineHeight` | `undefined` \| `number` |
+| `textSchema.position` | `Object` |
+| `textSchema.position.x` | `number` |
+| `textSchema.position.y` | `number` |
+| `textSchema.rotate` | `undefined` \| `number` |
+| `textSchema.type` | ``"text"`` |
+| `textSchema.width` | `number` |
+| `font` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback`: `undefined` \| `boolean` ; `subset`: `undefined` \| `boolean`  }\> |
+
+#### Returns
+
+`Promise`<`Font`\>
+
+#### Defined in
+
+[font.ts:147](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L147)
+
+___
+
+### heightOfFontAtSize
+
+▸ `Const` **heightOfFontAtSize**(`fontKitFont`, `fontSize`): `number`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `fontKitFont` | `Font` |
+| `fontSize` | `number` |
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[font.ts:93](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/font.ts#L93)
 
 ___
 
@@ -649,7 +737,7 @@ ___
 | `arg.height` | `number` | `undefined` |
 | `arg.position` | { x: number; y: number; } | `undefined` |
 | `arg.rotate` | `undefined` \| `number` | `undefined` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` | `SchemaType` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` | `SchemaType` |
 | `arg.width` | `number` | `undefined` |
 
 #### Returns
@@ -658,7 +746,7 @@ arg is Object
 
 #### Defined in
 
-[type.ts:35](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L35)
+[type.ts:35](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L35)
 
 ___
 
@@ -674,7 +762,7 @@ ___
 | `arg.height` | `number` | `undefined` |
 | `arg.position` | { x: number; y: number; } | `undefined` |
 | `arg.rotate` | `undefined` \| `number` | `undefined` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` | `SchemaType` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` | `SchemaType` |
 | `arg.width` | `number` | `undefined` |
 
 #### Returns
@@ -683,7 +771,7 @@ arg is Object
 
 #### Defined in
 
-[type.ts:34](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L34)
+[type.ts:34](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L34)
 
 ___
 
@@ -699,7 +787,7 @@ ___
 | `arg.height` | `number` | `undefined` |
 | `arg.position` | { x: number; y: number; } | `undefined` |
 | `arg.rotate` | `undefined` \| `number` | `undefined` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` | `SchemaType` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` | `SchemaType` |
 | `arg.width` | `number` | `undefined` |
 
 #### Returns
@@ -708,7 +796,7 @@ arg is Object
 
 #### Defined in
 
-[type.ts:33](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/type.ts#L33)
+[type.ts:33](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/type.ts#L33)
 
 ___
 
@@ -720,7 +808,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `input` | `string` |
 
 #### Returns
@@ -729,4 +817,4 @@ ___
 
 #### Defined in
 
-[helper.ts:168](https://github.com/pdfme/pdfme/blob/793ac59/packages/common/src/helper.ts#L168)
+[helper.ts:113](https://github.com/pdfme/pdfme/blob/107f6ee/packages/common/src/helper.ts#L113)

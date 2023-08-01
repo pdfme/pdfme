@@ -53,7 +53,7 @@ As an example, the author's service [https://labelmake.jp/](https://labelmake.jp
 
 ## Installation
 
-The operating requirements should be the node environment `>=14`. *Please see the note at the end of this section for usage on Node.js <16.*    
+The operating requirements should be the node environment `>=16`.    
 There are two packages in pdfme, generator and UI.
 
 The package for generating PDF can be installed with the following command.
