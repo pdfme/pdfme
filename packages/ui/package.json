@@ -41,7 +41,6 @@
     "@dnd-kit/core": "^5.0.1",
     "@dnd-kit/sortable": "^6.0.0",
     "@heroicons/react": "^2.0.13",
-    "@pdfme/common": "file:../common",
     "@scena/react-guides": "^0.16.0",
     "hotkeys-js": "^3.8.7",
     "pdfjs-dist": "2.12.313",
@@ -51,6 +50,7 @@
     "react-selecto": "^1.12.0"
   },
   "devDependencies": {
+    "@pdfme/common": "file:../common",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@types/pdfjs-dist": "^2.10.378",
@@ -62,6 +62,9 @@
     "process": "^0.11.10",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
+  },
+  "peerDependencies": {
+    "@pdfme/common": "^2.0.0"
   },
   "jest": {
     "setupFiles": [
