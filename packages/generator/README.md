@@ -59,14 +59,16 @@ There are two packages in pdfme, generator and UI.
 The package for generating PDF can be installed with the following command.
 
 ```
-npm i @pdfme/generator
+npm i @pdfme/generator @pdfme/common
 ```
 
 The packages for using PDF designer, forms and viewers can be installed with the following commands.
 
 ```
-npm i @pdfme/ui
+npm i @pdfme/ui @pdfme/common
 ```
+
+*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.
 
