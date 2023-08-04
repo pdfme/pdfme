@@ -91,8 +91,33 @@ const dictTh: { [key in keyof DictEn]: string } = {
   bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
 };
 
+const dictPl: {[key in keyof DictEn]: string} = {
+  cancel: 'Anuluj',
+  field: 'pole',
+  fieldName: 'Klucz pola',
+  require: 'wymagany',
+  uniq: 'unikalny',
+  inputExample: 'Przykład',
+  edit: 'Edytuj',
+  plsInputName: 'Wymagane wprowadzenie klucza pola',
+  fieldMustUniq: 'Klucz pola nie jest unikalny',
+  notUniq: '(Klucz pola nie jest unikalny)',
+  noKeyName: 'Brak nazwy klucza pola',
+  fieldsList: 'Lista pól',
+  addNewField: 'Dodaj nowe pole',
+  editField: 'Edytuj pole',
+  type: 'Typ pola',
+  errorOccurred: 'Wystąpił błąd',
+  errorBulkUpdateFieldName:
+    'Nie można wprowadzić zmian ponieważ liczba elementów uległa zmianie.',
+  commitBulkUpdateFieldName: 'Zaakceptuj zmiany',
+  bulkUpdateFieldName: 'Masowo aktualizuj klucze pól', 
+}
+
 const i18n = (lang: Lang, key: keyof DictEn) => {
   switch (lang) {
+    case 'pl':
+      return dictPl[key];
     case 'th':
       return dictTh[key];
 
