@@ -157,12 +157,12 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { t
 
     const textHeight = heightOfFontAtSize(fontKitFont, size);
     const textHeightInMm = textHeight * DEFAULT_PT_TO_MM_RATIO;
-    textContentRows.forEach((line, index) => {
+    textContentRows.forEach((line) => {
       const textWidth = widthOfTextAtSize(line, fontKitFont, size);
       const textWidthInMm = calculateTextWidthInMm(line, textWidth, characterSpacingCount);
 
       totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
-      if (index !== 0) totalHeightInMm += textHeightInMm;
+      totalHeightInMm += textHeightInMm;
     });
 
     return { totalWidthInMm, totalHeightInMm };
@@ -171,7 +171,7 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { t
   let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
 
   while (
-    (totalWidthInMm > width - DEFAULT_TOLERANCE || totalHeightInMm > height - DEFAULT_TOLERANCE) &&
+    (totalWidthInMm > width - DEFAULT_TOLERANCE || totalHeightInMm > height) &&
     dynamicFontSize > dynamicFontSizeSetting.min
   ) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
@@ -179,7 +179,7 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { t
   }
 
   while (
-    (totalWidthInMm < width - DEFAULT_TOLERANCE && totalHeightInMm < height - DEFAULT_TOLERANCE) &&
+    (totalWidthInMm < width - DEFAULT_TOLERANCE && totalHeightInMm < height) &&
     dynamicFontSize < dynamicFontSizeSetting.max
   ) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
