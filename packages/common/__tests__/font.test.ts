@@ -250,5 +250,19 @@ describe('calculateDynamicFontSize with Custom font', () => {
 
     expect(result).toBe(20);
   });
+
+  it('should return min font size when dynamicFontSizeSetting and tall text are provided', async () => {
+    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 }, height: 30 });
+    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう' });
+
+    expect(result).toBe(10);
+  });
+
+  it('should return max font size when dynamicFontSizeSetting and short text height are provided', async () => {
+    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 }, height: 100 });
+    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あ\nい' });
+
+    expect(result).toBe(20);
+  });
 });
 
