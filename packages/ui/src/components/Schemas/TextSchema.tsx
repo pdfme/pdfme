@@ -35,7 +35,7 @@ const TextSchemaUI = (
       const fav = getFontAlignmentValue(fontKitFont, dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE);
       setFontAlignmentValue(fav);
     });
-  }, [schema.data, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
+  }, [schema, schema.data, schema.width, schema.fontName, schema.fontSize, schema.dynamicFontSize, schema.dynamicFontSize?.max, schema.dynamicFontSize?.min, schema.characterSpacing, font]);
 
 
   const style: React.CSSProperties = {

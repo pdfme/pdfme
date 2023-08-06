@@ -316,7 +316,7 @@ const drawInputByTextSchema = async (arg: {
           height -
           textHeight -
           lineHeight * size * (inputLineIndex + lineIndex + beforeLineOver) -
-          (lineHeight === 0 ? 0 : ((lineHeight - 1) * size) / 2),
+          (lineHeight === DEFAULT_LINE_HEIGHT ? DEFAULT_LINE_HEIGHT : ((lineHeight - 1) * size) / 2),
         rotate,
         size,
         color,
