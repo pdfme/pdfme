@@ -7,6 +7,7 @@ import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
+  DEFAULT_LINE_HEIGHT,
   DEFAULT_TOLERANCE,
   DEFAULT_FONT_SIZE_ADJUSTMENT,
   DEFAULT_PT_TO_MM_RATIO,
@@ -140,9 +141,8 @@ export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
   return fontKitFont;
 }
 
-// FIXME This code does not use lineHeight and should be corrected
 export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { textSchema: TextSchema; font: Font; input: string; }) => {
-  const { fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width, height } = textSchema;
+  const { fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width, height, lineHeight = DEFAULT_LINE_HEIGHT } = textSchema;
   const fontSize = _fontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
 
@@ -169,10 +169,12 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { t
     return { totalWidthInMm, totalHeightInMm };
   };
 
+  const getCurrentHeight = (totalHeightInMm: number, dynamicFontSize: number) => totalHeightInMm + (textContentRows.length * (lineHeight - 1) * dynamicFontSize * DEFAULT_PT_TO_MM_RATIO)
+
   let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
 
   while (
-    (totalWidthInMm > width - DEFAULT_TOLERANCE || totalHeightInMm > height) &&
+    (totalWidthInMm > width - DEFAULT_TOLERANCE || getCurrentHeight(totalHeightInMm, dynamicFontSize) > height) &&
     dynamicFontSize > dynamicFontSizeSetting.min
   ) {
     dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
@@ -180,7 +182,7 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { t
   }
 
   while (
-    (totalWidthInMm < width - DEFAULT_TOLERANCE && totalHeightInMm < height) &&
+    (totalWidthInMm < width - DEFAULT_TOLERANCE && getCurrentHeight(totalHeightInMm, dynamicFontSize) < height) &&
     dynamicFontSize < dynamicFontSizeSetting.max
   ) {
     dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
