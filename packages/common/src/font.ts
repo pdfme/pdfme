@@ -140,6 +140,7 @@ export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
   return fontKitFont;
 }
 
+// FIXME This code does not use lineHeight and should be corrected
 export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { textSchema: TextSchema; font: Font; input: string; }) => {
   const { fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width, height } = textSchema;
   const fontSize = _fontSize || DEFAULT_FONT_SIZE;
