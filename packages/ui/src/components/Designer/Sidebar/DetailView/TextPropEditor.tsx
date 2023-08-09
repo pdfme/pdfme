@@ -24,11 +24,12 @@ const NumberInputSet = (props: {
   width: string;
   label: string;
   value: number;
+  step?: number;
   minNumber?: number;
   maxNumber?: number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, value, width, minNumber, maxNumber, onChange } = props;
+  const { label, step, value, width, minNumber, maxNumber, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -41,6 +42,7 @@ const NumberInputSet = (props: {
         onChange={onChange}
         value={value}
         type="number"
+        step={step ?? 1}
         {...(minNumber && { min: minNumber })}
         {...(maxNumber && { max: maxNumber })}
       />
@@ -209,6 +211,7 @@ const TextPropEditor = (
         <NumberInputSet
           width="30%"
           label={'LineHeight(em)'}
+          step={0.1}
           value={activeSchema.lineHeight ?? DEFAULT_LINE_HEIGHT}
           onChange={(e) =>
             changeSchemas([
@@ -220,6 +223,7 @@ const TextPropEditor = (
         <NumberInputSet
           width="40%"
           label={'CharacterSpacing(pt)'}
+          step={0.1}
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
           onChange={async (e) => {
             const currentCharacterSpacing = Number(e.target.value);
