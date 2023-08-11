@@ -66,7 +66,7 @@ const TextSchemaUI = (
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-    whiteSpace: 'pre-line',
+    whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
     backgroundColor:
       schema.data && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
