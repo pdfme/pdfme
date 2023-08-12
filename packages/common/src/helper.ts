@@ -11,7 +11,7 @@ import {
   UIProps as UIPropsSchema,
 } from './schema';
 import { MM_TO_PT_RATIO, PT_TO_MM_RATIO } from './constants';
-import { checkFont } from "./font"
+import { checkFont } from './font';
 
 export const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * MM_TO_PT_RATIO;

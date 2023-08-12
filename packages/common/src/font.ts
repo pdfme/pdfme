@@ -189,6 +189,11 @@ export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValu
   const splittedLine = textLine.substring(0, splitPos);
   const rest = textLine.substring(splitPos).trimStart();
 
+  if (rest === textLine) {
+    // end recursion if we didn't manage to split (can happen at tiny sizes)
+    return [textLine];
+  }
+
   if (rest.length === 0) {
     // end recursion if there is no leftover
     return [splittedLine];
@@ -275,7 +280,8 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input }: { te
   // Attempt to decrease the font size to fit into the box
   while (
     (totalWidthInMm > boxWidth || totalHeightInMm > boxHeight) &&
-    dynamicFontSize > dynamicFontSizeSetting.min
+    dynamicFontSize > dynamicFontSizeSetting.min &&
+    dynamicFontSize > 0
   ) {
     dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
     ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
