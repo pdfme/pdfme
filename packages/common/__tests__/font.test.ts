@@ -1,6 +1,14 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { calculateDynamicFontSize, checkFont, getDefaultFont, getFontKitFont, getSplittedLines } from '../src/font'
+import type { Font as FontKitFont } from 'fontkit';
+import {
+  calculateDynamicFontSize,
+  checkFont,
+  getDefaultFont,
+  getFontKitFont,
+  getSplittedLines,
+  FontWidthCalcValues,
+} from '../src/font'
 import { Font, TextSchema, Template } from '../src/type';
 import { BLANK_PDF } from '../src';
 
@@ -188,7 +196,69 @@ describe('checkFont test', () => {
   });
 });
 
-describe('getSplittedLines test', () => {
+describe('getSplitPosition test with mocked font width calculations', () => {
+  /**
+   * To simplify these tests we mock the widthOfTextAtSize function to return the length of the text.
+   * Therefore, setting the boxWidthInPt to 5 should result in a split after 5 characters.
+   */
+
+  let widthOfTextAtSizeSpy: jest.SpyInstance<number, [string]>;
+
+  beforeAll(() => {
+    // @ts-ignore
+    widthOfTextAtSizeSpy = jest.spyOn(require('../src/font'), 'widthOfTextAtSize');
+    widthOfTextAtSizeSpy.mockImplementation((text) => {
+      return text.length;
+    });
+  });
+
+  afterAll(() => {
+    widthOfTextAtSizeSpy.mockRestore();
+  });
+
+  const mockedFont: FontKitFont = {} as FontKitFont;
+  const mockCalcValues: FontWidthCalcValues = {
+    font: mockedFont,
+    fontSize: 12,
+    characterSpacing: 1,
+    boxWidthInPt: 5,
+  };
+
+  it('does not split an empty string', () => {
+    expect(getSplittedLines('', mockCalcValues)).toEqual(['']);
+  });
+
+  it('does not split a short line', () => {
+    expect(getSplittedLines('a', mockCalcValues)).toEqual(['a']);
+    expect(getSplittedLines('aaaa', mockCalcValues)).toEqual(['aaaa']);
+  });
+
+  it('splits a line to the nearest previous space', () => {
+    expect(getSplittedLines('aaa bbb', mockCalcValues)).toEqual(['aaa', 'bbb']);
+  });
+
+  it('splits a line where the split point is on a space', () => {
+    expect(getSplittedLines('aaaaa bbbbb', mockCalcValues)).toEqual(['aaaaa', 'bbbbb']);
+  });
+
+  it('splits a long line in the middle of a word if too long', () => {
+    expect(getSplittedLines('aaaaaa bbb', mockCalcValues)).toEqual(['aaaaa', 'a bbb']);
+  });
+
+  it('splits a long line without spaces at exactly 5 chars', () => {
+    expect(getSplittedLines('abcdef', mockCalcValues)).toEqual(['abcde', 'f']);
+  });
+
+  it('splits a very long line without spaces at exactly 5 chars', () => {
+    expect(getSplittedLines('abcdefghijklmn', mockCalcValues)).toEqual(['abcde', 'fghij', 'klmn']);
+  });
+
+  it('splits a line with lots of words', () => {
+    expect(getSplittedLines('a b c d e', mockCalcValues)).toEqual(['a b c', 'd e']);
+  });
+});
+
+describe('getSplittedLines test with real font width calculations', () => {
   const font = getDefaultFont();
   const baseCalcValues = {
     fontSize: 12,

@@ -43,7 +43,7 @@
       },
       "本文": {
         "position": { "x": 45, "y": 100 },
-        "width": 119.99,
+        "width": 120,
         "alignment": "left",
         "type": "text",
         "height": 114.77,

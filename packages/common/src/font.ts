@@ -145,7 +145,7 @@ export type FontWidthCalcValues = {
 const isTextExceedingBoxWidth = (text: string, calcValues: FontWidthCalcValues) => {
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
   const textWidth = widthOfTextAtSize(text, font, fontSize, characterSpacing);
-  return textWidth >= boxWidthInPt;
+  return textWidth > boxWidthInPt;
 };
 
 /**
@@ -177,7 +177,7 @@ const getSplitPosition = (textLine: string, calcValues: FontWidthCalcValues) => 
   }
 
   // For very long lines with no whitespace use the original overPos
-  return overPosTmp > 0 ? overPosTmp : overPos - 1;
+  return overPosTmp > 0 ? overPosTmp : overPos;
 };
 
 /**
@@ -190,7 +190,8 @@ export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValu
   const rest = textLine.substring(splitPos).trimStart();
 
   if (rest === textLine) {
-    // end recursion if we didn't manage to split (can happen at tiny sizes)
+    // if we went so small that we want to split on the first char
+    // then end recursion to avoid infinite loop
     return [textLine];
   }
 
@@ -248,8 +249,7 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input }: { te
         boxWidthInPt,
       });
       lines.forEach((line) => {
-        // We need to trim the end of the line, because any whitespace is not considered as exceeding the box width
-        const textWidth = widthOfTextAtSize(line.trimEnd(), fontKitFont, size, characterSpacing);
+        const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
         const textWidthInMm = pt2mm(textWidth);
 
         totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
