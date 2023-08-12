@@ -75,7 +75,6 @@ const generate = async (props: GenerateProps) => {
           templateSchema,
           pdfDoc,
           page,
-          pageHeight,
           fontSetting,
           inputImageCache,
         });
