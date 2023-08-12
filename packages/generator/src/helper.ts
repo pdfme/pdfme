@@ -275,15 +275,15 @@ const drawInputByTextSchema = async (arg: {
   templateSchema: TextSchema;
   pdfDoc: PDFDocument;
   page: PDFPage;
-  pageHeight: number;
   fontSetting: FontSetting;
 }) => {
-  const { input, templateSchema, page, pageHeight, fontSetting } = arg;
+  const { input, templateSchema, page, fontSetting } = arg;
   const { font, pdfFontObj, fallbackFontName } = fontSetting;
 
   const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
   const fontKitFont = await getFontKitFont(templateSchema, font)
 
+  const pageHeight = page.getHeight();
   drawBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
@@ -337,17 +337,16 @@ const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema
 const drawInputByImageSchema = async (arg: {
   input: string;
   templateSchema: ImageSchema;
-  pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
-  const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
+  const { input, templateSchema, pdfDoc, page, inputImageCache } = arg;
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const opt = {
     x: calcX(templateSchema.position.x, 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
+    y: calcY(templateSchema.position.y, page.getHeight(), height),
     rotate,
     width,
     height,
@@ -365,18 +364,17 @@ const drawInputByImageSchema = async (arg: {
 const drawInputByBarcodeSchema = async (arg: {
   input: string;
   templateSchema: BarcodeSchema;
-  pageHeight: number;
   pdfDoc: PDFDocument;
   page: PDFPage;
   inputImageCache: InputImageCache;
 }) => {
-  const { input, templateSchema, pageHeight, pdfDoc, page, inputImageCache } = arg;
+  const { input, templateSchema, pdfDoc, page, inputImageCache } = arg;
   if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
 
   const { width, height, rotate } = getSchemaSizeAndRotate(templateSchema);
   const opt = {
     x: calcX(templateSchema.position.x, 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
+    y: calcY(templateSchema.position.y, page.getHeight(), height),
     rotate,
     width,
     height,
@@ -398,7 +396,6 @@ export const drawInputByTemplateSchema = async (arg: {
   templateSchema: Schema;
   pdfDoc: PDFDocument;
   page: PDFPage;
-  pageHeight: number;
   fontSetting: FontSetting;
   inputImageCache: InputImageCache;
 }) => {
