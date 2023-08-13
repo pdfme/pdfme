@@ -17,40 +17,46 @@ import { FontContext } from '../../contexts';
 type Props = SchemaUIProps & { schema: TextSchema };
 
 const TextSchemaUI = (
-  { schema, editable, placeholder, tabIndex, onChange, onDynamicFontResize }: Props,
+  { schema, editable, placeholder, tabIndex, onChange }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
   const font = useContext(FontContext);
+  const [dynamicFontSize, setDynamicFontSize] = useState<number | undefined>(undefined);
   const [fontAlignmentValue, setFontAlignmentValue] = useState<number>(0);
 
-  useEffect(() => {
-    getFontKitFont(schema, font).then((fontKitFont) => {
-      const fav = getFontAlignmentValue(fontKitFont, schema.fontSize ?? DEFAULT_FONT_SIZE);
-      setFontAlignmentValue(fav);
-    });
-  }, [schema, schema.width, font]);
 
   useEffect(() => {
     if (schema.dynamicFontSize && schema.data) {
-      calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(
-        (dynamicFontSize) => {
-          if (onDynamicFontResize && dynamicFontSize != schema.fontSize) {
-            onDynamicFontResize(dynamicFontSize);
-          }
-        }
-      );
+      calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(setDynamicFontSize);
+    } else {
+      setDynamicFontSize(undefined);
     }
   }, [
+    schema,
     schema.data,
+    schema.dynamicFontSize,
+    font
+  ]);
+
+  useEffect(() => {
+    getFontKitFont(schema, font).then(fontKitFont => {
+      const fav = getFontAlignmentValue(fontKitFont, dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE);
+      setFontAlignmentValue(fav);
+    });
+  }, [
+    schema,
     schema.width,
     schema.height,
     schema.fontName,
+    schema.fontSize,
     schema.dynamicFontSize?.max,
     schema.dynamicFontSize?.min,
     schema.characterSpacing,
     schema.lineHeight,
     font,
+    dynamicFontSize
   ]);
+
 
 
   const style: React.CSSProperties = {
@@ -64,7 +70,7 @@ const TextSchemaUI = (
     paddingTop: fontAlignmentValue >= 0 ? fontAlignmentValue : 0,
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
-    fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
+    fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,

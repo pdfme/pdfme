@@ -42,7 +42,7 @@ const NumberInputSet = (props: {
         name={`input-${formattedLabel}`}
         style={{ ...inputStyle, ...style }}
         onChange={onChange}
-        value={value}
+        value={isNaN(value) ? '' : value}
         type="number"
         step={step ?? 1}
         disabled={disabled}
@@ -194,8 +194,8 @@ const TextPropEditor = (
         <NumberInputSet
           width="30%"
           label={'FontSize(pt)'}
-          value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
-          style={!!activeSchema.dynamicFontSize ? { background: '#ccc' } : {}}
+          value={activeSchema.dynamicFontSize ? NaN : (activeSchema.fontSize ?? DEFAULT_FONT_SIZE)}
+          style={activeSchema.dynamicFontSize ? { background: '#ccc', cursor: 'not-allowed' } : {}}
           disabled={!!activeSchema.dynamicFontSize}
           onChange={(e) => {
             changeSchemas([{ key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id }])
