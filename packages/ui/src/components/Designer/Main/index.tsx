@@ -267,9 +267,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (paperRefs.current[pageCursor] === inputEvent.target) {
             onEdit([]);
           }
-          console.log(inputEvent.target)
-          console.log(inputEvent.target)
-          if (inputEvent.target?.id === DELETE_BTN_ID || inputEvent.target?.parent?.id === DELETE_BTN_ID) {
+          if (inputEvent.target?.id === DELETE_BTN_ID) {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
