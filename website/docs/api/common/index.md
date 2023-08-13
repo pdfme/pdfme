@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[type.ts:40](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L40)
+[type.ts:40](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L40)
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 #### Defined in
 
-[type.ts:42](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L42)
+[type.ts:42](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L42)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[type.ts:45](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L45)
+[type.ts:45](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L45)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[type.ts:50](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L50)
+[type.ts:50](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L50)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[type.ts:52](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L52)
+[type.ts:52](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L52)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[type.ts:59](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L59)
+[type.ts:59](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L59)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[type.ts:60](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L60)
+[type.ts:60](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L60)
 
 ___
 
@@ -85,7 +85,26 @@ ___
 
 #### Defined in
 
-[type.ts:49](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L49)
+[type.ts:49](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L49)
+
+___
+
+### FontWidthCalcValues
+
+Ƭ **FontWidthCalcValues**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `boxWidthInPt` | `number` |
+| `characterSpacing` | `number` |
+| `font` | `FontKitFont` |
+| `fontSize` | `number` |
+
+#### Defined in
+
+[font.ts:138](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L138)
 
 ___
 
@@ -95,7 +114,7 @@ ___
 
 #### Defined in
 
-[type.ts:54](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L54)
+[type.ts:54](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L54)
 
 ___
 
@@ -105,7 +124,7 @@ ___
 
 #### Defined in
 
-[type.ts:53](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L53)
+[type.ts:53](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L53)
 
 ___
 
@@ -115,7 +134,7 @@ ___
 
 #### Defined in
 
-[type.ts:44](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L44)
+[type.ts:44](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L44)
 
 ___
 
@@ -125,7 +144,7 @@ ___
 
 #### Defined in
 
-[type.ts:38](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L38)
+[type.ts:38](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L38)
 
 ___
 
@@ -135,7 +154,7 @@ ___
 
 #### Defined in
 
-[type.ts:57](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L57)
+[type.ts:57](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L57)
 
 ___
 
@@ -145,7 +164,7 @@ ___
 
 #### Defined in
 
-[type.ts:58](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L58)
+[type.ts:58](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L58)
 
 ___
 
@@ -155,7 +174,7 @@ ___
 
 #### Defined in
 
-[type.ts:46](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L46)
+[type.ts:46](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L46)
 
 ___
 
@@ -165,7 +184,7 @@ ___
 
 #### Defined in
 
-[type.ts:48](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L48)
+[type.ts:48](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L48)
 
 ___
 
@@ -175,7 +194,7 @@ ___
 
 #### Defined in
 
-[type.ts:47](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L47)
+[type.ts:47](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L47)
 
 ___
 
@@ -185,7 +204,7 @@ ___
 
 #### Defined in
 
-[type.ts:41](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L41)
+[type.ts:41](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L41)
 
 ___
 
@@ -195,7 +214,7 @@ ___
 
 #### Defined in
 
-[type.ts:39](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L39)
+[type.ts:39](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L39)
 
 ___
 
@@ -205,7 +224,7 @@ ___
 
 #### Defined in
 
-[type.ts:51](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L51)
+[type.ts:51](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L51)
 
 ___
 
@@ -215,7 +234,7 @@ ___
 
 #### Defined in
 
-[type.ts:43](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L43)
+[type.ts:43](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L43)
 
 ___
 
@@ -225,7 +244,7 @@ ___
 
 #### Defined in
 
-[type.ts:55](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L55)
+[type.ts:55](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L55)
 
 ___
 
@@ -235,7 +254,7 @@ ___
 
 #### Defined in
 
-[type.ts:56](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L56)
+[type.ts:56](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L56)
 
 ## Variables
 
@@ -245,7 +264,7 @@ ___
 
 #### Defined in
 
-[constants.ts:12](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L12)
+[constants.ts:12](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L12)
 
 ___
 
@@ -255,7 +274,7 @@ ___
 
 #### Defined in
 
-[constants.ts:3](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L3)
+[constants.ts:3](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L3)
 
 ___
 
@@ -265,7 +284,7 @@ ___
 
 #### Defined in
 
-[constants.ts:5](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L5)
+[constants.ts:5](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L5)
 
 ___
 
@@ -275,7 +294,7 @@ ___
 
 #### Defined in
 
-[constants.ts:6](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L6)
+[constants.ts:6](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L6)
 
 ___
 
@@ -285,7 +304,7 @@ ___
 
 #### Defined in
 
-[constants.ts:1](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L1)
+[constants.ts:1](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L1)
 
 ___
 
@@ -295,17 +314,7 @@ ___
 
 #### Defined in
 
-[constants.ts:2](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L2)
-
-___
-
-### DEFAULT\_FONT\_SIZE\_ADJUSTMENT
-
-• **DEFAULT\_FONT\_SIZE\_ADJUSTMENT**: ``0.25``
-
-#### Defined in
-
-[constants.ts:8](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L8)
+[constants.ts:2](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L2)
 
 ___
 
@@ -315,7 +324,7 @@ ___
 
 #### Defined in
 
-[constants.ts:15](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L15)
+[constants.ts:15](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L15)
 
 ___
 
@@ -325,37 +334,47 @@ ___
 
 #### Defined in
 
-[constants.ts:4](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L4)
+[constants.ts:4](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L4)
 
 ___
 
-### DEFAULT\_PT\_TO\_MM\_RATIO
+### FONT\_SIZE\_ADJUSTMENT
 
-• **DEFAULT\_PT\_TO\_MM\_RATIO**: ``0.3528``
+• **FONT\_SIZE\_ADJUSTMENT**: ``0.25``
 
 #### Defined in
 
-[constants.ts:10](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L10)
+[constants.ts:7](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L7)
 
 ___
 
-### DEFAULT\_PT\_TO\_PX\_RATIO
+### MM\_TO\_PT\_RATIO
 
-• **DEFAULT\_PT\_TO\_PX\_RATIO**: ``1.333``
+• **MM\_TO\_PT\_RATIO**: ``2.8346``
 
 #### Defined in
 
-[constants.ts:9](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L9)
+[constants.ts:10](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L10)
 
 ___
 
-### DEFAULT\_TOLERANCE
+### PT\_TO\_MM\_RATIO
 
-• **DEFAULT\_TOLERANCE**: ``1``
+• **PT\_TO\_MM\_RATIO**: ``0.3528``
 
 #### Defined in
 
-[constants.ts:7](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/constants.ts#L7)
+[constants.ts:9](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L9)
+
+___
+
+### PT\_TO\_PX\_RATIO
+
+• **PT\_TO\_PX\_RATIO**: ``1.333``
+
+#### Defined in
+
+[constants.ts:8](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/constants.ts#L8)
 
 ___
 
@@ -365,7 +384,7 @@ ___
 
 #### Defined in
 
-[type.ts:32](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L32)
+[type.ts:32](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L32)
 
 ## Functions
 
@@ -385,13 +404,18 @@ ___
 
 #### Defined in
 
-[helper.ts:46](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L46)
+[helper.ts:55](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L55)
 
 ___
 
 ### calculateDynamicFontSize
 
 ▸ `Const` **calculateDynamicFontSize**(`__namedParameters`): `Promise`<`number`\>
+
+If using dynamic font size, iteratively increment or decrement the
+font size to fit the containing box.
+Calculating space usage involves splitting lines where they exceed
+the box width based on the proposed size.
 
 #### Parameters
 
@@ -423,7 +447,7 @@ ___
 
 #### Defined in
 
-[font.ts:170](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L170)
+[font.ts:212](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L212)
 
 ___
 
@@ -443,7 +467,7 @@ ___
 
 #### Defined in
 
-[helper.ts:88](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L88)
+[helper.ts:97](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L97)
 
 ___
 
@@ -469,7 +493,7 @@ ___
 
 #### Defined in
 
-[font.ts:50](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L50)
+[font.ts:50](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L50)
 
 ___
 
@@ -489,7 +513,7 @@ ___
 
 #### Defined in
 
-[helper.ts:89](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L89)
+[helper.ts:98](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L98)
 
 ___
 
@@ -509,7 +533,7 @@ ___
 
 #### Defined in
 
-[helper.ts:83](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L83)
+[helper.ts:92](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L92)
 
 ___
 
@@ -529,7 +553,7 @@ ___
 
 #### Defined in
 
-[helper.ts:87](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L87)
+[helper.ts:96](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L96)
 
 ___
 
@@ -549,7 +573,7 @@ ___
 
 #### Defined in
 
-[helper.ts:85](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L85)
+[helper.ts:94](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L94)
 
 ___
 
@@ -569,7 +593,7 @@ ___
 
 #### Defined in
 
-[helper.ts:84](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L84)
+[helper.ts:93](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L93)
 
 ___
 
@@ -589,7 +613,7 @@ ___
 
 #### Defined in
 
-[helper.ts:86](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L86)
+[helper.ts:95](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L95)
 
 ___
 
@@ -609,7 +633,7 @@ ___
 
 #### Defined in
 
-[helper.ts:29](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L29)
+[helper.ts:38](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L38)
 
 ___
 
@@ -623,7 +647,7 @@ ___
 
 #### Defined in
 
-[font.ts:36](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L36)
+[font.ts:36](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L36)
 
 ___
 
@@ -643,7 +667,7 @@ ___
 
 #### Defined in
 
-[font.ts:17](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L17)
+[font.ts:17](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L17)
 
 ___
 
@@ -664,7 +688,7 @@ ___
 
 #### Defined in
 
-[font.ts:77](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L77)
+[font.ts:77](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L77)
 
 ___
 
@@ -700,7 +724,31 @@ ___
 
 #### Defined in
 
-[font.ts:147](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L147)
+[font.ts:120](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L120)
+
+___
+
+### getSplittedLines
+
+▸ `Const` **getSplittedLines**(`textLine`, `calcValues`): `string`[]
+
+Recursively splits the line at getSplitPosition.
+If there is some leftover, split the rest again in the same manner.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `textLine` | `string` |
+| `calcValues` | [`FontWidthCalcValues`](.md#fontwidthcalcvalues) |
+
+#### Returns
+
+`string`[]
+
+#### Defined in
+
+[font.ts:187](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L187)
 
 ___
 
@@ -721,7 +769,7 @@ ___
 
 #### Defined in
 
-[font.ts:93](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/font.ts#L93)
+[font.ts:93](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L93)
 
 ___
 
@@ -746,7 +794,7 @@ arg is Object
 
 #### Defined in
 
-[type.ts:35](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L35)
+[type.ts:35](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L35)
 
 ___
 
@@ -771,7 +819,7 @@ arg is Object
 
 #### Defined in
 
-[type.ts:34](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L34)
+[type.ts:34](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L34)
 
 ___
 
@@ -796,7 +844,27 @@ arg is Object
 
 #### Defined in
 
-[type.ts:33](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/type.ts#L33)
+[type.ts:33](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/type.ts#L33)
+
+___
+
+### mm2pt
+
+▸ `Const` **mm2pt**(`mm`): `number`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `mm` | `number` |
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[helper.ts:16](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L16)
 
 ___
 
@@ -817,4 +885,27 @@ ___
 
 #### Defined in
 
-[helper.ts:113](https://github.com/pdfme/pdfme/blob/3015646/packages/common/src/helper.ts#L113)
+[helper.ts:122](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/helper.ts#L122)
+
+___
+
+### widthOfTextAtSize
+
+▸ `Const` **widthOfTextAtSize**(`text`, `fontKitFont`, `fontSize`, `characterSpacing`): `number`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `text` | `string` |
+| `fontKitFont` | `Font` |
+| `fontSize` | `number` |
+| `characterSpacing` | `number` |
+
+#### Returns
+
+`number`
+
+#### Defined in
+
+[font.ts:110](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/common/src/font.ts#L110)

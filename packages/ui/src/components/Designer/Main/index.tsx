@@ -39,6 +39,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         zIndex: 1,
         top,
         left,
+        padding: 2,
         height: 24,
         width: 24,
         cursor: 'pointer',
@@ -52,7 +53,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         justifyContent: 'center',
       }}
     >
-      <XMarkIcon width={10} height={10} />
+      <XMarkIcon style={{ pointerEvents: 'none' }} width={24} height={24} />
     </button>
   );
 };
@@ -266,8 +267,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (paperRefs.current[pageCursor] === inputEvent.target) {
             onEdit([]);
           }
-
-          if (inputEvent.target.id === DELETE_BTN_ID) {
+          console.log(inputEvent.target)
+          console.log(inputEvent.target)
+          if (inputEvent.target?.id === DELETE_BTN_ID || inputEvent.target?.parent?.id === DELETE_BTN_ID) {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
