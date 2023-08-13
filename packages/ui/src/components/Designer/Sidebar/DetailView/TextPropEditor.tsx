@@ -195,7 +195,7 @@ const TextPropEditor = (
           width="30%"
           label={'FontSize(pt)'}
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
-          style={!!activeSchema.dynamicFontSize ? { backgroundColor: '#ccc' } : {}}
+          style={!!activeSchema.dynamicFontSize ? { background: '#ccc' } : {}}
           disabled={!!activeSchema.dynamicFontSize}
           onChange={(e) => {
             changeSchemas([{ key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id }])
@@ -260,8 +260,8 @@ const TextPropEditor = (
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
-                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
-                  ? { backgroundColor: 'rgb(200 0 0 / 30%)' }
+                  activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { background: 'rgb(200 0 0 / 30%)' }
                   : {}
               }
               onChange={(e) => {
@@ -276,8 +276,8 @@ const TextPropEditor = (
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
-                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
-                  ? { backgroundColor: 'rgb(200 0 0 / 30%)' }
+                  activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { background: 'rgb(200 0 0 / 30%)' }
                   : {}
               }
               onChange={(e) => {
