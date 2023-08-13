@@ -1,4 +1,4 @@
-import { validateBarcodeInput } from '../src/helper';
+import { validateBarcodeInput, mm2pt, pt2mm } from '../src/helper';
 
 describe('validateBarcodeInput test', () => {
   test('qrcode', () => {
@@ -245,5 +245,22 @@ describe('validateBarcodeInput test', () => {
     expect(validateBarcodeInput(type, valid_12)).toEqual(true);
     expect(validateBarcodeInput(type, invalid_bad_checkdigit)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
+  });
+});
+
+describe('mm2pt test', () => {
+  it('converts millimeters to points', () => {
+    expect(mm2pt(1)).toEqual(2.8346);
+    expect(mm2pt(10)).toEqual(28.346);
+    expect(mm2pt(4395.12)).toEqual(12458.407152);
+  });
+});
+
+describe('pt2mm test', () => {
+  it('converts points to millimeters', () => {
+    expect(pt2mm(1)).toEqual(0.3528);
+    expect(pt2mm(2.8346)).toEqual(1.00004688); // close enough!
+    expect(pt2mm(10)).toEqual(3.528);
+    expect(pt2mm(5322.98)).toEqual(1877.947344);
   });
 });

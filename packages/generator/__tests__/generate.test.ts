@@ -9,10 +9,12 @@ const PDFParser = require('pdf2json');
 
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
+const NotoSerifJPRegularData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`));
 
 const getFont = (): Font => ({
   SauceHanSansJP: { fallback: true, data: SauceHanSansJPData },
   SauceHanSerifJP: { data: SauceHanSerifJPData },
+  'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
 });
 
 const getPdf = (pdfFilePath: string) => {
@@ -103,6 +105,7 @@ describe('generate integrate test', () => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
+
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
         const inputs = template.sampledata!;
@@ -110,6 +113,7 @@ describe('generate integrate test', () => {
         const font = getFont();
         font.SauceHanSansJP.fallback = false;
         font.SauceHanSerifJP.fallback = false;
+        font['NotoSerifJP-Regular'].fallback = false;
         // @ts-ignore
         font[template.fontName].fallback = true;
 

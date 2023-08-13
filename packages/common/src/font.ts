@@ -8,11 +8,10 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
-  DEFAULT_TOLERANCE,
-  DEFAULT_FONT_SIZE_ADJUSTMENT,
-  DEFAULT_PT_TO_MM_RATIO,
-  DEFAULT_PT_TO_PX_RATIO,
+  FONT_SIZE_ADJUSTMENT,
+  PT_TO_PX_RATIO,
 } from './constants';
+import { mm2pt, pt2mm } from './helper';
 import { b64toUint8Array } from "."
 
 export const getFallbackFontName = (font: Font) => {
@@ -32,7 +31,7 @@ export const getFallbackFontName = (font: Font) => {
 const getFallbackFont = (font: Font) => {
   const fallbackFontName = getFallbackFontName(font);
   return font[fallbackFontName];
-}
+};
 
 export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
@@ -78,7 +77,7 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
 export const getFontAlignmentValue = (fontKitFont: FontKitFont, fontSize: number) => {
   const { ascent, descent, unitsPerEm } = fontKitFont;
 
-  const fontSizeInPx = fontSize * DEFAULT_PT_TO_PX_RATIO;
+  const fontSizeInPx = fontSize * PT_TO_PX_RATIO;
 
   // Convert ascent and descent to px values
   const ascentInPixels = (ascent / unitsPerEm) * fontSizeInPx;
@@ -89,7 +88,7 @@ export const getFontAlignmentValue = (fontKitFont: FontKitFont, fontSize: number
 
   // Calculate the top margin/padding in px
   return ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2
-}
+};
 
 export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) => {
   const { ascent, descent, bbox, unitsPerEm } = fontKitFont;
@@ -104,23 +103,18 @@ export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) =
   return (height / 1000) * fontSize;
 };
 
-const widthOfTextAtSize = (input: string, fontKitFont: FontKitFont, fontSize: number) => {
-  const { glyphs } = fontKitFont.layout(input);
-  const scale = 1000 / fontKitFont.unitsPerEm;
-  return glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) * (fontSize / 1000);
-}
-
-const calculateCharacterSpacing = (
-  textContent: string,
-  textCharacterSpacing: number
-) => {
-  const numberOfCharacters = textContent.length;
-  return (numberOfCharacters - 1) * textCharacterSpacing;
+const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
+  return (textContent.length - 1) * textCharacterSpacing;
 };
 
-const calculateTextWidthInMm = (textContent: string, textWidth: number, textCharacterSpacing: number) =>
-  (textWidth + calculateCharacterSpacing(textContent, textCharacterSpacing)) * DEFAULT_PT_TO_MM_RATIO;
-
+export const widthOfTextAtSize = (text: string, fontKitFont: FontKitFont, fontSize: number, characterSpacing: number) => {
+  const { glyphs } = fontKitFont.layout(text);
+  const scale = 1000 / fontKitFont.unitsPerEm;
+  const standardWidth =
+    glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
+    (fontSize / 1000);
+  return standardWidth + calculateCharacterSpacing(text, characterSpacing);
+};
 
 const fontKitFontCache: { [fontName: string]: FontKitFont } = {};
 export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
@@ -136,56 +130,160 @@ export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
   }
 
   const fontKitFont = fontkit.create(fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer));
-  fontKitFontCache[fontName] = fontKitFont
+  fontKitFontCache[fontName] = fontKitFont;
 
   return fontKitFont;
-}
+};
 
-export const calculateDynamicFontSize = async ({ textSchema, font, input, }: { textSchema: TextSchema; font: Font; input: string; }) => {
-  const { fontSize: _fontSize, dynamicFontSize: dynamicFontSizeSetting, characterSpacing, width, height, lineHeight = DEFAULT_LINE_HEIGHT } = textSchema;
-  const fontSize = _fontSize || DEFAULT_FONT_SIZE;
+export type FontWidthCalcValues = {
+  font: FontKitFont;
+  fontSize: number;
+  characterSpacing: number;
+  boxWidthInPt: number;
+};
+
+const isTextExceedingBoxWidth = (text: string, calcValues: FontWidthCalcValues) => {
+  const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
+  const textWidth = widthOfTextAtSize(text, font, fontSize, characterSpacing);
+  return textWidth > boxWidthInPt;
+};
+
+/**
+ * Incrementally checks the current line for its real length
+ * and returns the position where it exceeds the box width.
+ * Returns `null` to indicate if textLine is shorter than the available box.
+ */
+const getOverPosition = (textLine: string, calcValues: FontWidthCalcValues) => {
+  for (let i = 0; i <= textLine.length; i++) {
+    if (isTextExceedingBoxWidth(textLine.slice(0, i + 1), calcValues)) {
+      return i;
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Gets the position of the split. Splits the exceeding line at
+ * the last whitespace prior to it exceeding the bounding box width.
+ */
+const getSplitPosition = (textLine: string, calcValues: FontWidthCalcValues) => {
+  const overPos = getOverPosition(textLine, calcValues);
+  if (overPos === null) return textLine.length; // input line is shorter than the available space
+
+  let overPosTmp = overPos;
+  while (textLine[overPosTmp] !== ' ' && overPosTmp >= 0) {
+    overPosTmp--;
+  }
+
+  // For very long lines with no whitespace use the original overPos
+  return overPosTmp > 0 ? overPosTmp : overPos;
+};
+
+/**
+ * Recursively splits the line at getSplitPosition.
+ * If there is some leftover, split the rest again in the same manner.
+ */
+export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValues): string[] => {
+  const splitPos = getSplitPosition(textLine, calcValues);
+  const splittedLine = textLine.substring(0, splitPos);
+  const rest = textLine.substring(splitPos).trimStart();
+
+  if (rest === textLine) {
+    // if we went so small that we want to split on the first char
+    // then end recursion to avoid infinite loop
+    return [textLine];
+  }
+
+  if (rest.length === 0) {
+    // end recursion if there is no leftover
+    return [splittedLine];
+  }
+
+  return [splittedLine, ...getSplittedLines(rest, calcValues)];
+};
+
+/**
+ * If using dynamic font size, iteratively increment or decrement the
+ * font size to fit the containing box.
+ * Calculating space usage involves splitting lines where they exceed
+ * the box width based on the proposed size.
+ */
+export const calculateDynamicFontSize = async ({ textSchema, font, input }: { textSchema: TextSchema; font: Font; input: string; }) => {
+  const {
+    fontSize: schemaFontSize,
+    dynamicFontSize: dynamicFontSizeSetting,
+    characterSpacing: schemaCharacterSpacing,
+    width: boxWidth,
+    height: boxHeight,
+    lineHeight = DEFAULT_LINE_HEIGHT,
+  } = textSchema;
+  const fontSize = schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
+  if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
-  const characterSpacingCount = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const fontKitFont = await getFontKitFont(textSchema, font);
   const textContentRows = input.split('\n');
 
   let dynamicFontSize = fontSize;
+  if (dynamicFontSize < dynamicFontSizeSetting.min) {
+    dynamicFontSize = dynamicFontSizeSetting.min;
+  } else if (dynamicFontSize > dynamicFontSizeSetting.max) {
+    dynamicFontSize = dynamicFontSizeSetting.max;
+  }
 
   const calculateConstraints = (size: number) => {
     let totalWidthInMm = 0;
     let totalHeightInMm = 0;
 
+    const boxWidthInPt = mm2pt(boxWidth);
     const textHeight = heightOfFontAtSize(fontKitFont, size);
-    const textHeightInMm = textHeight * DEFAULT_PT_TO_MM_RATIO;
-    textContentRows.forEach((line) => {
-      const textWidth = widthOfTextAtSize(line, fontKitFont, size);
-      const textWidthInMm = calculateTextWidthInMm(line, textWidth, characterSpacingCount);
+    const textHeightInMm = pt2mm(textHeight * lineHeight);
 
-      totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
-      totalHeightInMm += textHeightInMm;
+    textContentRows.forEach((paragraph) => {
+      const lines = getSplittedLines(paragraph, {
+        font: fontKitFont,
+        fontSize: size,
+        characterSpacing,
+        boxWidthInPt,
+      });
+      lines.forEach((line) => {
+        const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
+        const textWidthInMm = pt2mm(textWidth);
+
+        totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
+        totalHeightInMm += textHeightInMm;
+      });
     });
 
     return { totalWidthInMm, totalHeightInMm };
   };
 
-  const getCurrentHeight = (totalHeightInMm: number, dynamicFontSize: number) => totalHeightInMm + (textContentRows.length * (lineHeight - 1) * dynamicFontSize * DEFAULT_PT_TO_MM_RATIO)
-
   let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
 
-  while (
-    (totalWidthInMm > width - DEFAULT_TOLERANCE || getCurrentHeight(totalHeightInMm, dynamicFontSize) > height) &&
-    dynamicFontSize > dynamicFontSizeSetting.min
-  ) {
-    dynamicFontSize -= DEFAULT_FONT_SIZE_ADJUSTMENT;
-    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
+  // Attempt to increase the font size up to when it would exceed the box height
+  // (width is also constrained when splitting lines)
+  while (totalHeightInMm < boxHeight && dynamicFontSize < dynamicFontSizeSetting.max) {
+    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
+    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } = calculateConstraints(dynamicFontSize);
+
+    if (newHeight < boxHeight) {
+      totalWidthInMm = newWidth;
+      totalHeightInMm = newHeight;
+    } else {
+      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
+      break;
+    }
   }
 
+  // Attempt to decrease the font size to fit into the box
   while (
-    (totalWidthInMm < width - DEFAULT_TOLERANCE && getCurrentHeight(totalHeightInMm, dynamicFontSize) < height) &&
-    dynamicFontSize < dynamicFontSizeSetting.max
+    (totalWidthInMm > boxWidth || totalHeightInMm > boxHeight) &&
+    dynamicFontSize > dynamicFontSizeSetting.min &&
+    dynamicFontSize > 0
   ) {
-    dynamicFontSize += DEFAULT_FONT_SIZE_ADJUSTMENT;
+    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
     ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
   }
 

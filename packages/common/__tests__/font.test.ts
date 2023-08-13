@@ -1,6 +1,14 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { calculateDynamicFontSize, checkFont, getDefaultFont } from "../src/font"
+import type { Font as FontKitFont } from 'fontkit';
+import {
+  calculateDynamicFontSize,
+  checkFont,
+  getDefaultFont,
+  getFontKitFont,
+  getSplittedLines,
+  FontWidthCalcValues,
+} from '../src/font'
 import { Font, TextSchema, Template } from '../src/type';
 import { BLANK_PDF } from '../src';
 
@@ -35,10 +43,10 @@ const getTemplate = (): Template => ({
 
 const getTextSchema = () => {
   const textSchema: TextSchema = {
-    position: { x: 0, y: 0 }, type: 'text', fontSize: 14, characterSpacing: 1, width: 50, height: 50
+    position: { x: 0, y: 0 }, type: 'text', fontSize: 14, characterSpacing: 1, width: 50, height: 20
   };
-  return textSchema
-}
+  return textSchema;
+};
 
 describe('checkFont test', () => {
   test('success test: no fontName in Schemas', () => {
@@ -188,81 +196,221 @@ describe('checkFont test', () => {
   });
 });
 
+describe('getSplitPosition test with mocked font width calculations', () => {
+  /**
+   * To simplify these tests we mock the widthOfTextAtSize function to return
+   * the length of the text in number of characters.
+   * Therefore, setting the boxWidthInPt to 5 should result in a split after 5 characters.
+   */
+
+  let widthOfTextAtSizeSpy: jest.SpyInstance<number, [string]>;
+
+  beforeAll(() => {
+    // @ts-ignore
+    widthOfTextAtSizeSpy = jest.spyOn(require('../src/font'), 'widthOfTextAtSize');
+    widthOfTextAtSizeSpy.mockImplementation((text) => {
+      return text.length;
+    });
+  });
+
+  afterAll(() => {
+    widthOfTextAtSizeSpy.mockRestore();
+  });
+
+  const mockedFont: FontKitFont = {} as FontKitFont;
+  const mockCalcValues: FontWidthCalcValues = {
+    font: mockedFont,
+    fontSize: 12,
+    characterSpacing: 1,
+    boxWidthInPt: 5,
+  };
+
+  it('does not split an empty string', () => {
+    expect(getSplittedLines('', mockCalcValues)).toEqual(['']);
+  });
+
+  it('does not split a short line', () => {
+    expect(getSplittedLines('a', mockCalcValues)).toEqual(['a']);
+    expect(getSplittedLines('aaaa', mockCalcValues)).toEqual(['aaaa']);
+  });
+
+  it('splits a line to the nearest previous space', () => {
+    expect(getSplittedLines('aaa bbb', mockCalcValues)).toEqual(['aaa', 'bbb']);
+  });
+
+  it('splits a line where the split point is on a space', () => {
+    expect(getSplittedLines('aaaaa bbbbb', mockCalcValues)).toEqual(['aaaaa', 'bbbbb']);
+  });
+
+  it('splits a long line in the middle of a word if too long', () => {
+    expect(getSplittedLines('aaaaaa bbb', mockCalcValues)).toEqual(['aaaaa', 'a bbb']);
+  });
+
+  it('splits a long line without spaces at exactly 5 chars', () => {
+    expect(getSplittedLines('abcdef', mockCalcValues)).toEqual(['abcde', 'f']);
+  });
+
+  it('splits a very long line without spaces at exactly 5 chars', () => {
+    expect(getSplittedLines('abcdefghijklmn', mockCalcValues)).toEqual(['abcde', 'fghij', 'klmn']);
+  });
+
+  it('splits a line with lots of words', () => {
+    expect(getSplittedLines('a b c d e', mockCalcValues)).toEqual(['a b c', 'd e']);
+  });
+});
+
+describe('getSplittedLines test with real font width calculations', () => {
+  const font = getDefaultFont();
+  const baseCalcValues = {
+    fontSize: 12,
+    characterSpacing: 1,
+    boxWidthInPt: 40,
+  };
+
+  it('should not split a line when the text is shorter than the width', () => {
+    getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
+      const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
+      const result = getSplittedLines('short', fontWidthCalcs);
+      expect(result).toEqual(['short']);
+    });
+  });
+
+  it('should split a line when the text is longer than the width', () => {
+    getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
+      const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
+      const result = getSplittedLines('this will wrap', fontWidthCalcs);
+      expect(result).toEqual(['this', 'will', 'wrap']);
+    });
+  });
+
+  it('should split a line in the middle when unspaced text will not fit on a line', () => {
+    getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
+      const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
+      const result = getSplittedLines('thiswillbecut', fontWidthCalcs);
+      expect(result).toEqual(['thisw', 'illbe', 'cut']);
+    });
+  });
+
+  it('should not split text when it is impossible due to size constraints', () => {
+    getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
+      const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
+      fontWidthCalcs.boxWidthInPt = 10;
+      const result = getSplittedLines('thiswillnotbecut', fontWidthCalcs);
+      expect(result).toEqual(['thiswillnotbecut']);
+    });
+  });
+});
+
 describe('calculateDynamicFontSize with Default font', () => {
   const font = getDefaultFont();
+
   it('should return default font size when dynamicFontSizeSetting is not provided', async () => {
-    const textSchema = getTextSchema()
+    const textSchema = getTextSchema();
     const result = await calculateDynamicFontSize({ textSchema, font, input: 'test' });
 
     expect(result).toBe(14);
   });
 
-  it('should return smaller font size when dynamicFontSizeSetting is provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'testtesttesttesttest' });
-
-    expect(result).toBe(14.25);
-  });
-
-  it('should return min font size when dynamicFontSizeSetting and long text are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'testtesttesttesttesttesttesttesttesttesttest' });
-
-    expect(result).toBe(10);
-  });
-
-  it('should return max font size when dynamicFontSizeSetting and short text are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'a' });
-
-    expect(result).toBe(20);
-  });
-});
-
-
-
-describe('calculateDynamicFontSize with Custom font', () => {
-  const font = getSampleFont();
-  it('should return default font size when dynamicFontSizeSetting is not provided', async () => {
-    const textSchema = getTextSchema()
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あいう' });
+  it('should return default font size when dynamicFontSizeSetting max is less than min', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 11, max: 10 };
+    const result = await calculateDynamicFontSize({ textSchema, font, input: 'test' });
 
     expect(result).toBe(14);
   });
 
-  it('should return smaller font size when dynamicFontSizeSetting is provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あいうあいうあい' });
+  it('should calculate a dynamic font size between min and max', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
 
-    expect(result).toBe(16.5);
+    expect(result).toBe(19.25);
   });
 
-  it('should return min font size when dynamicFontSizeSetting and long text are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あいうあいうあいうあいうあいうあいうあいうあいうあいう' });
+  it('should calculate a dynamic font size between min and max regardless of current font size', async () => {
+    const textSchema = getTextSchema();
+    textSchema.fontSize = 2;
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    let result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(19.25);
+
+    textSchema.fontSize = 40;
+    result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(19.25);
+  });
+
+  it('should return min font size when content is too big to fit given constraints', async () => {
+    const textSchema = getTextSchema();
+    textSchema.width = 10;
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
 
     expect(result).toBe(10);
   });
 
-  it('should return max font size when dynamicFontSizeSetting and short text are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 } });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あ' });
+  it('should return max font size when content is too small to fit given constraints', async () => {
+    const textSchema = getTextSchema();
+    textSchema.width = 1000;
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
 
-    expect(result).toBe(20);
+    expect(result).toBe(30);
   });
 
-  it('should return min font size when dynamicFontSizeSetting and tall text are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 }, height: 30 });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう' });
+  it('should not reduce font size below 0', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: -5, max: 10 };
+    textSchema.width = 4;
+    textSchema.height = 1;
+    const input = 'a very \nlong \nmulti-line \nstring\nto';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
 
-    expect(result).toBe(10);
-  });
-
-  it('should return max font size when dynamicFontSizeSetting and short text height are provided', async () => {
-    const textSchema = Object.assign(getTextSchema(), { dynamicFontSize: { max: 20, min: 10 }, height: 100 });
-    const result = await calculateDynamicFontSize({ textSchema, font, input: 'あ\nい' });
-
-    expect(result).toBe(20);
+    expect(result).toBeGreaterThan(0);
   });
 });
 
+describe('calculateDynamicFontSize with Custom font', () => {
+  const font = getSampleFont();
+
+  it('should return smaller font size when dynamicFontSizeSetting is provided', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'あいうあいうあい';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(24.25);
+  });
+
+  it('should return min font size when content is too big to fit given constraints', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 20, max: 30 };
+    const input = 'あいうあいうあいうあいうあいうあいうあいうあいうあいう';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(20);
+  });
+
+  it('should return max font size when content is too small to fit given constraints', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'あ';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(30);
+  });
+
+  it('should return min font size when content is multi-line with too many lines for the container', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 5, max: 20 };
+    const input = 'あ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(5);
+  });
+});

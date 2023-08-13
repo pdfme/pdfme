@@ -27,9 +27,11 @@ const NumberInputSet = (props: {
   step?: number;
   minNumber?: number;
   maxNumber?: number;
+  disabled?: boolean;
+  style?: object;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, step, value, width, minNumber, maxNumber, onChange } = props;
+  const { label, step, value, width, minNumber, maxNumber, disabled, style, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -38,11 +40,12 @@ const NumberInputSet = (props: {
       <input
         id={`input-${formattedLabel}`}
         name={`input-${formattedLabel}`}
-        style={inputStyle}
+        style={{ ...inputStyle, ...style }}
         onChange={onChange}
         value={value}
         type="number"
         step={step ?? 1}
+        disabled={disabled}
         {...(minNumber && { min: minNumber })}
         {...(maxNumber && { max: maxNumber })}
       />
@@ -192,20 +195,10 @@ const TextPropEditor = (
           width="30%"
           label={'FontSize(pt)'}
           value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
+          style={!!activeSchema.dynamicFontSize ? { backgroundColor: '#ccc' } : {}}
+          disabled={!!activeSchema.dynamicFontSize}
           onChange={(e) => {
-            const currentFontSize = Number(e.target.value);
-            const dynamincFontSizeMinAdjust = activeSchema.dynamicFontSize && activeSchema.dynamicFontSize.min > currentFontSize;
-
-            changeSchemas([
-              { key: 'fontSize', value: currentFontSize, schemaId: activeSchema.id },
-              ...(dynamincFontSizeMinAdjust
-                ? [{
-                      key: 'dynamicFontSize.min',
-                      value: currentFontSize,
-                      schemaId: activeSchema.id,
-                    }]
-                : []),
-            ]);
+            changeSchemas([{ key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id }])
           }}
         />
         <NumberInputSet
@@ -265,10 +258,14 @@ const TextPropEditor = (
               label={'FontSize Min(pt)'}
               value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
-              maxNumber={activeSchema.fontSize}
+              style={
+                activeSchema.dynamicFontSize &&
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { backgroundColor: 'rgb(200 0 0 / 30%)' }
+                  : {}
+              }
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.min', value: Number(e.target.value), schemaId: activeSchema.id }])
-
               }}
             />
 
@@ -276,7 +273,13 @@ const TextPropEditor = (
               width="45%"
               label={'FontSize Max(pt)'}
               value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
-              minNumber={activeSchema.fontSize}
+              minNumber={0}
+              style={
+                activeSchema.dynamicFontSize &&
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { backgroundColor: 'rgb(200 0 0 / 30%)' }
+                  : {}
+              }
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.max', value: Number(e.target.value), schemaId: activeSchema.id }])
               }}

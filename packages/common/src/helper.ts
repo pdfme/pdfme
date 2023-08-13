@@ -10,7 +10,16 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema';
-import { checkFont } from "./font"
+import { MM_TO_PT_RATIO, PT_TO_MM_RATIO } from './constants';
+import { checkFont } from './font';
+
+export const mm2pt = (mm: number): number => {
+  return parseFloat(String(mm)) * MM_TO_PT_RATIO;
+};
+
+export const pt2mm = (pt: number): number => {
+  return pt * PT_TO_MM_RATIO;
+};
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
