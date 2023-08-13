@@ -11,7 +11,6 @@ export interface SchemaUIProps {
   onChange: (value: string) => void;
   tabIndex?: number;
   placeholder?: string;
-  onDynamicFontResize?: (value: number) => void;
 }
 
 type Props = SchemaUIProps & {
