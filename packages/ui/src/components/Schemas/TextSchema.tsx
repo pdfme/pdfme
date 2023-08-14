@@ -27,14 +27,23 @@ const TextSchemaUI = (
 
   useEffect(() => {
     if (schema.dynamicFontSize && schema.data) {
-      calculateDynamicFontSize({ textSchema: schema, font, input: schema.data }).then(setDynamicFontSize);
+      calculateDynamicFontSize({
+        textSchema: schema,
+        font,
+        input: schema.data,
+        startingFontSize: dynamicFontSize,
+      }).then(setDynamicFontSize);
     } else {
       setDynamicFontSize(undefined);
     }
   }, [
-    schema,
     schema.data,
-    schema.dynamicFontSize,
+    schema.width,
+    schema.height,
+    schema.dynamicFontSize?.min,
+    schema.dynamicFontSize?.max,
+    schema.characterSpacing,
+    schema.lineHeight,
     font
   ]);
 
@@ -44,7 +53,6 @@ const TextSchemaUI = (
       setFontAlignmentValue(fav);
     });
   }, [
-    schema,
     schema.width,
     schema.height,
     schema.fontName,
@@ -56,7 +64,6 @@ const TextSchemaUI = (
     font,
     dynamicFontSize
   ]);
-
 
 
   const style: React.CSSProperties = {

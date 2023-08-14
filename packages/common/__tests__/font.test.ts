@@ -373,6 +373,26 @@ describe('calculateDynamicFontSize with Default font', () => {
 
     expect(result).toBeGreaterThan(0);
   });
+
+  it('should calculate a dynamic font size when a starting font size is passed that is lower than the eventual', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const startingFontSize = 18;
+    const result = await calculateDynamicFontSize({ textSchema, font, input, startingFontSize });
+
+    expect(result).toBe(19.25);
+  });
+
+  it('should calculate a dynamic font size when a starting font size is passed that is higher than the eventual', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const startingFontSize = 36;
+    const result = await calculateDynamicFontSize({ textSchema, font, input, startingFontSize });
+
+    expect(result).toBe(19.25);
+  });
 });
 
 describe('calculateDynamicFontSize with Custom font', () => {
