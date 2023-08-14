@@ -196,14 +196,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
-  const currentlyEditingThisTextSchema = (target: EventTarget | null) => {
-    if (!target) return false;
-    if (target instanceof HTMLTextAreaElement) {
-      return activeElements.map((ae) => ae.id).includes(target.parentElement?.id || '');
-    }
-    return false;
-  };
-
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
     const s = target.style;
@@ -240,20 +232,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   return (
-    <div
-      ref={ref}
-      onClick={(e) => {
-        e.stopPropagation();
-        if (!currentlyEditingThisTextSchema(e.target)) {
-          setEditing(false);
-        }
-        // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
-        if (!e.shiftKey) {
-          setIsPressShiftKey(false);
-        }
-      }}
-      style={{ overflow: 'overlay' }}
-    >
+    <div ref={ref} style={{ overflow: 'overlay' }}>
       <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
@@ -280,8 +259,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (!isClick && removed.length > 0) {
             newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
           }
-
           onEdit(newActiveElements);
+
+          if (newActiveElements != activeElements) {
+            setEditing(false);
+          }
+          // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
+          if (!inputEvent.shiftKey) {
+            setIsPressShiftKey(false);
+          }
         }}
       />
       <Paper
