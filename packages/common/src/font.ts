@@ -245,9 +245,7 @@ export const calculateDynamicFontSize = async ({
   } else if (dynamicFontSize > dynamicFontSizeSetting.max) {
     dynamicFontSize = dynamicFontSizeSetting.max;
   }
-  if (!('fit' in dynamicFontSizeSetting)) {
-    dynamicFontSizeSetting.fit = DEFAULT_DYNAMIC_FIT;
-  }
+  const dynamicFontFit = dynamicFontSizeSetting.fit ?? DEFAULT_DYNAMIC_FIT;
 
   const calculateConstraints = (size: number) => {
     let totalWidthInMm = 0;
@@ -265,7 +263,7 @@ export const calculateDynamicFontSize = async ({
         boxWidthInPt,
       });
       lines.forEach((line) => {
-        if (dynamicFontSizeSetting.fit == DYNAMIC_FIT_VERTICAL) {
+        if (dynamicFontFit == DYNAMIC_FIT_VERTICAL) {
           // For vertical fit we want to consider the width of text lines where we detect a split
           const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
           const textWidthInMm = pt2mm(textWidth);
@@ -274,7 +272,7 @@ export const calculateDynamicFontSize = async ({
 
         totalHeightInMm += textHeightInMm;
       });
-      if (dynamicFontSizeSetting.fit == DYNAMIC_FIT_HORIZONTAL) {
+      if (dynamicFontFit == DYNAMIC_FIT_HORIZONTAL) {
         // For horizontal fit we want to consider the line's width 'unsplit'
         const textWidth = widthOfTextAtSize(paragraph, fontKitFont, size, characterSpacing);
         const textWidthInMm = pt2mm(textWidth);
@@ -289,7 +287,7 @@ export const calculateDynamicFontSize = async ({
     if (dynamicFontSize >= dynamicFontSizeSetting.max) {
       return false;
     }
-    if (dynamicFontSizeSetting.fit === DYNAMIC_FIT_HORIZONTAL) {
+    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
       return totalWidthInMm < boxWidth;
     }
     return totalHeightInMm < boxHeight;
