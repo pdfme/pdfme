@@ -42,6 +42,7 @@ const TextSchemaUI = (
     schema.height,
     schema.dynamicFontSize?.min,
     schema.dynamicFontSize?.max,
+    schema.dynamicFontSize?.fit,
     schema.characterSpacing,
     schema.lineHeight,
     font
