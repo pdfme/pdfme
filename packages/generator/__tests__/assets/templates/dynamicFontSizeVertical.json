@@ -58,7 +58,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 36
+          "max": 36,
+          "fit": "vertical"
         }
       },
       "single line dynamic long": {
@@ -76,7 +77,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 30
+          "max": 30,
+          "fit": "vertical"
         }
       },
       "multi-line dynamicc": {
@@ -94,7 +96,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       },
       "dynamic single char multiline": {
@@ -112,7 +115,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       },
       "long word dynamic": {
@@ -130,7 +134,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       },
       "dynamic with overflow": {
@@ -148,7 +153,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 15,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       },
       "dynamic single char multi line overflow": {
@@ -166,7 +172,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       },
       "dynamic does not shrink beyond min": {
@@ -184,7 +191,8 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 9,
-          "max": 25
+          "max": 25,
+          "fit": "vertical"
         }
       }
     }

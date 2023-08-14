@@ -319,19 +319,28 @@ describe('calculateDynamicFontSize with Default font', () => {
     expect(result).toBe(14);
   });
 
-  it('should calculate a dynamic font size between min and max', async () => {
+  it('should calculate a dynamic font size of vertical fit between min and max', async () => {
     const textSchema = getTextSchema();
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const input = 'test with a length string\n and a new line';
     const result = await calculateDynamicFontSize({ textSchema, font, input });
 
     expect(result).toBe(19.25);
   });
 
+  it('should calculate a dynamic font size of horizontal fit between min and max', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
+    const input = 'test with a length string\n and a new line';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(11.25);
+  });
+
   it('should calculate a dynamic font size between min and max regardless of current font size', async () => {
     const textSchema = getTextSchema();
     textSchema.fontSize = 2;
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const input = 'test with a length string\n and a new line';
     let result = await calculateDynamicFontSize({ textSchema, font, input });
 
@@ -346,7 +355,7 @@ describe('calculateDynamicFontSize with Default font', () => {
   it('should return min font size when content is too big to fit given constraints', async () => {
     const textSchema = getTextSchema();
     textSchema.width = 10;
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const input = 'test with a length string\n and a new line';
     const result = await calculateDynamicFontSize({ textSchema, font, input });
 
@@ -376,7 +385,7 @@ describe('calculateDynamicFontSize with Default font', () => {
 
   it('should calculate a dynamic font size when a starting font size is passed that is lower than the eventual', async () => {
     const textSchema = getTextSchema();
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const input = 'test with a length string\n and a new line';
     const startingFontSize = 18;
     const result = await calculateDynamicFontSize({ textSchema, font, input, startingFontSize });
@@ -386,21 +395,30 @@ describe('calculateDynamicFontSize with Default font', () => {
 
   it('should calculate a dynamic font size when a starting font size is passed that is higher than the eventual', async () => {
     const textSchema = getTextSchema();
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const input = 'test with a length string\n and a new line';
     const startingFontSize = 36;
     const result = await calculateDynamicFontSize({ textSchema, font, input, startingFontSize });
 
-    expect(result).toBe(19.25);
+    expect(result).toBe(11.25);
   });
 });
 
 describe('calculateDynamicFontSize with Custom font', () => {
   const font = getSampleFont();
 
-  it('should return smaller font size when dynamicFontSizeSetting is provided', async () => {
+  it('should return smaller font size when dynamicFontSizeSetting is provided with horizontal fit', async () => {
     const textSchema = getTextSchema();
-    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
+    const input = 'あいうあいうあい';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(16.75);
+  });
+
+  it('should return smaller font size when dynamicFontSizeSetting is provided with vertical fit', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const input = 'あいうあいうあい';
     const result = await calculateDynamicFontSize({ textSchema, font, input });
 
