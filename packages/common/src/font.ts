@@ -209,7 +209,17 @@ export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValu
  * Calculating space usage involves splitting lines where they exceed
  * the box width based on the proposed size.
  */
-export const calculateDynamicFontSize = async ({ textSchema, font, input }: { textSchema: TextSchema; font: Font; input: string; }) => {
+export const calculateDynamicFontSize = async ({
+  textSchema,
+  font,
+  input,
+  startingFontSize,
+}: {
+  textSchema: TextSchema;
+  font: Font;
+  input: string;
+  startingFontSize?: number | undefined;
+}) => {
   const {
     fontSize: schemaFontSize,
     dynamicFontSize: dynamicFontSizeSetting,
@@ -218,7 +228,7 @@ export const calculateDynamicFontSize = async ({ textSchema, font, input }: { te
     height: boxHeight,
     lineHeight = DEFAULT_LINE_HEIGHT,
   } = textSchema;
-  const fontSize = schemaFontSize || DEFAULT_FONT_SIZE;
+  const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
