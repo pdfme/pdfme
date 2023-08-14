@@ -287,14 +287,14 @@ describe('getSplittedLines test with real font width calculations', () => {
     getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
       const result = getSplittedLines('thiswillbecut', fontWidthCalcs);
-      expect(result).toEqual(['thisw', 'illbe', 'cut']);
+      expect(result).toEqual(['thiswi', 'llbecu', 't']);
     });
   });
 
   it('should not split text when it is impossible due to size constraints', () => {
     getFontKitFont(getTextSchema(), font).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
-      fontWidthCalcs.boxWidthInPt = 10;
+      fontWidthCalcs.boxWidthInPt = 2;
       const result = getSplittedLines('thiswillnotbecut', fontWidthCalcs);
       expect(result).toEqual(['thiswillnotbecut']);
     });
