@@ -1,0 +1,4 @@
+[submodule "playground"]
+	path = playground
+	url = https://github.com/pdfme/pdfme-playground.git
+	branch = pdfme-dev
