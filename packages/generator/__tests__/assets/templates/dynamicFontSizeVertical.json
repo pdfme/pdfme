@@ -77,8 +77,7 @@
         "fontName": "NotoSerifJP-Regular",
         "dynamicFontSize": {
           "min": 13,
-          "max": 30,
-          "fit": "vertical"
+          "max": 30
         }
       },
       "multi-line dynamicc": {
