@@ -37,6 +37,7 @@ export const TextSchema = CommonSchema.extend({
   dynamicFontSize: z.object({
     max: z.number(),
     min: z.number(),
+    fit: z.string().optional(),
   }).optional(),
 });
 

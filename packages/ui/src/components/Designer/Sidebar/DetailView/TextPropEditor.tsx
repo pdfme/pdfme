@@ -6,6 +6,9 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DYNAMIC_FIT_VERTICAL,
+  DYNAMIC_FIT_HORIZONTAL,
+  DEFAULT_DYNAMIC_FIT,
 } from '@pdfme/common';
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
@@ -97,13 +100,14 @@ const SelectSet = (props: {
   label: string;
   value: string;
   options: string[];
+  width?: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
-  const { label, value, options, onChange } = props;
+  const { label, value, options, width, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
-    <div style={{ width: '45%' }}>
+    <div style={{ width: width ?? '45%' }}>
       <label htmlFor={`select-${formattedLabel}`}>{label}:</label>
       <select
         id={`select-${formattedLabel}`}
@@ -150,6 +154,7 @@ const TextPropEditor = (
 ) => {
   const { changeSchemas, activeSchema } = props;
   const alignments = ['left', 'center', 'right'];
+  const dynamicFits = [DYNAMIC_FIT_HORIZONTAL, DYNAMIC_FIT_VERTICAL];
   const font = useContext(FontContext);
   const fallbackFontName = getFallbackFontName(font);
 
@@ -254,7 +259,7 @@ const TextPropEditor = (
         {activeSchema.dynamicFontSize && (
           <>
             <NumberInputSet
-              width="45%"
+              width="30%"
               label={'FontSize Min(pt)'}
               value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
@@ -270,7 +275,7 @@ const TextPropEditor = (
             />
 
             <NumberInputSet
-              width="45%"
+              width="30%"
               label={'FontSize Max(pt)'}
               value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
               minNumber={0}
@@ -282,6 +287,16 @@ const TextPropEditor = (
               }
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.max', value: Number(e.target.value), schemaId: activeSchema.id }])
+              }}
+            />
+
+            <SelectSet
+              width="40%"
+              label={'Fit'}
+              value={activeSchema.dynamicFontSize.fit ?? DEFAULT_DYNAMIC_FIT}
+              options={dynamicFits}
+              onChange={(e) => {
+                changeSchemas([{ key: 'dynamicFontSize.fit', value: e.target.value, schemaId: activeSchema.id }])
               }}
             />
           </>
