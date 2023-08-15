@@ -402,6 +402,15 @@ describe('calculateDynamicFontSize with Default font', () => {
 
     expect(result).toBe(11.25);
   });
+
+  it('should calculate a dynamic font size using vertical fit as a default if no fit provided', async () => {
+    const textSchema = getTextSchema();
+    textSchema.dynamicFontSize = { min: 10, max: 30 };
+    const input = 'test with a length string\n and a new line';
+    const result = await calculateDynamicFontSize({ textSchema, font, input });
+
+    expect(result).toBe(19.25);
+  });
 });
 
 describe('calculateDynamicFontSize with Custom font', () => {
