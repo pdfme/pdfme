@@ -2,7 +2,6 @@
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {},
   "postCreateCommand": [
-    "git submodule update --init --recursive",
-    "cd playground && npm install && npm run start"
+    "git submodule update --init --recursive && cd playground && npm install && npm run start"
   ]
 }
