@@ -1,5 +1,5 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {},
-  "postCreateCommand": "npm run build && git submodule add -b pdfme-dev https://github.com/pdfme/pdfme-playground.git playground && cd playground && npm install && npm run start"
+  "postCreateCommand": "npm install && npm run build && git submodule add -b pdfme-dev https://github.com/pdfme/pdfme-playground.git playground && cd playground && npm install && npm run start"
 }
