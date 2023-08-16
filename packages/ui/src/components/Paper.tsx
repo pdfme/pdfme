@@ -3,7 +3,7 @@ import { SchemaForUI, Size, getFallbackFontName } from '@pdfme/common';
 import { FontContext } from '../contexts';
 import { ZOOM, RULER_HEIGHT } from '../constants';
 
-const Paper = (porps: {
+const Paper = (props: {
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   scale: number;
   size: Size;
@@ -14,7 +14,7 @@ const Paper = (porps: {
   renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
 }) => {
   const { paperRefs, scale, size, schemasList, pageSizes, backgrounds, renderPaper, renderSchema } =
-    porps;
+    props;
   const font = useContext(FontContext);
 
   if (pageSizes.length !== backgrounds.length || pageSizes.length !== schemasList.length) {
