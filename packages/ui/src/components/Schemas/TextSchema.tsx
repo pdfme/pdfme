@@ -17,7 +17,7 @@ import { FontContext } from '../../contexts';
 type Props = SchemaUIProps & { schema: TextSchema };
 
 const TextSchemaUI = (
-  { schema, editable, placeholder, tabIndex, onChange }: Props,
+  { schema, editable, placeholder, tabIndex, onChange, onBlur }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
   const font = useContext(FontContext);
@@ -97,6 +97,7 @@ const TextSchemaUI = (
       tabIndex={tabIndex}
       style={style}
       onChange={(e) => onChange(e.target.value)}
+      onBlur={() => (onBlur ? onBlur() : null)}
       value={schema.data}
     ></textarea>
   ) : (

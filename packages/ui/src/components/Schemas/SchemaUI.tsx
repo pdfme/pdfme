@@ -9,6 +9,7 @@ export interface SchemaUIProps {
   schema: SchemaForUI;
   editable: boolean;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   tabIndex?: number;
   placeholder?: string;
 }
