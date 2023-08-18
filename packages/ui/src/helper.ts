@@ -314,7 +314,7 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
           })
           .map((e) => {
             const [key, value] = e;
-            const data = template.sampledata ? template.sampledata[0][key] : '';
+            const data = template.sampledata?.[0]?.[key] ?? '';
 
             return Object.assign(value, {
               key,
