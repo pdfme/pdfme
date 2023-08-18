@@ -314,7 +314,7 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
           })
           .map((e) => {
             const [key, value] = e;
-            const data = template.sampledata ? template.sampledata[0][key] : '';
+            const data = template.sampledata?.[0]?.[key] ?? '';
 
             return Object.assign(value, {
               key,
@@ -362,6 +362,7 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 };
 
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
+  console.log('fmtTemplate...');
   const schemaAddedTemplate: Template = {
     ...template,
     schemas: cloneDeep(schemasList).map((schema) =>
@@ -393,6 +394,8 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
     ],
     basePdf: template.basePdf,
   };
+
+  console.log('schemaaaddedtemplate: ', schemaAddedTemplate);
 
   return schemaAddedTemplate;
 };
