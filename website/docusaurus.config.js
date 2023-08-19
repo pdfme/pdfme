@@ -36,21 +36,21 @@ const config = {
     ],
   ],
   plugins: [
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: 'common',
-        out: 'api/common',
-        readme: 'none',
-        sidebar: {
-          categoryLabel: 'common',
-          position: 2,
-          fullNames: true,
-        },
-        entryPoints: ['../packages/common/src/index.ts'],
-        tsconfig: '../packages/common/tsconfig.esm.json',
-      },
-    ],
+    // [
+    //   'docusaurus-plugin-typedoc',
+    //   {
+    //     id: 'common',
+    //     out: 'api/common',
+    //     readme: 'none',
+    //     sidebar: {
+    //       categoryLabel: 'common',
+    //       position: 2,
+    //       fullNames: true,
+    //     },
+    //     entryPoints: ['../packages/common/src/index.ts'],
+    //     tsconfig: '../packages/common/tsconfig.esm.json',
+    //   },
+    // ],
     [
       'docusaurus-plugin-typedoc',
       {

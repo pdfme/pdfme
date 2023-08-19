@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:48
+common/dist/types/src/type.d.ts:56
 
 ___
 
@@ -25,7 +25,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:50
+common/dist/types/src/type.d.ts:58
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:53
+common/dist/types/src/type.d.ts:61
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:58
+common/dist/types/src/type.d.ts:66
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:60
+common/dist/types/src/type.d.ts:68
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:67
+common/dist/types/src/type.d.ts:75
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:57
+common/dist/types/src/type.d.ts:65
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:62
+common/dist/types/src/type.d.ts:70
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:61
+common/dist/types/src/type.d.ts:69
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:52
+common/dist/types/src/type.d.ts:60
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:46
+common/dist/types/src/type.d.ts:54
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:65
+common/dist/types/src/type.d.ts:73
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:54
+common/dist/types/src/type.d.ts:62
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:56
+common/dist/types/src/type.d.ts:64
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:49
+common/dist/types/src/type.d.ts:57
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:47
+common/dist/types/src/type.d.ts:55
 
 ___
 
@@ -175,7 +175,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:59
+common/dist/types/src/type.d.ts:67
 
 ___
 
@@ -185,7 +185,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:51
+common/dist/types/src/type.d.ts:59
 
 ___
 
@@ -195,7 +195,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:63
+common/dist/types/src/type.d.ts:71
 
 ___
 
@@ -205,7 +205,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:64
+common/dist/types/src/type.d.ts:72
 
 ## Variables
 
@@ -215,7 +215,7 @@ common/dist/types/src/type.d.ts:64
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:11
+common/dist/types/src/constants.d.ts:14
 
 ___
 
@@ -225,7 +225,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:12
+common/dist/types/src/constants.d.ts:15
 
 ## Functions
 
@@ -340,12 +340,12 @@ ___
 | `props` | `Object` |
 | `props.inputs` | `Record`<`string`, `string`\>[] |
 | `props.options?` | `Object` |
-| `props.options.font?` | `Record`<`string`, { `data`: `string` & `Uint8Array` & `ArrayBuffer` & `string` & `Uint8Array` & `string` & `ArrayBuffer` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
+| `props.options.font?` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
 | `props.template` | `Object` |
-| `props.template.basePdf` | `string` & `Uint8Array` & `ArrayBuffer` & `string` & `Uint8Array` & `string` & `ArrayBuffer` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` |
+| `props.template.basePdf` | `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` |
 | `props.template.columns?` | `string`[] |
 | `props.template.sampledata?` | `Record`<`string`, `string`\>[] |
-| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"right"`` \| ``"center"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `dynamicFontSize?`: { `max`: `number` ; `min`: `number`  } ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` ; `width`: `number`  }\>[] |
+| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `dynamicFontSize?`: { `fit?`: `string` ; `max`: `number` ; `min`: `number`  } ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` ; `width`: `number`  }\>[] |
 
 #### Returns
 
@@ -353,7 +353,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:45](https://github.com/pdfme/pdfme/blob/b9b1f5b/packages/generator/src/generate.ts#L45)
+[generator/src/generate.ts:45](https://github.com/pdfme/pdfme/blob/6ec2533/packages/generator/src/generate.ts#L45)
 
 ___
 
@@ -380,7 +380,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:36
+common/dist/types/src/type.d.ts:44
 
 ___
 
@@ -407,7 +407,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:26
+common/dist/types/src/type.d.ts:34
 
 ___
 
@@ -434,7 +434,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:5
+common/dist/types/src/type.d.ts:12
 
 ___
 

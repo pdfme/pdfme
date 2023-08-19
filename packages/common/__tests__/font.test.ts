@@ -7,9 +7,8 @@ import {
   getDefaultFont,
   getFontKitFont,
   getSplittedLines,
-  FontWidthCalcValues,
 } from '../src/font'
-import { Font, TextSchema, Template } from '../src/type';
+import { Font, TextSchema, Template, FontWidthCalcValues } from '../src/type';
 import { BLANK_PDF } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));

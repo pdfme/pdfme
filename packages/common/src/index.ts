@@ -17,6 +17,7 @@ import {
 } from './constants.js';
 import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
+  FontWidthCalcValues,
   Lang,
   Size,
   Alignment,
@@ -63,8 +64,7 @@ import {
   checkFont,
   getFontKitFont,
   getFontAlignmentValue,
-  getSplittedLines,
-  FontWidthCalcValues,
+  getSplittedLines
 } from './font.js';
 
 export {

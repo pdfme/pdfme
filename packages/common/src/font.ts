@@ -1,6 +1,6 @@
 import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
-import { Template, Schema, Font, isTextSchema, TextSchema } from './type';
+import { FontWidthCalcValues, Template, Schema, Font, isTextSchema, TextSchema } from './type';
 import { Buffer } from 'buffer';
 import {
   DEFAULT_FONT_VALUE,
@@ -138,12 +138,6 @@ export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
   return fontKitFont;
 };
 
-export type FontWidthCalcValues = {
-  font: FontKitFont;
-  fontSize: number;
-  characterSpacing: number;
-  boxWidthInPt: number;
-};
 
 const isTextExceedingBoxWidth = (text: string, calcValues: FontWidthCalcValues) => {
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
