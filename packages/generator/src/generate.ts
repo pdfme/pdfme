@@ -11,14 +11,14 @@ import {
   getFallbackFontName,
   checkGenerateProps,
 } from '@pdfme/common';
+import { renderInputByTemplateSchema } from './render';
 import {
-  getEmbeddedPagesAndEmbedPdfBoxes,
-  drawInputByTemplateSchema,
   drawEmbeddedPage,
   embedAndGetFontObj,
-  InputImageCache,
-} from './helper.js';
-import { TOOL_NAME } from './constants.js';
+  getEmbeddedPagesAndEmbedPdfBoxes,
+} from './pdfUtils'
+import { TOOL_NAME } from './constants';
+import type { InputImageCache } from "./types"
 
 const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
   const { template, font } = arg;
@@ -45,6 +45,25 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {} } = props;
+  // TODO  Implement the internal logic assuming that the following type of schema will be passed as an argument.
+  // export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
+  // const notBarcodeSchemaTypes = ['text', 'image'] as const;
+  /*
+  const customSchemaForGenerator = {
+    text: {
+      renderer: ({ pdfDoc, page, schema, inputValue }) => {
+        // TODO
+      }
+    },
+    image: {
+      renderer: ({ pdfDoc, page, schema, inputValue }) => {
+        // TODO
+      }
+    }
+    ...
+  };
+  */ 
+
   const { font = getDefaultFont() } = options;
   const { schemas } = template;
 
@@ -70,7 +89,7 @@ const generate = async (props: GenerateProps) => {
         const input = inputObj[key];
         const fontSetting = { font, pdfFontObj, fallbackFontName };
 
-        await drawInputByTemplateSchema({
+        await renderInputByTemplateSchema({
           input,
           templateSchema,
           pdfDoc,

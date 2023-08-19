@@ -1,18 +1,10 @@
 import {
   PDFPage,
-  PDFFont,
   PDFDocument,
-  PDFImage,
-  PDFEmbeddedPage,
-  rgb,
   degrees,
   setCharacterSpacing,
-  TransformationMatrix,
 } from '@pdfme/pdf-lib';
-import bwipjs, { ToBufferOptions } from 'bwip-js';
 import {
-  getB64BasePdf,
-  b64toUint8Array,
   validateBarcodeInput,
   Schema,
   TextSchema,
@@ -22,7 +14,6 @@ import {
   BarcodeSchema,
   isBarcodeSchema,
   Font,
-  BasePdf,
   BarCodeType,
   Alignment,
   DEFAULT_FONT_SIZE,
@@ -38,101 +29,10 @@ import {
   widthOfTextAtSize,
   FontWidthCalcValues,
 } from '@pdfme/common';
-import { Buffer } from 'buffer';
+import type { InputImageCache, FontSetting } from "./types"
+import { createBarCode } from "./barCodeUtils"
+import { hex2RgbColor } from "./colorUtils"
 
-export interface InputImageCache {
-  [key: string]: PDFImage | undefined;
-}
-
-const barCodeType2Bcid = (type: BarCodeType) => (type === 'nw7' ? 'rationalizedCodabar' : type);
-export const createBarCode = async (arg: {
-  type: BarCodeType;
-  input: string;
-  width: number;
-  height: number;
-  backgroundColor?: string;
-}): Promise<Buffer> => {
-  const { type, input, width, height, backgroundColor } = arg;
-  const bcid = barCodeType2Bcid(type);
-  const includetext = true;
-  const scale = 5;
-  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
-
-  if (backgroundColor) {
-    bwipjsArg.backgroundcolor = backgroundColor;
-  }
-
-  let res: Buffer;
-
-  if (typeof window !== 'undefined') {
-    const canvas = document.createElement('canvas');
-    bwipjs.toCanvas(canvas, bwipjsArg);
-    const dataUrl = canvas.toDataURL('image/png');
-    res = b64toUint8Array(dataUrl).buffer as Buffer;
-  } else {
-    res = await bwipjs.toBuffer(bwipjsArg);
-  }
-
-  return res;
-};
-
-type EmbedPdfBox = {
-  mediaBox: { x: number; y: number; width: number; height: number };
-  bleedBox: { x: number; y: number; width: number; height: number };
-  trimBox: { x: number; y: number; width: number; height: number };
-};
-
-export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
-  const { pdfDoc, font } = arg;
-  const fontValues = await Promise.all(
-    Object.values(font).map(async (v) => {
-      let fontData = v.data;
-      if (typeof fontData === 'string' && fontData.startsWith('http')) {
-        fontData = await fetch(fontData).then((res) => res.arrayBuffer());
-      }
-      return pdfDoc.embedFont(fontData, {
-        subset: typeof v.subset === 'undefined' ? true : v.subset,
-      });
-    })
-  );
-
-  return Object.keys(font).reduce(
-    (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
-    {} as { [key: string]: PDFFont }
-  );
-};
-
-export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {
-  pdfDoc: PDFDocument;
-  basePdf: BasePdf;
-}) => {
-  const { pdfDoc, basePdf } = arg;
-  let embeddedPages: PDFEmbeddedPage[] = [];
-  let embedPdfBoxes: EmbedPdfBox[] = [];
-  const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(basePdf) : basePdf;
-  const embedPdf = await PDFDocument.load(willLoadPdf);
-  const embedPdfPages = embedPdf.getPages();
-
-  embedPdfBoxes = embedPdfPages.map((p) => ({
-    mediaBox: p.getMediaBox(),
-    bleedBox: p.getBleedBox(),
-    trimBox: p.getTrimBox(),
-  }));
-
-  const boundingBoxes = embedPdfPages.map((p) => {
-    const { x, y, width, height } = p.getMediaBox();
-
-    return { left: x, bottom: y, right: width, top: height + y };
-  });
-
-  const transformationMatrices = embedPdfPages.map(
-    () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
-  );
-
-  embeddedPages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
-
-  return { embeddedPages, embedPdfBoxes };
-};
 
 const convertSchemaDimensionsToPt = (schema: Schema) => {
   const width = mm2pt(schema.width);
@@ -140,31 +40,6 @@ const convertSchemaDimensionsToPt = (schema: Schema) => {
   const rotate = degrees(schema.rotate ? schema.rotate : 0);
 
   return { width, height, rotate };
-};
-
-const hex2rgb = (hex: string) => {
-  if (hex.slice(0, 1) === '#') hex = hex.slice(1);
-  if (hex.length === 3)
-    hex =
-      hex.slice(0, 1) +
-      hex.slice(0, 1) +
-      hex.slice(1, 2) +
-      hex.slice(1, 2) +
-      hex.slice(2, 3) +
-      hex.slice(2, 3);
-
-  return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((str) => parseInt(str, 16));
-};
-
-const hex2RgbColor = (hexString: string | undefined) => {
-  if (hexString) {
-    const [r, g, b] = hex2rgb(hexString);
-
-    return rgb(r / 255, g / 255, b / 255);
-  }
-
-  // eslint-disable-next-line no-undefined
-  return undefined;
 };
 
 const getFontProp = async ({ input, font, schema }: { input: string, font: Font, schema: TextSchema }) => {
@@ -190,7 +65,7 @@ const calcX = (x: number, alignment: Alignment, boxWidth: number, textWidth: num
 
 const calcY = (y: number, height: number, itemHeight: number) => height - mm2pt(y) - itemHeight;
 
-const drawBackgroundColor = (arg: {
+const renderBackgroundColor = (arg: {
   templateSchema: TextSchema;
   page: PDFPage;
   pageHeight: number;
@@ -208,15 +83,8 @@ const drawBackgroundColor = (arg: {
   });
 };
 
-interface FontSetting {
-  font: Font;
-  pdfFontObj: {
-    [key: string]: PDFFont;
-  };
-  fallbackFontName: string;
-}
 
-const drawInputByTextSchema = async (arg: {
+const renderInputByTextSchema = async (arg: {
   input: string;
   templateSchema: TextSchema;
   pdfDoc: PDFDocument;
@@ -230,7 +98,7 @@ const drawInputByTextSchema = async (arg: {
   const fontKitFont = await getFontKitFont(templateSchema, font);
 
   const pageHeight = page.getHeight();
-  drawBackgroundColor({ templateSchema, page, pageHeight });
+  renderBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
   const { size, color, alignment, lineHeight, characterSpacing } = await getFontProp({
@@ -253,7 +121,7 @@ const drawInputByTextSchema = async (arg: {
   input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
     const splitLines = getSplittedLines(inputLine, fontWidthCalcValues);
 
-    const drawLine = (line: string, lineIndex: number) => {
+    const renderLine = (line: string, lineIndex: number) => {
       const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
       const textHeight = heightOfFontAtSize(fontKitFont, size);
 
@@ -276,13 +144,13 @@ const drawInputByTextSchema = async (arg: {
       if (splitLines.length === lineIndex + 1) beforeLineOver += lineIndex;
     };
 
-    splitLines.forEach(drawLine);
+    splitLines.forEach(renderLine);
   });
 };
 
 const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
 
-const drawInputByImageSchema = async (arg: {
+const renderInputByImageSchema = async (arg: {
   input: string;
   templateSchema: ImageSchema;
   pdfDoc: PDFDocument;
@@ -309,7 +177,7 @@ const drawInputByImageSchema = async (arg: {
   page.drawImage(image, opt);
 };
 
-const drawInputByBarcodeSchema = async (arg: {
+const renderInputByBarcodeSchema = async (arg: {
   input: string;
   templateSchema: BarcodeSchema;
   pdfDoc: PDFDocument;
@@ -339,7 +207,7 @@ const drawInputByBarcodeSchema = async (arg: {
   page.drawImage(image, opt);
 };
 
-export const drawInputByTemplateSchema = async (arg: {
+export const renderInputByTemplateSchema = async (arg: {
   input: string;
   templateSchema: Schema;
   pdfDoc: PDFDocument;
@@ -351,25 +219,12 @@ export const drawInputByTemplateSchema = async (arg: {
 
   if (isTextSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as TextSchema;
-    await drawInputByTextSchema({ ...arg, templateSchema });
+    await renderInputByTextSchema({ ...arg, templateSchema });
   } else if (isImageSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as ImageSchema;
-    await drawInputByImageSchema({ ...arg, templateSchema });
+    await renderInputByImageSchema({ ...arg, templateSchema });
   } else if (isBarcodeSchema(arg.templateSchema)) {
     const templateSchema = arg.templateSchema as BarcodeSchema;
-    await drawInputByBarcodeSchema({ ...arg, templateSchema });
+    await renderInputByBarcodeSchema({ ...arg, templateSchema });
   }
-};
-
-export const drawEmbeddedPage = (arg: {
-  page: PDFPage;
-  embeddedPage: PDFEmbeddedPage;
-  embedPdfBox: EmbedPdfBox;
-}) => {
-  const { page, embeddedPage, embedPdfBox } = arg;
-  page.drawPage(embeddedPage);
-  const { mediaBox: mb, bleedBox: bb, trimBox: tb } = embedPdfBox;
-  page.setMediaBox(mb.x, mb.y, mb.width, mb.height);
-  page.setBleedBox(bb.x, bb.y, bb.width, bb.height);
-  page.setTrimBox(tb.x, tb.y, tb.width, tb.height);
 };
