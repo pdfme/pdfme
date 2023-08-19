@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/generator",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -60,7 +60,7 @@
     "pngjs": "^6.0.0"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.0.0"
+    "@pdfme/common": "^2.1.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/ui",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -64,7 +64,7 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.0.0"
+    "@pdfme/common": "^2.1.0"
   },
   "jest": {
     "setupFiles": [
