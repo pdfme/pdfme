@@ -327,7 +327,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
-            onBlur={() => setEditing(false)}
+            onStopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
             ref={inputRef}
           />

@@ -8,7 +8,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 type Props = SchemaUIProps & { schema: ImageSchema };
 
 const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
-  const { editable, placeholder, tabIndex, schema, onChange, onBlur } = props;
+  const { editable, placeholder, tabIndex, schema, onChange, onStopEditing } = props;
   const [fileName, setFileName] = useState<string>('');
   const hasData = Boolean(schema.data);
 
@@ -75,7 +75,7 @@ const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             readFiles(event.target.files, 'dataURL').then((result) => onChange(result as string))
           }
-          onBlur={() => (onBlur ? onBlur() : null)}
+          onBlur={onStopEditing}
           type="file"
           accept="image/jpeg, image/png"
         />

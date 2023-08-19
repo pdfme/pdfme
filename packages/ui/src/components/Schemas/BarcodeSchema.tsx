@@ -69,7 +69,7 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
 type Props = SchemaUIProps & { schema: BarcodeSchema };
 
 const BarcodeSchemaUI = (
-  { schema, editable, placeholder, tabIndex, onChange, onBlur }: Props,
+  { schema, editable, placeholder, tabIndex, onChange, onStopEditing }: Props,
   ref: Ref<HTMLInputElement>
 ) => {
   const value = schema.data;
@@ -109,7 +109,7 @@ const BarcodeSchemaUI = (
           style={style}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={() => (onBlur ? onBlur() : null)}
+          onBlur={onStopEditing}
         />
       ) : (
         <div style={style}>
