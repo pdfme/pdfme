@@ -19,12 +19,12 @@ As of writing this page, we just released Version 2 two weeks ago. However, we a
 
 As we aim for the release of the next version, given our limited resources, we anticipate it being a long-term plan. Therefore, to ensure we do not lose sight of our developmental direction and to address our users who are anticipating new features, we have written this document.
 
-- [V2 Roadmap](https://github.com/orgs/pdfme/projects/5/views/1)  
+- ### [V2 Roadmap](https://github.com/orgs/pdfme/projects/5/views/1)  
 In this version, we mainly address what needs to be done before the release of V3. Development in V2 will not involve any schema other than the text type schema, and we will proceed with development that doesn't depend on schemas. While being conscious of the V3 release, we will improve the completeness of pdfme itself and work towards decoupling schemas from pdfme.
   - Bug fixes and improvements for text type schema
   - Bug fixes and usability improvements for the UI package
   - Refactoring with V3 in mind
-- [V3 Roadmap](https://github.com/orgs/pdfme/projects/6/views/1)  
+- ### [V3 Roadmap](https://github.com/orgs/pdfme/projects/6/views/1)  
 In this version, we will realize a more customizable pdfme to cater to individual user needs. It will be possible to create custom schemas to cater to various needs and designs that better match user sites. We believe that with this version, users will address niche problems and being open source will further make pdfme a special library.
   - [Custom Schema Plugin](https://github.com/pdfme/pdfme/issues/213)
     - Allow users to create custom schemas and define PDF and wysiwyg rendering from the outside.
