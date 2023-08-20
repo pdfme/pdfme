@@ -144,6 +144,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            href: 'https://discord.gg/xWPTJbmgNV',
+            label: 'Discord',
+            position: 'right',
+          },
         ],
       },
       footer: {
@@ -181,6 +186,10 @@ const config = {
               {
                 label: 'Github',
                 href: 'https://github.com/pdfme/pdfme',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.gg/xWPTJbmgNV',
               },
             ],
           },
