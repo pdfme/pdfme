@@ -771,7 +771,7 @@ If there is some leftover, split the rest again in the same manner.
 | Name | Type |
 | :------ | :------ |
 | `textLine` | `string` |
-| `calcValues` | [`FontWidthCalcValues`](.md#fontwidthcalcvalues) |
+| `calcValues` | `FontWidthCalcValues` |
 
 #### Returns
 
