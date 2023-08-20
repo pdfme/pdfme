@@ -1,5 +1,9 @@
 # Development Guide
 
+## Community Involvement and Your Role
+pdfme is proud to be an open-source project, supported and driven by our enthusiastic community. Whether you're diving into the codebase or raising your voice in our discussions, your involvement is what makes pdfme thrive. 
+
+**Not a coder? No problem!** From reporting bugs and becoming a sponsor to actively participating in discussions, There are many ways you can contribute. We cherish every form of participation and would be delighted to have you be a part of our development journey.
 
 ## Bug reports, questions and suggestions
 
@@ -11,9 +15,15 @@ It is possible that some of the problems or questions have already been solved.
 - To report application bugs, please use [GitHub issue](https://github.com/pdfme/pdfme/issues).
 - For questions or suggestions, please ask them in [GitHub Discussions](https://github.com/pdfme/pdfme/discussions).
 
-## Roadmap
+## Code Contribution
 
-On this page, we will share the direction in which pdfme will be developed.
+Basically we accept PRs for bug fixes. However, we might decide to decline your PR if contains code that add new features.
+Please remember that pdfme is created to be small and simple as possible.
+If you have any questions or suggestions, please feel free to send them to [GitHub Discussions](https://github.com/pdfme/pdfme/discussions) and we will reply as soon as possible.
+
+For insights on development: [How to develop pdfme](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
+
+## Roadmap
 
 As of writing this page, we just released Version 2 two weeks ago. However, we already have a plan for how we will proceed with the development of the next version.
 
@@ -33,15 +43,7 @@ In this version, we will realize a more customizable pdfme to cater to individua
     - Allow changes to the accent color (currently it's light blue)
     - Add class names to each UI component to allow customization from the outside.
 
-## Contribution
-
-Basically we accept PRs for bug fixes. However, we might decide to decline your PR if contains code that add new features.
-Please remember that pdfme is created to be small and simple as possible.
-If you have any questions or suggestions, please feel free to send them to [GitHub Discussions](https://github.com/pdfme/pdfme/discussions) and we will reply as soon as possible.
-
-How to develop pdfme: https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md
-
-## Support
+## Need technical support?
 
 If you need technical support, please contact the author via [LinkedIn](https://www.linkedin.com/in/hand-dot/).
 
@@ -49,6 +51,4 @@ If you need technical support, please contact the author via [LinkedIn](https://
 
 pdfme is an open source project that is free to use.
 However, it is not free to develop and maintain pdfme.
-If you are using pdfme in your business, please consider becoming a sponsor to pdfme.
-
-https://github.com/sponsors/pdfme
+If you are using pdfme in your business, please consider becoming a sponsor to pdfme. -> [sponsoring us](https://github.com/sponsors/pdfme)
