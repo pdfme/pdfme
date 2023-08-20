@@ -122,7 +122,7 @@ const config = {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
-            label: 'Docs&Guides',
+            label: 'Docs',
           },
           {
             to: '/demo',
@@ -135,9 +135,9 @@ const config = {
             label: 'Template Design',
           },
           {
-            to: '/help',
+            to: '/development-guide',
             position: 'right',
-            label: 'Help',
+            label: 'Development Guide',
           },
           {
             href: 'https://github.com/pdfme/pdfme',
@@ -170,8 +170,8 @@ const config = {
                 to: '/template-design',
               },
               {
-                label: 'Help',
-                to: '/help',
+                label: 'Development Guide',
+                to: '/development-guide',
               },
             ],
           },

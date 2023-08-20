@@ -12,7 +12,7 @@
   <a href="https://npmcharts.com/compare/@pdfme/common?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/common.svg" alt="Downloads per month on npm." />
   </a>
-  <a href="https://pdfme.com/help#contribution">
+  <a href="https://pdfme.com/development-guide#contribution">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
@@ -55,7 +55,7 @@ pdfme was created to simplify the design and generation process of a PDF. It is 
 - Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
 
-As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
+As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month. Notably, the monthly server cost, utilizing Cloud Functions For Firebase, remains below $10.
 
 ## Installation
 
