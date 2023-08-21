@@ -250,6 +250,7 @@ const viewer = new Viewer({ domContainer, template, inputs });
 ## Special Thanks
 
 - [pdf-lib](https://pdf-lib.js.org/): Used in PDF generation.
+- [fontkit](https://github.com/foliojs/fontkit): Used in font rendering.
 - [PDF.js](https://mozilla.github.io/pdf.js/): Used in PDF viewing.
 - [React](https://reactjs.org/): Used in building the UI.
 - [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): Used in Designer UI.
@@ -258,3 +259,6 @@ const viewer = new Viewer({ domContainer, template, inputs });
 - [zod](https://github.com/colinhacks/zod): Used in Validation.
 
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
+
+If you want to contribute to pdfme, please check the [Development Guide](/development-guide) page.  
+We look forward to your contribution!
