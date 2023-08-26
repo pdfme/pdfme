@@ -1,6 +1,10 @@
 export const DEFAULT_FONT_NAME = 'Roboto';
 export const DEFAULT_FONT_SIZE = 13;
 export const DEFAULT_ALIGNMENT = 'left';
+export const VERTICAL_ALIGN_TOP = 'top';
+export const VERTICAL_ALIGN_MIDDLE = 'middle';
+export const VERTICAL_ALIGN_BOTTOM = 'bottom';
+export const DEFAULT_VERTICAL_ALIGNMENT = VERTICAL_ALIGN_TOP;
 export const DEFAULT_LINE_HEIGHT = 1;
 export const DEFAULT_CHARACTER_SPACING = 0;
 export const DEFAULT_FONT_COLOR = '#000';

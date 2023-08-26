@@ -42,6 +42,9 @@ const canvasPdf = require('./canvasPdf.json') as Template;
 const background = require('./background.json') as Template;
 const dynamicFontSizeHorizontal = require('./dynamicFontSizeHorizontal.json') as Template;
 const dynamicFontSizeVertical = require('./dynamicFontSizeVertical.json') as Template;
+const verticalAlignmentTop = require('./verticalAlignmentTop.json') as Template;
+const verticalAlignmentMiddle = require('./verticalAlignmentMiddle.json') as Template;
+const verticalAlignmentBottom = require('./verticalAlignmentBottom.json') as Template;
 
 export default {
   test: {
@@ -111,4 +114,7 @@ export default {
   background,
   dynamicFontSizeHorizontal,
   dynamicFontSizeVertical,
+  verticalAlignmentTop,
+  verticalAlignmentMiddle,
+  verticalAlignmentBottom,
 };
