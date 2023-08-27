@@ -2,6 +2,10 @@ import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_MIDDLE,
+  VERTICAL_ALIGN_BOTTOM,
+  DEFAULT_VERTICAL_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
@@ -53,6 +57,7 @@ import {
   checkDesignerProps,
   checkGenerateProps,
   mm2pt,
+  pt2px,
   validateBarcodeInput,
 } from './helper.js';
 import {
@@ -63,14 +68,19 @@ import {
   widthOfTextAtSize,
   checkFont,
   getFontKitFont,
-  getFontAlignmentValue,
-  getSplittedLines
+  getBrowserVerticalFontAdjustments,
+  getFontDescentInPt,
+  getSplittedLines,
 } from './font.js';
 
 export {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_MIDDLE,
+  VERTICAL_ALIGN_BOTTOM,
+  DEFAULT_VERTICAL_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
@@ -95,9 +105,11 @@ export {
   heightOfFontAtSize,
   widthOfTextAtSize,
   mm2pt,
+  pt2px,
   checkFont,
+  getBrowserVerticalFontAdjustments,
+  getFontDescentInPt,
   getFontKitFont,
-  getFontAlignmentValue,
   checkInputs,
   checkUIOptions,
   checkTemplate,

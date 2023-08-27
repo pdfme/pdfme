@@ -10,7 +10,7 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema';
-import { MM_TO_PT_RATIO, PT_TO_MM_RATIO } from './constants';
+import { MM_TO_PT_RATIO, PT_TO_MM_RATIO, PT_TO_PX_RATIO } from './constants';
 import { checkFont } from './font';
 
 export const mm2pt = (mm: number): number => {
@@ -19,6 +19,10 @@ export const mm2pt = (mm: number): number => {
 
 export const pt2mm = (pt: number): number => {
   return pt * PT_TO_MM_RATIO;
+};
+
+export const pt2px = (pt: number): number => {
+  return pt * PT_TO_PX_RATIO;
 };
 
 const blob2Base64Pdf = (blob: Blob) => {

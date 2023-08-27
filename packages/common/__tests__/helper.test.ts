@@ -1,4 +1,5 @@
-import { validateBarcodeInput, mm2pt, pt2mm } from '../src/helper';
+import { validateBarcodeInput, mm2pt, pt2mm, pt2px } from '../src/helper';
+import { PT_TO_PX_RATIO } from "../src";
 
 describe('validateBarcodeInput test', () => {
   test('qrcode', () => {
@@ -262,5 +263,15 @@ describe('pt2mm test', () => {
     expect(pt2mm(2.8346)).toEqual(1.00004688); // close enough!
     expect(pt2mm(10)).toEqual(3.528);
     expect(pt2mm(5322.98)).toEqual(1877.947344);
+  });
+});
+
+describe('pt2px test', () => {
+  it('converts points to pixels', () => {
+    expect(pt2px(1)).toEqual(PT_TO_PX_RATIO);
+    expect(pt2px(1)).toEqual(1.333);
+    expect(pt2px(2.8346)).toEqual(3.7785218);
+    expect(pt2px(10)).toEqual(13.33);
+    expect(pt2px(5322.98)).toEqual(7095.532339999999);
   });
 });
