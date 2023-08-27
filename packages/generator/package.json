@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/generator",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
