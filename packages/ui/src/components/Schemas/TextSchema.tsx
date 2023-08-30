@@ -144,6 +144,7 @@ const TextSchemaUI = (
     <div style={containerStyle}>
       <textarea
         ref={ref}
+        rows={1}
         placeholder={placeholder}
         tabIndex={tabIndex}
         style={{ ...textareaStyle, ...fontStyles }}
@@ -162,7 +163,7 @@ const TextSchemaUI = (
         }}
       >
         {/*  Set the letterSpacing of the last character to 0. */}
-        {schema.data.split('').map((l, i) => (
+        {schema.data.split('').map((l: string, i: number) => (
           <span key={i} style={{ letterSpacing: String(schema.data).length === i + 1 ? 0 : 'inherit' }}>
             {l}
           </span>
