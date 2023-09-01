@@ -193,11 +193,12 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
     let res = input.match(regexp);
     if (
       res != null &&
+      input.length <= 52 && // 52 is the max length of a GS1 DataMatrix barcode before bwip-js throaws an error
       res[1] === '01' &&
       (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
     ) {
       let gtin = res[2];
-      ret = validateCheckDigit(gtin, gtin.length);
+        ret = validateCheckDigit(gtin, gtin.length);
     }
 
     return ret;
