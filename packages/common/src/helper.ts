@@ -198,7 +198,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
       (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
     ) {
       let gtin = res[2];
-        ret = validateCheckDigit(gtin, gtin.length);
+      ret = validateCheckDigit(gtin, gtin.length);
     }
 
     return ret;

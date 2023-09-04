@@ -1,5 +1,10 @@
 import React, { useContext } from 'react';
-import { SchemaForUI, DEFAULT_FONT_COLOR } from '@pdfme/common';
+import {
+  SchemaForUI,
+  DEFAULT_FONT_COLOR,
+  DEFAULT_BARCODE_BG_COLOR,
+  DEFAULT_BARCODE_COLOR,
+} from '@pdfme/common';
 import { I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -29,7 +34,7 @@ const ColorInputSet = (props: {
           id={`input-${formattedLabel}`}
           name={`input-${formattedLabel}`}
           onChange={onChange}
-          value={value || '#ffffff'}
+          value={value}
           type="color"
           style={inputStyle}
         />
@@ -74,7 +79,7 @@ const BarcodePropEditor = (
       >
         <ColorInputSet
           label={i18n('barColor')}
-          value={activeSchema.barcolor ?? '#000000'}
+          value={activeSchema.barcolor ?? DEFAULT_BARCODE_COLOR}
           onChange={(e) => {
             changeSchemas([{ key: 'barcolor', value: e.target.value, schemaId: activeSchema.id }]);
           }}
@@ -87,7 +92,7 @@ const BarcodePropEditor = (
 
         <ColorInputSet
           label={i18n('bgColor')}
-          value={activeSchema.backgroundcolor ?? '#ffffff'}
+          value={activeSchema.backgroundcolor ?? DEFAULT_BARCODE_BG_COLOR}
           onChange={(e) => {
             changeSchemas([{ key: 'backgroundcolor', value: e.target.value, schemaId: activeSchema.id }])
           }}
@@ -99,7 +104,7 @@ const BarcodePropEditor = (
         {barcodeHasText && (
           <ColorInputSet
             label={i18n('textColor')}
-            value={activeSchema.textcolor ?? '#000000'}
+            value={activeSchema.textcolor ?? DEFAULT_FONT_COLOR}
             onChange={(e) => {
               changeSchemas([{ key: 'textcolor', value: e.target.value, schemaId: activeSchema.id }])
             }}

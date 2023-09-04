@@ -60,11 +60,10 @@ export const createBarCode = async (arg: {
   textcolor?: string;
 }): Promise<Buffer> => {
   const { type, input, width, height, backgroundcolor, barcolor, textcolor } = arg;
-  
   const bcid = barCodeType2Bcid(type);
   const includetext = true;
   const scale = 5;
-  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext, };
+  const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
 
   if (backgroundcolor) bwipjsArg.backgroundcolor = backgroundcolor.replace('#', '');
   if (barcolor) bwipjsArg.barcolor = barcolor.replace('#', '');

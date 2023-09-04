@@ -4,17 +4,17 @@ import { ZOOM } from '../../constants';
 import { SchemaUIProps } from './SchemaUI';
 import bwipjs from 'bwip-js';
 
-const SampleBarcode = ({ schema, imageSrc }: { schema: BarcodeSchema, imageSrc: string }) => (
-      <img
-      style={{
-        width: schema.width * ZOOM,
-        height: schema.height * ZOOM,
-        position: 'absolute',
-        borderRadius: 0,
-        opacity: 0.5,
-      }}
-      src={imageSrc}
-    />
+const SampleBarcode = ({ schema, imageSrc }: { schema: BarcodeSchema; imageSrc: string }) => (
+  <img
+    style={{
+      width: schema.width * ZOOM,
+      height: schema.height * ZOOM,
+      position: 'absolute',
+      borderRadius: 0,
+      opacity: 0.5,
+    }}
+    src={imageSrc}
+  />
 );
 
 const ErrorBarcode = () => (
@@ -41,12 +41,8 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
   const { schema, value } = props;
   const { type, height, width, barcolor, backgroundcolor, textcolor } = schema;
 
-  if (value.length === 0) {
-    return null;
-  }
-
   useEffect(() => {
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     const barcodeType = type === 'nw7' ? 'rationalizedCodabar' : type;
 
     try {
@@ -60,15 +56,13 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
         width,
         barcolor: barcolor ? barcolor.replace('#', '') : '000000',
         backgroundcolor: backgroundcolor ? backgroundcolor.replace('#', '') : 'ffffff',
-        textcolor: textcolor? textcolor.replace('#', '') : '000000',
+        textcolor: textcolor ? textcolor.replace('#', '') : '000000',
       });
 
-      setIsBarcodeValid(true);
       setImageSrc(canvas.toDataURL('image/png'));
+      setIsBarcodeValid(true);
     } catch (error) {
-      console.error(error);
       setIsBarcodeValid(false);
-      return;
     }
   }, [type, height, width, barcolor, backgroundcolor, value, isBarcodeValid]);
 
