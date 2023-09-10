@@ -1,12 +1,9 @@
-import { Schema, } from '@pdfme/common';
-import type { InputImageCache, RenderProps } from "../types"
-import { calcX, calcY, convertSchemaDimensionsToPt } from '../renderUtils'
+import type { RenderProps } from "../types"
+import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 
-const inputImageCache: InputImageCache = {};
-const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
 
 const imageRenderer = async (arg: RenderProps) => {
-    const { input, templateSchema, pdfDoc, page } = arg;
+    const { input, templateSchema, pdfDoc, page, _cache } = arg;
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
     const opt = {
@@ -17,13 +14,12 @@ const imageRenderer = async (arg: RenderProps) => {
         height,
     };
     const inputImageCacheKey = getCacheKey(templateSchema, input);
-    let image = inputImageCache[inputImageCacheKey];
+    let image = _cache.get(inputImageCacheKey);
     if (!image) {
         const isPng = input.startsWith('data:image/png;');
         image = await (isPng ? pdfDoc.embedPng(input) : pdfDoc.embedJpg(input));
+        _cache.set(inputImageCacheKey, image);
     }
-    inputImageCache[inputImageCacheKey] = image;
     page.drawImage(image, opt);
-};
-
+}
 export default imageRenderer;

@@ -64,3 +64,5 @@ export const convertSchemaDimensionsToPt = (schema: Schema) => {
 
   return { width, height, rotate };
 };
+
+export const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;

@@ -29,6 +29,9 @@ const generate = async (props: GenerateProps) => {
   const { inputs, template, options = {} } = props;
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
+
+  const _cache = new Map();
+
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
@@ -56,7 +59,7 @@ const generate = async (props: GenerateProps) => {
         if (!rendererObj) {
           throw new Error(`Renderer for type ${templateSchema.type} not found`);
         }
-        await rendererObj.renderer({ input, templateSchema, pdfDoc, page, options });
+        await rendererObj.renderer({ input, templateSchema, pdfDoc, page, options, _cache });
       }
     }
   }

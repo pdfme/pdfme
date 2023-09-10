@@ -1,7 +1,6 @@
-import { Schema, } from '@pdfme/common';
 import { b64toUint8Array, validateBarcodeInput, BarCodeType } from '@pdfme/common';
-import type { InputImageCache, RenderProps } from "../types"
-import { calcX, calcY, convertSchemaDimensionsToPt } from '../renderUtils'
+import type { RenderProps } from "../types"
+import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 import bwipjs, { ToBufferOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 
@@ -37,11 +36,8 @@ export const createBarCode = async (arg: {
     return res;
 };
 
-const inputImageCache: InputImageCache = {};
-const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
-
 const barcodeRenderer = async (arg: RenderProps) => {
-    const { input, templateSchema, pdfDoc, page } = arg;
+    const { input, templateSchema, pdfDoc, page, _cache } = arg;
     if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
@@ -53,15 +49,15 @@ const barcodeRenderer = async (arg: RenderProps) => {
         height,
     };
     const inputBarcodeCacheKey = getCacheKey(templateSchema, input);
-    let image = inputImageCache[inputBarcodeCacheKey];
+    let image = _cache.get(inputBarcodeCacheKey);
     if (!image) {
         const imageBuf = await createBarCode(
             Object.assign(templateSchema, { type: templateSchema.type as BarCodeType, input })
         );
         image = await pdfDoc.embedPng(imageBuf);
+        _cache.set(inputBarcodeCacheKey, image)
     }
-    inputImageCache[inputBarcodeCacheKey] = image;
-    page.drawImage(image, opt);
-};
 
+    page.drawImage(image, opt);
+}
 export default barcodeRenderer;
