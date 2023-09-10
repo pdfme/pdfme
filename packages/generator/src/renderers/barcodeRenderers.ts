@@ -1,9 +1,41 @@
 import { Schema, } from '@pdfme/common';
-import { createBarCode } from "../barCodeUtils"
-import { validateBarcodeInput, BarCodeType } from '@pdfme/common';
+import { b64toUint8Array, validateBarcodeInput, BarCodeType } from '@pdfme/common';
 import type { InputImageCache, RenderProps } from "../types"
 import { calcX, calcY, convertSchemaDimensionsToPt } from '../renderUtils'
+import bwipjs, { ToBufferOptions } from 'bwip-js';
+import { Buffer } from 'buffer';
 
+
+export const createBarCode = async (arg: {
+    type: BarCodeType;
+    input: string;
+    width: number;
+    height: number;
+    backgroundColor?: string;
+}): Promise<Buffer> => {
+    const { type, input, width, height, backgroundColor } = arg;
+    const bcid = type === 'nw7' ? 'rationalizedCodabar' : type;
+    const includetext = true;
+    const scale = 5;
+    const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
+
+    if (backgroundColor) {
+        bwipjsArg.backgroundcolor = backgroundColor;
+    }
+
+    let res: Buffer;
+
+    if (typeof window !== 'undefined') {
+        const canvas = document.createElement('canvas');
+        bwipjs.toCanvas(canvas, bwipjsArg);
+        const dataUrl = canvas.toDataURL('image/png');
+        res = b64toUint8Array(dataUrl).buffer as Buffer;
+    } else {
+        res = await bwipjs.toBuffer(bwipjsArg);
+    }
+
+    return res;
+};
 
 const inputImageCache: InputImageCache = {};
 const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;

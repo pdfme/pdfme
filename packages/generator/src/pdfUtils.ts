@@ -1,15 +1,5 @@
-import {
-    PDFPage,
-    PDFFont,
-    PDFDocument,
-    PDFEmbeddedPage,
-    TransformationMatrix,
-} from '@pdfme/pdf-lib';
-import {
-    getB64BasePdf,
-    Font,
-    BasePdf,
-} from '@pdfme/common';
+import { PDFPage, PDFFont, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
+import { getB64BasePdf, Font, BasePdf } from '@pdfme/common';
 import type { EmbedPdfBox } from "./types"
 
 const embedAndGetFontObjCache = new WeakMap();

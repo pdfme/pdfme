@@ -56,7 +56,7 @@
     "@types/bwip-js": "^3.0.0",
     "@types/pngjs": "^6.0.1",
     "jsqr": "^1.4.0",
-    "pdf2json": "^2.0.0",
+    "pdf2json": "^3.0.4",
     "pngjs": "^6.0.0"
   },
   "peerDependencies": {

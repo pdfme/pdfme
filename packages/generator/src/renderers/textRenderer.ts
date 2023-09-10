@@ -17,9 +17,9 @@ import {
   getFallbackFontName,
 } from '@pdfme/common';
 import type { RenderProps } from "../types"
-import { hex2RgbColor } from "../colorUtils"
 import { embedAndGetFontObj } from '../pdfUtils'
 import {
+  hex2RgbColor,
   calcX,
   calcY,
   renderBackgroundColor,
