@@ -2,7 +2,7 @@ import { PDFDocument } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import type { GenerateProps, Template, } from '@pdfme/common';
 import { checkGenerateProps, } from '@pdfme/common';
-import { renderInputByTemplateSchema } from './render';
+import buildInRenderer from './renderers';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
 import { TOOL_NAME } from './constants';
 
@@ -27,24 +27,6 @@ const postProcessing = ({ pdfDoc }: { pdfDoc: PDFDocument }) => {
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {} } = props;
-  // TODO  Implement the internal logic assuming that the following type of schema will be passed as an argument.
-  // export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
-  // const notBarcodeSchemaTypes = ['text', 'image'] as const;
-  /*
-  const customSchemaForGenerator = {
-    text: {
-      renderer: ({ pdfDoc, page, schema, inputValue }) => {
-        // TODO
-      }
-    },
-    image: {
-      renderer: ({ pdfDoc, page, schema, inputValue }) => {
-        // TODO
-      }
-    }
-    ...
-  };
-  */ 
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
   for (let i = 0; i < inputs.length; i += 1) {
@@ -64,13 +46,17 @@ const generate = async (props: GenerateProps) => {
         const templateSchema = schema[key];
         const input = inputObj[key];
 
-        await renderInputByTemplateSchema({
-          input,
-          templateSchema,
-          pdfDoc,
-          page,
-          options,
-        });
+        if (!templateSchema || !input) {
+          continue;
+        }
+
+        // TODO ↓ If a Custom Schema is defined, it can undergo custom rendering processes by merging it with the renderer object.
+        // const renderer = Object.assign(buildInRenderer, options.schema);
+        const rendererObj = buildInRenderer[templateSchema.type];
+        if (!rendererObj) {
+          throw new Error(`Renderer for type ${templateSchema.type} not found`);
+        }
+        await rendererObj.renderer({ input, templateSchema, pdfDoc, page, options });
       }
     }
   }

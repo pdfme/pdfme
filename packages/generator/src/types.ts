@@ -19,3 +19,7 @@ export interface RenderProps {
     page: PDFPage;
     options: GeneratorOptions;
 }
+
+export interface Renderer {
+    [key: string]: { renderer: (arg: RenderProps) => Promise<void> } | undefined;
+}
