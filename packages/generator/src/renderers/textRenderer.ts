@@ -7,8 +7,13 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_VERTICAL_ALIGNMENT,
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_MIDDLE,
+  VERTICAL_ALIGN_BOTTOM,
   calculateDynamicFontSize,
   heightOfFontAtSize,
+  getFontDescentInPt,
   getFontKitFont,
   getSplittedLines,
   widthOfTextAtSize,
@@ -27,13 +32,14 @@ import {
 } from '../renderUtils'
 
 const getFontProp = async ({ input, font, schema }: { input: string, font: Font, schema: TextSchema }) => {
-  const size = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
+  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
+  const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
 
-  return { size, color, alignment, lineHeight, characterSpacing };
+  return { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing };
 };
 
 const textRenderer = async (arg: RenderProps) => {
@@ -48,7 +54,7 @@ const textRenderer = async (arg: RenderProps) => {
     getFontProp({ input, font, schema: templateSchema })
   ])
 
-  const { size, color, alignment, lineHeight, characterSpacing } = fontProp;
+  const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
   const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : getFallbackFontName(font)];
 
@@ -59,42 +65,51 @@ const textRenderer = async (arg: RenderProps) => {
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
-  let beforeLineOver = 0;
+  const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
+  const descent = getFontDescentInPt(fontKitFont, fontSize);
+  const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
   const fontWidthCalcValues: FontWidthCalcValues = {
     font: fontKitFont,
-    fontSize: size,
+    fontSize,
     characterSpacing,
     boxWidthInPt: width,
   };
 
-  input.split(/\r|\n|\r\n/g).forEach((inputLine, inputLineIndex) => {
-    const splitLines = getSplittedLines(inputLine, fontWidthCalcValues);
+  let lines: string[] = [];
+  input.split(/\r|\n|\r\n/g).forEach((inputLine) => {
+    lines = lines.concat(getSplittedLines(inputLine, fontWidthCalcValues));
+  });
 
-    const renderLine = (line: string, lineIndex: number) => {
-      const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
-      const textHeight = heightOfFontAtSize(fontKitFont, size);
+  // Text lines are rendered from the bottom upwards, we need to adjust the position down
+  let yOffset = 0;
+  if (verticalAlignment === VERTICAL_ALIGN_TOP) {
+    yOffset = firstLineTextHeight + halfLineHeightAdjustment;
+  } else {
+    const otherLinesHeight = lineHeight * fontSize * (lines.length - 1);
 
-      page.drawText(line, {
-        x: calcX(templateSchema.position.x, alignment, width, textWidth),
-        y:
-          calcY(templateSchema.position.y, pageHeight, height) +
-          height -
-          textHeight -
-          lineHeight * size * (inputLineIndex + lineIndex + beforeLineOver) -
-          (lineHeight === 0 ? 0 : ((lineHeight - 1) * size) / 2),
-        rotate,
-        size,
-        color,
-        lineHeight: lineHeight * size,
-        maxWidth: width,
-        font: pdfFontValue,
-        wordBreaks: [''],
-      });
-      if (splitLines.length === lineIndex + 1) beforeLineOver += lineIndex;
-    };
+    if (verticalAlignment === VERTICAL_ALIGN_BOTTOM) {
+      yOffset = height - otherLinesHeight + descent - halfLineHeightAdjustment;
+    } else if (verticalAlignment === VERTICAL_ALIGN_MIDDLE) {
+      yOffset = (height - otherLinesHeight - firstLineTextHeight + descent) / 2 + firstLineTextHeight;
+    }
+  }
 
-    splitLines.forEach(renderLine);
+  lines.forEach((line, rowIndex) => {
+    const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
+    const rowYOffset = lineHeight * fontSize * rowIndex;
+
+    page.drawText(line, {
+      x: calcX(templateSchema.position.x, alignment, width, textWidth),
+      y: calcY(templateSchema.position.y, pageHeight, yOffset) - rowYOffset,
+      rotate,
+      size: fontSize,
+      color,
+      lineHeight: lineHeight * fontSize,
+      maxWidth: width,
+      font: pdfFontValue,
+      wordBreaks: [''],
+    });
   });
 };
 

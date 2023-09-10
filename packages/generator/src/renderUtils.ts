@@ -37,7 +37,7 @@ export const calcX = (x: number, alignment: Alignment, boxWidth: number, textWid
   return mm2pt(x) + addition;
 };
 
-export const calcY = (y: number, height: number, itemHeight: number) => height - mm2pt(y) - itemHeight;
+export const calcY = (y: number, pageHeight: number, itemHeight: number) => pageHeight - mm2pt(y) - itemHeight;
 
 export const renderBackgroundColor = (arg: {
   templateSchema: TextSchema;
