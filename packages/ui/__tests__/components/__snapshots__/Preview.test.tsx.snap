@@ -81,13 +81,18 @@ exports[`Preview(as Form) snapshot 1`] = `
             style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; outline: 1px dashed #4af;"
             title="field1"
           >
-            <textarea
-              placeholder="bb"
-              style="position: absolute; top: 0px; padding: 3.436640624999999px 0px 0px 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; margin-top: 0px; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word;"
-              tabindex="100"
+            <div
+              style="position: absolute; top: 0px; padding: 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; display: flex; flex-direction: column; justify-content: flex-start;"
             >
-              field1
-            </textarea>
+              <textarea
+                placeholder="bb"
+                rows="1"
+                style="padding: 3.436640625px 0px 0px 0px; resize: none; outline: none; background: none; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word;"
+                tabindex="100"
+              >
+                field1
+              </textarea>
+            </div>
           </div>
         </div>
         <div>
@@ -227,10 +232,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             title="field1"
           >
             <div
-              style="position: absolute; top: 0px; padding: 0px 0px 0px 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; margin-top: 0px; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word;"
+              style="position: absolute; top: 0px; padding: 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; display: flex; flex-direction: column; justify-content: flex-start;"
             >
               <div
-                style="margin-top: 0px; padding-top: 3.436640624999999px;"
+                style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; margin-bottom: 0px; padding-top: 3.436640625px;"
               >
                 <span
                   style="letter-spacing: inherit;"

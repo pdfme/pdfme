@@ -8,11 +8,17 @@ const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 const NotoSerifJPRegularData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`));
+const GloriaHallelujahRegularData = readFileSync(path.join(__dirname, `/assets/fonts/GloriaHallelujah-Regular.ttf`));
+const GreatVibesRegularData = readFileSync(path.join(__dirname, `/assets/fonts/GreatVibes-Regular.ttf`));
+const JuliusSansOneRegularData = readFileSync(path.join(__dirname, `/assets/fonts/JuliusSansOne-Regular.ttf`));
 
 const getFont = (): Font => ({
   SauceHanSansJP: { fallback: true, data: SauceHanSansJPData },
   SauceHanSerifJP: { data: SauceHanSerifJPData },
   'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
+  'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
+  'GreatVibes-Regular': { data: GreatVibesRegularData },
+  'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },
 });
 
 const getPdf = (pdfFilePath: string) => {

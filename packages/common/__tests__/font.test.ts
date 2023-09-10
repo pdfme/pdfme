@@ -4,7 +4,9 @@ import type { Font as FontKitFont } from 'fontkit';
 import {
   calculateDynamicFontSize,
   checkFont,
+  getBrowserVerticalFontAdjustments,
   getDefaultFont,
+  getFontDescentInPt,
   getFontKitFont,
   getSplittedLines,
 } from '../src/font'
@@ -364,6 +366,7 @@ describe('calculateDynamicFontSize with Default font', () => {
   it('should return max font size when content is too small to fit given constraints', async () => {
     const textSchema = getTextSchema();
     textSchema.width = 1000;
+    textSchema.height = 200;
     textSchema.dynamicFontSize = { min: 10, max: 30 };
     const input = 'test with a length string\n and a new line';
     const result = await calculateDynamicFontSize({ textSchema, font, input });
@@ -430,7 +433,7 @@ describe('calculateDynamicFontSize with Custom font', () => {
     const input = 'あいうあいうあい';
     const result = await calculateDynamicFontSize({ textSchema, font, input });
 
-    expect(result).toBe(24.25);
+    expect(result).toBe(26);
   });
 
   it('should return min font size when content is too big to fit given constraints', async () => {
@@ -458,5 +461,57 @@ describe('calculateDynamicFontSize with Custom font', () => {
     const result = await calculateDynamicFontSize({ textSchema, font, input });
 
     expect(result).toBe(5);
+  });
+});
+
+describe('getFontDescentInPt test', () => {
+  test('it gets a descent size relative to the font size', () => {
+    expect(getFontDescentInPt({ descent: -400, unitsPerEm: 1000 } as FontKitFont, 12)).toBe(
+      -4.800000000000001
+    );
+    expect(getFontDescentInPt({ descent: 54, unitsPerEm: 1000 } as FontKitFont, 20)).toBe(1.08);
+    expect(getFontDescentInPt({ descent: -512, unitsPerEm: 2048 } as FontKitFont, 54)).toBe(-13.5);
+  });
+});
+
+describe('getBrowserVerticalFontAdjustments test', () => {
+  // Font with a base line-height of 1.349
+  const font = { ascent: 1037, descent: -312, unitsPerEm: 1000 } as FontKitFont;
+
+  test('it gets a top adjustment when vertically aligning top', () => {
+    expect(getBrowserVerticalFontAdjustments(font, 12, 1.0, 'top')).toEqual({
+      topAdj: 2.791301999999999,
+      bottomAdj: 0,
+    });
+    expect(getBrowserVerticalFontAdjustments(font, 36, 2.0, 'top')).toEqual({
+      topAdj: 8.373906,
+      bottomAdj: 0,
+    });
+  });
+
+  test('it gets a bottom adjustment when vertically aligning middle or bottom', () => {
+    expect(getBrowserVerticalFontAdjustments(font, 12, 1.0, 'bottom')).toEqual({
+      topAdj: 0,
+      bottomAdj: 2.791302,
+    });
+    expect(getBrowserVerticalFontAdjustments(font, 12, 1.15, 'middle')).toEqual({
+      topAdj: 0,
+      bottomAdj: 1.5916020000000004,
+    });
+  });
+
+  test('it does not get a bottom adjustment if the line height exceeds that of the font', () => {
+    expect(getBrowserVerticalFontAdjustments(font, 12, 1.35, 'bottom')).toEqual({
+      topAdj: 0,
+      bottomAdj: 0,
+    });
+  });
+
+  test('it does not get a bottom adjustment if the font base line-height is 1.0 or less', () => {
+    const thisFont = { ascent: 900, descent: -50, unitsPerEm: 1000 } as FontKitFont;
+    expect(getBrowserVerticalFontAdjustments(thisFont, 20, 1.0, 'bottom')).toEqual({
+      topAdj: 0,
+      bottomAdj: 0,
+    });
   });
 });

@@ -340,12 +340,12 @@ ___
 | `props` | `Object` |
 | `props.inputs` | `Record`<`string`, `string`\>[] |
 | `props.options?` | `Object` |
-| `props.options.font?` | `Record`<`string`, { `data`: `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
+| `props.options.font?` | `Record`<`string`, { `data`: `string` & `Uint8Array` & `ArrayBuffer` & `string` & `Uint8Array` & `string` & `ArrayBuffer` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` ; `fallback?`: `boolean` ; `subset?`: `boolean`  }\> |
 | `props.template` | `Object` |
-| `props.template.basePdf` | `string` & `ArrayBuffer` & `Uint8Array` & `string` & `ArrayBuffer` & `string` & `Uint8Array` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` |
+| `props.template.basePdf` | `string` & `Uint8Array` & `ArrayBuffer` & `string` & `Uint8Array` & `string` & `ArrayBuffer` & `Uint8Array` & `string` & `Uint8Array` & `ArrayBuffer` & `ArrayBuffer` & `string` & `ArrayBuffer` & `Uint8Array` |
 | `props.template.columns?` | `string`[] |
 | `props.template.sampledata?` | `Record`<`string`, `string`\>[] |
-| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"center"`` \| ``"left"`` \| ``"right"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `dynamicFontSize?`: { `fit?`: `string` ; `max`: `number` ; `min`: `number`  } ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` ; `width`: `number`  }\>[] |
+| `props.template.schemas` | `Record`<`string`, { `alignment?`: ``"left"`` \| ``"right"`` \| ``"center"`` ; `backgroundColor?`: `string` ; `characterSpacing?`: `number` ; `dynamicFontSize?`: { `fit?`: `string` ; `max`: `number` ; `min`: `number`  } ; `fontColor?`: `string` ; `fontName?`: `string` ; `fontSize?`: `number` ; `height`: `number` ; `lineHeight?`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"text"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"image"`` ; `width`: `number`  } \| { `height`: `number` ; `position`: { `x`: `number` ; `y`: `number`  } ; `rotate?`: `number` ; `type`: ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` ; `width`: `number`  }\>[] |
 
 #### Returns
 
@@ -353,7 +353,7 @@ ___
 
 #### Defined in
 
-[generator/src/generate.ts:45](https://github.com/pdfme/pdfme/blob/6ec2533/packages/generator/src/generate.ts#L45)
+[generator/src/generate.ts:45](https://github.com/pdfme/pdfme/blob/409de5a/packages/generator/src/generate.ts#L45)
 
 ___
 

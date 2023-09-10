@@ -6,6 +6,10 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_MIDDLE,
+  VERTICAL_ALIGN_BOTTOM,
+  DEFAULT_VERTICAL_ALIGNMENT,
   DYNAMIC_FIT_VERTICAL,
   DYNAMIC_FIT_HORIZONTAL,
   DEFAULT_DYNAMIC_FIT,
@@ -154,6 +158,7 @@ const TextPropEditor = (
 ) => {
   const { changeSchemas, activeSchema } = props;
   const alignments = ['left', 'center', 'right'];
+  const verticalAlignments = [VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM];
   const dynamicFits = [DYNAMIC_FIT_HORIZONTAL, DYNAMIC_FIT_VERTICAL];
   const font = useContext(FontContext);
   const fallbackFontName = getFallbackFontName(font);
@@ -180,12 +185,21 @@ const TextPropEditor = (
         />
 
         <SelectSet
-          label={'Alignment'}
+          label={'Horizontal Align'}
           value={activeSchema.alignment ?? 'left'}
           options={alignments}
           onChange={(e) =>
             changeSchemas([{ key: 'alignment', value: e.target.value, schemaId: activeSchema.id }])
           }
+        />
+
+        <SelectSet
+          label={'Vertical Align'}
+          value={activeSchema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT}
+          options={verticalAlignments}
+          onChange={(e) => {
+            changeSchemas([{ key: 'verticalAlignment', value: e.target.value, schemaId: activeSchema.id }]);
+          }}
         />
       </div>
       <div

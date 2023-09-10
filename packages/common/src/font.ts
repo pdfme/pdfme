@@ -9,12 +9,12 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
   FONT_SIZE_ADJUSTMENT,
-  PT_TO_PX_RATIO,
   DEFAULT_DYNAMIC_FIT,
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
+  VERTICAL_ALIGN_TOP,
 } from './constants';
-import { mm2pt, pt2mm } from './helper';
+import { mm2pt, pt2mm, pt2px } from './helper';
 import { b64toUint8Array } from "."
 
 export const getFallbackFontName = (font: Font) => {
@@ -74,20 +74,50 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
   }
 };
 
-export const getFontAlignmentValue = (fontKitFont: FontKitFont, fontSize: number) => {
+export const getBrowserVerticalFontAdjustments = (
+  fontKitFont: FontKitFont,
+  fontSize: number,
+  lineHeight: number,
+  verticalAlignment: string
+) => {
   const { ascent, descent, unitsPerEm } = fontKitFont;
 
-  const fontSizeInPx = fontSize * PT_TO_PX_RATIO;
+  // Fonts have a designed line height that the browser renders when using `line-height: normal`
+  const fontBaseLineHeight = (ascent - descent) / unitsPerEm;
 
-  // Convert ascent and descent to px values
-  const ascentInPixels = (ascent / unitsPerEm) * fontSizeInPx;
-  const descentInPixels = (descent / unitsPerEm) * fontSizeInPx;
+  // For vertical alignment top
+  // To achieve consistent positioning between browser and PDF, we apply the difference between
+  // the font's actual height and the font size in pixels.
+  // Browsers middle the font within this height, so we only need half of it to apply to the top.
+  // This means the font renders a bit lower in the browser, but achieves PDF alignment
+  const topAdjustment = (fontBaseLineHeight * fontSize - fontSize) / 2;
 
-  // Calculate the single line height in px
-  const singleLineHeight = ((ascentInPixels + Math.abs(descentInPixels)) / fontSizeInPx);
+  if (verticalAlignment === VERTICAL_ALIGN_TOP) {
+    return { topAdj: pt2px(topAdjustment), bottomAdj: 0 };
+  }
 
-  // Calculate the top margin/padding in px
-  return ((singleLineHeight * fontSizeInPx) - fontSizeInPx) / 2
+  // For vertical alignment bottom and middle
+  // When browsers render text in a non-form element (such as a <div>), some of the text may be
+  // lowered below and outside the containing element if the line height used is less than
+  // the base line-height of the font.
+  // This behaviour does not happen in a <textarea> though, so we need to adjust the positioning
+  // for consistency between editing and viewing to stop text jumping up and down.
+  // This portion of text is half of the difference between the base line height and the used
+  // line height. If using the same or higher line-height than the base font, then line-height
+  // takes over in the browser and this adjustment is not needed.
+  // Unlike the top adjustment - this is only driven by browser behaviour, not PDF alignment.
+  let bottomAdjustment = 0;
+  if (lineHeight < fontBaseLineHeight) {
+    bottomAdjustment = ((fontBaseLineHeight - lineHeight) * fontSize) / 2;
+  }
+
+  return { topAdj: 0, bottomAdj: pt2px(bottomAdjustment) };
+};
+
+export const getFontDescentInPt = (fontKitFont: FontKitFont, fontSize: number) => {
+  const { descent, unitsPerEm } = fontKitFont;
+
+  return (descent / unitsPerEm) * fontSize;
 };
 
 export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) => {
@@ -228,7 +258,7 @@ export const calculateDynamicFontSize = async ({
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const fontKitFont = await getFontKitFont(textSchema, font);
-  const textContentRows = input.split('\n');
+  const paragraphs = input.split('\n');
 
   let dynamicFontSize = fontSize;
   if (dynamicFontSize < dynamicFontSizeSetting.min) {
@@ -243,17 +273,18 @@ export const calculateDynamicFontSize = async ({
     let totalHeightInMm = 0;
 
     const boxWidthInPt = mm2pt(boxWidth);
-    const textHeight = heightOfFontAtSize(fontKitFont, size);
-    const textHeightInMm = pt2mm(textHeight * lineHeight);
+    const firstLineTextHeight = heightOfFontAtSize(fontKitFont, size);
+    const firstLineHeightInMm = pt2mm(firstLineTextHeight * lineHeight);
+    const otherRowHeightInMm = pt2mm(size * lineHeight);
 
-    textContentRows.forEach((paragraph) => {
+    paragraphs.forEach((paragraph, paraIndex) => {
       const lines = getSplittedLines(paragraph, {
         font: fontKitFont,
         fontSize: size,
         characterSpacing,
         boxWidthInPt,
       });
-      lines.forEach((line) => {
+      lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
           // For vertical fit we want to consider the width of text lines where we detect a split
           const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
@@ -261,7 +292,11 @@ export const calculateDynamicFontSize = async ({
           totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
         }
 
-        totalHeightInMm += textHeightInMm;
+        if (paraIndex + lineIndex === 0) {
+          totalHeightInMm += firstLineHeightInMm;
+        } else {
+          totalHeightInMm += otherRowHeightInMm;
+        }
       });
       if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
         // For horizontal fit we want to consider the line's width 'unsplit'

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from '@docusaurus/Link';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import ModalHead from './ModalHead';
@@ -42,7 +43,10 @@ const DesignerCodeModal = ({
           backgroundColor: 'var(--ifm-navbar-background-color)',
         }}
       >
-        <ModalHead title="Get Code" handleClose={handleClose} />
+        <ModalHead
+          title="Get Code"
+          descriptionElem={<p>Please check <Link to="/docs/getting-started">the document</Link> for details on how to handle the pdfme code.</p>}
+          handleClose={handleClose} />
         <ul className="tabs tabs--block">
           {modes.map((m) => (
             <li
