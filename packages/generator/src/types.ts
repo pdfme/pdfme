@@ -1,5 +1,7 @@
-import type { PDFFont, PDFImage } from '@pdfme/pdf-lib';
-import type { Font } from '@pdfme/common';
+import type { PDFImage } from '@pdfme/pdf-lib';
+import type { GeneratorOptions, Schema, } from '@pdfme/common';
+import type { PDFPage, PDFDocument, } from '@pdfme/pdf-lib';
+
 export interface InputImageCache {
     [key: string]: PDFImage | undefined;
 }
@@ -10,10 +12,10 @@ export type EmbedPdfBox = {
     trimBox: { x: number; y: number; width: number; height: number };
 };
 
-export interface FontSetting {
-    font: Font;
-    pdfFontObj: {
-        [key: string]: PDFFont;
-    };
-    fallbackFontName: string;
+export interface RenderProps {
+    input: string;
+    templateSchema: Schema;
+    pdfDoc: PDFDocument;
+    page: PDFPage;
+    options: GeneratorOptions;
 }

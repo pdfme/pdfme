@@ -1,6 +1,5 @@
 import {
   PDFPage,
-  PDFDocument,
   degrees,
   setCharacterSpacing,
 } from '@pdfme/pdf-lib';
@@ -28,11 +27,13 @@ import {
   mm2pt,
   widthOfTextAtSize,
   FontWidthCalcValues,
+  getDefaultFont,
+  getFallbackFontName,
 } from '@pdfme/common';
-import type { InputImageCache, FontSetting } from "./types"
+import type { InputImageCache, RenderProps } from "./types"
 import { createBarCode } from "./barCodeUtils"
 import { hex2RgbColor } from "./colorUtils"
-
+import { embedAndGetFontObj } from './pdfUtils'
 
 const convertSchemaDimensionsToPt = (schema: Schema) => {
   const width = mm2pt(schema.width);
@@ -83,29 +84,26 @@ const renderBackgroundColor = (arg: {
   });
 };
 
+const renderInputByTextSchema = async (arg: RenderProps) => {
+  const { input, pdfDoc, page, options } = arg;
+  const templateSchema = arg.templateSchema as TextSchema;
 
-const renderInputByTextSchema = async (arg: {
-  input: string;
-  templateSchema: TextSchema;
-  pdfDoc: PDFDocument;
-  page: PDFPage;
-  fontSetting: FontSetting;
-}) => {
-  const { input, templateSchema, page, fontSetting } = arg;
-  const { font, pdfFontObj, fallbackFontName } = fontSetting;
+  const { font = getDefaultFont() } = options;
 
-  const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : fallbackFontName];
-  const fontKitFont = await getFontKitFont(templateSchema, font);
+  const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
+    embedAndGetFontObj({ pdfDoc, font }),
+    getFontKitFont(templateSchema, font),
+    getFontProp({ input, font, schema: templateSchema })
+  ])
+
+  const { size, color, alignment, lineHeight, characterSpacing } = fontProp;
+
+  const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : getFallbackFontName(font)];
 
   const pageHeight = page.getHeight();
   renderBackgroundColor({ templateSchema, page, pageHeight });
 
   const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
-  const { size, color, alignment, lineHeight, characterSpacing } = await getFontProp({
-    input,
-    font,
-    schema: templateSchema,
-  });
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
@@ -148,16 +146,11 @@ const renderInputByTextSchema = async (arg: {
   });
 };
 
+const inputImageCache: InputImageCache = {};
 const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
 
-const renderInputByImageSchema = async (arg: {
-  input: string;
-  templateSchema: ImageSchema;
-  pdfDoc: PDFDocument;
-  page: PDFPage;
-  inputImageCache: InputImageCache;
-}) => {
-  const { input, templateSchema, pdfDoc, page, inputImageCache } = arg;
+const renderInputByImageSchema = async (arg: RenderProps) => {
+  const { input, templateSchema, pdfDoc, page } = arg;
 
   const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
   const opt = {
@@ -177,14 +170,8 @@ const renderInputByImageSchema = async (arg: {
   page.drawImage(image, opt);
 };
 
-const renderInputByBarcodeSchema = async (arg: {
-  input: string;
-  templateSchema: BarcodeSchema;
-  pdfDoc: PDFDocument;
-  page: PDFPage;
-  inputImageCache: InputImageCache;
-}) => {
-  const { input, templateSchema, pdfDoc, page, inputImageCache } = arg;
+const renderInputByBarcodeSchema = async (arg: RenderProps) => {
+  const { input, templateSchema, pdfDoc, page } = arg;
   if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
 
   const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
@@ -207,14 +194,7 @@ const renderInputByBarcodeSchema = async (arg: {
   page.drawImage(image, opt);
 };
 
-export const renderInputByTemplateSchema = async (arg: {
-  input: string;
-  templateSchema: Schema;
-  pdfDoc: PDFDocument;
-  page: PDFPage;
-  fontSetting: FontSetting;
-  inputImageCache: InputImageCache;
-}) => {
+export const renderInputByTemplateSchema = async (arg: RenderProps) => {
   if (!arg.input || !arg.templateSchema) return;
 
   if (isTextSchema(arg.templateSchema)) {

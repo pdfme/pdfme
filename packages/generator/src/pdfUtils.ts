@@ -12,8 +12,13 @@ import {
 } from '@pdfme/common';
 import type { EmbedPdfBox } from "./types"
 
+const embedAndGetFontObjCache = new WeakMap();
 export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
     const { pdfDoc, font } = arg;
+    if (embedAndGetFontObjCache.has(pdfDoc)) {
+        return embedAndGetFontObjCache.get(pdfDoc);
+    }
+
     const fontValues = await Promise.all(
         Object.values(font).map(async (v) => {
             let fontData = v.data;
@@ -26,10 +31,13 @@ export const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font 
         })
     );
 
-    return Object.keys(font).reduce(
+    const fontObj = Object.keys(font).reduce(
         (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
         {} as { [key: string]: PDFFont }
-    );
+    )
+
+    embedAndGetFontObjCache.set(pdfDoc, fontObj);
+    return fontObj;
 };
 
 export const getEmbeddedPagesAndEmbedPdfBoxes = async (arg: {

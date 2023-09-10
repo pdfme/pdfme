@@ -1,43 +1,25 @@
 import { PDFDocument } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import type {
-  Font,
-  GenerateProps,
-  SchemaInputs,
-  Template,
-} from '@pdfme/common';
-import {
-  getDefaultFont,
-  getFallbackFontName,
-  checkGenerateProps,
-} from '@pdfme/common';
+import type { GenerateProps, Template, } from '@pdfme/common';
+import { checkGenerateProps, } from '@pdfme/common';
 import { renderInputByTemplateSchema } from './render';
-import {
-  drawEmbeddedPage,
-  embedAndGetFontObj,
-  getEmbeddedPagesAndEmbedPdfBoxes,
-} from './pdfUtils'
+import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
 import { TOOL_NAME } from './constants';
-import type { InputImageCache } from "./types"
 
-const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
-  const { template, font } = arg;
+const preprocessing = async ({ template }: { template: Template; }) => {
   const { basePdf } = template;
-  const fallbackFontName = getFallbackFontName(font);
 
   const pdfDoc = await PDFDocument.create();
   // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
 
-  const pdfFontObj = await embedAndGetFontObj({ pdfDoc, font });
-
   const pagesAndBoxes = await getEmbeddedPagesAndEmbedPdfBoxes({ pdfDoc, basePdf });
   const { embeddedPages, embedPdfBoxes } = pagesAndBoxes;
 
-  return { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes };
+  return { pdfDoc, embeddedPages, embedPdfBoxes };
 };
 
-const postProcessing = (pdfDoc: PDFDocument) => {
+const postProcessing = ({ pdfDoc }: { pdfDoc: PDFDocument }) => {
   pdfDoc.setProducer(TOOL_NAME);
   pdfDoc.setCreator(TOOL_NAME);
 };
@@ -64,13 +46,7 @@ const generate = async (props: GenerateProps) => {
   };
   */ 
 
-  const { font = getDefaultFont() } = options;
-  const { schemas } = template;
-
-  const preRes = await preprocessing({ inputs, template, font });
-  const { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
-
-  const inputImageCache: InputImageCache = {};
+  const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
@@ -84,24 +60,22 @@ const generate = async (props: GenerateProps) => {
       drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schema = schemas[j];
+        const schema = template.schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const fontSetting = { font, pdfFontObj, fallbackFontName };
 
         await renderInputByTemplateSchema({
           input,
           templateSchema,
           pdfDoc,
           page,
-          fontSetting,
-          inputImageCache,
+          options,
         });
       }
     }
   }
 
-  postProcessing(pdfDoc);
+  postProcessing({ pdfDoc });
 
   return pdfDoc.save();
 };
