@@ -13,6 +13,8 @@ import bwipjs, { ToBufferOptions } from 'bwip-js';
 import {
   getB64BasePdf,
   b64toUint8Array,
+  barCodeType2Bcid,
+  mapHexColorForBwipJsLib,
   validateBarcodeInput,
   Schema,
   TextSchema,
@@ -48,8 +50,6 @@ import { Buffer } from 'buffer';
 export interface InputImageCache {
   [key: string]: PDFImage | undefined;
 }
-
-const barCodeType2Bcid = (type: BarCodeType) => (type === 'nw7' ? 'rationalizedCodabar' : type);
 export const createBarCode = async (arg: {
   type: BarCodeType;
   input: string;
@@ -65,9 +65,9 @@ export const createBarCode = async (arg: {
   const scale = 5;
   const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
 
-  if (backgroundcolor) bwipjsArg.backgroundcolor = backgroundcolor.replace('#', '');
-  if (barcolor) bwipjsArg.barcolor = barcolor.replace('#', '');
-  if (textcolor) bwipjsArg.textcolor = textcolor.replace('#', '');
+  if (backgroundcolor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundcolor);
+  if (barcolor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barcolor);
+  if (textcolor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textcolor);
 
   let res: Buffer;
 

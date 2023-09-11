@@ -21,6 +21,7 @@ import {
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
+import { barCodeType2Bcid, mapHexColorForBwipJsLib } from './barcode';
 import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
   FontWidthCalcValues,
@@ -123,6 +124,8 @@ export {
   checkGenerateProps,
   validateBarcodeInput,
   calculateDynamicFontSize,
+  barCodeType2Bcid,
+  mapHexColorForBwipJsLib,
 };
 
 export type {

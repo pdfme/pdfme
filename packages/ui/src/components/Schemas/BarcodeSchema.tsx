@@ -1,5 +1,11 @@
 import React, { forwardRef, Ref, useEffect, useState } from 'react';
-import { validateBarcodeInput, BarCodeType, BarcodeSchema, } from '@pdfme/common';
+import {
+  validateBarcodeInput,
+  BarCodeType,
+  BarcodeSchema,
+  barCodeType2Bcid,
+  mapHexColorForBwipJsLib,
+} from '@pdfme/common';
 import { ZOOM } from '../../constants';
 import { SchemaUIProps } from './SchemaUI';
 import bwipjs from 'bwip-js';
@@ -43,7 +49,7 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
 
   useEffect(() => {
     const canvas = document.createElement('canvas');
-    const barcodeType = type === 'nw7' ? 'rationalizedCodabar' : type;
+    const barcodeType = barCodeType2Bcid(type);
 
     try {
       bwipjs.toCanvas(canvas, {
@@ -54,11 +60,10 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
         textxalign: 'center',
         height,
         width,
-        barcolor: barcolor ? barcolor.replace('#', '') : '000000',
-        backgroundcolor: backgroundcolor ? backgroundcolor.replace('#', '') : 'ffffff',
-        textcolor: textcolor ? textcolor.replace('#', '') : '000000',
+        barcolor: mapHexColorForBwipJsLib(barcolor, '000000'),
+        backgroundcolor: mapHexColorForBwipJsLib(backgroundcolor, 'ffffff'),
+        textcolor: mapHexColorForBwipJsLib(textcolor, '000000'),
       });
-
       setImageSrc(canvas.toDataURL('image/png'));
       setIsBarcodeValid(true);
     } catch (error) {
