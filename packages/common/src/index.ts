@@ -9,6 +9,8 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_BARCODE_BG_COLOR,
+  DEFAULT_BARCODE_COLOR,
   DYNAMIC_FIT_VERTICAL,
   DYNAMIC_FIT_HORIZONTAL,
   DEFAULT_DYNAMIC_FIT,
@@ -19,6 +21,7 @@ import {
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
+import { barCodeType2Bcid, mapHexColorForBwipJsLib } from './barcode';
 import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
   FontWidthCalcValues,
@@ -84,6 +87,8 @@ export {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_BARCODE_BG_COLOR,
+  DEFAULT_BARCODE_COLOR,
   DYNAMIC_FIT_VERTICAL,
   DYNAMIC_FIT_HORIZONTAL,
   DEFAULT_DYNAMIC_FIT,
@@ -119,6 +124,8 @@ export {
   checkGenerateProps,
   validateBarcodeInput,
   calculateDynamicFontSize,
+  barCodeType2Bcid,
+  mapHexColorForBwipJsLib,
 };
 
 export type {

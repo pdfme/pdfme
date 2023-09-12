@@ -16,7 +16,7 @@ import {
 } from '@pdfme/common';
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import ColorInputSet from './FormComponents/ColorInputSet';
 
 const inputStyle = {
   width: '90%',
@@ -60,46 +60,6 @@ const NumberInputSet = (props: {
   );
 };
 
-const ColorInputSet = (props: {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
-}) => {
-  const { label, value, onChange, onClear } = props;
-  const formattedLabel = label.replace(/\s/g, '');
-
-  return (
-    <div style={{ width: '45%' }}>
-      <label htmlFor={`input-${formattedLabel}`}>{label}</label>
-      <div style={{ display: 'flex' }}>
-        <input
-          id={`input-${formattedLabel}`}
-          name={`input-${formattedLabel}`}
-          onChange={onChange}
-          value={value || '#ffffff'}
-          type="color"
-          style={inputStyle}
-        />
-        <button
-          onClick={onClear}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'none',
-            borderRadius: 2,
-            border: '1px solid #767676',
-            cursor: 'pointer',
-          }}
-        >
-          <XMarkIcon width={10} height={10} />
-        </button>
-      </div>
-    </div>
-  );
-};
-
 const SelectSet = (props: {
   label: string;
   value: string;
@@ -137,9 +97,11 @@ const CheckboxSet = (props: {
   checked: boolean | undefined;
 }) => {
   const { width, label, onChange, checked } = props;
+  const fieldId = 'input-' + label.replace(/\s/g, '');
 
   return (
     <label
+      htmlFor={fieldId}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -147,7 +109,7 @@ const CheckboxSet = (props: {
         width: `${width}`,
       }}
     >
-      <input type="checkbox" checked={checked} onChange={onChange} />
+      <input id={fieldId} type="checkbox" checked={checked} onChange={onChange} />
       {label}
     </label>
   );
@@ -279,7 +241,7 @@ const TextPropEditor = (
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
-                  activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
                   ? { background: 'rgb(200 0 0 / 30%)' }
                   : {}
               }
@@ -295,7 +257,7 @@ const TextPropEditor = (
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
-                  activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
                   ? { background: 'rgb(200 0 0 / 30%)' }
                   : {}
               }

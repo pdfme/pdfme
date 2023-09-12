@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { SchemaForUI } from '@pdfme/common';
+import { SchemaForUI, isBarcodeSchema, isTextSchema } from '@pdfme/common';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext } from '../../../../contexts';
 import Divider from '../../../Divider';
@@ -8,6 +8,7 @@ import TextPropEditor from './TextPropEditor';
 import ExampleInputEditor from './ExampleInputEditor';
 import PositionAndSizeEditor from './PositionAndSizeEditor';
 import TypeAndKeyEditor from './TypeAndKeyEditor';
+import BarcodePropEditor from './BarCodePropEditor';
 
 const DetailView = (
   props: Pick<SidebarProps, 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
@@ -36,7 +37,10 @@ const DetailView = (
         <Divider />
         <PositionAndSizeEditor {...props} />
         <Divider />
-        {activeSchema.type === 'text' && (
+        {isBarcodeSchema(activeSchema) && ( 
+          <BarcodePropEditor {...props} />
+        )}
+        {isTextSchema(activeSchema) && (
           <>
             <TextPropEditor {...props} />
             <Divider />
