@@ -52,6 +52,7 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
     const barcodeType = barCodeType2Bcid(type);
 
     try {
+      // TODO: https://github.com/pdfme/pdfme/pull/256#discussion_r1322255359
       bwipjs.toCanvas(canvas, {
         bcid: barcodeType,
         scale: 1,
