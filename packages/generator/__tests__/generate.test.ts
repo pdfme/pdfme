@@ -3,10 +3,8 @@ import * as path from 'path';
 import generate from '../src/generate';
 import templateData from './assets/templates';
 import { Template, Font, BLANK_PDF, TextSchema } from '@pdfme/common';
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
-
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 const NotoSerifJPRegularData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`));

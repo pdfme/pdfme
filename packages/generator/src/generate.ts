@@ -1,43 +1,25 @@
 import { PDFDocument } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import type {
-  Font,
-  GenerateProps,
-  SchemaInputs,
-  Template,
-} from '@pdfme/common';
-import {
-  getDefaultFont,
-  getFallbackFontName,
-  checkGenerateProps,
-} from '@pdfme/common';
-import {
-  getEmbeddedPagesAndEmbedPdfBoxes,
-  drawInputByTemplateSchema,
-  drawEmbeddedPage,
-  embedAndGetFontObj,
-  InputImageCache,
-} from './helper.js';
-import { TOOL_NAME } from './constants.js';
+import type { GenerateProps, Template, } from '@pdfme/common';
+import { checkGenerateProps, } from '@pdfme/common';
+import builtInRenderer from './builtInRenderer';
+import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
+import { TOOL_NAME } from './constants';
 
-const preprocessing = async (arg: { inputs: SchemaInputs[]; template: Template; font: Font }) => {
-  const { template, font } = arg;
+const preprocessing = async ({ template }: { template: Template; }) => {
   const { basePdf } = template;
-  const fallbackFontName = getFallbackFontName(font);
 
   const pdfDoc = await PDFDocument.create();
   // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
 
-  const pdfFontObj = await embedAndGetFontObj({ pdfDoc, font });
-
   const pagesAndBoxes = await getEmbeddedPagesAndEmbedPdfBoxes({ pdfDoc, basePdf });
   const { embeddedPages, embedPdfBoxes } = pagesAndBoxes;
 
-  return { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes };
+  return { pdfDoc, embeddedPages, embedPdfBoxes };
 };
 
-const postProcessing = (pdfDoc: PDFDocument) => {
+const postProcessing = ({ pdfDoc }: { pdfDoc: PDFDocument }) => {
   pdfDoc.setProducer(TOOL_NAME);
   pdfDoc.setCreator(TOOL_NAME);
 };
@@ -45,13 +27,13 @@ const postProcessing = (pdfDoc: PDFDocument) => {
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {} } = props;
-  const { font = getDefaultFont() } = options;
-  const { schemas } = template;
 
-  const preRes = await preprocessing({ inputs, template, font });
-  const { pdfDoc, pdfFontObj, fallbackFontName, embeddedPages, embedPdfBoxes } = preRes;
+  const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
 
-  const inputImageCache: InputImageCache = {};
+  // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
+  const rendererRegistry = Object.assign(builtInRenderer, {});
+  const _cache = new Map();
+
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     const keys = Object.keys(inputObj);
@@ -65,24 +47,24 @@ const generate = async (props: GenerateProps) => {
       drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schema = schemas[j];
+        const schema = template.schemas[j];
         const templateSchema = schema[key];
         const input = inputObj[key];
-        const fontSetting = { font, pdfFontObj, fallbackFontName };
 
-        await drawInputByTemplateSchema({
-          input,
-          templateSchema,
-          pdfDoc,
-          page,
-          fontSetting,
-          inputImageCache,
-        });
+        if (!templateSchema || !input) {
+          continue;
+        }
+
+        const renderer = rendererRegistry[templateSchema.type];
+        if (!renderer) {
+          throw new Error(`Renderer for type ${templateSchema.type} not found`);
+        }
+        await renderer.render({ input, templateSchema, pdfDoc, page, options, _cache });
       }
     }
   }
 
-  postProcessing(pdfDoc);
+  postProcessing({ pdfDoc });
 
   return pdfDoc.save();
 };
