@@ -3,12 +3,11 @@ import {
   validateBarcodeInput,
   BarCodeType,
   BarcodeSchema,
-  barCodeType2Bcid,
-  mapHexColorForBwipJsLib,
+  createBarCode,
 } from '@pdfme/common';
 import { ZOOM } from '../../constants';
+import { blobToDataURL } from '../../helper';
 import { SchemaUIProps } from './SchemaUI';
-import bwipjs from 'bwip-js';
 
 const SampleBarcode = ({ schema, imageSrc }: { schema: BarcodeSchema; imageSrc: string }) => (
   <img
@@ -45,32 +44,21 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
   const [isBarcodeValid, setIsBarcodeValid] = useState<boolean>(true);
 
   const { schema, value } = props;
-  const { type, height, width, barcolor, backgroundcolor, textcolor } = schema;
 
   useEffect(() => {
-    const canvas = document.createElement('canvas');
-    const barcodeType = barCodeType2Bcid(type);
+    createBarCode(
+      Object.assign(schema, { type: schema.type as BarCodeType, input: value })
+    ).then((imageBuf) =>
+      new Blob([new Uint8Array(imageBuf)], { type: 'image/png' }))
+      .then(blobToDataURL)
+      .then((dataUrl) => {
+        setImageSrc(dataUrl);
+        setIsBarcodeValid(true);
+      }).catch(() => {
+        setIsBarcodeValid(false);
+      })
 
-    try {
-      // TODO: https://github.com/pdfme/pdfme/pull/256#discussion_r1322255359
-      bwipjs.toCanvas(canvas, {
-        bcid: barcodeType,
-        scale: 1,
-        text: value,
-        includetext: true,
-        textxalign: 'center',
-        height,
-        width,
-        barcolor: mapHexColorForBwipJsLib(barcolor, '000000'),
-        backgroundcolor: mapHexColorForBwipJsLib(backgroundcolor, 'ffffff'),
-        textcolor: mapHexColorForBwipJsLib(textcolor, '000000'),
-      });
-      setImageSrc(canvas.toDataURL('image/png'));
-      setIsBarcodeValid(true);
-    } catch (error) {
-      setIsBarcodeValid(false);
-    }
-  }, [type, height, width, barcolor, backgroundcolor, value, isBarcodeValid]);
+  }, [schema.type, schema.height, schema.width, schema.barcolor, schema.backgroundcolor, value, isBarcodeValid]);
 
   return validateBarcodeInput(schema.type as BarCodeType, value) && isBarcodeValid ? (
     <SampleBarcode schema={schema} imageSrc={imageSrc} />

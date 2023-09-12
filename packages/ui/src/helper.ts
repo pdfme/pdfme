@@ -196,6 +196,14 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
+export const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onloadend = () => resolve(reader.result as string);
+  reader.onerror = reject;
+  reader.readAsDataURL(blob);
+})
+
+
 const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();

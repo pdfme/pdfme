@@ -1,48 +1,10 @@
 import {
-    b64toUint8Array,
+    createBarCode,
     validateBarcodeInput,
     BarCodeType,
-    barCodeType2Bcid,
-    mapHexColorForBwipJsLib,
 } from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
-import bwipjs, { ToBufferOptions } from 'bwip-js';
-import { Buffer } from 'buffer';
-
-
-export const createBarCode = async (arg: {
-    type: BarCodeType;
-    input: string;
-    width: number;
-    height: number;
-    backgroundcolor?: string;
-    barcolor?: string;
-    textcolor?: string;
-}): Promise<Buffer> => {
-    const { type, input, width, height, backgroundcolor, barcolor, textcolor } = arg;
-    const bcid = barCodeType2Bcid(type);
-    const includetext = true;
-    const scale = 5;
-    const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
-
-    if (backgroundcolor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundcolor);
-    if (barcolor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barcolor);
-    if (textcolor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textcolor);
-
-    let res: Buffer;
-
-    if (typeof window !== 'undefined') {
-        const canvas = document.createElement('canvas');
-        bwipjs.toCanvas(canvas, bwipjsArg);
-        const dataUrl = canvas.toDataURL('image/png');
-        res = b64toUint8Array(dataUrl).buffer as Buffer;
-    } else {
-        res = await bwipjs.toBuffer(bwipjsArg);
-    }
-
-    return res;
-};
 
 export const barcodeRender = async (arg: RenderProps) => {
     const { input, templateSchema, pdfDoc, page, _cache } = arg;
