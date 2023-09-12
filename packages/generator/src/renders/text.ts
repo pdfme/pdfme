@@ -42,7 +42,7 @@ const getFontProp = async ({ input, font, schema }: { input: string, font: Font,
   return { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing };
 };
 
-const textRenderer = async (arg: RenderProps) => {
+export const renderText = async (arg: RenderProps) => {
   const { input, pdfDoc, page, options } = arg;
   const templateSchema = arg.templateSchema as TextSchema;
 
@@ -112,5 +112,3 @@ const textRenderer = async (arg: RenderProps) => {
     });
   });
 };
-
-export default textRenderer;

@@ -2,7 +2,7 @@ import type { RenderProps } from "../types"
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 
 
-const imageRenderer = async (arg: RenderProps) => {
+export const renderImage = async (arg: RenderProps) => {
     const { input, templateSchema, pdfDoc, page, _cache } = arg;
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
@@ -22,4 +22,3 @@ const imageRenderer = async (arg: RenderProps) => {
     }
     page.drawImage(image, opt);
 }
-export default imageRenderer;

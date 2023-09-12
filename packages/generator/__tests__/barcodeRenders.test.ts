@@ -1,4 +1,4 @@
-import { createBarCode } from '../src/renderers/barcodeRenderers';
+import { createBarCode } from '../src/renders/barcodes';
 import jsQR, { QRCode } from 'jsqr';
 import { PNG } from 'pngjs';
 

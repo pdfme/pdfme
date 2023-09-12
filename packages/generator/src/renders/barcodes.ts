@@ -36,7 +36,7 @@ export const createBarCode = async (arg: {
     return res;
 };
 
-const barcodeRenderer = async (arg: RenderProps) => {
+export const barcodeRender = async (arg: RenderProps) => {
     const { input, templateSchema, pdfDoc, page, _cache } = arg;
     if (!validateBarcodeInput(templateSchema.type as BarCodeType, input)) return;
 
@@ -60,4 +60,3 @@ const barcodeRenderer = async (arg: RenderProps) => {
 
     page.drawImage(image, opt);
 }
-export default barcodeRenderer;

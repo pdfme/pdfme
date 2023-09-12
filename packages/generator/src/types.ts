@@ -19,5 +19,5 @@ export interface RenderProps {
 }
 
 export interface Renderer {
-    [key: string]: { renderer: (arg: RenderProps) => Promise<void> } | undefined;
+    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
 }

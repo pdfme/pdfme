@@ -2,7 +2,7 @@ import { PDFDocument } from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import type { GenerateProps, Template, } from '@pdfme/common';
 import { checkGenerateProps, } from '@pdfme/common';
-import buildInRenderer from './renderers';
+import builtInRenderer from './builtInRenderer';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
 import { TOOL_NAME } from './constants';
 
@@ -30,6 +30,8 @@ const generate = async (props: GenerateProps) => {
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
 
+  // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
+  const rendererRegistry = Object.assign(builtInRenderer, {});
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {
@@ -53,13 +55,11 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        // TODO ↓ If a Custom Schema is defined, it can undergo custom rendering processes by merging it with the renderer object.
-        // const renderer = Object.assign(buildInRenderer, options.schema);
-        const rendererObj = buildInRenderer[templateSchema.type];
-        if (!rendererObj) {
+        const renderer = rendererRegistry[templateSchema.type];
+        if (!renderer) {
           throw new Error(`Renderer for type ${templateSchema.type} not found`);
         }
-        await rendererObj.renderer({ input, templateSchema, pdfDoc, page, options, _cache });
+        await renderer.render({ input, templateSchema, pdfDoc, page, options, _cache });
       }
     }
   }
