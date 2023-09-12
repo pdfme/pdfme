@@ -1,4 +1,10 @@
-import { b64toUint8Array, validateBarcodeInput, BarCodeType } from '@pdfme/common';
+import {
+    b64toUint8Array,
+    validateBarcodeInput,
+    BarCodeType,
+    barCodeType2Bcid,
+    mapHexColorForBwipJsLib,
+} from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 import bwipjs, { ToBufferOptions } from 'bwip-js';
@@ -10,17 +16,19 @@ export const createBarCode = async (arg: {
     input: string;
     width: number;
     height: number;
-    backgroundColor?: string;
+    backgroundcolor?: string;
+    barcolor?: string;
+    textcolor?: string;
 }): Promise<Buffer> => {
-    const { type, input, width, height, backgroundColor } = arg;
-    const bcid = type === 'nw7' ? 'rationalizedCodabar' : type;
+    const { type, input, width, height, backgroundcolor, barcolor, textcolor } = arg;
+    const bcid = barCodeType2Bcid(type);
     const includetext = true;
     const scale = 5;
     const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
 
-    if (backgroundColor) {
-        bwipjsArg.backgroundcolor = backgroundColor;
-    }
+    if (backgroundcolor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundcolor);
+    if (barcolor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barcolor);
+    if (textcolor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textcolor);
 
     let res: Buffer;
 
