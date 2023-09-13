@@ -91,6 +91,29 @@ const dictTh: { [key in keyof DictEn]: string } = {
   bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
 };
 
+const dictIt = {
+  cancel: 'Annulla',
+  field: 'Campo',
+  fieldName: 'Nome',
+  require: 'Richiesto',
+  uniq: 'Univoco',
+  inputExample: 'Testo di esempio',
+  edit: 'Modifica',
+  plsInputName: 'Inserisci il nome per favore',
+  fieldMustUniq: 'Il nome del campo non è univoco',
+  notUniq: '(Nome non univoco)',
+  noKeyName: 'Nessun nome',
+  fieldsList: 'Lista campi',
+  addNewField: 'Aggiungi un campo',
+  editField: 'Modifica campo',
+  type: 'Tipo',
+  errorOccurred: 'Riscontrato errore',
+  errorBulkUpdateFieldName:
+    'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
+  commitBulkUpdateFieldName: 'Salva cambiamenti',
+  bulkUpdateFieldName: 'Modifica nomi campi in blocco',
+};
+
 const i18n = (lang: Lang, key: keyof DictEn) => {
   switch (lang) {
     case 'th':
@@ -101,6 +124,9 @@ const i18n = (lang: Lang, key: keyof DictEn) => {
 
     case 'ja':
       return dictJa[key];
+
+    case 'it':
+      return dictIt[key];
 
     default:
       return dictEn[key];
