@@ -224,7 +224,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (!ic) return;
     ic.focus();
     if (ic.type !== 'file') {
-      // TODO これは各Rendererに任せたい
+      // FIXME これは各Rendererに任せたい
       ic.setSelectionRange(ic.value.length, ic.value.length);
     }
   };
@@ -327,7 +327,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             }}
             stopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
-            // TODO inputRef を削除したい
+            // FIXME inputRef を削除したい
             ref={inputRef}
           />
         )}

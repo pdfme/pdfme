@@ -1,4 +1,8 @@
-import React, { useEffect, useContext, forwardRef, Ref, ReactNode, useRef } from 'react';
+import React, { useEffect, useContext, RefObject, forwardRef, Ref, ReactNode, useRef } from 'react';
+import { isTextSchema, isImageSchema, isBarcodeSchema } from '@pdfme/common';
+import TextSchema from './TextSchema';
+import ImageSchema from './ImageSchema';
+import BarcodeSchema from './BarcodeSchema';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../constants';
 import { RendererContext, OptionsContext } from '../../contexts';
 import { SchemaUIProps } from "../../types"
@@ -42,12 +46,17 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
 
   const _ref = useRef<HTMLDivElement>(null);
 
+  const r = {
+    [props.editable ? 'ref' : '']: ref as RefObject<HTMLTextAreaElement | HTMLInputElement>,
+  };
+
   useEffect(() => {
     if (_ref.current && schema.type) {
       const schemaType = schema.type as string;
       const renderer = rendererRegistry[schemaType];
       if (!renderer) {
-        //  TODO fallback to default renderer or Error
+        //  FIXME fallback to default renderer or Error
+        console.error(`Renderer for type ${schema.type} not found`);
         return;
       }
 
@@ -55,13 +64,12 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
         value: schema.data,
         schema,
         rootElement: _ref.current,
-        editing: editable, // TODO editingが正しく動かないはず
+        editing: editable, // FIXME editingが正しく動かないはず
         onChange: editable ? onChange : undefined,
         stopEditing: editable ? stopEditing : undefined,
         tabIndex,
         placeholder,
         options,
-        // 文平さんにメール
       });
     }
     return () => {
@@ -75,8 +83,11 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
   return (
     <Wrapper {...props}>
       <div ref={_ref}></div>
+      {/* {isTextSchema(schema) && <TextSchema {...r} {...props} schema={schema} />}
+      {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
+      {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />} */}
     </Wrapper>
   );
 };
-// TODO forwardRefは不要にしたい
+// FIXME forwardRefは不要にしたい
 export default forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(SchemaUI);

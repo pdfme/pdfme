@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
+import builtInRenderer from './builtInRenderer';
 import {
   Template,
   Size,
@@ -66,7 +67,7 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private renderer: Renderer = {};
+  private renderer: Renderer = builtInRenderer;
 
   private options = {};
 
