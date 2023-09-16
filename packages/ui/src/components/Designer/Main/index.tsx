@@ -6,7 +6,6 @@ import React, {
   useEffect,
   forwardRef,
   useCallback,
-  useContext,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
@@ -20,7 +19,6 @@ import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
-import { FontContext } from '../../../contexts';
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -100,7 +98,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
-  const font = useContext(FontContext);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -227,6 +224,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (!ic) return;
     ic.focus();
     if (ic.type !== 'file') {
+      // TODO これは各Rendererに任せたい
       ic.setSelectionRange(ic.value.length, ic.value.length);
     }
   };
@@ -327,8 +325,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
-            onStopEditing={() => setEditing(false)}
+            stopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
+            // TODO inputRef を削除したい
             ref={inputRef}
           />
         )}

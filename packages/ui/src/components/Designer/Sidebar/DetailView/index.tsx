@@ -37,14 +37,11 @@ const DetailView = (
         <Divider />
         <PositionAndSizeEditor {...props} />
         <Divider />
-        {isBarcodeSchema(activeSchema) && ( 
+        {isBarcodeSchema(activeSchema) && (
           <BarcodePropEditor {...props} />
         )}
         {isTextSchema(activeSchema) && (
-          <>
-            <TextPropEditor {...props} />
-            <Divider />
-          </>
+          <TextPropEditor {...props} />
         )}
         <ExampleInputEditor {...props} />
       </div>

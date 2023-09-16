@@ -1,3 +1,4 @@
+// TODO packages/ui/src/renders/barcodes.ts
 import React, { forwardRef, Ref, useEffect, useState } from 'react';
 import {
   validateBarcodeInput,
@@ -7,7 +8,7 @@ import {
 } from '@pdfme/common';
 import { ZOOM } from '../../constants';
 import { blobToDataURL } from '../../helper';
-import { SchemaUIProps } from './SchemaUI';
+import { SchemaUIProps } from "../../types"
 
 const SampleBarcode = ({ schema, imageSrc }: { schema: BarcodeSchema; imageSrc: string }) => (
   <img
@@ -70,7 +71,7 @@ const BarcodePreview = (props: { schema: BarcodeSchema; value: string }) => {
 type Props = SchemaUIProps & { schema: BarcodeSchema };
 
 const BarcodeSchemaUI = (
-  { schema, editable, placeholder, tabIndex, onChange, onStopEditing }: Props,
+  { schema, editable, placeholder, tabIndex, onChange, stopEditing }: Props,
   ref: Ref<HTMLInputElement>
 ) => {
   const value = schema.data;
@@ -110,7 +111,7 @@ const BarcodeSchemaUI = (
           style={style}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={onStopEditing}
+          onBlur={stopEditing}
         />
       ) : (
         <div style={style}>

@@ -40,17 +40,17 @@ export const calcX = (x: number, alignment: Alignment, boxWidth: number, textWid
 export const calcY = (y: number, pageHeight: number, itemHeight: number) => pageHeight - mm2pt(y) - itemHeight;
 
 export const renderBackgroundColor = (arg: {
-  templateSchema: TextSchema;
+  schema: TextSchema;
   page: PDFPage;
   pageHeight: number;
 }) => {
-  const { templateSchema, page, pageHeight } = arg;
-  if (!templateSchema.backgroundColor) return;
-  const { width, height } = convertSchemaDimensionsToPt(templateSchema);
-  const color = hex2RgbColor(templateSchema.backgroundColor);
+  const { schema, page, pageHeight } = arg;
+  if (!schema.backgroundColor) return;
+  const { width, height } = convertSchemaDimensionsToPt(schema);
+  const color = hex2RgbColor(schema.backgroundColor);
   page.drawRectangle({
-    x: calcX(templateSchema.position.x, 'left', width, width),
-    y: calcY(templateSchema.position.y, pageHeight, height),
+    x: calcX(schema.position.x, 'left', width, width),
+    y: calcY(schema.position.y, pageHeight, height),
     width,
     height,
     color,
@@ -65,4 +65,4 @@ export const convertSchemaDimensionsToPt = (schema: Schema) => {
   return { width, height, rotate };
 };
 
-export const getCacheKey = (templateSchema: Schema, input: string) => `${templateSchema.type}${input}`;
+export const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;

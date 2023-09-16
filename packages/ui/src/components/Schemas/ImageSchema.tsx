@@ -1,6 +1,7 @@
+// TODO packages/ui/src/renders/image.ts
 import React, { useState, forwardRef, ChangeEvent, Ref } from 'react';
 import { ImageSchema } from '@pdfme/common';
-import { SchemaUIProps } from './SchemaUI';
+import { SchemaUIProps } from "../../types"
 import { readFiles } from '../../helper';
 import { ZOOM } from '../../constants';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -8,7 +9,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 type Props = SchemaUIProps & { schema: ImageSchema };
 
 const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
-  const { editable, placeholder, tabIndex, schema, onChange, onStopEditing } = props;
+  const { editable, placeholder, tabIndex, schema, onChange, stopEditing } = props;
   const [fileName, setFileName] = useState<string>('');
   const hasData = Boolean(schema.data);
 
@@ -75,7 +76,7 @@ const ImageSchemaUI = (props: Props, ref: Ref<HTMLInputElement>) => {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             readFiles(event.target.files, 'dataURL').then((result) => onChange(result as string))
           }
-          onBlur={onStopEditing}
+          onBlur={stopEditing}
           type="file"
           accept="image/jpeg, image/png"
         />

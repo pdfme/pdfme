@@ -1,3 +1,4 @@
+// TODO packages/ui/src/renders/text.ts
 import React, { useContext, forwardRef, Ref, useState, useEffect } from 'react';
 import {
   DEFAULT_FONT_SIZE,
@@ -14,7 +15,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from '@pdfme/common';
-import { SchemaUIProps } from './SchemaUI';
+import { SchemaUIProps } from "../../types"
 import { ZOOM } from '../../constants';
 import { FontContext } from '../../contexts';
 
@@ -33,7 +34,7 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
 type Props = SchemaUIProps & { schema: TextSchema };
 
 const TextSchemaUI = (
-  { schema, editable, placeholder, tabIndex, onChange, onStopEditing }: Props,
+  { schema, editable, placeholder, tabIndex, onChange, stopEditing }: Props,
   ref: Ref<HTMLTextAreaElement>
 ) => {
   const font = useContext(FontContext);
@@ -149,7 +150,7 @@ const TextSchemaUI = (
         tabIndex={tabIndex}
         style={{ ...textareaStyle, ...fontStyles }}
         onChange={(e) => onChange(e.target.value)}
-        onBlur={onStopEditing}
+        onBlur={stopEditing}
         value={schema.data}
       ></textarea>
     </div>

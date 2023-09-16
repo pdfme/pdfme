@@ -47,19 +47,19 @@ const generate = async (props: GenerateProps) => {
       drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schema = template.schemas[j];
-        const templateSchema = schema[key];
-        const input = inputObj[key];
+        const schemaObj = template.schemas[j];
+        const schema = schemaObj[key];
+        const value = inputObj[key];
 
-        if (!templateSchema || !input) {
+        if (!schema || !value) {
           continue;
         }
 
-        const renderer = rendererRegistry[templateSchema.type];
+        const renderer = rendererRegistry[schema.type];
         if (!renderer) {
-          throw new Error(`Renderer for type ${templateSchema.type} not found`);
+          throw new Error(`Renderer for type ${schema.type} not found`);
         }
-        await renderer.render({ input, templateSchema, pdfDoc, page, options, _cache });
+        await renderer.render({ value, schema, pdfDoc, page, options, _cache });
       }
     }
   }

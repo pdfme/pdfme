@@ -1,18 +1,7 @@
-import React, { useEffect, forwardRef, RefObject, Ref, ReactNode, useRef } from 'react';
-import { SchemaForUI, isTextSchema, isImageSchema, isBarcodeSchema } from '@pdfme/common';
+import React, { useEffect, useContext, forwardRef, Ref, ReactNode, useRef } from 'react';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../constants';
-import TextSchema from './TextSchema';
-import ImageSchema from './ImageSchema';
-import BarcodeSchema from './BarcodeSchema';
-
-export interface SchemaUIProps {
-  schema: SchemaForUI;
-  editable: boolean;
-  onChange: (value: string) => void;
-  onStopEditing: () => void;
-  tabIndex?: number;
-  placeholder?: string;
-}
+import { RendererContext, OptionsContext } from '../../contexts';
+import { SchemaUIProps } from "../../types"
 
 type Props = SchemaUIProps & {
   outline: string;
@@ -45,75 +34,34 @@ const Wrapper = ({
   </div>
 );
 
-interface RenderProps {
-  rootElement: HTMLElement,
-  callback: (message: string) => void
-}
-interface Renderer {
-  [key: string]: { renderer: (arg: RenderProps) => void } | undefined;
-}
-const buildInRenderer: Renderer = {
-  // TODO 
-  text: {
-    renderer: ({ rootElement, callback }) => {
-      const button = document.createElement('button');
-      button.textContent = 'text';
-      button.addEventListener('click', () => {
-        alert('Vanilla Button Clicked');
-        callback('Vanilla Button Clicked');
-      });
-      rootElement.appendChild(button);
-    }
-  },
-  image: {
-    renderer: ({ rootElement, callback }) => {
-      const button = document.createElement('button');
-      button.textContent = 'image';
-      button.addEventListener('click', () => {
-        alert('Vanilla Button Clicked');
-        callback('Vanilla Button Clicked');
-      });
-      rootElement.appendChild(button);
-    }
-  },
-  qrcode: {
-    renderer: ({ rootElement, callback }) => {
-      const button = document.createElement('button');
-      button.textContent = 'qrcode';
-      button.addEventListener('click', () => {
-        alert('Vanilla Button Clicked');
-        callback('Vanilla Button Clicked');
-      });
-      rootElement.appendChild(button);
-    }
-  }
-}
-
 const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {
-  const { schema, editable } = props;
-  const r = {
-    [editable ? 'ref' : '']: ref as RefObject<HTMLTextAreaElement | HTMLInputElement>,
-  };
+  const rendererRegistry = useContext(RendererContext);
+  const options = useContext(OptionsContext);
+
+  const { schema, editable, onChange, stopEditing, tabIndex, placeholder } = props;
+
   const _ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (_ref.current && schema.type) {
       const schemaType = schema.type as string;
-      const rendererObj = buildInRenderer[schemaType];
-      if (!rendererObj) {
-        //  TODO fallback to default renderer
+      const renderer = rendererRegistry[schemaType];
+      if (!renderer) {
+        //  TODO fallback to default renderer or Error
         return;
       }
-      const p = {
-        ...r,
-        ...props,
+
+      renderer.render({
+        value: schema.data,
         schema,
-      }
-      rendererObj.renderer({
         rootElement: _ref.current,
-        callback: (message) => {
-          console.log('message: ', message)
-        }
+        editing: editable, // TODO editingが正しく動かないはず
+        onChange: editable ? onChange : undefined,
+        stopEditing: editable ? stopEditing : undefined,
+        tabIndex,
+        placeholder,
+        options,
+        // 文平さんにメール
       });
     }
     return () => {
@@ -127,10 +75,8 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
   return (
     <Wrapper {...props}>
       <div ref={_ref}></div>
-      {/* {isTextSchema(schema) && <TextSchema {...r} {...props} schema={schema} />}
-      {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
-      {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />} */}
     </Wrapper>
   );
 };
+// TODO forwardRefは不要にしたい
 export default forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(SchemaUI);

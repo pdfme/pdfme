@@ -31,8 +31,8 @@ import {
   convertSchemaDimensionsToPt
 } from '../renderUtils'
 
-const getFontProp = async ({ input, font, schema }: { input: string, font: Font, schema: TextSchema }) => {
-  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
+const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
+  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input: value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;
@@ -43,25 +43,25 @@ const getFontProp = async ({ input, font, schema }: { input: string, font: Font,
 };
 
 export const renderText = async (arg: RenderProps) => {
-  const { input, pdfDoc, page, options } = arg;
-  const templateSchema = arg.templateSchema as TextSchema;
+  const { value, pdfDoc, page, options } = arg;
+  const schema = arg.schema as TextSchema;
 
   const { font = getDefaultFont() } = options;
 
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font }),
-    getFontKitFont(templateSchema, font),
-    getFontProp({ input, font, schema: templateSchema })
+    getFontKitFont(schema, font),
+    getFontProp({ value, font, schema: schema })
   ])
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
-  const pdfFontValue = pdfFontObj[templateSchema.fontName ? templateSchema.fontName : getFallbackFontName(font)];
+  const pdfFontValue = pdfFontObj[schema.fontName ? schema.fontName : getFallbackFontName(font)];
 
   const pageHeight = page.getHeight();
-  renderBackgroundColor({ templateSchema, page, pageHeight });
+  renderBackgroundColor({ schema, page, pageHeight });
 
-  const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
+  const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
@@ -77,8 +77,8 @@ export const renderText = async (arg: RenderProps) => {
   };
 
   let lines: string[] = [];
-  input.split(/\r|\n|\r\n/g).forEach((inputLine) => {
-    lines = lines.concat(getSplittedLines(inputLine, fontWidthCalcValues));
+  value.split(/\r|\n|\r\n/g).forEach((line) => {
+    lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
   });
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down
@@ -100,8 +100,8 @@ export const renderText = async (arg: RenderProps) => {
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
     page.drawText(line, {
-      x: calcX(templateSchema.position.x, alignment, width, textWidth),
-      y: calcY(templateSchema.position.y, pageHeight, yOffset) - rowYOffset,
+      x: calcX(schema.position.x, alignment, width, textWidth),
+      y: calcY(schema.position.y, pageHeight, yOffset) - rowYOffset,
       rotate,
       size: fontSize,
       color,

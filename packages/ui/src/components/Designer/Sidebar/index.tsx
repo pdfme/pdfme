@@ -34,8 +34,8 @@ const Sidebar = (props: SidebarProps) => {
   const { height, size, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
-  const fonts = useContext(FontContext);
-  const fallbackFont = getFallbackFontName(fonts);
+  const font = useContext(FontContext);
+  const fallbackFont = getFallbackFontName(font);
   const [open, setOpen] = useState(true);
 
   const getActiveSchemas = () => {
