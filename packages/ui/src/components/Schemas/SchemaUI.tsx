@@ -78,8 +78,8 @@ const SchemaUI = (props: Props) => {
   return (
     <Wrapper {...props}>
       <div ref={ref}></div>
-      {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
-      {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />} */}
+      {/* {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />} */}
+      {/* {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />}  */}
     </Wrapper>
   );
 };

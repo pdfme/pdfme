@@ -95,7 +95,7 @@ export const renderText = async (arg: RenderProps) => {
         letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
         lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
         textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-        // whiteSpace: 'pre-wrap',
+        whiteSpace: 'pre-wrap',
         wordBreak: 'break-word',
     };
 
@@ -131,13 +131,8 @@ export const renderText = async (arg: RenderProps) => {
             paddingTop: topAdjustment + 'px',
         };
         Object.assign(div.style, divStyle);
-        // FIXME Empty characters are not rendered
         div.innerHTML = value.split('').map((l: string, i: number) => (
-            l === '\n' ?
-                '<br />' :
-                `<span style="display: inline-block; letter-spacing:${String(value).length === i + 1 ? 0 : 'inherit'};">
-            ${l ?? ' '}
-            </span>`
+            `<span style="letter-spacing:${String(value).length === i + 1 ? 0 : 'inherit'};">${l}</span>`
         )).join('');
 
         container.appendChild(div);
