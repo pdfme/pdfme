@@ -1,6 +1,5 @@
-import React, { useEffect, useContext, RefObject, forwardRef, Ref, ReactNode, useRef } from 'react';
-import { isTextSchema, isImageSchema, isBarcodeSchema } from '@pdfme/common';
-import TextSchema from './TextSchema';
+import React, { useEffect, useContext, ReactNode, useRef } from 'react';
+import { isImageSchema, isBarcodeSchema } from '@pdfme/common';
 import ImageSchema from './ImageSchema';
 import BarcodeSchema from './BarcodeSchema';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../../constants';
@@ -38,24 +37,20 @@ const Wrapper = ({
   </div>
 );
 
-const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>) => {
+const SchemaUI = (props: Props) => {
   const rendererRegistry = useContext(RendererContext);
   const options = useContext(OptionsContext);
 
   const { schema, editable, onChange, stopEditing, tabIndex, placeholder } = props;
 
-  const _ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const r = {
-    [props.editable ? 'ref' : '']: ref as RefObject<HTMLTextAreaElement | HTMLInputElement>,
-  };
 
   useEffect(() => {
-    if (_ref.current && schema.type) {
+    if (ref.current && schema.type) {
       const schemaType = schema.type as string;
       const renderer = rendererRegistry[schemaType];
       if (!renderer) {
-        //  FIXME fallback to default renderer or Error
         console.error(`Renderer for type ${schema.type} not found`);
         return;
       }
@@ -63,31 +58,29 @@ const SchemaUI = (props: Props, ref: Ref<HTMLTextAreaElement | HTMLInputElement>
       renderer.render({
         value: schema.data,
         schema,
-        rootElement: _ref.current,
-        editing: editable, // FIXME editingが正しく動かないはず
+        rootElement: ref.current,
+        editing: editable, // FIXME editingが正しく動かないはず というかeditingという名前がよくない mode という名前がいいかも
         onChange: editable ? onChange : undefined,
-        stopEditing: editable ? stopEditing : undefined,
+        stopEditing: editable ? stopEditing : undefined, // FIXME これもchangeModeとかにしたい
         tabIndex,
         placeholder,
         options,
       });
     }
     return () => {
-      if (_ref.current) {
-        _ref.current.innerHTML = '';
+      if (ref.current) {
+        ref.current.innerHTML = '';
       }
     };
-  }, [schema.type]);
+  }, [JSON.stringify(schema), editable, options]);
 
 
   return (
     <Wrapper {...props}>
-      <div ref={_ref}></div>
-      {/* {isTextSchema(schema) && <TextSchema {...r} {...props} schema={schema} />}
+      <div ref={ref}></div>
       {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />}
       {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />} */}
     </Wrapper>
   );
 };
-// FIXME forwardRefは不要にしたい
-export default forwardRef<HTMLTextAreaElement | HTMLInputElement, Props>(SchemaUI);
+export default SchemaUI

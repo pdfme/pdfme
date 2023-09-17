@@ -18,7 +18,6 @@ export interface RenderProps {
 
     editing?: boolean;
     onChange?: (value: string) => void;
-    onStartEditing?: () => void;
     stopEditing?: () => void;
 
     tabIndex?: number;
@@ -29,5 +28,5 @@ export interface RenderProps {
 }
 
 export interface Renderer {
-    [key: string]: { render: (arg: RenderProps) => void } | undefined;
+    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
 }

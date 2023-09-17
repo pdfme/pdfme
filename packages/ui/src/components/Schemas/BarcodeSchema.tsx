@@ -1,4 +1,3 @@
-// FIXME packages/ui/src/renders/barcodes.ts
 import React, { forwardRef, Ref, useEffect, useState } from 'react';
 import {
   validateBarcodeInput,

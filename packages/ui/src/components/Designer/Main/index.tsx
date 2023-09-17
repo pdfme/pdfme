@@ -94,7 +94,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { onEdit, changeSchemas, removeSchemas, onChangeHoveringSchemaId, paperRefs } = props;
 
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
@@ -220,13 +219,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const onClickMoveable = (e: OnClick) => {
     e.inputEvent.stopPropagation();
     setEditing(true);
-    const ic = inputRef.current;
-    if (!ic) return;
-    ic.focus();
-    if (ic.type !== 'file') {
-      // FIXME これは各Rendererに任せたい
-      ic.setSelectionRange(ic.value.length, ic.value.length);
-    }
   };
 
   return (
@@ -327,8 +319,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             }}
             stopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
-            // FIXME inputRef を削除したい
-            ref={inputRef}
           />
         )}
       />

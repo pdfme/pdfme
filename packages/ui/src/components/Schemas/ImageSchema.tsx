@@ -1,4 +1,3 @@
-// FIXME packages/ui/src/renders/image.ts
 import React, { useState, forwardRef, ChangeEvent, Ref } from 'react';
 import { ImageSchema } from '@pdfme/common';
 import { SchemaUIProps } from "../../types"
