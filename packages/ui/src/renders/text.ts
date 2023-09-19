@@ -33,7 +33,7 @@ export const renderText = async (arg: RenderProps) => {
     const {
         value,
         rootElement,
-        editing,
+        mode,
         onChange,
         stopEditing,
         tabIndex,
@@ -97,7 +97,7 @@ export const renderText = async (arg: RenderProps) => {
         wordBreak: 'break-word',
     };
 
-    if (editing) {
+    if (mode === 'form') {
         const textarea = document.createElement('textarea');
         const textareaStyle: CSS.Properties = {
             padding: 0,

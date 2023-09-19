@@ -14,7 +14,7 @@ import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
-import SchemaUI from '../../SchemaUI';
+import Renderer from '../../Renderer';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
@@ -309,11 +309,11 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           </>
         )}
         renderSchema={({ schema }) => (
-          <SchemaUI
+          <Renderer
             key={schema.id}
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-            editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
+            mode={editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'form' : 'viewer'}
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}

@@ -53,7 +53,7 @@ export const renderBarcode = async (arg: RenderProps) => {
     const {
         value,
         rootElement,
-        editing,
+        mode,
         onChange,
         stopEditing,
         tabIndex,
@@ -72,7 +72,8 @@ export const renderBarcode = async (arg: RenderProps) => {
     }
     Object.assign(container.style, containerStyle);
     rootElement.appendChild(container);
-    if (editing) {
+    const isForm = mode === 'form';
+    if (isForm) {
         const input = document.createElement('input');
         const inputStyle: CSS.Properties = {
             ...fullSize,
@@ -80,7 +81,7 @@ export const renderBarcode = async (arg: RenderProps) => {
             textAlign: 'center',
             fontSize: '1rem',
             color: '#000',
-            backgroundColor: editing || value ? 'rgb(242 244 255 / 75%)' : 'none',
+            backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
             border: 'none',
             display: 'flex',
             alignItems: 'center',

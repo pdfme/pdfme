@@ -10,12 +10,14 @@ export const renderImage = async (arg: RenderProps) => {
     const {
         value,
         rootElement,
-        editing,
+        mode,
         onChange,
         stopEditing,
         tabIndex,
         placeholder,
     } = arg;
+    const isForm = mode === 'form';
+
     const schema = arg.schema as ImageSchema;
 
     const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
@@ -28,7 +30,7 @@ export const renderImage = async (arg: RenderProps) => {
     }
     Object.assign(container.style, containerStyle);
     container.addEventListener('click', (e) => {
-        if (editing) {
+        if (isForm) {
             e.stopPropagation();
         }
     });
@@ -44,7 +46,7 @@ export const renderImage = async (arg: RenderProps) => {
     }
 
     // remove button
-    if (value && editing) {
+    if (value && isForm) {
         const button = document.createElement('button');
         button.textContent = 'x';
         const buttonStyle: CSS.Properties = {
@@ -74,10 +76,10 @@ export const renderImage = async (arg: RenderProps) => {
     const label = document.createElement('label');
     const labelStyle: CSS.Properties = {
         ...fullSize,
-        display: editing ? 'flex' : 'none',
+        display: isForm ? 'flex' : 'none',
         position: 'absolute',
         top: 0,
-        backgroundColor: editing || value ? 'rgb(242 244 255 / 75%)' : 'none',
+        backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
         cursor: 'pointer',
     }
     Object.assign(label.style, labelStyle);

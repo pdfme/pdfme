@@ -1,30 +1,26 @@
 
-import type { UIOptions, Schema, } from '@pdfme/common';
-import { SchemaForUI } from '@pdfme/common';
+import type { UIOptions, SchemaForUI } from '@pdfme/common';
 
-export interface SchemaUIProps {
+interface RenderBaseProps {
     schema: SchemaForUI;
-    editable: boolean;
-    onChange: (value: string) => void;
-    stopEditing: () => void;
+    mode: 'viewer' | 'form';
     tabIndex?: number;
     placeholder?: string;
-}
-
-export interface RenderProps {
-    value: string;
-    schema: Schema;
-    rootElement: HTMLDivElement,
-
-    editing?: boolean;
-    onChange?: (value: string) => void;
     stopEditing?: () => void;
 
-    tabIndex?: number;
-    placeholder?: string;
+}
 
+export type SchemaUIProps = RenderBaseProps & {
+    onChange: (value: string) => void;
+    outline: string;
+    onChangeHoveringSchemaId?: (id: string | null) => void;
+}
+
+export type RenderProps = RenderBaseProps & {
+    onChange?: (value: string) => void;
+    value: string;
+    rootElement: HTMLDivElement,
     options: UIOptions;
-
 }
 
 export interface Renderer {

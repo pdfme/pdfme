@@ -3,17 +3,12 @@ import { ZOOM, SELECTABLE_CLASSNAME } from '../constants';
 import { RendererContext, OptionsContext } from '../contexts';
 import { SchemaUIProps } from "../types"
 
-type Props = SchemaUIProps & {
-  outline: string;
-  onChangeHoveringSchemaId?: (id: string | null) => void;
-};
-
 const Wrapper = ({
   children,
   outline,
   onChangeHoveringSchemaId,
   schema,
-}: Props & { children: ReactNode }) => (
+}: SchemaUIProps & { children: ReactNode }) => (
   <div
     title={schema.key}
     onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
@@ -34,11 +29,11 @@ const Wrapper = ({
   </div>
 );
 
-const SchemaUI = (props: Props) => {
+const SchemaUI = (props: SchemaUIProps) => {
   const rendererRegistry = useContext(RendererContext);
   const options = useContext(OptionsContext);
 
-  const { schema, editable, onChange, stopEditing, tabIndex, placeholder } = props;
+  const { schema, mode, onChange, stopEditing, tabIndex, placeholder } = props;
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -54,13 +49,15 @@ const SchemaUI = (props: Props) => {
 
       ref.current.innerHTML = '';
 
+      const isForm = mode === 'form';
+
       renderer.render({
         value: schema.data,
         schema,
         rootElement: ref.current,
-        editing: editable, // FIXME editingが正しく動かないはず というかeditingという名前がよくない mode という名前がいいかも
-        onChange: editable ? onChange : undefined,
-        stopEditing: editable ? stopEditing : undefined, // FIXME これもchangeModeとかにしたい
+        mode,
+        onChange: isForm ? onChange : undefined,
+        stopEditing: isForm ? stopEditing : undefined,
         tabIndex,
         placeholder,
         options,
@@ -71,7 +68,7 @@ const SchemaUI = (props: Props) => {
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), editable, options]);
+  }, [JSON.stringify(schema), mode, options]);
 
 
   return (
