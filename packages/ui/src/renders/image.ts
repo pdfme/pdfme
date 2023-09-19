@@ -5,6 +5,7 @@ import type { RenderProps } from "../types"
 import { ZOOM } from '../constants';
 import { readFiles } from '../helper';
 
+const fullSize = { width: '100%', height: '100%' }
 export const renderImage = async (arg: RenderProps) => {
     const {
         value,
@@ -21,9 +22,7 @@ export const renderImage = async (arg: RenderProps) => {
 
     const container = document.createElement('div');
     const containerStyle: CSS.Properties = {
-        width: size.width + 'px',
-        height: size.height + 'px',
-        opacity: value ? 1 : 0.5,
+        ...fullSize,
         backgroundImage: value ? 'none' : `url(${placeholder})`,
         backgroundSize: `${size.width}px ${size.height}px`,
     }
@@ -38,11 +37,7 @@ export const renderImage = async (arg: RenderProps) => {
     // image tag
     if (value) {
         const img = document.createElement('img');
-        const imgStyle: CSS.Properties = {
-            width: size.width + 'px',
-            height: size.height + 'px',
-            borderRadius: 0,
-        }
+        const imgStyle: CSS.Properties = { height: '100%', width: '100%', borderRadius: 0 }
         Object.assign(img.style, imgStyle);
         img.src = value;
         container.appendChild(img);
@@ -78,10 +73,11 @@ export const renderImage = async (arg: RenderProps) => {
     // file input
     const label = document.createElement('label');
     const labelStyle: CSS.Properties = {
+        ...fullSize,
         display: editing ? 'flex' : 'none',
         position: 'absolute',
-        top: '50%',
-        width: '100%',
+        top: 0,
+        backgroundColor: editing || value ? 'rgb(242 244 255 / 75%)' : 'none',
         cursor: 'pointer',
     }
     Object.assign(label.style, labelStyle);
@@ -89,6 +85,8 @@ export const renderImage = async (arg: RenderProps) => {
 
 
     const input = document.createElement('input');
+    const inputStyle: CSS.Properties = { ...fullSize, position: 'absolute', top: '50%' }
+    Object.assign(input.style, inputStyle);
     input.tabIndex = tabIndex || 0;
     input.type = 'file';
     input.accept = 'image/jpeg, image/png';

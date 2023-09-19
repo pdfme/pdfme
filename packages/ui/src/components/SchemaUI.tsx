@@ -1,10 +1,7 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { isImageSchema, isBarcodeSchema } from '@pdfme/common';
-import ImageSchema from './ImageSchema';
-import BarcodeSchema from './BarcodeSchema';
-import { ZOOM, SELECTABLE_CLASSNAME } from '../../constants';
-import { RendererContext, OptionsContext } from '../../contexts';
-import { SchemaUIProps } from "../../types"
+import { ZOOM, SELECTABLE_CLASSNAME } from '../constants';
+import { RendererContext, OptionsContext } from '../contexts';
+import { SchemaUIProps } from "../types"
 
 type Props = SchemaUIProps & {
   outline: string;
@@ -55,6 +52,8 @@ const SchemaUI = (props: Props) => {
         return;
       }
 
+      ref.current.innerHTML = '';
+
       renderer.render({
         value: schema.data,
         schema,
@@ -77,9 +76,7 @@ const SchemaUI = (props: Props) => {
 
   return (
     <Wrapper {...props}>
-      <div ref={ref}></div>
-      {/* {isImageSchema(schema) && <ImageSchema {...r} {...props} schema={schema} />} */}
-      {/* {isBarcodeSchema(schema) && <BarcodeSchema {...r} {...props} schema={schema} />}  */}
+      <div style={{ height: '100%', width: '100%' }} ref={ref} />
     </Wrapper>
   );
 };

@@ -6,7 +6,7 @@ import Root from './Root';
 import Error from './Error';
 import CtlBar from './CtlBar/index';
 import Paper from './Paper';
-import SchemaUI from './Schemas/SchemaUI';
+import SchemaUI from './SchemaUI';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 

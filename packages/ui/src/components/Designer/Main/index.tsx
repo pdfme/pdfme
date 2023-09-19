@@ -14,7 +14,7 @@ import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
-import SchemaUI from '../../Schemas/SchemaUI';
+import SchemaUI from '../../SchemaUI';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';

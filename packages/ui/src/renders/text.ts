@@ -16,7 +16,6 @@ import {
     getDefaultFont,
     getBrowserVerticalFontAdjustments,
 } from '@pdfme/common';
-import { ZOOM } from '../constants';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
     switch (verticalAlignmentValue) {
@@ -72,19 +71,18 @@ export const renderText = async (arg: RenderProps) => {
 
     const container = document.createElement('div');
     const containerStyle: CSS.Properties = {
-        position: 'absolute',
-        top: 0,
         padding: 0,
-        height: schema.height * ZOOM + 'px',
-        width: schema.width * ZOOM + 'px',
         resize: 'none',
         backgroundColor: value && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
         border: 'none',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
+        width: '100%',
+        height: '100%',
     };
     Object.assign(container.style, containerStyle);
+    rootElement.innerHTML = '';
     rootElement.appendChild(container);
 
 
@@ -123,7 +121,6 @@ export const renderText = async (arg: RenderProps) => {
         textarea.setSelectionRange(value.length, value.length);
         textarea.focus();
     } else {
-
         const div = document.createElement('div');
         const divStyle: CSS.Properties = {
             ...fontStyles,
