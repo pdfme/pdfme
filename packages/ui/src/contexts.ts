@@ -8,6 +8,6 @@ export const I18nContext = createContext(curriedI18n(DEFAULT_LANG));
 
 export const FontContext = createContext(getDefaultFont());
 
-export const RendererContext = createContext(builtInRenderer);
+export const RendererRegistry = createContext(builtInRenderer);
 
 export const OptionsContext = createContext({});

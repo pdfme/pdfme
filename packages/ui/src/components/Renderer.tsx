@@ -1,14 +1,14 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
 import { ZOOM, SELECTABLE_CLASSNAME } from '../constants';
-import { RendererContext, OptionsContext } from '../contexts';
-import { SchemaUIProps } from "../types"
+import { RendererRegistry, OptionsContext } from '../contexts';
+import { RendererProps } from "../types"
 
 const Wrapper = ({
   children,
   outline,
   onChangeHoveringSchemaId,
   schema,
-}: SchemaUIProps & { children: ReactNode }) => (
+}: RendererProps & { children: ReactNode }) => (
   <div
     title={schema.key}
     onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
@@ -29,8 +29,8 @@ const Wrapper = ({
   </div>
 );
 
-const SchemaUI = (props: SchemaUIProps) => {
-  const rendererRegistry = useContext(RendererContext);
+const Renderer = (props: RendererProps) => {
+  const rendererRegistry = useContext(RendererRegistry);
   const options = useContext(OptionsContext);
 
   const { schema, mode, onChange, stopEditing, tabIndex, placeholder } = props;
@@ -77,4 +77,4 @@ const SchemaUI = (props: SchemaUIProps) => {
     </Wrapper>
   );
 };
-export default SchemaUI
+export default Renderer

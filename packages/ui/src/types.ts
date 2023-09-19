@@ -10,7 +10,7 @@ interface RenderBaseProps {
 
 }
 
-export type SchemaUIProps = RenderBaseProps & {
+export type RendererProps = RenderBaseProps & {
     onChange: (value: string) => void;
     outline: string;
     onChangeHoveringSchemaId?: (id: string | null) => void;

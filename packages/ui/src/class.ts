@@ -67,7 +67,7 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private renderer: Renderer = builtInRenderer;
+  private rendererRegistry: Renderer = builtInRenderer;
 
   private options = {};
 
@@ -117,8 +117,8 @@ export abstract class BaseUIClass {
     return this.font;
   }
 
-  protected getRenderer() {
-    return this.renderer;
+  protected getRendererRegistry() {
+    return this.rendererRegistry;
   }
 
   protected getOptions() {
