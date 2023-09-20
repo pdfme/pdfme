@@ -50,7 +50,7 @@ const getTextSchema = () => {
 };
 
 describe('checkFont test', () => {
-  test('success test: no fontName in Schemas', () => {
+  test('schema unchanged when no fontName in Schemas', () => {
     const _getTemplate = (): Template => ({
       basePdf: BLANK_PDF,
       schemas: [
@@ -70,77 +70,62 @@ describe('checkFont test', () => {
         },
       ],
     });
-    try {
-      checkFont({ template: _getTemplate(), font: getSampleFont() });
-      expect.anything();
-    } catch (e) {
-      fail();
-    }
+    const template = _getTemplate();
+    checkFont({ template, font: getSampleFont() });
+    expect(template).toEqual(_getTemplate());
   });
 
-  test('success test: fontName in Schemas(fallback font)', () => {
-    try {
-      checkFont({ template: getTemplate(), font: getSampleFont() });
-      expect.anything();
-    } catch (e) {
-      fail();
-    }
+  test('schema unchanged when fontName in Schemas with a fallback', () => {
+    const template = getTemplate();
+    checkFont({ template, font: getSampleFont() });
+    expect(template).toEqual(getTemplate());
   });
 
-  test('success test: fontName in Schemas(not fallback font)', () => {
+  test('schema unchanged when fontName in Schemas (not fallback font)', () => {
     const getFont = (): Font => ({
       SauceHanSansJP: { data: sansData },
       SauceHanSerifJP: { fallback: true, data: serifData },
     });
 
-    try {
-      checkFont({ template: getTemplate(), font: getFont() });
-      expect.anything();
-    } catch (e) {
-      fail();
-    }
+    const template = getTemplate();
+    checkFont({ template, font: getFont() });
+    expect(template).toEqual(getTemplate());
   });
 
-  test('fail test: no fallback font', () => {
+  test('fonts updated to set a fallback', () => {
     const getFont = (): Font => ({
       SauceHanSansJP: { data: sansData },
       SauceHanSerifJP: { data: serifData },
     });
 
-    try {
-      checkFont({ template: getTemplate(), font: getFont() });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        'fallback flag is not found in font. true fallback flag must be only one.'
-      );
-    }
+    const font = getFont();
+    checkFont({ template: getTemplate(), font });
+    const expectedFont = getFont();
+    expectedFont.SauceHanSansJP.fallback = true;
+    expect(font).toEqual(expectedFont);
   });
 
-  test('fail test: too many fallback font', () => {
+  test('fonts updated to remove a fallback', () => {
     const getFont = (): Font => ({
       SauceHanSansJP: { data: sansData, fallback: true },
       SauceHanSerifJP: { data: serifData, fallback: true },
     });
 
-    try {
-      checkFont({ template: getTemplate(), font: getFont() });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        '2 fallback flags found in font. true fallback flag must be only one.'
-      );
-    }
+    const font = getFont();
+    checkFont({ template: getTemplate(), font });
+    const expectedFont = getFont();
+    expectedFont.SauceHanSerifJP.fallback = false;
+    expect(font).toEqual(expectedFont);
   });
 
-  test('fail test: fontName in Schemas not found in font(single)', () => {
+  test('schema font updated to use fallback if not found in provided fonts', () => {
     const _getTemplate = (): Template => ({
       basePdf: BLANK_PDF,
       schemas: [
         {
           a: {
             type: 'text',
-            fontName: 'SauceHanSansJP2',
+            fontName: 'MissingFont',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -155,12 +140,12 @@ describe('checkFont test', () => {
       ],
     });
 
-    try {
-      checkFont({ template: _getTemplate(), font: getSampleFont() });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
-    }
+    const template = _getTemplate();
+    checkFont({ template, font: getSampleFont() });
+    const expectedTemplate = _getTemplate();
+    // @ts-ignore
+    expectedTemplate.schemas[0].a.fontName = 'SauceHanSansJP';
+    expect(template).toEqual(expectedTemplate);
   });
 
   test('fail test: fontName in Schemas not found in font(single)', () => {
@@ -170,14 +155,14 @@ describe('checkFont test', () => {
         {
           a: {
             type: 'text',
-            fontName: 'SauceHanSansJP2',
+            fontName: 'MissingFont',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
           b: {
             type: 'text',
-            fontName: 'SauceHanSerifJP2',
+            fontName: 'AnotherMissingFont',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -186,14 +171,14 @@ describe('checkFont test', () => {
       ],
     });
 
-    try {
-      checkFont({ template: _getTemplate(), font: getSampleFont() });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        'SauceHanSansJP2,SauceHanSerifJP2 of template.schemas is not found in font.'
-      );
-    }
+    const template = _getTemplate();
+    checkFont({ template, font: getSampleFont() });
+    const expectedTemplate = _getTemplate();
+    // @ts-ignore
+    expectedTemplate.schemas[0].a.fontName = 'SauceHanSansJP';
+    // @ts-ignore
+    expectedTemplate.schemas[0].b.fontName = 'SauceHanSansJP';
+    expect(template).toEqual(expectedTemplate);
   });
 });
 

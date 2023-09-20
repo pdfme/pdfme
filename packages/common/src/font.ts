@@ -40,38 +40,39 @@ export const getDefaultFont = (): Font => ({
   [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
 });
 
-const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
-
-const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
-  uniq(
-    schemas
-      .map((s) => Object.values(s).map((v) => (isTextSchema(v) ? v.fontName : '')))
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
-      .filter(Boolean) as string[]
-  );
-
 export const checkFont = (arg: { font: Font; template: Template }) => {
   const { font, template: { schemas } } = arg;
+  const fontNames = Object.keys(font);
   const fontValues = Object.values(font);
   const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
   if (fallbackFontNum === 0) {
-    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
-  }
-  if (fallbackFontNum > 1) {
-    throw Error(
-      `${fallbackFontNum} fallback flags found in font. true fallback flag must be only one.`
-    );
+    console.warn('No font has been set as a fallback, setting the first font in the list');
+    font[fontNames[0]].fallback = true;
+  } else if (fallbackFontNum > 1) {
+    console.warn('Too many fallback fonts have been provided, using the first');
+    let foundFallbacks = 0;
+    fontNames.forEach((fontName) => {
+      if (font[fontName].fallback) {
+        if (foundFallbacks === 0) {
+          foundFallbacks++;
+        } else {
+          font[fontName].fallback = false;
+        }
+      }
+    });
   }
 
-  const fontNamesInSchemas = getFontNamesInSchemas(schemas);
-  const fontNames = Object.keys(font);
-  if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-    throw Error(
-      `${fontNamesInSchemas
-        .filter((f) => !fontNames.includes(f))
-        .join()} of template.schemas is not found in font.`
-    );
-  }
+  schemas.forEach((s) =>
+    Object.values(s).forEach((v) => {
+      if (isTextSchema(v)) {
+        if (v.fontName && !fontNames.includes(v.fontName)) {
+          const fallbackFontName = getFallbackFontName(font);
+          console.warn(`Missing font '${v.fontName}' using fallback '${fallbackFontName}' instead`);
+          v.fontName = fallbackFontName;
+        }
+      }
+    })
+  );
 };
 
 export const getBrowserVerticalFontAdjustments = (
