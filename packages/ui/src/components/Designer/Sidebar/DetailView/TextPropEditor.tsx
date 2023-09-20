@@ -6,10 +6,17 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  VERTICAL_ALIGN_TOP,
+  VERTICAL_ALIGN_MIDDLE,
+  VERTICAL_ALIGN_BOTTOM,
+  DEFAULT_VERTICAL_ALIGNMENT,
+  DYNAMIC_FIT_VERTICAL,
+  DYNAMIC_FIT_HORIZONTAL,
+  DEFAULT_DYNAMIC_FIT,
 } from '@pdfme/common';
 import { FontContext } from '../../../../contexts';
 import { SidebarProps } from '..';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import ColorInputSet from './FormComponents/ColorInputSet';
 
 const inputStyle = {
   width: '90%',
@@ -24,11 +31,14 @@ const NumberInputSet = (props: {
   width: string;
   label: string;
   value: number;
+  step?: number;
   minNumber?: number;
   maxNumber?: number;
+  disabled?: boolean;
+  style?: object;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
-  const { label, value, width, minNumber, maxNumber, onChange } = props;
+  const { label, step, value, width, minNumber, maxNumber, disabled, style, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
@@ -37,53 +47,15 @@ const NumberInputSet = (props: {
       <input
         id={`input-${formattedLabel}`}
         name={`input-${formattedLabel}`}
-        style={inputStyle}
+        style={{ ...inputStyle, ...style }}
         onChange={onChange}
-        value={value}
+        value={isNaN(value) ? '' : value}
         type="number"
+        step={step ?? 1}
+        disabled={disabled}
         {...(minNumber && { min: minNumber })}
         {...(maxNumber && { max: maxNumber })}
       />
-    </div>
-  );
-};
-
-const ColorInputSet = (props: {
-  label: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
-}) => {
-  const { label, value, onChange, onClear } = props;
-  const formattedLabel = label.replace(/\s/g, '');
-
-  return (
-    <div style={{ width: '45%' }}>
-      <label htmlFor={`input-${formattedLabel}`}>{label}</label>
-      <div style={{ display: 'flex' }}>
-        <input
-          id={`input-${formattedLabel}`}
-          name={`input-${formattedLabel}`}
-          onChange={onChange}
-          value={value || '#ffffff'}
-          type="color"
-          style={inputStyle}
-        />
-        <button
-          onClick={onClear}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'none',
-            borderRadius: 2,
-            border: '1px solid #767676',
-            cursor: 'pointer',
-          }}
-        >
-          <XMarkIcon width={10} height={10} />
-        </button>
-      </div>
     </div>
   );
 };
@@ -92,13 +64,14 @@ const SelectSet = (props: {
   label: string;
   value: string;
   options: string[];
+  width?: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
-  const { label, value, options, onChange } = props;
+  const { label, value, options, width, onChange } = props;
   const formattedLabel = label.replace(/\s/g, '');
 
   return (
-    <div style={{ width: '45%' }}>
+    <div style={{ width: width ?? '45%' }}>
       <label htmlFor={`select-${formattedLabel}`}>{label}:</label>
       <select
         id={`select-${formattedLabel}`}
@@ -124,9 +97,11 @@ const CheckboxSet = (props: {
   checked: boolean | undefined;
 }) => {
   const { width, label, onChange, checked } = props;
+  const fieldId = 'input-' + label.replace(/\s/g, '');
 
   return (
     <label
+      htmlFor={fieldId}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -134,7 +109,7 @@ const CheckboxSet = (props: {
         width: `${width}`,
       }}
     >
-      <input type="checkbox" checked={checked} onChange={onChange} />
+      <input id={fieldId} type="checkbox" checked={checked} onChange={onChange} />
       {label}
     </label>
   );
@@ -145,6 +120,8 @@ const TextPropEditor = (
 ) => {
   const { changeSchemas, activeSchema } = props;
   const alignments = ['left', 'center', 'right'];
+  const verticalAlignments = [VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM];
+  const dynamicFits = [DYNAMIC_FIT_HORIZONTAL, DYNAMIC_FIT_VERTICAL];
   const font = useContext(FontContext);
   const fallbackFontName = getFallbackFontName(font);
 
@@ -170,12 +147,21 @@ const TextPropEditor = (
         />
 
         <SelectSet
-          label={'Alignment'}
+          label={'Horizontal Align'}
           value={activeSchema.alignment ?? 'left'}
           options={alignments}
           onChange={(e) =>
             changeSchemas([{ key: 'alignment', value: e.target.value, schemaId: activeSchema.id }])
           }
+        />
+
+        <SelectSet
+          label={'Vertical Align'}
+          value={activeSchema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT}
+          options={verticalAlignments}
+          onChange={(e) => {
+            changeSchemas([{ key: 'verticalAlignment', value: e.target.value, schemaId: activeSchema.id }]);
+          }}
         />
       </div>
       <div
@@ -189,26 +175,17 @@ const TextPropEditor = (
         <NumberInputSet
           width="30%"
           label={'FontSize(pt)'}
-          value={activeSchema.fontSize ?? DEFAULT_FONT_SIZE}
+          value={activeSchema.dynamicFontSize ? NaN : (activeSchema.fontSize ?? DEFAULT_FONT_SIZE)}
+          style={activeSchema.dynamicFontSize ? { background: '#ccc', cursor: 'not-allowed' } : {}}
+          disabled={!!activeSchema.dynamicFontSize}
           onChange={(e) => {
-            const currentFontSize = Number(e.target.value);
-            const dynamincFontSizeMinAdjust = activeSchema.dynamicFontSize && activeSchema.dynamicFontSize.min > currentFontSize;
-
-            changeSchemas([
-              { key: 'fontSize', value: currentFontSize, schemaId: activeSchema.id },
-              ...(dynamincFontSizeMinAdjust
-                ? [{
-                      key: 'dynamicFontSize.min',
-                      value: currentFontSize,
-                      schemaId: activeSchema.id,
-                    }]
-                : []),
-            ]);
+            changeSchemas([{ key: 'fontSize', value: Number(e.target.value), schemaId: activeSchema.id }])
           }}
         />
         <NumberInputSet
           width="30%"
           label={'LineHeight(em)'}
+          step={0.1}
           value={activeSchema.lineHeight ?? DEFAULT_LINE_HEIGHT}
           onChange={(e) =>
             changeSchemas([
@@ -220,6 +197,7 @@ const TextPropEditor = (
         <NumberInputSet
           width="40%"
           label={'CharacterSpacing(pt)'}
+          step={0.1}
           value={activeSchema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}
           onChange={async (e) => {
             const currentCharacterSpacing = Number(e.target.value);
@@ -257,24 +235,44 @@ const TextPropEditor = (
         {activeSchema.dynamicFontSize && (
           <>
             <NumberInputSet
-              width="45%"
+              width="30%"
               label={'FontSize Min(pt)'}
               value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
-              maxNumber={activeSchema.fontSize}
+              style={
+                activeSchema.dynamicFontSize &&
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { background: 'rgb(200 0 0 / 30%)' }
+                  : {}
+              }
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.min', value: Number(e.target.value), schemaId: activeSchema.id }])
-
               }}
             />
 
             <NumberInputSet
-              width="45%"
+              width="30%"
               label={'FontSize Max(pt)'}
               value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
-              minNumber={activeSchema.fontSize}
+              minNumber={0}
+              style={
+                activeSchema.dynamicFontSize &&
+                activeSchema.dynamicFontSize.max < activeSchema.dynamicFontSize.min
+                  ? { background: 'rgb(200 0 0 / 30%)' }
+                  : {}
+              }
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.max', value: Number(e.target.value), schemaId: activeSchema.id }])
+              }}
+            />
+
+            <SelectSet
+              width="40%"
+              label={'Fit'}
+              value={activeSchema.dynamicFontSize.fit ?? DEFAULT_DYNAMIC_FIT}
+              options={dynamicFits}
+              onChange={(e) => {
+                changeSchemas([{ key: 'dynamicFontSize.fit', value: e.target.value, schemaId: activeSchema.id }])
               }}
             />
           </>

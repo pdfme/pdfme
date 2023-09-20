@@ -39,6 +39,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         zIndex: 1,
         top,
         left,
+        padding: 2,
         height: 24,
         width: 24,
         cursor: 'pointer',
@@ -52,7 +53,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         justifyContent: 'center',
       }}
     >
-      <XMarkIcon width={10} height={10} />
+      <XMarkIcon style={{ pointerEvents: 'none' }} width={24} height={24} />
     </button>
   );
 };
@@ -110,7 +111,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (e.shiftKey) setIsPressShiftKey(true);
   };
   const onKeyup = (e: KeyboardEvent) => {
-    if (e.key === 'Shift') setIsPressShiftKey(false);
+    if (e.key === 'Shift' || !e.shiftKey) setIsPressShiftKey(false);
     if (e.key === 'Escape' || e.key === 'Esc') setEditing(false);
   };
 
@@ -231,14 +232,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   return (
-    <div
-      ref={ref}
-      onClick={(e) => {
-        e.stopPropagation();
-        setEditing(false);
-      }}
-      style={{ overflow: 'overlay' }}
-    >
+    <div ref={ref} style={{ overflow: 'overlay' }}>
       <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
@@ -252,8 +246,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (paperRefs.current[pageCursor] === inputEvent.target) {
             onEdit([]);
           }
-
-          if (inputEvent.target.id === DELETE_BTN_ID) {
+          if (inputEvent.target?.id === DELETE_BTN_ID) {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
@@ -266,8 +259,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (!isClick && removed.length > 0) {
             newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
           }
-
           onEdit(newActiveElements);
+
+          if (newActiveElements != activeElements) {
+            setEditing(false);
+          }
+          // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
+          if (!inputEvent.shiftKey) {
+            setIsPressShiftKey(false);
+          }
         }}
       />
       <Paper
@@ -324,9 +324,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
-            onChange={async (value) => {
+            onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
+            onStopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
             ref={inputRef}
           />

@@ -21,7 +21,7 @@ custom_edit_url: null
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:48
+common/dist/types/src/type.d.ts:56
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:50
+common/dist/types/src/type.d.ts:58
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:53
+common/dist/types/src/type.d.ts:61
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:58
+common/dist/types/src/type.d.ts:66
 
 ___
 
@@ -61,7 +61,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:60
+common/dist/types/src/type.d.ts:68
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:67
+common/dist/types/src/type.d.ts:75
 
 ___
 
@@ -81,7 +81,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:57
+common/dist/types/src/type.d.ts:65
 
 ___
 
@@ -91,7 +91,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:62
+common/dist/types/src/type.d.ts:70
 
 ___
 
@@ -101,7 +101,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:61
+common/dist/types/src/type.d.ts:69
 
 ___
 
@@ -111,7 +111,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:52
+common/dist/types/src/type.d.ts:60
 
 ___
 
@@ -121,7 +121,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:46
+common/dist/types/src/type.d.ts:54
 
 ___
 
@@ -131,7 +131,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:65
+common/dist/types/src/type.d.ts:73
 
 ___
 
@@ -141,7 +141,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:54
+common/dist/types/src/type.d.ts:62
 
 ___
 
@@ -151,7 +151,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:56
+common/dist/types/src/type.d.ts:64
 
 ___
 
@@ -161,7 +161,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:49
+common/dist/types/src/type.d.ts:57
 
 ___
 
@@ -171,7 +171,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:47
+common/dist/types/src/type.d.ts:55
 
 ___
 
@@ -181,7 +181,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:59
+common/dist/types/src/type.d.ts:67
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:51
+common/dist/types/src/type.d.ts:59
 
 ___
 
@@ -201,7 +201,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:63
+common/dist/types/src/type.d.ts:71
 
 ___
 
@@ -211,7 +211,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:64
+common/dist/types/src/type.d.ts:72
 
 ## Variables
 
@@ -221,7 +221,7 @@ common/dist/types/src/type.d.ts:64
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:10
+common/dist/types/src/constants.d.ts:14
 
 ___
 
@@ -231,7 +231,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/constants.d.ts:11
+common/dist/types/src/constants.d.ts:15
 
 ## Functions
 
@@ -251,7 +251,7 @@ common/dist/types/src/constants.d.ts:11
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:15
+common/dist/types/src/helper.d.ts:11
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:16
+common/dist/types/src/helper.d.ts:12
 
 ___
 
@@ -291,7 +291,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:14
+common/dist/types/src/helper.d.ts:10
 
 ___
 
@@ -311,7 +311,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:12
+common/dist/types/src/helper.d.ts:8
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:13
+common/dist/types/src/helper.d.ts:9
 
 ___
 
@@ -349,7 +349,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -358,7 +358,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:36
+common/dist/types/src/type.d.ts:44
 
 ___
 
@@ -376,7 +376,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -385,7 +385,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:26
+common/dist/types/src/type.d.ts:34
 
 ___
 
@@ -403,7 +403,7 @@ ___
 | `arg.position.x` | `number` |
 | `arg.position.y` | `number` |
 | `arg.rotate?` | `number` |
-| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `arg.type` | ``"text"`` \| ``"image"`` \| ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `arg.width` | `number` |
 
 #### Returns
@@ -412,7 +412,7 @@ arg is Object
 
 #### Defined in
 
-common/dist/types/src/type.d.ts:5
+common/dist/types/src/type.d.ts:12
 
 ___
 
@@ -424,7 +424,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` |
+| `type` | ``"qrcode"`` \| ``"japanpost"`` \| ``"ean13"`` \| ``"ean8"`` \| ``"code39"`` \| ``"code128"`` \| ``"nw7"`` \| ``"itf14"`` \| ``"upca"`` \| ``"upce"`` \| ``"gs1datamatrix"`` |
 | `input` | `string` |
 
 #### Returns
@@ -433,4 +433,4 @@ ___
 
 #### Defined in
 
-common/dist/types/src/helper.d.ts:17
+common/dist/types/src/helper.d.ts:13

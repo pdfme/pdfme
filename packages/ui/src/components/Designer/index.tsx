@@ -262,6 +262,7 @@ const TemplateEditor = ({
         }}
         onEditEnd={onEditEnd}
         addSchema={addSchema}
+        deselectSchema={onEditEnd}
       />
       <Main
         ref={mainRef}

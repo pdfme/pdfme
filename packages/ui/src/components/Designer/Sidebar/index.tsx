@@ -27,6 +27,7 @@ export type SidebarProps = {
     }[]
   ) => void;
   addSchema: () => void;
+  deselectSchema: () => void;
 };
 
 const Sidebar = (props: SidebarProps) => {

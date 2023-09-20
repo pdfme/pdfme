@@ -8,24 +8,26 @@ pdfme was created to simplify the design and generation process of a PDF. It is 
 - Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
 
-As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month.
+As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month. Notably, the monthly server cost, utilizing Cloud Functions For Firebase, remains below $10.
 
 ## Installation
 
-The operating requirements should be the node environment `>=14`. *Please see the note at the end of this section for usage on Node.js <16.*    
+The operating requirements should be the node environment `>=16`.    
 There are two packages in pdfme, generator and UI.
 
 The package for generating PDF can be installed with the following command.
 
 ```
-npm i @pdfme/generator
+npm i @pdfme/generator @pdfme/common
 ```
 
 The packages for using PDF designer, forms and viewers can be installed with the following commands.
 
 ```
-npm i @pdfme/ui
+npm i @pdfme/ui @pdfme/common
 ```
+
+*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.
 
@@ -248,6 +250,7 @@ const viewer = new Viewer({ domContainer, template, inputs });
 ## Special Thanks
 
 - [pdf-lib](https://pdf-lib.js.org/): Used in PDF generation.
+- [fontkit](https://github.com/foliojs/fontkit): Used in font rendering.
 - [PDF.js](https://mozilla.github.io/pdf.js/): Used in PDF viewing.
 - [React](https://reactjs.org/): Used in building the UI.
 - [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): Used in Designer UI.
@@ -256,3 +259,6 @@ const viewer = new Viewer({ domContainer, template, inputs });
 - [zod](https://github.com/colinhacks/zod): Used in Validation.
 
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
+
+If you want to contribute to pdfme, please check the [Development Guide](/development-guide) page.  
+We look forward to your contribution!

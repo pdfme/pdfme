@@ -370,18 +370,22 @@ exports[`Designer snapshot 1`] = `
               title="field1"
             >
               <div
-                style="padding: 0px; resize: none; position: absolute; font-family: inherit; height: 56.692913386499995px; width: 377.95275591px; text-align: left; font-size: 30pt; letter-spacing: 0pt; line-height: 1em; white-space: pre-line; word-break: break-word; color: rgb(0, 0, 0);"
+                style="position: absolute; top: 0px; padding: 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; display: flex; flex-direction: column; justify-content: flex-start;"
               >
-                <span
-                  style="letter-spacing: inherit;"
+                <div
+                  style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; margin-bottom: 0px; padding-top: 3.436640625px;"
                 >
-                  b
-                </span>
-                <span
-                  style="letter-spacing: 0;"
-                >
-                  b
-                </span>
+                  <span
+                    style="letter-spacing: inherit;"
+                  >
+                    b
+                  </span>
+                  <span
+                    style="letter-spacing: 0;"
+                  >
+                    b
+                  </span>
+                </div>
               </div>
             </div>
           </div>

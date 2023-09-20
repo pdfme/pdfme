@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/common",
-  "version": "1.2.6",
+  "version": "2.2.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -31,7 +31,7 @@
     }
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "develop": "tsc -p tsconfig.esm.json -w",
@@ -47,8 +47,16 @@
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "bwip-js": "^3.4.5",
     "fontkit": "^2.0.2",
     "zod": "^3.20.2"
+  },
+  "devDependencies": {
+    "@types/bwip-js": "^3.2.0",
+    "@types/fontkit": "^2.0.3",
+    "@types/pngjs": "^6.0.1",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
@@ -70,8 +78,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "devDependencies": {
-    "@types/fontkit": "^2.0.3"
   }
 }

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import type { Font as FontKitFont } from 'fontkit';
+
 import {
   Lang,
   Size,
@@ -27,6 +29,13 @@ import {
   DesignerProps,
   DesignerReactProps,
 } from './schema.js';
+
+export type FontWidthCalcValues = {
+  font: FontKitFont;
+  fontSize: number;
+  characterSpacing: number;
+  boxWidthInPt: number;
+};
 
 type CommonSchema = z.infer<typeof _CommonSchema>;
 export const schemaTypes = _schemaTypes;

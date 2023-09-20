@@ -1,6 +1,6 @@
 {
   "name": "@pdfme/generator",
-  "version": "1.2.6",
+  "version": "2.2.0",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -31,7 +31,7 @@
     }
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "scripts": {
     "develop": "tsc -w",
@@ -46,18 +46,16 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/common": "latest",
     "@pdfme/pdf-lib": "^1.17.3",
     "atob": "^2.1.2",
-    "bwip-js": "^3.2.2",
     "fontkit": "^2.0.2"
   },
   "devDependencies": {
-    "@types/bwip-js": "^3.0.0",
-    "@types/pngjs": "^6.0.1",
-    "jsqr": "^1.4.0",
-    "pdf2json": "^2.0.0",
-    "pngjs": "^6.0.0"
+    "@pdfme/common": "file:../common",
+    "pdf2json": "^2.0.0"
+  },
+  "peerDependencies": {
+    "@pdfme/common": "^2.1.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

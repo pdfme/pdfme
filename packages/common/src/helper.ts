@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { DEFAULT_FONT_NAME, DEFAULT_FONT_VALUE } from './constants.js';
-import { Template, Schema, BasePdf, Font, CommonProps, isTextSchema, BarCodeType } from './type.js';
+import { BasePdf, CommonProps, BarCodeType, } from './type';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -10,7 +9,21 @@ import {
   DesignerProps as DesignerPropsSchema,
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
-} from './schema.js';
+} from './schema';
+import { MM_TO_PT_RATIO, PT_TO_MM_RATIO, PT_TO_PX_RATIO } from './constants';
+import { checkFont } from './font';
+
+export const mm2pt = (mm: number): number => {
+  return parseFloat(String(mm)) * MM_TO_PT_RATIO;
+};
+
+export const pt2mm = (pt: number): number => {
+  return pt * PT_TO_MM_RATIO;
+};
+
+export const pt2px = (pt: number): number => {
+  return pt * PT_TO_PX_RATIO;
+};
 
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
@@ -53,61 +66,6 @@ export const b64toUint8Array = (base64: string) => {
     unit8arr[i] = byteString.charCodeAt(i);
   }
   return unit8arr;
-};
-
-export const getFallbackFontName = (font: Font) => {
-  const initial = '';
-  const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
-    const [fontName, fontValue] = cur;
-
-    return !acc && fontValue.fallback ? fontName : acc;
-  }, initial);
-  if (fallbackFontName === initial) {
-    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
-  }
-
-  return fallbackFontName;
-};
-
-export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
-});
-
-const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
-
-const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
-  uniq(
-    schemas
-      .map((s) => Object.values(s).map((v) => (isTextSchema(v) ? v.fontName : '')))
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
-      .filter(Boolean) as string[]
-  );
-
-export const checkFont = (arg: { font: Font; template: Template }) => {
-  const {
-    font,
-    template: { schemas },
-  } = arg;
-  const fontValues = Object.values(font);
-  const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
-  if (fallbackFontNum === 0) {
-    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
-  }
-  if (fallbackFontNum > 1) {
-    throw Error(
-      `${fallbackFontNum} fallback flags found in font. true fallback flag must be only one.`
-    );
-  }
-
-  const fontNamesInSchemas = getFontNamesInSchemas(schemas);
-  const fontNames = Object.keys(font);
-  if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-    throw Error(
-      `${fontNamesInSchemas
-        .filter((f) => !fontNames.includes(f))
-        .join()} of template.schemas is not found in font.`
-    );
-  }
 };
 
 const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
@@ -235,6 +193,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
     let res = input.match(regexp);
     if (
       res != null &&
+      input.length <= 52 && // 52 is the max length of a GS1 DataMatrix barcode before bwip-js throws an error
       res[1] === '01' &&
       (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
     ) {

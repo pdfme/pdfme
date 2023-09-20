@@ -36,21 +36,21 @@ const config = {
     ],
   ],
   plugins: [
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: 'common',
-        out: 'api/common',
-        readme: 'none',
-        sidebar: {
-          categoryLabel: 'common',
-          position: 2,
-          fullNames: true,
-        },
-        entryPoints: ['../packages/common/src/index.ts'],
-        tsconfig: '../packages/common/tsconfig.esm.json',
-      },
-    ],
+    // [
+    //   'docusaurus-plugin-typedoc',
+    //   {
+    //     id: 'common',
+    //     out: 'api/common',
+    //     readme: 'none',
+    //     sidebar: {
+    //       categoryLabel: 'common',
+    //       position: 2,
+    //       fullNames: true,
+    //     },
+    //     entryPoints: ['../packages/common/src/index.ts'],
+    //     tsconfig: '../packages/common/tsconfig.esm.json',
+    //   },
+    // ],
     [
       'docusaurus-plugin-typedoc',
       {
@@ -122,7 +122,7 @@ const config = {
             type: 'doc',
             docId: 'getting-started',
             position: 'right',
-            label: 'Docs&Guides',
+            label: 'Docs',
           },
           {
             to: '/demo',
@@ -135,13 +135,18 @@ const config = {
             label: 'Template Design',
           },
           {
-            to: '/help',
+            to: '/development-guide',
             position: 'right',
-            label: 'Help',
+            label: 'Development Guide',
           },
           {
             href: 'https://github.com/pdfme/pdfme',
             label: 'GitHub',
+            position: 'right',
+          },
+          {
+            href: 'https://discord.gg/xWPTJbmgNV',
+            label: 'Discord',
             position: 'right',
           },
         ],
@@ -170,8 +175,8 @@ const config = {
                 to: '/template-design',
               },
               {
-                label: 'Help',
-                to: '/help',
+                label: 'Development Guide',
+                to: '/development-guide',
               },
             ],
           },
@@ -181,6 +186,10 @@ const config = {
               {
                 label: 'Github',
                 href: 'https://github.com/pdfme/pdfme',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.gg/xWPTJbmgNV',
               },
             ],
           },

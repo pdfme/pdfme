@@ -196,6 +196,14 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
+export const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onloadend = () => resolve(reader.result as string);
+  reader.onerror = reject;
+  reader.readAsDataURL(blob);
+})
+
+
 const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
     const fileReader = new FileReader();
@@ -314,7 +322,7 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
           })
           .map((e) => {
             const [key, value] = e;
-            const data = template.sampledata ? template.sampledata[0][key] : '';
+            const data = template.sampledata?.[0]?.[key] ?? '';
 
             return Object.assign(value, {
               key,
