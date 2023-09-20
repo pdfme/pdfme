@@ -100,9 +100,8 @@ describe('checkFont test', () => {
 
     const font = getFont();
     checkFont({ template: getTemplate(), font });
-    const expectedFont = getFont();
-    expectedFont.SauceHanSansJP.fallback = true;
-    expect(font).toEqual(expectedFont);
+    expect(font.SauceHanSansJP.fallback).toEqual(true);
+    expect(font.SauceHanSerifJP.fallback).toBeUndefined();
   });
 
   test('fonts updated to remove a fallback', () => {
@@ -113,9 +112,8 @@ describe('checkFont test', () => {
 
     const font = getFont();
     checkFont({ template: getTemplate(), font });
-    const expectedFont = getFont();
-    expectedFont.SauceHanSerifJP.fallback = false;
-    expect(font).toEqual(expectedFont);
+    expect(font.SauceHanSansJP.fallback).toEqual(true);
+    expect(font.SauceHanSerifJP.fallback).toEqual(false);
   });
 
   test('schema font updated to use fallback if not found in provided fonts', () => {

@@ -25,7 +25,7 @@ export const getFallbackFontName = (font: Font) => {
     return !acc && fontValue.fallback ? fontName : acc;
   }, initial);
   if (fallbackFontName === initial) {
-    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
+    throw Error(`no fallback flag is set for provided fonts, you must set (only) one.`);
   }
 
   return fallbackFontName;

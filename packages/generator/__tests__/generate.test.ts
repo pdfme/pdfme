@@ -250,7 +250,8 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
 --------------------------`);
     }
   });
-  test(`missing fallback font`, async () => {
+
+  test(`missing fallback font is set`, async () => {
     const inputs = [{ a: 'test' }];
     const template: Template = {
       basePdf: BLANK_PDF,
@@ -268,14 +269,9 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
     const font = getFont();
     font.SauceHanSansJP.fallback = false;
     font.SauceHanSerifJP.fallback = false;
-    try {
-      await generate({ inputs, template, options: { font } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        'fallback flag is not found in font. true fallback flag must be only one.'
-      );
-    }
+    await generate({ inputs, template, options: { font } });
+    expect(font.SauceHanSansJP.fallback).toEqual(true);
+    expect(font.SauceHanSerifJP.fallback).toEqual(false);
   });
   test(`too many fallback font`, async () => {
     const inputs = [{ a: 'test' }];
@@ -295,14 +291,9 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
     const font = getFont();
     font.SauceHanSansJP.fallback = true;
     font.SauceHanSerifJP.fallback = true;
-    try {
-      await generate({ inputs, template, options: { font } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual(
-        '2 fallback flags found in font. true fallback flag must be only one.'
-      );
-    }
+    await generate({ inputs, template, options: { font } });
+    expect(font.SauceHanSansJP.fallback).toEqual(true);
+    expect(font.SauceHanSerifJP.fallback).toEqual(false);
   });
   test(`missing font in template.schemas`, async () => {
     const inputs = [{ a: 'test' }];
@@ -312,7 +303,7 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
         {
           a: {
             type: 'text',
-            fontName: 'SauceHanSansJP2',
+            fontName: 'MissingFont',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -326,12 +317,9 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
         },
       ],
     };
-    try {
-      await generate({ inputs, template, options: { font: getFont() } });
-      fail();
-    } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
-    }
+    await generate({ inputs, template, options: { font: getFont() } });
+    // @ts-ignore
+    expect(template.schemas[0].a.fontName).toEqual('SauceHanSansJP');
   });
 
   test(`check digit error`, async () => {
