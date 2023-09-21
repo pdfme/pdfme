@@ -123,6 +123,9 @@ const dictIt: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: 'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
   commitBulkUpdateFieldName: 'Salva cambiamenti',
   bulkUpdateFieldName: 'Modifica nomi campi in blocco',
+  barColor: 'Colore barra',
+  textColor: 'Colore testo',
+  bgColor: 'Colore sfondo',
 };
 
 const dictPl: {[key in keyof DictEn]: string} = {
