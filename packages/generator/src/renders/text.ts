@@ -32,7 +32,7 @@ import {
 } from '../renderUtils'
 
 const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
-  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, input: value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
+  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;

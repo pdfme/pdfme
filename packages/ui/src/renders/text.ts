@@ -50,7 +50,7 @@ export const renderText = async (arg: RenderProps) => {
         dynamicFontSize = await calculateDynamicFontSize({
             textSchema: schema,
             font,
-            input: value,
+            value,
             startingFontSize: dynamicFontSize,
         })
     }

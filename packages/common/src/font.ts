@@ -236,12 +236,12 @@ export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValu
 export const calculateDynamicFontSize = async ({
   textSchema,
   font,
-  input,
+  value,
   startingFontSize,
 }: {
   textSchema: TextSchema;
   font: Font;
-  input: string;
+  value: string;
   startingFontSize?: number | undefined;
 }) => {
   const {
@@ -258,7 +258,7 @@ export const calculateDynamicFontSize = async ({
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const fontKitFont = await getFontKitFont(textSchema, font);
-  const paragraphs = input.split('\n');
+  const paragraphs = value.split('\n');
 
   let dynamicFontSize = fontSize;
   if (dynamicFontSize < dynamicFontSizeSetting.min) {
