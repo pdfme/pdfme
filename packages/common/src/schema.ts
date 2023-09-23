@@ -2,7 +2,8 @@
 import { z } from 'zod';
 import { VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM } from "./constants";
 
-const langs = ['en', 'ja', 'ar', 'th', 'pl'] as const;
+const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it'] as const;
+
 export const Lang = z.enum(langs);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
