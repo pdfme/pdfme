@@ -9,8 +9,8 @@ export type EmbedPdfBox = {
 };
 
 export interface RenderProps {
-    input: string;
-    templateSchema: Schema;
+    value: string;
+    schema: Schema;
     pdfDoc: PDFDocument;
     page: PDFPage;
     options: GeneratorOptions;

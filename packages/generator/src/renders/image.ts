@@ -3,21 +3,21 @@ import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../rende
 
 
 export const renderImage = async (arg: RenderProps) => {
-    const { input, templateSchema, pdfDoc, page, _cache } = arg;
+    const { value, schema, pdfDoc, page, _cache } = arg;
 
-    const { width, height, rotate } = convertSchemaDimensionsToPt(templateSchema);
+    const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
     const opt = {
-        x: calcX(templateSchema.position.x, 'left', width, width),
-        y: calcY(templateSchema.position.y, page.getHeight(), height),
+        x: calcX(schema.position.x, 'left', width, width),
+        y: calcY(schema.position.y, page.getHeight(), height),
         rotate,
         width,
         height,
     };
-    const inputImageCacheKey = getCacheKey(templateSchema, input);
+    const inputImageCacheKey = getCacheKey(schema, value);
     let image = _cache.get(inputImageCacheKey);
     if (!image) {
-        const isPng = input.startsWith('data:image/png;');
-        image = await (isPng ? pdfDoc.embedPng(input) : pdfDoc.embedJpg(input));
+        const isPng = value.startsWith('data:image/png;');
+        image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
         _cache.set(inputImageCacheKey, image);
     }
     page.drawImage(image, opt);

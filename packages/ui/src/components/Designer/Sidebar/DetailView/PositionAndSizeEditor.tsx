@@ -1,8 +1,7 @@
-import React, { CSSProperties, useContext } from 'react';
+import React, { CSSProperties } from 'react';
 import { SchemaForUI } from '@pdfme/common';
 import { round } from '../../../../helper';
 import { SidebarProps } from '../index';
-import { FontContext } from '../../../../contexts';
 
 const inputSetStyle: CSSProperties = { marginRight: '1rem', display: 'flex', alignItems: 'center' };
 
@@ -38,7 +37,6 @@ const PositionAndSizeEditor = (
     activeSchema: SchemaForUI;
   }
 ) => {
-  const font = useContext(FontContext);
   const { changeSchemas, schemas, activeSchema, activeElements, pageSize } = props;
 
   const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {

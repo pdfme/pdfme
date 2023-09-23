@@ -6,7 +6,6 @@ import React, {
   useEffect,
   forwardRef,
   useCallback,
-  useContext,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
@@ -15,12 +14,11 @@ import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
-import SchemaUI from '../../Schemas/SchemaUI';
+import Renderer from '../../Renderer';
 import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
-import { FontContext } from '../../../contexts';
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -96,11 +94,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { onEdit, changeSchemas, removeSchemas, onChangeHoveringSchemaId, paperRefs } = props;
 
-  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
-  const font = useContext(FontContext);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -223,12 +219,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const onClickMoveable = (e: OnClick) => {
     e.inputEvent.stopPropagation();
     setEditing(true);
-    const ic = inputRef.current;
-    if (!ic) return;
-    ic.focus();
-    if (ic.type !== 'file') {
-      ic.setSelectionRange(ic.value.length, ic.value.length);
-    }
   };
 
   return (
@@ -319,17 +309,16 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
           </>
         )}
         renderSchema={({ schema }) => (
-          <SchemaUI
+          <Renderer
             key={schema.id}
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-            editable={editing && activeElements.map((ae) => ae.id).includes(schema.id)}
+            mode={editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'form' : 'viewer'}
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
-            onStopEditing={() => setEditing(false)}
+            stopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
-            ref={inputRef}
           />
         )}
       />

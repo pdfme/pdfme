@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { SchemaForUI } from '@pdfme/common';
 import { readFiles } from '../../../../helper';
-import { FontContext, I18nContext } from '../../../../contexts';
+import { I18nContext } from '../../../../contexts';
 import { SidebarProps } from '..';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
@@ -10,7 +10,6 @@ const ExampleInputEditor = (
 ) => {
   const { changeSchemas, activeSchema } = props;
   const i18n = useContext(I18nContext);
-  const fontData = useContext(FontContext);
 
   return (
     <div>

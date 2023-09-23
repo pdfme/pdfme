@@ -6,7 +6,7 @@ import Root from './Root';
 import Error from './Error';
 import CtlBar from './CtlBar/index';
 import Paper from './Paper';
-import SchemaUI from './Schemas/SchemaUI';
+import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 
@@ -47,7 +47,8 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, key, value });
 
-  const editable = Boolean(onChangeInput);
+  const isForm = Boolean(onChangeInput);
+
   const input = inputs[unitCursor];
 
   if (error) {
@@ -96,15 +97,14 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
           const { key } = schema;
           const data = (input && input[key]) || '';
           return (
-            <SchemaUI
+            <Renderer
               key={schema.id}
               schema={Object.assign(schema, { data })}
-              editable={editable}
+              mode={isForm ? 'form' : 'viewer'}
               placeholder={template.sampledata?.[0]?.[key] ?? ''}
               tabIndex={index + 100}
-              onStopEditing={() => { }}
               onChange={(value) => handleChangeInput({ key, value })}
-              outline={editable ? '1px dashed #4af' : 'transparent'}
+              outline={isForm ? '1px dashed #4af' : 'transparent'}
             />
           );
         }}

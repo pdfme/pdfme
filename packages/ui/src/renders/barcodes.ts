@@ -1,0 +1,117 @@
+import type { RenderProps } from "../types"
+import type * as CSS from 'csstype';
+import { validateBarcodeInput, BarcodeSchema, createBarCode } from '@pdfme/common';
+import { blobToDataURL } from '../helper';
+
+const fullSize = { width: '100%', height: '100%' }
+
+const createErrorBarcodeElm = () => {
+    const container = document.createElement('div');
+    const containerStyle: CSS.Properties = {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...fullSize,
+    }
+    Object.assign(container.style, containerStyle);
+
+    const span = document.createElement('span');
+    const spanStyle: CSS.Properties = {
+        color: 'white',
+        background: 'red',
+        padding: '0.25rem',
+        fontSize: '12pt',
+        fontWeight: 'bold',
+        borderRadius: '2px',
+    }
+    Object.assign(span.style, spanStyle);
+
+    span.textContent = 'ERROR';
+    container.appendChild(span);
+
+    return container;
+};
+
+const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
+    const imageBuf = await createBarCode({ ...schema, input: value });
+    const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
+    const barcodeDataURL = await blobToDataURL(barcodeData);
+    return barcodeDataURL;
+}
+
+const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
+    const barcodeDataURL = await createBarcodeImage(schema, value);
+    const img = document.createElement('img');
+    img.src = barcodeDataURL;
+    const imgStyle: CSS.Properties = { ...fullSize, borderRadius: 0 }
+    Object.assign(img.style, imgStyle)
+    return img;
+}
+
+
+export const renderBarcode = async (arg: RenderProps) => {
+    const {
+        value,
+        rootElement,
+        mode,
+        onChange,
+        stopEditing,
+        tabIndex,
+        placeholder,
+    } = arg;
+    const schema = arg.schema as BarcodeSchema;
+
+    const container = document.createElement('div');
+    const containerStyle: CSS.Properties = {
+        ...fullSize,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "'Open Sans', sans-serif",
+
+    }
+    Object.assign(container.style, containerStyle);
+    rootElement.appendChild(container);
+    const isForm = mode === 'form';
+    if (isForm) {
+        const input = document.createElement('input');
+        const inputStyle: CSS.Properties = {
+            ...fullSize,
+            position: 'absolute',
+            textAlign: 'center',
+            fontSize: '1rem',
+            color: '#000',
+            backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'auto',
+
+        };
+        Object.assign(input.style, inputStyle);
+        input.value = value;
+        input.placeholder = placeholder || "";
+        input.tabIndex = tabIndex || 0;
+        input.addEventListener('change', (e: Event) => {
+            onChange && onChange((e.target as HTMLInputElement).value);
+        });
+        input.addEventListener('blur', () => {
+            stopEditing && stopEditing();
+        });
+        container.appendChild(input);
+        input.setSelectionRange(value.length, value.length);
+        input.focus();
+    }
+
+    if (!value) return;
+    try {
+        if (!validateBarcodeInput(schema.type, value)) throw new Error('Invalid barcode input');
+        const imgElm = await createBarcodeImageElm(schema, value)
+        container.appendChild(imgElm);
+    } catch (err) {
+        console.error(err);
+        const errorBarcodeElm = createErrorBarcodeElm();
+        container.appendChild(errorBarcodeElm);
+    }
+}

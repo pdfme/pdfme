@@ -1,7 +1,9 @@
+import type { Renderer } from './types';
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
+import builtInRenderer from './builtInRenderer';
 import {
   Template,
   Size,
@@ -65,6 +67,10 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
+  private rendererRegistry: Renderer = builtInRenderer;
+
+  private options = {};
+
   private readonly setSize = debounce(() => {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.size = {
@@ -79,22 +85,28 @@ export abstract class BaseUIClass {
   constructor(props: UIProps) {
     checkUIProps(props);
 
-    const { domContainer, template, options } = props;
-    const { lang, font } = options || {};
+    const { domContainer, template, options = {} } = props;
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
+    this.options = options;
     this.size = {
       height: this.domContainer!.clientHeight || window.innerHeight,
       width: this.domContainer!.clientWidth || window.innerWidth,
     };
     this.resizeObserver.observe(this.domContainer!);
 
+    const { lang, font } = options;
     if (lang) {
       this.lang = lang;
     }
     if (font) {
       this.font = font;
     }
+    // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
+    // if(renderer){
+    //   this.renderer = Object.assign(this.renderer, renderer);;
+    // }
+
   }
 
   protected getI18n() {
@@ -103,6 +115,14 @@ export abstract class BaseUIClass {
 
   protected getFont() {
     return this.font;
+  }
+
+  protected getRendererRegistry() {
+    return this.rendererRegistry;
+  }
+
+  protected getOptions() {
+    return this.options;
   }
 
   public getTemplate() {

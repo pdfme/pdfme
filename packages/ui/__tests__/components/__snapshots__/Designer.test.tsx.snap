@@ -370,21 +370,25 @@ exports[`Designer snapshot 1`] = `
               title="field1"
             >
               <div
-                style="position: absolute; top: 0px; padding: 0px; height: 56.692913386499995px; width: 377.95275591px; resize: none; display: flex; flex-direction: column; justify-content: flex-start;"
+                style="height: 100%; width: 100%;"
               >
                 <div
-                  style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; margin-bottom: 0px; padding-top: 3.436640625px;"
+                  style="padding: 0px; resize: none; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
                 >
-                  <span
-                    style="letter-spacing: inherit;"
+                  <div
+                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; margin-bottom: 0px; padding-top: 3.436640625px;"
                   >
-                    b
-                  </span>
-                  <span
-                    style="letter-spacing: 0;"
-                  >
-                    b
-                  </span>
+                    <span
+                      style="letter-spacing:inherit;"
+                    >
+                      b
+                    </span>
+                    <span
+                      style="letter-spacing:0;"
+                    >
+                      b
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -397,22 +401,27 @@ exports[`Designer snapshot 1`] = `
               title="field2"
             >
               <div
-                style="width: 377.95275591px; height: 151.181102364px; opacity: 1; background-image: none; background-size: 377.95275591px 151.181102364px;"
+                style="height: 100%; width: 100%;"
               >
-                <img
-                  src="aaaaaaaaaaaa"
-                  style="width: 377.95275591px; height: 151.181102364px; border-radius: 0;"
-                />
+                <div
+                  style="width: 100%; height: 100%; background-image: none; background-size: 377.95275591px 151.181102364px;"
+                >
+                  <img
+                    src="aaaaaaaaaaaa"
+                    style="height: 100%; width: 100%; border-radius: 0;"
+                  />
+                  <label
+                    style="width: 100%; height: 100%; display: none; position: absolute; top: 0px; cursor: pointer;"
+                  >
+                    <input
+                      accept="image/jpeg, image/png"
+                      style="width: 100%; height: 100%; position: absolute; top: 50%;"
+                      tabindex="0"
+                      type="file"
+                    />
+                  </label>
+                </div>
               </div>
-              <label
-                style="display: none; position: absolute; top: 50%; width: 100%; cursor: pointer;"
-              >
-                <input
-                  accept="image/jpeg, image/png"
-                  type="file"
-                  value=""
-                />
-              </label>
             </div>
           </div>
         </div>
