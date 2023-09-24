@@ -16,9 +16,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
+import type { SidebarProps } from '../../../../types';
 import Item from './Item';
 import SelectableSortableItem from './SelectableSortableItem';
-import { SidebarProps } from '../index';
 
 const SelectableSortableContainer = (
   props: Pick<
@@ -114,9 +114,8 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    border: `1px solid ${
-                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
-                    }`,
+                    border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
+                      }`,
                   }}
                   schema={schema}
                   schemas={schemas}

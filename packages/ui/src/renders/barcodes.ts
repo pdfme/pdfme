@@ -1,7 +1,6 @@
 import type { RenderProps } from "../types"
 import type * as CSS from 'csstype';
 import { validateBarcodeInput, BarcodeSchema, createBarCode } from '@pdfme/common';
-import { blobToDataURL } from '../helper';
 
 const fullSize = { width: '100%', height: '100%' }
 
@@ -31,6 +30,13 @@ const createErrorBarcodeElm = () => {
 
     return container;
 };
+
+const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+});
 
 const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
     const imageBuf = await createBarCode({ ...schema, input: value });

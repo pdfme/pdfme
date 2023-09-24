@@ -196,60 +196,12 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
-export const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, reject) => {
-  const reader = new FileReader();
-  reader.onloadend = () => resolve(reader.result as string);
-  reader.onerror = reject;
-  reader.readAsDataURL(blob);
-})
 
-
-const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && file !== null) {
-        r(e.target.result);
-      }
-    });
-    if (file !== null) {
-      if (type === 'text') {
-        fileReader.readAsText(file);
-      } else if (type === 'dataURL') {
-        fileReader.readAsDataURL(file);
-      } else if (type === 'arrayBuffer') {
-        fileReader.readAsArrayBuffer(file);
-      }
-    }
-  });
-};
-
-export const readFiles = (files: FileList | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && files !== null) {
-        r(e.target.result);
-      }
-    });
-    if (files !== null && files[0]) {
-      readFile(files[0], type).then((data) => r(data));
-    }
-  });
-};
 
 const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
-
   return parseFloat(String(pt)) * mmRatio;
-};
-
-export const px2mm = (px: number) => {
-  // http://www.unitconversion.org/typography/millimeters-to-pixels-y-conversion.html
-  const mmRatio = 0.264583333;
-
-  return parseFloat(String(px)) * mmRatio;
 };
 
 export const getPdfPageSizes = async (pdfBlob: Blob) => {
