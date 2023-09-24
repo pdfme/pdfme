@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 import { SchemaForUI, isBarcodeSchema, isTextSchema } from '@pdfme/common';
+import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext } from '../../../../contexts';
 import Divider from '../../../Divider';
-import { SidebarProps } from '../index';
 import TextPropEditor from './TextPropEditor';
-import ExampleInputEditor from './ExampleInputEditor';
 import PositionAndSizeEditor from './PositionAndSizeEditor';
 import TypeAndKeyEditor from './TypeAndKeyEditor';
 import BarcodePropEditor from './BarCodePropEditor';
@@ -43,7 +42,6 @@ const DetailView = (
         {isTextSchema(activeSchema) && (
           <TextPropEditor {...props} />
         )}
-        <ExampleInputEditor {...props} />
       </div>
     </div>
   );
