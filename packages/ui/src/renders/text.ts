@@ -70,10 +70,20 @@ export const renderText = async (arg: RenderProps) => {
     const bottomAdjustment = bottomAdj;
 
     const container = document.createElement('div');
+    function getBackgroundColor(mode: 'form' | 'viewer', value: string, schema: TextSchema) {
+        if (mode === 'form' && value && schema.backgroundColor) {
+            return schema.backgroundColor;
+        } else if (mode === 'viewer') {
+            return schema.backgroundColor ?? 'transparent';
+        } else {
+            return 'rgb(242 244 255 / 75%)';
+        }
+    }
+
     const containerStyle: CSS.Properties = {
         padding: 0,
         resize: 'none',
-        backgroundColor: value && schema.backgroundColor ? schema.backgroundColor : 'rgb(242 244 255 / 75%)',
+        backgroundColor: getBackgroundColor(mode, value, schema),
         border: 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -105,7 +115,7 @@ export const renderText = async (arg: RenderProps) => {
             border: 'none',
             outline: 'none',
             paddingTop: topAdjustment + 'px',
-            background: 'none',
+            backgroundColor: 'transparent',
             width: '100%',
             height: '100%',
         };

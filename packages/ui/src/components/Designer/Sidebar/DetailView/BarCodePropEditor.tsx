@@ -5,8 +5,8 @@ import {
   DEFAULT_BARCODE_BG_COLOR,
   DEFAULT_BARCODE_COLOR,
 } from '@pdfme/common';
+import type { SidebarProps } from '../../../../types';
 import { I18nContext } from '../../../../contexts';
-import { SidebarProps } from '..';
 import ColorInputSet from './FormComponents/ColorInputSet';
 
 const BarcodePropEditor = (

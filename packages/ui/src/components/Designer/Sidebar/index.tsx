@@ -1,34 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { SchemaForUI, Size } from '@pdfme/common';
+import type { SidebarProps } from '../../../types';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext, FontContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
 import { getFallbackFontName } from '@pdfme/common';
-
-export type SidebarProps = {
-  height: number;
-  hoveringSchemaId: string | null;
-  onChangeHoveringSchemaId: (id: string | null) => void;
-  size: Size;
-  pageSize: Size;
-  activeElements: HTMLElement[];
-  schemas: SchemaForUI[];
-  onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
-  onEdit: (id: string) => void;
-  onEditEnd: () => void;
-  changeSchemas: (
-    objs: {
-      key: string; value: undefined | string | number | {
-        min: number;
-        max: number;
-      }; schemaId: string
-    }[]
-  ) => void;
-  addSchema: () => void;
-  deselectSchema: () => void;
-};
 
 const Sidebar = (props: SidebarProps) => {
   const { height, size, activeElements, schemas, addSchema } = props;

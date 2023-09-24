@@ -3,9 +3,37 @@ import type * as CSS from 'csstype';
 import { ImageSchema } from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { ZOOM } from '../constants';
-import { readFiles } from '../helper';
 
 const fullSize = { width: '100%', height: '100%' }
+
+const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> => new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = (e) => {
+        if (e.target?.result) {
+            resolve(e.target.result);
+        }
+    };
+
+    fileReader.onerror = (e) => {
+        reject(new Error('File reading failed'));
+    };
+
+    let file: File | null = null;
+    if (input instanceof FileList && input.length > 0) {
+        file = input[0];
+    } else if (input instanceof File) {
+        file = input;
+    }
+
+    if (file) {
+        fileReader.readAsDataURL(file);
+    } else {
+        reject(new Error('No files provided'));
+    }
+});
+
+
 export const renderImage = async (arg: RenderProps) => {
     const {
         value,
@@ -73,29 +101,30 @@ export const renderImage = async (arg: RenderProps) => {
     }
 
     // file input
-    const label = document.createElement('label');
-    const labelStyle: CSS.Properties = {
-        ...fullSize,
-        display: isForm ? 'flex' : 'none',
-        position: 'absolute',
-        top: 0,
-        backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
-        cursor: 'pointer',
+    if (!value && isForm) {
+        const label = document.createElement('label');
+        const labelStyle: CSS.Properties = {
+            ...fullSize,
+            display: isForm ? 'flex' : 'none',
+            position: 'absolute',
+            top: 0,
+            backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
+            cursor: 'pointer',
+        }
+        Object.assign(label.style, labelStyle);
+        container.appendChild(label);
+        const input = document.createElement('input');
+        const inputStyle: CSS.Properties = { ...fullSize, position: 'absolute', top: '50%' }
+        Object.assign(input.style, inputStyle);
+        input.tabIndex = tabIndex || 0;
+        input.type = 'file';
+        input.accept = 'image/jpeg, image/png';
+        input.addEventListener('change', (event: Event) => {
+            const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
+            readFile(changeEvent.target.files).then((result) => onChange && onChange(result as string))
+        });
+        input.addEventListener('blur', () => stopEditing && stopEditing());
+        label.appendChild(input);
     }
-    Object.assign(label.style, labelStyle);
-    container.appendChild(label);
 
-
-    const input = document.createElement('input');
-    const inputStyle: CSS.Properties = { ...fullSize, position: 'absolute', top: '50%' }
-    Object.assign(input.style, inputStyle);
-    input.tabIndex = tabIndex || 0;
-    input.type = 'file';
-    input.accept = 'image/jpeg, image/png';
-    input.addEventListener('change', (event: Event) => {
-        const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
-        readFiles(changeEvent.target.files, 'dataURL').then((result) => onChange && onChange(result as string))
-    });
-    input.addEventListener('blur', () => stopEditing && stopEditing());
-    label.appendChild(input);
 }

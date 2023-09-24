@@ -1,5 +1,5 @@
 
-import type { UIOptions, SchemaForUI } from '@pdfme/common';
+import type { UIOptions, SchemaForUI, Size } from '@pdfme/common';
 
 interface RenderBaseProps {
     schema: SchemaForUI;
@@ -26,3 +26,26 @@ export type RenderProps = RenderBaseProps & {
 export interface Renderer {
     [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
 }
+
+export type SidebarProps = {
+    height: number;
+    hoveringSchemaId: string | null;
+    onChangeHoveringSchemaId: (id: string | null) => void;
+    size: Size;
+    pageSize: Size;
+    activeElements: HTMLElement[];
+    schemas: SchemaForUI[];
+    onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
+    onEdit: (id: string) => void;
+    onEditEnd: () => void;
+    changeSchemas: (
+        objs: {
+            key: string; value: undefined | string | number | {
+                min: number;
+                max: number;
+            }; schemaId: string
+        }[]
+    ) => void;
+    addSchema: () => void;
+    deselectSchema: () => void;
+};
