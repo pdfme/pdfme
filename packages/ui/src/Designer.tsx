@@ -15,7 +15,7 @@ class Designer extends BaseUIClass {
     super(props);
     checkDesignerProps(props);
 
-    {/* TODO set propEditor from the propEditorRegistry here */ }
+    {/* TODO set propEditor from the propertyPanelRegistry here */ }
 
     this.render();
   }

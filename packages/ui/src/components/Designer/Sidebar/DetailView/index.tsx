@@ -17,7 +17,7 @@ const DetailView = (
   const { activeSchema, deselectSchema } = props;
   const i18n = useContext(I18nContext);
 
-  {/* TODO get propEditor from the propEditorRegistry here */ }
+  {/* TODO get propEditor from the propertyPanelRegistry here */ }
 
   return (
     <div>
@@ -38,7 +38,7 @@ const DetailView = (
         <Divider />
         <PositionAndSizeEditor {...props} />
         <Divider />
-        {/* TODO use propEditor from the propEditorRegistry here */}
+        {/* TODO use propEditor from the propertyPanelRegistry here */}
         {isBarcodeSchema(activeSchema) && (
           <BarcodePropEditor {...props} />
         )}
