@@ -128,6 +128,8 @@ const TextPropEditor = (
 
   if (activeSchema.type !== 'text') return <></>;
 
+  const dynamicFontFlg = typeof (activeSchema.dynamicFontSize?.max) === 'number' && typeof (activeSchema.dynamicFontSize?.min) === 'number';
+
   return (
     <section style={{ fontSize: '0.7rem' }}>
       <div
@@ -220,25 +222,23 @@ const TextPropEditor = (
         <CheckboxSet
           width="100%"
           label="Use dynamic font size"
-          checked={Boolean(activeSchema.dynamicFontSize)}
+          checked={dynamicFontFlg}
           onChange={(e) => {
+            const value = e.target.checked ? (activeSchema.fontSize || DEFAULT_FONT_SIZE) : undefined
+            const schemaId = activeSchema.id;
             changeSchemas([
-              {
-                key: 'dynamicFontSize', value: e.target.checked ? {
-                  min: activeSchema.fontSize || DEFAULT_FONT_SIZE,
-                  max: activeSchema.fontSize || DEFAULT_FONT_SIZE,
-                } : undefined, schemaId: activeSchema.id,
-              },
+              { key: 'dynamicFontSize.min', value, schemaId },
+              { key: 'dynamicFontSize.max', value, schemaId }
             ]);
           }}
         />
 
-        {activeSchema.dynamicFontSize && (
+        {dynamicFontFlg && (
           <>
             <NumberInputSet
               width="30%"
               label={'FontSize Min(pt)'}
-              value={activeSchema.dynamicFontSize.min ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize?.min ?? Number(activeSchema.fontSize)}
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
@@ -254,7 +254,7 @@ const TextPropEditor = (
             <NumberInputSet
               width="30%"
               label={'FontSize Max(pt)'}
-              value={activeSchema.dynamicFontSize.max ?? Number(activeSchema.fontSize)}
+              value={activeSchema.dynamicFontSize?.max ?? Number(activeSchema.fontSize)}
               minNumber={0}
               style={
                 activeSchema.dynamicFontSize &&
@@ -270,7 +270,7 @@ const TextPropEditor = (
             <SelectSet
               width="40%"
               label={'Fit'}
-              value={activeSchema.dynamicFontSize.fit ?? DEFAULT_DYNAMIC_FIT}
+              value={activeSchema.dynamicFontSize?.fit ?? DEFAULT_DYNAMIC_FIT}
               options={dynamicFits}
               onChange={(e) => {
                 changeSchemas([{ key: 'dynamicFontSize.fit', value: e.target.value, schemaId: activeSchema.id }])
@@ -309,7 +309,7 @@ const TextPropEditor = (
             ])
           }
           onClear={() =>
-            changeSchemas([{ key: 'backgroundColor', value: '', schemaId: activeSchema.id }])
+            changeSchemas([{ key: 'backgroundColor', value: undefined, schemaId: activeSchema.id }])
           }
         />
       </div>

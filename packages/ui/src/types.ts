@@ -27,6 +27,23 @@ export interface Renderer {
     [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
 }
 
+export type ChangeSchemas = (objs: { key: string; value: string | number | undefined; schemaId: string }[]) => void;
+
+export interface PropPanelProps {
+    rootElement: HTMLDivElement,
+    schema: SchemaForUI;
+    changeSchemas: ChangeSchemas;
+    options: UIOptions;
+
+}
+
+export interface PropPanel {
+    [key: string]: {
+        render: (arg: PropPanelProps) => Promise<void>
+        defaultValue: string | number | undefined;
+    } | undefined;
+}
+
 export type SidebarProps = {
     height: number;
     hoveringSchemaId: string | null;
@@ -38,14 +55,7 @@ export type SidebarProps = {
     onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
     onEdit: (id: string) => void;
     onEditEnd: () => void;
-    changeSchemas: (
-        objs: {
-            key: string; value: undefined | string | number | {
-                min: number;
-                max: number;
-            }; schemaId: string
-        }[]
-    ) => void;
+    changeSchemas: ChangeSchemas;
     addSchema: () => void;
     deselectSchema: () => void;
 };

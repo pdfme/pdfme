@@ -56,7 +56,7 @@ const BarcodePropEditor = (
             changeSchemas([{ key: 'backgroundcolor', value: e.target.value, schemaId: activeSchema.id }])
           }}
           onClear={() => {
-            changeSchemas([{ key: 'backgroundcolor', value: '', schemaId: activeSchema.id }])
+            changeSchemas([{ key: 'backgroundcolor', value: undefined, schemaId: activeSchema.id }])
           }}
           extraStyle={colorInputStyles}
         />
@@ -69,7 +69,7 @@ const BarcodePropEditor = (
               changeSchemas([{ key: 'textcolor', value: e.target.value, schemaId: activeSchema.id }])
             }}
             onClear={() => {
-              changeSchemas([{ key: 'textcolor', value: '', schemaId: activeSchema.id }])
+              changeSchemas([{ key: 'textcolor', value: undefined, schemaId: activeSchema.id }])
             }}
             extraStyle={colorInputStyles}
           />

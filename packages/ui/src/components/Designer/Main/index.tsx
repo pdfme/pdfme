@@ -10,6 +10,7 @@ import React, {
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import type { ChangeSchemas } from "../../../types"
 import { ZOOM, RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
@@ -76,7 +77,7 @@ interface Props {
   size: Size;
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
-  changeSchemas: (objs: { key: string; value: string | number; schemaId: string }[]) => void;
+  changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
 }

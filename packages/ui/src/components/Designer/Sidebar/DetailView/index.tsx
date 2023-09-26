@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { SchemaForUI, isBarcodeSchema, isTextSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
-import { I18nContext } from '../../../../contexts';
+import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
 import Divider from '../../../Divider';
-import TextPropEditor from './TextPropEditor';
 import PositionAndSizeEditor from './PositionAndSizeEditor';
 import TypeAndKeyEditor from './TypeAndKeyEditor';
+import TextPropEditor from './TextPropEditor';
 import BarcodePropEditor from './BarCodePropEditor';
 
 const DetailView = (
@@ -14,10 +14,38 @@ const DetailView = (
     activeSchema: SchemaForUI;
   }
 ) => {
-  const { activeSchema, deselectSchema } = props;
+  const { activeSchema, deselectSchema, changeSchemas } = props;
   const i18n = useContext(I18nContext);
+  const propPanelRegistry = useContext(PropPanelRegistry);
+  const options = useContext(OptionsContext);
 
-  {/* TODO get propEditor from the propertyPanelRegistry here */ }
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current && activeSchema.type) {
+      const schemaType = activeSchema.type as string;
+      const propPanel = propPanelRegistry[schemaType];
+      if (!propPanel) {
+        console.error(`PropPanel for type ${activeSchema.type} not found`);
+        return;
+      }
+
+      ref.current.innerHTML = '';
+
+      propPanel.render({
+        rootElement: ref.current,
+        schema: activeSchema,
+        changeSchemas,
+        options,
+      });
+    }
+    return () => {
+      if (ref.current) {
+        ref.current.innerHTML = '';
+      }
+    };
+  }, [JSON.stringify(activeSchema), options]);
+
 
   return (
     <div>
@@ -38,7 +66,8 @@ const DetailView = (
         <Divider />
         <PositionAndSizeEditor {...props} />
         <Divider />
-        {/* TODO use propEditor from the propertyPanelRegistry here */}
+        {/* PropPanel */}
+        <div style={{ height: '100%', width: '100%' }} ref={ref} />
         {isBarcodeSchema(activeSchema) && (
           <BarcodePropEditor {...props} />
         )}

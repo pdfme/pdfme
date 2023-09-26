@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { DesignerReactProps, Template, SchemaForUI, SchemaType } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
+import type { ChangeSchemas } from '../../types';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
 import { I18nContext } from '../../contexts';
 import {
@@ -89,21 +90,14 @@ const TemplateEditor = ({
     [schemasList, pageCursor, commitSchemas]
   );
 
-  const changeSchemas = useCallback(
-    (objs: { key: string; value: undefined | string | number | { min: number, max: number }; schemaId: string }[]) => {
+  const changeSchemas: ChangeSchemas = useCallback(
+    (objs) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
         // Assign to reference
         set(tgt, key, value);
-        if (key === 'type') {
-          const type = String(value) as SchemaType;
-          // set default value, text or barcode
-          set(tgt, 'data', getSampleByType(type));
-          // For barcodes, adjust the height to get the correct ratio.
-          if (type !== 'text' && type !== 'image') {
-            set(tgt, 'height', getKeepRatioHeightByWidth(type, tgt.width));
-          }
-        }
+
+        // FIXME set default value from propPanel option.
 
         return acc;
       }, cloneDeep(schemasList[pageCursor]));
