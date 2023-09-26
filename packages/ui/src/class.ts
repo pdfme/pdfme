@@ -104,7 +104,7 @@ export abstract class BaseUIClass {
     }
     // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
     // if(renderer){
-    //   this.rendererRegistry = Object.assign(this.renderer, renderer);
+    //   this.rendererRegistry = Object.assign(this.rendererRegistry, renderer);
     // }
 
   }
