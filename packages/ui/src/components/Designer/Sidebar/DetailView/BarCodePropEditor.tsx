@@ -9,7 +9,7 @@ import type { SidebarProps } from '../../../../types';
 import { I18nContext } from '../../../../contexts';
 import ColorInputSet from './FormComponents/ColorInputSet';
 
-// TODO Replace React to VanillaJS
+// FIXME Replace React to VanillaJS
 const BarcodePropEditor = (
   props: Pick<SidebarProps, 'changeSchemas'> & { activeSchema: SchemaForUI }
 ) => {

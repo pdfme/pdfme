@@ -40,7 +40,8 @@ export interface PropPanelProps {
 export interface PropPanel {
     [key: string]: {
         render: (arg: PropPanelProps) => Promise<void>
-        defaultValue: string | number | undefined;
+        // defaultValue: string | number | undefined; // <- FIXME この値、Rendererにあるべきでは？
+        // defaultSize があってもいいかも <- これもRendererにあるべきでは？
     } | undefined;
 }
 

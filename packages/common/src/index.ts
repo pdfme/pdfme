@@ -75,6 +75,7 @@ import {
   getFontDescentInPt,
   getSplittedLines,
 } from './font.js';
+import { barcodeSchemaTypes } from './schema.js';
 
 export {
   DEFAULT_FONT_NAME,
@@ -99,6 +100,7 @@ export {
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
   schemaTypes,
+  barcodeSchemaTypes,
   isTextSchema,
   isImageSchema,
   isBarcodeSchema,
@@ -124,7 +126,7 @@ export {
   checkGenerateProps,
   validateBarcodeInput,
   calculateDynamicFontSize,
-  createBarCode
+  createBarCode,
 };
 
 export type {

@@ -14,8 +14,6 @@ import {
   templateSchemas2SchemasList,
   fmtTemplate,
   getInitialSchema,
-  getSampleByType,
-  getKeepRatioHeightByWidth,
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
   getPagesScrollTopByIndex,
@@ -97,7 +95,13 @@ const TemplateEditor = ({
         // Assign to reference
         set(tgt, key, value);
 
-        // FIXME set default value from propPanel option.
+        // if (key === 'type') {
+          // FIXME set default value from propPanel option.
+          // set(tgt, 'data', 'default');
+          // maybe set default size is better.
+          // set(tgt, 'width', 200);
+          // set(tgt, 'height', 100);
+        // }
 
         return acc;
       }, cloneDeep(schemasList[pageCursor]));
