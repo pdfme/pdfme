@@ -21,7 +21,7 @@ export const VerticalAlignment = z.enum(verticalAlignments);
 // prettier-ignore
 export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
-export const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
+const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
 
 export const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export const SchemaType = z.enum(schemaTypes);
@@ -53,7 +53,7 @@ export const TextSchema = CommonSchema.extend({
 
 export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
 
-export const BarcodeSchema = CommonSchema.extend({ 
+export const BarcodeSchema = CommonSchema.extend({
   type: BarcodeSchemaType,
   backgroundcolor: z.string().optional(),
   barcolor: z.string().optional(),

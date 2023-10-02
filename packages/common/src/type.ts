@@ -6,7 +6,6 @@ import {
   Size,
   Alignment,
   barcodeSchemaTypes,
-  schemaTypes as _schemaTypes,
   BarcodeSchemaType,
   SchemaType,
   CommonSchema as _CommonSchema,
@@ -38,7 +37,6 @@ export type FontWidthCalcValues = {
 };
 
 type CommonSchema = z.infer<typeof _CommonSchema>;
-export const schemaTypes = _schemaTypes;
 export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
 export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
 export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>

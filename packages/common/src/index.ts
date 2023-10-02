@@ -22,7 +22,7 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 import { createBarCode } from './barcode';
-import { schemaTypes, isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
+import { isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
   FontWidthCalcValues,
   Lang,
@@ -99,7 +99,6 @@ export {
   PT_TO_PX_RATIO,
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
-  schemaTypes,
   barcodeSchemaTypes,
   isTextSchema,
   isImageSchema,

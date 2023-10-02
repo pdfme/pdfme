@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useCallback } from 'react';
-import { schemaTypes, SchemaForUI } from '@pdfme/common';
+import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
-import { I18nContext } from '../../../../contexts';
+import { I18nContext, PropPanelRegistry } from '../../../../contexts';
 
 const ErrorLabel = ({ isError, msg }: { isError: boolean; msg: string }) => (
   <span
@@ -16,6 +16,7 @@ const TypeAndKeyEditor = (
 ) => {
   const { changeSchemas, activeSchema, schemas } = props;
   const i18n = useContext(I18nContext);
+  const propPanelRegistry = useContext(PropPanelRegistry);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +50,7 @@ const TypeAndKeyEditor = (
           }
           value={activeSchema.type}
         >
-          {schemaTypes.map((t) => (
+          {Object.keys(propPanelRegistry).map((t) => (
             <option key={t} value={t}>
               {t}
             </option>
