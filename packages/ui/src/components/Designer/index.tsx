@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI, SchemaType } from '@pdfme/common';
+import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import type { ChangeSchemas } from '../../types';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
-import { I18nContext } from '../../contexts';
+import { I18nContext, RendererRegistry } from '../../contexts';
 import {
   uuid,
   set,
@@ -36,6 +36,8 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
+  const rendererRegistry = useContext(RendererRegistry);
+
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -95,13 +97,11 @@ const TemplateEditor = ({
         // Assign to reference
         set(tgt, key, value);
 
-        // if (key === 'type') {
-          // FIXME set default value from propPanel option.
-          // set(tgt, 'data', 'default');
-          // maybe set default size is better.
-          // set(tgt, 'width', 200);
-          // set(tgt, 'height', 100);
-        // }
+        if (key === 'type') {
+          set(tgt, 'data', rendererRegistry[value as string]?.defaultValue || '');
+          set(tgt, 'width', rendererRegistry[value as string]?.defaultSize.width || tgt.width);
+          set(tgt, 'height', rendererRegistry[value as string]?.defaultSize.height || tgt.height);
+        }
 
         return acc;
       }, cloneDeep(schemasList[pageCursor]));
@@ -206,7 +206,12 @@ const TemplateEditor = ({
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
-    s.data = 'text';
+
+    const renderer = rendererRegistry[s.type]
+    s.data = renderer?.defaultValue || '';
+    s.width = renderer?.defaultSize.width || s.width;
+    s.height = renderer?.defaultSize.height || s.height;
+
     s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)!]));

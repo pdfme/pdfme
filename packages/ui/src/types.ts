@@ -24,7 +24,11 @@ export type RenderProps = RenderBaseProps & {
 }
 
 export interface Renderer {
-    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
+    [key: string]: {
+        render: (arg: RenderProps) => Promise<void>;
+        defaultValue: string;
+        defaultSize: Size;
+    } | undefined;
 }
 
 export type ChangeSchemas = (objs: { key: string; value: string | number | undefined; schemaId: string }[]) => void;
@@ -40,8 +44,6 @@ export interface PropPanelProps {
 export interface PropPanel {
     [key: string]: {
         render: (arg: PropPanelProps) => Promise<void>
-        // defaultValue: string | number | undefined; // <- FIXME この値、Rendererにあるべきでは？
-        // defaultSize があってもいいかも <- これもRendererにあるべきでは？
     } | undefined;
 }
 
