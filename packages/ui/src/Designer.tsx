@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { ConfigProvider, ThemeConfig } from 'antd';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
 import { PropPanel } from './types'
 import { BaseUIClass } from './class';
@@ -8,6 +9,21 @@ import { I18nContext, FontContext, RendererRegistry, PropPanelRegistry, OptionsC
 import DesignerComponent from './components/Designer/index';
 import { cloneDeep } from './helper';
 import builtInPropPanel from './builtInPropPanel';
+
+// TODO Custom Design for UI #243
+// - https://github.com/pdfme/pdfme/issues/243
+// - https://ant.design/docs/react/customize-theme
+const theme: ThemeConfig = {
+  token: {
+    fontSize: 13,
+  },
+  components: {
+    Form: {
+      itemMarginBottom: 12,
+      verticalLabelPadding: '0 0 4px'
+    },
+  },
+};
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
@@ -60,32 +76,34 @@ class Designer extends BaseUIClass {
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
-      <I18nContext.Provider value={this.getI18n()}>
-        <FontContext.Provider value={this.getFont()}>
-          <RendererRegistry.Provider value={this.getRendererRegistry()}>
-            <PropPanelRegistry.Provider value={this.getPropPanelRegistry()}>
-              <OptionsContext.Provider value={this.getOptions()}>
-                <DesignerComponent
-                  template={this.template}
-                  onSaveTemplate={(template) => {
-                    this.template = template;
-                    if (this.onSaveTemplateCallback) {
-                      this.onSaveTemplateCallback(template);
-                    }
-                  }}
-                  onChangeTemplate={(template) => {
-                    this.template = template;
-                    if (this.onChangeTemplateCallback) {
-                      this.onChangeTemplateCallback(template);
-                    }
-                  }}
-                  size={this.size}
-                />
-              </OptionsContext.Provider>
-            </PropPanelRegistry.Provider>
-          </RendererRegistry.Provider>
-        </FontContext.Provider>
-      </I18nContext.Provider>,
+      <ConfigProvider theme={theme}>
+        <I18nContext.Provider value={this.getI18n()}>
+          <FontContext.Provider value={this.getFont()}>
+            <RendererRegistry.Provider value={this.getRendererRegistry()}>
+              <PropPanelRegistry.Provider value={this.getPropPanelRegistry()}>
+                <OptionsContext.Provider value={this.getOptions()}>
+                  <DesignerComponent
+                    template={this.template}
+                    onSaveTemplate={(template) => {
+                      this.template = template;
+                      if (this.onSaveTemplateCallback) {
+                        this.onSaveTemplateCallback(template);
+                      }
+                    }}
+                    onChangeTemplate={(template) => {
+                      this.template = template;
+                      if (this.onChangeTemplateCallback) {
+                        this.onChangeTemplateCallback(template);
+                      }
+                    }}
+                    size={this.size}
+                  />
+                </OptionsContext.Provider>
+              </PropPanelRegistry.Provider>
+            </RendererRegistry.Provider>
+          </FontContext.Provider>
+        </I18nContext.Provider>
+      </ConfigProvider>,
       this.domContainer
     );
   }

@@ -1,4 +1,5 @@
 
+import type { Schema as FormSchema } from 'form-render';
 import type { UIOptions, SchemaForUI, Size } from '@pdfme/common';
 
 interface RenderBaseProps {
@@ -33,17 +34,12 @@ export interface Renderer {
 
 export type ChangeSchemas = (objs: { key: string; value: string | number | undefined; schemaId: string }[]) => void;
 
-export interface PropPanelProps {
-    rootElement: HTMLDivElement,
-    schema: SchemaForUI;
-    changeSchemas: ChangeSchemas;
-    options: UIOptions;
-
-}
+export type PropPanelSchema = FormSchema;
 
 export interface PropPanel {
     [key: string]: {
-        render: (arg: PropPanelProps) => Promise<void>
+        schema?: PropPanelSchema;
+        widgets?: Record<string, any>,
     } | undefined;
 }
 

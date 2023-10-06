@@ -90,6 +90,8 @@ const Sidebar = (props: SidebarProps) => {
           ) : (
             <DetailView {...props} activeSchema={getLastActiveSchema()} />
           )}
+          {/* FIXME ListViewとDetailViewでスクロールの挙動を合わせる */}
+          {/* DetailViewがでかい場合にちゃんと表示できないし、Add new Field ボタンがおかしいことになる */}
           <div
             style={{
               display: 'flex',

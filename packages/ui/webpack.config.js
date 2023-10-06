@@ -30,6 +30,11 @@ const config = {
     globalObject: 'this',
     library: { type: 'umd' },
   },
-  module: { rules: [{ test: /\.tsx?$/, use: 'ts-loader' }] },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, use: 'ts-loader' },
+      { test: /\.css$/i, use: ['style-loader', 'css-loader'] }
+    ]
+  },
 };
 module.exports = config;

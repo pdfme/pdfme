@@ -1,13 +1,67 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { SchemaForUI, isBarcodeSchema, isTextSchema } from '@pdfme/common';
-import type { SidebarProps } from '../../../../types';
+import FormRender, { useForm } from 'form-render';
+import React, { useContext } from 'react';
+import { SchemaForUI } from '@pdfme/common';
+import type { SidebarProps, PropPanelSchema } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
 import Divider from '../../../Divider';
-import PositionAndSizeEditor from './PositionAndSizeEditor';
-import TypeAndKeyEditor from './TypeAndKeyEditor';
-import TextPropEditor from './TextPropEditor';
-import BarcodePropEditor from './BarCodePropEditor';
+
+const propPanelSchema: PropPanelSchema = {
+  type: 'object',
+  column: 2,
+  properties: {
+    type: {
+      title: 'Type',
+      type: 'string',
+      widget: 'select',
+      props: {
+        options: [
+          { label: 'Option1', value: 'Option1' },
+          { label: 'Option2', value: 'Option2' },
+          { label: 'Option3', value: 'Option3' }
+        ]
+      },
+    },
+    name: {
+      title: 'Name',
+      type: 'string',
+      widget: 'input',
+    },
+    align: {  // FIXME ウィジェットを作成する
+      title: 'Align',
+      type: 'string',
+      widget: 'button',
+      cellSpan: 2,
+    },
+    position: {
+      type: 'object',
+      widget: 'card',
+      column: 2,
+      properties: {
+        x: {
+          title: 'X',
+          type: 'number',
+          widget: 'inputNumber',
+        },
+        y: {
+          title: 'Y',
+          type: 'number',
+          widget: 'inputNumber',
+        },
+      }
+    },
+    width: {
+      title: 'Width',
+      type: 'number',
+      widget: 'inputNumber',
+    },
+    height: {
+      title: 'Height',
+      type: 'number',
+      widget: 'inputNumber',
+    },
+  }
+};
 
 const DetailView = (
   props: Pick<SidebarProps, 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
@@ -15,46 +69,53 @@ const DetailView = (
   }
 ) => {
   const { activeSchema, deselectSchema, changeSchemas } = props;
+  const form = useForm();
+
   const i18n = useContext(I18nContext);
   const propPanelRegistry = useContext(PropPanelRegistry);
   const options = useContext(OptionsContext);
 
-  const ref = useRef<HTMLDivElement>(null);
+  // FIXME propPanelSchema に propPanelRegistry で登録されたスキーマをマージする
 
-  useEffect(() => {
-    if (ref.current && activeSchema.type) {
-      const schemaType = activeSchema.type as string;
-      const propPanel = propPanelRegistry[schemaType];
-      if (!propPanel) {
-        console.error(`PropPanel for type ${activeSchema.type} not found`);
-        return;
-      }
-
-      ref.current.innerHTML = '';
-
-      propPanel.render({
-        rootElement: ref.current,
-        schema: activeSchema,
-        changeSchemas,
-        options,
-      });
-    }
-    return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
-      }
-    };
-  }, [JSON.stringify(activeSchema), options]);
+  // FIXME ここでフォームに値を設定する
+  form.setValues({
+    type: 'Option2',
+    name: 'Name',
+    align: 'Align',
+    position: { x: 0, y: 0 },
+    width: 0,
+    height: 0,
+    fontname: 'Arial',
+    horizontalAlign: 'left',
+    verticalAlign: 'top',
+    fontSize: 0,
+    lineHeight: 0,
+    characterSpacing: 0,
+    useDynamicFontSize: false,
+    fontSizeMin: 0,
+    fontSizeMax: 0,
+    fit: 'Fit1'
+  });
 
 
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <span
-          style={{ position: 'absolute', width: 20, padding: '5px', cursor: 'pointer' }}
+          style={{
+            position: 'absolute',
+            zIndex: 100,
+            border: 'none',
+            borderRadius: 2,
+            padding: '0.5rem',
+            cursor: 'pointer',
+            background: '#eee',
+            width: 14,
+            height: 14,
+          }}
           onClick={deselectSchema}
         >
-          <Bars3Icon />
+          <Bars3Icon width={15} height={15} />
         </span>
         <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('editField')}
@@ -62,18 +123,18 @@ const DetailView = (
       </div>
       <Divider />
       <div style={{ fontSize: '0.9rem' }}>
-        <TypeAndKeyEditor {...props} />
-        <Divider />
-        <PositionAndSizeEditor {...props} />
-        <Divider />
-        {/* PropPanel */}
-        <div style={{ height: '100%', width: '100%' }} ref={ref} />
-        {isBarcodeSchema(activeSchema) && (
-          <BarcodePropEditor {...props} />
-        )}
-        {isTextSchema(activeSchema) && (
-          <TextPropEditor {...props} />
-        )}
+        <FormRender
+          globalProps={options}
+          form={form}
+          schema={propPanelSchema}
+          watch={{
+            '#': (allValues) => {
+              // FIXME 値の変更をchangeSchemasで伝える
+              console.log('watch all:', allValues);
+            }
+          }}
+          locale='en-US'
+        />
       </div>
     </div>
   );
