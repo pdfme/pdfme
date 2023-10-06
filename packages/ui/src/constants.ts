@@ -8,4 +8,4 @@ export const SELECTABLE_CLASSNAME = 'selectable';
 
 export const RULER_HEIGHT = 30;
 
-export const SIDEBAR_WIDTH = 300;
+export const SIDEBAR_WIDTH = 325;

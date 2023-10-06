@@ -74,7 +74,7 @@ const Sidebar = (props: SidebarProps) => {
             top: RULER_HEIGHT / 2,
             right: 0,
             position: 'absolute',
-            background: '#ffffffed',
+            background: '#fffffffa',
             color: '#333',
             border: '1px solid #eee',
             padding: '0.5rem',
