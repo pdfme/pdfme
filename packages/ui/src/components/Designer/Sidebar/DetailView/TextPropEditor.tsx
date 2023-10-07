@@ -115,7 +115,7 @@ const CheckboxSet = (props: {
   );
 };
 
-// FIXME Replace React to VanillaJS
+// FIXME Replace React to VanillaJS and remove this file
 const TextPropEditor = (
   props: Pick<SidebarProps, 'changeSchemas'> & { activeSchema: SchemaForUI }
 ) => {

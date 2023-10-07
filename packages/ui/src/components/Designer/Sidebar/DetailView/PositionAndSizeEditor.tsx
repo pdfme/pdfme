@@ -3,6 +3,7 @@ import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { round } from '../../../../helper';
 
+// FIXME remove this file
 const inputSetStyle: CSSProperties = { marginRight: '1rem', display: 'flex', alignItems: 'center' };
 
 const inputStyle: CSSProperties = {

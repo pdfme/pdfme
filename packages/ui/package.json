@@ -79,7 +79,11 @@
       "./__tests__/test-helpers.js"
     ],
     "moduleNameMapper": {
-      "\\.(png)$": "<rootDir>/../../assetsTransformer.js"
+      "\\.(png|css)$": "<rootDir>/../../assetsTransformer.js",
+      "^antd/es/": "antd/lib/",
+      "^form-render/es/": "form-render/lib/",
+      "^rc-picker/es/": "rc-picker/lib/",
+      "^lodash-es$": "lodash"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [

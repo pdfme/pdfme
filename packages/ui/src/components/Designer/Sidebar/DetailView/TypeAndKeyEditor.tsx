@@ -3,6 +3,7 @@ import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { I18nContext, PropPanelRegistry } from '../../../../contexts';
 
+// FIXME remove this file
 const ErrorLabel = ({ isError, msg }: { isError: boolean; msg: string }) => (
   <span
     style={{ color: isError ? '#ffa19b' : 'inherit', fontWeight: isError ? 'bold' : 'inherit' }}
