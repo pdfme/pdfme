@@ -1,5 +1,7 @@
+import { Select } from 'antd';
 import React from 'react';
-import { PropPanelSchema, PropPanelWidgetProps } from '../types'
+import type { PropPanelSchema, PropPanelWidgetProps } from '../types'
+import { getFallbackFontName, DEFAULT_FONT_NAME } from "@pdfme/common"
 
 export const textSchema: Record<string, PropPanelSchema> = {
     fontName: {
@@ -39,7 +41,7 @@ export const textSchema: Record<string, PropPanelSchema> = {
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: "{{ formData.useDynamicFontSizeSwitch }}"
+        disabled: "{{ formData.useDynamicFontSize }}"
     },
     lineHeight: {
         title: 'Line Height',
@@ -53,14 +55,14 @@ export const textSchema: Record<string, PropPanelSchema> = {
         widget: 'inputNumber',
         span: 8
     },
-    useDynamicFontSizeSwitch: {
+    useDynamicFontSize: { // FIXME ここから: useDynamicFontSize をoffにしても dynamicFontSize自体が消えないので普通のフォントサイズに戻らない
         title: 'Use Dynamic Font Size',
         type: 'boolean',
         widget: 'checkbox',
         cellSpan: 2,
     },
-    useDynamicFontSize: {
-        type: 'object', widget: 'card', column: 3, hidden: "{{ !formData.useDynamicFontSizeSwitch }}",
+    dynamicFontSize: {
+        type: 'object', widget: 'card', column: 3, hidden: "{{ !formData.useDynamicFontSize }}",
         properties: {
             min: {
                 title: 'Min',
@@ -97,9 +99,17 @@ export const textSchema: Record<string, PropPanelSchema> = {
     },
 }
 
-// FIXME ここから FontSelectを作成する
-const FontSelect: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }) => {
-    return <div>FontSelect</div>
+const FontSelect: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: { globalProps: { options } } }) => {
+    const font = options.font || { [DEFAULT_FONT_NAME]: { data: '' } }
+    const fontNames = Object.keys(font);
+    const fallbackFontName = getFallbackFontName(font)
+
+    return <Select
+        value={value}
+        defaultValue={fallbackFontName}
+        onChange={onChange}
+        options={fontNames.map((label) => ({ label, value: label }))}
+    />
 }
 
 export const textWidgets = { FontSelect }

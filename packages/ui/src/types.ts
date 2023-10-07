@@ -46,7 +46,7 @@ export type PropPanelWidgetGlobalProps = {
     options: UIOptions;
 }
 
-export type PropPanelWidgetProps = Omit<WidgetProps, 'addons'> & {
+export type PropPanelWidgetProps = WidgetProps & {
     addons: {
         globalProps: PropPanelWidgetGlobalProps
     }
@@ -54,7 +54,7 @@ export type PropPanelWidgetProps = Omit<WidgetProps, 'addons'> & {
 
 export interface PropPanel {
     [key: string]: {
-        schema:  Record<string, PropPanelSchema>;
+        schema: Record<string, PropPanelSchema>;
         widgets?: Record<string, any>,
     } | undefined;
 }

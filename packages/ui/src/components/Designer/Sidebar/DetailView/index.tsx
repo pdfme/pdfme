@@ -41,7 +41,7 @@ const DetailView = (
       },
       width: { title: 'Width', type: 'number', widget: 'inputNumber' },
       height: { title: 'Height', type: 'number', widget: 'inputNumber' },
-      '--': { type: 'void', widget: 'Divider', cellSpan: 2 },
+      ...(activePropPanelRegistry?.schema ? { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } } : {}),
       ...activePropPanelRegistry?.schema
     }
   };
