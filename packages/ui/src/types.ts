@@ -1,5 +1,5 @@
 
-import type { Schema as FormSchema } from 'form-render';
+import type { Schema as FormSchema, WidgetProps } from 'form-render';
 import type { UIOptions, SchemaForUI, Size } from '@pdfme/common';
 
 interface RenderBaseProps {
@@ -27,8 +27,9 @@ export type RenderProps = RenderBaseProps & {
 export interface Renderer {
     [key: string]: {
         render: (arg: RenderProps) => Promise<void>;
-        defaultValue: string;
+        defaultValue: string; // <- もはやこれらはPropPanelにあるべき？
         defaultSize: Size;
+        // FIXME defaultSchema を追加する
     } | undefined;
 }
 
@@ -36,9 +37,24 @@ export type ChangeSchemas = (objs: { key: string; value: string | number | undef
 
 export type PropPanelSchema = FormSchema;
 
+export type PropPanelWidgetGlobalProps = {
+    activeSchema: SchemaForUI;
+    activeElements: HTMLElement[];
+    changeSchemas: ChangeSchemas;
+    schemas: SchemaForUI[];
+    pageSize: Size;
+    options: UIOptions;
+}
+
+export type PropPanelWidgetProps = Omit<WidgetProps, 'addons'> & {
+    addons: {
+        globalProps: PropPanelWidgetGlobalProps
+    }
+};
+
 export interface PropPanel {
     [key: string]: {
-        schema?: PropPanelSchema;
+        schema:  Record<string, PropPanelSchema>;
         widgets?: Record<string, any>,
     } | undefined;
 }

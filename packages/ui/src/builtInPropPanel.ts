@@ -5,7 +5,7 @@ import { barcodeSchema } from './propPanels/barcodes';
 
 const propPanel: PropPanel = {
     text: { schema: textSchema, widgets: textWidgets },
-    image: {},
+    image: { schema: {} },
     ...barcodeSchemaTypes.reduce((acc, barcodeType) =>
         Object.assign(acc, {
             [barcodeType]: {

@@ -15,12 +15,12 @@ import builtInPropPanel from './builtInPropPanel';
 // - https://ant.design/docs/react/customize-theme
 const theme: ThemeConfig = {
   token: {
-    fontSize: 13,
+    fontSize: 12,
   },
   components: {
     Form: {
-      itemMarginBottom: 12,
-      verticalLabelPadding: '0 0 4px'
+      itemMarginBottom: 8,
+      verticalLabelPadding: '0 0 2px'
     },
   },
 };

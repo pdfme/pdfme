@@ -77,7 +77,7 @@ const Sidebar = (props: SidebarProps) => {
             background: '#fffffffa',
             color: '#333',
             border: '1px solid #eee',
-            padding: '0.5rem',
+            padding: '1rem',
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
             fontWeight: 400,

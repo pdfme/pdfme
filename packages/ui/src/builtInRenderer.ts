@@ -5,17 +5,17 @@ import { renderImage } from './renders/image';
 import { renderBarcode } from './renders/barcodes';
 
 const barcodeDefaults = {
-    qrcode: { size: { width: 30, height: 30, }, value: 'https://pdfme.com/' },
-    japanpost: { size: { width: 80, height: 7.2, }, value: '6540123789-A-K-Z' },
-    ean13: { size: { width: 40, height: 16, }, value: '2112345678900' },
-    ean8: { size: { width: 40, height: 20, }, value: '02345673' },
-    code39: { size: { width: 40, height: 20, }, value: 'THIS IS CODE 39' },
-    code128: { size: { width: 40, height: 20, }, value: 'This is Code 128!' },
-    nw7: { size: { width: 40, height: 20, }, value: 'A0123456789B' },
-    itf14: { size: { width: 40, height: 12, }, value: '04601234567893' },
-    upca: { size: { width: 40, height: 16, }, value: '416000336108' },
-    upce: { size: { width: 40, height: 20, }, value: '00123457' },
-    gs1datamatrix: { size: { width: 30, height: 30, }, value: '(01)03453120000011(17)191125(10)ABCD1234' }
+    qrcode: { defaultSize: { width: 30, height: 30, }, defaultValue: 'https://pdfme.com/' },
+    japanpost: { defaultSize: { width: 80, height: 7.2, }, defaultValue: '6540123789-A-K-Z' },
+    ean13: { defaultSize: { width: 40, height: 16, }, defaultValue: '2112345678900' },
+    ean8: { defaultSize: { width: 40, height: 20, }, defaultValue: '02345673' },
+    code39: { defaultSize: { width: 40, height: 20, }, defaultValue: 'THIS IS CODE 39' },
+    code128: { defaultSize: { width: 40, height: 20, }, defaultValue: 'This is Code 128!' },
+    nw7: { defaultSize: { width: 40, height: 20, }, defaultValue: 'A0123456789B' },
+    itf14: { defaultSize: { width: 40, height: 12, }, defaultValue: '04601234567893' },
+    upca: { defaultSize: { width: 40, height: 16, }, defaultValue: '416000336108' },
+    upce: { defaultSize: { width: 40, height: 20, }, defaultValue: '00123457' },
+    gs1datamatrix: { defaultSize: { width: 30, height: 30, }, defaultValue: '(01)03453120000011(17)191125(10)ABCD1234' }
 }
 
 const renderer: Renderer = {
@@ -31,8 +31,7 @@ const renderer: Renderer = {
     },
     ...barcodeSchemaTypes.reduce((acc, barcodeType) => Object.assign(acc, {
         [barcodeType]: {
-            defaultValue: barcodeDefaults[barcodeType].value,
-            defaultSize: barcodeDefaults[barcodeType].size,
+            ...barcodeDefaults[barcodeType],
             render: renderBarcode
         }
     }), {}),
