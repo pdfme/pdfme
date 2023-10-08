@@ -93,7 +93,7 @@ const DetailView = (
         </span>
       </div>
       <Divider />
-      <div style={{ height, overflowY: 'auto' }}>
+      <div style={{ height, overflowY: 'auto', overflowX: 'hidden' }}>
         <FormRender
           globalProps={globalProps}
           form={form}
