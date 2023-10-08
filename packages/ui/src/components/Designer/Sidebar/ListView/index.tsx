@@ -38,7 +38,6 @@ const ListView = (
         </span>
       </div>
       <Divider />
-
       {isBulkUpdateFieldNamesMode ? (
         <div>
           <textarea
@@ -68,7 +67,6 @@ const ListView = (
           onEdit={onEdit}
         />
       )}
-
       <div
         style={{
           display: 'flex',
@@ -112,7 +110,6 @@ const ListView = (
           </u>
         )}
       </div>
-      <Divider />
     </div>
   );
 };

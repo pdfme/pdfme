@@ -90,12 +90,8 @@ const Sidebar = (props: SidebarProps) => {
           ) : (
             <DetailView {...props} activeSchema={getLastActiveSchema()} />
           )}
-          {/* FIXME ListViewとDetailViewでスクロールの挙動を合わせる */}
-          {/* DetailViewがでかい場合にちゃんと表示できないし、Add new Field ボタンがおかしいことになる */}
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-around',
               position: 'absolute',
               width: '100%',
               left: 0,
@@ -103,6 +99,7 @@ const Sidebar = (props: SidebarProps) => {
               paddingTop: '1rem',
             }}
           >
+            <div style={{ marginBottom: '1rem', borderBottom: '1px solid #e5e5e5' }} />
             <button
               style={{
                 padding: '0.5rem',
@@ -110,6 +107,8 @@ const Sidebar = (props: SidebarProps) => {
                 border: 'none',
                 borderRadius: 2,
                 cursor: 'pointer',
+                margin: '0 auto',
+                display: 'block',
               }}
               onClick={addSchema}
             >

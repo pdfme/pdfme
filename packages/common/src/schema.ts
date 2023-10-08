@@ -55,7 +55,7 @@ export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum
 
 export const BarcodeSchema = CommonSchema.extend({
   type: BarcodeSchemaType,
-  backgroundcolor: z.string().optional(),
+  backgroundColor: z.string().optional(),
   barcolor: z.string().optional(),
   textcolor: z.string().optional(),
 });

@@ -4,15 +4,16 @@ import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps, PropPanelSchema, PropPanelWidgetGlobalProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
+import { RULER_HEIGHT } from '../../../../constants';
 import Divider from '../../../Divider';
 import AlignWidget from './AlignWidget';
 
 const DetailView = (
-  props: Pick<SidebarProps, 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
+  props: Pick<SidebarProps, 'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
     activeSchema: SchemaForUI;
   }
 ) => {
-  const { activeSchema, changeSchemas, deselectSchema } = props;
+  const { size, activeSchema, changeSchemas, deselectSchema } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
@@ -22,6 +23,8 @@ const DetailView = (
   const globalProps: PropPanelWidgetGlobalProps = { ...props, options }
 
   const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
+
+  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
 
   if (!activePropPanelRegistry?.schema) {
     console.error(`No prop panel schema for ${activeSchema.type}`);
@@ -83,7 +86,8 @@ const DetailView = (
         </span>
       </div>
       <Divider />
-      <div style={{ fontSize: '0.9rem' }}>
+      {/* FIXME ここから */}
+      <div style={{ height, overflowY: 'auto' }}>
         <FormRender
           globalProps={globalProps}
           form={form}

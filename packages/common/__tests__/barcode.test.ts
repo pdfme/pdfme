@@ -28,7 +28,7 @@ describe('createBarCode', () => {
           input: t[1],
           width: 10, // mm
           height: 10, // mm
-          backgroundcolor: '00000000', // 背景色を指定しないとjsQRでうまく解析できない
+          backgroundColor: '00000000', // 背景色を指定しないとjsQRでうまく解析できない
         })) as Buffer;
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
@@ -49,7 +49,7 @@ describe('createBarCode', () => {
           input: t[1],
           width: 10, // mm
           height: 10, // mm
-          backgroundcolor: 'ffffff',
+          backgroundColor: 'ffffff',
           barcolor: 'f50505',
         })) as Buffer;
         const png = PNG.sync.read(buffer);
