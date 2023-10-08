@@ -1,7 +1,8 @@
-import { Select } from 'antd';
+import { Select, Checkbox } from 'antd';
 import React from 'react';
 import type { PropPanelSchema, PropPanelWidgetProps } from '../types'
-import { getFallbackFontName, DEFAULT_FONT_NAME } from "@pdfme/common"
+import { getFallbackFontName, DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE } from "@pdfme/common"
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 export const textSchema: Record<string, PropPanelSchema> = {
     fontName: {
@@ -55,10 +56,10 @@ export const textSchema: Record<string, PropPanelSchema> = {
         widget: 'inputNumber',
         span: 8
     },
-    useDynamicFontSize: { // FIXME ここから: useDynamicFontSize をoffにしても dynamicFontSize自体が消えないので普通のフォントサイズに戻らない
-        title: 'Use Dynamic Font Size',
+    // FIXME useDynamicFontSizeとdynamicFontSizeはまるっとwidgetを作成すべき
+    useDynamicFontSize: {
         type: 'boolean',
-        widget: 'checkbox',
+        widget: 'DynamicFontSizeCheckbox',
         cellSpan: 2,
     },
     dynamicFontSize: {
@@ -80,8 +81,8 @@ export const textSchema: Record<string, PropPanelSchema> = {
                 widget: 'select',
                 props: {
                     options: [
-                        { label: 'Vertical', value: 'vertical' },
-                        { label: 'Horizontal', value: 'horizontal' }
+                        { label: 'Horizontal', value: 'horizontal' },
+                        { label: 'Vertical', value: 'vertical' }
                     ]
                 },
             },
@@ -112,4 +113,34 @@ const FontSelect: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: {
     />
 }
 
-export const textWidgets = { FontSelect }
+// FIXME ここから: 
+// useDynamicFontSize をoffにしても dynamicFontSize自体が消えないので普通のフォントサイズに戻らない
+// ウィジェットを作成してどうにか対処する。
+const DynamicFontSizeCheckbox: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: { globalProps: { activeSchema, changeSchemas } } }) => {
+    const _activeSchema = activeSchema as any
+
+    const _onChange = (e: CheckboxChangeEvent) => {
+        const checked = e.target.checked
+        changeSchemas([
+            {
+                key: 'dynamicFontSize',
+                value: checked ? {
+                    min: _activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                    max: _activeSchema.fontSize || DEFAULT_FONT_SIZE,
+                    fit: 'horizontal'
+                } : undefined,
+                schemaId: activeSchema.id,
+            },
+        ]);
+        value = checked;
+        onChange(e)
+    }
+
+    return <Checkbox
+        checked={Boolean(_activeSchema.dynamicFontSize)}
+        onChange={_onChange}>
+        Use Dynamic Font Size
+    </Checkbox>;
+}
+
+export const textWidgets = { FontSelect, DynamicFontSizeCheckbox }

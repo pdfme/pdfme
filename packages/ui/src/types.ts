@@ -33,7 +33,7 @@ export interface Renderer {
     } | undefined;
 }
 
-export type ChangeSchemas = (objs: { key: string; value: string | number | undefined; schemaId: string }[]) => void;
+export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
 
 export type PropPanelSchema = FormSchema;
 

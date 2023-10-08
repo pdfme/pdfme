@@ -76,7 +76,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
         );
     };
 
-    const layoutBtns: { id: string; icon: any; action: () => void }[] = [
+    const layoutBtns: { id: string; icon: any; onClick: () => void }[] = [
         {
             id: 'left',
             icon: (
@@ -85,7 +85,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M4,22H2V2h2V22z M22,7H6v3h16V7z M16,14H6v3h10V14z" />
                 </svg>
             ),
-            action: () => align('left'),
+            onClick: () => align('left'),
         },
         {
             id: 'center',
@@ -95,7 +95,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <polygon points="11,2 13,2 13,7 21,7 21,10 13,10 13,14 18,14 18,17 13,17 13,22 11,22 11,17 6,17 6,14 11,14 11,10 3,10 3,7 11,7" />
                 </svg>
             ),
-            action: () => align('center'),
+            onClick: () => align('center'),
         },
         {
             id: 'right',
@@ -105,7 +105,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M20,2h2v20h-2V2z M2,10h16V7H2V10z M8,17h10v-3H8V17z" />
                 </svg>
             ),
-            action: () => align('right'),
+            onClick: () => align('right'),
         },
         {
             id: 'top',
@@ -115,7 +115,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M22,2v2H2V2H22z M7,22h3V6H7V22z M14,16h3V6h-3V16z" />
                 </svg>
             ),
-            action: () => align('top'),
+            onClick: () => align('top'),
         },
         {
             id: 'middle',
@@ -125,7 +125,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <polygon points="22,11 17,11 17,6 14,6 14,11 10,11 10,3 7,3 7,11 1.84,11 1.84,13 7,13 7,21 10,21 10,13 14,13 14,18 17,18 17,13 22,13" />
                 </svg>
             ),
-            action: () => align('middle'),
+            onClick: () => align('middle'),
         },
         {
             id: 'bottom',
@@ -135,7 +135,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M22,22H2v-2h20V22z M10,2H7v16h3V2z M17,8h-3v10h3V8z" />
                 </svg>
             ),
-            action: () => align('bottom'),
+            onClick: () => align('bottom'),
         },
         {
             id: 'vertical',
@@ -145,7 +145,7 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M22,2v2H2V2H22z M7,10.5v3h10v-3H7z M2,20v2h20v-2H2z" />
                 </svg>
             ),
-            action: () => distribute('vertical'),
+            onClick: () => distribute('vertical'),
         },
         {
             id: 'horizontal',
@@ -155,14 +155,20 @@ const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }
                     <path d="M4,22H2V2h2V22z M22,2h-2v20h2V2z M13.5,7h-3v10h3V7z" />
                 </svg>
             ),
-            action: () => distribute('horizontal'),
+            onClick: () => distribute('horizontal'),
         },
     ];
+
 
     return (
         <Form.Item label="Align">
             <Button.Group>
-                {layoutBtns.map((btn) => <Button style={{ padding: 7 }} key={btn.id} icon={btn.icon} onClick={btn.action} />)}
+                {layoutBtns.map((btn) => <Button
+                    key={btn.id}
+                    style={{ padding: 7 }}
+                    disabled={activeElements.length <= 2 && ['vertical', 'horizontal'].includes(btn.id)}
+                    {...btn}
+                />)}
             </Button.Group>
         </Form.Item>
     )
