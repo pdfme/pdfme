@@ -10,7 +10,7 @@ import {
   getFontKitFont,
   getSplittedLines,
 } from '../src/font'
-import { Font, TextSchema, Template, FontWidthCalcValues } from '../src/type';
+import { Font, Template, FontWidthCalcValues, Schema } from '../src/type';
 import { BLANK_PDF } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -43,7 +43,7 @@ const getTemplate = (): Template => ({
 });
 
 const getTextSchema = () => {
-  const textSchema: TextSchema = {
+  const textSchema: Schema = {
     position: { x: 0, y: 0 }, type: 'text', fontSize: 14, characterSpacing: 1, width: 50, height: 20
   };
   return textSchema;

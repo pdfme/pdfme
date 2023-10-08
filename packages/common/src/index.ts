@@ -22,17 +22,12 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 import { createBarCode } from './barcode';
-import { isImageSchema, isBarcodeSchema, isTextSchema } from './type.js';
 import type {
   FontWidthCalcValues,
   Lang,
   Size,
-  Alignment,
   SchemaType,
   BarCodeType,
-  TextSchema,
-  ImageSchema,
-  BarcodeSchema,
   Schema,
   SchemaInputs,
   SchemaForUI,
@@ -100,9 +95,6 @@ export {
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
   barcodeSchemaTypes,
-  isTextSchema,
-  isImageSchema,
-  isBarcodeSchema,
   getB64BasePdf,
   b64toUint8Array,
   getFallbackFontName,
@@ -131,12 +123,8 @@ export {
 export type {
   Lang,
   Size,
-  Alignment,
   SchemaType,
   BarCodeType,
-  TextSchema,
-  ImageSchema,
-  BarcodeSchema,
   Schema,
   SchemaInputs,
   SchemaForUI,

@@ -2,9 +2,6 @@ import generate from './generate.js';
 import {
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
-  isTextSchema,
-  isImageSchema,
-  isBarcodeSchema,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
@@ -15,12 +12,8 @@ import {
 import type {
   Lang,
   Size,
-  Alignment,
   SchemaType,
   BarCodeType,
-  TextSchema,
-  ImageSchema,
-  BarcodeSchema,
   Schema,
   SchemaForUI,
   Font,
@@ -39,9 +32,6 @@ export {
   generate,
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
-  isTextSchema,
-  isImageSchema,
-  isBarcodeSchema,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
@@ -52,12 +42,8 @@ export {
 export type {
   Lang,
   Size,
-  Alignment,
   SchemaType,
   BarCodeType,
-  TextSchema,
-  ImageSchema,
-  BarcodeSchema,
   Schema,
   SchemaForUI,
   Font,
@@ -71,3 +57,4 @@ export type {
   PreviewProps,
   DesignerProps,
 };
+

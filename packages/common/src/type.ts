@@ -4,14 +4,8 @@ import type { Font as FontKitFont } from 'fontkit';
 import {
   Lang,
   Size,
-  Alignment,
-  barcodeSchemaTypes,
   BarcodeSchemaType,
   SchemaType,
-  CommonSchema as _CommonSchema,
-  TextSchema,
-  ImageSchema,
-  BarcodeSchema,
   Schema,
   SchemaInputs,
   SchemaForUI,
@@ -36,20 +30,10 @@ export type FontWidthCalcValues = {
   boxWidthInPt: number;
 };
 
-type CommonSchema = z.infer<typeof _CommonSchema>;
-export const isTextSchema = (arg: CommonSchema): arg is TextSchema => arg.type === 'text';
-export const isImageSchema = (arg: CommonSchema): arg is ImageSchema => arg.type === 'image';
-export const isBarcodeSchema = (arg: CommonSchema): arg is BarcodeSchema =>
-  barcodeSchemaTypes.map((t) => t as string).includes(arg.type);
-
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;
-export type Alignment = z.infer<typeof Alignment>;
 export type SchemaType = z.infer<typeof SchemaType>;
 export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
-export type TextSchema = z.infer<typeof TextSchema>;
-export type ImageSchema = z.infer<typeof ImageSchema>;
-export type BarcodeSchema = z.infer<typeof BarcodeSchema>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaInputs = z.infer<typeof SchemaInputs>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;

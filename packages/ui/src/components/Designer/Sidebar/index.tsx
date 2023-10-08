@@ -5,7 +5,7 @@ import { I18nContext, FontContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
-import { getFallbackFontName } from '@pdfme/common';
+import { getFallbackFontName, Schema } from '@pdfme/common';
 
 const Sidebar = (props: SidebarProps) => {
   const { height, size, activeElements, schemas, addSchema } = props;
@@ -20,8 +20,8 @@ const Sidebar = (props: SidebarProps) => {
     const activeSchema = schemas.find((s) => ids.includes(s.id));
 
     if (activeSchema?.type === 'text') {
-      if (!activeSchema.fontName) {
-        activeSchema.fontName = fallbackFont;
+      if (!(activeSchema as Schema & { fontName?: string }).fontName) {
+        (activeSchema as Schema & { fontName?: string }).fontName = fallbackFont;
       }
     }
 

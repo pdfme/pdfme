@@ -1,6 +1,6 @@
 import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
-import { FontWidthCalcValues, Template, Schema, Font, isTextSchema, TextSchema } from './type';
+import { FontWidthCalcValues, Template, Schema, Font } from './type';
 import { Buffer } from 'buffer';
 import {
   DEFAULT_FONT_VALUE,
@@ -45,7 +45,7 @@ const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => (isTextSchema(v) ? v.fontName : '')))
+      .map((s) => Object.values(s).map((v) => ((v as any).fontName ?? '')))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
@@ -147,8 +147,8 @@ export const widthOfTextAtSize = (text: string, fontKitFont: FontKitFont, fontSi
 };
 
 const fontKitFontCache: { [fontName: string]: FontKitFont } = {};
-export const getFontKitFont = async (textSchema: TextSchema, font: Font) => {
-  const fontName = textSchema.fontName || getFallbackFontName(font);
+export const getFontKitFont = async (textSchema: Schema, font: Font) => {
+  const fontName = textSchema.fontName as string || getFallbackFontName(font);
   if (fontKitFontCache[fontName]) {
     return fontKitFontCache[fontName];
   }
@@ -239,7 +239,7 @@ export const calculateDynamicFontSize = async ({
   value,
   startingFontSize,
 }: {
-  textSchema: TextSchema;
+  textSchema: Schema;
   font: Font;
   value: string;
   startingFontSize?: number | undefined;
@@ -251,6 +251,17 @@ export const calculateDynamicFontSize = async ({
     width: boxWidth,
     height: boxHeight,
     lineHeight = DEFAULT_LINE_HEIGHT,
+  }: {
+    fontSize?: number;
+    dynamicFontSize?: {
+      min: number;
+      max: number;
+      fit?: 'horizontal' | 'vertical';
+    };
+    characterSpacing?: number;
+    width?: number;
+    height?: number;
+    lineHeight?: number;
   } = textSchema;
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;

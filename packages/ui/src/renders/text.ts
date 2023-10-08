@@ -10,7 +10,7 @@ import {
     DEFAULT_LINE_HEIGHT,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_FONT_COLOR,
-    TextSchema,
+    Schema,
     calculateDynamicFontSize,
     getFontKitFont,
     getDefaultFont,
@@ -30,18 +30,19 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
 };
 
 export const renderText = async (arg: RenderProps) => {
-    const {
-        value,
-        rootElement,
-        mode,
-        onChange,
-        stopEditing,
-        tabIndex,
-        placeholder,
-        options,
-    } = arg;
+    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, options } = arg;
+    const schema = arg.schema as Schema & {
+        dynamicFontSize?: { max: number; min: number; fit: 'vertical' | 'horizontal'; };
+        fontName?: string;
+        fontColor?: string;
+        fontSize?: number;
+        alignment?: 'left' | 'center' | 'right';
+        verticalAlignment?: 'top' | 'middle' | 'bottom';
+        lineHeight?: number;
+        characterSpacing?: number;
+        backgroundColor?: string;
+    };
 
-    const schema = arg.schema as TextSchema;
 
     const font = options?.font || getDefaultFont();
 
@@ -56,6 +57,7 @@ export const renderText = async (arg: RenderProps) => {
     }
 
 
+    // FIXME ここから
     const fontKitFont = await getFontKitFont(schema, font)
     // Depending on vertical alignment, we need to move the top or bottom of the font to keep
     // it within it's defined box and align it with the generated pdf.
@@ -70,11 +72,11 @@ export const renderText = async (arg: RenderProps) => {
     const bottomAdjustment = bottomAdj;
 
     const container = document.createElement('div');
-    function getBackgroundColor(mode: 'form' | 'viewer', value: string, schema: TextSchema) {
+    function getBackgroundColor(mode: 'form' | 'viewer', value: string, schema: Schema) {
         if (mode === 'form' && value && schema.backgroundColor) {
-            return schema.backgroundColor;
+            return schema.backgroundColor as string;
         } else if (mode === 'viewer') {
-            return schema.backgroundColor ?? 'transparent';
+            return (schema.backgroundColor as string) ?? 'transparent';
         } else {
             return 'rgb(242 244 255 / 75%)';
         }

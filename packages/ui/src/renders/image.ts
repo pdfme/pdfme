@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react';
 import type * as CSS from 'csstype';
-import { ImageSchema } from '@pdfme/common';
+import { Schema } from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { ZOOM } from '../constants';
 
@@ -35,18 +35,8 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
 
 
 export const renderImage = async (arg: RenderProps) => {
-    const {
-        value,
-        rootElement,
-        mode,
-        onChange,
-        stopEditing,
-        tabIndex,
-        placeholder,
-    } = arg;
+    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
     const isForm = mode === 'form';
-
-    const schema = arg.schema as ImageSchema;
 
     const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
