@@ -6,9 +6,7 @@ type PartOf<T> = {
 };
 
 const defaultColors = { backgroundColor: '', barColor: '#000000', };
-
 const defaultTextColors = { textColor: '#000000', };
-
 const default40x20 = { width: 40, height: 20, };
 
 const barcodeDefaults: Record<BarCodeType, { defaultValue: string; defaultSchema: PartOf<Schema>; }> = {
