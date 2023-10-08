@@ -69,7 +69,7 @@ const DetailView = (
   const handleWatch = (newSchema: any) => {
     const changes = [];
     for (const key in newSchema) {
-      if (['id', 'key', 'data'].includes(key)) continue;
+      if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
         changes.push({ key, value: newSchema[key], schemaId: activeSchema.id });
       }
