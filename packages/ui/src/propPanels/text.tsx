@@ -113,7 +113,7 @@ const FontSelect: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: {
     />
 }
 
-// FIXME ここから: 
+// FIXME 
 // useDynamicFontSize をoffにしても dynamicFontSize自体が消えないので普通のフォントサイズに戻らない
 // ウィジェットを作成してどうにか対処する。
 const DynamicFontSizeCheckbox: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: { globalProps: { activeSchema, changeSchemas } } }) => {

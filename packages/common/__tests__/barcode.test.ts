@@ -50,7 +50,7 @@ describe('createBarCode', () => {
           width: 10, // mm
           height: 10, // mm
           backgroundColor: 'ffffff',
-          barcolor: 'f50505',
+          barColor: 'f50505',
         })) as Buffer;
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);

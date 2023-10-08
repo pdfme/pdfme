@@ -4,7 +4,7 @@ import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import type { ChangeSchemas } from '../../types';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
-import { I18nContext, RendererRegistry } from '../../contexts';
+import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
   uuid,
   set,
@@ -13,7 +13,6 @@ import {
   destroyShortCuts,
   templateSchemas2SchemasList,
   fmtTemplate,
-  getInitialSchema,
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
   getPagesScrollTopByIndex,
@@ -36,7 +35,7 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
-  const rendererRegistry = useContext(RendererRegistry);
+  const propPanelRegistry = useContext(PropPanelRegistry);
 
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
@@ -98,9 +97,9 @@ const TemplateEditor = ({
         set(tgt, key, value);
 
         if (key === 'type') {
-          set(tgt, 'data', rendererRegistry[value as string]?.defaultValue || '');
-          set(tgt, 'width', rendererRegistry[value as string]?.defaultSize.width || tgt.width);
-          set(tgt, 'height', rendererRegistry[value as string]?.defaultSize.height || tgt.height);
+          const propPanel = propPanelRegistry[value as string]
+          set(tgt, 'data', propPanel?.defaultValue || '');
+          Object.assign(tgt, propPanel?.defaultSchema || {});
         }
 
         return acc;
@@ -202,17 +201,23 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const s = getInitialSchema();
+    const initialSchemaType = 'text';
+    const propPanel = propPanelRegistry[initialSchemaType];
+    const s = {
+      id: uuid(),
+      key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
+      data: propPanel?.defaultValue || '',
+      type: initialSchemaType,
+      position: { x: 0, y: 0 },
+      width: 40,
+      height: 10,
+      ...propPanel?.defaultSchema
+    } as SchemaForUI;
+
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
 
-    const renderer = rendererRegistry[s.type]
-    s.data = renderer?.defaultValue || '';
-    s.width = renderer?.defaultSize.width || s.width;
-    s.height = renderer?.defaultSize.height || s.height;
-
-    s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };

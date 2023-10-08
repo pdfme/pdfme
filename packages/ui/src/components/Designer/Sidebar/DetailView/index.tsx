@@ -86,7 +86,6 @@ const DetailView = (
         </span>
       </div>
       <Divider />
-      {/* FIXME ここから */}
       <div style={{ height, overflowY: 'auto' }}>
         <FormRender
           globalProps={globalProps}

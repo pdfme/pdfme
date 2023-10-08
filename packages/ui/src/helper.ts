@@ -10,13 +10,7 @@ import {
   Template,
   SchemaForUI,
   Schema,
-  SchemaType,
-  BarCodeType,
   Size,
-  DEFAULT_ALIGNMENT,
-  DEFAULT_FONT_SIZE,
-  DEFAULT_CHARACTER_SPACING,
-  DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
 import { ZOOM, RULER_HEIGHT } from './constants';
 
@@ -196,8 +190,6 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
-
-
 const pt2mm = (pt: number) => {
   // https://www.ddc.co.jp/words/archives/20090701114500.html
   const mmRatio = 0.3527;
@@ -356,20 +348,6 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
 
   return schemaAddedTemplate;
 };
-
-export const getInitialSchema = (): SchemaForUI => ({
-  id: uuid(),
-  key: '',
-  data: '',
-  type: 'text',
-  position: { x: 0, y: 0 },
-  width: 35,
-  height: 7,
-  alignment: DEFAULT_ALIGNMENT,
-  fontSize: DEFAULT_FONT_SIZE,
-  characterSpacing: DEFAULT_CHARACTER_SPACING,
-  lineHeight: DEFAULT_LINE_HEIGHT,
-});
 
 export const getUniqSchemaKey = (arg: {
   copiedSchemaKey: string;
