@@ -1,10 +1,18 @@
 import type { PropPanelSchema, PropPanelWidgetProps } from '../types'
-import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import React from 'react';
-import { Select, Checkbox } from 'antd';
-import { getFallbackFontName, DEFAULT_FONT_NAME, DEFAULT_FONT_SIZE } from "@pdfme/common"
+import { Select, Checkbox, Form, InputNumber, Space } from 'antd';
+import type { CheckboxChangeEvent } from 'antd/es/checkbox';
+import {
+    getFallbackFontName,
+    DEFAULT_FONT_NAME,
+    DEFAULT_FONT_SIZE,
+    DEFAULT_ALIGNMENT,
+    DEFAULT_VERTICAL_ALIGNMENT,
+    DEFAULT_CHARACTER_SPACING,
+    DEFAULT_LINE_HEIGHT,
+} from '@pdfme/common';
 
-export const textSchema: Record<string, PropPanelSchema> = {
+const textSchema: Record<string, PropPanelSchema> = {
     fontName: {
         title: 'Font Name',
         type: 'string',
@@ -42,7 +50,7 @@ export const textSchema: Record<string, PropPanelSchema> = {
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: "{{ formData.useDynamicFontSize }}"
+        disabled: "{{ Boolean(formData.dynamicFontSize) }}"
     },
     lineHeight: {
         title: 'Line Height',
@@ -56,14 +64,8 @@ export const textSchema: Record<string, PropPanelSchema> = {
         widget: 'inputNumber',
         span: 8
     },
-    // FIXME useDynamicFontSizeとdynamicFontSizeはまるっとwidgetを作成すべき
-    useDynamicFontSize: {
-        type: 'boolean',
-        widget: 'DynamicFontSizeCheckbox',
-        cellSpan: 2,
-    },
     dynamicFontSize: {
-        type: 'object', widget: 'card', column: 3, hidden: "{{ !formData.useDynamicFontSize }}",
+        type: 'object', widget: 'DynamicFontSize', column: 3,
         properties: {
             min: {
                 title: 'Min',
@@ -113,13 +115,13 @@ const FontSelect: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: {
     />
 }
 
-// FIXME 
-// useDynamicFontSize をoffにしても dynamicFontSize自体が消えないので普通のフォントサイズに戻らない
-// ウィジェットを作成してどうにか対処する。
-const DynamicFontSizeCheckbox: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: { globalProps: { activeSchema, changeSchemas } } }) => {
+const DynamicFontSize: React.FC<PropPanelWidgetProps> = ({ addons }) => {
+    const value = addons.getValueByPath('dynamicFontSize')
+
+    const { globalProps: { activeSchema, changeSchemas } } = addons
     const _activeSchema = activeSchema as any
 
-    const _onChange = (e: CheckboxChangeEvent) => {
+    const onChange = (e: CheckboxChangeEvent) => {
         const checked = e.target.checked
         changeSchemas([
             {
@@ -132,15 +134,53 @@ const DynamicFontSizeCheckbox: React.FC<PropPanelWidgetProps> = ({ value, onChan
                 schemaId: activeSchema.id,
             },
         ]);
-        value = checked;
-        onChange(e)
     }
 
-    return <Checkbox
-        checked={Boolean(_activeSchema.dynamicFontSize)}
-        onChange={_onChange}>
-        Use Dynamic Font Size
-    </Checkbox>;
+    // FIXME ここから 
+    const onChange2 = () => { }
+    const onChange3 = () => { }
+    const onChange4 = () => { }
+
+    return <>
+        <Form.Item>
+            <Checkbox checked={Boolean(value)} onChange={onChange}> Dynamic Font Size</Checkbox>
+        </Form.Item >
+        <Space>
+            {/* レイアウトもちょっといい感じにする */}
+            <Form.Item label="Min">
+                <InputNumber min={1} max={10} defaultValue={3} onChange={onChange2} />
+            </Form.Item >
+            <Form.Item label="Max">
+                <InputNumber min={1} max={10} defaultValue={3} onChange={onChange3} />
+            </Form.Item >
+            <Form.Item label="Fit">
+                <Select
+                    onChange={onChange4}
+                    options={[
+                        { label: 'Horizontal', value: 'horizontal' },
+                        { label: 'Vertical', value: 'vertical' }
+                    ]}
+                />
+            </Form.Item >
+        </Space>
+    </>
 }
 
-export const textWidgets = { FontSelect, DynamicFontSizeCheckbox }
+
+export const getTextPropPanel = () => ({
+    schema: textSchema,
+    widgets: { FontSelect, DynamicFontSize },
+    defaultValue: 'Text',
+    defaultSchema: {
+        width: 40,
+        height: 10,
+        alignment: DEFAULT_ALIGNMENT,
+        verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
+        fontSize: DEFAULT_FONT_SIZE,
+        lineHeight: DEFAULT_LINE_HEIGHT,
+        characterSpacing: DEFAULT_CHARACTER_SPACING,
+        dynamicFontSize: { min: 8, max: 32, fit: 'horizontal' },
+        fontColor: '#000000',
+        backgroundColor: ''
+    }
+})

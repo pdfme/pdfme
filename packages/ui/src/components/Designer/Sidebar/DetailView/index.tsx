@@ -20,7 +20,14 @@ const DetailView = (
   const propPanelRegistry = useContext(PropPanelRegistry);
   const options = useContext(OptionsContext);
 
-  const globalProps: PropPanelWidgetGlobalProps = { ...props, options }
+  const globalProps: PropPanelWidgetGlobalProps = {
+    activeSchema: props.activeSchema,
+    activeElements: props.activeElements,
+    changeSchemas: props.changeSchemas,
+    schemas: props.schemas,
+    pageSize: props.pageSize,
+    options
+  }
 
   const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
 

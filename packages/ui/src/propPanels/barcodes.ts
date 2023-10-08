@@ -59,7 +59,7 @@ const barcodeDefaults: Record<BarCodeType, { defaultValue: string; defaultSchema
 };
 
 
-export const getBarcodeSchemaByType = (barcodeType: BarCodeType) => {
+export const getBarcodePropPanel = (barcodeType: BarCodeType) => {
     const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix';
 
     const schema: PropPanelSchema = {
