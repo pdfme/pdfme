@@ -56,8 +56,6 @@ export const renderText = async (arg: RenderProps) => {
         })
     }
 
-
-    // FIXME ここから
     const fontKitFont = await getFontKitFont(schema, font)
     // Depending on vertical alignment, we need to move the top or bottom of the font to keep
     // it within it's defined box and align it with the generated pdf.
