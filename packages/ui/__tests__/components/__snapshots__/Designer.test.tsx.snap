@@ -207,15 +207,15 @@ exports[`Designer snapshot 1`] = `
                 Bulk update field names
               </u>
             </div>
-            <div
-              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
-            />
           </div>
           <div
-            style="display: flex; justify-content: space-around; position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
+            style="position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
           >
+            <div
+              style="margin-bottom: 1rem; border-bottom: 1px solid #e5e5e5;"
+            />
             <button
-              style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer;"
+              style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer; margin: 0px auto; display: block;"
             >
               <strong
                 style="color: rgb(255, 255, 255);"
