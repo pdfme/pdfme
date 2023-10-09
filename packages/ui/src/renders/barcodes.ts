@@ -1,6 +1,6 @@
 import type { RenderProps } from "../types"
 import type * as CSS from 'csstype';
-import { validateBarcodeInput, BarcodeSchema, createBarCode } from '@pdfme/common';
+import { validateBarcodeInput, Schema, createBarCode, BarCodeType } from '@pdfme/common';
 
 const fullSize = { width: '100%', height: '100%' }
 
@@ -38,14 +38,22 @@ const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, rej
     reader.readAsDataURL(blob);
 });
 
-const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
-    const imageBuf = await createBarCode({ ...schema, input: value });
+const createBarcodeImage = async (schema: Schema, value: string) => {
+    const imageBuf = await createBarCode({
+        type: schema.type as BarCodeType,
+        input: value,
+        width: schema.width,
+        height: schema.height,
+        backgroundColor: schema.backgroundColor as string | undefined,
+        barColor: schema.barColor as string | undefined,
+        textColor: schema.textColor as string | undefined,
+    });
     const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
     const barcodeDataURL = await blobToDataURL(barcodeData);
     return barcodeDataURL;
 }
 
-const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
+const createBarcodeImageElm = async (schema: Schema, value: string) => {
     const barcodeDataURL = await createBarcodeImage(schema, value);
     const img = document.createElement('img');
     img.src = barcodeDataURL;
@@ -56,16 +64,7 @@ const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
 
 
 export const renderBarcode = async (arg: RenderProps) => {
-    const {
-        value,
-        rootElement,
-        mode,
-        onChange,
-        stopEditing,
-        tabIndex,
-        placeholder,
-    } = arg;
-    const schema = arg.schema as BarcodeSchema;
+    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
 
     const container = document.createElement('div');
     const containerStyle: CSS.Properties = {
@@ -112,7 +111,7 @@ export const renderBarcode = async (arg: RenderProps) => {
 
     if (!value) return;
     try {
-        if (!validateBarcodeInput(schema.type, value)) throw new Error('Invalid barcode input');
+        if (!validateBarcodeInput(schema.type as BarCodeType, value)) throw new Error('Invalid barcode input');
         const imgElm = await createBarcodeImageElm(schema, value)
         container.appendChild(imgElm);
     } catch (err) {

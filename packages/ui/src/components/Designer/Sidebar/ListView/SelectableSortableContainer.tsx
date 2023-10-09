@@ -58,16 +58,16 @@ const SelectableSortableContainer = (
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={({ active }) => {
-        setActiveId(active.id);
+        setActiveId(String(active.id));
         setClonedItems(schemas);
 
-        if (!isItemSelected(active.id)) {
+        if (!isItemSelected(String(active.id))) {
           const newSelectedSchemas: SchemaForUI[] = [];
           setSelectedSchemas(newSelectedSchemas);
         } else if (selectedSchemas.length > 0) {
           onSortEnd(
             selectedSchemas.reduce((ret, selectedItem) => {
-              if (selectedItem.id === active.id) {
+              if (selectedItem.id === String(active.id)) {
                 return ret;
               }
               return ret.filter((schema) => schema !== selectedItem);
@@ -78,8 +78,8 @@ const SelectableSortableContainer = (
       onDragEnd={({ active, over }) => {
         const overId = over?.id || '';
 
-        const activeIndex = schemas.map((i) => i.id).indexOf(active.id);
-        const overIndex = schemas.map((i) => i.id).indexOf(overId);
+        const activeIndex = schemas.map((i) => i.id).indexOf(String(active.id));
+        const overIndex = schemas.map((i) => i.id).indexOf(String(overId));
 
         if (selectedSchemas.length) {
           let newSchemas = [...schemas];

@@ -2,7 +2,7 @@ import { writeFileSync, readFileSync, readdir, unlink } from 'fs';
 import * as path from 'path';
 import generate from '../src/generate';
 import templateData from './assets/templates';
-import { Template, Font, BLANK_PDF, TextSchema } from '@pdfme/common';
+import { Template, Font, BLANK_PDF, Schema } from '@pdfme/common';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -57,7 +57,7 @@ describe('generate integrate test', () => {
   });
 
   describe('basic generator', () => {
-    const textObject = (x: number, y: number): TextSchema => ({
+    const textObject = (x: number, y: number): Schema => ({
       type: 'text', position: { x, y }, width: 100, height: 100, fontSize: 13,
     });
 

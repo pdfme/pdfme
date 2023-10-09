@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI, SchemaType } from '@pdfme/common';
+import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
+import type { ChangeSchemas } from '../../types';
 import { ZOOM, RULER_HEIGHT } from '../../constants';
-import { I18nContext } from '../../contexts';
+import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
   uuid,
   set,
@@ -12,9 +13,6 @@ import {
   destroyShortCuts,
   templateSchemas2SchemasList,
   fmtTemplate,
-  getInitialSchema,
-  getSampleByType,
-  getKeepRatioHeightByWidth,
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
   getPagesScrollTopByIndex,
@@ -37,6 +35,8 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
+  const propPanelRegistry = useContext(PropPanelRegistry);
+
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -89,20 +89,17 @@ const TemplateEditor = ({
     [schemasList, pageCursor, commitSchemas]
   );
 
-  const changeSchemas = useCallback(
-    (objs: { key: string; value: undefined | string | number | { min: number, max: number }; schemaId: string }[]) => {
+  const changeSchemas: ChangeSchemas = useCallback(
+    (objs) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
         const tgt = acc.find((s) => s.id === schemaId)!;
         // Assign to reference
         set(tgt, key, value);
+
         if (key === 'type') {
-          const type = String(value) as SchemaType;
-          // set default value, text or barcode
-          set(tgt, 'data', getSampleByType(type));
-          // For barcodes, adjust the height to get the correct ratio.
-          if (type !== 'text' && type !== 'image') {
-            set(tgt, 'height', getKeepRatioHeightByWidth(type, tgt.width));
-          }
+          const propPanel = propPanelRegistry[value as string]
+          set(tgt, 'data', propPanel?.defaultValue || '');
+          Object.assign(tgt, propPanel?.defaultSchema || {});
         }
 
         return acc;
@@ -204,12 +201,23 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const s = getInitialSchema();
+    const initialSchemaType = 'text';
+    const propPanel = propPanelRegistry[initialSchemaType];
+    const s = {
+      id: uuid(),
+      key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
+      data: propPanel?.defaultValue || '',
+      type: initialSchemaType,
+      position: { x: 0, y: 0 },
+      width: 40,
+      height: 10,
+      ...propPanel?.defaultSchema
+    } as SchemaForUI;
+
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
     s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
-    s.data = 'text';
-    s.key = `${i18n('field')}${schemasList[pageCursor].length + 1}`;
+
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
   };

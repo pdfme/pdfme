@@ -5,7 +5,7 @@ import { I18nContext, FontContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
-import { getFallbackFontName } from '@pdfme/common';
+import { getFallbackFontName, Schema } from '@pdfme/common';
 
 const Sidebar = (props: SidebarProps) => {
   const { height, size, activeElements, schemas, addSchema } = props;
@@ -20,8 +20,8 @@ const Sidebar = (props: SidebarProps) => {
     const activeSchema = schemas.find((s) => ids.includes(s.id));
 
     if (activeSchema?.type === 'text') {
-      if (!activeSchema.fontName) {
-        activeSchema.fontName = fallbackFont;
+      if (!(activeSchema as Schema & { fontName?: string }).fontName) {
+        (activeSchema as Schema & { fontName?: string }).fontName = fallbackFont;
       }
     }
 
@@ -74,10 +74,10 @@ const Sidebar = (props: SidebarProps) => {
             top: RULER_HEIGHT / 2,
             right: 0,
             position: 'absolute',
-            background: '#ffffffed',
+            background: '#fffffffa',
             color: '#333',
             border: '1px solid #eee',
-            padding: '0.5rem',
+            padding: '1rem',
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
             fontWeight: 400,
@@ -92,8 +92,6 @@ const Sidebar = (props: SidebarProps) => {
           )}
           <div
             style={{
-              display: 'flex',
-              justifyContent: 'space-around',
               position: 'absolute',
               width: '100%',
               left: 0,
@@ -101,6 +99,7 @@ const Sidebar = (props: SidebarProps) => {
               paddingTop: '1rem',
             }}
           >
+            <div style={{ marginBottom: '1rem', borderBottom: '1px solid #e5e5e5' }} />
             <button
               style={{
                 padding: '0.5rem',
@@ -108,6 +107,8 @@ const Sidebar = (props: SidebarProps) => {
                 border: 'none',
                 borderRadius: 2,
                 cursor: 'pointer',
+                margin: '0 auto',
+                display: 'block',
               }}
               onClick={addSchema}
             >

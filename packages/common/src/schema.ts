@@ -1,6 +1,5 @@
 /* eslint dot-notation: "off"*/
 import { z } from 'zod';
-import { VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM } from "./constants";
 
 const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it'] as const;
 
@@ -8,69 +7,29 @@ export const Lang = z.enum(langs);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
 
-const alignments = ['left', 'center', 'right'] as const;
-export const Alignment = z.enum(alignments);
-
-const verticalAlignments = [
-  VERTICAL_ALIGN_TOP,
-  VERTICAL_ALIGN_MIDDLE,
-  VERTICAL_ALIGN_BOTTOM,
-] as const;
-export const VerticalAlignment = z.enum(verticalAlignments);
-
-// prettier-ignore
 export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
 const notBarcodeSchemaTypes = ['text', 'image'] as const;
-export const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
+const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
 
 export const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
 export const SchemaType = z.enum(schemaTypes);
 
-export const CommonSchema = z.object({
+
+export const Schema = z.object({
   type: SchemaType,
   position: z.object({ x: z.number(), y: z.number() }),
   width: z.number(),
   height: z.number(),
   rotate: z.number().optional(),
-});
-
-export const TextSchema = CommonSchema.extend({
-  type: z.literal(SchemaType.Enum.text),
-  alignment: Alignment.optional(),
-  verticalAlignment: VerticalAlignment.optional(),
-  fontSize: z.number().optional(),
-  fontName: z.string().optional(),
-  fontColor: z.string().optional(),
-  backgroundColor: z.string().optional(),
-  characterSpacing: z.number().optional(),
-  lineHeight: z.number().optional(),
-  dynamicFontSize: z.object({
-    max: z.number(),
-    min: z.number(),
-    fit: z.string().optional(),
-  }).optional(),
-});
-
-export const ImageSchema = CommonSchema.extend({ type: z.literal(SchemaType.Enum.image) });
-
-export const BarcodeSchema = CommonSchema.extend({ 
-  type: BarcodeSchemaType,
-  backgroundcolor: z.string().optional(),
-  barcolor: z.string().optional(),
-  textcolor: z.string().optional(),
-});
-
-export const Schema = z.union([TextSchema, ImageSchema, BarcodeSchema]);
+}).passthrough();
 
 const SchemaForUIAdditionalInfo = z.object({
-  id: z.string(), key: z.string(), data: z.string(),
+  id: z.string(),
+  key: z.string(),
+  data: z.string(),
 });
 
-export const SchemaForUI = z.union([
-  TextSchema.merge(SchemaForUIAdditionalInfo),
-  ImageSchema.merge(SchemaForUIAdditionalInfo),
-  BarcodeSchema.merge(SchemaForUIAdditionalInfo),
-]);
+export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo)
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);

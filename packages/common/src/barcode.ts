@@ -20,19 +20,19 @@ export const createBarCode = async (arg: {
   input: string;
   width: number;
   height: number;
-  backgroundcolor?: string;
-  barcolor?: string;
-  textcolor?: string;
+  backgroundColor?: string;
+  barColor?: string;
+  textColor?: string;
 }): Promise<Buffer> => {
-  const { type, input, width, height, backgroundcolor, barcolor, textcolor } = arg;
+  const { type, input, width, height, backgroundColor, barColor, textColor } = arg;
   const bcid = barCodeType2Bcid(type);
   const includetext = true;
   const scale = 5;
   const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
 
-  if (backgroundcolor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundcolor);
-  if (barcolor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barcolor);
-  if (textcolor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textcolor);
+  if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
+  if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
+  if (textColor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textColor);
 
   let res: Buffer;
 

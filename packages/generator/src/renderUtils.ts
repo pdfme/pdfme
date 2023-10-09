@@ -1,5 +1,5 @@
 import { PDFPage, degrees, rgb, } from '@pdfme/pdf-lib';
-import { Schema, TextSchema, Alignment, mm2pt } from '@pdfme/common';
+import { Schema, mm2pt } from '@pdfme/common';
 
 const hex2rgb = (hex: string) => {
   if (hex.slice(0, 1) === '#') hex = hex.slice(1);
@@ -26,7 +26,7 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-export const calcX = (x: number, alignment: Alignment, boxWidth: number, textWidth: number) => {
+export const calcX = (x: number, alignment: 'left' | 'center' | 'right', boxWidth: number, textWidth: number) => {
   let addition = 0;
   if (alignment === 'center') {
     addition = (boxWidth - textWidth) / 2;
@@ -40,14 +40,14 @@ export const calcX = (x: number, alignment: Alignment, boxWidth: number, textWid
 export const calcY = (y: number, pageHeight: number, itemHeight: number) => pageHeight - mm2pt(y) - itemHeight;
 
 export const renderBackgroundColor = (arg: {
-  schema: TextSchema;
+  schema: Schema;
   page: PDFPage;
   pageHeight: number;
 }) => {
   const { schema, page, pageHeight } = arg;
   if (!schema.backgroundColor) return;
   const { width, height } = convertSchemaDimensionsToPt(schema);
-  const color = hex2RgbColor(schema.backgroundColor);
+  const color = hex2RgbColor(schema.backgroundColor as string);
   page.drawRectangle({
     x: calcX(schema.position.x, 'left', width, width),
     y: calcY(schema.position.y, pageHeight, height),

@@ -1,7 +1,7 @@
 import { setCharacterSpacing, } from '@pdfme/pdf-lib';
 import {
-  TextSchema,
   Font,
+  Schema,
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
   DEFAULT_LINE_HEIGHT,
@@ -31,20 +31,19 @@ import {
   convertSchemaDimensionsToPt
 } from '../renderUtils'
 
-const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
-  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
-  const color = hex2RgbColor(schema.fontColor ?? DEFAULT_FONT_COLOR);
-  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
-  const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;
-  const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
-  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: Schema }) => {
+  const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : (schema.fontSize as number) ?? DEFAULT_FONT_SIZE;
+  const color = hex2RgbColor((schema.fontColor as string) ?? DEFAULT_FONT_COLOR);
+  const alignment = (schema.alignment as 'left' | 'center' | 'right') ?? DEFAULT_ALIGNMENT;
+  const verticalAlignment = (schema.verticalAlignment as  'top' | 'middle' | 'bottom') ?? DEFAULT_VERTICAL_ALIGNMENT;
+  const lineHeight = (schema.lineHeight as number) ?? DEFAULT_LINE_HEIGHT;
+  const characterSpacing = (schema.characterSpacing as number) ?? DEFAULT_CHARACTER_SPACING;
 
   return { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing };
 };
 
 export const renderText = async (arg: RenderProps) => {
-  const { value, pdfDoc, page, options } = arg;
-  const schema = arg.schema as TextSchema;
+  const { value, pdfDoc, page, options, schema } = arg;
 
   const { font = getDefaultFont() } = options;
 
@@ -56,7 +55,8 @@ export const renderText = async (arg: RenderProps) => {
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
-  const pdfFontValue = pdfFontObj[schema.fontName ? schema.fontName : getFallbackFontName(font)];
+  const fontName = (schema.fontName ? schema.fontName : getFallbackFontName(font)) as keyof typeof pdfFontObj;
+  const pdfFontValue = pdfFontObj[fontName];
 
   const pageHeight = page.getHeight();
   renderBackgroundColor({ schema, page, pageHeight });

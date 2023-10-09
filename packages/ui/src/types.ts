@@ -1,5 +1,6 @@
 
-import type { UIOptions, SchemaForUI, Size } from '@pdfme/common';
+import type { Schema as FormSchema, WidgetProps } from 'form-render';
+import type { UIOptions, Schema, SchemaForUI, Size } from '@pdfme/common';
 
 interface RenderBaseProps {
     schema: SchemaForUI;
@@ -24,7 +25,41 @@ export type RenderProps = RenderBaseProps & {
 }
 
 export interface Renderer {
-    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
+    [key: string]: {
+        render: (arg: RenderProps) => Promise<void>;
+    } | undefined;
+}
+
+export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
+
+export type PropPanelSchema = FormSchema;
+
+export type PropPanelWidgetGlobalProps = {
+    activeSchema: SchemaForUI;
+    activeElements: HTMLElement[];
+    changeSchemas: ChangeSchemas;
+    schemas: SchemaForUI[];
+    pageSize: Size;
+    options: UIOptions;
+}
+
+export type PropPanelWidgetProps = WidgetProps & {
+    addons: {
+        globalProps: PropPanelWidgetGlobalProps
+    }
+};
+
+type PartOf<T> = {
+    [K in keyof T]?: T[K];
+  };
+
+export interface PropPanel {
+    [key: string]: {
+        schema: Record<string, PropPanelSchema>;
+        widgets?: Record<string, any>,
+        defaultValue: string;
+        defaultSchema: PartOf<Schema>;
+    } | undefined;
 }
 
 export type SidebarProps = {
@@ -38,14 +73,7 @@ export type SidebarProps = {
     onSortEnd: (sortedSchemas: SchemaForUI[]) => void;
     onEdit: (id: string) => void;
     onEditEnd: () => void;
-    changeSchemas: (
-        objs: {
-            key: string; value: undefined | string | number | {
-                min: number;
-                max: number;
-            }; schemaId: string
-        }[]
-    ) => void;
+    changeSchemas: ChangeSchemas;
     addSchema: () => void;
     deselectSchema: () => void;
 };
