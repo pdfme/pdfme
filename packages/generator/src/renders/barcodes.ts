@@ -4,20 +4,12 @@ import {
     BarCodeType,
 } from '@pdfme/common';
 import type { RenderProps } from "../types"
-import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
+import { getCacheKey, convertForPdfLayoutProps } from '../renderUtils'
 
 export const renderBarcode = async (arg: RenderProps) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!validateBarcodeInput(schema.type as BarCodeType, value)) return;
 
-    const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
-    const opt = {
-        x: calcX(schema.position.x, 'left', width, width),
-        y: calcY(schema.position.y, page.getHeight(), height),
-        rotate,
-        width,
-        height,
-    };
     const inputBarcodeCacheKey = getCacheKey(schema, value);
     let image = _cache.get(inputBarcodeCacheKey);
     if (!image) {
@@ -28,5 +20,8 @@ export const renderBarcode = async (arg: RenderProps) => {
         _cache.set(inputBarcodeCacheKey, image)
     }
 
-    page.drawImage(image, opt);
+    const pageHeight = page.getHeight();
+    const { width, height, rotate, position: { x, y } } = convertForPdfLayoutProps({ schema, pageHeight });
+
+    page.drawImage(image, { x, y, rotate, width, height });
 }

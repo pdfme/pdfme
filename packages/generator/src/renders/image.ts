@@ -1,18 +1,10 @@
 import type { RenderProps } from "../types"
-import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
+import { getCacheKey, convertForPdfLayoutProps } from '../renderUtils'
 
 
 export const renderImage = async (arg: RenderProps) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
 
-    const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
-    const opt = {
-        x: calcX(schema.position.x, 'left', width, width),
-        y: calcY(schema.position.y, page.getHeight(), height),
-        rotate,
-        width,
-        height,
-    };
     const inputImageCacheKey = getCacheKey(schema, value);
     let image = _cache.get(inputImageCacheKey);
     if (!image) {
@@ -20,5 +12,9 @@ export const renderImage = async (arg: RenderProps) => {
         image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
         _cache.set(inputImageCacheKey, image);
     }
-    page.drawImage(image, opt);
+
+    const pageHeight = page.getHeight();
+    const { width, height, rotate, position: { x, y } } = convertForPdfLayoutProps({ schema, pageHeight });
+
+    page.drawImage(image, { x, y, rotate, width, height });
 }

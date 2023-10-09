@@ -20,22 +20,17 @@ import {
   FontWidthCalcValues,
   getDefaultFont,
   getFallbackFontName,
+  mm2pt
 } from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { embedAndGetFontObj } from '../pdfUtils'
-import {
-  hex2RgbColor,
-  calcX,
-  calcY,
-  renderBackgroundColor,
-  convertSchemaDimensionsToPt
-} from '../renderUtils'
+import { convertForPdfLayoutProps, hex2RgbColor } from '../renderUtils'
 
 const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: Schema }) => {
   const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : (schema.fontSize as number) ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor((schema.fontColor as string) ?? DEFAULT_FONT_COLOR);
   const alignment = (schema.alignment as 'left' | 'center' | 'right') ?? DEFAULT_ALIGNMENT;
-  const verticalAlignment = (schema.verticalAlignment as  'top' | 'middle' | 'bottom') ?? DEFAULT_VERTICAL_ALIGNMENT;
+  const verticalAlignment = (schema.verticalAlignment as 'top' | 'middle' | 'bottom') ?? DEFAULT_VERTICAL_ALIGNMENT;
   const lineHeight = (schema.lineHeight as number) ?? DEFAULT_LINE_HEIGHT;
   const characterSpacing = (schema.characterSpacing as number) ?? DEFAULT_CHARACTER_SPACING;
 
@@ -59,9 +54,12 @@ export const renderText = async (arg: RenderProps) => {
   const pdfFontValue = pdfFontObj[fontName];
 
   const pageHeight = page.getHeight();
-  renderBackgroundColor({ schema, page, pageHeight });
+  const { width, height, rotate, position: { x, y } } = convertForPdfLayoutProps({ schema, pageHeight });
 
-  const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
+  if (schema.backgroundColor) {
+    const color = hex2RgbColor(schema.backgroundColor as string);
+    page.drawRectangle({ x, y, width, height, rotate, color });
+  }
 
   page.pushOperators(setCharacterSpacing(characterSpacing));
 
@@ -99,9 +97,16 @@ export const renderText = async (arg: RenderProps) => {
     const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
+    let xAddition = 0;
+    if (alignment === 'center') {
+      xAddition = (width - textWidth) / 2;
+    } else if (alignment === 'right') {
+      xAddition = width - textWidth;
+    }
+
     page.drawText(line, {
-      x: calcX(schema.position.x, alignment, width, textWidth),
-      y: calcY(schema.position.y, pageHeight, yOffset) - rowYOffset,
+      x: x + xAddition,
+      y: pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset,
       rotate,
       size: fontSize,
       color,

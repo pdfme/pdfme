@@ -1,5 +1,5 @@
-import type { PDFImage } from '@pdfme/pdf-lib';
-import type { GeneratorOptions, Schema, } from '@pdfme/common';
+import type { PDFImage, Degrees } from '@pdfme/pdf-lib';
+import type { GeneratorOptions, Schema } from '@pdfme/common';
 import type { PDFPage, PDFDocument, } from '@pdfme/pdf-lib';
 
 export type EmbedPdfBox = {
@@ -8,7 +8,7 @@ export type EmbedPdfBox = {
     trimBox: { x: number; y: number; width: number; height: number };
 };
 
-export interface RenderProps {
+export type RenderProps = {
     value: string;
     schema: Schema;
     pdfDoc: PDFDocument;
