@@ -169,14 +169,14 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { transform } = target.style;
-    const rotate = transform.replace('rotate(', '').replace('deg)', '');
-    changeSchemas([{ key: 'rotate', value: Number(rotate), schemaId: target.id }]);
+    const rotate = Number(transform.replace('rotate(', '').replace('deg)', '')); // FIXME 360度以上は360度以下の値にする
+    changeSchemas([{ key: 'rotate', value: rotate, schemaId: target.id }]);
   };
 
   const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
     const arg = targets.map(({ style: { transform }, id }) => {
-      const rotate = transform.replace('rotate(', '').replace('deg)', '');
-      return [{ key: 'rotate', value: Number(rotate), schemaId: id }]
+      const rotate = Number(transform.replace('rotate(', '').replace('deg)', '')); // FIXME 360度以上は360度以下の値にする
+      return [{ key: 'rotate', value: rotate, schemaId: id }]
     });
     changeSchemas(flatten(arg));
   };
