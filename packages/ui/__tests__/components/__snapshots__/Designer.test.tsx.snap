@@ -125,7 +125,7 @@ exports[`Designer snapshot 1`] = `
                       style="padding: 0.5rem; background: none; display: flex;"
                     >
                       <object
-                        style="cursor: grab; margin-top: 7px;"
+                        style="cursor: grab; margin-top: 6px;"
                         width="15"
                       >
                         <svg
@@ -158,7 +158,7 @@ exports[`Designer snapshot 1`] = `
                       style="padding: 0.5rem; background: none; display: flex;"
                     >
                       <object
-                        style="cursor: grab; margin-top: 7px;"
+                        style="cursor: grab; margin-top: 6px;"
                         width="15"
                       >
                         <svg
