@@ -20,7 +20,7 @@ export const Schema = z.object({
   position: z.object({ x: z.number(), y: z.number() }),
   width: z.number(),
   height: z.number(),
-  rotate: z.number().optional(),
+  rotate: z.number().optional(), // FIXME optionalじゃない方がいいかも
 }).passthrough();
 
 const SchemaForUIAdditionalInfo = z.object({

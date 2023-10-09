@@ -47,20 +47,20 @@ const DetailView = (
       align: { title: 'Align', type: 'void', widget: 'AlignWidget', cellSpan: 2 },
       position: {
         type: 'object', widget: 'card', column: 2,
-        properties: { x: { title: 'X', type: 'number', widget: 'inputNumber' }, y: { title: 'Y', type: 'number', widget: 'inputNumber' } }
+        properties: {
+          x: { title: 'X', type: 'number', widget: 'inputNumber' },
+          y: { title: 'Y', type: 'number', widget: 'inputNumber' }
+        },
       },
-      width: { title: 'Width', type: 'number', widget: 'inputNumber' },
-      height: { title: 'Height', type: 'number', widget: 'inputNumber' },
+      width: { title: 'Width', type: 'number', widget: 'inputNumber', span: 8 },
+      height: { title: 'Height', type: 'number', widget: 'inputNumber', span: 8 },
+      rotate: { title: 'Rotate', type: 'number', widget: 'inputNumber', span: 8 },
       ...(Object.keys(activePropPanelRegistry?.schema || {}).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
       ...activePropPanelRegistry?.schema
     }
   };
 
-  const propPanelWidgets = {
-    AlignWidget,
-    Divider,
-    ...activePropPanelRegistry?.widgets
-  }
+  const propPanelWidgets = { AlignWidget, Divider, ...activePropPanelRegistry?.widgets }
 
   useEffect(() => {
     form.setValues({ ...activeSchema });

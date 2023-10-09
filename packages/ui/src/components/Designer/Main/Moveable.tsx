@@ -1,11 +1,9 @@
 import React, { forwardRef, Ref } from 'react';
 import Moveable, {
   OnDrag,
+  OnRotate,
+  OnRotateEnd,
   OnResize,
-  OnDragEnd,
-  OnDragGroupEnd,
-  OnResizeEnd,
-  OnResizeGroupEnd,
   OnClick,
 } from 'react-moveable';
 
@@ -15,16 +13,15 @@ type Props = {
   horizontalGuidelines: number[];
   verticalGuidelines: number[];
   keepRatio: boolean;
-  onDrag: ((e: OnDrag) => void) & (({ target, left, top }: OnDrag) => void);
-  onDragEnd: ((e: OnDragEnd) => void) &
-    (({ target }: { target: HTMLElement | SVGElement }) => void);
-  onDragGroupEnd: ((e: OnDragGroupEnd) => void) &
-    (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
-  onResize: ((e: OnResize) => void) & (({ target, width, height, direction }: OnResize) => void);
-  onResizeEnd: ((e: OnResizeEnd) => void) &
-    (({ target }: { target: HTMLElement | SVGElement }) => void);
-  onResizeGroupEnd: ((e: OnResizeGroupEnd) => void) &
-    (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
+  onDrag: (({ target, left, top }: OnDrag) => void);
+  onDragEnd: (({ target }: { target: HTMLElement | SVGElement }) => void);
+  onDragGroupEnd: (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
+  onRotate: (({ target, rotate }: OnRotate) => void);
+  onRotateEnd: (({ target }: OnRotateEnd) => void);
+  onRotateGroupEnd: (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
+  onResize: (({ target, width, height, direction }: OnResize) => void);
+  onResizeEnd: (({ target }: { target: HTMLElement | SVGElement }) => void);
+  onResizeGroupEnd: (({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void);
   onClick: (e: OnClick) => void;
 };
 
@@ -38,6 +35,9 @@ const _Moveable = (
     onDrag,
     onDragEnd,
     onDragGroupEnd,
+    onRotate,
+    onRotateEnd,
+    onRotateGroupEnd,
     onResize,
     onResizeEnd,
     onResizeGroupEnd,
@@ -51,8 +51,10 @@ const _Moveable = (
     snappable
     snapCenter
     draggable
+    rotatable
     resizable
     throttleDrag={1}
+    throttleRotate={1}
     throttleResize={1}
     ref={ref}
     target={target}
@@ -60,6 +62,12 @@ const _Moveable = (
     horizontalGuidelines={horizontalGuidelines}
     verticalGuidelines={verticalGuidelines}
     keepRatio={keepRatio}
+    onRotate={onRotate}
+    onRotateEnd={onRotateEnd}
+    onRotateGroup={({ events }) => {
+      events.forEach(onRotate);
+    }}
+    onRotateGroupEnd={onRotateGroupEnd}
     onDrag={onDrag}
     onDragGroup={({ events }) => {
       events.forEach(onDrag);

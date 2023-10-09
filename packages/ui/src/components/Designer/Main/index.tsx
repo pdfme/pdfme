@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { OnDrag, OnResize, OnClick } from 'react-moveable';
+import { OnDrag, OnResize, OnRotate, OnClick } from 'react-moveable';
 import { SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { ChangeSchemas } from "../../../types"
@@ -163,6 +163,24 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
+  const onRotate = ({ target, rotate }: OnRotate) => {
+    target.style.transform = `rotate(${rotate}deg)`;
+  }
+
+  const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+    const { transform } = target.style;
+    const rotate = transform.replace('rotate(', '').replace('deg)', '');
+    changeSchemas([{ key: 'rotate', value: Number(rotate), schemaId: target.id }]);
+  };
+
+  const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
+    const arg = targets.map(({ style: { transform }, id }) => {
+      const rotate = transform.replace('rotate(', '').replace('deg)', '');
+      return [{ key: 'rotate', value: Number(rotate), schemaId: id }]
+    });
+    changeSchemas(flatten(arg));
+  };
+
   const onResizeEnd = async ({ target }: { target: HTMLElement | SVGElement }) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
@@ -300,6 +318,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                   onDrag={onDrag}
                   onDragEnd={onDragEnd}
                   onDragGroupEnd={onDragEnds}
+                  onRotate={onRotate}
+                  onRotateEnd={onRotateEnd}
+                  onRotateGroupEnd={onRotateEnds}
                   onResize={onResize}
                   onResizeEnd={onResizeEnd}
                   onResizeGroupEnd={onResizeEnds}
