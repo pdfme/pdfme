@@ -1,6 +1,5 @@
 import type { ChangeEvent } from 'react';
 import type * as CSS from 'csstype';
-import { Schema } from '@pdfme/common';
 import type { RenderProps } from "../types"
 import { ZOOM } from '../constants';
 

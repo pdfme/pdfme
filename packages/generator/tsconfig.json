@@ -6,6 +6,9 @@
   "paths": {
     "@pdfme/common": [
       "packages/common/src"
+    ],
+    "@pdfme/schemas": [
+      "packages/schemas/src"
     ]
   }
 }

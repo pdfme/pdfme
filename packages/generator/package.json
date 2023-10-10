@@ -52,10 +52,12 @@
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",
+    "@pdfme/schemas": "file:../schemas",
     "pdf2json": "^2.0.0"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.1.0"
+    "@pdfme/common": "^2.1.0",
+    "@pdfme/schemas": "^2.1.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
