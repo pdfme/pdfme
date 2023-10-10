@@ -3,7 +3,7 @@ import { convertForPdfLayoutProps } from '../src/renderUtils';
 
 // npm run test:single -- "convertForPdfLayoutProps"
 
-// FIXME ここから unit testを作る
+// FIXME add unit tests
 describe('convertForPdfLayoutProps', () => {
     it.only('should return correct value', () => {
         const schema: Schema = {

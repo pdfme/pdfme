@@ -33,6 +33,7 @@ export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schem
 
   return {
     position: {
+      // FIXME x and y are not correct when rotate is not 0
       x: mm2pt(x),
       y: pageHeight - mm2pt(y) - mm2pt(height)
     },
