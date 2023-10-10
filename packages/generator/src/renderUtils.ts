@@ -26,34 +26,19 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-// FIXME ここから
 export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schema, pageHeight: number }) => {
   const { width, height, position, rotate } = schema;
   const { x, y } = position;
 
-  // Step 1: Calculate the center
-  const centerX = x + width / 2;
-  const centerY = y + height / 2;
-
-  // Step 2: Translate to the center
-  const translatedX = mm2pt(centerX);
-  const translatedY = pageHeight - mm2pt(centerY);
-
-  // Step 3: Apply rotation (handled externally, assume rotate is in degrees)
-  const rotatedAngle = degrees(-(rotate ?? 0));
-
-  // Step 4: Translate back to the original position
-  const finalX = translatedX - mm2pt(width) / 2;
-  const finalY = translatedY - mm2pt(height) / 2;
 
   return {
     position: {
-      x: finalX,
-      y: finalY
+      x: mm2pt(x),
+      y: pageHeight - mm2pt(y) - mm2pt(height)
     },
     height: mm2pt(height),
     width: mm2pt(width),
-    rotate: rotatedAngle
+    rotate: degrees(rotate ? -rotate : 0)
   };
 };
 

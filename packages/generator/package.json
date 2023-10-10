@@ -41,6 +41,7 @@
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
+    "test:single": "jest --testNamePattern",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src"

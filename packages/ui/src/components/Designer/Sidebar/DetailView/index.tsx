@@ -54,7 +54,7 @@ const DetailView = (
       },
       width: { title: 'Width', type: 'number', widget: 'inputNumber', span: 8 },
       height: { title: 'Height', type: 'number', widget: 'inputNumber', span: 8 },
-      rotate: { title: 'Rotate', type: 'number', widget: 'inputNumber', span: 8 },
+      rotate: { title: 'Rotate', type: 'number', widget: 'inputNumber', span: 8, max: 360, min: 0 },
       ...(Object.keys(activePropPanelRegistry?.schema || {}).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
       ...activePropPanelRegistry?.schema
     }
