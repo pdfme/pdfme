@@ -60,16 +60,6 @@ const generate = async (props: GenerateProps) => {
           throw new Error(`Renderer for type ${schema.type} not found`);
         }
         await renderer.render({ value, schema, pdfDoc, page, options, _cache });
-
-        // FIXME
-        // await renderer.render({
-        //   value,
-        //   schema: Object.assign(schema, convertForPdfLayoutProps({ schema, pageHeight })),
-        //   pdfDoc,
-        //   page,
-        //   options,
-        //   _cache
-        // });
       }
     }
   }
