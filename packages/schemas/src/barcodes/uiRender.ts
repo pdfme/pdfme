@@ -1,4 +1,4 @@
-import type { RenderProps } from "../types"
+import type { UIRenderProps } from "../types"
 import type * as CSS from 'csstype';
 import { validateBarcodeInput, Schema, createBarCode, BarCodeType } from '@pdfme/common';
 
@@ -63,7 +63,7 @@ const createBarcodeImageElm = async (schema: Schema, value: string) => {
 }
 
 
-export const renderBarcode = async (arg: RenderProps) => {
+export const uiRender = async (arg: UIRenderProps) => {
     const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
 
     const container = document.createElement('div');

@@ -1,8 +1,8 @@
-import { add } from "../src";
+import schema from "../src";
 
-
-describe('add test', () => {
-  it('add', () => {
-    expect(add(1, 1)).toEqual(2);
+describe('schema test', () => {
+  it('text', () => {
+    // schema.text.pdfRender
+    throw new Error('not implemented');
   });
 });

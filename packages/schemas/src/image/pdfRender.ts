@@ -1,8 +1,8 @@
-import type { RenderProps } from "../types"
+import type { PDFRenderProps } from "../types"
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 
 
-export const renderImage = async (arg: RenderProps) => {
+export const pdfRender = async (arg: PDFRenderProps) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(schema);

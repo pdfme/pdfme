@@ -22,7 +22,10 @@
     "url": "https://github.com/pdfme/pdfme/issues"
   },
   "workspaces": [
-    "packages/*"
+    "packages/common",
+    "packages/schemas",
+    "packages/generator",
+    "packages/ui"
   ],
   "scripts": {
     "postinstall": "./link-workspaces.sh",
