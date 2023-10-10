@@ -1,4 +1,4 @@
-import { degrees, rgb, Degrees } from '@pdfme/pdf-lib';
+import { degrees, rgb } from '@pdfme/pdf-lib';
 import { Schema, mm2pt } from '@pdfme/common';
 
 const hex2rgb = (hex: string) => {
@@ -31,38 +31,31 @@ export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schem
   const { width, height, position, rotate } = schema;
   const { x, y } = position;
 
-  let adjustedX = x;
-  let adjustedY = y;
+  // Step 1: Calculate the center
+  const centerX = x + width / 2;
+  const centerY = y + height / 2;
 
-  if (rotate && rotate !== 0) {
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
-    const radian = (rotate * Math.PI) / 180;
+  // Step 2: Translate to the center
+  const translatedX = mm2pt(centerX);
+  const translatedY = pageHeight - mm2pt(centerY);
 
-    // オブジェクトの中心を原点にシフト
-    const shiftedX = x - centerX;
-    const shiftedY = y - centerY;
+  // Step 3: Apply rotation (handled externally, assume rotate is in degrees)
+  const rotatedAngle = degrees(-(rotate ?? 0));
 
-    // 回転
-    const rotatedX = shiftedX * Math.cos(radian) - shiftedY * Math.sin(radian);
-    const rotatedY = shiftedX * Math.sin(radian) + shiftedY * Math.cos(radian);
-
-    // 元の位置に戻す（逆シフト）
-    adjustedX = rotatedX + centerX;
-    adjustedY = rotatedY + centerY;
-  }
+  // Step 4: Translate back to the original position
+  const finalX = translatedX - mm2pt(width) / 2;
+  const finalY = translatedY - mm2pt(height) / 2;
 
   return {
     position: {
-      x: mm2pt(adjustedX),
-      y: pageHeight - mm2pt(adjustedY) - mm2pt(height)
+      x: finalX,
+      y: finalY
     },
     height: mm2pt(height),
     width: mm2pt(width),
-    rotate: degrees(-(rotate ?? 0))
+    rotate: rotatedAngle
   };
 };
-
 
 
 export const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
