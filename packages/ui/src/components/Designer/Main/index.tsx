@@ -25,6 +25,7 @@ const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
+const normalizeRotate = (angle: number) => (angle % 360 + 360) % 360;
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
   const top = Math.min(...aes.map(({ style }) => fmt4Num(style.top)));
@@ -169,14 +170,16 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { transform } = target.style;
-    const rotate = Number(transform.replace('rotate(', '').replace('deg)', '')); // FIXME 360度以上は360度以下の値にする
-    changeSchemas([{ key: 'rotate', value: rotate, schemaId: target.id }]);
+    const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
+    const normalizedRotate = normalizeRotate(rotate);
+    changeSchemas([{ key: 'rotate', value: normalizedRotate, schemaId: target.id }]);
   };
 
   const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
     const arg = targets.map(({ style: { transform }, id }) => {
-      const rotate = Number(transform.replace('rotate(', '').replace('deg)', '')); // FIXME 360度以上は360度以下の値にする
-      return [{ key: 'rotate', value: rotate, schemaId: id }]
+      const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
+      const normalizedRotate = normalizeRotate(rotate);
+      return [{ key: 'rotate', value: normalizedRotate, schemaId: id }]
     });
     changeSchemas(flatten(arg));
   };

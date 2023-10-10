@@ -26,26 +26,43 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schema, pageHeight: number }): {
-  width: number;
-  height: number;
-  position: { x: number; y: number; }
-  originalPosition: { x: number; y: number; }
-  rotate: Degrees
-} => {
-  const { width, height, position } = schema;
+// FIXME ここから
+export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schema, pageHeight: number }) => {
+  const { width, height, position, rotate } = schema;
   const { x, y } = position;
 
+  let adjustedX = x;
+  let adjustedY = y;
+
+  if (rotate && rotate !== 0) {
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const radian = (rotate * Math.PI) / 180;
+
+    // オブジェクトの中心を原点にシフト
+    const shiftedX = x - centerX;
+    const shiftedY = y - centerY;
+
+    // 回転
+    const rotatedX = shiftedX * Math.cos(radian) - shiftedY * Math.sin(radian);
+    const rotatedY = shiftedX * Math.sin(radian) + shiftedY * Math.cos(radian);
+
+    // 元の位置に戻す（逆シフト）
+    adjustedX = rotatedX + centerX;
+    adjustedY = rotatedY + centerY;
+  }
+
   return {
-    originalPosition: { x, y },
     position: {
-      x: mm2pt(x),
-      y: pageHeight - mm2pt(y) - mm2pt(height)
+      x: mm2pt(adjustedX),
+      y: pageHeight - mm2pt(adjustedY) - mm2pt(height)
     },
     height: mm2pt(height),
     width: mm2pt(width),
-    rotate: degrees(-(schema.rotate ?? 0))
+    rotate: degrees(-(rotate ?? 0))
   };
 };
+
+
 
 export const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
