@@ -50,7 +50,7 @@ export const pdfRender = async (arg: PDFRenderProps) => {
     const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
         embedAndGetFontObj({ pdfDoc, font }),
         getFontKitFont(schema, font),
-        getFontProp({ value, font, schema: schema })
+        getFontProp({ value, font, schema })
     ])
 
     const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
@@ -63,7 +63,11 @@ export const pdfRender = async (arg: PDFRenderProps) => {
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
 
-    page.pushOperators(setCharacterSpacing(characterSpacing));
+    const operators = setCharacterSpacing(characterSpacing)
+    // FIXME PDF作成時にエラーになる
+    console.log(operators, characterSpacing)
+
+    page.pushOperators(operators);
 
     const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const descent = getFontDescentInPt(fontKitFont, fontSize);

@@ -38,14 +38,12 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "antd": "^5.9.4",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "@pdfme/pdf-lib": "^1.17.3",
+    "antd": "^5.9.4"
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",
     "@types/react": "^17.0.52",
-    "@types/react-dom": "^17.0.18",
     "css-loader": "^6.8.1",
     "csstype": "^3.1.2",
     "eslint-plugin-react": "^7.28.0",
@@ -56,7 +54,8 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.1.0"
+    "@pdfme/common": "^2.1.0",
+    "react": "^16.14.0"
   },
   "jest": {
     "moduleNameMapper": {
