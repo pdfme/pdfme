@@ -20,6 +20,7 @@ export type UIRenderProps = {
 export interface PDFRenderProps {
     value: string;
     schema: Schema;
+    pdfLib: typeof import('@pdfme/pdf-lib');
     pdfDoc: PDFDocument;
     page: PDFPage;
     options: GeneratorOptions;

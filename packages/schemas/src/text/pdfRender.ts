@@ -1,4 +1,3 @@
-import { setCharacterSpacing, } from '@pdfme/pdf-lib';
 import {
     Font,
     Schema,
@@ -43,7 +42,7 @@ const getFontProp = async ({ value, font, schema }: { value: string, font: Font,
 };
 
 export const pdfRender = async (arg: PDFRenderProps) => {
-    const { value, pdfDoc, page, options, schema } = arg;
+    const { value, pdfDoc, pdfLib, page, options, schema } = arg;
 
     const { font = getDefaultFont() } = options;
 
@@ -63,11 +62,7 @@ export const pdfRender = async (arg: PDFRenderProps) => {
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
 
-    const operators = setCharacterSpacing(characterSpacing)
-    // FIXME PDF作成時にエラーになる
-    console.log(operators, characterSpacing)
-
-    page.pushOperators(operators);
+    page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing));
 
     const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const descent = getFontDescentInPt(fontKitFont, fontSize);

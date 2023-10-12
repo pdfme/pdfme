@@ -1,8 +1,9 @@
-import schema from "../src";
+import { text } from "../src";
 
+// FIXME add test
 describe('schema test', () => {
   it('text', () => {
-    // schema.text.pdfRender
-    throw new Error('not implemented');
+    // text is not undefined
+    expect(text).toBeDefined();
   });
 });

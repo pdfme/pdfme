@@ -12,6 +12,7 @@ export interface RenderProps {
     value: string;
     schema: Schema;
     pdfDoc: PDFDocument;
+    pdfLib: typeof import('@pdfme/pdf-lib');
     page: PDFPage;
     options: GeneratorOptions;
 
