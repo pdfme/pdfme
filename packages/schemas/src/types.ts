@@ -2,21 +2,6 @@ import type { PDFImage } from '@pdfme/pdf-lib';
 import type { GeneratorOptions, Schema, UIOptions, SchemaForUI, Size } from '@pdfme/common';
 import type { PDFPage, PDFDocument, } from '@pdfme/pdf-lib';
 
-// FIXME exportしてUIで使う
-export type UIRenderProps = {
-    schema: SchemaForUI;
-    mode: 'viewer' | 'form';
-    tabIndex?: number;
-    placeholder?: string;
-    stopEditing?: () => void;
-    // -----
-    onChange?: (value: string) => void;
-    value: string;
-    rootElement: HTMLDivElement,
-    options: UIOptions;
-}
-
-// FIXME exportしてgeneratorで使う
 export interface PDFRenderProps {
     value: string;
     schema: Schema;
@@ -28,8 +13,18 @@ export interface PDFRenderProps {
     _cache: Map<string, PDFImage>;
 }
 
+export type UIRenderProps = {
+    mode: 'viewer' | 'form';
+    stopEditing?: () => void;
+    schema: SchemaForUI;
+    value: string;
+    onChange?: (value: string) => void;
+    rootElement: HTMLDivElement,
+    options: UIOptions;
+    tabIndex?: number;
+    placeholder?: string;
+}
 
-// FIXME exportしてUIで使う
 export type PropPanelWidgetGlobalProps = {
     activeSchema: SchemaForUI;
     activeElements: HTMLElement[];

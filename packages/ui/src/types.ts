@@ -1,6 +1,7 @@
 
 import type { Schema as FormSchema, WidgetProps } from 'form-render';
-import type { UIOptions, Schema, SchemaForUI, Size } from '@pdfme/common';
+import type { Schema, SchemaForUI, Size } from '@pdfme/common';
+import type { UIRenderProps, PropPanelWidgetGlobalProps as _PropPanelWidgetGlobalProps } from '@pdfme/schemas';
 
 interface RenderBaseProps {
     schema: SchemaForUI;
@@ -17,16 +18,10 @@ export type RendererProps = RenderBaseProps & {
     onChangeHoveringSchemaId?: (id: string | null) => void;
 }
 
-export type RenderProps = RenderBaseProps & {
-    onChange?: (value: string) => void;
-    value: string;
-    rootElement: HTMLDivElement,
-    options: UIOptions;
-}
 
 export interface Renderer {
     [key: string]: {
-        render: (arg: RenderProps) => Promise<void>;
+        render: (arg: UIRenderProps) => Promise<void>;
     } | undefined;
 }
 
@@ -34,14 +29,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
 
 export type PropPanelSchema = FormSchema;
 
-export type PropPanelWidgetGlobalProps = {
-    activeSchema: SchemaForUI;
-    activeElements: HTMLElement[];
-    changeSchemas: ChangeSchemas;
-    schemas: SchemaForUI[];
-    pageSize: Size;
-    options: UIOptions;
-}
+export type PropPanelWidgetGlobalProps = _PropPanelWidgetGlobalProps
 
 export type PropPanelWidgetProps = WidgetProps & {
     addons: {
@@ -51,7 +39,7 @@ export type PropPanelWidgetProps = WidgetProps & {
 
 type PartOf<T> = {
     [K in keyof T]?: T[K];
-  };
+};
 
 export interface PropPanel {
     [key: string]: {

@@ -1,6 +1,4 @@
-import type { PDFImage } from '@pdfme/pdf-lib';
-import type { GeneratorOptions, Schema, } from '@pdfme/common';
-import type { PDFPage, PDFDocument, } from '@pdfme/pdf-lib';
+import { PDFRenderProps } from '@pdfme/schemas';
 
 export type EmbedPdfBox = {
     mediaBox: { x: number; y: number; width: number; height: number };
@@ -8,17 +6,7 @@ export type EmbedPdfBox = {
     trimBox: { x: number; y: number; width: number; height: number };
 };
 
-export interface RenderProps {
-    value: string;
-    schema: Schema;
-    pdfDoc: PDFDocument;
-    pdfLib: typeof import('@pdfme/pdf-lib');
-    page: PDFPage;
-    options: GeneratorOptions;
-
-    _cache: Map<string, PDFImage>;
-}
 
 export interface Renderer {
-    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
+    [key: string]: { render: (arg: PDFRenderProps) => Promise<void> } | undefined;
 }
