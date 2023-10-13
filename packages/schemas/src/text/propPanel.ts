@@ -107,7 +107,7 @@ const textSchema: Record<string, PropPanelSchema> = {
 
 const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
     const { rootElement, onChange, value, addons: { globalProps: { options } } } = props;
-    const font = options.font || { [DEFAULT_FONT_NAME]: { data: '' } }
+    const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } }
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font)
 
