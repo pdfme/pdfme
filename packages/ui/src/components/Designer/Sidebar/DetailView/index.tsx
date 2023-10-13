@@ -59,7 +59,7 @@ const DetailView = (
   const propPanelWidgets = {
     AlignWidget,
     Divider,
-    ...activePropPanelRegistry?.widgets
+    ...activePropPanelRegistry?.widgets // FIXME ここから　Renderer.tsx を参考に、vanillaをReactにマウントする
   }
 
   useEffect(() => {
