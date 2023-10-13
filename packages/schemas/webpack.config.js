@@ -1,3 +1,4 @@
+// FIXME ここから 丸っとここら辺を消して、build等もcommonからコピーしてシンプルなものに書き換える
 const path = require('path');
 const webpack = require('webpack');
 const pkg = require('./package.json');

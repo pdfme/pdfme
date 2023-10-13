@@ -25,6 +25,7 @@
     "@mui/icons-material": "^5.3.0",
     "@mui/material": "^5.3.0",
     "@pdfme/common": "file:../packages/common",
+    "@pdfme/schemas": "file:../packages/schemas",
     "@pdfme/generator": "file:../packages/generator",
     "@pdfme/ui": "file:../packages/ui",
     "clsx": "^1.1.1",

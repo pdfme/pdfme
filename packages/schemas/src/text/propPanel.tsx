@@ -2,6 +2,8 @@ import React from 'react';
 import { Select, Checkbox, Form, InputNumber, Col, Row } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
+    PropPanelWidgetProps,
+    PropPanelSchema,
     getFallbackFontName,
     DEFAULT_FONT_NAME,
     DEFAULT_FONT_SIZE,
@@ -10,7 +12,6 @@ import {
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
-import { PropPanelWidgetProps, PropPanelSchema } from "../types"
 
 const textSchema: Record<string, PropPanelSchema> = {
     fontName: { title: 'Font Name', type: 'string', widget: 'FontSelect', span: 8 },

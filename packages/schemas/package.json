@@ -38,8 +38,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.17.3",
-    "antd": "^5.9.4"
+    "@pdfme/pdf-lib": "^1.17.3"
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",
@@ -54,8 +53,7 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.1.0",
-    "react": "^16.14.0"
+    "@pdfme/common": "latest"
   },
   "jest": {
     "moduleNameMapper": {

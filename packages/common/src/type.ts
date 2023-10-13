@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { Font as FontKitFont } from 'fontkit';
-
+import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
   Lang,
   Size,
@@ -28,6 +28,23 @@ export type FontWidthCalcValues = {
   fontSize: number;
   characterSpacing: number;
   boxWidthInPt: number;
+};
+
+export type PropPanelSchema = _PropPanelSchema;
+
+export type PropPanelWidgetGlobalProps = {
+    activeSchema: SchemaForUI;
+    activeElements: HTMLElement[];
+    changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
+    schemas: SchemaForUI[];
+    pageSize: Size;
+    options: UIOptions;
+}
+
+export type PropPanelWidgetProps = _PropPanelWidgetProps & {
+    addons: {
+        globalProps: PropPanelWidgetGlobalProps
+    }
 };
 
 export type Lang = z.infer<typeof Lang>;

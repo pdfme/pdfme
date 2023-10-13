@@ -70,8 +70,8 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.1.0",
-    "@pdfme/schemas": "^2.1.0"
+    "@pdfme/common": "latest",
+    "@pdfme/schemas": "latest"
   },
   "jest": {
     "setupFiles": [
