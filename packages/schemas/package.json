@@ -21,15 +21,23 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/types/index.d.ts",
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js"
+    }
+  },
   "engines": {
     "node": ">=16"
   },
   "scripts": {
-    "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "develop": "tsc -p tsconfig.esm.json -w",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
@@ -41,43 +49,27 @@
     "@pdfme/pdf-lib": "^1.17.3"
   },
   "devDependencies": {
-    "@pdfme/common": "file:../common",
-    "@types/react": "^17.0.52",
-    "css-loader": "^6.8.1",
-    "csstype": "^3.1.2",
-    "eslint-plugin-react": "^7.28.0",
-    "eslint-plugin-react-hooks": "^4.3.0",
-    "process": "^0.11.10",
-    "style-loader": "^3.3.3",
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1"
+    "@pdfme/common": "file:../common"
   },
   "peerDependencies": {
     "@pdfme/common": "latest"
   },
   "jest": {
-    "moduleNameMapper": {
-      "\\.(png|css)$": "<rootDir>/../../assetsTransformer.js",
-      "^antd/es/": "antd/lib/"
-    },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
-      "ts",
-      "tsx"
+      "ts"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest",
-      "^.+\\.tsx$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "globals": {
       "ts-jest": {
-        "tsconfig": "tsconfig.json"
+        "tsconfig": "tsconfig.esm.json"
       }
     },
     "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
+      "**/*.test.ts"
     ]
   },
   "publishConfig": {
