@@ -5,6 +5,6 @@
     "outDir": "./dist/esm",
     "declaration": true,
     "declarationDir": "dist/types",
-    "skipLibCheck": true, // FIXME 消したい
+    "skipLibCheck": true,
   }
 }

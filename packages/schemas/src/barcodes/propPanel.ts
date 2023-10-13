@@ -1,14 +1,14 @@
-import { BarCodeType, Schema } from '@pdfme/common';
-
-type PartOf<T> = {
-    [K in keyof T]?: T[K];
-};
+import type { PropPanel, BarCodeType } from '@pdfme/common';
 
 const defaultColors = { backgroundColor: '', barColor: '#000000', };
 const defaultTextColors = { textColor: '#000000', };
 const default40x20 = { width: 40, height: 20, };
 
-const barcodeDefaults: Record<BarCodeType, { defaultValue: string; defaultSchema: PartOf<Schema>; }> = {
+
+const barcodeDefaults: Record<BarCodeType, {
+    defaultValue: string,
+    defaultSchema: { width: number, height: number, backgroundColor: string, barColor: string, textColor?: string },
+}> = {
     qrcode: {
         defaultValue: 'https://pdfme.com/',
         defaultSchema: { ...defaultColors, width: 30, height: 30, },
@@ -56,7 +56,7 @@ const barcodeDefaults: Record<BarCodeType, { defaultValue: string; defaultSchema
 };
 
 
-export const getPropPanelByBarcodeType = (barcodeType: BarCodeType) => {
+export const getPropPanelByBarcodeType = (barcodeType: BarCodeType): PropPanel => {
     const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix';
 
     const schema = {

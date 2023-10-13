@@ -2,6 +2,7 @@
 // import { Select, Checkbox, Form, InputNumber, Col, Row } from 'antd';
 // import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
+    PropPanel,
     PropPanelWidgetProps,
     PropPanelSchema,
     getFallbackFontName,
@@ -124,7 +125,7 @@ const textSchema: Record<string, PropPanelSchema> = {
 // FIXME ここから textのpropPanelのレンダリングで下記のエラーが出る
 // react, form-render, antdをコメントアウトするとなんとかなる
 // https://reactjs.org/docs/error-decoder.html?invariant=321
-export const getPropPanel = () => ({
+export const getPropPanel = (): PropPanel => ({
     schema: textSchema,
     // widgets: { FontSelect, DynamicFontSize },
     defaultValue: 'Type Something...',

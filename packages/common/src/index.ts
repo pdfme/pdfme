@@ -24,6 +24,7 @@ import {
 import { createBarCode } from './barcode';
 import type {
   FontWidthCalcValues,
+  PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
   PropPanelWidgetGlobalProps,
@@ -144,6 +145,7 @@ export type {
   DesignerProps,
   DesignerReactProps,
   FontWidthCalcValues,
+  PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
   PropPanelWidgetGlobalProps

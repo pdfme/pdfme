@@ -12,14 +12,17 @@ export interface PDFRenderProps {
     _cache: Map<string, PDFImage>;
 }
 
-export type UIRenderProps = {
-    mode: 'viewer' | 'form';
-    stopEditing?: () => void;
+export type BaseUIRenderProps = {
     schema: SchemaForUI;
+    mode: 'viewer' | 'form';
+    tabIndex?: number;
+    placeholder?: string;
+    stopEditing?: () => void;
+}
+
+export type UIRenderProps = BaseUIRenderProps & {
     value: string;
     onChange?: (value: string) => void;
     rootElement: HTMLDivElement,
     options: UIOptions;
-    tabIndex?: number;
-    placeholder?: string;
 }

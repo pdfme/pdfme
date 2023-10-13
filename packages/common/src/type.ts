@@ -33,19 +33,30 @@ export type FontWidthCalcValues = {
 export type PropPanelSchema = _PropPanelSchema;
 
 export type PropPanelWidgetGlobalProps = {
-    activeSchema: SchemaForUI;
-    activeElements: HTMLElement[];
-    changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
-    schemas: SchemaForUI[];
-    pageSize: Size;
-    options: UIOptions;
+  activeSchema: SchemaForUI;
+  activeElements: HTMLElement[];
+  changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
+  schemas: SchemaForUI[];
+  pageSize: Size;
+  options: UIOptions;
 }
 
 export type PropPanelWidgetProps = _PropPanelWidgetProps & {
-    addons: {
-        globalProps: PropPanelWidgetGlobalProps
-    }
+  addons: {
+    globalProps: PropPanelWidgetGlobalProps
+  }
 };
+
+type PartOf<T> = {
+  [K in keyof T]?: T[K];
+};
+export interface PropPanel {
+  schema: Record<string, PropPanelSchema>; // FIXME propPanelSchemaの方がいいかも
+
+  widgets?: Record<string, any>,
+  defaultValue: string;
+  defaultSchema: PartOf<Schema>;
+}
 
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;
