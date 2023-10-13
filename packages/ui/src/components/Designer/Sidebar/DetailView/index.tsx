@@ -1,7 +1,8 @@
 import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect } from 'react';
 import { SchemaForUI } from '@pdfme/common';
-import type { SidebarProps, PropPanelSchema, PropPanelWidgetGlobalProps } from '../../../../types';
+import type { PropPanelWidgetGlobalProps, PropPanelSchema } from '@pdfme/schemas';
+import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
 import { RULER_HEIGHT } from '../../../../constants';
