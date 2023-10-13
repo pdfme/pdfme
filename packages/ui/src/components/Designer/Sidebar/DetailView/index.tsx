@@ -1,12 +1,33 @@
-import FormRender, { useForm } from 'form-render';
-import React, { useContext, useEffect } from 'react';
-import type { SchemaForUI, PropPanelWidgetGlobalProps, PropPanelSchema } from '@pdfme/common';
+import FormRender, { useForm, } from 'form-render';
+import React, { useContext, useEffect, useRef } from 'react';
+import type { SchemaForUI, PropPanelWidgetProps, PropPanelWidgetGlobalProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
 import { RULER_HEIGHT } from '../../../../constants';
 import Divider from '../../../Divider';
 import AlignWidget from './AlignWidget';
+
+const WidgetRenderer: React.FC<PropPanelWidgetProps & { widget: (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => void }> = (props) => {
+  const { widget } = props;
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.innerHTML = '';
+      widget({ ...props, rootElement: ref.current })
+    }
+
+    return () => {
+      if (ref.current) {
+        ref.current.innerHTML = '';
+      }
+    };
+  }, []);
+
+
+  return <div ref={ref} />
+};
 
 const DetailView = (
   props: Pick<SidebarProps, 'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
@@ -56,10 +77,16 @@ const DetailView = (
     }
   };
 
+  // FIXME useEffectの中にあった方がよさげ再レンダリングされる
+  const widgets = Object.entries(activePropPanelRegistry?.widgets || {}).reduce((acc, [key, widget]) => {
+    acc[key] = (props) => <WidgetRenderer {...props} widget={widget} />
+    return acc;
+  }, {} as { [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element });
+
   const propPanelWidgets = {
     AlignWidget,
     Divider,
-    ...activePropPanelRegistry?.widgets // FIXME ここから　Renderer.tsx を参考に、vanillaをReactにマウントする
+    ...widgets
   }
 
   useEffect(() => {

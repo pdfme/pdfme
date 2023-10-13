@@ -1,6 +1,3 @@
-// import React from 'react';
-// import { Select, Checkbox, Form, InputNumber, Col, Row } from 'antd';
-// import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import {
     PropPanel,
     PropPanelWidgetProps,
@@ -56,19 +53,6 @@ const textSchema: Record<string, PropPanelSchema> = {
     backgroundColor: { title: 'Background', type: 'string', widget: 'color', },
 }
 
-// const FontSelect: React.FC<PropPanelWidgetProps> = ({ value, onChange, addons: { globalProps: { options } } }) => {
-//     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '' } }
-//     const fontNames = Object.keys(font);
-//     const fallbackFontName = getFallbackFontName(font)
-
-//     return <Select
-//         value={value}
-//         defaultValue={fallbackFontName}
-//         onChange={onChange}
-//         options={fontNames.map((label) => ({ label, value: label }))}
-//     />
-// }
-
 // const DynamicFontSize: React.FC<PropPanelWidgetProps> = ({ addons }) => {
 //     const value = addons.getValueByPath('dynamicFontSize') as { min: number, max: number, fit: 'horizontal' | 'vertical' } | undefined
 
@@ -121,13 +105,51 @@ const textSchema: Record<string, PropPanelSchema> = {
 //     </Row>
 // }
 
+const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
+    const { rootElement, onChange, value, addons: { globalProps: { options } } } = props;
+    const font = options.font || { [DEFAULT_FONT_NAME]: { data: '' } }
+    const fontNames = Object.keys(font);
+    const fallbackFontName = getFallbackFontName(font)
 
-// FIXME ここから textのpropPanelのレンダリングで下記のエラーが出る
-// react, form-render, antdをコメントアウトするとなんとかなる
-// https://reactjs.org/docs/error-decoder.html?invariant=321
+    const select = document.createElement('select');
+    select.style.cssText = `
+    -webkit-font-smoothing: antialiased;
+    --ant-display: flex;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.88);
+    line-height: 1.6666666666666667;
+    list-style: none;
+    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 12px;
+    height: 32px;
+    width: 100%;
+    border: 1px solid rgb(217, 217, 217);
+    border-radius: 5px;`
+    select.onmouseenter = () => select.style.border = '1px solid #1890ff';
+    select.onmouseleave = () => select.style.border = '1px solid rgb(217, 217, 217)';
+    select.onchange = (e: any) => onChange(e.target?.value || "");
+    select.innerHTML = fontNames.map((label) =>
+        `<option ${value || fallbackFontName === label ? 'selected' : ''} value="${label}">${label}</option>`
+    ).join('');
+    select.value = value || fallbackFontName;
+
+    rootElement.appendChild(select);
+}
+
+const DynamicFontSize = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
+    // FIXME ここから DynamicFontSize を実装する
+    console.log('DynamicFontSize', props);
+}
+
+
 export const getPropPanel = (): PropPanel => ({
     schema: textSchema,
-    // widgets: { FontSelect, DynamicFontSize },
+    widgets: { FontSelect, DynamicFontSize },
     defaultValue: 'Type Something...',
     defaultSchema: {
         width: 45,
