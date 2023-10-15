@@ -48,9 +48,7 @@ type PartOf<T> = {
   [K in keyof T]?: T[K];
 };
 export interface PropPanel {
-  // FIXME の方がいいかも
-  // そして、これを関数にすれば、動的に変更できる(fontselectのコンポーネントが不要になるかも?)
-  propPanelSchema: Record<string, PropPanelSchema>;
+  propPanelSchema: ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>) | Record<string, PropPanelSchema>;
 
   widgets?: Record<string, any>,
   defaultValue: string;

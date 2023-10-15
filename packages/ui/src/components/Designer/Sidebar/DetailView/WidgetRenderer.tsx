@@ -20,7 +20,7 @@ const WidgetRenderer = (props: Props) => {
                 ref.current.innerHTML = '';
             }
         };
-    }, []);
+    }, [props.activeSchema]);
 
 
     return <div ref={ref} />

@@ -71,10 +71,24 @@ const DetailView = (
       position: { type: 'object', widget: 'card', column: 2, properties: { x: { title: 'X', type: 'number', widget: 'inputNumber' }, y: { title: 'Y', type: 'number', widget: 'inputNumber' } } },
       width: { title: 'Width', type: 'number', widget: 'inputNumber' },
       height: { title: 'Height', type: 'number', widget: 'inputNumber' },
-      ...(Object.keys(activePropPanelSchema || {}).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
-      ...activePropPanelSchema
     }
-  };
+  }
+
+  if (typeof activePropPanelSchema === 'function') {
+    const apps = activePropPanelSchema({ ...props, options }) || {};
+    propPanelSchema.properties = {
+      ...propPanelSchema.properties,
+      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...apps
+    }
+  } else {
+    const apps = activePropPanelSchema || {};
+    propPanelSchema.properties = {
+      ...propPanelSchema.properties,
+      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...apps
+    }
+  }
 
   return (
     <div>
