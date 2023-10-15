@@ -27,7 +27,6 @@ import type {
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
-  PropPanelWidgetGlobalProps,
   Lang,
   Size,
   SchemaType,
@@ -148,5 +147,4 @@ export type {
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
-  PropPanelWidgetGlobalProps
 };

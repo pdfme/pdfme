@@ -32,7 +32,8 @@ export type FontWidthCalcValues = {
 
 export type PropPanelSchema = _PropPanelSchema;
 
-export type PropPanelWidgetGlobalProps = {
+type PropPanelProps = {
+  rootElement: HTMLDivElement;
   activeSchema: SchemaForUI;
   activeElements: HTMLElement[];
   changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
@@ -41,17 +42,15 @@ export type PropPanelWidgetGlobalProps = {
   options: UIOptions;
 }
 
-export type PropPanelWidgetProps = _PropPanelWidgetProps & {
-  addons: {
-    globalProps: PropPanelWidgetGlobalProps
-  }
-};
+export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
 type PartOf<T> = {
   [K in keyof T]?: T[K];
 };
 export interface PropPanel {
-  schema: Record<string, PropPanelSchema>; // FIXME propPanelSchemaの方がいいかも
+  // FIXME の方がいいかも
+  // そして、これを関数にすれば、動的に変更できる(fontselectのコンポーネントが不要になるかも?)
+  propPanelSchema: Record<string, PropPanelSchema>;
 
   widgets?: Record<string, any>,
   defaultValue: string;

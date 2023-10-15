@@ -51,18 +51,18 @@ const textSchema: Record<string, PropPanelSchema> = {
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: "{{ Boolean(formData.useDynamicFontSize) }}"
+        disabled: "{{ Boolean(formData.dynamicFontSize.fit) }}"
     },
     lineHeight: { title: 'Line Height', type: 'number', widget: 'inputNumber', span: 8 },
     characterSpacing: { title: 'Char Spc', type: 'number', widget: 'inputNumber', span: 8 },
-    useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize' }, // FIXME この値はformの値としてignoreできないのか
+    useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false },
     dynamicFontSize: {
         type: 'object', widget: 'card', column: 3,
         properties: {
-            min: { title: 'Min', type: 'number', widget: 'inputNumber', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}" },
-            max: { title: 'Max', type: 'number', widget: 'inputNumber', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}" },
+            min: { title: 'Min', type: 'number', widget: 'inputNumber', hidden: "{{ !Boolean(formData.dynamicFontSize.fit) }}" },
+            max: { title: 'Max', type: 'number', widget: 'inputNumber', hidden: "{{ !Boolean(formData.dynamicFontSize.fit) }}" },
             fit: {
-                title: 'Fit', type: 'string', widget: 'select', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}",
+                title: 'Fit', type: 'string', widget: 'select', hidden: "{{ !Boolean(formData.dynamicFontSize.fit) }}",
                 props: { options: [{ label: 'Horizontal', value: 'horizontal' }, { label: 'Vertical', value: 'vertical' }] },
             }
         }
@@ -71,8 +71,8 @@ const textSchema: Record<string, PropPanelSchema> = {
     backgroundColor: { title: 'Background', type: 'string', widget: 'color', },
 }
 
-const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
-    const { rootElement, onChange, value, addons: { globalProps: { options } } } = props;
+const FontSelect = (props: PropPanelWidgetProps) => {
+    const { rootElement, onChange, value, options } = props;
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } }
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font)
@@ -90,17 +90,13 @@ const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement 
     rootElement.appendChild(select);
 }
 
-const UseDynamicFontSize = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
-    const { rootElement, onChange, addons } = props;
-    const { globalProps: { changeSchemas, activeSchema } } = addons;
+const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
+    const { rootElement, changeSchemas, activeSchema } = props;
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    // FIXME
-    // @ts-ignore
-    checkbox.checked = Boolean(activeSchema?.dynamicFontSize);
+    checkbox.checked = Boolean((activeSchema as any)?.dynamicFontSize);
     checkbox.onchange = (e: any) => {
         const val = e.target.checked ? { min: 4, max: 72, fit: 'horizontal' } : undefined;
-        onChange(e.target.checked);
         changeSchemas([{ key: 'dynamicFontSize', value: val, schemaId: activeSchema.id }]);
     };
     const label = document.createElement('label');
@@ -111,7 +107,7 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps & { rootElement: HTMLDiv
 }
 
 export const getPropPanel = (): PropPanel => ({
-    schema: textSchema,
+    propPanelSchema: textSchema,
     widgets: { FontSelect, UseDynamicFontSize },
     defaultValue: 'Type Something...',
     defaultSchema: { // FIXME add type

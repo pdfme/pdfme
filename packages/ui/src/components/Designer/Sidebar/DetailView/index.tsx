@@ -1,76 +1,41 @@
 import FormRender, { useForm, } from 'form-render';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import type { SchemaForUI, PropPanelWidgetProps, PropPanelWidgetGlobalProps, PropPanelSchema } from '@pdfme/common';
+import React, { useContext, useEffect, useState } from 'react';
+import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
 import { RULER_HEIGHT } from '../../../../constants';
 import Divider from '../../../Divider';
 import AlignWidget from './AlignWidget';
-
-const WidgetRenderer: React.FC<PropPanelWidgetProps & { widget: (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => void }> = (props) => {
-  const { widget } = props;
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.innerHTML = '';
-      widget({ ...props, rootElement: ref.current })
-    }
-
-    return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
-      }
-    };
-  }, []);
-
-
-  return <div ref={ref} />
-};
+import WidgetRenderer from './WidgetRenderer';
 
 const DetailView = (
   props: Pick<SidebarProps, 'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
     activeSchema: SchemaForUI;
   }
 ) => {
-  const { size, activeSchema, changeSchemas, deselectSchema } = props;
+  const { size, changeSchemas, deselectSchema, activeSchema, activeElements } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
   const propPanelRegistry = useContext(PropPanelRegistry);
   const options = useContext(OptionsContext);
 
-  const [widgets, setWidgets] = useState<{
-    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
-  }>({})
-
-  const globalProps: PropPanelWidgetGlobalProps = {
-    activeSchema: props.activeSchema,
-    activeElements: props.activeElements,
-    changeSchemas: props.changeSchemas,
-    schemas: props.schemas,
-    pageSize: props.pageSize,
-    options
-  }
-
-  const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
-
-
-  if (!activePropPanelRegistry?.schema) {
-    console.error(`No prop panel schema for ${activeSchema.type}`);
-  }
+  const [widgets, setWidgets] = useState<{ [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element; }>({})
 
   useEffect(() => {
-    const newWidgets: typeof widgets = {};
+    const newWidgets: typeof widgets = {
+      AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
+      Divider
+    };
     for (const propPanel of Object.values(propPanelRegistry)) {
       const widgets = propPanel?.widgets || {}
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
-        newWidgets[widgetKey] = (props) => <WidgetRenderer {...props} widget={widgetValue} />;
+        newWidgets[widgetKey] = (p) => <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />;
       })
     }
     setWidgets(newWidgets);
-  }, [activeSchema, propPanelRegistry]);
+  }, [activeSchema, activeElements, propPanelRegistry]);
 
   useEffect(() => {
     form.setValues({ ...activeSchema });
@@ -89,7 +54,11 @@ const DetailView = (
     }
   }
 
-  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
+  const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
+  const activePropPanelSchema = activePropPanelRegistry?.propPanelSchema
+  if (!activePropPanelSchema) {
+    console.error(`No prop panel schema for ${activeSchema.type}`);
+  }
 
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
@@ -99,14 +68,11 @@ const DetailView = (
       key: { title: 'Name', type: 'string', widget: 'input', },
       '-': { type: 'void', widget: 'Divider', cellSpan: 2 },
       align: { title: 'Align', type: 'void', widget: 'AlignWidget', cellSpan: 2 },
-      position: {
-        type: 'object', widget: 'card', column: 2,
-        properties: { x: { title: 'X', type: 'number', widget: 'inputNumber' }, y: { title: 'Y', type: 'number', widget: 'inputNumber' } }
-      },
+      position: { type: 'object', widget: 'card', column: 2, properties: { x: { title: 'X', type: 'number', widget: 'inputNumber' }, y: { title: 'Y', type: 'number', widget: 'inputNumber' } } },
       width: { title: 'Width', type: 'number', widget: 'inputNumber' },
       height: { title: 'Height', type: 'number', widget: 'inputNumber' },
-      ...(Object.keys(activePropPanelRegistry?.schema || {}).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
-      ...activePropPanelRegistry?.schema
+      ...(Object.keys(activePropPanelSchema || {}).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...activePropPanelSchema
     }
   };
 
@@ -124,12 +90,11 @@ const DetailView = (
         </span>
       </div>
       <Divider />
-      <div style={{ height, overflowY: 'auto', overflowX: 'hidden' }}>
+      <div style={{ height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145, overflowY: 'auto', overflowX: 'hidden' }}>
         <FormRender
-          globalProps={globalProps}
           form={form}
           schema={propPanelSchema}
-          widgets={{ AlignWidget, Divider, ...widgets }}
+          widgets={widgets}
           watch={{ '#': handleWatch }}
           locale='en-US'
         />

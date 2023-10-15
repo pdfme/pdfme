@@ -67,5 +67,5 @@ export const getPropPanelByBarcodeType = (barcodeType: BarCodeType): PropPanel =
 
     const defaults = barcodeDefaults[barcodeType];
 
-    return { schema, ...defaults };
+    return { propPanelSchema: schema, ...defaults };
 }

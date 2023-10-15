@@ -13,8 +13,7 @@ const svgBaseProp = {
     fill: '#000000',
 };
 
-const AlignWidget: React.FC<PropPanelWidgetProps> = ({ addons: { globalProps } }) => {
-    const { activeElements, changeSchemas, schemas, pageSize } = globalProps;
+const AlignWidget = ({ activeElements, changeSchemas, schemas, pageSize }: PropPanelWidgetProps) => {
     const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
         const ids = activeElements.map((ae) => ae.id);
         const ass = schemas.filter((s) => ids.includes(s.id));
