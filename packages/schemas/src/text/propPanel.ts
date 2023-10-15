@@ -11,32 +11,39 @@ import {
     DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
 
+const inputStyle = `
+-webkit-font-smoothing: antialiased;
+--ant-display: flex;
+box-sizing: border-box;
+margin: 0;
+padding: 5px 11px;
+color: rgba(0, 0, 0, 0.88);
+line-height: 1.6666666666666667;
+list-style: none;
+font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
+position: relative;
+display: inline-block;
+cursor: pointer;
+font-size: 12px;
+height: 32px;
+width: 100%;
+border: 1px solid rgb(217, 217, 217);
+border-radius: 5px;`
+
 const textSchema: Record<string, PropPanelSchema> = {
     fontName: { title: 'Font Name', type: 'string', widget: 'FontSelect', span: 8 },
     alignment: {
         title: 'Text Align',
         type: 'string',
         widget: 'select',
-        props: {
-            options: [
-                { label: 'Left', value: 'left' },
-                { label: 'Center', value: 'center' },
-                { label: 'Right', value: 'right' }
-            ]
-        },
+        props: { options: [{ label: 'Left', value: 'left' }, { label: 'Center', value: 'center' }, { label: 'Right', value: 'right' }] },
         span: 8,
     },
     verticalAlignment: {
         title: 'Vertical Align',
         type: 'string',
         widget: 'select',
-        props: {
-            options: [
-                { label: 'Top', value: 'top' },
-                { label: 'Middle', value: 'middle' },
-                { label: 'Bottom', value: 'bottom' }
-            ]
-        },
+        props: { options: [{ label: 'Top', value: 'top' }, { label: 'Middle', value: 'middle' }, { label: 'Bottom', value: 'bottom' }] },
         span: 8,
     },
     fontSize: {
@@ -44,66 +51,25 @@ const textSchema: Record<string, PropPanelSchema> = {
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: "{{ Boolean(formData.dynamicFontSize) }}"
+        disabled: "{{ Boolean(formData.useDynamicFontSize) }}"
     },
     lineHeight: { title: 'Line Height', type: 'number', widget: 'inputNumber', span: 8 },
     characterSpacing: { title: 'Char Spc', type: 'number', widget: 'inputNumber', span: 8 },
-    dynamicFontSize: { type: 'object', widget: 'DynamicFontSize', cellSpan: 2 },
+    useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize' }, // FIXME この値はformの値としてignoreできないのか
+    dynamicFontSize: {
+        type: 'object', widget: 'card', column: 3,
+        properties: {
+            min: { title: 'Min', type: 'number', widget: 'inputNumber', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}" },
+            max: { title: 'Max', type: 'number', widget: 'inputNumber', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}" },
+            fit: {
+                title: 'Fit', type: 'string', widget: 'select', disabled: "{{ !Boolean(formData.useDynamicFontSize) }}",
+                props: { options: [{ label: 'Horizontal', value: 'horizontal' }, { label: 'Vertical', value: 'vertical' }] },
+            }
+        }
+    },
     fontColor: { title: 'Font Color', type: 'string', widget: 'color', },
     backgroundColor: { title: 'Background', type: 'string', widget: 'color', },
 }
-
-// const DynamicFontSize: React.FC<PropPanelWidgetProps> = ({ addons }) => {
-//     const value = addons.getValueByPath('dynamicFontSize') as { min: number, max: number, fit: 'horizontal' | 'vertical' } | undefined
-
-//     const { globalProps: { activeSchema, changeSchemas } } = addons
-
-//     const onChangeCheck = (e: CheckboxChangeEvent) => {
-//         const checked = e.target.checked
-//         const value = checked ? { min: 8, max: 36, fit: 'horizontal' } : undefined
-//         changeSchemas([{ key: 'dynamicFontSize', value, schemaId: activeSchema.id, }]);
-//     }
-
-//     const onChangeSize = (type: 'min' | 'max', value: number) => {
-//         changeSchemas([{ key: `dynamicFontSize.${type}`, value, schemaId: activeSchema.id }]);
-//     }
-//     const onChangeFit = (value: 'horizontal' | 'vertical') => {
-//         changeSchemas([{ key: `dynamicFontSize.fit`, value, schemaId: activeSchema.id }]);
-//     }
-
-//     return <Row>
-//         <Col span={24}>
-//             <Form.Item>
-//                 <Checkbox checked={Boolean(value)} onChange={onChangeCheck}> Dynamic Font Size</Checkbox>
-//             </Form.Item>
-//         </Col>
-//         {Boolean(value) && <>
-//             <Col span={8}>
-//                 <Form.Item label="Min">
-//                     <InputNumber
-//                         value={value?.min}
-//                         onChange={(value: number | null) => value && onChangeSize('min', value)} />
-//                 </Form.Item>
-//             </Col>
-//             <Col span={8}>
-//                 <Form.Item label="Max">
-//                     <InputNumber
-//                         value={value?.max}
-//                         onChange={(value: number | null) => value && onChangeSize('max', value)} />
-//                 </Form.Item>
-//             </Col>
-//             <Col span={8}>
-//                 <Form.Item label="Fit">
-//                     <Select
-//                         value={value?.fit}
-//                         onChange={onChangeFit}
-//                         options={[{ label: 'Horizontal', value: 'horizontal' }, { label: 'Vertical', value: 'vertical' }]}
-//                     />
-//                 </Form.Item>
-//             </Col>
-//         </>}
-//     </Row>
-// }
 
 const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
     const { rootElement, onChange, value, addons: { globalProps: { options } } } = props;
@@ -112,24 +78,7 @@ const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement 
     const fallbackFontName = getFallbackFontName(font)
 
     const select = document.createElement('select');
-    select.style.cssText = `
-    -webkit-font-smoothing: antialiased;
-    --ant-display: flex;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    color: rgba(0, 0, 0, 0.88);
-    line-height: 1.6666666666666667;
-    list-style: none;
-    font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans',sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol','Noto Color Emoji';
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    font-size: 12px;
-    height: 32px;
-    width: 100%;
-    border: 1px solid rgb(217, 217, 217);
-    border-radius: 5px;`
+    select.style.cssText = inputStyle;
     select.onmouseenter = () => select.style.border = '1px solid #1890ff';
     select.onmouseleave = () => select.style.border = '1px solid rgb(217, 217, 217)';
     select.onchange = (e: any) => onChange(e.target?.value || "");
@@ -141,17 +90,31 @@ const FontSelect = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement 
     rootElement.appendChild(select);
 }
 
-const DynamicFontSize = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
-    // FIXME ここから DynamicFontSize を実装する
-    console.log('DynamicFontSize', props);
+const UseDynamicFontSize = (props: PropPanelWidgetProps & { rootElement: HTMLDivElement }) => {
+    const { rootElement, onChange, addons } = props;
+    const { globalProps: { changeSchemas, activeSchema } } = addons;
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    // FIXME
+    // @ts-ignore
+    checkbox.checked = Boolean(activeSchema?.dynamicFontSize);
+    checkbox.onchange = (e: any) => {
+        const val = e.target.checked ? { min: 4, max: 72, fit: 'horizontal' } : undefined;
+        onChange(e.target.checked);
+        changeSchemas([{ key: 'dynamicFontSize', value: val, schemaId: activeSchema.id }]);
+    };
+    const label = document.createElement('label');
+    label.innerText = 'Dynamic Font Size';
+    label.style.cssText = 'display: flex; width: 100%;';
+    label.appendChild(checkbox);
+    rootElement.appendChild(label);
 }
-
 
 export const getPropPanel = (): PropPanel => ({
     schema: textSchema,
-    widgets: { FontSelect, DynamicFontSize },
+    widgets: { FontSelect, UseDynamicFontSize },
     defaultValue: 'Type Something...',
-    defaultSchema: {
+    defaultSchema: { // FIXME add type
         width: 45,
         height: 10,
         alignment: DEFAULT_ALIGNMENT,

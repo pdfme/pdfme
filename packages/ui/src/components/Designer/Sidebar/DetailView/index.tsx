@@ -1,5 +1,5 @@
 import FormRender, { useForm, } from 'form-render';
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { SchemaForUI, PropPanelWidgetProps, PropPanelWidgetGlobalProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
@@ -41,6 +41,10 @@ const DetailView = (
   const propPanelRegistry = useContext(PropPanelRegistry);
   const options = useContext(OptionsContext);
 
+  const [widgets, setWidgets] = useState<{
+    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
+  }>({})
+
   const globalProps: PropPanelWidgetGlobalProps = {
     activeSchema: props.activeSchema,
     activeElements: props.activeElements,
@@ -52,11 +56,40 @@ const DetailView = (
 
   const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
 
-  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
 
   if (!activePropPanelRegistry?.schema) {
     console.error(`No prop panel schema for ${activeSchema.type}`);
   }
+
+  useEffect(() => {
+    const newWidgets: typeof widgets = {};
+    for (const propPanel of Object.values(propPanelRegistry)) {
+      const widgets = propPanel?.widgets || {}
+      Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
+        newWidgets[widgetKey] = (props) => <WidgetRenderer {...props} widget={widgetValue} />;
+      })
+    }
+    setWidgets(newWidgets);
+  }, [activeSchema, propPanelRegistry]);
+
+  useEffect(() => {
+    form.setValues({ ...activeSchema });
+  }, [activeSchema]);
+
+  const handleWatch = (newSchema: any) => {
+    const changes = [];
+    for (const key in newSchema) {
+      if (['id', 'data'].includes(key)) continue;
+      if (newSchema[key] !== (activeSchema as any)[key]) {
+        changes.push({ key, value: newSchema[key], schemaId: activeSchema.id });
+      }
+    }
+    if (changes.length) {
+      changeSchemas(changes);
+    }
+  }
+
+  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
 
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
@@ -77,35 +110,6 @@ const DetailView = (
     }
   };
 
-  // FIXME useEffectの中にあった方がよさげ再レンダリングされる
-  const widgets = Object.entries(activePropPanelRegistry?.widgets || {}).reduce((acc, [key, widget]) => {
-    acc[key] = (props) => <WidgetRenderer {...props} widget={widget} />
-    return acc;
-  }, {} as { [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element });
-
-  const propPanelWidgets = {
-    AlignWidget,
-    Divider,
-    ...widgets
-  }
-
-  useEffect(() => {
-    form.setValues({ ...activeSchema });
-  }, [activeSchema]);
-
-  const handleWatch = (newSchema: any) => {
-    const changes = [];
-    for (const key in newSchema) {
-      if (['id', 'data'].includes(key)) continue;
-      if (newSchema[key] !== (activeSchema as any)[key]) {
-        changes.push({ key, value: newSchema[key], schemaId: activeSchema.id });
-      }
-    }
-    if (changes.length) {
-      changeSchemas(changes);
-    }
-  }
-
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
@@ -125,7 +129,7 @@ const DetailView = (
           globalProps={globalProps}
           form={form}
           schema={propPanelSchema}
-          widgets={propPanelWidgets}
+          widgets={{ AlignWidget, Divider, ...widgets }}
           watch={{ '#': handleWatch }}
           locale='en-US'
         />
