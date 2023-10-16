@@ -45,12 +45,12 @@ type PropPanelProps = {
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
 
-export interface PropPanel<T> {
+export interface PropPanel<T extends Schema> {
   propPanelSchema: ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>) | Record<string, PropPanelSchema>;
 
   widgets?: Record<string, (props: PropPanelWidgetProps) => void>,
   defaultValue: string;
-  defaultSchema: Schema & T;
+  defaultSchema: T;
 }
 
 export type Lang = z.infer<typeof Lang>;
