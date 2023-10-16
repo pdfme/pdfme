@@ -5,6 +5,7 @@ import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 import hotkeys from 'hotkeys-js';
 import {
+  ZOOM,
   getB64BasePdf,
   b64toUint8Array,
   Template,
@@ -12,7 +13,7 @@ import {
   Schema,
   Size,
 } from '@pdfme/common';
-import { ZOOM, RULER_HEIGHT } from './constants';
+import { RULER_HEIGHT } from './constants';
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

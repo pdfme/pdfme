@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
+import { ZOOM, DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import type { ChangeSchemas } from '../../types';
-import { ZOOM, RULER_HEIGHT } from '../../constants';
+import { RULER_HEIGHT } from '../../constants';
 import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
   uuid,

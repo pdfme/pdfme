@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { ZOOM, SELECTABLE_CLASSNAME } from '../constants';
+import { ZOOM } from "@pdfme/common"
+import { SELECTABLE_CLASSNAME } from '../constants';
 import { RendererRegistry, OptionsContext } from '../contexts';
 import { RendererProps } from "../types"
 

@@ -8,10 +8,10 @@ import React, {
   useCallback,
 } from 'react';
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
-import { SchemaForUI, Size } from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import type { ChangeSchemas } from "../../../types"
-import { ZOOM, RULER_HEIGHT } from '../../../constants';
+import { RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';

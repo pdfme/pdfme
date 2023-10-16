@@ -19,6 +19,7 @@ import {
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,
   BLANK_PDF,
+  ZOOM,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 import { createBarCode } from './barcode';
@@ -97,6 +98,7 @@ export {
   PT_TO_PX_RATIO,
   BLANK_PDF,
   DEFAULT_FONT_VALUE,
+  ZOOM,
   barcodeSchemaTypes,
   getB64BasePdf,
   b64toUint8Array,
