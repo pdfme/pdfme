@@ -1,7 +1,9 @@
 import type { ChangeEvent } from 'react';
 import type * as CSS from 'csstype';
 import type { UIRenderProps } from "../types"
+import type { ImageSchema } from './types';
 import { ZOOM } from '../constants';
+
 
 const fullSize = { width: '100%', height: '100%' }
 
@@ -33,7 +35,7 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
 });
 
 
-export const uiRender = async (arg: UIRenderProps) => {
+export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
     const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
     const isForm = mode === 'form';
 

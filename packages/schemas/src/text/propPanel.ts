@@ -10,6 +10,7 @@ import {
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
 } from '@pdfme/common';
+import type { TextSchema } from './types';
 
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
@@ -29,7 +30,7 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
     rootElement.appendChild(label);
 }
 
-export const getPropPanel = (): PropPanel => ({
+export const propPanel: PropPanel<TextSchema> = ({
     propPanelSchema: ({ options, activeSchema }) => {
         const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } }
         const fontNames = Object.keys(font);
@@ -89,7 +90,7 @@ export const getPropPanel = (): PropPanel => ({
     },
     widgets: { UseDynamicFontSize },
     defaultValue: 'Type Something...',
-    defaultSchema: { // FIXME add type
+    defaultSchema: { // FIXME ここから typeやpositionがないとのこと
         width: 45,
         height: 10,
         alignment: DEFAULT_ALIGNMENT,
@@ -99,6 +100,7 @@ export const getPropPanel = (): PropPanel => ({
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         dynamicFontSize: undefined,
         fontColor: '#000000',
-        backgroundColor: ''
+        fontName:undefined,
+        backgroundColor: '',
     }
 })

@@ -1,4 +1,5 @@
 import type { PropPanel, BarCodeType } from '@pdfme/common';
+import type { BarcodeSchema } from './types';
 
 const defaultColors = { backgroundColor: '', barColor: '#000000', };
 const defaultTextColors = { textColor: '#000000', };
@@ -56,7 +57,7 @@ const barcodeDefaults: Record<BarCodeType, {
 };
 
 
-export const getPropPanelByBarcodeType = (barcodeType: BarCodeType): PropPanel => {
+export const getPropPanelByBarcodeType = (barcodeType: BarCodeType): PropPanel<BarcodeSchema> => {
     const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix';
 
     const schema = {

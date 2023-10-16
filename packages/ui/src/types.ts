@@ -3,7 +3,7 @@ import type { SchemaForUI, Size, PropPanel } from '@pdfme/common';
 import type { BaseUIRenderProps, UIRenderProps } from '@pdfme/schemas';
 
 
-export type RendererProps = BaseUIRenderProps & {
+export type RendererProps = BaseUIRenderProps<any> & {
     onChange: (value: string) => void;
     outline: string;
     onChangeHoveringSchemaId?: (id: string | null) => void;
@@ -11,7 +11,7 @@ export type RendererProps = BaseUIRenderProps & {
 
 export interface Renderer {
     [key: string]: {
-        render: (arg: UIRenderProps) => Promise<void>;
+        render: (arg: UIRenderProps<any>) => Promise<void>;
     } | undefined;
 }
 

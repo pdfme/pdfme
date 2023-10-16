@@ -16,6 +16,7 @@ import {
     getDefaultFont,
     getBrowserVerticalFontAdjustments,
 } from '@pdfme/common';
+import type { TextSchema } from './types';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
     switch (verticalAlignmentValue) {
@@ -29,21 +30,8 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
     return 'flex-start';
 };
 
-export const uiRender = async (arg: UIRenderProps) => {
-    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, options } = arg;
-    const schema = arg.schema as Schema & {
-        dynamicFontSize?: { max: number; min: number; fit: 'vertical' | 'horizontal'; };
-        fontName?: string;
-        fontColor?: string;
-        fontSize?: number;
-        alignment?: 'left' | 'center' | 'right';
-        verticalAlignment?: 'top' | 'middle' | 'bottom';
-        lineHeight?: number;
-        characterSpacing?: number;
-        backgroundColor?: string;
-    };
-
-
+export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
+    const { value, schema, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, options } = arg;
     const font = options?.font || getDefaultFont();
 
     let dynamicFontSize: undefined | number = undefined;

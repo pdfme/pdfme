@@ -47,12 +47,12 @@ export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 type PartOf<T> = {
   [K in keyof T]?: T[K];
 };
-export interface PropPanel {
+export interface PropPanel<T> {
   propPanelSchema: ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>) | Record<string, PropPanelSchema>;
 
-  widgets?: Record<string, any>,
+  widgets?: Record<string, (props: PropPanelWidgetProps) => void>,
   defaultValue: string;
-  defaultSchema: PartOf<Schema>;
+  defaultSchema: PartOf<Schema> & T;
 }
 
 export type Lang = z.infer<typeof Lang>;

@@ -1,12 +1,5 @@
 import {
     Font,
-    Schema,
-    DEFAULT_FONT_SIZE,
-    DEFAULT_ALIGNMENT,
-    DEFAULT_LINE_HEIGHT,
-    DEFAULT_CHARACTER_SPACING,
-    DEFAULT_FONT_COLOR,
-    DEFAULT_VERTICAL_ALIGNMENT,
     VERTICAL_ALIGN_TOP,
     VERTICAL_ALIGN_MIDDLE,
     VERTICAL_ALIGN_BOTTOM,
@@ -21,6 +14,7 @@ import {
     getFallbackFontName,
 } from '@pdfme/common';
 import type { PDFRenderProps } from "../types"
+import type { TextSchema } from './types';
 import { embedAndGetFontObj } from '../pdfUtils'
 import {
     hex2RgbColor,
@@ -30,19 +24,15 @@ import {
     convertSchemaDimensionsToPt
 } from '../renderUtils'
 
-const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: Schema }) => {
-    const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : (schema.fontSize as number) ?? DEFAULT_FONT_SIZE;
-    const color = hex2RgbColor((schema.fontColor as string) ?? DEFAULT_FONT_COLOR);
-    const alignment = (schema.alignment as 'left' | 'center' | 'right') ?? DEFAULT_ALIGNMENT;
-    const verticalAlignment = (schema.verticalAlignment as 'top' | 'middle' | 'bottom') ?? DEFAULT_VERTICAL_ALIGNMENT;
-    const lineHeight = (schema.lineHeight as number) ?? DEFAULT_LINE_HEIGHT;
-    const characterSpacing = (schema.characterSpacing as number) ?? DEFAULT_CHARACTER_SPACING;
-
-    return { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing };
+const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
+    const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize;
+    const color = hex2RgbColor(schema.fontColor);
+    return { ...schema, fontSize, color, };
 };
 
-export const pdfRender = async (arg: PDFRenderProps) => {
+export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     const { value, pdfDoc, pdfLib, page, options, schema } = arg;
+
 
     const { font = getDefaultFont() } = options;
 
