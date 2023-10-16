@@ -1,3 +1,4 @@
+import { Schema } from "@pdfme/common"
 import { PDFRenderProps } from '@pdfme/schemas';
 
 export type EmbedPdfBox = {
@@ -6,6 +7,6 @@ export type EmbedPdfBox = {
   trimBox: { x: number; y: number; width: number; height: number };
 };
 
-export interface Renderer<T = any> { // FIXME これは schemaを拡張したものであるべき
+export interface Renderer<T extends Schema = any> {
   [key: string]: { render: (arg: PDFRenderProps<T>) => Promise<void> } | undefined;
 }

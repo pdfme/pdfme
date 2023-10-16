@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import type { PropPanelWidgetProps } from '@pdfme/common';
 
-type Props = Omit<PropPanelWidgetProps, 'rootElement'> & {
+type Props = PropPanelWidgetProps & {
     widget: (props: PropPanelWidgetProps) => void
 }
 
@@ -12,7 +12,7 @@ const WidgetRenderer = (props: Props) => {
     useEffect(() => {
         if (ref.current) {
             ref.current.innerHTML = '';
-            widget({ ...otherProps, rootElement: ref.current }) // FIXME ビルドエラー
+            widget({ ...otherProps, rootElement: ref.current })
         }
 
         return () => {

@@ -90,7 +90,9 @@ export const propPanel: PropPanel<TextSchema> = ({
     },
     widgets: { UseDynamicFontSize },
     defaultValue: 'Type Something...',
-    defaultSchema: { // FIXME ここから typeやpositionがないとのこと
+    defaultSchema: {
+        type: 'text',
+        position: { x: 0, y: 0 },
         width: 45,
         height: 10,
         alignment: DEFAULT_ALIGNMENT,

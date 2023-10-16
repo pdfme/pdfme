@@ -1,5 +1,5 @@
 
-import type { SchemaForUI, Size, PropPanel } from '@pdfme/common';
+import type { SchemaForUI, Size, PropPanel, Schema } from '@pdfme/common';
 import type { BaseUIRenderProps, UIRenderProps } from '@pdfme/schemas';
 
 
@@ -16,7 +16,7 @@ export interface Renderer {
 }
 
 export interface PropPanelObject {
-    [key: string]: PropPanel | undefined;
+    [key: string]: PropPanel<any> | undefined;
 }
 
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
