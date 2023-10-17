@@ -1,20 +1,19 @@
-import type { UIRenderProps, SchemaForUI, Size, PropPanel } from '@pdfme/common';
+import type { UIRenderProps, SchemaForUI, Size, PropPanel, Schema } from '@pdfme/common';
 
-// FIXME anyをなくす
-export type RendererProps = Omit<UIRenderProps<any>, 'value' | 'onChange' | 'rootElement' | 'options'> & {
+export type RendererProps = Omit<UIRenderProps<Schema>, 'value' | 'onChange' | 'rootElement' | 'options'> & {
     onChange: (value: string) => void;
     outline: string;
     onChangeHoveringSchemaId?: (id: string | null) => void;
 }
 
+export type Render = (arg: UIRenderProps<Schema>) => Promise<void>;
+
 export interface Renderer {
-    [key: string]: {
-        render: (arg: UIRenderProps<any>) => Promise<void>;
-    } | undefined;
+    [key: string]: { render: Render } | undefined;
 }
 
 export interface PropPanelObject {
-    [key: string]: PropPanel<any> | undefined;
+    [key: string]: PropPanel<Schema> | undefined;
 }
 
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
