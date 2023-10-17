@@ -1,4 +1,5 @@
 import {
+    PDFRenderProps,
     Font,
     VERTICAL_ALIGN_TOP,
     VERTICAL_ALIGN_MIDDLE,
@@ -13,7 +14,6 @@ import {
     getDefaultFont,
     getFallbackFontName,
 } from '@pdfme/common';
-import type { PDFRenderProps } from "../types"
 import type { TextSchema } from './types';
 import { embedAndGetFontObj } from '../pdfUtils'
 import {

@@ -1,9 +1,4 @@
-import {
-    createBarCode,
-    validateBarcodeInput,
-    BarCodeType,
-} from '@pdfme/common';
-import type { PDFRenderProps } from "../types"
+import { createBarCode, validateBarcodeInput, BarCodeType, PDFRenderProps } from '@pdfme/common';
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 import type { BarcodeSchema } from './types';
 

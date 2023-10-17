@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
-import type { UIRenderProps } from "../types"
 import {
+    UIRenderProps,
     DEFAULT_FONT_SIZE,
     DEFAULT_ALIGNMENT,
     VERTICAL_ALIGN_TOP,

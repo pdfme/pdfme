@@ -1,4 +1,4 @@
-import type { PDFRenderProps } from "../types"
+import type { PDFRenderProps } from "@pdfme/common"
 import type { ImageSchema } from './types';
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 

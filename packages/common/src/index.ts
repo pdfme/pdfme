@@ -28,6 +28,9 @@ import type {
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
+  PDFRenderProps,
+  UIRenderProps,
+  Plugin,
   Lang,
   Size,
   SchemaType,
@@ -149,4 +152,7 @@ export type {
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
+  PDFRenderProps,
+  UIRenderProps,
+  Plugin,
 };

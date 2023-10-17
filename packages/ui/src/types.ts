@@ -1,9 +1,7 @@
+import type { UIRenderProps, SchemaForUI, Size, PropPanel } from '@pdfme/common';
 
-import type { SchemaForUI, Size, PropPanel, Schema } from '@pdfme/common';
-import type { BaseUIRenderProps, UIRenderProps } from '@pdfme/schemas';
-
-
-export type RendererProps = BaseUIRenderProps<any> & {
+// FIXME anyをなくす
+export type RendererProps = Omit<UIRenderProps<any>, 'value' | 'onChange' | 'rootElement' | 'options'> & {
     onChange: (value: string) => void;
     outline: string;
     onChangeHoveringSchemaId?: (id: string | null) => void;

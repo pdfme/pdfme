@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { Font as FontKitFont } from 'fontkit';
+import type { PDFImage, PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
   Lang,
@@ -51,6 +52,39 @@ export interface PropPanel<T extends Schema> {
   widgets?: Record<string, (props: PropPanelWidgetProps) => void>,
   defaultValue: string;
   defaultSchema: T;
+}
+
+interface ExtendSchema extends Schema {
+  [key: string]: any;
+}
+
+export interface PDFRenderProps<T extends Schema> {
+  value: string;
+  schema: T;
+  pdfLib: typeof import('@pdfme/pdf-lib');
+  pdfDoc: PDFDocument;
+  page: PDFPage;
+  options: GeneratorOptions;
+
+  _cache: Map<string, PDFImage>;
+}
+
+export type UIRenderProps<T extends Schema> = {
+  schema: SchemaForUI & T;
+  mode: 'viewer' | 'form';
+  tabIndex?: number;
+  placeholder?: string;
+  stopEditing?: () => void;
+  value: string;
+  onChange?: (value: string) => void;
+  rootElement: HTMLDivElement,
+  options: UIOptions;
+}
+
+export type Plugin<T extends Schema & { [key: string]: any }> = {
+  pdf: (arg: PDFRenderProps<T>) => Promise<void>;
+  ui: (arg: UIRenderProps<T>) => Promise<void>;
+  propPanel: PropPanel<T>;
 }
 
 export type Lang = z.infer<typeof Lang>;

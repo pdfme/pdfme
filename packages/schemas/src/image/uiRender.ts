@@ -1,8 +1,7 @@
 import type { ChangeEvent } from 'react';
 import type * as CSS from 'csstype';
-import type { UIRenderProps } from "../types"
 import type { ImageSchema } from './types';
-import { ZOOM } from '@pdfme/common';
+import { UIRenderProps, ZOOM } from '@pdfme/common';
 
 
 const fullSize = { width: '100%', height: '100%' }

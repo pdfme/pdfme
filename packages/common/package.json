@@ -46,6 +46,7 @@
     "prune": "ts-prune src"
   },
   "dependencies": {
+    "@pdfme/pdf-lib": "^1.17.3",
     "buffer": "^6.0.3",
     "bwip-js": "^3.4.5",
     "fontkit": "^2.0.2",
