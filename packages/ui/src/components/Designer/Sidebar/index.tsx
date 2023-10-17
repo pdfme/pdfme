@@ -45,6 +45,7 @@ const Sidebar = (props: SidebarProps) => {
     >
       <div style={{ position: 'sticky', top: 0, zIndex: 1, fontSize: '1rem' }}>
         <button
+          type="button"
           style={{
             position: 'absolute',
             top: '1.75rem',
@@ -101,6 +102,7 @@ const Sidebar = (props: SidebarProps) => {
           >
             <div style={{ marginBottom: '1rem', borderBottom: '1px solid #e5e5e5' }} />
             <button
+              type="button"
               style={{
                 padding: '0.5rem',
                 background: '#18a0fb',

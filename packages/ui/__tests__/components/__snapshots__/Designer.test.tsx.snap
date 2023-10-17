@@ -75,6 +75,7 @@ exports[`Designer snapshot 1`] = `
       >
         <button
           style="position: absolute; top: 1.75rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px; height: 30px;"
+          type="button"
         >
           <svg
             aria-hidden="true"
@@ -216,6 +217,7 @@ exports[`Designer snapshot 1`] = `
             />
             <button
               style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer; margin: 0px auto; display: block;"
+              type="button"
             >
               <strong
                 style="color: rgb(255, 255, 255);"
