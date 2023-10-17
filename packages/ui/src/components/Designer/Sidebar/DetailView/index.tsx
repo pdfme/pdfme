@@ -1,4 +1,4 @@
-import FormRender, { useForm, } from 'form-render';
+import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect, useState } from 'react';
 import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';

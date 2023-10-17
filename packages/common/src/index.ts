@@ -47,7 +47,7 @@ import type {
   PreviewReactProps,
   DesignerProps,
   DesignerReactProps,
-} from './type.js';
+} from './types.js';
 import {
   getB64BasePdf,
   b64toUint8Array,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { BasePdf, CommonProps, BarCodeType, } from './type';
+import { BasePdf, CommonProps, BarCodeType, } from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,

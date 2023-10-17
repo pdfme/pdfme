@@ -1,6 +1,6 @@
 import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
-import { FontWidthCalcValues, Template, Schema, Font } from './type';
+import { FontWidthCalcValues, Template, Schema, Font } from './types';
 import { Buffer } from 'buffer';
 import {
   DEFAULT_FONT_VALUE,

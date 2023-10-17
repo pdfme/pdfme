@@ -1,5 +1,5 @@
 import { b64toUint8Array, } from './helper';
-import { BarCodeType, } from './type';
+import { BarCodeType, } from './types';
 import bwipjs, { ToBufferOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 
