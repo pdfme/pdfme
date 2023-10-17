@@ -27,7 +27,7 @@ export type UIRenderProps<T extends Schema> = BaseUIRenderProps<T> & {
     options: UIOptions;
 }
 
-export type Plugin<T extends Schema> = {
+export type Plugin<T extends Schema> = {  // FIXME commonに移動
     pdf: (arg: PDFRenderProps<T>) => Promise<void>;
     ui: (arg: UIRenderProps<T>) => Promise<void>;
     propPanel: PropPanel<T>;
