@@ -208,7 +208,7 @@ describe('getSplitPosition test with mocked font width calculations', () => {
 
     beforeAll(() => {
         // @ts-ignore
-        widthOfTextAtSizeSpy = jest.spyOn(require('../src/font'), 'widthOfTextAtSize');
+        widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper'), 'widthOfTextAtSize');
         widthOfTextAtSizeSpy.mockImplementation((text) => {
             return text.length;
         });
