@@ -12,6 +12,17 @@ import {
     DEFAULT_VERTICAL_ALIGNMENT,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
+    VERTICAL_ALIGN_TOP,
+    VERTICAL_ALIGN_MIDDLE,
+    VERTICAL_ALIGN_BOTTOM,
+    DEFAULT_FONT_COLOR,
+    DYNAMIC_FIT_VERTICAL,
+    DYNAMIC_FIT_HORIZONTAL,
+    DEFAULT_DYNAMIC_FIT,
+    DEFAULT_DYNAMIC_MIN_FONT_SIZE,
+    DEFAULT_DYNAMIC_MAX_FONT_SIZE,
+    ALIGN_RIGHT,
+    ALIGN_CENTER
 } from './constants'
 
 
@@ -22,7 +33,7 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
     checkbox.type = 'checkbox';
     checkbox.checked = Boolean((activeSchema as any)?.dynamicFontSize);
     checkbox.onchange = (e: any) => {
-        const val = e.target.checked ? { min: 4, max: 72, fit: 'horizontal' } : undefined;
+        const val = e.target.checked ? { min: DEFAULT_DYNAMIC_MIN_FONT_SIZE, max: DEFAULT_DYNAMIC_MAX_FONT_SIZE, fit: DEFAULT_DYNAMIC_FIT } : undefined;
         changeSchemas([{ key: 'dynamicFontSize', value: val, schemaId: activeSchema.id }]);
     };
     const label = document.createElement('label');
@@ -40,7 +51,6 @@ export const propPanel: PropPanel<TextSchema> = ({
 
         const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
 
-        // FIXME valueはconstantsから使う
         const textSchema: Record<string, PropPanelSchema> = {
             fontName: {
                 title: 'Font Name',
@@ -54,14 +64,14 @@ export const propPanel: PropPanel<TextSchema> = ({
                 title: 'Text Align',
                 type: 'string',
                 widget: 'select',
-                props: { options: [{ label: 'Left', value: 'left' }, { label: 'Center', value: 'center' }, { label: 'Right', value: 'right' }] },
+                props: { options: [{ label: 'Left', value: DEFAULT_ALIGNMENT }, { label: 'Center', value: ALIGN_CENTER }, { label: 'Right', value: ALIGN_RIGHT }] },
                 span: 8,
             },
             verticalAlignment: {
                 title: 'Vertical Align',
                 type: 'string',
                 widget: 'select',
-                props: { options: [{ label: 'Top', value: 'top' }, { label: 'Middle', value: 'middle' }, { label: 'Bottom', value: 'bottom' }] },
+                props: { options: [{ label: 'Top', value: VERTICAL_ALIGN_TOP }, { label: 'Middle', value: VERTICAL_ALIGN_MIDDLE }, { label: 'Bottom', value: VERTICAL_ALIGN_BOTTOM }] },
                 span: 8,
             },
             fontSize: {
@@ -81,7 +91,7 @@ export const propPanel: PropPanel<TextSchema> = ({
                     max: { title: 'Max', type: 'number', widget: 'inputNumber', hidden: !enableDynamicFont },
                     fit: {
                         title: 'Fit', type: 'string', widget: 'select', hidden: !enableDynamicFont,
-                        props: { options: [{ label: 'Horizontal', value: 'horizontal' }, { label: 'Vertical', value: 'vertical' }] },
+                        props: { options: [{ label: 'Horizontal', value: DYNAMIC_FIT_HORIZONTAL }, { label: 'Vertical', value: DYNAMIC_FIT_VERTICAL }] },
                     }
                 }
             },
@@ -104,7 +114,7 @@ export const propPanel: PropPanel<TextSchema> = ({
         lineHeight: DEFAULT_LINE_HEIGHT,
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         dynamicFontSize: undefined,
-        fontColor: '#000000',
+        fontColor: DEFAULT_FONT_COLOR,
         fontName: undefined,
         backgroundColor: '',
     }

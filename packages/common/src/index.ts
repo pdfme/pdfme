@@ -15,8 +15,6 @@ import type {
   Plugin,
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaInputs,
   SchemaForUI,
@@ -38,6 +36,7 @@ import {
   getDefaultFont,
   getB64BasePdf,
   b64toUint8Array,
+  checkFont,
   checkInputs,
   checkUIOptions,
   checkTemplate,
@@ -49,7 +48,6 @@ import {
   pt2mm,
   pt2px,
 } from './helper.js';
-import { barcodeSchemaTypes } from './schema.js';
 
 export {
   MM_TO_PT_RATIO,
@@ -58,7 +56,6 @@ export {
   BLANK_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
-  barcodeSchemaTypes,
   getFallbackFontName,
   getDefaultFont,
   getB64BasePdf,
@@ -66,6 +63,7 @@ export {
   mm2pt,
   pt2mm,
   pt2px,
+  checkFont,
   checkInputs,
   checkUIOptions,
   checkTemplate,
@@ -78,8 +76,6 @@ export {
 export type {
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaInputs,
   SchemaForUI,

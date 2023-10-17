@@ -1,31 +1,9 @@
-import {
-    PDFRenderProps,
-    Font,
-    getDefaultFont,
-    getFallbackFontName,
-} from '@pdfme/common';
+import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import { embedAndGetFontObj } from '../pdfUtils'
-import {
-    VERTICAL_ALIGN_TOP,
-    VERTICAL_ALIGN_MIDDLE,
-    VERTICAL_ALIGN_BOTTOM,
-} from "./constants"
-import {
-    calculateDynamicFontSize,
-    heightOfFontAtSize,
-    getFontDescentInPt,
-    getFontKitFont,
-    getSplittedLines,
-    widthOfTextAtSize,
-} from "./helper"
-import {
-    hex2RgbColor,
-    calcX,
-    calcY,
-    renderBackgroundColor,
-    convertSchemaDimensionsToPt
-} from '../renderUtils'
+import { VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM, DEFAULT_CHARACTER_SPACING } from "./constants"
+import { calculateDynamicFontSize, heightOfFontAtSize, getFontDescentInPt, getFontKitFont, getSplittedLines, widthOfTextAtSize, } from "./helper"
+import { hex2RgbColor, calcX, calcY, renderBackgroundColor, convertSchemaDimensionsToPt } from '../renderUtils'
 
 const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
     const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize;
@@ -55,7 +33,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
 
-    page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing));
+    page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing ?? DEFAULT_CHARACTER_SPACING));
 
     const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const descent = getFontDescentInPt(fontKitFont, fontSize);

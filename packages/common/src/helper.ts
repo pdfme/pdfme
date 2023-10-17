@@ -95,7 +95,7 @@ const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
       .filter(Boolean) as string[]
   );
 
-const checkFont = (arg: { font: Font; template: Template }) => {
+export const checkFont = (arg: { font: Font; template: Template }) => {
   const { font, template: { schemas } } = arg;
   const fontValues = Object.values(font);
   const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);

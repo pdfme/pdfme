@@ -4,8 +4,6 @@ import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema }
 import {
   Lang,
   Size,
-  BarcodeSchemaType,
-  SchemaType,
   Schema,
   SchemaInputs,
   SchemaForUI,
@@ -77,8 +75,6 @@ export type Plugin<T extends Schema & { [key: string]: any }> = {
 
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;
-export type SchemaType = z.infer<typeof SchemaType>;
-export type BarCodeType = z.infer<typeof BarcodeSchemaType>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaInputs = z.infer<typeof SchemaInputs>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;

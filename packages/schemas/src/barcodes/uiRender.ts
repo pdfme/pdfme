@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import { UIRenderProps, Schema, BarCodeType } from '@pdfme/common';
+import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
 import { validateBarcodeInput, createBarCode } from './helper';
 
@@ -39,22 +39,17 @@ const blobToDataURL = (blob: Blob): Promise<string> => new Promise((resolve, rej
     reader.readAsDataURL(blob);
 });
 
-const createBarcodeImage = async (schema: Schema, value: string) => {
+const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
     const imageBuf = await createBarCode({
-        type: schema.type as BarCodeType,
+        ...schema,
         input: value,
-        width: schema.width,
-        height: schema.height,
-        backgroundColor: schema.backgroundColor as string | undefined,
-        barColor: schema.barColor as string | undefined,
-        textColor: schema.textColor as string | undefined,
     });
     const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
     const barcodeDataURL = await blobToDataURL(barcodeData);
     return barcodeDataURL;
 }
 
-const createBarcodeImageElm = async (schema: Schema, value: string) => {
+const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
     const barcodeDataURL = await createBarcodeImage(schema, value);
     const img = document.createElement('img');
     img.src = barcodeDataURL;
@@ -112,7 +107,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
 
     if (!value) return;
     try {
-        if (!validateBarcodeInput(schema.type as BarCodeType, value)) throw new Error('Invalid barcode input');
+        if (!validateBarcodeInput(schema.type, value)) throw new Error('Invalid barcode input');
         const imgElm = await createBarcodeImageElm(schema, value)
         container.appendChild(imgElm);
     } catch (err) {

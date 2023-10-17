@@ -14,8 +14,6 @@ import {
 import type {
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaForUI,
   Font,
@@ -45,8 +43,6 @@ export {
 export type {
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaForUI,
   Font,

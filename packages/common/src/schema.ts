@@ -7,16 +7,8 @@ export const Lang = z.enum(langs);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
 
-export const barcodeSchemaTypes = ['qrcode', 'japanpost', 'ean13', 'ean8', 'code39', 'code128', 'nw7', 'itf14', 'upca', 'upce', 'gs1datamatrix'] as const;
-const notBarcodeSchemaTypes = ['text', 'image'] as const;
-const schemaTypes = [...notBarcodeSchemaTypes, ...barcodeSchemaTypes] as const;
-
-export const BarcodeSchemaType = z.enum(barcodeSchemaTypes);
-export const SchemaType = z.enum(schemaTypes);
-
-
 export const Schema = z.object({
-  type: SchemaType,
+  type: z.string(),
   position: z.object({ x: z.number(), y: z.number() }),
   width: z.number(),
   height: z.number(),

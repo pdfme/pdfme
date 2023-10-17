@@ -1,8 +1,8 @@
 import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
-import { b64toUint8Array, mm2pt, pt2mm, pt2px, Template, Schema, Font, getFallbackFontName, getDefaultFont, DEFAULT_FONT_NAME } from '@pdfme/common';
+import { b64toUint8Array, mm2pt, pt2mm, pt2px, Schema, Font, getFallbackFontName, getDefaultFont, DEFAULT_FONT_NAME } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import type { FontWidthCalcValues } from "./types"
+import type { TextSchema, FontWidthCalcValues } from "./types"
 import {
     DEFAULT_FONT_SIZE,
     DEFAULT_CHARACTER_SPACING,
@@ -14,44 +14,6 @@ import {
     VERTICAL_ALIGN_TOP,
 } from './constants';
 
-const getFallbackFont = (font: Font) => {
-    const fallbackFontName = getFallbackFontName(font);
-    return font[fallbackFontName];
-};
-
-const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
-
-const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
-    uniq(
-        schemas
-            .map((s) => Object.values(s).map((v) => ((v as any).fontName ?? '')))
-            .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
-            .filter(Boolean) as string[]
-    );
-
-export const checkFont = (arg: { font: Font; template: Template }) => {
-    const { font, template: { schemas } } = arg;
-    const fontValues = Object.values(font);
-    const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
-    if (fallbackFontNum === 0) {
-        throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
-    }
-    if (fallbackFontNum > 1) {
-        throw Error(
-            `${fallbackFontNum} fallback flags found in font. true fallback flag must be only one.`
-        );
-    }
-
-    const fontNamesInSchemas = getFontNamesInSchemas(schemas);
-    const fontNames = Object.keys(font);
-    if (fontNamesInSchemas.some((f) => !fontNames.includes(f))) {
-        throw Error(
-            `${fontNamesInSchemas
-                .filter((f) => !fontNames.includes(f))
-                .join()} of template.schemas is not found in font.`
-        );
-    }
-};
 
 export const getBrowserVerticalFontAdjustments = (
     fontKitFont: FontKitFont,
@@ -123,6 +85,11 @@ export const widthOfTextAtSize = (text: string, fontKitFont: FontKitFont, fontSi
         glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
         (fontSize / 1000);
     return standardWidth + calculateCharacterSpacing(text, characterSpacing);
+};
+
+const getFallbackFont = (font: Font) => {
+    const fallbackFontName = getFallbackFontName(font);
+    return font[fallbackFontName];
 };
 
 const fontKitFontCache: { [fontName: string]: FontKitFont } = {};
@@ -218,7 +185,7 @@ export const calculateDynamicFontSize = async ({
     value,
     startingFontSize,
 }: {
-    textSchema: Schema;
+    textSchema: TextSchema;
     font: Font;
     value: string;
     startingFontSize?: number | undefined;
@@ -230,17 +197,6 @@ export const calculateDynamicFontSize = async ({
         width: boxWidth,
         height: boxHeight,
         lineHeight = DEFAULT_LINE_HEIGHT,
-    }: {
-        fontSize?: number;
-        dynamicFontSize?: {
-            min: number;
-            max: number;
-            fit?: 'horizontal' | 'vertical';
-        };
-        characterSpacing?: number;
-        width?: number;
-        height?: number;
-        lineHeight?: number;
     } = textSchema;
     const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
     if (!dynamicFontSizeSetting) return fontSize;

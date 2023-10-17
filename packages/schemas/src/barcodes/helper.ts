@@ -1,6 +1,7 @@
-import { BarCodeType, b64toUint8Array, } from '@pdfme/common';
+import { b64toUint8Array, } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
+import { BARCODE_TYPES } from './constants';
 
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
@@ -25,8 +26,11 @@ const validateCheckDigit = (input: string, checkDigitPos: number) => {
     return passCheckDigit;
 };
 
-export const validateBarcodeInput = (type: BarCodeType, input: string) => {
+export const validateBarcodeInput = (type: string, input: string) => {
     if (!input) return false;
+
+    if (!BARCODE_TYPES.includes(type)) return false;
+
     if (type === 'qrcode') {
         // 500文字以下
         return input.length < 500;
@@ -113,7 +117,7 @@ export const validateBarcodeInput = (type: BarCodeType, input: string) => {
 /**
  * The bwip.js lib has a different name for nw7 type barcodes
  */
-export const barCodeType2Bcid = (type: BarCodeType) =>
+export const barCodeType2Bcid = (type: string) =>
     type === 'nw7' ? 'rationalizedCodabar' : type;
 
 /**
@@ -123,7 +127,7 @@ export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: st
     color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
 export const createBarCode = async (arg: {
-    type: BarCodeType;
+    type: string;
     input: string;
     width: number;
     height: number;
@@ -132,6 +136,7 @@ export const createBarCode = async (arg: {
     textColor?: string;
 }): Promise<Buffer> => {
     const { type, input, width, height, backgroundColor, barColor, textColor } = arg;
+
     const bcid = barCodeType2Bcid(type);
     const includetext = true;
     const scale = 5;
