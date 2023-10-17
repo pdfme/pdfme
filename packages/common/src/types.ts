@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import type { Font as FontKitFont } from 'fontkit';
 import type { PDFImage, PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
@@ -24,13 +23,6 @@ import {
   DesignerReactProps,
 } from './schema.js';
 
-export type FontWidthCalcValues = {
-  font: FontKitFont;
-  fontSize: number;
-  characterSpacing: number;
-  boxWidthInPt: number;
-};
-
 export type PropPanelSchema = _PropPanelSchema;
 
 type PropPanelProps = {
@@ -52,10 +44,6 @@ export interface PropPanel<T extends Schema> {
   widgets?: Record<string, (props: PropPanelWidgetProps) => void>,
   defaultValue: string;
   defaultSchema: T;
-}
-
-interface ExtendSchema extends Schema {
-  [key: string]: any;
 }
 
 export interface PDFRenderProps<T extends Schema> {

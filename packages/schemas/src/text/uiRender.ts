@@ -1,6 +1,7 @@
 import type * as CSS from 'csstype';
+import { UIRenderProps, Schema, } from '@pdfme/common';
+import type { TextSchema } from './types';
 import {
-    UIRenderProps,
     DEFAULT_FONT_SIZE,
     DEFAULT_ALIGNMENT,
     VERTICAL_ALIGN_TOP,
@@ -10,13 +11,13 @@ import {
     DEFAULT_LINE_HEIGHT,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_FONT_COLOR,
-    Schema,
+} from './constants';
+import {
     calculateDynamicFontSize,
     getFontKitFont,
     getDefaultFont,
     getBrowserVerticalFontAdjustments,
-} from '@pdfme/common';
-import type { TextSchema } from './types';
+} from './helper';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
     switch (verticalAlignmentValue) {

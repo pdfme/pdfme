@@ -1,21 +1,24 @@
 import {
     PDFRenderProps,
     Font,
+} from '@pdfme/common';
+import type { TextSchema, FontWidthCalcValues } from './types';
+import { embedAndGetFontObj } from '../pdfUtils'
+import {
     VERTICAL_ALIGN_TOP,
     VERTICAL_ALIGN_MIDDLE,
     VERTICAL_ALIGN_BOTTOM,
+} from "./constants"
+import {
     calculateDynamicFontSize,
     heightOfFontAtSize,
     getFontDescentInPt,
     getFontKitFont,
     getSplittedLines,
     widthOfTextAtSize,
-    FontWidthCalcValues,
     getDefaultFont,
     getFallbackFontName,
-} from '@pdfme/common';
-import type { TextSchema } from './types';
-import { embedAndGetFontObj } from '../pdfUtils'
+} from "./helper"
 import {
     hex2RgbColor,
     calcX,

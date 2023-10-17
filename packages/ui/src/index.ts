@@ -4,13 +4,11 @@ import Viewer from './Viewer';
 
 import {
   BLANK_PDF,
-  DEFAULT_FONT_VALUE,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
-  validateBarcodeInput,
 } from '@pdfme/common';
 
 import type {
@@ -37,13 +35,11 @@ export {
   Viewer,
   Form,
   BLANK_PDF,
-  DEFAULT_FONT_VALUE,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
-  validateBarcodeInput,
 };
 
 export type {

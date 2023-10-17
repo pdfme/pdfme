@@ -1,6 +1,7 @@
-import { createBarCode, validateBarcodeInput, BarCodeType, PDFRenderProps } from '@pdfme/common';
+import { BarCodeType, PDFRenderProps } from '@pdfme/common';
 import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
 import type { BarcodeSchema } from './types';
+import { createBarCode, validateBarcodeInput } from './helper';
 
 export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;

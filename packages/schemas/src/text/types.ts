@@ -1,5 +1,12 @@
 import { Schema } from '@pdfme/common';
+import type { Font as FontKitFont } from 'fontkit';
 
+export type FontWidthCalcValues = {
+    font: FontKitFont;
+    fontSize: number;
+    characterSpacing: number;
+    boxWidthInPt: number;
+};
 export interface TextSchema extends Schema {
     fontName?: string;
     alignment: 'left' | 'center' | 'right';

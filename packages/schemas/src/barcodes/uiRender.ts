@@ -1,6 +1,7 @@
 import type * as CSS from 'csstype';
-import { UIRenderProps, validateBarcodeInput, Schema, createBarCode, BarCodeType } from '@pdfme/common';
+import { UIRenderProps, Schema, BarCodeType } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
+import { validateBarcodeInput, createBarCode } from './helper';
 
 const fullSize = { width: '100%', height: '100%' }
 

@@ -2,15 +2,19 @@ import {
     PropPanel,
     PropPanelWidgetProps,
     PropPanelSchema,
-    getFallbackFontName,
+} from '@pdfme/common';
+import type { TextSchema } from './types';
+import {
     DEFAULT_FONT_NAME,
     DEFAULT_FONT_SIZE,
     DEFAULT_ALIGNMENT,
     DEFAULT_VERTICAL_ALIGNMENT,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
-} from '@pdfme/common';
-import type { TextSchema } from './types';
+} from './constants'
+import {
+    getFallbackFontName,
+} from './helper'
 
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
@@ -38,6 +42,7 @@ export const propPanel: PropPanel<TextSchema> = ({
 
         const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
 
+        // FIXME valueはconstantsから使う
         const textSchema: Record<string, PropPanelSchema> = {
             fontName: {
                 title: 'Font Name',
@@ -102,7 +107,7 @@ export const propPanel: PropPanel<TextSchema> = ({
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         dynamicFontSize: undefined,
         fontColor: '#000000',
-        fontName:undefined,
+        fontName: undefined,
         backgroundColor: '',
     }
 })
