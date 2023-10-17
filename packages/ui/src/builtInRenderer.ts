@@ -6,7 +6,7 @@ const renderer: Renderer = {
     text: { render: text.ui, },
     image: { render: image.ui, },
     ...barcodeSchemaTypes.reduce((acc, barcodeType) => Object.assign(acc, {
-        [barcodeType]: { render: barcodes.ui }
+        [barcodeType]: { render: barcodes[barcodeType].ui }
     }), {}),
 }
 export default renderer

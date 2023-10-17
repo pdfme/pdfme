@@ -1,12 +1,11 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import type { Font as FontKitFont } from 'fontkit';
-import { BLANK_PDF, Font, Template, Schema } from '@pdfme/common';
+import { BLANK_PDF, Font, Template, Schema, getDefaultFont, } from '@pdfme/common';
 import {
     calculateDynamicFontSize,
     checkFont,
     getBrowserVerticalFontAdjustments,
-    getDefaultFont,
     getFontDescentInPt,
     getFontKitFont,
     getSplittedLines,

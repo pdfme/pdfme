@@ -4,6 +4,7 @@ import {
   PT_TO_PX_RATIO,
   BLANK_PDF,
   ZOOM,
+  DEFAULT_FONT_NAME,
 } from './constants.js';
 import type {
   PropPanel,
@@ -33,6 +34,8 @@ import type {
   DesignerReactProps,
 } from './types.js';
 import {
+  getFallbackFontName,
+  getDefaultFont,
   getB64BasePdf,
   b64toUint8Array,
   checkInputs,
@@ -54,7 +57,10 @@ export {
   PT_TO_PX_RATIO,
   BLANK_PDF,
   ZOOM,
+  DEFAULT_FONT_NAME,
   barcodeSchemaTypes,
+  getFallbackFontName,
+  getDefaultFont,
   getB64BasePdf,
   b64toUint8Array,
   mm2pt,

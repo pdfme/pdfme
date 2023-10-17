@@ -1,20 +1,18 @@
 import {
+    DEFAULT_FONT_NAME,
     PropPanel,
     PropPanelWidgetProps,
     PropPanelSchema,
+    getFallbackFontName,
 } from '@pdfme/common';
 import type { TextSchema } from './types';
 import {
-    DEFAULT_FONT_NAME,
     DEFAULT_FONT_SIZE,
     DEFAULT_ALIGNMENT,
     DEFAULT_VERTICAL_ALIGNMENT,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
 } from './constants'
-import {
-    getFallbackFontName,
-} from './helper'
 
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {

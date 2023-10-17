@@ -1,6 +1,8 @@
 import {
     PDFRenderProps,
     Font,
+    getDefaultFont,
+    getFallbackFontName,
 } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import { embedAndGetFontObj } from '../pdfUtils'
@@ -16,8 +18,6 @@ import {
     getFontKitFont,
     getSplittedLines,
     widthOfTextAtSize,
-    getDefaultFont,
-    getFallbackFontName,
 } from "./helper"
 import {
     hex2RgbColor,

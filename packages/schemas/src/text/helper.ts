@@ -1,11 +1,9 @@
 import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
-import { b64toUint8Array, mm2pt, pt2mm, pt2px, Template, Schema, Font } from '@pdfme/common';
+import { b64toUint8Array, mm2pt, pt2mm, pt2px, Template, Schema, Font, getFallbackFontName, getDefaultFont, DEFAULT_FONT_NAME } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import type { FontWidthCalcValues } from "./types"
 import {
-    DEFAULT_FONT_VALUE,
-    DEFAULT_FONT_NAME,
     DEFAULT_FONT_SIZE,
     DEFAULT_CHARACTER_SPACING,
     DEFAULT_LINE_HEIGHT,
@@ -16,28 +14,10 @@ import {
     VERTICAL_ALIGN_TOP,
 } from './constants';
 
-export const getFallbackFontName = (font: Font) => {
-    const initial = '';
-    const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
-        const [fontName, fontValue] = cur;
-
-        return !acc && fontValue.fallback ? fontName : acc;
-    }, initial);
-    if (fallbackFontName === initial) {
-        throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
-    }
-
-    return fallbackFontName;
-};
-
 const getFallbackFont = (font: Font) => {
     const fallbackFontName = getFallbackFontName(font);
     return font[fallbackFontName];
 };
-
-export const getDefaultFont = (): Font => ({
-    [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
-});
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 

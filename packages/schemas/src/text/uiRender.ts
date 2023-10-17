@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import { UIRenderProps, Schema, } from '@pdfme/common';
+import { UIRenderProps, Schema, getDefaultFont } from '@pdfme/common';
 import type { TextSchema } from './types';
 import {
     DEFAULT_FONT_SIZE,
@@ -15,7 +15,6 @@ import {
 import {
     calculateDynamicFontSize,
     getFontKitFont,
-    getDefaultFont,
     getBrowserVerticalFontAdjustments,
 } from './helper';
 

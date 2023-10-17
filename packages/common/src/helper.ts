@@ -10,7 +10,25 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema';
-import { MM_TO_PT_RATIO, PT_TO_MM_RATIO, PT_TO_PX_RATIO } from './constants';
+import { MM_TO_PT_RATIO, PT_TO_MM_RATIO, PT_TO_PX_RATIO, DEFAULT_FONT_NAME, DEFAULT_FONT_VALUE } from './constants';
+
+export const getFallbackFontName = (font: Font) => {
+  const initial = '';
+  const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
+    const [fontName, fontValue] = cur;
+
+    return !acc && fontValue.fallback ? fontName : acc;
+  }, initial);
+  if (fallbackFontName === initial) {
+    throw Error(`fallback flag is not found in font. true fallback flag must be only one.`);
+  }
+
+  return fallbackFontName;
+};
+
+export const getDefaultFont = (): Font => ({
+  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
+});
 
 export const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * MM_TO_PT_RATIO;

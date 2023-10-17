@@ -1,5 +1,5 @@
 import { BarCodeType, b64toUint8Array, } from '@pdfme/common';
-import bwipjs, { ToBufferOptions } from 'bwip-js'; // FIXME ここから
+import bwipjs, { ToBufferOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 
 
