@@ -1,5 +1,5 @@
 import { BarCodeType, b64toUint8Array, } from '@pdfme/common';
-import bwipjs, { ToBufferOptions } from 'bwip-js';
+import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 
 
@@ -135,7 +135,7 @@ export const createBarCode = async (arg: {
     const bcid = barCodeType2Bcid(type);
     const includetext = true;
     const scale = 5;
-    const bwipjsArg: ToBufferOptions = { bcid, text: input, width, height, scale, includetext };
+    const bwipjsArg: RenderOptions = { bcid, text: input, width, height, scale, includetext };
 
     if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
     if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
@@ -145,6 +145,7 @@ export const createBarCode = async (arg: {
 
     if (typeof window !== 'undefined') {
         const canvas = document.createElement('canvas');
+        // @ts-ignore
         bwipjs.toCanvas(canvas, bwipjsArg);
         const dataUrl = canvas.toDataURL('image/png');
         res = b64toUint8Array(dataUrl).buffer as Buffer;
