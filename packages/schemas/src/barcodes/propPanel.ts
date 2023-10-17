@@ -1,8 +1,9 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
+import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR } from './constants';
 
-const defaultColors = { backgroundColor: '', barColor: '#000000', };
-const defaultTextColors = { textColor: '#000000', };
+const defaultColors = { backgroundColor: DEFAULT_BARCODE_BG_COLOR, barColor: DEFAULT_BARCODE_COLOR };
+const defaultTextColors = { textColor: DEFAULT_BARCODE_COLOR };
 const position = { x: 0, y: 0, };
 const default40x20 = { width: 40, height: 20, };
 

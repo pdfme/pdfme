@@ -1,14 +1,30 @@
 import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import { embedAndGetFontObj } from '../pdfUtils'
-import { VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM, DEFAULT_CHARACTER_SPACING } from "./constants"
+import {
+    VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM,
+    DEFAULT_FONT_SIZE,
+    DEFAULT_ALIGNMENT,
+    DEFAULT_VERTICAL_ALIGNMENT,
+    DEFAULT_LINE_HEIGHT,
+    DEFAULT_CHARACTER_SPACING,
+    DEFAULT_FONT_COLOR,
+} from "./constants"
 import { calculateDynamicFontSize, heightOfFontAtSize, getFontDescentInPt, getFontKitFont, getSplittedLines, widthOfTextAtSize, } from "./helper"
 import { hex2RgbColor, calcX, calcY, renderBackgroundColor, convertSchemaDimensionsToPt } from '../renderUtils'
 
 const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
-    const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize;
-    const color = hex2RgbColor(schema.fontColor);
-    return { ...schema, fontSize, color, };
+    const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
+    const color = hex2RgbColor(schema.fontColor || DEFAULT_FONT_COLOR);
+
+    return {
+        alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
+        verticalAlignment: schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT,
+        lineHeight: schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+        characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+        fontSize,
+        color
+    };
 };
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
