@@ -30,10 +30,8 @@ export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schem
   const { width, height, position, rotate } = schema;
   const { x, y } = position;
 
-
   return {
     position: {
-      // FIXME x and y are not correct when rotate is not 0
       x: mm2pt(x),
       y: pageHeight - mm2pt(y) - mm2pt(height)
     },
@@ -42,6 +40,5 @@ export const convertForPdfLayoutProps = ({ schema, pageHeight }: { schema: Schem
     rotate: degrees(rotate ? -rotate : 0)
   };
 };
-
 
 export const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;

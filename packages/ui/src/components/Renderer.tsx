@@ -23,6 +23,8 @@ const Wrapper = ({
       top: schema.position.y * ZOOM,
       left: schema.position.x * ZOOM,
       transform: `rotate(${schema.rotate ?? 0}deg)`,
+      // If we want to avoid logic in other pdf renderers then we would use this line below:
+      // transformOrigin: 'bottom left',
       outline,
     }}
   >

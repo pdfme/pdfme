@@ -1,4 +1,4 @@
-import { setCharacterSpacing, } from '@pdfme/pdf-lib';
+import { Degrees, degreesToRadians, setCharacterSpacing } from '@pdfme/pdf-lib';
 import {
   Font,
   Schema,
@@ -35,6 +35,21 @@ const getFontProp = async ({ value, font, schema }: { value: string, font: Font,
   const characterSpacing = (schema.characterSpacing as number) ?? DEFAULT_CHARACTER_SPACING;
 
   return { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing };
+};
+
+const rotatePoint = (
+  point: { x: number; y: number },
+  pivot: { x: number; y: number },
+  rotate: Degrees
+): { x: number; y: number } => {
+  // Convert the angle from degrees to radians
+  const angleRadians = degreesToRadians(rotate.angle);
+
+  // Calculate the new coordinates
+  const x = Math.cos(angleRadians) * (point.x - pivot.x) - Math.sin(angleRadians) * (point.y - pivot.y) + pivot.x;
+  const y = Math.sin(angleRadians) * (point.x - pivot.x) + Math.cos(angleRadians) * (point.y - pivot.y) + pivot.y;
+
+  return { x, y };
 };
 
 export const renderText = async (arg: RenderProps) => {
@@ -93,20 +108,38 @@ export const renderText = async (arg: RenderProps) => {
     }
   }
 
+  // If rotating we must pivot around the same point as the UI performs its rotation.
+  // Whilst pdflib does the actual rotation of text, we need to move each line relative
+  // to this pivot point
+
+  // If the Pivot point in the UI is set to bottom corner then we can use this:
+  //const pivotPoint = { x: x, y: pageHeight - mm2pt(schema.position.y) - height };
+
+  // If the Pivot point in the UI is the center we can use this, but we must also use it in other schema rendering, not just text
+  const pivotPoint = { x: x + (width / 2), y: pageHeight - mm2pt(schema.position.y) - (height / 2) };
+
   lines.forEach((line, rowIndex) => {
     const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
-    let xAddition = 0;
+    let xLine = x;
     if (alignment === 'center') {
-      xAddition = (width - textWidth) / 2;
+      xLine += (width - textWidth) / 2;
     } else if (alignment === 'right') {
-      xAddition = width - textWidth;
+      xLine += width - textWidth;
+    }
+
+    let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
+
+    if (rotate.angle !== 0) {
+      const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate);
+      xLine = rotatedPoint.x;
+      yLine = rotatedPoint.y;
     }
 
     page.drawText(line, {
-      x: x + xAddition,
-      y: pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset,
+      x: xLine,
+      y: yLine,
       rotate,
       size: fontSize,
       color,
