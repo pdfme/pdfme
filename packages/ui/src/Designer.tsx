@@ -2,10 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { ConfigProvider, ThemeConfig } from 'antd';
 import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
-import { PropPanel } from './types'
 import { BaseUIClass } from './class';
+import { PropPanelObject } from './types';
 import { DESTROYED_ERR_MSG } from './constants';
-import { I18nContext, FontContext, RendererRegistry, PropPanelRegistry, OptionsContext } from './contexts';
+import {
+  I18nContext,
+  FontContext,
+  RendererRegistry,
+  PropPanelRegistry,
+  OptionsContext,
+} from './contexts';
 import DesignerComponent from './components/Designer/index';
 import { cloneDeep } from './helper';
 import builtInPropPanel from './builtInPropPanel';
@@ -20,7 +26,7 @@ const theme: ThemeConfig = {
   components: {
     Form: {
       itemMarginBottom: 8,
-      verticalLabelPadding: '0 0 2px'
+      verticalLabelPadding: '0 0 2px',
     },
   },
 };
@@ -29,7 +35,7 @@ class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
 
-  private propPanelRegistry: PropPanel = builtInPropPanel;
+  private propPanelRegistry: PropPanelObject = builtInPropPanel;
 
   constructor(props: DesignerProps) {
     super(props);
@@ -71,7 +77,6 @@ class Designer extends BaseUIClass {
   protected getPropPanelRegistry() {
     return this.propPanelRegistry;
   }
-
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);

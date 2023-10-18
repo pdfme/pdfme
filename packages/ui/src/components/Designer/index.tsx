@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
+import { ZOOM, DesignerReactProps, Template, SchemaForUI } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Main from './Main/index';
 import type { ChangeSchemas } from '../../types';
-import { ZOOM, RULER_HEIGHT } from '../../constants';
+import { RULER_HEIGHT } from '../../constants';
 import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
   uuid,
@@ -19,7 +19,7 @@ import {
 } from '../../helper';
 import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
 import Root from '../Root';
-import Error from '../Error';
+import ErrorScreen from '../ErrorScreen';
 import CtlBar from '../CtlBar/index';
 
 const TemplateEditor = ({
@@ -36,7 +36,6 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const propPanelRegistry = useContext(PropPanelRegistry);
-
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -97,7 +96,7 @@ const TemplateEditor = ({
         set(tgt, key, value);
 
         if (key === 'type') {
-          const propPanel = propPanelRegistry[value as string]
+          const propPanel = propPanelRegistry[value as string];
           set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
         }
@@ -201,17 +200,17 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const initialSchemaType = 'text';
-    const propPanel = propPanelRegistry[initialSchemaType];
+    const propPanel = Object.values(propPanelRegistry)[0];
+
+    if (!propPanel) {
+      throw new Error('addSchema failed: propPanelRegistry is empty');
+    }
+
     const s = {
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
-      data: propPanel?.defaultValue || '',
-      type: initialSchemaType,
-      position: { x: 0, y: 0 },
-      width: 40,
-      height: 10,
-      ...propPanel?.defaultSchema
+      data: propPanel.defaultValue || '',
+      ...propPanel.defaultSchema,
     } as SchemaForUI;
 
     const paper = paperRefs.current[pageCursor];
@@ -231,7 +230,7 @@ const TemplateEditor = ({
   };
 
   if (error) {
-    return <Error size={size} error={error} />;
+    return <ErrorScreen size={size} error={error} />;
   }
 
   return (

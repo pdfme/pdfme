@@ -17,7 +17,8 @@
     "sourceMap": true,
     "baseUrl": "..", 
     "paths": {
-      "@pdfme/common": ["packages/common/src"] 
+      "@pdfme/common": ["packages/common/src"], 
+      "@pdfme/schemas": ["packages/schemas/src"] 
     }
   },
   "baseUrl": ".",

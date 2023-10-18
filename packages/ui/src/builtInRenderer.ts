@@ -1,14 +1,12 @@
-import { barcodeSchemaTypes } from '@pdfme/common';
-import type { Renderer } from './types';
-import { renderText } from './renders/text';
-import { renderImage } from './renders/image';
-import { renderBarcode } from './renders/barcodes';
+import type { Renderer, Render } from './types';
+import { text, image, barcodes } from '@pdfme/schemas';
 
 const renderer: Renderer = {
-    text: { render: renderText, },
-    image: { render: renderImage, },
-    ...barcodeSchemaTypes.reduce((acc, barcodeType) => Object.assign(acc, {
-        [barcodeType]: { render: renderBarcode }
-    }), {}),
-}
-export default renderer
+  text: text.ui as Render,
+  image: image.ui as Render,
+  ...Object.entries(barcodes).reduce(
+    (acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.ui as Render }),
+    {}
+  ),
+};
+export default renderer;

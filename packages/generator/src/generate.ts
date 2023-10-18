@@ -1,15 +1,15 @@
-import { PDFDocument } from '@pdfme/pdf-lib';
+import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import type { GenerateProps, Template, } from '@pdfme/common';
-import { checkGenerateProps, } from '@pdfme/common';
+import type { GenerateProps, Template } from '@pdfme/common';
+import { checkGenerateProps } from '@pdfme/common';
 import builtInRenderer from './builtInRenderer';
-import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
+import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
 import { TOOL_NAME } from './constants';
 
-const preprocessing = async ({ template }: { template: Template; }) => {
+const preprocessing = async ({ template }: { template: Template }) => {
   const { basePdf } = template;
 
-  const pdfDoc = await PDFDocument.create();
+  const pdfDoc = await pdfLib.PDFDocument.create();
   // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
 
@@ -19,7 +19,7 @@ const preprocessing = async ({ template }: { template: Template; }) => {
   return { pdfDoc, embeddedPages, embedPdfBoxes };
 };
 
-const postProcessing = ({ pdfDoc }: { pdfDoc: PDFDocument }) => {
+const postProcessing = ({ pdfDoc }: { pdfDoc: pdfLib.PDFDocument }) => {
   pdfDoc.setProducer(TOOL_NAME);
   pdfDoc.setCreator(TOOL_NAME);
 };
@@ -55,11 +55,11 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        const renderer = rendererRegistry[schema.type];
-        if (!renderer) {
+        const render = rendererRegistry[schema.type];
+        if (!render) {
           throw new Error(`Renderer for type ${schema.type} not found`);
         }
-        await renderer.render({ value, schema, pdfDoc, page, options, _cache });
+        await render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

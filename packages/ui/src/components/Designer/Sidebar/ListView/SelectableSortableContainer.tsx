@@ -114,8 +114,9 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
-                      }`,
+                    border: `1px solid ${
+                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
+                    }`,
                   }}
                   schema={schema}
                   schemas={schemas}

@@ -106,7 +106,6 @@ export abstract class BaseUIClass {
     // if(renderer){
     //   this.rendererRegistry = Object.assign(this.rendererRegistry, renderer);
     // }
-
   }
 
   protected getI18n() {

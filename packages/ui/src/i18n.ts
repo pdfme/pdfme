@@ -115,7 +115,8 @@ const dictIt: { [key in keyof DictEn]: string } = {
   editField: 'Modifica campo',
   type: 'Tipo',
   errorOccurred: 'Riscontrato errore',
-  errorBulkUpdateFieldName: 'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
+  errorBulkUpdateFieldName:
+    'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
   commitBulkUpdateFieldName: 'Salva cambiamenti',
   bulkUpdateFieldName: 'Modifica nomi campi in blocco',
   barColor: 'Colore barra',
@@ -123,7 +124,7 @@ const dictIt: { [key in keyof DictEn]: string } = {
   bgColor: 'Colore sfondo',
 };
 
-const dictPl: {[key in keyof DictEn]: string} = {
+const dictPl: { [key in keyof DictEn]: string } = {
   cancel: 'Anuluj',
   field: 'pole',
   fieldName: 'Klucz pola',
@@ -139,14 +140,13 @@ const dictPl: {[key in keyof DictEn]: string} = {
   editField: 'Edytuj pole',
   type: 'Typ pola',
   errorOccurred: 'Wystąpił błąd',
-  errorBulkUpdateFieldName:
-    'Nie można wprowadzić zmian ponieważ liczba elementów uległa zmianie.',
+  errorBulkUpdateFieldName: 'Nie można wprowadzić zmian ponieważ liczba elementów uległa zmianie.',
   commitBulkUpdateFieldName: 'Zaakceptuj zmiany',
   bulkUpdateFieldName: 'Masowo aktualizuj klucze pól',
   barColor: 'Kolor paska',
   textColor: 'Kolor tekstu',
   bgColor: 'Kolor tła',
-}
+};
 
 const i18n = (lang: Lang, key: keyof DictEn) => {
   switch (lang) {

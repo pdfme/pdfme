@@ -43,7 +43,8 @@
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
-    "prune": "ts-prune src"
+    "prune": "ts-prune src",
+    "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "^1.17.3",
@@ -52,10 +53,12 @@
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",
+    "@pdfme/schemas": "file:../schemas",
     "pdf2json": "^2.0.0"
   },
   "peerDependencies": {
-    "@pdfme/common": "^2.1.0"
+    "@pdfme/common": "latest",
+    "@pdfme/schemas": "latest"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

@@ -1,15 +1,12 @@
-import type { PropPanel } from './types';
-import { barcodeSchemaTypes } from '@pdfme/common';
-import { getTextPropPanel } from './propPanels/text';
-import { getImagePropPanel } from './propPanels/image';
-import { getBarcodePropPanel } from './propPanels/barcodes';
+import { PropPanelObject } from './types';
+import { text, image, barcodes } from '@pdfme/schemas';
 
-const propPanel: PropPanel = {
-    text: getTextPropPanel(),
-    image: getImagePropPanel(),
-    ...barcodeSchemaTypes.reduce((acc, type) =>
-        Object.assign(acc, {
-            [type]: getBarcodePropPanel(type)
-        }), {}),
-}
-export default propPanel
+const propPanel: PropPanelObject = {
+  text: text.propPanel,
+  image: image.propPanel,
+  ...Object.entries(barcodes).reduce(
+    (acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.propPanel }),
+    {}
+  ),
+};
+export default propPanel;

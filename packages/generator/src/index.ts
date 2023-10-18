@@ -1,19 +1,15 @@
 import generate from './generate.js';
 import {
   BLANK_PDF,
-  DEFAULT_FONT_VALUE,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
-  validateBarcodeInput,
 } from '@pdfme/common';
 import type {
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaForUI,
   Font,
@@ -31,19 +27,15 @@ import type {
 export {
   generate,
   BLANK_PDF,
-  DEFAULT_FONT_VALUE,
   checkTemplate,
   checkUIProps,
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
-  validateBarcodeInput,
 };
 export type {
   Lang,
   Size,
-  SchemaType,
-  BarCodeType,
   Schema,
   SchemaForUI,
   Font,
@@ -57,4 +49,3 @@ export type {
   PreviewProps,
   DesignerProps,
 };
-

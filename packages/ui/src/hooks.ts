@@ -1,7 +1,7 @@
 import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
-import { Template, Size, getB64BasePdf } from '@pdfme/common';
+import { ZOOM, Template, Size, getB64BasePdf } from '@pdfme/common';
 import { pdf2Pngs, getPdfPageSizes, b64toBlob } from './helper';
-import { ZOOM, RULER_HEIGHT } from './constants';
+import { RULER_HEIGHT } from './constants';
 
 export const usePrevious = <T>(value: T) => {
   const ref = useRef<T | null>(null);
@@ -23,7 +23,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
-  const init = async (prop: { template: Template; size: Size; }) => {
+  const init = async (prop: { template: Template; size: Size }) => {
     const { template, size } = prop;
     const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);

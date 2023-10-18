@@ -1,7 +1,8 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { ZOOM, SELECTABLE_CLASSNAME } from '../constants';
+import { ZOOM } from '@pdfme/common';
+import { SELECTABLE_CLASSNAME } from '../constants';
 import { RendererRegistry, OptionsContext } from '../contexts';
-import { RendererProps } from "../types"
+import { RendererProps } from '../types';
 
 const Wrapper = ({
   children,
@@ -37,12 +38,11 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
     if (ref.current && schema.type) {
       const schemaType = schema.type as string;
-      const renderer = rendererRegistry[schemaType];
-      if (!renderer) {
+      const render = rendererRegistry[schemaType];
+      if (!render) {
         console.error(`Renderer for type ${schema.type} not found`);
         return;
       }
@@ -51,7 +51,7 @@ const Renderer = (props: RendererProps) => {
 
       const isForm = mode === 'form';
 
-      renderer.render({
+      render({
         value: schema.data,
         schema,
         rootElement: ref.current,
@@ -70,11 +70,10 @@ const Renderer = (props: RendererProps) => {
     };
   }, [JSON.stringify(schema), mode, options]);
 
-
   return (
     <Wrapper {...props}>
       <div style={{ height: '100%', width: '100%' }} ref={ref} />
     </Wrapper>
   );
 };
-export default Renderer
+export default Renderer;

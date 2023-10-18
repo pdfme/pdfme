@@ -43,20 +43,14 @@
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
-    "prune": "ts-prune src"
+    "prune": "ts-prune src",
+    "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
+    "@pdfme/pdf-lib": "^1.17.3",
     "buffer": "^6.0.3",
-    "bwip-js": "^3.4.5",
-    "fontkit": "^2.0.2",
+    "form-render": "^2.2.20",
     "zod": "^3.20.2"
-  },
-  "devDependencies": {
-    "@types/bwip-js": "^3.2.0",
-    "@types/fontkit": "^2.0.3",
-    "@types/pngjs": "^6.0.1",
-    "jsqr": "^1.4.0",
-    "pngjs": "^7.0.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

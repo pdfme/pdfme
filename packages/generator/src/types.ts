@@ -1,23 +1,13 @@
-import type { PDFImage } from '@pdfme/pdf-lib';
-import type { GeneratorOptions, Schema, } from '@pdfme/common';
-import type { PDFPage, PDFDocument, } from '@pdfme/pdf-lib';
+import { PDFRenderProps, Schema } from '@pdfme/common';
 
 export type EmbedPdfBox = {
-    mediaBox: { x: number; y: number; width: number; height: number };
-    bleedBox: { x: number; y: number; width: number; height: number };
-    trimBox: { x: number; y: number; width: number; height: number };
+  mediaBox: { x: number; y: number; width: number; height: number };
+  bleedBox: { x: number; y: number; width: number; height: number };
+  trimBox: { x: number; y: number; width: number; height: number };
 };
 
-export interface RenderProps {
-    value: string;
-    schema: Schema;
-    pdfDoc: PDFDocument;
-    page: PDFPage;
-    options: GeneratorOptions;
-
-    _cache: Map<string, PDFImage>;
-}
+export type Render = (arg: PDFRenderProps<Schema>) => Promise<void>;
 
 export interface Renderer {
-    [key: string]: { render: (arg: RenderProps) => Promise<void> } | undefined;
+  [key: string]: Render | undefined;
 }
