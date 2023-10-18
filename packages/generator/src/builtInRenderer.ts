@@ -3,8 +3,8 @@ import { text, image, barcodes } from '@pdfme/schemas';
 
 
 const renderer: Renderer = {
-    text: { render: text.pdf as Render },
-    image: { render: image.pdf as Render, },
-    ...Object.entries(barcodes).reduce((acc, [type, barcode]) => Object.assign(acc, { [type]: { render: barcode.pdf as Render } }), {})
+    text: text.pdf as Render,
+    image: image.pdf as Render,
+    ...Object.entries(barcodes).reduce((acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.pdf as Render }), {})
 }
 export default renderer

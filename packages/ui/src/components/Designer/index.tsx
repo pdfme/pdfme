@@ -19,7 +19,7 @@ import {
 } from '../../helper';
 import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
 import Root from '../Root';
-import Error from '../Error';
+import ErrorScreen from '../ErrorScreen';
 import CtlBar from '../CtlBar/index';
 
 const TemplateEditor = ({
@@ -201,17 +201,17 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const initialSchemaType = 'text';
-    const propPanel = propPanelRegistry[initialSchemaType];
+    const propPanel = Object.values(propPanelRegistry)[0];
+
+    if (!propPanel) {
+      throw new Error('addSchema failed: propPanelRegistry is empty');
+    }
+
     const s = {
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
-      data: propPanel?.defaultValue || '',
-      type: initialSchemaType,
-      position: { x: 0, y: 0 },
-      width: 40,
-      height: 10,
-      ...propPanel?.defaultSchema
+      data: propPanel.defaultValue || '',
+      ...propPanel.defaultSchema
     } as SchemaForUI;
 
     const paper = paperRefs.current[pageCursor];
@@ -231,7 +231,7 @@ const TemplateEditor = ({
   };
 
   if (error) {
-    return <Error size={size} error={error} />;
+    return <ErrorScreen size={size} error={error} />;
   }
 
   return (

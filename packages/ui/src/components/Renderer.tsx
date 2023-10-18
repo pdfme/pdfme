@@ -42,8 +42,8 @@ const Renderer = (props: RendererProps) => {
   useEffect(() => {
     if (ref.current && schema.type) {
       const schemaType = schema.type as string;
-      const renderer = rendererRegistry[schemaType];
-      if (!renderer) {
+      const render = rendererRegistry[schemaType];
+      if (!render) {
         console.error(`Renderer for type ${schema.type} not found`);
         return;
       }
@@ -52,7 +52,7 @@ const Renderer = (props: RendererProps) => {
 
       const isForm = mode === 'form';
 
-      renderer.render({
+      render({
         value: schema.data,
         schema,
         rootElement: ref.current,

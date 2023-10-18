@@ -55,11 +55,11 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        const renderer = rendererRegistry[schema.type];
-        if (!renderer) {
+        const render = rendererRegistry[schema.type];
+        if (!render) {
           throw new Error(`Renderer for type ${schema.type} not found`);
         }
-        await renderer.render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

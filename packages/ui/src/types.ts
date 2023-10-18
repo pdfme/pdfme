@@ -9,7 +9,7 @@ export type RendererProps = Omit<UIRenderProps<Schema>, 'value' | 'onChange' | '
 export type Render = (arg: UIRenderProps<Schema>) => Promise<void>;
 
 export interface Renderer {
-    [key: string]: { render: Render } | undefined;
+    [key: string]: Render | undefined;
 }
 
 export interface PropPanelObject {
