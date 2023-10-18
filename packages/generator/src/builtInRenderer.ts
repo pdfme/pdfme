@@ -1,5 +1,6 @@
-import { text, image, barcodes } from "@pdfme/schemas"
 import type { Renderer, Render } from './types';
+import { text, image, barcodes } from '@pdfme/schemas';
+
 
 const renderer: Renderer = {
     text: { render: text.pdf as Render },

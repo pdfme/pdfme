@@ -2,6 +2,7 @@ import { b64toUint8Array, } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 import { BARCODE_TYPES } from './constants';
+import { BarcodeTypes } from './types';
 
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
@@ -26,7 +27,7 @@ const validateCheckDigit = (input: string, checkDigitPos: number) => {
     return passCheckDigit;
 };
 
-export const validateBarcodeInput = (type: string, input: string) => {
+export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
     if (!input) return false;
 
     if (!BARCODE_TYPES.includes(type)) return false;
@@ -117,7 +118,7 @@ export const validateBarcodeInput = (type: string, input: string) => {
 /**
  * The bwip.js lib has a different name for nw7 type barcodes
  */
-export const barCodeType2Bcid = (type: string) =>
+export const barCodeType2Bcid = (type: BarcodeTypes) =>
     type === 'nw7' ? 'rationalizedCodabar' : type;
 
 /**
@@ -127,7 +128,7 @@ export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: st
     color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
 export const createBarCode = async (arg: {
-    type: string;
+    type: BarcodeTypes;
     input: string;
     width: number;
     height: number;

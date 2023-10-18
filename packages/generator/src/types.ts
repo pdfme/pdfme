@@ -9,5 +9,6 @@ export type EmbedPdfBox = {
 export type Render = (arg: PDFRenderProps<Schema>) => Promise<void>;
 
 export interface Renderer {
+  // FIXME render　っていらなくない？
   [key: string]: { render: Render } | undefined;
 }

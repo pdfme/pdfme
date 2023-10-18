@@ -1,5 +1,6 @@
-import { text, image, barcodes } from "@pdfme/schemas"
 import { PropPanelObject } from './types';
+import { text, image, barcodes } from '@pdfme/schemas';
+
 
 const propPanel: PropPanelObject = {
     text: text.propPanel,
