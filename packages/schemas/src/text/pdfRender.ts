@@ -1,17 +1,37 @@
+import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
-import { embedAndGetFontObj } from '../pdfUtils'
-import {
-    VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM,
-    DEFAULT_FONT_SIZE,
-    DEFAULT_ALIGNMENT,
-    DEFAULT_VERTICAL_ALIGNMENT,
-    DEFAULT_LINE_HEIGHT,
-    DEFAULT_CHARACTER_SPACING,
-    DEFAULT_FONT_COLOR,
-} from "./constants"
+import { VERTICAL_ALIGN_TOP, VERTICAL_ALIGN_MIDDLE, VERTICAL_ALIGN_BOTTOM, DEFAULT_FONT_SIZE, DEFAULT_ALIGNMENT, DEFAULT_VERTICAL_ALIGNMENT, DEFAULT_LINE_HEIGHT, DEFAULT_CHARACTER_SPACING, DEFAULT_FONT_COLOR, } from "./constants"
 import { calculateDynamicFontSize, heightOfFontAtSize, getFontDescentInPt, getFontKitFont, getSplittedLines, widthOfTextAtSize, } from "./helper"
 import { hex2RgbColor, calcX, calcY, renderBackgroundColor, convertSchemaDimensionsToPt } from '../renderUtils'
+
+const embedAndGetFontObjCache = new WeakMap();
+const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
+    const { pdfDoc, font } = arg;
+    if (embedAndGetFontObjCache.has(pdfDoc)) {
+        return embedAndGetFontObjCache.get(pdfDoc);
+    }
+
+    const fontValues = await Promise.all(
+        Object.values(font).map(async (v) => {
+            let fontData = v.data;
+            if (typeof fontData === 'string' && fontData.startsWith('http')) {
+                fontData = await fetch(fontData).then((res) => res.arrayBuffer());
+            }
+            return pdfDoc.embedFont(fontData, {
+                subset: typeof v.subset === 'undefined' ? true : v.subset,
+            });
+        })
+    );
+
+    const fontObj = Object.keys(font).reduce(
+        (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
+        {} as { [key: string]: PDFFont }
+    )
+
+    embedAndGetFontObjCache.set(pdfDoc, fontObj);
+    return fontObj;
+};
 
 const getFontProp = async ({ value, font, schema }: { value: string, font: Font, schema: TextSchema }) => {
     const fontSize = schema.dynamicFontSize ? await calculateDynamicFontSize({ textSchema: schema, font, value }) : schema.fontSize ?? DEFAULT_FONT_SIZE;
