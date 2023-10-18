@@ -1,29 +1,29 @@
 import { PDFRenderProps } from '@pdfme/common';
-import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils'
+import { calcX, calcY, convertSchemaDimensionsToPt, getCacheKey } from '../renderUtils';
 import type { BarcodeSchema } from './types';
 import { createBarCode, validateBarcodeInput } from './helper';
 
 export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
-    const { value, schema, pdfDoc, page, _cache } = arg;
-    if (!validateBarcodeInput(schema.type, value)) return;
+  const { value, schema, pdfDoc, page, _cache } = arg;
+  if (!validateBarcodeInput(schema.type, value)) return;
 
-    const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
-    const opt = {
-        x: calcX(schema.position.x, 'left', width, width),
-        y: calcY(schema.position.y, page.getHeight(), height),
-        rotate,
-        width,
-        height,
-    };
-    const inputBarcodeCacheKey = getCacheKey(schema, value);
-    let image = _cache.get(inputBarcodeCacheKey);
-    if (!image) {
-        const imageBuf = await createBarCode(
-            Object.assign(schema, { type: schema.type, input: value })
-        );
-        image = await pdfDoc.embedPng(imageBuf);
-        _cache.set(inputBarcodeCacheKey, image)
-    }
+  const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
+  const opt = {
+    x: calcX(schema.position.x, 'left', width, width),
+    y: calcY(schema.position.y, page.getHeight(), height),
+    rotate,
+    width,
+    height,
+  };
+  const inputBarcodeCacheKey = getCacheKey(schema, value);
+  let image = _cache.get(inputBarcodeCacheKey);
+  if (!image) {
+    const imageBuf = await createBarCode(
+      Object.assign(schema, { type: schema.type, input: value })
+    );
+    image = await pdfDoc.embedPng(imageBuf);
+    _cache.set(inputBarcodeCacheKey, image);
+  }
 
-    page.drawImage(image, opt);
-}
+  page.drawImage(image, opt);
+};

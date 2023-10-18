@@ -4,10 +4,5 @@ import { propPanel } from './propPanel';
 import { uiRender } from './uiRender';
 import type { ImageSchema } from './types';
 
-const schema: Plugin<ImageSchema> = {
-    pdf: pdfRender,
-    ui: uiRender,
-    propPanel
-};
-
+const schema: Plugin<ImageSchema> = { pdf: pdfRender, ui: uiRender, propPanel };
 export default schema;

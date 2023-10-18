@@ -5,7 +5,13 @@ import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdf
 import { BaseUIClass } from './class';
 import { PropPanelObject } from './types';
 import { DESTROYED_ERR_MSG } from './constants';
-import { I18nContext, FontContext, RendererRegistry, PropPanelRegistry, OptionsContext } from './contexts';
+import {
+  I18nContext,
+  FontContext,
+  RendererRegistry,
+  PropPanelRegistry,
+  OptionsContext,
+} from './contexts';
 import DesignerComponent from './components/Designer/index';
 import { cloneDeep } from './helper';
 import builtInPropPanel from './builtInPropPanel';
@@ -20,7 +26,7 @@ const theme: ThemeConfig = {
   components: {
     Form: {
       itemMarginBottom: 8,
-      verticalLabelPadding: '0 0 2px'
+      verticalLabelPadding: '0 0 2px',
     },
   },
 };
@@ -71,7 +77,6 @@ class Designer extends BaseUIClass {
   protected getPropPanelRegistry() {
     return this.propPanelRegistry;
   }
-
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);

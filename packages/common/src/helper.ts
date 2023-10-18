@@ -10,7 +10,13 @@ import {
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
 } from './schema';
-import { MM_TO_PT_RATIO, PT_TO_MM_RATIO, PT_TO_PX_RATIO, DEFAULT_FONT_NAME, DEFAULT_FONT_VALUE } from './constants';
+import {
+  MM_TO_PT_RATIO,
+  PT_TO_MM_RATIO,
+  PT_TO_PX_RATIO,
+  DEFAULT_FONT_NAME,
+  DEFAULT_FONT_VALUE,
+} from './constants';
 
 export const getFallbackFontName = (font: Font) => {
   const initial = '';
@@ -90,13 +96,16 @@ const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => ((v as any).fontName ?? '')))
+      .map((s) => Object.values(s).map((v) => (v as any).fontName ?? ''))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
 
 export const checkFont = (arg: { font: Font; template: Template }) => {
-  const { font, template: { schemas } } = arg;
+  const {
+    font,
+    template: { schemas },
+  } = arg;
   const fontValues = Object.values(font);
   const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0);
   if (fallbackFontNum === 0) {

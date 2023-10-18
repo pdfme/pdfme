@@ -10,7 +10,10 @@ import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
 
 const DetailView = (
-  props: Pick<SidebarProps, 'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'> & {
+  props: Pick<
+    SidebarProps,
+    'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
+  > & {
     activeSchema: SchemaForUI;
   }
 ) => {
@@ -21,18 +24,22 @@ const DetailView = (
   const propPanelRegistry = useContext(PropPanelRegistry);
   const options = useContext(OptionsContext);
 
-  const [widgets, setWidgets] = useState<{ [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element; }>({})
+  const [widgets, setWidgets] = useState<{
+    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
+  }>({});
 
   useEffect(() => {
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      Divider
+      Divider,
     };
     for (const propPanel of Object.values(propPanelRegistry)) {
-      const widgets = propPanel?.widgets || {}
+      const widgets = propPanel?.widgets || {};
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
-        newWidgets[widgetKey] = (p) => <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />;
-      })
+        newWidgets[widgetKey] = (p) => (
+          <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />
+        );
+      });
     }
     setWidgets(newWidgets);
   }, [activeSchema, activeElements, propPanelRegistry]);
@@ -52,10 +59,10 @@ const DetailView = (
     if (changes.length) {
       changeSchemas(changes);
     }
-  }
+  };
 
-  const activePropPanelRegistry = propPanelRegistry[activeSchema.type]
-  const activePropPanelSchema = activePropPanelRegistry?.propPanelSchema
+  const activePropPanelRegistry = propPanelRegistry[activeSchema.type];
+  const activePropPanelSchema = activePropPanelRegistry?.propPanelSchema;
   if (!activePropPanelSchema) {
     console.error(`No prop panel schema for ${activeSchema.type}`);
   }
@@ -64,37 +71,66 @@ const DetailView = (
     type: 'object',
     column: 2,
     properties: {
-      type: { title: 'Type', type: 'string', widget: 'select', props: { options: Object.keys(propPanelRegistry).map((label) => ({ label, value: label })) }, },
-      key: { title: 'Name', type: 'string', widget: 'input', },
+      type: {
+        title: 'Type',
+        type: 'string',
+        widget: 'select',
+        props: {
+          options: Object.keys(propPanelRegistry).map((label) => ({ label, value: label })),
+        },
+      },
+      key: { title: 'Name', type: 'string', widget: 'input' },
       '-': { type: 'void', widget: 'Divider', cellSpan: 2 },
       align: { title: 'Align', type: 'void', widget: 'AlignWidget', cellSpan: 2 },
-      position: { type: 'object', widget: 'card', column: 2, properties: { x: { title: 'X', type: 'number', widget: 'inputNumber' }, y: { title: 'Y', type: 'number', widget: 'inputNumber' } } },
+      position: {
+        type: 'object',
+        widget: 'card',
+        column: 2,
+        properties: {
+          x: { title: 'X', type: 'number', widget: 'inputNumber' },
+          y: { title: 'Y', type: 'number', widget: 'inputNumber' },
+        },
+      },
       width: { title: 'Width', type: 'number', widget: 'inputNumber' },
       height: { title: 'Height', type: 'number', widget: 'inputNumber' },
-    }
-  }
+    },
+  };
 
   if (typeof activePropPanelSchema === 'function') {
     const apps = activePropPanelSchema({ ...props, options }) || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
-      ...apps
-    }
+      ...(Object.keys(apps).length === 0
+        ? {}
+        : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...apps,
+    };
   } else {
     const apps = activePropPanelSchema || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
-      ...apps
-    }
+      ...(Object.keys(apps).length === 0
+        ? {}
+        : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...apps,
+    };
   }
 
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <span
-          style={{ position: 'absolute', zIndex: 100, border: 'none', borderRadius: 2, padding: '0.5rem', cursor: 'pointer', background: '#eee', width: 14, height: 14 }}
+          style={{
+            position: 'absolute',
+            zIndex: 100,
+            border: 'none',
+            borderRadius: 2,
+            padding: '0.5rem',
+            cursor: 'pointer',
+            background: '#eee',
+            width: 14,
+            height: 14,
+          }}
           onClick={deselectSchema}
         >
           <Bars3Icon width={15} height={15} />
@@ -104,13 +140,19 @@ const DetailView = (
         </span>
       </div>
       <Divider />
-      <div style={{ height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145, overflowY: 'auto', overflowX: 'hidden' }}>
+      <div
+        style={{
+          height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+        }}
+      >
         <FormRender
           form={form}
           schema={propPanelSchema}
           widgets={widgets}
           watch={{ '#': handleWatch }}
-          locale='en-US'
+          locale="en-US"
         />
       </div>
     </div>

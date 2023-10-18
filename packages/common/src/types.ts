@@ -31,15 +31,16 @@ type PropPanelProps = {
   schemas: SchemaForUI[];
   pageSize: Size;
   options: UIOptions;
-}
+};
 
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
-
 export interface PropPanel<T extends Schema> {
-  propPanelSchema: ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>) | Record<string, PropPanelSchema>;
+  propPanelSchema:
+    | ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>)
+    | Record<string, PropPanelSchema>;
 
-  widgets?: Record<string, (props: PropPanelWidgetProps) => void>,
+  widgets?: Record<string, (props: PropPanelWidgetProps) => void>;
   defaultValue: string;
   defaultSchema: T;
 }
@@ -63,15 +64,15 @@ export type UIRenderProps<T extends Schema> = {
   stopEditing?: () => void;
   value: string;
   onChange?: (value: string) => void;
-  rootElement: HTMLDivElement,
+  rootElement: HTMLDivElement;
   options: UIOptions;
-}
+};
 
 export type Plugin<T extends Schema & { [key: string]: any }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void>;
   ui: (arg: UIRenderProps<T>) => Promise<void>;
   propPanel: PropPanel<T>;
-}
+};
 
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;

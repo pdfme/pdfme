@@ -1,8 +1,8 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { ZOOM } from "@pdfme/common"
+import { ZOOM } from '@pdfme/common';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { RendererRegistry, OptionsContext } from '../contexts';
-import { RendererProps } from "../types"
+import { RendererProps } from '../types';
 
 const Wrapper = ({
   children,
@@ -38,7 +38,6 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
     if (ref.current && schema.type) {
       const schemaType = schema.type as string;
@@ -71,11 +70,10 @@ const Renderer = (props: RendererProps) => {
     };
   }, [JSON.stringify(schema), mode, options]);
 
-
   return (
     <Wrapper {...props}>
       <div style={{ height: '100%', width: '100%' }} ref={ref} />
     </Wrapper>
   );
 };
-export default Renderer
+export default Renderer;

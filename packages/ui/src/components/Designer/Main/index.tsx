@@ -10,7 +10,7 @@ import React, {
 import { OnDrag, OnResize, OnClick } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import type { ChangeSchemas } from "../../../types"
+import type { ChangeSchemas } from '../../../types';
 import { RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
@@ -314,7 +314,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             key={schema.id}
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-            mode={editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'form' : 'viewer'}
+            mode={
+              editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'form' : 'viewer'
+            }
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}

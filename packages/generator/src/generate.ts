@@ -1,12 +1,12 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import type { GenerateProps, Template, } from '@pdfme/common';
-import { checkGenerateProps, } from '@pdfme/common';
+import type { GenerateProps, Template } from '@pdfme/common';
+import { checkGenerateProps } from '@pdfme/common';
 import builtInRenderer from './builtInRenderer';
-import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes, } from './pdfUtils'
+import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
 import { TOOL_NAME } from './constants';
 
-const preprocessing = async ({ template }: { template: Template; }) => {
+const preprocessing = async ({ template }: { template: Template }) => {
   const { basePdf } = template;
 
   const pdfDoc = await pdfLib.PDFDocument.create();

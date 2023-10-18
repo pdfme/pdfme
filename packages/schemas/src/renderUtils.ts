@@ -1,4 +1,4 @@
-import { PDFPage, degrees, rgb, } from '@pdfme/pdf-lib';
+import { PDFPage, degrees, rgb } from '@pdfme/pdf-lib';
 import { Schema, mm2pt } from '@pdfme/common';
 
 const hex2rgb = (hex: string) => {
@@ -26,7 +26,12 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-export const calcX = (x: number, alignment: 'left' | 'center' | 'right', boxWidth: number, textWidth: number) => {
+export const calcX = (
+  x: number,
+  alignment: 'left' | 'center' | 'right',
+  boxWidth: number,
+  textWidth: number
+) => {
   let addition = 0;
   if (alignment === 'center') {
     addition = (boxWidth - textWidth) / 2;
@@ -37,7 +42,8 @@ export const calcX = (x: number, alignment: 'left' | 'center' | 'right', boxWidt
   return mm2pt(x) + addition;
 };
 
-export const calcY = (y: number, pageHeight: number, itemHeight: number) => pageHeight - mm2pt(y) - itemHeight;
+export const calcY = (y: number, pageHeight: number, itemHeight: number) =>
+  pageHeight - mm2pt(y) - itemHeight;
 
 export const renderBackgroundColor = (arg: {
   schema: Schema;

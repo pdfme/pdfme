@@ -23,7 +23,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
-  const init = async (prop: { template: Template; size: Size; }) => {
+  const init = async (prop: { template: Template; size: Size }) => {
     const { template, size } = prop;
     const _basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(_basePdf);

@@ -259,22 +259,22 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
     acc.push(
       template.schemas[i]
         ? Object.entries(template.schemas[i])
-          .sort((a, b) => {
-            const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
-            const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
+            .sort((a, b) => {
+              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
+              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
 
-            return aIndex > bIndex ? 1 : -1;
-          })
-          .map((e) => {
-            const [key, value] = e;
-            const data = template.sampledata?.[0]?.[key] ?? '';
+              return aIndex > bIndex ? 1 : -1;
+            })
+            .map((e) => {
+              const [key, value] = e;
+              const data = template.sampledata?.[0]?.[key] ?? '';
 
-            return Object.assign(value, {
-              key,
-              data,
-              id: uuid(),
-            });
-          })
+              return Object.assign(value, {
+                key,
+                data,
+                id: uuid(),
+              });
+            })
         : []
     );
 

@@ -37,7 +37,6 @@ const TemplateEditor = ({
   const i18n = useContext(I18nContext);
   const propPanelRegistry = useContext(PropPanelRegistry);
 
-
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
@@ -97,7 +96,7 @@ const TemplateEditor = ({
         set(tgt, key, value);
 
         if (key === 'type') {
-          const propPanel = propPanelRegistry[value as string]
+          const propPanel = propPanelRegistry[value as string];
           set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
         }
@@ -211,7 +210,7 @@ const TemplateEditor = ({
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
       data: propPanel.defaultValue || '',
-      ...propPanel.defaultSchema
+      ...propPanel.defaultSchema,
     } as SchemaForUI;
 
     const paper = paperRefs.current[pageCursor];

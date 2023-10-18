@@ -35,7 +35,8 @@
     "test": "jest",
     "lint:watch": "tsc -w --noEmit",
     "test:watch": "jest --coverage --watch",
-    "prune": "ts-prune src"
+    "prune": "ts-prune src",
+    "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.8",
