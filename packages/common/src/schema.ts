@@ -47,6 +47,7 @@ export const Template = z.object({
 
 export const Inputs = z.array(z.record(z.string())).min(1);
 
+// FIXME  ここから。ここにプラグインを入れられるようにする。
 const CommonOptions = z.object({ font: Font.optional() });
 
 export const CommonProps = z.object({

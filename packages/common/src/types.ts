@@ -22,12 +22,13 @@ import {
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
+export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
 
 type PropPanelProps = {
   rootElement: HTMLDivElement;
   activeSchema: SchemaForUI;
   activeElements: HTMLElement[];
-  changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
+  changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
   pageSize: Size;
   options: UIOptions;
@@ -73,6 +74,22 @@ export type Plugin<T extends Schema & { [key: string]: any }> = {
   ui: (arg: UIRenderProps<T>) => Promise<void>;
   propPanel: PropPanel<T>;
 };
+
+export type PDFRender = (arg: PDFRenderProps<Schema>) => Promise<void>;
+
+export interface PDFRenderer {
+  [key: string]: PDFRender | undefined;
+}
+
+export type UIRender = (arg: UIRenderProps<Schema>) => Promise<void>;
+
+export interface UIRenderer {
+  [key: string]: UIRender | undefined;
+}
+
+export interface PropPanelObject {
+  [key: string]: PropPanel<Schema> | undefined;
+}
 
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;

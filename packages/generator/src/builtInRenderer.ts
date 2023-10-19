@@ -1,11 +1,11 @@
-import type { Renderer, Render } from './types';
+import type { PDFRenderer, PDFRender } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 
-const renderer: Renderer = {
-  text: text.pdf as Render,
-  image: image.pdf as Render,
+const renderer: PDFRenderer = {
+  text: text.pdf as PDFRender,
+  image: image.pdf as PDFRender,
   ...Object.entries(barcodes).reduce(
-    (acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.pdf as Render }),
+    (acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.pdf as PDFRender }),
     {}
   ),
 };

@@ -22,6 +22,7 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
+  Plugin,
 } from '@pdfme/common';
 
 export {
@@ -48,4 +49,5 @@ export type {
   UIProps,
   PreviewProps,
   DesignerProps,
+  Plugin,
 };

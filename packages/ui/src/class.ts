@@ -1,10 +1,10 @@
-import type { Renderer } from './types';
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
 import builtInRenderer from './builtInRenderer';
 import {
+  UIRenderer,
   Template,
   Size,
   Lang,
@@ -67,7 +67,7 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private rendererRegistry: Renderer = builtInRenderer;
+  private rendererRegistry: UIRenderer = builtInRenderer;
 
   private options = {};
 

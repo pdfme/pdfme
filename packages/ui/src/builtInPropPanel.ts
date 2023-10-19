@@ -1,4 +1,4 @@
-import { PropPanelObject } from './types';
+import { PropPanelObject } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 
 const propPanel: PropPanelObject = {
