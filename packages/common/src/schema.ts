@@ -52,9 +52,7 @@ const CommonOptions = z.object({ font: Font.optional() });
 export const CommonProps = z.object({
   template: Template,
   options: CommonOptions.optional(),
-  plugins: z
-    .record(z.object({ ui: z.function(), pdf: z.function(), propPanel: z.any() }))
-    .optional(),
+  plugins: z.record(z.object({ ui: z.any(), pdf: z.any(), propPanel: z.any() })).optional(),
 });
 
 // -------------------generate-------------------

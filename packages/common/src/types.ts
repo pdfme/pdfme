@@ -102,12 +102,9 @@ export type Template = z.infer<typeof Template>;
 export type CommonProps = z.infer<typeof CommonProps>; // FIXME不要なのでは？
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 
-type Plugins = {
-  plugins?: { [key: string]: Plugin<Schema> };
-};
+type Plugins = { plugins?: { [key: string]: { pdf: any; ui: any; propPanel: any } } };
 export type GenerateProps = z.infer<typeof GenerateProps> & Plugins;
 
-// FIXME 呼び出し元でコンパイルエラーになる
 export type UIProps = z.infer<typeof UIProps> & Plugins;
 export type PreviewProps = z.infer<typeof PreviewProps> & Plugins;
 export type DesignerProps = z.infer<typeof DesignerProps> & Plugins;
