@@ -1,12 +1,5 @@
 import { PropPanelObject } from '@pdfme/common';
-import { text, image, barcodes } from '@pdfme/schemas';
+import { text, image } from '@pdfme/schemas';
 
-const propPanel: PropPanelObject = {
-  text: text.propPanel,
-  image: image.propPanel,
-  ...Object.entries(barcodes).reduce(
-    (acc, [type, barcode]) => Object.assign(acc, { [type]: barcode.propPanel }),
-    {}
-  ),
-};
+const propPanel: PropPanelObject = { text: text.propPanel, image: image.propPanel };
 export default propPanel;
