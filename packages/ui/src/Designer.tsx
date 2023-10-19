@@ -40,10 +40,13 @@ class Designer extends BaseUIClass {
     super(props);
     checkDesignerProps(props);
 
-    // TODO: In the future, when we support custom schemas, we will create the registry using options.propPanel instead of {}.
-    // if(propPanel){
-    //   this.propPanelRegistry = Object.assign(this.propPanelRegistry, propPanel);
-    // }
+    const { plugins = {} } = props;
+
+    const customPropPanel = Object.entries(plugins).reduce(
+      (acc, [key, { propPanel }]) => Object.assign(acc, { [key]: propPanel }),
+      {} as PropPanelObject
+    );
+    this.propPanelRegistry = Object.assign(this.propPanelRegistry, customPropPanel);
 
     this.render();
   }

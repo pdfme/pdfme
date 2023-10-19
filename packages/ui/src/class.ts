@@ -18,6 +18,7 @@ import {
   checkInputs,
   checkUIOptions,
   checkPreviewProps,
+  UIRender,
 } from '@pdfme/common';
 
 const generateColumnsAndSampledataIfNeeded = (template: Template) => {
@@ -85,7 +86,7 @@ export abstract class BaseUIClass {
   constructor(props: UIProps) {
     checkUIProps(props);
 
-    const { domContainer, template, options = {} } = props;
+    const { domContainer, template, options = {}, plugins = {} } = props;
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
     this.options = options;
@@ -102,10 +103,12 @@ export abstract class BaseUIClass {
     if (font) {
       this.font = font;
     }
-    // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
-    // if(renderer){
-    //   this.rendererRegistry = Object.assign(this.rendererRegistry, renderer);
-    // }
+
+    const customRenderer = Object.entries(plugins).reduce(
+      (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
+      {} as UIRender
+    );
+    this.rendererRegistry = Object.assign(this.rendererRegistry, customRenderer);
   }
 
   protected getI18n() {

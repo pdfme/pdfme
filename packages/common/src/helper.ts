@@ -151,6 +151,9 @@ ${message}`);
   if (font) {
     checkFont({ font, template });
   }
+  // FIXME checkPluginがあるべき
+  // checkUIProps, checkDesignerProps, checkGenerateProps　から呼び出される場合、
+  // テンプレートのtypeに対して、pdf, ui, propPanelがあるかどうか、また呼び出し元に応じて何が必要なのか変わるので注意
 };
 
 export const checkInputs = (data: unknown) => checkProps(data, InputsSchema);
