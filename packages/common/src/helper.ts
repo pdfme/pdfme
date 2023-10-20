@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf } from './types';
+import { Schema, Template, Font, BasePdf, Plugins } from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -17,6 +17,8 @@ import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_VALUE,
 } from './constants';
+
+const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
 export const getFallbackFontName = (font: Font) => {
   const initial = '';
@@ -91,8 +93,6 @@ export const b64toUint8Array = (base64: string) => {
   return unit8arr;
 };
 
-const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
-
 const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
   uniq(
     schemas
@@ -128,6 +128,23 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
   }
 };
 
+export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
+  const {
+    plugins,
+    template: { schemas },
+  } = arg;
+  const allSchemaTypes = uniq(schemas.map((s) => Object.values(s).map((v) => v.type)).flat());
+  const pluginsSchemaTypes = Object.keys(plugins);
+
+  if (allSchemaTypes.some((s) => !pluginsSchemaTypes.includes(s))) {
+    throw Error(
+      `${allSchemaTypes
+        .filter((s) => !pluginsSchemaTypes.includes(s))
+        .join()} of template.schemas is not found in plugins.`
+    );
+  }
+};
+
 const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
   try {
     zodSchema.parse(data);
@@ -154,9 +171,13 @@ ${message}`);
     }
   }
 
-  // FIXME checkPluginがあるべき
-  // checkUIProps, checkDesignerProps, checkGenerateProps　から呼び出される場合、
-  // テンプレートのtypeに対して、pdf, ui, propPanelがあるかどうか、また呼び出し元に応じて何が必要なのか変わるので注意
+  // Check plugins if template and plugins exist
+  if (data && typeof data === 'object' && 'template' in data && 'plugins' in data) {
+    const { template, plugins } = data as { template: Template; plugins: Plugins };
+    if (plugins) {
+      checkPlugins({ plugins, template });
+    }
+  }
 };
 
 export const checkInputs = (data: unknown) => checkProps(data, InputsSchema);
