@@ -10,7 +10,6 @@ import {
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,
@@ -22,12 +21,13 @@ import {
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
+export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
 
 type PropPanelProps = {
   rootElement: HTMLDivElement;
   activeSchema: SchemaForUI;
   activeElements: HTMLElement[];
-  changeSchemas: (objs: { key: string; value: any; schemaId: string }[]) => void;
+  changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
   pageSize: Size;
   options: UIOptions;
@@ -74,6 +74,24 @@ export type Plugin<T extends Schema & { [key: string]: any }> = {
   propPanel: PropPanel<T>;
 };
 
+export type Plugins = { [key: string]: Plugin<any> | undefined };
+
+export type PDFRender = (arg: PDFRenderProps<Schema>) => Promise<void>;
+
+export interface PDFRenderer {
+  [key: string]: PDFRender | undefined;
+}
+
+export type UIRender = (arg: UIRenderProps<Schema>) => Promise<void>;
+
+export interface UIRenderer {
+  [key: string]: UIRender | undefined;
+}
+
+export interface PropPanelObject {
+  [key: string]: PropPanel<Schema> | undefined;
+}
+
 export type Lang = z.infer<typeof Lang>;
 export type Size = z.infer<typeof Size>;
 export type Schema = z.infer<typeof Schema>;
@@ -82,12 +100,11 @@ export type SchemaForUI = z.infer<typeof SchemaForUI>;
 export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;
 export type Template = z.infer<typeof Template>;
-export type CommonProps = z.infer<typeof CommonProps>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
-export type GenerateProps = z.infer<typeof GenerateProps>;
+export type GenerateProps = z.infer<typeof GenerateProps> & { plugins?: Plugins };
+export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
+export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
+export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
 export type UIOptions = z.infer<typeof UIOptions>;
-export type UIProps = z.infer<typeof UIProps>;
-export type PreviewProps = z.infer<typeof PreviewProps>;
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
-export type DesignerProps = z.infer<typeof DesignerProps>;
 export type DesignerReactProps = z.infer<typeof DesignerReactProps>;

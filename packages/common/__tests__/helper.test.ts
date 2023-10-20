@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { mm2pt, pt2mm, pt2px, checkFont } from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font } from "../src";
+import { mm2pt, pt2mm, pt2px, checkFont, checkPlugins } from '../src/helper';
+import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -10,7 +10,6 @@ const getSampleFont = (): Font => ({
   SauceHanSansJP: { fallback: true, data: sansData },
   SauceHanSerifJP: { data: serifData },
 });
-
 
 const getTemplate = (): Template => ({
   basePdf: BLANK_PDF,
@@ -204,6 +203,93 @@ describe('checkFont test', () => {
       expect(e.message).toEqual(
         'SauceHanSansJP2,SauceHanSerifJP2 of template.schemas is not found in font.'
       );
+    }
+  });
+});
+
+describe('checkPlugins test', () => {
+  const plugins: Plugins = {
+    myText: {
+      pdf: async () => {},
+      ui: async () => {},
+      propPanel: {
+        propPanelSchema: {},
+        defaultValue: '',
+        defaultSchema: { type: 'myText', position: { x: 0, y: 0 }, width: 100, height: 100 },
+      },
+    },
+    myImage: {
+      pdf: async () => {},
+      ui: async () => {},
+      propPanel: {
+        propPanelSchema: {},
+        defaultValue: '',
+        defaultSchema: { type: 'myImage', position: { x: 0, y: 0 }, width: 100, height: 100 },
+      },
+    },
+  };
+  test('success test: no type in Schemas(no plugins)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas = [];
+      checkPlugins({ template, plugins: {} });
+      expect.anything();
+    } catch (e) {
+      fail();
+    }
+  });
+  test('success test: no type in Schemas(with plugins)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas = [];
+      checkPlugins({ template, plugins });
+      expect.anything();
+    } catch (e) {
+      fail();
+    }
+  });
+  test('success test: type in Schemas(single)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas[0].a.type = 'myText';
+      template.schemas[0].b.type = 'myText';
+      checkPlugins({ template, plugins });
+      expect.anything();
+    } catch (e) {
+      fail();
+    }
+  });
+  test('success test: type in Schemas(multiple)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas[0].a.type = 'myText';
+      template.schemas[0].b.type = 'myImage';
+      checkPlugins({ template, plugins });
+      expect.anything();
+    } catch (e) {
+      fail();
+    }
+  });
+  test('fail test: type in Schemas not found in plugins(single)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas[0].a.type = 'fail';
+      template.schemas[0].b.type = 'myImage';
+      checkPlugins({ template, plugins });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('fail of template.schemas is not found in plugins.');
+    }
+  });
+  test('fail test: type in Schemas not found in plugins(multiple)', () => {
+    try {
+      const template = getTemplate();
+      template.schemas[0].a.type = 'fail';
+      template.schemas[0].b.type = 'fail2';
+      checkPlugins({ template, plugins });
+      fail();
+    } catch (e: any) {
+      expect(e.message).toEqual('fail,fail2 of template.schemas is not found in plugins.');
     }
   });
 });

@@ -11,17 +11,16 @@ import type {
   Lang,
   Size,
   Schema,
-  SchemaForUI,
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,
   UIProps,
   PreviewProps,
   DesignerProps,
+  Plugin,
 } from '@pdfme/common';
 
 export {
@@ -33,19 +32,19 @@ export {
   checkDesignerProps,
   checkGenerateProps,
 };
+
 export type {
   Lang,
   Size,
   Schema,
-  SchemaForUI,
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,
   UIProps,
   PreviewProps,
   DesignerProps,
+  Plugin,
 };

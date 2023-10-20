@@ -1,10 +1,10 @@
-import type { Renderer } from './types';
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
 import builtInRenderer from './builtInRenderer';
 import {
+  UIRenderer,
   Template,
   Size,
   Lang,
@@ -18,6 +18,7 @@ import {
   checkInputs,
   checkUIOptions,
   checkPreviewProps,
+  UIRender,
 } from '@pdfme/common';
 
 const generateColumnsAndSampledataIfNeeded = (template: Template) => {
@@ -67,7 +68,7 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private rendererRegistry: Renderer = builtInRenderer;
+  private rendererRegistry: UIRenderer = builtInRenderer;
 
   private options = {};
 
@@ -85,7 +86,7 @@ export abstract class BaseUIClass {
   constructor(props: UIProps) {
     checkUIProps(props);
 
-    const { domContainer, template, options = {} } = props;
+    const { domContainer, template, options = {}, plugins = {} } = props;
     this.domContainer = domContainer;
     this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
     this.options = options;
@@ -102,10 +103,12 @@ export abstract class BaseUIClass {
     if (font) {
       this.font = font;
     }
-    // TODO: In the future, when we support custom schemas, we will create the registry using options.renderer instead of {}.
-    // if(renderer){
-    //   this.rendererRegistry = Object.assign(this.rendererRegistry, renderer);
-    // }
+
+    const customRenderer = Object.entries(plugins).reduce(
+      (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
+      {} as UIRender
+    );
+    this.rendererRegistry = Object.assign(this.rendererRegistry, customRenderer);
   }
 
   protected getI18n() {

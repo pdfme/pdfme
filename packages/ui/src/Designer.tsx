@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ConfigProvider, ThemeConfig } from 'antd';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
+import { Template, DesignerProps, checkDesignerProps, checkTemplate, PropPanelObject } from '@pdfme/common';
 import { BaseUIClass } from './class';
-import { PropPanelObject } from './types';
 import { DESTROYED_ERR_MSG } from './constants';
 import {
   I18nContext,
@@ -41,10 +40,13 @@ class Designer extends BaseUIClass {
     super(props);
     checkDesignerProps(props);
 
-    // TODO: In the future, when we support custom schemas, we will create the registry using options.propPanel instead of {}.
-    // if(propPanel){
-    //   this.propPanelRegistry = Object.assign(this.propPanelRegistry, propPanel);
-    // }
+    const { plugins = {} } = props;
+
+    const customPropPanel = Object.entries(plugins).reduce(
+      (acc, [key, { propPanel }]) => Object.assign(acc, { [key]: propPanel }),
+      {} as PropPanelObject
+    );
+    this.propPanelRegistry = Object.assign(this.propPanelRegistry, customPropPanel);
 
     this.render();
   }
