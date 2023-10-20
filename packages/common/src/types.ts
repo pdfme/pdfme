@@ -74,7 +74,7 @@ export type Plugin<T extends Schema & { [key: string]: any }> = {
   propPanel: PropPanel<T>;
 };
 
-export type Plugins = { plugins?: { [key: string]: Plugin<Schema & { [key: string]: any }> } };
+export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type PDFRender = (arg: PDFRenderProps<Schema>) => Promise<void>;
 
@@ -101,10 +101,10 @@ export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;
 export type Template = z.infer<typeof Template>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
-export type GenerateProps = z.infer<typeof GenerateProps> & Plugins;
-export type UIProps = z.infer<typeof UIProps> & Plugins;
-export type PreviewProps = z.infer<typeof PreviewProps> & Plugins;
-export type DesignerProps = z.infer<typeof DesignerProps> & Plugins;
+export type GenerateProps = z.infer<typeof GenerateProps> & { plugins?: Plugins };
+export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
+export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
+export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
 export type UIOptions = z.infer<typeof UIOptions>;
 export type PreviewReactProps = z.infer<typeof PreviewReactProps>;
 export type DesignerReactProps = z.infer<typeof DesignerReactProps>;

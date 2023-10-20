@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { mm2pt, pt2mm, pt2px, checkFont, checkPlugins } from '../src/helper';
 import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins } from '../src';
-import { text, image, barcodes } from '../../schemas/src/index';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -209,7 +208,26 @@ describe('checkFont test', () => {
 });
 
 describe('checkPlugins test', () => {
-  const plugins = { text, image, ...barcodes } as Plugins;
+  const plugins: Plugins = {
+    myText: {
+      pdf: async () => {},
+      ui: async () => {},
+      propPanel: {
+        propPanelSchema: {},
+        defaultValue: '',
+        defaultSchema: { type: 'myText', position: { x: 0, y: 0 }, width: 100, height: 100 },
+      },
+    },
+    myImage: {
+      pdf: async () => {},
+      ui: async () => {},
+      propPanel: {
+        propPanelSchema: {},
+        defaultValue: '',
+        defaultSchema: { type: 'myImage', position: { x: 0, y: 0 }, width: 100, height: 100 },
+      },
+    },
+  };
   test('success test: no type in Schemas(no plugins)', () => {
     try {
       const template = getTemplate();
@@ -233,6 +251,8 @@ describe('checkPlugins test', () => {
   test('success test: type in Schemas(single)', () => {
     try {
       const template = getTemplate();
+      template.schemas[0].a.type = 'myText';
+      template.schemas[0].b.type = 'myText';
       checkPlugins({ template, plugins });
       expect.anything();
     } catch (e) {
@@ -242,7 +262,8 @@ describe('checkPlugins test', () => {
   test('success test: type in Schemas(multiple)', () => {
     try {
       const template = getTemplate();
-      template.schemas[0].a.type = 'image';
+      template.schemas[0].a.type = 'myText';
+      template.schemas[0].b.type = 'myImage';
       checkPlugins({ template, plugins });
       expect.anything();
     } catch (e) {
@@ -253,6 +274,7 @@ describe('checkPlugins test', () => {
     try {
       const template = getTemplate();
       template.schemas[0].a.type = 'fail';
+      template.schemas[0].b.type = 'myImage';
       checkPlugins({ template, plugins });
       fail();
     } catch (e: any) {
