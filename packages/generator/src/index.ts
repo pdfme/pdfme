@@ -11,11 +11,9 @@ import type {
   Lang,
   Size,
   Schema,
-  SchemaForUI,
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,
@@ -34,15 +32,14 @@ export {
   checkDesignerProps,
   checkGenerateProps,
 };
+
 export type {
   Lang,
   Size,
   Schema,
-  SchemaForUI,
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,

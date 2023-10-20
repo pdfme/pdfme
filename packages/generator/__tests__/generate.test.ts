@@ -46,7 +46,6 @@ const getPdfPath = (dir: string, fileName: string) =>
 const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
 const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);
 
-// FIXME test
 describe('generate integrate test', () => {
   afterAll(() => {
     const dir = path.join(__dirname, 'assets/pdfs/tmp');

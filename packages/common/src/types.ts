@@ -10,7 +10,6 @@ import {
   Font,
   BasePdf,
   Template,
-  CommonProps,
   GeneratorOptions,
   GenerateProps,
   UIOptions,
@@ -99,7 +98,6 @@ export type SchemaForUI = z.infer<typeof SchemaForUI>;
 export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;
 export type Template = z.infer<typeof Template>;
-export type CommonProps = z.infer<typeof CommonProps>; // FIXME不要なのでは？
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 
 type Plugins = { plugins?: { [key: string]: { pdf: any; ui: any; propPanel: any } } };

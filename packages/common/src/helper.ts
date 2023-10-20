@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf, CommonProps } from './types';
+import { Schema, Template, Font, BasePdf } from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -145,12 +145,15 @@ ERROR MESSAGE: ${issue.message}
 ${message}`);
     }
   }
-  const commonProps = data as CommonProps;
-  const { template, options } = commonProps;
-  const font = options?.font;
-  if (font) {
-    checkFont({ font, template });
+
+  // Check fon if template and options exist
+  if (data && typeof data === 'object' && 'template' in data && 'options' in data) {
+    const { template, options } = data as { template: Template; options: { font?: Font } };
+    if (options && options.font) {
+      checkFont({ font: options.font, template });
+    }
   }
+
   // FIXME checkPluginがあるべき
   // checkUIProps, checkDesignerProps, checkGenerateProps　から呼び出される場合、
   // テンプレートのtypeに対して、pdf, ui, propPanelがあるかどうか、また呼び出し元に応じて何が必要なのか変わるので注意
