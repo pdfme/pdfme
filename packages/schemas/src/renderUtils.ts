@@ -46,7 +46,6 @@ export const convertForPdfLayoutProps = ({
   let y = pageHeight - mm2pt(mmY) - height;
 
   if (rotateDegrees && doRotate) {
-    // console.log('doing pivot rotation');
     // If rotating we must pivot around the same point as the UI performs its rotation.
     // The UI performs rotation around the objects center point (the pivot point below),
     // pdflib rotates around the bottom left corner of the object.
