@@ -1,4 +1,5 @@
 # PDFME
+
 <p>
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
@@ -12,7 +13,7 @@
   <a href="https://npmcharts.com/compare/@pdfme/ui?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/ui.svg" alt="Downloads per month on npm." />
   </a>
-  <a href="https://pdfme.com/development-guide#contribution">
+  <a href="https://pdfme.com/docs/development-guide#contribution">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
@@ -53,7 +54,7 @@ As an example, the author's service [https://labelmake.jp/](https://labelmake.jp
 
 ## Installation
 
-The operating requirements should be the node environment `>=16`.    
+The operating requirements should be the node environment `>=16`.  
 There are two packages in pdfme, generator and UI.
 
 The package for generating PDF can be installed with the following command.
@@ -68,7 +69,7 @@ The packages for using PDF designer, forms and viewers can be installed with the
 npm i @pdfme/ui @pdfme/common
 ```
 
-*You must install `@pdfme/common` regardless of which package you use.
+\*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.
 
@@ -301,5 +302,5 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
 
-If you want to contribute to pdfme, please check the [Development Guide](https://pdfme.com/development-guide) page.  
+If you want to contribute to pdfme, please check the [Development Guide](https://pdfme.com/docs/development-guide) page.  
 We look forward to your contribution!

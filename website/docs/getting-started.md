@@ -12,7 +12,7 @@ As an example, the author's service [https://labelmake.jp/](https://labelmake.jp
 
 ## Installation
 
-The operating requirements should be the node environment `>=16`.    
+The operating requirements should be the node environment `>=16`.  
 There are two packages in pdfme, generator and UI.
 
 The package for generating PDF can be installed with the following command.
@@ -27,7 +27,7 @@ The packages for using PDF designer, forms and viewers can be installed with the
 npm i @pdfme/ui @pdfme/common
 ```
 
-*You must install `@pdfme/common` regardless of which package you use.
+\*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.
 
@@ -258,7 +258,9 @@ const viewer = new Viewer({ domContainer, template, inputs });
 - [bwip-js](https://github.com/metafloor/bwip-js): Used in barcode generation.
 - [zod](https://github.com/colinhacks/zod): Used in Validation.
 
+<!-- FIXME ここにform-renderとAnt Designを追加する -->
+
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
 
-If you want to contribute to pdfme, please check the [Development Guide](/development-guide) page.  
+If you want to contribute to pdfme, please check the [Development Guide](/docs/development-guide) page.  
 We look forward to your contribution!

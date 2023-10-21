@@ -2,8 +2,11 @@
   // This file is not used in compilation. It is here just for a nice editor experience.
   "extends": "@tsconfig/docusaurus/tsconfig.json",
   "target": "ES2015",
-  "include": ["src/"],
+  "include": [
+    "src/"
+  ],
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "skipLibCheck": true,
   }
 }

@@ -1,4 +1,5 @@
 # PDFME
+
 <p>
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
@@ -12,7 +13,7 @@
   <a href="https://npmcharts.com/compare/@pdfme/common?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/common.svg" alt="Downloads per month on npm." />
   </a>
-  <a href="https://pdfme.com/development-guide#contribution">
+  <a href="https://pdfme.com/docs/development-guide#contribution">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
@@ -74,7 +75,7 @@ The packages for using PDF designer, forms and viewers can be installed with the
 npm i @pdfme/ui @pdfme/common
 ```
 
-*You must install `@pdfme/common` regardless of which package you use.
+\*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.
 
@@ -101,7 +102,6 @@ import { Template, Designer, Form, Viewer } from '@pdfme/ui';
 ```
 
 **All objects use `Template`, which will be briefly explained in the next section.**
-
 
 ## Template
 
@@ -308,5 +308,5 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
 
-If you want to contribute to pdfme, please check the [Development Guide](https://pdfme.com/development-guide) page.  
+If you want to contribute to pdfme, please check the [Development Guide](https://pdfme.com/docs/development-guide) page.  
 We look forward to your contribution!

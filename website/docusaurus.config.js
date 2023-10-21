@@ -36,51 +36,6 @@ const config = {
     ],
   ],
   plugins: [
-    // [
-    //   'docusaurus-plugin-typedoc',
-    //   {
-    //     id: 'common',
-    //     out: 'api/common',
-    //     readme: 'none',
-    //     sidebar: {
-    //       categoryLabel: 'common',
-    //       position: 2,
-    //       fullNames: true,
-    //     },
-    //     entryPoints: ['../packages/common/src/index.ts'],
-    //     tsconfig: '../packages/common/tsconfig.esm.json',
-    //   },
-    // ],
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: 'generator',
-        out: 'api/generator',
-        readme: 'none',
-        sidebar: {
-          categoryLabel: 'generator',
-          position: 3,
-          fullNames: true,
-        },
-        entryPoints: ['../packages/generator/src/index.ts'],
-        tsconfig: '../packages/generator/tsconfig.esm.json',
-      },
-    ],
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: 'ui',
-        out: 'api/ui',
-        readme: 'none',
-        sidebar: {
-          categoryLabel: 'ui',
-          position: 4,
-          fullNames: true,
-        },
-        entryPoints: ['../packages/ui/src/index.ts'],
-        tsconfig: '../packages/ui/tsconfig.json',
-      },
-    ],
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',
@@ -102,110 +57,110 @@ const config = {
     },
   ],
   themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    {
-      announcementBar: {
-        id: 'support_us',
-        content: `⭐️  &nbsp; If you like pdfme, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme">GitHub</a>! &nbsp; ⭐️`,
-      },
-      image: 'img/ogimage.png',
-      docs: {
-        sidebar: {
-          hideable: true,
-        },
-      },
-      hideOnScroll: true,
-      navbar: {
-        title: 'pdfme',
-        items: [
-          {
-            type: 'doc',
-            docId: 'getting-started',
-            position: 'right',
-            label: 'Docs',
-          },
-          {
-            to: '/demo',
-            position: 'right',
-            label: 'Demo Apps',
-          },
-          {
-            to: '/template-design',
-            position: 'right',
-            label: 'Template Design',
-          },
-          {
-            to: '/development-guide',
-            position: 'right',
-            label: 'Development Guide',
-          },
-          {
-            href: 'https://github.com/pdfme/pdfme',
-            label: 'GitHub',
-            position: 'right',
-          },
-          {
-            href: 'https://discord.gg/xWPTJbmgNV',
-            label: 'Discord',
-            position: 'right',
-          },
-        ],
-      },
-      footer: {
-        style: 'dark',
-        links: [
-          {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Getting Started',
-                to: '/docs/getting-started',
-              },
-            ],
-          },
-          {
-            title: 'More',
-            items: [
-              {
-                label: 'Demo Apps',
-                to: '/demo',
-              },
-              {
-                label: 'Template Design',
-                to: '/template-design',
-              },
-              {
-                label: 'Development Guide',
-                to: '/development-guide',
-              },
-            ],
-          },
-          {
-            title: 'Community',
-            items: [
-              {
-                label: 'Github',
-                href: 'https://github.com/pdfme/pdfme',
-              },
-              {
-                label: 'Discord',
-                href: 'https://discord.gg/xWPTJbmgNV',
-              },
-            ],
-          },
-        ],
-        copyright: `Copyright © ${new Date().getFullYear()} pdfme`,
-      },
-      prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
-      },
-      algolia: {
-        appId: 'V6YWG1D4SV',
-        apiKey: '873346e96f9110d660c39fd1edd7eb17',
-        indexName: 'pdfme',
+  /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
+  {
+    announcementBar: {
+      id: 'support_us',
+      content: `⭐️  &nbsp; If you like pdfme, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme">GitHub</a>! &nbsp; ⭐️`,
+    },
+    image: 'img/ogimage.png',
+    docs: {
+      sidebar: {
+        hideable: true,
       },
     },
+    hideOnScroll: true,
+    navbar: {
+      title: 'pdfme',
+      items: [
+        {
+          type: 'doc',
+          docId: 'getting-started',
+          position: 'right',
+          label: 'Docs',
+        },
+        {
+          to: '/demo',
+          position: 'right',
+          label: 'Demo Apps',
+        },
+        {
+          to: '/template-design',
+          position: 'right',
+          label: 'Template Design',
+        },
+        {
+          to: '/docs/development-guide',
+          position: 'right',
+          label: 'Development Guide',
+        },
+        {
+          href: 'https://github.com/pdfme/pdfme',
+          label: 'GitHub',
+          position: 'right',
+        },
+        {
+          href: 'https://discord.gg/xWPTJbmgNV',
+          label: 'Discord',
+          position: 'right',
+        },
+      ],
+    },
+    footer: {
+      style: 'dark',
+      links: [
+        {
+          title: 'Docs',
+          items: [
+            {
+              label: 'Getting Started',
+              to: '/docs/getting-started',
+            },
+          ],
+        },
+        {
+          title: 'More',
+          items: [
+            {
+              label: 'Demo Apps',
+              to: '/demo',
+            },
+            {
+              label: 'Template Design',
+              to: '/template-design',
+            },
+            {
+              label: 'Development Guide',
+              to: '/docs/development-guide',
+            },
+          ],
+        },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'Github',
+              href: 'https://github.com/pdfme/pdfme',
+            },
+            {
+              label: 'Discord',
+              href: 'https://discord.gg/xWPTJbmgNV',
+            },
+          ],
+        },
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} pdfme`,
+    },
+    prism: {
+      theme: lightCodeTheme,
+      darkTheme: darkCodeTheme,
+    },
+    algolia: {
+      appId: 'V6YWG1D4SV',
+      apiKey: '873346e96f9110d660c39fd1edd7eb17',
+      indexName: 'pdfme',
+    },
+  },
 };
 
 module.exports = config;

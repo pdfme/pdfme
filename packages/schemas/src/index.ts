@@ -1,7 +1,5 @@
-import textSchema from './text';
-import imageSchema from './image';
-import barcodesSchemaObj from './barcodes';
+import text from './text';
+import image from './image';
+import barcodes from './barcodes';
 
-export const text = textSchema;
-export const image = imageSchema;
-export const barcodes = barcodesSchemaObj;
+export { text, image, barcodes };
