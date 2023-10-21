@@ -1,5 +1,5 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
-import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName } from '@pdfme/common';
+import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import {
   VERTICAL_ALIGN_TOP,
@@ -20,13 +20,7 @@ import {
   getSplittedLines,
   widthOfTextAtSize,
 } from './helper';
-import {
-  hex2RgbColor,
-  calcX,
-  calcY,
-  renderBackgroundColor,
-  convertSchemaDimensionsToPt,
-} from '../renderUtils';
+import { convertForPdfLayoutProps, hex2RgbColor, rotatePoint } from '../renderUtils';
 
 const embedAndGetFontObjCache = new WeakMap();
 const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
@@ -99,9 +93,17 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const pdfFontValue = pdfFontObj[fontName];
 
   const pageHeight = page.getHeight();
-  renderBackgroundColor({ schema, page, pageHeight });
+  const {
+    width,
+    height,
+    rotate,
+    position: { x, y },
+  } = convertForPdfLayoutProps({ schema, pageHeight, doRotate: false });
 
-  const { width, height, rotate } = convertSchemaDimensionsToPt(schema);
+  if (schema.backgroundColor) {
+    const color = hex2RgbColor(schema.backgroundColor as string);
+    page.drawRectangle({ x, y, width, height, rotate, color });
+  }
 
   page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing ?? DEFAULT_CHARACTER_SPACING));
 
@@ -117,7 +119,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   };
 
   let lines: string[] = [];
-  value.split(/\r|\n|\r\n/g).forEach((line) => {
+  value.split(/\r|\n|\r\n/g).forEach((line: string) => {
     lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
   });
 
@@ -136,13 +138,32 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
   }
 
+  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+
   lines.forEach((line, rowIndex) => {
     const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
+    let xLine = x;
+    if (alignment === 'center') {
+      xLine += (width - textWidth) / 2;
+    } else if (alignment === 'right') {
+      xLine += width - textWidth;
+    }
+
+    let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
+
+    if (rotate.angle !== 0) {
+      // As we draw each line individually from different points, we must translate each lines position
+      // relative to the UI rotation pivot point. see comments in convertForPdfLayoutProps() for more info.
+      const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
+      xLine = rotatedPoint.x;
+      yLine = rotatedPoint.y;
+    }
+
     page.drawText(line, {
-      x: calcX(schema.position.x, alignment, width, textWidth),
-      y: calcY(schema.position.y, pageHeight, yOffset) - rowYOffset,
+      x: xLine,
+      y: yLine,
       rotate,
       size: fontSize,
       color,

@@ -7,9 +7,10 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { OnDrag, OnResize, OnClick } from 'react-moveable';
+import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import type { ChangeSchemas } from '../../../types';
 import { RULER_HEIGHT } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';

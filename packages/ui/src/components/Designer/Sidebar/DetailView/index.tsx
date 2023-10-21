@@ -93,6 +93,7 @@ const DetailView = (
       },
       width: { title: 'Width', type: 'number', widget: 'inputNumber' },
       height: { title: 'Height', type: 'number', widget: 'inputNumber' },
+      rotate: { title: 'Rotate', type: 'number', widget: 'inputNumber', span: 8, max: 360, min: 0 },
     },
   };
 

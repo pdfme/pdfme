@@ -23,6 +23,7 @@ const Wrapper = ({
       width: schema.width * ZOOM,
       top: schema.position.y * ZOOM,
       left: schema.position.x * ZOOM,
+      transform: `rotate(${schema.rotate ?? 0}deg)`,
       outline,
     }}
   >
