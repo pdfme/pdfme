@@ -87,13 +87,14 @@ The following type, function and classes are available in pdfme.
 
 If your environment uses webpack, import the necessary items as shown below.
 
-```ts
-import { Template, generate } from '@pdfme/generator';
-```
+````ts
+import type { Template } from '@pdfme/common';
+import { generate } from '@pdfme/generator';```
 
 ```ts
-import { Template, Designer, Form, Viewer } from '@pdfme/ui';
-```
+import type { Template } from '@pdfme/common';
+import {  Designer, Form, Viewer } from '@pdfme/ui';
+````
 
 **All objects use `Template`, which will be briefly explained in the next section.**
 
@@ -126,8 +127,7 @@ Let's take a look at some specific data.
 ### Minimal Template
 
 ```ts
-import { Template, BLANK_PDF } from '@pdfme/generator';
-// import { Template, BLANK_PDF } from '@pdfme/ui'; <- Template types and BLANK_PDF can also be imported from @pdfme/ui.
+import { Template, BLANK_PDF } from '@pdfme/common';
 
 const template: Template = {
   basePdf: BLANK_PDF,
@@ -156,8 +156,6 @@ const template: Template = {
 };
 ```
 
-[For more information, please refer to the API documentation of the Template type here](https://pdfme.com/docs/api/common/#template).
-
 You can create a template from [Template Design page](https://pdfme.com/template-design). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](https://pdfme.com/docs/getting-started#designer).
 
 ## Generator
@@ -167,7 +165,8 @@ The PDF generator function, `generate`, takes 2 arguments of `template` and `inp
 The code to generate a PDF file using the [template created above](https://pdfme.com/docs/getting-started#sample-template) is shown below.
 
 ```ts
-import { Template, generate } from '@pdfme/generator';
+import type { Template } from '@pdfme/common';
+import { generate } from '@pdfme/generator';
 
 const template: Template = {
   // skip...　Check the Template section.
@@ -192,9 +191,9 @@ You can create a PDF file like the below.
 
 Also, each element in the inputs array corresponds to a page in the PDF, you can create a multi-page PDF file by providing multiple elements of inputs.
 
-[For more information, please refer to the API documentation of the generate function here](https://pdfme.com/docs/api/generator/#generate).
-
 ## UI
+
+The UI is composed of the Designer, Form, and Viewer classes.
 
 ### Designer
 
@@ -205,7 +204,8 @@ You can design your own template from [Template Design page](https://pdfme.com/t
 Let's integrate the designer using the template created above as the default template.
 
 ```ts
-import { Template, Designer } from '@pdfme/ui';
+import type { Template } from '@pdfme/common';
+import { Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -229,8 +229,6 @@ The designer instance can be manipulated with the following methods.
 - `onSaveTemplate`
 - `destroy`
 
-[For more information, please refer to the API documentation of the Designer class here](https://pdfme.com/docs/api/ui/classes/Designer).
-
 ### Form
 
 You can use templates to create forms and PDF viewers.
@@ -238,7 +236,8 @@ You can use templates to create forms and PDF viewers.
 The Form creates a UI for the user to enter schemas based on the template.
 
 ```ts
-import { Template, Form } from '@pdfme/ui';
+import type { Template } from '@pdfme/common';
+import { Form } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -263,8 +262,6 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 });
 ```
 
-[For more information, please refer to the API documentation of the Form class here](https://pdfme.com/docs/api/ui/classes/Form).
-
 ### Viewer
 
 Viewing a PDF file in a mobile browser is a pain, because it doesn't display well in an iframe.
@@ -274,7 +271,8 @@ The Viewer is a byproduct of the Form development process, but it allows you to 
 Using the Viewer is basically the same as using the Form, except that user cannot edit it.
 
 ```ts
-import { Template, Viewer } from '@pdfme/ui';
+import type { Template } from '@pdfme/common';
+import { Viewer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
@@ -286,8 +284,6 @@ const viewer = new Viewer({ domContainer, template, inputs });
 ```
 
 ![](https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/viewer.png)
-
-[For more information, please refer to the API documentation of the Viewer class here](https://pdfme.com/docs/api/ui/classes/Viewer).
 
 ## Special Thanks
 

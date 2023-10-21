@@ -90,11 +90,6 @@ const config = {
           label: 'Template Design',
         },
         {
-          to: '/docs/development-guide',
-          position: 'right',
-          label: 'Development Guide',
-        },
-        {
           href: 'https://github.com/pdfme/pdfme',
           label: 'GitHub',
           position: 'right',
@@ -128,10 +123,6 @@ const config = {
             {
               label: 'Template Design',
               to: '/template-design',
-            },
-            {
-              label: 'Development Guide',
-              to: '/docs/development-guide',
             },
           ],
         },
