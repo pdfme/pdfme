@@ -98,7 +98,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     height,
     rotate,
     position: { x, y },
-  } = convertForPdfLayoutProps({ schema, pageHeight, doRotate: false });
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
   if (schema.backgroundColor) {
     const color = hex2RgbColor(schema.backgroundColor as string);

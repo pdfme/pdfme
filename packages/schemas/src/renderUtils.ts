@@ -29,11 +29,11 @@ export const hex2RgbColor = (hexString: string | undefined) => {
 export const convertForPdfLayoutProps = ({
   schema,
   pageHeight,
-  doRotate = true,
+  applyRotateTranslate = true,
 }: {
   schema: Schema;
   pageHeight: number;
-  doRotate?: boolean;
+  applyRotateTranslate?: boolean;
 }) => {
   const { width: mmWidth, height: mmHeight, position, rotate } = schema;
   const { x: mmX, y: mmY } = position;
@@ -45,7 +45,7 @@ export const convertForPdfLayoutProps = ({
   // PDF coordinate system is from bottom left, UI is top left, so we need to flip the y axis
   let y = pageHeight - mm2pt(mmY) - height;
 
-  if (rotateDegrees && doRotate) {
+  if (rotateDegrees && applyRotateTranslate) {
     // If rotating we must pivot around the same point as the UI performs its rotation.
     // The UI performs rotation around the objects center point (the pivot point below),
     // pdflib rotates around the bottom left corner of the object.
