@@ -76,6 +76,9 @@ A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it 
 
 **schemas** currently has the following types of data available
 
+<!-- デフォルトはtextしか入っていないのでimageやbarcodesが欲しい場合はschemasパッケージをインストールし設定でしたり、自分で作ることができることを書く -->
+<!-- FIXME custom-schemasへのリンクを追加する -->
+
 - text
 - image
 - Various types of barcodes
@@ -254,7 +257,6 @@ const viewer = new Viewer({ domContainer, template, inputs });
 - [antd](https://ant.design/): Used in building the UI.
 - [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): Used in Designer UI.
 - [dnd-kit](https://github.com/clauderic/dnd-kit): Used in Designer UI.
-- [bwip-js](https://github.com/metafloor/bwip-js): Used in barcode generation.
 
 I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
 

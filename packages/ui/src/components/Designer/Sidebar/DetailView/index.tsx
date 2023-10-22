@@ -71,7 +71,7 @@ const DetailView = (
     type: 'object',
     column: 2,
     properties: {
-      type: {
+      type: { // FIXME textだけ(Object.keys(propPanelRegistry)が1つだけの場合)の場合はreadonlyでいいかも
         title: 'Type',
         type: 'string',
         widget: 'select',
@@ -122,14 +122,18 @@ const DetailView = (
         <span
           style={{
             position: 'absolute',
+            top: '0.75rem',
             zIndex: 100,
             border: 'none',
             borderRadius: 2,
             padding: '0.5rem',
             cursor: 'pointer',
             background: '#eee',
-            width: 14,
-            height: 14,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: 30,
+            maxHeight: 30,
           }}
           onClick={deselectSchema}
         >

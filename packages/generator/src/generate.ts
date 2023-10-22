@@ -34,7 +34,7 @@ const generate = async (props: GenerateProps) => {
     (acc, [key, { pdf }]) => Object.assign(acc, { [key]: pdf }),
     {} as PDFRenderer
   );
-  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer);
+  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer); // FIXME ここだけじゃないが Object.assignじゃなくて既存のレンダラーを置き換えてもいいでのは？
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {

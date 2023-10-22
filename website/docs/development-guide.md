@@ -40,9 +40,12 @@ As we aim for the release of the next version, given our limited resources, we a
   - [Custom Schema Plugin](https://github.com/pdfme/pdfme/issues/213)
     - Allow users to create custom schemas and define PDF and wysiwyg rendering from the outside.
     - Currently built-in schemas will be packaged separately, and improvements will be made individually.
-  - Custom Design for UI
+  - [Custom Design for UI](https://github.com/pdfme/pdfme/issues/243)
     - Allow changes to the accent color (currently it's light blue)
     - Add class names to each UI component to allow customization from the outside.
+  - [Custom Label for UI](https://github.com/pdfme/pdfme/issues/107)
+    - Allow users to change the label of the UI component from the outside.
+    - Overwrite the any language label with the user's own label
 
 ## Need technical support?
 
