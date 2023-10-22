@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import {
   ChangeCircleOutlined,
   UploadFileOutlined,
@@ -6,8 +7,9 @@ import {
   CodeOutlined,
   PreviewOutlined,
 } from '@mui/icons-material';
-import { generate, Template } from '@pdfme/generator';
-import { Designer } from '@pdfme/ui';
+import type { Template } from '@pdfme/common';
+import { generate } from '@pdfme/generator';
+import type { Designer } from '@pdfme/ui';
 import Layout from '@theme/Layout';
 import {
   getSampleTemplate,
@@ -57,9 +59,11 @@ const TemplateDesign = () => {
 
   useEffect(() => {
     if (designerRef.current) {
-      designer.current = new Designer({ domContainer: designerRef.current, template });
-      designer.current.onSaveTemplate(downloadTemplate);
-      designer.current.onChangeTemplate(setTemplate);
+      import('@pdfme/ui').then(({ Designer }) => {
+        designer.current = new Designer({ domContainer: designerRef.current, template });
+        designer.current.onSaveTemplate(downloadTemplate);
+        designer.current.onChangeTemplate(setTemplate);
+      })
     }
     return () => {
       designer.current.destroy();
@@ -259,10 +263,12 @@ ${e}`);
         )}
       </div>
 
-      <div
-        ref={designerRef}
-        style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
-      />
+      <BrowserOnly>
+        {() => <div
+          ref={designerRef}
+          style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
+        />}
+      </BrowserOnly>
 
       <DesignerCodeModal
         code={code}

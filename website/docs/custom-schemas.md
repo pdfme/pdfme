@@ -75,4 +75,11 @@ By loading image and qrcode as plugins, you can render schemas of type image and
 
 ## Creating Your Own Schemas
 
-<!-- FIXME from here  -->
+<!--
+FIXME from here
+
+まずは pdf, ui, propPanel の概念を説明する
+
+
+
+-->

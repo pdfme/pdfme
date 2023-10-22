@@ -20,7 +20,7 @@ type Props = {
   templateItems: { id: string; jsonUrl: string; imgUrl: string }[];
 };
 
-const DemoApp = (props: Props) => {
+const DemoAppGrid = (props: Props) => {
   const { title, description, thumbnail, templateItems } = props;
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templateItems[0].id);
@@ -129,4 +129,4 @@ const DemoApp = (props: Props) => {
   );
 };
 
-export default DemoApp;
+export default DemoAppGrid;
