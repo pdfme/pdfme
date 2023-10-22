@@ -74,7 +74,7 @@ exports[`Designer snapshot 1`] = `
         style="position: sticky; top: 0px; z-index: 1; font-size: 1rem;"
       >
         <button
-          style="position: absolute; top: 1.75rem; right: 0.5rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px; height: 30px;"
+          style="position: absolute; top: 1.75rem; right: 1rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px; height: 30px;"
           type="button"
         >
           <svg
@@ -421,16 +421,7 @@ exports[`Designer snapshot 1`] = `
             >
               <div
                 style="height: 100%; width: 100%;"
-              >
-                <div
-                  style="width: 100%; height: 100%; background-image: none; background-size: 377.95275591px 151.181102364px;"
-                >
-                  <img
-                    src="aaaaaaaaaaaa"
-                    style="height: 100%; width: 100%; border-radius: 0;"
-                  />
-                </div>
-              </div>
+              />
             </div>
           </div>
         </div>
