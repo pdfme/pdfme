@@ -2,7 +2,9 @@
 
 pdfme uses the [Roboto Regular 400](https://fonts.google.com/specimen/Roboto) font by default, but you can use any font you like.
 
-<!-- FIXME 日本語など、Robotoに収録されていない文字は文字化けすることも書く -->
+To prioritize design, you can use your favorite fonts, and if you're using characters not included in the default Roboto font, such as Japanese or Chinese characters, they will be rendered as [Tofu](https://fonts.google.com/knowledge/glossary/tofu) in the PDF.
+
+You can use this feature to solve those issues.
 
 ## About Font type
 

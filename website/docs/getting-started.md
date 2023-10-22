@@ -74,14 +74,9 @@ The following image is a good illustration of a template.
 **basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`.  
 A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it works.
 
-**schemas** currently has the following types of data available
-
-<!-- デフォルトはtextしか入っていないのでimageやbarcodesが欲しい場合はschemasパッケージをインストールし設定でしたり、自分で作ることができることを書く -->
-<!-- FIXME custom-schemasへのリンクを追加する -->
-
-- text
-- image
-- Various types of barcodes
+**schemas** can only utilize text by default, but you can load images and various barcodes like QR codes as plugins from the `@pdfme/schemas` package.  
+Additionally, you can create your own schemas, allowing you to render types other than the ones mentioned above.  
+Check detail about [Custom Schemas](/docs/custom-schemas) from here
 
 Let's take a look at some specific data.  
 (If you are using TypeScript, you can import the Template type.)

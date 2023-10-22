@@ -71,7 +71,7 @@ const DetailView = (
     type: 'object',
     column: 2,
     properties: {
-      type: { // FIXME textだけ(Object.keys(propPanelRegistry)が1つだけの場合)の場合はreadonlyでいいかも
+      type: {
         title: 'Type',
         type: 'string',
         widget: 'select',

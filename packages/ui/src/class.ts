@@ -18,7 +18,6 @@ import {
   checkInputs,
   checkUIOptions,
   checkPreviewProps,
-  UIRender,
 } from '@pdfme/common';
 
 const generateColumnsAndSampledataIfNeeded = (template: Template) => {
@@ -106,7 +105,7 @@ export abstract class BaseUIClass {
 
     const customRenderer = Object.entries(plugins).reduce(
       (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
-      {} as UIRender
+      {} as UIRenderer
     );
     this.rendererRegistry = Object.assign(this.rendererRegistry, customRenderer);
   }

@@ -47,8 +47,7 @@ export const Template = z.object({
 
 export const Inputs = z.array(z.record(z.string())).min(1);
 
-// FIXME fontだけじゃなく他の値も自由に入れられるようにする
-const CommonOptions = z.object({ font: Font.optional() });
+const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 
 const CommonProps = z.object({
   template: Template,

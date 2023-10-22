@@ -30,11 +30,12 @@ const generate = async (props: GenerateProps) => {
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
 
-  const customRenderer = Object.entries<PDFRenderer>(plugins).reduce(
+  const customRenderer = Object.entries(plugins).reduce(
     (acc, [key, { pdf }]) => Object.assign(acc, { [key]: pdf }),
     {} as PDFRenderer
   );
-  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer); // FIXME ここだけじゃないが Object.assignじゃなくて既存のレンダラーを置き換えてもいいでのは？
+  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer);
+
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {

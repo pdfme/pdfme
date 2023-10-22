@@ -1,5 +1,5 @@
 import { PropPanelObject } from '@pdfme/common';
-import { text, image } from '@pdfme/schemas';
+import { text } from '@pdfme/schemas';
 
-const propPanel: PropPanelObject = { text: text.propPanel, image: image.propPanel };
+const propPanel: PropPanelObject = { text: text.propPanel };
 export default propPanel;
