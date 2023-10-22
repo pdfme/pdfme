@@ -3,7 +3,7 @@ import * as path from 'path';
 import generate from '../src/generate';
 import templateData from './assets/templates';
 import { Template, Font, BLANK_PDF, Schema } from '@pdfme/common';
-import { barcodes } from '@pdfme/schemas';
+import { barcodes, image } from '@pdfme/schemas';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PDFParser = require('pdf2json');
@@ -158,7 +158,7 @@ describe('generate integrate test', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { ...barcodes },
+          plugins: { ...barcodes, image },
           options: { font },
         });
 
