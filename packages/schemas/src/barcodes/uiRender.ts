@@ -72,8 +72,8 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);
-  const isEditable = mode === 'form' || mode === 'designer';
-  if (isEditable) {
+  const editable = mode === 'form' || mode === 'designer';
+  if (editable) {
     const input = document.createElement('input');
     const inputStyle: CSS.Properties = {
       ...fullSize,
@@ -81,7 +81,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
       textAlign: 'center',
       fontSize: '1rem',
       color: '#000',
-      backgroundColor: isEditable || value ? 'rgb(242 244 255 / 75%)' : 'none',
+      backgroundColor: editable || value ? 'rgb(242 244 255 / 75%)' : 'none',
       border: 'none',
       display: 'flex',
       alignItems: 'center',
