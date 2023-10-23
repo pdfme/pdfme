@@ -79,5 +79,7 @@ By loading image and qrcode as plugins, you can render schemas of type image and
 FIXME from here
 
 まずは pdf, ui, propPanel の概念を説明する
+また、uiのモードについても説明する
+  基本的にフォームと同じだが、designerの時はレンダリング時にフォーカスをするようにしたりすることができる
 
 -->

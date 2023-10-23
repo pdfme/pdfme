@@ -58,7 +58,7 @@ export interface PDFRenderProps<T extends Schema> {
 
 export type UIRenderProps<T extends Schema> = {
   schema: SchemaForUI & T;
-  mode: 'viewer' | 'form';
+  mode: 'viewer' | 'form' | 'designer';
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
