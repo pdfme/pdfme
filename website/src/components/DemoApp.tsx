@@ -51,7 +51,7 @@ const DemoApp = (props: Props) => {
     const t0 = performance.now();
     const pdf = await generate({
       template,
-      plugins: { text, image, qrcode: barcodes.qrcode },
+      plugins: { text, image, ...barcodes },
       inputs,
       options: { font }
     });
