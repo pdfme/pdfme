@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Template } from '@pdfme/common';
 import type { Form, Viewer } from '@pdfme/ui';
+import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont } from './libs/helper';
 
 const useForceUpdate = () => {
@@ -22,10 +23,12 @@ export const useForm = (props: {
         form.current = new Form({
           domContainer: formRef.current,
           template,
+          plugins: { text, image, ...barcodes },
           inputs: [{}],
           options: { font },
         });
         form.current.onChangeInput(forceUpdate);
+        forceUpdate();
       });
     } else if (form.current && template) {
       form.current?.updateTemplate(template);
@@ -51,9 +54,11 @@ export const useViewer = (props: {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
           template,
+          plugins: { text, image, ...barcodes },
           inputs: [{}],
           options: { font },
         });
+        forceUpdate();
       });
     } else if (viewer.current && template) {
       viewer.current?.updateTemplate(template);

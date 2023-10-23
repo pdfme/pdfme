@@ -9,6 +9,7 @@ import {
 import type { Template } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 import type { Designer } from '@pdfme/ui';
+import { text, image, barcodes } from '@pdfme/schemas';
 import Layout from '@theme/Layout';
 import {
   getSampleTemplate,
@@ -59,7 +60,11 @@ const TemplateDesign = () => {
   useEffect(() => {
     if (designerRef.current) {
       import('@pdfme/ui').then(({ Designer }) => {
-        designer.current = new Designer({ domContainer: designerRef.current, template });
+        designer.current = new Designer({
+          domContainer: designerRef.current,
+          template,
+          plugins: { text, image, qrcode: barcodes.qrcode },
+        });
         designer.current.onSaveTemplate(downloadTemplate);
         designer.current.onChangeTemplate(setTemplate);
       })
@@ -94,7 +99,11 @@ ${e}`);
 
   const generatePdf = async () => {
     const inputs = template.sampledata ?? [];
-    const pdf = await generate({ template, inputs });
+    const pdf = await generate({
+      template,
+      plugins: { text, image, qrcode: barcodes.qrcode },
+      inputs
+    });
     const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
     window.open(URL.createObjectURL(blob));
   };

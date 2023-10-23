@@ -5,6 +5,7 @@ import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, deNormalizeDatas, normalizeDatas } from '../libs/helper';
 import { useViewer } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
@@ -53,7 +54,12 @@ const DemoAppGrid = (props: Props) => {
     const font = await getFont();
 
     const t0 = performance.now();
-    const pdf = await generate({ template, inputs, options: { font } });
+    const pdf = await generate({
+      template,
+      plugins: { text, image, qrcode: barcodes.qrcode },
+      inputs,
+      options: { font }
+    });
     const t1 = performance.now();
 
     setPdfCreationTime(t1 - t0);

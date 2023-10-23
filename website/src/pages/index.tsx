@@ -8,6 +8,7 @@ import Divider from '../components/Divider';
 import Code from '../components/Code';
 import GithubStar from '../components/GithubStar';
 import type { Template } from '@pdfme/common';
+import { text, image, barcodes } from '@pdfme/schemas';
 import { generate } from '@pdfme/generator';
 import type { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
@@ -46,6 +47,7 @@ export default function Home(): JSX.Element {
         designer.current = new Designer({
           domContainer: designerRef.current,
           template,
+          plugins: { text, image, qrcode: barcodes.qrcode },
         });
 
         designer.current.onSaveTemplate(onSaveTemplate);
@@ -63,6 +65,7 @@ export default function Home(): JSX.Element {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
           template,
+          plugins: { text, image, qrcode: barcodes.qrcode },
           inputs: cloneDeep(template.sampledata ?? [{}]),
         });
       });
@@ -74,6 +77,7 @@ export default function Home(): JSX.Element {
         form.current = new Form({
           domContainer: formRef.current,
           template,
+          plugins: { text, image, qrcode: barcodes.qrcode },
           inputs: cloneDeep(template.sampledata ?? [{}]),
         });
 

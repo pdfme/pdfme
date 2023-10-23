@@ -147,13 +147,15 @@ const templateFmt4SampleCode = (template: Template) =>
   );
 
 export const getGeneratorSampleCode = (template: Template) =>
-  `import { generate } from "@pdfme/generator";
+  `import { text, image, barcodes } from "@pdfme/schemas";
+import { generate } from "@pdfme/generator";
 
 (async () => {
   const template = ${templateFmt4SampleCode(template)};
+  const plugins = { text, image, qrcode: barcodes.qrcode };
   const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
-  const pdf = await generate({ template, inputs });
+  const pdf = await generate({ template, plugins, inputs });
 
   // Node.js
   // fs.writeFileSync(path.join(__dirname, 'test.pdf'), pdf);
@@ -164,30 +166,36 @@ export const getGeneratorSampleCode = (template: Template) =>
 })();`.trim();
 
 export const getDesignerSampleCode = (template: Template) =>
-  `import { Designer } from "@pdfme/ui";
+  `import { text, image, barcodes } from "@pdfme/schemas";
+import { Designer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
+const plugins = { text, image, qrcode: barcodes.qrcode };
 
-const designer = new Designer({ domContainer, template });`.trim();
+const designer = new Designer({ domContainer, template, plugins });`.trim();
 
 export const getFormSampleCode = (template: Template) =>
-  `import { Form } from "@pdfme/ui";
+  `import { text, image, barcodes } from "@pdfme/schemas";
+import { Form } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
+const plugins = { text, image, qrcode: barcodes.qrcode };
 const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
-const form = new Form({ domContainer, template, inputs });`.trim();
+const form = new Form({ domContainer, template, plugins, inputs });`.trim();
 
 export const getViewerSampleCode = (template: Template) =>
-  `import { Viewer } from "@pdfme/ui";
+  `import { text, image, barcodes } from "@pdfme/schemas";
+import { Viewer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
+const plugins = { text, image, qrcode: barcodes.qrcode };
 const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
-const viewer = new Viewer({ domContainer, template });`.trim();
+const viewer = new Viewer({ domContainer, template, plugins });`.trim();
 
 const fonts = ['Roboto-Regular', 'PinyonScript-Regular'];
 export const getFont = () =>
