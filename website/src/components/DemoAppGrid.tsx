@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { generate, Template, BLANK_PDF, checkTemplate } from '@pdfme/generator';
+import { Template, checkTemplate } from '@pdfme/common';
+import { generate } from '@pdfme/generator';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
@@ -24,7 +25,7 @@ const DemoAppGrid = (props: Props) => {
   const { title, description, thumbnail, templateItems } = props;
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templateItems[0].id);
-  const [template, setTemplate] = useState<Template>({ basePdf: BLANK_PDF, schemas: [] });
+  const [template, setTemplate] = useState<Template | null>(null);
   const [datas, setDatas] = React.useState<{ [key: string]: string }[]>([]);
   const [pdfCreationTime, setPdfCreationTime] = useState(0);
   const viewer = useViewer({ viewerRef, template });
@@ -100,6 +101,7 @@ const DemoAppGrid = (props: Props) => {
                     datas={datas}
                     setDatas={(value) => {
                       setDatas(value);
+                      if (!template) return;
                       viewer?.setInputs(normalizeDatas(value, template));
                     }}
                   />

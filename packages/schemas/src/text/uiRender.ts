@@ -129,7 +129,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textarea.value = value;
     container.appendChild(textarea);
     textarea.setSelectionRange(value.length, value.length);
-    textarea.focus();
+    textarea.focus(); // FIXME これがwebsiteのデザイナーを変更した時にスクロールする問題に関係しているのでは？
   } else {
     const div = document.createElement('div');
     const divStyle: CSS.Properties = {

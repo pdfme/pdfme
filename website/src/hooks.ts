@@ -1,28 +1,37 @@
-import { useEffect, useRef } from 'react';
-import { Form, Viewer, Template } from '@pdfme/ui';
-import { getFont, cloneDeep } from './libs/helper';
+import { useEffect, useRef, useState } from 'react';
+import { Template } from '@pdfme/common';
+import type { Form, Viewer } from '@pdfme/ui';
+import { getFont } from './libs/helper';
+
+const useForceUpdate = () => {
+  const [, forceUpdate] = useState(0);
+  return () => forceUpdate((s) => s + 1);
+};
 
 export const useForm = (props: {
   formRef: React.MutableRefObject<HTMLDivElement>;
-  template: Template;
+  template: Template | null;
 }) => {
   const { formRef, template } = props;
   const form = useRef<Form | null>(null);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    if (formRef.current && form.current === null) {
-      getFont().then((font) => {
+    if (formRef.current && form.current === null && template) {
+      Promise.all([import('@pdfme/ui'), getFont()]).then(([{ Form }, font]) => {
         form.current = new Form({
           domContainer: formRef.current,
           template,
           inputs: [{}],
           options: { font },
         });
+        form.current.onChangeInput(forceUpdate);
       });
-    } else {
-      form.current.updateTemplate(template);
+    } else if (form.current && template) {
+      form.current?.updateTemplate(template);
       form.current.setInputs([{}]);
     }
+    forceUpdate();
   }, [formRef.current, template]);
 
   return form.current;
@@ -30,25 +39,27 @@ export const useForm = (props: {
 
 export const useViewer = (props: {
   viewerRef: React.MutableRefObject<HTMLDivElement>;
-  template: Template;
+  template: Template | null;
 }) => {
   const { viewerRef, template } = props;
   const viewer = useRef<Viewer | null>(null);
+  const forceUpdate = useForceUpdate();
 
   useEffect(() => {
-    if (viewerRef.current && viewer.current === null) {
-      getFont().then((font) => {
+    if (viewerRef.current && viewer.current === null && template) {
+      Promise.all([import('@pdfme/ui'), getFont()]).then(([{ Viewer }, font]) => {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
           template,
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: [{}],
           options: { font },
         });
       });
-    } else {
+    } else if (viewer.current && template) {
       viewer.current?.updateTemplate(template);
-      viewer.current?.setInputs([{}]);
+      viewer.current.setInputs([{}]);
     }
+    forceUpdate();
   }, [viewerRef.current, template]);
 
   return viewer.current;

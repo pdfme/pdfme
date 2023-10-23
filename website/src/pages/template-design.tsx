@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import BrowserOnly from '@docusaurus/BrowserOnly';
 import {
   ChangeCircleOutlined,
   UploadFileOutlined,
@@ -65,9 +64,6 @@ const TemplateDesign = () => {
         designer.current.onChangeTemplate(setTemplate);
       })
     }
-    return () => {
-      designer.current.destroy();
-    };
   }, [designerRef]);
 
   const changeBasePdf = (file: File) => {
@@ -262,14 +258,10 @@ ${e}`);
           </div>
         )}
       </div>
-
-      <BrowserOnly>
-        {() => <div
-          ref={designerRef}
-          style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
-        />}
-      </BrowserOnly>
-
+      <div
+        ref={designerRef}
+        style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
+      />
       <DesignerCodeModal
         code={code}
         open={codeModalOpen}

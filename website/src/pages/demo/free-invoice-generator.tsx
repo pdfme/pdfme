@@ -1,5 +1,5 @@
 import React from 'react';
-import DemoAppLoader from '../../components/DemoAppLoader';
+import DemoApp from '../../components/DemoApp';
 
 export const title = 'Free Invoice Generator';
 export const description = `Free Invoice Generator is a web application that is easy to use, completely free, and unlimited.
@@ -13,9 +13,12 @@ const templateItems = ['white', 'green', 'blue'].map((c) => ({
 }));
 
 
-export default () => <DemoAppLoader
-  importPath='../../components/DemoApp'
-  title={title}
-  description={description}
-  thumbnail={thumbnail}
-  templateItems={templateItems} />;
+
+export default () => (
+  <DemoApp
+    title={title}
+    description={description}
+    thumbnail={thumbnail}
+    templateItems={templateItems}
+  />
+);

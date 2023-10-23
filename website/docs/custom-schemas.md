@@ -80,6 +80,4 @@ FIXME from here
 
 まずは pdf, ui, propPanel の概念を説明する
 
-
-
 -->

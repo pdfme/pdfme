@@ -1,5 +1,5 @@
 import React from 'react';
-import DemoAppLoader from '../../components/DemoAppLoader';
+import DemoApp from '../../components/DemoApp';
 
 export const title = 'Certificate Maker';
 export const description = `Online Certificate Maker is a web application that is easy to use, completely free, and unlimited.
@@ -12,9 +12,12 @@ const templateItems = ['white', 'gold', 'black', 'blue'].map((c) => ({
   imgUrl: `/img/templates/certificate_${c}.webp`,
 }));
 
-export default () => <DemoAppLoader
-  importPath='../../components/DemoApp'
-  title={title}
-  description={description}
-  thumbnail={thumbnail}
-  templateItems={templateItems} />;
+
+export default () => (
+  <DemoApp
+    title={title}
+    description={description}
+    thumbnail={thumbnail}
+    templateItems={templateItems}
+  />
+);
