@@ -8,6 +8,7 @@ import {
   ZOOM,
   getB64BasePdf,
   b64toUint8Array,
+  pt2mm,
   Template,
   SchemaForUI,
   Schema,
@@ -189,12 +190,6 @@ export const initShortCuts = (arg: {
 
 export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
-};
-
-const pt2mm = (pt: number) => {
-  // https://www.ddc.co.jp/words/archives/20090701114500.html
-  const mmRatio = 0.3527;
-  return parseFloat(String(pt)) * mmRatio;
 };
 
 export const getPdfPageSizes = async (pdfBlob: Blob) => {

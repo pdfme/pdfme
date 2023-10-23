@@ -1,0 +1,178 @@
+{
+  "schemas": [
+    {
+      "center": {
+        "type": "text",
+        "position": {
+          "x": 25.14,
+          "y": 25.66
+        },
+        "width": 77.02,
+        "height": 44.39,
+        "alignment": "center",
+        "verticalAlignment": "top",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 25
+      },
+      "left-align": {
+        "type": "text",
+        "position": {
+          "x": 17.94,
+          "y": 92.8
+        },
+        "width": 77.02,
+        "height": 44.39,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 130
+      },
+      "right-align": {
+        "type": "text",
+        "position": {
+          "x": 119.75,
+          "y": 22.38
+        },
+        "width": 77.02,
+        "height": 44.39,
+        "alignment": "right",
+        "verticalAlignment": "bottom",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 326
+      },
+      "90degree": {
+        "type": "text",
+        "position": {
+          "x": 132.39,
+          "y": 103.03
+        },
+        "width": 77.02,
+        "height": 19.25,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 90
+      },
+      "no rotate": {
+        "type": "text",
+        "position": {
+          "x": 23.6,
+          "y": 165.94
+        },
+        "width": 77.02,
+        "height": 19.25,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": ""
+      },
+      "dynamic-font-size": {
+        "type": "text",
+        "position": {
+          "x": 119.7,
+          "y": 156.47
+        },
+        "width": 77.02,
+        "height": 48.36,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 20,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#1f2b74",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "dynamicFontSize": {
+          "min": 4,
+          "max": 72,
+          "fit": "vertical"
+        },
+        "rotate": 10
+      },
+      "red-square": {
+        "type": "image",
+        "position": {
+          "x": 130.17,
+          "y": 230.19
+        },
+        "width": 40,
+        "height": 40,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 13,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 45
+      },
+      "green-rectangle": {
+        "type": "image",
+        "position": {
+          "x": 11.91,
+          "y": 222.51
+        },
+        "width": 71.75,
+        "height": 32.59,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 13,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "fontName": "NotoSerifJP-Regular",
+        "backgroundColor": "",
+        "rotate": 90
+      }
+    }
+  ],
+  "basePdf": "data:application/pdf;base64,JVBERi0xLjUKJbXtrvsKNCAwIG9iago8PCAvTGVuZ3RoIDUgMCBSCiAgIC9GaWx0ZXIgL0ZsYXRlRGVjb2RlCj4+CnN0cmVhbQp4nDNUMABCXUMgYWFiqGdppJCcy1XIFahQyAWSMLU0BYkrFKUqhCvkcRkqgGBRuoJ+ooFCejFMiZ6hpSVUuxFIaRpXIBcALJUSiwplbmRzdHJlYW0KZW5kb2JqCjUgMCBvYmoKICAgNzQKZW5kb2JqCjMgMCBvYmoKPDwKICAgL0V4dEdTdGF0ZSA8PAogICAgICAvYTAgPDwgL0NBIDEgL2NhIDEgPj4KICAgPj4KPj4KZW5kb2JqCjIgMCBvYmoKPDwgL1R5cGUgL1BhZ2UgJSAxCiAgIC9QYXJlbnQgMSAwIFIKICAgL01lZGlhQm94IFsgMCAwIDU5NS4yIDg0MS45MiBdCiAgIC9Db250ZW50cyA0IDAgUgogICAvR3JvdXAgPDwKICAgICAgL1R5cGUgL0dyb3VwCiAgICAgIC9TIC9UcmFuc3BhcmVuY3kKICAgICAgL0kgdHJ1ZQogICAgICAvQ1MgL0RldmljZVJHQgogICA+PgogICAvUmVzb3VyY2VzIDMgMCBSCj4+CmVuZG9iagoxIDAgb2JqCjw8IC9UeXBlIC9QYWdlcwogICAvS2lkcyBbIDIgMCBSIF0KICAgL0NvdW50IDEKPj4KZW5kb2JqCjYgMCBvYmoKPDwgL1Byb2R1Y2VyIChjYWlybyAxLjE2LjAgKGh0dHBzOi8vY2Fpcm9ncmFwaGljcy5vcmcpKQogICAvQ3JlYXRpb25EYXRlIChEOjIwMjMwODA3MTE0MjU3KzAxJzAwKQo+PgplbmRvYmoKNyAwIG9iago8PCAvVHlwZSAvQ2F0YWxvZwogICAvUGFnZXMgMSAwIFIKPj4KZW5kb2JqCnhyZWYKMCA4CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDQ4MiAwMDAwMCBuIAowMDAwMDAwMjU5IDAwMDAwIG4gCjAwMDAwMDAxODcgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMTY2IDAwMDAwIG4gCjAwMDAwMDA1NDcgMDAwMDAgbiAKMDAwMDAwMDY2MyAwMDAwMCBuIAp0cmFpbGVyCjw8IC9TaXplIDgKICAgL1Jvb3QgNyAwIFIKICAgL0luZm8gNiAwIFIKPj4Kc3RhcnR4cmVmCjcxNQolJUVPRgo=",
+  "fontName": "NotoSerifJP-Regular",
+  "sampledata": [
+    {
+      "center": "Multi-lined\ncentrally aligned\ntext box with wrapping",
+      "left-align": "Multi-lined\nleft aligned\ntext box with wrapping",
+      "right-align": "Multi-lined\nright aligned\ntext box with wrapping",
+      "90degree": "single line of text",
+      "no rotate": "no rotation",
+      "dynamic-font-size": "Dynamic font size to go big",
+      "red-square": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9bpVJaHCwo4pChOlkQFRFctApFqBBqhVYdTC79giYNSYqLo+BacPBjserg4qyrg6sgCH6AuLo4KbpIif9LCi1iPDjux7t7j7t3gL9RYarZNQaommWkkwkhm1sVgq8IoR8RBDAjMVOfE8UUPMfXPXx8vYvzLO9zf46IkjcZ4BOIZ5luWMQbxFObls55nzjKSpJCfE48atAFiR+5Lrv8xrnosJ9nRo1Mep44SiwUO1juYFYyVOJJ4piiapTvz7qscN7irFZqrHVP/sJwXltZ5jrNISSxiCWIECCjhjIqsBCnVSPFRJr2Ex7+QccvkksmVxmMHAuoQoXk+MH/4He3ZmFi3E0KJ4DuF9v+GAaCu0Czbtvfx7bdPAECz8CV1vZXG8D0J+n1thY7Anq3gYvrtibvAZc7wMCTLhmSIwVo+gsF4P2MvikH9N0CoTW3t9Y+Th+ADHWVugEODoGRImWve7y7p7O3f8+0+vsBf4RyrCZIZPAAAAAJcEhZcwAALiMAAC4jAXilP3YAAAAHdElNRQfnChcNCBsKjyaqAAAAGXRFWHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAAAFpJREFUWMPt2LENwCAMBECMGJdtyL6kpEGIyoqi+9LNn106RvliasHCwsLCwsLCwsLCwsLCWmnbaZ8zp/6JuL1WmunQVe83yLxW+EFgYWFhYWFhYWFhYf2e9QKZCgqL+WAh0wAAAABJRU5ErkJggg==",
+      "green-rectangle": "data:image/jpeg;base64,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"
+    }
+  ],
+  "columns": [
+    "center",
+    "left-align",
+    "right-align",
+    "90degree",
+    "no rotate",
+    "dynamic-font-size",
+    "red-square",
+    "green-rectangle"
+  ]
+}
