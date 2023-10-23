@@ -53,7 +53,7 @@ export interface PDFRenderProps<T extends Schema> {
   page: PDFPage;
   options: GeneratorOptions;
 
-  _cache: Map<string, PDFImage>;
+  _cache: Map<string, any>;
 }
 
 export type UIRenderProps<T extends Schema> = {
