@@ -68,6 +68,12 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
 };
 
+// FIXME こんな感じで説明があるべきtypeにはJSdocを書く
+/**
+ * Plugin インターフェースは PDF と UI のレンダリング、
+ * およびプロパティパネルの定義に使用されます。
+ * @template T 拡張された Schema オブジェクトの型
+ */
 export type Plugin<T extends Schema & { [key: string]: any }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void>;
   ui: (arg: UIRenderProps<T>) => Promise<void>;
