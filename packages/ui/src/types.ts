@@ -12,8 +12,9 @@ import type {
 
 export type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'onChange' | 'rootElement' | 'options'
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options'
 > & {
+  schema: SchemaForUI;
   onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
