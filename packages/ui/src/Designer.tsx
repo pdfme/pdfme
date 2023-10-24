@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ConfigProvider, ThemeConfig } from 'antd';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate, PropPanelObject } from '@pdfme/common';
+import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
+import type { PropPanelObject } from './types';
 import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants';
 import {

@@ -421,7 +421,16 @@ exports[`Designer snapshot 1`] = `
             >
               <div
                 style="height: 100%; width: 100%;"
-              />
+              >
+                <div
+                  style="width: 100%; height: 100%; background-image: none; background-size: 377.95275591px 151.181102364px;"
+                >
+                  <img
+                    src="aaaaaaaaaaaa"
+                    style="height: 100%; width: 100%; border-radius: 0;"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>

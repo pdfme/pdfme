@@ -21,8 +21,7 @@ const SchemaForUIAdditionalInfo = z.object({
   key: z.string(),
   data: z.string(),
 });
-
-export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo); // FIXME これ、再利用しないしUIにあればいいのでは？
+export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
@@ -56,14 +55,12 @@ const CommonProps = z.object({
 
 // -------------------generate-------------------
 
-export const GeneratorOptions = CommonOptions;
+export const GeneratorOptions = CommonOptions.extend({});
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions.optional(),
 }).strict();
-
-export const SchemaInputs = z.record(z.string()); // FIXME 不要？
 
 // ---------------------ui------------------------
 
@@ -76,26 +73,6 @@ export const UIProps = CommonProps.extend({
   options: UIOptions.optional(),
 });
 
-// -----------------ui - Form, Viewer-----------------
-
 export const PreviewProps = UIProps.extend({ inputs: Inputs }).strict();
 
-// FIXME これ、再利用しないしUIにあればいいのでは？
-export const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({
-  onChangeInput: z
-    .function()
-    .args(z.object({ index: z.number(), value: z.string(), key: z.string() }))
-    .returns(z.void())
-    .optional(),
-  size: Size,
-});
-
-// ---------------ui - Designer---------------
-
 export const DesignerProps = UIProps.extend({}).strict();
-
-// FIXME これ、再利用しないしUIにあればいいのでは？
-export const DesignerReactProps = DesignerProps.omit({ domContainer: true }).extend({
-  onSaveTemplate: z.function().args(Template).returns(z.void()),
-  size: Size,
-});

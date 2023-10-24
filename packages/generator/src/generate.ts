@@ -1,7 +1,8 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import type { GenerateProps, Template } from '@pdfme/common';
-import { PDFRenderer, checkGenerateProps } from '@pdfme/common';
+import { checkGenerateProps } from '@pdfme/common';
+import type { PDFRenderer } from './types';
 import builtInRenderer from './builtInRenderer';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
 import { TOOL_NAME } from './constants';

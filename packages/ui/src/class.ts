@@ -1,10 +1,10 @@
 import ReactDOM from 'react-dom';
+import type { UIRenderer } from './types';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
 import builtInRenderer from './builtInRenderer';
 import {
-  UIRenderer,
   Template,
   Size,
   Lang,
