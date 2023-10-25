@@ -7,7 +7,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { OnDrag, OnResize, OnClick } from 'react-moveable';
+import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { RULER_HEIGHT } from '../../../constants';
@@ -24,6 +24,7 @@ const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
+const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
   const top = Math.min(...aes.map(({ style }) => fmt4Num(style.top)));
@@ -159,6 +160,26 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       { key: 'position.y', value: fmt(top), schemaId: id },
       { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
+    changeSchemas(flatten(arg));
+  };
+
+  const onRotate = ({ target, rotate }: OnRotate) => {
+    target.style.transform = `rotate(${rotate}deg)`;
+  };
+
+  const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
+    const { transform } = target.style;
+    const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
+    const normalizedRotate = normalizeRotate(rotate);
+    changeSchemas([{ key: 'rotate', value: normalizedRotate, schemaId: target.id }]);
+  };
+
+  const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
+    const arg = targets.map(({ style: { transform }, id }) => {
+      const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
+      const normalizedRotate = normalizeRotate(rotate);
+      return [{ key: 'rotate', value: normalizedRotate, schemaId: id }];
+    });
     changeSchemas(flatten(arg));
   };
 
@@ -299,6 +320,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                   onDrag={onDrag}
                   onDragEnd={onDragEnd}
                   onDragGroupEnd={onDragEnds}
+                  onRotate={onRotate}
+                  onRotateEnd={onRotateEnd}
+                  onRotateGroupEnd={onRotateEnds}
                   onResize={onResize}
                   onResizeEnd={onResizeEnd}
                   onResizeGroupEnd={onResizeEnds}

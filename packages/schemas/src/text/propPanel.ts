@@ -63,8 +63,16 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'select',
         default: fallbackFontName,
         props: { options: fontNames.map((name) => ({ label: name, value: name })) },
-        span: 8,
+        span: 12,
       },
+      fontSize: {
+        title: 'Size',
+        type: 'number',
+        widget: 'inputNumber',
+        span: 6,
+        disabled: enableDynamicFont,
+      },
+      characterSpacing: { title: 'Spacing', type: 'number', widget: 'inputNumber', span: 6 },
       alignment: {
         title: 'Text Align',
         type: 'string',
@@ -91,15 +99,7 @@ export const propPanel: PropPanel<TextSchema> = {
         },
         span: 8,
       },
-      fontSize: {
-        title: 'Font Size',
-        type: 'number',
-        widget: 'inputNumber',
-        span: 8,
-        disabled: enableDynamicFont,
-      },
       lineHeight: { title: 'Line Height', type: 'number', widget: 'inputNumber', span: 8 },
-      characterSpacing: { title: 'Char Spc', type: 'number', widget: 'inputNumber', span: 8 },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false },
       dynamicFontSize: {
         type: 'object',
