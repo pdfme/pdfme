@@ -144,7 +144,7 @@ generate({ template, inputs }).then((pdf) => {
 
 You can create a PDF file like the below.
 
-![](/img/simplePdf.png)
+![](/img/simple-pdf.png)
 
 Also, each element in the inputs array corresponds to a page in the PDF, you can create a multi-page PDF file by providing multiple elements of inputs.
 

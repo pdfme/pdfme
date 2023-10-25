@@ -35,7 +35,9 @@ const generate = async (props: GenerateProps) => {
     (acc, [key, { pdf }]) => Object.assign(acc, { [key]: pdf }),
     {} as PDFRenderer
   );
-  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer);
+
+  const rendererRegistry: PDFRenderer =
+    Object.keys(customRenderer).length > 0 ? customRenderer : builtInRenderer;
 
   const _cache = new Map();
 

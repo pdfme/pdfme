@@ -1,21 +1,8 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
-import {
-  Lang,
-  Size,
-  Schema,
-  Font,
-  SchemaForUI,
-  BasePdf,
-  Template,
-  GeneratorOptions,
-  GenerateProps,
-  UIOptions,
-  UIProps,
-  PreviewProps,
-  DesignerProps,
-} from './schema.js';
+// prettier-ignore
+import {Lang,Size,Schema,Font,SchemaForUI,BasePdf,Template,GeneratorOptions,GenerateProps,UIOptions,UIProps,PreviewProps,DesignerProps,} from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;

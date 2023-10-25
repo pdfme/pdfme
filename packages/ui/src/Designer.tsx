@@ -47,7 +47,9 @@ class Designer extends BaseUIClass {
       (acc, [key, { propPanel }]) => Object.assign(acc, { [key]: propPanel }),
       {} as PropPanelObject
     );
-    this.propPanelRegistry = Object.assign(this.propPanelRegistry, customPropPanel);
+    if (Object.keys(customPropPanel).length > 0) {
+      this.propPanelRegistry = customPropPanel
+    }
 
     this.render();
   }

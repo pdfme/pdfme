@@ -26,7 +26,7 @@ type Font = {
 };
 ```
 
-- \*`fallback`: Setting it to true makes it the font to use if not set to a `fontName`. Only one of the font objects must be set to true.
+- \*`fallback`: Setting it to true makes it the font to use if not set to a `fontName`. **Only one of the font objects must be set to true.**
 - \*`subset`: The default is true, but it can be set to false to set the font embedding to not subset. (This setting is for a bug in fontkit when embedding certain fonts with subsetting.)
 
 Please read font data by fetch or fs.readFileSync as below.

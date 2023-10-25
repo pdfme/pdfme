@@ -107,7 +107,9 @@ export abstract class BaseUIClass {
       (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
       {} as UIRenderer
     );
-    this.rendererRegistry = Object.assign(this.rendererRegistry, customRenderer);
+    if (Object.keys(customRenderer).length > 0) {
+      this.rendererRegistry = customRenderer;
+    }
   }
 
   protected getI18n() {
