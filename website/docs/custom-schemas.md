@@ -17,6 +17,8 @@ This page explains how to use schemas from `@pdfme/schemas` and how to create yo
 
 Here, we explain how to import image and QR code schemas from `@pdfme/schemas`.
 
+### Getting Started
+
 First, install `@pdfme/schemas`.
 
 ```bash
@@ -77,6 +79,8 @@ const designer = new Designer({
 
 By loading image and qrcode as plugins, you can render schemas of type image and qrcode found in your template's schemas.
 
+![](/img/custom-schemas.png)
+
 ### Tips
 
 Using plugins, you can override the default schema to remove text, replace it with custom schema, or rearrange the order.
@@ -97,31 +101,31 @@ const designer = new Designer({
 
 ## Creating Your Own Schemas
 
-次に独自のスキーマを作成したい人向けに、その方法を紹介する。  
-スキーマを作ったり、スキーマのアイデアがある人は [GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288) で教えてください。  
-pdfme はオープンソースで開発されているため、みんなでスキーマをシェアしたり、開発したりすることができるはずだと考えている。
+Next, we will introduce the method for those who want to create their own schemas.  
+If you have created a schema or have an idea for one, please share it on [GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288).  
+We believe that since pdfme is developed as open-source, everyone should be able to share and develop schemas together.
 
-### カスタムスキーマ / プラグイン の概要
+### Overview of Custom Schemas / Plugins
 
-カスタムスキーマは３つの要素で構成されており、それらをまとめてプラグインと呼んでいる。  
-プラグインとそれの型定義は [packages/common/src/types.ts](https://github.com/pdfme/pdfme/blob/main/packages/common/src/types.ts) ファイル内に定義されている。
+Custom schemas consist of three elements, which are collectively referred to as plugins.  
+The type definitions for plugins are defined within the [packages/common/src/types.ts](https://github.com/pdfme/pdfme/blob/main/packages/common/src/types.ts) file.
 
-**Plugin** がどのように構成され、どのように動作するかを説明する。
+We will explain how the **Plugin** is structured and how it operates.
 
-- **pdf**: `@pdfme/generator`で使用され、PDF にスキーマをレンダリングするための処理を書く。PDF に描画する処理は [pdf-lib](https://pdf-lib.js.org/) で行っている。
-- **ui**: `@pdfme/ui`で DOM にスキーマをレンダリングする処理を書く。ui には下記のモードがある。
-  - **viewer**: [Viewer](/docs/getting-started#viewer), [Designer](/docs/getting-started#designer)（フィールド未選択時）で利用される。PDF のレンダリングと見た目を合わせることでプレビューとして機能する
-  - **form**: [Form](/docs/getting-started#form) で利用される。ユーザーが入力できるようにすることでフォームとして機能する。
-  - **designer**: [Designer](/docs/getting-started#designer)（ダブルクリックでフィールド選択時）で利用される。基本的にフォームと同じでユーザーが入力できるようにすることで WYSIWYG エディターとして機能する。textarea や input 要素の場合はフォーカスさせる必要がある。
-- **propPanel**: `@pdfme/ui`の[Designer](/docs/getting-started#designer)にて、フィールドの選択時のサイドバーに独自のプロパティ編集用のフォームを追加できる。[form-render](https://xrender.fun/form-render) の JSON 形式(ウィジェットによる拡張も可能)のスキーマで記入することができる。
+- **pdf**: Used in `@pdfme/generator`, it includes code for rendering schemas into PDFs. The PDF rendering process is handled by [pdf-lib](https://pdf-lib.js.org/).
+- **ui**: Used in `@pdfme/ui`, it includes code for rendering schemas into the DOM. The ui has the following modes:
+  - **viewer**: Utilized in [Viewer](/docs/getting-started#viewer), [Designer](/docs/getting-started#designer) (when no field is selected). Functions as a preview by matching the rendering and appearance of the PDF.
+  - **form**: Utilized in [Form](/docs/getting-started#form). Functions as a form that users can input into.
+  - **designer**: Utilized in [Designer](/docs/getting-started#designer) (when a field is double-clicked). Basically the same as the form but serves as a WYSIWYG editor where users can input. For textarea and input elements, focusing is required.
+- **propPanel**: Used in `@pdfme/ui`'s [Designer](/docs/getting-started#designer), it allows you to add custom property editing forms to the sidebar when a field is selected. You can fill it out using [form-render](https://xrender.fun/form-render)'s JSON format (widget extensions are also possible).
 
 :::note
-pdfme は[pdf-lib](https://pdf-lib.js.org/), [form-render](https://xrender.fun/form-render) に依存しています。  
-プラグインを通じて pdfme 内部で使われているこれらのライブラリを操作しプラグインを実現しています。  
-必要に応じて上記のライブラリのドキュメントを参照してください。
+pdfme relies on [pdf-lib](https://pdf-lib.js.org/) and [form-render](https://xrender.fun/form-render).  
+These libraries are manipulated through plugins to achieve their functionalities within pdfme.  
+Please refer to the documentation of the above libraries as needed.
 :::
 
-下記の画像は、プラグインの pdf, ui, propPanel がどこで動作しているかをハイライトしたものです。
+The images below highlight where the pdf, ui, and propPanel of the plugin are used.
 
 - **pdf**
   ![](/img/plugin-pdf.png)
@@ -130,18 +134,18 @@ pdfme は[pdf-lib](https://pdf-lib.js.org/), [form-render](https://xrender.fun/f
 - **ui(mode: designer), ui(mode: viewer), propPanel**
   ![](/img/plugin-designer.png)
 
-### @pdfme/schemas のコードから作り方を学ぶ
+### Learning How to Create from @pdfme/schemas' Code
 
-自分でスキーマを作成する場合は既存の `@pdfme/schemas` のコードを参考にしながら作成することをおすすめします。  
-既存のスキーマのコードはそれぞれ下記のファイルにあります。
+If you're looking to create your own schema, it is recommended to refer to the existing code within `@pdfme/schemas` while doing so.  
+The code for existing schemas can be found in the files below:
 
-- [packages/schemas/src/text/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/text/index.ts): PDF のレンダリングが一番複雑なスキーマで、propPanel も[form-render の Widget](https://xrender.fun/form-render/advanced-widget)を使ってカスタマイズしており、プラグインが複雑なニーズに対応できることがわかる。
-- [packages/schemas/src/image/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/image/index.ts): PDF のレンダリングはシンプルな実装だが、ui(mode: form), ui(mode: designer)はレンダリング時に画像を入力するための input type="file"要素を使っている。全体的にシンプルな実装なので、最初はこのスキーマを参考にするのが良いかもしれない。
-- [packages/schemas/src/barcodes/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/barcodes/index.ts): ui でバーコードをプレビューするためにリアルタイムで生成したり、そのモジュールを pdf と共有して使っている点がクール。また、一つの実装で 10 種類以上のバーコードをサポートしており、バーコードの種類に応じて propPanel のフォームを変更している。プラグインが柔軟かつ、効率的に作成できることがわかる。
+- [packages/schemas/src/text/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/text/index.ts): The most complex schema in terms of PDF rendering. The propPanel is also customized using [form-render's Widget](https://xrender.fun/form-render/advanced-widget), demonstrating that the plugin can meet complex needs.
+- [packages/schemas/src/image/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/image/index.ts): Simple implementation for PDF rendering, but uses an input type="file" element for image input during ui(mode: form) and ui(mode: designer) rendering. Overall, it’s a simple implementation and may serve as a good starting point.
+- [packages/schemas/src/barcodes/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/barcodes/index.ts): Cool for generating barcodes in real-time for ui preview, and shares that module with pdf. Also, supports more than 10 types of barcodes and changes the form in the propPanel according to the type of barcode. Demonstrates that the plugin can be both flexible and efficient.
 
-### 独自のスキーマを作成してみる
+### Creating Your Own Schema
 
-サンプルのシナリオとして form で署名を記入できるプラグインを作成してみます。  
-具体的には [signature_pad](https://github.com/szimek/signature_pad) を使って署名を入力、その署名は画像として DOM と PDF にレンダリングすることができれば実現できるはずです。
+As a sample scenario, let's try creating a plugin that allows you to input signatures in the form.  
+Specifically, it should be possible to input the signature using [signature_pad](https://github.com/szimek/signature_pad), and to render that signature as an image in both the DOM and PDF.
 
 Coming soon...
