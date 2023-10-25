@@ -79,7 +79,14 @@ type PropPanelProps = {
 };
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
-// FIXME 書く
+/**
+ * Used for customizing the property panel.
+ * @template T - Type of the extended Schema object.
+ * @property {Record<string, PropPanelSchema> | ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>)} propPanelSchema - A function returning a form-render schema object or the schema object itself. When a function, it takes properties passed from the designer as arguments.
+ * @property {Record<string, (props: PropPanelWidgetProps) => void>} [widgets] - An object of functions returning form-render widgets. The functions take, as arguments, both form-render's WidgetProps and properties passed from the designer.
+ * @property {string} defaultValue - The default input value set when adding the schema.
+ * @property {T} defaultSchema - The default schema set when adding the schema.
+ */
 export interface PropPanel<T extends Schema> {
   propPanelSchema:
     | ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>)
@@ -90,14 +97,14 @@ export interface PropPanel<T extends Schema> {
   defaultSchema: T;
 }
 
-// FIXME 書く
 /**
- * Plugin インターフェースは PDF と UI のレンダリング、
- * およびプロパティパネルの定義に使用されます。
- * @template T 拡張された Schema オブジェクトの型
- * @property {function} pdf PDF のレンダリングを行う関数
- * @property {function} ui UI のレンダリングを行う関数
- * @property {PropPanel} propPanel プロパティパネルの定義
+ * The Plugin interface is used for PDF and UI rendering, as well as defining the property panel.
+ * The 'pdf' is used in the generator package, 'ui' is used in the viewer, form, and designer packages, and 'propPanel' is used in the designer package.
+ * Objects defined as Plugins using this interface can be used with a consistent interface across all packages.
+ * @template T Type of the extended Schema object.
+ * @property {function} pdf Function for rendering PDFs.
+ * @property {function} ui Function for rendering UI.
+ * @property {PropPanel} propPanel Object for defining the property panel.
  */
 export type Plugin<T extends Schema & { [key: string]: any }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void>;
