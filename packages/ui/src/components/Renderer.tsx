@@ -44,7 +44,8 @@ const Renderer = (props: RendererProps) => {
       const schemaType = schema.type as string;
       const render = rendererRegistry[schemaType];
       if (!render) {
-        console.error(`Renderer for type ${schema.type} not found`);
+        console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.
+Check this document: https://pdfme.com/docs/custom-schemas`);
         return;
       }
 

@@ -1,4 +1,4 @@
-# Custom Schemas
+# Custom Schemas(Plugins)
 
 :::caution
 This feature is still in beta and has not yet been released to npm.  

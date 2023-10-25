@@ -203,7 +203,8 @@ const TemplateEditor = ({
     const propPanel = Object.values(propPanelRegistry)[0];
 
     if (!propPanel) {
-      throw new Error('addSchema failed: propPanelRegistry is empty');
+      throw new Error(`[@pdfme/ui] addSchema failed: propPanel is empty.
+Check this document: https://pdfme.com/docs/custom-schemas`);
     }
 
     const s = {

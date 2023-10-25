@@ -1,6 +1,6 @@
 export const DEFAULT_LANG = 'en' as const;
 
-export const DESTROYED_ERR_MSG = 'this instance is already destroyed';
+export const DESTROYED_ERR_MSG = '[@pdfme/ui] this instance is already destroyed';
 
 export const SELECTABLE_CLASSNAME = 'selectable';
 

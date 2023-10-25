@@ -16,7 +16,7 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
     };
 
     fileReader.onerror = (e) => {
-      reject(new Error('File reading failed'));
+      reject(new Error('[@pdfme/schemas] File reading failed'));
     };
 
     let file: File | null = null;
@@ -29,7 +29,7 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
     if (file) {
       fileReader.readAsDataURL(file);
     } else {
-      reject(new Error('No files provided'));
+      reject(new Error('[@pdfme/schemas] No files provided'));
     }
   });
 

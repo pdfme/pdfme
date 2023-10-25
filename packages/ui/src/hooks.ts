@@ -44,8 +44,9 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       .then(({ pageSizes, scale, backgrounds }) => {
         setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
       })
-      .catch((e: Error) => {
-        setError(e);
+      .catch((err: Error) => {
+        setError(err);
+        console.error(`[@pdfme/ui] ${err}`);
       });
   }, [template, size]);
 
