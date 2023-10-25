@@ -25,13 +25,25 @@ const Paper = (props: {
     <div
       style={{
         transform: `scale(${scale})`,
-        transformOrigin: 'center top',
-        ...size,
+        transformOrigin: 'top left',
+        // NOTE: These values do not apply, but changing them with scale ensures the
+        // container is updated to show appropriately sized scrollbars when you zoom in/out.
+        height: size.height + scale,
+        width: size.width + scale,
       }}
     >
       {backgrounds.map((background, paperIndex) => {
         const pageSize = pageSizes[paperIndex];
         const paperSize = { width: pageSize.width * ZOOM, height: pageSize.height * ZOOM };
+
+        // We want to center the content within the available viewport.
+        // However, scaling must be done from the top-left or CSS crops off left-hand content
+        // due to it being a visual effect.
+        // We apply a left indent for when the content does not exceed its container
+        const leftCenteringIndent =
+          paperSize.width * scale + RULER_HEIGHT < size.width
+            ? `${(size.width / scale - paperSize.width) / 2}px`
+            : `${RULER_HEIGHT}px`;
 
         return (
           <div
@@ -55,8 +67,7 @@ const Paper = (props: {
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
               top: `${RULER_HEIGHT}px`,
-              left: paperSize.width > size.width ? `${(size.width - paperSize.width) / 2}px` : 0,
-              margin: '0 auto',
+              left: leftCenteringIndent,
               position: 'relative',
               backgroundImage: `url(${background})`,
               backgroundSize: `${paperSize.width}px ${paperSize.height}px`,

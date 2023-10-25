@@ -8,12 +8,11 @@ import DetailView from './DetailView/index';
 import { getFallbackFontName, Schema } from '@pdfme/common';
 
 const Sidebar = (props: SidebarProps) => {
-  const { height, size, activeElements, schemas, addSchema } = props;
+  const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
   const font = useContext(FontContext);
   const fallbackFont = getFallbackFontName(font);
-  const [open, setOpen] = useState(true);
 
   const getActiveSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
@@ -39,16 +38,17 @@ const Sidebar = (props: SidebarProps) => {
         position: 'absolute',
         right: 0,
         zIndex: 1,
-        height: height ? height : '100%',
-        width: open ? SIDEBAR_WIDTH : 0,
+        height: '100%',
+        width: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        fontSize: '1rem',
       }}
     >
-      <div style={{ position: 'sticky', top: 0, zIndex: 1, fontSize: '1rem' }}>
+      <div>
         <button
           type="button"
           style={{
             position: 'absolute',
-            top: '1.75rem',
+            top: '1.15rem',
             right: '1rem',
             zIndex: 100,
             border: 'none',
@@ -59,9 +59,9 @@ const Sidebar = (props: SidebarProps) => {
             width: 30,
             height: 30,
           }}
-          onClick={() => setOpen(!open)}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
         >
-          {open ? (
+          {sidebarOpen ? (
             <ArrowRightIcon width={15} height={15} />
           ) : (
             <ArrowLeftIcon width={15} height={15} />
@@ -70,20 +70,20 @@ const Sidebar = (props: SidebarProps) => {
         <div
           style={{
             width: SIDEBAR_WIDTH,
-            height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2,
-            display: open ? 'block' : 'none',
-            top: RULER_HEIGHT / 2,
+            height: '100%',
+            display: sidebarOpen ? 'block' : 'none',
+            top: 0,
             right: 0,
             position: 'absolute',
             background: '#fffffffa',
             color: '#333',
             border: '1px solid #eee',
-            padding: '1rem',
+            padding: '0.7rem 1rem',
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
             fontWeight: 400,
             textAlign: 'left',
-            boxSizing: 'content-box',
+            boxSizing: 'border-box',
           }}
         >
           {getActiveSchemas().length === 0 ? (

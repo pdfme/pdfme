@@ -18,15 +18,15 @@ const CtlBar = (props: Props) => {
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
   const width = pageNum > 1 ? barWidth : barWidth / 2;
   return (
-    <div style={{ position: 'absolute', width: '100%', minHeight: size.height }}>
+    <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          position: 'sticky',
+          gap: '15px',
+          position: 'relative',
           zIndex: 1,
-          top: '90%',
           left: `calc(50% - ${width / 2}px)`,
           width,
           background: '#777777e6',
@@ -35,10 +35,7 @@ const CtlBar = (props: Props) => {
         }}
       >
         {pageNum > 1 && (
-          <>
-            <Pager pageCursor={pageCursor} pageNum={pageNum} setPageCursor={setPageCursor} />
-            <strong style={{ color: 'white', fontSize: '0.9rem', padding: 0 }}>|</strong>
-          </>
+          <Pager pageCursor={pageCursor} pageNum={pageNum} setPageCursor={setPageCursor} />
         )}
         <Zoom zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
       </div>

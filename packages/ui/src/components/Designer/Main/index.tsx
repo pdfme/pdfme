@@ -10,7 +10,7 @@ import React, {
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { RULER_HEIGHT } from '../../../constants';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
@@ -80,6 +80,7 @@ interface Props {
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
+  sidebarOpen: boolean;
 }
 
 const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
@@ -92,8 +93,13 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     activeElements,
     schemasList,
     hoveringSchemaId,
+    onEdit,
+    changeSchemas,
+    removeSchemas,
+    onChangeHoveringSchemaId,
+    paperRefs,
+    sidebarOpen,
   } = props;
-  const { onEdit, changeSchemas, removeSchemas, onChangeHoveringSchemaId, paperRefs } = props;
 
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
@@ -103,6 +109,11 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const [editing, setEditing] = useState(false);
 
   const prevSchemas = usePrevious(schemasList[pageCursor]);
+
+  const sizeExclSidebar = {
+    width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
+    height: size.height,
+  };
 
   const onKeydown = (e: KeyboardEvent) => {
     if (e.shiftKey) setIsPressShiftKey(true);
@@ -243,7 +254,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   return (
-    <div ref={ref} style={{ overflow: 'overlay' }}>
+    <div
+      style={{
+        position: 'relative',
+        overflow: 'auto',
+        marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        ...sizeExclSidebar,
+      }}
+      ref={ref}
+    >
       <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
@@ -284,7 +303,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       <Paper
         paperRefs={paperRefs}
         scale={scale}
-        size={size}
+        size={sizeExclSidebar}
         schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
