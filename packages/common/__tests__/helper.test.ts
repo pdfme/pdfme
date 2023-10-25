@@ -122,7 +122,8 @@ describe('checkFont test', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'fallback flag is not found in font. true fallback flag must be only one.'
+        `[@pdfme/common] fallback flag is not found in font. true fallback flag must be only one.
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       );
     }
   });
@@ -138,7 +139,8 @@ describe('checkFont test', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        '2 fallback flags found in font. true fallback flag must be only one.'
+        `[@pdfme/common] 2 fallback flags found in font. true fallback flag must be only one.
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       );
     }
   });
@@ -169,7 +171,10 @@ describe('checkFont test', () => {
       checkFont({ template: _getTemplate(), font: getSampleFont() });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
+      expect(e.message).toEqual(
+        `[@pdfme/common] SauceHanSansJP2 of template.schemas is not found in font.
+Check this document: https://pdfme.com/docs/custom-fonts`
+      );
     }
   });
 
@@ -201,7 +206,8 @@ describe('checkFont test', () => {
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'SauceHanSansJP2,SauceHanSerifJP2 of template.schemas is not found in font.'
+        `[@pdfme/common] SauceHanSansJP2,SauceHanSerifJP2 of template.schemas is not found in font.
+Check this document: https://pdfme.com/docs/custom-fonts`
       );
     }
   });
@@ -278,7 +284,9 @@ describe('checkPlugins test', () => {
       checkPlugins({ template, plugins });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('fail of template.schemas is not found in plugins.');
+      expect(e.message).toEqual(
+        `[@pdfme/common] fail of template.schemas is not found in plugins.`
+      );
     }
   });
   test('fail test: type in Schemas not found in plugins(multiple)', () => {
@@ -289,7 +297,9 @@ describe('checkPlugins test', () => {
       checkPlugins({ template, plugins });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('fail,fail2 of template.schemas is not found in plugins.');
+      expect(e.message).toEqual(
+        `[@pdfme/common] fail,fail2 of template.schemas is not found in plugins.`
+      );
     }
   });
 });
