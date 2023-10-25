@@ -50,15 +50,15 @@ const Renderer = (props: RendererProps) => {
 
       ref.current.innerHTML = '';
 
-      const isForm = mode === 'form';
+      const editable = mode === 'form' || mode === 'designer';
 
       render({
         value: schema.data,
         schema,
         rootElement: ref.current,
         mode,
-        onChange: isForm ? onChange : undefined,
-        stopEditing: isForm ? stopEditing : undefined,
+        onChange: editable ? onChange : undefined,
+        stopEditing: editable ? stopEditing : undefined,
         tabIndex,
         placeholder,
         options,

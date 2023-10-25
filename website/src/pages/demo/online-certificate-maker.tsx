@@ -12,6 +12,7 @@ const templateItems = ['white', 'gold', 'black', 'blue'].map((c) => ({
   imgUrl: `/img/templates/certificate_${c}.webp`,
 }));
 
+
 export default () => (
   <DemoApp
     title={title}

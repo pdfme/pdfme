@@ -30,6 +30,16 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
+function getBackgroundColor(mode: 'form' | 'viewer' | 'designer', value: string, schema: Schema) {
+  if ((mode === 'form' || mode === 'designer') && value && schema.backgroundColor) {
+    return schema.backgroundColor as string;
+  } else if (mode === 'viewer') {
+    return (schema.backgroundColor as string) ?? 'transparent';
+  } else {
+    return 'rgb(242 244 255 / 75%)';
+  }
+}
+
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const {
     value,
@@ -68,15 +78,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const bottomAdjustment = bottomAdj;
 
   const container = document.createElement('div');
-  function getBackgroundColor(mode: 'form' | 'viewer', value: string, schema: Schema) {
-    if (mode === 'form' && value && schema.backgroundColor) {
-      return schema.backgroundColor as string;
-    } else if (mode === 'viewer') {
-      return (schema.backgroundColor as string) ?? 'transparent';
-    } else {
-      return 'rgb(242 244 255 / 75%)';
-    }
-  }
 
   const containerStyle: CSS.Properties = {
     padding: 0,
@@ -104,7 +105,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     wordBreak: 'break-word',
   };
 
-  if (mode === 'form') {
+  if (mode === 'form' || mode === 'designer') {
     const textarea = document.createElement('textarea');
     const textareaStyle: CSS.Properties = {
       padding: 0,
@@ -128,8 +129,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textarea.addEventListener('blur', () => stopEditing && stopEditing());
     textarea.value = value;
     container.appendChild(textarea);
-    textarea.setSelectionRange(value.length, value.length);
-    textarea.focus();
+    if (mode === 'designer') {
+      textarea.setSelectionRange(value.length, value.length);
+      textarea.focus();
+    }
   } else {
     const div = document.createElement('div');
     const divStyle: CSS.Properties = {

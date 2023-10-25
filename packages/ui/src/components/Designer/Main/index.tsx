@@ -338,7 +338,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             mode={
-              editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'form' : 'viewer'
+              editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'designer' : 'viewer'
             }
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);

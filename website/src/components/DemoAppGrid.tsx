@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { generate, Template, BLANK_PDF, checkTemplate } from '@pdfme/generator';
+import { Template, checkTemplate } from '@pdfme/common';
+import { generate } from '@pdfme/generator';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, deNormalizeDatas, normalizeDatas } from '../libs/helper';
 import { useViewer } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
@@ -20,11 +22,11 @@ type Props = {
   templateItems: { id: string; jsonUrl: string; imgUrl: string }[];
 };
 
-const DemoApp = (props: Props) => {
+const DemoAppGrid = (props: Props) => {
   const { title, description, thumbnail, templateItems } = props;
   const viewerRef = useRef<HTMLDivElement | null>(null);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(templateItems[0].id);
-  const [template, setTemplate] = useState<Template>({ basePdf: BLANK_PDF, schemas: [] });
+  const [template, setTemplate] = useState<Template | null>(null);
   const [datas, setDatas] = React.useState<{ [key: string]: string }[]>([]);
   const [pdfCreationTime, setPdfCreationTime] = useState(0);
   const viewer = useViewer({ viewerRef, template });
@@ -52,7 +54,12 @@ const DemoApp = (props: Props) => {
     const font = await getFont();
 
     const t0 = performance.now();
-    const pdf = await generate({ template, inputs, options: { font } });
+    const pdf = await generate({
+      template,
+      plugins: { text, image, ...barcodes },
+      inputs,
+      options: { font }
+    });
     const t1 = performance.now();
 
     setPdfCreationTime(t1 - t0);
@@ -100,6 +107,7 @@ const DemoApp = (props: Props) => {
                     datas={datas}
                     setDatas={(value) => {
                       setDatas(value);
+                      if (!template) return;
                       viewer?.setInputs(normalizeDatas(value, template));
                     }}
                   />
@@ -129,4 +137,4 @@ const DemoApp = (props: Props) => {
   );
 };
 
-export default DemoApp;
+export default DemoAppGrid;

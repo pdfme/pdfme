@@ -49,7 +49,7 @@ const Sidebar = (props: SidebarProps) => {
           style={{
             position: 'absolute',
             top: '1.75rem',
-            right: '0.5rem',
+            right: '1rem',
             zIndex: 100,
             border: 'none',
             borderRadius: 2,

@@ -1,7 +1,8 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import type { GenerateProps, Template } from '@pdfme/common';
-import { PDFRenderer, checkGenerateProps } from '@pdfme/common';
+import { checkGenerateProps } from '@pdfme/common';
+import type { PDFRenderer } from './types';
 import builtInRenderer from './builtInRenderer';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
 import { TOOL_NAME } from './constants';
@@ -30,11 +31,14 @@ const generate = async (props: GenerateProps) => {
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
 
-  const customRenderer = Object.entries<PDFRenderer>(plugins).reduce(
+  const customRenderer = Object.entries(plugins).reduce(
     (acc, [key, { pdf }]) => Object.assign(acc, { [key]: pdf }),
     {} as PDFRenderer
   );
-  const rendererRegistry: PDFRenderer = Object.assign(builtInRenderer, customRenderer);
+
+  const rendererRegistry: PDFRenderer =
+    Object.keys(customRenderer).length > 0 ? customRenderer : builtInRenderer;
+
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {

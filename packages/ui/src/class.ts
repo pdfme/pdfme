@@ -1,10 +1,10 @@
 import ReactDOM from 'react-dom';
+import type { UIRenderer } from './types';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
 import builtInRenderer from './builtInRenderer';
 import {
-  UIRenderer,
   Template,
   Size,
   Lang,
@@ -18,7 +18,6 @@ import {
   checkInputs,
   checkUIOptions,
   checkPreviewProps,
-  UIRender,
 } from '@pdfme/common';
 
 const generateColumnsAndSampledataIfNeeded = (template: Template) => {
@@ -106,9 +105,11 @@ export abstract class BaseUIClass {
 
     const customRenderer = Object.entries(plugins).reduce(
       (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
-      {} as UIRender
+      {} as UIRenderer
     );
-    this.rendererRegistry = Object.assign(this.rendererRegistry, customRenderer);
+    if (Object.keys(customRenderer).length > 0) {
+      this.rendererRegistry = customRenderer;
+    }
   }
 
   protected getI18n() {

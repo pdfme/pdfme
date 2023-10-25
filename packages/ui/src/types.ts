@@ -1,9 +1,20 @@
-import type { UIRenderProps, SchemaForUI, Size, Schema, ChangeSchemas } from '@pdfme/common';
+import type {
+  DesignerProps,
+  PreviewProps,
+  UIRenderProps,
+  SchemaForUI,
+  Template,
+  Size,
+  Schema,
+  ChangeSchemas,
+  PropPanel,
+} from '@pdfme/common';
 
 export type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'onChange' | 'rootElement' | 'options'
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options'
 > & {
+  schema: SchemaForUI;
   onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
@@ -23,4 +34,24 @@ export type SidebarProps = {
   changeSchemas: ChangeSchemas;
   addSchema: () => void;
   deselectSchema: () => void;
+};
+
+export type UIRender = (arg: UIRenderProps<Schema>) => Promise<void>;
+
+export interface UIRenderer {
+  [key: string]: UIRender | undefined;
+}
+
+export interface PropPanelObject {
+  [key: string]: PropPanel<Schema> | undefined;
+}
+
+export type DesignerReactProps = Omit<DesignerProps, 'domContainer'> & {
+  onSaveTemplate: (t: Template) => void;
+  size: Size;
+};
+
+export type PreviewReactProps = Omit<PreviewProps, 'domContainer'> & {
+  onChangeInput?: (args: { index: number; value: string; key: string }) => void;
+  size: Size;
 };

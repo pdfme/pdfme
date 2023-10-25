@@ -19,7 +19,9 @@ const DemoAppCard = ({
           src={app.thumbnail}
           alt={app.title}
           title={app.title}
-          style={{ margin: '0 auto', display: 'block' }}
+          style={{ margin: '0 auto', padding: '1rem', display: 'block' }}
+          width={348}
+          height={348}
         />
       </Link>
     </div>

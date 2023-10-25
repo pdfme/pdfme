@@ -35,7 +35,7 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
 
 export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
-  const isForm = mode === 'form';
+  const editable = mode === 'form' || mode === 'designer';
 
   const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
@@ -47,7 +47,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   };
   Object.assign(container.style, containerStyle);
   container.addEventListener('click', (e) => {
-    if (isForm) {
+    if (editable) {
       e.stopPropagation();
     }
   });
@@ -63,7 +63,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   }
 
   // remove button
-  if (value && isForm) {
+  if (value && editable) {
     const button = document.createElement('button');
     button.textContent = 'x';
     const buttonStyle: CSS.Properties = {
@@ -90,14 +90,14 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   }
 
   // file input
-  if (!value && isForm) {
+  if (!value && editable) {
     const label = document.createElement('label');
     const labelStyle: CSS.Properties = {
       ...fullSize,
-      display: isForm ? 'flex' : 'none',
+      display: editable ? 'flex' : 'none',
       position: 'absolute',
       top: 0,
-      backgroundColor: isForm || value ? 'rgb(242 244 255 / 75%)' : 'none',
+      backgroundColor: editable || value ? 'rgb(242 244 255 / 50%)' : 'none',
       cursor: 'pointer',
     };
     Object.assign(label.style, labelStyle);

@@ -1,4 +1,3 @@
-/* eslint dot-notation: "off"*/
 import { z } from 'zod';
 
 const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it'] as const;
@@ -22,7 +21,6 @@ const SchemaForUIAdditionalInfo = z.object({
   key: z.string(),
   data: z.string(),
 });
-
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
@@ -47,7 +45,7 @@ export const Template = z.object({
 
 export const Inputs = z.array(z.record(z.string())).min(1);
 
-const CommonOptions = z.object({ font: Font.optional() });
+const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 
 const CommonProps = z.object({
   template: Template,
@@ -57,16 +55,14 @@ const CommonProps = z.object({
 
 // -------------------generate-------------------
 
-export const GeneratorOptions = CommonOptions;
+export const GeneratorOptions = CommonOptions.extend({});
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
   options: GeneratorOptions.optional(),
 }).strict();
 
-export const SchemaInputs = z.record(z.string());
-
-// ---------------------------------------------
+// ---------------------ui------------------------
 
 export const UIOptions = CommonOptions.extend({ lang: Lang.optional() });
 
@@ -77,22 +73,6 @@ export const UIProps = CommonProps.extend({
   options: UIOptions.optional(),
 });
 
-// -----------------Form, Viewer-----------------
-
 export const PreviewProps = UIProps.extend({ inputs: Inputs }).strict();
-export const PreviewReactProps = PreviewProps.omit({ domContainer: true }).extend({
-  onChangeInput: z
-    .function()
-    .args(z.object({ index: z.number(), value: z.string(), key: z.string() }))
-    .returns(z.void())
-    .optional(),
-  size: Size,
-});
-
-// ---------------Designer---------------
 
 export const DesignerProps = UIProps.extend({}).strict();
-export const DesignerReactProps = DesignerProps.omit({ domContainer: true }).extend({
-  onSaveTemplate: z.function().args(Template).returns(z.void()),
-  size: Size,
-});

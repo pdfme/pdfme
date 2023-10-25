@@ -12,6 +12,8 @@ const templateItems = ['white', 'green', 'blue'].map((c) => ({
   imgUrl: `/img/templates/invoice_${c}.webp`,
 }));
 
+
+
 export default () => (
   <DemoApp
     title={title}
