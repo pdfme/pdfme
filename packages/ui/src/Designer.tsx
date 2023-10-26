@@ -48,7 +48,7 @@ class Designer extends BaseUIClass {
       {} as PropPanelObject
     );
     if (Object.keys(customPropPanel).length > 0) {
-      this.propPanelRegistry = customPropPanel
+      this.propPanelRegistry = customPropPanel;
     }
 
     this.render();

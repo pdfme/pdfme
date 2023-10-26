@@ -86,15 +86,22 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       position: {
         type: 'object',
         widget: 'card',
-        column: 2,
         properties: {
           x: { title: 'X', type: 'number', widget: 'inputNumber' },
           y: { title: 'Y', type: 'number', widget: 'inputNumber' },
         },
       },
-      width: { title: 'Width', type: 'number', widget: 'inputNumber' },
-      height: { title: 'Height', type: 'number', widget: 'inputNumber' },
-      rotate: { title: 'Rotate', type: 'number', widget: 'inputNumber', span: 8, max: 360, min: 0 },
+      width: { title: 'Width', type: 'number', widget: 'inputNumber', span: 8 },
+      height: { title: 'Height', type: 'number', widget: 'inputNumber', span: 8 },
+      rotate: {
+        title: 'Rotate',
+        type: 'number',
+        widget: 'inputNumber',
+        span: 8,
+        disabled: activeSchema.rotate === undefined,
+        max: 360,
+        min: 0,
+      },
     },
   };
 

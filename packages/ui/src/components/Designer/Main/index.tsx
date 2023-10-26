@@ -242,6 +242,10 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     setEditing(true);
   };
 
+  const rotatable = schemasList[pageCursor]
+    .filter((s) => activeElements.map((ae) => ae.id).includes(s.id))
+    .every((schema) => schema.rotate !== undefined);
+
   return (
     <div ref={ref} style={{ overflow: 'overlay' }}>
       <Selecto
@@ -317,6 +321,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
                   horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                   verticalGuidelines={getGuideLines(verticalGuides.current, index)}
                   keepRatio={isPressShiftKey}
+                  rotatable={rotatable}
                   onDrag={onDrag}
                   onDragEnd={onDragEnd}
                   onDragGroupEnd={onDragEnds}
@@ -338,7 +343,9 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
             schema={schema}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             mode={
-              editing && activeElements.map((ae) => ae.id).includes(schema.id) ? 'designer' : 'viewer'
+              editing && activeElements.map((ae) => ae.id).includes(schema.id)
+                ? 'designer'
+                : 'viewer'
             }
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
