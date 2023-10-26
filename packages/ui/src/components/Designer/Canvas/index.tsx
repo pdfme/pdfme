@@ -83,7 +83,7 @@ interface Props {
   sidebarOpen: boolean;
 }
 
-const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
+const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const {
     pageCursor,
     scale,
@@ -109,11 +109,6 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
   const [editing, setEditing] = useState(false);
 
   const prevSchemas = usePrevious(schemasList[pageCursor]);
-
-  const sizeExclSidebar = {
-    width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
-    height: size.height,
-  };
 
   const onKeydown = (e: KeyboardEvent) => {
     if (e.shiftKey) setIsPressShiftKey(true);
@@ -263,7 +258,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
         position: 'relative',
         overflow: 'auto',
         marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
-        ...sizeExclSidebar,
+        ...size,
       }}
       ref={ref}
     >
@@ -307,7 +302,7 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
       <Paper
         paperRefs={paperRefs}
         scale={scale}
-        size={sizeExclSidebar}
+        size={size}
         schemasList={schemasList}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
@@ -377,4 +372,4 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     </div>
   );
 };
-export default forwardRef<HTMLDivElement, Props>(Main);
+export default forwardRef<HTMLDivElement, Props>(Canvas);

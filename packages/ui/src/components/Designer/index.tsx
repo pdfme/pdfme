@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { ZOOM, Template, SchemaForUI, ChangeSchemas } from '@pdfme/common';
 import { DesignerReactProps } from '../../types';
 import Sidebar from './Sidebar/index';
-import Main from './Main/index';
+import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
 import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
@@ -281,7 +281,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
       />
-      <Main
+      <Canvas
         ref={mainRef}
         paperRefs={paperRefs}
         hoveringSchemaId={hoveringSchemaId}
@@ -289,7 +289,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         height={size.height - RULER_HEIGHT * ZOOM}
         pageCursor={pageCursor}
         scale={scale}
-        size={size}
+        size={sizeExcSidebar}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         activeElements={activeElements}
