@@ -71,7 +71,7 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="width: 1200px; height: 1200px; position: relative; overflow: auto;"
     >
       <div
-        style="transform: scale(1); transform-origin: top left; height: 1199px; width: 1199px;"
+        style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
       >
         <div
           id="@pdfme/ui-paper0"
@@ -204,7 +204,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="width: 1200px; height: 1200px; position: relative; overflow: auto;"
     >
       <div
-        style="transform: scale(1); transform-origin: top left; height: 1199px; width: 1199px;"
+        style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
       >
         <div
           id="@pdfme/ui-paper0"

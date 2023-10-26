@@ -26,10 +26,10 @@ const Paper = (props: {
       style={{
         transform: `scale(${scale})`,
         transformOrigin: 'top left',
-        // NOTE: These values do not apply, but changing them with scale ensures the
-        // container is updated to show appropriately sized scrollbars when you zoom in/out.
-        height: size.height - scale,
-        width: size.width - scale,
+        // NOTE: These values do not impact the UI unless they exceed the Paper sizes.
+        // We set them to the scale value to ensure the container is redrawn when you zoom in/out.
+        height: scale,
+        width: scale,
       }}
     >
       {backgrounds.map((background, paperIndex) => {
