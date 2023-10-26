@@ -275,7 +275,7 @@ describe('check validation', () => {
       await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual(`Invalid argument:
+      expect(e.message).toEqual(`[@pdfme/common] Invalid argument:
 --------------------------
 ERROR POSITION: inputs
 ERROR MESSAGE: Array must contain at least 1 element(s)
@@ -305,7 +305,8 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        'fallback flag is not found in font. true fallback flag must be only one.'
+        `[@pdfme/common] fallback flag is not found in font. true fallback flag must be only one.
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       );
     }
   });
@@ -332,7 +333,8 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        '2 fallback flags found in font. true fallback flag must be only one.'
+        `[@pdfme/common] 2 fallback flags found in font. true fallback flag must be only one.
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       );
     }
   });
@@ -362,7 +364,10 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
       await generate({ inputs, template, options: { font: getFont() } });
       fail();
     } catch (e: any) {
-      expect(e.message).toEqual('SauceHanSansJP2 of template.schemas is not found in font.');
+      expect(e.message).toEqual(
+        `[@pdfme/common] SauceHanSansJP2 of template.schemas is not found in font.
+Check this document: https://pdfme.com/docs/custom-fonts`
+      );
     }
   });
 
