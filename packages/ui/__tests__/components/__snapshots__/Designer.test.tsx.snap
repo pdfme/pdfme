@@ -234,7 +234,7 @@ exports[`Designer snapshot 1`] = `
         class="selecto-selection rCS179bs95"
       />
       <div
-        style="transform: scale(1); transform-origin: top left; height: 1201px; width: 851px;"
+        style="transform: scale(1); transform-origin: top left; height: 1199px; width: 849px;"
       >
         <div
           id="@pdfme/ui-paper0"

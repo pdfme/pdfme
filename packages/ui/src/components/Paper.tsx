@@ -30,7 +30,6 @@ const Paper = (props: {
         // container is updated to show appropriately sized scrollbars when you zoom in/out.
         height: size.height - scale,
         width: size.width - scale,
-        marginBottom: '30px',
       }}
     >
       {backgrounds.map((background, paperIndex) => {
