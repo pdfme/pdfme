@@ -12,7 +12,7 @@ import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 
 const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
-  const rootRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const [unitCursor, setUnitCursor] = useState(0);
@@ -38,7 +38,7 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   }, [init]);
 
   useScrollPageCursor({
-    ref: rootRef,
+    ref: containerRef,
     pageSizes,
     scale,
     pageCursor,
@@ -62,54 +62,50 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   );
 
   return (
-    <Root ref={rootRef} size={size} scale={scale}>
+    <Root size={size} scale={scale}>
       <CtlBar
-        size={{ height: Math.max(size.height, pageSizesHeightSum), width: size.width }}
+        size={size}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
-          if (!rootRef.current) return;
-          rootRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
+          if (!containerRef.current) return;
+          containerRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
           setPageCursor(p);
         }}
         zoomLevel={zoomLevel}
-        setZoomLevel={(zoom) => {
-          if (rootRef.current) {
-            rootRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pageCursor, scale);
-          }
-          setZoomLevel(zoom);
-        }}
+        setZoomLevel={setZoomLevel}
       />
       <UnitPager
-        size={{ height: Math.max(size.height, pageSizesHeightSum), width: size.width }}
+        size={size}
         unitCursor={unitCursor}
         unitNum={inputs.length}
         setUnitCursor={setUnitCursor}
       />
-
-      <Paper
-        paperRefs={paperRefs}
-        scale={scale}
-        size={size}
-        schemasList={schemasList}
-        pageSizes={pageSizes}
-        backgrounds={backgrounds}
-        renderSchema={({ schema, index }) => {
-          const { key } = schema;
-          const data = (input && input[key]) || '';
-          return (
-            <Renderer
-              key={schema.id}
-              schema={Object.assign(schema, { data })}
-              mode={isForm ? 'form' : 'viewer'}
-              placeholder={template.sampledata?.[0]?.[key] ?? ''}
-              tabIndex={index + 100}
-              onChange={(value) => handleChangeInput({ key, value })}
-              outline={isForm ? '1px dashed #4af' : 'transparent'}
-            />
-          );
-        }}
-      />
+      <div ref={containerRef} style={{ ...size, position: 'relative', overflow: 'auto' }}>
+        <Paper
+          paperRefs={paperRefs}
+          scale={scale}
+          size={size}
+          schemasList={schemasList}
+          pageSizes={pageSizes}
+          backgrounds={backgrounds}
+          renderSchema={({ schema, index }) => {
+            const { key } = schema;
+            const data = (input && input[key]) || '';
+            return (
+              <Renderer
+                key={schema.id}
+                schema={Object.assign(schema, { data })}
+                mode={isForm ? 'form' : 'viewer'}
+                placeholder={template.sampledata?.[0]?.[key] ?? ''}
+                tabIndex={index + 100}
+                onChange={(value) => handleChangeInput({ key, value })}
+                outline={isForm ? '1px dashed #4af' : 'transparent'}
+              />
+            );
+          }}
+        />
+      </div>
     </Root>
   );
 };
