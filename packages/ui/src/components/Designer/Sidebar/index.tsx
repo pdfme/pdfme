@@ -1,32 +1,16 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import type { SidebarProps } from '../../../types';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext, FontContext } from '../../../contexts';
+import { SIDEBAR_WIDTH } from '../../../constants';
+import { I18nContext } from '../../../contexts';
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
-import { getFallbackFontName, Schema } from '@pdfme/common';
 
 const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
-  const font = useContext(FontContext);
-  const fallbackFont = getFallbackFontName(font);
-
-  const getActiveSchemas = () => {
-    const ids = activeElements.map((ae) => ae.id);
-    const activeSchema = schemas.find((s) => ids.includes(s.id));
-
-    if (activeSchema?.type === 'text') {
-      if (!(activeSchema as Schema & { fontName?: string }).fontName) {
-        (activeSchema as Schema & { fontName?: string }).fontName = fallbackFont;
-      }
-    }
-
-    return schemas.filter((s) => ids.includes(s.id));
-  };
-
+  const getActiveSchemas = () => schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id))
   const getLastActiveSchema = () => {
     const activeSchemas = getActiveSchemas();
     return activeSchemas[activeSchemas.length - 1];

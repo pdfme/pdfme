@@ -92,11 +92,17 @@ const TemplateEditor = ({
   const changeSchemas: ChangeSchemas = useCallback(
     (objs) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
-        const tgt = acc.find((s) => s.id === schemaId)!;
+        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;
         // Assign to reference
         set(tgt, key, value);
 
         if (key === 'type') {
+          const keysToKeep = ['id', 'key', 'type', 'position'];
+          Object.keys(tgt).forEach((key) => {
+            if (!keysToKeep.includes(key)) {
+              delete tgt[key as keyof typeof tgt];
+            }
+          });
           const propPanel = propPanelRegistry[value as string];
           set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});

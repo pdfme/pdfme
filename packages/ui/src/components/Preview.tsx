@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { ZOOM, SchemaForUI } from '@pdfme/common';
-import { PreviewReactProps } from "../types";
+import { PreviewReactProps } from '../types';
 import { RULER_HEIGHT } from '../constants';
 import UnitPager from './UnitPager';
 import Root from './Root';

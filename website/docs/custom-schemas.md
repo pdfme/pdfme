@@ -17,8 +17,6 @@ This page explains how to use schemas from `@pdfme/schemas` and how to create yo
 
 Here, we explain how to import image and QR code schemas from `@pdfme/schemas`.
 
-### Getting Started
-
 First, install `@pdfme/schemas`.
 
 ```bash
@@ -81,23 +79,19 @@ By loading image and qrcode as plugins, you can render schemas of type image and
 
 ![](/img/custom-schemas.png)
 
-### Tips
+:::tip
 
-Using plugins, you can override the default schema to remove text, replace it with custom schema, or rearrange the order.
+Using plugins from Designer, you can override the default schema to remove text, replace it with custom schema, or rearrange the order.
 
 ```ts
-const designer = new Designer({
-  domContainer,
-  template,
-  // ↓ You can remove text schema and rearrange the order(1st: qrcode, 2nd: image) like this.
   plugins: {
     qrcode: barcodes.qrcode,
     image,
   },
-});
 ```
 
 ![](/img/custom-schemas-tips.png)
+:::
 
 ## Creating Your Own Schemas
 
@@ -142,6 +136,13 @@ The code for existing schemas can be found in the files below:
 - [packages/schemas/src/text/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/text/index.ts): The most complex schema in terms of PDF rendering. The propPanel is also customized using [form-render's Widget](https://xrender.fun/form-render/advanced-widget), demonstrating that the plugin can meet complex needs.
 - [packages/schemas/src/image/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/image/index.ts): Simple implementation for PDF rendering, but uses an input type="file" element for image input during ui(mode: form) and ui(mode: designer) rendering. Overall, it’s a simple implementation and may serve as a good starting point.
 - [packages/schemas/src/barcodes/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/barcodes/index.ts): Cool for generating barcodes in real-time for ui preview, and shares that module with pdf. Also, supports more than 10 types of barcodes and changes the form in the propPanel according to the type of barcode. Demonstrates that the plugin can be both flexible and efficient.
+
+:::tip
+
+- If `PropPanel.defaultSchema.rotate` is not set or is undefined, the rotate handle will disappear from the Designer.
+- If rotation is not required, it's efficient to skip its implementation in PDF rendering.
+
+:::
 
 ### Creating Your Own Schema
 

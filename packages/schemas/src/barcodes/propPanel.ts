@@ -13,7 +13,14 @@ const default40x20 = { width: 40, height: 20 };
 const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] = [
   {
     defaultValue: 'https://pdfme.com/',
-    defaultSchema: { type: 'qrcode', position, ...defaultColors, width: 30, height: 30 },
+    defaultSchema: {
+      type: 'qrcode',
+      position,
+      ...defaultColors,
+      width: 30,
+      height: 30,
+      rotate: 0,
+    },
   },
   {
     defaultValue: '6540123789-A-K-Z',
@@ -24,6 +31,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       width: 80,
       height: 7.2,
+      rotate: 0,
     },
   },
   {
@@ -35,6 +43,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       height: 16,
+      rotate: 0,
     },
   },
   {
@@ -45,6 +54,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultColors,
       ...defaultTextColors,
       ...default40x20,
+      rotate: 0,
     },
   },
   {
@@ -65,6 +75,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultColors,
       ...defaultTextColors,
       ...default40x20,
+      rotate: 0,
     },
   },
   {
@@ -75,6 +86,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultColors,
       ...defaultTextColors,
       ...default40x20,
+      rotate: 0,
     },
   },
   {
@@ -86,6 +98,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       height: 12,
+      rotate: 0,
     },
   },
   {
@@ -97,6 +110,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       height: 16,
+      rotate: 0,
     },
   },
   {
@@ -107,11 +121,19 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultColors,
       ...defaultTextColors,
       ...default40x20,
+      rotate: 0,
     },
   },
   {
     defaultValue: '(01)03453120000011(17)191125(10)ABCD1234',
-    defaultSchema: { type: 'gs1datamatrix', position, ...defaultColors, width: 30, height: 30 },
+    defaultSchema: {
+      type: 'gs1datamatrix',
+      position,
+      ...defaultColors,
+      width: 30,
+      height: 30,
+      rotate: 0,
+    },
   },
 ];
 
