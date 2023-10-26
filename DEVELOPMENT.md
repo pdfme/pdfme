@@ -1,5 +1,11 @@
-Clone the repository , install dependency and use `npm link` for local development.  
-For this purpose, please do `npm link` in `packages/generator` and `packages/ui`.
+To develop pdfme locally you need to install it, then embed it within a React application.
+You can either use your own, or use the [pdfme-playground](https://github.com/pdfme/pdfme-playground).
+
+## Installing and linking pdfme
+
+* Clone the repository
+* install dependency with `npm install`
+* Use `npm link` in `packages/generator` and `packages/ui`:
 
 ```cmd
 [in pdfme dir] $ npm install
@@ -8,36 +14,46 @@ For this purpose, please do `npm link` in `packages/generator` and `packages/ui`
 [in pdfme/packages/generator dir] $ npm link
 ```
 
-Then, run `npm run develop` on `packages/common`, `packages/generator`, and `packages/ui`, and
-Make sure that any changes are output to the each packages's `dist` folder.
+Then, run `npm run develop` on `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui`, 
+and make sure that any changes are output to each packages `dist` folder.
 
 ```cmd
 [in pdfme/packages/common dir] $ npm run develop
+[in pdfme/packages/schemas dir] $ npm run develop
 [in pdfme/packages/ui dir] $ npm run develop
 [in pdfme/packages/generator dir] $ npm run develop
 ```
 
-To confirm the changes, for example, create a React application with `npx create-react-app my-app` in other folder and
-Install `@pdfme/generator` and `@pdfme/ui` with the following command.
+## Using pdfme UI within an application
+
+### Create your own application
+
+Create a React application, e.g. with `npx create-react-app my-app` in another folder and
+Install `@pdfme/generator` and `@pdfme/ui` with the following command:
 
 ```cmd
 [in my-app dir] $ npm install --save @pdfme/generator @pdfme/ui
 ```
 
-In addition, connect `packages/generator` and `packages/ui`, which you npm linked above, to my-app with the following command
+### OR use the pdfme-playground
+
+If you don't want to prepare your own app, you can clone the [pdfme-playground](https://github.com/pdfme/pdfme-playground) repository, which contains a comprehensive example of how to use the pdfme ui and generator in a browser.
+
+### Linking packages to your checked out version of pdfme
+
+Regardless of whether you use your own application or the pdfme-playground, you need to link the packages to your checked out version of pdfme.
+
+Connect `packages/generator` and `packages/ui`, which you npm linked above, to the relevant app with the following command:
 
 ```cmd
-[in my-app dir] $ npm link @pdfme/generator @pdfme/ui
+[in app dir] $ npm link @pdfme/generator @pdfme/ui
 ```
 
-> If you don't want to prepare my-app by yourself, you can clone the following repository and use npm link @pdfme/generator @pdfme/ui to develop it.  
-> https://github.com/pdfme/pdfme-playground
-
-You can use `npm ls` to check if the `npm link` is configured correctly as follows.
+You can use `npm ls` to check if the `npm link` is configured correctly as follows:
 
 ```cmd
-[in my-app dir] $ npm ls
-my-app@0.1.0 /Users/user/my-app
+[in app dir] $ npm ls
+app@0.1.0 /Users/user/app
 ├── @pdfme/generator@npm:generator@1.0.0-beta.7 extraneous -> ./../../../pdfme/packages/generator
 ├── @pdfme/ui@npm:ui@1.0.0-beta.7 extraneous -> ./../../../pdfme/packages/ui
 ├── @testing-library/jest-dom@5.16.2
@@ -49,6 +65,9 @@ my-app@0.1.0 /Users/user/my-app
 └── web-vitals@2.1.4
 ```
 
-Now, changes in `packages/common`, `packages/generator`, and `packages/ui` will be reflected in my-app's @pdfme/generator and @pdfme/ui.
+Now, changes in `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui` will be reflected in the app's @pdfme/generator and @pdfme/ui.
 
-If you run npm run start on my-app and rewrite `packages/common`, `packages/generator`, and `packages/ui`, you can confirm the changes on my-app
+If you run `npm run start` on your app and make changes to any of the pdfme packages you can confirm these changes within your app.
+
+Note that after making codes changes you will need to rebuild each package (`npm run build`). If you changed either `packages/common` or `packages/schemas` then you will also need to rebuild the package using them (`ui` or `generator`).
+

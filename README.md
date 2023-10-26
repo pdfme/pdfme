@@ -290,6 +290,11 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 ![](https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/viewer.png)
 
+## Examples using pdfme
+
+If you are looking for code examples using pdfme to get started, please check out the [pdfme-playground](https://github.com/pdfme/pdfme-playground) repository 
+or look at the examples in the `websit/src/pages/` folder of this repository. Settings these up is covered in the [DEVELOPMENT.md](DEVELOPMENT.md) file.
+
 ## Special Thanks
 
 - [pdf-lib](https://pdf-lib.js.org/): Used in PDF generation.
