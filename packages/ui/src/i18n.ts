@@ -13,7 +13,7 @@ const dictEn = {
   fieldMustUniq: 'Name of field is not unique',
   notUniq: '(Not unique name)',
   noKeyName: 'No name',
-  fieldsList: 'List of Fields',
+  fieldsList: 'Field List',
   addNewField: 'Add new field',
   editField: 'Edit Field',
   type: 'Type',

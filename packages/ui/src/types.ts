@@ -34,6 +34,8 @@ export type SidebarProps = {
   changeSchemas: ChangeSchemas;
   addSchema: () => void;
   deselectSchema: () => void;
+  sidebarOpen: boolean;
+  setSidebarOpen: (sidebarOpen: boolean) => void;
 };
 
 export type UIRender = (arg: UIRenderProps<Schema>) => Promise<void>;

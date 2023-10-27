@@ -2,8 +2,8 @@ import React, { useRef, useState, useEffect, useContext, useCallback } from 'rea
 import { ZOOM, Template, SchemaForUI, ChangeSchemas } from '@pdfme/common';
 import { DesignerReactProps } from '../../types';
 import Sidebar from './Sidebar/index';
-import Main from './Main/index';
-import { RULER_HEIGHT } from '../../constants';
+import Canvas from './Canvas/index';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
 import { I18nContext, PropPanelRegistry } from '../../contexts';
 import {
   uuid,
@@ -42,6 +42,7 @@ const TemplateEditor = ({
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
 
@@ -236,6 +237,11 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     setHoveringSchemaId(id);
   };
 
+  const sizeExcSidebar = {
+    width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
+    height: size.height,
+  };
+
   if (error) {
     return <ErrorScreen size={size} error={error} />;
   }
@@ -243,7 +249,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   return (
     <Root size={size} scale={scale}>
       <CtlBar
-        size={size}
+        size={sizeExcSidebar}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
@@ -253,12 +259,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           onEditEnd();
         }}
         zoomLevel={zoomLevel}
-        setZoomLevel={(zoom) => {
-          if (mainRef.current) {
-            mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pageCursor, scale);
-          }
-          setZoomLevel(zoom);
-        }}
+        setZoomLevel={setZoomLevel}
       />
       <Sidebar
         hoveringSchemaId={hoveringSchemaId}
@@ -277,8 +278,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         onEditEnd={onEditEnd}
         addSchema={addSchema}
         deselectSchema={onEditEnd}
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
       />
-      <Main
+      <Canvas
         ref={mainRef}
         paperRefs={paperRefs}
         hoveringSchemaId={hoveringSchemaId}
@@ -286,13 +289,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         height={size.height - RULER_HEIGHT * ZOOM}
         pageCursor={pageCursor}
         scale={scale}
-        size={size}
+        size={sizeExcSidebar}
         pageSizes={pageSizes}
         backgrounds={backgrounds}
         activeElements={activeElements}
         schemasList={schemasList}
         changeSchemas={changeSchemas}
         removeSchemas={removeSchemas}
+        sidebarOpen={sidebarOpen}
         onEdit={onEdit}
       />
     </Root>

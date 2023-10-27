@@ -10,7 +10,7 @@ import React, {
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { RULER_HEIGHT } from '../../../constants';
+import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
@@ -80,9 +80,10 @@ interface Props {
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
+  sidebarOpen: boolean;
 }
 
-const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
+const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const {
     pageCursor,
     scale,
@@ -92,8 +93,13 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     activeElements,
     schemasList,
     hoveringSchemaId,
+    onEdit,
+    changeSchemas,
+    removeSchemas,
+    onChangeHoveringSchemaId,
+    paperRefs,
+    sidebarOpen,
   } = props;
-  const { onEdit, changeSchemas, removeSchemas, onChangeHoveringSchemaId, paperRefs } = props;
 
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
@@ -247,7 +253,15 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     .every((schema) => schema.rotate !== undefined);
 
   return (
-    <div ref={ref} style={{ overflow: 'overlay' }}>
+    <div
+      style={{
+        position: 'relative',
+        overflow: 'auto',
+        marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        ...size,
+      }}
+      ref={ref}
+    >
       <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
@@ -358,4 +372,4 @@ const Main = (props: Props, ref: Ref<HTMLDivElement>) => {
     </div>
   );
 };
-export default forwardRef<HTMLDivElement, Props>(Main);
+export default forwardRef<HTMLDivElement, Props>(Canvas);
