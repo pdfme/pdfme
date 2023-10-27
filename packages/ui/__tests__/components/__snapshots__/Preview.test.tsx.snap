@@ -75,7 +75,7 @@ exports[`Preview(as Form) snapshot 1`] = `
       >
         <div
           id="@pdfme/ui-paper0"
-          style="font-family: 'Roboto'; top: 30px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+          style="font-family: 'Roboto'; top: 0px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div>
             <div
@@ -208,7 +208,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       >
         <div
           id="@pdfme/ui-paper0"
-          style="font-family: 'Roboto'; top: 30px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+          style="font-family: 'Roboto'; top: 0px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div>
             <div
