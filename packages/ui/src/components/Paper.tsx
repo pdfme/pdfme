@@ -1,7 +1,7 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
 import { ZOOM, SchemaForUI, Size, getFallbackFontName } from '@pdfme/common';
 import { FontContext } from '../contexts';
-import { RULER_HEIGHT } from '../constants';
+import { RULER_HEIGHT, PAGE_GAP } from '../constants';
 
 const Paper = (props: {
   paperRefs: MutableRefObject<HTMLDivElement[]>;
@@ -12,10 +12,21 @@ const Paper = (props: {
   backgrounds: string[];
   renderPaper?: (arg: { index: number; paperSize: Size }) => ReactNode;
   renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
+  hasRulers?: boolean;
 }) => {
-  const { paperRefs, scale, size, schemasList, pageSizes, backgrounds, renderPaper, renderSchema } =
-    props;
+  const {
+    paperRefs,
+    scale,
+    size,
+    schemasList,
+    pageSizes,
+    backgrounds,
+    renderPaper,
+    renderSchema,
+    hasRulers,
+  } = props;
   const font = useContext(FontContext);
+  const rulerHeight = hasRulers ? RULER_HEIGHT : 0;
 
   if (pageSizes.length !== backgrounds.length || pageSizes.length !== schemasList.length) {
     return null;
@@ -41,9 +52,13 @@ const Paper = (props: {
         // However, we want to display the content centrally, so we apply a left indent for
         // when the content does not exceed its container
         const leftCenteringIndent =
-          paperSize.width * scale + RULER_HEIGHT < size.width
+          paperSize.width * scale + rulerHeight < size.width
             ? `${(size.width / scale - paperSize.width) / 2}px`
-            : `${RULER_HEIGHT}px`;
+            : `${rulerHeight}px`;
+
+        // Rulers are drawn above/before the top of each page, so we place the start of the page below them
+        const pageTop =
+          paperIndex > 0 ? `${(rulerHeight + PAGE_GAP) * (paperIndex + 1)}px` : `${rulerHeight}px`;
 
         return (
           <div
@@ -66,7 +81,7 @@ const Paper = (props: {
             }}
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
-              top: `${RULER_HEIGHT}px`,
+              top: pageTop,
               left: leftCenteringIndent,
               position: 'relative',
               backgroundImage: `url(${background})`,
