@@ -36,6 +36,25 @@ const config = {
     ],
   ],
   plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            to: '/docs/tables',
+            from: '/docs/guides/tables',
+          },
+          {
+            to: '/docs/custom-fonts',
+            from: '/docs/guides/custom-fonts',
+          },
+          {
+            to: '/docs/development-guide',
+            from: '/development-guide',
+          },
+        ],
+      },
+    ],
     function myPlugin() {
       return {
         name: 'custom-docusaurus-plugin',
