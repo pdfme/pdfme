@@ -1,5 +1,7 @@
 import React, {
   Ref,
+  useMemo,
+  useContext,
   MutableRefObject,
   useRef,
   useState,
@@ -9,6 +11,7 @@ import React, {
 } from 'react';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
+import { PropPanelRegistry } from '../../../contexts';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -100,6 +103,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     paperRefs,
     sidebarOpen,
   } = props;
+  const propPanelRegistry = useContext(PropPanelRegistry);
 
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
@@ -248,9 +252,16 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     setEditing(true);
   };
 
-  const rotatable = schemasList[pageCursor]
-    .filter((s) => activeElements.map((ae) => ae.id).includes(s.id))
-    .every((schema) => schema.rotate !== undefined);
+  const rotatable = useMemo(() => {
+    const selectedSchemas = schemasList[pageCursor].filter((s) =>
+      activeElements.map((ae) => ae.id).includes(s.id)
+    );
+    const schemaTypes = selectedSchemas.map((s) => s.type);
+    const uniqueSchemaTypes = [...new Set(schemaTypes)];
+    return uniqueSchemaTypes.every(
+      (type) => propPanelRegistry[type]?.defaultSchema?.rotate !== undefined
+    );
+  }, [activeElements, pageCursor, schemasList]);
 
   return (
     <div
@@ -315,14 +326,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {
-                if (e) {
-                  horizontalGuides.current[index] = e;
-                }
+                if (e) horizontalGuides.current[index] = e;
               }}
               verticalRef={(e) => {
-                if (e) {
-                  verticalGuides.current[index] = e;
-                }
+                if (e) verticalGuides.current[index] = e;
               }}
             />
             {pageCursor !== index ? (

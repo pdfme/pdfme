@@ -98,7 +98,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: activeSchema.rotate === undefined,
+        disabled: activePropPanelRegistry?.defaultSchema?.rotate === undefined,
         max: 360,
         min: 0,
       },
