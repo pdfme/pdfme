@@ -1,8 +1,17 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { ZOOM } from '@pdfme/common';
+import { ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { RendererRegistry, OptionsContext } from '../contexts';
-import { RendererProps } from '../types';
+
+type RendererProps = Omit<
+  UIRenderProps<Schema>,
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options'
+> & {
+  schema: SchemaForUI;
+  onChange: (value: string) => void;
+  outline: string;
+  onChangeHoveringSchemaId?: (id: string | null) => void;
+};
 
 const Wrapper = ({
   children,

@@ -1,7 +1,5 @@
 import React, { useCallback, useRef, useState, useEffect } from 'react';
-import { ZOOM, SchemaForUI } from '@pdfme/common';
-import { PreviewReactProps } from '../types';
-import { RULER_HEIGHT } from '../constants';
+import type { SchemaForUI, PreviewProps, Size } from '@pdfme/common';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -11,7 +9,15 @@ import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
 
-const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) => {
+const Preview = ({
+  template,
+  inputs,
+  size,
+  onChangeInput,
+}: Omit<PreviewProps, 'domContainer'> & {
+  onChangeInput?: (args: { index: number; value: string; key: string }) => void;
+  size: Size;
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
@@ -55,11 +61,6 @@ const Preview = ({ template, inputs, size, onChangeInput }: PreviewReactProps) =
   if (error) {
     return <ErrorScreen size={size} error={error} />;
   }
-
-  const pageSizesHeightSum = pageSizes.reduce(
-    (acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale,
-    0
-  );
 
   return (
     <Root size={size} scale={scale}>

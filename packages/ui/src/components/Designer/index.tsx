@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { ZOOM, Template, SchemaForUI, ChangeSchemas } from '@pdfme/common';
-import { DesignerReactProps } from '../../types';
+import { ZOOM, Template, SchemaForUI, ChangeSchemas, DesignerProps, Size } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
@@ -27,7 +26,10 @@ const TemplateEditor = ({
   size,
   onSaveTemplate,
   onChangeTemplate,
-}: DesignerReactProps & { onChangeTemplate: (t: Template) => void }) => {
+}: Omit<DesignerProps, 'domContainer'> & {
+  onSaveTemplate: (t: Template) => void;
+  size: Size;
+} & { onChangeTemplate: (t: Template) => void }) => {
   const copiedSchemas = useRef<SchemaForUI[] | null>(null);
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);

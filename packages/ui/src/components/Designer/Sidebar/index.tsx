@@ -10,7 +10,8 @@ const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
 
   const i18n = useContext(I18nContext);
-  const getActiveSchemas = () => schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id))
+  const getActiveSchemas = () =>
+    schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id));
   const getLastActiveSchema = () => {
     const activeSchemas = getActiveSchemas();
     return activeSchemas[activeSchemas.length - 1];
