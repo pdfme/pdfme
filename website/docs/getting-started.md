@@ -31,17 +31,19 @@ npm i @pdfme/ui @pdfme/common
 
 The following type, function and classes are available in pdfme.
 
+`@pdfme/common`
+
+- [Template](https://pdfme.com/docs/getting-started#template)
+
 `@pdfme/generator`
 
-- [generate](/docs/getting-started#generator)
-- [Template](/docs/getting-started#template)
+- [generate](https://pdfme.com/docs/getting-started#generator)
 
 `@pdfme/ui`
 
-- [Designer](/docs/getting-started#designer)
-- [Form](/docs/getting-started#form)
-- [Viewer](/docs/getting-started#viewer)
-- [Template](/docs/getting-started#template)
+- [Designer](https://pdfme.com/docs/getting-started#designer)
+- [Form](https://pdfme.com/docs/getting-started#form)
+- [Viewer](https://pdfme.com/docs/getting-started#viewer)
 
 If your environment uses webpack, import the necessary items as shown below.
 

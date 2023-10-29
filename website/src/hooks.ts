@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Template } from '@pdfme/common';
+import type { Template } from '@pdfme/common';
 import type { Form, Viewer } from '@pdfme/ui';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont } from './libs/helper';

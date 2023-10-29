@@ -57,8 +57,7 @@
     "pdf2json": "^2.0.0"
   },
   "peerDependencies": {
-    "@pdfme/common": "latest",
-    "@pdfme/schemas": "latest"
+    "@pdfme/common": "latest"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

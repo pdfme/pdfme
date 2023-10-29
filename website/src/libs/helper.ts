@@ -1,4 +1,4 @@
-import { Template, Font, checkTemplate } from '@pdfme/generator';
+import { Template, Font, checkTemplate } from '@pdfme/common';
 import { examplePdfb64, dogPngb64 } from './sampleData';
 
 export const getSampleTemplate = (): Template => ({

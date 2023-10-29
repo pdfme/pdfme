@@ -79,27 +79,29 @@ npm i @pdfme/ui @pdfme/common
 
 The following type, function and classes are available in pdfme.
 
+`@pdfme/common`
+
+- [Template](https://pdfme.com/docs/getting-started#template)
+
 `@pdfme/generator`
 
 - [generate](https://pdfme.com/docs/getting-started#generator)
-- [Template](https://pdfme.com/docs/getting-started#template)
 
 `@pdfme/ui`
 
 - [Designer](https://pdfme.com/docs/getting-started#designer)
 - [Form](https://pdfme.com/docs/getting-started#form)
 - [Viewer](https://pdfme.com/docs/getting-started#viewer)
-- [Template](https://pdfme.com/docs/getting-started#template)
 
 If your environment uses webpack, import the necessary items as shown below.
 
 ```ts
-import type { Template } from '@pdfme/generator';
+import type { Template } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 ```
 
 ```ts
-import type { Template } from '@pdfme/generator';
+import type { Template } from '@pdfme/common';
 import { Designer, Form, Viewer } from '@pdfme/ui';
 ```
 
@@ -292,7 +294,7 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 ## Examples using pdfme
 
-If you are looking for code examples using pdfme to get started, please check out the [pdfme-playground](https://github.com/pdfme/pdfme-playground) repository 
+If you are looking for code examples using pdfme to get started, please check out the [pdfme-playground](https://github.com/pdfme/pdfme-playground) repository
 or look at the examples in the `websit/src/pages/` folder of this repository. Settings these up is covered in the [DEVELOPMENT.md](DEVELOPMENT.md) file.
 
 ## Special Thanks

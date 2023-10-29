@@ -30,7 +30,11 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-function getBackgroundColor(mode: 'form' | 'viewer' | 'designer', value: string, schema: Schema) {
+const getBackgroundColor = (
+  mode: 'form' | 'viewer' | 'designer',
+  value: string,
+  schema: Schema
+) => {
   if ((mode === 'form' || mode === 'designer') && value && schema.backgroundColor) {
     return schema.backgroundColor as string;
   } else if (mode === 'viewer') {
@@ -38,7 +42,7 @@ function getBackgroundColor(mode: 'form' | 'viewer' | 'designer', value: string,
   } else {
     return 'rgb(242 244 255 / 75%)';
   }
-}
+};
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const {
