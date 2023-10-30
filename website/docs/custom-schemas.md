@@ -144,9 +144,12 @@ The code for existing schemas can be found in the files below:
 
 :::
 
-### Creating Your Own Schema
+### Sample Scenario for Creating a Signature Plugin
 
 As a sample scenario, let's try creating a plugin that allows you to input signatures in the form.  
 Specifically, it should be possible to input the signature using [signature_pad](https://github.com/szimek/signature_pad), and to render that signature as an image in both the DOM and PDF.
 
-Coming soon...
+[![](/img/signature-schema.gif)](https://playground.pdfme.com/)
+
+- Demo: https://playground.pdfme.com/
+- Code: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)

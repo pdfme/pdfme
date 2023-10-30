@@ -40,7 +40,7 @@ export default function HomepageHeader() {
           <div className="col col--3" style={{ marginTop: '1rem' }}>
             <a
               className="button button--lg button--info "
-              href="https://codesandbox.io/embed/github/pdfme/pdfme-playground/tree/main/?module=%2Fsrc%2FDesigner.tsx"
+              href="https://playground.pdfme.com"
               target={'_blank'}
             >
               Playground
