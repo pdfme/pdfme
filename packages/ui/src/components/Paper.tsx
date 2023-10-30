@@ -56,9 +56,14 @@ const Paper = (props: {
             ? `${(size.width / scale - paperSize.width) / 2}px`
             : `${rulerHeight}px`;
 
-        // Rulers are drawn above/before the top of each page, so we place the start of the page below them
-        const pageTop =
-          paperIndex > 0 ? `${(rulerHeight + PAGE_GAP) * (paperIndex + 1)}px` : `${rulerHeight}px`;
+        // Rulers are drawn above/before the top of each page, so each Paper div must have
+        // a top offset considering them.
+        let pageTop = paperIndex > 0 ? (rulerHeight + PAGE_GAP) * (paperIndex + 1) : rulerHeight;
+
+        if (!hasRulers) {
+          // If no rulers (i.e. Preview/Form) then we'll add an initial gap at the top of the first page
+          pageTop += PAGE_GAP * 2;
+        }
 
         return (
           <div
@@ -81,7 +86,7 @@ const Paper = (props: {
             }}
             style={{
               fontFamily: `'${getFallbackFontName(font)}'`,
-              top: pageTop,
+              top: `${pageTop}px`,
               left: leftCenteringIndent,
               position: 'relative',
               backgroundImage: `url(${background})`,
