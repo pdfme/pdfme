@@ -320,7 +320,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
         hasRulers={true}
         renderPaper={({ index, paperSize }) => (
           <>
-            {!editing && activeElements.length > 0 && (
+            {!editing && activeElements.length > 0 && pageCursor === index && (
               <DeleteButton activeElements={activeElements} />
             )}
             <Guides
