@@ -102,6 +102,7 @@ const Preview = ({
                 tabIndex={index + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
                 outline={isForm ? '1px dashed #4af' : 'transparent'}
+                scale={scale}
               />
             );
           }}

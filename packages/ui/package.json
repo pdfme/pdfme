@@ -71,7 +71,8 @@
     "webpack-cli": "^5.0.1"
   },
   "peerDependencies": {
-    "@pdfme/common": "latest"
+    "@pdfme/common": "latest",
+    "@pdfme/schemas": "latest"
   },
   "jest": {
     "setupFiles": [

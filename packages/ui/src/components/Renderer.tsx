@@ -11,6 +11,7 @@ type RendererProps = Omit<
   onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
+  scale: number;
 };
 
 const Wrapper = ({
@@ -44,7 +45,7 @@ const Renderer = (props: RendererProps) => {
   const rendererRegistry = useContext(RendererRegistry);
   const options = useContext(OptionsContext);
 
-  const { schema, mode, onChange, stopEditing, tabIndex, placeholder } = props;
+  const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -79,7 +80,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), mode, options]);
+  }, [JSON.stringify(schema), mode, options, scale]);
 
   return (
     <Wrapper {...props}>

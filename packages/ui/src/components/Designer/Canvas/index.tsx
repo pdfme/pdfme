@@ -377,6 +377,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             }}
             stopEditing={() => setEditing(false)}
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
+            scale={scale}
           />
         )}
       />
