@@ -27,12 +27,12 @@ const generateColumnsAndSampledataIfNeeded = (template: Template) => {
     .map((schema) => Object.keys(schema).length)
     .reduce((acc, cur) => acc + cur, 0);
 
-  const neetColumns = !columns || flatSchemaLength !== columns.length;
+  const needColumns = !columns || flatSchemaLength !== columns.length;
 
   const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
 
   // columns
-  if (neetColumns) {
+  if (needColumns) {
     template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
   }
 

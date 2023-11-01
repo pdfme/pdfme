@@ -80,7 +80,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'string',
         widget: 'select',
         props: {
-          options: Object.entries(pluginsRegistry).map(([label, value]) => ({ label, value: value?.propPanel.defaultSchema.type })),
+          options: Object.entries(pluginsRegistry).map(([label, value]) => ({
+            label,
+            value: value?.propPanel.defaultSchema.type,
+          })),
         },
       },
       key: { title: 'Name', type: 'string', widget: 'input' },
@@ -134,7 +137,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         <span
           style={{
             position: 'absolute',
-            top: '0.75rem',
+            top: '0.85rem',
             zIndex: 100,
             border: 'none',
             borderRadius: 2,
