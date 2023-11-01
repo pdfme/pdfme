@@ -57,12 +57,12 @@ const generate = async (props: GenerateProps) => {
 
         const render = Object.values(plugins).find(
           (plugin) => plugin.propPanel.defaultSchema.type === schema.type
-        );
+        )?.pdf;
         if (!render) {
           throw new Error(`[@pdfme/generator] Renderer for type ${schema.type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
         }
-        await render.pdf({ value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

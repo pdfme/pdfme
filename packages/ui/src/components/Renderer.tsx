@@ -54,7 +54,7 @@ const Renderer = (props: RendererProps) => {
 
       const render = Object.values(pluginsRegistry).find(
         (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-      );
+      )?.ui
 
       if (!render) {
         console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.
@@ -66,7 +66,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       const editable = mode === 'form' || mode === 'designer';
 
-      render.ui({
+      render({
         value: schema.data,
         schema,
         rootElement: ref.current,
