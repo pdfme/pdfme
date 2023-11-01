@@ -65,9 +65,9 @@ const DetailView = (
     (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
   )!;
 
-  const activePropPanelSchema = activePlugin?.propPanel.propPanelSchema;
+  const activePropPanelSchema = activePlugin?.propPanel.schema;
   if (!activePropPanelSchema) {
-    console.error(`[@pdfme/ui] No propPanel.propPanelSchema for ${activeSchema.type}.
+    console.error(`[@pdfme/ui] No propPanel.schema for ${activeSchema.type}.
 Check this document: https://pdfme.com/docs/custom-schemas`);
   }
 
