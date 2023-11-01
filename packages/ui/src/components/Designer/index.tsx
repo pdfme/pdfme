@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
-import { ZOOM, Template, SchemaForUI, ChangeSchemas, DesignerProps, Size } from '@pdfme/common';
+import { ZOOM, Template, Schema, SchemaForUI, ChangeSchemas, DesignerProps, Size, Plugin } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
-import { I18nContext, PropPanelRegistry } from '../../contexts';
+import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
   uuid,
   set,
@@ -37,7 +37,7 @@ const TemplateEditor = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
-  const propPanelRegistry = useContext(PropPanelRegistry);
+  const pluginsRegistry = useContext(PluginsRegistry);
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -105,7 +105,9 @@ const TemplateEditor = ({
               delete tgt[key as keyof typeof tgt];
             }
           });
-          const propPanel = propPanelRegistry[value as string];
+          const propPanel = Object.values(pluginsRegistry).find(
+            (plugin) => plugin?.propPanel.defaultSchema.type === value
+          )?.propPanel;
           set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
         }
@@ -209,7 +211,7 @@ const TemplateEditor = ({
   }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
-    const propPanel = Object.values(propPanelRegistry)[0];
+    const propPanel = (Object.values(pluginsRegistry)[0] as Plugin<Schema>)?.propPanel;
 
     if (!propPanel) {
       throw new Error(`[@pdfme/ui] addSchema failed: propPanel is empty.

@@ -2,8 +2,7 @@ import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
 import type { GenerateProps, Template } from '@pdfme/common';
 import { checkGenerateProps } from '@pdfme/common';
-import type { PDFRenderer } from './types';
-import builtInRenderer from './builtInRenderer';
+import { builtInPlugins } from '@pdfme/schemas';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
 import { TOOL_NAME } from './constants';
 
@@ -27,17 +26,11 @@ const postProcessing = ({ pdfDoc }: { pdfDoc: pdfLib.PDFDocument }) => {
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
-  const { inputs, template, options = {}, plugins = {} } = props;
+  const { inputs, template, options = {}, plugins: userPlugins = {} } = props;
 
   const { pdfDoc, embeddedPages, embedPdfBoxes } = await preprocessing({ template });
 
-  const customRenderer = Object.entries(plugins).reduce(
-    (acc, [key, { pdf }]) => Object.assign(acc, { [key]: pdf }),
-    {} as PDFRenderer
-  );
-
-  const rendererRegistry: PDFRenderer =
-    Object.keys(customRenderer).length > 0 ? customRenderer : builtInRenderer;
+  const plugins = Object.values(userPlugins).length > 0 ? userPlugins : builtInPlugins;
 
   const _cache = new Map();
 
@@ -62,12 +55,14 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        const render = rendererRegistry[schema.type];
+        const render = Object.values(plugins).find(
+          (plugin) => plugin.propPanel.defaultSchema.type === schema.type
+        );
         if (!render) {
           throw new Error(`[@pdfme/generator] Renderer for type ${schema.type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
         }
-        await render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render.pdf({ value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

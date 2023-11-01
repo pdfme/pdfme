@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
-import { PropPanelRegistry } from '../../../contexts';
+import { PluginsRegistry } from '../../../contexts';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
@@ -103,7 +103,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     paperRefs,
     sidebarOpen,
   } = props;
-  const propPanelRegistry = useContext(PropPanelRegistry);
+  const pluginsRegistry = useContext(PluginsRegistry);
 
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
@@ -259,7 +259,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const schemaTypes = selectedSchemas.map((s) => s.type);
     const uniqueSchemaTypes = [...new Set(schemaTypes)];
     return uniqueSchemaTypes.every(
-      (type) => propPanelRegistry[type]?.defaultSchema?.rotate !== undefined
+      (type) => pluginsRegistry[type]?.propPanel.defaultSchema.rotate !== undefined
     );
   }, [activeElements, pageCursor, schemasList]);
 

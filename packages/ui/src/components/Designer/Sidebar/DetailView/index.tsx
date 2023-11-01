@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
-import { I18nContext, PropPanelRegistry, OptionsContext } from '../../../../contexts';
+import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
 import { RULER_HEIGHT } from '../../../../constants';
 import Divider from '../../../Divider';
 import AlignWidget from './AlignWidget';
@@ -21,7 +21,7 @@ const DetailView = (
   const form = useForm();
 
   const i18n = useContext(I18nContext);
-  const propPanelRegistry = useContext(PropPanelRegistry);
+  const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
   const [widgets, setWidgets] = useState<{
@@ -33,8 +33,8 @@ const DetailView = (
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
       Divider,
     };
-    for (const propPanel of Object.values(propPanelRegistry)) {
-      const widgets = propPanel?.widgets || {};
+    for (const plugin of Object.values(pluginsRegistry)) {
+      const widgets = plugin?.propPanel.widgets || {};
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
         newWidgets[widgetKey] = (p) => (
           <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />
@@ -42,7 +42,7 @@ const DetailView = (
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, activeElements, propPanelRegistry]);
+  }, [activeSchema, activeElements, pluginsRegistry]);
 
   useEffect(() => {
     form.setValues({ ...activeSchema });
@@ -61,8 +61,11 @@ const DetailView = (
     }
   };
 
-  const activePropPanelRegistry = propPanelRegistry[activeSchema.type];
-  const activePropPanelSchema = activePropPanelRegistry?.propPanelSchema;
+  const activePlugin = Object.values(pluginsRegistry).find(
+    (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
+  )!;
+
+  const activePropPanelSchema = activePlugin?.propPanel.propPanelSchema;
   if (!activePropPanelSchema) {
     console.error(`[@pdfme/ui] No propPanel.propPanelSchema for ${activeSchema.type}.
 Check this document: https://pdfme.com/docs/custom-schemas`);
@@ -77,7 +80,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'string',
         widget: 'select',
         props: {
-          options: Object.keys(propPanelRegistry).map((label) => ({ label, value: label })),
+          options: Object.entries(pluginsRegistry).map(([label, value]) => ({ label, value: value?.propPanel.defaultSchema.type })),
         },
       },
       key: { title: 'Name', type: 'string', widget: 'input' },
@@ -98,7 +101,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'number',
         widget: 'inputNumber',
         span: 8,
-        disabled: activePropPanelRegistry?.defaultSchema?.rotate === undefined,
+        disabled: activePlugin.propPanel.defaultSchema?.rotate === undefined,
         max: 360,
         min: 0,
       },

@@ -142,14 +142,11 @@ export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
   } = arg;
   const allSchemaTypes = uniq(schemas.map((s) => Object.values(s).map((v) => v.type)).flat());
 
-  // text and image are builtin schema types so they are not included in plugins.
-  const exceptBuiltinSchemaTypes = allSchemaTypes.filter((t) => t !== 'text' && t !== 'image');
+  const pluginsSchemaTypes = Object.values(plugins).map((p) => p?.propPanel.defaultSchema.type);
 
-  const pluginsSchemaTypes = Object.keys(plugins);
-
-  if (exceptBuiltinSchemaTypes.some((s) => !pluginsSchemaTypes.includes(s))) {
+  if (allSchemaTypes.some((s) => !pluginsSchemaTypes.includes(s))) {
     throw Error(
-      `[@pdfme/common] ${exceptBuiltinSchemaTypes
+      `[@pdfme/common] ${allSchemaTypes
         .filter((s) => !pluginsSchemaTypes.includes(s))
         .join()} of template.schemas is not found in plugins.`
     );
