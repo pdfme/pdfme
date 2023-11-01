@@ -151,5 +151,5 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
 
   if (!defaults) throw new Error(`[@pdfme/schemas] No default for barcode type ${barcodeType}`);
 
-  return { propPanelSchema: schema, ...defaults };
+  return { schema, ...defaults };
 };

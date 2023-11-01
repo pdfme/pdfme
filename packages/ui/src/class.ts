@@ -1,14 +1,13 @@
 import ReactDOM from 'react-dom';
-import type { UIRenderer } from './types';
 import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
 import { debounce, flatten, cloneDeep } from './helper';
-import builtInRenderer from './builtInRenderer';
 import {
   Template,
   Size,
   Lang,
   Font,
+  Plugins,
   UIProps,
   UIOptions,
   PreviewProps,
@@ -19,6 +18,7 @@ import {
   checkUIOptions,
   checkPreviewProps,
 } from '@pdfme/common';
+import { builtInPlugins } from '@pdfme/schemas';
 
 const generateColumnsAndSampledataIfNeeded = (template: Template) => {
   const { schemas, columns, sampledata } = template;
@@ -67,7 +67,7 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private rendererRegistry: UIRenderer = builtInRenderer;
+  private pluginsRegistry: Plugins = builtInPlugins;
 
   private options = {};
 
@@ -103,12 +103,8 @@ export abstract class BaseUIClass {
       this.font = font;
     }
 
-    const customRenderer = Object.entries(plugins).reduce(
-      (acc, [key, { ui }]) => Object.assign(acc, { [key]: ui }),
-      {} as UIRenderer
-    );
-    if (Object.keys(customRenderer).length > 0) {
-      this.rendererRegistry = customRenderer;
+    if (Object.values(plugins).length > 0) {
+      this.pluginsRegistry = plugins;
     }
   }
 
@@ -120,8 +116,8 @@ export abstract class BaseUIClass {
     return this.font;
   }
 
-  protected getRendererRegistry() {
-    return this.rendererRegistry;
+  protected getPluginsRegistry() {
+    return this.pluginsRegistry;
   }
 
   protected getOptions() {

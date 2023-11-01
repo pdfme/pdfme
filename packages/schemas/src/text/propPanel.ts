@@ -49,7 +49,7 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<TextSchema> = {
-  propPanelSchema: ({ options, activeSchema }) => {
+  schema: ({ options, activeSchema }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);

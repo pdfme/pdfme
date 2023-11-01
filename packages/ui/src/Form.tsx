@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { PreviewProps } from '@pdfme/common';
 import { PreviewUI } from './class';
 import { DESTROYED_ERR_MSG } from './constants';
-import { I18nContext, FontContext, RendererRegistry, OptionsContext } from './contexts';
+import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from './contexts';
 import Preview from './components/Preview';
 
 class Form extends PreviewUI {
@@ -23,7 +23,7 @@ class Form extends PreviewUI {
     ReactDOM.render(
       <I18nContext.Provider value={this.getI18n()}>
         <FontContext.Provider value={this.getFont()}>
-          <RendererRegistry.Provider value={this.getRendererRegistry()}>
+          <PluginsRegistry.Provider value={this.getPluginsRegistry()}>
             <OptionsContext.Provider value={this.getOptions()}>
               <Preview
                 template={this.template}
@@ -39,7 +39,7 @@ class Form extends PreviewUI {
                 }}
               />
             </OptionsContext.Provider>
-          </RendererRegistry.Provider>
+          </PluginsRegistry.Provider>
         </FontContext.Provider>
       </I18nContext.Provider>,
       this.domContainer

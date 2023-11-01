@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
 import { ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
 import { SELECTABLE_CLASSNAME } from '../constants';
-import { RendererRegistry, OptionsContext } from '../contexts';
+import { PluginsRegistry, OptionsContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
@@ -42,7 +42,7 @@ const Wrapper = ({
 );
 
 const Renderer = (props: RendererProps) => {
-  const rendererRegistry = useContext(RendererRegistry);
+  const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
   const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
@@ -51,8 +51,11 @@ const Renderer = (props: RendererProps) => {
 
   useEffect(() => {
     if (ref.current && schema.type) {
-      const schemaType = schema.type as string;
-      const render = rendererRegistry[schemaType];
+
+      const render = Object.values(pluginsRegistry).find(
+        (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
+      )?.ui
+
       if (!render) {
         console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
