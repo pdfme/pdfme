@@ -81,14 +81,12 @@ By loading image and qrcode as plugins, you can render schemas of type image and
 
 :::tip
 
-<!-- FIXME ラベルを上書きすることができることを書く -->
-
-Using plugins from Designer, you can override the default schema to remove text, replace it with custom schema, or rearrange the order.
+Using plugins from Designer, you can override the default schema to remove text, replace it with custom schema, or rename label, rearrange the order.
 
 ```ts
   plugins: {
-    qrcode: barcodes.qrcode,
-    image,
+    QR: barcodes.qrcode,
+    Image: image,
   },
 ```
 
