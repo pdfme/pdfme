@@ -33,7 +33,7 @@ const Sidebar = (props: SidebarProps) => {
           type="button"
           style={{
             position: 'absolute',
-            top: '1.15rem',
+            top: '1.0rem',
             right: '1rem',
             zIndex: 100,
             border: 'none',
