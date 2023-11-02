@@ -1,0 +1,42 @@
+# .github/workflows/publish-commit.yml
+name: Publish Commit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Increment version and append git hash
+        run: ./scripts/increment-version.sh
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set NPM version
+        run: npm version --no-git-tag-version $VERSION
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+        
+      - name: Publish to NPM
+        run: npm publish --workspaces --access public --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

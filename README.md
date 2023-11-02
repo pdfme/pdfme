@@ -77,6 +77,9 @@ npm i @pdfme/ui @pdfme/common
 
 \*You must install `@pdfme/common` regardless of which package you use.
 
+On NPM stable releases are published to the `latest` tag, and pre-releases are published to the `next` tag.
+On the `dev` tag you can find releases for every commit to the `main` branch.
+
 The following type, function and classes are available in pdfme.
 
 `@pdfme/common`
