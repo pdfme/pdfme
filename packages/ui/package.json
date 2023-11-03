@@ -82,7 +82,7 @@
       "./__tests__/test-helpers.js"
     ],
     "moduleNameMapper": {
-      "\\.(png|css)$": "<rootDir>/../../assetsTransformer.js",
+      "\\.(png|css)$": "./assetsTransformer.js",
       "^antd/es/": "antd/lib/",
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",

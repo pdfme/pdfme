@@ -28,7 +28,7 @@
     "packages/ui"
   ],
   "scripts": {
-    "postinstall": "./link-workspaces.sh",
+    "postinstall": "./scripts/link-workspaces.sh",
     "clean": "npm run --workspaces clean",
     "lint": "npm run --workspaces lint",
     "build": "npm run --workspaces clean && npm run --workspaces build",
