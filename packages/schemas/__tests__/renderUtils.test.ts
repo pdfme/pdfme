@@ -2,10 +2,23 @@ import { Schema, mm2pt, pt2mm } from '@pdfme/common';
 import { convertForPdfLayoutProps, rotatePoint, getCacheKey } from '../src/renderUtils';
 
 describe('getCacheKey', () => {
-  it('should return a key of name and input', () => {
+  it('should return a key of JSON string version of the schema with input appended', () => {
     // @ts-ignore
     const schema = { type: 'text', name: 'test' } as Schema;
-    expect(getCacheKey(schema, 'input')).toEqual('textinput');
+    expect(getCacheKey(schema, 'input')).toEqual('{\"type\":\"text\",\"name\":\"test\"}input');
+  });
+
+  it('should return a key for a more complex schema', () => {
+    const schema: Schema = {
+      type: 'image',
+      width: 50,
+      height: 120,
+      position: { x: 100, y: 100 },
+      rotate: 90,
+    };
+    expect(getCacheKey(schema, 'MY_IMAGE')).toEqual(
+      '{\"type\":\"image\",\"width\":50,\"height\":120,\"position\":{\"x\":100,\"y\":100},\"rotate\":90}MY_IMAGE'
+    );
   });
 });
 

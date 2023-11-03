@@ -61,4 +61,4 @@ export const rotatePoint = (
   return { x, y };
 };
 
-export const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
+export const getCacheKey = (schema: Schema, input: string) => `${JSON.stringify(schema)}${input}`;
