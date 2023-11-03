@@ -1,12 +1,5 @@
 # Custom Schemas(Plugins)
 
-:::caution
-This feature is still in beta and has not yet been released to npm.  
-If you encounter bugs, issues, or have suggestions, please report them through [GitHub](https://github.com/pdfme/pdfme/issues/new/choose).
-
-\*The specifications may change in future versions.  
-:::
-
 By default, pdfme allows you to use a text schema. However, some users may want to utilize schemas for images or QR codes.
 These can be loaded as plugins from the `@pdfme/schemas` package.
 
