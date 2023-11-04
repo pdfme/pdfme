@@ -29,7 +29,7 @@
   },
   "scripts": {
     "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "build": "set NODE_ENV=production webpack --mode production",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
