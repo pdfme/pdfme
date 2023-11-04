@@ -146,3 +146,15 @@ Specifically, it should be possible to input the signature using [signature_pad]
 
 - Demo: https://playground.pdfme.com/
 - Code: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)
+
+
+### Caveats for writing Custom Schemas
+
+#### Renderer schema caching
+
+pdfme supports caching of memory or cpu-intensive content so that it can be re-used within the same rendering process.
+
+The most common use-case for this is when you're rendering a large number of PDFs with the same template. Often these
+inputs might be the same and your schema could benefit from caching them. This is optional, but if you're intending for your custom schema to be used by others then you should consider it.
+
+Examples of caching are available in both [image](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/image/pdfRender.ts) and [barcode](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/barcodes/pdfRender.ts) schema render functions. You will need to choosing a caching key that captures the uniqueness of your generated PDF artifact (excluding attributes such as size and position, which are usually handled by pdf-lib on rendering). You will notice in the barcode schema that it requires more attributes to describe it's uniqueness compare to images which use the default `getCacheKey` function.
