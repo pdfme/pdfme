@@ -1,5 +1,5 @@
 import { PDFRenderProps } from '@pdfme/common';
-import { getCacheKey, convertForPdfLayoutProps } from '../renderUtils';
+import { convertForPdfLayoutProps } from '../renderUtils';
 import type { BarcodeSchema } from './types';
 import { createBarCode, validateBarcodeInput } from './helper';
 
@@ -7,7 +7,7 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   const { value, schema, pdfDoc, page, _cache } = arg;
   if (!validateBarcodeInput(schema.type, value)) return;
 
-  const inputBarcodeCacheKey = getCacheKey(schema, value);
+  const inputBarcodeCacheKey = getBarcodeCacheKey(schema, value);
   let image = _cache.get(inputBarcodeCacheKey);
   if (!image) {
     const imageBuf = await createBarCode(
@@ -27,3 +27,7 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
 
   page.drawImage(image, { x, y, rotate, width, height });
 };
+
+const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
+  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}`;
+}
