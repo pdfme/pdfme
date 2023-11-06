@@ -3,6 +3,10 @@ import { convertForPdfLayoutProps } from '../renderUtils';
 import type { BarcodeSchema } from './types';
 import { createBarCode, validateBarcodeInput } from './helper';
 
+const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
+  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}`;
+};
+
 export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   const { value, schema, pdfDoc, page, _cache } = arg;
   if (!validateBarcodeInput(schema.type, value)) return;
@@ -27,7 +31,3 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
 
   page.drawImage(image, { x, y, rotate, width, height });
 };
-
-const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
-  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}`;
-}

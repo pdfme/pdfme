@@ -1,6 +1,8 @@
-import type { PDFRenderProps } from '@pdfme/common';
+import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type { ImageSchema } from './types';
-import { getCacheKey, convertForPdfLayoutProps } from '../renderUtils';
+import { convertForPdfLayoutProps } from '../renderUtils';
+
+const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 
 export const pdfRender = async (arg: PDFRenderProps<ImageSchema>) => {
   const { value, schema, pdfDoc, page, _cache } = arg;

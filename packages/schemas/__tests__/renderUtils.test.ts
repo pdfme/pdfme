@@ -1,13 +1,5 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint, getCacheKey } from '../src/renderUtils';
-
-describe('getCacheKey', () => {
-  it('should return a key of name and input', () => {
-    // @ts-ignore
-    const schema = { type: 'text', name: 'test' } as Schema;
-    expect(getCacheKey(schema, 'input')).toEqual('textinput');
-  });
-});
+import { convertForPdfLayoutProps, rotatePoint } from '../src/renderUtils';
 
 describe('rotatePoint', () => {
   it('should rotate one point round another by 90 degrees', () => {
