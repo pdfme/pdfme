@@ -24,11 +24,13 @@
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js"
-    }
+  "import": {
+    "types": "./dist/types/src/index.d.ts",
+    "default": "./dist/esm/src/index.js"
+  },
+  "require": {
+    "types": "./dist/types/src/index.d.ts",
+    "default": "./dist/cjs/src/index.js"
   },
   "engines": {
     "node": ">=16"
