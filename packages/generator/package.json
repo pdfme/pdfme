@@ -62,6 +62,7 @@
   },
   "jest": {
     "resolver": "ts-jest-resolver",
+    "globalTeardown": "<rootDir>/teardown.js",
     "moduleFileExtensions": [
       "js",
       "ts"

@@ -1,71 +1,9 @@
-import { writeFileSync, readFileSync, readdir, unlink } from 'fs';
-import * as path from 'path';
+import { writeFileSync } from 'fs';
 import generate from '../src/generate';
-import templateData from './assets/templates';
-import { Template, Font, BLANK_PDF, Schema } from '@pdfme/common';
-import { text, image, barcodes } from '@pdfme/schemas';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const PDFParser = require('pdf2json');
-const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
-const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
-const NotoSerifJPRegularData = readFileSync(
-  path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`)
-);
-const GloriaHallelujahRegularData = readFileSync(
-  path.join(__dirname, `/assets/fonts/GloriaHallelujah-Regular.ttf`)
-);
-const GreatVibesRegularData = readFileSync(
-  path.join(__dirname, `/assets/fonts/GreatVibes-Regular.ttf`)
-);
-const JuliusSansOneRegularData = readFileSync(
-  path.join(__dirname, `/assets/fonts/JuliusSansOne-Regular.ttf`)
-);
-
-const getFont = (): Font => ({
-  SauceHanSansJP: { fallback: true, data: SauceHanSansJPData },
-  SauceHanSerifJP: { data: SauceHanSerifJPData },
-  'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
-  'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
-  'GreatVibes-Regular': { data: GreatVibesRegularData },
-  'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },
-});
-
-const getPdf = (pdfFilePath: string) => {
-  const pdfParser = new PDFParser();
-
-  return new Promise((resolve, reject) => {
-    pdfParser.on('pdfParser_dataError', reject);
-    pdfParser.on('pdfParser_dataReady', resolve);
-    pdfParser.loadPDF(pdfFilePath);
-  });
-};
-
-const getPdfPath = (dir: string, fileName: string) =>
-  path.join(__dirname, `assets/pdfs/${dir}/${fileName}`);
-const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
-const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);
+import { Template, BLANK_PDF, Schema } from '@pdfme/common';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integrate test', () => {
-  afterAll(() => {
-    const dir = path.join(__dirname, 'assets/pdfs/tmp');
-    const unLinkFile = (file: any) => {
-      if (file !== '.gitkeep') {
-        unlink(`${dir}/${file}`, (e: any) => {
-          if (e) {
-            throw e;
-          }
-        });
-      }
-    };
-    readdir(dir, (err: any, files: any) => {
-      if (err) {
-        throw err;
-      }
-      files.forEach(unLinkFile);
-    });
-  });
-
   describe('basic generator', () => {
     const textObject = (x: number, y: number): Schema => ({
       type: 'text',
@@ -136,46 +74,6 @@ describe('generate integrate test', () => {
     }
   });
 
-  // TODO Slow test... need speed up, use Promise.all?
-  describe('use labelmake.jp template', () => {
-    const entries = Object.entries(templateData);
-    for (let l = 0; l < entries.length; l += 1) {
-      const [key, template] = entries[l];
-
-      // eslint-disable-next-line no-loop-func
-      test(`snapshot ${key}`, async () => {
-        const inputs = template.sampledata!;
-
-        const font = getFont();
-        font.SauceHanSansJP.fallback = false;
-        font.SauceHanSerifJP.fallback = false;
-        font['NotoSerifJP-Regular'].fallback = false;
-        // @ts-ignore
-        font[template.fontName].fallback = true;
-
-        const hrstart = process.hrtime();
-
-        const pdf = await generate({
-          inputs,
-          template,
-          plugins: { text, image, ...barcodes },
-          options: { font },
-        });
-
-        const hrend = process.hrtime(hrstart);
-        expect(hrend[0]).toBeLessThanOrEqual(1);
-
-        const tmpFile = getPdfTmpPath(`${key}.pdf`);
-        const assertFile = getPdfAssertPath(`${key}.pdf`);
-
-        writeFileSync(tmpFile, pdf);
-        const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
-        const [a, e] = res;
-        expect(a.Pages).toEqual(e.Pages);
-      });
-    }
-  });
-
   describe('use fontColor template', () => {
     test(`sample`, async () => {
       const inputs = [{ name: 'here is purple color' }];
@@ -228,18 +126,19 @@ describe('generate integrate test', () => {
         ],
       };
       jest.setTimeout(30000);
+      const { SauceHanSansJP, SauceHanSerifJP } = getFont();
       const pdf = await generate({
         inputs,
         template,
         options: {
           font: {
             SauceHanSansJP: {
-              data: SauceHanSansJPData,
+              data: SauceHanSansJP.data,
               fallback: true,
               subset: false,
             },
             SauceHanSerifJP: {
-              data: SauceHanSerifJPData,
+              data: SauceHanSerifJP.data,
               subset: false,
             },
           },
@@ -369,40 +268,5 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
 Check this document: https://pdfme.com/docs/custom-fonts`
       );
     }
-  });
-
-  test(`check digit error`, async () => {
-    const inputs = [{ a: 'worng text', b: 'worng text', c: 'worng text' }];
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'ean8',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-          },
-          b: {
-            type: 'ean13',
-            position: { x: 0, y: 100 },
-            width: 100,
-            height: 100,
-          },
-          c: {
-            type: 'nw7',
-            position: { x: 0, y: 200 },
-            width: 100,
-            height: 100,
-          },
-        },
-      ],
-    };
-    try {
-      await generate({ inputs, template, plugins: { ...barcodes } });
-    } catch (e: any) {
-      fail();
-    }
-    expect(true).toEqual(true);
   });
 });

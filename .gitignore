@@ -5,4 +5,4 @@
 .cache
 dist
 coverage/
-__tests__/assets/pdfs/tmp/*.pdf
+packages/generator/__tests__/assets/pdfs/tmp/*.pdf
