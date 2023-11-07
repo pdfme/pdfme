@@ -1,12 +1,11 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
-import templateData from './assets/templates';
-import { text, image, barcodes } from '@pdfme/schemas';
+import { label, envelope } from './assets/templates';
+import { text, image } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
-describe('generate integration test', () => {
-  // TODO Slow test... need speed up, use Promise.all?
-  describe('use labelmake.jp template', () => {
+describe('generate integration test(label, envelope)', () => {
+  describe.each([label, envelope])('%i', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
@@ -27,7 +26,7 @@ describe('generate integration test', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image, ...barcodes },
+          plugins: { text, image },
           options: { font },
         });
 
