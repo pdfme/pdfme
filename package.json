@@ -39,11 +39,7 @@
     "build:schemas": "npm run -w packages/schemas build",
     "build:generator": "npm run -w packages/generator build",
     "build:ui": "npm run -w packages/ui build",
-    "test": "npm-run-all --parallel test:*",
-    "test:common": "npm run -w packages/common test",
-    "test:schemas": "npm run -w packages/schemas test",
-    "test:generator": "npm run -w packages/generator test",
-    "test:ui": "npm run -w packages/ui test",
+    "test": "npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "prettier": "npm run prettier --workspaces"
   },
