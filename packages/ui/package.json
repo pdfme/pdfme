@@ -21,15 +21,17 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.es.js",
   "types": "dist/types/index.d.ts",
   "engines": {
     "node": ">=16"
   },
   "scripts": {
-    "develop": "webpack --watch --mode development",
-    "build": "NODE_ENV=production webpack --mode production",
+    "develop": "npm-run-all --parallel devBuild:watch devBuildType:watch",
+    "devBuild:watch": "NODE_ENV=development vite build --watch",
+    "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
+    "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
@@ -60,6 +62,7 @@
     "@types/pdfjs-dist": "^2.10.378",
     "@types/react": "^17.0.52",
     "@types/react-dom": "^17.0.18",
+    "@vitejs/plugin-react": "^4.1.1",
     "css-loader": "^6.8.1",
     "csstype": "^3.1.2",
     "eslint-plugin-react": "^7.28.0",
@@ -67,10 +70,8 @@
     "jest-canvas-mock": "^2.3.1",
     "process": "^0.11.10",
     "style-loader": "^3.3.3",
-    "terser-webpack-plugin": "^5.3.9",
-    "webpack": "^5.75.0",
-    "webpack-bundle-analyzer": "^4.9.1",
-    "webpack-cli": "^5.0.1"
+    "vite": "^4.5.0",
+    "vite-tsconfig-paths": "^4.2.1"
   },
   "peerDependencies": {
     "@pdfme/common": "latest",
