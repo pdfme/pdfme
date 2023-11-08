@@ -7,11 +7,16 @@ export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   build: {
     minify: !isDev,
+    sourcemap: !isDev,
     lib: {
       entry: 'src/index.ts',
       name: '@pdfme/ui',
       fileName: (format) => `index.${format}.js`,
       formats: isDev ? ['es'] : ['es', 'umd'],
     },
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
+    exclude: ['@pdfme/common', '@pdfme/schemas'],
   },
 });
