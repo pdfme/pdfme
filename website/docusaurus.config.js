@@ -16,6 +16,7 @@ const config = {
   favicon: 'favicon.ico',
   organizationName: 'pdfme',
   projectName: 'pdfme',
+  deploymentBranch: 'website',
   trailingSlash: false,
   presets: [
     [
