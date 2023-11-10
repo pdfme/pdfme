@@ -11,12 +11,12 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
-} from './constants';
+} from './constants.js';
 import {
   calculateDynamicFontSize,
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
-} from './helper';
+} from './helper.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {

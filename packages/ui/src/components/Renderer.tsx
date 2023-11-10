@@ -51,10 +51,9 @@ const Renderer = (props: RendererProps) => {
 
   useEffect(() => {
     if (ref.current && schema.type) {
-
       const render = Object.values(pluginsRegistry).find(
         (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-      )?.ui
+      )?.ui;
 
       if (!render) {
         console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.

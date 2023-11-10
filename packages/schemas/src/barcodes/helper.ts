@@ -1,7 +1,7 @@
 import { b64toUint8Array } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
-import { BARCODE_TYPES } from './constants';
+import { BARCODE_TYPES } from './constants.js';
 import { BarcodeTypes } from './types';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14

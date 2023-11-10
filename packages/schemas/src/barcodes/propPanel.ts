@@ -1,6 +1,6 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
-import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR } from './constants';
+import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR } from './constants.js';
 
 const defaultColors = {
   backgroundColor: DEFAULT_BARCODE_BG_COLOR,

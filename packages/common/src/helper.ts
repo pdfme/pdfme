@@ -9,14 +9,14 @@ import {
   DesignerProps as DesignerPropsSchema,
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
-} from './schema';
+} from './schema.js';
 import {
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_VALUE,
-} from './constants';
+} from './constants.js';
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 

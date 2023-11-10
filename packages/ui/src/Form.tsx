@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { PreviewProps } from '@pdfme/common';
 import { PreviewUI } from './class';
-import { DESTROYED_ERR_MSG } from './constants';
+import { DESTROYED_ERR_MSG } from './constants.js';
 import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from './contexts';
 import Preview from './components/Preview';
 

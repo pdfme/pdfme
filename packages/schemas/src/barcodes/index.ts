@@ -1,8 +1,8 @@
-import { pdfRender } from './pdfRender';
-import { getPropPanelByBarcodeType } from './propPanel';
-import { uiRender } from './uiRender';
+import { pdfRender } from './pdfRender.js';
+import { getPropPanelByBarcodeType } from './propPanel.js';
+import { uiRender } from './uiRender.js';
 import type { BarcodeSchema, BarcodeTypes } from './types';
-import { BARCODE_TYPES } from './constants';
+import { BARCODE_TYPES } from './constants.js';
 import { Plugin } from '@pdfme/common';
 
 const schemas = BARCODE_TYPES.reduce(

@@ -1,18 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ConfigProvider, ThemeConfig } from 'antd';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate, Plugins } from '@pdfme/common';
-import { builtInPlugins } from '@pdfme/schemas';
+import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
 import { BaseUIClass } from './class';
-import { DESTROYED_ERR_MSG } from './constants';
-import {
-  I18nContext,
-  FontContext,
-  PluginsRegistry,
-  OptionsContext,
-} from './contexts';
+import { DESTROYED_ERR_MSG } from './constants.js';
+import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from './contexts';
 import DesignerComponent from './components/Designer/index';
-import { cloneDeep } from './helper';
+import { cloneDeep } from './helper.js';
 
 // TODO Custom Design for UI #243
 // - https://github.com/pdfme/pdfme/issues/243
@@ -32,7 +26,6 @@ const theme: ThemeConfig = {
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
-
 
   constructor(props: DesignerProps) {
     super(props);

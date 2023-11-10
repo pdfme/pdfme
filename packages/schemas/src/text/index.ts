@@ -1,7 +1,7 @@
 import type { Plugin } from '@pdfme/common';
-import { pdfRender } from './pdfRender';
-import { propPanel } from './propPanel';
-import { uiRender } from './uiRender';
+import { pdfRender } from './pdfRender.js';
+import { propPanel } from './propPanel.js';
+import { uiRender } from './uiRender.js';
 import type { TextSchema } from './types';
 
 const schema: Plugin<TextSchema> = { pdf: pdfRender, ui: uiRender, propPanel };

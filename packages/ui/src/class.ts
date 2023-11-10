@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import { curriedI18n } from './i18n';
-import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants';
-import { debounce, flatten, cloneDeep } from './helper';
+import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
+import { debounce, flatten, cloneDeep } from './helper.js';
 import {
   Template,
   Size,

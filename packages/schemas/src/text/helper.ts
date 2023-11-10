@@ -22,7 +22,7 @@ import {
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
   VERTICAL_ALIGN_TOP,
-} from './constants';
+} from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
   fontKitFont: FontKitFont,

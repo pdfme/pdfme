@@ -258,10 +258,12 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
     const uniqueSchemaTypes = [...new Set(schemaTypes)];
-    const defaultSchemas = Object.values(pluginsRegistry).map(plugin => plugin?.propPanel.defaultSchema)
+    const defaultSchemas = Object.values(pluginsRegistry).map(
+      (plugin) => plugin?.propPanel.defaultSchema
+    );
 
     return uniqueSchemaTypes.every(
-      (type) => defaultSchemas.find(ds => ds.type === type)?.rotate !== undefined
+      (type) => defaultSchemas.find((ds) => ds.type === type)?.rotate !== undefined
     );
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
 

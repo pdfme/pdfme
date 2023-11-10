@@ -1,5 +1,5 @@
 import { Schema } from '@pdfme/common';
-import { BARCODE_TYPES } from './constants';
+import { BARCODE_TYPES } from './constants.js';
 
 export interface BarcodeSchema extends Schema {
   type: (typeof BARCODE_TYPES)[number];

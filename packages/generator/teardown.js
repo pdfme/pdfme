@@ -1,21 +1,17 @@
-const path = require('path');
-const { readdir, unlink } = require('fs');
+import path from 'path';
+import { readdir, unlink } from 'fs/promises';
 
-module.exports = async () => {
-  const dir = path.join(__dirname, '__tests__/assets/pdfs/tmp');
-  const unLinkFile = (file) => {
+export default async () => {
+  const dir = path.join(path.dirname(''), '__tests__/assets/pdfs/tmp');
+  const files = await readdir(dir);
+
+  for (const file of files) {
     if (file !== '.gitkeep') {
-      unlink(`${dir}/${file}`, (e) => {
-        if (e) {
-          throw e;
-        }
-      });
+      try {
+        await unlink(`${dir}/${file}`);
+      } catch (e) {
+        throw e;
+      }
     }
-  };
-  readdir(dir, (err, files) => {
-    if (err) {
-      throw err;
-    }
-    files.forEach(unLinkFile);
-  });
+  }
 };

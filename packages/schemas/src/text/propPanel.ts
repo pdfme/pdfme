@@ -23,7 +23,7 @@ import {
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
   ALIGN_RIGHT,
   ALIGN_CENTER,
-} from './constants';
+} from './constants.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema } = props;

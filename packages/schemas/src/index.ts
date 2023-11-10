@@ -1,7 +1,7 @@
-import text from './text';
-import image from './image';
-import barcodes from './barcodes';
-import { convertForPdfLayoutProps, rotatePoint } from './renderUtils';
+import text from './text/index.js';
+import image from './image/index.js';
+import barcodes from './barcodes/index.js';
+import { convertForPdfLayoutProps, rotatePoint } from './renderUtils.js';
 
 const builtInPlugins = { Text: text };
 

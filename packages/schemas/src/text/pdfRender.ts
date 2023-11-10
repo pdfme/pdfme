@@ -11,7 +11,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
-} from './constants';
+} from './constants.js';
 import {
   calculateDynamicFontSize,
   heightOfFontAtSize,
@@ -19,8 +19,8 @@ import {
   getFontKitFont,
   getSplittedLines,
   widthOfTextAtSize,
-} from './helper';
-import { convertForPdfLayoutProps, rotatePoint } from '../renderUtils';
+} from './helper.js';
+import { convertForPdfLayoutProps, rotatePoint } from '../renderUtils.js';
 
 const hex2rgb = (hex: string) => {
   if (hex.slice(0, 1) === '#') hex = hex.slice(1);

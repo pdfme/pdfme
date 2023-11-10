@@ -1,6 +1,6 @@
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type { ImageSchema } from './types';
-import { convertForPdfLayoutProps } from '../renderUtils';
+import { convertForPdfLayoutProps } from '../renderUtils.js';
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 

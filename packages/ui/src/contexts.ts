@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { curriedI18n } from './i18n';
-import { DEFAULT_LANG } from './constants';
+import { DEFAULT_LANG } from './constants.js';
 import { getDefaultFont, Plugins } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 

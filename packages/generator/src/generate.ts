@@ -3,8 +3,8 @@ import * as fontkit from 'fontkit';
 import type { GenerateProps, Template } from '@pdfme/common';
 import { checkGenerateProps } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
-import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils';
-import { TOOL_NAME } from './constants';
+import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils.js';
+import { TOOL_NAME } from './constants.js';
 
 const preprocessing = async ({ template }: { template: Template }) => {
   const { basePdf } = template;
