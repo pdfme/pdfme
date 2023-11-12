@@ -57,6 +57,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
         {unitCursor > 0 && (
           <div style={{ left: '1rem', marginLeft: '1rem', ...buttonWrapStyle }}>
             <button
+              type="button"
               style={{ paddingLeft: '0.5rem', ...btnStyle }}
               disabled={unitCursor <= 0}
               onClick={() => setUnitCursor(0)}
@@ -64,6 +65,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               <ChevronDoubleLeftIcon width={20} height={20} color={'#fff'} />
             </button>
             <button
+              type="button"
               style={{ paddingLeft: '0.5rem', ...btnStyle }}
               disabled={unitCursor <= 0}
               onClick={() => setUnitCursor(unitCursor - 1)}
@@ -83,6 +85,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               {unitCursor + 1}/{unitNum}
             </strong>
             <button
+              type="button"
               style={{ paddingRight: '0.5rem', ...btnStyle }}
               disabled={unitCursor + 1 >= unitNum}
               onClick={() => setUnitCursor(unitCursor + 1)}
@@ -90,6 +93,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               <ChevronRightIcon width={20} height={20} color={'#fff'} />
             </button>
             <button
+              type="button"
               style={{ paddingRight: '0.5rem', ...btnStyle }}
               disabled={unitCursor + 1 >= unitNum}
               onClick={() => setUnitCursor(unitNum - 1)}

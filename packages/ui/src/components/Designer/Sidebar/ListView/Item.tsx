@@ -70,6 +70,7 @@ const Item = React.memo(
           <div style={{ display: 'flex', alignItems: 'center', ...style }} {...props}>
             <button
               {...listeners}
+              type="button"
               style={{ padding: '0.5rem', background: 'none', border: 'none', display: 'flex' }}
             >
               <object style={{ cursor: 'grab', marginTop: 6 }} width={15}>

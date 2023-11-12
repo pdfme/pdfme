@@ -35,6 +35,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
 
   return (
     <button
+      type="button"
       id={DELETE_BTN_ID}
       style={{
         position: 'absolute',

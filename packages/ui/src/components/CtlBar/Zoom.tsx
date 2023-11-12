@@ -25,6 +25,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <button
+        type="button"
         style={{
           paddingLeft: '0.5rem',
           ...btnStyle,
@@ -39,6 +40,7 @@ const Pager = ({ zoomLevel, setZoomLevel }: Props) => {
         {Math.round(zoomLevel * 100)}%
       </strong>
       <button
+        type="button"
         style={{
           paddingRight: '0.5rem',
           ...btnStyle,
