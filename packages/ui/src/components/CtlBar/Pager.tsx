@@ -22,6 +22,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <button
+        type="button"
         style={{
           paddingLeft: '0.5rem',
           ...btnStyle,
@@ -36,6 +37,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor }: Props) => {
         {pageCursor + 1}/{pageNum}
       </strong>
       <button
+        type="button"
         style={{
           paddingRight: '0.5rem',
           ...btnStyle,
