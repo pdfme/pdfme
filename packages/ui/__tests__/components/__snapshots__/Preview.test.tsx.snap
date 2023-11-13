@@ -121,7 +121,6 @@ exports[`Preview(as Form) snapshot 1`] = `
                   />
                   <button
                     style="position: absolute; top: 0px; left: 0px; z-index: 1; display: flex; justify-content: center; align-items: center; color: rgb(51, 51, 51); background: rgb(242, 242, 242); border-radius: 2px; border: 1px solid #767676; cursor: pointer; height: 24px; width: 24px;"
-                    type="button"
                   >
                     x
                   </button>
