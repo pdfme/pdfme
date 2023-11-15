@@ -31,7 +31,7 @@ const DetailView = (
   useEffect(() => {
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      Divider,
+      Divider: () => <Divider mini />,
     };
     for (const plugin of Object.values(pluginsRegistry)) {
       const widgets = plugin?.propPanel.widgets || {};
