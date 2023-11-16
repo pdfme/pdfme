@@ -36,7 +36,6 @@
     },
     "skipLibCheck": true,
   },
-  "baseUrl": ".",
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx"
