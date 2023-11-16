@@ -32,7 +32,7 @@
     "develop": "npm-run-all --parallel devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
     "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm && tsc --emitDeclarationOnly",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --minify --sourcemap && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
