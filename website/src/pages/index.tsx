@@ -89,6 +89,7 @@ export default function Home(): JSX.Element {
   const generatePDF = () => {
     generate({
       template,
+      plugins: { text, image, qrcode: barcodes.qrcode },
       inputs: form.current.getInputs(),
     }).then((pdf) => {
       const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
