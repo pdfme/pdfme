@@ -82,7 +82,6 @@ const Sidebar = (props: SidebarProps) => {
               width: '100%',
               left: 0,
               bottom: '1rem',
-              paddingTop: '1rem',
             }}
           >
             <div style={{ marginBottom: '1rem', borderBottom: '1px solid #e5e5e5' }} />

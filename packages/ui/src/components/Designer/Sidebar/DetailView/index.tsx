@@ -5,7 +5,7 @@ import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
 import { RULER_HEIGHT } from '../../../../constants';
-import Divider from '../../../Divider';
+import { Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
 
@@ -31,7 +31,7 @@ const DetailView = (
   useEffect(() => {
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      Divider: () => <Divider mini />,
+      Divider: () => <Divider />,
     };
     for (const plugin of Object.values(pluginsRegistry)) {
       const widgets = plugin?.propPanel.widgets || {};
@@ -161,7 +161,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       <Divider />
       <div
         style={{
-          height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145,
+          height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 115,
           overflowY: 'auto',
           overflowX: 'hidden',
         }}

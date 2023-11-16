@@ -13,7 +13,13 @@ import { cloneDeep } from './helper.js';
 // - https://ant.design/docs/react/customize-theme
 const theme: ThemeConfig = {
   token: {
-    fontSize: 12,
+    fontSize: 11,
+    margin: 8,
+    marginLG: 12,
+    marginXS: 4,
+    padding: 8,
+    paddingLG: 12,
+    paddingXS: 4,
   },
   components: {
     Form: {

@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import type { SidebarProps } from '../../../../types';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants';
 import { I18nContext } from '../../../../contexts';
-import Divider from '../../../Divider';
+import { Divider } from 'antd';
 import SelectableSortableContainer from './SelectableSortableContainer';
 
 const ListView = (
@@ -29,7 +29,8 @@ const ListView = (
   const i18n = useContext(I18nContext);
   const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
   const [fieldNamesValue, setFieldNamesValue] = useState('');
-  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
+  // TODO このロジックは共通化したい
+  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
@@ -46,12 +47,13 @@ const ListView = (
             onChange={(e) => setFieldNamesValue(e.target.value)}
             style={{
               height: height - 5,
-              width: SIDEBAR_WIDTH,
+              width: SIDEBAR_WIDTH - 35,
               fontSize: '1rem',
-              lineHeight: '2.5rem',
+              lineHeight: '2.25rem',
               background: 'transparent',
               margin: 0,
-              padding: '1rem',
+              padding: '0.51rem',
+              border: '1px  solid #555',
               boxSizing: 'border-box',
               fontFamily: 'inherit',
             }}
