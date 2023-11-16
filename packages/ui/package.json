@@ -30,9 +30,9 @@
   },
   "scripts": {
     "develop": "npm-run-all --parallel devBuild:watch devBuildType:watch",
-    "devBuild:watch": "NODE_ENV=development vite build --watch",
+    "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
     "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "tsc --noEmit",
     "test": "jest",
@@ -62,17 +62,14 @@
     "@testing-library/react": "^12.1.2",
     "@types/react": "^17.0.52",
     "@types/react-dom": "^17.0.18",
-    "@vitejs/plugin-react": "^4.1.1",
     "css-loader": "^6.8.1",
     "csstype": "^3.1.2",
+    "esbuild": "^0.19.5",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest-canvas-mock": "^2.3.1",
     "process": "^0.11.10",
-    "style-loader": "^3.3.3",
-    "vite": "^4.5.0",
-    "vite-plugin-top-level-await": "^1.3.1",
-    "vite-tsconfig-paths": "^4.2.1"
+    "style-loader": "^3.3.3"
   },
   "peerDependencies": {
     "@pdfme/common": "latest",
