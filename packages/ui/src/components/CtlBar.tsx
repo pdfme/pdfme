@@ -1,22 +1,22 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { theme, Typography, Button } from 'antd';
+import { StyleContext } from '../contexts';
 
-const btnStyle: React.CSSProperties = {
-  cursor: 'pointer',
-  border: 'none',
-  background: 'none',
-  display: 'flex',
-  alignItems: 'center',
-};
+const { Text } = Typography;
 
 type ZoomProps = {
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
+  style: {
+    textStyle: React.CSSProperties;
+    iconStyle: { size: number, color: string }
+  };
 };
 
-const Zoom = ({ zoomLevel, setZoomLevel }: ZoomProps) => {
+const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   const zoomStep = 0.25;
   const maxZoom = 2;
   const minZoom = 0.25;
@@ -25,34 +25,24 @@ const Zoom = ({ zoomLevel, setZoomLevel }: ZoomProps) => {
   const nextZoomIn = zoomLevel + zoomStep;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <button
-        type="button"
-        style={{
-          paddingLeft: '0.5rem',
-          ...btnStyle,
-          cursor: minZoom >= nextZoomOut ? 'not-allowed' : 'pointer',
-        }}
+    <div style={{ display: 'flex', }}>
+      <Button
+        type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
       >
-        <MinusIcon width={20} height={20} color={'#fff'} />
-      </button>
-      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 50, textAlign: 'center' }}>
+        <MinusIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+      </Button>
+      <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
-      </strong>
-      <button
-        type="button"
-        style={{
-          paddingRight: '0.5rem',
-          ...btnStyle,
-          cursor: maxZoom < nextZoomIn ? 'not-allowed' : 'pointer',
-        }}
+      </Text>
+      <Button
+        type="text"
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
       >
-        <PlusIcon width={20} height={20} color={'#fff'} />
-      </button>
+        <PlusIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+      </Button>
     </div>
   );
 };
@@ -61,38 +51,32 @@ type PagerProps = {
   pageCursor: number;
   pageNum: number;
   setPageCursor: (page: number) => void;
+  style: {
+    textStyle: React.CSSProperties;
+    iconStyle: { size: number, color: string }
+  };
 };
 
-const Pager = ({ pageCursor, pageNum, setPageCursor }: PagerProps) => {
+const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <button
-        type="button"
-        style={{
-          paddingLeft: '0.5rem',
-          ...btnStyle,
-          cursor: pageCursor <= 0 ? 'not-allowed' : 'pointer',
-        }}
+    <div style={{ display: 'flex', }}>
+      <Button
+        type="text"
         disabled={pageCursor <= 0}
         onClick={() => setPageCursor(pageCursor - 1)}
       >
-        <ChevronLeftIcon width={20} height={20} color={'#fff'} />
-      </button>
-      <strong style={{ color: 'white', fontSize: '0.9rem', minWidth: 45, textAlign: 'center' }}>
+        <ChevronLeftIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+      </Button>
+      <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
-      </strong>
-      <button
-        type="button"
-        style={{
-          paddingRight: '0.5rem',
-          ...btnStyle,
-          cursor: pageCursor + 1 >= pageNum ? 'not-allowed' : 'pointer',
-        }}
+      </Text>
+      <Button
+        type="text"
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <ChevronRightIcon width={20} height={20} color={'#fff'} />
-      </button>
+        <ChevronRightIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+      </Button>
     </div>
   );
 };
@@ -106,11 +90,22 @@ type CtlBarProps = {
   setZoomLevel: (zoom: number) => void;
 };
 
-
 const CtlBar = (props: CtlBarProps) => {
-  const barWidth = 250;
+  const style = useContext(StyleContext);
+  const { token } = theme.useToken();
+
+  const barWidth = style.CtlBar.barWidth;
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
   const width = pageNum > 1 ? barWidth : barWidth / 2;
+
+
+  const textStyle = {
+    color: style.CtlBar.textColor,
+    fontSize: token.fontSize,
+    margin: token.marginXS,
+  };
+  const iconStyle = style.CtlBar.icon;
+
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
       <div
@@ -118,20 +113,26 @@ const CtlBar = (props: CtlBarProps) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '15px',
           position: 'relative',
           zIndex: 1,
           left: `calc(50% - ${width / 2}px)`,
           width,
-          background: '#777777e6',
-          borderRadius: 2,
-          padding: '0.5rem',
+          height: style.CtlBar.height,
+          boxSizing: 'border-box',
+          padding: token.paddingSM,
+          borderRadius: token.borderRadius,
+          backgroundColor: style.CtlBar.background,
         }}
       >
         {pageNum > 1 && (
-          <Pager pageCursor={pageCursor} pageNum={pageNum} setPageCursor={setPageCursor} />
+          <Pager
+            style={{ textStyle, iconStyle }}
+            pageCursor={pageCursor}
+            pageNum={pageNum}
+            setPageCursor={setPageCursor}
+          />
         )}
-        <Zoom zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+        <Zoom style={{ textStyle, iconStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
       </div>
     </div>
   );

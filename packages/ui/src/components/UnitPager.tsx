@@ -1,35 +1,38 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Size } from '@pdfme/common';
+import { theme, Typography, Button } from 'antd';
+import { StyleContext } from '../contexts';
 import {
   ChevronLeftIcon,
-  ChevronDoubleLeftIcon,
   ChevronRightIcon,
+  ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
 } from '@heroicons/react/24/outline';
-import { Size } from '@pdfme/common';
 
-// TODO ここから
-const buttonHeight = 38;
-const buttonWrapStyle: React.CSSProperties = {
-  pointerEvents: 'initial',
-  position: 'sticky',
-  zIndex: 1,
-  backgroundColor: '#777777bd',
-  borderRadius: 2,
-  padding: '0.5rem',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-around',
-  boxSizing: 'border-box',
-  width: 110,
-  height: buttonHeight,
+const { Text } = Typography;
+
+type UnitButtonProps = {
+  type: 'left' | 'right' | 'doubleLeft' | 'doubleRight';
+  onClick: () => void;
+  disabled: boolean;
 };
 
-const btnStyle: React.CSSProperties = {
-  cursor: 'pointer',
-  border: 'none',
-  background: 'none',
-  display: 'flex',
-  alignItems: 'center',
+const icons = {
+  left: ChevronLeftIcon,
+  right: ChevronRightIcon,
+  doubleLeft: ChevronDoubleLeftIcon,
+  doubleRight: ChevronDoubleRightIcon,
+};
+
+const UnitButton: React.FC<UnitButtonProps> = ({ type, onClick, disabled }) => {
+  const Icon = icons[type];
+  const style = useContext(StyleContext);
+  const iconStyle = style.CtlBar.icon;
+  return (
+    <Button type="text" onClick={onClick} disabled={disabled}>
+      <Icon width={iconStyle.size} height={iconStyle.size} color={iconStyle.color} />
+    </Button>
+  );
 };
 
 type Props = {
@@ -40,7 +43,29 @@ type Props = {
 };
 
 const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
-  if (unitNum <= 1) return <></>;
+  if (unitNum <= 1) return null;
+
+  const style = useContext(StyleContext);
+
+  const { token } = theme.useToken();
+
+  const buttonWrapStyle: React.CSSProperties = {
+    pointerEvents: 'initial',
+    position: 'sticky',
+    zIndex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    boxSizing: 'border-box',
+    height: style.UnitPager.height,
+    padding: token.paddingSM,
+    borderRadius: token.borderRadius,
+    backgroundColor: style.UnitPager.background,
+  };
+  const textStyle = {
+    color: style.CtlBar.textColor,
+    fontSize: token.fontSize,
+    margin: token.marginXS,
+  };
 
   return (
     <div style={{ position: 'absolute', ...size }}>
@@ -49,58 +74,45 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
           position: 'sticky',
           width: '100%',
           zIndex: 1,
-          pointerEvents: 'none',
-          top: `calc(50% - ${buttonHeight / 2}px)`,
+          top: `calc(50% - ${style.UnitPager.height / 2}px)`,
           display: 'flex',
           alignItems: 'center',
         }}
       >
         {unitCursor > 0 && (
           <div style={{ left: '1rem', marginLeft: '1rem', ...buttonWrapStyle }}>
-            <button
-              type="button"
-              style={{ paddingLeft: '0.5rem', ...btnStyle }}
-              disabled={unitCursor <= 0}
+            <UnitButton
+              type="doubleLeft"
               onClick={() => setUnitCursor(0)}
-            >
-              <ChevronDoubleLeftIcon width={20} height={20} color={'#fff'} />
-            </button>
-            <button
-              type="button"
-              style={{ paddingLeft: '0.5rem', ...btnStyle }}
               disabled={unitCursor <= 0}
+            />
+            <UnitButton
+              type="left"
               onClick={() => setUnitCursor(unitCursor - 1)}
-            >
-              <ChevronLeftIcon width={20} height={20} color={'#fff'} />
-            </button>
-            <strong style={{ color: 'white', fontSize: '0.9rem' }}>
+              disabled={unitCursor <= 0}
+            />
+            <Text strong style={textStyle}>
               {unitCursor + 1}/{unitNum}
-            </strong>
+            </Text>
           </div>
         )}
         {unitCursor + 1 < unitNum && (
           <div
             style={{ right: '1rem', marginLeft: 'auto', marginRight: '1rem', ...buttonWrapStyle }}
           >
-            <strong style={{ color: 'white', fontSize: '0.9rem' }}>
+            <Text strong style={textStyle}>
               {unitCursor + 1}/{unitNum}
-            </strong>
-            <button
-              type="button"
-              style={{ paddingRight: '0.5rem', ...btnStyle }}
-              disabled={unitCursor + 1 >= unitNum}
+            </Text>
+            <UnitButton
+              type="right"
               onClick={() => setUnitCursor(unitCursor + 1)}
-            >
-              <ChevronRightIcon width={20} height={20} color={'#fff'} />
-            </button>
-            <button
-              type="button"
-              style={{ paddingRight: '0.5rem', ...btnStyle }}
               disabled={unitCursor + 1 >= unitNum}
+            />
+            <UnitButton
+              type="doubleRight"
               onClick={() => setUnitCursor(unitNum - 1)}
-            >
-              <ChevronDoubleRightIcon width={20} height={20} color={'#fff'} />
-            </button>
+              disabled={unitCursor + 1 >= unitNum}
+            />
           </div>
         )}
       </div>
