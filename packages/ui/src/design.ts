@@ -18,9 +18,13 @@ export const theme: ThemeConfig = {
   },
 };
 
+const background = 'rgb(74, 74, 74)';
 export const style = {
   ErrorScreen: {
-    background: 'rgb(74, 74, 74)',
+    background,
     cardBackground: '#ffffffad',
+  },
+  Root: {
+    background,
   },
 };

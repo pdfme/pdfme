@@ -24,7 +24,7 @@ import {
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks';
 import Root from '../Root';
 import ErrorScreen from '../ErrorScreen';
-import CtlBar from '../CtlBar/index';
+import CtlBar from '../CtlBar';
 
 const TemplateEditor = ({
   template,

@@ -3,7 +3,7 @@ import type { SchemaForUI, PreviewProps, Size } from '@pdfme/common';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
-import CtlBar from './CtlBar/index';
+import CtlBar from './CtlBar';
 import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';

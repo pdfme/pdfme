@@ -1,12 +1,13 @@
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { Size } from '@pdfme/common';
-import { FontContext } from '../contexts';
+import { FontContext, StyleContext } from '../contexts';
 import Spinner from './Spinner';
 
 type Props = { size: Size; scale: number; children: ReactNode };
 
 const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   const font = useContext(FontContext);
+  const style = useContext(StyleContext);
 
   useEffect(() => {
     if (!document || !document.fonts) return;
@@ -30,14 +31,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   }, [font]);
 
   return (
-    <div
-      ref={ref}
-      style={{
-        position: 'relative',
-        background: 'rgb(74, 74, 74)',
-        ...size,
-      }}
-    >
+    <div ref={ref} style={{ position: 'relative', background: style.Root.background, ...size }}>
       <div style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
     </div>
   );
