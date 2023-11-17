@@ -4,7 +4,7 @@ import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/
 import type { SidebarProps } from '../../../../types';
 import { Bars3Icon } from '@heroicons/react/20/solid';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { RULER_HEIGHT } from '../../../../constants';
+import { getSidebarContentHeight } from '../../../../helper';
 import { Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
@@ -161,7 +161,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       <Divider />
       <div
         style={{
-          height: size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 115,
+          height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
           overflowX: 'hidden',
         }}

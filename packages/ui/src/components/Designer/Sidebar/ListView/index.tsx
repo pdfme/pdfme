@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import type { SidebarProps } from '../../../../types';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants';
+import { SIDEBAR_WIDTH } from '../../../../constants';
 import { I18nContext } from '../../../../contexts';
+import { getSidebarContentHeight } from '../../../../helper';
 import { Divider } from 'antd';
 import SelectableSortableContainer from './SelectableSortableContainer';
 
@@ -29,8 +30,7 @@ const ListView = (
   const i18n = useContext(I18nContext);
   const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
   const [fieldNamesValue, setFieldNamesValue] = useState('');
-  // TODO このロジックは共通化したい
-  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;
+  const height = getSidebarContentHeight(size.height);
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>

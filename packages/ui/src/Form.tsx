@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { PreviewProps } from '@pdfme/common';
 import { PreviewUI } from './class';
 import { DESTROYED_ERR_MSG } from './constants.js';
-import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from './contexts';
+import AppContextProvider from './components/AppContextProvider';
 import Preview from './components/Preview';
 
 class Form extends PreviewUI {
@@ -21,27 +21,26 @@ class Form extends PreviewUI {
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
-      <I18nContext.Provider value={this.getI18n()}>
-        <FontContext.Provider value={this.getFont()}>
-          <PluginsRegistry.Provider value={this.getPluginsRegistry()}>
-            <OptionsContext.Provider value={this.getOptions()}>
-              <Preview
-                template={this.template}
-                size={this.size}
-                inputs={this.inputs}
-                onChangeInput={(arg: { index: number; value: string; key: string }) => {
-                  const { index, value, key } = arg;
-                  if (this.onChangeInputCallback) {
-                    this.onChangeInputCallback({ index, value, key });
-                  }
-                  this.inputs[index][key] = value;
-                  this.render();
-                }}
-              />
-            </OptionsContext.Provider>
-          </PluginsRegistry.Provider>
-        </FontContext.Provider>
-      </I18nContext.Provider>,
+      <AppContextProvider
+        i18n={this.getI18n()}
+        font={this.getFont()}
+        plugins={this.getPluginsRegistry()}
+        options={this.getOptions()}
+      >
+        <Preview
+          template={this.template}
+          size={this.size}
+          inputs={this.inputs}
+          onChangeInput={(arg: { index: number; value: string; key: string }) => {
+            const { index, value, key } = arg;
+            if (this.onChangeInputCallback) {
+              this.onChangeInputCallback({ index, value, key });
+            }
+            this.inputs[index][key] = value;
+            this.render();
+          }}
+        />
+      </AppContextProvider>,
       this.domContainer
     );
   }
