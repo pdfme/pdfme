@@ -11,24 +11,24 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; z-index: 1; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 90px); width: 180px; height: 38px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(119, 119, 119, 0.741);"
       >
         <div
-          style="display: flex; align-items: center; justify-content: center;"
+          style="display: flex;"
         >
           <button
-            style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text"
             type="button"
           >
             <svg
               aria-hidden="true"
-              color="#fff"
+              color="#ffffff"
               fill="none"
-              height="20"
+              height="19"
               stroke="currentColor"
               stroke-width="1.5"
               viewBox="0 0 24 24"
-              width="20"
+              width="19"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -37,26 +37,30 @@ exports[`Preview(as Form) snapshot 1`] = `
                 stroke-linejoin="round"
               />
             </svg>
+            
           </button>
-          <strong
-            style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
+          <span
+            class="ant-typography css-dev-only-do-not-override-amq5gd"
+            style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
-            100
-            %
-          </strong>
+            <strong>
+              100
+              %
+            </strong>
+          </span>
           <button
-            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text"
             type="button"
           >
             <svg
               aria-hidden="true"
-              color="#fff"
+              color="#ffffff"
               fill="none"
-              height="20"
+              height="19"
               stroke="currentColor"
               stroke-width="1.5"
               viewBox="0 0 24 24"
-              width="20"
+              width="19"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -65,6 +69,7 @@ exports[`Preview(as Form) snapshot 1`] = `
                 stroke-linejoin="round"
               />
             </svg>
+            
           </button>
         </div>
       </div>
@@ -146,24 +151,24 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; z-index: 1; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 90px); width: 180px; height: 38px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(119, 119, 119, 0.741);"
       >
         <div
-          style="display: flex; align-items: center; justify-content: center;"
+          style="display: flex;"
         >
           <button
-            style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text"
             type="button"
           >
             <svg
               aria-hidden="true"
-              color="#fff"
+              color="#ffffff"
               fill="none"
-              height="20"
+              height="19"
               stroke="currentColor"
               stroke-width="1.5"
               viewBox="0 0 24 24"
-              width="20"
+              width="19"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -172,26 +177,30 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 stroke-linejoin="round"
               />
             </svg>
+            
           </button>
-          <strong
-            style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
+          <span
+            class="ant-typography css-dev-only-do-not-override-amq5gd"
+            style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
-            100
-            %
-          </strong>
+            <strong>
+              100
+              %
+            </strong>
+          </span>
           <button
-            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text"
             type="button"
           >
             <svg
               aria-hidden="true"
-              color="#fff"
+              color="#ffffff"
               fill="none"
-              height="20"
+              height="19"
               stroke="currentColor"
               stroke-width="1.5"
               viewBox="0 0 24 24"
-              width="20"
+              width="19"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
@@ -200,6 +209,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 stroke-linejoin="round"
               />
             </svg>
+            
           </button>
         </div>
       </div>
