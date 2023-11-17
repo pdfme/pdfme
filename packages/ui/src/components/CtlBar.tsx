@@ -1,5 +1,4 @@
 import React from 'react';
-import Zoom from './Zoom';
 import { Size } from '@pdfme/common';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
