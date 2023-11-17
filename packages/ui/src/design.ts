@@ -36,6 +36,9 @@ export const style = {
     background,
     cardBackground: '#ffffffad',
   },
+  Mask: {
+    background: 'rgba(158, 158, 158, 0.58)',
+  },
   Root: {
     background,
   },

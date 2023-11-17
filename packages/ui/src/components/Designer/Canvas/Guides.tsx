@@ -3,11 +3,15 @@ import Guides from '@scena/react-guides';
 import { ZOOM, Size } from '@pdfme/common';
 import { RULER_HEIGHT } from '../../../constants';
 
-const _Guides = ({
-  paperSize,
-  horizontalRef,
-  verticalRef,
-}: {
+const guideStyle = (top: number, left: number, height: number, width: number): React.CSSProperties => ({
+  position: 'absolute',
+  top,
+  left,
+  height,
+  width
+});
+
+const _Guides = ({ paperSize, horizontalRef, verticalRef }: {
   paperSize: Size;
   horizontalRef: Ref<Guides> | undefined;
   verticalRef: Ref<Guides> | undefined;
@@ -15,36 +19,17 @@ const _Guides = ({
   <>
     <div
       className="ruler-container"
-      style={{
-        width: RULER_HEIGHT,
-        height: RULER_HEIGHT,
-        position: 'absolute',
-        top: -RULER_HEIGHT,
-        left: -RULER_HEIGHT,
-        background: '#333',
-      }}
-    ></div>
+      style={guideStyle(-RULER_HEIGHT, -RULER_HEIGHT, RULER_HEIGHT, RULER_HEIGHT)}
+    />
     <Guides
       zoom={ZOOM}
-      style={{
-        position: 'absolute',
-        top: -RULER_HEIGHT,
-        left: 0,
-        height: RULER_HEIGHT,
-        width: paperSize.width,
-      }}
+      style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
       ref={horizontalRef}
     />
     <Guides
       zoom={ZOOM}
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: -RULER_HEIGHT,
-        height: paperSize.height,
-        width: RULER_HEIGHT,
-      }}
+      style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"
       ref={verticalRef}
     />
