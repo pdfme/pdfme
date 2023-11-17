@@ -21,7 +21,6 @@ type Props = {
 
 export default ({ children, i18n, font, plugins, options }: Props) => {
   // TODO theme, styleはoptionsから上書きできるようにする
-
   return (
     <ThemeConfigProvider theme={theme}>
       <StyleContext.Provider value={style}>

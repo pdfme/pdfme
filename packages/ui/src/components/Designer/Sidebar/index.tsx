@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { Divider } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext } from '../../../contexts';
@@ -29,6 +30,7 @@ const Sidebar = (props: SidebarProps) => {
       }}
     >
       <div>
+        {/* TODO 修正 */}
         <button
           type="button"
           style={{
@@ -47,11 +49,13 @@ const Sidebar = (props: SidebarProps) => {
           onClick={() => setSidebarOpen(!sidebarOpen)}
         >
           {sidebarOpen ? (
+            // TODO 修正
             <ArrowRightIcon width={15} height={15} />
           ) : (
             <ArrowLeftIcon width={15} height={15} />
           )}
         </button>
+        {/* // TODO 修正 */}
         <div
           style={{
             width: SIDEBAR_WIDTH,
@@ -76,15 +80,9 @@ const Sidebar = (props: SidebarProps) => {
           ) : (
             <DetailView {...props} activeSchema={getLastActiveSchema()} />
           )}
-          <div
-            style={{
-              position: 'absolute',
-              width: '100%',
-              left: 0,
-              bottom: '1rem',
-            }}
-          >
-            <div style={{ marginBottom: '1rem', borderBottom: '1px solid #e5e5e5' }} />
+          <div style={{ position: 'absolute', width: '100%', left: 0, bottom: 0 }}>
+            <Divider />
+            {/* TODO 修正 */}
             <button
               type="button"
               style={{
@@ -93,7 +91,7 @@ const Sidebar = (props: SidebarProps) => {
                 border: 'none',
                 borderRadius: 2,
                 cursor: 'pointer',
-                margin: '0 auto',
+                margin: '0 auto 1rem',
                 display: 'block',
               }}
               onClick={addSchema}

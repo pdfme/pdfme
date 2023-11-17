@@ -34,6 +34,7 @@ const ListView = (
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
+        {/* TODO 修正 */}
         <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('fieldsList')}
         </span>
@@ -69,6 +70,7 @@ const ListView = (
           onEdit={onEdit}
         />
       )}
+      {/* TODO 修正 */}
       <div
         style={{
           display: 'flex',

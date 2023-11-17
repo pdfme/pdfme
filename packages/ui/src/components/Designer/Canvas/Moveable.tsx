@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref } from 'react';
+import React, { useEffect, forwardRef, Ref } from 'react';
 import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnClick } from 'react-moveable';
 
 type Props = {
@@ -20,64 +20,58 @@ type Props = {
   onClick: (e: OnClick) => void;
 };
 
+const className = 'pdfme-moveable';
+
 const _Moveable = (
-  {
-    target,
-    bounds,
-    horizontalGuidelines,
-    verticalGuidelines,
-    keepRatio,
-    rotatable,
-    onDrag,
-    onDragEnd,
-    onDragGroupEnd,
-    onRotate,
-    onRotateEnd,
-    onRotateGroupEnd,
-    onResize,
-    onResizeEnd,
-    onResizeGroupEnd,
-    onClick,
-  }: Props,
+  props: Props,
   ref: Ref<any>
-) => (
-  <Moveable
+) => {
+  useEffect(() => {
+    const containerElement = document.querySelector('.' + className) as HTMLElement | null;
+    if (containerElement) {
+      // TODO ここで themeのprimaryColorを取得して、それを使う
+      containerElement.style.setProperty('--moveable-color', 'red');
+    }
+  }, [props.target]);
+
+  return <Moveable
     style={{ zIndex: 1 }}
+    className={className}
     rootContainer={document ? document.body : undefined}
     snappable
     snapCenter
     draggable
-    rotatable={rotatable}
+    rotatable={props.rotatable}
     resizable
     throttleDrag={1}
     throttleRotate={1}
     throttleResize={1}
     ref={ref}
-    target={target}
-    bounds={bounds}
-    horizontalGuidelines={horizontalGuidelines}
-    verticalGuidelines={verticalGuidelines}
-    keepRatio={keepRatio}
-    onRotate={onRotate}
-    onRotateEnd={onRotateEnd}
+    target={props.target}
+    bounds={props.bounds}
+    horizontalGuidelines={props.horizontalGuidelines}
+    verticalGuidelines={props.verticalGuidelines}
+    keepRatio={props.keepRatio}
+    onRotate={props.onRotate}
+    onRotateEnd={props.onRotateEnd}
     onRotateGroup={({ events }) => {
-      events.forEach(onRotate);
+      events.forEach(props.onRotate);
     }}
-    onRotateGroupEnd={onRotateGroupEnd}
-    onDrag={onDrag}
+    onRotateGroupEnd={props.onRotateGroupEnd}
+    onDrag={props.onDrag}
     onDragGroup={({ events }) => {
-      events.forEach(onDrag);
+      events.forEach(props.onDrag);
     }}
-    onDragEnd={onDragEnd}
-    onDragGroupEnd={onDragGroupEnd}
-    onResize={onResize}
+    onDragEnd={props.onDragEnd}
+    onDragGroupEnd={props.onDragGroupEnd}
+    onResize={props.onResize}
     onResizeGroup={({ events }) => {
-      events.forEach(onResize);
+      events.forEach(props.onResize);
     }}
-    onResizeEnd={onResizeEnd}
-    onResizeGroupEnd={onResizeGroupEnd}
-    onClick={onClick}
+    onResizeEnd={props.onResizeEnd}
+    onResizeGroupEnd={props.onResizeGroupEnd}
+    onClick={props.onClick}
   />
-);
+}
 
 export default forwardRef<any, Props>(_Moveable);

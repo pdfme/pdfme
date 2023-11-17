@@ -114,9 +114,8 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    border: `1px solid ${
-                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
-                    }`,
+                    // TODO 修正
+                    border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
                   }}
                   schema={schema}
                   schemas={schemas}
@@ -137,6 +136,7 @@ const SelectableSortableContainer = (
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   <Item
                     value={schemas.find((schema) => schema.id === activeId)!.key}
+                    // TODO 修正
                     style={{ color: '#fff', background: '#18a0fb' }}
                     dragOverlay
                   />
@@ -148,6 +148,7 @@ const SelectableSortableContainer = (
                       <Item
                         key={item.id}
                         value={item.key}
+                        // TODO 修正
                         style={{ color: '#fff', background: '#18a0fb' }}
                         dragOverlay
                       />

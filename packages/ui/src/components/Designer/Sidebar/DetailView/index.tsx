@@ -134,6 +134,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
+        {/* TODO  修正 */}
         <span
           style={{
             position: 'absolute',
@@ -154,6 +155,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         >
           <Bars3Icon width={15} height={15} />
         </span>
+        {/* TODO 修正 */}
         <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
           {i18n('editField')}
         </span>

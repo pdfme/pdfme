@@ -50,6 +50,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         border: 'none',
         fontWeight: 'bold',
         borderRadius: 2,
+        // TODO 修正
         background: 'rgb(68, 170, 255)',
         display: 'flex',
         alignItems: 'center',
@@ -381,6 +382,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
+            // TODO 修正
             outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
             scale={scale}
           />

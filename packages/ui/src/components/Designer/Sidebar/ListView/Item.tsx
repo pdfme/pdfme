@@ -68,6 +68,7 @@ const Item = React.memo(
           ref={ref}
         >
           <div style={{ display: 'flex', alignItems: 'center', ...style }} {...props}>
+            {/* TODO 修正 */}
             <button
               {...listeners}
               type="button"
@@ -79,6 +80,7 @@ const Item = React.memo(
                 </svg>
               </object>
             </button>
+            {/* TODO 修正 */}
             <div
               style={{
                 width: '100%',

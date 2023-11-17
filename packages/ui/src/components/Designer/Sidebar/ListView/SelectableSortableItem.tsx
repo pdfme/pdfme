@@ -51,6 +51,7 @@ const SelectableSortableItem = ({
     title = i18n('fieldMustUniq');
   }
 
+  // TODO 修正
   const selectedStyle = isSelected
     ? { color: 'pink', background: '#18a0fb', opacity: isSorting || isDragging ? 0.5 : 1 }
     : ({} as React.CSSProperties);
