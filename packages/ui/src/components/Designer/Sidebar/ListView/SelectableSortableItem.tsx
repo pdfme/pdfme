@@ -52,7 +52,7 @@ const SelectableSortableItem = ({
   }
 
   const selectedStyle = isSelected
-    ? { color: '#fff', background: '#18a0fb', opacity: isSorting || isDragging ? 0.5 : 1 }
+    ? { color: 'pink', background: '#18a0fb', opacity: isSorting || isDragging ? 0.5 : 1 }
     : ({} as React.CSSProperties);
 
   return (

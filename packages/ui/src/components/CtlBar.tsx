@@ -12,7 +12,7 @@ type ZoomProps = {
   setZoomLevel: (zoom: number) => void;
   style: {
     textStyle: React.CSSProperties;
-    iconStyle: { size: number, color: string }
+    iconStyle: { size: number; color: string };
   };
 };
 
@@ -25,23 +25,27 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   const nextZoomIn = zoomLevel + zoomStep;
 
   return (
-    <div style={{ display: 'flex', }}>
+    <div style={{ display: 'flex' }}>
       <Button
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
       >
-        <MinusIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+        <MinusIcon
+          width={style.iconStyle.size}
+          height={style.iconStyle.size}
+          color={style.iconStyle.color}
+        />
       </Button>
       <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
       </Text>
-      <Button
-        type="text"
-        disabled={maxZoom < nextZoomIn}
-        onClick={() => setZoomLevel(nextZoomIn)}
-      >
-        <PlusIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+      <Button type="text" disabled={maxZoom < nextZoomIn} onClick={() => setZoomLevel(nextZoomIn)}>
+        <PlusIcon
+          width={style.iconStyle.size}
+          height={style.iconStyle.size}
+          color={style.iconStyle.color}
+        />
       </Button>
     </div>
   );
@@ -53,19 +57,19 @@ type PagerProps = {
   setPageCursor: (page: number) => void;
   style: {
     textStyle: React.CSSProperties;
-    iconStyle: { size: number, color: string }
+    iconStyle: { size: number; color: string };
   };
 };
 
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
-    <div style={{ display: 'flex', }}>
-      <Button
-        type="text"
-        disabled={pageCursor <= 0}
-        onClick={() => setPageCursor(pageCursor - 1)}
-      >
-        <ChevronLeftIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+    <div style={{ display: 'flex' }}>
+      <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
+        <ChevronLeftIcon
+          width={style.iconStyle.size}
+          height={style.iconStyle.size}
+          color={style.iconStyle.color}
+        />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
@@ -75,7 +79,11 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <ChevronRightIcon width={style.iconStyle.size} height={style.iconStyle.size} color={style.iconStyle.color} />
+        <ChevronRightIcon
+          width={style.iconStyle.size}
+          height={style.iconStyle.size}
+          color={style.iconStyle.color}
+        />
       </Button>
     </div>
   );
@@ -97,7 +105,6 @@ const CtlBar = (props: CtlBarProps) => {
   const barWidth = style.CtlBar.barWidth;
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
   const width = pageNum > 1 ? barWidth : barWidth / 2;
-
 
   const textStyle = {
     color: style.CtlBar.textColor,

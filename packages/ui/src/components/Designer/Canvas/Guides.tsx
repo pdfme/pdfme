@@ -3,15 +3,24 @@ import Guides from '@scena/react-guides';
 import { ZOOM, Size } from '@pdfme/common';
 import { RULER_HEIGHT } from '../../../constants';
 
-const guideStyle = (top: number, left: number, height: number, width: number): React.CSSProperties => ({
+const guideStyle = (
+  top: number,
+  left: number,
+  height: number,
+  width: number
+): React.CSSProperties => ({
   position: 'absolute',
   top,
   left,
   height,
-  width
+  width,
 });
 
-const _Guides = ({ paperSize, horizontalRef, verticalRef }: {
+const _Guides = ({
+  paperSize,
+  horizontalRef,
+  verticalRef,
+}: {
   paperSize: Size;
   horizontalRef: Ref<Guides> | undefined;
   verticalRef: Ref<Guides> | undefined;

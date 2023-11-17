@@ -11,11 +11,7 @@ export const theme: ThemeConfig = {
     paddingXS: 4,
   },
   components: {
-    Form: {
-      fontSize: 12,
-      itemMarginBottom: 4,
-      verticalLabelPadding: '0 0 2px',
-    },
+    Form: { fontSize: 12, itemMarginBottom: 4, verticalLabelPadding: '0 0 2px' },
   },
 };
 
@@ -25,23 +21,13 @@ const controllerTextColor = '#ffffff';
 const controllerStyle = {
   textColor: controllerTextColor,
   background: controllerBackground,
-  icon: {
-    color: controllerTextColor,
-    size: 19,
-  },
+  icon: { color: controllerTextColor, size: 19 },
   height: 38,
 };
 export const style = {
-  ErrorScreen: {
-    background,
-    cardBackground: '#ffffffad',
-  },
-  Mask: {
-    background: 'rgba(158, 158, 158, 0.58)',
-  },
-  Root: {
-    background,
-  },
+  ErrorScreen: { background, cardBackground: '#ffffffad' },
+  Mask: { background: 'rgba(158, 158, 158, 0.58)' },
+  Root: { background },
   UnitPager: controllerStyle,
   CtlBar: { ...controllerStyle, barWidth: 360 },
 };
