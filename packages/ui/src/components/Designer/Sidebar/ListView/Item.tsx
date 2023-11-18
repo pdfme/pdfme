@@ -90,6 +90,7 @@ const Item = React.memo(
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
+                width: '100%',
               }}
               title={title || ''}
               onClick={() => onClick && onClick()}

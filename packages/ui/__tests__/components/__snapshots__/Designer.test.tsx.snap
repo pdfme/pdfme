@@ -194,7 +194,7 @@ exports[`Designer snapshot 1`] = `
                         </button>
                         <span
                           class="ant-typography css-dev-only-do-not-override-amq5gd"
-                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
                           field1
@@ -240,7 +240,7 @@ exports[`Designer snapshot 1`] = `
                         </button>
                         <span
                           class="ant-typography css-dev-only-do-not-override-amq5gd"
-                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
+                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
                           field2
