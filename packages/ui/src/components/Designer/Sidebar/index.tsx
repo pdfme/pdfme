@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Button } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
+import { I18nContext, StyleContext } from '../../../contexts';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
@@ -10,6 +10,7 @@ import DetailView from './DetailView/index';
 const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
 
+  const style = useContext(StyleContext);
   const i18n = useContext(I18nContext);
   const getActiveSchemas = () =>
     schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id));
@@ -34,7 +35,6 @@ const Sidebar = (props: SidebarProps) => {
           icon={sidebarOpen ? <ArrowRightOutlined /> : <ArrowLeftOutlined />}
           onClick={() => setSidebarOpen(!sidebarOpen)}
         />
-        {/* // TODO 修正 */}
         <div
           style={{
             width: SIDEBAR_WIDTH,
@@ -43,15 +43,11 @@ const Sidebar = (props: SidebarProps) => {
             top: 0,
             right: 0,
             position: 'absolute',
-            background: '#fffffffa',
-            color: '#333',
-            border: '1px solid #eee',
             padding: '0.7rem 1rem',
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
-            fontWeight: 400,
-            textAlign: 'left',
             boxSizing: 'border-box',
+            background: style.Sidebar.background,
           }}
         >
           <div>
@@ -64,7 +60,7 @@ const Sidebar = (props: SidebarProps) => {
           <div
             style={{
               position: 'absolute',
-              bottom: '1rem',
+              bottom: '1.5rem',
               marginTop: '1rem',
               left: '50%',
               transform: 'translateX(-50%)',

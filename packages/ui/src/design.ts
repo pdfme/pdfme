@@ -25,6 +25,7 @@ const controllerStyle = {
   height: 40,
 };
 export const style = {
+  Sidebar: { background: '#fffffffa' },
   ErrorScreen: { background, cardBackground: '#ffffffad' },
   Mask: { background: 'rgba(158, 158, 158, 0.58)' },
   Root: { background },

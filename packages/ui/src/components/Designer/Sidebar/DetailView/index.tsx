@@ -5,7 +5,7 @@ import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
 import { getSidebarContentHeight } from '../../../../helper';
-import { Typography, Button, Divider } from 'antd';
+import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
 
@@ -19,6 +19,8 @@ const DetailView = (
     activeSchema: SchemaForUI;
   }
 ) => {
+  const { token } = theme.useToken();
+
   const { size, changeSchemas, deselectSchema, activeSchema, activeElements } = props;
   const form = useForm();
 
@@ -151,6 +153,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
           overflowX: 'hidden',
+          paddingBottom: '0.5rem',
+          borderBottom: `1px solid ${token.colorSplit}`,
         }}
       >
         <FormRender

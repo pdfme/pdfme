@@ -3,11 +3,13 @@ import type { SidebarProps } from '../../../../types';
 import { SIDEBAR_WIDTH } from '../../../../constants';
 import { I18nContext } from '../../../../contexts';
 import { getSidebarContentHeight } from '../../../../helper';
-import { Input, Typography, Divider, Button } from 'antd';
+import { theme, Input, Typography, Divider, Button } from 'antd';
 import SelectableSortableContainer from './SelectableSortableContainer';
 
 const { Text } = Typography;
 const { TextArea } = Input;
+
+const headHeight = 40;
 
 const ListView = (
   props: Pick<
@@ -30,6 +32,7 @@ const ListView = (
     onChangeHoveringSchemaId,
     changeSchemas,
   } = props;
+  const { token } = theme.useToken();
   const i18n = useContext(I18nContext);
   const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
   const [fieldNamesValue, setFieldNamesValue] = useState('');
@@ -49,29 +52,33 @@ const ListView = (
       );
       setIsBulkUpdateFieldNamesMode(false);
     }
-  }
+  };
 
   const startBulk = () => {
     setFieldNamesValue(schemas.map((s) => s.key).join('\n'));
     setIsBulkUpdateFieldNamesMode(true);
-  }
+  };
 
   return (
     <div>
-      <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
+      <div style={{ height: headHeight, display: 'flex', alignItems: 'center' }}>
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('fieldsList')}
         </Text>
       </div>
       <Divider />
-      {/* TODO ここの高さがずれる */}
-      <div style={{ height: height - 40 }}>
+      <div style={{ height: height - headHeight }}>
         {isBulkUpdateFieldNamesMode ? (
           <TextArea
             wrap="off"
             value={fieldNamesValue}
             onChange={(e) => setFieldNamesValue(e.target.value)}
-            style={{ paddingLeft: 30, height: height - 40, width: SIDEBAR_WIDTH - 35, lineHeight: '2.75rem' }}
+            style={{
+              paddingLeft: 30,
+              height: height - headHeight,
+              width: SIDEBAR_WIDTH - 35,
+              lineHeight: '2.75rem',
+            }}
           />
         ) : (
           <SelectableSortableContainer
@@ -82,18 +89,29 @@ const ListView = (
             onEdit={onEdit}
           />
         )}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: 40 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            height: headHeight,
+            borderBottom: `1px solid ${token.colorSplit}`,
+            paddingBottom: '0.5rem',
+          }}
+        >
           {isBulkUpdateFieldNamesMode ? (
             <>
-              <Button type="text" onClick={commitBulk}              >
-                {i18n('commitBulkUpdateFieldName')}
+              <Button size="small" type="text" onClick={commitBulk}>
+                <u> {i18n('commitBulkUpdateFieldName')}</u>
               </Button>
               <span style={{ margin: '0 1rem' }}>/</span>
-              <Button type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>{i18n('cancel')}</Button>
+              <Button size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
+                <u> {i18n('cancel')}</u>
+              </Button>
             </>
           ) : (
-            <Button type="text" onClick={startBulk}>
-              {i18n('bulkUpdateFieldName')}
+            <Button size="small" type="text" onClick={startBulk}>
+              <u> {i18n('bulkUpdateFieldName')}</u>
             </Button>
           )}
         </div>

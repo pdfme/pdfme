@@ -74,10 +74,16 @@ const Item = React.memo(
           <div style={{ display: 'flex', alignItems: 'center', ...style }} {...props}>
             <Button
               {...listeners}
-              style={{ display: 'flex', alignItems: 'center', background: 'none', boxShadow: 'none', border: 'none' }}
-              icon={<HolderOutlined style={{ cursor: 'grab', }} />}
-            >
-            </Button>
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'none',
+                boxShadow: 'none',
+                border: 'none',
+                paddingLeft: '0.25rem',
+              }}
+              icon={<HolderOutlined style={{ cursor: 'grab' }} />}
+            ></Button>
             <Text
               style={{
                 cursor: 'pointer',
@@ -99,7 +105,7 @@ const Item = React.memo(
               )}
             </Text>
           </div>
-        </li >
+        </li>
       );
     }
   )
