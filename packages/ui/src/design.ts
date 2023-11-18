@@ -2,7 +2,8 @@ import { ThemeConfig } from 'antd';
 
 export const theme: ThemeConfig = {
   token: {
-    fontSize: 14,
+    colorPrimary: '#25c2a0',
+    fontSize: 16,
     margin: 8,
     marginLG: 12,
     marginXS: 4,
@@ -21,13 +22,12 @@ const controllerTextColor = '#ffffff';
 const controllerStyle = {
   textColor: controllerTextColor,
   background: controllerBackground,
-  icon: { color: controllerTextColor, size: 19 },
-  height: 38,
+  height: 40,
 };
 export const style = {
   ErrorScreen: { background, cardBackground: '#ffffffad' },
   Mask: { background: 'rgba(158, 158, 158, 0.58)' },
   Root: { background },
   UnitPager: controllerStyle,
-  CtlBar: { ...controllerStyle, barWidth: 360 },
+  CtlBar: { ...controllerStyle, barWidth: 300 },
 };

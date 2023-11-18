@@ -9,10 +9,11 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
+import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import { CloseOutlined } from '@ant-design/icons';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
@@ -30,35 +31,33 @@ const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0
 const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
+  const { token } = theme.useToken();
+
+  const size = 26;
   const top = Math.min(...aes.map(({ style }) => fmt4Num(style.top)));
   const left = Math.max(...aes.map(({ style }) => fmt4Num(style.left) + fmt4Num(style.width))) + 10;
 
   return (
-    <button
-      type="button"
+    <Button
       id={DELETE_BTN_ID}
       style={{
         position: 'absolute',
         zIndex: 1,
         top,
         left,
+        width: size,
+        height: size,
         padding: 2,
-        height: 24,
-        width: 24,
-        cursor: 'pointer',
-        color: 'white',
-        border: 'none',
-        fontWeight: 'bold',
-        borderRadius: 2,
-        // TODO 修正
-        background: 'rgb(68, 170, 255)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: token.borderRadius,
+        color: token.colorWhite,
+        background: token.colorPrimary,
       }}
     >
-      <XMarkIcon style={{ pointerEvents: 'none' }} width={24} height={24} />
-    </button>
+      <CloseOutlined style={{ pointerEvents: 'none' }} />
+    </Button>
   );
 };
 
@@ -105,6 +104,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     paperRefs,
     sidebarOpen,
   } = props;
+  const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
 
   const verticalGuides = useRef<GuidesInterface[]>([]);
@@ -382,8 +382,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            // TODO 修正
-            outline={hoveringSchemaId === schema.id ? '1px solid #18a0fb' : '1px dashed #4af'}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
+              token.colorPrimary
+            }`}
             scale={scale}
           />
         )}

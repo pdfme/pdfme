@@ -1,8 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts';
-import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 interface Props {
   value: React.ReactNode;
   style?: React.CSSProperties;
@@ -98,7 +97,7 @@ const Item = React.memo(
                 value
               ) : (
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <ExclamationTriangleIcon width={15} style={{ marginRight: '0.5rem' }} />
+                  <ExclamationCircleOutlined width={15} style={{ marginRight: '0.5rem' }} />
                   {status === 'is-warning' ? i18n('noKeyName') : value}
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>

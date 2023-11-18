@@ -1,19 +1,16 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
-import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { MinusOutlined, PlusOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { theme, Typography, Button } from 'antd';
 import { StyleContext } from '../contexts';
 
 const { Text } = Typography;
 
+type TextStyle = { color: string; fontSize: number; margin: number };
 type ZoomProps = {
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
-  style: {
-    textStyle: React.CSSProperties;
-    iconStyle: { size: number; color: string };
-  };
+  style: { textStyle: TextStyle };
 };
 
 const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
@@ -30,23 +27,17 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
-      >
-        <MinusIcon
-          width={style.iconStyle.size}
-          height={style.iconStyle.size}
-          color={style.iconStyle.color}
-        />
-      </Button>
+        icon={<MinusOutlined style={{ color: style.textStyle.color }} />}
+      />
       <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
       </Text>
-      <Button type="text" disabled={maxZoom < nextZoomIn} onClick={() => setZoomLevel(nextZoomIn)}>
-        <PlusIcon
-          width={style.iconStyle.size}
-          height={style.iconStyle.size}
-          color={style.iconStyle.color}
-        />
-      </Button>
+      <Button
+        type="text"
+        disabled={maxZoom < nextZoomIn}
+        onClick={() => setZoomLevel(nextZoomIn)}
+        icon={<PlusOutlined style={{ color: style.textStyle.color }} />}
+      />
     </div>
   );
 };
@@ -55,21 +46,14 @@ type PagerProps = {
   pageCursor: number;
   pageNum: number;
   setPageCursor: (page: number) => void;
-  style: {
-    textStyle: React.CSSProperties;
-    iconStyle: { size: number; color: string };
-  };
+  style: { textStyle: TextStyle };
 };
 
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex' }}>
       <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
-        <ChevronLeftIcon
-          width={style.iconStyle.size}
-          height={style.iconStyle.size}
-          color={style.iconStyle.color}
-        />
+        <LeftOutlined style={{ color: style.textStyle.color }} />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
@@ -79,11 +63,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <ChevronRightIcon
-          width={style.iconStyle.size}
-          height={style.iconStyle.size}
-          color={style.iconStyle.color}
-        />
+        <RightOutlined style={{ color: style.textStyle.color }} />
       </Button>
     </div>
   );
@@ -111,7 +91,6 @@ const CtlBar = (props: CtlBarProps) => {
     fontSize: token.fontSize,
     margin: token.marginXS,
   };
-  const iconStyle = style.CtlBar.icon;
 
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
@@ -133,13 +112,13 @@ const CtlBar = (props: CtlBarProps) => {
       >
         {pageNum > 1 && (
           <Pager
-            style={{ textStyle, iconStyle }}
+            style={{ textStyle }}
             pageCursor={pageCursor}
             pageNum={pageNum}
             setPageCursor={setPageCursor}
           />
         )}
-        <Zoom style={{ textStyle, iconStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+        <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
       </div>
     </div>
   );

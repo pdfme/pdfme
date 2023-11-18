@@ -2,12 +2,14 @@ import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect, useState } from 'react';
 import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
-import { Bars3Icon } from '@heroicons/react/20/solid';
+import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
 import { getSidebarContentHeight } from '../../../../helper';
-import { Divider } from 'antd';
+import { Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
+
+const { Text } = Typography;
 
 const DetailView = (
   props: Pick<
@@ -134,31 +136,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-        {/* TODO  修正 */}
-        <span
-          style={{
-            position: 'absolute',
-            top: '0.85rem',
-            zIndex: 100,
-            border: 'none',
-            borderRadius: 2,
-            padding: '0.5rem',
-            cursor: 'pointer',
-            background: '#eee',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            maxWidth: 30,
-            maxHeight: 30,
-          }}
+        <Button
+          style={{ position: 'absolute', zIndex: 100 }}
           onClick={deselectSchema}
-        >
-          <Bars3Icon width={15} height={15} />
-        </span>
-        {/* TODO 修正 */}
-        <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
+          icon={<MenuOutlined />}
+        />
+        <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('editField')}
-        </span>
+        </Text>
       </div>
       <Divider />
       <div

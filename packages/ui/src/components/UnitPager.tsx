@@ -3,12 +3,11 @@ import { Size } from '@pdfme/common';
 import { theme, Typography, Button } from 'antd';
 import { StyleContext } from '../contexts';
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-} from '@heroicons/react/24/outline';
-
+  LeftOutlined,
+  RightOutlined,
+  DoubleLeftOutlined,
+  DoubleRightOutlined,
+} from '@ant-design/icons';
 const { Text } = Typography;
 
 type UnitButtonProps = {
@@ -18,19 +17,19 @@ type UnitButtonProps = {
 };
 
 const icons = {
-  left: ChevronLeftIcon,
-  right: ChevronRightIcon,
-  doubleLeft: ChevronDoubleLeftIcon,
-  doubleRight: ChevronDoubleRightIcon,
+  left: LeftOutlined,
+  right: RightOutlined,
+  doubleLeft: DoubleLeftOutlined,
+  doubleRight: DoubleRightOutlined,
 };
 
 const UnitButton: React.FC<UnitButtonProps> = ({ type, onClick, disabled }) => {
   const Icon = icons[type];
   const style = useContext(StyleContext);
-  const iconStyle = style.CtlBar.icon;
+
   return (
     <Button type="text" onClick={onClick} disabled={disabled}>
-      <Icon width={iconStyle.size} height={iconStyle.size} color={iconStyle.color} />
+      <Icon style={{ color: style.UnitPager.textColor }} />
     </Button>
   );
 };

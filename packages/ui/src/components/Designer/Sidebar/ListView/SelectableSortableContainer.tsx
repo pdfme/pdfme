@@ -23,10 +23,10 @@ import SelectableSortableItem from './SelectableSortableItem';
 const SelectableSortableContainer = (
   props: Pick<
     SidebarProps,
-    'schemas' | 'onEdit' | 'onSortEnd' | 'height' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
+    'schemas' | 'onEdit' | 'onSortEnd' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
   >
 ) => {
-  const { schemas, onEdit, onSortEnd, height, hoveringSchemaId, onChangeHoveringSchemaId } = props;
+  const { schemas, onEdit, onSortEnd, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const [selectedSchemas, setSelectedSchemas] = useState<SchemaForUI[]>([]);
   const [dragOverlaydItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -107,7 +107,7 @@ const SelectableSortableContainer = (
       }}
     >
       <>
-        <div style={{ height, overflowY: 'auto' }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
           <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
               {schemas.map((schema) => (
@@ -115,7 +115,9 @@ const SelectableSortableContainer = (
                   key={schema.id}
                   style={{
                     // TODO 修正
-                    border: `1px solid ${schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'}`,
+                    border: `1px solid ${
+                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
+                    }`,
                   }}
                   schema={schema}
                   schemas={schemas}
