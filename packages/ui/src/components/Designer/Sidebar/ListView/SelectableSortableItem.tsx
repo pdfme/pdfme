@@ -4,6 +4,7 @@ import { SchemaForUI } from '@pdfme/common';
 import { I18nContext } from '../../../../contexts';
 import Item from './Item';
 import { useMountStatus } from '../../../../hooks';
+import { theme } from 'antd';
 
 interface Props {
   isSelected: boolean;
@@ -25,6 +26,8 @@ const SelectableSortableItem = ({
   onMouseEnter,
   onMouseLeave,
 }: Props) => {
+  const { token } = theme.useToken();
+
   const i18n = useContext(I18nContext);
   const { setNodeRef, listeners, isDragging, isSorting, transform, transition } = useSortable({
     id: schema.id,
@@ -51,9 +54,8 @@ const SelectableSortableItem = ({
     title = i18n('fieldMustUniq');
   }
 
-  // TODO 修正
   const selectedStyle = isSelected
-    ? { color: 'pink', background: '#18a0fb', opacity: isSorting || isDragging ? 0.5 : 1 }
+    ? { background: token.colorPrimary, opacity: isSorting || isDragging ? 0.5 : 1 }
     : ({} as React.CSSProperties);
 
   return (

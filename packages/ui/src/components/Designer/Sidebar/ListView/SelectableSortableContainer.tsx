@@ -19,6 +19,7 @@ import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import Item from './Item';
 import SelectableSortableItem from './SelectableSortableItem';
+import { theme } from 'antd';
 
 const SelectableSortableContainer = (
   props: Pick<
@@ -26,6 +27,8 @@ const SelectableSortableContainer = (
     'schemas' | 'onEdit' | 'onSortEnd' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
   >
 ) => {
+  const { token } = theme.useToken();
+
   const { schemas, onEdit, onSortEnd, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const [selectedSchemas, setSelectedSchemas] = useState<SchemaForUI[]>([]);
   const [dragOverlaydItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
@@ -114,10 +117,8 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    // TODO 修正
-                    border: `1px solid ${
-                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
-                    }`,
+                    border: `1px solid ${schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
+                      }`,
                   }}
                   schema={schema}
                   schemas={schemas}
@@ -138,8 +139,7 @@ const SelectableSortableContainer = (
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   <Item
                     value={schemas.find((schema) => schema.id === activeId)!.key}
-                    // TODO 修正
-                    style={{ color: '#fff', background: '#18a0fb' }}
+                    style={{ background: token.colorPrimary }}
                     dragOverlay
                   />
                 </ul>
@@ -150,8 +150,7 @@ const SelectableSortableContainer = (
                       <Item
                         key={item.id}
                         value={item.key}
-                        // TODO 修正
-                        style={{ color: '#fff', background: '#18a0fb' }}
+                        style={{ background: token.colorPrimary }}
                         dragOverlay
                       />
                     ))}

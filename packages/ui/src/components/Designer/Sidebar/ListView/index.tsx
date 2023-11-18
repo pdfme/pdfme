@@ -71,7 +71,7 @@ const ListView = (
             wrap="off"
             value={fieldNamesValue}
             onChange={(e) => setFieldNamesValue(e.target.value)}
-            style={{ height: height - 40, width: SIDEBAR_WIDTH - 35, lineHeight: '2.75rem' }}
+            style={{ paddingLeft: 30, height: height - 40, width: SIDEBAR_WIDTH - 35, lineHeight: '2.75rem' }}
           />
         ) : (
           <SelectableSortableContainer

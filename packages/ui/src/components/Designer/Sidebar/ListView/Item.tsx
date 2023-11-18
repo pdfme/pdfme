@@ -1,7 +1,11 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { HolderOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Typography } from 'antd';
+
+const { Text } = Typography;
+
 interface Props {
   value: React.ReactNode;
   style?: React.CSSProperties;
@@ -59,6 +63,7 @@ const Item = React.memo(
       return (
         <li
           style={{
+            marginTop: 10,
             transition,
             transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`,
           }}
@@ -67,24 +72,14 @@ const Item = React.memo(
           ref={ref}
         >
           <div style={{ display: 'flex', alignItems: 'center', ...style }} {...props}>
-            {/* TODO 修正 */}
-            <button
+            <Button
               {...listeners}
-              type="button"
-              style={{ padding: '0.5rem', background: 'none', border: 'none', display: 'flex' }}
+              style={{ display: 'flex', alignItems: 'center', background: 'none', boxShadow: 'none', border: 'none' }}
+              icon={<HolderOutlined style={{ cursor: 'grab', }} />}
             >
-              <object style={{ cursor: 'grab', marginTop: 6 }} width={15}>
-                <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="16" height="16">
-                  <path d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"></path>
-                </svg>
-              </object>
-            </button>
-            {/* TODO 修正 */}
-            <div
+            </Button>
+            <Text
               style={{
-                width: '100%',
-                padding: '0.5rem',
-                paddingLeft: 0,
                 cursor: 'pointer',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
@@ -102,9 +97,9 @@ const Item = React.memo(
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>
               )}
-            </div>
+            </Text>
           </div>
-        </li>
+        </li >
       );
     }
   )

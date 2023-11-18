@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Typography, Divider, Button } from 'antd';
+import { Button } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { SIDEBAR_WIDTH } from '../../../constants';
 import { I18nContext } from '../../../contexts';

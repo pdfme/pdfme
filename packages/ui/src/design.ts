@@ -3,7 +3,7 @@ import { ThemeConfig } from 'antd';
 export const theme: ThemeConfig = {
   token: {
     colorPrimary: '#25c2a0',
-    fontSize: 16,
+    fontSize: 15,
     margin: 8,
     marginLG: 12,
     marginXS: 4,
