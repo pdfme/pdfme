@@ -38,9 +38,9 @@ function App() {
           template,
           options: {
             font,
-            customTheme: {
+            theme: {
               token: {
-                colorPrimary: 'red',
+                colorPrimary: '#25c2a0',
               },
             },
           },

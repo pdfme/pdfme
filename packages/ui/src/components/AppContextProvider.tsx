@@ -40,8 +40,8 @@ const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>
 
 export default ({ children, i18n, font, plugins, options }: Props) => {
   let theme = defaultTheme;
-  if (options.customTheme) {
-    theme = deepMerge(theme, options.customTheme);
+  if (options.theme) {
+    theme = deepMerge(theme, options.theme);
   }
   return (
     <ThemeConfigProvider theme={theme}>
