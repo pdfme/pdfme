@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 import { I18nContext } from '../contexts';
+import { BACKGROUND_COLOR } from '../constants';
 import { theme, Result } from 'antd';
 
 const ErrorScreen = ({ size, error }: { size: Size; error: Error }) => {
@@ -13,7 +14,7 @@ const ErrorScreen = ({ size, error }: { size: Size; error: Error }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        background: 'rgb(74, 74, 74)',
+        background: BACKGROUND_COLOR,
         ...size,
       }}
     >
