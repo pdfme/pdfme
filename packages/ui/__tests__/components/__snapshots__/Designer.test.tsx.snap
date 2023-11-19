@@ -145,7 +145,7 @@ exports[`Designer snapshot 1`] = `
               <div
                 class="ant-divider css-dev-only-do-not-override-nllxry ant-divider-horizontal"
                 role="separator"
-                style="margin: 8px; padding: 8px;"
+                style="margin-top: 8px; margin-bottom: 8px;"
               />
               <div
                 style="height: 1000px;"

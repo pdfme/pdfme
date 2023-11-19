@@ -66,7 +66,8 @@ export const GenerateProps = CommonProps.extend({
 
 export const UIOptions = CommonOptions.extend({
   lang: Lang.optional(),
-  theme: z.union([z.string(), z.unknown()]).optional(),
+  labels: z.record(z.string(), z.string()).optional(),
+  theme: z.record(z.string(), z.unknown()).optional(),
 });
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
