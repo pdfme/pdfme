@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { Button } from 'antd';
+import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext, StyleContext } from '../../../contexts';
+import { I18nContext } from '../../../contexts';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
@@ -10,7 +10,7 @@ import DetailView from './DetailView/index';
 const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
 
-  const style = useContext(StyleContext);
+  const { token } = theme.useToken();
   const i18n = useContext(I18nContext);
   const getActiveSchemas = () =>
     schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id));
@@ -31,7 +31,15 @@ const Sidebar = (props: SidebarProps) => {
     >
       <div>
         <Button
-          style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 100 }}
+          style={{
+            position: 'absolute',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            top: '1rem',
+            right: '1rem',
+            zIndex: 100,
+          }}
           icon={sidebarOpen ? <ArrowRightOutlined /> : <ArrowLeftOutlined />}
           onClick={() => setSidebarOpen(!sidebarOpen)}
         />
@@ -47,7 +55,7 @@ const Sidebar = (props: SidebarProps) => {
             overflowY: 'auto',
             fontFamily: "'Open Sans', sans-serif",
             boxSizing: 'border-box',
-            background: style.Sidebar.background,
+            background: token.colorBgLayout,
           }}
         >
           <div>

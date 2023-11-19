@@ -139,7 +139,13 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <Button
-          style={{ position: 'absolute', zIndex: 100 }}
+          style={{
+            position: 'absolute',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
           onClick={deselectSchema}
           icon={<MenuOutlined />}
         />

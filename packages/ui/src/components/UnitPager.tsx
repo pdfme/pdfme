@@ -1,7 +1,6 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Size } from '@pdfme/common';
 import { theme, Typography, Button } from 'antd';
-import { StyleContext } from '../contexts';
 import {
   LeftOutlined,
   RightOutlined,
@@ -14,6 +13,7 @@ type UnitButtonProps = {
   type: 'left' | 'right' | 'doubleLeft' | 'doubleRight';
   onClick: () => void;
   disabled: boolean;
+  textStyle: { color: string; fontSize: number; margin: number };
 };
 
 const icons = {
@@ -23,13 +23,12 @@ const icons = {
   doubleRight: DoubleRightOutlined,
 };
 
-const UnitButton: React.FC<UnitButtonProps> = ({ type, onClick, disabled }) => {
+const UnitButton: React.FC<UnitButtonProps> = ({ type, onClick, disabled, textStyle }) => {
   const Icon = icons[type];
-  const style = useContext(StyleContext);
 
   return (
     <Button type="text" onClick={onClick} disabled={disabled}>
-      <Icon style={{ color: style.UnitPager.textColor }} />
+      <Icon style={{ color: textStyle.color }} />
     </Button>
   );
 };
@@ -44,8 +43,6 @@ type Props = {
 const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
   if (unitNum <= 1) return null;
 
-  const style = useContext(StyleContext);
-
   const { token } = theme.useToken();
 
   const buttonWrapStyle: React.CSSProperties = {
@@ -55,13 +52,13 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
     display: 'flex',
     alignItems: 'center',
     boxSizing: 'border-box',
-    height: style.UnitPager.height,
+    height: 40,
     padding: token.paddingSM,
     borderRadius: token.borderRadius,
-    backgroundColor: style.UnitPager.background,
+    backgroundColor: token.colorBgMask,
   };
   const textStyle = {
-    color: style.CtlBar.textColor,
+    color: token.colorWhite,
     fontSize: token.fontSize,
     margin: token.marginXS,
   };
@@ -73,7 +70,7 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
           position: 'sticky',
           width: '100%',
           zIndex: 1,
-          top: `calc(50% - ${style.UnitPager.height / 2}px)`,
+          top: `calc(50% - ${(buttonWrapStyle.height as number) / 2}px)`,
           display: 'flex',
           alignItems: 'center',
         }}
@@ -84,11 +81,13 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               type="doubleLeft"
               onClick={() => setUnitCursor(0)}
               disabled={unitCursor <= 0}
+              textStyle={textStyle}
             />
             <UnitButton
               type="left"
               onClick={() => setUnitCursor(unitCursor - 1)}
               disabled={unitCursor <= 0}
+              textStyle={textStyle}
             />
             <Text strong style={textStyle}>
               {unitCursor + 1}/{unitNum}
@@ -106,11 +105,13 @@ const UnitPager = ({ size, unitCursor, unitNum, setUnitCursor }: Props) => {
               type="right"
               onClick={() => setUnitCursor(unitCursor + 1)}
               disabled={unitCursor + 1 >= unitNum}
+              textStyle={textStyle}
             />
             <UnitButton
               type="doubleRight"
               onClick={() => setUnitCursor(unitNum - 1)}
               disabled={unitCursor + 1 >= unitNum}
+              textStyle={textStyle}
             />
           </div>
         )}

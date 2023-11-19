@@ -60,3 +60,13 @@ export const rotatePoint = (
 
   return { x, y };
 };
+
+export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
+  if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i.test(hex)) {
+    throw new Error('Invalid HEX color code');
+  }
+  const alphaValue = Math.round((alphaPercentage / 100) * 255);
+  let alphaHex = alphaValue.toString(16);
+  if (alphaHex.length === 1) alphaHex = '0' + alphaHex;
+  return hex + alphaHex;
+};

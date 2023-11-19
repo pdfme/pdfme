@@ -36,7 +36,14 @@ function App() {
         designer.current = new Designer({
           domContainer: designerRef.current,
           template,
-          options: { font },
+          options: {
+            font,
+            customTheme: {
+              token: {
+                colorPrimary: 'orange',
+              }
+            }
+          },
           plugins: getPlugins(),
         });
         designer.current.onSaveTemplate(onSaveTemplate);

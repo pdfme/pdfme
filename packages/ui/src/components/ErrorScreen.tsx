@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
-import { I18nContext, StyleContext } from '../contexts';
-import { Result } from 'antd';
+import { I18nContext } from '../contexts';
+import { theme, Result } from 'antd';
 
 const ErrorScreen = ({ size, error }: { size: Size; error: Error }) => {
   const i18n = useContext(I18nContext);
-  const style = useContext(StyleContext);
+  const { token } = theme.useToken();
 
   return (
     <div
@@ -13,11 +13,11 @@ const ErrorScreen = ({ size, error }: { size: Size; error: Error }) => {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        background: style.ErrorScreen.background,
+        background: 'rgb(74, 74, 74)',
         ...size,
       }}
     >
-      <div style={{ width: 300, margin: '0 auto', background: style.ErrorScreen.cardBackground }}>
+      <div style={{ width: 300, margin: '0 auto', background: token.colorBgLayout }}>
         <Result
           icon={null}
           title="ERROR"

@@ -11,10 +11,10 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 850px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(119, 119, 119, 0.741);"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
-          style="display: flex;"
+          style="display: flex; align-items: center;"
         >
           <button
             class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
@@ -97,7 +97,7 @@ exports[`Designer snapshot 1`] = `
       <div>
         <button
           class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-default ant-btn-icon-only"
-          style="position: absolute; top: 1rem; right: 1rem; z-index: 100;"
+          style="position: absolute; display: flex; align-items: center; justify-content: center; top: 1rem; right: 1rem; z-index: 100;"
           type="button"
         >
           <span
@@ -126,7 +126,7 @@ exports[`Designer snapshot 1`] = `
           
         </button>
         <div
-          style="width: 350px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgba(255, 255, 255, 0.98);"
+          style="width: 350px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
         >
           <div>
             <div>
@@ -145,6 +145,7 @@ exports[`Designer snapshot 1`] = `
               <div
                 class="ant-divider css-dev-only-do-not-override-amq5gd ant-divider-horizontal"
                 role="separator"
+                style="margin: 8px; padding: 8px;"
               />
               <div
                 style="height: 1000px;"
@@ -267,7 +268,7 @@ exports[`Designer snapshot 1`] = `
                   style="position: fixed; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
                 />
                 <div
-                  style="display: flex; align-items: center; justify-content: flex-end; height: 40px; border-bottom: 1px solid rgba(5, 5, 5, 0.06); padding-bottom: 0.5rem;"
+                  style="display: flex; align-items: center; justify-content: flex-end; height: 40px; border-bottom: 1px solid rgba(5, 5, 5, 0.06);"
                 >
                   <button
                     class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-sm"

@@ -9,3 +9,6 @@ export const RULER_HEIGHT = 30;
 export const PAGE_GAP = 10;
 
 export const SIDEBAR_WIDTH = 350;
+
+// TODO
+// 'rgb(74, 74, 74)'

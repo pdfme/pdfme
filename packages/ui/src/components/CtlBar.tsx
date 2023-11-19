@@ -1,8 +1,7 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Size } from '@pdfme/common';
 import { MinusOutlined, PlusOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { theme, Typography, Button } from 'antd';
-import { StyleContext } from '../contexts';
 
 const { Text } = Typography;
 
@@ -79,15 +78,14 @@ type CtlBarProps = {
 };
 
 const CtlBar = (props: CtlBarProps) => {
-  const style = useContext(StyleContext);
   const { token } = theme.useToken();
 
-  const barWidth = style.CtlBar.barWidth;
+  const barWidth = 300;
   const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
   const width = pageNum > 1 ? barWidth : barWidth / 2;
 
   const textStyle = {
-    color: style.CtlBar.textColor,
+    color: token.colorWhite,
     fontSize: token.fontSize,
     margin: token.marginXS,
   };
@@ -103,11 +101,11 @@ const CtlBar = (props: CtlBarProps) => {
           zIndex: 1,
           left: `calc(50% - ${width / 2}px)`,
           width,
-          height: style.CtlBar.height,
+          height: 40,
           boxSizing: 'border-box',
           padding: token.paddingSM,
           borderRadius: token.borderRadius,
-          backgroundColor: style.CtlBar.background,
+          backgroundColor: token.colorBgMask,
         }}
       >
         {pageNum > 1 && (

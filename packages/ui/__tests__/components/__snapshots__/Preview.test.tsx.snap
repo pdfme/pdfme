@@ -11,10 +11,10 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(119, 119, 119, 0.741);"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
-          style="display: flex;"
+          style="display: flex; align-items: center;"
         >
           <button
             class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
@@ -112,7 +112,7 @@ exports[`Preview(as Form) snapshot 1`] = `
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
+                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
                 >
                   <textarea
                     placeholder="bb"
@@ -168,10 +168,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(119, 119, 119, 0.741);"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
-          style="display: flex;"
+          style="display: flex; align-items: center;"
         >
           <button
             class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
