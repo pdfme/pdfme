@@ -66,7 +66,7 @@ const ListView = (
           {i18n('fieldsList')}
         </Text>
       </div>
-      <Divider style={{ margin: token.marginXS, padding: token.paddingXS }} />
+      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
       <div style={{ height: height - headHeight }}>
         {isBulkUpdateFieldNamesMode ? (
           <TextArea
