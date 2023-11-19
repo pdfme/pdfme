@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
-import type { GlobalToken } from 'antd';
+import type { ThemeConfig, GlobalToken } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 // prettier-ignore
 import {Lang, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
@@ -120,7 +120,7 @@ export type BasePdf = z.infer<typeof BasePdf>;
 export type Template = z.infer<typeof Template>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 export type GenerateProps = z.infer<typeof GenerateProps> & { plugins?: Plugins };
-export type UIOptions = z.infer<typeof UIOptions>;
+export type UIOptions = z.infer<typeof UIOptions> & { customTheme?: ThemeConfig };
 export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
 export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
 export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };

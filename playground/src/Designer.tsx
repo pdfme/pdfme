@@ -40,9 +40,9 @@ function App() {
             font,
             customTheme: {
               token: {
-                colorPrimary: 'orange',
-              }
-            }
+                colorPrimary: 'red',
+              },
+            },
           },
           plugins: getPlugins(),
         });

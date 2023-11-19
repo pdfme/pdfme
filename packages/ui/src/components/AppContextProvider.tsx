@@ -1,11 +1,6 @@
 import React from 'react';
 import { ConfigProvider as ThemeConfigProvider } from 'antd';
-import {
-  I18nContext,
-  FontContext,
-  PluginsRegistry,
-  OptionsContext,
-} from '../contexts';
+import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from '../contexts';
 import { curriedI18n } from '../i18n';
 import { defaultTheme } from '../theme';
 import type { Plugins, Font, UIOptions } from '@pdfme/common';
@@ -18,11 +13,13 @@ type Props = {
   options: UIOptions;
 };
 
-const isObject = (item: any): item is Record<string, any> => (
-  item && typeof item === 'object' && !Array.isArray(item)
-);
+const isObject = (item: any): item is Record<string, any> =>
+  item && typeof item === 'object' && !Array.isArray(item);
 
-const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>(target: T, source: U): T & U => {
+const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>(
+  target: T,
+  source: U
+): T & U => {
   let output = { ...target } as T & U;
 
   if (isObject(target) && isObject(source)) {

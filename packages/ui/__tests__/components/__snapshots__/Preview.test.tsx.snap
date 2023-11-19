@@ -17,7 +17,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -47,7 +47,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-amq5gd"
+            class="ant-typography css-dev-only-do-not-override-nllxry"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -56,7 +56,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -174,7 +174,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -204,7 +204,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-amq5gd"
+            class="ant-typography css-dev-only-do-not-override-nllxry"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -213,7 +213,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-amq5gd ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
