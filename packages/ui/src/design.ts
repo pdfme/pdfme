@@ -1,4 +1,4 @@
-import { ThemeConfig } from 'antd';
+import type { ThemeConfig } from 'antd';
 
 export const theme: ThemeConfig = {
   token: {
@@ -27,7 +27,10 @@ const controllerStyle = {
   background: controllerBackground,
   height: 40,
 };
-// これ本当に必要かな？少なくとも外からカスタマイズできる必要はないかも
+// TODO これ本当に必要かな？少なくとも外からカスタマイズできる必要はないかも
+// となるとcontextを使わず普通にconstantsで管理すればいいかも
+// 高さ、横幅は絶対値で指定する
+// カラーはなんとか https://ant.design/docs/react/customize-theme#theme から入れる
 export const style = {
   Sidebar: { background: '#fffffffa' },
   ErrorScreen: { background, cardBackground: '#ffffffad' },

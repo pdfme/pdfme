@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
+import type { GlobalToken } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 // prettier-ignore
 import {Lang, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
@@ -53,6 +54,7 @@ export type UIRenderProps<T extends Schema> = {
   onChange?: (value: string) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
+  theme: GlobalToken;
 };
 
 type PropPanelProps = {
