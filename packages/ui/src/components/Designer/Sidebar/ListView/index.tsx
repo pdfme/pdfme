@@ -1,9 +1,15 @@
 import React, { useContext, useState } from 'react';
 import type { SidebarProps } from '../../../../types';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../../constants';
+import { SIDEBAR_WIDTH } from '../../../../constants';
 import { I18nContext } from '../../../../contexts';
-import Divider from '../../../Divider';
+import { getSidebarContentHeight } from '../../../../helper';
+import { theme, Input, Typography, Divider, Button } from 'antd';
 import SelectableSortableContainer from './SelectableSortableContainer';
+
+const { Text } = Typography;
+const { TextArea } = Input;
+
+const headHeight = 40;
 
 const ListView = (
   props: Pick<
@@ -26,89 +32,88 @@ const ListView = (
     onChangeHoveringSchemaId,
     changeSchemas,
   } = props;
+  const { token } = theme.useToken();
   const i18n = useContext(I18nContext);
   const [isBulkUpdateFieldNamesMode, setIsBulkUpdateFieldNamesMode] = useState(false);
   const [fieldNamesValue, setFieldNamesValue] = useState('');
-  const height = size.height - RULER_HEIGHT - RULER_HEIGHT / 2 - 145;
+  const height = getSidebarContentHeight(size.height);
+
+  const commitBulk = () => {
+    const names = fieldNamesValue.split('\n');
+    if (names.length !== schemas.length) {
+      alert(i18n('errorBulkUpdateFieldName'));
+    } else {
+      changeSchemas(
+        names.map((value, index) => ({
+          key: 'key',
+          value,
+          schemaId: schemas[index].id,
+        }))
+      );
+      setIsBulkUpdateFieldNamesMode(false);
+    }
+  };
+
+  const startBulk = () => {
+    setFieldNamesValue(schemas.map((s) => s.key).join('\n'));
+    setIsBulkUpdateFieldNamesMode(true);
+  };
+
   return (
     <div>
-      <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
-        <span style={{ textAlign: 'center', width: '100%', fontWeight: 'bold' }}>
+      <div style={{ height: headHeight, display: 'flex', alignItems: 'center' }}>
+        <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('fieldsList')}
-        </span>
+        </Text>
       </div>
-      <Divider />
-      {isBulkUpdateFieldNamesMode ? (
-        <div>
-          <textarea
+      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
+      <div style={{ height: height - headHeight }}>
+        {isBulkUpdateFieldNamesMode ? (
+          <TextArea
             wrap="off"
             value={fieldNamesValue}
             onChange={(e) => setFieldNamesValue(e.target.value)}
             style={{
-              height: height - 5,
-              width: SIDEBAR_WIDTH,
-              fontSize: '1rem',
-              lineHeight: '2.5rem',
-              background: 'transparent',
-              margin: 0,
-              padding: '1rem',
-              boxSizing: 'border-box',
-              fontFamily: 'inherit',
+              paddingLeft: 30,
+              height: height - headHeight,
+              width: SIDEBAR_WIDTH - 35,
+              lineHeight: '2.75rem',
             }}
-          ></textarea>
-        </div>
-      ) : (
-        <SelectableSortableContainer
-          height={height}
-          schemas={schemas}
-          hoveringSchemaId={hoveringSchemaId}
-          onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-          onSortEnd={onSortEnd}
-          onEdit={onEdit}
-        />
-      )}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          cursor: 'pointer',
-          fontSize: '0.75rem',
-        }}
-      >
-        {isBulkUpdateFieldNamesMode ? (
-          <>
-            <u
-              onClick={() => {
-                const names = fieldNamesValue.split('\n');
-                if (names.length !== schemas.length) {
-                  alert(i18n('errorBulkUpdateFieldName'));
-                } else {
-                  changeSchemas(
-                    names.map((value, index) => ({
-                      key: 'key',
-                      value,
-                      schemaId: schemas[index].id,
-                    }))
-                  );
-                  setIsBulkUpdateFieldNamesMode(false);
-                }
-              }}
-            >
-              {i18n('commitBulkUpdateFieldName')}
-            </u>
-            <span style={{ margin: '0 1rem' }}>/</span>
-            <u onClick={() => setIsBulkUpdateFieldNamesMode(false)}>{i18n('cancel')}</u>
-          </>
+          />
         ) : (
-          <u
-            onClick={() => {
-              setFieldNamesValue(schemas.map((s) => s.key).join('\n'));
-              setIsBulkUpdateFieldNamesMode(true);
-            }}
-          >
-            {i18n('bulkUpdateFieldName')}
-          </u>
+          <SelectableSortableContainer
+            schemas={schemas}
+            hoveringSchemaId={hoveringSchemaId}
+            onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+            onSortEnd={onSortEnd}
+            onEdit={onEdit}
+          />
         )}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            height: headHeight,
+            borderBottom: `1px solid ${token.colorSplit}`,
+          }}
+        >
+          {isBulkUpdateFieldNamesMode ? (
+            <>
+              <Button size="small" type="text" onClick={commitBulk}>
+                <u> {i18n('commitBulkUpdateFieldName')}</u>
+              </Button>
+              <span style={{ margin: '0 1rem' }}>/</span>
+              <Button size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
+                <u> {i18n('cancel')}</u>
+              </Button>
+            </>
+          ) : (
+            <Button size="small" type="text" onClick={startBulk}>
+              <u> {i18n('bulkUpdateFieldName')}</u>
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

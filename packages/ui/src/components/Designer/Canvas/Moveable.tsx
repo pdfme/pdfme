@@ -1,5 +1,6 @@
-import React, { forwardRef, Ref } from 'react';
+import React, { useEffect, forwardRef, Ref } from 'react';
 import Moveable, { OnDrag, OnResize, OnRotate, OnRotateEnd, OnClick } from 'react-moveable';
+import { theme } from 'antd';
 
 type Props = {
   target: HTMLElement[];
@@ -20,64 +21,63 @@ type Props = {
   onClick: (e: OnClick) => void;
 };
 
-const _Moveable = (
-  {
-    target,
-    bounds,
-    horizontalGuidelines,
-    verticalGuidelines,
-    keepRatio,
-    rotatable,
-    onDrag,
-    onDragEnd,
-    onDragGroupEnd,
-    onRotate,
-    onRotateEnd,
-    onRotateGroupEnd,
-    onResize,
-    onResizeEnd,
-    onResizeGroupEnd,
-    onClick,
-  }: Props,
-  ref: Ref<any>
-) => (
-  <Moveable
-    style={{ zIndex: 1 }}
-    rootContainer={document ? document.body : undefined}
-    snappable
-    snapCenter
-    draggable
-    rotatable={rotatable}
-    resizable
-    throttleDrag={1}
-    throttleRotate={1}
-    throttleResize={1}
-    ref={ref}
-    target={target}
-    bounds={bounds}
-    horizontalGuidelines={horizontalGuidelines}
-    verticalGuidelines={verticalGuidelines}
-    keepRatio={keepRatio}
-    onRotate={onRotate}
-    onRotateEnd={onRotateEnd}
-    onRotateGroup={({ events }) => {
-      events.forEach(onRotate);
-    }}
-    onRotateGroupEnd={onRotateGroupEnd}
-    onDrag={onDrag}
-    onDragGroup={({ events }) => {
-      events.forEach(onDrag);
-    }}
-    onDragEnd={onDragEnd}
-    onDragGroupEnd={onDragGroupEnd}
-    onResize={onResize}
-    onResizeGroup={({ events }) => {
-      events.forEach(onResize);
-    }}
-    onResizeEnd={onResizeEnd}
-    onResizeGroupEnd={onResizeGroupEnd}
-    onClick={onClick}
-  />
-);
+const className = 'pdfme-moveable';
+
+const _Moveable = (props: Props, ref: Ref<any>) => {
+  const { token } = theme.useToken();
+  useEffect(() => {
+    const containerElement = document.querySelector(`.${className}`) as HTMLElement | null;
+    const containerElement2 = document.querySelectorAll(
+      `.${className} .moveable-line`
+    ) as NodeListOf<HTMLElement>;
+    if (containerElement) {
+      containerElement.style.setProperty('--moveable-color', token.colorPrimary);
+      Array.from(containerElement2).map((e) =>
+        e.style.setProperty('--moveable-color', token.colorPrimary)
+      );
+    }
+  }, [props.target]);
+
+  return (
+    <Moveable
+      style={{ zIndex: 1 }}
+      className={className}
+      rootContainer={document ? document.body : undefined}
+      snappable
+      snapCenter
+      draggable
+      rotatable={props.rotatable}
+      resizable
+      throttleDrag={1}
+      throttleRotate={1}
+      throttleResize={1}
+      ref={ref}
+      target={props.target}
+      bounds={props.bounds}
+      horizontalGuidelines={props.horizontalGuidelines}
+      verticalGuidelines={props.verticalGuidelines}
+      keepRatio={props.keepRatio}
+      onRotate={props.onRotate}
+      onRotateEnd={props.onRotateEnd}
+      onRotateGroup={({ events }) => {
+        events.forEach(props.onRotate);
+      }}
+      onRotateGroupEnd={props.onRotateGroupEnd}
+      onDrag={props.onDrag}
+      onDragGroup={({ events }) => {
+        events.forEach(props.onDrag);
+      }}
+      onDragEnd={props.onDragEnd}
+      onDragGroupEnd={props.onDragGroupEnd}
+      onResize={props.onResize}
+      onResizeGroup={({ events }) => {
+        events.forEach(props.onResize);
+      }}
+      onResizeEnd={props.onResizeEnd}
+      onResizeGroupEnd={props.onResizeGroupEnd}
+      onClick={props.onClick}
+    />
+  );
+};
 
 export default forwardRef<any, Props>(_Moveable);

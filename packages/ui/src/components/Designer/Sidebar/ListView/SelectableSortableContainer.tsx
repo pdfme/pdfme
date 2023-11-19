@@ -19,14 +19,17 @@ import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import Item from './Item';
 import SelectableSortableItem from './SelectableSortableItem';
+import { theme } from 'antd';
 
 const SelectableSortableContainer = (
   props: Pick<
     SidebarProps,
-    'schemas' | 'onEdit' | 'onSortEnd' | 'height' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
+    'schemas' | 'onEdit' | 'onSortEnd' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
   >
 ) => {
-  const { schemas, onEdit, onSortEnd, height, hoveringSchemaId, onChangeHoveringSchemaId } = props;
+  const { token } = theme.useToken();
+
+  const { schemas, onEdit, onSortEnd, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const [selectedSchemas, setSelectedSchemas] = useState<SchemaForUI[]>([]);
   const [dragOverlaydItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -107,7 +110,7 @@ const SelectableSortableContainer = (
       }}
     >
       <>
-        <div style={{ height, overflowY: 'auto' }}>
+        <div style={{ height: '100%', overflowY: 'auto' }}>
           <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
               {schemas.map((schema) => (
@@ -115,7 +118,7 @@ const SelectableSortableContainer = (
                   key={schema.id}
                   style={{
                     border: `1px solid ${
-                      schema.id === hoveringSchemaId ? '#18a0fb' : 'transparent'
+                      schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
                     }`,
                   }}
                   schema={schema}
@@ -137,7 +140,7 @@ const SelectableSortableContainer = (
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   <Item
                     value={schemas.find((schema) => schema.id === activeId)!.key}
-                    style={{ color: '#fff', background: '#18a0fb' }}
+                    style={{ background: token.colorPrimary }}
                     dragOverlay
                   />
                 </ul>
@@ -148,7 +151,7 @@ const SelectableSortableContainer = (
                       <Item
                         key={item.id}
                         value={item.key}
-                        style={{ color: '#fff', background: '#18a0fb' }}
+                        style={{ background: token.colorPrimary }}
                         dragOverlay
                       />
                     ))}

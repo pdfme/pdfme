@@ -3,11 +3,12 @@ import type { SchemaForUI, PreviewProps, Size } from '@pdfme/common';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
-import CtlBar from './CtlBar/index';
+import CtlBar from './CtlBar';
 import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
+import { theme } from 'antd';
 
 const Preview = ({
   template,
@@ -18,6 +19,8 @@ const Preview = ({
   onChangeInput?: (args: { index: number; value: string; key: string }) => void;
   size: Size;
 }) => {
+  const { token } = theme.useToken();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
@@ -101,7 +104,7 @@ const Preview = ({
                 placeholder={template.sampledata?.[0]?.[key] ?? ''}
                 tabIndex={index + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
-                outline={isForm ? '1px dashed #4af' : 'transparent'}
+                outline={isForm ? `1px dashed ${token.colorPrimary}` : 'transparent'}
                 scale={scale}
               />
             );

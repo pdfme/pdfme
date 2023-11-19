@@ -13,6 +13,19 @@ const svgBaseProp = {
   fill: '#000000',
 };
 
+const createSvgIcon = (path: JSX.Element) => (
+  <svg {...svgBaseProp}>
+    <rect fill="none" height="24" width="24" />
+    {path}
+  </svg>
+);
+
+const createButtonConfig = (id: string, path: JSX.Element, onClick: () => void) => ({
+  id,
+  icon: createSvgIcon(path),
+  onClick,
+});
+
 const AlignWidget = ({
   activeElements,
   changeSchemas,
@@ -79,88 +92,43 @@ const AlignWidget = ({
       })
     );
   };
-
-  const layoutBtns: { id: string; icon: any; onClick: () => void }[] = [
-    {
-      id: 'left',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M4,22H2V2h2V22z M22,7H6v3h16V7z M16,14H6v3h10V14z" />
-        </svg>
-      ),
-      onClick: () => align('left'),
-    },
-    {
-      id: 'center',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <polygon points="11,2 13,2 13,7 21,7 21,10 13,10 13,14 18,14 18,17 13,17 13,22 11,22 11,17 6,17 6,14 11,14 11,10 3,10 3,7 11,7" />
-        </svg>
-      ),
-      onClick: () => align('center'),
-    },
-    {
-      id: 'right',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M20,2h2v20h-2V2z M2,10h16V7H2V10z M8,17h10v-3H8V17z" />
-        </svg>
-      ),
-      onClick: () => align('right'),
-    },
-    {
-      id: 'top',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M22,2v2H2V2H22z M7,22h3V6H7V22z M14,16h3V6h-3V16z" />
-        </svg>
-      ),
-      onClick: () => align('top'),
-    },
-    {
-      id: 'middle',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <polygon points="22,11 17,11 17,6 14,6 14,11 10,11 10,3 7,3 7,11 1.84,11 1.84,13 7,13 7,21 10,21 10,13 14,13 14,18 17,18 17,13 22,13" />
-        </svg>
-      ),
-      onClick: () => align('middle'),
-    },
-    {
-      id: 'bottom',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M22,22H2v-2h20V22z M10,2H7v16h3V2z M17,8h-3v10h3V8z" />
-        </svg>
-      ),
-      onClick: () => align('bottom'),
-    },
-    {
-      id: 'vertical',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M22,2v2H2V2H22z M7,10.5v3h10v-3H7z M2,20v2h20v-2H2z" />
-        </svg>
-      ),
-      onClick: () => distribute('vertical'),
-    },
-    {
-      id: 'horizontal',
-      icon: (
-        <svg {...svgBaseProp}>
-          <rect fill="none" height="24" width="24" />
-          <path d="M4,22H2V2h2V22z M22,2h-2v20h2V2z M13.5,7h-3v10h3V7z" />
-        </svg>
-      ),
-      onClick: () => distribute('horizontal'),
-    },
+  const layoutBtns = [
+    createButtonConfig('left', <path d="M4,22H2V2h2V22z M22,7H6v3h16V7z M16,14H6v3h10V14z" />, () =>
+      align('left')
+    ),
+    createButtonConfig(
+      'center',
+      <polygon points="11,2 13,2 13,7 21,7 21,10 13,10 13,14 18,14 18,17 13,17 13,22 11,22 11,17 6,17 6,14 11,14 11,10 3,10 3,7 11,7" />,
+      () => align('center')
+    ),
+    createButtonConfig(
+      'right',
+      <path d="M20,2h2v20h-2V2z M2,10h16V7H2V10z M8,17h10v-3H8V17z" />,
+      () => align('right')
+    ),
+    createButtonConfig('top', <path d="M22,2v2H2V2H22z M7,22h3V6H7V22z M14,16h3V6h-3V16z" />, () =>
+      align('top')
+    ),
+    createButtonConfig(
+      'middle',
+      <polygon points="22,11 17,11 17,6 14,6 14,11 10,11 10,3 7,3 7,11 1.84,11 1.84,13 7,13 7,21 10,21 10,13 14,13 14,18 17,18 17,13 22,13" />,
+      () => align('middle')
+    ),
+    createButtonConfig(
+      'bottom',
+      <path d="M22,22H2v-2h20V22z M10,2H7v16h3V2z M17,8h-3v10h3V8z" />,
+      () => align('bottom')
+    ),
+    createButtonConfig(
+      'vertical',
+      <path d="M22,2v2H2V2H22z M7,10.5v3h10v-3H7z M2,20v2h20v-2H2z" />,
+      () => distribute('vertical')
+    ),
+    createButtonConfig(
+      'horizontal',
+      <path d="M4,22H2V2h2V22z M22,2h-2v20h2V2z M13.5,7h-3v10h3V7z" />,
+      () => distribute('horizontal')
+    ),
   ];
 
   return (

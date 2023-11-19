@@ -14,21 +14,17 @@ import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
 import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
+  fmtTemplate,
   uuid,
   set,
   cloneDeep,
-  initShortCuts,
-  destroyShortCuts,
   templateSchemas2SchemasList,
-  fmtTemplate,
-  getUniqSchemaKey,
-  moveCommandToChangeSchemasArg,
   getPagesScrollTopByIndex,
 } from '../../helper';
-import { useUIPreProcessor, useScrollPageCursor } from '../../hooks';
+import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks';
 import Root from '../Root';
 import ErrorScreen from '../ErrorScreen';
-import CtlBar from '../CtlBar/index';
+import CtlBar from '../CtlBar';
 
 const TemplateEditor = ({
   template,
@@ -39,7 +35,6 @@ const TemplateEditor = ({
   onSaveTemplate: (t: Template) => void;
   size: Size;
 } & { onChangeTemplate: (t: Template) => void }) => {
-  const copiedSchemas = useRef<SchemaForUI[] | null>(null);
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -77,8 +72,6 @@ const TemplateEditor = ({
       onEditEnd();
     },
   });
-
-  const modifiedTemplate = fmtTemplate(template, schemasList);
 
   const commitSchemas = useCallback(
     (newSchemas: SchemaForUI[]) => {
@@ -128,76 +121,22 @@ const TemplateEditor = ({
     [commitSchemas, pageCursor, schemasList]
   );
 
-  const initEvents = useCallback(() => {
-    const getActiveSchemas = () => {
-      const ids = activeElements.map((ae) => ae.id);
-
-      return schemasList[pageCursor].filter((s) => ids.includes(s.id));
-    };
-    const timeTravel = (mode: 'undo' | 'redo') => {
-      const isUndo = mode === 'undo';
-      const stack = isUndo ? past : future;
-      if (stack.current.length <= 0) return;
-      (isUndo ? future : past).current.push(cloneDeep(schemasList[pageCursor]));
-      const s = cloneDeep(schemasList);
-      s[pageCursor] = stack.current.pop()!;
-      setSchemasList(s);
-    };
-    initShortCuts({
-      move: (command, isShift) => {
-        const pageSize = pageSizes[pageCursor];
-        const activeSchemas = getActiveSchemas();
-        const arg = moveCommandToChangeSchemasArg({ command, activeSchemas, pageSize, isShift });
-        changeSchemas(arg);
-      },
-
-      copy: () => {
-        const activeSchemas = getActiveSchemas();
-        if (activeSchemas.length === 0) return;
-        copiedSchemas.current = activeSchemas;
-      },
-      paste: () => {
-        if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
-        const schema = schemasList[pageCursor];
-        const stackUniqSchemaKeys: string[] = [];
-        const pasteSchemas = copiedSchemas.current.map((cs) => {
-          const id = uuid();
-          const key = getUniqSchemaKey({ copiedSchemaKey: cs.key, schema, stackUniqSchemaKeys });
-          const { height, width, position: p } = cs;
-          const ps = pageSizes[pageCursor];
-          const position = {
-            x: p.x + 10 > ps.width - width ? ps.width - width : p.x + 10,
-            y: p.y + 10 > ps.height - height ? ps.height - height : p.y + 10,
-          };
-
-          return Object.assign(cloneDeep(cs), { id, key, position });
-        });
-        commitSchemas(schemasList[pageCursor].concat(pasteSchemas));
-        onEdit(pasteSchemas.map((s) => document.getElementById(s.id)!));
-        copiedSchemas.current = pasteSchemas;
-      },
-      redo: () => timeTravel('redo'),
-      undo: () => timeTravel('undo'),
-      save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
-      remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
-      esc: onEditEnd,
-      selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),
-    });
-  }, [
-    activeElements,
-    changeSchemas,
-    commitSchemas,
-    modifiedTemplate,
+  useInitEvents({
     pageCursor,
     pageSizes,
+    activeElements,
+    template,
+    schemasList,
+    changeSchemas,
+    commitSchemas,
     removeSchemas,
     onSaveTemplate,
-    schemasList,
-  ]);
-
-  const destroyEvents = useCallback(() => {
-    destroyShortCuts();
-  }, []);
+    past,
+    future,
+    setSchemasList,
+    onEdit,
+    onEditEnd,
+  });
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
     const sl = await templateSchemas2SchemasList(newTemplate);
@@ -212,12 +151,6 @@ const TemplateEditor = ({
   useEffect(() => {
     updateTemplate(template);
   }, [template, updateTemplate]);
-
-  useEffect(() => {
-    initEvents();
-
-    return destroyEvents;
-  }, [initEvents, destroyEvents]);
 
   const addSchema = () => {
     const propPanel = (Object.values(pluginsRegistry)[0] as Plugin<Schema>)?.propPanel;

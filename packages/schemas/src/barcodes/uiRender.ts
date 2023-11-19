@@ -2,6 +2,7 @@ import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
 import { validateBarcodeInput, createBarCode } from './helper.js';
+import { addAlphaToHex } from '../renderUtils.js';
 
 const fullSize = { width: '100%', height: '100%' };
 
@@ -60,7 +61,8 @@ const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
 };
 
 export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
-  const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema } = arg;
+  const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema, theme } =
+    arg;
 
   const container = document.createElement('div');
   const containerStyle: CSS.Properties = {
@@ -81,7 +83,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
       textAlign: 'center',
       fontSize: '1rem',
       color: '#000',
-      backgroundColor: editable || value ? 'rgb(242 244 255 / 75%)' : 'none',
+      backgroundColor: editable || value ? addAlphaToHex(theme.colorPrimaryBg, 30) : 'none',
       border: 'none',
       display: 'flex',
       alignItems: 'center',

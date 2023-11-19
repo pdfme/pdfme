@@ -42,9 +42,9 @@
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^7.0.2",
-    "@heroicons/react": "^2.0.13",
     "@scena/react-guides": "^0.16.0",
     "antd": "^5.9.4",
     "form-render": "^2.2.16",

@@ -1,6 +1,18 @@
 import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
-import { ZOOM, Template, Size, getB64BasePdf } from '@pdfme/common';
-import { pdf2Pngs, getPdfPageSizes, b64toBlob } from './helper.js';
+import { ZOOM, Template, Size, getB64BasePdf, SchemaForUI, ChangeSchemas } from '@pdfme/common';
+
+import {
+  fmtTemplate,
+  uuid,
+  cloneDeep,
+  getUniqSchemaKey,
+  moveCommandToChangeSchemasArg,
+  pdf2Pngs,
+  getPdfPageSizes,
+  b64toBlob,
+  initShortCuts,
+  destroyShortCuts,
+} from './helper.js';
 import { RULER_HEIGHT } from './constants.js';
 
 export const usePrevious = <T>(value: T) => {
@@ -114,4 +126,125 @@ export const useMountStatus = () => {
   }, []);
 
   return isMounted;
+};
+
+interface UseInitEventsParams {
+  pageCursor: number;
+  pageSizes: Size[];
+  activeElements: HTMLElement[];
+  template: Template;
+  schemasList: SchemaForUI[][];
+  changeSchemas: ChangeSchemas;
+  commitSchemas: (newSchemas: SchemaForUI[]) => void;
+  removeSchemas: (ids: string[]) => void;
+  onSaveTemplate: (t: Template) => void;
+  past: React.MutableRefObject<SchemaForUI[][]>;
+  future: React.MutableRefObject<SchemaForUI[][]>;
+  setSchemasList: React.Dispatch<React.SetStateAction<SchemaForUI[][]>>;
+  onEdit: (targets: HTMLElement[]) => void;
+  onEditEnd: () => void;
+}
+
+export const useInitEvents = ({
+  pageCursor,
+  pageSizes,
+  activeElements,
+  template,
+  schemasList,
+  changeSchemas,
+  commitSchemas,
+  removeSchemas,
+  onSaveTemplate,
+  past,
+  future,
+  setSchemasList,
+  onEdit,
+  onEditEnd,
+}: UseInitEventsParams) => {
+  const copiedSchemas = useRef<SchemaForUI[] | null>(null);
+
+  const modifiedTemplate = fmtTemplate(template, schemasList);
+
+  const initEvents = useCallback(() => {
+    const getActiveSchemas = () => {
+      const ids = activeElements.map((ae) => ae.id);
+
+      return schemasList[pageCursor].filter((s) => ids.includes(s.id));
+    };
+    const timeTravel = (mode: 'undo' | 'redo') => {
+      const isUndo = mode === 'undo';
+      const stack = isUndo ? past : future;
+      if (stack.current.length <= 0) return;
+      (isUndo ? future : past).current.push(cloneDeep(schemasList[pageCursor]));
+      const s = cloneDeep(schemasList);
+      s[pageCursor] = stack.current.pop()!;
+      setSchemasList(s);
+    };
+    initShortCuts({
+      move: (command, isShift) => {
+        const pageSize = pageSizes[pageCursor];
+        const activeSchemas = getActiveSchemas();
+        const arg = moveCommandToChangeSchemasArg({ command, activeSchemas, pageSize, isShift });
+        changeSchemas(arg);
+      },
+
+      copy: () => {
+        const activeSchemas = getActiveSchemas();
+        if (activeSchemas.length === 0) return;
+        copiedSchemas.current = activeSchemas;
+      },
+      paste: () => {
+        if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
+        const schema = schemasList[pageCursor];
+        const stackUniqSchemaKeys: string[] = [];
+        const pasteSchemas = copiedSchemas.current.map((cs) => {
+          const id = uuid();
+          const key = getUniqSchemaKey({ copiedSchemaKey: cs.key, schema, stackUniqSchemaKeys });
+          const { height, width, position: p } = cs;
+          const ps = pageSizes[pageCursor];
+          const position = {
+            x: p.x + 10 > ps.width - width ? ps.width - width : p.x + 10,
+            y: p.y + 10 > ps.height - height ? ps.height - height : p.y + 10,
+          };
+
+          return Object.assign(cloneDeep(cs), { id, key, position });
+        });
+        commitSchemas(schemasList[pageCursor].concat(pasteSchemas));
+        onEdit(pasteSchemas.map((s) => document.getElementById(s.id)!));
+        copiedSchemas.current = pasteSchemas;
+      },
+      redo: () => timeTravel('redo'),
+      undo: () => timeTravel('undo'),
+      save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
+      remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
+      esc: onEditEnd,
+      selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),
+    });
+  }, [
+    activeElements,
+    pageCursor,
+    pageSizes,
+    changeSchemas,
+    commitSchemas,
+    schemasList,
+    onSaveTemplate,
+    modifiedTemplate,
+    removeSchemas,
+    past,
+    future,
+    setSchemasList,
+    copiedSchemas,
+    onEdit,
+    onEditEnd,
+  ]);
+
+  const destroyEvents = useCallback(() => {
+    destroyShortCuts();
+  }, []);
+
+  useEffect(() => {
+    initEvents();
+
+    return destroyEvents;
+  }, [initEvents, destroyEvents]);
 };

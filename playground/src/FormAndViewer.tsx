@@ -56,7 +56,14 @@ function App() {
           domContainer: uiRef.current,
           template,
           inputs,
-          options: { font },
+          options: {
+            font,
+            theme: {
+              token: {
+                colorPrimary: '#25c2a0',
+              },
+            },
+          },
           plugins: getPlugins(),
         });
       }

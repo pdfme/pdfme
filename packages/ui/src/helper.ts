@@ -440,3 +440,6 @@ export const getPagesScrollTopByIndex = (
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
 };
+
+export const getSidebarContentHeight = (sidebarHeight: number) =>
+  sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;

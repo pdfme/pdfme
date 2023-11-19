@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "^1.17.3",
+    "antd": "^5.11.2",
     "buffer": "^6.0.3",
     "form-render": "^2.2.20",
     "zod": "^3.20.2"

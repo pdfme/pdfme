@@ -11,221 +11,291 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 850px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; gap: 15px; position: relative; z-index: 1; left: calc(50% - 62.5px); width: 125px; background: rgba(119, 119, 119, 0.902); border-radius: 2px; padding: 0.5rem;"
+        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
-          style="display: flex; align-items: center; justify-content: center;"
+          style="display: flex; align-items: center;"
         >
           <button
-            style="padding-left: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              color="#fff"
-              fill="none"
-              height="20"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              width="20"
-              xmlns="http://www.w3.org/2000/svg"
+            <span
+              class="ant-btn-icon"
             >
-              <path
-                d="M19.5 12h-15"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+              <span
+                aria-label="minus"
+                class="anticon anticon-minus"
+                role="img"
+                style="color: rgb(255, 255, 255);"
+              >
+                <svg
+                  aria-hidden="true"
+                  data-icon="minus"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  viewBox="64 64 896 896"
+                  width="1em"
+                >
+                  <path
+                    d="M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"
+                  />
+                </svg>
+              </span>
+            </span>
+            
           </button>
-          <strong
-            style="color: white; font-size: 0.9rem; min-width: 50px; text-align: center;"
+          <span
+            class="ant-typography css-dev-only-do-not-override-nllxry"
+            style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
-            100
-            %
-          </strong>
+            <strong>
+              100
+              %
+            </strong>
+          </span>
           <button
-            style="padding-right: 0.5rem; cursor: pointer; background: none; display: flex; align-items: center;"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              color="#fff"
-              fill="none"
-              height="20"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-              width="20"
-              xmlns="http://www.w3.org/2000/svg"
+            <span
+              class="ant-btn-icon"
             >
-              <path
-                d="M12 4.5v15m7.5-7.5h-15"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+              <span
+                aria-label="plus"
+                class="anticon anticon-plus"
+                role="img"
+                style="color: rgb(255, 255, 255);"
+              >
+                <svg
+                  aria-hidden="true"
+                  data-icon="plus"
+                  fill="currentColor"
+                  focusable="false"
+                  height="1em"
+                  viewBox="64 64 896 896"
+                  width="1em"
+                >
+                  <path
+                    d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
+                  />
+                  <path
+                    d="M192 474h672q8 0 8 8v60q0 8-8 8H160q-8 0-8-8v-60q0-8 8-8z"
+                  />
+                </svg>
+              </span>
+            </span>
+            
           </button>
         </div>
       </div>
     </div>
     <div
-      style="position: absolute; right: 0px; z-index: 1; height: 100%; width: 350px; font-size: 1rem;"
+      style="position: absolute; right: 0px; z-index: 1; height: 100%; width: 350px;"
     >
       <div>
         <button
-          style="position: absolute; top: 1.0rem; right: 1rem; z-index: 100; border-radius: 2px; padding: 0.5rem; cursor: pointer; background: rgb(238, 238, 238); width: 30px; height: 30px;"
+          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
+          style="position: absolute; display: flex; align-items: center; justify-content: center; top: 1rem; right: 1rem; z-index: 100;"
           type="button"
         >
-          <svg
-            aria-hidden="true"
-            fill="none"
-            height="15"
-            stroke="currentColor"
-            stroke-width="1.5"
-            viewBox="0 0 24 24"
-            width="15"
-            xmlns="http://www.w3.org/2000/svg"
+          <span
+            class="ant-btn-icon"
           >
-            <path
-              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+            <span
+              aria-label="arrow-right"
+              class="anticon anticon-arrow-right"
+              role="img"
+            >
+              <svg
+                aria-hidden="true"
+                data-icon="arrow-right"
+                fill="currentColor"
+                focusable="false"
+                height="1em"
+                viewBox="64 64 896 896"
+                width="1em"
+              >
+                <path
+                  d="M869 487.8L491.2 159.9c-2.9-2.5-6.6-3.9-10.5-3.9h-88.5c-7.4 0-10.8 9.2-5.2 14l350.2 304H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h585.1L386.9 854c-5.6 4.9-2.2 14 5.2 14h91.5c1.9 0 3.8-.7 5.2-2L869 536.2a32.07 32.07 0 000-48.4z"
+                />
+              </svg>
+            </span>
+          </span>
+          
         </button>
         <div
-          style="width: 350px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; background: rgba(255, 255, 255, 0.98); color: rgb(51, 51, 51); border: 1px solid #eee; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; font-weight: 400; text-align: left; box-sizing: border-box;"
+          style="width: 350px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
         >
           <div>
-            <div
-              style="height: 40px; display: flex; align-items: center;"
-            >
-              <span
-                style="text-align: center; width: 100%; font-weight: bold;"
+            <div>
+              <div
+                style="height: 40px; display: flex; align-items: center;"
               >
-                Field List
-              </span>
-            </div>
-            <div
-              style="margin-top: 0.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e5e5e5;"
-            />
-            <div
-              style="height: 1010px; overflow-y: auto;"
-            >
-              <ul
-                style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
+                <span
+                  class="ant-typography css-dev-only-do-not-override-nllxry"
+                  style="text-align: center; width: 100%;"
+                >
+                  <strong>
+                    Field List
+                  </strong>
+                </span>
+              </div>
+              <div
+                class="ant-divider css-dev-only-do-not-override-nllxry ant-divider-horizontal"
+                role="separator"
+                style="margin-top: 8px; margin-bottom: 8px;"
+              />
+              <div
+                style="height: 1000px;"
               >
-                <li
-                  style="transform: translate(0px, 0px) scale(1, 1);"
+                <div
+                  style="height: 100%; overflow-y: auto;"
                 >
-                  <div
-                    style="display: flex; align-items: center; border: 1px solid transparent;"
+                  <ul
+                    style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
                   >
-                    <button
-                      style="padding: 0.5rem; background: none; display: flex;"
-                      type="button"
+                    <li
+                      style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                     >
-                      <object
-                        style="cursor: grab; margin-top: 6px;"
-                        width="15"
+                      <div
+                        style="display: flex; align-items: center; border: 1px solid transparent;"
                       >
-                        <svg
-                          aria-hidden="true"
-                          height="16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
+                        <button
+                          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
+                          style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                          type="button"
                         >
-                          <path
-                            d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"
-                          />
-                        </svg>
-                      </object>
-                    </button>
-                    <div
-                      style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                      title="Edit"
+                          <span
+                            class="ant-btn-icon"
+                          >
+                            <span
+                              aria-label="holder"
+                              class="anticon anticon-holder"
+                              role="img"
+                              style="cursor: grab;"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                data-icon="holder"
+                                fill="currentColor"
+                                focusable="false"
+                                height="1em"
+                                viewBox="64 64 896 896"
+                                width="1em"
+                              >
+                                <path
+                                  d="M300 276.5a56 56 0 1056-97 56 56 0 00-56 97zm0 284a56 56 0 1056-97 56 56 0 00-56 97zM640 228a56 56 0 10112 0 56 56 0 00-112 0zm0 284a56 56 0 10112 0 56 56 0 00-112 0zM300 844.5a56 56 0 1056-97 56 56 0 00-56 97zM640 796a56 56 0 10112 0 56 56 0 00-112 0z"
+                                />
+                              </svg>
+                            </span>
+                          </span>
+                          
+                        </button>
+                        <span
+                          class="ant-typography css-dev-only-do-not-override-nllxry"
+                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                          title="Edit"
+                        >
+                          field1
+                        </span>
+                      </div>
+                    </li>
+                    <li
+                      style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                     >
-                      field1
-                    </div>
-                  </div>
-                </li>
-                <li
-                  style="transform: translate(0px, 0px) scale(1, 1);"
+                      <div
+                        style="display: flex; align-items: center; border: 1px solid transparent;"
+                      >
+                        <button
+                          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
+                          style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                          type="button"
+                        >
+                          <span
+                            class="ant-btn-icon"
+                          >
+                            <span
+                              aria-label="holder"
+                              class="anticon anticon-holder"
+                              role="img"
+                              style="cursor: grab;"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                data-icon="holder"
+                                fill="currentColor"
+                                focusable="false"
+                                height="1em"
+                                viewBox="64 64 896 896"
+                                width="1em"
+                              >
+                                <path
+                                  d="M300 276.5a56 56 0 1056-97 56 56 0 00-56 97zm0 284a56 56 0 1056-97 56 56 0 00-56 97zM640 228a56 56 0 10112 0 56 56 0 00-112 0zm0 284a56 56 0 10112 0 56 56 0 00-112 0zM300 844.5a56 56 0 1056-97 56 56 0 00-56 97zM640 796a56 56 0 10112 0 56 56 0 00-112 0z"
+                                />
+                              </svg>
+                            </span>
+                          </span>
+                          
+                        </button>
+                        <span
+                          class="ant-typography css-dev-only-do-not-override-nllxry"
+                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                          title="Edit"
+                        >
+                          field2
+                        </span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  id="DndDescribedBy-0"
+                  style="display: none;"
                 >
-                  <div
-                    style="display: flex; align-items: center; border: 1px solid transparent;"
-                  >
-                    <button
-                      style="padding: 0.5rem; background: none; display: flex;"
-                      type="button"
-                    >
-                      <object
-                        style="cursor: grab; margin-top: 6px;"
-                        width="15"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          height="16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M10 13a1 1 0 100-2 1 1 0 000 2zm-4 0a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zm3 1a1 1 0 100-2 1 1 0 000 2zm1-5a1 1 0 11-2 0 1 1 0 012 0zM6 5a1 1 0 100-2 1 1 0 000 2z"
-                          />
-                        </svg>
-                      </object>
-                    </button>
-                    <div
-                      style="width: 100%; padding: 0.5rem 0.5rem 0.5rem 0px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;"
-                      title="Edit"
-                    >
-                      field2
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div
-              id="DndDescribedBy-0"
-              style="display: none;"
-            >
-              
+                  
     To pick up a draggable item, press the space bar.
     While dragging, use the arrow keys to move the item.
     Press space again to drop the item in its new position, or press escape to cancel.
   
-            </div>
-            <div
-              aria-atomic="true"
-              aria-live="assertive"
-              id="DndLiveRegion-0"
-              role="status"
-              style="position: fixed; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-            />
-            <div
-              style="display: flex; justify-content: flex-end; cursor: pointer; font-size: 0.75rem;"
-            >
-              <u>
-                Bulk update field names
-              </u>
+                </div>
+                <div
+                  aria-atomic="true"
+                  aria-live="assertive"
+                  id="DndLiveRegion-0"
+                  role="status"
+                  style="position: fixed; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
+                />
+                <div
+                  style="display: flex; align-items: center; justify-content: flex-end; height: 40px; border-bottom: 1px solid rgba(5, 5, 5, 0.06);"
+                >
+                  <button
+                    class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-sm"
+                    type="button"
+                  >
+                    <u>
+                       
+                      Bulk update field names
+                    </u>
+                    
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div
-            style="position: absolute; width: 100%; left: 0px; bottom: 1rem; padding-top: 1rem;"
+            style="position: absolute; bottom: 1.5rem; margin-top: 1rem; left: 50%; transform: translateX(-50%);"
           >
-            <div
-              style="margin-bottom: 1rem; border-bottom: 1px solid #e5e5e5;"
-            />
             <button
-              style="padding: 0.5rem; background: rgb(24, 160, 251); border-radius: 2px; cursor: pointer; margin: 0px auto; display: block;"
+              class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-primary"
+              style="font-weight: 600;"
               type="button"
             >
-              <strong
-                style="color: rgb(255, 255, 255);"
-              >
+              <span>
                 Add new field
-              </strong>
+              </span>
+              
             </button>
           </div>
         </div>
@@ -235,7 +305,8 @@ exports[`Designer snapshot 1`] = `
       style="position: relative; overflow: auto; margin-right: 350px; width: 850px; height: 1200px;"
     >
       <div
-        class="selecto-selection rCS179bs95"
+        class="selecto-selection rCS179bs95 pdfme-selecto"
+        style="background-color: rgb(22, 119, 255); opacity: 0.75; border-color: #91caff;"
       />
       <div
         style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
@@ -246,12 +317,12 @@ exports[`Designer snapshot 1`] = `
         >
           <div
             class="ruler-container"
-            style="width: 30px; height: 30px; position: absolute; top: -30px; left: -30px; background: rgb(51, 51, 51);"
+            style="position: absolute; top: -30px; left: -30px; height: 30px; width: 30px; background: rgb(51, 51, 51);"
           />
           <div
             class="scena-manager scena-horizontal  rCS1dv2ewo"
             data-styled-id="rCS1dv2ewo"
-            style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px;"
+            style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px; background: rgb(51, 51, 51);"
           >
             <div
               class="scena-guide-origin"
@@ -273,7 +344,7 @@ exports[`Designer snapshot 1`] = `
           <div
             class="scena-manager scena-vertical  rCS1dv2ewo"
             data-styled-id="rCS1dv2ewo"
-            style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px;"
+            style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px; background: rgb(51, 51, 51);"
           >
             <div
               class="scena-guide-origin"
@@ -293,7 +364,7 @@ exports[`Designer snapshot 1`] = `
             </div>
           </div>
           <div
-            class="moveable-control-box    rCSuehiy8"
+            class="moveable-control-box   pdfme-moveable rCSuehiy8"
             data-able-draggable="true"
             data-able-origin="true"
             data-able-padding="true"
@@ -301,7 +372,7 @@ exports[`Designer snapshot 1`] = `
             data-able-rotatable="true"
             data-able-snappable="true"
             data-styled-id="rCSuehiy8"
-            style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px;"
+            style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px; --moveable-color: #1677ff;"
           >
             <div
               class="moveable-rotation"
@@ -309,7 +380,7 @@ exports[`Designer snapshot 1`] = `
             >
               <div
                 class="moveable-line moveable-rotation-line"
-                style="transform: scaleX(1);"
+                style="transform: scaleX(1); --moveable-color: #1677ff;"
               />
               <div
                 class="moveable-control moveable-rotation-control"
@@ -373,35 +444,35 @@ exports[`Designer snapshot 1`] = `
               data-direction=""
               data-line-index="0"
               data-rotation="-1"
-              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
             />
             <div
               class="moveable-line moveable-direction "
               data-direction=""
               data-line-index="1"
               data-rotation="-1"
-              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
             />
             <div
               class="moveable-line moveable-direction "
               data-direction=""
               data-line-index="2"
               data-rotation="-1"
-              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
             />
             <div
               class="moveable-line moveable-direction "
               data-direction=""
               data-line-index="3"
               data-rotation="-1"
-              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px;"
+              style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
             />
           </div>
           <div>
             <div
               class="selectable"
               id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #1677ff;"
               title="field1"
             >
               <div
@@ -432,7 +503,7 @@ exports[`Designer snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #4af;"
+              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #1677ff;"
               title="field2"
             >
               <div

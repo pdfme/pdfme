@@ -17,6 +17,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
+import { addAlphaToHex } from '../renderUtils.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -33,14 +34,15 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
 const getBackgroundColor = (
   mode: 'form' | 'viewer' | 'designer',
   value: string,
-  schema: Schema
+  schema: Schema,
+  defaultBackgroundColor: string
 ) => {
   if ((mode === 'form' || mode === 'designer') && value && schema.backgroundColor) {
     return schema.backgroundColor as string;
   } else if (mode === 'viewer') {
     return (schema.backgroundColor as string) ?? 'transparent';
   } else {
-    return 'rgb(242 244 255 / 75%)';
+    return defaultBackgroundColor;
   }
 };
 
@@ -55,6 +57,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     tabIndex,
     placeholder,
     options,
+    theme,
   } = arg;
   const font = options?.font || getDefaultFont();
 
@@ -86,7 +89,12 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(mode, value, schema),
+    backgroundColor: getBackgroundColor(
+      mode,
+      value,
+      schema,
+      addAlphaToHex(theme.colorPrimaryBg, 30)
+    ),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
