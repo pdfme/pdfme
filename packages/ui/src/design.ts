@@ -2,17 +2,20 @@ import { ThemeConfig } from 'antd';
 
 export const theme: ThemeConfig = {
   token: {
-    colorPrimary: '#25c2a0',
-    fontSize: 15,
-    margin: 8,
-    marginLG: 12,
-    marginXS: 4,
-    padding: 8,
-    paddingLG: 12,
-    paddingXS: 4,
+    colorPrimary: '#1890ff',
   },
   components: {
-    Form: { fontSize: 12, itemMarginBottom: 4, verticalLabelPadding: '0 0 2px' },
+    Form: {
+      fontSize: 12,
+      margin: 8,
+      marginLG: 12,
+      marginXS: 4,
+      padding: 8,
+      paddingLG: 12,
+      paddingXS: 4,
+      itemMarginBottom: 4,
+      verticalLabelPadding: '0 0 2px',
+    },
   },
 };
 
@@ -24,6 +27,7 @@ const controllerStyle = {
   background: controllerBackground,
   height: 40,
 };
+// これ本当に必要かな？少なくとも外からカスタマイズできる必要はないかも
 export const style = {
   Sidebar: { background: '#fffffffa' },
   ErrorScreen: { background, cardBackground: '#ffffffad' },

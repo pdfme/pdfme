@@ -22,7 +22,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   const nextZoomIn = zoomLevel + zoomStep;
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button
         type="text"
         disabled={minZoom >= nextZoomOut}
@@ -51,7 +51,7 @@ type PagerProps = {
 
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
         <LeftOutlined style={{ color: style.textStyle.color }} />
       </Button>

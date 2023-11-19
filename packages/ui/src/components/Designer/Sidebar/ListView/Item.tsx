@@ -83,7 +83,7 @@ const Item = React.memo(
                 paddingLeft: '0.25rem',
               }}
               icon={<HolderOutlined style={{ cursor: 'grab' }} />}
-            ></Button>
+            />
             <Text
               style={{
                 cursor: 'pointer',

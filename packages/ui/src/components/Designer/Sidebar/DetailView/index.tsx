@@ -35,7 +35,7 @@ const DetailView = (
   useEffect(() => {
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      Divider: () => <Divider />,
+      Divider: () => <Divider style={{ margin: token.marginXS, padding: token.paddingXS }} />,
     };
     for (const plugin of Object.values(pluginsRegistry)) {
       const widgets = plugin?.propPanel.widgets || {};
@@ -147,13 +147,12 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           {i18n('editField')}
         </Text>
       </div>
-      <Divider />
+      <Divider style={{ margin: token.marginXS, padding: token.paddingXS }} />
       <div
         style={{
           height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
           overflowX: 'hidden',
-          paddingBottom: '0.5rem',
           borderBottom: `1px solid ${token.colorSplit}`,
         }}
       >
