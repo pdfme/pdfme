@@ -110,7 +110,7 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'inputNumber',
         span: 8,
       },
-      useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false },
+      useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
       dynamicFontSize: {
         type: 'object',
         widget: 'card',
