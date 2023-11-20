@@ -87,7 +87,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), mode, options, scale]);
+  }, [JSON.stringify(schema), JSON.stringify(options), mode, scale]);
 
   return (
     <Wrapper {...props}>

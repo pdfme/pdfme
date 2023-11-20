@@ -55,7 +55,7 @@ const DetailView = (
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, activeElements, pluginsRegistry]);
+  }, [activeSchema, activeElements, pluginsRegistry, JSON.stringify(options)]);
 
   useEffect(() => {
     form.setValues({ ...activeSchema });

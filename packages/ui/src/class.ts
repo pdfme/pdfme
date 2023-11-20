@@ -147,6 +147,7 @@ export abstract class BaseUIClass {
     if (font) {
       this.font = font;
     }
+    this.options = Object.assign(this.options, options);
     this.render();
   }
 
