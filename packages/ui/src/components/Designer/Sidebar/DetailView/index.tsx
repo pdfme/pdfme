@@ -43,7 +43,14 @@ const DetailView = (
       const widgets = plugin?.propPanel.widgets || {};
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
         newWidgets[widgetKey] = (p) => (
-          <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />
+          <WidgetRenderer
+            {...p}
+            {...props}
+            options={options}
+            theme={token}
+            i18n={i18n as (key: keyof Dict | string) => string}
+            widget={widgetValue}
+          />
         );
       });
     }

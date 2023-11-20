@@ -147,10 +147,10 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
   return {
     schema: ({ i18n }) => {
       return {
-        barColor: { title: i18n('barColor'), type: 'string', widget: 'color' },
-        backgroundColor: { title: i18n('bgColor'), type: 'string', widget: 'color' },
+        barColor: { title: i18n('schemas.barcodes.barColor'), type: 'string', widget: 'color' },
+        backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
         ...(barcodeHasText
-          ? { textColor: { title: i18n('textColor'), type: 'string', widget: 'color' } }
+          ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
           : {}),
       };
     },

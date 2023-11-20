@@ -26,19 +26,29 @@ export const Dict = z.object({
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
   // -----------------used in schemas-----------------
-  // TODO 1 キーがよくない
-  barColor: z.string(),
-  textColor: z.string(),
-  bgColor: z.string(),
-  fontName: z.string(),
-  size: z.string(),
-  spacing: z.string(),
-  textAlign: z.string(),
-  verticalAlign: z.string(),
-  lineHeight: z.string(),
-  min: z.string(),
-  max: z.string(),
-  fit: z.string(),
+  'schemas.textColor': z.string(),
+  'schemas.bgColor': z.string(),
+  'schemas.horizontal': z.string(),
+  'schemas.vertical': z.string(),
+  'schemas.left': z.string(),
+  'schemas.center': z.string(),
+  'schemas.right': z.string(),
+  'schemas.top': z.string(),
+  'schemas.middle': z.string(),
+  'schemas.bottom': z.string(),
+
+  'schemas.text.fontName': z.string(),
+  'schemas.text.size': z.string(),
+  'schemas.text.spacing': z.string(),
+  'schemas.text.textAlign': z.string(),
+  'schemas.text.verticalAlign': z.string(),
+  'schemas.text.lineHeight': z.string(),
+  'schemas.text.min': z.string(),
+  'schemas.text.max': z.string(),
+  'schemas.text.fit': z.string(),
+  'schemas.text.dynamicFontSize': z.string(),
+
+  'schemas.barcodes.barColor': z.string(),
 });
 
 export const Size = z.object({ height: z.number(), width: z.number() });

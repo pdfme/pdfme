@@ -26,7 +26,7 @@ import {
 } from './constants.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
-  const { rootElement, changeSchemas, activeSchema } = props;
+  const { rootElement, changeSchemas, activeSchema, i18n } = props;
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -42,7 +42,7 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
     changeSchemas([{ key: 'dynamicFontSize', value: val, schemaId: activeSchema.id }]);
   };
   const label = document.createElement('label');
-  label.innerText = 'Dynamic Font Size';
+  label.innerText = i18n('schemas.text.dynamicFontSize') || '';
   label.style.cssText = 'display: flex; width: 100%;';
   label.appendChild(checkbox);
   rootElement.appendChild(label);
@@ -56,10 +56,9 @@ export const propPanel: PropPanel<TextSchema> = {
 
     const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
 
-    // TODO 2 i18nを使う
     const textSchema: Record<string, PropPanelSchema> = {
       fontName: {
-        title: 'Font Name',
+        title: i18n('schemas.text.fontName'),
         type: 'string',
         widget: 'select',
         default: fallbackFontName,
@@ -67,64 +66,84 @@ export const propPanel: PropPanel<TextSchema> = {
         span: 12,
       },
       fontSize: {
-        title: 'Size',
+        title: i18n('schemas.text.size'),
         type: 'number',
         widget: 'inputNumber',
         span: 6,
         disabled: enableDynamicFont,
       },
-      characterSpacing: { title: 'Spacing', type: 'number', widget: 'inputNumber', span: 6 },
+      characterSpacing: {
+        title: i18n('schemas.text.spacing'),
+        type: 'number',
+        widget: 'inputNumber',
+        span: 6,
+      },
       alignment: {
-        title: 'Text Align',
+        title: i18n('schemas.text.textAlign'),
         type: 'string',
         widget: 'select',
         props: {
           options: [
-            { label: 'Left', value: DEFAULT_ALIGNMENT },
-            { label: 'Center', value: ALIGN_CENTER },
-            { label: 'Right', value: ALIGN_RIGHT },
+            { label: i18n('schemas.left'), value: DEFAULT_ALIGNMENT },
+            { label: i18n('schemas.center'), value: ALIGN_CENTER },
+            { label: i18n('schemas.right'), value: ALIGN_RIGHT },
           ],
         },
         span: 8,
       },
       verticalAlignment: {
-        title: 'Vertical Align',
+        title: i18n('schemas.text.verticalAlign'),
         type: 'string',
         widget: 'select',
         props: {
           options: [
-            { label: 'Top', value: VERTICAL_ALIGN_TOP },
-            { label: 'Middle', value: VERTICAL_ALIGN_MIDDLE },
-            { label: 'Bottom', value: VERTICAL_ALIGN_BOTTOM },
+            { label: i18n('schemas.top'), value: VERTICAL_ALIGN_TOP },
+            { label: i18n('schemas.middle'), value: VERTICAL_ALIGN_MIDDLE },
+            { label: i18n('schemas.bottom'), value: VERTICAL_ALIGN_BOTTOM },
           ],
         },
         span: 8,
       },
-      lineHeight: { title: 'Line Height', type: 'number', widget: 'inputNumber', span: 8 },
+      lineHeight: {
+        title: i18n('schemas.text.lineHeight'),
+        type: 'number',
+        widget: 'inputNumber',
+        span: 8,
+      },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false },
       dynamicFontSize: {
         type: 'object',
         widget: 'card',
         column: 3,
         properties: {
-          min: { title: 'Min', type: 'number', widget: 'inputNumber', hidden: !enableDynamicFont },
-          max: { title: 'Max', type: 'number', widget: 'inputNumber', hidden: !enableDynamicFont },
+          min: {
+            title: i18n('schemas.text.min'),
+            type: 'number',
+            widget: 'inputNumber',
+            hidden: !enableDynamicFont,
+          },
+          max: {
+            title: i18n('schemas.text.max'),
+            type: 'number',
+            widget: 'inputNumber',
+            hidden: !enableDynamicFont,
+          },
           fit: {
-            title: 'Fit',
+            title: i18n('schemas.text.fit'),
             type: 'string',
             widget: 'select',
             hidden: !enableDynamicFont,
             props: {
               options: [
-                { label: 'Horizontal', value: DYNAMIC_FIT_HORIZONTAL },
-                { label: 'Vertical', value: DYNAMIC_FIT_VERTICAL },
+                { label: i18n('schemas.horizontal'), value: DYNAMIC_FIT_HORIZONTAL },
+                { label: i18n('schemas.vertical'), value: DYNAMIC_FIT_VERTICAL },
               ],
             },
           },
         },
       },
-      fontColor: { title: i18n('textColor'), type: 'string', widget: 'color' },
-      backgroundColor: { title: i18n('bgColor'), type: 'string', widget: 'color' },
+      fontColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
+      backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
     };
 
     return textSchema;
