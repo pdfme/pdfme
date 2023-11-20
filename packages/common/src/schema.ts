@@ -26,7 +26,7 @@ export const Dict = z.object({
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
   // -----------------used in schemas-----------------
-  // TODO キーがよくない
+  // TODO 1 キーがよくない
   barColor: z.string(),
   textColor: z.string(),
   bgColor: z.string(),

@@ -61,16 +61,15 @@ const dictJa: { [key in keyof Dict]: string } = {
   barColor: 'バーの色',
   textColor: 'テキストの色',
   bgColor: '背景色',
-  // TODO 多言語化する
-  fontName: 'xxx',
-  size: 'xxx',
-  spacing: 'xxx',
-  textAlign: 'xxx',
-  verticalAlign: 'xxx',
-  lineHeight: 'xxx',
-  min: 'xxx',
-  max: 'xxx',
-  fit: 'xxx',
+  fontName: 'Font Name',
+  size: 'Size',
+  spacing: 'Spacing',
+  textAlign: 'Text Align',
+  verticalAlign: 'Vertical Align',
+  lineHeight: 'Line Height',
+  min: 'Min',
+  max: 'Max',
+  fit: 'Fit',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -97,6 +96,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   barColor: 'لون الشريط',
   textColor: 'لون الخط',
   bgColor: 'لون الخلفية',
+  // TODO 3 多言語化する
   fontName: 'xxx',
   size: 'xxx',
   spacing: 'xxx',

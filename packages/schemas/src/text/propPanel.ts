@@ -56,7 +56,7 @@ export const propPanel: PropPanel<TextSchema> = {
 
     const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
 
-    // TODO 多言語化
+    // TODO 2 i18nを使う
     const textSchema: Record<string, PropPanelSchema> = {
       fontName: {
         title: 'Font Name',
@@ -123,7 +123,7 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         },
       },
-      fontColor: { title: 'Font Color', type: 'string', widget: 'color' },
+      fontColor: { title: i18n('textColor'), type: 'string', widget: 'color' },
       backgroundColor: { title: i18n('bgColor'), type: 'string', widget: 'color' },
     };
 
