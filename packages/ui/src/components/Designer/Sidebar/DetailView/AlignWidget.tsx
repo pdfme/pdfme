@@ -26,12 +26,8 @@ const createButtonConfig = (id: string, path: JSX.Element, onClick: () => void) 
   onClick,
 });
 
-const AlignWidget = ({
-  activeElements,
-  changeSchemas,
-  schemas,
-  pageSize,
-}: PropPanelWidgetProps) => {
+const AlignWidget = (props: PropPanelWidgetProps) => {
+  const { activeElements, changeSchemas, schemas, pageSize, schema } = props;
   const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
     const ids = activeElements.map((ae) => ae.id);
     const ass = schemas.filter((s) => ids.includes(s.id));
@@ -132,7 +128,7 @@ const AlignWidget = ({
   ];
 
   return (
-    <Form.Item label="Align">
+    <Form.Item label={schema.title}>
       <Button.Group>
         {layoutBtns.map((btn) => (
           <Button

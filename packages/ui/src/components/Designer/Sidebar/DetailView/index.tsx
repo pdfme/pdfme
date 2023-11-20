@@ -82,7 +82,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     column: 2,
     properties: {
       type: {
-        title: 'Type',
+        title: i18n('type'),
         type: 'string',
         widget: 'select',
         props: {
@@ -92,9 +92,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           })),
         },
       },
-      key: { title: 'Name', type: 'string', widget: 'input' },
+      key: { title: i18n('fieldName'), type: 'string', widget: 'input' },
       '-': { type: 'void', widget: 'Divider', cellSpan: 2 },
-      align: { title: 'Align', type: 'void', widget: 'AlignWidget', cellSpan: 2 },
+      align: { title: i18n('align'), type: 'void', widget: 'AlignWidget', cellSpan: 2 },
       position: {
         type: 'object',
         widget: 'card',
@@ -103,10 +103,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           y: { title: 'Y', type: 'number', widget: 'inputNumber' },
         },
       },
-      width: { title: 'Width', type: 'number', widget: 'inputNumber', span: 8 },
-      height: { title: 'Height', type: 'number', widget: 'inputNumber', span: 8 },
+      width: { title: i18n('width'), type: 'number', widget: 'inputNumber', span: 8 },
+      height: { title: i18n('height'), type: 'number', widget: 'inputNumber', span: 8 },
       rotate: {
-        title: 'Rotate',
+        title: i18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
         span: 8,

@@ -37,6 +37,7 @@ function App() {
           domContainer: designerRef.current,
           template,
           options: {
+            lang: 'ja',
             font,
             theme: {
               token: {

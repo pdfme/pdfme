@@ -6,8 +6,10 @@ const dictEn = {
   cancel: 'Cancel',
   field: 'field',
   fieldName: 'Name',
-  require: 'Required',
-  uniq: 'Unique',
+  align: 'Align',
+  width: 'Width',
+  height: 'Height',
+  rotate: 'Rotate',
   edit: 'Edit',
   plsInputName: 'Please input name',
   fieldMustUniq: 'Name of field is not unique',
@@ -22,6 +24,7 @@ const dictEn = {
     'Cannot commit the change because the number of items has been changed.',
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
+  // TODO ここでschemasのラベルを定義しておく、i18nはユーザーからのオプションとマージしてschemas ui render に渡す
   barColor: 'Bar Color',
   textColor: 'Text Color',
   bgColor: 'Background Color',
@@ -31,8 +34,10 @@ const dictJa: { [key in keyof DictEn]: string } = {
   cancel: 'キャンセル',
   field: '入力項目',
   fieldName: '項目名',
-  require: '必須',
-  uniq: '他の項目名と同一不可',
+  align: '整列',
+  width: '幅',
+  height: '高さ',
+  rotate: '回転',
   edit: '編集する',
   plsInputName: '項目名を入力してください',
   fieldMustUniq: '他の入力項目名と被っています',
@@ -55,8 +60,10 @@ const dictAr: { [key in keyof DictEn]: string } = {
   cancel: 'إلغاء',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
-  require: 'مطلوب',
-  uniq: 'يجب أن يكون فريداً',
+  align: 'محاذاة',
+  width: 'العرض',
+  height: 'الارتفاع',
+  rotate: 'تدوير',
   edit: 'تعديل',
   plsInputName: 'الرجاء إدخال الاسم',
   fieldMustUniq: 'يجب أن يكون الحقل فريداً',
@@ -79,8 +86,10 @@ const dictTh: { [key in keyof DictEn]: string } = {
   cancel: 'ยกเลิก',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
-  require: 'จำเป็น',
-  uniq: 'ต้องไม่ซ้ำกัน',
+  align: 'จัดเรียง',
+  width: 'ความกว้าง',
+  height: 'ความสูง',
+  rotate: 'หมุน',
   edit: 'แก้ไข',
   plsInputName: 'กรุณาใส่ชื่อ',
   fieldMustUniq: 'ชื่อฟิลด์ต้องไม่ซ้ำกัน',
@@ -103,8 +112,10 @@ const dictIt: { [key in keyof DictEn]: string } = {
   cancel: 'Annulla',
   field: 'Campo',
   fieldName: 'Nome',
-  require: 'Richiesto',
-  uniq: 'Univoco',
+  align: 'Allinea',
+  width: 'Larghezza',
+  height: 'Altezza',
+  rotate: 'Ruota',
   edit: 'Modifica',
   plsInputName: 'Inserisci il nome per favore',
   fieldMustUniq: 'Il nome del campo non è univoco',
@@ -128,8 +139,10 @@ const dictPl: { [key in keyof DictEn]: string } = {
   cancel: 'Anuluj',
   field: 'pole',
   fieldName: 'Klucz pola',
-  require: 'wymagany',
-  uniq: 'unikalny',
+  align: 'Wyrównanie',
+  width: 'Szerokość',
+  height: 'Wysokość',
+  rotate: 'Obrót',
   edit: 'Edytuj',
   plsInputName: 'Wymagane wprowadzenie klucza pola',
   fieldMustUniq: 'Klucz pola nie jest unikalny',
@@ -154,16 +167,12 @@ const i18n = (lang: Lang, key: keyof DictEn) => {
       return dictPl[key];
     case 'th':
       return dictTh[key];
-
     case 'ar':
       return dictAr[key];
-
     case 'ja':
       return dictJa[key];
-
     case 'it':
       return dictIt[key];
-
     default:
       return dictEn[key];
   }
