@@ -1,7 +1,7 @@
 import React from 'react';
 import { ConfigProvider as ThemeConfigProvider } from 'antd';
 import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from '../contexts';
-import { getDict } from '../i18n';
+import { i18n, getDict } from '../i18n';
 import { defaultTheme } from '../theme';
 import type { Dict, Plugins, Font, Lang, UIOptions } from '@pdfme/common';
 
@@ -51,7 +51,7 @@ export default ({ children, lang, font, plugins, options }: Props) => {
 
   return (
     <ThemeConfigProvider theme={theme}>
-      <I18nContext.Provider value={(key: keyof Dict) => dict[key]}>
+      <I18nContext.Provider value={(key: keyof Dict) => i18n(key, dict)}>
         <FontContext.Provider value={font}>
           <PluginsRegistry.Provider value={plugins}>
             <OptionsContext.Provider value={options}>{children}</OptionsContext.Provider>

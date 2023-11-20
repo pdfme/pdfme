@@ -1,10 +1,9 @@
 import { createContext } from 'react';
-import { getDict } from './i18n';
-import { DEFAULT_LANG } from './constants.js';
-import { type Dict, getDefaultFont, Plugins } from '@pdfme/common';
+import { i18n } from './i18n';
+import { getDefaultFont, Plugins } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 
-export const I18nContext = createContext((key: keyof Dict) => getDict(DEFAULT_LANG)[key]);
+export const I18nContext = createContext(i18n);
 
 export const FontContext = createContext(getDefaultFont());
 

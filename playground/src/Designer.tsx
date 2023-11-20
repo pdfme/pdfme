@@ -37,6 +37,7 @@ function App() {
           domContainer: designerRef.current,
           template,
           options: {
+            // TODO オプションから言語設定を変更できるようにする
             lang: 'ja',
             font,
             labels: {

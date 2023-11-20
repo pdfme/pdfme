@@ -6,7 +6,7 @@ import { render, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Preview from '../../src/components/Preview';
 import { I18nContext, FontContext, PluginsRegistry } from '../../src/contexts';
-import { curriedI18n } from '../../src/i18n';
+import { i18n } from '../../src/i18n';
 import { SELECTABLE_CLASSNAME } from '../../src/constants';
 import { getDefaultFont } from '@pdfme/common';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
@@ -20,7 +20,7 @@ test('Preview(as Viewer) snapshot', async () => {
   let container: HTMLElement = document.createElement('a');
   act(() => {
     const { container: c } = render(
-      <I18nContext.Provider value={curriedI18n('en')}>
+      <I18nContext.Provider value={i18n}>
         <FontContext.Provider value={getDefaultFont()}>
           <PluginsRegistry.Provider value={plugins}>
             <Preview
@@ -44,7 +44,7 @@ test('Preview(as Form) snapshot', async () => {
   let container: HTMLElement = document.createElement('a');
   act(() => {
     const { container: c } = render(
-      <I18nContext.Provider value={curriedI18n('en')}>
+      <I18nContext.Provider value={i18n}>
         <FontContext.Provider value={getDefaultFont()}>
           <PluginsRegistry.Provider value={plugins}>
             <Preview

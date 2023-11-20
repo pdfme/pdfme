@@ -276,4 +276,6 @@ const dictionaries: { [key in Lang]: Dict } = {
   pl: dictPl,
 };
 
-export const getDict = (lang: Lang) => dictionaries[lang] || dictionaries[DEFAULT_LANG];
+export const getDict = (lang: Lang): Dict => dictionaries[lang] || dictionaries[DEFAULT_LANG];
+
+export const i18n = (key: keyof Dict, dict?: Dict) => (dict || getDict(DEFAULT_LANG))[key];
