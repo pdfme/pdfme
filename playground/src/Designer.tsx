@@ -39,6 +39,9 @@ function App() {
           options: {
             lang: 'ja',
             font,
+            labels: {
+              addNewField: '項目追加!',
+            },
             theme: {
               token: {
                 colorPrimary: '#25c2a0',

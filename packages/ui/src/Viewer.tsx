@@ -16,7 +16,7 @@ class Viewer extends PreviewUI {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
       <AppContextProvider
-        i18n={this.getI18n()}
+        lang={this.getLang()}
         font={this.getFont()}
         plugins={this.getPluginsRegistry()}
         options={this.getOptions()}

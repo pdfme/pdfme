@@ -1,6 +1,5 @@
-import { Lang } from '@pdfme/common';
-
-type DictEn = typeof dictEn;
+import type { Lang, Dict } from '@pdfme/common';
+import { DEFAULT_LANG } from './constants.js';
 
 const dictEn = {
   cancel: 'Cancel',
@@ -24,13 +23,12 @@ const dictEn = {
     'Cannot commit the change because the number of items has been changed.',
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
-  // TODO ここでschemasのラベルを定義しておく、i18nはユーザーからのオプションとマージしてschemas ui render に渡す
   barColor: 'Bar Color',
   textColor: 'Text Color',
   bgColor: 'Background Color',
 };
 
-const dictJa: { [key in keyof DictEn]: string } = {
+const dictJa: { [key in keyof Dict]: string } = {
   cancel: 'キャンセル',
   field: '入力項目',
   fieldName: '項目名',
@@ -56,7 +54,7 @@ const dictJa: { [key in keyof DictEn]: string } = {
   bgColor: '背景色',
 };
 
-const dictAr: { [key in keyof DictEn]: string } = {
+const dictAr: { [key in keyof Dict]: string } = {
   cancel: 'إلغاء',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
@@ -82,7 +80,7 @@ const dictAr: { [key in keyof DictEn]: string } = {
   bgColor: 'لون الخلفية',
 };
 
-const dictTh: { [key in keyof DictEn]: string } = {
+const dictTh: { [key in keyof Dict]: string } = {
   cancel: 'ยกเลิก',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
@@ -108,7 +106,7 @@ const dictTh: { [key in keyof DictEn]: string } = {
   bgColor: 'สีพื้นหลัง',
 };
 
-const dictIt: { [key in keyof DictEn]: string } = {
+const dictIt: { [key in keyof Dict]: string } = {
   cancel: 'Annulla',
   field: 'Campo',
   fieldName: 'Nome',
@@ -135,7 +133,7 @@ const dictIt: { [key in keyof DictEn]: string } = {
   bgColor: 'Colore sfondo',
 };
 
-const dictPl: { [key in keyof DictEn]: string } = {
+const dictPl: { [key in keyof Dict]: string } = {
   cancel: 'Anuluj',
   field: 'pole',
   fieldName: 'Klucz pola',
@@ -161,21 +159,13 @@ const dictPl: { [key in keyof DictEn]: string } = {
   bgColor: 'Kolor tła',
 };
 
-const i18n = (lang: Lang, key: keyof DictEn) => {
-  switch (lang) {
-    case 'pl':
-      return dictPl[key];
-    case 'th':
-      return dictTh[key];
-    case 'ar':
-      return dictAr[key];
-    case 'ja':
-      return dictJa[key];
-    case 'it':
-      return dictIt[key];
-    default:
-      return dictEn[key];
-  }
+const dictionaries: { [key in Lang]: Dict } = {
+  en: dictEn,
+  ja: dictJa,
+  ar: dictAr,
+  th: dictTh,
+  it: dictIt,
+  pl: dictPl,
 };
 
-export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);
+export const getDict = (lang: Lang) => dictionaries[lang] || dictionaries[DEFAULT_LANG];

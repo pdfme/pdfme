@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom';
-import { curriedI18n } from './i18n';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
 import { debounce, flatten, cloneDeep } from './helper.js';
 import {
@@ -108,8 +107,8 @@ export abstract class BaseUIClass {
     }
   }
 
-  protected getI18n() {
-    return curriedI18n(this.lang);
+  protected getLang() {
+    return this.lang;
   }
 
   protected getFont() {
