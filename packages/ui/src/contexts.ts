@@ -1,13 +1,12 @@
 import { createContext } from 'react';
-import { curriedI18n } from './i18n';
-import { DEFAULT_LANG } from './constants.js';
-import { getDefaultFont, Plugins } from '@pdfme/common';
+import { i18n } from './i18n';
+import { getDefaultFont, Plugins, UIOptions } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 
-export const I18nContext = createContext(curriedI18n(DEFAULT_LANG));
+export const I18nContext = createContext(i18n);
 
 export const FontContext = createContext(getDefaultFont());
 
 export const PluginsRegistry = createContext<Plugins>(builtInPlugins);
 
-export const OptionsContext = createContext({});
+export const OptionsContext = createContext<UIOptions>({});

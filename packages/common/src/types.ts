@@ -3,7 +3,7 @@ import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { ThemeConfig, GlobalToken } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 // prettier-ignore
-import {Lang, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
+import {Lang, Dict, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
@@ -43,6 +43,8 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
+ * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
+ * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
@@ -55,8 +57,22 @@ export type UIRenderProps<T extends Schema> = {
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;
+  i18n: (key: keyof Dict | string) => string;
 };
 
+/**
+ * Type for properties used in configuring the property panel.
+ *
+ * @property {HTMLDivElement} rootElement - The root HTML element of the property panel.
+ * @property {SchemaForUI} activeSchema - The currently active schema for UI rendering.
+ * @property {HTMLElement[]} activeElements - Array of currently active HTML elements in the UI.
+ * @property {ChangeSchemas} changeSchemas - Function to change multiple schemas simultaneously.
+ * @property {SchemaForUI[]} schemas - Array of schemas for UI rendering.
+ * @property {Size} pageSize - The size of the page being edited.
+ * @property {UIOptions} options - UI options for the property panel.
+ * @property {GlobalToken} theme - The theme configuration used in the UI.
+ * @property {(key: keyof Dict | string) => string} i18n - Internationalization dictionary for UI labels and texts.
+ */
 type PropPanelProps = {
   rootElement: HTMLDivElement;
   activeSchema: SchemaForUI;
@@ -65,7 +81,10 @@ type PropPanelProps = {
   schemas: SchemaForUI[];
   pageSize: Size;
   options: UIOptions;
+  theme: GlobalToken;
+  i18n: (key: keyof Dict | string) => string;
 };
+
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
 /**
@@ -104,6 +123,7 @@ export type Plugin<T extends Schema & { [key: string]: any }> = {
 export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;
+export type Dict = z.infer<typeof Dict>;
 export type Size = z.infer<typeof Size>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;

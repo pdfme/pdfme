@@ -71,7 +71,16 @@ const Item = React.memo(
           onMouseLeave={onMouseLeave}
           ref={ref}
         >
-          <div style={{ display: 'flex', alignItems: 'center', ...style }} {...props}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              ...style,
+            }}
+            {...props}
+            onClick={() => onClick && onClick()}
+          >
             <Button
               {...listeners}
               style={{
@@ -86,14 +95,12 @@ const Item = React.memo(
             />
             <Text
               style={{
-                cursor: 'pointer',
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
                 textOverflow: 'ellipsis',
                 width: '100%',
               }}
               title={title || ''}
-              onClick={() => onClick && onClick()}
             >
               {status === undefined ? (
                 value

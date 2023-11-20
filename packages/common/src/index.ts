@@ -15,6 +15,7 @@ import type {
   UIRenderProps,
   Plugin,
   Lang,
+  Dict,
   Size,
   Schema,
   SchemaForUI,
@@ -73,6 +74,7 @@ export {
 
 export type {
   Lang,
+  Dict,
   Size,
   Schema,
   SchemaForUI,

@@ -140,16 +140,20 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
 export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<BarcodeSchema> => {
   const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix';
 
-  const schema = {
-    barColor: { title: 'Bar Color', type: 'string', widget: 'color' },
-    backgroundColor: { title: 'Background', type: 'string', widget: 'color' },
-    ...(barcodeHasText
-      ? { textColor: { title: 'Text Color', type: 'string', widget: 'color' } }
-      : {}),
-  };
   const defaults = barcodeDefaults.find(({ defaultSchema }) => defaultSchema.type === barcodeType);
 
   if (!defaults) throw new Error(`[@pdfme/schemas] No default for barcode type ${barcodeType}`);
 
-  return { schema, ...defaults };
+  return {
+    schema: ({ i18n }) => {
+      return {
+        barColor: { title: i18n('schemas.barcodes.barColor'), type: 'string', widget: 'color' },
+        backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
+        ...(barcodeHasText
+          ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
+          : {}),
+      };
+    },
+    ...defaults,
+  };
 };

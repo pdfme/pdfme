@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { Template, checkTemplate } from "@pdfme/common";
+import { useEffect, useRef, useState } from "react";
+import { Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
@@ -17,6 +17,7 @@ const headerHeight = 65;
 function App() {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
+  const [lang, setLang] = useState<Lang>('en');
 
   useEffect(() => {
     let template: Template = getTemplate();
@@ -38,6 +39,11 @@ function App() {
           template,
           options: {
             font,
+            lang,
+            labels: {
+              addNewField: 'pdfme!', // Update existing labels
+              'clear': '🗑️', // Add custom labels to consume them in your own plugins
+            },
             theme: {
               token: {
                 colorPrimary: '#25c2a0',
@@ -99,6 +105,20 @@ function App() {
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginRight: 120, }}>
         <strong>Designer</strong>
         <span style={{ margin: "0 1rem" }}>:</span>
+        <select onChange={(e) => {
+          setLang(e.target.value as Lang)
+          if (designer.current) {
+            designer.current.updateOptions({ lang: e.target.value as Lang })
+          }
+        }} value={lang}>
+          <option value="en">English</option>
+          <option value="ja">Japanese</option>
+          <option value="ar">Arabic</option>
+          <option value="th">Thai</option>
+          <option value="pl">Polish</option>
+          <option value="it">Italian</option>
+        </select>
+        <span style={{ margin: "0 1rem" }}>/</span>
         <label style={{ width: 180 }}>
           Change BasePDF
           <input type="file" accept="application/pdf" onChange={onChangeBasePDF} />

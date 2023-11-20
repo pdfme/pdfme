@@ -52,12 +52,11 @@ new Designer({
   options: {
     lang: 'ja',
     labels: {
-      edit: '編集',
+      fieldsList: '入力項目一覧ビュー', // override the label for the edit button
+      youCanCreateYourOwnLabel: '独自のラベルを作成できます', // add a new label for the custom plugin
     },
   },
 });
 ```
 
-```
-
-```
+Create your own labels and use the i18n function from the plugin to retrieve the labels. Please refer to the implementation of the [Signature plugin](https://github.com/pdfme/pdfme/blob/main/playground/src/plugins/signature.ts) in the Playground code.

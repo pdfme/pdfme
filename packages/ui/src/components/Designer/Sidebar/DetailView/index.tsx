@@ -1,6 +1,6 @@
 import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect, useState } from 'react';
-import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
+import type { Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
@@ -43,12 +43,19 @@ const DetailView = (
       const widgets = plugin?.propPanel.widgets || {};
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
         newWidgets[widgetKey] = (p) => (
-          <WidgetRenderer {...p} {...props} options={options} widget={widgetValue} />
+          <WidgetRenderer
+            {...p}
+            {...props}
+            options={options}
+            theme={token}
+            i18n={i18n as (key: keyof Dict | string) => string}
+            widget={widgetValue}
+          />
         );
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, activeElements, pluginsRegistry]);
+  }, [activeSchema, activeElements, pluginsRegistry, JSON.stringify(options)]);
 
   useEffect(() => {
     form.setValues({ ...activeSchema });
@@ -82,7 +89,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     column: 2,
     properties: {
       type: {
-        title: 'Type',
+        title: i18n('type'),
         type: 'string',
         widget: 'select',
         props: {
@@ -92,9 +99,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           })),
         },
       },
-      key: { title: 'Name', type: 'string', widget: 'input' },
+      key: { title: i18n('fieldName'), type: 'string', widget: 'input' },
       '-': { type: 'void', widget: 'Divider', cellSpan: 2 },
-      align: { title: 'Align', type: 'void', widget: 'AlignWidget', cellSpan: 2 },
+      align: { title: i18n('align'), type: 'void', widget: 'AlignWidget', cellSpan: 2 },
       position: {
         type: 'object',
         widget: 'card',
@@ -103,10 +110,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           y: { title: 'Y', type: 'number', widget: 'inputNumber' },
         },
       },
-      width: { title: 'Width', type: 'number', widget: 'inputNumber', span: 8 },
-      height: { title: 'Height', type: 'number', widget: 'inputNumber', span: 8 },
+      width: { title: i18n('width'), type: 'number', widget: 'inputNumber', span: 8 },
+      height: { title: i18n('height'), type: 'number', widget: 'inputNumber', span: 8 },
       rotate: {
-        title: 'Rotate',
+        title: i18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
         span: 8,
@@ -118,7 +125,13 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   };
 
   if (typeof activePropPanelSchema === 'function') {
-    const apps = activePropPanelSchema({ ...props, options }) || {};
+    const apps =
+      activePropPanelSchema({
+        ...props,
+        options,
+        theme: token,
+        i18n: i18n as (key: keyof Dict | string) => string,
+      }) || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
       ...(Object.keys(apps).length === 0

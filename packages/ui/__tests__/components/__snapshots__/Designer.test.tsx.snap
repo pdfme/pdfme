@@ -160,7 +160,7 @@ exports[`Designer snapshot 1`] = `
                       style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                     >
                       <div
-                        style="display: flex; align-items: center; border: 1px solid transparent;"
+                        style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
                       >
                         <button
                           class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
@@ -195,7 +195,7 @@ exports[`Designer snapshot 1`] = `
                         </button>
                         <span
                           class="ant-typography css-dev-only-do-not-override-nllxry"
-                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
                           field1
@@ -206,7 +206,7 @@ exports[`Designer snapshot 1`] = `
                       style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                     >
                       <div
-                        style="display: flex; align-items: center; border: 1px solid transparent;"
+                        style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
                       >
                         <button
                           class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
@@ -241,7 +241,7 @@ exports[`Designer snapshot 1`] = `
                         </button>
                         <span
                           class="ant-typography css-dev-only-do-not-override-nllxry"
-                          style="cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                          style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
                           field2

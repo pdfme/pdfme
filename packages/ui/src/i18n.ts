@@ -1,13 +1,14 @@
-import { Lang } from '@pdfme/common';
+import type { Lang, Dict } from '@pdfme/common';
+import { DEFAULT_LANG } from './constants.js';
 
-type DictEn = typeof dictEn;
-
-const dictEn = {
+const dictEn: { [key in keyof Dict]: string } = {
   cancel: 'Cancel',
   field: 'field',
   fieldName: 'Name',
-  require: 'Required',
-  uniq: 'Unique',
+  align: 'Align',
+  width: 'Width',
+  height: 'Height',
+  rotate: 'Rotate',
   edit: 'Edit',
   plsInputName: 'Please input name',
   fieldMustUniq: 'Name of field is not unique',
@@ -22,17 +23,37 @@ const dictEn = {
     'Cannot commit the change because the number of items has been changed.',
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
-  barColor: 'Bar Color',
-  textColor: 'Text Color',
-  bgColor: 'Background Color',
+  'schemas.textColor': 'Text Color',
+  'schemas.bgColor': 'Background Color',
+  'schemas.horizontal': 'Horizontal',
+  'schemas.vertical': 'Vertical',
+  'schemas.left': 'Left',
+  'schemas.center': 'Center',
+  'schemas.right': 'Right',
+  'schemas.top': 'Top',
+  'schemas.middle': 'Middle',
+  'schemas.bottom': 'Bottom',
+  'schemas.text.fontName': 'Font Name',
+  'schemas.text.size': 'Size',
+  'schemas.text.spacing': 'Spacing',
+  'schemas.text.textAlign': 'Text Align',
+  'schemas.text.verticalAlign': 'Vertical Align',
+  'schemas.text.lineHeight': 'Line Height',
+  'schemas.text.min': 'Min',
+  'schemas.text.max': 'Max',
+  'schemas.text.fit': 'Fit',
+  'schemas.text.dynamicFontSize': 'Dynamic Font Size',
+  'schemas.barcodes.barColor': 'Bar Color',
 };
 
-const dictJa: { [key in keyof DictEn]: string } = {
+const dictJa: { [key in keyof Dict]: string } = {
   cancel: 'キャンセル',
   field: '入力項目',
   fieldName: '項目名',
-  require: '必須',
-  uniq: '他の項目名と同一不可',
+  align: '整列',
+  width: '幅',
+  height: '高さ',
+  rotate: '回転',
   edit: '編集する',
   plsInputName: '項目名を入力してください',
   fieldMustUniq: '他の入力項目名と被っています',
@@ -46,17 +67,37 @@ const dictJa: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: '項目数が変更されているため変更をコミットできません。',
   commitBulkUpdateFieldName: '変更を反映',
   bulkUpdateFieldName: '項目名を一括変更',
-  barColor: 'バーの色',
-  textColor: 'テキストの色',
-  bgColor: '背景色',
+  'schemas.textColor': 'テキストの色',
+  'schemas.bgColor': '背景色',
+  'schemas.horizontal': '水平',
+  'schemas.vertical': '垂直',
+  'schemas.left': '左',
+  'schemas.center': '中央',
+  'schemas.right': '右',
+  'schemas.top': '上',
+  'schemas.middle': '中間',
+  'schemas.bottom': '下',
+  'schemas.text.fontName': 'フォント名',
+  'schemas.text.size': 'サイズ',
+  'schemas.text.spacing': '間隔',
+  'schemas.text.textAlign': 'テキストの揃え',
+  'schemas.text.verticalAlign': '垂直方向の揃え',
+  'schemas.text.lineHeight': '行の高さ',
+  'schemas.text.min': '最小',
+  'schemas.text.max': '最大',
+  'schemas.text.fit': 'フィット',
+  'schemas.text.dynamicFontSize': '動的フォントサイズ',
+  'schemas.barcodes.barColor': 'バーの色',
 };
 
-const dictAr: { [key in keyof DictEn]: string } = {
+const dictAr: { [key in keyof Dict]: string } = {
   cancel: 'إلغاء',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
-  require: 'مطلوب',
-  uniq: 'يجب أن يكون فريداً',
+  align: 'محاذاة',
+  width: 'العرض',
+  height: 'الارتفاع',
+  rotate: 'تدوير',
   edit: 'تعديل',
   plsInputName: 'الرجاء إدخال الاسم',
   fieldMustUniq: 'يجب أن يكون الحقل فريداً',
@@ -70,17 +111,37 @@ const dictAr: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: 'لا يمكن تنفيذ التغيير لأنه تم تغيير عدد العناصر.',
   commitBulkUpdateFieldName: 'تنفيذ التغييرات',
   bulkUpdateFieldName: 'تغيير الأسماء',
-  barColor: 'لون الشريط',
-  textColor: 'لون الخط',
-  bgColor: 'لون الخلفية',
+  'schemas.textColor': 'لون الخط',
+  'schemas.bgColor': 'لون الخلفية',
+  'schemas.horizontal': 'أفقي',
+  'schemas.vertical': 'عمودي',
+  'schemas.left': 'يسار',
+  'schemas.center': 'مركز',
+  'schemas.right': 'يمين',
+  'schemas.top': 'أعلى',
+  'schemas.middle': 'وسط',
+  'schemas.bottom': 'أسفل',
+  'schemas.text.fontName': 'اسم الخط',
+  'schemas.text.size': 'الحجم',
+  'schemas.text.spacing': 'التباعد',
+  'schemas.text.textAlign': 'محاذاة النص',
+  'schemas.text.verticalAlign': 'محاذاة عمودية',
+  'schemas.text.lineHeight': 'ارتفاع السطر',
+  'schemas.text.min': 'الحد الأدنى',
+  'schemas.text.max': 'الحد الأقصى',
+  'schemas.text.fit': 'ملاءمة',
+  'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
+  'schemas.barcodes.barColor': 'لون الشريط',
 };
 
-const dictTh: { [key in keyof DictEn]: string } = {
+const dictTh: { [key in keyof Dict]: string } = {
   cancel: 'ยกเลิก',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
-  require: 'จำเป็น',
-  uniq: 'ต้องไม่ซ้ำกัน',
+  align: 'จัดเรียง',
+  width: 'ความกว้าง',
+  height: 'ความสูง',
+  rotate: 'หมุน',
   edit: 'แก้ไข',
   plsInputName: 'กรุณาใส่ชื่อ',
   fieldMustUniq: 'ชื่อฟิลด์ต้องไม่ซ้ำกัน',
@@ -94,17 +155,37 @@ const dictTh: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: 'ไม่สามารถยืนยันการแก้ไขได้เนื่องจากจำนวนรายการมีการเปลี่ยนแปลง',
   commitBulkUpdateFieldName: 'ยืนยันการแก้ไข',
   bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
-  barColor: 'สีบาร์',
-  textColor: 'สีข้อความ',
-  bgColor: 'สีพื้นหลัง',
+  'schemas.textColor': 'สีข้อความ',
+  'schemas.bgColor': 'สีพื้นหลัง',
+  'schemas.horizontal': 'แนวนอน',
+  'schemas.vertical': 'แนวตั้ง',
+  'schemas.left': 'ซ้าย',
+  'schemas.center': 'ตรงกลาง',
+  'schemas.right': 'ขวา',
+  'schemas.top': 'ด้านบน',
+  'schemas.middle': 'ตรงกลาง',
+  'schemas.bottom': 'ด้านล่าง',
+  'schemas.text.fontName': 'ชื่อแบบอักษร',
+  'schemas.text.size': 'ขนาด',
+  'schemas.text.spacing': 'ระยะห่าง',
+  'schemas.text.textAlign': 'จัดแนวข้อความ',
+  'schemas.text.verticalAlign': 'จัดแนวแนวตั้ง',
+  'schemas.text.lineHeight': 'ความสูงของบรรทัด',
+  'schemas.text.min': 'ต่ำสุด',
+  'schemas.text.max': 'สูงสุด',
+  'schemas.text.fit': 'พอดี',
+  'schemas.text.dynamicFontSize': 'ขนาดตัวอักษรแบบไดนามิก',
+  'schemas.barcodes.barColor': 'สีบาร์',
 };
 
-const dictIt: { [key in keyof DictEn]: string } = {
+const dictIt: { [key in keyof Dict]: string } = {
   cancel: 'Annulla',
   field: 'Campo',
   fieldName: 'Nome',
-  require: 'Richiesto',
-  uniq: 'Univoco',
+  align: 'Allinea',
+  width: 'Larghezza',
+  height: 'Altezza',
+  rotate: 'Ruota',
   edit: 'Modifica',
   plsInputName: 'Inserisci il nome per favore',
   fieldMustUniq: 'Il nome del campo non è univoco',
@@ -119,17 +200,37 @@ const dictIt: { [key in keyof DictEn]: string } = {
     'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
   commitBulkUpdateFieldName: 'Salva cambiamenti',
   bulkUpdateFieldName: 'Modifica nomi campi in blocco',
-  barColor: 'Colore barra',
-  textColor: 'Colore testo',
-  bgColor: 'Colore sfondo',
+  'schemas.textColor': 'Colore testo',
+  'schemas.bgColor': 'Colore sfondo',
+  'schemas.horizontal': 'Orizzontale',
+  'schemas.vertical': 'Verticale',
+  'schemas.left': 'Sinistra',
+  'schemas.center': 'Centro',
+  'schemas.right': 'Destra',
+  'schemas.top': 'Sopra',
+  'schemas.middle': 'Medio',
+  'schemas.bottom': 'Sotto',
+  'schemas.text.fontName': 'Nome del font',
+  'schemas.text.size': 'Dimensione',
+  'schemas.text.spacing': 'Spaziatura',
+  'schemas.text.textAlign': 'Allineamento testo',
+  'schemas.text.verticalAlign': 'Allineamento verticale',
+  'schemas.text.lineHeight': 'Altezza della linea',
+  'schemas.text.min': 'Minimo',
+  'schemas.text.max': 'Massimo',
+  'schemas.text.fit': 'Adatta',
+  'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
+  'schemas.barcodes.barColor': 'Colore barra',
 };
 
-const dictPl: { [key in keyof DictEn]: string } = {
+const dictPl: { [key in keyof Dict]: string } = {
   cancel: 'Anuluj',
   field: 'pole',
   fieldName: 'Klucz pola',
-  require: 'wymagany',
-  uniq: 'unikalny',
+  align: 'Wyrównanie',
+  width: 'Szerokość',
+  height: 'Wysokość',
+  rotate: 'Obrót',
   edit: 'Edytuj',
   plsInputName: 'Wymagane wprowadzenie klucza pola',
   fieldMustUniq: 'Klucz pola nie jest unikalny',
@@ -143,30 +244,38 @@ const dictPl: { [key in keyof DictEn]: string } = {
   errorBulkUpdateFieldName: 'Nie można wprowadzić zmian ponieważ liczba elementów uległa zmianie.',
   commitBulkUpdateFieldName: 'Zaakceptuj zmiany',
   bulkUpdateFieldName: 'Masowo aktualizuj klucze pól',
-  barColor: 'Kolor paska',
-  textColor: 'Kolor tekstu',
-  bgColor: 'Kolor tła',
+  'schemas.textColor': 'Kolor tekstu',
+  'schemas.bgColor': 'Kolor tła',
+  'schemas.horizontal': 'Poziomo',
+  'schemas.vertical': 'Pionowo',
+  'schemas.left': 'Lewo',
+  'schemas.center': 'Centrum',
+  'schemas.right': 'Prawo',
+  'schemas.top': 'Góra',
+  'schemas.middle': 'Środek',
+  'schemas.bottom': 'Dół',
+  'schemas.text.fontName': 'Nazwa czcionki',
+  'schemas.text.size': 'Rozmiar',
+  'schemas.text.spacing': 'Odstępy',
+  'schemas.text.textAlign': 'Wyrównanie tekstu',
+  'schemas.text.verticalAlign': 'Wyrównanie pionowe',
+  'schemas.text.lineHeight': 'Wysokość linii',
+  'schemas.text.min': 'Minimum',
+  'schemas.text.max': 'Maksimum',
+  'schemas.text.fit': 'Dopasowanie',
+  'schemas.text.dynamicFontSize': 'Dynamiczny rozmiar czcionki',
+  'schemas.barcodes.barColor': 'Kolor paska',
 };
 
-const i18n = (lang: Lang, key: keyof DictEn) => {
-  switch (lang) {
-    case 'pl':
-      return dictPl[key];
-    case 'th':
-      return dictTh[key];
-
-    case 'ar':
-      return dictAr[key];
-
-    case 'ja':
-      return dictJa[key];
-
-    case 'it':
-      return dictIt[key];
-
-    default:
-      return dictEn[key];
-  }
+const dictionaries: { [key in Lang]: Dict } = {
+  en: dictEn,
+  ja: dictJa,
+  ar: dictAr,
+  th: dictTh,
+  it: dictIt,
+  pl: dictPl,
 };
 
-export const curriedI18n = (lang: Lang) => (key: keyof DictEn) => i18n(lang, key);
+export const getDict = (lang: Lang): Dict => dictionaries[lang] || dictionaries[DEFAULT_LANG];
+
+export const i18n = (key: keyof Dict, dict?: Dict) => (dict || getDict(DEFAULT_LANG))[key];

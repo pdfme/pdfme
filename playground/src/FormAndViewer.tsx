@@ -58,6 +58,7 @@ function App() {
           inputs,
           options: {
             font,
+            labels: { 'clear': '消去' },
             theme: {
               token: {
                 colorPrimary: '#25c2a0',

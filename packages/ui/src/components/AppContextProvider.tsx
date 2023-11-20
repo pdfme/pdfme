@@ -1,13 +1,13 @@
 import React from 'react';
 import { ConfigProvider as ThemeConfigProvider } from 'antd';
 import { I18nContext, FontContext, PluginsRegistry, OptionsContext } from '../contexts';
-import { curriedI18n } from '../i18n';
+import { i18n, getDict } from '../i18n';
 import { defaultTheme } from '../theme';
-import type { Plugins, Font, UIOptions } from '@pdfme/common';
+import type { Dict, Plugins, Font, Lang, UIOptions } from '@pdfme/common';
 
 type Props = {
   children: React.ReactNode;
-  i18n: ReturnType<typeof curriedI18n>;
+  lang: Lang;
   font: Font;
   plugins: Plugins;
   options: UIOptions;
@@ -38,14 +38,20 @@ const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>
   return output;
 };
 
-export default ({ children, i18n, font, plugins, options }: Props) => {
+export default ({ children, lang, font, plugins, options }: Props) => {
   let theme = defaultTheme;
   if (options.theme) {
     theme = deepMerge(theme, options.theme);
   }
+
+  let dict = getDict(lang);
+  if (options.labels) {
+    dict = deepMerge(dict, options.labels);
+  }
+
   return (
     <ThemeConfigProvider theme={theme}>
-      <I18nContext.Provider value={i18n}>
+      <I18nContext.Provider value={(key: keyof Dict) => i18n(key, dict)}>
         <FontContext.Provider value={font}>
           <PluginsRegistry.Provider value={plugins}>
             <OptionsContext.Provider value={options}>{children}</OptionsContext.Provider>
