@@ -26,6 +26,15 @@ const dictEn = {
   barColor: 'Bar Color',
   textColor: 'Text Color',
   bgColor: 'Background Color',
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -52,6 +61,16 @@ const dictJa: { [key in keyof Dict]: string } = {
   barColor: 'バーの色',
   textColor: 'テキストの色',
   bgColor: '背景色',
+  // TODO 多言語化する
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -78,6 +97,15 @@ const dictAr: { [key in keyof Dict]: string } = {
   barColor: 'لون الشريط',
   textColor: 'لون الخط',
   bgColor: 'لون الخلفية',
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -104,6 +132,15 @@ const dictTh: { [key in keyof Dict]: string } = {
   barColor: 'สีบาร์',
   textColor: 'สีข้อความ',
   bgColor: 'สีพื้นหลัง',
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -131,6 +168,15 @@ const dictIt: { [key in keyof Dict]: string } = {
   barColor: 'Colore barra',
   textColor: 'Colore testo',
   bgColor: 'Colore sfondo',
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -157,6 +203,15 @@ const dictPl: { [key in keyof Dict]: string } = {
   barColor: 'Kolor paska',
   textColor: 'Kolor tekstu',
   bgColor: 'Kolor tła',
+  fontName: 'xxx',
+  size: 'xxx',
+  spacing: 'xxx',
+  textAlign: 'xxx',
+  verticalAlign: 'xxx',
+  lineHeight: 'xxx',
+  min: 'xxx',
+  max: 'xxx',
+  fit: 'xxx',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

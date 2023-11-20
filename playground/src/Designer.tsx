@@ -41,6 +41,8 @@ function App() {
             font,
             labels: {
               addNewField: '項目追加!',
+              // TODO signatureのプラグインからこの追加したラベルを参照する
+              test: '!!'
             },
             theme: {
               token: {

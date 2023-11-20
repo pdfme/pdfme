@@ -4,6 +4,7 @@ const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it'] as const;
 
 export const Lang = z.enum(langs);
 export const Dict = z.object({
+  // -----------------used in ui-----------------
   cancel: z.string(),
   field: z.string(),
   fieldName: z.string(),
@@ -24,10 +25,20 @@ export const Dict = z.object({
   errorBulkUpdateFieldName: z.string(),
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
-  // TODO ここで公式のschemasのラベルを定義しておく、i18nはユーザーからのオプションとマージしてschemas ui render に渡す
+  // -----------------used in schemas-----------------
+  // TODO キーがよくない
   barColor: z.string(),
   textColor: z.string(),
   bgColor: z.string(),
+  fontName: z.string(),
+  size: z.string(),
+  spacing: z.string(),
+  textAlign: z.string(),
+  verticalAlign: z.string(),
+  lineHeight: z.string(),
+  min: z.string(),
+  max: z.string(),
+  fit: z.string(),
 });
 
 export const Size = z.object({ height: z.number(), width: z.number() });

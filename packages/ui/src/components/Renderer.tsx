@@ -1,12 +1,12 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
+import { Dict, ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
-import { PluginsRegistry, OptionsContext } from '../contexts';
+import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme'
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n'
 > & {
   schema: SchemaForUI;
   onChange: (value: string) => void;
@@ -45,6 +45,7 @@ const Wrapper = ({
 const Renderer = (props: RendererProps) => {
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
+  const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
   const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
@@ -78,6 +79,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         placeholder,
         options,
         theme,
+        i18n,
       });
     }
     return () => {

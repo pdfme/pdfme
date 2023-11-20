@@ -1,6 +1,6 @@
 import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect, useState } from 'react';
-import type { SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
+import type { Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
@@ -118,7 +118,13 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   };
 
   if (typeof activePropPanelSchema === 'function') {
-    const apps = activePropPanelSchema({ ...props, options }) || {};
+    const apps =
+      activePropPanelSchema({
+        ...props,
+        options,
+        theme: token,
+        i18n: i18n as (key: keyof Dict | string) => string,
+      }) || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
       ...(Object.keys(apps).length === 0
