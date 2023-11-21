@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['../../eslint.base.js'],
+  extends: ['../../eslint.base.js', "plugin:react/recommended", 'plugin:react-hooks/recommended'],
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
@@ -8,11 +8,6 @@ module.exports = {
       },
     },
   ],
-  plugins: ['prettier', 'react', 'react-hooks', '@typescript-eslint'],
-  rules: {
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-  },
   settings: {
     react: {
       version: 'detect',
