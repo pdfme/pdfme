@@ -17,7 +17,6 @@
     "types": [
       "node",
       "jest",
-      "@types/jest"
     ],
     "typeRoots": [
       "node_modules/@types"

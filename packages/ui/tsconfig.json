@@ -19,13 +19,12 @@
     "types": [
       "node",
       "jest",
-      "@types/jest"
     ],
     "typeRoots": [
       "../node_modules/@types"
     ],
     "sourceMap": true,
-    "baseUrl": "..",
+    "baseUrl": ".",
     "paths": {
       "@pdfme/common": [
         "packages/common/dist/esm/src"
