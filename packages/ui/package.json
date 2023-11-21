@@ -34,10 +34,8 @@
     "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
-    "lint": "tsc --noEmit",
+    "lint": "eslint --ext .ts,.tsx src",
     "test": "jest",
-    "lint:watch": "tsc -w --noEmit",
-    "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
