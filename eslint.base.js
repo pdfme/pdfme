@@ -3,10 +3,16 @@ module.exports = {
   env: {
     es6: true,
     node: true,
-    mocha: true,
     jest: true,
-    jasmine: true,
   },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.esm.json'],
+      },
+    },
+  ],
   parser: '@typescript-eslint/parser',
   plugins: ['prettier', '@typescript-eslint'],
   rules: {
