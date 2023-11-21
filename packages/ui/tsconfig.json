@@ -28,10 +28,10 @@
     "baseUrl": "..",
     "paths": {
       "@pdfme/common": [
-        "packages/common/src"
+        "packages/common/dist/esm/src"
       ],
       "@pdfme/schemas": [
-        "packages/schemas/src"
+        "packages/schemas/dist/esm/src"
       ]
     },
     "skipLibCheck": true,

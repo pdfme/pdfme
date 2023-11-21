@@ -41,10 +41,8 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
-    "lint": "tsc --noEmit",
+    "lint": "eslint --ext .ts src",
     "test": "jest",
-    "lint:watch": "tsc -w --noEmit",
-    "test:watch": "jest --coverage --watch",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },

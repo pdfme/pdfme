@@ -7,9 +7,9 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.ts', '*.tsx'], // Your TypeScript files extension
+      files: ['*.ts', '*.tsx'],
       parserOptions: {
-        project: ['./tsconfig.json'], // Specify it only for TypeScript files
+        project: ['./tsconfig.json'],
       },
     },
   ],
