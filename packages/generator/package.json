@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "type": "module",
+  "type": "commonjs",
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
