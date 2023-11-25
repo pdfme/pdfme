@@ -1,6 +1,6 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import * as fontkit from 'fontkit';
-import type { GenerateProps, Template } from '@pdfme/common';
+import type { GenerateProps, GeneratorOptions, Template } from '@pdfme/common';
 import { checkGenerateProps } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 import { drawEmbeddedPage, getEmbeddedPagesAndEmbedPdfBoxes } from './pdfUtils.js';
@@ -19,9 +19,28 @@ const preprocessing = async ({ template }: { template: Template }) => {
   return { pdfDoc, embeddedPages, embedPdfBoxes };
 };
 
-const postProcessing = ({ pdfDoc }: { pdfDoc: pdfLib.PDFDocument }) => {
-  pdfDoc.setProducer(TOOL_NAME);
-  pdfDoc.setCreator(TOOL_NAME);
+const postProcessing = (props: { pdfDoc: pdfLib.PDFDocument; options: GeneratorOptions }) => {
+  const { pdfDoc, options } = props;
+  const {
+    author = TOOL_NAME,
+    creationDate = new Date(),
+    creator = TOOL_NAME,
+    keywords = [],
+    language = 'en-US',
+    modificationDate = new Date(),
+    producer = TOOL_NAME,
+    subject = '',
+    title = '',
+  } = options;
+  pdfDoc.setAuthor(author);
+  pdfDoc.setCreationDate(creationDate);
+  pdfDoc.setCreator(creator);
+  pdfDoc.setKeywords(keywords);
+  pdfDoc.setLanguage(language);
+  pdfDoc.setModificationDate(modificationDate);
+  pdfDoc.setProducer(producer);
+  pdfDoc.setSubject(subject);
+  pdfDoc.setTitle(title);
 };
 
 const generate = async (props: GenerateProps) => {
@@ -67,7 +86,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     }
   }
 
-  postProcessing({ pdfDoc });
+  postProcessing({ pdfDoc, options });
 
   return pdfDoc.save();
 };
