@@ -102,7 +102,17 @@ const CommonProps = z.object({
 
 // -------------------generate-------------------
 
-export const GeneratorOptions = CommonOptions.extend({});
+export const GeneratorOptions = CommonOptions.extend({
+  author: z.string().optional(),
+  creationDate: z.date().optional(),
+  creator: z.string().optional(),
+  keywords: z.array(z.string()).optional(),
+  language: z.string().optional(),
+  modificationDate: z.date().optional(),
+  producer: z.string().optional(),
+  subject: z.string().optional(),
+  title: z.string().optional(),
+});
 
 export const GenerateProps = CommonProps.extend({
   inputs: Inputs,
