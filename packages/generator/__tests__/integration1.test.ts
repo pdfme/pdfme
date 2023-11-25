@@ -5,7 +5,7 @@ import { text, image } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integration test(label, envelope)', () => {
-  describe.each([label, envelope])('%i', (templateData) => {
+  describe.each([label, envelope])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
