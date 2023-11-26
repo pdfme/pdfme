@@ -305,6 +305,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (!isClick && removed.length > 0) {
             newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
           }
+          if(selected.length === 1){
+            onEdit([])
+          }
           onEdit(newActiveElements);
 
           if (newActiveElements != activeElements) {
