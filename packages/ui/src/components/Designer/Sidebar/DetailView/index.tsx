@@ -121,6 +121,19 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         max: 360,
         min: 0,
       },
+      opacity: {
+        title: i18n('opacity'),
+        type: 'number',
+        widget: 'slider',
+        step: 0.1,
+        min: 0,
+        max: 1,
+        cellSpan: 2,
+        default: 1,
+        props: {
+          hideInput: true
+        }
+      },
     },
   };
 

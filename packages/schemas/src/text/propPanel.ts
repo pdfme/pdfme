@@ -23,6 +23,7 @@ import {
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
   ALIGN_RIGHT,
   ALIGN_CENTER,
+  DEFAULT_OPACITY,
 } from './constants.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
@@ -167,5 +168,6 @@ export const propPanel: PropPanel<TextSchema> = {
     fontColor: DEFAULT_FONT_COLOR,
     fontName: undefined,
     backgroundColor: '',
+    opacity: DEFAULT_OPACITY
   },
 };

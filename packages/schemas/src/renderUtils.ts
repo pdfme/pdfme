@@ -10,7 +10,7 @@ export const convertForPdfLayoutProps = ({
   pageHeight: number;
   applyRotateTranslate?: boolean;
 }) => {
-  const { width: mmWidth, height: mmHeight, position, rotate } = schema;
+  const { width: mmWidth, height: mmHeight, position, rotate, opacity } = schema;
   const { x: mmX, y: mmY } = position;
 
   const rotateDegrees = rotate ? -rotate : 0;
@@ -39,6 +39,7 @@ export const convertForPdfLayoutProps = ({
     height: height,
     width: width,
     rotate: degrees(rotateDegrees),
+    opacity
   };
 };
 
