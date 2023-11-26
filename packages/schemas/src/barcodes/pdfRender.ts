@@ -27,7 +27,8 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
     height,
     rotate,
     position: { x, y },
+    opacity
   } = convertForPdfLayoutProps({ schema, pageHeight });
 
-  page.drawImage(image, { x, y, rotate, width, height });
+  page.drawImage(image, { x, y, rotate, width, height, opacity });
 };

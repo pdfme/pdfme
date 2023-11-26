@@ -10,6 +10,7 @@ export const Dict = z.object({
   fieldName: z.string(),
   align: z.string(),
   width: z.string(),
+  opacity: z.string(),
   height: z.string(),
   rotate: z.string(),
   edit: z.string(),
@@ -60,6 +61,7 @@ export const Schema = z
     width: z.number(),
     height: z.number(),
     rotate: z.number().optional(),
+    opacity: z.number().optional(),
   })
   .passthrough();
 

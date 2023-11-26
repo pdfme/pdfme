@@ -122,6 +122,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     height,
     rotate,
     position: { x, y },
+    opacity
   } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
   if (schema.backgroundColor) {
@@ -195,6 +196,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       maxWidth: width,
       font: pdfFontValue,
       wordBreaks: [''],
+      opacity
     });
   });
 };
