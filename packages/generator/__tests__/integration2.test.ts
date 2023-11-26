@@ -5,7 +5,7 @@ import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integration test(barcode, business)', () => {
-  describe.each([barcode, business])('%i', (templateData) => {
+  describe.each([barcode, business])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
