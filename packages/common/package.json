@@ -21,7 +21,6 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "type": "module",
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
@@ -31,9 +30,6 @@
       "require": "./dist/cjs/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     }
-  },
-  "engines": {
-    "node": ">=16"
   },
   "scripts": {
     "develop": "tsc -p tsconfig.esm.json -w",
