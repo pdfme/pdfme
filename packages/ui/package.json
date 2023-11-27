@@ -25,9 +25,6 @@
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
-  "engines": {
-    "node": ">=16"
-  },
   "scripts": {
     "develop": "npm-run-all --parallel devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
