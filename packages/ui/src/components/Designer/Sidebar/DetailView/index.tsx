@@ -58,6 +58,7 @@ const DetailView = (
   }, [activeSchema, activeElements, pluginsRegistry, JSON.stringify(options)]);
 
   useEffect(() => {
+    form.resetFields();
     form.setValues({ ...activeSchema });
   }, [activeSchema]);
 
