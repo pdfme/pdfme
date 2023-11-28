@@ -20,7 +20,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       width: 30,
       height: 30,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -33,7 +33,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       width: 80,
       height: 7.2,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -46,7 +46,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...default40x20,
       height: 16,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -58,7 +58,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -69,7 +69,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultColors,
       ...defaultTextColors,
       ...default40x20,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -81,7 +81,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -93,7 +93,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -106,7 +106,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...default40x20,
       height: 12,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -119,7 +119,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...default40x20,
       height: 16,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -131,7 +131,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       ...defaultTextColors,
       ...default40x20,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
   {
@@ -143,7 +143,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       width: 30,
       height: 30,
       rotate: 0,
-      opacity: DEFAULT_OPACITY
+      opacity: DEFAULT_OPACITY,
     },
   },
 ];

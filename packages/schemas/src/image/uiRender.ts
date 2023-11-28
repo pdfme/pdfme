@@ -46,7 +46,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
     ...fullSize,
     backgroundImage: value ? 'none' : `url(${placeholder})`,
     backgroundSize: `${size.width}px ${size.height}px`,
-    opacity: schema.opacity 
+    opacity: schema.opacity,
   };
   Object.assign(container.style, containerStyle);
   container.addEventListener('click', (e) => {

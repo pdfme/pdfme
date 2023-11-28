@@ -168,6 +168,6 @@ export const propPanel: PropPanel<TextSchema> = {
     fontColor: DEFAULT_FONT_COLOR,
     fontName: undefined,
     backgroundColor: '',
-    opacity: DEFAULT_OPACITY
+    opacity: DEFAULT_OPACITY,
   },
 };

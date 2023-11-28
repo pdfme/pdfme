@@ -39,7 +39,7 @@ export const convertForPdfLayoutProps = ({
     height: height,
     width: width,
     rotate: degrees(rotateDegrees),
-    opacity
+    opacity,
   };
 };
 

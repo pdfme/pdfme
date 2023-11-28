@@ -102,7 +102,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
-    opacity: schema.opacity
+    opacity: schema.opacity,
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';

@@ -14,6 +14,6 @@ export const propPanel: PropPanel<ImageSchema> = {
     // If the value of "rotate" is set to undefined or not set at all, rotation will be disabled in the UI.
     // Check this document: https://pdfme.com//docs/custom-schemas#learning-how-to-create-from-pdfmeschemas-code
     rotate: 0,
-    opacity: DEFAULT_OPACITY
+    opacity: DEFAULT_OPACITY,
   },
 };

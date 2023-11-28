@@ -71,7 +71,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     alignItems: 'center',
     justifyContent: 'center',
     fontFamily: "'Open Sans', sans-serif",
-    opacity: schema.opacity 
+    opacity: schema.opacity,
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);

@@ -58,16 +58,23 @@ const DetailView = (
   }, [activeSchema, activeElements, pluginsRegistry, JSON.stringify(options)]);
 
   useEffect(() => {
-    form.resetFields();
-    form.setValues({ ...activeSchema });
+    const values: any = { ...activeSchema };
+    values.x = values.position.x;
+    values.y = values.position.y;
+    delete values.position;
+
+    form.setValues(values);
   }, [activeSchema]);
 
   const handleWatch = (newSchema: any) => {
     const changes = [];
-    for (const key in newSchema) {
+    for (let key in newSchema) {
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
-        changes.push({ key, value: newSchema[key], schemaId: activeSchema.id });
+        const value = newSchema[key] || undefined;
+        if (key === 'x') key = 'position.x';
+        if (key === 'y') key = 'position.y';
+        changes.push({ key, value, schemaId: activeSchema.id });
       }
     }
     if (changes.length) {
@@ -85,6 +92,12 @@ const DetailView = (
 Check this document: https://pdfme.com/docs/custom-schemas`);
   }
 
+  const typeOptions = Object.entries(pluginsRegistry).map(([label, value]) => ({
+    label,
+    value: value?.propPanel.defaultSchema.type,
+  }));
+  const defaultSchema = activePlugin.propPanel.defaultSchema;
+
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
     column: 2,
@@ -93,47 +106,46 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         title: i18n('type'),
         type: 'string',
         widget: 'select',
-        props: {
-          options: Object.entries(pluginsRegistry).map(([label, value]) => ({
-            label,
-            value: value?.propPanel.defaultSchema.type,
-          })),
-        },
+        props: { options: typeOptions },
+        required: true,
+        span: 10,
       },
-      key: { title: i18n('fieldName'), type: 'string', widget: 'input' },
-      '-': { type: 'void', widget: 'Divider', cellSpan: 2 },
-      align: { title: i18n('align'), type: 'void', widget: 'AlignWidget', cellSpan: 2 },
-      position: {
-        type: 'object',
-        widget: 'card',
-        properties: {
-          x: { title: 'X', type: 'number', widget: 'inputNumber' },
-          y: { title: 'Y', type: 'number', widget: 'inputNumber' },
-        },
-      },
-      width: { title: i18n('width'), type: 'number', widget: 'inputNumber', span: 8 },
-      height: { title: i18n('height'), type: 'number', widget: 'inputNumber', span: 8 },
+      key: { title: i18n('fieldName'), type: 'string', required: true, span: 14 },
+      '-': { type: 'void', widget: 'Divider' },
+      align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
+      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8 },
+      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8 },
       rotate: {
         title: i18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
-        span: 8,
-        disabled: activePlugin.propPanel.defaultSchema?.rotate === undefined,
+        disabled: defaultSchema?.rotate === undefined,
         max: 360,
         min: 0,
+        span: 8,
+      },
+      width: {
+        title: i18n('width'),
+        type: 'number',
+        widget: 'inputNumber',
+        required: true,
+        span: 8,
+      },
+      height: {
+        title: i18n('height'),
+        type: 'number',
+        widget: 'inputNumber',
+        required: true,
+        span: 8,
       },
       opacity: {
         title: i18n('opacity'),
         type: 'number',
-        widget: 'slider',
-        step: 0.1,
-        min: 0,
+        widget: 'inputNumber',
+        disabled: defaultSchema?.opacity === undefined,
         max: 1,
-        cellSpan: 2,
-        default: 1,
-        props: {
-          hideInput: true
-        }
+        min: 0,
+        span: 8,
       },
     },
   };
@@ -148,18 +160,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       }) || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0
-        ? {}
-        : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } }),
       ...apps,
     };
   } else {
     const apps = activePropPanelSchema || {};
     propPanelSchema.properties = {
       ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0
-        ? {}
-        : { '--': { type: 'void', widget: 'Divider', cellSpan: 2 } }),
+      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } }),
       ...apps,
     };
   }
