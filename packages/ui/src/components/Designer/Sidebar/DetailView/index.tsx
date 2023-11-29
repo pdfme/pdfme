@@ -59,12 +59,18 @@ const DetailView = (
 
   useEffect(() => {
     const values: any = { ...activeSchema };
+
+    // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
     values.x = values.position.x;
     values.y = values.position.y;
     delete values.position;
 
+    if (values.key !== (form.getValues() || {}).key) {
+      form.resetFields();
+    }
+
     form.setValues(values);
-  }, [activeSchema]);
+  }, [form, activeSchema]);
 
   const handleWatch = (newSchema: any) => {
     const changes = [];
@@ -72,6 +78,8 @@ const DetailView = (
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
         const value = newSchema[key] || undefined;
+
+        // [position] Return the flattened position to its original form.
         if (key === 'x') key = 'position.x';
         if (key === 'y') key = 'position.y';
         changes.push({ key, value, schemaId: activeSchema.id });
