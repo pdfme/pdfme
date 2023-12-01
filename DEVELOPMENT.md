@@ -1,4 +1,4 @@
-## Contribute to the Codebase
+# Contribute to the Codebase
 
 - Clone the repository
 - install dependency with `npm install`
@@ -28,7 +28,7 @@ and make sure that any changes are output to each packages `dist` folder.
 If you want to check the changes in the browser, go to `playground`.
 
 ```cmd
-[in pdfme/playground dir] $ npm run install
+[in pdfme/playground dir] $ npm install
 [in pdfme/playground dir] $ npm run dev
 ```
 
