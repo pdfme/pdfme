@@ -2,7 +2,7 @@ import type { ChangeEvent } from 'react';
 import type * as CSS from 'csstype';
 import type { ImageSchema } from './types';
 import { UIRenderProps, ZOOM } from '@pdfme/common';
-import { addAlphaToHex } from '../renderUtils.js';
+import { addAlphaToHex, isEditable } from '../renderUtils.js';
 
 const fullSize = { width: '100%', height: '100%' };
 
@@ -37,7 +37,7 @@ const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> 
 export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema, theme } =
     arg;
-  const editable = mode === 'form' || mode === 'designer';
+  const editable = isEditable(mode);
 
   const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 

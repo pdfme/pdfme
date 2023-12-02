@@ -5,5 +5,4 @@ import { uiRender } from './uiRender.js';
 import type { TextSchema } from './types';
 
 const schema: Plugin<TextSchema> = { pdf: pdfRender, ui: uiRender, propPanel };
-
 export default schema;

@@ -1,5 +1,5 @@
 import { degrees, degreesToRadians } from '@pdfme/pdf-lib';
-import { Schema, mm2pt } from '@pdfme/common';
+import { Schema, mm2pt, Mode } from '@pdfme/common';
 
 export const convertForPdfLayoutProps = ({
   schema,
@@ -70,3 +70,5 @@ export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
   if (alphaHex.length === 1) alphaHex = '0' + alphaHex;
   return hex + alphaHex;
 };
+
+export const isEditable = (mode: Mode) => mode === 'form' || mode === 'designer';

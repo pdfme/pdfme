@@ -17,7 +17,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
-import { addAlphaToHex } from '../renderUtils.js';
+import { addAlphaToHex, isEditable } from '../renderUtils.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -31,19 +31,10 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-const getBackgroundColor = (
-  mode: 'form' | 'viewer' | 'designer',
-  value: string,
-  schema: Schema,
-  defaultBackgroundColor: string
-) => {
-  if ((mode === 'form' || mode === 'designer') && value && schema.backgroundColor) {
-    return schema.backgroundColor as string;
-  } else if (mode === 'viewer') {
-    return (schema.backgroundColor as string) ?? 'transparent';
-  } else {
-    return defaultBackgroundColor;
-  }
+const getBackgroundColor = (value: string, schema: Schema, defaultBackgroundColor: string) => {
+  if (!value) return 'transparent';
+  if (schema.backgroundColor) return schema.backgroundColor as string;
+  return defaultBackgroundColor;
 };
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
@@ -89,12 +80,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(
-      mode,
-      value,
-      schema,
-      addAlphaToHex(theme.colorPrimaryBg, 30)
-    ),
+    backgroundColor: getBackgroundColor(value, schema, addAlphaToHex(theme.colorPrimaryBg, 30)),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
@@ -117,14 +103,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     wordBreak: 'break-word',
   };
 
-  if (mode === 'form' || mode === 'designer') {
+  if (isEditable(mode)) {
     const textarea = document.createElement('textarea');
     const textareaStyle: CSS.Properties = {
       padding: 0,
       resize: 'none',
       border: 'none',
       outline: 'none',
-      paddingTop: topAdjustment + 'px',
+      paddingTop: `${topAdjustment}px`,
       backgroundColor: 'transparent',
       width: '100%',
       height: '100%',
@@ -141,16 +127,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textarea.addEventListener('blur', () => stopEditing && stopEditing());
     textarea.value = value;
     container.appendChild(textarea);
-    if (mode === 'designer') {
-      textarea.setSelectionRange(value.length, value.length);
-      textarea.focus();
-    }
+    textarea.setSelectionRange(value.length, value.length);
+    textarea.focus();
   } else {
     const div = document.createElement('div');
     const divStyle: CSS.Properties = {
       ...fontStyles,
-      marginBottom: bottomAdjustment + 'px',
-      paddingTop: topAdjustment + 'px',
+      marginBottom: `${bottomAdjustment}px`,
+      paddingTop: `${topAdjustment}px`,
     };
     Object.assign(div.style, divStyle);
     div.innerHTML = value

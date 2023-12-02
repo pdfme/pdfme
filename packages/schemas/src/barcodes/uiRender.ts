@@ -2,7 +2,7 @@ import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
 import { validateBarcodeInput, createBarCode } from './helper.js';
-import { addAlphaToHex } from '../renderUtils.js';
+import { addAlphaToHex, isEditable } from '../renderUtils.js';
 
 const fullSize = { width: '100%', height: '100%' };
 
@@ -74,7 +74,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);
-  const editable = mode === 'form' || mode === 'designer';
+  const editable = isEditable(mode);
   if (editable) {
     const input = document.createElement('input');
     const inputStyle: CSS.Properties = {
@@ -101,10 +101,8 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
       stopEditing && stopEditing();
     });
     container.appendChild(input);
-    if (mode === 'designer') {
-      input.setSelectionRange(value.length, value.length);
-      input.focus();
-    }
+    input.setSelectionRange(value.length, value.length);
+    input.focus();
   }
 
   if (!value) return;

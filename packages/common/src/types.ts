@@ -30,12 +30,14 @@ export interface PDFRenderProps<T extends Schema> {
   _cache: Map<string, any>;
 }
 
+export type Mode = 'viewer' | 'form' | 'designer';
+
 /**
  * Type for properties used in UI rendering.
  *
  * @template T - Type of the extended Schema object.
  * @property {T} schema - Extended Schema object for rendering.
- * @property {'viewer' | 'form' | 'designer'} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
+ * @property {Mode} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
@@ -48,7 +50,7 @@ export interface PDFRenderProps<T extends Schema> {
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
-  mode: 'viewer' | 'form' | 'designer';
+  mode: Mode;
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;

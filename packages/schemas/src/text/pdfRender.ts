@@ -46,7 +46,7 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const embedAndGetFontObjCache = new WeakMap();
+const embedAndGetFontObjCache: WeakMap<PDFDocument, { [key: string]: PDFFont }> = new WeakMap();
 const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
   const { pdfDoc, font } = arg;
   if (embedAndGetFontObjCache.has(pdfDoc)) {
@@ -114,7 +114,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const fontName = (
     schema.fontName ? schema.fontName : getFallbackFontName(font)
   ) as keyof typeof pdfFontObj;
-  const pdfFontValue = pdfFontObj[fontName];
+  const pdfFontValue = pdfFontObj && pdfFontObj[fontName];
 
   const pageHeight = page.getHeight();
   const {
