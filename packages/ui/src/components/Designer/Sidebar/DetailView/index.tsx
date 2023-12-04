@@ -151,6 +151,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'number',
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
+        props: {
+          step: 0.1,
+        },
         max: 1,
         min: 0,
         span: 8,
