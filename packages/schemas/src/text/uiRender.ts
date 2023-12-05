@@ -59,6 +59,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     placeholder,
     options,
     theme,
+    _cache,
   } = arg;
   const font = options?.font || getDefaultFont();
 
@@ -69,10 +70,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       font,
       value,
       startingFontSize: dynamicFontSize,
+      _cache,
     });
   }
 
-  const fontKitFont = await getFontKitFont(schema, font);
+  const fontKitFont = await getFontKitFont(schema, font, _cache);
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(
