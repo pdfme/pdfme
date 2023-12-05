@@ -106,11 +106,13 @@ const getFallbackFont = (font: Font) => {
   return font[fallbackFontName];
 };
 
-const fontKitFontCache: { [fontName: string]: FontKitFont } = {};
-export const getFontKitFont = async (textSchema: Schema, font: Font) => {
-  const fontName = (textSchema.fontName as string) || getFallbackFontName(font);
-  if (fontKitFontCache[fontName]) {
-    return fontKitFontCache[fontName];
+const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
+
+export const getFontKitFont = async (textSchema: TextSchema, font: Font, _cache: Map<any, any>) => {
+  const fontName = textSchema.fontName || getFallbackFontName(font);
+  const cacheKey = getCacheKey(fontName);
+  if (_cache.has(cacheKey)) {
+    return _cache.get(cacheKey) as fontkit.Font;
   }
 
   const currentFont =
@@ -125,7 +127,7 @@ export const getFontKitFont = async (textSchema: Schema, font: Font) => {
   const fontKitFont = fontkit.create(
     fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer)
   );
-  fontKitFontCache[fontName] = fontKitFont;
+  _cache.set(cacheKey, fontKitFont);
 
   return fontKitFont;
 };
@@ -202,11 +204,13 @@ export const calculateDynamicFontSize = async ({
   font,
   value,
   startingFontSize,
+  _cache,
 }: {
   textSchema: TextSchema;
   font: Font;
   value: string;
   startingFontSize?: number | undefined;
+  _cache: Map<any, any>;
 }) => {
   const {
     fontSize: schemaFontSize,
@@ -221,7 +225,7 @@ export const calculateDynamicFontSize = async ({
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const fontKitFont = await getFontKitFont(textSchema, font);
+  const fontKitFont = await getFontKitFont(textSchema, font, _cache);
   const paragraphs = value.split('\n');
 
   let dynamicFontSize = fontSize;
