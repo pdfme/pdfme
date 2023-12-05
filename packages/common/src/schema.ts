@@ -51,12 +51,14 @@ export const Dict = z.object({
 
   'schemas.barcodes.barColor': z.string(),
 });
+export const Mode = z.enum(['viewer', 'form', 'designer']);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
 
 export const Schema = z
   .object({
     type: z.string(),
+    readOnly: z.boolean().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),

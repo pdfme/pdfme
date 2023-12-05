@@ -2,8 +2,23 @@ import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { ThemeConfig, GlobalToken } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
-// prettier-ignore
-import {Lang, Dict, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
+import {
+  Lang,
+  Dict,
+  Mode,
+  Size,
+  Schema,
+  Font,
+  SchemaForUI,
+  BasePdf,
+  Template,
+  GeneratorOptions,
+  GenerateProps,
+  UIOptions,
+  UIProps,
+  PreviewProps,
+  DesignerProps,
+} from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
@@ -29,8 +44,6 @@ export interface PDFRenderProps<T extends Schema> {
 
   _cache: Map<string, any>;
 }
-
-export type Mode = 'viewer' | 'form' | 'designer';
 
 /**
  * Type for properties used in UI rendering.
@@ -126,6 +139,7 @@ export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;
+export type Mode = z.infer<typeof Mode>;
 export type Size = z.infer<typeof Size>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;
