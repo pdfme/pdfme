@@ -6,7 +6,7 @@ import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n'
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
   schema: SchemaForUI;
   onChange: (value: string) => void;
@@ -51,6 +51,7 @@ const Renderer = (props: RendererProps) => {
   const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
+  const _cache = useRef<Map<any, any>>(new Map());
 
   useEffect(() => {
     if (ref.current && schema.type) {
@@ -81,6 +82,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         options,
         theme,
         i18n,
+        _cache: _cache.current,
       });
     }
     return () => {

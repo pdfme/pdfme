@@ -17,7 +17,7 @@ exports[`Designer snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -47,7 +47,7 @@ exports[`Designer snapshot 1`] = `
             
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-zcfrx9"
+            class="ant-typography css-dev-only-do-not-override-nllxry"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -56,7 +56,7 @@ exports[`Designer snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -96,7 +96,7 @@ exports[`Designer snapshot 1`] = `
     >
       <div>
         <button
-          class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-default ant-btn-icon-only"
+          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
           style="position: absolute; display: flex; align-items: center; justify-content: center; top: 1rem; right: 1rem; z-index: 100;"
           type="button"
         >
@@ -134,7 +134,7 @@ exports[`Designer snapshot 1`] = `
                 style="height: 40px; display: flex; align-items: center;"
               >
                 <span
-                  class="ant-typography css-dev-only-do-not-override-zcfrx9"
+                  class="ant-typography css-dev-only-do-not-override-nllxry"
                   style="text-align: center; width: 100%;"
                 >
                   <strong>
@@ -143,7 +143,7 @@ exports[`Designer snapshot 1`] = `
                 </span>
               </div>
               <div
-                class="ant-divider css-dev-only-do-not-override-zcfrx9 ant-divider-horizontal"
+                class="ant-divider css-dev-only-do-not-override-nllxry ant-divider-horizontal"
                 role="separator"
                 style="margin-top: 8px; margin-bottom: 8px;"
               />
@@ -163,7 +163,7 @@ exports[`Designer snapshot 1`] = `
                         style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
                       >
                         <button
-                          class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-default ant-btn-icon-only"
+                          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
                           style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                           type="button"
                         >
@@ -194,7 +194,7 @@ exports[`Designer snapshot 1`] = `
                           
                         </button>
                         <span
-                          class="ant-typography css-dev-only-do-not-override-zcfrx9"
+                          class="ant-typography css-dev-only-do-not-override-nllxry"
                           style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
@@ -209,7 +209,7 @@ exports[`Designer snapshot 1`] = `
                         style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
                       >
                         <button
-                          class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-default ant-btn-icon-only"
+                          class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-default ant-btn-icon-only"
                           style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                           type="button"
                         >
@@ -240,7 +240,7 @@ exports[`Designer snapshot 1`] = `
                           
                         </button>
                         <span
-                          class="ant-typography css-dev-only-do-not-override-zcfrx9"
+                          class="ant-typography css-dev-only-do-not-override-nllxry"
                           style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                           title="Edit"
                         >
@@ -271,7 +271,7 @@ exports[`Designer snapshot 1`] = `
                   style="display: flex; align-items: center; justify-content: flex-end; height: 40px; border-bottom: 1px solid rgba(5, 5, 5, 0.06);"
                 >
                   <button
-                    class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-text ant-btn-sm"
+                    class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-text ant-btn-sm"
                     type="button"
                   >
                     <u>
@@ -288,7 +288,7 @@ exports[`Designer snapshot 1`] = `
             style="position: absolute; bottom: 1.5rem; margin-top: 1rem; left: 50%; transform: translateX(-50%);"
           >
             <button
-              class="ant-btn css-dev-only-do-not-override-zcfrx9 ant-btn-primary"
+              class="ant-btn css-dev-only-do-not-override-nllxry ant-btn-primary"
               style="font-weight: 600;"
               type="button"
             >

@@ -18,7 +18,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
  * @property {PDFDocument} pdfDoc PDFDocument object from pdf-lib.
  * @property {PDFPage} page PDFPage object from pdf-lib.
  * @property {GeneratorOptions} options Options object passed from the generator.
- * @property {Map<string, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
+ * @property {Map<any, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
  */
 export interface PDFRenderProps<T extends Schema> {
   key: string;
@@ -29,7 +29,7 @@ export interface PDFRenderProps<T extends Schema> {
   page: PDFPage;
   options: GeneratorOptions;
 
-  _cache: Map<string, any>;
+  _cache: Map<any, any>;
 }
 
 /**
@@ -48,6 +48,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
+ * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
@@ -62,6 +63,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
+  _cache: Map<any, any>;
 };
 
 /**
