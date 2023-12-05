@@ -11,6 +11,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_OPACITY,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -101,6 +102,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
+    opacity: schema.opacity,
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
