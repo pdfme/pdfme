@@ -1,5 +1,12 @@
 import { PDFFont, PDFDocument, rgb } from '@pdfme/pdf-lib';
-import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
+import {
+  PDFRenderProps,
+  Font,
+  getDefaultFont,
+  getFallbackFontName,
+  mm2pt,
+  isHexValid,
+} from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import {
   VERTICAL_ALIGN_TOP,
@@ -38,6 +45,12 @@ const hex2rgb = (hex: string) => {
 
 const hex2RgbColor = (hexString: string | undefined) => {
   if (hexString) {
+    const isValid = isHexValid(hexString);
+
+    if (!isValid) {
+      throw new Error(`Invalid hex color value ${hexString}`);
+    }
+
     const [r, g, b] = hex2rgb(hexString);
 
     return rgb(r / 255, g / 255, b / 255);
