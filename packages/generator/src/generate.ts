@@ -40,7 +40,7 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        await render({ value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

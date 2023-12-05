@@ -69,6 +69,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       const editable = mode === 'form' || mode === 'designer';
 
       render({
+        key: schema.key,
         value: schema.data,
         schema,
         rootElement: ref.current,

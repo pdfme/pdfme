@@ -11,6 +11,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
 /**
  * Properties used for PDF rendering.
  * @template T Type of the extended Schema object.
+ * @property {string} key The key of the schema object.
  * @property {string} value The string used for PDF rendering.
  * @property {T} schema Extended Schema object for rendering.
  * @property {typeof import('@pdfme/pdf-lib')} pdfLib The pdf-lib library used for rendering.
@@ -20,6 +21,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
  * @property {Map<string, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
  */
 export interface PDFRenderProps<T extends Schema> {
+  key: string;
   value: string;
   schema: T;
   pdfLib: typeof import('@pdfme/pdf-lib');
@@ -39,6 +41,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
+ * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
  * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
@@ -52,6 +55,7 @@ export type UIRenderProps<T extends Schema> = {
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
+  key: string;
   value: string;
   onChange?: (value: string) => void;
   rootElement: HTMLDivElement;
