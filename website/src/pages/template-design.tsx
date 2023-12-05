@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import type { Template } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
-import type { Designer } from '@pdfme/ui';
+import { Designer } from '@pdfme/ui';
 import { text, image, barcodes } from '@pdfme/schemas';
 import Layout from '@theme/Layout';
 import {
@@ -33,6 +33,7 @@ const TemplateDesign = () => {
   const designer = useRef<Designer | null>(null);
   const [template, setTemplate] = useState<Template>(getSampleTemplate());
   const [smallDisplay, setSmallDisplay] = useState(true);
+  const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
   const modes = ['generator', 'designer', 'form', 'viewer'];
 
@@ -57,19 +58,17 @@ const TemplateDesign = () => {
     setSmallDisplay(window.innerWidth < 900);
   }, []);
 
-  useEffect(() => {
+  const buildDesigner = () => {
     if (designerRef.current) {
-      import('@pdfme/ui').then(({ Designer }) => {
-        designer.current = new Designer({
-          domContainer: designerRef.current,
-          template,
-          plugins: { text, image, qrcode: barcodes.qrcode },
-        });
-        designer.current.onSaveTemplate(downloadTemplate);
-        designer.current.onChangeTemplate(setTemplate);
-      })
+      designer.current = new Designer({
+        domContainer: designerRef.current,
+        template,
+        plugins: { text, image, qrcode: barcodes.qrcode },
+      });
+      designer.current.onSaveTemplate(downloadTemplate);
+      designer.current.onChangeTemplate(setTemplate);
     }
-  }, [designerRef]);
+  };
 
   const changeBasePdf = (file: File) => {
     if (designer.current) {
@@ -107,6 +106,14 @@ ${e}`);
     const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
     window.open(URL.createObjectURL(blob));
   };
+
+  if (designerRef.current && designerRef != prevDesignerRef) {
+    if (prevDesignerRef && designer.current) {
+      designer.current.destroy();
+    }
+    buildDesigner();
+    setPrevDesignerRef(designerRef);
+  }
 
   return (
     <Layout title="Template Design">
