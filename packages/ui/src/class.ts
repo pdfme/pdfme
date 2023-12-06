@@ -89,10 +89,10 @@ export abstract class BaseUIClass {
     this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
     this.options = options;
     this.size = {
-      height: this.domContainer!.clientHeight || window.innerHeight,
-      width: this.domContainer!.clientWidth || window.innerWidth,
+      height: this.domContainer.clientHeight || window.innerHeight,
+      width: this.domContainer.clientWidth || window.innerWidth,
     };
-    this.resizeObserver.observe(this.domContainer!);
+    this.resizeObserver.observe(this.domContainer);
 
     const { lang, font } = options;
     if (lang) {

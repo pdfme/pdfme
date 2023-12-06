@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
+import React, { useRef, useState, useContext, useCallback } from 'react';
 import {
   ZOOM,
   Template,
@@ -49,6 +49,7 @@ const TemplateEditor = ({
   const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
 
@@ -148,10 +149,6 @@ const TemplateEditor = ({
     }
   }, []);
 
-  useEffect(() => {
-    updateTemplate(template);
-  }, [template, updateTemplate]);
-
   const addSchema = () => {
     const propPanel = (Object.values(pluginsRegistry)[0] as Plugin<Schema>)?.propPanel;
 
@@ -182,6 +179,11 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   const onChangeHoveringSchemaId = (id: string | null) => {
     setHoveringSchemaId(id);
   };
+
+  if (prevTemplate !== template) {
+    setPrevTemplate(template);
+    void updateTemplate(template);
+  }
 
   const sizeExcSidebar = {
     width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
