@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect, useContext, useCallback, useMemo} from 'react';
+import React, { useRef, useState, useContext, useCallback } from 'react';
 import {
   ZOOM,
   Template,
