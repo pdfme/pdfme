@@ -146,8 +146,30 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         },
       },
-      fontColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
-      backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
+      fontColor: {
+        title: i18n('schemas.textColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            // Pattern to support hex color codes with alpha channel and shorthand hex color codes
+            pattern: '^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$',
+            message: 'Please enter a valid hex color code.',
+          },
+        ],
+      },
+      backgroundColor: {
+        title: i18n('schemas.bgColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            // Pattern to support hex color codes with alpha channel and shorthand hex color codes
+            pattern: '^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$',
+            message: 'Please enter a valid hex color code.',
+          },
+        ],
+      },
     };
 
     return textSchema;
