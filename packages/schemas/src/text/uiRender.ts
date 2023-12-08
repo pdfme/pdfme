@@ -132,18 +132,34 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   Object.assign(textBlock.style, textBlockStyle);
 
   if (mode === 'form' || mode === 'designer') {
-    textBlock.contentEditable = 'plaintext-only'
-    textBlock.tabIndex = tabIndex || 0
+    textBlock.contentEditable = 'plaintext-only';
+    textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
-    textBlock.addEventListener(
-      'blur',
-      (e: Event) => {
-        onChange && onChange((e.target as HTMLDivElement).innerText);
-        stopEditing && stopEditing();
-      }
-    );
+    textBlock.addEventListener('blur', (e: Event) => {
+      onChange && onChange((e.target as HTMLDivElement).innerText);
+      stopEditing && stopEditing();
+    });
+
+    textBlock.addEventListener('keypress', () => {
+      setTimeout(() => {
+        void (async () => {
+        const value = textBlock.textContent;
+        if (!schema.dynamicFontSize || !value) return;
+
+        const newFontSize = await calculateDynamicFontSize({
+          textSchema: schema,
+          font,
+          value,
+          startingFontSize: dynamicFontSize,
+          _cache,
+        });
+        textBlock.style.fontSize = `${newFontSize}pt`;
+      })()
+      }, 0);
+    });
+
     if (placeholder) {
-      textBlock.setAttribute('dataPlaceholder', placeholder);
+      textBlock.setAttribute('placeholder', placeholder);
       const placeholderStyle = document.createElement('style');
       placeholderStyle.textContent = `
         [contenteditable=true]:empty:before {
