@@ -12,7 +12,6 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
   PLACEHOLDER_FONT_COLOR,
-  DEFAULT_OPACITY,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -20,6 +19,7 @@ import {
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
 import { addAlphaToHex } from '../renderUtils.js';
+import { DEFAULT_OPACITY } from '../constants.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
