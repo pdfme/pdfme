@@ -20,4 +20,3 @@ export const DEFAULT_DYNAMIC_MIN_FONT_SIZE = 4;
 
 export const DEFAULT_DYNAMIC_MAX_FONT_SIZE = 72;
 export const FONT_SIZE_ADJUSTMENT = 0.25;
-export const DEFAULT_OPACITY = 1;
