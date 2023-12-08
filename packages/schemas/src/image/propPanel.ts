@@ -1,6 +1,6 @@
 import { PropPanel } from '@pdfme/common';
 import type { ImageSchema } from './types';
-import { DEFAULT_OPACITY } from '../image/constants';
+import { DEFAULT_OPACITY } from '../constants.js';
 
 export const propPanel: PropPanel<ImageSchema> = {
   schema: {},

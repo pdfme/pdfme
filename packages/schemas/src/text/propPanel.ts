@@ -23,8 +23,8 @@ import {
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
   ALIGN_RIGHT,
   ALIGN_CENTER,
-  DEFAULT_OPACITY,
 } from './constants.js';
+import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -152,8 +152,7 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'color',
         rules: [
           {
-            // Pattern to support hex color codes with alpha channel and shorthand hex color codes
-            pattern: '^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$',
+            pattern: HEX_COLOR_PATTERN,
             message: 'Please enter a valid hex color code.',
           },
         ],
@@ -164,8 +163,7 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'color',
         rules: [
           {
-            // Pattern to support hex color codes with alpha channel and shorthand hex color codes
-            pattern: '^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$',
+            pattern: HEX_COLOR_PATTERN,
             message: 'Please enter a valid hex color code.',
           },
         ],
