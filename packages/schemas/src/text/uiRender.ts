@@ -11,6 +11,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  PLACEHOLDER_FONT_COLOR,
   DEFAULT_OPACITY,
 } from './constants.js';
 import {
@@ -64,14 +65,15 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const font = options?.font || getDefaultFont();
 
   let dynamicFontSize: undefined | number = undefined;
+  const getCdfArg = (v: string) => ({
+    textSchema: schema,
+    font,
+    value: v,
+    startingFontSize: dynamicFontSize,
+    _cache,
+  });
   if (schema.dynamicFontSize && value) {
-    dynamicFontSize = await calculateDynamicFontSize({
-      textSchema: schema,
-      font,
-      value,
-      startingFontSize: dynamicFontSize,
-      _cache,
-    });
+    dynamicFontSize = await calculateDynamicFontSize(getCdfArg(value));
   }
 
   const fontKitFont = await getFontKitFont(schema, font, _cache);
@@ -143,32 +145,26 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textBlock.addEventListener('keypress', () => {
       setTimeout(() => {
         void (async () => {
-        const value = textBlock.textContent;
-        if (!schema.dynamicFontSize || !value) return;
-
-        const newFontSize = await calculateDynamicFontSize({
-          textSchema: schema,
-          font,
-          value,
-          startingFontSize: dynamicFontSize,
-          _cache,
-        });
-        textBlock.style.fontSize = `${newFontSize}pt`;
-      })()
+          if (!schema.dynamicFontSize || !textBlock.textContent) return;
+          const newFontSize = await calculateDynamicFontSize(getCdfArg(textBlock.textContent));
+          textBlock.style.fontSize = `${newFontSize}pt`;
+        })();
       }, 0);
     });
 
-    if (placeholder) {
-      textBlock.setAttribute('placeholder', placeholder);
-      const placeholderStyle = document.createElement('style');
-      placeholderStyle.textContent = `
-        [contenteditable=true]:empty:before {
-          content: attr(placeholder);
-          pointer-events: none;
-          display: block;
+    if (placeholder && !value) {
+      textBlock.innerText = placeholder;
+      textBlock.style.color = PLACEHOLDER_FONT_COLOR;
+      if (schema.dynamicFontSize) {
+        const fontSize = await calculateDynamicFontSize(getCdfArg(placeholder));
+        textBlock.style.fontSize = `${fontSize}pt`;
+      }
+      textBlock.addEventListener('focus', () => {
+        if (textBlock.innerText === placeholder) {
+          textBlock.innerText = '';
+          textBlock.style.color = schema.fontColor ?? DEFAULT_FONT_COLOR;
         }
-      `;
-      container.appendChild(placeholderStyle);
+      });
     }
 
     container.appendChild(textBlock);
