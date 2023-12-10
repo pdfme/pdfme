@@ -142,15 +142,26 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       stopEditing && stopEditing();
     });
 
-    textBlock.addEventListener('keypress', () => {
-      setTimeout(() => {
-        void (async () => {
-          if (!schema.dynamicFontSize || !textBlock.textContent) return;
-          const newFontSize = await calculateDynamicFontSize(getCdfArg(textBlock.textContent));
-          textBlock.style.fontSize = `${newFontSize}pt`;
-        })();
-      }, 0);
-    });
+    if (schema.dynamicFontSize) {
+      textBlock.addEventListener('keyup', () => {
+        setTimeout(() => {
+          void (async () => {
+            if (!textBlock.textContent) return;
+            dynamicFontSize = await calculateDynamicFontSize(getCdfArg(textBlock.textContent));
+            textBlock.style.fontSize = `${dynamicFontSize}pt`;
+
+            const { topAdj: newTopAdj, bottomAdj: newBottomAdj } = getBrowserVerticalFontAdjustments(
+                fontKitFont,
+                dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
+                schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+                schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+            );
+            textBlock.style.paddingTop = newTopAdj.toString() + 'px';
+            textBlock.style.marginBottom = newBottomAdj.toString() + 'px';
+          })();
+        }, 0);
+      });
+    }
 
     if (placeholder && !value) {
       textBlock.innerText = placeholder;
