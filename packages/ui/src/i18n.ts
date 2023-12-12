@@ -273,6 +273,52 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.barcodes.barColor': 'Kolor paska',
 };
 
+const dictDe: { [key in keyof Dict]: string } = {
+  cancel: 'Abbrechen',
+  field: 'Feld',
+  fieldName: 'Name',
+  align: 'Ausrichten',
+  width: 'Breite',
+  height: 'Höhe',
+  opacity: 'Opazität',
+  rotate: 'Drehen',
+  edit: 'Bearbeiten',
+  plsInputName: 'Bitte geben Sie einen Namen ein',
+  fieldMustUniq: 'Feldname ist nicht eindeutig',
+  notUniq: '(Nicht eindeutiger Name)',
+  noKeyName: 'Kein Name',
+  fieldsList: 'Feldliste',
+  addNewField: 'Neues Feld hinzufügen',
+  editField: 'Feld bearbeiten',
+  type: 'Typ',
+  errorOccurred: 'Ein Fehler ist aufgetreten',
+  errorBulkUpdateFieldName:
+    'Die Änderung kann nicht übernommen werden, weil die Anzahl der Elemente geändert wurde.',
+  commitBulkUpdateFieldName: 'Änderungen übernehmen',
+  bulkUpdateFieldName: 'Mehrfachaktualisierung der Feldnamen',
+  'schemas.textColor': 'Textfarbe',
+  'schemas.bgColor': 'Hintergrundfarbe',
+  'schemas.horizontal': 'Horizontal',
+  'schemas.vertical': 'Vertikal',
+  'schemas.left': 'Left',
+  'schemas.center': 'Zentrum',
+  'schemas.right': 'Rechts',
+  'schemas.top': 'Top',
+  'schemas.middle': 'Mitte',
+  'schemas.bottom': 'Unten',
+  'schemas.text.fontName': 'Schriftart',
+  'schemas.text.size': 'Größe',
+  'schemas.text.spacing': 'Abstand',
+  'schemas.text.textAlign': 'Ausrichtung',
+  'schemas.text.verticalAlign': 'vert. Ausr.',
+  'schemas.text.lineHeight': 'Zeilenhöhe',
+  'schemas.text.min': 'Min',
+  'schemas.text.max': 'Max',
+  'schemas.text.fit': 'Anpassen',
+  'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
+  'schemas.barcodes.barColor': 'Strichcodefarbe',
+};
+
 const dictionaries: { [key in Lang]: Dict } = {
   en: dictEn,
   ja: dictJa,
@@ -280,6 +326,7 @@ const dictionaries: { [key in Lang]: Dict } = {
   th: dictTh,
   it: dictIt,
   pl: dictPl,
+  de: dictDe,
 };
 
 export const getDict = (lang: Lang): Dict => dictionaries[lang] || dictionaries[DEFAULT_LANG];
