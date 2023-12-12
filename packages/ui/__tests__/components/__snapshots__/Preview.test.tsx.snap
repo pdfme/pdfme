@@ -112,12 +112,10 @@ exports[`Preview(as Form) snapshot 1`] = `
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
+                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; opacity: 1;"
                 >
-                  <textarea
-                    placeholder="bb"
-                    rows="1"
-                    style="padding: 3.436640625px 0px 0px 0px; resize: none; outline: none; background-color: transparent; width: 100%; height: 100%; font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word;"
+                  <div
+                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
                     tabindex="100"
                   />
                 </div>
@@ -269,10 +267,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
+                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; opacity: 1;"
                 >
                   <div
-                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; margin-bottom: 0px; padding-top: 3.436640625px;"
+                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
                   >
                     <span
                       style="letter-spacing:inherit;"

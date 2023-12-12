@@ -11,6 +11,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  PLACEHOLDER_FONT_COLOR,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -18,6 +19,7 @@ import {
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
 import { addAlphaToHex } from '../renderUtils.js';
+import { DEFAULT_OPACITY } from '../constants.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -63,14 +65,15 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const font = options?.font || getDefaultFont();
 
   let dynamicFontSize: undefined | number = undefined;
+  const getCdfArg = (v: string) => ({
+    textSchema: schema,
+    font,
+    value: v,
+    startingFontSize: dynamicFontSize,
+    _cache,
+  });
   if (schema.dynamicFontSize && value) {
-    dynamicFontSize = await calculateDynamicFontSize({
-      textSchema: schema,
-      font,
-      value,
-      startingFontSize: dynamicFontSize,
-      _cache,
-    });
+    dynamicFontSize = await calculateDynamicFontSize(getCdfArg(value));
   }
 
   const fontKitFont = await getFontKitFont(schema, font, _cache);
@@ -83,8 +86,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
   );
 
-  const topAdjustment = topAdj;
-  const bottomAdjustment = bottomAdj;
+  const topAdjustment = topAdj.toString();
+  const bottomAdjustment = bottomAdj.toString();
 
   const container = document.createElement('div');
 
@@ -103,13 +106,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
-    opacity: schema.opacity,
+    opacity: schema.opacity ?? DEFAULT_OPACITY,
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
   rootElement.appendChild(container);
 
-  const fontStyles: CSS.Properties = {
+  const textBlockStyle: CSS.Properties = {
+    // Font formatting styles
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
@@ -118,45 +122,77 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
+    // Block layout styles
+    resize: 'none',
+    border: 'none',
+    outline: 'none',
+    marginBottom: bottomAdjustment + 'px',
+    paddingTop: topAdjustment + 'px',
+    backgroundColor: 'transparent',
   };
+  const textBlock = document.createElement('div');
+  Object.assign(textBlock.style, textBlockStyle);
 
   if (mode === 'form' || mode === 'designer') {
-    const textarea = document.createElement('textarea');
-    const textareaStyle: CSS.Properties = {
-      padding: 0,
-      resize: 'none',
-      border: 'none',
-      outline: 'none',
-      paddingTop: topAdjustment + 'px',
-      backgroundColor: 'transparent',
-      width: '100%',
-      height: '100%',
-    };
-    Object.assign(textarea.style, textareaStyle, fontStyles);
-    textarea.rows = 1;
-    textarea.placeholder = placeholder || '';
-    textarea.tabIndex = tabIndex || 0;
+    textBlock.contentEditable = 'plaintext-only';
+    textBlock.tabIndex = tabIndex || 0;
+    textBlock.innerText = value;
+    textBlock.addEventListener('blur', (e: Event) => {
+      onChange && onChange((e.target as HTMLDivElement).innerText);
+      stopEditing && stopEditing();
+    });
 
-    textarea.addEventListener(
-      'change',
-      (e: Event) => onChange && onChange((e.target as HTMLTextAreaElement).value)
-    );
-    textarea.addEventListener('blur', () => stopEditing && stopEditing());
-    textarea.value = value;
-    container.appendChild(textarea);
+    if (schema.dynamicFontSize) {
+      textBlock.addEventListener('keyup', () => {
+        setTimeout(() => {
+          void (async () => {
+            if (!textBlock.textContent) return;
+            dynamicFontSize = await calculateDynamicFontSize(getCdfArg(textBlock.textContent));
+            textBlock.style.fontSize = `${dynamicFontSize}pt`;
+
+            const { topAdj: newTopAdj, bottomAdj: newBottomAdj } = getBrowserVerticalFontAdjustments(
+                fontKitFont,
+                dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
+                schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+                schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+            );
+            textBlock.style.paddingTop = newTopAdj.toString() + 'px';
+            textBlock.style.marginBottom = newBottomAdj.toString() + 'px';
+          })();
+        }, 0);
+      });
+    }
+
+    if (placeholder && !value) {
+      textBlock.innerText = placeholder;
+      textBlock.style.color = PLACEHOLDER_FONT_COLOR;
+      if (schema.dynamicFontSize) {
+        const fontSize = await calculateDynamicFontSize(getCdfArg(placeholder));
+        textBlock.style.fontSize = `${fontSize}pt`;
+      }
+      textBlock.addEventListener('focus', () => {
+        if (textBlock.innerText === placeholder) {
+          textBlock.innerText = '';
+          textBlock.style.color = schema.fontColor ?? DEFAULT_FONT_COLOR;
+        }
+      });
+    }
+
+    container.appendChild(textBlock);
+
     if (mode === 'designer') {
-      textarea.setSelectionRange(value.length, value.length);
-      textarea.focus();
+      textBlock.focus();
+
+      // Set the focus to the end of the editable element when you focus, as we would for a textarea
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(textBlock);
+      range.collapse(false); // Collapse range to the end
+      selection?.removeAllRanges();
+      selection?.addRange(range);
     }
   } else {
-    const div = document.createElement('div');
-    const divStyle: CSS.Properties = {
-      ...fontStyles,
-      marginBottom: bottomAdjustment + 'px',
-      paddingTop: topAdjustment + 'px',
-    };
-    Object.assign(div.style, divStyle);
-    div.innerHTML = value
+    textBlock.innerHTML = value
       .split('')
       .map(
         (l: string, i: number) =>
@@ -166,6 +202,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       )
       .join('');
 
-    container.appendChild(div);
+    container.appendChild(textBlock);
   }
 };
