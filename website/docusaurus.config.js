@@ -141,6 +141,10 @@ const config = {
               label: 'Getting Started',
               to: '/docs/getting-started',
             },
+            {
+              label: 'Supported Features',
+              to: '/docs/supported-features',
+            },
           ],
         },
         {
@@ -153,6 +157,10 @@ const config = {
             {
               label: 'Template Design',
               to: '/template-design',
+            },
+            {
+              label: 'Blog',
+              to: '/blog',
             },
           ],
         },
