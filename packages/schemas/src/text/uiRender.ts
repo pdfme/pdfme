@@ -150,12 +150,13 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
             dynamicFontSize = await calculateDynamicFontSize(getCdfArg(textBlock.textContent));
             textBlock.style.fontSize = `${dynamicFontSize}pt`;
 
-            const { topAdj: newTopAdj, bottomAdj: newBottomAdj } = getBrowserVerticalFontAdjustments(
+            const { topAdj: newTopAdj, bottomAdj: newBottomAdj } =
+              getBrowserVerticalFontAdjustments(
                 fontKitFont,
                 dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
                 schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
                 schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
-            );
+              );
             textBlock.style.paddingTop = newTopAdj.toString() + 'px';
             textBlock.style.marginBottom = newBottomAdj.toString() + 'px';
           })();

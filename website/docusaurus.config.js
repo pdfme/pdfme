@@ -22,10 +22,15 @@ const config = {
     [
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
+      {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/pdfme/pdfme/tree/main/website/',
+        },
+        blog: {
+          postsPerPage: 'ALL',
+          blogSidebarTitle: 'All posts',
+          blogSidebarCount: 'ALL',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -33,7 +38,7 @@ const config = {
         gtag: {
           trackingID: 'G-1Z2MZW44WP',
         },
-      }),
+      },
     ],
   ],
   plugins: [
@@ -108,6 +113,11 @@ const config = {
           to: '/template-design',
           position: 'right',
           label: 'Template Design',
+        },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'right'
         },
         {
           href: 'https://github.com/pdfme/pdfme',
