@@ -6,16 +6,14 @@
         "position": { "x": 32.97, "y": 22.57 },
         "width": 43.38,
         "height": 6.38,
-        "fontSize": 13,
-        "fontColor": "#6a6a6a"
+        "fontSize": 13
       },
       "Due": {
         "type": "text",
         "position": { "x": 32.97, "y": 29.07 },
         "width": 43.38,
         "height": 6.11,
-        "fontSize": 12,
-        "fontColor": "#6a6a6a"
+        "fontSize": 12
       },
       "InvoiceTo": {
         "type": "text",
@@ -23,8 +21,7 @@
         "width": 82.12,
         "height": 28.34,
         "fontSize": 12,
-        "lineHeight": 1.25,
-        "fontColor": "#6a6a6a"
+        "lineHeight": 1.25
       },
       "Company": {
         "type": "text",
@@ -33,8 +30,7 @@
         "height": 28.34,
         "fontSize": 12,
         "lineHeight": 1.25,
-        "alignment": "right",
-        "fontColor": "#6a6a6a"
+        "alignment": "right"
       },
       "Description1": {
         "type": "text",
@@ -42,8 +38,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price1": {
         "type": "text",
@@ -51,8 +46,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description2": {
         "type": "text",
@@ -60,8 +54,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price2": {
         "type": "text",
@@ -69,8 +62,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description3": {
         "type": "text",
@@ -78,8 +70,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price3": {
         "type": "text",
@@ -87,8 +78,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description4": {
         "type": "text",
@@ -96,8 +86,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price4": {
         "type": "text",
@@ -105,8 +94,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description5": {
         "type": "text",
@@ -114,8 +102,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price5": {
         "type": "text",
@@ -123,8 +110,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description6": {
         "type": "text",
@@ -132,8 +118,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price6": {
         "type": "text",
@@ -141,8 +126,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Description7": {
         "type": "text",
@@ -150,8 +134,7 @@
         "width": 116.91,
         "height": 8.74,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Price7": {
         "type": "text",
@@ -159,8 +142,7 @@
         "width": 46.53,
         "height": 8.73,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Subtotal": {
         "type": "text",
@@ -168,8 +150,7 @@
         "width": 44.41,
         "height": 6,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "TaxRate": {
         "type": "text",
@@ -177,8 +158,7 @@
         "width": 10.54,
         "height": 5.99,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Tax": {
         "type": "text",
@@ -186,8 +166,7 @@
         "width": 44.41,
         "height": 6,
         "fontSize": 14,
-        "alignment": "center",
-        "fontColor": "#595959"
+        "alignment": "center"
       },
       "Total": {
         "type": "text",
@@ -195,8 +174,7 @@
         "width": 44.41,
         "height": 6,
         "fontSize": 16,
-        "alignment": "center",
-        "fontColor": "#0c0c0c"
+        "alignment": "center"
       },
       "PaymentMethod": {
         "type": "text",
@@ -206,8 +184,7 @@
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1,
-        "fontColor": "#3b3b3b"
+        "lineHeight": 1
       },
       "Note": {
         "type": "text",
@@ -217,8 +194,7 @@
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1,
-        "fontColor": "#3b3b3b"
+        "lineHeight": 1
       },
       "Date": {
         "type": "text",
@@ -226,8 +202,7 @@
         "width": 35.97,
         "height": 5.31,
         "fontSize": 12,
-        "alignment": "center",
-        "fontColor": "#3b3b3b"
+        "alignment": "center"
       }
     }
   ],
