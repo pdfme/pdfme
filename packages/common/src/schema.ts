@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it'] as const;
+const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it', 'de'] as const;
 
 export const Lang = z.enum(langs);
 export const Dict = z.object({

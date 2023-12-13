@@ -121,6 +121,7 @@ function App() {
           <option value="th">Thai</option>
           <option value="pl">Polish</option>
           <option value="it">Italian</option>
+          <option value="de">German</option>
         </select>
         <span style={{ margin: "0 1rem" }}>/</span>
         <label style={{ width: 180 }}>
