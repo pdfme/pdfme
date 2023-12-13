@@ -28,8 +28,6 @@ const config = {
           editUrl: 'https://github.com/pdfme/pdfme/tree/main/website/',
         },
         blog: {
-          blogTitle: 'pdfme blog!',
-          blogDescription: 'A pdfme powered blog!',
           postsPerPage: 'ALL',
           blogSidebarTitle: 'All posts',
           blogSidebarCount: 'ALL',
@@ -103,20 +101,24 @@ const config = {
         {
           type: 'doc',
           docId: 'getting-started',
-          position: 'left',
+          position: 'right',
           label: 'Docs',
         },
         {
           to: '/demo',
-          position: 'left',
+          position: 'right',
           label: 'Demo Apps',
         },
         {
           to: '/template-design',
-          position: 'left',
+          position: 'right',
           label: 'Template Design',
         },
-        { to: '/blog', label: 'Blog', position: 'left' },
+        {
+          to: '/blog',
+          label: 'Blog',
+          position: 'right'
+        },
         {
           href: 'https://github.com/pdfme/pdfme',
           label: 'GitHub',
