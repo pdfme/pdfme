@@ -77,7 +77,7 @@ const DetailView = (
     for (let key in newSchema) {
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
-        const value = newSchema[key] || undefined;
+        const value = newSchema[key];
 
         // [position] Return the flattened position to its original form.
         if (key === 'x') key = 'position.x';
@@ -138,6 +138,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
+        min: 0,
       },
       height: {
         title: i18n('height'),
@@ -145,6 +146,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
+        min: 0,
       },
       opacity: {
         title: i18n('opacity'),
