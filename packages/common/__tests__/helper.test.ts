@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { mm2pt, pt2mm, pt2px, checkFont, checkPlugins } from '../src/helper';
+import { mm2pt, pt2mm, pt2px, checkFont, checkPlugins, isHexValid } from '../src/helper';
 import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -56,6 +56,25 @@ describe('pt2px test', () => {
     expect(pt2px(2.8346)).toEqual(3.7785218);
     expect(pt2px(10)).toEqual(13.33);
     expect(pt2px(5322.98)).toEqual(7095.532339999999);
+  });
+});
+
+describe('isHexValid test', () => {
+  test('valid hex', () => {
+    expect(isHexValid('#fff')).toEqual(true);
+    expect(isHexValid('#ffffff')).toEqual(true);
+    expect(isHexValid('#ffffff00')).toEqual(true);
+    expect(isHexValid('#ffffff00')).toEqual(true);
+  });
+
+  test('invalid hex', () => {
+    expect(isHexValid('#ff')).toEqual(false);
+    expect(isHexValid('#fffff')).toEqual(false);
+    expect(isHexValid('#ffffff000')).toEqual(false);
+    expect(isHexValid('#ffffff0000')).toEqual(false);
+    expect(isHexValid('#ffffff00000')).toEqual(false);
+    expect(isHexValid('#ffffff000000')).toEqual(false);
+    expect(isHexValid('#pdfme123')).toEqual(false);
   });
 });
 

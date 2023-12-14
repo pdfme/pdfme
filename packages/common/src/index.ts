@@ -47,6 +47,7 @@ import {
   mm2pt,
   pt2mm,
   pt2px,
+  isHexValid,
 } from './helper.js';
 
 export {
@@ -63,6 +64,7 @@ export {
   mm2pt,
   pt2mm,
   pt2px,
+  isHexValid,
   checkFont,
   checkInputs,
   checkUIOptions,

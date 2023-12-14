@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
@@ -18,8 +18,9 @@ function App() {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [lang, setLang] = useState<Lang>('en');
+  const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
-  useEffect(() => {
+  const buildDesigner = () => {
     let template: Template = getTemplate();
     try {
       const templateString = localStorage.getItem("template");
@@ -55,12 +56,7 @@ function App() {
         designer.current.onSaveTemplate(onSaveTemplate);
       }
     });
-    return () => {
-      if (designer.current) {
-        designer.current.destroy();
-      }
-    };
-  }, [designerRef]);
+  }
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target && e.target.files) {
@@ -100,6 +96,14 @@ function App() {
     }
   };
 
+  if (designerRef != prevDesignerRef) {
+    if (prevDesignerRef && designer.current) {
+      designer.current.destroy();
+    }
+    buildDesigner();
+    setPrevDesignerRef(designerRef);
+  }
+
   return (
     <div>
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginRight: 120, }}>
@@ -117,6 +121,7 @@ function App() {
           <option value="th">Thai</option>
           <option value="pl">Polish</option>
           <option value="it">Italian</option>
+          <option value="de">German</option>
         </select>
         <span style={{ margin: "0 1rem" }}>/</span>
         <label style={{ width: 180 }}>

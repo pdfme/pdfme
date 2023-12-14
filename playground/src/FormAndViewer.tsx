@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Template, checkTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
@@ -32,12 +32,14 @@ const initTemplate = () => {
 function App() {
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
+  const [prevUiRef, setPrevUiRef] = useState<Form | Viewer | null>(null);
+
 
   const [mode, setMode] = useState<Mode>(
     (localStorage.getItem("mode") as Mode) ?? "form"
   );
 
-  useEffect(() => {
+  const buildUi = () => {
     const template = initTemplate();
     let inputs = template.sampledata ?? [{}];
     try {
@@ -69,13 +71,7 @@ function App() {
         });
       }
     });
-
-    return () => {
-      if (ui.current) {
-        ui.current.destroy();
-      }
-    };
-  }, [uiRef, mode]);
+  };
 
   const onChangeMode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value as Mode;
@@ -119,6 +115,14 @@ function App() {
       ui.current.setInputs(template.sampledata ?? [{}]);
     }
   };
+
+  if (uiRef != prevUiRef) {
+    if (prevUiRef && ui.current) {
+      ui.current.destroy();
+    }
+    buildUi();
+    setPrevUiRef(uiRef);
+  }
 
   return (
     <div>

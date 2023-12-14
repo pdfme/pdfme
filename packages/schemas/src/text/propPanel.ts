@@ -23,8 +23,8 @@ import {
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
   ALIGN_RIGHT,
   ALIGN_CENTER,
-  DEFAULT_OPACITY,
 } from './constants.js';
+import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -146,8 +146,28 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         },
       },
-      fontColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
-      backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
+      fontColor: {
+        title: i18n('schemas.textColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: 'Please enter a valid hex color code.',
+          },
+        ],
+      },
+      backgroundColor: {
+        title: i18n('schemas.bgColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: 'Please enter a valid hex color code.',
+          },
+        ],
+      },
     };
 
     return textSchema;

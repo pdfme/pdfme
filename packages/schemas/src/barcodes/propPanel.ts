@@ -1,6 +1,7 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
-import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR, DEFAULT_OPACITY } from './constants.js';
+import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR } from './constants.js';
+import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 
 const defaultColors = {
   backgroundColor: DEFAULT_BARCODE_BG_COLOR,
@@ -158,8 +159,28 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
   return {
     schema: ({ i18n }) => {
       return {
-        barColor: { title: i18n('schemas.barcodes.barColor'), type: 'string', widget: 'color' },
-        backgroundColor: { title: i18n('schemas.bgColor'), type: 'string', widget: 'color' },
+        barColor: {
+          title: i18n('schemas.barcodes.barColor'),
+          type: 'string',
+          widget: 'color',
+          rules: [
+            {
+              pattern: HEX_COLOR_PATTERN,
+              message: 'Please enter a valid hex color code.',
+            },
+          ],
+        },
+        backgroundColor: {
+          title: i18n('schemas.bgColor'),
+          type: 'string',
+          widget: 'color',
+          rules: [
+            {
+              pattern: HEX_COLOR_PATTERN,
+              message: 'Please enter a valid hex color code.',
+            },
+          ],
+        },
         ...(barcodeHasText
           ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
           : {}),

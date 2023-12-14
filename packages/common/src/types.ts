@@ -26,15 +26,17 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
 /**
  * Properties used for PDF rendering.
  * @template T Type of the extended Schema object.
+ * @property {string} key The key of the schema object.
  * @property {string} value The string used for PDF rendering.
  * @property {T} schema Extended Schema object for rendering.
  * @property {typeof import('@pdfme/pdf-lib')} pdfLib The pdf-lib library used for rendering.
  * @property {PDFDocument} pdfDoc PDFDocument object from pdf-lib.
  * @property {PDFPage} page PDFPage object from pdf-lib.
  * @property {GeneratorOptions} options Options object passed from the generator.
- * @property {Map<string, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
+ * @property {Map<any, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
  */
 export interface PDFRenderProps<T extends Schema> {
+  key: string;
   value: string;
   schema: T;
   pdfLib: typeof import('@pdfme/pdf-lib');
@@ -42,7 +44,7 @@ export interface PDFRenderProps<T extends Schema> {
   page: PDFPage;
   options: GeneratorOptions;
 
-  _cache: Map<string, any>;
+  _cache: Map<any, any>;
 }
 
 /**
@@ -54,12 +56,14 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
+ * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
  * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
+ * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
@@ -67,12 +71,14 @@ export type UIRenderProps<T extends Schema> = {
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
+  key: string;
   value: string;
   onChange?: (value: string) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
+  _cache: Map<any, any>;
 };
 
 /**

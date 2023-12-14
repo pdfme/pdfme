@@ -1,5 +1,12 @@
 import { PDFFont, PDFDocument, rgb } from '@pdfme/pdf-lib';
-import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
+import {
+  PDFRenderProps,
+  Font,
+  getDefaultFont,
+  getFallbackFontName,
+  mm2pt,
+  isHexValid,
+} from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import {
   VERTICAL_ALIGN_TOP,
@@ -38,6 +45,12 @@ const hex2rgb = (hex: string) => {
 
 const hex2RgbColor = (hexString: string | undefined) => {
   if (hexString) {
+    const isValid = isHexValid(hexString);
+
+    if (!isValid) {
+      throw new Error(`Invalid hex color value ${hexString}`);
+    }
+
     const [r, g, b] = hex2rgb(hexString);
 
     return rgb(r / 255, g / 255, b / 255);
@@ -46,11 +59,14 @@ const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-const embedAndGetFontObjCache: WeakMap<PDFDocument, { [key: string]: PDFFont }> = new WeakMap();
-const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
-  const { pdfDoc, font } = arg;
-  if (embedAndGetFontObjCache.has(pdfDoc)) {
-    return embedAndGetFontObjCache.get(pdfDoc);
+const embedAndGetFontObj = async (arg: {
+  pdfDoc: PDFDocument;
+  font: Font;
+  _cache: Map<any, any>;
+}) => {
+  const { pdfDoc, font, _cache } = arg;
+  if (_cache.has(pdfDoc)) {
+    return _cache.get(pdfDoc) as { [key: string]: PDFFont };
   }
 
   const fontValues = await Promise.all(
@@ -70,7 +86,7 @@ const embedAndGetFontObj = async (arg: { pdfDoc: PDFDocument; font: Font }) => {
     {} as { [key: string]: PDFFont }
   );
 
-  embedAndGetFontObjCache.set(pdfDoc, fontObj);
+  _cache.set(pdfDoc, fontObj);
   return fontObj;
 };
 
@@ -78,13 +94,15 @@ const getFontProp = async ({
   value,
   font,
   schema,
+  _cache,
 }: {
   value: string;
   font: Font;
   schema: TextSchema;
+  _cache: Map<any, any>;
 }) => {
   const fontSize = schema.dynamicFontSize
-    ? await calculateDynamicFontSize({ textSchema: schema, font, value })
+    ? await calculateDynamicFontSize({ textSchema: schema, font, value, _cache })
     : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2RgbColor(schema.fontColor || DEFAULT_FONT_COLOR);
 
@@ -99,14 +117,14 @@ const getFontProp = async ({
 };
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
-  const { value, pdfDoc, pdfLib, page, options, schema } = arg;
+  const { value, pdfDoc, pdfLib, page, options, schema, _cache } = arg;
 
   const { font = getDefaultFont() } = options;
 
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
-    embedAndGetFontObj({ pdfDoc, font }),
-    getFontKitFont(schema, font),
-    getFontProp({ value, font, schema }),
+    embedAndGetFontObj({ pdfDoc, font, _cache }),
+    getFontKitFont(schema, font, _cache),
+    getFontProp({ value, font, schema, _cache }),
   ]);
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
@@ -126,7 +144,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
   if (schema.backgroundColor) {
-    const color = hex2RgbColor(schema.backgroundColor as string);
+    const color = hex2RgbColor(schema.backgroundColor);
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 
