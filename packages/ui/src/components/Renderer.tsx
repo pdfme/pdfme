@@ -29,7 +29,7 @@ const Wrapper = ({
     id={schema.id}
     style={{
       position: 'absolute',
-      cursor: 'pointer',
+      cursor: schema.readOnly ? 'initial' : 'pointer',
       height: schema.height * ZOOM,
       width: schema.width * ZOOM,
       top: schema.position.y * ZOOM,

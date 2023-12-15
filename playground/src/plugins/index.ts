@@ -1,7 +1,9 @@
-import { signature } from './signature'
+import { signature } from './signature';
+import { line } from './line';
 
 const plugins = {
-    signature
-}
+  signature,
+  line,
+};
 
-export default plugins
+export default plugins;

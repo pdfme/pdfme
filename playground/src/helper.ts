@@ -98,6 +98,7 @@ export const getPlugins = () => {
   return {
     Text: text,
     Signature: plugins.signature,
+    Line: plugins.line,
     QR: barcodes.qrcode,
     Image: image,
   };
