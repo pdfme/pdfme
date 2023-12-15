@@ -77,7 +77,8 @@ const DetailView = (
     for (let key in newSchema) {
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
-        const value = newSchema[key];
+        let value = newSchema[key];
+        if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
         // [position] Return the flattened position to its original form.
         if (key === 'x') key = 'position.x';
