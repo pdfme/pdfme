@@ -309,6 +309,46 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
+export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
+  const { schemas, columns, sampledata } = template;
+
+  const flatSchemaLength = schemas
+    .map((schema) => Object.keys(schema).length)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  const needColumns = !columns || flatSchemaLength !== columns.length;
+
+  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
+
+  // columns
+  if (needColumns) {
+    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
+  }
+
+  // sampledata
+  if (needSampledata) {
+    template.sampledata = [
+      schemas.reduce(
+        (acc, cur) =>
+          Object.assign(
+            acc,
+            Object.keys(cur).reduce((a, c) => {
+              const { readOnly } = cur[c];
+              if (readOnly) {
+                return a;
+              }
+              return Object.assign(a, { [c]: '' });
+            }, {} as { [key: string]: string })
+          ),
+        {} as { [key: string]: string }
+      ),
+    ];
+  }
+
+  console.log(template);
+  return template;
+};
+
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
   const schemaAddedTemplate: Template = {
     ...template,
@@ -333,6 +373,9 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
     sampledata: [
       cloneDeep(schemasList).reduce((acc, cur) => {
         cur.forEach((c) => {
+          if (c.readOnly) {
+            return;
+          }
           acc[c.key] = c.data;
         });
 
