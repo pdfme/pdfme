@@ -42,9 +42,10 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
   const container = document.createElement('div');
+  const backgroundStyle = placeholder ? `url(${placeholder})` : 'none';
   const containerStyle: CSS.Properties = {
     ...fullSize,
-    backgroundImage: value ? 'none' : `url(${placeholder})`,
+    backgroundImage: value ? 'none' : backgroundStyle,
     backgroundSize: `${size.width}px ${size.height}px`,
     opacity: schema.opacity,
   };

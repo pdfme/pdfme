@@ -52,6 +52,8 @@ const generateColumnsAndSampledataIfNeeded = (template: Template) => {
     ];
   }
 
+  // TODO ここにreadOnlyのものは必要ない
+
   return template;
 };
 
