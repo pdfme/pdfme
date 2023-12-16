@@ -162,7 +162,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   };
 
   let lines: string[] = [];
-  value.split(/\r|\n|\r\n/g).forEach((line: string) => {
+  value.split(/\r\n|\r|\n/g).forEach((line: string) => {
     lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
   });
 
