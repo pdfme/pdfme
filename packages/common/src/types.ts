@@ -2,8 +2,23 @@ import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
 import type { ThemeConfig, GlobalToken } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
-// prettier-ignore
-import {Lang, Dict, Size, Schema, Font, SchemaForUI, BasePdf, Template, GeneratorOptions, GenerateProps, UIOptions, UIProps, PreviewProps, DesignerProps} from './schema.js';
+import {
+  Lang,
+  Dict,
+  Mode,
+  Size,
+  Schema,
+  Font,
+  SchemaForUI,
+  BasePdf,
+  Template,
+  GeneratorOptions,
+  GenerateProps,
+  UIOptions,
+  UIProps,
+  PreviewProps,
+  DesignerProps,
+} from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
@@ -37,7 +52,7 @@ export interface PDFRenderProps<T extends Schema> {
  *
  * @template T - Type of the extended Schema object.
  * @property {T} schema - Extended Schema object for rendering.
- * @property {'viewer' | 'form' | 'designer'} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
+ * @property {Mode} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
@@ -52,7 +67,7 @@ export interface PDFRenderProps<T extends Schema> {
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
-  mode: 'viewer' | 'form' | 'designer';
+  mode: Mode;
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
@@ -121,8 +136,8 @@ export interface PropPanel<T extends Schema> {
  * @property {PropPanel} propPanel Object for defining the property panel.
  */
 export type Plugin<T extends Schema & { [key: string]: any }> = {
-  pdf: (arg: PDFRenderProps<T>) => Promise<void>;
-  ui: (arg: UIRenderProps<T>) => Promise<void>;
+  pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
+  ui: (arg: UIRenderProps<T>) => Promise<void> | void;
   propPanel: PropPanel<T>;
 };
 
@@ -130,6 +145,7 @@ export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;
+export type Mode = z.infer<typeof Mode>;
 export type Size = z.infer<typeof Size>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;

@@ -1,5 +1,5 @@
-import { degrees, degreesToRadians } from '@pdfme/pdf-lib';
-import { Schema, mm2pt } from '@pdfme/common';
+import { degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
+import { Schema, mm2pt, Mode, isHexValid } from '@pdfme/common';
 
 export const convertForPdfLayoutProps = ({
   schema,
@@ -70,4 +70,36 @@ export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
   let alphaHex = alphaValue.toString(16);
   if (alphaHex.length === 1) alphaHex = '0' + alphaHex;
   return hex + alphaHex;
+};
+
+export const isEditable = (mode: Mode) => mode === 'form' || mode === 'designer';
+
+const hex2rgb = (hex: string) => {
+  if (hex.slice(0, 1) === '#') hex = hex.slice(1);
+  if (hex.length === 3)
+    hex =
+      hex.slice(0, 1) +
+      hex.slice(0, 1) +
+      hex.slice(1, 2) +
+      hex.slice(1, 2) +
+      hex.slice(2, 3) +
+      hex.slice(2, 3);
+
+  return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((str) => parseInt(str, 16));
+};
+
+export const hex2RgbColor = (hexString: string | undefined) => {
+  if (hexString) {
+    const isValid = isHexValid(hexString);
+
+    if (!isValid) {
+      throw new Error(`Invalid hex color value ${hexString}`);
+    }
+
+    const [r, g, b] = hex2rgb(hexString);
+
+    return rgb(r / 255, g / 255, b / 255);
+  }
+
+  return undefined;
 };

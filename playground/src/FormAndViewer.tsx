@@ -39,7 +39,7 @@ function App() {
     (localStorage.getItem("mode") as Mode) ?? "form"
   );
 
-  const buildUi = () => {
+  const buildUi = (mode: Mode) => {
     const template = initTemplate();
     let inputs = template.sampledata ?? [{}];
     try {
@@ -77,6 +77,7 @@ function App() {
     const value = e.target.value as Mode;
     setMode(value);
     localStorage.setItem("mode", value);
+    buildUi(value);
   };
 
   const onGetInputs = () => {
@@ -120,7 +121,7 @@ function App() {
     if (prevUiRef && ui.current) {
       ui.current.destroy();
     }
-    buildUi();
+    buildUi(mode);
     setPrevUiRef(uiRef);
   }
 

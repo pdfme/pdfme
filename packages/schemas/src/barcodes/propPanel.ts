@@ -157,35 +157,33 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
   if (!defaults) throw new Error(`[@pdfme/schemas] No default for barcode type ${barcodeType}`);
 
   return {
-    schema: ({ i18n }) => {
-      return {
-        barColor: {
-          title: i18n('schemas.barcodes.barColor'),
-          type: 'string',
-          widget: 'color',
-          rules: [
-            {
-              pattern: HEX_COLOR_PATTERN,
-              message: 'Please enter a valid hex color code.',
-            },
-          ],
-        },
-        backgroundColor: {
-          title: i18n('schemas.bgColor'),
-          type: 'string',
-          widget: 'color',
-          rules: [
-            {
-              pattern: HEX_COLOR_PATTERN,
-              message: 'Please enter a valid hex color code.',
-            },
-          ],
-        },
-        ...(barcodeHasText
-          ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
-          : {}),
-      };
-    },
+    schema: ({ i18n }) => ({
+      barColor: {
+        title: i18n('schemas.barcodes.barColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: i18n('hexColorPrompt'),
+          },
+        ],
+      },
+      backgroundColor: {
+        title: i18n('schemas.bgColor'),
+        type: 'string',
+        widget: 'color',
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: i18n('hexColorPrompt'),
+          },
+        ],
+      },
+      ...(barcodeHasText
+        ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
+        : {}),
+    }),
     ...defaults,
   };
 };

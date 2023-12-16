@@ -31,7 +31,7 @@ const generate = async (props: GenerateProps) => {
         const schema = schemaObj[key];
         const value = inputObj[key];
 
-        if (!schema || !value) {
+        if (!schema) {
           continue;
         }
 

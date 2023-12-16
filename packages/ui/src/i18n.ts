@@ -24,6 +24,7 @@ const dictEn: { [key in keyof Dict]: string } = {
     'Cannot commit the change because the number of items has been changed.',
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
+  hexColorPrompt: 'Please enter a valid hex color code.',
   'schemas.textColor': 'Text Color',
   'schemas.bgColor': 'Background Color',
   'schemas.horizontal': 'Horizontal',
@@ -45,6 +46,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Fit',
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.barcodes.barColor': 'Bar Color',
+  'schemas.line.color': 'Color',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -69,6 +71,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   errorBulkUpdateFieldName: '項目数が変更されているため変更をコミットできません。',
   commitBulkUpdateFieldName: '変更を反映',
   bulkUpdateFieldName: '項目名を一括変更',
+  hexColorPrompt: '有効な16進数のカラーコードを入力してください。',
   'schemas.textColor': 'テキストの色',
   'schemas.bgColor': '背景色',
   'schemas.horizontal': '水平',
@@ -90,6 +93,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'フィット',
   'schemas.text.dynamicFontSize': '動的フォントサイズ',
   'schemas.barcodes.barColor': 'バーの色',
+  'schemas.line.color': '色',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -114,6 +118,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   errorBulkUpdateFieldName: 'لا يمكن تنفيذ التغيير لأنه تم تغيير عدد العناصر.',
   commitBulkUpdateFieldName: 'تنفيذ التغييرات',
   bulkUpdateFieldName: 'تغيير الأسماء',
+  hexColorPrompt: 'الرجاء إدخال رمز لون سداسي عشري صالح.',
   'schemas.textColor': 'لون الخط',
   'schemas.bgColor': 'لون الخلفية',
   'schemas.horizontal': 'أفقي',
@@ -135,6 +140,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'ملاءمة',
   'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
   'schemas.barcodes.barColor': 'لون الشريط',
+  'schemas.line.color': 'اللون',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -159,6 +165,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   errorBulkUpdateFieldName: 'ไม่สามารถยืนยันการแก้ไขได้เนื่องจากจำนวนรายการมีการเปลี่ยนแปลง',
   commitBulkUpdateFieldName: 'ยืนยันการแก้ไข',
   bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
+  hexColorPrompt: 'กรุณาใส่รหัสสีแบบฐานสิบหกที่ถูกต้อง',
   'schemas.textColor': 'สีข้อความ',
   'schemas.bgColor': 'สีพื้นหลัง',
   'schemas.horizontal': 'แนวนอน',
@@ -180,6 +187,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'พอดี',
   'schemas.text.dynamicFontSize': 'ขนาดตัวอักษรแบบไดนามิก',
   'schemas.barcodes.barColor': 'สีบาร์',
+  'schemas.line.color': 'สี',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -205,6 +213,7 @@ const dictIt: { [key in keyof Dict]: string } = {
     'Non è possibile salvare le modifiche perché il numero di elementi è cambiato.',
   commitBulkUpdateFieldName: 'Salva cambiamenti',
   bulkUpdateFieldName: 'Modifica nomi campi in blocco',
+  hexColorPrompt: 'Inserisci un codice colore esadecimale valido.',
   'schemas.textColor': 'Colore testo',
   'schemas.bgColor': 'Colore sfondo',
   'schemas.horizontal': 'Orizzontale',
@@ -226,6 +235,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Adatta',
   'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
   'schemas.barcodes.barColor': 'Colore barra',
+  'schemas.line.color': 'Colore',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -250,6 +260,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   errorBulkUpdateFieldName: 'Nie można wprowadzić zmian ponieważ liczba elementów uległa zmianie.',
   commitBulkUpdateFieldName: 'Zaakceptuj zmiany',
   bulkUpdateFieldName: 'Masowo aktualizuj klucze pól',
+  hexColorPrompt: 'Wprowadź poprawny kod koloru szesnastkowego.',
   'schemas.textColor': 'Kolor tekstu',
   'schemas.bgColor': 'Kolor tła',
   'schemas.horizontal': 'Poziomo',
@@ -271,6 +282,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Dopasowanie',
   'schemas.text.dynamicFontSize': 'Dynamiczny rozmiar czcionki',
   'schemas.barcodes.barColor': 'Kolor paska',
+  'schemas.line.color': 'Kolor',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -296,6 +308,7 @@ const dictDe: { [key in keyof Dict]: string } = {
     'Die Änderung kann nicht übernommen werden, weil die Anzahl der Elemente geändert wurde.',
   commitBulkUpdateFieldName: 'Änderungen übernehmen',
   bulkUpdateFieldName: 'Mehrfachaktualisierung der Feldnamen',
+  hexColorPrompt: 'Bitte geben Sie einen gültigen Hex-Farbcode ein.',
   'schemas.textColor': 'Textfarbe',
   'schemas.bgColor': 'Hintergrundfarbe',
   'schemas.horizontal': 'Horizontal',
@@ -317,6 +330,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Anpassen',
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
+  'schemas.line.color': 'Farbe',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

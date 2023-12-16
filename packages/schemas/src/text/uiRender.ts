@@ -18,7 +18,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
-import { addAlphaToHex } from '../renderUtils.js';
+import { addAlphaToHex, isEditable } from '../renderUtils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
@@ -33,19 +33,10 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-const getBackgroundColor = (
-  mode: 'form' | 'viewer' | 'designer',
-  value: string,
-  schema: Schema,
-  defaultBackgroundColor: string
-) => {
-  if ((mode === 'form' || mode === 'designer') && value && schema.backgroundColor) {
-    return schema.backgroundColor as string;
-  } else if (mode === 'viewer') {
-    return (schema.backgroundColor as string) ?? 'transparent';
-  } else {
-    return defaultBackgroundColor;
-  }
+const getBackgroundColor = (value: string, schema: Schema, defaultBackgroundColor: string) => {
+  if (!value) return 'transparent';
+  if (schema.backgroundColor) return schema.backgroundColor as string;
+  return defaultBackgroundColor;
 };
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
@@ -94,12 +85,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(
-      mode,
-      value,
-      schema,
-      addAlphaToHex(theme.colorPrimaryBg, 30)
-    ),
+    backgroundColor: getBackgroundColor(value, schema, addAlphaToHex(theme.colorPrimaryBg, 30)),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
@@ -126,14 +112,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     resize: 'none',
     border: 'none',
     outline: 'none',
-    marginBottom: bottomAdjustment + 'px',
-    paddingTop: topAdjustment + 'px',
+    marginBottom: `${bottomAdjustment}px`,
+    paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
   };
   const textBlock = document.createElement('div');
   Object.assign(textBlock.style, textBlockStyle);
 
-  if (mode === 'form' || mode === 'designer') {
+  if (isEditable(mode)) {
     textBlock.contentEditable = 'plaintext-only';
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
@@ -157,8 +143,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
                 schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
                 schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
               );
-            textBlock.style.paddingTop = newTopAdj.toString() + 'px';
-            textBlock.style.marginBottom = newBottomAdj.toString() + 'px';
+            textBlock.style.paddingTop = `${newTopAdj}px`;
+            textBlock.style.marginBottom = `${newBottomAdj}px`;
           })();
         }, 0);
       });

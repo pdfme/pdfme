@@ -104,7 +104,9 @@ const Preview = ({
                 placeholder={template.sampledata?.[0]?.[key] ?? ''}
                 tabIndex={index + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
-                outline={isForm ? `1px dashed ${token.colorPrimary}` : 'transparent'}
+                outline={
+                  isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
+                }
                 scale={scale}
               />
             );

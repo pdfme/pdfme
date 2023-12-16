@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
-import { debounce, flatten, cloneDeep } from './helper.js';
+import { debounce, generateColumnsAndSampledataIfNeeded, cloneDeep } from './helper.js';
 import {
   Template,
   Size,
@@ -18,42 +18,6 @@ import {
   checkPreviewProps,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
-
-const generateColumnsAndSampledataIfNeeded = (template: Template) => {
-  const { schemas, columns, sampledata } = template;
-
-  const flatSchemaLength = schemas
-    .map((schema) => Object.keys(schema).length)
-    .reduce((acc, cur) => acc + cur, 0);
-
-  const needColumns = !columns || flatSchemaLength !== columns.length;
-
-  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
-
-  // columns
-  if (needColumns) {
-    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
-  }
-
-  // sampledata
-  if (needSampledata) {
-    template.sampledata = [
-      schemas.reduce(
-        (acc, cur) =>
-          Object.assign(
-            acc,
-            Object.keys(cur).reduce(
-              (a, c) => Object.assign(a, { [c]: '' }),
-              {} as { [key: string]: string }
-            )
-          ),
-        {} as { [key: string]: string }
-      ),
-    ];
-  }
-
-  return template;
-};
 
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;

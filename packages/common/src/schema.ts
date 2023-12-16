@@ -26,6 +26,7 @@ export const Dict = z.object({
   errorBulkUpdateFieldName: z.string(),
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
+  hexColorPrompt: z.string(),
   // -----------------used in schemas-----------------
   'schemas.textColor': z.string(),
   'schemas.bgColor': z.string(),
@@ -50,13 +51,17 @@ export const Dict = z.object({
   'schemas.text.dynamicFontSize': z.string(),
 
   'schemas.barcodes.barColor': z.string(),
+
+  'schemas.line.color': z.string(),
 });
+export const Mode = z.enum(['viewer', 'form', 'designer']);
 
 export const Size = z.object({ height: z.number(), width: z.number() });
 
 export const Schema = z
   .object({
     type: z.string(),
+    readOnly: z.boolean().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),

@@ -12,6 +12,7 @@ import type {
   PropPanelSchema,
   PropPanelWidgetProps,
   PDFRenderProps,
+  Mode,
   UIRenderProps,
   Plugin,
   Lang,
@@ -96,5 +97,6 @@ export type {
   PropPanelWidgetProps,
   PDFRenderProps,
   UIRenderProps,
+  Mode,
   Plugin,
 };
