@@ -165,7 +165,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: 'Please enter a valid hex color code.',
+            message: i18n('hexColorPrompt'),
           },
         ],
       },
@@ -176,7 +176,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: 'Please enter a valid hex color code.',
+            message: i18n('hexColorPrompt'),
           },
         ],
       },

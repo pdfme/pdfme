@@ -26,6 +26,7 @@ export const Dict = z.object({
   errorBulkUpdateFieldName: z.string(),
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
+  hexColorPrompt: z.string(),
   // -----------------used in schemas-----------------
   'schemas.textColor': z.string(),
   'schemas.bgColor': z.string(),
@@ -50,6 +51,8 @@ export const Dict = z.object({
   'schemas.text.dynamicFontSize': z.string(),
 
   'schemas.barcodes.barColor': z.string(),
+
+  'schemas.line.color': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 

@@ -82,7 +82,7 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
 Check this document: https://pdfme.com/docs/custom-schemas`);
     }
     return { ...acc, [type]: render.pdf };
-  }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void>>);
+  }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
 
   return { pdfDoc, embeddedPages, embedPdfBoxes, renderObj };
 };
