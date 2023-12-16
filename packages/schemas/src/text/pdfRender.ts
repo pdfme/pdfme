@@ -1,11 +1,10 @@
-import { PDFFont, PDFDocument, rgb } from '@pdfme/pdf-lib';
+import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import {
   PDFRenderProps,
   Font,
   getDefaultFont,
   getFallbackFontName,
   mm2pt,
-  isHexValid,
 } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import {
@@ -88,6 +87,7 @@ const getFontProp = async ({
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const { value, pdfDoc, pdfLib, page, options, schema, _cache } = arg;
+  if (!value) return;
 
   const { font = getDefaultFont() } = options;
 

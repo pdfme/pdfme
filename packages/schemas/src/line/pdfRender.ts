@@ -17,7 +17,7 @@ export const pdfRender = (arg: PDFRenderProps<LineSchema>) => {
     start: rotatePoint({ x, y: y + height / 2 }, pivot, rotate.angle),
     end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
     thickness: height,
-    color: hex2RgbColor(schema.color),
+    color: hex2RgbColor(schema.color ?? '#ffffff'),
     opacity: opacity,
   });
 };

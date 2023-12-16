@@ -1,7 +1,7 @@
 import type { LineSchema } from './types';
 import { UIRenderProps } from '@pdfme/common';
 
-export const uiRender = async (arg: UIRenderProps<LineSchema>) => {
+export const uiRender = (arg: UIRenderProps<LineSchema>) => {
   const { schema, rootElement } = arg;
   const div = document.createElement('div');
   div.style.backgroundColor = schema.color;

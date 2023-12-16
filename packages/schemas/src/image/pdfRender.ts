@@ -6,6 +6,7 @@ const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 
 export const pdfRender = async (arg: PDFRenderProps<ImageSchema>) => {
   const { value, schema, pdfDoc, page, _cache } = arg;
+  if (!value || !value.startsWith('data:image/')) return;
 
   const inputImageCacheKey = getCacheKey(schema, value);
   let image = _cache.get(inputImageCacheKey);
