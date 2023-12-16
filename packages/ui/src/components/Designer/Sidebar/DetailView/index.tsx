@@ -78,6 +78,7 @@ const DetailView = (
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
         let value = newSchema[key];
+        // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
         // [position] Return the flattened position to its original form.
