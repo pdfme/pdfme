@@ -345,7 +345,6 @@ export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
     ];
   }
 
-  console.log(template);
   return template;
 };
 

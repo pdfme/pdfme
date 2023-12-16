@@ -1,11 +1,5 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
-import {
-  PDFRenderProps,
-  Font,
-  getDefaultFont,
-  getFallbackFontName,
-  mm2pt,
-} from '@pdfme/common';
+import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
 import type { TextSchema, FontWidthCalcValues } from './types';
 import {
   VERTICAL_ALIGN_TOP,
