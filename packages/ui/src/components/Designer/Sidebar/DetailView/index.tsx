@@ -77,7 +77,9 @@ const DetailView = (
     for (let key in newSchema) {
       if (['id', 'data'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
-        const value = newSchema[key] || undefined;
+        let value = newSchema[key];
+        // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
+        if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
         // [position] Return the flattened position to its original form.
         if (key === 'x') key = 'position.x';
@@ -138,6 +140,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
+        min: 0,
       },
       height: {
         title: i18n('height'),
@@ -145,6 +148,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
+        min: 0,
       },
       opacity: {
         title: i18n('opacity'),
