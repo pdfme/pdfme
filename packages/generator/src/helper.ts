@@ -55,7 +55,7 @@ export const drawEmbeddedPage = (arg: {
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { basePdf } = template;
+  const { basePdf, schemas } = template;
 
   const pdfDoc = await pdfLib.PDFDocument.create();
   // @ts-ignore
@@ -70,7 +70,7 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
       : Object.values(builtInPlugins)
   ) as Plugin<Schema>[];
 
-  const schemaTypes = template.schemas.flatMap((schemaObj) =>
+  const schemaTypes = schemas.flatMap((schemaObj) =>
     Object.values(schemaObj).map((schema) => schema.type)
   );
 
@@ -84,7 +84,16 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return { ...acc, [type]: render.pdf };
   }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
 
-  return { pdfDoc, embeddedPages, embedPdfBoxes, renderObj };
+  const readOnlySchemaKeys = schemas.reduce((acc, schema) => {
+    const entries = Object.entries(schema);
+    const keys = entries.reduce(
+      (acc, [key, value]) => (value.readOnly ? [...acc, key] : acc),
+      [] as string[]
+    );
+    return [...acc, ...keys];
+  }, [] as string[]);
+
+  return { pdfDoc, embeddedPages, embedPdfBoxes, renderObj, readOnlySchemaKeys };
 };
 
 export const postProcessing = (props: {

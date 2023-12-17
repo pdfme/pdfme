@@ -312,13 +312,16 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
   const { schemas, columns, sampledata } = template;
 
-  const flatSchemaLength = schemas
+  const flatSchemaLengthForColumns = schemas
     .map((schema) => Object.keys(schema).length)
     .reduce((acc, cur) => acc + cur, 0);
+  const needColumns = !columns || flatSchemaLengthForColumns !== columns.length;
 
-  const needColumns = !columns || flatSchemaLength !== columns.length;
-
-  const needSampledata = !sampledata || flatSchemaLength !== Object.keys(sampledata[0]).length;
+  const flatSchemaLengthForSampleData = schemas
+    .map((schema) => Object.keys(schema).filter((key) => !schema[key].readOnly).length)
+    .reduce((acc, cur) => acc + cur, 0);
+  const needSampledata =
+    !sampledata || flatSchemaLengthForSampleData !== Object.keys(sampledata[0]).length;
 
   // columns
   if (needColumns) {

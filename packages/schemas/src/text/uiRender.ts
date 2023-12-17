@@ -19,7 +19,6 @@ import {
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
 import { addAlphaToHex, isEditable } from '../renderUtils.js';
-import { DEFAULT_OPACITY } from '../constants.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -92,7 +91,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
-    opacity: schema.opacity ?? DEFAULT_OPACITY,
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
