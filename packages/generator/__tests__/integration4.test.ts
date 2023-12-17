@@ -1,11 +1,11 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
-import { other } from './assets/templates';
-import { text, image } from '@pdfme/schemas';
+import { slowerAndTextType } from './assets/templates';
+import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
-describe('generate integration test(other)', () => {
-  describe.each([other])('%s', (templateData) => {
+describe('generate integration test(slower)', () => {
+  describe.each([slowerAndTextType])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
@@ -26,13 +26,13 @@ describe('generate integration test(other)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image },
+          plugins: { text, image, ...barcodes },
           options: { font },
         });
 
         const hrend = process.hrtime(hrstart);
         const execSeconds = hrend[0] + hrend[1] / 1000000000;
-        expect(execSeconds).toBeLessThan(1.5);
+        expect(execSeconds).toBeLessThan(2.5);
 
         const tmpFile = getPdfTmpPath(`${key}.pdf`);
         const assertFile = getPdfAssertPath(`${key}.pdf`);
