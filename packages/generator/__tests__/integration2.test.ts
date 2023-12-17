@@ -34,7 +34,6 @@ describe('generate integration test(barcode, business)', () => {
         const execSeconds = hrend[0] + hrend[1] / 1000000000;
         expect(execSeconds).toBeLessThan(1.5);
 
-
         const tmpFile = getPdfTmpPath(`${key}.pdf`);
         const assertFile = getPdfAssertPath(`${key}.pdf`);
 
