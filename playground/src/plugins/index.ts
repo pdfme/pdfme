@@ -4,6 +4,7 @@ import { ellipse } from './ellipse';
 
 const plugins = {
   signature,
+  // TODO TMP
   rectangle,
   ellipse,
 };

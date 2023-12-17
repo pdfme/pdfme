@@ -4,22 +4,20 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { DEFAULT_LINE_COLOR } from './constants.js';
 
 export const propPanel: PropPanel<LineSchema> = {
-  schema: ({ i18n }) => {
-    return {
-      color: {
-        title: i18n('schemas.line.color'),
-        type: 'string',
-        widget: 'color',
-        required: true,
-        rules: [
-          {
-            pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
-          },
-        ],
-      },
-    };
-  },
+  schema: ({ i18n }) => ({
+    color: {
+      title: i18n('schemas.line.color'),
+      type: 'string',
+      widget: 'color',
+      required: true,
+      rules: [
+        {
+          pattern: HEX_COLOR_PATTERN,
+          message: i18n('hexColorPrompt'),
+        },
+      ],
+    },
+  }),
   defaultValue: '',
   defaultSchema: {
     type: 'line',
