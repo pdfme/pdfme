@@ -105,14 +105,14 @@ exports[`Preview(as Form) snapshot 1`] = `
             <div
               class="selectable"
               id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #1677ff;"
+              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
               title="field1"
             >
               <div
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; opacity: 1;"
+                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
                 >
                   <div
                     style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
@@ -126,7 +126,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); outline: 1px dashed #1677ff;"
+              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
               title="field2"
             >
               <div
@@ -260,14 +260,14 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <div
               class="selectable"
               id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); outline: transparent;"
+              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: transparent;"
               title="field1"
             >
               <div
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; opacity: 1;"
+                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
                 >
                   <div
                     style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
@@ -311,7 +311,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <div
               class="selectable"
               id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); outline: transparent;"
+              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: transparent;"
               title="field2"
             >
               <div

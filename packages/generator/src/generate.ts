@@ -7,16 +7,14 @@ const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {}, plugins: userPlugins = {} } = props;
 
-  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj } = await preprocessing({
-    template,
-    userPlugins,
-  });
+  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj, readOnlySchemaKeys } =
+    await preprocessing({ template, userPlugins });
 
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
-    const keys = Object.keys(inputObj);
+    const keys = Object.keys(inputObj).concat(readOnlySchemaKeys);
     for (let j = 0; j < embeddedPages.length; j += 1) {
       const embeddedPage = embeddedPages[j];
       const { width: pageWidth, height: pageHeight } = embeddedPage;
@@ -29,8 +27,6 @@ const generate = async (props: GenerateProps) => {
         const key = keys[l];
         const schemaObj = template.schemas[j];
         const schema = schemaObj[key];
-        const value = inputObj[key];
-
         if (!schema) {
           continue;
         }
@@ -40,7 +36,7 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
 
-        await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render({ key, value: inputObj[key], schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

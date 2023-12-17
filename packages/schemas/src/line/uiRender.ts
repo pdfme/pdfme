@@ -8,8 +8,5 @@ export const uiRender = (arg: UIRenderProps<LineSchema>) => {
   div.style.backgroundColor = schema.color ?? DEFAULT_LINE_COLOR;
   div.style.width = '100%';
   div.style.height = '100%';
-  if (schema.opacity !== undefined) {
-    div.style.opacity = `${schema.opacity}`;
-  }
   rootElement.appendChild(div);
 };
