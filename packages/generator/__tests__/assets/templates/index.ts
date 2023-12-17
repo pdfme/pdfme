@@ -69,6 +69,7 @@ export const envelope = {
 
 export const barcode = {
   Aone31555QRコード,
+  Aone31553QRコード,
   Aone72230JANコード短縮,
   Aone72230JANコード標準,
   barcodes,
@@ -87,8 +88,7 @@ export const business = {
 };
 
 // These tests are slower, so we allow more time for them to pass
-export const slowerAndTextType = {
-  Aone31553QRコード,
+export const textType = {
   dynamicFontSizeHorizontal,
   dynamicFontSizeVertical,
   verticalAlignmentTop,

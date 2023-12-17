@@ -1,11 +1,11 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
-import { slowerAndTextType } from './assets/templates';
+import { textType } from './assets/templates';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integration test(slower)', () => {
-  describe.each([slowerAndTextType])('%s', (templateData) => {
+  describe.each([textType])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
