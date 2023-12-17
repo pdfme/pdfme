@@ -19,8 +19,8 @@ const getEffectiveScale = (element: HTMLElement | null) => {
 };
 
 export const signature: Plugin<Signature> = {
-  ui: async (props) => {
-    const { schema, value, onChange, rootElement, mode, i18n } = props;
+  ui: async (arg) => {
+    const { schema, value, onChange, rootElement, mode, i18n } = arg;
 
     const canvas = document.createElement('canvas');
     canvas.width = schema.width * ZOOM;

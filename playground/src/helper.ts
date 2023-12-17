@@ -98,6 +98,8 @@ export const getPlugins = () => {
   return {
     Text: text,
     Signature: plugins.signature,
+    Rectangle: plugins.rectangle,
+    Ellipse: plugins.ellipse,
     Line: line,
     QR: barcodes.qrcode,
     Image: image,
