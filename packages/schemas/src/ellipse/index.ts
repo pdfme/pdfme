@@ -3,6 +3,7 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2RgbColor, convertForPdfLayoutProps } from '../pdfRenderUtils.js';
 
 // TODO rectangleとほぼ同じなので共通化できるはず
+// https://chat.openai.com/share/8dd78d27-1166-47ef-9801-3451c4a88a49
 // memo image, line等はindex.tsしかないのでディレクトリに分ける必要はない
 
 interface Ellipse extends Schema {
@@ -20,7 +21,7 @@ const schema: Plugin<Ellipse> = {
     div.style.boxSizing = 'border-box';
     // TODO 差分
     div.style.borderRadius = '50%';
-    // 
+    //
     div.style.borderWidth = `${schema.borderWidth ?? 0}mm`;
     div.style.borderStyle = schema.borderWidth && schema.borderColor ? 'solid' : 'none';
     div.style.borderColor = schema.borderColor ?? 'transparent';
@@ -41,11 +42,11 @@ const schema: Plugin<Ellipse> = {
 
     const borderWidth = schema.borderWidth ? mm2pt(schema.borderWidth) : 0;
     page.drawEllipse({
-      x: x + borderWidth / 2,
-      y: y + borderWidth / 2,
       // TODO 差分
-      xScale: width,
-      yScale: height,
+      x: x + width / 2,
+      y: y + height / 2,
+      xScale: width / 2 - borderWidth / 2,
+      yScale: height / 2 - borderWidth / 2,
       //
       rotate,
       borderWidth,
