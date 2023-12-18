@@ -100,8 +100,6 @@ export const getPlugins = () => {
     Signature: plugins.signature,
     Line: line,
     QR: barcodes.qrcode,
-    EAN13: barcodes.ean13,
-    EAN8: barcodes.ean8,
     Image: image,
   };
 };
