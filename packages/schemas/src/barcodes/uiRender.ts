@@ -2,7 +2,7 @@ import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
 import { validateBarcodeInput, createBarCode } from './helper.js';
-import { addAlphaToHex, isEditable } from '../renderUtils.js';
+import { addAlphaToHex, isEditable } from '../pdfRenderUtils.js';
 
 const fullSize = { width: '100%', height: '100%' };
 

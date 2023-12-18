@@ -3,7 +3,6 @@ import { Plugin, Schema } from '@pdfme/common';
 interface Ellipse extends Schema {
   borderWidth: number;
   borderColor: string;
-  borderOpacity: number;
   color: string;
 }
 
@@ -17,7 +16,6 @@ export const ellipse: Plugin<Ellipse> = {
 
     // borderWidth;
     // borderColor;
-    // borderOpacity;
     // color;
 
     rootElement.appendChild(div);
@@ -38,7 +36,6 @@ export const ellipse: Plugin<Ellipse> = {
       opacity: 1,
       borderWidth: 5,
       borderColor: '#000000',
-      borderOpacity: 0.75,
       color: '#ffffff',
       readOnly: true,
     },
