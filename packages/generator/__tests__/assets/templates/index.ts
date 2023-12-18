@@ -87,6 +87,7 @@ export const business = {
   労働条件通知書,
 };
 
+// These tests are slower, so we allow more time for them to pass
 export const textType = {
   dynamicFontSizeHorizontal,
   dynamicFontSizeVertical,
