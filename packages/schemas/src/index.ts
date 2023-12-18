@@ -3,6 +3,7 @@ import image from './image/index.js';
 import barcodes from './barcodes/index.js';
 import line from './line/index.js';
 import rectangle from './rectangle/index.js';
+import ellipse from './ellipse/index.js';
 import { convertForPdfLayoutProps, rotatePoint } from './pdfRenderUtils.js';
 
 const builtInPlugins = { Text: text };
@@ -13,6 +14,7 @@ export {
   barcodes,
   line,
   rectangle,
+  ellipse,
   builtInPlugins,
   convertForPdfLayoutProps,
   rotatePoint,
