@@ -3,6 +3,7 @@ import type * as CSS from 'csstype';
 import type { ImageSchema } from './types';
 import { UIRenderProps, ZOOM } from '@pdfme/common';
 import { addAlphaToHex, isEditable } from '../renderUtils.js';
+import { propPanel } from "./propPanel";
 
 const fullSize = { width: '100%', height: '100%' };
 
@@ -38,6 +39,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, schema, theme } =
     arg;
   const editable = isEditable(mode);
+  const isDefault = value === propPanel.defaultValue;
 
   const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
@@ -66,7 +68,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   }
 
   // remove button
-  if (value && editable) {
+  if (value && !isDefault && editable) {
     const button = document.createElement('button');
     button.textContent = 'x';
     const buttonStyle: CSS.Properties = {
@@ -93,7 +95,7 @@ export const uiRender = async (arg: UIRenderProps<ImageSchema>) => {
   }
 
   // file input
-  if (!value && editable) {
+  if ((!value || isDefault) && editable) {
     const label = document.createElement('label');
     const labelStyle: CSS.Properties = {
       ...fullSize,
