@@ -39,7 +39,7 @@ const schema: Plugin<LineSchema> = {
   propPanel: {
     schema: ({ i18n }) => ({
       color: {
-        title: i18n('schemas.line.color'),
+        title: i18n('schemas.color'),
         type: 'string',
         widget: 'color',
         required: true,

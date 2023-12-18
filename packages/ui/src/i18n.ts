@@ -25,6 +25,9 @@ const dictEn: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'Commit Changes',
   bulkUpdateFieldName: 'Bulk update field names',
   hexColorPrompt: 'Please enter a valid hex color code.',
+  'schemas.color': 'Color',
+  'schemas.borderWidth': 'Border Width',
+  'schemas.borderColor': 'Border Color',
   'schemas.textColor': 'Text Color',
   'schemas.bgColor': 'Background Color',
   'schemas.horizontal': 'Horizontal',
@@ -46,7 +49,6 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Fit',
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.barcodes.barColor': 'Bar Color',
-  'schemas.line.color': 'Color',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -72,6 +74,9 @@ const dictJa: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: '変更を反映',
   bulkUpdateFieldName: '項目名を一括変更',
   hexColorPrompt: '有効な16進数のカラーコードを入力してください。',
+  'schemas.color': '色',
+  'schemas.borderWidth': '枠線の太さ',
+  'schemas.borderColor': '枠線の色',
   'schemas.textColor': 'テキストの色',
   'schemas.bgColor': '背景色',
   'schemas.horizontal': '水平',
@@ -93,7 +98,6 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'フィット',
   'schemas.text.dynamicFontSize': '動的フォントサイズ',
   'schemas.barcodes.barColor': 'バーの色',
-  'schemas.line.color': '色',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -119,6 +123,9 @@ const dictAr: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'تنفيذ التغييرات',
   bulkUpdateFieldName: 'تغيير الأسماء',
   hexColorPrompt: 'الرجاء إدخال رمز لون سداسي عشري صالح.',
+  'schemas.color': 'اللون',
+  'schemas.borderWidth': 'عرض الحدود',
+  'schemas.borderColor': 'لون الحدود',
   'schemas.textColor': 'لون الخط',
   'schemas.bgColor': 'لون الخلفية',
   'schemas.horizontal': 'أفقي',
@@ -140,7 +147,6 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'ملاءمة',
   'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
   'schemas.barcodes.barColor': 'لون الشريط',
-  'schemas.line.color': 'اللون',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -166,6 +172,9 @@ const dictTh: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'ยืนยันการแก้ไข',
   bulkUpdateFieldName: 'แก้ไขชื่อฟิลด์เป็นชุด',
   hexColorPrompt: 'กรุณาใส่รหัสสีแบบฐานสิบหกที่ถูกต้อง',
+  'schemas.color': 'สี',
+  'schemas.borderWidth': 'ความกว้างของเส้นขอบ',
+  'schemas.borderColor': 'สีขอบ',
   'schemas.textColor': 'สีข้อความ',
   'schemas.bgColor': 'สีพื้นหลัง',
   'schemas.horizontal': 'แนวนอน',
@@ -187,7 +196,6 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'พอดี',
   'schemas.text.dynamicFontSize': 'ขนาดตัวอักษรแบบไดนามิก',
   'schemas.barcodes.barColor': 'สีบาร์',
-  'schemas.line.color': 'สี',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -214,6 +222,9 @@ const dictIt: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'Salva cambiamenti',
   bulkUpdateFieldName: 'Modifica nomi campi in blocco',
   hexColorPrompt: 'Inserisci un codice colore esadecimale valido.',
+  'schemas.color': 'Colore',
+  'schemas.borderWidth': 'Spessore bordo',
+  'schemas.borderColor': 'Colore bordo',
   'schemas.textColor': 'Colore testo',
   'schemas.bgColor': 'Colore sfondo',
   'schemas.horizontal': 'Orizzontale',
@@ -235,7 +246,6 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Adatta',
   'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
   'schemas.barcodes.barColor': 'Colore barra',
-  'schemas.line.color': 'Colore',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -261,6 +271,9 @@ const dictPl: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'Zaakceptuj zmiany',
   bulkUpdateFieldName: 'Masowo aktualizuj klucze pól',
   hexColorPrompt: 'Wprowadź poprawny kod koloru szesnastkowego.',
+  'schemas.color': 'Kolor',
+  'schemas.borderWidth': 'Szerokość obramowania',
+  'schemas.borderColor': 'Kolor obramowania',
   'schemas.textColor': 'Kolor tekstu',
   'schemas.bgColor': 'Kolor tła',
   'schemas.horizontal': 'Poziomo',
@@ -282,7 +295,6 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Dopasowanie',
   'schemas.text.dynamicFontSize': 'Dynamiczny rozmiar czcionki',
   'schemas.barcodes.barColor': 'Kolor paska',
-  'schemas.line.color': 'Kolor',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -309,6 +321,9 @@ const dictDe: { [key in keyof Dict]: string } = {
   commitBulkUpdateFieldName: 'Änderungen übernehmen',
   bulkUpdateFieldName: 'Mehrfachaktualisierung der Feldnamen',
   hexColorPrompt: 'Bitte geben Sie einen gültigen Hex-Farbcode ein.',
+  'schemas.color': 'Farbe',
+  'schemas.borderWidth': 'Rahmenbreite',
+  'schemas.borderColor': 'Rahmenfarbe',
   'schemas.textColor': 'Textfarbe',
   'schemas.bgColor': 'Hintergrundfarbe',
   'schemas.horizontal': 'Horizontal',
@@ -330,7 +345,6 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Anpassen',
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
-  'schemas.line.color': 'Farbe',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

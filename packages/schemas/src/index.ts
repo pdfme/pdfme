@@ -1,9 +1,8 @@
 import text from './text/index.js';
-import image from './image/index.js';
+import image from './graphics/image.js';
 import barcodes from './barcodes/index.js';
-import line from './line/index.js';
-import rectangle from './rectangle/index.js';
-import ellipse from './ellipse/index.js';
+import line from './shapes/line.js';
+import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
 import { convertForPdfLayoutProps, rotatePoint } from './pdfRenderUtils.js';
 
 const builtInPlugins = { Text: text };
