@@ -1,5 +1,30 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint } from '../src/pdfRenderUtils';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../src/pdfRenderUtils';
+
+describe('hex2RgbColor', () => {
+  it('should convert hex to rgb', () => {
+    const hex = '#000000';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({ red: 0, green: 0, blue: 0, type: 'RGB' });
+  });
+
+  it('should convert hex to rgb with a short hex', () => {
+    const hex = '#fff';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({ red: 1, green: 1, blue: 1, type: 'RGB' });
+  });
+
+  it('should convert hex to rgb for non-trivial color', () => {
+    const hex = '#33af5a';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({ red: 0.2, green: 0.6862745098039216, blue: 0.35294117647058826, type: 'RGB' });
+  });
+
+  it('should throw an error if hex is invalid', () => {
+    const hex = '#fffee';
+    expect(() => hex2RgbColor(hex)).toThrowError('Invalid hex color value #ff');
+  });
+});
 
 describe('rotatePoint', () => {
   it('should rotate one point round another by 90 degrees', () => {
