@@ -78,12 +78,13 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   if (editable) {
     const input = document.createElement('input');
     const inputStyle: CSS.Properties = {
-      ...fullSize,
+      width: '100%',
       position: 'absolute',
       textAlign: 'center',
-      fontSize: '1rem',
-      color: '#000',
-      backgroundColor: editable || value ? addAlphaToHex(theme.colorPrimaryBg, 30) : 'none',
+      fontSize: '12pt',
+      fontWeight: 'bold',
+      color: theme.colorWhite,
+      backgroundColor: editable || value ? addAlphaToHex('#000000', 80) : 'none',
       border: 'none',
       display: 'flex',
       alignItems: 'center',

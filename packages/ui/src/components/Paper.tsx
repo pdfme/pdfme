@@ -74,7 +74,7 @@ const Paper = (props: {
                 paperRefs.current[paperIndex] = e;
               }
             }}
-            onClick={(e) => {
+            onMouseDown={(e) => {
               if (
                 e.currentTarget === e.target &&
                 document &&
