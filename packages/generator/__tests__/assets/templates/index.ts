@@ -42,6 +42,7 @@ const verticalAlignmentTop = require('./verticalAlignmentTop.json') as Template;
 const verticalAlignmentMiddle = require('./verticalAlignmentMiddle.json') as Template;
 const verticalAlignmentBottom = require('./verticalAlignmentBottom.json') as Template;
 const test = require('./test.json') as Template;
+const shapes = require('./shapes.json') as Template;
 
 export const label = {
   宛名8面,
@@ -102,4 +103,8 @@ export const other = {
   canvasPdf,
   background,
   rotation,
+};
+
+export const shape = {
+  shapes,
 };

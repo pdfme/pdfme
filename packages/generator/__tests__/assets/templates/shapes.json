@@ -1,0 +1,235 @@
+{
+  "schemas": [
+    {
+      "field1": {
+        "type": "rectangle",
+        "position": {
+          "x": 113.97,
+          "y": 42.7
+        },
+        "width": 75.59,
+        "height": 47.01,
+        "rotate": 0,
+        "opacity": 1,
+        "borderWidth": 15,
+        "borderColor": "#000",
+        "borderOpacity": 0.75,
+        "color": "",
+        "readOnly": true
+      },
+      "field2": {
+        "type": "line",
+        "position": {
+          "x": 113.16,
+          "y": 42.82
+        },
+        "width": 1,
+        "height": 47.01,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field3": {
+        "type": "line",
+        "position": {
+          "x": 113.77,
+          "y": 41.8
+        },
+        "width": 75,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field4": {
+        "type": "line",
+        "position": {
+          "x": 189.86,
+          "y": 43.82
+        },
+        "width": 1,
+        "height": 47.01,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field5": {
+        "type": "line",
+        "position": {
+          "x": 113.77,
+          "y": 89.8
+        },
+        "width": 75,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field6": {
+        "type": "line",
+        "position": {
+          "x": 128.45,
+          "y": 58.06
+        },
+        "width": 1,
+        "height": 16.01,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field7": {
+        "type": "line",
+        "position": {
+          "x": 129.53,
+          "y": 57.62
+        },
+        "width": 45,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field8": {
+        "type": "line",
+        "position": {
+          "x": 129.53,
+          "y": 73.62
+        },
+        "width": 45,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field9": {
+        "type": "line",
+        "position": {
+          "x": 174.45,
+          "y": 58.06
+        },
+        "width": 1,
+        "height": 16.01,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#FFC800"
+      },
+      "field10": {
+        "type": "ellipse",
+        "position": {
+          "x": 13.63,
+          "y": 33.14
+        },
+        "width": 75.45,
+        "height": 35.76,
+        "rotate": 0,
+        "opacity": 1,
+        "borderWidth": 9,
+        "borderColor": "#000000",
+        "color": "",
+        "readOnly": true
+      },
+      "field11": {
+        "type": "ellipse",
+        "position": {
+          "x": 17.56,
+          "y": 232.84
+        },
+        "width": 18.83,
+        "height": 40,
+        "rotate": 0,
+        "opacity": 1,
+        "borderWidth": 1,
+        "borderColor": "#000000",
+        "color": "",
+        "readOnly": true
+      },
+      "field12": {
+        "type": "ellipse",
+        "position": {
+          "x": 104.55,
+          "y": 211.93
+        },
+        "width": 52.96,
+        "height": 9.58,
+        "rotate": 45,
+        "opacity": 1,
+        "borderWidth": 1,
+        "borderColor": "#000000",
+        "color": "",
+        "readOnly": true
+      },
+      "field13": {
+        "type": "line",
+        "position": {
+          "x": 37.57,
+          "y": 122.24
+        },
+        "width": 150,
+        "height": 1,
+        "rotate": 90,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#000000"
+      },
+      "field23": {
+        "type": "line",
+        "position": {
+          "x": 0,
+          "y": 105
+        },
+        "width": 190,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#000000"
+      },
+      "field1 copy 2": {
+        "type": "rectangle",
+        "position": {
+          "x": 117.31,
+          "y": 105.35
+        },
+        "width": 75.59,
+        "height": 47.01,
+        "rotate": 0,
+        "opacity": 1,
+        "borderWidth": 15,
+        "borderColor": "#000",
+        "borderOpacity": 0.75,
+        "color": "",
+        "readOnly": true
+      }
+    }
+  ],
+  "basePdf": "data:application/pdf;base64,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",
+  "sampledata": [
+    {}
+  ],
+  "fontName": "NotoSerifJP-Regular",
+  "columns": [
+    "field1",
+    "field2",
+    "field3",
+    "field4",
+    "field5",
+    "field6",
+    "field7",
+    "field8",
+    "field9",
+    "field10",
+    "field11",
+    "field12",
+    "field13",
+    "field23",
+    "field1 copy 2"
+  ]
+}

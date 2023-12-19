@@ -32,10 +32,7 @@ export const convertForPdfLayoutProps = ({
   }
 
   return {
-    position: {
-      x: x,
-      y: y,
-    },
+    position: { x, y },
     height: height,
     width: width,
     rotate: degrees(rotateDegrees),

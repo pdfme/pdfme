@@ -1,5 +1,5 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint } from '../src/renderUtils';
+import { convertForPdfLayoutProps, rotatePoint } from '../src/pdfRenderUtils';
 
 describe('rotatePoint', () => {
   it('should rotate one point round another by 90 degrees', () => {

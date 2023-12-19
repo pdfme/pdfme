@@ -14,7 +14,13 @@ const generate = async (props: GenerateProps) => {
 
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
-    const keys = Object.keys(inputObj).concat(readOnlySchemaKeys);
+    const keys = readOnlySchemaKeys.concat(Object.keys(inputObj));
+    if (template.columns) {
+      keys.sort(
+        (a, b) => (template.columns ?? []).indexOf(a) - (template.columns ?? []).indexOf(b)
+      );
+    }
+
     for (let j = 0; j < embeddedPages.length; j += 1) {
       const embeddedPage = embeddedPages[j];
       const { width: pageWidth, height: pageHeight } = embeddedPage;
