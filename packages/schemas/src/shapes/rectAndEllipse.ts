@@ -29,31 +29,35 @@ const shape: Plugin<Shape> = {
   pdf: (arg) => {
     const { schema, page } = arg;
     const pageHeight = page.getHeight();
-    const layoutProps = convertForPdfLayoutProps({ schema, pageHeight });
+    const cArg = { schema, pageHeight };
+    const { position, width, height, rotate, opacity } = convertForPdfLayoutProps(cArg);
+    const {
+      position: { x: x4Ellipse, y: y4Ellipse },
+    } = convertForPdfLayoutProps({ ...cArg, applyRotateTranslate: false });
     const borderWidth = schema.borderWidth ? mm2pt(schema.borderWidth) : 0;
 
     const drawOptions = {
-      rotate: layoutProps.rotate,
+      rotate,
       borderWidth,
       borderColor: hex2RgbColor(schema.borderColor),
       color: hex2RgbColor(schema.color),
-      opacity: layoutProps.opacity,
-      borderOpacity: layoutProps.opacity,
+      opacity,
+      borderOpacity: opacity,
     };
     if (schema.type === 'ellipse') {
       page.drawEllipse({
-        x: layoutProps.position.x + layoutProps.width / 2,
-        y: layoutProps.position.y + layoutProps.height / 2,
-        xScale: layoutProps.width / 2 - borderWidth / 2,
-        yScale: layoutProps.height / 2 - borderWidth / 2,
+        x: x4Ellipse + width / 2,
+        y: y4Ellipse + height / 2,
+        xScale: width / 2 - borderWidth / 2,
+        yScale: height / 2 - borderWidth / 2,
         ...drawOptions,
       });
     } else if (schema.type === 'rectangle') {
       page.drawRectangle({
-        x: layoutProps.position.x + borderWidth / 2,
-        y: layoutProps.position.y + borderWidth / 2,
-        width: layoutProps.width - borderWidth,
-        height: layoutProps.height - borderWidth,
+        x: position.x + borderWidth / 2,
+        y: position.y + borderWidth / 2,
+        width: width - borderWidth,
+        height: height - borderWidth,
         ...drawOptions,
       });
     }

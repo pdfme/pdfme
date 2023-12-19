@@ -139,8 +139,8 @@
       "field11": {
         "type": "ellipse",
         "position": {
-          "x": 21.79,
-          "y": 171.72
+          "x": 17.56,
+          "y": 232.84
         },
         "width": 18.83,
         "height": 40,
@@ -154,15 +154,57 @@
       "field12": {
         "type": "ellipse",
         "position": {
-          "x": 111.96,
-          "y": 190.24
+          "x": 104.55,
+          "y": 211.93
         },
         "width": 52.96,
         "height": 9.58,
-        "rotate": 0,
+        "rotate": 45,
         "opacity": 1,
         "borderWidth": 1,
         "borderColor": "#000000",
+        "color": "",
+        "readOnly": true
+      },
+      "field13": {
+        "type": "line",
+        "position": {
+          "x": 37.57,
+          "y": 122.24
+        },
+        "width": 150,
+        "height": 1,
+        "rotate": 90,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#000000"
+      },
+      "field23": {
+        "type": "line",
+        "position": {
+          "x": 0,
+          "y": 105
+        },
+        "width": 190,
+        "height": 1,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#000000"
+      },
+      "field1 copy 2": {
+        "type": "rectangle",
+        "position": {
+          "x": 117.31,
+          "y": 105.35
+        },
+        "width": 75.59,
+        "height": 47.01,
+        "rotate": 0,
+        "opacity": 1,
+        "borderWidth": 15,
+        "borderColor": "#000",
+        "borderOpacity": 0.75,
         "color": "",
         "readOnly": true
       }
@@ -185,6 +227,9 @@
     "field9",
     "field10",
     "field11",
-    "field12"
+    "field12",
+    "field13",
+    "field23",
+    "field1 copy 2"
   ]
 }
