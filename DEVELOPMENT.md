@@ -15,14 +15,14 @@ At this point, to check if the build is done correctly, let's execute `npm run t
 [in pdfme dir] $ npm run test
 ```
 
-Then, run `npm run develop` on `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui`,
+Then, run `npm run dev` on `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui`,
 and make sure that any changes are output to each packages `dist` folder.
 
 ```cmd
-[in pdfme/packages/common dir] $ npm run develop
-[in pdfme/packages/schemas dir] $ npm run develop
-[in pdfme/packages/ui dir] $ npm run develop
-[in pdfme/packages/generator dir] $ npm run develop
+[in pdfme/packages/common dir] $ npm run dev
+[in pdfme/packages/schemas dir] $ npm run dev
+[in pdfme/packages/ui dir] $ npm run dev
+[in pdfme/packages/generator dir] $ npm run dev
 ```
 
 If you want to check the changes in the browser, go to `playground`.
@@ -32,7 +32,7 @@ If you want to check the changes in the browser, go to `playground`.
 [in pdfme/playground dir] $ npm run dev
 ```
 
-If `npm run develop` is running in each package, changes made will be reflected in the playground. (For the UI package, it may take about 5-10 seconds for the changes to be reflected.)
+If `npm run dev` is running in each package, changes made will be reflected in the playground. (For the UI package, it may take about 5-10 seconds for the changes to be reflected.)
 
 Please feel free to send a PR if you can fix bugs or add new features. Also, don't forget to add the necessary tests before sending a PR and make sure that the tests pass.
 

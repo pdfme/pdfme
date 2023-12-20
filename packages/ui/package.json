@@ -26,7 +26,7 @@
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "develop": "npm-run-all --parallel devBuild:watch devBuildType:watch",
+    "dev": "npm-run-all --parallel devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
     "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
     "build": "vite build && tsc --emitDeclarationOnly",
