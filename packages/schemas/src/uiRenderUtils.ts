@@ -1,3 +1,5 @@
+import type * as CSS from 'csstype';
+
 export const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
     const fileReader = new FileReader();
@@ -25,3 +27,31 @@ export const readFile = (input: File | FileList | null): Promise<string | ArrayB
       reject(new Error('[@pdfme/schemas] No files provided'));
     }
   });
+
+export const createErrorElm = () => {
+  const container = document.createElement('div');
+  const containerStyle: CSS.Properties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+  };
+  Object.assign(container.style, containerStyle);
+
+  const span = document.createElement('span');
+  const spanStyle: CSS.Properties = {
+    color: 'white',
+    background: 'red',
+    padding: '0.25rem',
+    fontSize: '12pt',
+    fontWeight: 'bold',
+    borderRadius: '2px',
+  };
+  Object.assign(span.style, spanStyle);
+
+  span.textContent = 'ERROR';
+  container.appendChild(span);
+
+  return container;
+};
