@@ -102,6 +102,8 @@ export const getPlugins = () => {
     Ellipse: ellipse,
     QR: barcodes.qrcode,
     Image: image,
+    SVG: plugins.svg,
+    Code128: barcodes.code128,
     Signature: plugins.signature,
   };
 };
