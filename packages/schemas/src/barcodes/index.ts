@@ -5,7 +5,7 @@ import type { BarcodeSchema, BarcodeTypes } from './types';
 import { BARCODE_TYPES } from './constants.js';
 import { Plugin } from '@pdfme/common';
 
-const schemas = BARCODE_TYPES.reduce(
+const barcodes = BARCODE_TYPES.reduce(
   (acc, type) =>
     Object.assign(acc, {
       [type]: { pdf: pdfRender, ui: uiRender, propPanel: getPropPanelByBarcodeType(type) },
@@ -13,4 +13,4 @@ const schemas = BARCODE_TYPES.reduce(
   {} as Record<BarcodeTypes, Plugin<BarcodeSchema>>
 );
 
-export default schemas;
+export default barcodes;

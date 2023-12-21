@@ -1,6 +1,6 @@
-import text from './text/index.js';
-import image from './graphics/image.js';
-import svg from './graphics/svg.js';
+import text, { readOnlyText } from './text/index.js';
+import image, { readOnlyImage } from './graphics/image.js';
+import svg, { readOnlySvg } from './graphics/svg.js';
 import barcodes from './barcodes/index.js';
 import line from './shapes/line.js';
 import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
@@ -10,8 +10,11 @@ const builtInPlugins = { Text: text };
 
 export {
   text,
+  readOnlyText,
   image,
+  readOnlyImage,
   svg,
+  readOnlySvg,
   barcodes,
   line,
   rectangle,

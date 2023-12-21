@@ -70,7 +70,8 @@ export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
   return hex + alphaHex;
 };
 
-export const isEditable = (mode: Mode) => mode === 'form' || mode === 'designer';
+export const isEditable = (mode: Mode, schema: Schema) =>
+  mode === 'designer' || (mode === 'form' && schema.readOnly !== true);
 
 const hex2rgb = (hex: string) => {
   if (hex.slice(0, 1) === '#') hex = hex.slice(1);

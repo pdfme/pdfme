@@ -47,7 +47,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);
-  const editable = isEditable(mode);
+  const editable = isEditable(mode, schema);
   if (editable) {
     const input = document.createElement('input');
     const inputStyle: CSS.Properties = {

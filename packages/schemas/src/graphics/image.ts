@@ -6,12 +6,7 @@ import type * as CSS from 'csstype';
 import sizeOf from 'image-size';
 import { Buffer } from 'buffer';
 import { UIRenderProps } from '@pdfme/common';
-import {
-  convertForPdfLayoutProps,
-  addAlphaToHex,
-  isEditable,
-  readFile,
-} from '../utils.js';
+import { convertForPdfLayoutProps, addAlphaToHex, isEditable, readFile } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
 
 const px2mm = (px: number): number => {
@@ -48,7 +43,7 @@ const defaultValue =
 
 interface ImageSchema extends Schema {}
 
-const schema: Plugin<ImageSchema> = {
+const imageSchema: Plugin<ImageSchema> = {
   pdf: async (arg: PDFRenderProps<ImageSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value || !value.startsWith('data:image/')) return;
@@ -92,8 +87,18 @@ const schema: Plugin<ImageSchema> = {
     page.drawImage(image, { x, y, rotate, width, height, opacity });
   },
   ui: (arg: UIRenderProps<ImageSchema>) => {
-    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, theme } = arg;
-    const editable = isEditable(mode);
+    const {
+      value,
+      rootElement,
+      mode,
+      onChange,
+      stopEditing,
+      tabIndex,
+      placeholder,
+      theme,
+      schema,
+    } = arg;
+    const editable = isEditable(mode, schema);
     const isDefault = value === defaultValue;
 
     const container = document.createElement('div');
@@ -205,4 +210,20 @@ const schema: Plugin<ImageSchema> = {
     },
   },
 };
-export default schema;
+
+// TODO readOnly版と、readOnlyでない版を作る
+export default imageSchema;
+
+export const readOnlyImage: Plugin<ImageSchema> = {
+  pdf: imageSchema.pdf,
+  ui: imageSchema.ui,
+  propPanel: {
+    ...imageSchema.propPanel,
+    defaultSchema: {
+      ...imageSchema.propPanel.defaultSchema,
+      type: 'readOnlyImage',
+      readOnly: true,
+      readOnlyValue: defaultValue,
+    },
+  },
+};
