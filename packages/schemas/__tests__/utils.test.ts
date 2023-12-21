@@ -1,5 +1,35 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint } from '../src/utils';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../src/utils';
+
+describe('hex2RgbColor', () => {
+  it('should convert hex to rgb', () => {
+    const hex = '#000000';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({ red: 0, green: 0, blue: 0, type: 'RGB' });
+  });
+
+  it('should convert hex to rgb with a short hex', () => {
+    const hex = '#fff';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({ red: 1, green: 1, blue: 1, type: 'RGB' });
+  });
+
+  it('should convert hex to rgb for non-trivial color', () => {
+    const hex = '#33af5a';
+    const rgbValue = hex2RgbColor(hex);
+    expect(rgbValue).toEqual({
+      red: 0.2,
+      green: 0.6862745098039216,
+      blue: 0.35294117647058826,
+      type: 'RGB',
+    });
+  });
+
+  it('should throw an error if hex is invalid', () => {
+    const hex = '#fffee';
+    expect(() => hex2RgbColor(hex)).toThrowError('Invalid hex color value #ff');
+  });
+});
 
 describe('rotatePoint', () => {
   it('should rotate one point round another by 90 degrees', () => {
@@ -51,7 +81,7 @@ describe('convertForPdfLayoutProps', () => {
       height: 100,
       position: { x: 100, y: 100 },
       rotate: 0,
-      opacity: 1
+      opacity: 1,
     };
     const pageHeight = 1000;
 
@@ -60,10 +90,10 @@ describe('convertForPdfLayoutProps', () => {
       height,
       width,
       rotate,
-      opacity
+      opacity,
     } = convertForPdfLayoutProps({ schema, pageHeight });
 
-    expect(opacity).toEqual(schema.opacity)
+    expect(opacity).toEqual(schema.opacity);
     expect(height).toEqual(mm2pt(schema.height));
     expect(width).toEqual(mm2pt(schema.width));
     expect(x).toEqual(mm2pt(schema.position.x));
@@ -78,7 +108,7 @@ describe('convertForPdfLayoutProps', () => {
       height: 120,
       position: { x: 100, y: 100 },
       rotate: 90,
-      opacity: 1
+      opacity: 1,
     };
     const pageHeight = 1000;
 
@@ -87,7 +117,7 @@ describe('convertForPdfLayoutProps', () => {
       height,
       width,
       rotate,
-      opacity
+      opacity,
     } = convertForPdfLayoutProps({ schema, pageHeight });
 
     expect(opacity).toBeCloseTo(1);
@@ -105,7 +135,7 @@ describe('convertForPdfLayoutProps', () => {
       height: 120,
       position: { x: 100, y: 100 },
       rotate: 90,
-      opacity: 1
+      opacity: 1,
     };
     const pageHeight = 1000;
 
@@ -114,10 +144,10 @@ describe('convertForPdfLayoutProps', () => {
       height,
       width,
       rotate,
-      opacity
+      opacity,
     } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
-    expect(opacity).toBeCloseTo(1)
+    expect(opacity).toBeCloseTo(1);
     expect(pt2mm(width)).toBeCloseTo(50);
     expect(pt2mm(height)).toBeCloseTo(120.005);
     expect(pt2mm(x)).toBeCloseTo(100);
