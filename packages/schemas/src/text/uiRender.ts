@@ -18,7 +18,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
-import { addAlphaToHex, isEditable } from '../pdfRenderUtils.js';
+import { addAlphaToHex, isEditable } from '../utils.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {

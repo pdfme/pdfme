@@ -1,5 +1,5 @@
 import { PDFRenderProps } from '@pdfme/common';
-import { convertForPdfLayoutProps } from '../pdfRenderUtils.js';
+import { convertForPdfLayoutProps } from '../utils.js';
 import type { BarcodeSchema } from './types';
 import { createBarCode, validateBarcodeInput } from './helper.js';
 

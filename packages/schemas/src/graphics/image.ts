@@ -1,16 +1,50 @@
 import type { ChangeEvent } from 'react';
+import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
-import { UIRenderProps, ZOOM } from '@pdfme/common';
-import { convertForPdfLayoutProps, addAlphaToHex, isEditable } from '../pdfRenderUtils.js';
-import { readFile } from '../uiRenderUtils.js';
+import sizeOf from 'image-size';
+import { Buffer } from 'buffer';
+import { UIRenderProps } from '@pdfme/common';
+import {
+  convertForPdfLayoutProps,
+  addAlphaToHex,
+  isEditable,
+  readFile,
+} from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
+
+const px2mm = (px: number): number => {
+  // http://www.endmemo.com/sconvert/millimeterpixel.php
+  const ratio = 0.26458333333333;
+  return parseFloat(String(px)) * ratio;
+};
+
+const getDimension = (imgBuffer: Buffer): Promise<{ height: number; width: number }> => {
+  if (typeof window !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([imgBuffer]);
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (e) => {
+        reject(e);
+      };
+      img.src = url;
+    });
+  } else {
+    const dimensions = sizeOf(imgBuffer);
+    return Promise.resolve({ width: dimensions.width ?? 0, height: dimensions.height ?? 0 });
+  }
+};
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };
 const defaultValue =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAu4AAALuAQMAAADL0wGJAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAGUExURbzAw+rv8fKruy0AAAPoSURBVHja7dwxbtwwEEBRCkKwRQodYftcYk+ROkcJz5NTsEuZK/AIKlIQAUEnke0VqQ0pA5zxWvFnZcD2s0CNuENxPOZBc0QDDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PDw8PD/+P8bkxvnTzzjTG0M2b5rh08rHNT518aPOnTt63+aGTd23edPJ2h//ax+/oO6Gzx6c78+cuPu7x01vmwx5/6uLnO/PjO+b/rGifvtWH3VnT9vmh/e3eqx/bc9d79af2YwEPDw8P/6r8r1GVt5VcUoZPtXxGhp9rGYEM72vbEBne1hJ5Gb6ayIvwqZppi/CxmgqL8KGaTIrwc3WDfATeV/ffIryr7r+PwNvq/vsIfH17D5/qbw/gb/mLKp/OqnycFPj14yqcJPm4vfp5VJ0cP6jyzqjy9rr2q/Dr4qzBp3V5E1wxp/V3rl8LXn32qF6fAY31Psv2NXi/5lQaH+Vuzak0eLsmPRppVPa3FPiU3QiFFDZmD4FCAh6yxV+Bn7O9isLmx2d/TGHr5rI7obDxtFkcKWyb89M2+U1/sX7Kv7Io8gaxFy5l2D/faRk++3x6PgsalV52+fwUW4j/+eGhDPuneyH/otHmp9jyfHHMLM6n4phZnI/FObA4H4qDWnF+Lo46xXlflG+I864o3xDnbVG+Ic6X9RXSfCrrK6T5WBZASPOhrFCQ5ufyjF+a92XdkjTvyrolad6WdUvS/KawSI7/sQn7JfDl+O+bsF8CX44fN2FvHnNnIT4Nm7BfAl+ON5uwXwJfjA/LCuk2BXvCvN0U7InxflmAtxV1gvx0U2N3luPtdZOlwj/FoR5vbuq85Pi48F6LD0scOk3+sq1cleP9ohlNfkpq/N9pGaMuH7T4ZVqGWYt/nBavyxstftblfaVIWJU/y72yODCfzJH5oMvPh+adLm+PzCdzZD5U/61ClT9Lnvyo8e7QvFHlE3ydj0zOu5ucickhcpgcJofJedUVk8j5b/nGgIeHh4d/I3x/RwLlhgfNH3DavSwGXf7YjT76uqCEQ/P37p9z7uKVmwspd17S7hul3PXK6fbsmnvWhO6GZlMnn3ri8gXN5GzHnX0B35ydj91814CHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHl+d/A9cKjmiL040TAAAAAElFTkSuQmCC';
+  'data:image/png;base64,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';
 
 interface ImageSchema extends Schema {}
 
@@ -20,47 +54,56 @@ const schema: Plugin<ImageSchema> = {
     if (!value || !value.startsWith('data:image/')) return;
 
     const inputImageCacheKey = getCacheKey(schema, value);
-    let image = _cache.get(inputImageCacheKey);
+    let image = _cache.get(inputImageCacheKey) as PDFImage;
     if (!image) {
       const isPng = value.startsWith('data:image/png;');
       image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
       _cache.set(inputImageCacheKey, image);
     }
 
-    const pageHeight = page.getHeight();
-    const {
-      width,
-      height,
-      rotate,
-      position: { x, y },
-      opacity,
-    } = convertForPdfLayoutProps({ schema, pageHeight });
+    const _schema = { ...schema, position: { ...schema.position } };
+    const dataUriPrefix = ';base64,';
+    const idx = value.indexOf(dataUriPrefix);
+    const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
+    const dimension = await getDimension(Buffer.from(imgBase64, 'base64'));
 
+    const imageWidth = px2mm(dimension.width);
+    const imageHeight = px2mm(dimension.height);
+    const boxWidth = _schema.width;
+    const boxHeight = _schema.height;
+
+    const imageRatio = imageWidth / imageHeight;
+    const boxRatio = boxWidth / boxHeight;
+
+    if (imageRatio > boxRatio) {
+      _schema.width = boxWidth;
+      _schema.height = boxWidth / imageRatio;
+      _schema.position.y += (boxHeight - _schema.height) / 2;
+    } else {
+      _schema.width = boxHeight * imageRatio;
+      _schema.height = boxHeight;
+      _schema.position.x += (boxWidth - _schema.width) / 2;
+    }
+
+    const pageHeight = page.getHeight();
+    const lProps = convertForPdfLayoutProps({ schema: _schema, pageHeight });
+    const { width, height, rotate, position, opacity } = lProps;
+    const { x, y } = position;
     page.drawImage(image, { x, y, rotate, width, height, opacity });
   },
   ui: (arg: UIRenderProps<ImageSchema>) => {
-    const {
-      value,
-      rootElement,
-      mode,
-      onChange,
-      stopEditing,
-      tabIndex,
-      placeholder,
-      schema,
-      theme,
-    } = arg;
+    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, theme } = arg;
     const editable = isEditable(mode);
     const isDefault = value === defaultValue;
-
-    const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
     const container = document.createElement('div');
     const backgroundStyle = placeholder ? `url(${placeholder})` : 'none';
     const containerStyle: CSS.Properties = {
       ...fullSize,
       backgroundImage: value ? 'none' : backgroundStyle,
-      backgroundSize: `${size.width}px ${size.height}px`,
+      backgroundSize: `contain`,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
     };
     Object.assign(container.style, containerStyle);
     container.addEventListener('click', (e) => {
@@ -73,7 +116,12 @@ const schema: Plugin<ImageSchema> = {
     // image tag
     if (value) {
       const img = document.createElement('img');
-      const imgStyle: CSS.Properties = { height: '100%', width: '100%', borderRadius: 0 };
+      const imgStyle: CSS.Properties = {
+        height: '100%',
+        width: '100%',
+        borderRadius: 0,
+        objectFit: 'contain',
+      };
       Object.assign(img.style, imgStyle);
       img.src = value;
       container.appendChild(img);
@@ -120,7 +168,16 @@ const schema: Plugin<ImageSchema> = {
       Object.assign(label.style, labelStyle);
       container.appendChild(label);
       const input = document.createElement('input');
-      const inputStyle: CSS.Properties = { ...fullSize, position: 'absolute', top: '50%' };
+      const inputStyle: CSS.Properties = {
+        ...fullSize,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '180px',
+        height: '30px',
+        marginLeft: '-90px',
+        marginTop: '-15px',
+      };
       Object.assign(input.style, inputStyle);
       input.tabIndex = tabIndex || 0;
       input.type = 'file';

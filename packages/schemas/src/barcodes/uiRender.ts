@@ -2,36 +2,9 @@ import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
 import { validateBarcodeInput, createBarCode } from './helper.js';
-import { addAlphaToHex, isEditable } from '../pdfRenderUtils.js';
+import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 
 const fullSize = { width: '100%', height: '100%' };
-
-const createErrorBarcodeElm = () => {
-  const container = document.createElement('div');
-  const containerStyle: CSS.Properties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...fullSize,
-  };
-  Object.assign(container.style, containerStyle);
-
-  const span = document.createElement('span');
-  const spanStyle: CSS.Properties = {
-    color: 'white',
-    background: 'red',
-    padding: '0.25rem',
-    fontSize: '12pt',
-    fontWeight: 'bold',
-    borderRadius: '2px',
-  };
-  Object.assign(span.style, spanStyle);
-
-  span.textContent = 'ERROR';
-  container.appendChild(span);
-
-  return container;
-};
 
 const blobToDataURL = (blob: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -114,7 +87,6 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     container.appendChild(imgElm);
   } catch (err) {
     console.error(`[@pdfme/ui] ${err}`);
-    const errorBarcodeElm = createErrorBarcodeElm();
-    container.appendChild(errorBarcodeElm);
+    container.appendChild(createErrorElm());
   }
 };

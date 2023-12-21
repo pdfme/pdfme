@@ -1,6 +1,6 @@
 import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { hex2RgbColor, convertForPdfLayoutProps } from '../pdfRenderUtils.js';
+import { hex2RgbColor, convertForPdfLayoutProps } from '../utils.js';
 
 interface Shape extends Schema {
   type: 'ellipse' | 'rectangle';

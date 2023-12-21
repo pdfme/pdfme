@@ -32,7 +32,7 @@
     }
   },
   "scripts": {
-    "develop": "tsc -p tsconfig.esm.json -w",
+    "dev": "tsc -p tsconfig.esm.json -w",
     "build": "npm-run-all --parallel build:cjs build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
@@ -43,9 +43,11 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.17.3",
+    "@pdfme/pdf-lib": "^1.18.1",
     "bwip-js": "^4.1.1",
-    "fontkit": "^2.0.2"
+    "fast-xml-parser": "^4.3.2",
+    "fontkit": "^2.0.2",
+    "image-size": "^1.0.2"
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",

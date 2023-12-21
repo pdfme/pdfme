@@ -1,7 +1,7 @@
 import { Template, Font, checkTemplate } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
-import { text, barcodes, image, line, rectangle, ellipse } from '@pdfme/schemas';
+import { text, barcodes, image, svg, line, rectangle, ellipse } from '@pdfme/schemas';
 import plugins from './plugins';
 
 const fontObjList = [
@@ -102,6 +102,8 @@ export const getPlugins = () => {
     Ellipse: ellipse,
     QR: barcodes.qrcode,
     Image: image,
+    SVG: svg,
+    Code128: barcodes.code128,
     Signature: plugins.signature,
   };
 };

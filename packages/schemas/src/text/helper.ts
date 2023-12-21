@@ -5,7 +5,6 @@ import {
   mm2pt,
   pt2mm,
   pt2px,
-  Schema,
   Font,
   getFallbackFontName,
   getDefaultFont,
