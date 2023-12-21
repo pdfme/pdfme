@@ -1,5 +1,5 @@
 import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
-import { rotatePoint, convertForPdfLayoutProps, hex2RgbColor } from '../pdfRenderUtils.js';
+import { rotatePoint, convertForPdfLayoutProps, hex2RgbColor } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
 const DEFAULT_LINE_COLOR = '#000000';

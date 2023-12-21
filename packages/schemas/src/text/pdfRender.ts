@@ -20,7 +20,7 @@ import {
   getSplittedLines,
   widthOfTextAtSize,
 } from './helper.js';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../pdfRenderUtils.js';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../utils.js';
 
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;

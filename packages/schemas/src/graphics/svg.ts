@@ -1,7 +1,6 @@
 import { Plugin, Schema } from '@pdfme/common';
 import { XMLValidator } from 'fast-xml-parser';
-import { convertForPdfLayoutProps, isEditable } from '../pdfRenderUtils.js';
-import { createErrorElm } from '../uiRenderUtils.js';
+import { convertForPdfLayoutProps, isEditable, addAlphaToHex, createErrorElm } from '../utils.js';
 
 const isValidSVG = (svgString: string) => XMLValidator.validate(svgString) === true;
 
@@ -15,7 +14,7 @@ interface SVG extends Schema {}
 
 const schema: Plugin<SVG> = {
   ui: (arg) => {
-    const { rootElement, value, mode, onChange } = arg;
+    const { rootElement, value, mode, onChange, theme } = arg;
     const container = document.createElement(isEditable(mode) ? 'textarea' : 'div');
     container.style.width = '100%';
     container.style.height = '100%';
@@ -23,6 +22,23 @@ const schema: Plugin<SVG> = {
     if (isEditable(mode)) {
       const textarea = container as HTMLTextAreaElement;
       textarea.value = value;
+      textarea.style.position = 'absolute';
+      textarea.style.backgroundColor = addAlphaToHex(theme.colorPrimaryBg, 30);
+
+      if (isValidSVG(value)) {
+        const svgElement = new DOMParser().parseFromString(value, 'text/xml').childNodes[0];
+        if (svgElement instanceof SVGElement) {
+          svgElement.setAttribute('width', '100%');
+          svgElement.setAttribute('height', '100%');
+          svgElement.style.position = 'absolute';
+        }
+        rootElement.appendChild(svgElement);
+      } else if (value) {
+        const errorElm = createErrorElm();
+        errorElm.style.position = 'absolute';
+        rootElement.appendChild(errorElm);
+      }
+
       textarea.addEventListener('change', (e: Event) => {
         const newValue = (e.target as HTMLTextAreaElement).value;
         onChange && onChange(newValue);

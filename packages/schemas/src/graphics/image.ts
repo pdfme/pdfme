@@ -1,16 +1,50 @@
 import type { ChangeEvent } from 'react';
+import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
-import { UIRenderProps, ZOOM } from '@pdfme/common';
-import { convertForPdfLayoutProps, addAlphaToHex, isEditable } from '../pdfRenderUtils.js';
-import { readFile } from '../uiRenderUtils.js';
+import sizeOf from 'image-size';
+import { Buffer } from 'buffer';
+import { UIRenderProps } from '@pdfme/common';
+import {
+  convertForPdfLayoutProps,
+  addAlphaToHex,
+  isEditable,
+  readFile,
+} from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
+
+const px2mm = (px: number): number => {
+  // http://www.endmemo.com/sconvert/millimeterpixel.php
+  const ratio = 0.26458333333333;
+  return parseFloat(String(px)) * ratio;
+};
+
+const getDimension = (imgBuffer: Buffer): Promise<{ height: number; width: number }> => {
+  if (typeof window !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const blob = new Blob([imgBuffer]);
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (e) => {
+        reject(e);
+      };
+      img.src = url;
+    });
+  } else {
+    const dimensions = sizeOf(imgBuffer);
+    return Promise.resolve({ width: dimensions.width ?? 0, height: dimensions.height ?? 0 });
+  }
+};
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };
 const defaultValue =
-  'data:image/png;base64,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';
+  'data:image/png;base64,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';
 
 interface ImageSchema extends Schema {}
 
@@ -20,47 +54,56 @@ const schema: Plugin<ImageSchema> = {
     if (!value || !value.startsWith('data:image/')) return;
 
     const inputImageCacheKey = getCacheKey(schema, value);
-    let image = _cache.get(inputImageCacheKey);
+    let image = _cache.get(inputImageCacheKey) as PDFImage;
     if (!image) {
       const isPng = value.startsWith('data:image/png;');
       image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
       _cache.set(inputImageCacheKey, image);
     }
 
-    const pageHeight = page.getHeight();
-    const {
-      width,
-      height,
-      rotate,
-      position: { x, y },
-      opacity,
-    } = convertForPdfLayoutProps({ schema, pageHeight });
+    const _schema = { ...schema, position: { ...schema.position } };
+    const dataUriPrefix = ';base64,';
+    const idx = value.indexOf(dataUriPrefix);
+    const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
+    const dimension = await getDimension(Buffer.from(imgBase64, 'base64'));
 
+    const imageWidth = px2mm(dimension.width);
+    const imageHeight = px2mm(dimension.height);
+    const boxWidth = _schema.width;
+    const boxHeight = _schema.height;
+
+    const imageRatio = imageWidth / imageHeight;
+    const boxRatio = boxWidth / boxHeight;
+
+    if (imageRatio > boxRatio) {
+      _schema.width = boxWidth;
+      _schema.height = boxWidth / imageRatio;
+      _schema.position.y += (boxHeight - _schema.height) / 2;
+    } else {
+      _schema.width = boxHeight * imageRatio;
+      _schema.height = boxHeight;
+      _schema.position.x += (boxWidth - _schema.width) / 2;
+    }
+
+    const pageHeight = page.getHeight();
+    const lProps = convertForPdfLayoutProps({ schema: _schema, pageHeight });
+    const { width, height, rotate, position, opacity } = lProps;
+    const { x, y } = position;
     page.drawImage(image, { x, y, rotate, width, height, opacity });
   },
   ui: (arg: UIRenderProps<ImageSchema>) => {
-    const {
-      value,
-      rootElement,
-      mode,
-      onChange,
-      stopEditing,
-      tabIndex,
-      placeholder,
-      schema,
-      theme,
-    } = arg;
+    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, theme } = arg;
     const editable = isEditable(mode);
     const isDefault = value === defaultValue;
-
-    const size = { width: schema.width * ZOOM, height: schema.height * ZOOM };
 
     const container = document.createElement('div');
     const backgroundStyle = placeholder ? `url(${placeholder})` : 'none';
     const containerStyle: CSS.Properties = {
       ...fullSize,
       backgroundImage: value ? 'none' : backgroundStyle,
-      backgroundSize: `${size.width}px ${size.height}px`,
+      backgroundSize: `contain`,
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
     };
     Object.assign(container.style, containerStyle);
     container.addEventListener('click', (e) => {
@@ -73,7 +116,12 @@ const schema: Plugin<ImageSchema> = {
     // image tag
     if (value) {
       const img = document.createElement('img');
-      const imgStyle: CSS.Properties = { height: '100%', width: '100%', borderRadius: 0 };
+      const imgStyle: CSS.Properties = {
+        height: '100%',
+        width: '100%',
+        borderRadius: 0,
+        objectFit: 'contain',
+      };
       Object.assign(img.style, imgStyle);
       img.src = value;
       container.appendChild(img);
@@ -120,7 +168,16 @@ const schema: Plugin<ImageSchema> = {
       Object.assign(label.style, labelStyle);
       container.appendChild(label);
       const input = document.createElement('input');
-      const inputStyle: CSS.Properties = { ...fullSize, position: 'absolute', top: '50%' };
+      const inputStyle: CSS.Properties = {
+        ...fullSize,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        width: '180px',
+        height: '30px',
+        marginLeft: '-90px',
+        marginTop: '-15px',
+      };
       Object.assign(input.style, inputStyle);
       input.tabIndex = tabIndex || 0;
       input.type = 'file';
