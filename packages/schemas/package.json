@@ -43,7 +43,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.1",
+    "@pdfme/pdf-lib": "^1.18.3",
     "bwip-js": "^4.1.1",
     "fast-xml-parser": "^4.3.2",
     "fontkit": "^2.0.2"
