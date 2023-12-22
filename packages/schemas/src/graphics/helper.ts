@@ -136,7 +136,6 @@ export const imageSize = (imgBuffer: Buffer): { height: number; width: number } 
   if (typeof type !== 'undefined' && type in typeHandlers) {
     const size = typeHandlers[type].calculate(imgBuffer);
     if (size !== undefined) {
-      console.log('size', size);
       return size;
     }
   }
