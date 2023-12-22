@@ -1,8 +1,29 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { other, shape } from './assets/templates';
-import { text, image, line, rectangle, ellipse } from '@pdfme/schemas';
+import {
+  text,
+  image,
+  line,
+  rectangle,
+  ellipse,
+  readOnlyText,
+  barcodes,
+  readOnlySvg,
+} from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+
+const signature = {
+  pdf: image.pdf,
+  ui: () => {},
+  propPanel: {
+    ...image.propPanel,
+    defaultSchema: {
+      ...image.propPanel.defaultSchema,
+      type: 'signature',
+    },
+  },
+};
 
 describe('generate integration test(other, shape)', () => {
   describe.each([other, shape])('%s', (templateData) => {
@@ -26,7 +47,17 @@ describe('generate integration test(other, shape)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image, line, rectangle, ellipse },
+          plugins: {
+            text,
+            image,
+            line,
+            rectangle,
+            ellipse,
+            signature,
+            qrcode: barcodes.qrcode,
+            readOnlyText,
+            readOnlySvg,
+          },
           options: { font },
         });
 
