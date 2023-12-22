@@ -81,7 +81,6 @@ const svgSchema: Plugin<SVGSchema> = {
   },
 };
 
-// TODO readOnly版と、readOnlyでない版を作る
 export default svgSchema;
 
 export const readOnlySvg: Plugin<SVGSchema> = {

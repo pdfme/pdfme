@@ -114,7 +114,6 @@ const TemplateEditor = ({
           set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
         } else if (key === 'data' && tgt.readOnly) {
-          // TODO readOnlyなら、valueをreadOnlyValueにも設定する?
           set(tgt, 'readOnlyValue', value);
         }
 

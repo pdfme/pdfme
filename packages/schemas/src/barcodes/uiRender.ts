@@ -82,7 +82,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   if (!value) return;
   try {
     if (!validateBarcodeInput(schema.type, value))
-      throw new Error('[@pdfme/schemas] Invalid barcode input');
+      throw new Error('[@pdfme/schemas/barcodes] Invalid barcode input');
     const imgElm = await createBarcodeImageElm(schema, value);
     container.appendChild(imgElm);
   } catch (err) {

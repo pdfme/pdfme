@@ -63,7 +63,6 @@ export const Schema = z
   .object({
     type: z.string(),
     readOnly: z.boolean().optional(),
-    // TODO readOnlyValueを追加する?
     readOnlyValue: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),

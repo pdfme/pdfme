@@ -6,7 +6,6 @@ import type { TextSchema } from './types';
 
 const textSchema: Plugin<TextSchema> = { pdf: pdfRender, ui: uiRender, propPanel };
 
-// TODO readOnly版と、readOnlyでない版を作る
 export default textSchema;
 
 export const readOnlyText: Plugin<TextSchema> = {

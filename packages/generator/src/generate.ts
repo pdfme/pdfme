@@ -42,7 +42,6 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        // TODO readOnlyなら、valueをreadOnlyValueにする？
         const value = schema.readOnly ? schema.readOnlyValue || '' : inputObj[key];
         await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
