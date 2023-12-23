@@ -160,7 +160,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     const s = {
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
-      data: propPanel.defaultValue || '',
+      content: propPanel.defaultValue || '',
       ...propPanel.defaultSchema,
     } as SchemaForUI;
 
