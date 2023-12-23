@@ -49,6 +49,37 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
+// This will move into the plugin, I was just testing it here...
+const mapDynamicVariables = (props: PropPanelWidgetProps) => {
+  const { rootElement, changeSchemas, activeSchema, i18n } = props;
+
+  const regex = /\{([^{}]+)}/g;
+  const matches = activeSchema.data.match(regex);
+
+  if (matches) {
+    for (const match of matches) {
+      const variableName = match.replace('{', '').replace('}', '');
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = variableName;
+      input.onchange = (e: any) => {
+          const val = e.target.value;
+          changeSchemas([{ key: 'dynamicVariables', value: { [variableName]: val }, schemaId: activeSchema.id }]);
+      };
+      const label = document.createElement('label');
+      label.innerText = variableName;
+      label.style.cssText = 'display: flex; width: 100%;';
+      label.appendChild(input);
+      rootElement.appendChild(label);
+    }
+  } else {
+    const para = document.createElement('p');
+    para.innerText = 'Add a variable by typing a name for it surrounded by `{` and `}`';
+    rootElement.appendChild(para);
+  }
+};
+
 export const propPanel: PropPanel<TextSchema> = {
   schema: ({ options, activeSchema, i18n }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
@@ -168,11 +199,12 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      dynamicVariables: { type: 'object', widget: 'mapDynamicVariables', bind: false, span: 16 },
     };
 
     return textSchema;
   },
-  widgets: { UseDynamicFontSize },
+  widgets: { UseDynamicFontSize, mapDynamicVariables },
   defaultValue: 'Type Something...',
   defaultSchema: {
     type: 'text',

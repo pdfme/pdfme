@@ -115,6 +115,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     backgroundColor: 'transparent',
   };
   const textBlock = document.createElement('div');
+  textBlock.id = 'text-' + schema.id;
   Object.assign(textBlock.style, textBlockStyle);
 
   if (isEditable(mode, schema)) {

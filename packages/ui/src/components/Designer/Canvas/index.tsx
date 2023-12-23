@@ -381,6 +381,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
+            onCustomAttributeChange={(key, value) => {
+              changeSchemas([{ key, value, schemaId: schema.id }]);
+            }}
             stopEditing={() => setEditing(false)}
             outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
               schema.readOnly ? 'transparent' : token.colorPrimary
