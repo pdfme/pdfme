@@ -1,3 +1,4 @@
+import multiVariableText from './multiVariableText/index.js'
 import text, { readOnlyText } from './text/index.js';
 import image, { readOnlyImage } from './graphics/image.js';
 import svg, { readOnlySvg } from './graphics/svg.js';
@@ -13,6 +14,7 @@ const tableBeta = table;
 const builtInPlugins = { Text: text };
 
 export {
+  multiVariableText,
   text,
   readOnlyText,
   image,

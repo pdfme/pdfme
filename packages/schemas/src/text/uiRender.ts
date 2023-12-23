@@ -121,6 +121,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textDecoration: textDecorations.join(' '),
   };
   const textBlock = document.createElement('div');
+  textBlock.id = 'text-' + schema.id;
   Object.assign(textBlock.style, textBlockStyle);
 
   if (isEditable(mode, schema)) {
