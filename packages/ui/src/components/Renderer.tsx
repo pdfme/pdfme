@@ -57,6 +57,10 @@ const Renderer = (props: RendererProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
 
+  // If this schema is actively being edited (e.g. typing into a field)
+  // then we don't want changes to that schema triggering a re-render
+  const schemaRerenderState = mode === 'form' || mode === 'designer' ? '' : JSON.stringify(schema);
+
   useEffect(() => {
     if (ref.current && schema.type) {
       const render = Object.values(pluginsRegistry).find(
@@ -95,6 +99,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       }
     };
   }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+// }, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
 
   return (
     <Wrapper {...props}>
