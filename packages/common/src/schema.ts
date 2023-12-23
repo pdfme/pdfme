@@ -63,6 +63,7 @@ export const Schema = z
   .object({
     type: z.string(),
     readOnly: z.boolean().optional(),
+    readOnlyValue: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),

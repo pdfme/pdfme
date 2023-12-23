@@ -3,42 +3,16 @@ import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
-import sizeOf from 'image-size';
 import { Buffer } from 'buffer';
 import { UIRenderProps } from '@pdfme/common';
-import {
-  convertForPdfLayoutProps,
-  addAlphaToHex,
-  isEditable,
-  readFile,
-} from '../utils.js';
+import { convertForPdfLayoutProps, addAlphaToHex, isEditable, readFile } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
+import { imageSize } from './helper.js';
 
 const px2mm = (px: number): number => {
   // http://www.endmemo.com/sconvert/millimeterpixel.php
   const ratio = 0.26458333333333;
   return parseFloat(String(px)) * ratio;
-};
-
-const getDimension = (imgBuffer: Buffer): Promise<{ height: number; width: number }> => {
-  if (typeof window !== 'undefined') {
-    return new Promise((resolve, reject) => {
-      const blob = new Blob([imgBuffer]);
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        resolve({ width: img.width, height: img.height });
-        URL.revokeObjectURL(url);
-      };
-      img.onerror = (e) => {
-        reject(e);
-      };
-      img.src = url;
-    });
-  } else {
-    const dimensions = sizeOf(imgBuffer);
-    return Promise.resolve({ width: dimensions.width ?? 0, height: dimensions.height ?? 0 });
-  }
 };
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
@@ -48,7 +22,7 @@ const defaultValue =
 
 interface ImageSchema extends Schema {}
 
-const schema: Plugin<ImageSchema> = {
+const imageSchema: Plugin<ImageSchema> = {
   pdf: async (arg: PDFRenderProps<ImageSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value || !value.startsWith('data:image/')) return;
@@ -65,7 +39,7 @@ const schema: Plugin<ImageSchema> = {
     const dataUriPrefix = ';base64,';
     const idx = value.indexOf(dataUriPrefix);
     const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
-    const dimension = await getDimension(Buffer.from(imgBase64, 'base64'));
+    const dimension = imageSize(Buffer.from(imgBase64, 'base64'));
 
     const imageWidth = px2mm(dimension.width);
     const imageHeight = px2mm(dimension.height);
@@ -92,8 +66,18 @@ const schema: Plugin<ImageSchema> = {
     page.drawImage(image, { x, y, rotate, width, height, opacity });
   },
   ui: (arg: UIRenderProps<ImageSchema>) => {
-    const { value, rootElement, mode, onChange, stopEditing, tabIndex, placeholder, theme } = arg;
-    const editable = isEditable(mode);
+    const {
+      value,
+      rootElement,
+      mode,
+      onChange,
+      stopEditing,
+      tabIndex,
+      placeholder,
+      theme,
+      schema,
+    } = arg;
+    const editable = isEditable(mode, schema);
     const isDefault = value === defaultValue;
 
     const container = document.createElement('div');
@@ -205,4 +189,19 @@ const schema: Plugin<ImageSchema> = {
     },
   },
 };
-export default schema;
+
+export default imageSchema;
+
+export const readOnlyImage: Plugin<ImageSchema> = {
+  pdf: imageSchema.pdf,
+  ui: imageSchema.ui,
+  propPanel: {
+    ...imageSchema.propPanel,
+    defaultSchema: {
+      ...imageSchema.propPanel.defaultSchema,
+      type: 'readOnlyImage',
+      readOnly: true,
+      readOnlyValue: defaultValue,
+    },
+  },
+};

@@ -4,5 +4,20 @@ import { propPanel } from './propPanel.js';
 import { uiRender } from './uiRender.js';
 import type { TextSchema } from './types';
 
-const schema: Plugin<TextSchema> = { pdf: pdfRender, ui: uiRender, propPanel };
-export default schema;
+const textSchema: Plugin<TextSchema> = { pdf: pdfRender, ui: uiRender, propPanel };
+
+export default textSchema;
+
+export const readOnlyText: Plugin<TextSchema> = {
+  pdf: textSchema.pdf,
+  ui: textSchema.ui,
+  propPanel: {
+    ...textSchema.propPanel,
+    defaultSchema: {
+      ...textSchema.propPanel.defaultSchema,
+      type: 'readOnlyText',
+      readOnly: true,
+      readOnlyValue: textSchema.propPanel.defaultValue,
+    },
+  },
+};

@@ -117,7 +117,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const textBlock = document.createElement('div');
   Object.assign(textBlock.style, textBlockStyle);
 
-  if (isEditable(mode)) {
+  if (isEditable(mode, schema)) {
     textBlock.contentEditable = 'plaintext-only';
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;

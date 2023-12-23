@@ -43,7 +43,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.1",
+    "@pdfme/pdf-lib": "^1.18.3",
     "antd": "^5.11.2",
     "buffer": "^6.0.3",
     "form-render": "^2.2.20",

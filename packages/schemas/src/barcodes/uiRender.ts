@@ -47,7 +47,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);
-  const editable = isEditable(mode);
+  const editable = isEditable(mode, schema);
   if (editable) {
     const input = document.createElement('input');
     const inputStyle: CSS.Properties = {
@@ -82,7 +82,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   if (!value) return;
   try {
     if (!validateBarcodeInput(schema.type, value))
-      throw new Error('[@pdfme/schemas] Invalid barcode input');
+      throw new Error('[@pdfme/schemas/barcodes] Invalid barcode input');
     const imgElm = await createBarcodeImageElm(schema, value);
     container.appendChild(imgElm);
   } catch (err) {

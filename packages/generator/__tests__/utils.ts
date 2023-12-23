@@ -8,6 +8,9 @@ const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/Sau
 const NotoSerifJPRegularData = readFileSync(
   path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`)
 );
+const NotoSansJPRegularData = readFileSync(
+  path.join(__dirname, `/assets/fonts/NotoSansJP-Regular.otf`)
+);
 const GloriaHallelujahRegularData = readFileSync(
   path.join(__dirname, `/assets/fonts/GloriaHallelujah-Regular.ttf`)
 );
@@ -22,6 +25,7 @@ export const getFont = (): Font => ({
   SauceHanSansJP: { fallback: true, data: SauceHanSansJPData },
   SauceHanSerifJP: { data: SauceHanSerifJPData },
   'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
+  'NotoSansJP-Regular': { data: NotoSansJPRegularData },
   'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
   'GreatVibes-Regular': { data: GreatVibesRegularData },
   'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },

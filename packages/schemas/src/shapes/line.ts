@@ -8,7 +8,7 @@ interface LineSchema extends Schema {
   color: string;
 }
 
-const schema: Plugin<LineSchema> = {
+const lineSchema: Plugin<LineSchema> = {
   pdf: (arg: PDFRenderProps<LineSchema>) => {
     const { page, schema } = arg;
     const pageHeight = page.getHeight();
@@ -64,4 +64,4 @@ const schema: Plugin<LineSchema> = {
     },
   },
 };
-export default schema;
+export default lineSchema;
