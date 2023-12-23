@@ -72,7 +72,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       render({
         key: schema.key,
-        value: schema.readOnly ? schema.readOnlyValue || '' : schema.data,
+        value: schema.content || '',
         schema,
         rootElement: ref.current,
         mode,

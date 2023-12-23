@@ -17,7 +17,7 @@ export const readOnlyText: Plugin<TextSchema> = {
       ...textSchema.propPanel.defaultSchema,
       type: 'readOnlyText',
       readOnly: true,
-      readOnlyValue: textSchema.propPanel.defaultValue,
+      content: textSchema.propPanel.defaultValue,
     },
   },
 };

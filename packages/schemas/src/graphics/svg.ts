@@ -92,7 +92,7 @@ export const readOnlySvg: Plugin<SVGSchema> = {
       ...svgSchema.propPanel.defaultSchema,
       type: 'readOnlySvg',
       readOnly: true,
-      readOnlyValue: defaultValue,
+      content: defaultValue,
     },
   },
 };

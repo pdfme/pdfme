@@ -94,12 +94,14 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
-            const { key } = schema;
-            const data = (input && input[key]) || '';
+            const { key, readOnly } = schema;
+            const content = (
+              readOnly ? schema.content || '' : (input && input[key]) || ''
+            ) as string;
             return (
               <Renderer
                 key={schema.id}
-                schema={Object.assign(schema, { data })}
+                schema={Object.assign(schema, { content })}
                 mode={isForm ? 'form' : 'viewer'}
                 placeholder={template.sampledata?.[0]?.[key] ?? ''}
                 tabIndex={index + 100}

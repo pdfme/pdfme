@@ -97,7 +97,7 @@ const TemplateEditor = ({
   const changeSchemas: ChangeSchemas = useCallback(
     (objs) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
-        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;        
+        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;
         // Assign to reference
         set(tgt, key, value);
 
@@ -111,10 +111,8 @@ const TemplateEditor = ({
           const propPanel = Object.values(pluginsRegistry).find(
             (plugin) => plugin?.propPanel.defaultSchema.type === value
           )?.propPanel;
-          set(tgt, 'data', propPanel?.defaultValue || '');
+          set(tgt, 'content', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
-        } else if (key === 'data' && tgt.readOnly) {
-          set(tgt, 'readOnlyValue', value);
         }
 
         return acc;

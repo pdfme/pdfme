@@ -262,11 +262,10 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
             })
             .map((e) => {
               const [key, value] = e;
-              const data = template.sampledata?.[0]?.[key] ?? '';
-
+              const { readOnly } = value;
               return Object.assign(value, {
                 key,
-                data,
+                content: readOnly ? value.content ?? '' : template.sampledata?.[0]?.[key] ?? '',
                 id: uuid(),
               });
             })
@@ -361,8 +360,10 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         delete cur.id;
         // @ts-ignore
         delete cur.key;
-        // @ts-ignore
-        delete cur.data;
+        if (!cur.readOnly) {
+          // @ts-ignore
+          delete cur.content;
+        }
         acc[k] = cur;
 
         return acc;
@@ -378,7 +379,7 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
           if (c.readOnly) {
             return;
           }
-          acc[c.key] = c.data;
+          acc[c.key] = c.content || '';
         });
 
         return acc;

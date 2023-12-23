@@ -39,7 +39,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "My best friend",
+        "content": "My best friend",
         "fontName": "NotoSansJP-Regular"
       },
       "photo": {
@@ -71,7 +71,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Age:",
+        "content": "Age:",
         "fontName": "NotoSansJP-Regular"
       },
       "age": {
@@ -92,7 +92,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "4 years",
+        "content": "4 years",
         "fontName": "NotoSerifJP-Regular"
       },
       "sexLabel": {
@@ -113,7 +113,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Sex:",
+        "content": "Sex:",
         "fontName": "NotoSansJP-Regular"
       },
       "sex": {
@@ -134,7 +134,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Male",
+        "content": "Male",
         "fontName": "NotoSerifJP-Regular"
       },
       "weightLabel": {
@@ -155,7 +155,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Weight: ",
+        "content": "Weight: ",
         "fontName": "NotoSansJP-Regular"
       },
       "weight": {
@@ -176,7 +176,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "33 pounds",
+        "content": "33 pounds",
         "fontName": "NotoSerifJP-Regular"
       },
       "breedLabel": {
@@ -197,7 +197,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Breed:",
+        "content": "Breed:",
         "fontName": "NotoSansJP-Regular"
       },
       "breed": {
@@ -218,7 +218,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Mutt",
+        "content": "Mutt",
         "fontName": "NotoSerifJP-Regular"
       },
       "line1": {
@@ -252,7 +252,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "PERSONALITY",
+        "content": "PERSONALITY",
         "fontName": "NotoSansJP-Regular"
       },
       "personalityText": {
@@ -273,7 +273,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor\nincididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud\nexercitation ullamco laboris nisi ut aliquip ex\nea commodo consequat.\n\nDuis aute irure dolor in reprehenderit. Enim\nad minim veniam.",
+        "content": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor\nincididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud\nexercitation ullamco laboris nisi ut aliquip ex\nea commodo consequat.\n\nDuis aute irure dolor in reprehenderit. Enim\nad minim veniam.",
         "fontName": "NotoSansJP-Regular"
       },
       "line2": {
@@ -307,7 +307,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "HEALTH & GROOMING",
+        "content": "HEALTH & GROOMING",
         "fontName": "NotoSansJP-Regular"
       },
       "healthText": {
@@ -328,7 +328,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do tempor incididunt ut\nlabore et dolore magna aliqua. Ut enim ad\nminim veniam, quis nostrud exercitation\nullamco laboris nisi ut aliquip ex ea\ncommodo consequat. Lorem ipsum dolor sit\namet, consectetur adipiscing elit, sed dolore\neiusmod tempor.\n\nLorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed dolore eiusmod tempor\nincididunt ut labore et dolore magna aliqua.",
+        "content": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do tempor incididunt ut\nlabore et dolore magna aliqua. Ut enim ad\nminim veniam, quis nostrud exercitation\nullamco laboris nisi ut aliquip ex ea\ncommodo consequat. Lorem ipsum dolor sit\namet, consectetur adipiscing elit, sed dolore\neiusmod tempor.\n\nLorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed dolore eiusmod tempor\nincididunt ut labore et dolore magna aliqua.",
         "fontName": "NotoSansJP-Regular"
       },
       "line3": {
@@ -362,7 +362,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "readOnlyValue": "ABOUT THE OWNER",
+        "content": "ABOUT THE OWNER",
         "fontName": "NotoSansJP-Regular"
       },
       "qr": {
@@ -396,7 +396,7 @@
         "width": 20,
         "height": 20,
         "readOnly": true,
-        "readOnlyValue": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"#14b351\" class=\"w-6 h-6\">\n  <path fill-rule=\"evenodd\" d=\"M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z\" clip-rule=\"evenodd\" />\n</svg>\n"
+        "content": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" fill=\"#14b351\" class=\"w-6 h-6\">\n  <path fill-rule=\"evenodd\" d=\"M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307Zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z\" clip-rule=\"evenodd\" />\n</svg>\n"
       }
     }
   ],

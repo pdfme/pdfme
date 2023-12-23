@@ -154,7 +154,8 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
 
   const defaults = barcodeDefaults.find(({ defaultSchema }) => defaultSchema.type === barcodeType);
 
-  if (!defaults) throw new Error(`[@pdfme/schemas/barcodes] No default for barcode type ${barcodeType}`);
+  if (!defaults)
+    throw new Error(`[@pdfme/schemas/barcodes] No default for barcode type ${barcodeType}`);
 
   return {
     schema: ({ i18n }) => ({

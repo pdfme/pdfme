@@ -201,7 +201,7 @@ export const readOnlyImage: Plugin<ImageSchema> = {
       ...imageSchema.propPanel.defaultSchema,
       type: 'readOnlyImage',
       readOnly: true,
-      readOnlyValue: defaultValue,
+      content: defaultValue,
     },
   },
 };
