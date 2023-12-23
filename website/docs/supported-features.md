@@ -25,14 +25,31 @@ For using schemas other than the Text schema, please refer to the following docu
     - Support for multiple fonts and fallback fonts
     - Dynamic Font Sizing
         - Detailed options for Min, Max, Fit
+- Support Read only
 
-### Image
-- Formats
-    - JPEG
-    - PNG
-- [Option to maintain aspect ratio (planned support)](https://github.com/pdfme/pdfme/issues/22)
-    - Cover
-    - Contain
+### Shape
+- Line
+  - Style-related
+    - Color
+- Rectangle
+    - Style-related
+        - Border Width
+        - Border Color
+        - Color
+- Ellipse
+    - Style-related
+        - Border Width
+        - Border Color
+        - Color
+
+### Graphics
+- Image
+    - Formats
+        - JPEG
+        - PNG
+    - Support Read only
+- SVG
+    - Support Read only
 
 ### Barcodes
 - Various types
@@ -55,9 +72,5 @@ For using schemas other than the Text schema, please refer to the following docu
 
 ## Planned Support
 
-- [Line](https://github.com/pdfme/pdfme/issues/329)
-- [Ellipse](https://github.com/pdfme/pdfme/issues/331)
-- [Rectangle](https://github.com/pdfme/pdfme/issues/330)
 - [HyperLink](https://github.com/pdfme/pdfme/issues/319)
-- [SVG](https://github.com/pdfme/pdfme/issues/29)
 - [Table](/docs/tables)

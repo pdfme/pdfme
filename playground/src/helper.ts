@@ -107,16 +107,16 @@ ${e}`);
 
 export const getPlugins = () => {
   return {
-    ReadOnlyText: readOnlyText,
     Text: text,
+    ReadOnlyText: readOnlyText,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
-    QR: barcodes.qrcode,
     Image: image,
     ReadOnlyImage: readOnlyImage,
     SVG: svg,
     ReadOnlySvg: readOnlySvg,
+    QR: barcodes.qrcode,
     Code128: barcodes.code128,
     Signature: plugins.signature,
   };
