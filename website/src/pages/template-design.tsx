@@ -21,6 +21,7 @@ import {
   getDesignerSampleCode,
   getFormSampleCode,
   getViewerSampleCode,
+  getInputFromTemplate
 } from '../libs/helper';
 import HowToUseDesignerButton from '../components/HowToUseDesignerButton';
 import DesignerCodeModal from '../components/DesignerCodeModal';
@@ -97,8 +98,7 @@ ${e}`);
   };
 
   const generatePdf = async () => {
-    // TODO ここ
-    const inputs = template.sampledata ?? [];
+    const inputs = getInputFromTemplate(template)
     const pdf = await generate({
       template,
       plugins: { text, image, qrcode: barcodes.qrcode },

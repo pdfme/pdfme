@@ -3,11 +3,12 @@ import {
   uuid,
   getUniqSchemaKey,
   fmtTemplate,
-  generateColumnsAndSampledataIfNeeded,
+  generateColumnsIfNeeded,
 } from '../src/helper';
 
 const getSchema = (): Schema => ({
   type: 'text',
+  content: '',
   position: { x: 0, y: 0 },
   width: 100,
   height: 100,
@@ -16,7 +17,7 @@ const getSchema = (): Schema => ({
 describe('getUniqSchemaKey test', () => {
   test('getUniqSchemaKey case1', () => {
     const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'b', content: 'b', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'b', ...getSchema(), content: 'b' }];
     const stackUniqSchemaKeys: string[] = [];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy');
@@ -24,7 +25,7 @@ describe('getUniqSchemaKey test', () => {
 
   test('getUniqSchemaKey case2', () => {
     const copiedSchemaKey = 'a copy';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy', content: 'a', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy', ...getSchema(), content: 'a' }];
     const stackUniqSchemaKeys: string[] = [];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy 2');
@@ -33,8 +34,8 @@ describe('getUniqSchemaKey test', () => {
   test('getUniqSchemaKey case3', () => {
     const copiedSchemaKey = 'a';
     const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', content: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 2', content: 'a', ...getSchema() },
+      { id: uuid(), key: 'a', ...getSchema(), content: 'a' },
+      { id: uuid(), key: 'a copy 2', ...getSchema(), content: 'a' },
     ];
     const stackUniqSchemaKeys: string[] = [];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
@@ -44,8 +45,8 @@ describe('getUniqSchemaKey test', () => {
   test('getUniqSchemaKey case4', () => {
     const copiedSchemaKey = 'a';
     const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', content: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 2', content: 'a', ...getSchema() },
+      { id: uuid(), key: 'a', ...getSchema(), content: 'a' },
+      { id: uuid(), key: 'a copy 2', ...getSchema(), content: 'a' },
     ];
     const stackUniqSchemaKeys: string[] = ['a copy 3'];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
@@ -55,8 +56,8 @@ describe('getUniqSchemaKey test', () => {
   test('getUniqSchemaKey case5', () => {
     const copiedSchemaKey = 'a';
     const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', content: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 3', content: 'a', ...getSchema() },
+      { id: uuid(), key: 'a', ...getSchema(), content: 'a' },
+      { id: uuid(), key: 'a copy 3', ...getSchema(), content: 'a' },
     ];
     const stackUniqSchemaKeys: string[] = [];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
@@ -66,8 +67,8 @@ describe('getUniqSchemaKey test', () => {
   test('getUniqSchemaKey case6', () => {
     const copiedSchemaKey = 'a';
     const schema: SchemaForUI[] = [
-      { id: uuid(), key: 'a', content: 'a', ...getSchema() },
-      { id: uuid(), key: 'a copy 3', content: 'a', ...getSchema() },
+      { id: uuid(), key: 'a', ...getSchema(), content: 'a' },
+      { id: uuid(), key: 'a copy 3', ...getSchema(), content: 'a' },
     ];
     const stackUniqSchemaKeys: string[] = ['a copy 4'];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
@@ -76,7 +77,7 @@ describe('getUniqSchemaKey test', () => {
 
   test('getUniqSchemaKey case7', () => {
     const copiedSchemaKey = 'a';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a', content: 'a', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a', ...getSchema(), content: 'a' }];
     const stackUniqSchemaKeys: string[] = ['a copy 2', 'a copy 3', 'a copy 4'];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy 5');
@@ -84,7 +85,7 @@ describe('getUniqSchemaKey test', () => {
 
   test('getUniqSchemaKey case8', () => {
     const copiedSchemaKey = 'a copy 2';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 2', content: 'a', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 2', ...getSchema(), content: 'a' }];
     const stackUniqSchemaKeys: string[] = ['a copy 3'];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy 4');
@@ -92,7 +93,7 @@ describe('getUniqSchemaKey test', () => {
 
   test('getUniqSchemaKey case9', () => {
     const copiedSchemaKey = 'a copy 9';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 9', content: 'a', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 9', ...getSchema(), content: 'a' }];
     const stackUniqSchemaKeys: string[] = ['a copy 10'];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy 11');
@@ -100,7 +101,7 @@ describe('getUniqSchemaKey test', () => {
 
   test('getUniqSchemaKey case10', () => {
     const copiedSchemaKey = 'a copy 10';
-    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 10', content: 'a', ...getSchema() }];
+    const schema: SchemaForUI[] = [{ id: uuid(), key: 'a copy 10', ...getSchema(), content: 'a' }];
     const stackUniqSchemaKeys: string[] = [];
     const uniqSchemaKey = getUniqSchemaKey({ copiedSchemaKey, schema, stackUniqSchemaKeys });
     expect(uniqSchemaKey).toBe('a copy 11');
@@ -113,13 +114,13 @@ describe('fmtTemplate test', () => {
       basePdf: BLANK_PDF,
       schemas: [{ a: getSchema() }],
     };
-    const schemasList: SchemaForUI[][] = [[{ id: uuid(), key: 'b', content: 'b', ...getSchema() }]];
+    const schemasList: SchemaForUI[][] = [[{ id: uuid(), key: 'b', ...getSchema(), content: 'b' }]];
     expect(fmtTemplate(template, schemasList)).toStrictEqual({
       basePdf: BLANK_PDF,
-      schemas: [{ b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100 } }],
+      schemas: [
+        { b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: 'b' } },
+      ],
       columns: ['b'],
-      // TODO ここ
-      sampledata: [{ b: 'b' }],
     });
   });
 
@@ -129,7 +130,7 @@ describe('fmtTemplate test', () => {
       schemas: [{ a: getSchema() }],
     };
     const schemasList: SchemaForUI[][] = [
-      [{ id: uuid(), key: 'b', content: 'b', readOnly: true, ...getSchema() }],
+      [{ id: uuid(), key: 'b', readOnly: true, ...getSchema(), content: 'b' }],
     ];
     expect(fmtTemplate(template, schemasList)).toStrictEqual({
       basePdf: BLANK_PDF,
@@ -146,40 +147,45 @@ describe('fmtTemplate test', () => {
         },
       ],
       columns: ['b'],
-      // TODO ここ
-      sampledata: [{}],
     });
   });
 });
 
-describe('generateColumnsAndSampledataIfNeeded test', () => {
-  test('generateColumnsAndSampledataIfNeeded normal', () => {
+describe('generateColumnsIfNeeded test', () => {
+  test('generateColumnsIfNeeded normal', () => {
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [{ a: getSchema() }],
     };
-    expect(generateColumnsAndSampledataIfNeeded(template)).toStrictEqual({
+    expect(generateColumnsIfNeeded(template)).toStrictEqual({
       basePdf: BLANK_PDF,
-      schemas: [{ a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100 } }],
+      schemas: [
+        { a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: '' } },
+      ],
       columns: ['a'],
-      // TODO ここ
-      sampledata: [{ a: '' }],
     });
   });
 
-  test('generateColumnsAndSampledataIfNeeded with readOnly', () => {
+  test('generateColumnsIfNeeded with readOnly', () => {
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [{ a: { readOnly: true, ...getSchema() } }],
     };
-    expect(generateColumnsAndSampledataIfNeeded(template)).toStrictEqual({
+    expect(generateColumnsIfNeeded(template)).toStrictEqual({
       basePdf: BLANK_PDF,
       schemas: [
-        { a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, readOnly: true } },
+        {
+          a: {
+            type: 'text',
+            position: { x: 0, y: 0 },
+            width: 100,
+            height: 100,
+            readOnly: true,
+            content: '',
+          },
+        },
       ],
       columns: ['a'],
-      // TODO ここ
-      sampledata: [{}],
     });
   });
 });

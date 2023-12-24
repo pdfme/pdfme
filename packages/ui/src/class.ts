@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
-import { debounce, generateColumnsAndSampledataIfNeeded, cloneDeep } from './helper.js';
+import { debounce, generateColumnsIfNeeded, cloneDeep } from './helper.js';
 import {
   Template,
   Size,
@@ -50,7 +50,7 @@ export abstract class BaseUIClass {
 
     const { domContainer, template, options = {}, plugins = {} } = props;
     this.domContainer = domContainer;
-    this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
+    this.template = generateColumnsIfNeeded(cloneDeep(template));
     this.options = options;
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,

@@ -6,6 +6,7 @@ import {
   getTemplate,
   handleLoadTemplate,
   generatePDF,
+  getInputFromTemplate,
   getPlugins,
   isJsonString,
 } from "./helper";
@@ -41,14 +42,13 @@ function App() {
 
   const buildUi = (mode: Mode) => {
     const template = initTemplate();
-    // TODO ここ
-    let inputs = template.sampledata ?? [{}];
+    let inputs = getInputFromTemplate(template);
     try {
       const inputsString = localStorage.getItem("inputs");
-      const inputsJson = inputsString
-        ? JSON.parse(inputsString)
-        : template.sampledata ?? [{}];
-      inputs = inputsJson;
+      if (inputsString) {
+        const inputsJson = JSON.parse(inputsString);
+        inputs = inputsJson;
+      }
     } catch {
       localStorage.removeItem("inputs");
     }

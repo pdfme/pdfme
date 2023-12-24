@@ -12,6 +12,7 @@ describe('generate integration test(barcode, business)', () => {
 
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
+        // @ts-ignore
         const inputs = template.sampledata!;
 
         const font = getFont();

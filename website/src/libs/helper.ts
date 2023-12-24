@@ -1,11 +1,24 @@
 import { Template, Font, checkTemplate } from '@pdfme/common';
 import { examplePdfb64, dogPngb64 } from './sampleData';
+export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
+  const input: { [key: string]: string } = {};
+  template.schemas.forEach((schema) => {
+    Object.entries(schema).forEach(([key, value]) => {
+      if (!value.readOnly) {
+        input[key] = value.content;
+      }
+    });
+  });
+
+  return [input];
+};
 
 export const getSampleTemplate = (): Template => ({
   schemas: [
     {
       name: {
         type: 'text',
+        content: 'Pet Name',
         position: {
           x: 25.06,
           y: 26.35,
@@ -18,6 +31,7 @@ export const getSampleTemplate = (): Template => ({
 
       photo: {
         type: 'image',
+        content: dogPngb64,
         position: {
           x: 24.99,
           y: 65.61,
@@ -27,6 +41,7 @@ export const getSampleTemplate = (): Template => ({
       },
       age: {
         type: 'text',
+        content: '4 years',
         position: {
           x: 36,
           y: 179.46,
@@ -37,6 +52,7 @@ export const getSampleTemplate = (): Template => ({
       },
       sex: {
         type: 'text',
+        content: 'Male',
         position: {
           x: 36,
           y: 186.23,
@@ -47,6 +63,7 @@ export const getSampleTemplate = (): Template => ({
       },
       weight: {
         type: 'text',
+        content: '33 pounds',
         position: {
           x: 40,
           y: 192.99,
@@ -57,6 +74,7 @@ export const getSampleTemplate = (): Template => ({
       },
       breed: {
         type: 'text',
+        content: 'Mutt',
         position: {
           x: 40,
           y: 199.09,
@@ -67,6 +85,7 @@ export const getSampleTemplate = (): Template => ({
       },
       owner: {
         type: 'qrcode',
+        content: 'https://pdfme.com/',
         position: {
           x: 115.09,
           y: 204.43,
@@ -77,18 +96,6 @@ export const getSampleTemplate = (): Template => ({
     },
   ],
   basePdf: examplePdfb64,
-  // TODO ここ
-  sampledata: [
-    {
-      name: 'Pet Name',
-      photo: dogPngb64,
-      age: '4 years',
-      sex: 'Male',
-      weight: '33 pounds',
-      breed: 'Mutt',
-      owner: 'https://pdfme.com/',
-    },
-  ],
   columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
 
@@ -147,7 +154,6 @@ const templateFmt4SampleCode = (template: Template) =>
     2
   );
 
-  // TODO ここ
 export const getGeneratorSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { generate } from "@pdfme/generator";
@@ -155,7 +161,7 @@ import { generate } from "@pdfme/generator";
 (async () => {
   const template = ${templateFmt4SampleCode(template)};
   const plugins = { text, image, qrcode: barcodes.qrcode };
-  const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+  const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
   const pdf = await generate({ template, plugins, inputs });
 
@@ -177,7 +183,6 @@ const plugins = { text, image, qrcode: barcodes.qrcode };
 
 const designer = new Designer({ domContainer, template, plugins });`.trim();
 
-// TODO ここ
 export const getFormSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { Form } from "@pdfme/ui";
@@ -185,11 +190,10 @@ import { Form } from "@pdfme/ui";
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
 const form = new Form({ domContainer, template, plugins, inputs });`.trim();
 
-// TODO ここ
 export const getViewerSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { Viewer } from "@pdfme/ui";
@@ -197,7 +201,7 @@ import { Viewer } from "@pdfme/ui";
 const domContainer = document.getElementById('container');
 const template = ${templateFmt4SampleCode(template)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
 const viewer = new Viewer({ domContainer, template, plugins });`.trim();
 

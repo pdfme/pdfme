@@ -113,7 +113,6 @@ export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
  * @template T - Type of the extended Schema object.
  * @property {Record<string, PropPanelSchema> | ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>)} schema - A function returning a form-render schema object or the schema object itself. When a function, it takes properties passed from the designer as arguments.
  * @property {Record<string, (props: PropPanelWidgetProps) => void>} [widgets] - An object of functions returning form-render widgets. The functions take, as arguments, both form-render's WidgetProps and properties passed from the designer.
- * @property {string} defaultValue - The default input value set when adding the schema.
  * @property {T} defaultSchema - The default schema set when adding the schema.
  */
 export interface PropPanel<T extends Schema> {
@@ -122,7 +121,6 @@ export interface PropPanel<T extends Schema> {
     | Record<string, PropPanelSchema>;
 
   widgets?: Record<string, (props: PropPanelWidgetProps) => void>;
-  defaultValue: string;
   defaultSchema: T;
 }
 

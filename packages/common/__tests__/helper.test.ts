@@ -16,6 +16,7 @@ const getTemplate = (): Template => ({
   schemas: [
     {
       a: {
+        content: 'a',
         type: 'text',
         fontName: 'SauceHanSansJP',
         position: { x: 0, y: 0 },
@@ -23,6 +24,7 @@ const getTemplate = (): Template => ({
         height: 100,
       },
       b: {
+        content: 'b',
         type: 'text',
         position: { x: 0, y: 0 },
         width: 100,
@@ -85,12 +87,14 @@ describe('checkFont test', () => {
       schemas: [
         {
           a: {
+            content: 'a',
             type: 'text',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
           b: {
+            content: 'b',
             type: 'text',
             position: { x: 0, y: 0 },
             width: 100,
@@ -171,6 +175,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
         {
           a: {
             type: 'text',
+            content: 'a',
             fontName: 'SauceHanSansJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -178,6 +183,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
           },
           b: {
             type: 'text',
+            content: 'b',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -204,6 +210,7 @@ Check this document: https://pdfme.com/docs/custom-fonts`
         {
           a: {
             type: 'text',
+            content: 'a',
             fontName: 'SauceHanSansJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -211,6 +218,7 @@ Check this document: https://pdfme.com/docs/custom-fonts`
           },
           b: {
             type: 'text',
+            content: 'b',
             fontName: 'SauceHanSerifJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -239,8 +247,13 @@ describe('checkPlugins test', () => {
       ui: async () => {},
       propPanel: {
         schema: {},
-        defaultValue: '',
-        defaultSchema: { type: 'myText', position: { x: 0, y: 0 }, width: 100, height: 100 },
+        defaultSchema: {
+          type: 'myText',
+          content: '',
+          position: { x: 0, y: 0 },
+          width: 100,
+          height: 100,
+        },
       },
     },
     myImage: {
@@ -248,8 +261,13 @@ describe('checkPlugins test', () => {
       ui: async () => {},
       propPanel: {
         schema: {},
-        defaultValue: '',
-        defaultSchema: { type: 'myImage', position: { x: 0, y: 0 }, width: 100, height: 100 },
+        defaultSchema: {
+          type: 'myImage',
+          content: '',
+          position: { x: 0, y: 0 },
+          width: 100,
+          height: 100,
+        },
       },
     },
   };

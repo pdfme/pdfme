@@ -262,11 +262,10 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
             })
             .map((e) => {
               const [key, value] = e;
-              const { readOnly } = value;
+              const { content } = value;
               return Object.assign(value, {
                 key,
-                // TODO ここ
-                content: readOnly ? value.content ?? '' : template.sampledata?.[0]?.[key] ?? '',
+                content,
                 id: uuid(),
               });
             })
@@ -309,44 +308,17 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
-export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
-  // TODO ここ
-  const { schemas, columns, sampledata } = template;
+export const generateColumnsIfNeeded = (template: Template) => {
+  const { schemas, columns } = template;
 
   const flatSchemaLengthForColumns = schemas
     .map((schema) => Object.keys(schema).length)
     .reduce((acc, cur) => acc + cur, 0);
   const needColumns = !columns || flatSchemaLengthForColumns !== columns.length;
 
-  const flatSchemaLengthForSampleData = schemas
-    .map((schema) => Object.keys(schema).filter((key) => !schema[key].readOnly).length)
-    .reduce((acc, cur) => acc + cur, 0);
-  const needSampledata =
-    !sampledata || flatSchemaLengthForSampleData !== Object.keys(sampledata[0]).length;
-
   // columns
   if (needColumns) {
     template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
-  }
-
-  // sampledata
-  if (needSampledata) {
-    template.sampledata = [
-      schemas.reduce(
-        (acc, cur) =>
-          Object.assign(
-            acc,
-            Object.keys(cur).reduce((a, c) => {
-              const { readOnly } = cur[c];
-              if (readOnly) {
-                return a;
-              }
-              return Object.assign(a, { [c]: '' });
-            }, {} as { [key: string]: string })
-          ),
-        {} as { [key: string]: string }
-      ),
-    ];
   }
 
   return template;
@@ -362,10 +334,6 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         delete cur.id;
         // @ts-ignore
         delete cur.key;
-        if (!cur.readOnly) {
-          // @ts-ignore
-          delete cur.content;
-        }
         acc[k] = cur;
 
         return acc;
@@ -375,19 +343,6 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
       (acc, cur) => acc.concat(cur.map((s) => s.key)),
       [] as string[]
     ),
-    // TODO ここ
-    sampledata: [
-      cloneDeep(schemasList).reduce((acc, cur) => {
-        cur.forEach((c) => {
-          if (c.readOnly) {
-            return;
-          }
-          acc[c.key] = c.content || '';
-        });
-
-        return acc;
-      }, {} as { [key: string]: string }),
-    ],
     basePdf: template.basePdf,
   };
 

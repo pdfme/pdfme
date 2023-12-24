@@ -96,15 +96,14 @@ const Preview = ({
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
             const content = (
-              readOnly ? schema.content || '' : (input && input[key]) || ''
+              readOnly ? schema.content : (input && input[key]) || ''
             ) as string;
             return (
               <Renderer
                 key={schema.id}
                 schema={Object.assign(schema, { content })}
                 mode={isForm ? 'form' : 'viewer'}
-                // TODO ここ
-                placeholder={template.sampledata?.[0]?.[key] ?? ''}
+                placeholder={schema.content as string}
                 tabIndex={index + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
                 outline={

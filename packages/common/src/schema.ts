@@ -62,13 +62,13 @@ export const Size = z.object({ height: z.number(), width: z.number() });
 export const Schema = z
   .object({
     type: z.string(),
-    readOnly: z.boolean().optional(),
-    content: z.string().optional(),
+    content: z.string(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),
     rotate: z.number().optional(),
     opacity: z.number().optional(),
+    readOnly: z.boolean().optional(),
   })
   .passthrough();
 
@@ -94,8 +94,6 @@ export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]
 export const Template = z.object({
   schemas: z.array(z.record(Schema)),
   basePdf: BasePdf,
-  // TODO ここ
-  sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
 });
 

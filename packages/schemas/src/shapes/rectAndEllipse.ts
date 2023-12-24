@@ -84,9 +84,9 @@ const shape: Plugin<Shape> = {
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
     }),
-    defaultValue: '',
     defaultSchema: {
       type: 'rectangle',
+      content: '',
       position: { x: 0, y: 0 },
       width: 62.5,
       height: 37.5,

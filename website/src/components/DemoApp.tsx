@@ -6,7 +6,7 @@ import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import { getFont } from '../libs/helper';
+import { getFont, getInputFromTemplate } from '../libs/helper';
 import { useForm } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';
@@ -63,8 +63,7 @@ const DemoApp = (props: Props) => {
   };
 
   const loadSampleData = () => {
-    // TODO ここ
-    form?.setInputs(template.sampledata ?? []);
+    form?.setInputs(getInputFromTemplate(template));
     alert('Sample Data loaded.\nPlease click "Download" button.');
   };
 

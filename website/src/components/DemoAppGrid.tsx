@@ -6,7 +6,7 @@ import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { text, image, barcodes } from '@pdfme/schemas';
-import { getFont, deNormalizeDatas, normalizeDatas } from '../libs/helper';
+import { getFont, deNormalizeDatas, normalizeDatas, getInputFromTemplate } from '../libs/helper';
 import { useViewer } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';
@@ -40,8 +40,8 @@ const DemoAppGrid = (props: Props) => {
       .then((_) => _.json())
       .then((t) => {
         checkTemplate(t);
-        // TODO ここ
-        const emptyDatas = deNormalizeDatas(t.sampledata, t).map((row) =>
+        const inputs = getInputFromTemplate(t);
+        const emptyDatas = deNormalizeDatas(inputs, t).map((row) =>
           Object.fromEntries(Object.entries(row).map(([key]) => [key, '']))
         );
         setDatas(emptyDatas);
@@ -69,9 +69,8 @@ const DemoAppGrid = (props: Props) => {
   };
 
   const loadSampleData = () => {
-    // TODO ここ
-    viewer?.setInputs(template.sampledata ?? []);
-    setDatas(deNormalizeDatas(template.sampledata, template));
+    viewer?.setInputs(getInputFromTemplate(template));
+    setDatas(deNormalizeDatas(getInputFromTemplate(template), template));
     alert('Sample Data loaded.\nPlease click "Download" button.');
   };
 

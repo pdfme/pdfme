@@ -22,6 +22,7 @@ const getSampleFont = (): Font => ({
 const getTextSchema = () => {
   const textSchema: TextSchema = {
     type: 'text',
+    content: 'test',
     position: { x: 0, y: 0 },
     width: 50,
     height: 20,

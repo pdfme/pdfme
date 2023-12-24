@@ -176,9 +176,9 @@ const imageSchema: Plugin<ImageSchema> = {
   },
   propPanel: {
     schema: {},
-    defaultValue,
     defaultSchema: {
       type: 'image',
+      content: defaultValue,
       position: { x: 0, y: 0 },
       width: 40,
       height: 40,
@@ -201,7 +201,6 @@ export const readOnlyImage: Plugin<ImageSchema> = {
       ...imageSchema.propPanel.defaultSchema,
       type: 'readOnlyImage',
       readOnly: true,
-      content: defaultValue,
     },
   },
 };

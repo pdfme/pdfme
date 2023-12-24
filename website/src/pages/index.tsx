@@ -11,7 +11,7 @@ import type { Template } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { generate } from '@pdfme/generator';
 import type { Designer, Viewer, Form } from '@pdfme/ui';
-import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
+import { getSampleTemplate, cloneDeep, getGeneratorSampleCode, getInputFromTemplate } from '../libs/helper';
 
 export default function Home(): JSX.Element {
   const designerRef = useRef<HTMLDivElement | null>(null);
@@ -28,17 +28,12 @@ export default function Home(): JSX.Element {
   const onSaveTemplate = (t: Template) => {
     setTemplate(t);
     if (form.current) {
-      // TODO ここ
       form.current.updateTemplate(t);
-      if (t.sampledata) {
-        form.current.setInputs(cloneDeep(t.sampledata));
-      }
+      form.current.setInputs(getInputFromTemplate(t));
     }
     if (viewer.current) {
       viewer.current.updateTemplate(t);
-      if (t.sampledata) {
-        viewer.current.setInputs(cloneDeep(t.sampledata));
-      }
+      viewer.current.setInputs(getInputFromTemplate(t));
     }
   };
 
@@ -65,10 +60,9 @@ export default function Home(): JSX.Element {
       import('@pdfme/ui').then(({ Viewer }) => {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
-          template,          
+          template,
           plugins: { text, image, qrcode: barcodes.qrcode },
-          // TODO ここ
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: getInputFromTemplate(template),
         });
       });
 
@@ -80,8 +74,7 @@ export default function Home(): JSX.Element {
           domContainer: formRef.current,
           template,
           plugins: { text, image, qrcode: barcodes.qrcode },
-          // TODO ここ
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: getInputFromTemplate(template),
         });
 
         form.current.onChangeInput(console.log);
