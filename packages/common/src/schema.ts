@@ -94,6 +94,7 @@ export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]
 export const Template = z.object({
   schemas: z.array(z.record(Schema)),
   basePdf: BasePdf,
+  // TODO ここ
   sampledata: z.array(z.record(z.string())).length(1).optional(),
   columns: z.array(z.string()).optional(),
 });

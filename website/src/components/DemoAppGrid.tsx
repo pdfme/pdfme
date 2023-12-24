@@ -40,6 +40,7 @@ const DemoAppGrid = (props: Props) => {
       .then((_) => _.json())
       .then((t) => {
         checkTemplate(t);
+        // TODO ここ
         const emptyDatas = deNormalizeDatas(t.sampledata, t).map((row) =>
           Object.fromEntries(Object.entries(row).map(([key]) => [key, '']))
         );
@@ -68,6 +69,7 @@ const DemoAppGrid = (props: Props) => {
   };
 
   const loadSampleData = () => {
+    // TODO ここ
     viewer?.setInputs(template.sampledata ?? []);
     setDatas(deNormalizeDatas(template.sampledata, template));
     alert('Sample Data loaded.\nPlease click "Download" button.');

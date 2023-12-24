@@ -118,6 +118,7 @@ describe('fmtTemplate test', () => {
       basePdf: BLANK_PDF,
       schemas: [{ b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100 } }],
       columns: ['b'],
+      // TODO ここ
       sampledata: [{ b: 'b' }],
     });
   });
@@ -145,6 +146,7 @@ describe('fmtTemplate test', () => {
         },
       ],
       columns: ['b'],
+      // TODO ここ
       sampledata: [{}],
     });
   });
@@ -160,6 +162,7 @@ describe('generateColumnsAndSampledataIfNeeded test', () => {
       basePdf: BLANK_PDF,
       schemas: [{ a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100 } }],
       columns: ['a'],
+      // TODO ここ
       sampledata: [{ a: '' }],
     });
   });
@@ -175,6 +178,7 @@ describe('generateColumnsAndSampledataIfNeeded test', () => {
         { a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, readOnly: true } },
       ],
       columns: ['a'],
+      // TODO ここ
       sampledata: [{}],
     });
   });

@@ -28,6 +28,7 @@ export default function Home(): JSX.Element {
   const onSaveTemplate = (t: Template) => {
     setTemplate(t);
     if (form.current) {
+      // TODO ここ
       form.current.updateTemplate(t);
       if (t.sampledata) {
         form.current.setInputs(cloneDeep(t.sampledata));
@@ -64,8 +65,9 @@ export default function Home(): JSX.Element {
       import('@pdfme/ui').then(({ Viewer }) => {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
-          template,
+          template,          
           plugins: { text, image, qrcode: barcodes.qrcode },
+          // TODO ここ
           inputs: cloneDeep(template.sampledata ?? [{}]),
         });
       });
@@ -78,6 +80,7 @@ export default function Home(): JSX.Element {
           domContainer: formRef.current,
           template,
           plugins: { text, image, qrcode: barcodes.qrcode },
+          // TODO ここ
           inputs: cloneDeep(template.sampledata ?? [{}]),
         });
 

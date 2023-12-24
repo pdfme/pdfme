@@ -77,6 +77,7 @@ export const getSampleTemplate = (): Template => ({
     },
   ],
   basePdf: examplePdfb64,
+  // TODO ここ
   sampledata: [
     {
       name: 'Pet Name',
@@ -146,6 +147,7 @@ const templateFmt4SampleCode = (template: Template) =>
     2
   );
 
+  // TODO ここ
 export const getGeneratorSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { generate } from "@pdfme/generator";
@@ -175,6 +177,7 @@ const plugins = { text, image, qrcode: barcodes.qrcode };
 
 const designer = new Designer({ domContainer, template, plugins });`.trim();
 
+// TODO ここ
 export const getFormSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { Form } from "@pdfme/ui";
@@ -186,6 +189,7 @@ const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
 
 const form = new Form({ domContainer, template, plugins, inputs });`.trim();
 
+// TODO ここ
 export const getViewerSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { Viewer } from "@pdfme/ui";

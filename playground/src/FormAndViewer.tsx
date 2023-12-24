@@ -41,6 +41,7 @@ function App() {
 
   const buildUi = (mode: Mode) => {
     const template = initTemplate();
+    // TODO ここ
     let inputs = template.sampledata ?? [{}];
     try {
       const inputsString = localStorage.getItem("inputs");

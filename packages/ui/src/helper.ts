@@ -265,6 +265,7 @@ const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =
               const { readOnly } = value;
               return Object.assign(value, {
                 key,
+                // TODO ここ
                 content: readOnly ? value.content ?? '' : template.sampledata?.[0]?.[key] ?? '',
                 id: uuid(),
               });
@@ -309,6 +310,7 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 };
 
 export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
+  // TODO ここ
   const { schemas, columns, sampledata } = template;
 
   const flatSchemaLengthForColumns = schemas
@@ -373,6 +375,7 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
       (acc, cur) => acc.concat(cur.map((s) => s.key)),
       [] as string[]
     ),
+    // TODO ここ
     sampledata: [
       cloneDeep(schemasList).reduce((acc, cur) => {
         cur.forEach((c) => {

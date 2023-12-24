@@ -103,6 +103,7 @@ const Preview = ({
                 key={schema.id}
                 schema={Object.assign(schema, { content })}
                 mode={isForm ? 'form' : 'viewer'}
+                // TODO ここ
                 placeholder={template.sampledata?.[0]?.[key] ?? ''}
                 tabIndex={index + 100}
                 onChange={(value) => handleChangeInput({ key, value })}
