@@ -58,58 +58,6 @@
     "{12}[お届け先]氏名",
     "{12}**credit**"
   ],
-  "sampledata": [
-    {
-      "{1}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{1}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{1}[お届け先]氏名": "東京都 出得太",
-      "{1}[お届け先]郵便番号": "1234567",
-      "{2}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{2}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{2}[お届け先]氏名": "東京都 出得太",
-      "{2}[お届け先]郵便番号": "1234567",
-      "{3}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{3}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{3}[お届け先]氏名": "東京都 出得太",
-      "{3}[お届け先]郵便番号": "1234567",
-      "{4}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{4}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{4}[お届け先]氏名": "東京都 出得太",
-      "{4}[お届け先]郵便番号": "1234567",
-      "{5}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{5}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{5}[お届け先]氏名": "東京都 出得太",
-      "{5}[お届け先]郵便番号": "1234567",
-      "{6}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{6}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{6}[お届け先]氏名": "東京都 出得太",
-      "{6}[お届け先]郵便番号": "1234567",
-      "{7}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{7}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{7}[お届け先]氏名": "東京都 出得太",
-      "{7}[お届け先]郵便番号": "1234567",
-      "{8}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{8}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{8}[お届け先]氏名": "東京都 出得太",
-      "{8}[お届け先]郵便番号": "1234567",
-      "{9}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{9}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{9}[お届け先]氏名": "東京都 出得太",
-      "{9}[お届け先]郵便番号": "1234567",
-      "{10}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{10}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{10}[お届け先]氏名": "東京都 出得太",
-      "{10}[お届け先]郵便番号": "1234567",
-      "{11}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{11}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{11}[お届け先]氏名": "東京都 出得太",
-      "{11}[お届け先]郵便番号": "1234567",
-      "{12}**credit**": "このラベルは labelmake.jp で作成されました",
-      "{12}[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "{12}[お届け先]氏名": "東京都 出得太",
-      "{12}[お届け先]郵便番号": "1234567"
-    }
-  ],
   "schemas": [
     {
       "{1}**credit**": {
@@ -125,7 +73,8 @@
         "backgroundColor": "#c8c8c8",
         "width": 52.45,
         "lineHeight": 1,
-        "type": "text"
+        "type": "text",
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{1}[お届け先]住所": {
         "lineHeight": 0.9,
@@ -140,7 +89,8 @@
           "x": 23.5
         },
         "backgroundColor": "",
-        "fontColor": ""
+        "fontColor": "",
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{1}[お届け先]氏名": {
         "type": "text",
@@ -155,7 +105,8 @@
         "position": {
           "y": 48.5,
           "x": 23.5
-        }
+        },
+        "content": "東京都 出得太"
       },
       "{1}[お届け先]郵便番号": {
         "type": "text",
@@ -170,7 +121,8 @@
         "height": 6.03,
         "alignment": "left",
         "backgroundColor": "",
-        "characterSpacing": 0
+        "characterSpacing": 0,
+        "content": "1234567"
       },
       "{2}**credit**": {
         "fontColor": "#000000",
@@ -185,7 +137,8 @@
         "height": 3.02,
         "characterSpacing": 0,
         "width": 52.45,
-        "fontSize": 7
+        "fontSize": 7,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{2}[お届け先]住所": {
         "height": 13.96,
@@ -200,7 +153,8 @@
         "backgroundColor": "",
         "fontColor": "",
         "alignment": "left",
-        "lineHeight": 0.9
+        "lineHeight": 0.9,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{2}[お届け先]氏名": {
         "fontColor": "",
@@ -215,7 +169,8 @@
         "fontSize": 14.5,
         "type": "text",
         "characterSpacing": 0,
-        "lineHeight": 0.85
+        "lineHeight": 0.85,
+        "content": "東京都 出得太"
       },
       "{2}[お届け先]郵便番号": {
         "fontColor": "",
@@ -230,7 +185,8 @@
         "width": 77.8,
         "lineHeight": 1,
         "characterSpacing": 0,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "1234567"
       },
       "{3}**credit**": {
         "backgroundColor": "#c8c8c8",
@@ -245,7 +201,8 @@
         "fontSize": 7,
         "fontColor": "#000000",
         "width": 52.45,
-        "alignment": "center"
+        "alignment": "center",
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{3}[お届け先]住所": {
         "height": 14.49,
@@ -260,7 +217,8 @@
         "fontColor": "",
         "fontSize": 14.5,
         "backgroundColor": "",
-        "characterSpacing": 0
+        "characterSpacing": 0,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{3}[お届け先]氏名": {
         "width": 77.8,
@@ -275,7 +233,8 @@
         "fontSize": 14.5,
         "fontColor": "",
         "lineHeight": 0.85,
-        "type": "text"
+        "type": "text",
+        "content": "東京都 出得太"
       },
       "{3}[お届け先]郵便番号": {
         "fontColor": "",
@@ -290,7 +249,8 @@
         "type": "text",
         "width": 77.8,
         "backgroundColor": "",
-        "height": 6.03
+        "height": 6.03,
+        "content": "1234567"
       },
       "{4}**credit**": {
         "type": "text",
@@ -305,7 +265,8 @@
         },
         "fontSize": 7,
         "height": 3.02,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{4}[お届け先]住所": {
         "type": "text",
@@ -320,7 +281,8 @@
           "y": 161.2
         },
         "lineHeight": 0.9,
-        "characterSpacing": 0
+        "characterSpacing": 0,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{4}[お届け先]氏名": {
         "backgroundColor": "",
@@ -335,7 +297,8 @@
           "x": 23.5
         },
         "width": 77.8,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都 出得太"
       },
       "{4}[お届け先]郵便番号": {
         "height": 6.03,
@@ -350,7 +313,8 @@
           "x": 23.5
         },
         "fontColor": "",
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{5}**credit**": {
         "characterSpacing": 0,
@@ -365,7 +329,8 @@
         "fontSize": 7,
         "fontColor": "#000000",
         "alignment": "center",
-        "width": 52.45
+        "width": 52.45,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{5}[お届け先]住所": {
         "backgroundColor": "",
@@ -380,7 +345,8 @@
         "position": {
           "y": 203.5,
           "x": 23.5
-        }
+        },
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{5}[お届け先]氏名": {
         "height": 10,
@@ -395,7 +361,8 @@
         "position": {
           "y": 217.7,
           "x": 23.5
-        }
+        },
+        "content": "東京都 出得太"
       },
       "{5}[お届け先]郵便番号": {
         "characterSpacing": 0,
@@ -410,7 +377,8 @@
         "lineHeight": 1,
         "fontSize": 14.5,
         "width": 77.8,
-        "type": "text"
+        "type": "text",
+        "content": "1234567"
       },
       "{6}**credit**": {
         "width": 52.45,
@@ -425,7 +393,8 @@
         "characterSpacing": 0,
         "fontColor": "#000000",
         "fontSize": 7,
-        "height": 3.02
+        "height": 3.02,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{6}[お届け先]住所": {
         "backgroundColor": "",
@@ -440,7 +409,8 @@
         },
         "type": "text",
         "alignment": "left",
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{6}[お届け先]氏名": {
         "alignment": "left",
@@ -455,7 +425,8 @@
         "fontSize": 14.5,
         "fontColor": "",
         "width": 77.8,
-        "lineHeight": 0.85
+        "lineHeight": 0.85,
+        "content": "東京都 出得太"
       },
       "{6}[お届け先]郵便番号": {
         "position": {
@@ -470,7 +441,8 @@
         "fontSize": 14.5,
         "alignment": "left",
         "type": "text",
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{7}**credit**": {
         "characterSpacing": 0,
@@ -485,7 +457,8 @@
           "y": 54.89
         },
         "width": 52.45,
-        "fontSize": 7
+        "fontSize": 7,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{7}[お届け先]住所": {
         "height": 15.02,
@@ -500,7 +473,8 @@
         },
         "width": 77.8,
         "lineHeight": 0.9,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{7}[お届け先]氏名": {
         "alignment": "left",
@@ -515,7 +489,8 @@
         "type": "text",
         "characterSpacing": 0,
         "lineHeight": 0.85,
-        "height": 10
+        "height": 10,
+        "content": "東京都 出得太"
       },
       "{7}[お届け先]郵便番号": {
         "lineHeight": 1,
@@ -530,7 +505,8 @@
         "backgroundColor": "",
         "width": 77.8,
         "alignment": "left",
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "1234567"
       },
       "{8}**credit**": {
         "height": 3.02,
@@ -545,7 +521,8 @@
         "position": {
           "x": 136.45,
           "y": 98.15
-        }
+        },
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{8}[お届け先]住所": {
         "backgroundColor": "",
@@ -560,7 +537,8 @@
         },
         "type": "text",
         "lineHeight": 0.9,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{8}[お届け先]氏名": {
         "fontColor": "",
@@ -575,7 +553,8 @@
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
-        "height": 10
+        "height": 10,
+        "content": "東京都 出得太"
       },
       "{8}[お届け先]郵便番号": {
         "fontColor": "",
@@ -590,7 +569,8 @@
         "width": 77.8,
         "characterSpacing": 0,
         "backgroundColor": "",
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{9}**credit**": {
         "backgroundColor": "#c8c8c8",
@@ -605,7 +585,8 @@
         "height": 3.02,
         "fontColor": "#000000",
         "fontSize": 7,
-        "width": 52.45
+        "width": 52.45,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{9}[お届け先]住所": {
         "type": "text",
@@ -620,7 +601,8 @@
         "alignment": "left",
         "width": 77.8,
         "height": 14.49,
-        "fontColor": ""
+        "fontColor": "",
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{9}[お届け先]氏名": {
         "characterSpacing": 0,
@@ -635,7 +617,8 @@
         },
         "backgroundColor": "",
         "lineHeight": 0.85,
-        "fontColor": ""
+        "fontColor": "",
+        "content": "東京都 出得太"
       },
       "{9}[お届け先]郵便番号": {
         "backgroundColor": "",
@@ -650,7 +633,8 @@
         "height": 6.03,
         "characterSpacing": 0,
         "fontColor": "",
-        "type": "text"
+        "type": "text",
+        "content": "1234567"
       },
       "{10}**credit**": {
         "characterSpacing": 0,
@@ -665,7 +649,8 @@
         "alignment": "center",
         "width": 52.45,
         "type": "text",
-        "backgroundColor": "#c8c8c8"
+        "backgroundColor": "#c8c8c8",
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{10}[お届け先]住所": {
         "alignment": "left",
@@ -680,7 +665,8 @@
         "fontColor": "",
         "type": "text",
         "width": 77.8,
-        "characterSpacing": 0
+        "characterSpacing": 0,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{10}[お届け先]氏名": {
         "fontColor": "",
@@ -695,7 +681,8 @@
         "width": 77.8,
         "height": 10,
         "characterSpacing": 0,
-        "backgroundColor": ""
+        "backgroundColor": "",
+        "content": "東京都 出得太"
       },
       "{10}[お届け先]郵便番号": {
         "alignment": "left",
@@ -710,7 +697,8 @@
         "characterSpacing": 0,
         "height": 6.03,
         "fontColor": "",
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{11}**credit**": {
         "fontColor": "#000000",
@@ -725,7 +713,8 @@
         "type": "text",
         "height": 3.02,
         "characterSpacing": 0,
-        "width": 52.45
+        "width": 52.45,
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{11}[お届け先]住所": {
         "fontSize": 14.5,
@@ -740,7 +729,8 @@
         "alignment": "left",
         "lineHeight": 0.9,
         "height": 14.49,
-        "fontColor": ""
+        "fontColor": "",
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{11}[お届け先]氏名": {
         "characterSpacing": 0,
@@ -755,7 +745,8 @@
           "x": 111.1,
           "y": 217.7
         },
-        "fontColor": ""
+        "fontColor": "",
+        "content": "東京都 出得太"
       },
       "{11}[お届け先]郵便番号": {
         "alignment": "left",
@@ -770,7 +761,8 @@
         "fontColor": "",
         "characterSpacing": 0,
         "backgroundColor": "",
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "1234567"
       },
       "{12}**credit**": {
         "characterSpacing": 0,
@@ -785,7 +777,8 @@
         "fontColor": "#000000",
         "backgroundColor": "#c8c8c8",
         "alignment": "center",
-        "type": "text"
+        "type": "text",
+        "content": "このラベルは labelmake.jp で作成されました"
       },
       "{12}[お届け先]住所": {
         "width": 77.8,
@@ -800,7 +793,8 @@
         "backgroundColor": "",
         "type": "text",
         "lineHeight": 0.9,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "{12}[お届け先]氏名": {
         "backgroundColor": "",
@@ -815,7 +809,8 @@
         "alignment": "left",
         "fontColor": "",
         "characterSpacing": 0,
-        "fontSize": 14.5
+        "fontSize": 14.5,
+        "content": "東京都 出得太"
       },
       "{12}[お届け先]郵便番号": {
         "characterSpacing": 0,
@@ -830,7 +825,8 @@
           "x": 111.1,
           "y": 240
         },
-        "width": 77.8
+        "width": 77.8,
+        "content": "1234567"
       }
     }
   ]

@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { textType } from './assets/templates';
 import { text, image, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath, getInputFromTemplate } from './utils';
 
 describe('generate integration test(slower)', () => {
   describe.each([textType])('%s', (templateData) => {
@@ -12,8 +12,7 @@ describe('generate integration test(slower)', () => {
 
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        // @ts-ignore
-        const inputs = template.sampledata!;
+        const inputs = getInputFromTemplate(template);
 
         const font = getFont();
         font.SauceHanSansJP.fallback = false;

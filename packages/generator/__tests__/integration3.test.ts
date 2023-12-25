@@ -11,7 +11,7 @@ import {
   barcodes,
   readOnlySvg,
 } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath, getInputFromTemplate } from './utils';
 
 const signature = {
   pdf: image.pdf,
@@ -33,8 +33,7 @@ describe('generate integration test(other, shape)', () => {
 
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        // @ts-ignore
-        const inputs = template.sampledata!;
+        const inputs = getInputFromTemplate(template);
 
         const font = getFont();
         font.SauceHanSansJP.fallback = false;

@@ -1,50 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["宛名ラベル"],
+  "tags": [
+    "宛名ラベル"
+  ],
   "description": "[A-one エーワン ラベルシール 12面 22シート 72312](https://amzn.to/2wZvuR1)に対応した書式です。    12面の宛名ラベルを作成できます。  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "{1}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{1}2行": "Tokyo 101-0032, Japan",
-      "{1}3行": "A-one Co., Ltd",
-      "{2}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{2}2行": "Tokyo 101-0032, Japan",
-      "{2}3行": "A-one Co., Ltd",
-      "{3}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{3}2行": "Tokyo 101-0032, Japan",
-      "{3}3行": "A-one Co., Ltd",
-      "{4}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{4}2行": "Tokyo 101-0032, Japan",
-      "{4}3行": "A-one Co., Ltd",
-      "{5}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{5}2行": "Tokyo 101-0032, Japan",
-      "{5}3行": "A-one Co., Ltd",
-      "{6}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{6}2行": "Tokyo 101-0032, Japan",
-      "{6}3行": "A-one Co., Ltd",
-      "{7}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{7}2行": "Tokyo 101-0032, Japan",
-      "{7}3行": "A-one Co., Ltd",
-      "{8}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{8}2行": "Tokyo 101-0032, Japan",
-      "{8}3行": "A-one Co., Ltd",
-      "{9}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{9}2行": "Tokyo 101-0032, Japan",
-      "{9}3行": "A-one Co., Ltd",
-      "{10}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{10}2行": "Tokyo 101-0032, Japan",
-      "{10}3行": "A-one Co., Ltd",
-      "{11}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{11}2行": "Tokyo 101-0032, Japan",
-      "{11}3行": "A-one Co., Ltd",
-      "{12}1行": "3-5-5 Iwamoto-cho, Chiyoda-ku",
-      "{12}2行": "Tokyo 101-0032, Japan",
-      "{12}3行": "A-one Co., Ltd"
-    }
-  ],
   "columns": [
     "{1}1行",
     "{1}2行",
@@ -90,364 +52,508 @@
   "schemas": [
     {
       "{1}1行": {
-        "position": { "x": 23.5, "y": 28.5 },
+        "position": {
+          "x": 23.5,
+          "y": 28.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{1}2行": {
-        "position": { "x": 23.5, "y": 38.5 },
+        "position": {
+          "x": 23.5,
+          "y": 38.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{1}3行": {
-        "position": { "x": 23.5, "y": 48.5 },
+        "position": {
+          "x": 23.5,
+          "y": 48.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{2}1行": {
-        "position": { "x": 23.5, "y": 70.8 },
+        "position": {
+          "x": 23.5,
+          "y": 70.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{2}2行": {
-        "position": { "x": 23.5, "y": 80.8 },
+        "position": {
+          "x": 23.5,
+          "y": 80.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{2}3行": {
-        "position": { "x": 23.5, "y": 90.8 },
+        "position": {
+          "x": 23.5,
+          "y": 90.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{3}1行": {
-        "position": { "x": 23.5, "y": 113.1 },
+        "position": {
+          "x": 23.5,
+          "y": 113.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{3}2行": {
-        "position": { "x": 23.5, "y": 123.1 },
+        "position": {
+          "x": 23.5,
+          "y": 123.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{3}3行": {
-        "position": { "x": 23.5, "y": 133.1 },
+        "position": {
+          "x": 23.5,
+          "y": 133.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{4}1行": {
-        "position": { "x": 23.5, "y": 155.4 },
+        "position": {
+          "x": 23.5,
+          "y": 155.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{4}2行": {
-        "position": { "x": 23.5, "y": 165.4 },
+        "position": {
+          "x": 23.5,
+          "y": 165.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{4}3行": {
-        "position": { "x": 23.5, "y": 175.4 },
+        "position": {
+          "x": 23.5,
+          "y": 175.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{5}1行": {
-        "position": { "x": 23.5, "y": 197.7 },
+        "position": {
+          "x": 23.5,
+          "y": 197.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{5}2行": {
-        "position": { "x": 23.5, "y": 207.7 },
+        "position": {
+          "x": 23.5,
+          "y": 207.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{5}3行": {
-        "position": { "x": 23.5, "y": 217.7 },
+        "position": {
+          "x": 23.5,
+          "y": 217.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{6}1行": {
-        "position": { "x": 23.5, "y": 240 },
+        "position": {
+          "x": 23.5,
+          "y": 240
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{6}2行": {
-        "position": { "x": 23.5, "y": 250 },
+        "position": {
+          "x": 23.5,
+          "y": 250
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{6}3行": {
-        "position": { "x": 23.5, "y": 260 },
+        "position": {
+          "x": 23.5,
+          "y": 260
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{7}1行": {
-        "position": { "x": 111.1, "y": 28.5 },
+        "position": {
+          "x": 111.1,
+          "y": 28.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{7}2行": {
-        "position": { "x": 111.1, "y": 38.5 },
+        "position": {
+          "x": 111.1,
+          "y": 38.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{7}3行": {
-        "position": { "x": 111.1, "y": 48.5 },
+        "position": {
+          "x": 111.1,
+          "y": 48.5
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{8}1行": {
-        "position": { "x": 111.1, "y": 70.8 },
+        "position": {
+          "x": 111.1,
+          "y": 70.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{8}2行": {
-        "position": { "x": 111.1, "y": 80.8 },
+        "position": {
+          "x": 111.1,
+          "y": 80.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{8}3行": {
-        "position": { "x": 111.1, "y": 90.8 },
+        "position": {
+          "x": 111.1,
+          "y": 90.8
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{9}1行": {
-        "position": { "x": 111.1, "y": 113.1 },
+        "position": {
+          "x": 111.1,
+          "y": 113.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{9}2行": {
-        "position": { "x": 111.1, "y": 123.1 },
+        "position": {
+          "x": 111.1,
+          "y": 123.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{9}3行": {
-        "position": { "x": 111.1, "y": 133.1 },
+        "position": {
+          "x": 111.1,
+          "y": 133.1
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{10}1行": {
-        "position": { "x": 111.1, "y": 155.4 },
+        "position": {
+          "x": 111.1,
+          "y": 155.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{10}2行": {
-        "position": { "x": 111.1, "y": 165.4 },
+        "position": {
+          "x": 111.1,
+          "y": 165.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{10}3行": {
-        "position": { "x": 111.1, "y": 175.4 },
+        "position": {
+          "x": 111.1,
+          "y": 175.4
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{11}1行": {
-        "position": { "x": 111.1, "y": 197.7 },
+        "position": {
+          "x": 111.1,
+          "y": 197.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{11}2行": {
-        "position": { "x": 111.1, "y": 207.7 },
+        "position": {
+          "x": 111.1,
+          "y": 207.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{11}3行": {
-        "position": { "x": 111.1, "y": 217.7 },
+        "position": {
+          "x": 111.1,
+          "y": 217.7
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       },
       "{12}1行": {
-        "position": { "x": 111.1, "y": 240 },
+        "position": {
+          "x": 111.1,
+          "y": 240
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "3-5-5 Iwamoto-cho, Chiyoda-ku"
       },
       "{12}2行": {
-        "position": { "x": 111.1, "y": 250 },
+        "position": {
+          "x": 111.1,
+          "y": 250
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "Tokyo 101-0032, Japan"
       },
       "{12}3行": {
-        "position": { "x": 111.1, "y": 260 },
+        "position": {
+          "x": 111.1,
+          "y": 260
+        },
         "width": 77.8,
         "height": 10,
         "alignment": "left",
         "type": "text",
         "fontSize": 14.5,
         "characterSpacing": 0,
-        "lineHeight": 0.7
+        "lineHeight": 0.7,
+        "content": "A-one Co., Ltd"
       }
     }
   ]

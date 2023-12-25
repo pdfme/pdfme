@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { Font } from '@pdfme/common';
+import { Font, Template } from '@pdfme/common';
 
 const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -46,3 +46,16 @@ const getPdfPath = (dir: string, fileName: string) =>
 
 export const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
 export const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);
+
+export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
+  const input: { [key: string]: string } = {};
+  template.schemas.forEach((schema) => {
+    Object.entries(schema).forEach(([key, value]) => {
+      if (!value.readOnly) {
+        input[key] = value.content;
+      }
+    });
+  });
+
+  return [input];
+};
