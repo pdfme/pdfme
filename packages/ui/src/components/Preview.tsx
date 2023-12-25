@@ -95,7 +95,7 @@ const Preview = ({
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
-            const content = (readOnly ? schema.content : (input && input[key]) || '');
+            const content = readOnly ? schema.content || '' : (input && input[key]) || '';
             return (
               <Renderer
                 key={schema.id}

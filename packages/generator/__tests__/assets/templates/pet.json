@@ -234,8 +234,7 @@
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
-        "color": "#14b351",
-        "content": ""
+        "color": "#14b351"
       },
       "personality": {
         "type": "readOnlyText",
@@ -290,8 +289,7 @@
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
-        "color": "#14b351",
-        "content": ""
+        "color": "#14b351"
       },
       "health": {
         "type": "readOnlyText",
@@ -346,8 +344,7 @@
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
-        "color": "#14b351",
-        "content": ""
+        "color": "#14b351"
       },
       "owner": {
         "type": "readOnlyText",

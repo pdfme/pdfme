@@ -42,7 +42,7 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.content : inputObj[key];
+        const value = schema.readOnly ? schema.content || '' : inputObj[key];
         await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }

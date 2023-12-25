@@ -52,7 +52,7 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   template.schemas.forEach((schema) => {
     Object.entries(schema).forEach(([key, value]) => {
       if (!value.readOnly) {
-        input[key] = value.content;
+        input[key] = value.content || '';
       }
     });
   });

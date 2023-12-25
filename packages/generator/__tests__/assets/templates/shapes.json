@@ -3,7 +3,6 @@
     {
       "field1": {
         "type": "rectangle",
-        "content": "",
         "position": {
           "x": 113.97,
           "y": 42.7
@@ -20,7 +19,6 @@
       },
       "field2": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 113.16,
           "y": 42.82
@@ -34,7 +32,6 @@
       },
       "field3": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 113.77,
           "y": 41.8
@@ -48,7 +45,6 @@
       },
       "field4": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 189.86,
           "y": 43.82
@@ -62,7 +58,6 @@
       },
       "field5": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 113.77,
           "y": 89.8
@@ -76,7 +71,6 @@
       },
       "field6": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 128.45,
           "y": 58.06
@@ -90,7 +84,6 @@
       },
       "field7": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 129.53,
           "y": 57.62
@@ -104,7 +97,6 @@
       },
       "field8": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 129.53,
           "y": 73.62
@@ -118,7 +110,6 @@
       },
       "field9": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 174.45,
           "y": 58.06
@@ -132,7 +123,6 @@
       },
       "field10": {
         "type": "ellipse",
-        "content": "",
         "position": {
           "x": 13.63,
           "y": 33.14
@@ -148,7 +138,6 @@
       },
       "field11": {
         "type": "ellipse",
-        "content": "",
         "position": {
           "x": 17.56,
           "y": 232.84
@@ -164,7 +153,6 @@
       },
       "field12": {
         "type": "ellipse",
-        "content": "",
         "position": {
           "x": 104.55,
           "y": 211.93
@@ -180,7 +168,6 @@
       },
       "field13": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 37.57,
           "y": 122.24
@@ -194,7 +181,6 @@
       },
       "field23": {
         "type": "line",
-        "content": "",
         "position": {
           "x": 0,
           "y": 105
@@ -208,7 +194,6 @@
       },
       "field1 copy 2": {
         "type": "rectangle",
-        "content": "",
         "position": {
           "x": 117.31,
           "y": 105.35
