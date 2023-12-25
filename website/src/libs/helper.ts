@@ -147,19 +147,12 @@ export const getTemplateFromJsonFile = (file: File) => {
   });
 };
 
-const templateFmt4SampleCode = (template: Template) =>
-  JSON.stringify(
-    Object.assign(cloneDeep(template), { columns: undefined, sampledata: undefined }),
-    null,
-    2
-  );
-
 export const getGeneratorSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { generate } from "@pdfme/generator";
 
 (async () => {
-  const template = ${templateFmt4SampleCode(template)};
+  const template = ${JSON.stringify(template, null, 2)};
   const plugins = { text, image, qrcode: barcodes.qrcode };
   const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
@@ -178,7 +171,7 @@ export const getDesignerSampleCode = (template: Template) =>
 import { Designer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
 
 const designer = new Designer({ domContainer, template, plugins });`.trim();
@@ -188,7 +181,7 @@ export const getFormSampleCode = (template: Template) =>
 import { Form } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
 const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
@@ -199,7 +192,7 @@ export const getViewerSampleCode = (template: Template) =>
 import { Viewer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
 const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 

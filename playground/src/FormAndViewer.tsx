@@ -114,7 +114,7 @@ function App() {
     localStorage.removeItem("inputs");
     if (ui.current) {
       const template = initTemplate();
-      ui.current.setInputs(template.sampledata ?? [{}]);
+      ui.current.setInputs(getInputFromTemplate(template));
     }
   };
 
