@@ -4,6 +4,8 @@ import { barcode, business } from './assets/templates';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.0');
+
 describe('generate integration test(barcode, business)', () => {
   describe.each([barcode, business])('%s', (templateData) => {
     const entries = Object.entries(templateData);
@@ -32,8 +34,10 @@ describe('generate integration test(barcode, business)', () => {
 
         const hrend = process.hrtime(hrstart);
         const execSeconds = hrend[0] + hrend[1] / 1000000000;
-        if (execSeconds >= 2) {
-          console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold.`);
+        if (process.env.CI) {
+          expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
+        } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
+          console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
         }
 
         const tmpFile = getPdfTmpPath(`${key}.pdf`);
