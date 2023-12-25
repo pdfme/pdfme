@@ -4,6 +4,8 @@ import { label, envelope } from './assets/templates';
 import { text, image } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
+
 describe('generate integration test(label, envelope)', () => {
   describe.each([label, envelope])('%s', (templateData) => {
     const entries = Object.entries(templateData);
@@ -32,7 +34,11 @@ describe('generate integration test(label, envelope)', () => {
 
         const hrend = process.hrtime(hrstart);
         const execSeconds = hrend[0] + hrend[1] / 1000000000;
-        expect(execSeconds).toBeLessThan(1.5);
+        if (process.env.CI) {
+          expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
+        } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
+          console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
+        }
 
         const tmpFile = getPdfTmpPath(`${key}.pdf`);
         const assertFile = getPdfAssertPath(`${key}.pdf`);
