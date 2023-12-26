@@ -1,8 +1,9 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { barcode, business } from './assets/templates';
+import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath, getInputFromTemplate } from './utils';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integration test(barcode, business)', () => {
   describe.each([barcode, business])('%s', (templateData) => {

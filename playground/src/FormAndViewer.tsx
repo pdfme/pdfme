@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
-import { Template, checkTemplate } from "@pdfme/common";
+import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
   getTemplate,
   handleLoadTemplate,
   generatePDF,
-  getInputFromTemplate,
   getPlugins,
   isJsonString,
 } from "./helper";

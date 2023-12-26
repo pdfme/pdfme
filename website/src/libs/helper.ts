@@ -1,18 +1,5 @@
-import { Template, Font, checkTemplate } from '@pdfme/common';
+import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { examplePdfb64, dogPngb64 } from './sampleData';
-export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
-  const input: { [key: string]: string } = {};
-  template.schemas.forEach((schema) => {
-    Object.entries(schema).forEach(([key, value]) => {
-      if (!value.readOnly) {
-        input[key] = value.content || '';
-      }
-    });
-  });
-
-  return [input];
-};
-
 export const getSampleTemplate = (): Template => ({
   schemas: [
     {
@@ -96,6 +83,7 @@ export const getSampleTemplate = (): Template => ({
     },
   ],
   basePdf: examplePdfb64,
+  // TODO 削除する
   columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
 
@@ -239,6 +227,7 @@ const get = (obj: any, path: string | number, defaultValue?: any) => {
 
 const getLabelLengthInPage = (template: Template) => {
   if (!isMultiLabel(template)) return 1;
+  // TODO template.schemasのキー判断する
   const rowNums = template.columns.map((column) =>
     Number(column.match(/^{\d+}/)![0].replace(/{|}/g, ''))
   );
@@ -246,6 +235,7 @@ const getLabelLengthInPage = (template: Template) => {
 };
 
 const isMultiLabel = (template: Template) => {
+  // TODO template.schemasのキー判断する
   if (template.columns.length === 0) return false;
   const regex = RegExp(/^{\d+}.*/);
   return regex.test(template.columns[0]);

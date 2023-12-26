@@ -8,10 +8,11 @@ import Divider from '../components/Divider';
 import Code from '../components/Code';
 import GithubStar from '../components/GithubStar';
 import type { Template } from '@pdfme/common';
+import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { generate } from '@pdfme/generator';
 import type { Designer, Viewer, Form } from '@pdfme/ui';
-import { getSampleTemplate, cloneDeep, getGeneratorSampleCode, getInputFromTemplate } from '../libs/helper';
+import { getSampleTemplate, getGeneratorSampleCode } from '../libs/helper';
 
 export default function Home(): JSX.Element {
   const designerRef = useRef<HTMLDivElement | null>(null);

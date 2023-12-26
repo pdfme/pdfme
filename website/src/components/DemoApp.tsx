@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Template, checkTemplate } from '@pdfme/common';
+import { Template, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import { getFont, getInputFromTemplate } from '../libs/helper';
+import { getFont } from '../libs/helper';
 import { useForm } from '../hooks';
 import DemoAppHeader from './DemoAppHeader';
 import DemoAppTemplateList from './DemoAppTemplateList';

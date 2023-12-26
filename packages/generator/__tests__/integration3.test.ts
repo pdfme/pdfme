@@ -1,6 +1,7 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { other, shape } from './assets/templates';
+import { getInputFromTemplate } from '@pdfme/common';
 import {
   text,
   image,
@@ -11,7 +12,7 @@ import {
   barcodes,
   readOnlySvg,
 } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath, getInputFromTemplate } from './utils';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 const signature = {
   pdf: image.pdf,

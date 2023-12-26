@@ -1,8 +1,9 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { textType } from './assets/templates';
+import {getInputFromTemplate} from "@pdfme/common"
 import { text, image, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath, getInputFromTemplate } from './utils';
+import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integration test(slower)', () => {
   describe.each([textType])('%s', (templateData) => {
