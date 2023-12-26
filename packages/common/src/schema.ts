@@ -91,11 +91,12 @@ export const Font = z.record(
 
 export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
-export const Template = z.object({
-  schemas: z.array(z.record(Schema)),
-  basePdf: BasePdf,
-  columns: z.array(z.string()).optional(),
-});
+export const Template = z
+  .object({
+    schemas: z.array(z.record(Schema)),
+    basePdf: BasePdf,
+  })
+  .passthrough();
 
 export const Inputs = z.array(z.record(z.string())).min(1);
 

@@ -83,8 +83,6 @@ export const getSampleTemplate = (): Template => ({
     },
   ],
   basePdf: examplePdfb64,
-  // TODO 削除する
-  columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
 
 export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
@@ -227,18 +225,16 @@ const get = (obj: any, path: string | number, defaultValue?: any) => {
 
 const getLabelLengthInPage = (template: Template) => {
   if (!isMultiLabel(template)) return 1;
-  // TODO template.schemasのキー判断する
-  const rowNums = template.columns.map((column) =>
-    Number(column.match(/^{\d+}/)![0].replace(/{|}/g, ''))
-  );
+  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  const rowNums = keys.map((column) => Number(column.match(/^{\d+}/)![0].replace(/{|}/g, '')));
   return Math.max(...rowNums);
 };
 
 const isMultiLabel = (template: Template) => {
-  // TODO template.schemasのキー判断する
-  if (template.columns.length === 0) return false;
+  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  if (keys.length === 0) return false;
   const regex = RegExp(/^{\d+}.*/);
-  return regex.test(template.columns[0]);
+  return regex.test(keys[0]);
 };
 
 export const normalizeDatas = (datas: { [key: string]: string }[], template: Template) => {

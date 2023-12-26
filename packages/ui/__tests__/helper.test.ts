@@ -1,10 +1,5 @@
 import { SchemaForUI, Schema, Template, BLANK_PDF } from '@pdfme/common';
-import {
-  uuid,
-  getUniqSchemaKey,
-  fmtTemplate,
-  generateColumnsIfNeeded,
-} from '../src/helper';
+import { uuid, getUniqSchemaKey, fmtTemplate } from '../src/helper';
 
 const getSchema = (): Schema => ({
   type: 'text',
@@ -147,45 +142,6 @@ describe('fmtTemplate test', () => {
         },
       ],
       columns: ['b'],
-    });
-  });
-});
-
-describe('generateColumnsIfNeeded test', () => {
-  test('generateColumnsIfNeeded normal', () => {
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [{ a: getSchema() }],
-    };
-    expect(generateColumnsIfNeeded(template)).toStrictEqual({
-      basePdf: BLANK_PDF,
-      schemas: [
-        { a: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: '' } },
-      ],
-      columns: ['a'],
-    });
-  });
-
-  test('generateColumnsIfNeeded with readOnly', () => {
-    const template: Template = {
-      basePdf: BLANK_PDF,
-      schemas: [{ a: { readOnly: true, ...getSchema() } }],
-    };
-    expect(generateColumnsIfNeeded(template)).toStrictEqual({
-      basePdf: BLANK_PDF,
-      schemas: [
-        {
-          a: {
-            type: 'text',
-            position: { x: 0, y: 0 },
-            width: 100,
-            height: 100,
-            readOnly: true,
-            content: '',
-          },
-        },
-      ],
-      columns: ['a'],
     });
   });
 });

@@ -60,22 +60,6 @@
   ],
   "schemas": [
     {
-      "{1}**credit**": {
-        "position": {
-          "x": 48.43,
-          "y": 55.57
-        },
-        "height": 3.02,
-        "fontColor": "#000000",
-        "fontSize": 7,
-        "characterSpacing": 0,
-        "alignment": "center",
-        "backgroundColor": "#c8c8c8",
-        "width": 52.45,
-        "lineHeight": 1,
-        "type": "text",
-        "content": "このラベルは labelmake.jp で作成されました"
-      },
       "{1}[お届け先]住所": {
         "lineHeight": 0.9,
         "characterSpacing": 0,
@@ -124,20 +108,20 @@
         "characterSpacing": 0,
         "content": "1234567"
       },
-      "{2}**credit**": {
-        "fontColor": "#000000",
-        "alignment": "center",
+      "{1}**credit**": {
         "position": {
-          "y": 98.03,
-          "x": 48.56
+          "x": 48.43,
+          "y": 55.57
         },
+        "height": 3.02,
+        "fontColor": "#000000",
+        "fontSize": 7,
+        "characterSpacing": 0,
+        "alignment": "center",
         "backgroundColor": "#c8c8c8",
+        "width": 52.45,
         "lineHeight": 1,
         "type": "text",
-        "height": 3.02,
-        "characterSpacing": 0,
-        "width": 52.45,
-        "fontSize": 7,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{2}[お届け先]住所": {
@@ -188,20 +172,20 @@
         "fontSize": 14.5,
         "content": "1234567"
       },
-      "{3}**credit**": {
+      "{2}**credit**": {
+        "fontColor": "#000000",
+        "alignment": "center",
+        "position": {
+          "y": 98.03,
+          "x": 48.56
+        },
         "backgroundColor": "#c8c8c8",
         "lineHeight": 1,
-        "characterSpacing": 0,
-        "position": {
-          "y": 139.91,
-          "x": 48.43
-        },
-        "height": 3.02,
         "type": "text",
-        "fontSize": 7,
-        "fontColor": "#000000",
+        "height": 3.02,
+        "characterSpacing": 0,
         "width": 52.45,
-        "alignment": "center",
+        "fontSize": 7,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{3}[お届け先]住所": {
@@ -252,20 +236,20 @@
         "height": 6.03,
         "content": "1234567"
       },
-      "{4}**credit**": {
+      "{3}**credit**": {
+        "backgroundColor": "#c8c8c8",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "position": {
+          "y": 139.91,
+          "x": 48.43
+        },
+        "height": 3.02,
         "type": "text",
+        "fontSize": 7,
         "fontColor": "#000000",
         "width": 52.45,
-        "characterSpacing": 0,
         "alignment": "center",
-        "backgroundColor": "#c8c8c8",
-        "position": {
-          "y": 182.24,
-          "x": 48.56
-        },
-        "fontSize": 7,
-        "height": 3.02,
-        "lineHeight": 1,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{4}[お届け先]住所": {
@@ -316,20 +300,20 @@
         "lineHeight": 1,
         "content": "1234567"
       },
-      "{5}**credit**": {
-        "characterSpacing": 0,
-        "backgroundColor": "#c8c8c8",
+      "{4}**credit**": {
         "type": "text",
-        "lineHeight": 1,
-        "position": {
-          "x": 48.43,
-          "y": 225.23
-        },
-        "height": 3.02,
-        "fontSize": 7,
         "fontColor": "#000000",
-        "alignment": "center",
         "width": 52.45,
+        "characterSpacing": 0,
+        "alignment": "center",
+        "backgroundColor": "#c8c8c8",
+        "position": {
+          "y": 182.24,
+          "x": 48.56
+        },
+        "fontSize": 7,
+        "height": 3.02,
+        "lineHeight": 1,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{5}[お届け先]住所": {
@@ -380,20 +364,20 @@
         "type": "text",
         "content": "1234567"
       },
-      "{6}**credit**": {
-        "width": 52.45,
-        "alignment": "center",
-        "position": {
-          "y": 267.11,
-          "x": 48.56
-        },
+      "{5}**credit**": {
+        "characterSpacing": 0,
         "backgroundColor": "#c8c8c8",
         "type": "text",
         "lineHeight": 1,
-        "characterSpacing": 0,
-        "fontColor": "#000000",
-        "fontSize": 7,
+        "position": {
+          "x": 48.43,
+          "y": 225.23
+        },
         "height": 3.02,
+        "fontSize": 7,
+        "fontColor": "#000000",
+        "alignment": "center",
+        "width": 52.45,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{6}[お届け先]住所": {
@@ -444,20 +428,20 @@
         "lineHeight": 1,
         "content": "1234567"
       },
-      "{7}**credit**": {
-        "characterSpacing": 0,
-        "backgroundColor": "#c8c8c8",
-        "height": 3.02,
-        "lineHeight": 1,
-        "alignment": "center",
-        "type": "text",
-        "fontColor": "#000000",
-        "position": {
-          "x": 136.42,
-          "y": 54.89
-        },
+      "{6}**credit**": {
         "width": 52.45,
+        "alignment": "center",
+        "position": {
+          "y": 267.11,
+          "x": 48.56
+        },
+        "backgroundColor": "#c8c8c8",
+        "type": "text",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
         "fontSize": 7,
+        "height": 3.02,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{7}[お届け先]住所": {
@@ -508,20 +492,20 @@
         "fontSize": 14.5,
         "content": "1234567"
       },
-      "{8}**credit**": {
-        "height": 3.02,
-        "fontColor": "#000000",
-        "type": "text",
-        "width": 52.45,
-        "lineHeight": 1,
-        "alignment": "center",
+      "{7}**credit**": {
         "characterSpacing": 0,
         "backgroundColor": "#c8c8c8",
-        "fontSize": 7,
+        "height": 3.02,
+        "lineHeight": 1,
+        "alignment": "center",
+        "type": "text",
+        "fontColor": "#000000",
         "position": {
-          "x": 136.45,
-          "y": 98.15
+          "x": 136.42,
+          "y": 54.89
         },
+        "width": 52.45,
+        "fontSize": 7,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{8}[お届け先]住所": {
@@ -572,20 +556,20 @@
         "lineHeight": 1,
         "content": "1234567"
       },
-      "{9}**credit**": {
-        "backgroundColor": "#c8c8c8",
-        "alignment": "center",
-        "position": {
-          "y": 140.03,
-          "x": 136.48
-        },
-        "type": "text",
-        "lineHeight": 1,
-        "characterSpacing": 0,
+      "{8}**credit**": {
         "height": 3.02,
         "fontColor": "#000000",
-        "fontSize": 7,
+        "type": "text",
         "width": 52.45,
+        "lineHeight": 1,
+        "alignment": "center",
+        "characterSpacing": 0,
+        "backgroundColor": "#c8c8c8",
+        "fontSize": 7,
+        "position": {
+          "x": 136.45,
+          "y": 98.15
+        },
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{9}[お届け先]住所": {
@@ -636,20 +620,20 @@
         "type": "text",
         "content": "1234567"
       },
-      "{10}**credit**": {
+      "{9}**credit**": {
+        "backgroundColor": "#c8c8c8",
+        "alignment": "center",
+        "position": {
+          "y": 140.03,
+          "x": 136.48
+        },
+        "type": "text",
+        "lineHeight": 1,
         "characterSpacing": 0,
-        "fontSize": 7,
         "height": 3.02,
         "fontColor": "#000000",
-        "position": {
-          "y": 181.83,
-          "x": 136.51
-        },
-        "lineHeight": 1,
-        "alignment": "center",
+        "fontSize": 7,
         "width": 52.45,
-        "type": "text",
-        "backgroundColor": "#c8c8c8",
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{10}[お届け先]住所": {
@@ -700,20 +684,20 @@
         "lineHeight": 1,
         "content": "1234567"
       },
-      "{11}**credit**": {
+      "{10}**credit**": {
+        "characterSpacing": 0,
+        "fontSize": 7,
+        "height": 3.02,
         "fontColor": "#000000",
-        "backgroundColor": "#c8c8c8",
         "position": {
-          "y": 225.01,
-          "x": 136.35
+          "y": 181.83,
+          "x": 136.51
         },
         "lineHeight": 1,
-        "fontSize": 7,
         "alignment": "center",
-        "type": "text",
-        "height": 3.02,
-        "characterSpacing": 0,
         "width": 52.45,
+        "type": "text",
+        "backgroundColor": "#c8c8c8",
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{11}[お届け先]住所": {
@@ -764,20 +748,20 @@
         "fontSize": 14.5,
         "content": "1234567"
       },
-      "{12}**credit**": {
-        "characterSpacing": 0,
-        "position": {
-          "y": 266.89,
-          "x": 136.38
-        },
-        "width": 52.45,
-        "height": 3.02,
-        "fontSize": 7,
-        "lineHeight": 1,
+      "{11}**credit**": {
         "fontColor": "#000000",
         "backgroundColor": "#c8c8c8",
+        "position": {
+          "y": 225.01,
+          "x": 136.35
+        },
+        "lineHeight": 1,
+        "fontSize": 7,
         "alignment": "center",
         "type": "text",
+        "height": 3.02,
+        "characterSpacing": 0,
+        "width": 52.45,
         "content": "このラベルは labelmake.jp で作成されました"
       },
       "{12}[お届け先]住所": {
@@ -827,6 +811,22 @@
         },
         "width": 77.8,
         "content": "1234567"
+      },
+      "{12}**credit**": {
+        "characterSpacing": 0,
+        "position": {
+          "y": 266.89,
+          "x": 136.38
+        },
+        "width": 52.45,
+        "height": 3.02,
+        "fontSize": 7,
+        "lineHeight": 1,
+        "fontColor": "#000000",
+        "backgroundColor": "#c8c8c8",
+        "alignment": "center",
+        "type": "text",
+        "content": "このラベルは labelmake.jp で作成されました"
       }
     }
   ]

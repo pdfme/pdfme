@@ -249,35 +249,24 @@ export const b64toBlob = (base64: string) => {
   return new Blob([uniy8Array.buffer], { type: mimeType });
 };
 
-const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =>
-  new Array(pageNum).fill('').reduce((acc, _, i) => {
+const sortSchemasList = (template: Template): SchemaForUI[][] => {
+  const { schemas } = template;
+  const pageNum = schemas.length;
+  const arr = new Array(pageNum).fill('') as SchemaForUI[][];
+  return arr.reduce((acc, _, i) => {
     acc.push(
-      template.schemas[i]
-        ? Object.entries(template.schemas[i])
-            .sort((a, b) => {
-              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
-              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
-
-              return aIndex > bIndex ? 1 : -1;
-            })
-            .map((e) => {
-              const [key, value] = e;
-              const { content } = value;
-              return Object.assign(value, {
-                key,
-                content,
-                id: uuid(),
-              });
-            })
+      schemas[i]
+        ? Object.entries(schemas[i]).map(([key, schema]) =>
+            Object.assign(schema, { key, content: schema.content, id: uuid() })
+          )
         : []
     );
-
     return acc;
   }, [] as SchemaForUI[][]);
-
+};
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
-  const sortedSchemasList = sortSchemasList(template, template.schemas.length);
+  const sortedSchemasList = sortSchemasList(template);
   const basePdf = await getB64BasePdf(template.basePdf);
   const pdfBlob = b64toBlob(basePdf);
   const pageSizes = await getPdfPageSizes(pdfBlob);
@@ -304,29 +293,11 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 
     return schema;
   });
-
   return schemasList;
-};
-
-export const generateColumnsIfNeeded = (template: Template) => {
-  const { schemas, columns } = template;
-
-  const flatSchemaLengthForColumns = schemas
-    .map((schema) => Object.keys(schema).length)
-    .reduce((acc, cur) => acc + cur, 0);
-  const needColumns = !columns || flatSchemaLengthForColumns !== columns.length;
-
-  // columns
-  if (needColumns) {
-    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
-  }
-
-  return template;
 };
 
 export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
   const schemaAddedTemplate: Template = {
-    ...template,
     schemas: cloneDeep(schemasList).map((schema) =>
       schema.reduce((acc, cur) => {
         const k = cur.key;
@@ -339,13 +310,8 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
         return acc;
       }, {} as { [key: string]: Schema })
     ),
-    columns: cloneDeep(schemasList).reduce(
-      (acc, cur) => acc.concat(cur.map((s) => s.key)),
-      [] as string[]
-    ),
     basePdf: template.basePdf,
   };
-
   return schemaAddedTemplate;
 };
 
