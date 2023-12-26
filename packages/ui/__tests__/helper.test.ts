@@ -115,7 +115,6 @@ describe('fmtTemplate test', () => {
       schemas: [
         { b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: 'b' } },
       ],
-      columns: ['b'],
     });
   });
 
@@ -141,7 +140,6 @@ describe('fmtTemplate test', () => {
           },
         },
       ],
-      columns: ['b'],
     });
   });
 });

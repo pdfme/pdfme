@@ -21,7 +21,6 @@ export const setupUIMock = () => {
 };
 
 export const getSampleTemplate = (): Template => ({
-  columns: ['field1', 'field2'],
   basePdf: BLANK_PDF,
   schemas: [
     {
