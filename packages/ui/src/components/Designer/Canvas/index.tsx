@@ -155,7 +155,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [pageCursor, schemasList, prevSchemas]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
-    // TODO basePdfのmarginを考慮できていない
+    // TODO basePdfのpaddingを考慮できていない
     target.style.left = `${left < 0 ? 0 : left}px`;
     target.style.top = `${top < 0 ? 0 : top}px`;
   };
