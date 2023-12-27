@@ -11,13 +11,12 @@ const generate = async (props: GenerateProps) => {
     throw new Error('inputs should not be empty');
   }
 
-  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj, readOnlySchemaKeys } =
-    await preprocessing({ template, userPlugins });
+  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj } = await preprocessing({
+    template,
+    userPlugins,
+  });
 
-  const keys = readOnlySchemaKeys.concat(Object.keys(inputs[0]));
-  if (template.columns) {
-    keys.sort((a, b) => (template.columns ?? []).indexOf(a) - (template.columns ?? []).indexOf(b));
-  }
+  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
 
   const _cache = new Map();
   for (let i = 0; i < inputs.length; i += 1) {
@@ -42,7 +41,7 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.readOnlyValue || '' : inputObj[key];
+        const value = schema.readOnly ? schema.content || '' : inputObj[key];
         await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }

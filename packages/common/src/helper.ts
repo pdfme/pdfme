@@ -70,6 +70,19 @@ export const isHexValid = (hex: string): boolean => {
   return /^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/i.test(hex);
 };
 
+export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
+  const input: { [key: string]: string } = {};
+  template.schemas.forEach((schema) => {
+    Object.entries(schema).forEach(([key, value]) => {
+      if (!value.readOnly) {
+        input[key] = value.content || '';
+      }
+    });
+  });
+
+  return [input];
+};
+
 export const getB64BasePdf = (basePdf: BasePdf) => {
   const needFetchFromNetwork =
     typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');

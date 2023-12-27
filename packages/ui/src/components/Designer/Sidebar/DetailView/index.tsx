@@ -75,7 +75,7 @@ const DetailView = (
   const handleWatch = (newSchema: any) => {
     const changes = [];
     for (let key in newSchema) {
-      if (['id', 'data'].includes(key)) continue;
+      if (['id', 'content'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
         let value = newSchema[key];
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274

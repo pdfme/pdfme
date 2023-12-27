@@ -1,11 +1,11 @@
-import { Template, Font, checkTemplate } from '@pdfme/common';
+import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { examplePdfb64, dogPngb64 } from './sampleData';
-
 export const getSampleTemplate = (): Template => ({
   schemas: [
     {
       name: {
         type: 'text',
+        content: 'Pet Name',
         position: {
           x: 25.06,
           y: 26.35,
@@ -18,6 +18,7 @@ export const getSampleTemplate = (): Template => ({
 
       photo: {
         type: 'image',
+        content: dogPngb64,
         position: {
           x: 24.99,
           y: 65.61,
@@ -27,6 +28,7 @@ export const getSampleTemplate = (): Template => ({
       },
       age: {
         type: 'text',
+        content: '4 years',
         position: {
           x: 36,
           y: 179.46,
@@ -37,6 +39,7 @@ export const getSampleTemplate = (): Template => ({
       },
       sex: {
         type: 'text',
+        content: 'Male',
         position: {
           x: 36,
           y: 186.23,
@@ -47,6 +50,7 @@ export const getSampleTemplate = (): Template => ({
       },
       weight: {
         type: 'text',
+        content: '33 pounds',
         position: {
           x: 40,
           y: 192.99,
@@ -57,6 +61,7 @@ export const getSampleTemplate = (): Template => ({
       },
       breed: {
         type: 'text',
+        content: 'Mutt',
         position: {
           x: 40,
           y: 199.09,
@@ -67,6 +72,7 @@ export const getSampleTemplate = (): Template => ({
       },
       owner: {
         type: 'qrcode',
+        content: 'https://pdfme.com/',
         position: {
           x: 115.09,
           y: 204.43,
@@ -77,18 +83,6 @@ export const getSampleTemplate = (): Template => ({
     },
   ],
   basePdf: examplePdfb64,
-  sampledata: [
-    {
-      name: 'Pet Name',
-      photo: dogPngb64,
-      age: '4 years',
-      sex: 'Male',
-      weight: '33 pounds',
-      breed: 'Mutt',
-      owner: 'https://pdfme.com/',
-    },
-  ],
-  columns: ['name', 'photo', 'age', 'sex', 'weight', 'breed', 'owner'],
 });
 
 export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
@@ -139,21 +133,14 @@ export const getTemplateFromJsonFile = (file: File) => {
   });
 };
 
-const templateFmt4SampleCode = (template: Template) =>
-  JSON.stringify(
-    Object.assign(cloneDeep(template), { columns: undefined, sampledata: undefined }),
-    null,
-    2
-  );
-
 export const getGeneratorSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { generate } from "@pdfme/generator";
 
 (async () => {
-  const template = ${templateFmt4SampleCode(template)};
+  const template = ${JSON.stringify(template, null, 2)};
   const plugins = { text, image, qrcode: barcodes.qrcode };
-  const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+  const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
   const pdf = await generate({ template, plugins, inputs });
 
@@ -170,7 +157,7 @@ export const getDesignerSampleCode = (template: Template) =>
 import { Designer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
 
 const designer = new Designer({ domContainer, template, plugins });`.trim();
@@ -180,9 +167,9 @@ export const getFormSampleCode = (template: Template) =>
 import { Form } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
 const form = new Form({ domContainer, template, plugins, inputs });`.trim();
 
@@ -191,9 +178,9 @@ export const getViewerSampleCode = (template: Template) =>
 import { Viewer } from "@pdfme/ui";
 
 const domContainer = document.getElementById('container');
-const template = ${templateFmt4SampleCode(template)};
+const template = ${JSON.stringify(template, null, 2)};
 const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(cloneDeep(template.sampledata), null, 2)};
+const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
 
 const viewer = new Viewer({ domContainer, template, plugins });`.trim();
 
@@ -238,16 +225,16 @@ const get = (obj: any, path: string | number, defaultValue?: any) => {
 
 const getLabelLengthInPage = (template: Template) => {
   if (!isMultiLabel(template)) return 1;
-  const rowNums = template.columns.map((column) =>
-    Number(column.match(/^{\d+}/)![0].replace(/{|}/g, ''))
-  );
+  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  const rowNums = keys.map((column) => Number(column.match(/^{\d+}/)![0].replace(/{|}/g, '')));
   return Math.max(...rowNums);
 };
 
 const isMultiLabel = (template: Template) => {
-  if (template.columns.length === 0) return false;
+  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  if (keys.length === 0) return false;
   const regex = RegExp(/^{\d+}.*/);
-  return regex.test(template.columns[0]);
+  return regex.test(keys[0]);
 };
 
 export const normalizeDatas = (datas: { [key: string]: string }[], template: Template) => {

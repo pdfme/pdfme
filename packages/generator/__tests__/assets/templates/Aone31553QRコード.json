@@ -1,54 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["QR・バーコード"],
+  "tags": [
+    "QR・バーコード"
+  ],
   "description": "[A-one エーワン ラベルシール 40面 20シート 31553](https://amzn.to/39WdjKL)に対応した書式です。  40面のQRコードを作成できます。  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "http://localhost:8000/static/aone40-73e72e89e98d2c420f6ced1766f0ae48.png",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "{1}1行": "あいうえおあいうえお２",
-      "{1}2行": "漢字も有効です。",
-      "{1}3行": "新年快乐",
-      "{1}4行": "สวัสดีปีใหม่",
-      "{1}5行": "https://labelmake.jp/#5",
-      "{1}6行": "https://labelmake.jp/#6",
-      "{1}7行": "https://labelmake.jp/#7",
-      "{1}8行": "https://labelmake.jp/#8",
-      "{2}1行": "https://labelmake.jp/#1",
-      "{2}2行": "https://labelmake.jp/#2",
-      "{2}3行": "https://labelmake.jp/#3",
-      "{2}4行": "https://labelmake.jp/#4",
-      "{2}5行": "https://labelmake.jp/#5",
-      "{2}6行": "https://labelmake.jp/#6",
-      "{2}7行": "https://labelmake.jp/#7",
-      "{2}8行": "https://labelmake.jp/#8",
-      "{3}1行": "https://labelmake.jp/#1",
-      "{3}2行": "https://labelmake.jp/#2",
-      "{3}3行": "https://labelmake.jp/#3",
-      "{3}4行": "https://labelmake.jp/#4",
-      "{3}5行": "https://labelmake.jp/#5",
-      "{3}6行": "https://labelmake.jp/#6",
-      "{3}7行": "https://labelmake.jp/#7",
-      "{3}8行": "https://labelmake.jp/#8",
-      "{4}1行": "https://labelmake.jp/#1",
-      "{4}2行": "https://labelmake.jp/#2",
-      "{4}3行": "https://labelmake.jp/#3",
-      "{4}4行": "https://labelmake.jp/#4",
-      "{4}5行": "https://labelmake.jp/#5",
-      "{4}6行": "https://labelmake.jp/#6",
-      "{4}7行": "https://labelmake.jp/#7",
-      "{4}8行": "https://labelmake.jp/#8",
-      "{5}1行": "https://labelmake.jp/#1",
-      "{5}2行": "https://labelmake.jp/#2",
-      "{5}3行": "https://labelmake.jp/#3",
-      "{5}4行": "https://labelmake.jp/#4",
-      "{5}5行": "https://labelmake.jp/#5",
-      "{5}6行": "https://labelmake.jp/#6",
-      "{5}7行": "https://labelmake.jp/#7",
-      "{5}8行": "https://labelmake.jp/#8"
-    }
-  ],
   "columns": [
     "{1}1行",
     "{1}2行",
@@ -98,404 +56,564 @@
   "schemas": [
     {
       "{1}1行": {
-        "position": { "x": 25, "y": 17.5 },
+        "position": {
+          "x": 25,
+          "y": 17.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "あいうえおあいうえお２"
       },
       "{1}2行": {
-        "position": { "x": 25, "y": 51.5 },
+        "position": {
+          "x": 25,
+          "y": 51.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "漢字も有効です。"
       },
       "{1}3行": {
-        "position": { "x": 25, "y": 85.5 },
+        "position": {
+          "x": 25,
+          "y": 85.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "新年快乐"
       },
       "{1}4行": {
-        "position": { "x": 25, "y": 119.5 },
+        "position": {
+          "x": 25,
+          "y": 119.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "สวัสดีปีใหม่"
       },
       "{1}5行": {
-        "position": { "x": 25, "y": 153 },
+        "position": {
+          "x": 25,
+          "y": 153
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#5"
       },
       "{1}6行": {
-        "position": { "x": 25, "y": 187 },
+        "position": {
+          "x": 25,
+          "y": 187
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#6"
       },
       "{1}7行": {
-        "position": { "x": 25, "y": 221 },
+        "position": {
+          "x": 25,
+          "y": 221
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#7"
       },
       "{1}8行": {
-        "position": { "x": 25, "y": 255 },
+        "position": {
+          "x": 25,
+          "y": 255
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#8"
       },
       "{2}1行": {
-        "position": { "x": 59, "y": 17.5 },
+        "position": {
+          "x": 59,
+          "y": 17.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#1"
       },
       "{2}2行": {
-        "position": { "x": 59, "y": 51.5 },
+        "position": {
+          "x": 59,
+          "y": 51.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#2"
       },
       "{2}3行": {
-        "position": { "x": 59, "y": 85.5 },
+        "position": {
+          "x": 59,
+          "y": 85.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#3"
       },
       "{2}4行": {
-        "position": { "x": 59, "y": 119.5 },
+        "position": {
+          "x": 59,
+          "y": 119.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#4"
       },
       "{2}5行": {
-        "position": { "x": 59, "y": 153 },
+        "position": {
+          "x": 59,
+          "y": 153
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#5"
       },
       "{2}6行": {
-        "position": { "x": 59, "y": 187 },
+        "position": {
+          "x": 59,
+          "y": 187
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#6"
       },
       "{2}7行": {
-        "position": { "x": 59, "y": 221 },
+        "position": {
+          "x": 59,
+          "y": 221
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#7"
       },
       "{2}8行": {
-        "position": { "x": 59, "y": 255 },
+        "position": {
+          "x": 59,
+          "y": 255
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#8"
       },
       "{3}1行": {
-        "position": { "x": 93, "y": 17.5 },
+        "position": {
+          "x": 93,
+          "y": 17.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#1"
       },
       "{3}2行": {
-        "position": { "x": 93, "y": 51.5 },
+        "position": {
+          "x": 93,
+          "y": 51.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#2"
       },
       "{3}3行": {
-        "position": { "x": 93, "y": 85.5 },
+        "position": {
+          "x": 93,
+          "y": 85.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#3"
       },
       "{3}4行": {
-        "position": { "x": 93, "y": 119.5 },
+        "position": {
+          "x": 93,
+          "y": 119.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#4"
       },
       "{3}5行": {
-        "position": { "x": 93, "y": 153 },
+        "position": {
+          "x": 93,
+          "y": 153
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#5"
       },
       "{3}6行": {
-        "position": { "x": 93, "y": 187 },
+        "position": {
+          "x": 93,
+          "y": 187
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#6"
       },
       "{3}7行": {
-        "position": { "x": 93, "y": 221 },
+        "position": {
+          "x": 93,
+          "y": 221
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#7"
       },
       "{3}8行": {
-        "position": { "x": 93, "y": 255 },
+        "position": {
+          "x": 93,
+          "y": 255
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#8"
       },
       "{4}1行": {
-        "position": { "x": 127, "y": 17.5 },
+        "position": {
+          "x": 127,
+          "y": 17.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#1"
       },
       "{4}2行": {
-        "position": { "x": 127, "y": 51.5 },
+        "position": {
+          "x": 127,
+          "y": 51.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#2"
       },
       "{4}3行": {
-        "position": { "x": 127, "y": 85.5 },
+        "position": {
+          "x": 127,
+          "y": 85.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#3"
       },
       "{4}4行": {
-        "position": { "x": 127, "y": 119.5 },
+        "position": {
+          "x": 127,
+          "y": 119.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#4"
       },
       "{4}5行": {
-        "position": { "x": 127, "y": 153 },
+        "position": {
+          "x": 127,
+          "y": 153
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#5"
       },
       "{4}6行": {
-        "position": { "x": 127, "y": 187 },
+        "position": {
+          "x": 127,
+          "y": 187
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#6"
       },
       "{4}7行": {
-        "position": { "x": 127, "y": 221 },
+        "position": {
+          "x": 127,
+          "y": 221
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#7"
       },
       "{4}8行": {
-        "position": { "x": 127, "y": 255 },
+        "position": {
+          "x": 127,
+          "y": 255
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#8"
       },
       "{5}1行": {
-        "position": { "x": 161, "y": 17.5 },
+        "position": {
+          "x": 161,
+          "y": 17.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#1"
       },
       "{5}2行": {
-        "position": { "x": 161, "y": 51.5 },
+        "position": {
+          "x": 161,
+          "y": 51.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#2"
       },
       "{5}3行": {
-        "position": { "x": 161, "y": 85.5 },
+        "position": {
+          "x": 161,
+          "y": 85.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#3"
       },
       "{5}4行": {
-        "position": { "x": 161, "y": 119.5 },
+        "position": {
+          "x": 161,
+          "y": 119.5
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#4"
       },
       "{5}5行": {
-        "position": { "x": 161, "y": 153 },
+        "position": {
+          "x": 161,
+          "y": 153
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#5"
       },
       "{5}6行": {
-        "position": { "x": 161, "y": 187 },
+        "position": {
+          "x": 161,
+          "y": 187
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#6"
       },
       "{5}7行": {
-        "position": { "x": 161, "y": 221 },
+        "position": {
+          "x": 161,
+          "y": 221
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#7"
       },
       "{5}8行": {
-        "position": { "x": 161, "y": 255 },
+        "position": {
+          "x": 161,
+          "y": 255
+        },
         "width": 24,
         "height": 24,
         "alignment": "left",
         "type": "qrcode",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "https://labelmake.jp/#8"
       }
     }
   ]

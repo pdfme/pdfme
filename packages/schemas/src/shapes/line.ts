@@ -51,7 +51,6 @@ const lineSchema: Plugin<LineSchema> = {
         ],
       },
     }),
-    defaultValue: '',
     defaultSchema: {
       type: 'line',
       position: { x: 0, y: 0 },

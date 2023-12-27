@@ -71,9 +71,9 @@ const svgSchema: Plugin<SVGSchema> = {
   },
   propPanel: {
     schema: {},
-    defaultValue,
     defaultSchema: {
       type: 'svg',
+      content: defaultValue,
       position: { x: 0, y: 0 },
       width: 40,
       height: 40,
@@ -92,7 +92,6 @@ export const readOnlySvg: Plugin<SVGSchema> = {
       ...svgSchema.propPanel.defaultSchema,
       type: 'readOnlySvg',
       readOnly: true,
-      readOnlyValue: defaultValue,
     },
   },
 };

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Template, checkTemplate } from "@pdfme/common";
+import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
@@ -41,13 +41,13 @@ function App() {
 
   const buildUi = (mode: Mode) => {
     const template = initTemplate();
-    let inputs = template.sampledata ?? [{}];
+    let inputs = getInputFromTemplate(template);
     try {
       const inputsString = localStorage.getItem("inputs");
-      const inputsJson = inputsString
-        ? JSON.parse(inputsString)
-        : template.sampledata ?? [{}];
-      inputs = inputsJson;
+      if (inputsString) {
+        const inputsJson = JSON.parse(inputsString);
+        inputs = inputsJson;
+      }
     } catch {
       localStorage.removeItem("inputs");
     }
@@ -113,7 +113,7 @@ function App() {
     localStorage.removeItem("inputs");
     if (ui.current) {
       const template = initTemplate();
-      ui.current.setInputs(template.sampledata ?? [{}]);
+      ui.current.setInputs(getInputFromTemplate(template));
     }
   };
 
