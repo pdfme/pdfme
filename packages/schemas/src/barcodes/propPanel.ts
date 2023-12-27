@@ -16,11 +16,11 @@ const defaultIncludetext = { includetext: DEFAULT_BARCODE_INCLUDETEXT };
 const position = { x: 0, y: 0 };
 const default40x20 = { width: 40, height: 20 };
 
-const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] = [
+const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
-    defaultValue: 'https://pdfme.com/',
     defaultSchema: {
       type: 'qrcode',
+      content: 'https://pdfme.com/',
       position,
       ...defaultColors,
       width: 30,
@@ -30,9 +30,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '6540123789-A-K-Z',
     defaultSchema: {
       type: 'japanpost',
+      content: '6540123789-A-K-Z',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -44,9 +44,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '2112345678900',
     defaultSchema: {
       type: 'ean13',
+      content: '2112345678900',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -58,9 +58,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '02345673',
     defaultSchema: {
       type: 'ean8',
+      content: '02345673',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -71,9 +71,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: 'THIS IS CODE 39',
     defaultSchema: {
       type: 'code39',
+      content: 'THIS IS CODE 39',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -83,9 +83,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: 'This is Code 128!',
     defaultSchema: {
       type: 'code128',
+      content: 'This is Code 128!',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -96,9 +96,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: 'A0123456789B',
     defaultSchema: {
       type: 'nw7',
+      content: 'A0123456789B',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -109,9 +109,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '04601234567893',
     defaultSchema: {
       type: 'itf14',
+      content: '04601234567893',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -123,9 +123,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '416000336108',
     defaultSchema: {
       type: 'upca',
+      content: '416000336108',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -137,9 +137,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '00123457',
     defaultSchema: {
       type: 'upce',
+      content: '00123457',
       position,
       ...defaultColors,
       ...defaultTextColors,
@@ -150,9 +150,9 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
     },
   },
   {
-    defaultValue: '(01)03453120000011(17)191125(10)ABCD1234',
     defaultSchema: {
       type: 'gs1datamatrix',
+      content: '(01)03453120000011(17)191125(10)ABCD1234',
       position,
       ...defaultColors,
       width: 30,

@@ -63,20 +63,19 @@ export const Size = z.object({ height: z.number(), width: z.number() });
 export const Schema = z
   .object({
     type: z.string(),
-    readOnly: z.boolean().optional(),
-    readOnlyValue: z.string().optional(),
+    content: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),
     rotate: z.number().optional(),
     opacity: z.number().optional(),
+    readOnly: z.boolean().optional(),
   })
   .passthrough();
 
 const SchemaForUIAdditionalInfo = z.object({
   id: z.string(),
   key: z.string(),
-  data: z.string(),
 });
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
@@ -93,12 +92,12 @@ export const Font = z.record(
 
 export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
-export const Template = z.object({
-  schemas: z.array(z.record(Schema)),
-  basePdf: BasePdf,
-  sampledata: z.array(z.record(z.string())).length(1).optional(),
-  columns: z.array(z.string()).optional(),
-});
+export const Template = z
+  .object({
+    schemas: z.array(z.record(Schema)),
+    basePdf: BasePdf,
+  })
+  .passthrough();
 
 export const Inputs = z.array(z.record(z.string())).min(1);
 

@@ -6,9 +6,10 @@ import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
+  'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
   schema: SchemaForUI;
+  value: string;
   onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
@@ -49,7 +50,7 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
@@ -72,7 +73,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       render({
         key: schema.key,
-        value: schema.readOnly ? schema.readOnlyValue || '' : schema.data,
+        value,
         schema,
         rootElement: ref.current,
         mode,
@@ -91,7 +92,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
 
   return (
     <Wrapper {...props}>

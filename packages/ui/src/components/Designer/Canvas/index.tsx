@@ -195,7 +195,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
-  const onResizeEnd = async ({ target }: { target: HTMLElement | SVGElement }) => {
+  const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
@@ -372,6 +372,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           <Renderer
             key={schema.id}
             schema={schema}
+            value={schema.content || ''}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             mode={
               editing && activeElements.map((ae) => ae.id).includes(schema.id)
@@ -379,7 +380,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                 : 'viewer'
             }
             onChange={(value) => {
-              changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
+              changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
             outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${

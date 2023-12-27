@@ -84,16 +84,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return { ...acc, [type]: render.pdf };
   }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
 
-  const readOnlySchemaKeys = schemas.reduce((acc, schema) => {
-    const entries = Object.entries(schema);
-    const keys = entries.reduce(
-      (acc, [key, value]) => (value.readOnly ? [...acc, key] : acc),
-      [] as string[]
-    );
-    return [...acc, ...keys];
-  }, [] as string[]);
-
-  return { pdfDoc, embeddedPages, embedPdfBoxes, renderObj, readOnlySchemaKeys };
+  return { pdfDoc, embeddedPages, embedPdfBoxes, renderObj };
 };
 
 export const postProcessing = (props: {

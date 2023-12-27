@@ -111,10 +111,7 @@ const TemplateEditor = ({
           const propPanel = Object.values(pluginsRegistry).find(
             (plugin) => plugin?.propPanel.defaultSchema.type === value
           )?.propPanel;
-          set(tgt, 'data', propPanel?.defaultValue || '');
           Object.assign(tgt, propPanel?.defaultSchema || {});
-        } else if (key === 'data' && tgt.readOnly) {
-          set(tgt, 'readOnlyValue', value);
         }
 
         return acc;
@@ -162,7 +159,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     const s = {
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
-      data: propPanel.defaultValue || '',
       ...propPanel.defaultSchema,
     } as SchemaForUI;
 

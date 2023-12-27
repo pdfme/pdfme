@@ -21,18 +21,12 @@ export const setupUIMock = () => {
 };
 
 export const getSampleTemplate = (): Template => ({
-  columns: ['field1', 'field2'],
-  sampledata: [
-    {
-      field1: 'bb',
-      field2: 'aaaaaaaaaaaa',
-    },
-  ],
   basePdf: BLANK_PDF,
   schemas: [
     {
       field1: {
         type: 'text',
+        content: 'bb',
         position: { x: 20, y: 20 },
         width: 100,
         height: 15,
@@ -43,6 +37,7 @@ export const getSampleTemplate = (): Template => ({
       },
       field2: {
         type: 'image',
+        content: 'aaaaaaaaaaaa',
         position: { x: 20, y: 35 },
         width: 100,
         height: 40,

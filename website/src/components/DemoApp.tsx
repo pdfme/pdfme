@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Template, checkTemplate } from '@pdfme/common';
+import { Template, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 import { text, image, barcodes } from '@pdfme/schemas';
 import Link from '@docusaurus/Link';
@@ -63,7 +63,7 @@ const DemoApp = (props: Props) => {
   };
 
   const loadSampleData = () => {
-    form?.setInputs(template.sampledata ?? []);
+    form?.setInputs(getInputFromTemplate(template));
     alert('Sample Data loaded.\nPlease click "Download" button.');
   };
 
