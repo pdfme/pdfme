@@ -268,9 +268,9 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const sortedSchemasList = sortSchemasList(template);
-  let pageSizes: { width: number; height: number }[] = [];
+  let pageSizes: Size[] = [];
   if (isBlankPdf(template.basePdf)) {
-    pageSizes = template.schemas.map(() => template.basePdf as { width: number; height: number });
+    pageSizes = template.schemas.map(() => template.basePdf as Size);
   } else {
     const basePdf = await getB64BasePdf(template.basePdf);
     const pdfBlob = b64toBlob(basePdf);
@@ -405,14 +405,7 @@ export const moveCommandToChangeSchemasArg = (props: {
   });
 };
 
-export const getPagesScrollTopByIndex = (
-  pageSizes: {
-    width: number;
-    height: number;
-  }[],
-  index: number,
-  scale: number
-) => {
+export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale: number) => {
   return pageSizes
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);

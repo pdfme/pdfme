@@ -51,14 +51,14 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
     let paperWidth, paperHeight, _backgrounds, _pageSizes;
 
     if (isBlankPdf(basePdf)) {
-      const { width, height } = basePdf as { width: number; height: number };
+      const { width, height } = basePdf as Size;
       paperWidth = width * ZOOM;
       paperHeight = height * ZOOM;
       _backgrounds = schemas.map(
         () =>
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII='
       );
-      _pageSizes = [{ width, height }];
+      _pageSizes = schemas.map(() => ({ width, height }));
     } else {
       const _basePdf = await getB64BasePdf(basePdf);
       const pdfBlob = b64toBlob(_basePdf);
@@ -86,7 +86,12 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       });
   }, [template, size]);
 
-  return { backgrounds, pageSizes, scale: scale * zoomLevel, error };
+  return {
+    backgrounds,
+    pageSizes,
+    scale: scale * zoomLevel,
+    error,
+  };
 };
 
 type ScrollPageCursorProps = {

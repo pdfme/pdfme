@@ -1,15 +1,19 @@
 import * as fontkit from 'fontkit';
-import type {
+import {
+  Size,
   Schema,
   Plugins,
   GeneratorOptions,
   Template,
   PDFRenderProps,
   Plugin,
+  getB64BasePdf,
+  BasePdf,
+  isBlankPdf,
+  mm2pt,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
-import { getB64BasePdf, BasePdf, isBlankPdf, mm2pt } from '@pdfme/common';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
 
@@ -27,7 +31,7 @@ const getBasePagesAndEmbedPdfBoxes = async (arg: {
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
   if (isBlankPdf(basePdf)) {
-    const { width: _width, height: _height } = basePdf as { width: number; height: number };
+    const { width: _width, height: _height } = basePdf as Size;
     const width = mm2pt(_width);
     const height = mm2pt(_height);
     basePages = schemas.map(() => {

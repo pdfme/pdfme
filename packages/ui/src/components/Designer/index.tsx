@@ -1,4 +1,5 @@
 import React, { useRef, useState, useContext, useCallback } from 'react';
+import { theme, Button } from 'antd';
 import {
   ZOOM,
   Template,
@@ -8,6 +9,7 @@ import {
   DesignerProps,
   Size,
   Plugin,
+  isBlankPdf,
 } from '@pdfme/common';
 import Sidebar from './Sidebar/index';
 import Canvas from './Canvas/index';
@@ -32,9 +34,10 @@ const TemplateEditor = ({
   onSaveTemplate,
   onChangeTemplate,
 }: Omit<DesignerProps, 'domContainer'> & {
-  onSaveTemplate: (t: Template) => void;
   size: Size;
-} & { onChangeTemplate: (t: Template) => void }) => {
+  onSaveTemplate: (t: Template) => void;
+  onChangeTemplate: (t: Template) => void;
+}) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -42,6 +45,7 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
+  const { token } = theme.useToken();
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -245,6 +249,48 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         sidebarOpen={sidebarOpen}
         onEdit={onEdit}
       />
+      {/* TODO UIをどうにかする */}
+      {/* TODO ページ追加・削除時に正しくページがレンダリングされない */}
+      {isBlankPdf(template.basePdf) && (
+        <div
+          style={{
+            background: token.colorBgContainer,
+            position: 'absolute',
+            bottom: 0,
+            right: SIDEBAR_WIDTH,
+            padding: 8,
+          }}
+        >
+          <Button
+            type="default"
+            disabled={pageCursor === 0}
+            style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}
+            onClick={() => {
+              if (pageCursor === 0) return;
+              const _schemasList = cloneDeep(schemasList);
+              _schemasList.splice(pageCursor, 1);
+              onChangeTemplate(fmtTemplate(template, _schemasList));
+              setSchemasList(_schemasList);
+              setPageCursor(pageCursor - 1);
+            }}
+          >
+            Remove page
+          </Button>
+          <Button
+            type="primary"
+            style={{ fontWeight: 600 }}
+            onClick={() => {
+              const _schemasList = cloneDeep(schemasList);
+              _schemasList.splice(pageCursor + 1, 0, []);
+              onChangeTemplate(fmtTemplate(template, _schemasList));
+              setSchemasList(_schemasList);
+              setPageCursor(pageCursor + 1);
+            }}
+          >
+            Add page after
+          </Button>
+        </div>
+      )}
     </Root>
   );
 };
