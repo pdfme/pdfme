@@ -72,6 +72,7 @@ const TemplateDesign = () => {
   };
 
   const changeBasePdf = (file: File) => {
+    // TODO 修正 size指定で渡せるような仕組みを作る。じゃないとページ埋め込みのサンプルしか見せられない
     if (designer.current) {
       readFile(file, 'dataURL').then(async (basePdf: string) => {
         designer.current.updateTemplate(Object.assign(cloneDeep(template), { basePdf }));

@@ -13,6 +13,7 @@ import {
   SchemaForUI,
   Schema,
   Size,
+  isBlankPdf,
 } from '@pdfme/common';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -267,9 +268,15 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const sortedSchemasList = sortSchemasList(template);
-  const basePdf = await getB64BasePdf(template.basePdf);
-  const pdfBlob = b64toBlob(basePdf);
-  const pageSizes = await getPdfPageSizes(pdfBlob);
+  let pageSizes: { width: number; height: number }[] = [];
+  if (isBlankPdf(template.basePdf)) {
+    pageSizes = template.schemas.map(() => template.basePdf as { width: number; height: number });
+  } else {
+    const basePdf = await getB64BasePdf(template.basePdf);
+    const pdfBlob = b64toBlob(basePdf);
+    pageSizes = await getPdfPageSizes(pdfBlob);
+  }
+
   const ssl = sortedSchemasList.length;
   const psl = pageSizes.length;
   const schemasList = (

@@ -155,6 +155,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [pageCursor, schemasList, prevSchemas]);
 
   const onDrag = ({ target, left, top }: OnDrag) => {
+    // TODO basePdfのmarginを考慮できていない
     target.style.left = `${left < 0 ? 0 : left}px`;
     target.style.top = `${top < 0 ? 0 : top}px`;
   };
@@ -383,9 +384,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}

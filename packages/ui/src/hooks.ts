@@ -1,5 +1,13 @@
 import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
-import { ZOOM, Template, Size, getB64BasePdf, SchemaForUI, ChangeSchemas } from '@pdfme/common';
+import {
+  ZOOM,
+  Template,
+  Size,
+  getB64BasePdf,
+  SchemaForUI,
+  ChangeSchemas,
+  isBlankPdf,
+} from '@pdfme/common';
 
 import {
   fmtTemplate,
@@ -36,14 +44,29 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
   const [error, setError] = useState<Error | null>(null);
 
   const init = async (prop: { template: Template; size: Size }) => {
-    const { template, size } = prop;
-    const _basePdf = await getB64BasePdf(template.basePdf);
-    const pdfBlob = b64toBlob(_basePdf);
-    const _pageSizes = await getPdfPageSizes(pdfBlob);
-    const paperWidth = _pageSizes[0].width * ZOOM;
-    const paperHeight = _pageSizes[0].height * ZOOM;
-    const _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
+    const {
+      template: { basePdf, schemas },
+      size,
+    } = prop;
+    let paperWidth, paperHeight, _backgrounds, _pageSizes;
 
+    if (isBlankPdf(basePdf)) {
+      const { width, height } = basePdf as { width: number; height: number };
+      paperWidth = width * ZOOM;
+      paperHeight = height * ZOOM;
+      _backgrounds = schemas.map(
+        () =>
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII='
+      );
+      _pageSizes = [{ width, height }];
+    } else {
+      const _basePdf = await getB64BasePdf(basePdf);
+      const pdfBlob = b64toBlob(_basePdf);
+      _pageSizes = await getPdfPageSizes(pdfBlob);
+      paperWidth = _pageSizes[0].width * ZOOM;
+      paperHeight = _pageSizes[0].height * ZOOM;
+      _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
+    }
     const _scale = Math.min(
       getScale(size.width, paperWidth),
       getScale(size.height - RULER_HEIGHT, paperHeight)
@@ -51,6 +74,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
 
     return { backgrounds: _backgrounds, pageSizes: _pageSizes, scale: _scale };
   };
+
   useEffect(() => {
     init({ template, size })
       .then(({ pageSizes, scale, backgrounds }) => {

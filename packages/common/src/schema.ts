@@ -80,16 +80,13 @@ export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
+export const BlankPdf = z.object({
+  width: z.number(),
+  height: z.number(),
+  margin: z.array(z.number()).length(4).optional(),
+});
 
-export const Font = z.record(
-  z.object({
-    data: z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]),
-    fallback: z.boolean().optional(),
-    subset: z.boolean().optional(),
-  })
-);
-
-export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
+export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema, BlankPdf]);
 
 export const Template = z
   .object({
@@ -99,6 +96,14 @@ export const Template = z
   .passthrough();
 
 export const Inputs = z.array(z.record(z.string())).min(1);
+
+export const Font = z.record(
+  z.object({
+    data: z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]),
+    fallback: z.boolean().optional(),
+    subset: z.boolean().optional(),
+  })
+);
 
 const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 

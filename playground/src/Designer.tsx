@@ -59,6 +59,7 @@ function App() {
   }
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // TODO 修正 size指定で渡せるような仕組みを作る。じゃないとページ埋め込みのサンプルしか見せられない
     if (e.target && e.target.files) {
       readFile(e.target.files[0], "dataURL").then(async (basePdf) => {
         if (designer.current) {

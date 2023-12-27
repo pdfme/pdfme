@@ -9,6 +9,7 @@ import {
   DesignerProps as DesignerPropsSchema,
   GenerateProps as GeneratePropsSchema,
   UIProps as UIPropsSchema,
+  BlankPdf,
 } from './schema.js';
 import {
   MM_TO_PT_RATIO,
@@ -97,6 +98,8 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
 
   return basePdf as string;
 };
+
+export const isBlankPdf = (basePdf: BasePdf) => BlankPdf.safeParse(basePdf).success;
 
 const getByteString = (base64: string) => Buffer.from(base64, 'base64').toString('binary');
 
