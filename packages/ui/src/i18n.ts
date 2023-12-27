@@ -49,6 +49,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Fit',
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.barcodes.barColor': 'Bar Color',
+  'schemas.barcodes.includetext': 'Include Text',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -345,6 +346,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Anpassen',
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
+  'schemas.barcodes.includetext': 'Text anzeigen',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

@@ -193,7 +193,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
       ...(barcodeHasText
         ? { 
           textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
-          includetext: { title: i18n('schemas.includetext'), type: 'boolean' },
+          includetext: { title: i18n('schemas.barcodes.includetext'), type: 'boolean' },
          }
         : {}),
     }),
