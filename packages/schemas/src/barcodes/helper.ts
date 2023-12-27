@@ -133,11 +133,11 @@ export const createBarCode = async (arg: {
   backgroundColor?: string;
   barColor?: string;
   textColor?: string;
+  includetext?: boolean;
 }): Promise<Buffer> => {
-  const { type, input, width, height, backgroundColor, barColor, textColor } = arg;
+  const { type, input, width, height, backgroundColor, barColor, textColor, includetext } = arg;
 
   const bcid = barCodeType2Bcid(type);
-  const includetext = true;
   const scale = 5;
   const bwipjsArg: RenderOptions = { bcid, text: input, width, height, scale, includetext };
 

@@ -1,6 +1,6 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
-import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR } from './constants.js';
+import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 
 const defaultColors = {
@@ -8,6 +8,7 @@ const defaultColors = {
   barColor: DEFAULT_BARCODE_COLOR,
 };
 const defaultTextColors = { textColor: DEFAULT_BARCODE_COLOR };
+const defaultIncludetext = { includetext: DEFAULT_BARCODE_INCLUDETEXT };
 const position = { x: 0, y: 0 };
 const default40x20 = { width: 40, height: 20 };
 
@@ -31,6 +32,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       width: 80,
       height: 7.2,
       rotate: 0,
@@ -44,6 +46,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       height: 16,
       rotate: 0,
@@ -57,6 +60,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       rotate: 0,
       opacity: DEFAULT_OPACITY,
@@ -69,6 +73,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       opacity: DEFAULT_OPACITY,
     },
@@ -80,6 +85,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       rotate: 0,
       opacity: DEFAULT_OPACITY,
@@ -92,6 +98,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       rotate: 0,
       opacity: DEFAULT_OPACITY,
@@ -104,6 +111,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       height: 12,
       rotate: 0,
@@ -117,6 +125,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       height: 16,
       rotate: 0,
@@ -130,6 +139,7 @@ const barcodeDefaults: { defaultValue: string; defaultSchema: BarcodeSchema }[] 
       position,
       ...defaultColors,
       ...defaultTextColors,
+      ...defaultIncludetext,
       ...default40x20,
       rotate: 0,
       opacity: DEFAULT_OPACITY,
@@ -181,7 +191,10 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         ],
       },
       ...(barcodeHasText
-        ? { textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' } }
+        ? { 
+          textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
+          includetext: { title: i18n('schemas.includetext'), type: 'boolean' },
+         }
         : {}),
     }),
     ...defaults,
