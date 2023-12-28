@@ -51,7 +51,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
     let paperWidth, paperHeight, _backgrounds, _pageSizes;
 
     if (isBlankPdf(basePdf)) {
-      const { width, height } = basePdf as Size;
+      const { width, height } = basePdf;
       paperWidth = width * ZOOM;
       paperHeight = height * ZOOM;
       _backgrounds = schemas.map(

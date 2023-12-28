@@ -406,7 +406,13 @@
   ],
   "basePdf": {
     "width": 210,
-    "height": 297
+    "height": 297,
+    "padding": [
+      10,
+      10,
+      10,
+      10
+    ]
   },
   "columns": [
     "name",

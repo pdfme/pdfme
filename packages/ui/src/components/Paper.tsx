@@ -1,5 +1,5 @@
 import React, { MutableRefObject, ReactNode, useContext } from 'react';
-import { ZOOM, SchemaForUI, Size, getFallbackFontName } from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size, getFallbackFontName,isBlankPdf } from '@pdfme/common';
 import { FontContext } from '../contexts';
 import { RULER_HEIGHT, PAGE_GAP } from '../constants';
 
@@ -67,8 +67,7 @@ const Paper = (props: {
 
         return (
           <div
-            id={`@pdfme/ui-paper${paperIndex}`}
-            key={paperIndex + JSON.stringify(paperSize)}
+            key={String(paperIndex) + JSON.stringify(paperSize)}
             ref={(e) => {
               if (e) {
                 paperRefs.current[paperIndex] = e;

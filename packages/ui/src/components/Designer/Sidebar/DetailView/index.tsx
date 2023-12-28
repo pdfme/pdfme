@@ -123,8 +123,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       key: { title: i18n('fieldName'), type: 'string', required: true, span: 14 },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
-      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8 },
-      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8 },
+      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
       rotate: {
         title: i18n('rotate'),
         type: 'number',

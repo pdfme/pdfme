@@ -267,13 +267,18 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
 };
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
+  const { basePdf, schemas } = template;
   const sortedSchemasList = sortSchemasList(template);
+
   let pageSizes: Size[] = [];
-  if (isBlankPdf(template.basePdf)) {
-    pageSizes = template.schemas.map(() => template.basePdf as Size);
+  if (isBlankPdf(basePdf)) {
+    pageSizes = schemas.map(() => ({
+      width: basePdf.width,
+      height: basePdf.height,
+    }));
   } else {
-    const basePdf = await getB64BasePdf(template.basePdf);
-    const pdfBlob = b64toBlob(basePdf);
+    const b64BasePdf = await getB64BasePdf(basePdf);
+    const pdfBlob = b64toBlob(b64BasePdf);
     pageSizes = await getPdfPageSizes(pdfBlob);
   }
 

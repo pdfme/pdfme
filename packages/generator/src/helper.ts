@@ -31,7 +31,7 @@ const getBasePagesAndEmbedPdfBoxes = async (arg: {
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
   if (isBlankPdf(basePdf)) {
-    const { width: _width, height: _height } = basePdf as Size;
+    const { width: _width, height: _height } = basePdf;
     const width = mm2pt(_width);
     const height = mm2pt(_height);
     basePages = schemas.map(() => {
