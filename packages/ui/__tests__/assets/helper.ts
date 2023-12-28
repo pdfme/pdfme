@@ -6,7 +6,13 @@ export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
   const pageSizes = [{ height: 297, width: 210 }];
   const mock = jest.spyOn(hooks, 'useUIPreProcessor');
-  mock.mockImplementation(() => ({ backgrounds, pageSizes, scale: 1, error: null }));
+  mock.mockImplementation(() => ({
+    backgrounds,
+    pageSizes,
+    scale: 1,
+    error: null,
+    refresh: () => Promise.resolve(),
+  }));
   (getPdfPageSizes as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(pageSizes));
   (pdf2Pngs as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(backgrounds));
   (uuid as jest.Mock) = jest
