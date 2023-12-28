@@ -1,3 +1,4 @@
+import type * as CSS from 'csstype';
 import React, {
   Ref,
   useMemo,
@@ -11,7 +12,14 @@ import React, {
 } from 'react';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
+import {
+  ZOOM,
+  SchemaForUI,
+  Size,
+  ChangeSchemas,
+  BasePdf,
+  isBlankPdf,
+} from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
@@ -29,6 +37,44 @@ const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
+const getPaddingStyle = (i: number, p: number, color: string): CSS.Properties => {
+  const style: CSS.Properties = {
+    position: 'absolute',
+    background: color,
+    opacity: 0.25,
+    pointerEvents: 'none',
+  };
+  switch (i) {
+    case 0:
+      style.top = 0;
+      style.height = `${p * ZOOM}px`;
+      style.left = 0;
+      style.right = 0;
+      break;
+    case 1:
+      style.right = 0;
+      style.width = `${p * ZOOM}px`;
+      style.top = 0;
+      style.bottom = 0;
+      break;
+    case 2:
+      style.bottom = 0;
+      style.height = `${p * ZOOM}px`;
+      style.left = 0;
+      style.right = 0;
+      break;
+    case 3:
+      style.left = 0;
+      style.width = `${p * ZOOM}px`;
+      style.top = 0;
+      style.bottom = 0;
+      break;
+    default:
+      break;
+  }
+
+  return style;
+};
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
   const { token } = theme.useToken();
@@ -70,6 +116,7 @@ interface GuidesInterface {
 }
 
 interface Props {
+  basePdf: BasePdf;
   height: number;
   hoveringSchemaId: string | null;
   onChangeHoveringSchemaId: (id: string | null) => void;
@@ -89,6 +136,7 @@ interface Props {
 
 const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const {
+    basePdf,
     pageCursor,
     scale,
     backgrounds,
@@ -154,10 +202,37 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     }
   }, [pageCursor, schemasList, prevSchemas]);
 
-  const onDrag = ({ target, left, top }: OnDrag) => {
-    // TODO basePdfのpaddingを考慮できていない
-    target.style.left = `${left < 0 ? 0 : left}px`;
-    target.style.top = `${top < 0 ? 0 : top}px`;
+  const onDrag = ({ target, top, left }: OnDrag) => {
+    const { width: _width, height: _height } = target.style;
+    const targetWidth = fmt(_width);
+    const targetHeight = fmt(_height);
+    const actualTop = top / ZOOM;
+    const actualLeft = left / ZOOM;
+    const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
+    let topPadding = 0;
+    let rightPadding = 0;
+    let bottomPadding = 0;
+    let leftPadding = 0;
+
+    if (isBlankPdf(basePdf) && basePdf.padding) {
+      const [t, r, b, l] = basePdf.padding;
+      topPadding = t * ZOOM;
+      rightPadding = r;
+      bottomPadding = b;
+      leftPadding = l * ZOOM;
+    }
+
+    if (actualTop + targetHeight > pageHeight - bottomPadding) {
+      target.style.top = `${(pageHeight - targetHeight - bottomPadding) * ZOOM}px`;
+    } else {
+      target.style.top = `${top < topPadding ? topPadding : top}px`;
+    }
+
+    if (actualLeft + targetWidth > pageWidth - rightPadding) {
+      target.style.left = `${(pageWidth - targetWidth - rightPadding) * ZOOM}px`;
+    } else {
+      target.style.left = `${left < leftPadding ? leftPadding : left}px`;
+    }
   };
 
   const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
@@ -330,6 +405,11 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             {!editing && activeElements.length > 0 && pageCursor === index && (
               <DeleteButton activeElements={activeElements} />
             )}
+            {isBlankPdf(basePdf) &&
+              basePdf.padding &&
+              basePdf.padding.map((p, i) => (
+                <div key={String(i)} style={getPaddingStyle(i, p, token.colorError)} />
+              ))}
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {

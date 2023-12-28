@@ -55,7 +55,11 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({ template, size, zoomLevel });
+  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
+    template,
+    size,
+    zoomLevel,
+  });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -116,13 +120,32 @@ const TemplateEditor = ({
             (plugin) => plugin?.propPanel.defaultSchema.type === value
           )?.propPanel;
           Object.assign(tgt, propPanel?.defaultSchema || {});
+        } else if (key === 'position.x' || key === 'position.y') {
+          const padding =
+            isBlankPdf(template.basePdf) && template.basePdf.padding
+              ? template.basePdf.padding
+              : [0, 0, 0, 0];
+          const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
+          const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
+          const { width: targetWidth, height: targetHeight } = tgt;
+          if (key === 'position.x') {
+            tgt.position.x = Math.min(
+              Math.max(Number(value), paddingLeft),
+              pageWidth - targetWidth - paddingRight
+            );
+          } else {
+            tgt.position.y = Math.min(
+              Math.max(Number(value), paddingTop),
+              pageHeight - targetHeight - paddingBottom
+            );
+          }
         }
 
         return acc;
       }, cloneDeep(schemasList[pageCursor]));
       commitSchemas(newSchemas);
     },
-    [commitSchemas, pageCursor, schemasList]
+    [commitSchemas, pageCursor, schemasList, pluginsRegistry, pageSizes, template.basePdf]
   );
 
   useInitEvents({
@@ -168,7 +191,12 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    s.position.y = rectTop > 0 ? 0 : pageSizes[pageCursor].height / 2;
+    const [paddingTop, , , paddingLeft] =
+      isBlankPdf(template.basePdf) && template.basePdf.padding
+        ? template.basePdf.padding
+        : [0, 0, 0, 0];
+    s.position.y = rectTop > 0 ? paddingTop : pageSizes[pageCursor].height / 2;
+    s.position.x = paddingLeft;
 
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)!]));
@@ -187,9 +215,13 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     const newTemplate = fmtTemplate(template, sl);
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
-    void refresh(newTemplate)
-    setTimeout(() => mainRef.current && (mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale), 0))
-  }
+    void refresh(newTemplate);
+    setTimeout(
+      () =>
+        mainRef.current &&
+        ((mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)), 0)
+    );
+  };
 
   const handleRemovePage = () => {
     if (pageCursor === 0) return;
@@ -208,7 +240,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     setPrevTemplate(template);
     void updateTemplate(template);
   }
-
 
   const sizeExcSidebar = {
     width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
@@ -257,6 +288,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       <Canvas
         ref={mainRef}
         paperRefs={paperRefs}
+        basePdf={template.basePdf}
         hoveringSchemaId={hoveringSchemaId}
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={size.height - RULER_HEIGHT * ZOOM}
@@ -291,17 +323,12 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           >
             Remove page
           </Button>
-          <Button
-            type="primary"
-            style={{ fontWeight: 600 }}
-            onClick={handleAddPageAfter}
-          >
+          <Button type="primary" style={{ fontWeight: 600 }} onClick={handleAddPageAfter}>
             Add page after
           </Button>
         </div>
-      )
-      }
-    </Root >
+      )}
+    </Root>
   );
 };
 
