@@ -312,7 +312,6 @@ exports[`Designer snapshot 1`] = `
         style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
       >
         <div
-          id="@pdfme/ui-paper0"
           style="font-family: 'Roboto'; top: 30px; left: 28.149606294500018px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div
