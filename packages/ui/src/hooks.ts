@@ -91,6 +91,10 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
     pageSizes,
     scale: scale * zoomLevel,
     error,
+    refresh: (template: Template) =>
+      init({ template, size }).then(({ pageSizes, scale, backgrounds }) => {
+        setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
+      }),
   };
 };
 
@@ -192,8 +196,6 @@ export const useInitEvents = ({
 }: UseInitEventsParams) => {
   const copiedSchemas = useRef<SchemaForUI[] | null>(null);
 
-  const modifiedTemplate = fmtTemplate(template, schemasList);
-
   const initEvents = useCallback(() => {
     const getActiveSchemas = () => {
       const ids = activeElements.map((ae) => ae.id);
@@ -244,12 +246,13 @@ export const useInitEvents = ({
       },
       redo: () => timeTravel('redo'),
       undo: () => timeTravel('undo'),
-      save: () => onSaveTemplate && onSaveTemplate(modifiedTemplate),
+      save: () => onSaveTemplate && onSaveTemplate(fmtTemplate(template, schemasList)),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
       selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),
     });
   }, [
+    template,
     activeElements,
     pageCursor,
     pageSizes,
@@ -257,7 +260,6 @@ export const useInitEvents = ({
     commitSchemas,
     schemasList,
     onSaveTemplate,
-    modifiedTemplate,
     removeSchemas,
     past,
     future,

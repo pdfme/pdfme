@@ -55,7 +55,7 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
+  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({ template, size, zoomLevel });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -182,10 +182,33 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     setHoveringSchemaId(id);
   };
 
+  const updatePage = async (sl: SchemaForUI[][], newPageCursor: number) => {
+    setPageCursor(newPageCursor);
+    const newTemplate = fmtTemplate(template, sl);
+    onChangeTemplate(newTemplate);
+    await updateTemplate(newTemplate);
+    void refresh(newTemplate)
+    setTimeout(() => mainRef.current && (mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale), 0))
+  }
+
+  const handleRemovePage = () => {
+    if (pageCursor === 0) return;
+    const _schemasList = cloneDeep(schemasList);
+    _schemasList.splice(pageCursor, 1);
+    void updatePage(_schemasList, pageCursor - 1);
+  };
+
+  const handleAddPageAfter = () => {
+    const _schemasList = cloneDeep(schemasList);
+    _schemasList.splice(pageCursor + 1, 0, []);
+    void updatePage(_schemasList, pageCursor + 1);
+  };
+
   if (prevTemplate !== template) {
     setPrevTemplate(template);
     void updateTemplate(template);
   }
+
 
   const sizeExcSidebar = {
     width: sidebarOpen ? size.width - SIDEBAR_WIDTH : size.width,
@@ -216,9 +239,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         onChangeHoveringSchemaId={onChangeHoveringSchemaId}
         height={mainRef.current ? mainRef.current.clientHeight : 0}
         size={size}
-        pageSize={pageSizes[pageCursor]}
+        pageSize={pageSizes[pageCursor] ?? []}
         activeElements={activeElements}
-        schemas={schemasList[pageCursor]}
+        schemas={schemasList[pageCursor] ?? []}
         changeSchemas={changeSchemas}
         onSortEnd={onSortEnd}
         onEdit={(id: string) => {
@@ -250,7 +273,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         onEdit={onEdit}
       />
       {/* TODO UIをどうにかする */}
-      {/* TODO ページ追加・削除時に正しくページがレンダリングされない */}
       {isBlankPdf(template.basePdf) && (
         <div
           style={{
@@ -265,33 +287,21 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
             type="default"
             disabled={pageCursor === 0}
             style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}
-            onClick={() => {
-              if (pageCursor === 0) return;
-              const _schemasList = cloneDeep(schemasList);
-              _schemasList.splice(pageCursor, 1);
-              onChangeTemplate(fmtTemplate(template, _schemasList));
-              setSchemasList(_schemasList);
-              setPageCursor(pageCursor - 1);
-            }}
+            onClick={handleRemovePage}
           >
             Remove page
           </Button>
           <Button
             type="primary"
             style={{ fontWeight: 600 }}
-            onClick={() => {
-              const _schemasList = cloneDeep(schemasList);
-              _schemasList.splice(pageCursor + 1, 0, []);
-              onChangeTemplate(fmtTemplate(template, _schemasList));
-              setSchemasList(_schemasList);
-              setPageCursor(pageCursor + 1);
-            }}
+            onClick={handleAddPageAfter}
           >
             Add page after
           </Button>
         </div>
-      )}
-    </Root>
+      )
+      }
+    </Root >
   );
 };
 

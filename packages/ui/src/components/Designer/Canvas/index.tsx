@@ -142,7 +142,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   useEffect(() => {
     moveable.current?.updateRect();
-    if (prevSchemas === null) {
+    if (!prevSchemas) {
       return;
     }
 
@@ -256,7 +256,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   const rotatable = useMemo(() => {
-    const selectedSchemas = schemasList[pageCursor].filter((s) =>
+    const selectedSchemas = (schemasList[pageCursor] || []).filter((s) =>
       activeElements.map((ae) => ae.id).includes(s.id)
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
@@ -384,9 +384,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}
