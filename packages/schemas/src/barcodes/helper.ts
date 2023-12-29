@@ -135,7 +135,16 @@ export const createBarCode = async (arg: {
   textColor?: string;
   includetext?: boolean;
 }): Promise<Buffer> => {
-  const { type, input, width, height, backgroundColor, barColor, textColor, includetext } = arg;
+  const {
+    type,
+    input,
+    width,
+    height,
+    backgroundColor,
+    barColor,
+    textColor,
+    includetext = true,
+  } = arg;
 
   const bcid = barCodeType2Bcid(type);
   const scale = 5;
