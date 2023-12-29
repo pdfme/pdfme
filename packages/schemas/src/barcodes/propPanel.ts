@@ -1,6 +1,10 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types';
-import { DEFAULT_BARCODE_COLOR, DEFAULT_BARCODE_BG_COLOR, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
+import {
+  DEFAULT_BARCODE_COLOR,
+  DEFAULT_BARCODE_BG_COLOR,
+  DEFAULT_BARCODE_INCLUDETEXT,
+} from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 
 const defaultColors = {
@@ -164,7 +168,8 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
 
   const defaults = barcodeDefaults.find(({ defaultSchema }) => defaultSchema.type === barcodeType);
 
-  if (!defaults) throw new Error(`[@pdfme/schemas/barcodes] No default for barcode type ${barcodeType}`);
+  if (!defaults)
+    throw new Error(`[@pdfme/schemas/barcodes] No default for barcode type ${barcodeType}`);
 
   return {
     schema: ({ i18n }) => ({
@@ -191,10 +196,14 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         ],
       },
       ...(barcodeHasText
-        ? { 
-          textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
-          includetext: { title: i18n('schemas.barcodes.includetext'), type: 'boolean' },
-         }
+        ? {
+            textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
+            includetext: {
+              title: i18n('schemas.barcodes.includetext'),
+              type: 'boolean',
+              widget: 'switch',
+            },
+          }
         : {}),
     }),
     ...defaults,
