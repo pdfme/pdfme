@@ -54,6 +54,7 @@ export const Dict = z.object({
   'schemas.text.dynamicFontSize': z.string(),
 
   'schemas.barcodes.barColor': z.string(),
+  'schemas.barcodes.includetext': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 

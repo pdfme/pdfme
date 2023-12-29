@@ -97,7 +97,7 @@ const TemplateEditor = ({
   const changeSchemas: ChangeSchemas = useCallback(
     (objs) => {
       const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
-        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;        
+        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;
         // Assign to reference
         set(tgt, key, value);
 

@@ -15,3 +15,5 @@ export const BARCODE_TYPES = [
 export const DEFAULT_BARCODE_BG_COLOR = '#ffffff';
 
 export const DEFAULT_BARCODE_COLOR = '#000000';
+
+export const DEFAULT_BARCODE_INCLUDETEXT = true;
