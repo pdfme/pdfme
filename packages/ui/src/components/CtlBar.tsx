@@ -124,10 +124,11 @@ const CtlBar = (props: CtlBarProps) => {
   if (removePage && pageNum > 1 && pageCursor !== 0) {
     contextMenuItems.push({
       key: '2',
-      // TODO 削除前に確認ダイアログを出す
       label: <div onClick={removePage}>Remove page</div>,
     },)
   }
+
+  // TODO padding追加のUIを作る
 
   const barWidth = 300;
   const contextMenuWidth = contextMenuItems.length > 0 ? 50 : 0;
