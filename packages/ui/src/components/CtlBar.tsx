@@ -121,7 +121,7 @@ const CtlBar = (props: CtlBarProps) => {
       ),
     })
   }
-  if (removePage) {
+  if (removePage && pageNum > 1 && pageCursor !== 0) {
     contextMenuItems.push({
       key: '2',
       // TODO 削除前に確認ダイアログを出す
@@ -130,7 +130,7 @@ const CtlBar = (props: CtlBarProps) => {
   }
 
   const barWidth = 300;
-  const contextMenuWidth = contextMenuItems.length ? 50 : 0;
+  const contextMenuWidth = contextMenuItems.length > 0 ? 50 : 0;
   const width = (pageNum > 1 ? barWidth : barWidth / 2) + contextMenuWidth;
 
   const textStyle = {
@@ -168,7 +168,7 @@ const CtlBar = (props: CtlBarProps) => {
           />
         )}
         <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
-        {addPageAfter && removePage && (
+        {contextMenuItems.length > 0 && (
           <ContextMenu items={contextMenuItems} style={{ textStyle }} />
         )}
       </div>
