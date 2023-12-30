@@ -1,7 +1,14 @@
 import React from 'react';
 import { Size } from '@pdfme/common';
-import { MinusOutlined, PlusOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { theme, Typography, Button } from 'antd';
+import {
+  MinusOutlined,
+  PlusOutlined,
+  LeftOutlined,
+  RightOutlined,
+  EllipsisOutlined,
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { theme, Typography, Button, Dropdown } from 'antd';
 
 const { Text } = Typography;
 
@@ -68,6 +75,16 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   );
 };
 
+type ContextMenuProps = {
+  items: MenuProps['items'];
+  style: { textStyle: TextStyle };
+};
+const ContextMenu = ({ items, style }: ContextMenuProps) => <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
+  <Button type="text">
+    <EllipsisOutlined style={{ color: style.textStyle.color }} />
+  </Button>
+</Dropdown>
+
 type CtlBarProps = {
   size: Size;
   pageCursor: number;
@@ -75,14 +92,46 @@ type CtlBarProps = {
   setPageCursor: (page: number) => void;
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
+  addPageAfter?: () => void;
+  removePage?: () => void;
 };
 
 const CtlBar = (props: CtlBarProps) => {
   const { token } = theme.useToken();
+  const {
+    size,
+    pageCursor,
+    pageNum,
+    setPageCursor,
+    zoomLevel,
+    setZoomLevel,
+    addPageAfter,
+    removePage,
+  } = props;
+
+  const contextMenuItems: MenuProps['items'] = [];
+  if (addPageAfter) {
+    contextMenuItems.push({
+      key: '1',
+      label: (
+        <div onClick={addPageAfter}>
+          {/* TODO i18n */}
+          Add page after
+        </div>
+      ),
+    })
+  }
+  if (removePage) {
+    contextMenuItems.push({
+      key: '2',
+      // TODO 削除前に確認ダイアログを出す
+      label: <div onClick={removePage}>Remove page</div>,
+    },)
+  }
 
   const barWidth = 300;
-  const { size, pageCursor, pageNum, setPageCursor, zoomLevel, setZoomLevel } = props;
-  const width = pageNum > 1 ? barWidth : barWidth / 2;
+  const contextMenuWidth = contextMenuItems.length ? 50 : 0;
+  const width = (pageNum > 1 ? barWidth : barWidth / 2) + contextMenuWidth;
 
   const textStyle = {
     color: token.colorWhite,
@@ -90,13 +139,15 @@ const CtlBar = (props: CtlBarProps) => {
     margin: token.marginXS,
   };
 
+
+
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'space-evenly',
           position: 'relative',
           zIndex: 1,
           left: `calc(50% - ${width / 2}px)`,
@@ -117,6 +168,9 @@ const CtlBar = (props: CtlBarProps) => {
           />
         )}
         <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+        {addPageAfter && removePage && (
+          <ContextMenu items={contextMenuItems} style={{ textStyle }} />
+        )}
       </div>
     </div>
   );

@@ -12,14 +12,7 @@ import React, {
 } from 'react';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import {
-  ZOOM,
-  SchemaForUI,
-  Size,
-  ChangeSchemas,
-  BasePdf,
-  isBlankPdf,
-} from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
@@ -465,7 +458,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             }}
             stopEditing={() => setEditing(false)}
             outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly ? 'transparent' : token.colorPrimary
+              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
             }`}
             scale={scale}
           />

@@ -264,6 +264,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }}
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
+        addPageAfter={isBlankPdf(template.basePdf) ? handleAddPageAfter : undefined}
+        removePage={isBlankPdf(template.basePdf) ? handleRemovePage : undefined}
       />
       <Sidebar
         hoveringSchemaId={hoveringSchemaId}
@@ -304,30 +306,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         sidebarOpen={sidebarOpen}
         onEdit={onEdit}
       />
-      {/* TODO UIをどうにかする */}
-      {isBlankPdf(template.basePdf) && (
-        <div
-          style={{
-            background: token.colorBgContainer,
-            position: 'absolute',
-            bottom: 0,
-            right: SIDEBAR_WIDTH,
-            padding: 8,
-          }}
-        >
-          <Button
-            type="default"
-            disabled={pageCursor === 0}
-            style={{ fontWeight: 600, display: 'block', marginBottom: 8 }}
-            onClick={handleRemovePage}
-          >
-            Remove page
-          </Button>
-          <Button type="primary" style={{ fontWeight: 600 }} onClick={handleAddPageAfter}>
-            Add page after
-          </Button>
-        </div>
-      )}
     </Root>
   );
 };
