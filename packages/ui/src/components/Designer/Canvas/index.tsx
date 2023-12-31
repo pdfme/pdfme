@@ -207,7 +207,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     let bottomPadding = 0;
     let leftPadding = 0;
 
-    if (isBlankPdf(basePdf) && basePdf.padding) {
+    if (isBlankPdf(basePdf)) {
       const [t, r, b, l] = basePdf.padding;
       topPadding = t * ZOOM;
       rightPadding = r;
@@ -399,7 +399,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               <DeleteButton activeElements={activeElements} />
             )}
             {isBlankPdf(basePdf) &&
-              basePdf.padding &&
               basePdf.padding.map((p, i) => (
                 <div key={String(i)} style={getPaddingStyle(i, p, token.colorError)} />
               ))}

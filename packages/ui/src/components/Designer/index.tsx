@@ -121,10 +121,7 @@ const TemplateEditor = ({
           )?.propPanel;
           Object.assign(tgt, propPanel?.defaultSchema || {});
         } else if (key === 'position.x' || key === 'position.y') {
-          const padding =
-            isBlankPdf(template.basePdf) && template.basePdf.padding
-              ? template.basePdf.padding
-              : [0, 0, 0, 0];
+          const padding = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
           const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
           const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
           const { width: targetWidth, height: targetHeight } = tgt;
@@ -191,10 +188,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
     const paper = paperRefs.current[pageCursor];
     const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-    const [paddingTop, , , paddingLeft] =
-      isBlankPdf(template.basePdf) && template.basePdf.padding
-        ? template.basePdf.padding
-        : [0, 0, 0, 0];
+    const [paddingTop, , , paddingLeft] = isBlankPdf(template.basePdf)
+      ? template.basePdf.padding
+      : [0, 0, 0, 0];
     s.position.y = rectTop > 0 ? paddingTop : pageSizes[pageCursor].height / 2;
     s.position.x = paddingLeft;
 
