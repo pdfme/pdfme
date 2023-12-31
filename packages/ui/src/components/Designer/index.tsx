@@ -1,5 +1,5 @@
 import React, { useRef, useState, useContext, useCallback } from 'react';
-import { theme, Button } from 'antd';
+import { theme } from 'antd';
 import {
   ZOOM,
   Template,

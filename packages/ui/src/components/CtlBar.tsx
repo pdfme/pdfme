@@ -80,11 +80,13 @@ type ContextMenuProps = {
   items: MenuProps['items'];
   style: { textStyle: TextStyle };
 };
-const ContextMenu = ({ items, style }: ContextMenuProps) => <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
-  <Button type="text">
-    <EllipsisOutlined style={{ color: style.textStyle.color }} />
-  </Button>
-</Dropdown>
+const ContextMenu = ({ items, style }: ContextMenuProps) => (
+  <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
+    <Button type="text">
+      <EllipsisOutlined style={{ color: style.textStyle.color }} />
+    </Button>
+  </Dropdown>
+);
 
 type CtlBarProps = {
   size: Size;
@@ -116,21 +118,15 @@ const CtlBar = (props: CtlBarProps) => {
   if (addPageAfter) {
     contextMenuItems.push({
       key: '1',
-      label: (
-        <div onClick={addPageAfter}>
-          {i18n('addPageAfter')}
-        </div>
-      ),
-    })
+      label: <div onClick={addPageAfter}>{i18n('addPageAfter')}</div>,
+    });
   }
   if (removePage && pageNum > 1 && pageCursor !== 0) {
     contextMenuItems.push({
       key: '2',
       label: <div onClick={removePage}>{i18n('removePage')}</div>,
-    },)
+    });
   }
-
-  // TODO padding追加のUIを作る
 
   const barWidth = 300;
   const contextMenuWidth = contextMenuItems.length > 0 ? 50 : 0;
@@ -141,8 +137,6 @@ const CtlBar = (props: CtlBarProps) => {
     fontSize: token.fontSize,
     margin: token.marginXS,
   };
-
-
 
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
