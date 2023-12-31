@@ -225,7 +225,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
   const handleRemovePage = () => {
     if (pageCursor === 0) return;
-    // TODO 削除前に確認ダイアログを出す
+    if (!window.confirm(i18n('removePageConfirm'))) return;
+
     const _schemasList = cloneDeep(schemasList);
     _schemasList.splice(pageCursor, 1);
     void updatePage(_schemasList, pageCursor - 1);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 import {
   MinusOutlined,
@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
+import { I18nContext } from '../contexts';
 
 const { Text } = Typography;
 
@@ -98,6 +99,8 @@ type CtlBarProps = {
 
 const CtlBar = (props: CtlBarProps) => {
   const { token } = theme.useToken();
+  const i18n = useContext(I18nContext);
+
   const {
     size,
     pageCursor,
@@ -115,8 +118,7 @@ const CtlBar = (props: CtlBarProps) => {
       key: '1',
       label: (
         <div onClick={addPageAfter}>
-          {/* TODO i18n */}
-          Add page after
+          {i18n('addPageAfter')}
         </div>
       ),
     })
@@ -124,7 +126,7 @@ const CtlBar = (props: CtlBarProps) => {
   if (removePage && pageNum > 1 && pageCursor !== 0) {
     contextMenuItems.push({
       key: '2',
-      label: <div onClick={removePage}>Remove page</div>,
+      label: <div onClick={removePage}>{i18n('removePage')}</div>,
     },)
   }
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it', 'de'] as const;
+const langs = ['en', 'ja', 'ar', 'th', 'it', 'pl', 'de'] as const;
 
 export const Lang = z.enum(langs);
 export const Dict = z.object({
@@ -26,6 +26,9 @@ export const Dict = z.object({
   errorBulkUpdateFieldName: z.string(),
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
+  addPageAfter: z.string(),
+  removePage: z.string(),
+  removePageConfirm: z.string(),
   hexColorPrompt: z.string(),
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
