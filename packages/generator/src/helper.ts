@@ -1,6 +1,5 @@
 import * as fontkit from 'fontkit';
 import {
-  Size,
   Schema,
   Plugins,
   GeneratorOptions,
