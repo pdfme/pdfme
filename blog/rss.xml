@@ -4,10 +4,126 @@
         <title>pdfme Blog</title>
         <link>https://pdfme.com/blog</link>
         <description>pdfme Blog</description>
-        <lastBuildDate>Wed, 13 Dec 2023 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Tue, 02 Jan 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[Implementation Ideas for Dynamic Tables in pdfme]]></title>
+            <link>https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables</link>
+            <guid>https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables</guid>
+            <pubDate>Tue, 02 Jan 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[Explore the innovative solutions for implementing dynamic tables in pdfme, a comprehensive guide discussing challenges, strategies, and ideas for advanced PDF table rendering, including page breaks, table styling, and layout calculations.]]></description>
+            <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-dynamic-tables-couldnt-be-implemented-in-pdfme">Why Dynamic Tables Couldn't Be Implemented in pdfme<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#why-dynamic-tables-couldnt-be-implemented-in-pdfme" class="hash-link" aria-label="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme" title="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme">​</a></h2>
+<p>Until now, pdfme has been realizing simple <a href="https://en.wikipedia.org/wiki/Variable_data_printing" target="_blank" rel="noopener noreferrer">variable data printing</a> by embedding PDF data into a property called <code>basePdf</code> in the template and overlaying a <code>schema</code> on top of this PDF.</p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/b7b9c0b7611e-20240102.png" alt="Image of the pdfme process" class="img_ev3q"></p>
+<p>This method is incredibly simple and allows for the easy creation of customized PDFs.</p>
+<p>However, there is a significant need that cannot be ignored for certain use cases in PDF creation.<br>
+<!-- -->That need is table rendering. More specifically, many users want to address cases where the number of rows, like in the red-framed section of the image below, increases, such as in invoices.</p>
+<img src="https://storage.googleapis.com/zenn-user-upload/53a9a0a584fc-20240102.png" width="500px">
+<p>The method of overlaying a schema on the basePdf, as explained above, doesn't allow for an efficient implementation of page breaks.</p>
+<p>Therefore, the current version of pdfme cannot support tables where rows dynamically increase.</p>
+<p>I understand this need but was struggling with how exactly to implement it.<br>
+<!-- -->This has been the main blocker in implementing Tables.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-implement-page-breaks">How to Implement Page Breaks<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-implement-page-breaks" class="hash-link" aria-label="Direct link to How to Implement Page Breaks" title="Direct link to How to Implement Page Breaks">​</a></h2>
+<p>I've been <a href="https://github.com/pdfme/pdfme/discussions/148" target="_blank" rel="noopener noreferrer">discussing</a> this with users for quite some time, and finally, there seems to be a way to implement page breaks. Two key elements have come together:</p>
+<ul>
+<li>ReadOnly Schemas added in <a href="https://github.com/pdfme/pdfme/releases/tag/3.2.0" target="_blank" rel="noopener noreferrer">V3.2.0</a>
+<ul>
+<li>Line, Rectangle, Ellipse, SVG, Text, Image</li>
+</ul>
+</li>
+<li>A new way to specify basePdf and padding implemented for <a href="https://github.com/pdfme/pdfme/pull/394" target="_blank" rel="noopener noreferrer">V4</a>, called <a href="https://github.com/pdfme/pdfme/blob/c4dfa7023a42d9ab207784a6557f902c078bdcd6/packages/common/src/schema.ts#L87" target="_blank" rel="noopener noreferrer">BlankPDF</a></li>
+</ul>
+<p>With ReadOnly Schemas, it's possible to design the static parts of a template within pdfme without loading a PDF designed in basePdf. This allows for the addition of the height of schemas added to the page, adjusting the y-coordinate of all schemas below it by the increased height. Padding also allows control over where to resume rendering after a page break.</p>
+<p>The following figure shows an example where 19 rows of table data are provided, causing a page break, and the 'note' schema being pushed down.</p>
+<p><img loading="lazy" alt="Example of table with page break" src="https://pdfme.com/assets/images/dynamictable-2bb810fcf2dd2086c5951ed2ee4442cb.png" width="4705" height="3766" class="img_ev3q"></p>
+<p>The logic I had in mind was:</p>
+<ul>
+<li>Render the table one row at a time, from Header to Row19.</li>
+<li>As the height increases and spills over the first page at Row 12, a page break occurs, creating a second page.</li>
+<li>After rendering up to Row19, the generator function returns the final height of the table, which is retained in a variable like yAdjust (190mm in the figure above).</li>
+<li>For all schemas below the increased height schema (in this example, 'note'), add the increased height (190mm) to their y-coordinate. The rendering starts on the second page at a y-coordinate of 140mm.</li>
+</ul>
+<p>The issue is that it doesn't accommodate fixed layouts like headers or footers. In that case, instead of specifying the size of <a href="https://github.com/pdfme/pdfme/blob/c4dfa7023a42d9ab207784a6557f902c078bdcd6/packages/common/src/schema.ts#L87" target="_blank" rel="noopener noreferrer">BlankPDF</a>'s width and height, specify a PDF containing the fixed design of the header or footer. This is planned for further modification.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-tackle-the-complexity-of-table-settings-and-rendering">How to Tackle the Complexity of Table Settings and Rendering<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-tackle-the-complexity-of-table-settings-and-rendering" class="hash-link" aria-label="Direct link to How to Tackle the Complexity of Table Settings and Rendering" title="Direct link to How to Tackle the Complexity of Table Settings and Rendering">​</a></h2>
+<p>Table settings and rendering can get complex. How should we approach it?<br>
+<!-- -->I want to leverage the simplicity of pdfme, which allows for easy PDF creation, to implement the table functionality.</p>
+<p>For example, consider how to set up the following table.</p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/5607ddfc06c7-20240102.png" alt="Example of a complex table" class="img_ev3q"></p>
+<p>A table is essentially composed of headers (th) and table data (td).<br>
+<!-- -->Table data may be rendered in something other than text. In this example, <code>Name</code> and <code>Category</code> columns are rendered with a Text renderer, while <code>Image</code> column is rendered with an Image renderer.</p>
+<p><strong>Fortunately, pdfme already implements various renderers like Text, Image, SVG, Barcodes, etc. Therefore, there's no need to create new rendering processes for each cell; once the size and position of a cell are determined, existing PDF rendering processes can be used.</strong></p>
+<p>This leverages the plugin architecture of pdfme's rendering processes, potentially simplifying complex tasks.</p>
+<p>This idea came from an <a href="https://github.com/pdfme/pdfme/issues/332#issuecomment-1872032370" target="_blank" rel="noopener noreferrer">interesting comment</a> left by <a href="https://github.com/MP70" target="_blank" rel="noopener noreferrer">MP70</a> on the dynamic table issue.<br>
+<!-- -->Considering the above, I believe the table should do the following three things:</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-table-styling">1. Table Styling<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#1-table-styling" class="hash-link" aria-label="Direct link to 1. Table Styling" title="Direct link to 1. Table Styling">​</a></h3>
+<p>The following image shows a QR code setting panel, but similar style settings should be possible for tables as well.</p>
+<img src="https://storage.googleapis.com/zenn-user-upload/9444827add81-20240102.png" width="500px">
+<ul>
+<li>Border<!-- -->
+<ul>
+<li>color, width</li>
+</ul>
+</li>
+<li>Cell Padding (content margin)<!-- -->
+<ul>
+<li>horizontal, vertical</li>
+</ul>
+</li>
+<li>Cell Background Color<!-- -->
+<ul>
+<li>Plan to implement a stripe design, alternating odd and even rows</li>
+</ul>
+</li>
+<li>Header Visibility</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-setting-headers-and-columns">2. Setting Headers and Columns<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#2-setting-headers-and-columns" class="hash-link" aria-label="Direct link to 2. Setting Headers and Columns" title="Direct link to 2. Setting Headers and Columns">​</a></h3>
+<p>Add columns to the header and set how they will be rendered.</p>
+<img src="https://storage.googleapis.com/zenn-user-upload/560ebea7ca2e-20240102.png" width="500px">
+<ul>
+<li>Each column is rendered with <code>ReadOnlyText</code>
+<ul>
+<li>Options available in the existing Text renderer like text color and background color can be used</li>
+</ul>
+</li>
+<li>Specify Type to set up rendering of table data<!-- -->
+<ul>
+<li>Use renderers available in pdfme like Image, Barcodes, etc., as types</li>
+</ul>
+</li>
+<li>Clicking the gear icon in the image above opens a modal to set the Column and Type</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-calculating-table-layout">3. Calculating Table Layout<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#3-calculating-table-layout" class="hash-link" aria-label="Direct link to 3. Calculating Table Layout" title="Direct link to 3. Calculating Table Layout">​</a></h3>
+<p>Once the style and column rendering settings are determined, calculate the layout and render the cells.</p>
+<ul>
+<li>Calculating and rendering cell positions<!-- -->
+<ul>
+<li>Generally, render at the same x-coordinate as each column, but use the y-coordinate and height of the row above for the y-coordinate. Once the position is set, render the cell using the column settings.</li>
+</ul>
+</li>
+<li>Calculating the height of Rows and Cells<!-- -->
+<ul>
+<li>As explained in the page break section, the increased height needs to be communicated to the generator function.</li>
+<li>As a current issue, the Text renderer, if not using the Dynamic Font Size feature, might render beyond the set height, as shown in the image below.
+<img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2f880c86b4fd-20240102.png" alt="Text rendering spilling over set height" class="img_ev3q"></li>
+<li>Ideally, the row height should be expanded, as shown in the image below. To achieve this, the Text renderer needs to return the rendered height after rendering.<!-- -->
+<img src="https://storage.googleapis.com/zenn-user-upload/3b7065ee2f39-20240102.png" width="500px">
+</li>
+<li>The height of each cell's rendering result determines the height of each Row, and the total height of all Rows determines the height of the table.</li>
+</ul>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="i-would-appreciate-feedback">I Would Appreciate Feedback<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#i-would-appreciate-feedback" class="hash-link" aria-label="Direct link to I Would Appreciate Feedback" title="Direct link to I Would Appreciate Feedback">​</a></h2>
+<p>The implementation of the table hasn't started yet. Right now, it's just the ideas written in this document.<br>
+<!-- -->I believe there are many oversights and issues with these ideas.</p>
+<p>Being an OSS, I hope it gets seen by many and receives feedback and collaboration. If there seem to be any issues, please let me know.<br>
+<!-- -->The dynamic table issue is here. Feel free to comment.<br>
+<a href="https://github.com/pdfme/pdfme/issues/332" target="_blank" rel="noopener noreferrer">https://github.com/pdfme/pdfme/issues/332</a></p>
+<p>And thank you for reading until the end.<br>
+<!-- -->If you want to support this project, the easiest way to contribute is to share this article.<br>
+<!-- -->I look forward to your continued support for pdfme.</p>]]></content:encoded>
+        </item>
         <item>
             <title><![CDATA[Why Develop a PDF Library Now?]]></title>
             <link>https://pdfme.com/blog/why-develop-pdf-library-now</link>
