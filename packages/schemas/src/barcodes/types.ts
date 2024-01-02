@@ -6,6 +6,7 @@ export interface BarcodeSchema extends Schema {
   backgroundColor: string;
   barColor: string;
   textColor?: string;
+  includetext?: boolean;
 }
 
 export type BarcodeTypes = (typeof BARCODE_TYPES)[number];

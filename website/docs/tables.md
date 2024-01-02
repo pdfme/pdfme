@@ -3,9 +3,9 @@
 Unfortunately, at the moment, pdfme does not have table functionality.  
 However, we understand that there is a need for this feature.
 
-Currently, we are at the stage of having discussions within the community.  
-To join the conversation surrounding this feature, please follow the link below:  
-[Discussing Tables with Dynamic Data #148](https://github.com/pdfme/pdfme/discussions/148)
+Currently, discussions and implementation are underway to implement this feature in [pdfme V4](https://github.com/orgs/pdfme/projects/8).   
+-> [Add DynamicTable Schema #332](https://github.com/pdfme/pdfme/issues/332)
 
-We apologize for the lack of this feature at this moment, but we are looking for someone to help us improve the pdfme.  
-Please join us via the discussion above.
+
+For those interested in more details on the implementation ideas and background,  
+please refer to this blog article: [Implementation Ideas for Dynamic Tables in pdfme](/blog/implementation-Ideas-for-dynamic-tables).

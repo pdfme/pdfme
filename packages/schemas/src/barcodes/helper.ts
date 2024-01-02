@@ -1,7 +1,7 @@
 import { b64toUint8Array } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
-import { BARCODE_TYPES } from './constants.js';
+import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
 import { BarcodeTypes } from './types';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
@@ -133,11 +133,20 @@ export const createBarCode = async (arg: {
   backgroundColor?: string;
   barColor?: string;
   textColor?: string;
+  includetext?: boolean;
 }): Promise<Buffer> => {
-  const { type, input, width, height, backgroundColor, barColor, textColor } = arg;
+  const {
+    type,
+    input,
+    width,
+    height,
+    backgroundColor,
+    barColor,
+    textColor,
+    includetext = DEFAULT_BARCODE_INCLUDETEXT,
+  } = arg;
 
   const bcid = barCodeType2Bcid(type);
-  const includetext = true;
   const scale = 5;
   const bwipjsArg: RenderOptions = { bcid, text: input, width, height, scale, includetext };
 

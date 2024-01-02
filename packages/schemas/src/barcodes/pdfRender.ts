@@ -4,7 +4,7 @@ import type { BarcodeSchema } from './types';
 import { createBarCode, validateBarcodeInput } from './helper.js';
 
 const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
-  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}`;
+  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}${schema.includetext}`;
 };
 
 export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {

@@ -49,6 +49,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Fit',
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.barcodes.barColor': 'Bar Color',
+  'schemas.barcodes.includetext': 'Include Text',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -98,6 +99,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'フィット',
   'schemas.text.dynamicFontSize': '動的フォントサイズ',
   'schemas.barcodes.barColor': 'バーの色',
+  'schemas.barcodes.includetext': 'テキストを含める',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -147,6 +149,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'ملاءمة',
   'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
   'schemas.barcodes.barColor': 'لون الشريط',
+  'schemas.barcodes.includetext': 'تضمين النص',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -196,6 +199,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'พอดี',
   'schemas.text.dynamicFontSize': 'ขนาดตัวอักษรแบบไดนามิก',
   'schemas.barcodes.barColor': 'สีบาร์',
+  'schemas.barcodes.includetext': 'รวมข้อความ',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -246,6 +250,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Adatta',
   'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
   'schemas.barcodes.barColor': 'Colore barra',
+  'schemas.barcodes.includetext': 'Includi testo',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -295,6 +300,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Dopasowanie',
   'schemas.text.dynamicFontSize': 'Dynamiczny rozmiar czcionki',
   'schemas.barcodes.barColor': 'Kolor paska',
+  'schemas.barcodes.includetext': 'Dołącz tekst',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -345,6 +351,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Anpassen',
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
+  'schemas.barcodes.includetext': 'Text anzeigen',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {
