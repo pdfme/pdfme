@@ -84,7 +84,7 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   return [input];
 };
 
-export const getB64BasePdf = (basePdf: string | ArrayBuffer | Uint8Array) => {
+export const getB64BasePdf = (basePdf: BasePdf) => {
   const needFetchFromNetwork =
     typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');
   if (needFetchFromNetwork && typeof window !== 'undefined') {
