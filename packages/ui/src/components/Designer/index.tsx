@@ -247,6 +247,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   if (error) {
     return <ErrorScreen size={size} error={error} />;
   }
+  const pageManipulation = isBlankPdf(template.basePdf) ? { addPageAfter: handleAddPageAfter, removePage: handleRemovePage } : {};
 
   return (
     <Root size={size} scale={scale}>
@@ -262,8 +263,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }}
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
-        addPageAfter={isBlankPdf(template.basePdf) ? handleAddPageAfter : undefined}
-        removePage={isBlankPdf(template.basePdf) ? handleRemovePage : undefined}
+        {...pageManipulation}
       />
       <Sidebar
         hoveringSchemaId={hoveringSchemaId}
