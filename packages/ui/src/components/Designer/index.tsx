@@ -247,7 +247,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   if (error) {
     return <ErrorScreen size={size} error={error} />;
   }
-  const pageManipulation = isBlankPdf(template.basePdf) ? { addPageAfter: handleAddPageAfter, removePage: handleRemovePage } : {};
+  const pageManipulation = isBlankPdf(template.basePdf)
+    ? { addPageAfter: handleAddPageAfter, removePage: handleRemovePage }
+    : {};
 
   return (
     <Root size={size} scale={scale}>
