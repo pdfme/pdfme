@@ -14,6 +14,7 @@ import {
   SchemaForUI,
   Schema,
   Size,
+  isBlankPdf,
 } from '@pdfme/common';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -267,10 +268,21 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
 };
 export const templateSchemas2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
+  const { basePdf, schemas } = template;
   const sortedSchemasList = sortSchemasList(template);
-  const basePdf = await getB64BasePdf(template.basePdf);
-  const pdfBlob = b64toBlob(basePdf);
-  const pageSizes = await getPdfPageSizes(pdfBlob);
+
+  let pageSizes: Size[] = [];
+  if (isBlankPdf(basePdf)) {
+    pageSizes = schemas.map(() => ({
+      width: basePdf.width,
+      height: basePdf.height,
+    }));
+  } else {
+    const b64BasePdf = await getB64BasePdf(basePdf);
+    const pdfBlob = b64toBlob(b64BasePdf);
+    pageSizes = await getPdfPageSizes(pdfBlob);
+  }
+
   const ssl = sortedSchemasList.length;
   const psl = pageSizes.length;
   const schemasList = (
@@ -297,24 +309,21 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
-export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
-  const schemaAddedTemplate: Template = {
-    schemas: cloneDeep(schemasList).map((schema) =>
-      schema.reduce((acc, cur) => {
-        const k = cur.key;
-        // @ts-ignore
-        delete cur.id;
-        // @ts-ignore
-        delete cur.key;
-        acc[k] = cur;
+export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => ({
+  schemas: cloneDeep(schemasList).map((schema) =>
+    schema.reduce((acc, cur) => {
+      const k = cur.key;
+      // @ts-ignore
+      delete cur.id;
+      // @ts-ignore
+      delete cur.key;
+      acc[k] = cur;
 
-        return acc;
-      }, {} as { [key: string]: Schema })
-    ),
-    basePdf: template.basePdf,
-  };
-  return schemaAddedTemplate;
-};
+      return acc;
+    }, {} as { [key: string]: Schema })
+  ),
+  basePdf: template.basePdf,
+});
 
 export const getUniqSchemaKey = (arg: {
   copiedSchemaKey: string;
@@ -399,14 +408,7 @@ export const moveCommandToChangeSchemasArg = (props: {
   });
 };
 
-export const getPagesScrollTopByIndex = (
-  pageSizes: {
-    width: number;
-    height: number;
-  }[],
-  index: number,
-  scale: number
-) => {
+export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale: number) => {
   return pageSizes
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
