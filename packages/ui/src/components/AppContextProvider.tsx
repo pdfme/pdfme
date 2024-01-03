@@ -38,7 +38,7 @@ const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>
   return output;
 };
 
-export default ({ children, lang, font, plugins, options }: Props) => {
+const AppContextProvider = ({ children, lang, font, plugins, options }: Props) => {
   let theme = defaultTheme;
   if (options.theme) {
     theme = deepMerge(theme, options.theme);
@@ -61,3 +61,5 @@ export default ({ children, lang, font, plugins, options }: Props) => {
     </ThemeConfigProvider>
   );
 };
+
+export default AppContextProvider;

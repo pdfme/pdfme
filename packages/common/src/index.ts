@@ -48,7 +48,8 @@ import {
   pt2mm,
   pt2px,
   isHexValid,
-  getInputFromTemplate
+  getInputFromTemplate,
+  isBlankPdf,
 } from './helper.js';
 
 export {
@@ -67,6 +68,7 @@ export {
   pt2px,
   isHexValid,
   getInputFromTemplate,
+  isBlankPdf,
   checkFont,
   checkInputs,
   checkUIOptions,

@@ -1,7 +1,7 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps } from '@pdfme/common';
-import { drawEmbeddedPage, preprocessing, postProcessing } from './helper.js';
+import { insertPage, preprocessing, postProcessing } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -11,7 +11,7 @@ const generate = async (props: GenerateProps) => {
     throw new Error('inputs should not be empty');
   }
 
-  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj } = await preprocessing({
+  const { pdfDoc, basePages, embedPdfBoxes, renderObj } = await preprocessing({
     template,
     userPlugins,
   });
@@ -21,14 +21,10 @@ const generate = async (props: GenerateProps) => {
   const _cache = new Map();
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
-    for (let j = 0; j < embeddedPages.length; j += 1) {
-      const embeddedPage = embeddedPages[j];
-      const { width: pageWidth, height: pageHeight } = embeddedPage;
+    for (let j = 0; j < basePages.length; j += 1) {
+      const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
-
-      const page = pdfDoc.addPage([pageWidth, pageHeight]);
-
-      drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
+      const page = insertPage({ basePage, embedPdfBox, pdfDoc });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
         const schemaObj = template.schemas[j];
