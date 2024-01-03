@@ -18,10 +18,10 @@ import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
   fmtTemplate,
   uuid,
-  set,
   cloneDeep,
   templateSchemas2SchemasList,
   getPagesScrollTopByIndex,
+  changeSchemas as _changeSchemas,
 } from '../../helper';
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks';
 import Root from '../Root';
@@ -104,43 +104,14 @@ const TemplateEditor = ({
 
   const changeSchemas: ChangeSchemas = useCallback(
     (objs) => {
-      const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
-        const tgt = acc.find((s) => s.id === schemaId)! as SchemaForUI;
-        // Assign to reference
-        set(tgt, key, value);
-
-        if (key === 'type') {
-          const keysToKeep = ['id', 'key', 'type', 'position'];
-          Object.keys(tgt).forEach((key) => {
-            if (!keysToKeep.includes(key)) {
-              delete tgt[key as keyof typeof tgt];
-            }
-          });
-          const propPanel = Object.values(pluginsRegistry).find(
-            (plugin) => plugin?.propPanel.defaultSchema.type === value
-          )?.propPanel;
-          Object.assign(tgt, propPanel?.defaultSchema || {});
-        } else if (key === 'position.x' || key === 'position.y') {
-          const padding = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
-          const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
-          const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
-          const { width: targetWidth, height: targetHeight } = tgt;
-          if (key === 'position.x') {
-            tgt.position.x = Math.min(
-              Math.max(Number(value), paddingLeft),
-              pageWidth - targetWidth - paddingRight
-            );
-          } else {
-            tgt.position.y = Math.min(
-              Math.max(Number(value), paddingTop),
-              pageHeight - targetHeight - paddingBottom
-            );
-          }
-        }
-
-        return acc;
-      }, cloneDeep(schemasList[pageCursor]));
-      commitSchemas(newSchemas);
+      _changeSchemas({
+        objs,
+        schemas: schemasList[pageCursor],
+        basePdf: template.basePdf,
+        pluginsRegistry,
+        pageSize: pageSizes[pageCursor],
+        commitSchemas,
+      });
     },
     [commitSchemas, pageCursor, schemasList, pluginsRegistry, pageSizes, template.basePdf]
   );

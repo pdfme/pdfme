@@ -87,7 +87,7 @@ const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instan
 export const BlankPdf = z.object({
   width: z.number(),
   height: z.number(),
-  padding: z.array(z.number()).length(4),
+  padding: z.tuple([z.number(), z.number(), z.number(), z.number()]),
 });
 
 export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema, BlankPdf]);
