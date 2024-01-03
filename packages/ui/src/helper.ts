@@ -11,10 +11,12 @@ import {
   b64toUint8Array,
   pt2mm,
   Template,
+  BasePdf,
   SchemaForUI,
   Schema,
   Size,
   isBlankPdf,
+  Plugins,
 } from '@pdfme/common';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -416,3 +418,52 @@ export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale
 
 export const getSidebarContentHeight = (sidebarHeight: number) =>
   sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;
+
+export const changeSchemas = (args: {
+  objs: { key: string; value: any; schemaId: string }[];
+  schemas: SchemaForUI[];
+  basePdf: BasePdf;
+  pluginsRegistry: Plugins;
+  pageSize: { width: number; height: number };
+  commitSchemas: (newSchemas: SchemaForUI[]) => void;
+}) => {
+  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas } = args;
+  const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
+    const tgt = acc.find((s) => s.id === schemaId);
+    if (!tgt) return acc;
+    // Assign to reference
+    set(tgt, key, value);
+
+    if (key === 'type') {
+      const keysToKeep = ['id', 'key', 'type', 'position'];
+      Object.keys(tgt).forEach((key) => {
+        if (!keysToKeep.includes(key)) {
+          delete tgt[key as keyof typeof tgt];
+        }
+      });
+      const propPanel = Object.values(pluginsRegistry).find(
+        (plugin) => plugin?.propPanel.defaultSchema.type === value
+      )?.propPanel;
+      Object.assign(tgt, propPanel?.defaultSchema || {});
+    } else if (key === 'position.x' || key === 'position.y') {
+      const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
+      const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
+      const { width: pageWidth, height: pageHeight } = pageSize;
+      const { width: targetWidth, height: targetHeight } = tgt;
+      if (key === 'position.x') {
+        tgt.position.x = Math.min(
+          Math.max(Number(value), paddingLeft),
+          pageWidth - targetWidth - paddingRight
+        );
+      } else {
+        tgt.position.y = Math.min(
+          Math.max(Number(value), paddingTop),
+          pageHeight - targetHeight - paddingBottom
+        );
+      }
+    }
+
+    return acc;
+  }, cloneDeep(schemas));
+  commitSchemas(newSchemas);
+};
