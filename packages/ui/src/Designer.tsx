@@ -5,7 +5,7 @@ import {
   DesignerProps,
   checkDesignerProps,
   checkTemplate,
-  pdfmeVersion,
+  PDFME_VERSION,
 } from '@pdfme/common';
 import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants.js';
@@ -68,7 +68,7 @@ class Designer extends BaseUIClass {
           }}
           onChangeTemplate={(template) => {
             this.template = template;
-            this.template.pdfmeVersion = pdfmeVersion;
+            this.template.pdfmeVersion = PDFME_VERSION;
             if (this.onChangeTemplateCallback) {
               this.onChangeTemplateCallback(template);
             }
