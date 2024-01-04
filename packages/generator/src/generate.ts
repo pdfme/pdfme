@@ -27,7 +27,7 @@ const generate = async (props: GenerateProps) => {
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schemaObj = template.schemas[j];
+        const schemaObj = template.schemas[j] || {};
         const schema = schemaObj[key];
         if (!schema) {
           continue;
