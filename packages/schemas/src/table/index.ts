@@ -3,6 +3,10 @@ import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/commo
 import { convertForPdfLayoutProps, hex2RgbColor } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
+// MEMO to pdf-lib-draw-table-beta
+// - デフォルト(undefined)のヘッダーカラーは透明にして欲しい
+// - Vertical Alignは？
+
 interface TableSchema extends Schema {
   borderColor: string;
   textColor: string;
@@ -11,7 +15,7 @@ interface TableSchema extends Schema {
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
-    const { page, schema, pdfDoc, pdfLib, value } = arg;
+    const { page, schema, pdfDoc, value } = arg;
     const pageHeight = page.getHeight();
     const {
       width,
@@ -24,7 +28,10 @@ const tableSchema: Plugin<TableSchema> = {
         textColor: hex2RgbColor(schema.textColor),
         backgroundColor: hex2RgbColor(schema.bgColor),
       },
-      pageMargin: { right: page.getSize().width - x - width },
+      pageMargin: {
+        right: page.getSize().width - x - width,
+        bottom: page.getSize().height - y - height,
+      },
       border: { color: hex2RgbColor(schema.borderColor) },
       textColor: hex2RgbColor(schema.textColor),
     };
@@ -39,8 +46,11 @@ const tableSchema: Plugin<TableSchema> = {
 
     console.log('Table dimensions:', tableDimensions);
   },
+  // TODO heightを自動で決められるようにしたい->どうやってvalue以外の値を変更するかは別途修正が必要
+  // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。現在はtableLayout:fixed(https://developer.mozilla.org/ja/docs/Web/CSS/table-layout)で決定している。colの横幅で決定できるようにしたい。
   ui: (arg: UIRenderProps<TableSchema>) => {
-    const { schema, rootElement, value } = arg;
+    console.log('ui', arg);
+    const { schema, rootElement, value, mode, onChange } = arg;
     const tableData = JSON.parse(value) as string[][];
     const tableHeader = tableData[0];
     const tableBody = tableData.slice(1);
@@ -53,10 +63,9 @@ const tableSchema: Plugin<TableSchema> = {
 
     const style = `border: 1px solid ${schema.borderColor}; color: ${schema.textColor}; background-color: ${schema.bgColor};`;
 
-    table.innerHTML = `
-  <tr>
-    ${tableHeader.map((data) => `<th style="${style}">${data}</th>`).join('')}
-  </tr>
+    table.innerHTML = `<tr>${tableHeader
+      .map((data) => `<th style="${style}">${data}</th>`)
+      .join('')}</tr>
   ${tableBody
     .map(
       (row) =>
@@ -64,8 +73,23 @@ const tableSchema: Plugin<TableSchema> = {
           .map((data) => `<td contenteditable="plaintext-only" style="${style}">${data}</td>`)
           .join('')}</tr>`
     )
-    .join('')}
-`;
+    .join('')}`;
+
+    // TODO impl onChange
+    // TODO: if mode === 'form', need to add a button to add a row
+
+    rootElement.onclick = (e) => {
+      if (e.target instanceof HTMLTableCellElement && e.target.tagName === 'TD') {
+        if (e.target === document.activeElement) return;
+        e.target.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(e.target);
+        range.collapse(false); // Collapse range to the end
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+    };
     rootElement.appendChild(table);
   },
   propPanel: {
@@ -77,15 +101,20 @@ const tableSchema: Plugin<TableSchema> = {
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
-      textColor: {
-        title: i18n('schemas.textColor'),
+      bgColor: {
+        title: i18n('schemas.bgColor'),
         type: 'string',
         widget: 'color',
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
-      bgColor: {
-        title: i18n('schemas.bgColor'),
+      // TODO: Text Size
+      // TODO: Text Alignment
+      // TODO: Font
+      // TODO: Content Margin Horizontal
+      // TODO: Content Margin Vertical
+      textColor: {
+        title: i18n('schemas.textColor'),
         type: 'string',
         widget: 'color',
         required: true,
