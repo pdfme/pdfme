@@ -1,4 +1,5 @@
 import {
+  pdfmeVersion,
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,
@@ -53,6 +54,7 @@ import {
 } from './helper.js';
 
 export {
+  pdfmeVersion,
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,

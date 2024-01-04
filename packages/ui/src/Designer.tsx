@@ -1,6 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
+import {
+  Template,
+  DesignerProps,
+  checkDesignerProps,
+  checkTemplate,
+  pdfmeVersion,
+} from '@pdfme/common';
 import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants.js';
 import DesignerComponent from './components/Designer/index';
@@ -62,6 +68,7 @@ class Designer extends BaseUIClass {
           }}
           onChangeTemplate={(template) => {
             this.template = template;
+            this.template.pdfmeVersion = pdfmeVersion;
             if (this.onChangeTemplateCallback) {
               this.onChangeTemplateCallback(template);
             }
