@@ -1,5 +1,9 @@
 import { rectangle } from '../shapes/rectAndEllipse';
 import { pdfRender as textRender } from '../text/pdfRender';
+import type { Schema, PDFRenderProps } from '@pdfme/common';
+import type { TableSchema } from './types';
+import type { ShapeSchema } from '../shapes/rectAndEllipse';
+import type { TextSchema } from '../text/types';
 
 const SCALE_FACTOR = 1;
 
@@ -238,7 +242,7 @@ interface UserOptions {
   includeHiddenHtml?: boolean;
   useCss?: boolean;
   theme?: ThemeType;
-  startY?: number | false;
+  startY?: number;
   margin?: MarginPaddingInput;
   pageBreak?: PageBreakType;
   rowPageBreak?: RowPageBreakType;
@@ -571,16 +575,8 @@ class CellHookData extends HookData {
 
 // ------------------------------
 
-export function autoTable(options: UserOptions) {
-  const input = parseInput(options);
-  const table = createTable(input);
-  console.log(table);
-  drawTable(table);
-}
-
-function drawTable(table: Table): void {
-  // TODO
-  const pageHeight = 297;
+async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promise<void> {
+  const pageSize = arg.page.getSize();
 
   const settings = table.settings;
   const startY = settings.startY;
@@ -601,7 +597,7 @@ function drawTable(table: Table): void {
 
   if (
     settings.pageBreak === 'always' ||
-    (settings.startY != null && minTableBottomPos > pageHeight)
+    (settings.startY != null && minTableBottomPos > pageSize.height)
   ) {
     nextPage();
     cursor.y = margin.top;
@@ -616,23 +612,33 @@ function drawTable(table: Table): void {
 
   // normal flow
   if (settings.showHead === 'firstPage' || settings.showHead === 'everyPage') {
-    table.head.forEach((row) => printRow(table, row, cursor, table.columns));
+    for (const row of table.head) {
+      await printRow(arg, table, row, cursor, table.columns);
+    }
   }
 
-  table.body.forEach((row, index) => {
-    const isLastRow = index === table.body.length - 1;
-    printFullRow(table, row, isLastRow, startPos, cursor, table.columns);
-  });
+  for (const row of table.body) {
+    const isLastRow = row.index === table.body.length - 1;
+    await printFullRow(arg, table, row, isLastRow, startPos, cursor, table.columns, pageSize);
+  }
 
   if (settings.showFoot === 'lastPage' || settings.showFoot === 'everyPage') {
-    table.foot.forEach((row) => printRow(table, row, cursor, table.columns));
+    for (const row of table.foot) {
+      await printRow(arg, table, row, cursor, table.columns);
+    }
   }
 
-  addTableBorder(table, startPos, cursor);
+  await addTableBorder(arg, table, startPos, cursor, pageSize.width);
   table.callEndPageHooks(cursor);
 }
 
-function printRow(table: Table, row: Row, cursor: Pos, columns: Column[]) {
+async function printRow(
+  arg: PDFRenderProps<Schema>,
+  table: Table,
+  row: Row,
+  cursor: Pos,
+  columns: Column[]
+) {
   cursor.x = table.settings.margin.left;
   for (const column of columns) {
     const cell = row.cells[column.index];
@@ -649,26 +655,46 @@ function printRow(table: Table, row: Row, cursor: Pos, columns: Column[]) {
       cursor.x += column.width;
       continue;
     }
-
-    // TODO ここから
-    console.log('cell', cell.x, cell.y, cell.width, cell.height, cell.raw);
-    // rectangle.pdf();
-    // drawCellRect(doc, cell, cursor);
+    const rectangleArg: PDFRenderProps<ShapeSchema> = {
+      ...arg,
+      schema: {
+        type: 'rectangle',
+        borderWidth: 0.1,
+        borderColor: '#000000',
+        color: '#ffffff',
+        position: {
+          x: cell.x,
+          y: cell.y,
+        },
+        width: cell.width,
+        height: cell.height,
+        readOnly: true,
+      },
+    };
+    await rectangle.pdf(rectangleArg);
 
     const textPos = cell.getTextPos();
-    console.log('textPos', textPos);
-    // textRender;
-    // autoTableText(
-    //   cell.text,
-    //   textPos.x,
-    //   textPos.y,
-    //   {
-    //     halign: cell.styles.halign,
-    //     valign: cell.styles.valign,
-    //     maxWidth: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
-    //   },
-    //   doc.getDocument()
-    // );
+    const textArg: PDFRenderProps<TextSchema> = {
+      ...arg,
+      value: cell.text.join(),
+      schema: {
+        type: 'text',
+        alignment: 'left', //  halign: cell.styles.halign,
+        verticalAlignment: 'top', // valign: cell.styles.valign,
+        fontSize: 14,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#000000',
+        backgroundColor: '',
+        position: {
+          x: textPos.x,
+          y: textPos.y,
+        },
+        width: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
+        height: cell.height,
+      },
+    };
+    await textRender(textArg);
 
     table.callCellHooks(table.hooks.didDrawCell, cell, row, column, cursor);
 
@@ -678,35 +704,49 @@ function printRow(table: Table, row: Row, cursor: Pos, columns: Column[]) {
   cursor.y += row.height;
 }
 
-function printFullRow(
+async function printFullRow(
+  arg: PDFRenderProps<TableSchema>,
   table: Table,
   row: Row,
   isLastRow: boolean,
   startPos: Pos,
   cursor: Pos,
-  columns: Column[]
+  columns: Column[],
+  pageSize: {
+    width: number;
+    height: number;
+  }
 ) {
-  // TODO
-  const pageHeight = 297;
+  const pageHeight = pageSize.height;
+  const pageWidth = pageSize.width;
   const remainingSpace = getRemainingPageSpace(table, isLastRow, cursor, pageHeight);
   if (row.canEntireRowFit(remainingSpace, columns)) {
-    printRow(table, row, cursor, columns);
+    await printRow(arg, table, row, cursor, columns);
   } else {
     if (shouldPrintOnCurrentPage(row, remainingSpace, table, pageHeight)) {
       const remainderRow = modifyRowToFit(row, remainingSpace, table);
-      printRow(table, row, cursor, columns);
-      addPage(table, startPos, cursor, columns);
-      printFullRow(table, remainderRow, isLastRow, startPos, cursor, columns);
+      await printRow(arg, table, row, cursor, columns);
+      await addPage(arg, table, startPos, cursor, columns, pageWidth);
+      await printFullRow(arg, table, remainderRow, isLastRow, startPos, cursor, columns, pageSize);
     } else {
-      addPage(table, startPos, cursor, columns);
-      printFullRow(table, row, isLastRow, startPos, cursor, columns);
+      await addPage(arg, table, startPos, cursor, columns, pageWidth);
+      await printFullRow(arg, table, row, isLastRow, startPos, cursor, columns, pageSize);
     }
   }
 }
 
-function addPage(table: Table, startPos: Pos, cursor: Pos, columns: Column[] = []) {
+async function addPage(
+  arg: PDFRenderProps<TableSchema>,
+  table: Table,
+  startPos: Pos,
+  cursor: Pos,
+  columns: Column[] = [],
+  pageWidth: number
+) {
   if (table.settings.showFoot === 'everyPage') {
-    table.foot.forEach((row: Row) => printRow(table, row, cursor, columns));
+    for (const row of table.foot) {
+      await printRow(arg, table, row, cursor, columns);
+    }
   }
 
   // Add user content just before adding new page ensure it will
@@ -714,7 +754,8 @@ function addPage(table: Table, startPos: Pos, cursor: Pos, columns: Column[] = [
   table.callEndPageHooks(cursor);
 
   const margin = table.settings.margin;
-  addTableBorder(table, startPos, cursor);
+  await addTableBorder(arg, table, startPos, cursor, pageWidth);
+
   nextPage();
   table.pageNumber++;
   table.pageCount++;
@@ -726,7 +767,10 @@ function addPage(table: Table, startPos: Pos, cursor: Pos, columns: Column[] = [
   table.callWillDrawPageHooks(cursor);
 
   if (table.settings.showHead === 'everyPage') {
-    table.head.forEach((row: Row) => printRow(table, row, cursor, columns));
+    // table.head.forEach((row: Row) => printRow(table, row, cursor, columns));
+    for (const row of table.head) {
+      await printRow(arg, table, row, cursor, columns);
+    }
   }
 }
 
@@ -741,20 +785,35 @@ function nextPage() {
   // return false;
 }
 
-function addTableBorder(table: Table, startPos: Pos, cursor: Pos) {
+async function addTableBorder(
+  arg: PDFRenderProps<TableSchema>,
+  table: Table,
+  startPos: Pos,
+  cursor: Pos,
+  pageWidth: number
+) {
   const lineWidth = table.settings.tableLineWidth;
   const lineColor = table.settings.tableLineColor;
 
   const fillStyle = getFillStyle(lineWidth, false);
   if (fillStyle) {
-    // TODO ここから
-    // doc.rect(
-    //   startPos.x,
-    //   startPos.y,
-    //   table.getWidth(doc.pageSize().width),
-    //   cursor.y - startPos.y,
-    //   fillStyle
-    // );
+    const rectangleArg: PDFRenderProps<ShapeSchema> = {
+      ...arg,
+      schema: {
+        type: 'rectangle',
+        borderWidth: 1,
+        borderColor: '#000000',
+        color: '#ffffff',
+        position: {
+          x: startPos.x,
+          y: startPos.y,
+        },
+        width: table.getWidth(pageWidth),
+        height: cursor.y - startPos.y,
+        readOnly: true,
+      },
+    };
+    await rectangle.pdf(rectangleArg);
   }
 }
 
@@ -787,7 +846,7 @@ function shouldPrintOnCurrentPage(
     maxRowHeight -= table.getHeadHeight(table.columns) + table.getFootHeight(table.columns);
   }
 
-  // TODO
+  // TODO 1.15を書き換える
   const minRowHeight = row.getMinimumRowHeight(table.columns, 1.15);
   const minRowFits = minRowHeight < remainingPageSpace;
   if (minRowHeight > maxRowHeight) {
@@ -904,13 +963,10 @@ function getRemainingLineCount(cell: Cell, remainingPageSpace: number) {
   return Math.max(0, remainingLines);
 }
 
-function createTable(input: TableInput) {
+function createTable(input: TableInput, pageWidth: number) {
   const content = parseContent4Table(input, SCALE_FACTOR);
   const table = new Table(input, content);
-  // TODO
-  const pageWidth = 210;
   calculateWidths(table, pageWidth);
-
   return table;
 }
 
@@ -1240,7 +1296,7 @@ function getStringWidth(text: string | string[]) {
   //   .reduce((a, b) => Math.max(a, b), 0);
 
   // return widestLineWidth;
-  return 100;
+  return 0;
 }
 
 function getPageAvailableWidth(table: Table, pageWidth: number) {
@@ -1534,7 +1590,7 @@ function parseHooks(current: UserOptions) {
 
 function parseSettings(options: UserOptions): Settings {
   const margin = parseSpacing(options.margin, 40 / SCALE_FACTOR);
-  const startY = getStartY(options.startY) ?? margin.top;
+  const startY = options.startY ? getStartY(options.startY) : margin.top;
 
   let showFoot: 'everyPage' | 'lastPage' | 'never';
   if (options.showFoot === true) {
@@ -1578,7 +1634,7 @@ function parseSettings(options: UserOptions): Settings {
   };
 }
 
-function getStartY(userStartY: number | false | undefined) {
+function getStartY(userStartY: number) {
   // const previous = doc.getLastAutoTable();
   // const sf = doc.scaleFactor();
   // const currentPage = doc.pageNumber();
@@ -1599,7 +1655,7 @@ function getStartY(userStartY: number | false | undefined) {
   //   }
   // }
   // return null;
-  return 0;
+  return userStartY;
 }
 
 function parseContent4Input(options: UserOptions) {
@@ -1644,4 +1700,11 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
       }
     });
   return result;
+}
+
+export async function autoTable(arg: PDFRenderProps<TableSchema>, options: UserOptions) {
+  const input = parseInput(options);
+  const table = createTable(input, arg.page.getSize().width);
+  await drawTable(arg, table);
+  return table;
 }

@@ -2,14 +2,14 @@ import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2RgbColor, convertForPdfLayoutProps } from '../utils.js';
 
-interface Shape extends Schema {
+export interface ShapeSchema extends Schema {
   type: 'ellipse' | 'rectangle';
   borderWidth: number;
   borderColor: string;
   color: string;
 }
 
-const shape: Plugin<Shape> = {
+const shape: Plugin<ShapeSchema> = {
   ui: (arg) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');

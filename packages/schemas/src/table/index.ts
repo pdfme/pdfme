@@ -1,68 +1,62 @@
-import { drawTable, DrawTableOptions } from 'pdf-lib-draw-table-beta';
-import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
-import { convertForPdfLayoutProps, hex2RgbColor } from '../utils.js';
+import { Plugin, PDFRenderProps, UIRenderProps, pt2mm } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { autoTable } from './autoTable';
+import type { TableSchema } from './types';
 
 // MEMO to pdf-lib-draw-table-beta
 // - デフォルト(undefined)のヘッダーカラーは透明にして欲しい
 // - Vertical Alignは？
 
-interface TableSchema extends Schema {
-  borderColor: string;
-  textColor: string;
-  bgColor: string;
-}
-
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
-    const res = autoTable({
-      head: [['Name', 'Email', 'Country']],
-      body: [
-        ['David', 'david@example.com', 'Sweden'],
-        ['Castille', 'castille@example.com', 'Spain'],
-        // ...
-      ],
-      // TODO 位置を決めるオプション等をちゃんとつける
-      // startY
-    });
-    console.log('autoTable-res', res);
-
     const { page, schema, pdfDoc, value } = arg;
-    const pageHeight = page.getHeight();
-    const {
-      width,
-      height,
-      position: { x, y },
-    } = convertForPdfLayoutProps({ schema, pageHeight });
-    const options: DrawTableOptions = {
-      header: {
-        hasHeaderRow: true,
-        textColor: hex2RgbColor(schema.textColor),
-        backgroundColor: hex2RgbColor(schema.bgColor),
+    const valueJson = JSON.parse(value) as string[][];
+    const head = valueJson[0];
+    const body = valueJson.slice(1);
+    const res = await autoTable(arg, {
+      head: [head],
+      body,
+      startY: schema.position.y,
+      tableWidth: schema.width,
+      styles: {
+        cellPadding: 0,
       },
-      pageMargin: {
-        right: page.getSize().width - x - width,
-        bottom: page.getSize().height - y - height,
+      margin: {
+        top: 0,
+        right: pt2mm(page.getSize().width) - schema.position.x - schema.width,
+        left: schema.position.x,
+        bottom: 0,
       },
-      border: { color: hex2RgbColor(schema.borderColor) },
-      textColor: hex2RgbColor(schema.textColor),
-    };
-    const tableDimensions = await drawTable(
-      pdfDoc,
-      page,
-      JSON.parse(value) as string[][],
-      x,
-      y + height,
-      options
-    );
+    });
+    console.log('res', res);
+
+    // const options: DrawTableOptions = {
+    //   header: {
+    //     hasHeaderRow: true,
+    //     textColor: hex2RgbColor(schema.textColor),
+    //     backgroundColor: hex2RgbColor(schema.bgColor),
+    //   },
+    //   pageMargin: {
+    //     right: page.getSize().width - x - width,
+    //     bottom: page.getSize().height - y - height,
+    //   },
+    //   border: { color: hex2RgbColor(schema.borderColor) },
+    //   textColor: hex2RgbColor(schema.textColor),
+    // };
+    // const tableDimensions = await drawTable(
+    //   pdfDoc,
+    //   page,
+    //   JSON.parse(value) as string[][],
+    //   x,
+    //   y + height,
+    //   options
+    // );
 
     // console.log('Table dimensions:', tableDimensions);
   },
   // TODO heightを自動で決められるようにしたい->どうやってvalue以外の値を変更するかは別途修正が必要
   // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。現在はtableLayout:fixed(https://developer.mozilla.org/ja/docs/Web/CSS/table-layout)で決定している。colの横幅で決定できるようにしたい。
   ui: (arg: UIRenderProps<TableSchema>) => {
-    console.log('ui', arg);
     const { schema, rootElement, value, mode, onChange } = arg;
     const tableData = JSON.parse(value) as string[][];
     const tableHeader = tableData[0];
