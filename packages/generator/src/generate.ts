@@ -1,6 +1,6 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps,pt2mm } from '@pdfme/common';
+import { checkGenerateProps, pt2mm } from '@pdfme/common';
 import { insertPage, preprocessing, postProcessing } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
@@ -39,7 +39,7 @@ const generate = async (props: GenerateProps) => {
         }
         const value = schema.readOnly ? schema.content || '' : inputObj[key];
         const res = await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
-        if(res){
+        if (res) {
           console.log(pt2mm(res.width), pt2mm(res.height));
         }
       }

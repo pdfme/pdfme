@@ -2,7 +2,7 @@ import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2RgbColor, convertForPdfLayoutProps } from '../utils.js';
 
-export interface ShapeSchema extends Schema {
+interface ShapeSchema extends Schema {
   type: 'ellipse' | 'rectangle';
   borderWidth: number;
   borderColor: string;
