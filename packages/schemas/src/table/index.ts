@@ -3,10 +3,6 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { autoTable } from './autoTable';
 import type { TableSchema } from './types';
 
-// MEMO to pdf-lib-draw-table-beta
-// - デフォルト(undefined)のヘッダーカラーは透明にして欲しい
-// - Vertical Alignは？
-
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { page, schema, pdfDoc, value } = arg;
@@ -29,30 +25,6 @@ const tableSchema: Plugin<TableSchema> = {
       },
     });
     console.log('res', res);
-
-    // const options: DrawTableOptions = {
-    //   header: {
-    //     hasHeaderRow: true,
-    //     textColor: hex2RgbColor(schema.textColor),
-    //     backgroundColor: hex2RgbColor(schema.bgColor),
-    //   },
-    //   pageMargin: {
-    //     right: page.getSize().width - x - width,
-    //     bottom: page.getSize().height - y - height,
-    //   },
-    //   border: { color: hex2RgbColor(schema.borderColor) },
-    //   textColor: hex2RgbColor(schema.textColor),
-    // };
-    // const tableDimensions = await drawTable(
-    //   pdfDoc,
-    //   page,
-    //   JSON.parse(value) as string[][],
-    //   x,
-    //   y + height,
-    //   options
-    // );
-
-    // console.log('Table dimensions:', tableDimensions);
   },
   // TODO heightを自動で決められるようにしたい->どうやってvalue以外の値を変更するかは別途修正が必要
   // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。現在はtableLayout:fixed(https://developer.mozilla.org/ja/docs/Web/CSS/table-layout)で決定している。colの横幅で決定できるようにしたい。
@@ -115,11 +87,6 @@ const tableSchema: Plugin<TableSchema> = {
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
-      // TODO: Text Size
-      // TODO: Text Alignment
-      // TODO: Font
-      // TODO: Content Margin Horizontal
-      // TODO: Content Margin Vertical
       textColor: {
         title: i18n('schemas.textColor'),
         type: 'string',

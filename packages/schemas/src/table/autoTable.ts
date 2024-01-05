@@ -5,6 +5,8 @@ import type { TableSchema } from './types';
 import type { ShapeSchema } from '../shapes/rectAndEllipse';
 import type { TextSchema } from '../text/types';
 
+// TODO ここから 不要なロジック、カスタマイズ可能な部分を把握する
+
 const SCALE_FACTOR = 1;
 
 // ### function
