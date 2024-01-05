@@ -1,5 +1,6 @@
 import * as fontkit from 'fontkit';
 import {
+  Size,
   Schema,
   Plugins,
   GeneratorOptions,
@@ -93,7 +94,7 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
 Check this document: https://pdfme.com/docs/custom-schemas`);
     }
     return { ...acc, [type]: render.pdf };
-  }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
+  }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void | Size> | void>);
 
   return { pdfDoc, basePages, embedPdfBoxes, renderObj };
 };

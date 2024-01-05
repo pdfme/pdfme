@@ -2,6 +2,7 @@ import { drawTable, DrawTableOptions } from 'pdf-lib-draw-table-beta';
 import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
 import { convertForPdfLayoutProps, hex2RgbColor } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { autoTable } from './autoTable';
 
 // MEMO to pdf-lib-draw-table-beta
 // - デフォルト(undefined)のヘッダーカラーは透明にして欲しい
@@ -15,6 +16,18 @@ interface TableSchema extends Schema {
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
+    const res = autoTable({
+      head: [['Name', 'Email', 'Country']],
+      body: [
+        ['David', 'david@example.com', 'Sweden'],
+        ['Castille', 'castille@example.com', 'Spain'],
+        // ...
+      ],
+      // TODO 位置を決めるオプション等をちゃんとつける
+      // startY
+    });
+    console.log('autoTable-res', res);
+
     const { page, schema, pdfDoc, value } = arg;
     const pageHeight = page.getHeight();
     const {
@@ -44,7 +57,7 @@ const tableSchema: Plugin<TableSchema> = {
       options
     );
 
-    console.log('Table dimensions:', tableDimensions);
+    // console.log('Table dimensions:', tableDimensions);
   },
   // TODO heightを自動で決められるようにしたい->どうやってvalue以外の値を変更するかは別途修正が必要
   // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。現在はtableLayout:fixed(https://developer.mozilla.org/ja/docs/Web/CSS/table-layout)で決定している。colの横幅で決定できるようにしたい。
