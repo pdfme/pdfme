@@ -1,6 +1,6 @@
 import { Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { autoTable } from './autoTable';
+import { autoTable, Styles } from './autoTable';
 import type { TableSchema } from './types';
 
 const tableSchema: Plugin<TableSchema> = {
@@ -16,11 +16,16 @@ const tableSchema: Plugin<TableSchema> = {
       tableWidth: schema.width,
       headStyles: {
         cellPadding: 0,
+        textColor: schema.textColor,
       },
       bodyStyles: {
         cellPadding: 0,
+        textColor: schema.textColor,
       },
-      columnStyles: {},
+      columnStyles: head.reduce((acc, _, i) => {
+        acc[i] = { cellWidth: schema.width / head.length };
+        return acc;
+      }, {} as Record<number, Partial<Styles>>),
       margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
     });
     console.log('res', res);
@@ -100,8 +105,13 @@ const tableSchema: Plugin<TableSchema> = {
       width: 100,
       height: 20,
       content: JSON.stringify([
-        ['Name', 'Age', 'City City City City City City City City City City City'],
-        ['Alice', '24', 'New York New York New York New York New York New York New York New York'],
+        ['Name', 'Age', 'City', 'City City City City City City City City City City City'],
+        [
+          'Alice',
+          '24',
+          'New York',
+          'New York New York New York New York New York New York New York New York',
+        ],
       ]),
       borderColor: '#000000',
       textColor: '#000000',

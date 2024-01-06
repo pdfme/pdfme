@@ -132,7 +132,6 @@ type StyleProp =
   | 'alternateRowStyles'
   | 'columnStyles';
 
-type ThemeType = 'striped' | 'grid' | 'plain' | null;
 type MarginPaddingInput =
   | number
   | number[]
@@ -154,15 +153,7 @@ type Color = string;
 
 type RowInput = { [key: string]: CellInput } | CellInput[];
 type CellInput = null | string | string[] | number | boolean | CellDef;
-
-type StandardFontType = 'helvetica' | 'times' | 'courier';
-
-type CustomFontType = string;
-type FontType = StandardFontType | CustomFontType;
 type FontStyle = 'normal' | 'bold' | 'italic' | 'bolditalic';
-
-type HAlignType = 'left' | 'center' | 'right';
-type VAlignType = 'top' | 'middle' | 'bottom';
 
 type MarginPadding = {
   top: number;
@@ -193,8 +184,6 @@ type ColumnInput =
       dataKey?: string | number;
     };
 
-type ThemeName = 'striped' | 'grid' | 'plain';
-
 // ### interface
 
 interface StylesProps {
@@ -211,14 +200,14 @@ interface CellDef {
   content?: string | string[] | number;
 }
 
-interface Styles {
-  font: FontType;
+export interface Styles {
+  fontName: string;
   fontStyle: FontStyle;
   fillColor: Color;
   textColor: Color;
-  // TODO lineHeight: number;
-  halign: HAlignType;
-  valign: VAlignType;
+  lineHeight: number;
+  alignment: 'left' | 'center' | 'right';
+  verticalAlignment: 'top' | 'middle' | 'bottom';
   fontSize: number;
   cellPadding: MarginPaddingInput;
   lineColor: Color;
@@ -235,7 +224,6 @@ interface LineWidths {
 }
 
 interface Settings {
-  theme: 'striped' | 'grid' | 'plain';
   startY: number;
   margin: MarginPadding;
   pageBreak: 'auto' | 'avoid' | 'always';
@@ -281,7 +269,6 @@ interface TableInput {
 interface UserOptions {
   startY: number;
   tableWidth: number;
-  theme?: ThemeType;
   margin: MarginPaddingInput;
   pageBreak?: PageBreakType;
   rowPageBreak?: RowPageBreakType;
@@ -354,9 +341,9 @@ class Cell {
 
   getTextPos(): Pos {
     let y;
-    if (this.styles.valign === 'top') {
+    if (this.styles.verticalAlignment === 'top') {
       y = this.y + this.padding('top');
-    } else if (this.styles.valign === 'bottom') {
+    } else if (this.styles.verticalAlignment === 'bottom') {
       y = this.y + this.height - this.padding('bottom');
     } else {
       const netHeight = this.height - this.padding('vertical');
@@ -364,9 +351,9 @@ class Cell {
     }
 
     let x;
-    if (this.styles.halign === 'right') {
+    if (this.styles.alignment === 'right') {
       x = this.x + this.width - this.padding('right');
-    } else if (this.styles.halign === 'center') {
+    } else if (this.styles.alignment === 'center') {
       const netWidth = this.width - this.padding('horizontal');
       x = this.x + netWidth / 2 + this.padding('left');
     } else {
@@ -375,10 +362,9 @@ class Cell {
     return { x, y };
   }
 
-  // TODO (v4): replace parameters with only (lineHeight)
-  getContentHeight(lineHeightFactor: number) {
+  getContentHeight() {
     const lineCount = Array.isArray(this.text) ? this.text.length : 1;
-    const lineHeight = this.styles.fontSize * lineHeightFactor;
+    const lineHeight = this.styles.fontSize * this.styles.lineHeight;
     const height = lineCount * lineHeight + this.padding('vertical');
     return Math.max(height, this.styles.minCellHeight);
   }
@@ -446,12 +432,12 @@ class Row {
     return this.getMaxCellHeight(columns) <= height;
   }
 
-  getMinimumRowHeight(columns: Column[], lineHeight: number) {
+  getMinimumRowHeight(columns: Column[]) {
     return columns.reduce((acc: number, column: Column) => {
       const cell = this.cells[column.index];
       if (!cell) return 0;
       const vPadding = cell.padding('vertical');
-      const oneRowHeight = vPadding + lineHeight;
+      const oneRowHeight = vPadding + cell.styles.lineHeight;
       return oneRowHeight > acc ? oneRowHeight : acc;
     }, 0);
   }
@@ -736,8 +722,7 @@ function shouldPrintOnCurrentPage(
     maxRowHeight -= table.getHeadHeight(table.columns) + table.getFootHeight(table.columns);
   }
 
-  // TODO 1.15を書き換える
-  const minRowHeight = row.getMinimumRowHeight(table.columns, 1.15);
+  const minRowHeight = row.getMinimumRowHeight(table.columns);
   const minRowFits = minRowHeight < remainingPageSpace;
   if (minRowHeight > maxRowHeight) {
     console.error(
@@ -795,9 +780,7 @@ function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
       remainderCell.text = cell.text.splice(remainingLineCount, cell.text.length);
     }
 
-    // TODO
-    const lineHeightFactor = 1.15;
-    cell.contentHeight = cell.getContentHeight(lineHeightFactor);
+    cell.contentHeight = cell.getContentHeight();
 
     if (cell.contentHeight >= remainingPageSpace) {
       cell.contentHeight = remainingPageSpace;
@@ -807,7 +790,7 @@ function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
       row.height = cell.contentHeight;
     }
 
-    remainderCell.contentHeight = remainderCell.getContentHeight(lineHeightFactor);
+    remainderCell.contentHeight = remainderCell.getContentHeight();
     if (remainderCell.contentHeight > rowHeight) {
       rowHeight = remainderCell.contentHeight;
     }
@@ -832,11 +815,8 @@ function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
 }
 
 function getRemainingLineCount(cell: Cell, remainingPageSpace: number) {
-  // TODO
-  // const lineHeight = doc.getLineHeight(cell.styles.fontSize);
-  const lineHeight = 1.15;
   const vPadding = cell.padding('vertical');
-  const remainingLines = Math.floor((remainingPageSpace - vPadding) / lineHeight);
+  const remainingLines = Math.floor((remainingPageSpace - vPadding) / cell.styles.lineHeight);
   return Math.max(0, remainingLines);
 }
 
@@ -965,6 +945,7 @@ async function fitContent(table: Table) {
 
       cell.text = splitTextToSize({
         // TODO cell.text がどのようなロジックで配列になっているのか確認するべき
+        // ↑ 改行コードで分割している
         value: cell.text.join(),
         characterSpacing: 0,
         boxWidthInPt: mm2pt(cell.width),
@@ -972,8 +953,7 @@ async function fitContent(table: Table) {
         fontKitFont,
       });
 
-      // TODO
-      cell.contentHeight = cell.getContentHeight(1.15);
+      cell.contentHeight = cell.getContentHeight();
 
       let realContentHeight = cell.contentHeight;
       if (rowSpanHeight && rowSpanHeight.count > 0) {
@@ -1136,13 +1116,12 @@ function parseContent4Table(input: TableInput) {
     if (sectionRow) content.foot.push(sectionRow);
   }
 
-  const theme = input.settings.theme;
   const styles = input.styles;
   return {
     columns,
-    head: parseSection('head', content.head, columns, styles, theme),
-    body: parseSection('body', content.body, columns, styles, theme),
-    foot: parseSection('foot', content.foot, columns, styles, theme),
+    head: parseSection('head', content.head, columns, styles),
+    body: parseSection('body', content.body, columns, styles),
+    foot: parseSection('foot', content.foot, columns, styles),
   };
 }
 
@@ -1181,8 +1160,7 @@ function parseSection(
   sectionName: Section,
   sectionRows: RowInput[],
   columns: Column[],
-  styleProps: StylesProps,
-  theme: ThemeName
+  styleProps: StylesProps
 ): Row[] {
   const rowSpansLeftForColumn: { [key: string]: { left: number; times: number } } = {};
   const result = sectionRows.map((rawRow, rowIndex) => {
@@ -1208,14 +1186,7 @@ function parseSection(
           if (typeof rawCell === 'object' && !Array.isArray(rawCell)) {
             cellInputStyles = rawCell?.styles || {};
           }
-          const styles = cellStyles(
-            sectionName,
-            column,
-            rowIndex,
-            theme,
-            styleProps,
-            cellInputStyles
-          );
+          const styles = cellStyles(sectionName, column, rowIndex, styleProps, cellInputStyles);
           const cell = new Cell(rawCell, styles, sectionName);
           cells[column.index] = cell;
 
@@ -1243,11 +1214,9 @@ function cellStyles(
   sectionName: Section,
   column: Column,
   rowIndex: number,
-  themeName: ThemeName,
   styles: StylesProps,
   cellInputStyles: Partial<Styles>
 ) {
-  const theme = getTheme(themeName);
   let sectionStyles;
   if (sectionName === 'head') {
     sectionStyles = styles.headStyles;
@@ -1256,34 +1225,27 @@ function cellStyles(
   } else if (sectionName === 'foot') {
     sectionStyles = styles.footStyles;
   }
-  const otherStyles = Object.assign(
-    {},
-    theme.table,
-    theme[sectionName],
-    styles.styles,
-    sectionStyles
-  ) as Partial<Styles>;
+  const otherStyles = Object.assign({}, styles.styles, sectionStyles);
   const columnStyles =
     styles.columnStyles[column.dataKey] || styles.columnStyles[column.index] || {};
   const colStyles = sectionName === 'body' ? columnStyles : {};
   const rowStyles =
     sectionName === 'body' && rowIndex % 2 === 0
-      ? Object.assign({}, theme.alternateRow, styles.alternateRowStyles)
+      ? Object.assign({}, styles.alternateRowStyles)
       : {};
   const defaultStyle = defaultStyles();
-  const themeStyles = Object.assign({}, defaultStyle, otherStyles, rowStyles, colStyles) as Styles &
-    Partial<Styles>;
-  return Object.assign(themeStyles, cellInputStyles);
+  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles, cellInputStyles) as Styles;
 }
 
 function defaultStyles(): Styles {
   return {
-    font: 'helvetica', // helvetica, times, courier
+    fontName: 'helvetica', // helvetica, times, courier
     fontStyle: 'normal', // normal, bold, italic, bolditalic
     fillColor: '', // Either false for transparent, rbg array e.g. [255, 255, 255] or gray level e.g 200
     textColor: '#000000', // color string
-    halign: 'left', // left, center, right, justify
-    valign: 'top', // top, middle, bottom
+    lineHeight: 1,
+    alignment: 'left', // left, center, right, justify
+    verticalAlignment: 'top', // top, middle, bottom
     fontSize: 10,
     cellPadding: 5, // number or {top,left,right,left,vertical,horizontal}
     lineColor: '#000000',
@@ -1292,59 +1254,6 @@ function defaultStyles(): Styles {
     minCellHeight: 0,
     minCellWidth: 0,
   };
-}
-
-function getTheme(name: ThemeName): { [key: string]: Partial<Styles> } {
-  const themes: { [key in ThemeName]: { [key: string]: Partial<Styles> } } = {
-    striped: {
-      table: {
-        fillColor: '#ffffff',
-        textColor: '#505050',
-        fontStyle: 'normal',
-      },
-      head: {
-        textColor: '#ffffff',
-        fillColor: '#2980ba',
-        fontStyle: 'bold',
-      },
-      body: {},
-      foot: {
-        textColor: '#ffffff',
-        fillColor: '#2980ba',
-        fontStyle: 'bold',
-      },
-      alternateRow: {
-        fillColor: '#f5f5f5',
-      },
-    },
-    grid: {
-      table: {
-        fillColor: '#ffffff',
-        textColor: '#505050',
-        fontStyle: 'normal',
-        lineWidth: 0.1,
-      },
-      head: {
-        textColor: '#ffffff',
-        fillColor: '#1cbd9d',
-        fontStyle: 'bold',
-        lineWidth: 0,
-      },
-      body: {},
-      foot: {
-        textColor: '#ffffff',
-        fillColor: '#1cbd9d',
-        fontStyle: 'bold',
-        lineWidth: 0,
-      },
-      alternateRow: {},
-    },
-    plain: {
-      head: { fontStyle: 'bold' },
-      foot: { fontStyle: 'bold' },
-    },
-  };
-  return themes[name];
 }
 
 function parseInput(current: UserOptions): TableInput {
@@ -1419,10 +1328,7 @@ function parseSettings(options: UserOptions): Settings {
     showHead = options.showHead ?? 'everyPage';
   }
 
-  const theme = options.theme || 'striped';
-
   return {
-    theme,
     startY: options.startY,
     margin: parseSpacing(options.margin, 0),
     pageBreak: options.pageBreak ?? 'auto',
