@@ -62,14 +62,14 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
 }
 
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
-  // TODO ちゃんとスタイルを反映させる
   await rectangleRender({
     ...arg,
     schema: {
       type: 'rectangle',
-      borderWidth: 0.1,
-      borderColor: '#000000',
-      color: '#ffffff',
+      // TODO スタイルの適応
+      borderWidth: typeof cell.styles.lineWidth === 'number' ? cell.styles.lineWidth : 0.1,
+      borderColor: cell.styles.lineColor,
+      color: cell.styles.fillColor,
       position: { x: cell.x, y: cell.y },
       width: cell.width,
       height: cell.height,
@@ -83,12 +83,13 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
     value: cell.text.join(''),
     schema: {
       type: 'text',
+      // TODO スタイルの適応
       alignment: 'left', //  halign: cell.styles.halign,
       verticalAlignment: 'top', // valign: cell.styles.valign,
       fontSize: 14,
       lineHeight: 1,
       characterSpacing: 0,
-      fontColor: '#000000',
+      fontColor: cell.styles.textColor,
       backgroundColor: '',
       position: { x: textPos.x, y: textPos.y },
       width: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
@@ -97,7 +98,6 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   });
 };
 
-// TODO ちゃんとカスタマイズできるようにする
 async function addTableBorder(
   arg: PDFRenderProps<TableSchema>,
   table: Table,
@@ -112,7 +112,7 @@ async function addTableBorder(
     schema: {
       type: 'rectangle',
       borderWidth: lineWidth,
-      borderColor: '#000000',
+      borderColor: lineColor,
       color: '',
       position: { x: startPos.x, y: startPos.y },
       width: table.getWidth(),
@@ -150,8 +150,7 @@ type RowPageBreakType = 'auto' | 'avoid';
 
 type ShowHeadType = 'everyPage' | 'firstPage' | 'never' | boolean;
 type ShowFootType = 'everyPage' | 'lastPage' | 'never' | boolean;
-// TODO hexだけにしたい
-type Color = [number, number, number] | number | string | false;
+type Color = string;
 
 type RowInput = { [key: string]: CellInput } | CellInput[];
 type CellInput = null | string | string[] | number | boolean | CellDef;
@@ -1281,13 +1280,13 @@ function defaultStyles(): Styles {
   return {
     font: 'helvetica', // helvetica, times, courier
     fontStyle: 'normal', // normal, bold, italic, bolditalic
-    fillColor: false, // Either false for transparent, rbg array e.g. [255, 255, 255] or gray level e.g 200
-    textColor: 20,
+    fillColor: '', // Either false for transparent, rbg array e.g. [255, 255, 255] or gray level e.g 200
+    textColor: '#000000', // color string
     halign: 'left', // left, center, right, justify
     valign: 'top', // top, middle, bottom
     fontSize: 10,
     cellPadding: 5, // number or {top,left,right,left,vertical,horizontal}
-    lineColor: 200,
+    lineColor: '#000000',
     lineWidth: 0,
     cellWidth: 'auto', // 'auto'|'wrap'|number
     minCellHeight: 0,
@@ -1298,29 +1297,43 @@ function defaultStyles(): Styles {
 function getTheme(name: ThemeName): { [key: string]: Partial<Styles> } {
   const themes: { [key in ThemeName]: { [key: string]: Partial<Styles> } } = {
     striped: {
-      table: { fillColor: 255, textColor: 80, fontStyle: 'normal' },
-      head: { textColor: 255, fillColor: [41, 128, 185], fontStyle: 'bold' },
+      table: {
+        fillColor: '#ffffff',
+        textColor: '#505050',
+        fontStyle: 'normal',
+      },
+      head: {
+        textColor: '#ffffff',
+        fillColor: '#2980ba',
+        fontStyle: 'bold',
+      },
       body: {},
-      foot: { textColor: 255, fillColor: [41, 128, 185], fontStyle: 'bold' },
-      alternateRow: { fillColor: 245 },
+      foot: {
+        textColor: '#ffffff',
+        fillColor: '#2980ba',
+        fontStyle: 'bold',
+      },
+      alternateRow: {
+        fillColor: '#f5f5f5',
+      },
     },
     grid: {
       table: {
-        fillColor: 255,
-        textColor: 80,
+        fillColor: '#ffffff',
+        textColor: '#505050',
         fontStyle: 'normal',
         lineWidth: 0.1,
       },
       head: {
-        textColor: 255,
-        fillColor: [26, 188, 156],
+        textColor: '#ffffff',
+        fillColor: '#1cbd9d',
         fontStyle: 'bold',
         lineWidth: 0,
       },
       body: {},
       foot: {
-        textColor: 255,
-        fillColor: [26, 188, 156],
+        textColor: '#ffffff',
+        fillColor: '#1cbd9d',
         fontStyle: 'bold',
         lineWidth: 0,
       },
@@ -1418,7 +1431,7 @@ function parseSettings(options: UserOptions): Settings {
     showHead,
     showFoot,
     tableLineWidth: options.tableLineWidth ?? 0,
-    tableLineColor: options.tableLineColor ?? 200,
+    tableLineColor: options.tableLineColor ?? '#000000',
   };
 }
 
