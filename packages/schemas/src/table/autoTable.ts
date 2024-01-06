@@ -1,7 +1,15 @@
+import type { Font as FontKitFont } from 'fontkit';
 import { rectangle } from '../shapes/rectAndEllipse';
 import { pdfRender as textRender } from '../text/pdfRender';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
-import { Schema, PDFRenderProps, getDefaultFont, mm2pt } from '@pdfme/common';
+import {
+  Font,
+  Schema,
+  PDFRenderProps,
+  getDefaultFont,
+  mm2pt,
+  getFallbackFontName,
+} from '@pdfme/common';
 import type { TableSchema } from './types';
 const rectangleRender = rectangle.pdf;
 
@@ -77,23 +85,22 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
     },
   });
 
-  const textPos = cell.getTextPos();
   await textRender({
     ...arg,
     value: cell.text.join(''),
     schema: {
       type: 'text',
-      // TODO スタイルの適応
-      alignment: 'left', //  halign: cell.styles.halign,
-      verticalAlignment: 'top', // valign: cell.styles.valign,
-      fontSize: 14,
-      lineHeight: 1,
-      characterSpacing: 0,
+      alignment: cell.styles.alignment,
+      verticalAlignment: cell.styles.verticalAlignment,
+      fontSize: cell.styles.fontSize,
+      lineHeight: cell.styles.lineHeight,
+      characterSpacing: cell.styles.characterSpacing,
       fontColor: cell.styles.textColor,
+      fontName: cell.styles.fontName,
       backgroundColor: '',
-      position: { x: textPos.x, y: textPos.y },
-      width: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
-      height: cell.height,
+      position: { x: cell.x + cell.padding('left'), y: cell.y + cell.padding('top') },
+      width: cell.width - cell.padding('left') - cell.padding('right'),
+      height: cell.height - cell.padding('top') - cell.padding('bottom'),
     },
   });
 };
@@ -151,9 +158,7 @@ type ShowHeadType = 'everyPage' | 'firstPage' | 'never' | boolean;
 type ShowFootType = 'everyPage' | 'lastPage' | 'never' | boolean;
 type Color = string;
 
-type RowInput = { [key: string]: CellInput } | CellInput[];
-type CellInput = null | string | string[] | number | boolean | CellDef;
-type FontStyle = 'normal' | 'bold' | 'italic' | 'bolditalic';
+type RowInput = { [key: string]: string } | string[];
 
 type MarginPadding = {
   top: number;
@@ -179,8 +184,8 @@ type ColumnInput =
   | string
   | number
   | {
-      header?: CellInput;
-      footer?: CellInput;
+      header?: string;
+      footer?: string;
       dataKey?: string | number;
     };
 
@@ -195,17 +200,12 @@ interface StylesProps {
   columnStyles: { [key: string]: Partial<Styles> };
 }
 
-interface CellDef {
-  styles?: Partial<Styles>;
-  content?: string | string[] | number;
-}
-
 export interface Styles {
-  fontName: string;
-  fontStyle: FontStyle;
+  fontName: string | undefined;
   fillColor: Color;
   textColor: Color;
   lineHeight: number;
+  characterSpacing: number;
   alignment: 'left' | 'center' | 'right';
   verticalAlignment: 'top' | 'middle' | 'bottom';
   fontSize: number;
@@ -307,7 +307,7 @@ interface UserOptions {
 // ### class
 
 class Cell {
-  raw: CellInput;
+  raw: string;
   styles: Styles;
   text: string[];
   section: Section;
@@ -323,43 +323,12 @@ class Cell {
   x = 0;
   y = 0;
 
-  constructor(raw: CellInput, styles: Styles, section: Section) {
+  constructor(raw: string, styles: Styles, section: Section) {
     this.styles = styles;
     this.section = section;
     this.raw = raw;
-
-    let content = raw;
-    if (raw != null && typeof raw === 'object' && !Array.isArray(raw)) {
-      content = raw.content ?? raw;
-    }
-
-    // Stringify 0 and false, but not undefined or null
-    const text = content != null ? '' + String(content) : '';
     const splitRegex = /\r\n|\r|\n/g;
-    this.text = text.split(splitRegex);
-  }
-
-  getTextPos(): Pos {
-    let y;
-    if (this.styles.verticalAlignment === 'top') {
-      y = this.y + this.padding('top');
-    } else if (this.styles.verticalAlignment === 'bottom') {
-      y = this.y + this.height - this.padding('bottom');
-    } else {
-      const netHeight = this.height - this.padding('vertical');
-      y = this.y + netHeight / 2 + this.padding('top');
-    }
-
-    let x;
-    if (this.styles.alignment === 'right') {
-      x = this.x + this.width - this.padding('right');
-    } else if (this.styles.alignment === 'center') {
-      const netWidth = this.width - this.padding('horizontal');
-      x = this.x + netWidth / 2 + this.padding('left');
-    } else {
-      x = this.x + this.padding('left');
-    }
-    return { x, y };
+    this.text = raw.split(splitRegex);
   }
 
   getContentHeight() {
@@ -820,15 +789,19 @@ function getRemainingLineCount(cell: Cell, remainingPageSpace: number) {
   return Math.max(0, remainingLines);
 }
 
-async function createTable(input: TableInput, pageWidth: number) {
-  const content = parseContent4Table(input);
+async function createTable(input: TableInput, arg: PDFRenderProps<TableSchema>) {
+  const { page, options, _cache, schema } = arg;
+  const pageWidth = page.getWidth();
+  const { font = getDefaultFont() } = options;
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
+  const content = parseContent4Table(input, font);
   const table = new Table(input, content);
-  await calculateWidths(table, pageWidth);
+  calculateWidths(table, pageWidth, fontKitFont);
   return table;
 }
 
-async function calculateWidths(table: Table, pageWidth: number) {
-  await calculate(table, pageWidth);
+function calculateWidths(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
+  calculate(table, pageWidth, fontKitFont);
 
   const resizableColumns: Column[] = [];
   let initialTableWidth = 0;
@@ -864,7 +837,7 @@ async function calculateWidths(table: Table, pageWidth: number) {
   resizeWidth = Math.abs(resizeWidth);
 
   applyColSpans(table);
-  await fitContent(table);
+  fitContent(table, fontKitFont);
   applyRowSpans(table);
 }
 
@@ -932,11 +905,7 @@ function applyColSpans(table: Table) {
   }
 }
 
-async function fitContent(table: Table) {
-  const font = getDefaultFont();
-  // TODO ちゃんとキャッシュする
-  const _cache = new Map<any, any>();
-  const fontKitFont = await getFontKitFont(undefined, font, _cache);
+function fitContent(table: Table, fontKitFont: FontKitFont) {
   const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
     for (const column of table.columns) {
@@ -946,7 +915,7 @@ async function fitContent(table: Table) {
       cell.text = splitTextToSize({
         // TODO cell.text がどのようなロジックで配列になっているのか確認するべき
         // ↑ 改行コードで分割している
-        value: cell.text.join(),
+        value: cell.text.join(' '),
         characterSpacing: 0,
         boxWidthInPt: mm2pt(cell.width),
         fontSize: cell.styles.fontSize,
@@ -1010,7 +979,7 @@ function resizeColumns(
   return resizeWidth;
 }
 
-async function calculate(table: Table, pageWidth: number) {
+function calculate(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
   const availablePageWidth = getPageAvailableWidth(table, pageWidth);
   for (const row of table.allRows()) {
     for (const column of table.columns) {
@@ -1020,9 +989,12 @@ async function calculate(table: Table, pageWidth: number) {
       table.callCellHooks(hooks, cell, row, column, null);
 
       const padding = cell.padding('horizontal');
-      cell.contentWidth = (await getStringWidth(cell.text)) + padding;
+      cell.contentWidth = getStringWidth(cell, fontKitFont) + padding;
 
-      const longestWordWidth = await getStringWidth(cell.text.join(' ').split(/\s+/));
+      const longestWordWidth = getStringWidth(
+        Object.assign(cell, { text: cell.text.join(' ').split(/\s+/) }),
+        fontKitFont
+      );
       cell.minReadableWidth = longestWordWidth + cell.padding('horizontal');
 
       if (typeof cell.styles.cellWidth === 'number') {
@@ -1081,15 +1053,11 @@ async function calculate(table: Table, pageWidth: number) {
   });
 }
 
-async function getStringWidth(text: string | string[]) {
+function getStringWidth(cell: Cell, fontKitFont: FontKitFont) {
+  const text = cell.text;
   const textArr: string[] = Array.isArray(text) ? text : [text];
-  // TODO 値を使う
-  const fontSize = 14;
-  const characterSpacing = 0;
-  const font = getDefaultFont();
-  // TODO ちゃんとキャッシュする
-  const _cache = new Map<any, any>();
-  const fontKitFont = await getFontKitFont(undefined, font, _cache);
+  const fontSize = cell.styles.fontSize;
+  const characterSpacing = cell.styles.characterSpacing;
   const widestLineWidth = textArr
     .map((text) => widthOfTextAtSize(text, fontKitFont, fontSize, characterSpacing))
     .reduce((a, b) => Math.max(a, b), 0);
@@ -1102,7 +1070,7 @@ function getPageAvailableWidth(table: Table, pageWidth: number) {
   return pageWidth - (margins.left + margins.right);
 }
 
-function parseContent4Table(input: TableInput) {
+function parseContent4Table(input: TableInput, font: Font) {
   const content = input.content;
   const columns = createColumns(content.columns);
 
@@ -1119,23 +1087,22 @@ function parseContent4Table(input: TableInput) {
   const styles = input.styles;
   return {
     columns,
-    head: parseSection('head', content.head, columns, styles),
-    body: parseSection('body', content.body, columns, styles),
-    foot: parseSection('foot', content.foot, columns, styles),
+    head: parseSection('head', content.head, columns, styles, font),
+    body: parseSection('body', content.body, columns, styles, font),
+    foot: parseSection('foot', content.foot, columns, styles, font),
   };
 }
 
 function generateSectionRow(columns: Column[], section: Section): RowInput | null {
-  const sectionRow: { [key: string]: CellInput } = {};
+  const sectionRow: { [key: string]: string } = {};
   columns.forEach((col) => {
     if (col.raw != null) {
       const title = getSectionTitle(section, col.raw);
-      if (title != null) sectionRow[col.dataKey] = title;
+      if (title != null) sectionRow[col.dataKey] = String(title);
     }
   });
   return Object.keys(sectionRow).length > 0 ? sectionRow : null;
 }
-
 function getSectionTitle(section: Section, column: ColumnInput) {
   if (section === 'head') {
     if (typeof column === 'object') {
@@ -1148,7 +1115,6 @@ function getSectionTitle(section: Section, column: ColumnInput) {
   }
   return null;
 }
-
 function createColumns(columns: ColumnInput[]) {
   return columns.map((input, index) => {
     const key = index;
@@ -1160,7 +1126,8 @@ function parseSection(
   sectionName: Section,
   sectionRows: RowInput[],
   columns: Column[],
-  styleProps: StylesProps
+  styleProps: StylesProps,
+  font: Font
 ): Row[] {
   const rowSpansLeftForColumn: { [key: string]: { left: number; times: number } } = {};
   const result = sectionRows.map((rawRow, rowIndex) => {
@@ -1181,12 +1148,7 @@ function parseSection(
           } else {
             rawCell = rawRow[column.dataKey];
           }
-
-          let cellInputStyles = {};
-          if (typeof rawCell === 'object' && !Array.isArray(rawCell)) {
-            cellInputStyles = rawCell?.styles || {};
-          }
-          const styles = cellStyles(sectionName, column, rowIndex, styleProps, cellInputStyles);
+          const styles = cellStyles(sectionName, column, rowIndex, styleProps, font);
           const cell = new Cell(rawCell, styles, sectionName);
           cells[column.index] = cell;
 
@@ -1215,7 +1177,7 @@ function cellStyles(
   column: Column,
   rowIndex: number,
   styles: StylesProps,
-  cellInputStyles: Partial<Styles>
+  font: Font
 ) {
   let sectionStyles;
   if (sectionName === 'head') {
@@ -1233,24 +1195,24 @@ function cellStyles(
     sectionName === 'body' && rowIndex % 2 === 0
       ? Object.assign({}, styles.alternateRowStyles)
       : {};
-  const defaultStyle = defaultStyles();
-  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles, cellInputStyles) as Styles;
+  const defaultStyle = defaultStyles(font);
+  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
 }
 
-function defaultStyles(): Styles {
+function defaultStyles(font: Font): Styles {
   return {
-    fontName: 'helvetica', // helvetica, times, courier
-    fontStyle: 'normal', // normal, bold, italic, bolditalic
-    fillColor: '', // Either false for transparent, rbg array e.g. [255, 255, 255] or gray level e.g 200
-    textColor: '#000000', // color string
+    fontName: getFallbackFontName(font),
+    fillColor: '',
+    textColor: '#000000',
     lineHeight: 1,
-    alignment: 'left', // left, center, right, justify
-    verticalAlignment: 'top', // top, middle, bottom
+    characterSpacing: 0,
+    alignment: 'left',
+    verticalAlignment: 'middle',
     fontSize: 10,
-    cellPadding: 5, // number or {top,left,right,left,vertical,horizontal}
+    cellPadding: 5,
     lineColor: '#000000',
     lineWidth: 0,
-    cellWidth: 'auto', // 'auto'|'wrap'|number
+    cellWidth: 'auto',
     minCellHeight: 0,
     minCellWidth: 0,
   };
@@ -1355,7 +1317,7 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
   const result: ColumnInput[] = [];
   Object.keys(firstRow).forEach((key) => {
     let colSpan = 1;
-    let input: CellInput;
+    let input: string;
     if (Array.isArray(firstRow)) {
       input = firstRow[parseInt(key)];
     } else {
@@ -1380,7 +1342,7 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
 
 export async function autoTable(arg: PDFRenderProps<TableSchema>, options: UserOptions) {
   const input = parseInput(options);
-  const table = await createTable(input, arg.page.getSize().width);
+  const table = await createTable(input, arg);
   await drawTable(arg, table);
   return table;
 }

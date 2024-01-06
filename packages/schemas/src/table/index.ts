@@ -14,13 +14,26 @@ const tableSchema: Plugin<TableSchema> = {
       body,
       startY: schema.position.y,
       tableWidth: schema.width,
+      // TODO
+      // tableLineColor
+      // tableLineWidth
       headStyles: {
-        cellPadding: 0,
+        // schemaからstyleのマッピング用の関数を作った方がいいだろう
+        lineWidth: schema.borderWidth,
+        cellPadding: schema.cellPadding + schema.borderWidth * 2,
+        lineColor: schema.borderColor,
         textColor: schema.textColor,
+        fillColor: schema.bgColor,
+        // TODO
+        // schema.fontName
+        fontName: 'NotoSansJP-Regular',
       },
       bodyStyles: {
-        cellPadding: 0,
+        lineWidth: schema.borderWidth,
+        cellPadding: schema.cellPadding + schema.borderWidth * 2,
+        lineColor: schema.borderColor,
         textColor: schema.textColor,
+        fillColor: schema.bgColor,
       },
       columnStyles: head.reduce((acc, _, i) => {
         acc[i] = { cellWidth: schema.width / head.length };
@@ -44,7 +57,11 @@ const tableSchema: Plugin<TableSchema> = {
     table.style.textAlign = 'left';
     table.style.fontSize = '14pt';
 
-    const style = `border: 1px solid ${schema.borderColor}; color: ${schema.textColor}; background-color: ${schema.bgColor};`;
+    const style = `border: ${schema.borderWidth}mm solid ${schema.borderColor}; 
+color: ${schema.textColor}; 
+background-color: ${schema.bgColor};
+padding: ${schema.cellPadding}mm;
+`;
 
     table.innerHTML = `<tr>${tableHeader
       .map((data) => `<th style="${style}">${data}</th>`)
@@ -58,7 +75,7 @@ const tableSchema: Plugin<TableSchema> = {
     )
     .join('')}`;
 
-    // TODO impl onChange
+    // TODO ここから impl onChange
     // TODO: if mode === 'form', need to add a button to add a row
 
     rootElement.onclick = (e) => {
@@ -91,12 +108,28 @@ const tableSchema: Plugin<TableSchema> = {
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
+      borderWidth: {
+        title: i18n('schemas.borderWidth'),
+        type: 'number',
+        widget: 'inputNumber',
+        min: 0,
+        props: {
+          step: 0.1,
+        },
+      },
       textColor: {
         title: i18n('schemas.textColor'),
         type: 'string',
         widget: 'color',
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+      },
+      cellPadding: {
+        // TODO i18n
+        title: 'cellPadding',
+        type: 'number',
+        widget: 'inputNumber',
+        min: 0,
       },
     }),
     defaultSchema: {
@@ -114,8 +147,10 @@ const tableSchema: Plugin<TableSchema> = {
         ],
       ]),
       borderColor: '#000000',
+      borderWidth: 0.1,
       textColor: '#000000',
       bgColor: '#ffffff',
+      cellPadding: 5,
     },
   },
 };
