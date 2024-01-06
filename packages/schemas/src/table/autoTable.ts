@@ -1,11 +1,9 @@
 import { rectangle } from '../shapes/rectAndEllipse';
 import { pdfRender as textRender } from '../text/pdfRender';
-import type { Schema, PDFRenderProps } from '@pdfme/common';
+import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
+import { Schema, PDFRenderProps, getDefaultFont, mm2pt } from '@pdfme/common';
 import type { TableSchema } from './types';
-
 const rectangleRender = rectangle.pdf;
-
-// TODO ここから 不要なロジック、カスタマイズ可能な部分を把握する
 
 // ### function
 function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: number): MarginPadding {
@@ -63,6 +61,67 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
   return { top: value, right: value, bottom: value, left: value };
 }
 
+const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
+  // TODO ちゃんとスタイルを反映させる
+  await rectangleRender({
+    ...arg,
+    schema: {
+      type: 'rectangle',
+      borderWidth: 0.1,
+      borderColor: '#000000',
+      color: '#ffffff',
+      position: { x: cell.x, y: cell.y },
+      width: cell.width,
+      height: cell.height,
+      readOnly: true,
+    },
+  });
+
+  const textPos = cell.getTextPos();
+  await textRender({
+    ...arg,
+    value: cell.text.join(''),
+    schema: {
+      type: 'text',
+      alignment: 'left', //  halign: cell.styles.halign,
+      verticalAlignment: 'top', // valign: cell.styles.valign,
+      fontSize: 14,
+      lineHeight: 1,
+      characterSpacing: 0,
+      fontColor: '#000000',
+      backgroundColor: '',
+      position: { x: textPos.x, y: textPos.y },
+      width: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
+      height: cell.height,
+    },
+  });
+};
+
+// TODO ちゃんとカスタマイズできるようにする
+async function addTableBorder(
+  arg: PDFRenderProps<TableSchema>,
+  table: Table,
+  startPos: Pos,
+  cursor: Pos
+) {
+  const lineWidth = table.settings.tableLineWidth;
+  const lineColor = table.settings.tableLineColor;
+
+  await rectangleRender({
+    ...arg,
+    schema: {
+      type: 'rectangle',
+      borderWidth: lineWidth,
+      borderColor: '#000000',
+      color: '',
+      position: { x: startPos.x, y: startPos.y },
+      width: table.getWidth(),
+      height: cursor.y - startPos.y,
+      readOnly: true,
+    },
+  });
+}
+
 // ### type alias
 
 type StyleProp =
@@ -89,10 +148,9 @@ type PageBreakType = 'auto' | 'avoid' | 'always';
 
 type RowPageBreakType = 'auto' | 'avoid';
 
-type TableWidthType = 'auto' | 'wrap' | number;
-
 type ShowHeadType = 'everyPage' | 'firstPage' | 'never' | boolean;
 type ShowFootType = 'everyPage' | 'lastPage' | 'never' | boolean;
+// TODO hexだけにしたい
 type Color = [number, number, number] | number | string | false;
 
 type RowInput = { [key: string]: CellInput } | CellInput[];
@@ -104,7 +162,7 @@ type CustomFontType = string;
 type FontType = StandardFontType | CustomFontType;
 type FontStyle = 'normal' | 'bold' | 'italic' | 'bolditalic';
 
-type HAlignType = 'left' | 'center' | 'right' | 'justify';
+type HAlignType = 'left' | 'center' | 'right';
 type VAlignType = 'top' | 'middle' | 'bottom';
 
 type MarginPadding = {
@@ -150,8 +208,6 @@ interface StylesProps {
 }
 
 interface CellDef {
-  rowSpan?: number;
-  colSpan?: number;
   styles?: Partial<Styles>;
   content?: string | string[] | number;
 }
@@ -161,6 +217,7 @@ interface Styles {
   fontStyle: FontStyle;
   fillColor: Color;
   textColor: Color;
+  // TODO lineHeight: number;
   halign: HAlignType;
   valign: VAlignType;
   fontSize: number;
@@ -184,7 +241,7 @@ interface Settings {
   margin: MarginPadding;
   pageBreak: 'auto' | 'avoid' | 'always';
   rowPageBreak: 'auto' | 'avoid';
-  tableWidth: 'auto' | 'wrap' | number;
+  tableWidth: number;
   showHead: 'everyPage' | 'firstPage' | 'never';
   showFoot: 'everyPage' | 'lastPage' | 'never';
   tableLineWidth: number;
@@ -216,7 +273,6 @@ interface ContentInput {
 }
 
 interface TableInput {
-  id: string | number | undefined;
   settings: Settings;
   styles: StylesProps;
   hooks: HookProps;
@@ -224,17 +280,16 @@ interface TableInput {
 }
 
 interface UserOptions {
+  startY: number;
+  tableWidth: number;
   theme?: ThemeType;
-  startY?: number;
-  margin?: MarginPaddingInput;
+  margin: MarginPaddingInput;
   pageBreak?: PageBreakType;
   rowPageBreak?: RowPageBreakType;
-  tableWidth?: TableWidthType;
   showHead?: ShowHeadType;
   showFoot?: ShowFootType;
   tableLineWidth?: number;
   tableLineColor?: Color;
-  tableId?: string | number;
   head?: RowInput[];
   body?: RowInput[];
   foot?: RowInput[];
@@ -270,8 +325,6 @@ class Cell {
   styles: Styles;
   text: string[];
   section: Section;
-  colSpan: number;
-  rowSpan: number;
 
   contentHeight = 0;
   contentWidth = 0;
@@ -291,12 +344,7 @@ class Cell {
 
     let content = raw;
     if (raw != null && typeof raw === 'object' && !Array.isArray(raw)) {
-      this.rowSpan = raw.rowSpan || 1;
-      this.colSpan = raw.colSpan || 1;
       content = raw.content ?? raw;
-    } else {
-      this.rowSpan = 1;
-      this.colSpan = 1;
     }
 
     // Stringify 0 and false, but not undefined or null
@@ -381,36 +429,18 @@ class Row {
   readonly index: number;
   readonly section: Section;
   readonly cells: { [key: string]: Cell };
-  spansMultiplePages: boolean;
 
   height = 0;
 
-  constructor(
-    raw: RowInput,
-    index: number,
-    section: Section,
-    cells: { [key: string]: Cell },
-    spansMultiplePages = false
-  ) {
+  constructor(raw: RowInput, index: number, section: Section, cells: { [key: string]: Cell }) {
     this.raw = raw;
     this.index = index;
     this.section = section;
     this.cells = cells;
-    this.spansMultiplePages = spansMultiplePages;
   }
 
   getMaxCellHeight(columns: Column[]) {
     return columns.reduce((acc, column) => Math.max(acc, this.cells[column.index]?.height || 0), 0);
-  }
-
-  hasRowSpan(columns: Column[]) {
-    return (
-      columns.filter((column: Column) => {
-        const cell = this.cells[column.index];
-        if (!cell) return false;
-        return cell.rowSpan > 1;
-      }).length > 0
-    );
   }
 
   canEntireRowFit(height: number, columns: Column[]) {
@@ -429,8 +459,6 @@ class Row {
 }
 
 class Table {
-  readonly id?: string | number;
-
   readonly settings: Settings;
   readonly styles: StylesProps;
   readonly hooks: HookProps;
@@ -443,7 +471,6 @@ class Table {
   pageNumber = 1;
 
   constructor(input: TableInput, content: ContentSettings) {
-    this.id = input.id;
     this.settings = input.settings;
     this.styles = input.styles;
     this.hooks = input.hooks;
@@ -496,16 +523,8 @@ class Table {
     }
   }
 
-  getWidth(pageWidth: number) {
-    if (typeof this.settings.tableWidth === 'number') {
-      return this.settings.tableWidth;
-    } else if (this.settings.tableWidth === 'wrap') {
-      const wrappedWidth = this.columns.reduce((total, col) => total + col.wrappedWidth, 0);
-      return wrappedWidth;
-    } else {
-      const margin = this.settings.margin;
-      return pageWidth - margin.left - margin.right;
-    }
+  getWidth() {
+    return this.settings.tableWidth;
   }
 }
 
@@ -590,11 +609,10 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
     }
   }
 
-  await addTableBorder(arg, table, startPos, cursor, pageSize.width);
+  await addTableBorder(arg, table, startPos, cursor);
   table.callEndPageHooks(cursor);
 }
 
-// TODO もうちょいカスタマイズできるようにする
 async function printRow(
   arg: PDFRenderProps<Schema>,
   table: Table,
@@ -618,39 +636,8 @@ async function printRow(
       cursor.x += column.width;
       continue;
     }
-    // TODO rectangleRenderとtextRenderはまとめてcellRenderにしたい
-    await rectangleRender({
-      ...arg,
-      schema: {
-        type: 'rectangle',
-        borderWidth: 0.1,
-        borderColor: '#000000',
-        color: '#ffffff',
-        position: { x: cell.x, y: cell.y },
-        width: cell.width,
-        height: cell.height,
-        readOnly: true,
-      },
-    });
 
-    const textPos = cell.getTextPos();
-    await textRender({
-      ...arg,
-      value: cell.text.join(),
-      schema: {
-        type: 'text',
-        alignment: 'left', //  halign: cell.styles.halign,
-        verticalAlignment: 'top', // valign: cell.styles.valign,
-        fontSize: 14,
-        lineHeight: 1,
-        characterSpacing: 0,
-        fontColor: '#000000',
-        backgroundColor: '',
-        position: { x: textPos.x, y: textPos.y },
-        width: Math.ceil(cell.width - cell.padding('left') - cell.padding('right')),
-        height: cell.height,
-      },
-    });
+    await drawCell(arg, cell);
 
     table.callCellHooks(table.hooks.didDrawCell, cell, row, column, cursor);
 
@@ -659,7 +646,6 @@ async function printRow(
 
   cursor.y += row.height;
 }
-
 async function printFullRow(
   arg: PDFRenderProps<TableSchema>,
   table: Table,
@@ -671,7 +657,6 @@ async function printFullRow(
   pageSize: { width: number; height: number }
 ) {
   const pageHeight = pageSize.height;
-  const pageWidth = pageSize.width;
   const remainingSpace = getRemainingPageSpace(table, isLastRow, cursor, pageHeight);
   if (row.canEntireRowFit(remainingSpace, columns)) {
     await printRow(arg, table, row, cursor, columns);
@@ -679,10 +664,10 @@ async function printFullRow(
     if (shouldPrintOnCurrentPage(row, remainingSpace, table, pageHeight)) {
       const remainderRow = modifyRowToFit(row, remainingSpace, table);
       await printRow(arg, table, row, cursor, columns);
-      await addPage(arg, table, startPos, cursor, columns, pageWidth);
+      await addPage(arg, table, startPos, cursor, columns);
       await printFullRow(arg, table, remainderRow, isLastRow, startPos, cursor, columns, pageSize);
     } else {
-      await addPage(arg, table, startPos, cursor, columns, pageWidth);
+      await addPage(arg, table, startPos, cursor, columns);
       await printFullRow(arg, table, row, isLastRow, startPos, cursor, columns, pageSize);
     }
   }
@@ -693,8 +678,7 @@ async function addPage(
   table: Table,
   startPos: Pos,
   cursor: Pos,
-  columns: Column[] = [],
-  pageWidth: number
+  columns: Column[] = []
 ) {
   if (table.settings.showFoot === 'everyPage') {
     for (const row of table.foot) {
@@ -707,7 +691,7 @@ async function addPage(
   table.callEndPageHooks(cursor);
 
   const margin = table.settings.margin;
-  await addTableBorder(arg, table, startPos, cursor, pageWidth);
+  await addTableBorder(arg, table, startPos, cursor);
 
   nextPage();
   table.pageNumber++;
@@ -736,52 +720,6 @@ function nextPage() {
   //   return true;
   // }
   // return false;
-}
-
-// TODO ちゃんとカスタマイズできるようにする
-async function addTableBorder(
-  arg: PDFRenderProps<TableSchema>,
-  table: Table,
-  startPos: Pos,
-  cursor: Pos,
-  pageWidth: number
-) {
-  const lineWidth = table.settings.tableLineWidth;
-  const lineColor = table.settings.tableLineColor;
-
-  const fillStyle = getFillStyle(lineWidth, false);
-  if (fillStyle) {
-    await rectangleRender({
-      ...arg,
-      schema: {
-        type: 'rectangle',
-        borderWidth: 1,
-        borderColor: '#000000',
-        color: '#ffffff',
-        position: {
-          x: startPos.x,
-          y: startPos.y,
-        },
-        width: table.getWidth(pageWidth),
-        height: cursor.y - startPos.y,
-        readOnly: true,
-      },
-    });
-  }
-}
-
-function getFillStyle(lineWidth: number, fillColor: Color) {
-  const drawLine = lineWidth > 0;
-  const drawBackground = fillColor || fillColor === 0;
-  if (drawLine && drawBackground) {
-    return 'DF'; // Fill then stroke
-  } else if (drawLine) {
-    return 'S'; // Only stroke (transparent background)
-  } else if (drawBackground) {
-    return 'F'; // Only fill, no stroke
-  } else {
-    return null;
-  }
 }
 
 function shouldPrintOnCurrentPage(
@@ -813,20 +751,9 @@ function shouldPrintOnCurrentPage(
     return false;
   }
 
-  const rowHasRowSpanCell = row.hasRowSpan(table.columns);
   const rowHigherThanPage = row.getMaxCellHeight(table.columns) > maxRowHeight;
   if (rowHigherThanPage) {
-    if (rowHasRowSpanCell) {
-      console.error(
-        `The content of row ${row.index} will not be drawn correctly since drawing rows with a height larger than the page height and has cells with rowspans is not supported.`
-      );
-    }
     return true;
-  }
-
-  if (rowHasRowSpanCell) {
-    // Currently a new page is required whenever a rowspan row don't fit a page.
-    return false;
   }
 
   if (table.settings.rowPageBreak === 'avoid') {
@@ -848,7 +775,6 @@ function getRemainingPageSpace(table: Table, isLastRow: boolean, cursor: Pos, pa
 
 function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
   const cells: { [key: string]: Cell } = {};
-  row.spansMultiplePages = true;
   row.height = 0;
 
   let rowHeight = 0;
@@ -889,7 +815,7 @@ function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
 
     cells[column.index] = remainderCell;
   }
-  const remainderRow = new Row(row.raw, -1, row.section, cells, true);
+  const remainderRow = new Row(row.raw, -1, row.section, cells);
   remainderRow.height = rowHeight;
 
   for (const column of table.columns) {
@@ -915,15 +841,15 @@ function getRemainingLineCount(cell: Cell, remainingPageSpace: number) {
   return Math.max(0, remainingLines);
 }
 
-function createTable(input: TableInput, pageWidth: number) {
+async function createTable(input: TableInput, pageWidth: number) {
   const content = parseContent4Table(input);
   const table = new Table(input, content);
-  calculateWidths(table, pageWidth);
+  await calculateWidths(table, pageWidth);
   return table;
 }
 
-function calculateWidths(table: Table, pageWidth: number) {
-  calculate(table, pageWidth);
+async function calculateWidths(table: Table, pageWidth: number) {
+  await calculate(table, pageWidth);
 
   const resizableColumns: Column[] = [];
   let initialTableWidth = 0;
@@ -942,7 +868,7 @@ function calculateWidths(table: Table, pageWidth: number) {
   });
 
   // width difference that needs to be distributed
-  let resizeWidth = table.getWidth(pageWidth) - initialTableWidth;
+  let resizeWidth = table.getWidth() - initialTableWidth;
 
   // first resize attempt: with respect to minReadableWidth and minWidth
   if (resizeWidth) {
@@ -959,7 +885,7 @@ function calculateWidths(table: Table, pageWidth: number) {
   resizeWidth = Math.abs(resizeWidth);
 
   applyColSpans(table);
-  fitContent(table);
+  await fitContent(table);
   applyRowSpans(table);
 }
 
@@ -978,7 +904,7 @@ function applyRowSpans(table: Table) {
         delete row.cells[column.index];
       } else if (data) {
         data.cell.height += row.height;
-        colRowSpansLeft = data.cell.colSpan;
+        colRowSpansLeft = 1;
         delete row.cells[column.index];
         data.left--;
         if (data.left <= 1) {
@@ -990,11 +916,6 @@ function applyRowSpans(table: Table) {
           continue;
         }
         cell.height = row.height;
-        if (cell.rowSpan > 1) {
-          const remaining = all.length - rowIndex;
-          const left = cell.rowSpan > remaining ? remaining : cell.rowSpan;
-          rowSpanCells[column.index] = { cell, left, row };
-        }
       }
     }
   }
@@ -1024,43 +945,39 @@ function applyColSpans(table: Table) {
       } else {
         const cell = row.cells[column.index];
         if (!cell) continue;
-        colSpansLeft = cell.colSpan;
+        colSpansLeft = 1;
         combinedColSpanWidth = 0;
-        if (cell.colSpan > 1) {
-          colSpanCell = cell;
-          combinedColSpanWidth += column.width;
-          continue;
-        }
         cell.width = column.width + combinedColSpanWidth;
       }
     }
   }
 }
 
-function fitContent(table: Table) {
-  let rowSpanHeight = { count: 0, height: 0 };
+async function fitContent(table: Table) {
+  const font = getDefaultFont();
+  // TODO ちゃんとキャッシュする
+  const _cache = new Map<any, any>();
+  const fontKitFont = await getFontKitFont(undefined, font, _cache);
+  const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
     for (const column of table.columns) {
       const cell: Cell = row.cells[column.index];
       if (!cell) continue;
 
-      // Add one pt to textSpace to fix rounding error
-      // TODO
-      // cell.text = splitTextToSize(cell.text, textSpace + 1, {
-      //   fontSize: cell.styles.fontSize,
-      // });
-      cell.text = cell.text.map((str) => str.split(/\r\n|\r|\n/g)).flat();
+      cell.text = splitTextToSize({
+        // TODO cell.text がどのようなロジックで配列になっているのか確認するべき
+        value: cell.text.join(),
+        characterSpacing: 0,
+        boxWidthInPt: mm2pt(cell.width),
+        fontSize: cell.styles.fontSize,
+        fontKitFont,
+      });
 
       // TODO
       cell.contentHeight = cell.getContentHeight(1.15);
 
-      let realContentHeight = cell.contentHeight / cell.rowSpan;
-      if (
-        cell.rowSpan > 1 &&
-        rowSpanHeight.count * rowSpanHeight.height < realContentHeight * cell.rowSpan
-      ) {
-        rowSpanHeight = { height: realContentHeight, count: cell.rowSpan };
-      } else if (rowSpanHeight && rowSpanHeight.count > 0) {
+      let realContentHeight = cell.contentHeight;
+      if (rowSpanHeight && rowSpanHeight.count > 0) {
         if (rowSpanHeight.height > realContentHeight) {
           realContentHeight = rowSpanHeight.height;
         }
@@ -1114,9 +1031,9 @@ function resizeColumns(
   return resizeWidth;
 }
 
-function calculate(table: Table, pageWidth: number) {
+async function calculate(table: Table, pageWidth: number) {
   const availablePageWidth = getPageAvailableWidth(table, pageWidth);
-  table.allRows().forEach((row) => {
+  for (const row of table.allRows()) {
     for (const column of table.columns) {
       const cell = row.cells[column.index];
       if (!cell) continue;
@@ -1124,9 +1041,9 @@ function calculate(table: Table, pageWidth: number) {
       table.callCellHooks(hooks, cell, row, column, null);
 
       const padding = cell.padding('horizontal');
-      cell.contentWidth = getStringWidth(cell.text) + padding;
+      cell.contentWidth = (await getStringWidth(cell.text)) + padding;
 
-      const longestWordWidth = getStringWidth(cell.text.join(' ').split(/\s+/));
+      const longestWordWidth = await getStringWidth(cell.text.join(' ').split(/\s+/));
       cell.minReadableWidth = longestWordWidth + cell.padding('horizontal');
 
       if (typeof cell.styles.cellWidth === 'number') {
@@ -1151,7 +1068,7 @@ function calculate(table: Table, pageWidth: number) {
         }
       }
     }
-  });
+  }
 
   table.allRows().forEach((row) => {
     for (const column of table.columns) {
@@ -1159,7 +1076,7 @@ function calculate(table: Table, pageWidth: number) {
 
       // For now we ignore the minWidth and wrappedWidth of colspan cells when calculating colspan widths.
       // Could probably be improved upon however.
-      if (cell && cell.colSpan === 1) {
+      if (cell) {
         column.wrappedWidth = Math.max(column.wrappedWidth, cell.wrappedWidth);
         column.minWidth = Math.max(column.minWidth, cell.minWidth);
         column.minReadableWidth = Math.max(column.minReadableWidth, cell.minReadableWidth);
@@ -1181,30 +1098,24 @@ function calculate(table: Table, pageWidth: number) {
           column.wrappedWidth = cellWidth;
         }
       }
-
-      if (cell) {
-        // Make sure all columns get at least min width even though width calculations are not based on them
-        if (cell.colSpan > 1 && !column.minWidth) {
-          column.minWidth = cell.minWidth;
-        }
-        if (cell.colSpan > 1 && !column.wrappedWidth) {
-          column.wrappedWidth = cell.minWidth;
-        }
-      }
     }
   });
 }
 
-function getStringWidth(text: string | string[]) {
+async function getStringWidth(text: string | string[]) {
   const textArr: string[] = Array.isArray(text) ? text : [text];
+  // TODO 値を使う
+  const fontSize = 14;
+  const characterSpacing = 0;
+  const font = getDefaultFont();
+  // TODO ちゃんとキャッシュする
+  const _cache = new Map<any, any>();
+  const fontKitFont = await getFontKitFont(undefined, font, _cache);
+  const widestLineWidth = textArr
+    .map((text) => widthOfTextAtSize(text, fontKitFont, fontSize, characterSpacing))
+    .reduce((a, b) => Math.max(a, b), 0);
 
-  // TODO
-  // const widestLineWidth = textArr
-  //   .map((text) => getTextWidth(text))
-  //   .reduce((a, b) => Math.max(a, b), 0);
-
-  // return widestLineWidth;
-  return 0;
+  return widestLineWidth;
 }
 
 function getPageAvailableWidth(table: Table, pageWidth: number) {
@@ -1309,9 +1220,9 @@ function parseSection(
           const cell = new Cell(rawCell, styles, sectionName);
           cells[column.index] = cell;
 
-          columnSpansLeft = cell.colSpan - 1;
+          columnSpansLeft = 0;
           rowSpansLeftForColumn[column.index] = {
-            left: cell.rowSpan - 1,
+            left: 0,
             times: columnSpansLeft,
           };
         } else {
@@ -1431,13 +1342,7 @@ function parseInput(current: UserOptions): TableInput {
   const settings = parseSettings(options);
   const content = parseContent4Input(options);
 
-  return {
-    id: current.tableId,
-    content,
-    hooks,
-    styles,
-    settings,
-  };
+  return { content, hooks, styles, settings };
 }
 
 function parseStyles(cInput: UserOptions) {
@@ -1483,9 +1388,6 @@ function parseHooks(current: UserOptions) {
 }
 
 function parseSettings(options: UserOptions): Settings {
-  const margin = parseSpacing(options.margin, 40);
-  const startY = options.startY ?? margin.top;
-
   let showFoot: 'everyPage' | 'lastPage' | 'never';
   if (options.showFoot === true) {
     showFoot = 'everyPage';
@@ -1508,11 +1410,11 @@ function parseSettings(options: UserOptions): Settings {
 
   return {
     theme,
-    startY,
-    margin,
+    startY: options.startY,
+    margin: parseSpacing(options.margin, 0),
     pageBreak: options.pageBreak ?? 'auto',
     rowPageBreak: options.rowPageBreak ?? 'auto',
-    tableWidth: options.tableWidth ?? 'auto',
+    tableWidth: options.tableWidth,
     showHead,
     showFoot,
     tableLineWidth: options.tableLineWidth ?? 0,
@@ -1541,7 +1443,7 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
       input = firstRow[key];
     }
     if (typeof input === 'object' && !Array.isArray(input)) {
-      colSpan = input?.colSpan || 1;
+      colSpan = 1;
     }
     for (let i = 0; i < colSpan; i++) {
       let id;
@@ -1559,7 +1461,7 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
 
 export async function autoTable(arg: PDFRenderProps<TableSchema>, options: UserOptions) {
   const input = parseInput(options);
-  const table = createTable(input, arg.page.getSize().width);
+  const table = await createTable(input, arg.page.getSize().width);
   await drawTable(arg, table);
   return table;
 }

@@ -66,7 +66,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     dynamicFontSize = await calculateDynamicFontSize(getCdfArg(value));
   }
 
-  const fontKitFont = await getFontKitFont(schema, font, _cache);
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(

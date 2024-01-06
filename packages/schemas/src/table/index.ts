@@ -1,11 +1,11 @@
-import { Plugin, PDFRenderProps, UIRenderProps, pt2mm } from '@pdfme/common';
+import { Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { autoTable } from './autoTable';
 import type { TableSchema } from './types';
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
-    const { page, schema, pdfDoc, value } = arg;
+    const { schema, value } = arg;
     const valueJson = JSON.parse(value) as string[][];
     const head = valueJson[0];
     const body = valueJson.slice(1);
@@ -14,20 +14,19 @@ const tableSchema: Plugin<TableSchema> = {
       body,
       startY: schema.position.y,
       tableWidth: schema.width,
-      styles: {
+      headStyles: {
         cellPadding: 0,
       },
-      margin: {
-        top: 0,
-        right: pt2mm(page.getSize().width) - schema.position.x - schema.width,
-        left: schema.position.x,
-        bottom: 0,
+      bodyStyles: {
+        cellPadding: 0,
       },
+      columnStyles: {},
+      margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
     });
     console.log('res', res);
   },
-  // TODO heightを自動で決められるようにしたい->どうやってvalue以外の値を変更するかは別途修正が必要
-  // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。現在はtableLayout:fixed(https://developer.mozilla.org/ja/docs/Web/CSS/table-layout)で決定している。colの横幅で決定できるようにしたい。
+  // TODO heightは意味をはたさないから自動で決まるようにする->value以外の値を変更するかは別途修正が必要
+  // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。
   ui: (arg: UIRenderProps<TableSchema>) => {
     const { schema, rootElement, value, mode, onChange } = arg;
     const tableData = JSON.parse(value) as string[][];
@@ -101,8 +100,8 @@ const tableSchema: Plugin<TableSchema> = {
       width: 100,
       height: 20,
       content: JSON.stringify([
-        ['Name', 'Age', 'City'],
-        ['Alice', '24', 'New York'],
+        ['Name', 'Age', 'City City City City City City City City City City City'],
+        ['Alice', '24', 'New York New York New York New York New York New York New York New York'],
       ]),
       borderColor: '#000000',
       textColor: '#000000',

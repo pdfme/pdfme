@@ -110,7 +110,7 @@ describe('getSplittedLines test with real font width calculations', () => {
 
   it('should not split a line when the text is shorter than the width', async () => {
     const _cache = new Map();
-    await getFontKitFont(getTextSchema(), font, _cache).then((fontKitFont) => {
+    await getFontKitFont(getTextSchema().fontName, font, _cache).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
       const result = getSplittedLines('short', fontWidthCalcs);
       expect(result).toEqual(['short']);
@@ -119,7 +119,7 @@ describe('getSplittedLines test with real font width calculations', () => {
 
   it('should split a line when the text is longer than the width', async () => {
     const _cache = new Map();
-    await getFontKitFont(getTextSchema(), font, _cache).then((fontKitFont) => {
+    await getFontKitFont(getTextSchema().fontName, font, _cache).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
       const result = getSplittedLines('this will wrap', fontWidthCalcs);
       expect(result).toEqual(['this', 'will', 'wrap']);
@@ -128,7 +128,7 @@ describe('getSplittedLines test with real font width calculations', () => {
 
   it('should split a line in the middle when unspaced text will not fit on a line', async () => {
     const _cache = new Map();
-    await getFontKitFont(getTextSchema(), font, _cache).then((fontKitFont) => {
+    await getFontKitFont(getTextSchema().fontName, font, _cache).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
       const result = getSplittedLines('thiswillbecut', fontWidthCalcs);
       expect(result).toEqual(['thiswi', 'llbecu', 't']);
@@ -137,7 +137,7 @@ describe('getSplittedLines test with real font width calculations', () => {
 
   it('should not split text when it is impossible due to size constraints', async () => {
     const _cache = new Map();
-    await getFontKitFont(getTextSchema(), font, _cache).then((fontKitFont) => {
+    await getFontKitFont(getTextSchema().fontName, font, _cache).then((fontKitFont) => {
       const fontWidthCalcs = Object.assign({}, baseCalcValues, { font: fontKitFont });
       fontWidthCalcs.boxWidthInPt = 2;
       const result = getSplittedLines('thiswillnotbecut', fontWidthCalcs);
