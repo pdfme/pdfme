@@ -122,7 +122,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
     textBlock.addEventListener('blur', (e: Event) => {
-      onChange && onChange((e.target as HTMLDivElement).innerText);
+      onChange && onChange({ key: 'content', value: (e.target as HTMLDivElement).innerText });
       stopEditing && stopEditing();
     });
 

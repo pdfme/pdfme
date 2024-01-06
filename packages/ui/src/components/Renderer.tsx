@@ -6,11 +6,10 @@ import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
+  'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
   schema: SchemaForUI;
   value: string;
-  onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
@@ -69,16 +68,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       ref.current.innerHTML = '';
 
-      const editable = mode === 'form' || mode === 'designer';
-
       render({
         key: schema.key,
         value,
         schema,
         rootElement: ref.current,
         mode,
-        onChange: editable ? onChange : undefined,
-        stopEditing: editable ? stopEditing : undefined,
+        onChange,
+        stopEditing: stopEditing,
         tabIndex,
         placeholder,
         options,

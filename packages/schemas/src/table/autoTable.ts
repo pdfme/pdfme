@@ -435,12 +435,16 @@ class Table {
     this.foot = content.foot;
   }
 
-  getHeadHeight(columns: Column[]) {
-    return this.head.reduce((acc, row) => acc + row.getMaxCellHeight(columns), 0);
+  getHeadHeight() {
+    return this.head.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
   }
 
-  getFootHeight(columns: Column[]) {
-    return this.foot.reduce((acc, row) => acc + row.getMaxCellHeight(columns), 0);
+  getFootHeight() {
+    return this.foot.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
+  }
+
+  getBodyHeight() {
+    return this.body.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
   }
 
   allRows() {
@@ -524,7 +528,7 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
     x: margin.left,
     y: startY,
   };
-  const sectionsHeight = table.getHeadHeight(table.columns) + table.getFootHeight(table.columns);
+  const sectionsHeight = table.getHeadHeight() + table.getFootHeight();
   let minTableBottomPos = startY + margin.bottom + sectionsHeight;
 
   if (settings.pageBreak === 'avoid') {
@@ -688,7 +692,7 @@ function shouldPrintOnCurrentPage(
   if (row.section === 'body') {
     // Should also take into account that head and foot is not
     // on every page with some settings
-    maxRowHeight -= table.getHeadHeight(table.columns) + table.getFootHeight(table.columns);
+    maxRowHeight -= table.getHeadHeight() + table.getFootHeight();
   }
 
   const minRowHeight = row.getMinimumRowHeight(table.columns);
@@ -721,7 +725,7 @@ function getRemainingPageSpace(table: Table, isLastRow: boolean, cursor: Pos, pa
   let bottomContentHeight = table.settings.margin.bottom;
   const showFoot = table.settings.showFoot;
   if (showFoot === 'everyPage' || (showFoot === 'lastPage' && isLastRow)) {
-    bottomContentHeight += table.getFootHeight(table.columns);
+    bottomContentHeight += table.getFootHeight();
   }
   return pageHeight - cursor.y - bottomContentHeight;
 }

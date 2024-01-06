@@ -452,13 +452,12 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                 ? 'designer'
                 : 'viewer'
             }
-            onChange={(value) => {
-              changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
+            onChange={({ key, value }) => {
+              changeSchemas([{ key, value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}

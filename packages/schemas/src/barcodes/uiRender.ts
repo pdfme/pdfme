@@ -69,7 +69,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     input.placeholder = placeholder || '';
     input.tabIndex = tabIndex || 0;
     input.addEventListener('change', (e: Event) => {
-      onChange && onChange((e.target as HTMLInputElement).value);
+      onChange && onChange({key: 'content', value: (e.target as HTMLInputElement).value});
     });
     input.addEventListener('blur', () => {
       stopEditing && stopEditing();

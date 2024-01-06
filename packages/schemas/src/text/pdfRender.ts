@@ -177,5 +177,4 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       opacity,
     });
   });
-  return { width, height: lines.length * lineHeight * fontSize };
 };

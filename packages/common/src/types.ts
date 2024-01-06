@@ -59,7 +59,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
  * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
- * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
+ * @property {(arg: { key: string; value: any }) => void;} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
@@ -74,7 +74,7 @@ export type UIRenderProps<T extends Schema> = {
   stopEditing?: () => void;
   key: string;
   value: string;
-  onChange?: (value: string) => void;
+  onChange?: (arg: { key: string; value: any }) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;
