@@ -2,6 +2,7 @@ import { Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { autoTable, Styles } from './autoTable';
 import type { TableSchema } from './types';
+import { isEditable } from '../utils.js';
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
@@ -43,7 +44,7 @@ const tableSchema: Plugin<TableSchema> = {
     });
     console.log('res', res);
   },
-  // TODO heightは意味をはたさないから自動で決まるようにする->value以外の値を変更するかは別途修正が必要
+  // TODO ここから heightは意味をはたさないから自動で決まるようにする->value以外の値を変更するかは別途修正が必要
   // TODO カラムの横幅をドラッグ&ドロップで決定できるようにしたい。
   ui: (arg: UIRenderProps<TableSchema>) => {
     const { schema, rootElement, value, mode, onChange } = arg;
@@ -63,23 +64,36 @@ background-color: ${schema.bgColor};
 padding: ${schema.cellPadding}mm;
 `;
 
+    const contentEditable = isEditable(mode, schema) ? 'contenteditable="plaintext-only"' : '';
+
     table.innerHTML = `<tr>${tableHeader
-      .map((data) => `<th style="${style}">${data}</th>`)
+      .map(
+        (data) => `<th ${mode === 'designer' ? contentEditable : ''} style="${style}">${data}</th>`
+      )
       .join('')}</tr>
   ${tableBody
     .map(
       (row) =>
         `<tr>${row
-          .map((data) => `<td contenteditable="plaintext-only" style="${style}">${data}</td>`)
+          .map((data) => `<td ${contentEditable} style="${style}">${data}</td>`)
           .join('')}</tr>`
     )
     .join('')}`;
 
-    // TODO ここから impl onChange
-    // TODO: if mode === 'form', need to add a button to add a row
-
     rootElement.onclick = (e) => {
-      if (e.target instanceof HTMLTableCellElement && e.target.tagName === 'TD') {
+      if (
+        e.target instanceof HTMLTableCellElement &&
+        (e.target.tagName === 'TD' || e.target.tagName === 'TH')
+      ) {
+        e.target.onblur = (e) => {
+          const target = e.target as HTMLTableCellElement;
+          const row = target.parentElement as HTMLTableRowElement;
+          const table = row.parentElement as HTMLTableElement;
+          const tableData = Array.from(table.rows).map((row) =>
+            Array.from(row.cells).map((cell) => cell.innerText)
+          );
+          onChange && onChange(JSON.stringify(tableData));
+        };
         if (e.target === document.activeElement) return;
         e.target.focus();
         const selection = window.getSelection();
