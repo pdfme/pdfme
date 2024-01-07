@@ -108,8 +108,10 @@ const tableSchema: Plugin<TableSchema> = {
           if (!onChange) return;
           const head = tableData[0];
           const body = tableData.slice(1);
-          onChange({ key: 'head', value: head });
-          onChange({ key: 'content', value: JSON.stringify(body) });
+          onChange([
+            { key: 'head', value: head },
+            { key: 'content', value: JSON.stringify(body) },
+          ]);
         }, 25);
       };
       cell.onclick = (e) => {
@@ -165,32 +167,34 @@ const tableSchema: Plugin<TableSchema> = {
       addColumnButton.style.right = '-25px';
       addColumnButton.innerText = '+';
       addColumnButton.onclick = () => {
-        // TODO ここで onChangeを連発するのが問題
-        onChange({
-          key: 'content',
-          value: JSON.stringify(tableBody.map((row) => row.concat(''))),
-        });
-        onChange({ key: 'head', value: tableHeader.concat('') });
+        onChange([
+          { key: 'head', value: tableHeader.concat('') },
+          {
+            key: 'content',
+            value: JSON.stringify(tableBody.map((row) => row.concat(''))),
+          },
+        ]);
       };
       rootElement.appendChild(addColumnButton);
 
       const tableHeads = table.querySelectorAll('th');
       let skipThWidth = 0;
       tableHeads.forEach((head, i) => {
-        const deleteRowButton = document.createElement('button');
-        deleteRowButton.style.position = 'absolute';
-        deleteRowButton.style.left = String(skipThWidth) + 'px';
-        deleteRowButton.style.top = '-25px';
-        deleteRowButton.innerText = '-';
-        deleteRowButton.onclick = () => {
-          // TODO ここで onChangeを連発するのが問題
-          onChange({
-            key: 'content',
-            value: JSON.stringify(tableBody.map((row) => row.filter((_, j) => j !== i))),
-          });
-          onChange({ key: 'head', value: tableHeader.filter((_, j) => j !== i) });
+        const deleteColumnButton = document.createElement('button');
+        deleteColumnButton.style.position = 'absolute';
+        deleteColumnButton.style.left = String(skipThWidth) + 'px';
+        deleteColumnButton.style.top = '-25px';
+        deleteColumnButton.innerText = '-';
+        deleteColumnButton.onclick = () => {
+          onChange([
+            { key: 'head', value: tableHeader.filter((_, j) => j !== i) },
+            {
+              key: 'content',
+              value: JSON.stringify(tableBody.map((row) => row.filter((_, j) => j !== i))),
+            },
+          ]);
         };
-        rootElement.appendChild(deleteRowButton);
+        rootElement.appendChild(deleteColumnButton);
         skipThWidth += head.clientWidth;
       });
     }

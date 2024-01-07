@@ -104,9 +104,12 @@ const Preview = ({
                 mode={isForm ? 'form' : 'viewer'}
                 placeholder={schema.content}
                 tabIndex={index + 100}
-                onChange={({ key: _key, value }) => {
-                  if (_key !== 'content') return;
-                  handleChangeInput({ key, value: value as string })
+                onChange={(arg) => {
+                  const args = Array.isArray(arg) ? arg : [arg];
+                  args.forEach(({ key: _key, value }) => {
+                    if (_key !== 'content') return;
+                    handleChangeInput({ key, value: value as string });
+                  });
                 }}
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
