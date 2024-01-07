@@ -5,6 +5,7 @@ import type { Schema } from '@pdfme/common';
 // tableLineColor, tableLineWidthは別で必要
 export interface TableSchema extends Schema {
   head: string[];
+  headWidthsPercentage: number[];
   fontName?: string;
   borderColor: string;
   borderWidth: number;

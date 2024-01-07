@@ -4,10 +4,16 @@ import { autoTable, Styles } from './autoTable';
 import type { TableSchema } from './types';
 import { isEditable, px2mm } from '../utils.js';
 
-// TODO ここから
-// 行の追加、削除
-// カラムの追加、削除
-// でbugが発生中
+const shift = (number: number, precision: number, reverseShift: boolean) => {
+  if (reverseShift) {
+    precision = -precision;
+  }
+  const numArray = `${number}`.split('e');
+
+  return Number(`${numArray[0]}e${numArray[1] ? Number(numArray[1]) + precision : precision}`);
+};
+const round = (number: number, precision: number) =>
+  shift(Math.round(shift(number, precision, false)), precision, true);
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
@@ -19,8 +25,8 @@ const tableSchema: Plugin<TableSchema> = {
       startY: schema.position.y,
       tableWidth: schema.width,
       // TODO
-      // tableLineColor
-      // tableLineWidth
+      tableLineColor: '#ff2200',
+      tableLineWidth: 0,
       headStyles: {
         // schemaからstyleのマッピング用の関数を作った方がいいだろう
         lineWidth: schema.borderWidth,
@@ -43,10 +49,10 @@ const tableSchema: Plugin<TableSchema> = {
         // schema.fontName
         // fontSize: 14,
       },
-      columnStyles: schema.head.reduce((acc, _, i) => {
-        acc[i] = { cellWidth: schema.width / schema.head.length };
-        return acc;
-      }, {} as Record<number, Partial<Styles>>),
+      columnStyles: schema.headWidthsPercentage.reduce(
+        (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
+        {} as Record<number, Partial<Styles>>
+      ),
       margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
     });
     const tableSize = {
@@ -57,7 +63,6 @@ const tableSchema: Plugin<TableSchema> = {
   },
   ui: (arg: UIRenderProps<TableSchema>) => {
     const { schema, rootElement, value, mode, onChange } = arg;
-    const tableHeader = schema.head;
     const tableBody = JSON.parse(value || '[]') as string[][];
     const table = document.createElement('table');
     table.style.tableLayout = 'fixed';
@@ -67,30 +72,93 @@ const tableSchema: Plugin<TableSchema> = {
     table.style.textAlign = 'left';
     table.style.fontSize = '14pt';
 
-    const style = `border: ${schema.borderWidth}mm solid ${schema.borderColor}; 
+    const thTdStyle = `border: ${schema.borderWidth}mm solid ${schema.borderColor}; 
     color: ${schema.textColor}; 
     background-color: ${schema.bgColor};
     padding: ${schema.cellPadding}mm;
+    position: relative;
+    word-break: break-word;
+    `;
+
+    const dragHandleClass = 'table-schema-resize-handle';
+    const dragHandleStyle = `width: 5px; 
+    height: 100%; 
+    background-color: transparent;
+    cursor: col-resize; 
+    position: absolute;
+    right: 0;
+    top: 0;
     `;
 
     const contentEditable = isEditable(mode, schema) ? 'contenteditable="plaintext-only"' : '';
-    console.log('tableHeader', tableHeader);
-    console.log('tableBody', tableBody);
-    table.innerHTML = `<tr>${tableHeader
-      // TODO ここから カラムの横幅をドラッグ&ドロップで決定できるようにしたい。
-      // https://chat.openai.com/share/8ffbc430-f5fc-4419-8241-5ea82f100eeb
+    table.innerHTML = `<tr>${schema.head
       .map(
-        (data) => `<th ${mode === 'designer' ? contentEditable : ''} style="${style}">${data}</th>`
+        (data, i) =>
+          `<th ${mode === 'designer' ? contentEditable : ''} style="${
+            thTdStyle + ` width: ${schema.headWidthsPercentage[i]}%;`
+          }">${data}${
+            mode === 'designer' && i < schema.head.length - 1
+              ? `<div class="${dragHandleClass}" style="${dragHandleStyle}"></div>`
+              : ''
+          }</th>`
       )
       .join('')}</tr>
         ${tableBody
           .map(
             (row) =>
               `<tr>${row
-                .map((data) => `<td ${contentEditable} style="${style}">${data}</td>`)
+                .map((data) => `<td ${contentEditable} style="${thTdStyle}">${data}</td>`)
                 .join('')}</tr>`
           )
           .join('')}`;
+
+    // TODO ここから! カラムの横幅をドラッグ&ドロップで決定できるようにしたい。
+    // 問題点:
+    // - headerクリック時にハンドルにフォーカスが移動してしまう。
+    const dragHandles = table.querySelectorAll(`.${dragHandleClass}`)
+    dragHandles.forEach((handle) => {
+      handle.addEventListener('mouseover', (e) => {
+        const handle = e.target as HTMLDivElement;
+        handle.style.backgroundColor = '#2196f3';
+      });
+      handle.addEventListener('mouseout', (e) => {
+        const handle = e.target as HTMLDivElement;
+        handle.style.backgroundColor = 'transparent';
+      });
+      // TODO ここから ハンドルの位置がずれる。
+      handle.addEventListener('mousedown', (e) => {
+        const th = handle.parentElement;
+        if (!(th instanceof HTMLTableCellElement)) return;
+        const startWidth = th.offsetWidth;
+        const startX = e.pageX;
+        console.log('startWidth', startWidth);
+        console.log('startX', startX);
+
+        const mouseMoveHandler = (e: MouseEvent) => {
+          e.preventDefault();
+          const newWidth = startWidth + (e.pageX - startX);
+          if (!(th instanceof HTMLTableCellElement)) return;
+          th.style.width = String(newWidth) + 'px';
+        };
+
+        const mouseUpHandler = (e: MouseEvent) => {
+          e.preventDefault();
+          document.removeEventListener('mousemove', mouseMoveHandler);
+          document.removeEventListener('mouseup', mouseUpHandler);
+          const tableHeader = table.querySelectorAll('th');
+          const newTableHeaderWidths = Array.from(tableHeader).map((th) => th.clientWidth);
+          const tableWidth = table.offsetWidth;
+          const newWidthsPercentage = newTableHeaderWidths.map(
+            (width) => (width / tableWidth) * 100
+          );
+          onChange && onChange({ key: 'headWidthsPercentage', value: newWidthsPercentage });
+        };
+
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+      });
+    });
+    // TODO ここまで!
 
     const tableCell = table.querySelectorAll('td, th');
     tableCell.forEach((cell) => {
@@ -136,7 +204,7 @@ const tableSchema: Plugin<TableSchema> = {
       addRowButton.style.right = '0';
       addRowButton.innerText = '+';
       addRowButton.onclick = () => {
-        const newRow = Array(tableHeader.length).fill('') as string[];
+        const newRow = Array(schema.head.length).fill('') as string[];
         onChange({ key: 'content', value: JSON.stringify(tableBody.concat([newRow])) });
       };
       rootElement.appendChild(addRowButton);
@@ -154,7 +222,7 @@ const tableSchema: Plugin<TableSchema> = {
         deleteRowButton.style.right = '-25px';
         deleteRowButton.innerText = '-';
         deleteRowButton.onclick = () => {
-          const newTableBody = tableBody.filter((_, j) => j !== i);
+          const newTableBody = tableBody.filter((_, j) => j !== i - 1); // Exclude line 0 because it is a header.
           onChange({ key: 'content', value: JSON.stringify(newTableBody) });
         };
         rootElement.appendChild(deleteRowButton);
@@ -167,14 +235,26 @@ const tableSchema: Plugin<TableSchema> = {
       addColumnButton.style.right = '-25px';
       addColumnButton.innerText = '+';
       addColumnButton.onclick = () => {
+        const newColumnWidthPercentage = 25;
+        const totalCurrentWidth = schema.headWidthsPercentage.reduce(
+          (acc, width) => acc + width,
+          0
+        );
+        const scalingRatio = (100 - newColumnWidthPercentage) / totalCurrentWidth;
+        const scaledWidths = schema.headWidthsPercentage.map((width) => width * scalingRatio);
         onChange([
-          { key: 'head', value: tableHeader.concat('') },
+          { key: 'head', value: schema.head.concat('') },
+          {
+            key: 'headWidthsPercentage',
+            value: scaledWidths.concat(newColumnWidthPercentage),
+          },
           {
             key: 'content',
             value: JSON.stringify(tableBody.map((row) => row.concat(''))),
           },
         ]);
       };
+
       rootElement.appendChild(addColumnButton);
 
       const tableHeads = table.querySelectorAll('th');
@@ -186,8 +266,18 @@ const tableSchema: Plugin<TableSchema> = {
         deleteColumnButton.style.top = '-25px';
         deleteColumnButton.innerText = '-';
         deleteColumnButton.onclick = () => {
+          const totalWidthMinusRemoved = schema.headWidthsPercentage.reduce(
+            (sum, width, j) => (j !== i ? sum + width : sum),
+            0
+          );
           onChange([
-            { key: 'head', value: tableHeader.filter((_, j) => j !== i) },
+            { key: 'head', value: schema.head.filter((_, j) => j !== i) },
+            {
+              key: 'headWidthsPercentage',
+              value: schema.headWidthsPercentage
+                .filter((_, j) => j !== i)
+                .map((width) => (width / totalWidthMinusRemoved) * 100),
+            },
             {
               key: 'content',
               value: JSON.stringify(tableBody.map((row) => row.filter((_, j) => j !== i))),
@@ -199,15 +289,13 @@ const tableSchema: Plugin<TableSchema> = {
       });
     }
 
-    setTimeout(() => {
-      const tableHeight = px2mm(table.clientHeight);
-      if (rootElement.parentElement) {
-        rootElement.parentElement.style.height = `${tableHeight}mm`;
-      }
-      if (schema.height !== tableHeight && onChange) {
-        onChange({ key: 'height', value: tableHeight });
-      }
-    }, 25);
+    const tableHeight = round(px2mm(table.clientHeight), 2);
+    if (rootElement.parentElement) {
+      rootElement.parentElement.style.height = `${tableHeight}mm`;
+    }
+    if (schema.height !== tableHeight && onChange) {
+      onChange({ key: 'height', value: tableHeight });
+    }
   },
   propPanel: {
     schema: ({ i18n }) => ({
@@ -249,11 +337,12 @@ const tableSchema: Plugin<TableSchema> = {
     defaultSchema: {
       type: 'table',
       position: { x: 0, y: 0 },
-      width: 100,
+      width: 150,
       height: 20,
-      head: ['Name', 'Age', 'City', 'Description'],
+      head: ['Name', 'City', 'Description'],
+      headWidthsPercentage: [30, 30, 40],
       content: JSON.stringify([
-        ['Alice', '24', 'New York', 'Alice is a freelance web designer and developer'],
+        ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
       ]),
       borderColor: '#000000',
       borderWidth: 0.1,
