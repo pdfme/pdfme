@@ -15,6 +15,22 @@ const shift = (number: number, precision: number, reverseShift: boolean) => {
 const round = (number: number, precision: number) =>
   shift(Math.round(shift(number, precision, false)), precision, true);
 
+const getScale = (element: HTMLElement | null): number => {
+  if (!element || element === document.body) {
+    return 1;
+  }
+  const style = window.getComputedStyle(element);
+  const match = style.transform.match(/matrix\((\d+\.?\d*),/);
+  let scale = 1;
+  if (match && match[1] && match[1] !== '1') {
+    scale = parseFloat(match[1]);
+  } else {
+    return getScale(element.parentElement);
+  }
+
+  return scale;
+};
+
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { schema, value } = arg;
@@ -35,9 +51,10 @@ const tableSchema: Plugin<TableSchema> = {
         textColor: schema.textColor,
         fillColor: schema.bgColor,
         // TODO
-        // schema.fontName
-        // fontSize: 14,
-        fontName: 'NotoSansJP-Regular',
+        // fontName
+        // fontSize
+        // alignment
+        // verticalAlignment
       },
       bodyStyles: {
         lineWidth: schema.borderWidth,
@@ -46,8 +63,10 @@ const tableSchema: Plugin<TableSchema> = {
         textColor: schema.textColor,
         fillColor: schema.bgColor,
         // TODO
-        // schema.fontName
-        // fontSize: 14,
+        // fontName
+        // fontSize
+        // alignment
+        // verticalAlignment
       },
       columnStyles: schema.headWidthsPercentage.reduce(
         (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
@@ -63,12 +82,16 @@ const tableSchema: Plugin<TableSchema> = {
   },
   ui: (arg: UIRenderProps<TableSchema>) => {
     const { schema, rootElement, value, mode, onChange } = arg;
+    console.log('========');
+    console.log(schema.headWidthsPercentage);
+    console.log(schema.headWidthsPercentage.reduce((acc, cur) => acc + cur, 0));
+    console.log('========');
     const tableBody = JSON.parse(value || '[]') as string[][];
     const table = document.createElement('table');
     table.style.tableLayout = 'fixed';
     table.style.borderCollapse = 'collapse';
     table.style.width = '100%';
-    // TODO スタイルの適応
+    // TODO スタイルの適応 text/uiRender.tsをそのままつかえばいいかもしれない
     table.style.textAlign = 'left';
     table.style.fontSize = '14pt';
 
@@ -86,7 +109,8 @@ const tableSchema: Plugin<TableSchema> = {
     background-color: transparent;
     cursor: col-resize; 
     position: absolute;
-    right: 0;
+    z-index: 10;
+    right: -2.5px;
     top: 0;
     `;
 
@@ -97,8 +121,8 @@ const tableSchema: Plugin<TableSchema> = {
           `<th ${mode === 'designer' ? contentEditable : ''} style="${
             thTdStyle + ` width: ${schema.headWidthsPercentage[i]}%;`
           }">${data}${
-            mode === 'designer' && i < schema.head.length - 1
-              ? `<div class="${dragHandleClass}" style="${dragHandleStyle}"></div>`
+            mode === 'designer'
+              ? `<div tabindex="-1" contenteditable="false" class="${dragHandleClass}" style="${dragHandleStyle}"></div>`
               : ''
           }</th>`
       )
@@ -112,11 +136,10 @@ const tableSchema: Plugin<TableSchema> = {
           )
           .join('')}`;
 
-    // TODO ここから! カラムの横幅をドラッグ&ドロップで決定できるようにしたい。
-    // 問題点:
-    // - headerクリック時にハンドルにフォーカスが移動してしまう。
-    const dragHandles = table.querySelectorAll(`.${dragHandleClass}`)
+    const dragHandles = table.querySelectorAll(`.${dragHandleClass}`);
     dragHandles.forEach((handle) => {
+      const th = handle.parentElement;
+      if (!(th instanceof HTMLTableCellElement)) return;
       handle.addEventListener('mouseover', (e) => {
         const handle = e.target as HTMLDivElement;
         handle.style.backgroundColor = '#2196f3';
@@ -125,20 +148,39 @@ const tableSchema: Plugin<TableSchema> = {
         const handle = e.target as HTMLDivElement;
         handle.style.backgroundColor = 'transparent';
       });
-      // TODO ここから ハンドルの位置がずれる。
       handle.addEventListener('mousedown', (e) => {
-        const th = handle.parentElement;
-        if (!(th instanceof HTMLTableCellElement)) return;
         const startWidth = th.offsetWidth;
-        const startX = e.pageX;
-        console.log('startWidth', startWidth);
-        console.log('startX', startX);
+        const scale = getScale(e.target as HTMLElement);
+        const startX = (e as MouseEvent).clientX / scale;
 
         const mouseMoveHandler = (e: MouseEvent) => {
-          e.preventDefault();
-          const newWidth = startWidth + (e.pageX - startX);
-          if (!(th instanceof HTMLTableCellElement)) return;
-          th.style.width = String(newWidth) + 'px';
+          const targetTh = th;
+          const tableWidth = (targetTh.parentElement?.parentElement as HTMLTableElement)
+            .offsetWidth;
+          const allThs = Array.from(
+            targetTh.parentElement?.children ?? []
+          ) as HTMLTableCellElement[];
+          const targetThIdx = allThs.indexOf(targetTh);
+          const newWidth = startWidth + (e.clientX / scale - startX); // 新しい幅の計算
+
+          let totalWidth = 0; // 全ての<th>要素の幅の合計
+          allThs.forEach((th, idx) => {
+            if (idx !== targetThIdx) {
+              totalWidth += th.offsetWidth;
+            }
+          });
+
+          const remainingWidth = tableWidth - newWidth; // 残りの幅
+          const scaleRatio = remainingWidth / totalWidth; // 残りの<th>要素の幅をどれだけ変更するかの比率
+
+          allThs.forEach((th, idx) => {
+            if (idx === targetThIdx) {
+              th.style.width = `${(newWidth / tableWidth) * 100}%`; // 選択された<th>の幅を設定
+            } else {
+              const originalWidth = th.offsetWidth;
+              th.style.width = `${((originalWidth * scaleRatio) / tableWidth) * 100}%`; // 他の<th>の幅を調整
+            }
+          });
         };
 
         const mouseUpHandler = (e: MouseEvent) => {
@@ -146,7 +188,7 @@ const tableSchema: Plugin<TableSchema> = {
           document.removeEventListener('mousemove', mouseMoveHandler);
           document.removeEventListener('mouseup', mouseUpHandler);
           const tableHeader = table.querySelectorAll('th');
-          const newTableHeaderWidths = Array.from(tableHeader).map((th) => th.clientWidth);
+          const newTableHeaderWidths = Array.from(tableHeader).map((th) => th.offsetWidth);
           const tableWidth = table.offsetWidth;
           const newWidthsPercentage = newTableHeaderWidths.map(
             (width) => (width / tableWidth) * 100
@@ -158,14 +200,17 @@ const tableSchema: Plugin<TableSchema> = {
         document.addEventListener('mouseup', mouseUpHandler);
       });
     });
-    // TODO ここまで!
 
     const tableCell = table.querySelectorAll('td, th');
     tableCell.forEach((cell) => {
       if (!(cell instanceof HTMLTableCellElement)) return;
       cell.onblur = (e) => {
-        const target = e.target as HTMLTableCellElement;
-        const row = target.parentElement as HTMLTableRowElement;
+        if (!(e.target instanceof HTMLTableCellElement)) return;
+        const handle = e.target.querySelector('.' + dragHandleClass) as HTMLDivElement;
+        if (handle) {
+          handle.style.display = 'block';
+        }
+        const row = e.target.parentElement as HTMLTableRowElement;
         const table = row.parentElement as HTMLTableElement;
         const tableData = Array.from(table.rows).map((row) =>
           Array.from(row.cells).map((cell) => cell.innerText)
@@ -176,15 +221,25 @@ const tableSchema: Plugin<TableSchema> = {
           if (!onChange) return;
           const head = tableData[0];
           const body = tableData.slice(1);
-          onChange([
-            { key: 'head', value: head },
-            { key: 'content', value: JSON.stringify(body) },
-          ]);
+          const changes: { key: string; value: any }[] = [];
+          if (JSON.stringify(schema.head) !== JSON.stringify(head)) {
+            changes.push({ key: 'head', value: head });
+          }
+          if (JSON.stringify(tableBody) !== JSON.stringify(body)) {
+            changes.push({ key: 'content', value: JSON.stringify(body) });
+          }
+          if (changes.length > 0) {
+            onChange(changes);
+          }
         }, 25);
       };
       cell.onclick = (e) => {
         if (!(e.target instanceof HTMLTableCellElement)) return;
         if (e.target === document.activeElement) return;
+        const handle = e.target.querySelector('.' + dragHandleClass) as HTMLDivElement;
+        if (handle) {
+          handle.style.display = 'none';
+        }
         e.target.focus();
         const selection = window.getSelection();
         const range = document.createRange();
@@ -285,7 +340,7 @@ const tableSchema: Plugin<TableSchema> = {
           ]);
         };
         rootElement.appendChild(deleteColumnButton);
-        skipThWidth += head.clientWidth;
+        skipThWidth += head.offsetWidth;
       });
     }
 
