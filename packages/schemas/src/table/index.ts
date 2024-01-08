@@ -82,10 +82,6 @@ const tableSchema: Plugin<TableSchema> = {
   },
   ui: (arg: UIRenderProps<TableSchema>) => {
     const { schema, rootElement, value, mode, onChange } = arg;
-    console.log('========');
-    console.log(schema.headWidthsPercentage);
-    console.log(schema.headWidthsPercentage.reduce((acc, cur) => acc + cur, 0));
-    console.log('========');
     const tableBody = JSON.parse(value || '[]') as string[][];
     const table = document.createElement('table');
     table.style.tableLayout = 'fixed';
@@ -161,39 +157,38 @@ const tableSchema: Plugin<TableSchema> = {
             targetTh.parentElement?.children ?? []
           ) as HTMLTableCellElement[];
           const targetThIdx = allThs.indexOf(targetTh);
-          const newWidth = startWidth + (e.clientX / scale - startX); // 新しい幅の計算
+          const newWidth = startWidth + (e.clientX / scale - startX);
 
-          let totalWidth = 0; // 全ての<th>要素の幅の合計
+          let totalWidth = 0;
           allThs.forEach((th, idx) => {
             if (idx !== targetThIdx) {
               totalWidth += th.offsetWidth;
             }
           });
 
-          const remainingWidth = tableWidth - newWidth; // 残りの幅
-          const scaleRatio = remainingWidth / totalWidth; // 残りの<th>要素の幅をどれだけ変更するかの比率
+          const remainingWidth = tableWidth - newWidth;
+          const scaleRatio = remainingWidth / totalWidth;
 
           allThs.forEach((th, idx) => {
             if (idx === targetThIdx) {
-              th.style.width = `${(newWidth / tableWidth) * 100}%`; // 選択された<th>の幅を設定
+              th.style.width = `${(newWidth / tableWidth) * 100}%`;
             } else {
               const originalWidth = th.offsetWidth;
-              th.style.width = `${((originalWidth * scaleRatio) / tableWidth) * 100}%`; // 他の<th>の幅を調整
+              th.style.width = `${((originalWidth * scaleRatio) / tableWidth) * 100}%`;
             }
           });
         };
-
         const mouseUpHandler = (e: MouseEvent) => {
           e.preventDefault();
           document.removeEventListener('mousemove', mouseMoveHandler);
           document.removeEventListener('mouseup', mouseUpHandler);
-          const tableHeader = table.querySelectorAll('th');
-          const newTableHeaderWidths = Array.from(tableHeader).map((th) => th.offsetWidth);
-          const tableWidth = table.offsetWidth;
-          const newWidthsPercentage = newTableHeaderWidths.map(
-            (width) => (width / tableWidth) * 100
-          );
-          onChange && onChange({ key: 'headWidthsPercentage', value: newWidthsPercentage });
+          const allThs = Array.from(th.parentElement?.children ?? []) as HTMLTableCellElement[];
+          const newHeadWidthsPercentage = allThs
+            .map((th) => th.style.width)
+            .map((width) => String(width).replace('%', ''))
+            .map((width) => Number(width));
+
+          onChange && onChange({ key: 'headWidthsPercentage', value: newHeadWidthsPercentage });
         };
 
         document.addEventListener('mousemove', mouseMoveHandler);
