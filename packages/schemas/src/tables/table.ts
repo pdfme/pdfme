@@ -366,10 +366,7 @@ const tableSchema: Plugin<TableSchema> = {
         title: i18n('schemas.borderWidth'),
         type: 'number',
         widget: 'inputNumber',
-        min: 0,
-        props: {
-          step: 0.1,
-        },
+        props: { step: 0.1, min: 0 },
       },
       textColor: {
         title: i18n('schemas.textColor'),
@@ -382,7 +379,7 @@ const tableSchema: Plugin<TableSchema> = {
         title: 'cellPadding',
         type: 'number',
         widget: 'inputNumber',
-        min: 0,
+        props: { min: 0 },
       },
     }),
     defaultSchema: {

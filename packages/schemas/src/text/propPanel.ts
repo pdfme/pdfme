@@ -72,12 +72,14 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'inputNumber',
         span: 6,
         disabled: enableDynamicFont,
+        props: { min: 0 },
       },
       characterSpacing: {
         title: i18n('schemas.text.spacing'),
         type: 'number',
         widget: 'inputNumber',
         span: 6,
+        props: { min: 0 },
       },
       alignment: {
         title: i18n('schemas.text.textAlign'),
@@ -109,9 +111,7 @@ export const propPanel: PropPanel<TextSchema> = {
         title: i18n('schemas.text.lineHeight'),
         type: 'number',
         widget: 'inputNumber',
-        props: {
-          step: 0.1,
-        },
+        props: { step: 0.1, min: 0 },
         span: 8,
       },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
@@ -125,12 +125,14 @@ export const propPanel: PropPanel<TextSchema> = {
             type: 'number',
             widget: 'inputNumber',
             hidden: !enableDynamicFont,
+            props: { min: 0 },
           },
           max: {
             title: i18n('schemas.text.max'),
             type: 'number',
             widget: 'inputNumber',
             hidden: !enableDynamicFont,
+            props: { min: 0 },
           },
           fit: {
             title: i18n('schemas.text.fit'),

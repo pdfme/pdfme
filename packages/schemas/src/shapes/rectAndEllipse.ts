@@ -68,7 +68,7 @@ const shape: Plugin<ShapeSchema> = {
         title: i18n('schemas.borderWidth'),
         type: 'number',
         widget: 'inputNumber',
-        min: 0,
+        props: { min: 0 },
         step: 1,
       },
       borderColor: {

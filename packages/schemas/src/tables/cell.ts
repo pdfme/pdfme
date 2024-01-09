@@ -21,6 +21,9 @@ import {
   getFallbackFontName,
 } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { uiRender as textUiRender } from '../text/uiRender.js';
+import line from '../shapes/line.js';
+const lineUiRender = line.ui;
 
 const DEFAULT_BORDER_COLOR = '#000000';
 
@@ -46,19 +49,48 @@ interface CellSchema extends Schema {
 }
 
 const getBoxDimensionProp = () => ({
-  top: { title: 'Top', type: 'number', widget: 'inputNumber', span: 6 },
-  left: { title: 'Left', type: 'number', widget: 'inputNumber', span: 6 },
-  bottom: { title: 'Bottom', type: 'number', widget: 'inputNumber', span: 6 },
-  right: { title: 'Right', type: 'number', widget: 'inputNumber', span: 6 },
+  top: { title: 'Top', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
+  right: { title: 'Right', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
+  bottom: { title: 'Bottom', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
+  left: { title: 'Left', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
 });
 
 const cellSchema: Plugin<CellSchema> = {
   pdf: (arg: PDFRenderProps<CellSchema>) => {},
-  ui: (arg: UIRenderProps<CellSchema>) => {
+  ui: async (arg: UIRenderProps<CellSchema>) => {
+    const { schema } = arg;
+    const textUiArg = Object.assign(arg, {
+      schema: {
+        ...schema,
+        type: 'text',
+        backgroundColor: '',
+        width: schema.width - schema.borderWidth.left - schema.borderWidth.right,
+        height: schema.height - schema.borderWidth.top - schema.borderWidth.bottom,
+        position: {
+          x: schema.position.x + schema.borderWidth.left,
+          y: schema.position.y + schema.borderWidth.top,
+        },
+      },
+    });
+    await textUiRender(textUiArg);
+
     // TODO ここから
+    const lineTopUiArg = Object.assign(arg, {
+      schema: {
+        type: 'line',
+        position: {
+          x: schema.position.x,
+          y: schema.position.y + schema.borderWidth.top,
+        },
+        width: schema.width,
+        height: schema.borderWidth.top,
+        color: schema.borderColor,
+      },
+    });
+    await lineUiRender(lineTopUiArg);
   },
   propPanel: {
-    schema: ({ options, activeSchema, i18n }) => {
+    schema: ({ options, i18n }) => {
       const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
       const fontNames = Object.keys(font);
       const fallbackFontName = getFallbackFontName(font);
@@ -75,12 +107,14 @@ const cellSchema: Plugin<CellSchema> = {
           title: i18n('schemas.text.size'),
           type: 'number',
           widget: 'inputNumber',
+          props: { min: 0 },
           span: 6,
         },
         characterSpacing: {
           title: i18n('schemas.text.spacing'),
           type: 'number',
           widget: 'inputNumber',
+          props: { min: 0 },
           span: 6,
         },
         alignment: {
@@ -113,9 +147,7 @@ const cellSchema: Plugin<CellSchema> = {
           title: i18n('schemas.text.lineHeight'),
           type: 'number',
           widget: 'inputNumber',
-          props: {
-            step: 0.1,
-          },
+          props: { step: 0.1, min: 0 },
           span: 8,
         },
         fontColor: {
@@ -158,6 +190,7 @@ const cellSchema: Plugin<CellSchema> = {
     },
     defaultSchema: {
       type: 'cell',
+      content: 'Type Something...',
       position: { x: 0, y: 0 },
       width: 50,
       height: 10,
