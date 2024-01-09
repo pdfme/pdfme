@@ -25,6 +25,8 @@ import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
 
+const mm2px = (mm: number) => mm * 3.7795275591;
+
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
@@ -268,20 +270,20 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
+      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'position.y', value: fmt(top), schemaId: id },
       { key: 'width', value: fmt(width), schemaId: id },
       { key: 'height', value: fmt(height), schemaId: id },
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
 
     const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
 
     if (!targetSchema) return;
 
+    targetSchema.position.x = fmt(left);
+    targetSchema.position.y = fmt(top);
     targetSchema.width = fmt(width);
     targetSchema.height = fmt(height);
-    targetSchema.position.y = fmt(top);
-    targetSchema.position.x = fmt(left);
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -296,13 +298,45 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
-    const s = target.style;
-    const newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
-    const newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
+    let topPadding = 0;
+    let rightPadding = 0;
+    let bottomPadding = 0;
+    let leftPadding = 0;
+
+    if (isBlankPdf(basePdf)) {
+      const [t, r, b, l] = basePdf.padding;
+      topPadding = t * ZOOM;
+      rightPadding = mm2px(r);
+      bottomPadding = mm2px(b);
+      leftPadding = l * ZOOM;
+    }
+
+    const pageWidth = mm2px(pageSizes[pageCursor].width)
+    const pageHeight = mm2px(pageSizes[pageCursor].height);
+
     const obj: { top?: string; left?: string; width: string; height: string } = {
       width: `${width}px`,
       height: `${height}px`,
     };
+
+    const s = target.style;
+    let newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
+    let newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
+    if (newLeft < leftPadding) {
+      newLeft = leftPadding;
+    }
+    if (newTop < topPadding) {
+      newTop = topPadding;
+    }
+    if (newLeft + width > pageWidth - rightPadding) {
+      obj.width = `${pageWidth - rightPadding - newLeft}px`;
+    }
+    if (newTop + height > pageHeight - bottomPadding) {
+      obj.height = `${pageHeight - bottomPadding - newTop}px`;
+    }
+
+
+
     const d = direction.toString();
     if (isTopLeftResize(d)) {
       obj.top = `${newTop}px`;
@@ -456,9 +490,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}
