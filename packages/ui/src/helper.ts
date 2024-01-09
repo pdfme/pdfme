@@ -419,6 +419,47 @@ export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale
 export const getSidebarContentHeight = (sidebarHeight: number) =>
   sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;
 
+const handlePositionSizeChange = (
+  schema: SchemaForUI,
+  key: string,
+  value: any,
+  basePdf: BasePdf,
+  pageSize: Size
+) => {
+  const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
+  const [pt, pr, pb, pl] = padding;
+  const { width: pw, height: ph } = pageSize;
+  const calcBounds = (v: any, min: number, max: number) => Math.min(Math.max(Number(v), min), max);
+  if (key === 'position.x') {
+    schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
+  } else if (key === 'position.y') {
+    schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
+  } else if (key === 'width') {
+    schema.width = calcBounds(value, pl, pw - schema.position.x - pr);
+  } else if (key === 'height') {
+    schema.height = calcBounds(value, pt, ph - schema.position.y - pb);
+  }
+};
+
+const handleTypeChange = (
+  schema: SchemaForUI,
+  key: string,
+  value: any,
+  pluginsRegistry: Plugins
+) => {
+  if (key !== 'type') return;
+  const keysToKeep = ['id', 'key', 'type', 'position'];
+  Object.keys(schema).forEach((key) => {
+    if (!keysToKeep.includes(key)) {
+      delete schema[key as keyof typeof schema];
+    }
+  });
+  const propPanel = Object.values(pluginsRegistry).find(
+    (plugin) => plugin?.propPanel.defaultSchema.type === value
+  )?.propPanel;
+  Object.assign(schema, propPanel?.defaultSchema || {});
+};
+
 export const changeSchemas = (args: {
   objs: { key: string; value: any; schemaId: string }[];
   schemas: SchemaForUI[];
@@ -435,32 +476,9 @@ export const changeSchemas = (args: {
     set(tgt, key, value);
 
     if (key === 'type') {
-      const keysToKeep = ['id', 'key', 'type', 'position'];
-      Object.keys(tgt).forEach((key) => {
-        if (!keysToKeep.includes(key)) {
-          delete tgt[key as keyof typeof tgt];
-        }
-      });
-      const propPanel = Object.values(pluginsRegistry).find(
-        (plugin) => plugin?.propPanel.defaultSchema.type === value
-      )?.propPanel;
-      Object.assign(tgt, propPanel?.defaultSchema || {});
-    } else if (key === 'position.x' || key === 'position.y') {
-      const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
-      const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
-      const { width: pageWidth, height: pageHeight } = pageSize;
-      const { width: targetWidth, height: targetHeight } = tgt;
-      if (key === 'position.x') {
-        tgt.position.x = Math.min(
-          Math.max(Number(value), paddingLeft),
-          pageWidth - targetWidth - paddingRight
-        );
-      } else {
-        tgt.position.y = Math.min(
-          Math.max(Number(value), paddingTop),
-          pageHeight - targetHeight - paddingBottom
-        );
-      }
+      handleTypeChange(tgt, key, value, pluginsRegistry);
+    } else if (['position.x', 'position.y', 'width', 'height'].includes(key)) {
+      handlePositionSizeChange(tgt, key, value, basePdf, pageSize);
     }
 
     return acc;

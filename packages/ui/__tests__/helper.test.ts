@@ -443,4 +443,79 @@ describe('changeSchemas test', () => {
       },
     ]);
   });
+
+  test('changeSchemas - change width and height(padding out) with objs length = 2 and BlankPDF', () => {
+    const objs = [
+      { key: 'width', value: 110, schemaId: schemaA.id },
+      { key: 'height', value: 110, schemaId: schemaA.id },
+    ];
+    const mockCallback = jest.fn();
+
+    changeSchemas({
+      schemas,
+      objs,
+      commitSchemas: mockCallback,
+      basePdf: basePdf2,
+      pluginsRegistry,
+      pageSize,
+    });
+    expect(mockCallback.mock.calls[0][0]).toStrictEqual([
+      {
+        id: schemaA.id,
+        key: 'a',
+        type: 'text',
+        content: 'a',
+        position: { x: 0, y: 0 },
+        width: 110,
+        height: 110,
+      },
+      {
+        id: schemaB.id,
+        key: 'b',
+        type: 'text',
+        content: 'b',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
+    ]);
+  });
+  test('changeSchemas - change width and height(padding in) with objs length = 2 and BlankPDF', () => {
+    const objs = [
+      { key: 'position.x', value: 100, schemaId: schemaA.id },
+      { key: 'position.y', value: 197, schemaId: schemaA.id },
+      { key: 'width', value: 110, schemaId: schemaA.id },
+      { key: 'height', value: 110, schemaId: schemaA.id },
+    ];
+    const mockCallback = jest.fn();
+
+    changeSchemas({
+      schemas,
+      objs,
+      commitSchemas: mockCallback,
+      basePdf: basePdf2,
+      pluginsRegistry,
+      pageSize,
+    });
+    expect(mockCallback.mock.calls[0][0]).toStrictEqual([
+      {
+        id: schemaA.id,
+        key: 'a',
+        type: 'text',
+        content: 'a',
+        position: { x: 100, y: 187 },
+        width: 100,
+        height: 100,
+      },
+      {
+        id: schemaB.id,
+        key: 'b',
+        type: 'text',
+        content: 'b',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 100,
+      },
+    ]);
+  });
 });
