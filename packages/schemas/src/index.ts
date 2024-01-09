@@ -4,6 +4,7 @@ import svg, { readOnlySvg } from './graphics/svg.js';
 import barcodes from './barcodes/index.js';
 import line from './shapes/line.js';
 import table from './tables/table.js';
+import cell from './tables/cell.js';
 import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
 import { convertForPdfLayoutProps, rotatePoint } from './utils.js';
 
@@ -19,6 +20,7 @@ export {
   barcodes,
   line,
   table,
+  cell,
   rectangle,
   ellipse,
   builtInPlugins,

@@ -11,6 +11,7 @@ import {
   readOnlySvg,
   line,
   table,
+  cell,
   rectangle,
   ellipse,
 } from '@pdfme/schemas';
@@ -110,6 +111,7 @@ export const getPlugins = () => {
   return {
     Text: text,
     Table: table,
+    Cell: cell,
     ReadOnlyText: readOnlyText,
     Line: line,
     Rectangle: rectangle,

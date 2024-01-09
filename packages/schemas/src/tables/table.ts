@@ -384,22 +384,6 @@ const tableSchema: Plugin<TableSchema> = {
         widget: 'inputNumber',
         min: 0,
       },
-      // TODO これはテスト
-      test: {
-        title: 'test',
-        type: 'object',
-        widget: 'Card',
-        properties: {
-          nestTest1: {
-            title: 'nestTest1',
-            type: 'string',
-          },
-          nestTest2: {
-            title: 'nestTest2',
-            type: 'string',
-          },
-        },
-      },
     }),
     defaultSchema: {
       type: 'table',
