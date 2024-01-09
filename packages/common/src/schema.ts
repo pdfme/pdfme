@@ -96,6 +96,7 @@ export const Template = z
   .object({
     schemas: z.array(z.record(Schema)),
     basePdf: BasePdf,
+    pdfmeVersion: z.string().optional(),
   })
   .passthrough();
 
