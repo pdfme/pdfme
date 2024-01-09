@@ -460,6 +460,21 @@ export const changeSchemas = (args: {
           pageHeight - targetHeight - paddingBottom
         );
       }
+    } else if (key === 'width' || key === 'height') {
+      const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
+      const [paddingTop, paddingRight, paddingBottom, paddingLeft] = padding;
+      const { width: pageWidth, height: pageHeight } = pageSize;
+      if (key === 'width') {
+        tgt.width = Math.min(
+          Math.max(Number(value), paddingLeft),
+          pageWidth - tgt.position.x - paddingRight
+        );
+      } else {
+        tgt.height = Math.min(
+          Math.max(Number(value), paddingTop),
+          pageHeight - tgt.position.y - paddingBottom
+        );
+      }
     }
 
     return acc;

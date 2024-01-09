@@ -268,20 +268,20 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
+      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'position.y', value: fmt(top), schemaId: id },
       { key: 'width', value: fmt(width), schemaId: id },
       { key: 'height', value: fmt(height), schemaId: id },
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
 
     const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
 
     if (!targetSchema) return;
 
+    targetSchema.position.x = fmt(left);
+    targetSchema.position.y = fmt(top);
     targetSchema.width = fmt(width);
     targetSchema.height = fmt(height);
-    targetSchema.position.y = fmt(top);
-    targetSchema.position.x = fmt(left);
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -303,6 +303,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       width: `${width}px`,
       height: `${height}px`,
     };
+    // TODO ここでpaddingを考慮できていない
     const d = direction.toString();
     if (isTopLeftResize(d)) {
       obj.top = `${newTop}px`;
@@ -456,9 +457,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas([{ key: 'content', value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}
