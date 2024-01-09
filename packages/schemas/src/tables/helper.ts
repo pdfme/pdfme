@@ -69,12 +69,14 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
   return { top: value, right: value, bottom: value, left: value };
 }
 
+// TODO セルレンダラーを作った方がいいかも。
+// それらを使い回して、テーブルのレンダラーを作る
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   await rectangleRender({
     ...arg,
     schema: {
       type: 'rectangle',
-      // TODO スタイルの適応
+      // TODO スタイルの適応 これだとボーダーを細かく設定できないので、rectangleRenderではなくlineRenderを使うべき
       borderWidth: typeof cell.styles.lineWidth === 'number' ? cell.styles.lineWidth : 0.1,
       borderColor: cell.styles.lineColor,
       color: cell.styles.fillColor,

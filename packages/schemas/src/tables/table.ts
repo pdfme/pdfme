@@ -1,7 +1,7 @@
 import { Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { autoTable, Styles } from './autoTable';
-import type { TableSchema } from './types';
+import { autoTable, Styles } from './helper.js';
+import type { TableSchema } from './types.js';
 import { isEditable, px2mm } from '../utils.js';
 
 const shift = (number: number, precision: number, reverseShift: boolean) => {
@@ -90,6 +90,7 @@ const tableSchema: Plugin<TableSchema> = {
     // TODO スタイルの適応 text/uiRender.tsをそのままつかえばいいかもしれない
     table.style.textAlign = 'left';
     table.style.fontSize = '14pt';
+    table.style.whiteSpace = 'pre-wrap';
 
     const thTdStyle = `border: ${schema.borderWidth}mm solid ${schema.borderColor}; 
     color: ${schema.textColor}; 
@@ -383,6 +384,22 @@ const tableSchema: Plugin<TableSchema> = {
         widget: 'inputNumber',
         min: 0,
       },
+      // TODO これはテスト
+      test: {
+        title: 'test',
+        type: 'object',
+        widget: 'Card',
+        properties: {
+          nestTest1: {
+            title: 'nestTest1',
+            type: 'string',
+          },
+          nestTest2: {
+            title: 'nestTest2',
+            type: 'string',
+          },
+        },
+      },
     }),
     defaultSchema: {
       type: 'table',
@@ -399,6 +416,10 @@ const tableSchema: Plugin<TableSchema> = {
       textColor: '#000000',
       bgColor: '#ffffff',
       cellPadding: 5,
+      test: {
+        nestTest1: 'nestTest1',
+        nestTest2: 'nestTest2',
+      },
     },
   },
 };
