@@ -1,6 +1,5 @@
 import type { Font as FontKitFont } from 'fontkit';
 import { rectangle } from '../shapes/rectAndEllipse';
-import { pdfRender as textRender } from '../text/pdfRender';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
 import {
   Font,
@@ -11,7 +10,9 @@ import {
   getFallbackFontName,
 } from '@pdfme/common';
 import type { TableSchema } from './types';
+import cell from './cell';
 const rectangleRender = rectangle.pdf;
+const cellRender = cell.pdf;
 
 // ### function
 function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: number): MarginPadding {
@@ -69,40 +70,50 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
   return { top: value, right: value, bottom: value, left: value };
 }
 
-// TODO セルレンダラーを作った方がいいかも。
-// それらを使い回して、テーブルのレンダラーを作る
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
-  await rectangleRender({
+  await cellRender({
     ...arg,
+    // TODO 改行がうまく反映されていない
+    value: cell.text.join('\n'),
     schema: {
-      type: 'rectangle',
-      // TODO スタイルの適応 これだとボーダーを細かく設定できないので、rectangleRenderではなくlineRenderを使うべき
-      borderWidth: typeof cell.styles.lineWidth === 'number' ? cell.styles.lineWidth : 0.1,
-      borderColor: cell.styles.lineColor,
-      color: cell.styles.fillColor,
+      type: 'cell',
       position: { x: cell.x, y: cell.y },
       width: cell.width,
       height: cell.height,
-      readOnly: true,
-    },
-  });
-
-  await textRender({
-    ...arg,
-    value: cell.text.join(''),
-    schema: {
-      type: 'text',
+      fontName: cell.styles.fontName,
       alignment: cell.styles.alignment,
       verticalAlignment: cell.styles.verticalAlignment,
       fontSize: cell.styles.fontSize,
       lineHeight: cell.styles.lineHeight,
       characterSpacing: cell.styles.characterSpacing,
       fontColor: cell.styles.textColor,
-      fontName: cell.styles.fontName,
-      backgroundColor: '',
-      position: { x: cell.x + cell.padding('left'), y: cell.y + cell.padding('top') },
-      width: cell.width - cell.padding('left') - cell.padding('right'),
-      height: cell.height - cell.padding('top') - cell.padding('bottom'),
+      backgroundColor: cell.styles.fillColor,
+      borderColor: cell.styles.lineColor,
+      borderWidth: {
+        top:
+          // TODO  Partial<LineWidths> は統一する
+          typeof cell.styles.lineWidth === 'number'
+            ? cell.styles.lineWidth
+            : cell.styles.lineWidth.top ?? 0,
+        bottom:
+          typeof cell.styles.lineWidth === 'number'
+            ? cell.styles.lineWidth
+            : cell.styles.lineWidth.bottom ?? 0,
+        left:
+          typeof cell.styles.lineWidth === 'number'
+            ? cell.styles.lineWidth
+            : cell.styles.lineWidth.left ?? 0,
+        right:
+          typeof cell.styles.lineWidth === 'number'
+            ? cell.styles.lineWidth
+            : cell.styles.lineWidth.right ?? 0,
+      },
+      padding: {
+        top: cell.padding('top'),
+        bottom: cell.padding('bottom'),
+        left: cell.padding('left'),
+        right: cell.padding('right'),
+      },
     },
   });
 };

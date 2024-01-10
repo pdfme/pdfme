@@ -43,12 +43,7 @@ const lineSchema: Plugin<LineSchema> = {
         type: 'string',
         widget: 'color',
         required: true,
-        rules: [
-          {
-            pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
-          },
-        ],
+        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
     }),
     defaultSchema: {

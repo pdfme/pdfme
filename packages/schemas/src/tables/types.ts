@@ -1,15 +1,33 @@
+import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types';
 import type { Schema } from '@pdfme/common';
 
-// TODO ここにカスタマイズ可能なプロパティを追加する
-// headStyles, bodyStyles はここに追加する
-// tableLineColor, tableLineWidthは別で必要
+interface BoxDimensions {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+export interface CellSchema extends Schema {
+  fontName?: string;
+  alignment: ALIGNMENT;
+  verticalAlignment: VERTICAL_ALIGNMENT;
+  fontSize: number;
+  lineHeight: number;
+  characterSpacing: number;
+  fontColor: string;
+  backgroundColor: string;
+  borderColor: string;
+  borderWidth: BoxDimensions;
+  padding: BoxDimensions;
+}
+
+// TODO ここから
 /*
-  - テーブルのスタイル
-      - ヘッダー、ボディ、カラム単位でカスタマイズできるようにする
-          - 基本的にテキストスキーマでできることができる
-      - ボーダーの細かいカスタム
-      - パディングの細かいカスタム
-  ただのアイデアだがrowのmin,max,readOnlyがあるといいかも
+ヘッダー、ボディ、カラム単位でカスタマイズできるようにする。
+基本的にCellSchemaでできることが設定できるはず。
+どんなふうに設定するかは考える必要がある。
+ヘッダー、ボディは全体で、カラムはカラム単位で設定できるようにする？
 */
 export interface TableSchema extends Schema {
   head: string[];
@@ -21,8 +39,5 @@ export interface TableSchema extends Schema {
   bgColor: string;
 
   cellPadding: number;
-  test: {
-    nestTest1: string;
-    nestTest2: string;
-  };
+  // ただのアイデアだがrowのmin,max,readOnlyがあるといいかも
 }

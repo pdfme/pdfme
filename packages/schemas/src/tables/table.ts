@@ -3,6 +3,8 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { autoTable, Styles } from './helper.js';
 import type { TableSchema } from './types.js';
 import { isEditable, px2mm } from '../utils.js';
+import cell from './cell.js';
+const cellUiRender = cell.ui;
 
 const shift = (number: number, precision: number, reverseShift: boolean) => {
   if (reverseShift) {
@@ -127,6 +129,7 @@ const tableSchema: Plugin<TableSchema> = {
         ${tableBody
           .map(
             (row) =>
+              // TODO  cellrendererを使ってみる?
               `<tr>${row
                 .map((data) => `<td ${contentEditable} style="${thTdStyle}">${data}</td>`)
                 .join('')}</tr>`
@@ -397,10 +400,6 @@ const tableSchema: Plugin<TableSchema> = {
       textColor: '#000000',
       bgColor: '#ffffff',
       cellPadding: 5,
-      test: {
-        nestTest1: 'nestTest1',
-        nestTest2: 'nestTest2',
-      },
     },
   },
 };
