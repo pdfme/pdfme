@@ -1,9 +1,17 @@
-import { Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
-import { HEX_COLOR_PATTERN } from '../constants.js';
-import { autoTable, Styles } from './helper.js';
+import {
+  Plugin,
+  PDFRenderProps,
+  UIRenderProps,
+  getFallbackFontName,
+  DEFAULT_FONT_NAME,
+} from '@pdfme/common';
+import { autoTable, Styles } from './tableHelper.js';
+import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
 import type { TableSchema } from './types.js';
 import { isEditable, px2mm } from '../utils.js';
 import cell from './cell.js';
+import { HEX_COLOR_PATTERN } from '../constants.js';
+
 const cellUiRender = cell.ui;
 
 const shift = (number: number, precision: number, reverseShift: boolean) => {
@@ -42,33 +50,30 @@ const tableSchema: Plugin<TableSchema> = {
       body,
       startY: schema.position.y,
       tableWidth: schema.width,
-      // TODO
-      tableLineColor: '#ff2200',
-      tableLineWidth: 0,
+      tableLineColor: schema.tableLineColor,
+      tableLineWidth: schema.tableLineWidth,
       headStyles: {
-        // schemaからstyleのマッピング用の関数を作った方がいいだろう
-        lineWidth: schema.borderWidth,
-        cellPadding: schema.cellPadding + schema.borderWidth * 2,
-        lineColor: schema.borderColor,
-        textColor: schema.textColor,
-        fillColor: schema.bgColor,
-        // TODO
-        // fontName
-        // fontSize
-        // alignment
-        // verticalAlignment
+        // TODO schemaからstyleのマッピング用の関数を作った方がいいだろう
+        lineWidth: schema.headStyles.borderWidth,
+        cellPadding: schema.headStyles.padding,
+        lineColor: schema.headStyles.borderColor,
+        textColor: schema.headStyles.fontColor,
+        fillColor: schema.headStyles.backgroundColor,
+        fontName: schema.headStyles.fontName,
+        fontSize: schema.headStyles.fontSize,
+        alignment: schema.headStyles.alignment,
+        verticalAlignment: schema.headStyles.verticalAlignment,
       },
       bodyStyles: {
-        lineWidth: schema.borderWidth,
-        cellPadding: schema.cellPadding + schema.borderWidth * 2,
-        lineColor: schema.borderColor,
-        textColor: schema.textColor,
-        fillColor: schema.bgColor,
-        // TODO
-        // fontName
-        // fontSize
-        // alignment
-        // verticalAlignment
+        lineWidth: schema.bodyStyles.borderWidth,
+        cellPadding: schema.bodyStyles.padding,
+        lineColor: schema.bodyStyles.borderColor,
+        textColor: schema.bodyStyles.fontColor,
+        fillColor: schema.bodyStyles.backgroundColor,
+        fontName: schema.bodyStyles.fontName,
+        fontSize: schema.bodyStyles.fontSize,
+        alignment: schema.bodyStyles.alignment,
+        verticalAlignment: schema.bodyStyles.verticalAlignment,
       },
       columnStyles: schema.headWidthsPercentage.reduce(
         (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
@@ -352,54 +357,63 @@ const tableSchema: Plugin<TableSchema> = {
     }
   },
   propPanel: {
-    schema: ({ i18n }) => ({
-      borderColor: {
-        title: i18n('schemas.borderColor'),
-        type: 'string',
-        widget: 'color',
-        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
-      },
-      bgColor: {
-        title: i18n('schemas.bgColor'),
-        type: 'string',
-        widget: 'color',
-        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
-      },
-      borderWidth: {
-        title: i18n('schemas.borderWidth'),
-        type: 'number',
-        widget: 'inputNumber',
-        props: { step: 0.1, min: 0 },
-      },
-      textColor: {
-        title: i18n('schemas.textColor'),
-        type: 'string',
-        widget: 'color',
-        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
-      },
-      cellPadding: {
-        // TODO i18n
-        title: 'cellPadding',
-        type: 'number',
-        widget: 'inputNumber',
-        props: { min: 0 },
-      },
-    }),
+    schema: ({ options, i18n }) => {
+      const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
+      const fontNames = Object.keys(font);
+      const fallbackFontName = getFallbackFontName(font);
+      return {
+        tableLineWidth: {
+          // TODO i18n
+          title: 'tableLineWidth',
+          type: 'number',
+          widget: 'inputNumber',
+          props: { min: 0 },
+          step: 1,
+        },
+        tableLineColor: {
+          // TODO i18n
+          title: 'tableLineColor',
+          type: 'string',
+          widget: 'color',
+          required: true,
+          rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+        },
+        headStyles: {
+          // TODO i18n
+          title: 'headStyles',
+          type: 'object',
+          widget: 'Card',
+          span: 24,
+          // activeSchemaのfontNameがあればfallbackFontNameにそれを使う?
+          properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
+        },
+        bodyStyles: {
+          // TODO i18n
+          title: 'bodyStyles',
+          type: 'object',
+          widget: 'Card',
+          span: 24,
+          properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
+        },
+      };
+    },
     defaultSchema: {
       type: 'table',
       position: { x: 0, y: 0 },
       width: 150,
       height: 20,
-      head: ['Name', 'City', 'Description'],
-      headWidthsPercentage: [30, 30, 40],
       content: JSON.stringify([
         ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
       ]),
-      borderColor: '#000000',
-      borderWidth: 0.1,
-      textColor: '#000000',
-      bgColor: '#ffffff',
-      cellPadding: 5,
+
+      head: ['Name', 'City', 'Description'],
+      headWidthsPercentage: [30, 30, 40],
+
+      fontName: undefined,
+      headStyles: getDefaultCellStyles(),
+      bodyStyles: getDefaultCellStyles(),
+      tableLineColor: '#000000',
+      tableLineWidth: 0.1,
     },
   },
 };

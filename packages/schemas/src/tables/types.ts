@@ -8,7 +8,7 @@ interface BoxDimensions {
   right: number;
 }
 
-export interface CellSchema extends Schema {
+interface CellStyle {
   fontName?: string;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
@@ -22,22 +22,23 @@ export interface CellSchema extends Schema {
   padding: BoxDimensions;
 }
 
-// TODO ここから
-/*
-ヘッダー、ボディ、カラム単位でカスタマイズできるようにする。
-基本的にCellSchemaでできることが設定できるはず。
-どんなふうに設定するかは考える必要がある。
-ヘッダー、ボディは全体で、カラムはカラム単位で設定できるようにする？
-*/
+export type CellSchema = Schema & CellStyle;
+
 export interface TableSchema extends Schema {
   head: string[];
+  // contentではなくbodyを使うのもありという気がする
+  // body: string[][];
   headWidthsPercentage: number[];
-  fontName?: string;
-  borderColor: string;
-  borderWidth: number;
-  textColor: string;
-  bgColor: string;
+  // TODO Stylesを配列にするか、それともカラムと分けるか
+  // カラムにした場合、細かく設定できるが複雑になる。どの程度の設定が必要か見極める必要がある。
+  // もしかしたらカラム単位で設定できるようにした方がいいかもしれない。
+  headStyles: CellStyle;
+  bodyStyles: CellStyle;
 
-  cellPadding: number;
-  // ただのアイデアだがrowのmin,max,readOnlyがあるといいかも
+  // 下記はテーブルに対するスタイル
+  fontName?: string;
+  tableLineColor: string;
+  tableLineWidth: number;
+
+  // ただのアイデアだがrowのmin,maxがあるといいかも
 }
