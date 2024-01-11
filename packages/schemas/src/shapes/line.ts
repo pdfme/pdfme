@@ -11,6 +11,7 @@ interface LineSchema extends Schema {
 const lineSchema: Plugin<LineSchema> = {
   pdf: (arg: PDFRenderProps<LineSchema>) => {
     const { page, schema } = arg;
+    if (schema.width === 0 || schema.height === 0) return;
     const pageHeight = page.getHeight();
     const {
       width,

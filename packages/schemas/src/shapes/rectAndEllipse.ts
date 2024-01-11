@@ -28,6 +28,7 @@ const shape: Plugin<ShapeSchema> = {
   },
   pdf: (arg) => {
     const { schema, page } = arg;
+    if (!schema.color && !schema.borderColor) return;
     const pageHeight = page.getHeight();
     const cArg = { schema, pageHeight };
     const { position, width, height, rotate, opacity } = convertForPdfLayoutProps(cArg);

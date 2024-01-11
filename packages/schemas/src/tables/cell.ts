@@ -29,17 +29,20 @@ const cellSchema: Plugin<CellSchema> = {
         schema: { ...schema, type: 'line', position, width, height, color: schema.borderColor },
       });
     // render frame
+    console.log(schema.backgroundColor);
+
     await Promise.all([
       rectanglePdfRender({
         ...arg,
         schema: {
           ...schema,
           type: 'rectangle',
-          position: { x: schema.position.x, y: schema.position.y },
+          position: { ...schema.position },
           width: schema.width,
           height: schema.height,
-          color: schema.backgroundColor,
           borderWidth: 0,
+          borderColor: '',
+          color: schema.backgroundColor,
         },
       }),
       // TOP
@@ -85,7 +88,6 @@ const cellSchema: Plugin<CellSchema> = {
     const createTextDiv = (schema: CellSchema) => {
       const { borderWidth, width, height, padding } = schema;
       const textDiv = document.createElement('div');
-      textDiv.id = 'textDiv';
       textDiv.style.position = 'absolute';
       textDiv.style.zIndex = '1';
       textDiv.style.width = `${

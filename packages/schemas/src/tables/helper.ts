@@ -28,12 +28,20 @@ export const getDefaultCellStyles = () => ({
   padding: { top: 3, bottom: 3, left: 3, right: 3 },
 });
 
-const getBoxDimensionProp = () => ({
-  top: { title: 'Top', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
-  right: { title: 'Right', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
-  bottom: { title: 'Bottom', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
-  left: { title: 'Left', type: 'number', widget: 'inputNumber', props: { min: 0 }, span: 6 },
-});
+const getBoxDimensionProp = (step = 1) => {
+  const getCommonProp = () => ({
+    type: 'number',
+    widget: 'inputNumber',
+    props: { min: 0, step },
+    span: 6,
+  });
+  return {
+    top: { title: 'Top', ...getCommonProp() },
+    right: { title: 'Right', ...getCommonProp() },
+    bottom: { title: 'Bottom', ...getCommonProp() },
+    left: { title: 'Left', ...getCommonProp() },
+  };
+};
 
 export const getCellPropPanelSchema = ({
   i18n,
@@ -125,7 +133,7 @@ export const getCellPropPanelSchema = ({
     type: 'object',
     widget: 'SubInline',
     span: 24,
-    properties: getBoxDimensionProp(),
+    properties: getBoxDimensionProp(0.1),
   },
   padding: {
     // TODO i18n

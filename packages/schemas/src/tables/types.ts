@@ -8,7 +8,7 @@ interface BoxDimensions {
   right: number;
 }
 
-interface CellStyle {
+export interface CellStyle {
   fontName?: string;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
@@ -34,6 +34,10 @@ export interface TableSchema extends Schema {
   // もしかしたらカラム単位で設定できるようにした方がいいかもしれない。
   headStyles: CellStyle;
   bodyStyles: CellStyle;
+
+  // TODO どこにあるのがいいのか
+  // alternateRowStyles
+  // もしかしたらbackgroundColorだけでいいかもしれない
 
   // 下記はテーブルに対するスタイル
   fontName?: string;
