@@ -493,6 +493,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             stopEditing={() => setEditing(false)}
             outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
               }`}
+            pageSize={pageSizes[pageCursor]}
             scale={scale}
           />
         )}

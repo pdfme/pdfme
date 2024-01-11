@@ -114,6 +114,7 @@ const Preview = ({
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
                 }
+                pageSize={pageSizes[index]}
                 scale={scale}
               />
             );

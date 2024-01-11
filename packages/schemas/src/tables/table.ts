@@ -100,13 +100,11 @@ const tableSchema: Plugin<TableSchema> = {
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, schema, value, options, _cache } = arg;
+    const { rootElement, onChange, schema, value, options, pageSize, _cache } = arg;
     const body = JSON.parse(value || '[]') as string[][];
     const font = options.font || getDefaultFont();
-    // TODO ここでのpageの指定はどうするか
-    const page = { width: 210, height: 297 };
     const table = await dryRunAutoTable(
-      { page, font, _cache, schema },
+      { pageSize, font, _cache, schema },
       getTableOptions(schema, body)
     );
     // TODO ここから テーブルのスタイルを適応する

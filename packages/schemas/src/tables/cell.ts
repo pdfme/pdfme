@@ -14,30 +14,30 @@ import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
 
+const renderLine = async (
+  arg: PDFRenderProps<CellSchema>,
+  schema: CellSchema,
+  position: { x: number; y: number },
+  width: number,
+  height: number
+) =>
+  linePdfRender({
+    ...arg,
+    schema: { ...schema, type: 'line', position, width, height, color: schema.borderColor },
+  });
+
 const cellSchema: Plugin<CellSchema> = {
   pdf: async (arg: PDFRenderProps<CellSchema>) => {
     const { schema } = arg;
     const { position, width, height, borderWidth, padding } = schema;
-    const renderLine = async (
-      schema: CellSchema,
-      position: { x: number; y: number },
-      width: number,
-      height: number
-    ) =>
-      linePdfRender({
-        ...arg,
-        schema: { ...schema, type: 'line', position, width, height, color: schema.borderColor },
-      });
-    // render frame
-    console.log(schema.backgroundColor);
 
     await Promise.all([
+      // BACKGROUND
       rectanglePdfRender({
         ...arg,
         schema: {
           ...schema,
           type: 'rectangle',
-          position: { ...schema.position },
           width: schema.width,
           height: schema.height,
           borderWidth: 0,
@@ -46,9 +46,10 @@ const cellSchema: Plugin<CellSchema> = {
         },
       }),
       // TOP
-      renderLine(schema, { x: position.x, y: position.y }, width, borderWidth.top),
+      renderLine(arg, schema, { x: position.x, y: position.y }, width, borderWidth.top),
       // RIGHT
       renderLine(
+        arg,
         schema,
         { x: position.x + width - borderWidth.right, y: position.y },
         borderWidth.right,
@@ -56,15 +57,16 @@ const cellSchema: Plugin<CellSchema> = {
       ),
       // BOTTOM
       renderLine(
+        arg,
         schema,
         { x: position.x, y: position.y + height - borderWidth.bottom },
         width,
         borderWidth.bottom
       ),
       // LEFT
-      renderLine(schema, { x: position.x, y: position.y }, borderWidth.left, height),
+      renderLine(arg, schema, { x: position.x, y: position.y }, borderWidth.left, height),
     ]);
-    // render text
+    // TEXT
     await textPdfRender({
       ...arg,
       schema: {

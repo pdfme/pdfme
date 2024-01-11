@@ -12,10 +12,9 @@ import {
 } from '@pdfme/common';
 import type { TableSchema } from './types';
 import cell from './cell';
-import { DEFAULT_BORDER_COLOR } from './constants';
 
-const rectangleRender = rectangle.pdf;
-const cellRender = cell.pdf;
+const rectanglePdfRender = rectangle.pdf;
+const cellPdfRender = cell.pdf;
 
 // ### function
 function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: number): MarginPadding {
@@ -74,7 +73,7 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
 }
 
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
-  await cellRender({
+  await cellPdfRender({
     ...arg,
     // TODO 改行がうまく反映されていない
     value: cell.text.join('\n'),
@@ -129,8 +128,8 @@ async function addTableBorder(
 ) {
   const lineWidth = table.settings.tableLineWidth;
   const lineColor = table.settings.tableLineColor;
-
-  await rectangleRender({
+  if (!lineWidth || !lineColor) return;
+  await rectanglePdfRender({
     ...arg,
     schema: {
       type: 'rectangle',
@@ -1308,7 +1307,7 @@ function parseSettings(options: UserOptions): Settings {
     showHead,
     showFoot,
     tableLineWidth: options.tableLineWidth ?? 0,
-    tableLineColor: options.tableLineColor ?? DEFAULT_BORDER_COLOR,
+    tableLineColor: options.tableLineColor ?? '',
   };
 }
 
@@ -1350,7 +1349,7 @@ function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
 }
 
 interface TableArgs {
-  page: Size;
+  pageSize: Size;
   font: Font;
   _cache: Map<any, any>;
   schema: TableSchema;
@@ -1358,7 +1357,7 @@ interface TableArgs {
 
 async function createTable(input: TableInput, args: TableArgs) {
   const {
-    page: { width: pageWidth },
+    pageSize: { width: pageWidth },
     font,
     _cache,
     schema,
@@ -1378,7 +1377,7 @@ export const dryRunAutoTable = (args: TableArgs, options: UserOptions) => {
 export async function autoTable(args: PDFRenderProps<TableSchema>, options: UserOptions) {
   const input = parseInput(options);
   const table = await createTable(input, {
-    page: {
+    pageSize: {
       width: args.page.getWidth(),
       height: args.page.getHeight(),
     },

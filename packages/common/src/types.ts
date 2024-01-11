@@ -64,6 +64,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
+ * @property {Size} pageSize - The size of the page being edited.
  * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
@@ -79,6 +80,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
+  pageSize: Size;
   _cache: Map<any, any>;
 };
 
