@@ -37,12 +37,12 @@ export interface TableSchema extends Schema {
 
   // TODO どこにあるのがいいのか
   // alternateRowStyles
-  // もしかしたらbackgroundColorだけでいいかもしれない
+  // もしかしたらbodyStylesに入れ込んでbackgroundColorだけでいいかもしれない
 
-  // 下記はテーブルに対するスタイル
-  fontName?: string;
-  tableLineColor: string;
-  tableLineWidth: number;
+  // 下記はテーブルに対するスタイル。これ、オブジェクトに入れた方がいいか？
+  fontName?: string; // これ、ないほうがいいかも?
+  tableBorderColor: string;
+  tableBorderWidth: number;
 
   // ただのアイデアだがrowのmin,maxがあるといいかも
 }

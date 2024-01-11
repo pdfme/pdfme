@@ -28,14 +28,18 @@ const renderRowUi = ({
   arg: UIRenderProps<TableSchema>;
   offsetY?: number;
 }) => {
+  // TODO ここから
+  // border-collapse: collapse; と同じスタイルにする
+  // 重なるボーダーは一つにするこれはテーブル自体もそうだが、セルも同じようにする
+  const tableBorderWidth = arg.schema.tableBorderWidth;
   let rowHeight = offsetY;
   for (const { cells, height } of row) {
     let colWidth = 0;
     for (const cell of Object.values(cells)) {
       const div = document.createElement('div');
       div.style.position = 'absolute';
-      div.style.top = `${rowHeight}mm`;
-      div.style.left = `${colWidth}mm`;
+      div.style.top = `${rowHeight + tableBorderWidth}mm`;
+      div.style.left = `${colWidth + tableBorderWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
       arg.rootElement.appendChild(div);
@@ -76,8 +80,8 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
     body,
     startY: schema.position.y,
     tableWidth: schema.width,
-    tableLineColor: schema.tableLineColor,
-    tableLineWidth: schema.tableLineWidth,
+    tableLineColor: schema.tableBorderColor,
+    tableLineWidth: schema.tableBorderWidth,
     headStyles: mapCellStyle(schema.headStyles),
     bodyStyles: mapCellStyle(schema.bodyStyles),
     columnStyles: schema.headWidthsPercentage.reduce(
@@ -107,7 +111,10 @@ const tableSchema: Plugin<TableSchema> = {
       { pageSize, font, _cache, schema },
       getTableOptions(schema, body)
     );
-    // TODO ここから テーブルのスタイルを適応する
+    rootElement.style.borderColor = schema.tableBorderColor;
+    rootElement.style.borderWidth = String(schema.tableBorderWidth) + 'mm';
+    rootElement.style.borderStyle = 'solid';
+    rootElement.style.boxSizing = 'border-box';
 
     renderRowUi({ row: table.head, arg, cellStyle: schema.headStyles });
     renderRowUi({
@@ -117,6 +124,7 @@ const tableSchema: Plugin<TableSchema> = {
       offsetY: table.getHeadHeight(),
     });
 
+    // TODO カラムの追加/削除の実装
     // const tableBody = JSON.parse(value || '[]') as string[][];
     // const table = document.createElement('table');
     // table.style.tableLayout = 'fixed';
@@ -389,17 +397,17 @@ const tableSchema: Plugin<TableSchema> = {
       const fontNames = Object.keys(font);
       const fallbackFontName = getFallbackFontName(font);
       return {
-        tableLineWidth: {
+        tableBorderWidth: {
           // TODO i18n
-          title: 'tableLineWidth',
+          title: 'tableBorderWidth',
           type: 'number',
           widget: 'inputNumber',
           props: { min: 0 },
           step: 1,
         },
-        tableLineColor: {
+        tableBorderColor: {
           // TODO i18n
-          title: 'tableLineColor',
+          title: 'tableBorderColor',
           type: 'string',
           widget: 'color',
           rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
@@ -438,8 +446,8 @@ const tableSchema: Plugin<TableSchema> = {
       fontName: undefined,
       headStyles: getDefaultCellStyles(),
       bodyStyles: getDefaultCellStyles(),
-      tableLineColor: '#000000',
-      tableLineWidth: 0.1,
+      tableBorderColor: '#000000',
+      tableBorderWidth: 0.5,
     },
   },
 };

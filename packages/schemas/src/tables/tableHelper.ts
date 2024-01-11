@@ -73,6 +73,8 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
 }
 
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
+  // TODO ここから
+  // テーブルのボーダーを考慮できていない気がする
   await cellPdfRender({
     ...arg,
     // TODO 改行がうまく反映されていない
@@ -1356,12 +1358,9 @@ interface TableArgs {
 }
 
 async function createTable(input: TableInput, args: TableArgs) {
-  const {
-    pageSize: { width: pageWidth },
-    font,
-    _cache,
-    schema,
-  } = args;
+  const { pageSize, font, _cache, schema } = args;
+  const pageWidth = pageSize.width;
+  // TODO ここでschema.fontNameを使っているがそもそもschema.fontNameを削除したいかも
   const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
   const content = parseContent4Table(input, font);
   const table = new Table(input, content);
@@ -1374,17 +1373,11 @@ export const dryRunAutoTable = (args: TableArgs, options: UserOptions) => {
   return createTable(input, args);
 };
 
-export async function autoTable(args: PDFRenderProps<TableSchema>, options: UserOptions) {
-  const input = parseInput(options);
-  const table = await createTable(input, {
-    pageSize: {
-      width: args.page.getWidth(),
-      height: args.page.getHeight(),
-    },
-    font: args.options.font || getDefaultFont(),
-    _cache: args._cache,
-    schema: args.schema,
-  });
+export async function autoTable(args: PDFRenderProps<TableSchema>, userOptions: UserOptions) {
+  const { page, options, _cache, schema } = args;
+  const input = parseInput(userOptions);
+  const font = options.font || getDefaultFont();
+  const table = await createTable(input, { pageSize: page.getSize(), font, _cache, schema });
   await drawTable(args, table);
   return table;
 }
