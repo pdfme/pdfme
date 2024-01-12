@@ -27,18 +27,14 @@ const renderLine = async (
   });
 
 const createTextDiv = (schema: CellSchema) => {
-  const { borderWidth, width, height, padding } = schema;
+  const { borderWidth: bw, width, height, padding: pd } = schema;
   const textDiv = document.createElement('div');
   textDiv.style.position = 'absolute';
   textDiv.style.zIndex = '1';
-  textDiv.style.width = `${
-    width - borderWidth.left - borderWidth.right - padding.left - padding.right
-  }mm`;
-  textDiv.style.height = `${
-    height - borderWidth.top - borderWidth.bottom - padding.top - padding.bottom
-  }mm`;
-  textDiv.style.top = `${borderWidth.top + padding.top}mm`;
-  textDiv.style.left = `${borderWidth.left + padding.left}mm`;
+  textDiv.style.width = `${width - bw.left - bw.right - pd.left - pd.right}mm`;
+  textDiv.style.height = `${height - bw.top - bw.bottom - pd.top - pd.bottom}mm`;
+  textDiv.style.top = `${bw.top + pd.top}mm`;
+  textDiv.style.left = `${bw.left + pd.left}mm`;
   return textDiv;
 };
 
@@ -125,7 +121,6 @@ const cellSchema: Plugin<CellSchema> = {
     rootElement.style.backgroundColor = schema.backgroundColor;
 
     const textDiv = createTextDiv(schema);
-    // TODO これでレンダリングしたtextが編集モードに入れない
     await textUiRender({
       ...arg,
       schema: { ...schema, backgroundColor: '' },

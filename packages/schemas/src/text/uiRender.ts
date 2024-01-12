@@ -166,15 +166,16 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     container.appendChild(textBlock);
 
     if (mode === 'designer') {
-      textBlock.focus();
-
-      // Set the focus to the end of the editable element when you focus, as we would for a textarea
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(textBlock);
-      range.collapse(false); // Collapse range to the end
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+      setTimeout(() => {
+        textBlock.focus();
+        // Set the focus to the end of the editable element when you focus, as we would for a textarea
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(textBlock);
+        range.collapse(false); // Collapse range to the end
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }, 0);
     }
   } else {
     textBlock.innerHTML = value
