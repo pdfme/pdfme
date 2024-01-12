@@ -26,21 +26,11 @@ export type CellSchema = Schema & CellStyle;
 
 export interface TableSchema extends Schema {
   head: string[];
-  // contentではなくbodyを使うのもありという気がする
-  // body: string[][];
-  headWidthsPercentage: number[];
-  // TODO Stylesを配列にするか、それともカラムと分けるか
-  // カラムにした場合、細かく設定できるが複雑になる。どの程度の設定が必要か見極める必要がある。
-  // もしかしたらカラム単位で設定できるようにした方がいいかもしれない。
+  headWidthPercentages: number[];
   headStyles: CellStyle;
-  bodyStyles: CellStyle;
-
-  // TODO どこにあるのがいいのか
-  // alternateRowStyles
-  // もしかしたらbodyStylesに入れ込んでbackgroundColorだけでいいかもしれない
-
-  // 下記はテーブルに対するスタイル。これ、オブジェクトに入れた方がいいか？
-  fontName?: string; // これ、ないほうがいいかも?
+  bodyStyles: CellStyle & { alternateBackgroundColor: string };
+  // TODO これ、ないほうがいいかも?  -> ここでschema.fontNameを使っているがそもそもschema.fontNameを削除したいかも の場所もチェックして
+  fontName?: string;
   tableBorderColor: string;
   tableBorderWidth: number;
 

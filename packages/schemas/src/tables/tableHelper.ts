@@ -73,8 +73,8 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
 }
 
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
-  // TODO ここから
-  // テーブルのボーダーを考慮できていない気がする
+  // TODO テーブルのボーダーを考慮できていない気がする
+  // 本当はテーブルのボーダーの分を引いた位置に描画したい
   await cellPdfRender({
     ...arg,
     // TODO 改行がうまく反映されていない

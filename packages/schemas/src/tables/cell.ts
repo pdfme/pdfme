@@ -26,6 +26,43 @@ const renderLine = async (
     schema: { ...schema, type: 'line', position, width, height, color: schema.borderColor },
   });
 
+const createTextDiv = (schema: CellSchema) => {
+  const { borderWidth, width, height, padding } = schema;
+  const textDiv = document.createElement('div');
+  textDiv.style.position = 'absolute';
+  textDiv.style.zIndex = '1';
+  textDiv.style.width = `${
+    width - borderWidth.left - borderWidth.right - padding.left - padding.right
+  }mm`;
+  textDiv.style.height = `${
+    height - borderWidth.top - borderWidth.bottom - padding.top - padding.bottom
+  }mm`;
+  textDiv.style.top = `${borderWidth.top + padding.top}mm`;
+  textDiv.style.left = `${borderWidth.left + padding.left}mm`;
+  return textDiv;
+};
+
+const createLineDiv = (
+  width: string,
+  height: string,
+  top: string | null,
+  right: string | null,
+  bottom: string | null,
+  left: string | null,
+  borderColor: string
+) => {
+  const div = document.createElement('div');
+  div.style.width = width;
+  div.style.height = height;
+  div.style.position = 'absolute';
+  if (top !== null) div.style.top = top;
+  if (right !== null) div.style.right = right;
+  if (bottom !== null) div.style.bottom = bottom;
+  if (left !== null) div.style.left = left;
+  div.style.backgroundColor = borderColor;
+  return div;
+};
+
 const cellSchema: Plugin<CellSchema> = {
   pdf: async (arg: PDFRenderProps<CellSchema>) => {
     const { schema } = arg;
@@ -84,44 +121,8 @@ const cellSchema: Plugin<CellSchema> = {
   },
   ui: async (arg: UIRenderProps<CellSchema>) => {
     const { schema, rootElement } = arg;
-    const { borderWidth, width, height } = schema;
+    const { borderWidth, width, height, borderColor } = schema;
     rootElement.style.backgroundColor = schema.backgroundColor;
-
-    const createTextDiv = (schema: CellSchema) => {
-      const { borderWidth, width, height, padding } = schema;
-      const textDiv = document.createElement('div');
-      textDiv.style.position = 'absolute';
-      textDiv.style.zIndex = '1';
-      textDiv.style.width = `${
-        width - borderWidth.left - borderWidth.right - padding.left - padding.right
-      }mm`;
-      textDiv.style.height = `${
-        height - borderWidth.top - borderWidth.bottom - padding.top - padding.bottom
-      }mm`;
-      textDiv.style.top = `${borderWidth.top + padding.top}mm`;
-      textDiv.style.left = `${borderWidth.left + padding.left}mm`;
-      return textDiv;
-    };
-
-    const createLineDiv = (
-      width: string,
-      height: string,
-      top: string | null,
-      right: string | null,
-      bottom: string | null,
-      left: string | null
-    ) => {
-      const div = document.createElement('div');
-      div.style.width = width;
-      div.style.height = height;
-      div.style.position = 'absolute';
-      if (top !== null) div.style.top = top;
-      if (right !== null) div.style.right = right;
-      if (bottom !== null) div.style.bottom = bottom;
-      if (left !== null) div.style.left = left;
-      div.style.backgroundColor = schema.borderColor;
-      return div;
-    };
 
     const textDiv = createTextDiv(schema);
     // TODO これでレンダリングしたtextが編集モードに入れない
@@ -133,10 +134,10 @@ const cellSchema: Plugin<CellSchema> = {
     rootElement.appendChild(textDiv);
 
     const lines = [
-      createLineDiv(`${width}mm`, `${borderWidth.top}mm`, '0mm', null, null, '0mm'),
-      createLineDiv(`${width}mm`, `${borderWidth.bottom}mm`, null, null, '0mm', '0mm'),
-      createLineDiv(`${borderWidth.left}mm`, `${height}mm`, '0mm', null, null, '0mm'),
-      createLineDiv(`${borderWidth.right}mm`, `${height}mm`, '0mm', '0mm', null, null),
+      createLineDiv(`${width}mm`, `${borderWidth.top}mm`, '0mm', null, null, '0mm', borderColor),
+      createLineDiv(`${width}mm`, `${borderWidth.bottom}mm`, null, null, '0mm', '0mm', borderColor),
+      createLineDiv(`${borderWidth.left}mm`, `${height}mm`, '0mm', null, null, '0mm', borderColor),
+      createLineDiv(`${borderWidth.right}mm`, `${height}mm`, '0mm', '0mm', null, null, borderColor),
     ];
 
     lines.forEach((line) => rootElement.appendChild(line));

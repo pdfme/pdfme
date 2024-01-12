@@ -14,51 +14,62 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 
 const cellUiRender = cell.ui;
 
-const renderRowUi = ({
-  cellStyle,
-  row,
-  arg,
-  offsetY = 0,
-}: {
-  cellStyle: CellStyle;
-  row: {
-    cells: Record<string, { raw: string; width: number; height: number }>;
-    height: number;
-  }[];
+const renderRowUi = (args: {
+  section: 'head' | 'body';
+  cellStyle: CellStyle & { alternateBackgroundColor?: string };
+  rows: { cells: Record<string, { raw: string; width: number; height: number }>; height: number }[];
   arg: UIRenderProps<TableSchema>;
   offsetY?: number;
 }) => {
-  // TODO ここから
+  const { section, cellStyle, rows, arg, offsetY = 0 } = args;
+  console.log(arg.mode);
+  const value: string[][] = JSON.parse(arg.value) as string[][];
+
+  // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
   // border-collapse: collapse; と同じスタイルにする
   // 重なるボーダーは一つにするこれはテーブル自体もそうだが、セルも同じようにする
-  const tableBorderWidth = arg.schema.tableBorderWidth;
-  let rowHeight = offsetY;
-  for (const { cells, height } of row) {
+  // const tableBorderWidth = arg.schema.tableBorderWidth;
+  let rowOffsetY = offsetY;
+  rows.forEach((row, rowIndex) => {
+    const { cells, height } = row;
     let colWidth = 0;
-    for (const cell of Object.values(cells)) {
+    Object.values(cells).forEach((cell, colIndex) => {
       const div = document.createElement('div');
       div.style.position = 'absolute';
-      div.style.top = `${rowHeight + tableBorderWidth}mm`;
-      div.style.left = `${colWidth + tableBorderWidth}mm`;
+      div.style.top = `${rowOffsetY}mm`;
+      div.style.left = `${colWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
       arg.rootElement.appendChild(div);
       void cellUiRender({
         ...arg,
+        mode: arg.mode === 'form' && section === 'head' ? 'viewer' : arg.mode,
+        onChange: (newCellValue) => {
+          value[rowIndex][colIndex] = (
+            Array.isArray(newCellValue) ? newCellValue[0].value : newCellValue.value
+          ) as string;
+          arg.onChange && arg.onChange({ key: 'content', value: JSON.stringify(value) });
+        },
+        // TODO ここから cell.raw を使うべきではない？
         value: cell.raw,
+        placeholder: '',
         rootElement: div,
         schema: {
           type: 'cell',
-          position: { x: colWidth, y: rowHeight },
+          position: { x: colWidth, y: rowOffsetY },
           width: cell.width,
           height: cell.height,
           ...cellStyle,
+          backgroundColor:
+            rowIndex % 2 === 0
+              ? cellStyle.alternateBackgroundColor || cellStyle.backgroundColor || ''
+              : cellStyle.backgroundColor,
         },
       });
       colWidth += cell.width;
-    }
-    rowHeight += height;
-  }
+    });
+    rowOffsetY += height;
+  });
 };
 
 const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => {
@@ -84,7 +95,8 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
     tableLineWidth: schema.tableBorderWidth,
     headStyles: mapCellStyle(schema.headStyles),
     bodyStyles: mapCellStyle(schema.bodyStyles),
-    columnStyles: schema.headWidthsPercentage.reduce(
+    alternateRowStyles: { fillColor: schema.bodyStyles.alternateBackgroundColor },
+    columnStyles: schema.headWidthPercentages.reduce(
       (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
       {} as Record<number, Partial<Styles>>
     ),
@@ -116,13 +128,9 @@ const tableSchema: Plugin<TableSchema> = {
     rootElement.style.borderStyle = 'solid';
     rootElement.style.boxSizing = 'border-box';
 
-    renderRowUi({ row: table.head, arg, cellStyle: schema.headStyles });
-    renderRowUi({
-      row: table.body,
-      arg,
-      cellStyle: schema.bodyStyles,
-      offsetY: table.getHeadHeight(),
-    });
+    renderRowUi({ section: 'head', rows: table.head, arg, cellStyle: schema.headStyles });
+    const offsetY = table.getHeadHeight();
+    renderRowUi({ section: 'body', rows: table.body, arg, cellStyle: schema.bodyStyles, offsetY });
 
     // TODO カラムの追加/削除の実装
     // const tableBody = JSON.parse(value || '[]') as string[][];
@@ -169,7 +177,6 @@ const tableSchema: Plugin<TableSchema> = {
     //     ${tableBody
     //       .map(
     //         (row) =>
-    //           // TODO  cellrendererを使ってみる?
     //           `<tr>${row
     //             .map((data) => `<td ${contentEditable} style="${thTdStyle}">${data}</td>`)
     //             .join('')}</tr>`
@@ -402,7 +409,7 @@ const tableSchema: Plugin<TableSchema> = {
           title: 'tableBorderWidth',
           type: 'number',
           widget: 'inputNumber',
-          props: { min: 0 },
+          props: { min: 0, step: 0.1 },
           step: 1,
         },
         tableBorderColor: {
@@ -427,7 +434,7 @@ const tableSchema: Plugin<TableSchema> = {
           type: 'object',
           widget: 'Card',
           span: 24,
-          properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
+          properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
         },
       };
     },
@@ -438,16 +445,23 @@ const tableSchema: Plugin<TableSchema> = {
       height: 20,
       content: JSON.stringify([
         ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
+        ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
       ]),
 
       head: ['Name', 'City', 'Description'],
-      headWidthsPercentage: [30, 30, 40],
-
+      headWidthPercentages: [30, 30, 40],
       fontName: undefined,
-      headStyles: getDefaultCellStyles(),
-      bodyStyles: getDefaultCellStyles(),
+      headStyles: Object.assign(getDefaultCellStyles(), {
+        fontColor: '#ffffff',
+        backgroundColor: '#2980ba',
+        borderColor: '',
+        borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+      }),
+      bodyStyles: Object.assign(getDefaultCellStyles(), {
+        alternateBackgroundColor: '#f5f5f5',
+      }),
       tableBorderColor: '#000000',
-      tableBorderWidth: 0.5,
+      tableBorderWidth: 0.3,
     },
   },
 };
