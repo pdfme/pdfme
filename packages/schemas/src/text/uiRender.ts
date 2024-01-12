@@ -18,7 +18,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
 } from './helper.js';
-import { addAlphaToHex, isEditable } from '../utils.js';
+import { isEditable } from '../utils.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -32,12 +32,6 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-const getBackgroundColor = (value: string, schema: Schema, defaultBackgroundColor: string) => {
-  if (!value) return 'transparent';
-  if (schema.backgroundColor) return schema.backgroundColor as string;
-  return defaultBackgroundColor;
-};
-
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const {
     value,
@@ -49,7 +43,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     tabIndex,
     placeholder,
     options,
-    theme,
     _cache,
   } = arg;
   const font = options?.font || getDefaultFont();
@@ -84,7 +77,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(value, schema, addAlphaToHex(theme.colorPrimaryBg, 30)),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
@@ -175,7 +167,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
         range.collapse(false); // Collapse range to the end
         selection?.removeAllRanges();
         selection?.addRange(range);
-      }, 0);
+      });
     }
   } else {
     textBlock.innerHTML = value

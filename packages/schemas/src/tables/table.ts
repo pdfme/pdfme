@@ -55,9 +55,11 @@ const convertToCellStyle = (styles: Styles): CellStyle => ({
 const renderRowUi = (args: {
   rows: RowType[];
   arg: UIRenderProps<TableSchema>;
+  editingPosition: { rowIndex: number; colIndex: number };
+  onChangeEditingPosition: (position: { rowIndex: number; colIndex: number }) => void;
   offsetY?: number;
 }) => {
-  const { rows, arg, offsetY = 0 } = args;
+  const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition: ep } = args;
   const value: string[][] = JSON.parse(arg.value) as string[][];
 
   // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
@@ -75,14 +77,26 @@ const renderRowUi = (args: {
       div.style.left = `${colWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
+      div.addEventListener('click', () => {
+        onChangeEditingPosition({ rowIndex, colIndex });
+      });
       arg.rootElement.appendChild(div);
+      const isEditing = ep.rowIndex === rowIndex && ep.colIndex === colIndex;
+      let mode: 'form' | 'viewer' | 'designer' = 'viewer';
+      if (arg.mode === 'form') {
+        mode = section === 'head' ? 'viewer' : 'form';
+      } else if (arg.mode === 'designer') {
+        mode = isEditing ? 'designer' : 'viewer';
+      }
+
       void cellUiRender({
         ...arg,
-        mode: arg.mode === 'form' && section === 'head' ? 'viewer' : arg.mode,
+        mode,
         onChange: (newCellValue) => {
           value[rowIndex][colIndex] = (
             Array.isArray(newCellValue) ? newCellValue[0].value : newCellValue.value
           ) as string;
+          // TODO 編集時に文字かがさなるバグがある
           arg.onChange && arg.onChange({ key: 'content', value: JSON.stringify(value) });
         },
         // TODO cell.raw を使うべきではない？
@@ -91,6 +105,7 @@ const renderRowUi = (args: {
         rootElement: div,
         schema: {
           type: 'cell',
+          content: cell.raw,
           position: { x: colWidth, y: rowOffsetY },
           width: cell.width,
           height: cell.height,
@@ -122,6 +137,8 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
   };
 };
 
+const headEditingPosition = { rowIndex: -1, colIndex: -1 };
+const bodyEditingPosition = { rowIndex: -1, colIndex: -1 };
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { schema, value } = arg;
@@ -134,21 +151,50 @@ const tableSchema: Plugin<TableSchema> = {
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, schema, value, options, mode, pageSize, _cache } = arg;
+    const { rootElement, onChange, stopEditing, schema, value, options, mode, pageSize, _cache } =
+      arg;
     const body = JSON.parse(value || '[]') as string[][];
     const font = options.font || getDefaultFont();
     const table = await dryRunAutoTable(
       { pageSize, font, _cache, schema },
       getTableOptions(schema, body)
     );
+    // TODO 編集時に文字かがさなるバグは何度もこれが呼び出されているせいかも。しかし、.innerHTML = '';を呼ぶと、うまくいかない。
+    // rootElement.innerHTML = '';
+
     rootElement.style.borderColor = schema.tableBorderColor;
     rootElement.style.borderWidth = String(schema.tableBorderWidth) + 'mm';
     rootElement.style.borderStyle = 'solid';
     rootElement.style.boxSizing = 'border-box';
 
-    renderRowUi({ rows: table.head, arg });
+    renderRowUi({
+      rows: table.head,
+      arg,
+      editingPosition: headEditingPosition,
+      onChangeEditingPosition: (position) => {
+        headEditingPosition.rowIndex = position.rowIndex;
+        headEditingPosition.colIndex = position.colIndex;
+        bodyEditingPosition.rowIndex = -1;
+        bodyEditingPosition.colIndex = -1;
+        stopEditing && stopEditing();
+        // onChange && onChange({ key: 'content', value: JSON.stringify(body) });
+      },
+    });
     const offsetY = table.getHeadHeight();
-    renderRowUi({ rows: table.body, arg, offsetY });
+    renderRowUi({
+      rows: table.body,
+      arg,
+      editingPosition: bodyEditingPosition,
+      onChangeEditingPosition: (position) => {
+        bodyEditingPosition.rowIndex = position.rowIndex;
+        bodyEditingPosition.colIndex = position.colIndex;
+        headEditingPosition.rowIndex = -1;
+        headEditingPosition.colIndex = -1;
+        stopEditing && stopEditing();
+        // onChange && onChange({ key: 'content', value: JSON.stringify(body) });
+      },
+      offsetY,
+    });
 
     if (mode === 'form' && onChange) {
       const addRowButton = document.createElement('button');
@@ -182,10 +228,64 @@ const tableSchema: Plugin<TableSchema> = {
       });
     }
 
-    // TODO カラムの追加/削除の実装
     if (mode === 'designer' && onChange) {
-      // TODO ここから
+      const addColumnButton = document.createElement('button');
+      addColumnButton.style.width = '30px';
+      addColumnButton.style.height = '30px';
+      addColumnButton.style.position = 'absolute';
+      addColumnButton.style.top = `${table.getHeadHeight() - px2mm(30)}mm`;
+      addColumnButton.style.right = '-30px';
+      addColumnButton.innerText = '+';
+      addColumnButton.onclick = () => {
+        const newColumnWidthPercentage = 25;
+        const totalCurrentWidth = schema.headWidthPercentages.reduce(
+          (acc, width) => acc + width,
+          0
+        );
+        const scalingRatio = (100 - newColumnWidthPercentage) / totalCurrentWidth;
+        const scaledWidths = schema.headWidthPercentages.map((width) => width * scalingRatio);
+        onChange([
+          { key: 'head', value: schema.head.concat('') },
+          { key: 'headWidthPercentages', value: scaledWidths.concat(newColumnWidthPercentage) },
+          { key: 'content', value: JSON.stringify(body.map((row) => row.concat(''))) },
+        ]);
+      };
+      rootElement.appendChild(addColumnButton);
+
+      let offsetX = 0;
+      table.columns.forEach((column, i) => {
+        offsetX = offsetX + column.width;
+        const removeColumnButton = document.createElement('button');
+        removeColumnButton.style.width = '30px';
+        removeColumnButton.style.height = '30px';
+        removeColumnButton.style.position = 'absolute';
+        removeColumnButton.style.top = '-30px';
+        removeColumnButton.style.left = `${offsetX - px2mm(30)}mm`;
+        removeColumnButton.innerText = '-';
+        removeColumnButton.onclick = () => {
+          const totalWidthMinusRemoved = schema.headWidthPercentages.reduce(
+            (sum, width, j) => (j !== i ? sum + width : sum),
+            0
+          );
+          onChange([
+            { key: 'head', value: schema.head.filter((_, j) => j !== i) },
+            {
+              key: 'headWidthPercentages',
+              value: schema.headWidthPercentages
+                .filter((_, j) => j !== i)
+                .map((width) => (width / totalWidthMinusRemoved) * 100),
+            },
+            {
+              key: 'content',
+              value: JSON.stringify(body.map((row) => row.filter((_, j) => j !== i))),
+            },
+          ]);
+        };
+        rootElement.appendChild(removeColumnButton);
+      });
     }
+
+    // TODO ここから カラムのリサイズを実装する。
 
     // const tableBody = JSON.parse(value || '[]') as string[][];
     // const table = document.createElement('table');

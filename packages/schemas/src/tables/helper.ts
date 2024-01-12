@@ -49,7 +49,8 @@ export const getCellPropPanelSchema = (arg: {
   isBody?: boolean;
 }) => {
   const { i18n, fallbackFontName, fontNames, isBody } = arg;
-  const cellPropPanelSchema = {
+
+  return {
     fontName: {
       title: i18n('schemas.text.fontName'),
       type: 'string',
@@ -125,13 +126,17 @@ export const getCellPropPanelSchema = (arg: {
       widget: 'color',
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
     },
-    alternateBackgroundColor: {
-      // TODO i18n
-      title: 'alternateBackgroundColor',
-      type: 'string',
-      widget: 'color',
-      rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
-    },
+    ...(isBody
+      ? {
+          alternateBackgroundColor: {
+            // TODO i18n
+            title: 'alternateBackgroundColor',
+            type: 'string',
+            widget: 'color',
+            rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+          },
+        }
+      : {}),
     borderWidth: {
       // TODO i18n
       title: 'borderWidth',
@@ -149,8 +154,4 @@ export const getCellPropPanelSchema = (arg: {
       properties: getBoxDimensionProp(),
     },
   };
-  if (!isBody) {
-    delete cellPropPanelSchema.alternateBackgroundColor;
-  }
-  return cellPropPanelSchema;
 };
