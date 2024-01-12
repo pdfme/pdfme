@@ -149,13 +149,7 @@ const addTableBorder = async (
 
 // ### type alias
 
-type StyleProp =
-  | 'styles'
-  | 'headStyles'
-  | 'bodyStyles'
-  | 'footStyles'
-  | 'alternateRowStyles'
-  | 'columnStyles';
+type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
 type MarginPaddingInput =
   | number
@@ -173,7 +167,6 @@ type PageBreakType = 'auto' | 'avoid' | 'always';
 type RowPageBreakType = 'auto' | 'avoid';
 
 type ShowHeadType = 'everyPage' | 'firstPage' | 'never' | boolean;
-type ShowFootType = 'everyPage' | 'lastPage' | 'never' | boolean;
 type Color = string;
 
 type RowInput = { [key: string]: string } | string[];
@@ -191,11 +184,10 @@ type CellHook = (data: CellHookData) => void | boolean;
 type ContentSettings = {
   body: Row[];
   head: Row[];
-  foot: Row[];
   columns: Column[];
 };
 type PageHook = (data: HookData) => void | boolean;
-type Section = 'head' | 'body' | 'foot';
+type Section = 'head' | 'body';
 type Pos = { x: number; y: number };
 
 type ColumnInput =
@@ -203,7 +195,6 @@ type ColumnInput =
   | number
   | {
       header?: string;
-      footer?: string;
       dataKey?: string | number;
     };
 
@@ -213,7 +204,6 @@ interface StylesProps {
   styles: Partial<Styles>;
   headStyles: Partial<Styles>;
   bodyStyles: Partial<Styles>;
-  footStyles: Partial<Styles>;
   alternateRowStyles: Partial<Styles>;
   columnStyles: { [key: string]: Partial<Styles> };
 }
@@ -248,7 +238,6 @@ interface Settings {
   rowPageBreak: 'auto' | 'avoid';
   tableWidth: number;
   showHead: 'everyPage' | 'firstPage' | 'never';
-  showFoot: 'everyPage' | 'lastPage' | 'never';
   tableLineWidth: number;
   tableLineColor: Color;
 }
@@ -257,7 +246,6 @@ interface StylesProps {
   styles: Partial<Styles>;
   headStyles: Partial<Styles>;
   bodyStyles: Partial<Styles>;
-  footStyles: Partial<Styles>;
   alternateRowStyles: Partial<Styles>;
   columnStyles: { [key: string]: Partial<Styles> };
 }
@@ -273,7 +261,6 @@ interface HookProps {
 interface ContentInput {
   body: RowInput[];
   head: RowInput[];
-  foot: RowInput[];
   columns: ColumnInput[];
 }
 
@@ -291,19 +278,16 @@ export interface UserOptions {
   pageBreak?: PageBreakType;
   rowPageBreak?: RowPageBreakType;
   showHead?: ShowHeadType;
-  showFoot?: ShowFootType;
   tableLineWidth?: number;
   tableLineColor?: Color;
   head?: RowInput[];
   body?: RowInput[];
-  foot?: RowInput[];
   columns?: ColumnInput[];
 
   // Styles
   styles?: Partial<Styles>;
   bodyStyles?: Partial<Styles>;
   headStyles?: Partial<Styles>;
-  footStyles?: Partial<Styles>;
   alternateRowStyles?: Partial<Styles>;
   columnStyles?: {
     [key: string]: Partial<Styles>;
@@ -440,7 +424,6 @@ class Table {
   readonly columns: Column[];
   readonly head: Row[];
   readonly body: Row[];
-  readonly foot: Row[];
 
   pageNumber = 1;
 
@@ -452,15 +435,10 @@ class Table {
     this.columns = content.columns;
     this.head = content.head;
     this.body = content.body;
-    this.foot = content.foot;
   }
 
   getHeadHeight() {
     return this.head.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
-  }
-
-  getFootHeight() {
-    return this.foot.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
   }
 
   getBodyHeight() {
@@ -468,7 +446,7 @@ class Table {
   }
 
   allRows() {
-    return this.head.concat(this.body).concat(this.foot);
+    return this.head.concat(this.body);
   }
 
   callCellHooks(
@@ -524,7 +502,7 @@ class CellHookData extends HookData {
   cell: Cell;
   row: Row;
   column: Column;
-  section: 'head' | 'body' | 'foot';
+  section: 'head' | 'body';
 
   constructor(table: Table, cell: Cell, row: Row, column: Column, cursor: Pos | null) {
     super(table, cursor);
@@ -548,7 +526,7 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
     x: margin.left,
     y: startY,
   };
-  const sectionsHeight = table.getHeadHeight() + table.getFootHeight();
+  const sectionsHeight = table.getHeadHeight();
   let minTableBottomPos = startY + margin.bottom + sectionsHeight;
 
   if (settings.pageBreak === 'avoid') {
@@ -579,12 +557,6 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
   for (const row of table.body) {
     const isLastRow = row.index === table.body.length - 1;
     await printFullRow(arg, table, row, isLastRow, startPos, cursor, table.columns, pageSize);
-  }
-
-  if (settings.showFoot === 'lastPage' || settings.showFoot === 'everyPage') {
-    for (const row of table.foot) {
-      await printRow(arg, table, row, cursor, table.columns);
-    }
   }
 
   await addTableBorder(arg, table, startPos, cursor);
@@ -635,7 +607,7 @@ async function printFullRow(
   pageSize: { width: number; height: number }
 ) {
   const pageHeight = pageSize.height;
-  const remainingSpace = getRemainingPageSpace(table, isLastRow, cursor, pageHeight);
+  const remainingSpace = pageHeight - cursor.y;
   if (row.canEntireRowFit(remainingSpace, columns)) {
     await printRow(arg, table, row, cursor, columns);
   } else {
@@ -658,12 +630,6 @@ async function addPage(
   cursor: Pos,
   columns: Column[] = []
 ) {
-  if (table.settings.showFoot === 'everyPage') {
-    for (const row of table.foot) {
-      await printRow(arg, table, row, cursor, columns);
-    }
-  }
-
   // Add user content just before adding new page ensure it will
   // be drawn above other things on the page
   table.callEndPageHooks(cursor);
@@ -710,9 +676,9 @@ function shouldPrintOnCurrentPage(
   const marginHeight = margin.top + margin.bottom;
   let maxRowHeight = pageHeight - marginHeight;
   if (row.section === 'body') {
-    // Should also take into account that head and foot is not
+    // Should also take into account that head is not
     // on every page with some settings
-    maxRowHeight -= table.getHeadHeight() + table.getFootHeight();
+    maxRowHeight -= table.getHeadHeight();
   }
 
   const minRowHeight = row.getMinimumRowHeight(table.columns);
@@ -739,15 +705,6 @@ function shouldPrintOnCurrentPage(
 
   // In all other cases print the row on current page
   return true;
-}
-
-function getRemainingPageSpace(table: Table, isLastRow: boolean, cursor: Pos, pageHeight: number) {
-  let bottomContentHeight = table.settings.margin.bottom;
-  const showFoot = table.settings.showFoot;
-  if (showFoot === 'everyPage' || (showFoot === 'lastPage' && isLastRow)) {
-    bottomContentHeight += table.getFootHeight();
-  }
-  return pageHeight - cursor.y - bottomContentHeight;
 }
 
 function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
@@ -1087,14 +1044,10 @@ function parseContent4Table(input: TableInput, font: Font) {
   const content = input.content;
   const columns = createColumns(content.columns);
 
-  // If no head or foot is set, try generating it with content from columns
+  // If no head is set, try generating it with content from columns
   if (content.head.length === 0) {
     const sectionRow = generateSectionRow(columns, 'head');
     if (sectionRow) content.head.push(sectionRow);
-  }
-  if (content.foot.length === 0) {
-    const sectionRow = generateSectionRow(columns, 'foot');
-    if (sectionRow) content.foot.push(sectionRow);
   }
 
   const styles = input.styles;
@@ -1102,7 +1055,6 @@ function parseContent4Table(input: TableInput, font: Font) {
     columns,
     head: parseSection('head', content.head, columns, styles, font),
     body: parseSection('body', content.body, columns, styles, font),
-    foot: parseSection('foot', content.foot, columns, styles, font),
   };
 }
 
@@ -1123,8 +1075,6 @@ function getSectionTitle(section: Section, column: ColumnInput) {
     } else if (typeof column === 'string' || typeof column === 'number') {
       return column;
     }
-  } else if (section === 'foot' && typeof column === 'object') {
-    return column.footer;
   }
   return null;
 }
@@ -1197,8 +1147,6 @@ function cellStyles(
     sectionStyles = styles.headStyles;
   } else if (sectionName === 'body') {
     sectionStyles = styles.bodyStyles;
-  } else if (sectionName === 'foot') {
-    sectionStyles = styles.footStyles;
   }
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
   const columnStyles =
@@ -1247,7 +1195,6 @@ function parseStyles(cInput: UserOptions) {
     styles: {},
     headStyles: {},
     bodyStyles: {},
-    footStyles: {},
     alternateRowStyles: {},
     columnStyles: {},
   };
@@ -1285,15 +1232,6 @@ function parseHooks(current: UserOptions) {
 }
 
 function parseSettings(options: UserOptions): Settings {
-  let showFoot: 'everyPage' | 'lastPage' | 'never';
-  if (options.showFoot === true) {
-    showFoot = 'everyPage';
-  } else if (options.showFoot === false) {
-    showFoot = 'never';
-  } else {
-    showFoot = options.showFoot ?? 'everyPage';
-  }
-
   let showHead: 'everyPage' | 'firstPage' | 'never';
   if (options.showHead === true) {
     showHead = 'everyPage';
@@ -1310,7 +1248,6 @@ function parseSettings(options: UserOptions): Settings {
     rowPageBreak: options.rowPageBreak ?? 'auto',
     tableWidth: options.tableWidth,
     showHead,
-    showFoot,
     tableLineWidth: options.tableLineWidth ?? 0,
     tableLineColor: options.tableLineColor ?? '',
   };
@@ -1319,14 +1256,13 @@ function parseSettings(options: UserOptions): Settings {
 function parseContent4Input(options: UserOptions) {
   const head = options.head || [];
   const body = options.body || [];
-  const foot = options.foot || [];
 
-  const columns = options.columns || parseColumns(head, body, foot);
-  return { columns, head, body, foot };
+  const columns = options.columns || parseColumns(head, body);
+  return { columns, head, body };
 }
 
-function parseColumns(head: RowInput[], body: RowInput[], foot: RowInput[]) {
-  const firstRow: RowInput = head[0] || body[0] || foot[0] || [];
+function parseColumns(head: RowInput[], body: RowInput[]) {
+  const firstRow: RowInput = head[0] || body[0] || [];
   const result: ColumnInput[] = [];
   Object.keys(firstRow).forEach((key) => {
     let colSpan = 1;

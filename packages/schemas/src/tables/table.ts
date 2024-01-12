@@ -18,6 +18,7 @@ import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
 import type { TableSchema, CellStyle } from './types.js';
 import cell from './cell.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { px2mm } from '../utils';
 
 const cellUiRender = cell.ui;
 
@@ -133,7 +134,7 @@ const tableSchema: Plugin<TableSchema> = {
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, schema, value, options, pageSize, _cache } = arg;
+    const { rootElement, onChange, schema, value, options, mode, pageSize, _cache } = arg;
     const body = JSON.parse(value || '[]') as string[][];
     const font = options.font || getDefaultFont();
     const table = await dryRunAutoTable(
@@ -149,7 +150,43 @@ const tableSchema: Plugin<TableSchema> = {
     const offsetY = table.getHeadHeight();
     renderRowUi({ rows: table.body, arg, offsetY });
 
+    if (mode === 'form' && onChange) {
+      const addRowButton = document.createElement('button');
+      addRowButton.style.width = '30px';
+      addRowButton.style.height = '30px';
+      addRowButton.style.position = 'absolute';
+      addRowButton.style.bottom = '-30px';
+      addRowButton.style.left = 'calc(50% - 15px)';
+      addRowButton.innerText = '+';
+      addRowButton.onclick = () => {
+        const newRow = Array(schema.head.length).fill('') as string[];
+        onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
+      };
+      rootElement.appendChild(addRowButton);
+
+      let offsetY = table.getHeadHeight();
+      table.body.forEach((row, i) => {
+        offsetY = offsetY + row.height;
+        const removeRowButton = document.createElement('button');
+        removeRowButton.style.width = '30px';
+        removeRowButton.style.height = '30px';
+        removeRowButton.style.position = 'absolute';
+        removeRowButton.style.top = `${offsetY - px2mm(30)}mm`;
+        removeRowButton.style.right = '-30px';
+        removeRowButton.innerText = '-';
+        removeRowButton.onclick = () => {
+          const newTableBody = body.filter((_, j) => j !== i);
+          onChange({ key: 'content', value: JSON.stringify(newTableBody) });
+        };
+        rootElement.appendChild(removeRowButton);
+      });
+    }
+
     // TODO カラムの追加/削除の実装
+    if (mode === 'designer' && onChange) {
+      // TODO ここから
+    }
+
     // const tableBody = JSON.parse(value || '[]') as string[][];
     // const table = document.createElement('table');
     // table.style.tableLayout = 'fixed';
