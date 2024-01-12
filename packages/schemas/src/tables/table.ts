@@ -71,6 +71,7 @@ const renderRowUi = (args: {
     const { cells, height, section } = row;
     let colWidth = 0;
     Object.values(cells).forEach((cell, colIndex) => {
+      // TODO これがあるから編集時に文字かがさなるバグがあるのかも
       const div = document.createElement('div');
       div.style.position = 'absolute';
       div.style.top = `${rowOffsetY}mm`;
@@ -92,12 +93,17 @@ const renderRowUi = (args: {
       void cellUiRender({
         ...arg,
         mode,
-        onChange: (newCellValue) => {
-          value[rowIndex][colIndex] = (
-            Array.isArray(newCellValue) ? newCellValue[0].value : newCellValue.value
-          ) as string;
-          // TODO 編集時に文字かがさなるバグがある
-          arg.onChange && arg.onChange({ key: 'content', value: JSON.stringify(value) });
+        onChange: (v) => {
+          if (!arg.onChange) return;
+          const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
+          if (section === 'body') {
+            value[rowIndex][colIndex] = newValue;
+            arg.onChange({ key: 'content', value: JSON.stringify(value) });
+          } else {
+            const newHead = [...arg.schema.head];
+            newHead[colIndex] = newValue;
+            arg.onChange({ key: 'head', value: newHead });
+          }
         },
         // TODO cell.raw を使うべきではない？
         value: cell.raw,
