@@ -6,7 +6,14 @@ import {
   DEFAULT_FONT_NAME,
   getDefaultFont,
 } from '@pdfme/common';
-import { dryRunAutoTable, autoTable, Styles, UserOptions } from './tableHelper.js';
+import {
+  dryRunAutoTable,
+  autoTable,
+  Styles,
+  UserOptions,
+  RowType,
+  parseSpacing,
+} from './tableHelper.js';
 import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
 import type { TableSchema, CellStyle } from './types.js';
 import cell from './cell.js';
@@ -14,15 +21,42 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 
 const cellUiRender = cell.ui;
 
+const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
+  fontName: style.fontName,
+  alignment: style.alignment,
+  verticalAlignment: style.verticalAlignment,
+  fontSize: style.fontSize,
+  lineHeight: style.lineHeight,
+  characterSpacing: style.characterSpacing,
+  backgroundColor: style.backgroundColor,
+  // ---
+  textColor: style.fontColor,
+  lineColor: style.borderColor,
+  lineWidth: style.borderWidth,
+  cellPadding: style.padding,
+});
+
+const convertToCellStyle = (styles: Styles): CellStyle => ({
+  fontName: styles.fontName,
+  alignment: styles.alignment,
+  verticalAlignment: styles.verticalAlignment,
+  fontSize: styles.fontSize,
+  lineHeight: styles.lineHeight,
+  characterSpacing: styles.characterSpacing,
+  backgroundColor: styles.backgroundColor,
+  // ---
+  fontColor: styles.textColor,
+  borderColor: styles.lineColor,
+  borderWidth: parseSpacing(styles.lineWidth),
+  padding: parseSpacing(styles.cellPadding),
+});
+
 const renderRowUi = (args: {
-  section: 'head' | 'body';
-  cellStyle: CellStyle & { alternateBackgroundColor?: string };
-  rows: { cells: Record<string, { raw: string; width: number; height: number }>; height: number }[];
+  rows: RowType[];
   arg: UIRenderProps<TableSchema>;
   offsetY?: number;
 }) => {
-  const { section, cellStyle, rows, arg, offsetY = 0 } = args;
-  console.log(arg.mode);
+  const { rows, arg, offsetY = 0 } = args;
   const value: string[][] = JSON.parse(arg.value) as string[][];
 
   // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
@@ -31,7 +65,7 @@ const renderRowUi = (args: {
   // const tableBorderWidth = arg.schema.tableBorderWidth;
   let rowOffsetY = offsetY;
   rows.forEach((row, rowIndex) => {
-    const { cells, height } = row;
+    const { cells, height, section } = row;
     let colWidth = 0;
     Object.values(cells).forEach((cell, colIndex) => {
       const div = document.createElement('div');
@@ -50,7 +84,7 @@ const renderRowUi = (args: {
           ) as string;
           arg.onChange && arg.onChange({ key: 'content', value: JSON.stringify(value) });
         },
-        // TODO ここから cell.raw を使うべきではない？
+        // TODO cell.raw を使うべきではない？
         value: cell.raw,
         placeholder: '',
         rootElement: div,
@@ -59,11 +93,7 @@ const renderRowUi = (args: {
           position: { x: colWidth, y: rowOffsetY },
           width: cell.width,
           height: cell.height,
-          ...cellStyle,
-          backgroundColor:
-            rowIndex % 2 === 0
-              ? cellStyle.alternateBackgroundColor || cellStyle.backgroundColor || ''
-              : cellStyle.backgroundColor,
+          ...convertToCellStyle(cell.styles),
         },
       });
       colWidth += cell.width;
@@ -73,19 +103,6 @@ const renderRowUi = (args: {
 };
 
 const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => {
-  const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
-    fontName: style.fontName,
-    alignment: style.alignment,
-    verticalAlignment: style.verticalAlignment,
-    fontSize: style.fontSize,
-    lineHeight: style.lineHeight,
-    characterSpacing: style.characterSpacing,
-    textColor: style.fontColor,
-    fillColor: style.backgroundColor,
-    lineColor: style.borderColor,
-    lineWidth: style.borderWidth,
-    cellPadding: style.padding,
-  });
   return {
     head: [schema.head],
     body,
@@ -95,7 +112,7 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
     tableLineWidth: schema.tableBorderWidth,
     headStyles: mapCellStyle(schema.headStyles),
     bodyStyles: mapCellStyle(schema.bodyStyles),
-    alternateRowStyles: { fillColor: schema.bodyStyles.alternateBackgroundColor },
+    alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
     columnStyles: schema.headWidthPercentages.reduce(
       (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
       {} as Record<number, Partial<Styles>>
@@ -128,9 +145,9 @@ const tableSchema: Plugin<TableSchema> = {
     rootElement.style.borderStyle = 'solid';
     rootElement.style.boxSizing = 'border-box';
 
-    renderRowUi({ section: 'head', rows: table.head, arg, cellStyle: schema.headStyles });
+    renderRowUi({ rows: table.head, arg });
     const offsetY = table.getHeadHeight();
-    renderRowUi({ section: 'body', rows: table.body, arg, cellStyle: schema.bodyStyles, offsetY });
+    renderRowUi({ rows: table.body, arg, offsetY });
 
     // TODO カラムの追加/削除の実装
     // const tableBody = JSON.parse(value || '[]') as string[][];

@@ -17,7 +17,8 @@ const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
 
 // ### function
-function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: number): MarginPadding {
+export const parseSpacing = (value: MarginPaddingInput | undefined): MarginPadding => {
+  const defaultValue = 0;
   value = value || defaultValue;
   if (Array.isArray(value)) {
     if (value.length >= 4) {
@@ -70,7 +71,7 @@ function parseSpacing(value: MarginPaddingInput | undefined, defaultValue: numbe
   }
 
   return { top: value, right: value, bottom: value, left: value };
-}
+};
 
 const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   // TODO テーブルのボーダーを考慮できていない気がする
@@ -91,7 +92,7 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
       lineHeight: cell.styles.lineHeight,
       characterSpacing: cell.styles.characterSpacing,
       fontColor: cell.styles.textColor,
-      backgroundColor: cell.styles.fillColor,
+      backgroundColor: cell.styles.backgroundColor,
       borderColor: cell.styles.lineColor,
       borderWidth: {
         top:
@@ -122,12 +123,12 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   });
 };
 
-async function addTableBorder(
+const addTableBorder = async (
   arg: PDFRenderProps<TableSchema>,
   table: Table,
   startPos: Pos,
   cursor: Pos
-) {
+) => {
   const lineWidth = table.settings.tableLineWidth;
   const lineColor = table.settings.tableLineColor;
   if (!lineWidth || !lineColor) return;
@@ -144,7 +145,7 @@ async function addTableBorder(
       readOnly: true,
     },
   });
-}
+};
 
 // ### type alias
 
@@ -219,7 +220,7 @@ interface StylesProps {
 
 export interface Styles {
   fontName: string | undefined;
-  fillColor: Color;
+  backgroundColor: Color;
   textColor: Color;
   lineHeight: number;
   characterSpacing: number;
@@ -356,7 +357,7 @@ class Cell {
   }
 
   padding(name: 'vertical' | 'horizontal' | 'top' | 'bottom' | 'left' | 'right') {
-    const padding = parseSpacing(this.styles.cellPadding, 0);
+    const padding = parseSpacing(this.styles.cellPadding);
     if (name === 'vertical') {
       return padding.top + padding.bottom;
     } else if (name === 'horizontal') {
@@ -394,6 +395,8 @@ class Column {
     return max;
   }
 }
+
+export type RowType = InstanceType<typeof Row>;
 
 class Row {
   readonly raw: RowInput;
@@ -1076,7 +1079,7 @@ function getStringWidth(cell: Cell, fontKitFont: FontKitFont) {
 }
 
 function getPageAvailableWidth(table: Table, pageWidth: number) {
-  const margins = parseSpacing(table.settings.margin, 0);
+  const margins = parseSpacing(table.settings.margin);
   return pageWidth - (margins.left + margins.right);
 }
 
@@ -1212,7 +1215,7 @@ function cellStyles(
 function defaultStyles(font: Font): Styles {
   return {
     fontName: getFallbackFontName(font),
-    fillColor: '',
+    backgroundColor: '',
     textColor: '#000000',
     lineHeight: 1,
     characterSpacing: 0,
@@ -1302,7 +1305,7 @@ function parseSettings(options: UserOptions): Settings {
 
   return {
     startY: options.startY,
-    margin: parseSpacing(options.margin, 0),
+    margin: parseSpacing(options.margin),
     pageBreak: options.pageBreak ?? 'auto',
     rowPageBreak: options.rowPageBreak ?? 'auto',
     tableWidth: options.tableWidth,
