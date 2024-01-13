@@ -20,6 +20,7 @@ export {
   barcodes,
   line,
   table,
+  // TODO 最終的にcellはエクスポートしない
   cell,
   rectangle,
   ellipse,

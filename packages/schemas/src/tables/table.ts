@@ -52,6 +52,26 @@ const convertToCellStyle = (styles: Styles): CellStyle => ({
   padding: parseSpacing(styles.cellPadding),
 });
 
+const calcResizedHeadWidthPercentages = (arg: {
+  currentHeadWidthPercentages: number[];
+  currentHeadWidths: number[];
+  changedHeadWidth: number;
+  changedHeadIndex: number;
+}) => {
+  const { currentHeadWidthPercentages, currentHeadWidths, changedHeadWidth, changedHeadIndex } =
+    arg;
+  const headWidthPercentages = [...currentHeadWidthPercentages];
+  const totalWidth = currentHeadWidths.reduce((a, b) => a + b, 0);
+  const changedWidthPercentage = (changedHeadWidth / totalWidth) * 100;
+  const originalNextWidthPercentage = headWidthPercentages[changedHeadIndex + 1] ?? 0;
+  const adjustment = headWidthPercentages[changedHeadIndex] - changedWidthPercentage;
+  headWidthPercentages[changedHeadIndex] = changedWidthPercentage;
+  if (changedHeadIndex + 1 < headWidthPercentages.length) {
+    headWidthPercentages[changedHeadIndex + 1] = originalNextWidthPercentage + adjustment;
+  }
+  return headWidthPercentages;
+};
+
 const renderRowUi = (args: {
   rows: RowType[];
   arg: UIRenderProps<TableSchema>;
@@ -78,7 +98,9 @@ const renderRowUi = (args: {
       div.style.left = `${colWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
-      div.addEventListener('click', () => {
+      div.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (arg.mode !== 'designer') return;
         onChangeEditingPosition({ rowIndex, colIndex });
       });
       arg.rootElement.appendChild(div);
@@ -124,27 +146,32 @@ const renderRowUi = (args: {
   });
 };
 
-const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => {
-  return {
-    head: [schema.head],
-    body,
-    startY: schema.position.y,
-    tableWidth: schema.width,
-    tableLineColor: schema.tableBorderColor,
-    tableLineWidth: schema.tableBorderWidth,
-    headStyles: mapCellStyle(schema.headStyles),
-    bodyStyles: mapCellStyle(schema.bodyStyles),
-    alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
-    columnStyles: schema.headWidthPercentages.reduce(
-      (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
-      {} as Record<number, Partial<Styles>>
-    ),
-    margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
-  };
-};
+const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => ({
+  head: [schema.head],
+  body,
+  startY: schema.position.y,
+  tableWidth: schema.width,
+  tableLineColor: schema.tableBorderColor,
+  tableLineWidth: schema.tableBorderWidth,
+  headStyles: mapCellStyle(schema.headStyles),
+  bodyStyles: mapCellStyle(schema.bodyStyles),
+  alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
+  columnStyles: schema.headWidthPercentages.reduce(
+    (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
+    {} as Record<number, Partial<Styles>>
+  ),
+  margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
+});
 
 const headEditingPosition = { rowIndex: -1, colIndex: -1 };
 const bodyEditingPosition = { rowIndex: -1, colIndex: -1 };
+const resetEditingPosition = () => {
+  headEditingPosition.rowIndex = -1;
+  headEditingPosition.colIndex = -1;
+  bodyEditingPosition.rowIndex = -1;
+  bodyEditingPosition.colIndex = -1;
+};
+
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { schema, value } = arg;
@@ -152,8 +179,9 @@ const tableSchema: Plugin<TableSchema> = {
     const table = await autoTable(arg, getTableOptions(schema, body));
     const tableSize = {
       width: schema.width,
-      height: table.getHeadHeight() + table.getBodyHeight(),
+      height: table.getHeight(),
     };
+    console.log(table);
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
@@ -161,12 +189,12 @@ const tableSchema: Plugin<TableSchema> = {
       arg;
     const body = JSON.parse(value || '[]') as string[][];
     const font = options.font || getDefaultFont();
-    const table = await dryRunAutoTable(
-      { pageSize, font, _cache, schema },
-      getTableOptions(schema, body)
-    );
+    const tOption = getTableOptions(schema, body);
+    const table = await dryRunAutoTable({ pageSize, font, _cache, schema }, tOption);
+
     // TODO 編集時に文字かがさなるバグは何度もこれが呼び出されているせいかも。しかし、.innerHTML = '';を呼ぶと、うまくいかない。
-    // rootElement.innerHTML = '';
+    // まずここを治すじゃないと編集モードにちゃんと遷移できていない問題が解消されない
+    rootElement.innerHTML = '';
 
     rootElement.style.borderColor = schema.tableBorderColor;
     rootElement.style.borderWidth = String(schema.tableBorderWidth) + 'mm';
@@ -177,13 +205,13 @@ const tableSchema: Plugin<TableSchema> = {
       rows: table.head,
       arg,
       editingPosition: headEditingPosition,
-      onChangeEditingPosition: (position) => {
-        headEditingPosition.rowIndex = position.rowIndex;
-        headEditingPosition.colIndex = position.colIndex;
-        bodyEditingPosition.rowIndex = -1;
-        bodyEditingPosition.colIndex = -1;
+      onChangeEditingPosition: (p) => {
+        resetEditingPosition();
+        headEditingPosition.rowIndex = p.rowIndex;
+        headEditingPosition.colIndex = p.colIndex;
+        // TODO ここから。一度レンダリングし直さないと、cellが編集モードにならない。
+        // しかしレンダリングするとテーブル自体が編集モードを抜けてしまう。
         stopEditing && stopEditing();
-        // onChange && onChange({ key: 'content', value: JSON.stringify(body) });
       },
     });
     const offsetY = table.getHeadHeight();
@@ -191,13 +219,11 @@ const tableSchema: Plugin<TableSchema> = {
       rows: table.body,
       arg,
       editingPosition: bodyEditingPosition,
-      onChangeEditingPosition: (position) => {
-        bodyEditingPosition.rowIndex = position.rowIndex;
-        bodyEditingPosition.colIndex = position.colIndex;
-        headEditingPosition.rowIndex = -1;
-        headEditingPosition.colIndex = -1;
+      onChangeEditingPosition: (p) => {
+        resetEditingPosition();
+        bodyEditingPosition.rowIndex = p.rowIndex;
+        bodyEditingPosition.colIndex = p.colIndex;
         stopEditing && stopEditing();
-        // onChange && onChange({ key: 'content', value: JSON.stringify(body) });
       },
       offsetY,
     });
@@ -242,7 +268,8 @@ const tableSchema: Plugin<TableSchema> = {
       addColumnButton.style.top = `${table.getHeadHeight() - px2mm(30)}mm`;
       addColumnButton.style.right = '-30px';
       addColumnButton.innerText = '+';
-      addColumnButton.onclick = () => {
+      addColumnButton.onclick = (e) => {
+        e.preventDefault();
         const newColumnWidthPercentage = 25;
         const totalCurrentWidth = schema.headWidthPercentages.reduce(
           (acc, width) => acc + width,
@@ -268,7 +295,8 @@ const tableSchema: Plugin<TableSchema> = {
         removeColumnButton.style.top = '-30px';
         removeColumnButton.style.left = `${offsetX - px2mm(30)}mm`;
         removeColumnButton.innerText = '-';
-        removeColumnButton.onclick = () => {
+        removeColumnButton.onclick = (e) => {
+          e.preventDefault();
           const totalWidthMinusRemoved = schema.headWidthPercentages.reduce(
             (sum, width, j) => (j !== i ? sum + width : sum),
             0
@@ -288,272 +316,74 @@ const tableSchema: Plugin<TableSchema> = {
           ]);
         };
         rootElement.appendChild(removeColumnButton);
+
+        if (i === table.columns.length - 1) return;
+
+        const dragHandle = document.createElement('div');
+        const lineWidth = 10;
+        dragHandle.style.width = `${lineWidth}px`;
+        dragHandle.style.height = '100%';
+        dragHandle.style.backgroundColor = 'transparent';
+        dragHandle.style.cursor = 'col-resize';
+        dragHandle.style.position = 'absolute';
+        dragHandle.style.zIndex = '10';
+        dragHandle.style.left = `${offsetX - px2mm(lineWidth)}mm`;
+        dragHandle.style.top = '0';
+        const setColor = (e: MouseEvent) => {
+          const handle = e.target as HTMLDivElement;
+          handle.style.backgroundColor = '#2196f3';
+        };
+        const resetColor = (e: MouseEvent) => {
+          const handle = e.target as HTMLDivElement;
+          handle.style.backgroundColor = 'transparent';
+        };
+        dragHandle.addEventListener('mouseover', setColor);
+        dragHandle.addEventListener('mouseout', resetColor);
+
+        dragHandle.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          resetEditingPosition();
+          const handle = e.target as HTMLDivElement;
+          dragHandle.removeEventListener('mouseover', setColor);
+          dragHandle.removeEventListener('mouseout', resetColor);
+
+          let move = 0;
+          handle.addEventListener('mousemove', (e: MouseEvent) => {
+            console.log('e.clientX', e.clientX);
+            console.log('e.movementX', e.movementX);
+            handle.style.left =
+              String(Number(handle.style.left.replace('mm', '')) + e.movementX) + 'mm';
+            move = move + e.movementX;
+          });
+
+          const commitResize = () => {
+            if (move !== 0) {
+              const newHeadWidthPercentages = calcResizedHeadWidthPercentages({
+                currentHeadWidthPercentages: schema.headWidthPercentages,
+                currentHeadWidths: table.columns.map((column) => column.width),
+                changedHeadWidth: table.columns[i].width + move,
+                changedHeadIndex: i,
+              });
+              console.log('!!');
+              onChange({ key: 'headWidthPercentages', value: newHeadWidthPercentages });
+            }
+            move = 0;
+            dragHandle.addEventListener('mouseover', setColor);
+            dragHandle.addEventListener('mouseout', resetColor);
+            document.removeEventListener('mouseup', commitResize);
+          };
+          document.addEventListener('mouseup', commitResize);
+        });
+        rootElement.appendChild(dragHandle);
       });
     }
 
-    // TODO ここから カラムのリサイズを実装する。
-
-    // const tableBody = JSON.parse(value || '[]') as string[][];
-    // const table = document.createElement('table');
-    // table.style.tableLayout = 'fixed';
-    // table.style.borderCollapse = 'collapse';
-    // table.style.width = '100%';
-    // table.style.textAlign = 'left';
-    // table.style.fontSize = '14pt';
-    // table.style.whiteSpace = 'pre-wrap';
-
-    // const thTdStyle = `border: ${schema.borderWidth}mm solid ${schema.borderColor};
-    // color: ${schema.textColor};
-    // background-color: ${schema.bgColor};
-    // padding: ${schema.cellPadding}mm;
-    // position: relative;
-    // word-break: break-word;
-    // `;
-
-    // const dragHandleClass = 'table-schema-resize-handle';
-    // const dragHandleStyle = `width: 5px;
-    // height: 100%;
-    // background-color: transparent;
-    // cursor: col-resize;
-    // position: absolute;
-    // z-index: 10;
-    // right: -2.5px;
-    // top: 0;
-    // `;
-
-    // const contentEditable = isEditable(mode, schema) ? 'contenteditable="plaintext-only"' : '';
-    // table.innerHTML = `<tr>${schema.head
-    //   .map(
-    //     (data, i) =>
-    //       `<th ${mode === 'designer' ? contentEditable : ''} style="${
-    //         thTdStyle + ` width: ${schema.headWidthsPercentage[i]}%;`
-    //       }">${data}${
-    //         mode === 'designer'
-    //           ? `<div tabindex="-1" contenteditable="false" class="${dragHandleClass}" style="${dragHandleStyle}"></div>`
-    //           : ''
-    //       }</th>`
-    //   )
-    //   .join('')}</tr>
-    //     ${tableBody
-    //       .map(
-    //         (row) =>
-    //           `<tr>${row
-    //             .map((data) => `<td ${contentEditable} style="${thTdStyle}">${data}</td>`)
-    //             .join('')}</tr>`
-    //       )
-    //       .join('')}`;
-
-    // const dragHandles = table.querySelectorAll(`.${dragHandleClass}`);
-    // dragHandles.forEach((handle) => {
-    //   const th = handle.parentElement;
-    //   if (!(th instanceof HTMLTableCellElement)) return;
-    //   handle.addEventListener('mouseover', (e) => {
-    //     const handle = e.target as HTMLDivElement;
-    //     handle.style.backgroundColor = '#2196f3';
-    //   });
-    //   handle.addEventListener('mouseout', (e) => {
-    //     const handle = e.target as HTMLDivElement;
-    //     handle.style.backgroundColor = 'transparent';
-    //   });
-    //   handle.addEventListener('mousedown', (e) => {
-    //     const startWidth = th.offsetWidth;
-    //     const scale = getScale(e.target as HTMLElement);
-    //     const startX = (e as MouseEvent).clientX / scale;
-
-    //     const mouseMoveHandler = (e: MouseEvent) => {
-    //       const targetTh = th;
-    //       const tableWidth = (targetTh.parentElement?.parentElement as HTMLTableElement)
-    //         .offsetWidth;
-    //       const allThs = Array.from(
-    //         targetTh.parentElement?.children ?? []
-    //       ) as HTMLTableCellElement[];
-    //       const targetThIdx = allThs.indexOf(targetTh);
-    //       const newWidth = startWidth + (e.clientX / scale - startX);
-
-    //       let totalWidth = 0;
-    //       allThs.forEach((th, idx) => {
-    //         if (idx !== targetThIdx) {
-    //           totalWidth += th.offsetWidth;
-    //         }
-    //       });
-
-    //       const remainingWidth = tableWidth - newWidth;
-    //       const scaleRatio = remainingWidth / totalWidth;
-
-    //       allThs.forEach((th, idx) => {
-    //         if (idx === targetThIdx) {
-    //           th.style.width = `${(newWidth / tableWidth) * 100}%`;
-    //         } else {
-    //           const originalWidth = th.offsetWidth;
-    //           th.style.width = `${((originalWidth * scaleRatio) / tableWidth) * 100}%`;
-    //         }
-    //       });
-    //     };
-    //     const mouseUpHandler = (e: MouseEvent) => {
-    //       e.preventDefault();
-    //       document.removeEventListener('mousemove', mouseMoveHandler);
-    //       document.removeEventListener('mouseup', mouseUpHandler);
-    //       const allThs = Array.from(th.parentElement?.children ?? []) as HTMLTableCellElement[];
-    //       const newHeadWidthsPercentage = allThs
-    //         .map((th) => th.style.width)
-    //         .map((width) => String(width).replace('%', ''))
-    //         .map((width) => Number(width));
-
-    //       onChange && onChange({ key: 'headWidthsPercentage', value: newHeadWidthsPercentage });
-    //     };
-
-    //     document.addEventListener('mousemove', mouseMoveHandler);
-    //     document.addEventListener('mouseup', mouseUpHandler);
-    //   });
-    // });
-
-    // const tableCell = table.querySelectorAll('td, th');
-    // tableCell.forEach((cell) => {
-    //   if (!(cell instanceof HTMLTableCellElement)) return;
-    //   cell.onblur = (e) => {
-    //     if (!(e.target instanceof HTMLTableCellElement)) return;
-    //     const handle = e.target.querySelector('.' + dragHandleClass) as HTMLDivElement;
-    //     if (handle) {
-    //       handle.style.display = 'block';
-    //     }
-    //     const row = e.target.parentElement as HTMLTableRowElement;
-    //     const table = row.parentElement as HTMLTableElement;
-    //     const tableData = Array.from(table.rows).map((row) =>
-    //       Array.from(row.cells).map((cell) => cell.innerText)
-    //     );
-
-    //     setTimeout(() => {
-    //       if (document.activeElement instanceof HTMLTableCellElement) return;
-    //       if (!onChange) return;
-    //       const head = tableData[0];
-    //       const body = tableData.slice(1);
-    //       const changes: { key: string; value: any }[] = [];
-    //       if (JSON.stringify(schema.head) !== JSON.stringify(head)) {
-    //         changes.push({ key: 'head', value: head });
-    //       }
-    //       if (JSON.stringify(tableBody) !== JSON.stringify(body)) {
-    //         changes.push({ key: 'content', value: JSON.stringify(body) });
-    //       }
-    //       if (changes.length > 0) {
-    //         onChange(changes);
-    //       }
-    //     }, 25);
-    //   };
-    //   cell.onclick = (e) => {
-    //     if (!(e.target instanceof HTMLTableCellElement)) return;
-    //     if (e.target === document.activeElement) return;
-    //     const handle = e.target.querySelector('.' + dragHandleClass) as HTMLDivElement;
-    //     if (handle) {
-    //       handle.style.display = 'none';
-    //     }
-    //     e.target.focus();
-    //     const selection = window.getSelection();
-    //     const range = document.createRange();
-    //     range.selectNodeContents(e.target);
-    //     range.collapse(false); // Collapse range to the end
-    //     selection?.removeAllRanges();
-    //     selection?.addRange(range);
-    //   };
-    // });
-
-    // rootElement.appendChild(table);
-
-    // if (mode === 'form' && onChange) {
-    //   const addRowButton = document.createElement('button');
-    //   addRowButton.style.position = 'absolute';
-    //   addRowButton.style.bottom = '-25px';
-    //   addRowButton.style.right = '0';
-    //   addRowButton.innerText = '+';
-    //   addRowButton.onclick = () => {
-    //     const newRow = Array(schema.head.length).fill('') as string[];
-    //     onChange({ key: 'content', value: JSON.stringify(tableBody.concat([newRow])) });
-    //   };
-    //   rootElement.appendChild(addRowButton);
-
-    //   const tableRows = table.querySelectorAll('tr');
-    //   let skipTrHeight = 0;
-    //   tableRows.forEach((row, i) => {
-    //     if (i === 0) {
-    //       skipTrHeight = row.clientHeight;
-    //       return;
-    //     }
-    //     const deleteRowButton = document.createElement('button');
-    //     deleteRowButton.style.position = 'absolute';
-    //     deleteRowButton.style.top = String(skipTrHeight) + 'px';
-    //     deleteRowButton.style.right = '-25px';
-    //     deleteRowButton.innerText = '-';
-    //     deleteRowButton.onclick = () => {
-    //       const newTableBody = tableBody.filter((_, j) => j !== i - 1); // Exclude line 0 because it is a header.
-    //       onChange({ key: 'content', value: JSON.stringify(newTableBody) });
-    //     };
-    //     rootElement.appendChild(deleteRowButton);
-    //     skipTrHeight += row.clientHeight;
-    //   });
-    // } else if (mode === 'designer' && onChange) {
-    //   const addColumnButton = document.createElement('button');
-    //   addColumnButton.style.position = 'absolute';
-    //   addColumnButton.style.top = '0';
-    //   addColumnButton.style.right = '-25px';
-    //   addColumnButton.innerText = '+';
-    //   addColumnButton.onclick = () => {
-    //     const newColumnWidthPercentage = 25;
-    //     const totalCurrentWidth = schema.headWidthsPercentage.reduce(
-    //       (acc, width) => acc + width,
-    //       0
-    //     );
-    //     const scalingRatio = (100 - newColumnWidthPercentage) / totalCurrentWidth;
-    //     const scaledWidths = schema.headWidthsPercentage.map((width) => width * scalingRatio);
-    //     onChange([
-    //       { key: 'head', value: schema.head.concat('') },
-    //       {
-    //         key: 'headWidthsPercentage',
-    //         value: scaledWidths.concat(newColumnWidthPercentage),
-    //       },
-    //       {
-    //         key: 'content',
-    //         value: JSON.stringify(tableBody.map((row) => row.concat(''))),
-    //       },
-    //     ]);
-    //   };
-
-    //   rootElement.appendChild(addColumnButton);
-
-    //   const tableHeads = table.querySelectorAll('th');
-    //   let skipThWidth = 0;
-    //   tableHeads.forEach((head, i) => {
-    //     const deleteColumnButton = document.createElement('button');
-    //     deleteColumnButton.style.position = 'absolute';
-    //     deleteColumnButton.style.left = String(skipThWidth) + 'px';
-    //     deleteColumnButton.style.top = '-25px';
-    //     deleteColumnButton.innerText = '-';
-    //     deleteColumnButton.onclick = () => {
-    //       const totalWidthMinusRemoved = schema.headWidthsPercentage.reduce(
-    //         (sum, width, j) => (j !== i ? sum + width : sum),
-    //         0
-    //       );
-    //       onChange([
-    //         { key: 'head', value: schema.head.filter((_, j) => j !== i) },
-    //         {
-    //           key: 'headWidthsPercentage',
-    //           value: schema.headWidthsPercentage
-    //             .filter((_, j) => j !== i)
-    //             .map((width) => (width / totalWidthMinusRemoved) * 100),
-    //         },
-    //         {
-    //           key: 'content',
-    //           value: JSON.stringify(tableBody.map((row) => row.filter((_, j) => j !== i))),
-    //         },
-    //       ]);
-    //     };
-    //     rootElement.appendChild(deleteColumnButton);
-    //     skipThWidth += head.offsetWidth;
-    //   });
-    // }
-
-    const tableHeight = table.getHeadHeight() + table.getBodyHeight();
-    if (rootElement.parentElement) {
-      rootElement.parentElement.style.height = `${tableHeight}mm`;
+    if (mode === 'viewer') {
+      resetEditingPosition();
     }
+
+    const tableHeight = table.getHeight();
     if (schema.height !== tableHeight && onChange) {
       onChange({ key: 'height', value: tableHeight });
     }

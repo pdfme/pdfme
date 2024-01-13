@@ -482,6 +482,10 @@ class Table {
   getWidth() {
     return this.settings.tableWidth;
   }
+
+  getHeight() {
+    return this.getHeadHeight() + this.getBodyHeight();
+  }
 }
 
 class HookData {
