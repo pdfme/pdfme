@@ -209,7 +209,7 @@ const tableSchema: Plugin<TableSchema> = {
         resetEditingPosition();
         headEditingPosition.rowIndex = p.rowIndex;
         headEditingPosition.colIndex = p.colIndex;
-        // TODO ここから。一度レンダリングし直さないと、cellが編集モードにならない。
+        // TODO 一度レンダリングし直さないと、cellが編集モードにならない。
         // しかしレンダリングするとテーブル自体が編集モードを抜けてしまう。
         stopEditing && stopEditing();
       },
@@ -320,14 +320,15 @@ const tableSchema: Plugin<TableSchema> = {
         if (i === table.columns.length - 1) return;
 
         const dragHandle = document.createElement('div');
-        const lineWidth = 10;
+        const lineWidth = 5;
         dragHandle.style.width = `${lineWidth}px`;
         dragHandle.style.height = '100%';
-        dragHandle.style.backgroundColor = 'transparent';
+        dragHandle.style.backgroundColor = '#eee';
+        dragHandle.style.opacity = '0.5';
         dragHandle.style.cursor = 'col-resize';
         dragHandle.style.position = 'absolute';
         dragHandle.style.zIndex = '10';
-        dragHandle.style.left = `${offsetX - px2mm(lineWidth)}mm`;
+        dragHandle.style.left = `${offsetX - px2mm(lineWidth) / 2}mm`;
         dragHandle.style.top = '0';
         const setColor = (e: MouseEvent) => {
           const handle = e.target as HTMLDivElement;
@@ -335,27 +336,38 @@ const tableSchema: Plugin<TableSchema> = {
         };
         const resetColor = (e: MouseEvent) => {
           const handle = e.target as HTMLDivElement;
-          handle.style.backgroundColor = 'transparent';
+          handle.style.backgroundColor = '#eee';
         };
         dragHandle.addEventListener('mouseover', setColor);
         dragHandle.addEventListener('mouseout', resetColor);
 
+        const prevColumnLeft = offsetX - column.width;
+        const nextColumnRight = offsetX - px2mm(lineWidth) + table.columns[i + 1].width;
+
         dragHandle.addEventListener('mousedown', (e) => {
-          e.stopPropagation();
-          e.preventDefault();
           resetEditingPosition();
           const handle = e.target as HTMLDivElement;
           dragHandle.removeEventListener('mouseover', setColor);
           dragHandle.removeEventListener('mouseout', resetColor);
 
           let move = 0;
-          handle.addEventListener('mousemove', (e: MouseEvent) => {
-            console.log('e.clientX', e.clientX);
-            console.log('e.movementX', e.movementX);
-            handle.style.left =
-              String(Number(handle.style.left.replace('mm', '')) + e.movementX) + 'mm';
-            move = move + e.movementX;
-          });
+          const mouseMove = (e: MouseEvent) => {
+            // TODO ドラッグ&ドロップに対してnewLeftがずれていく問題がある
+            let moveX = e.movementX;
+            const currentLeft = Number(handle.style.left.replace('mm', ''));
+            let newLeft = currentLeft + moveX;
+            if (newLeft < prevColumnLeft) {
+              newLeft = prevColumnLeft;
+              moveX = newLeft - currentLeft;
+            }
+            if (newLeft >= nextColumnRight) {
+              newLeft = nextColumnRight;
+              moveX = newLeft - currentLeft;
+            }
+            handle.style.left = `${newLeft}mm`;
+            move += moveX;
+          };
+          rootElement.addEventListener('mousemove', mouseMove);
 
           const commitResize = () => {
             if (move !== 0) {
@@ -365,15 +377,15 @@ const tableSchema: Plugin<TableSchema> = {
                 changedHeadWidth: table.columns[i].width + move,
                 changedHeadIndex: i,
               });
-              console.log('!!');
               onChange({ key: 'headWidthPercentages', value: newHeadWidthPercentages });
             }
             move = 0;
             dragHandle.addEventListener('mouseover', setColor);
             dragHandle.addEventListener('mouseout', resetColor);
-            document.removeEventListener('mouseup', commitResize);
+            rootElement.removeEventListener('mousemove', mouseMove);
+            rootElement.removeEventListener('mouseup', commitResize);
           };
-          document.addEventListener('mouseup', commitResize);
+          rootElement.addEventListener('mouseup', commitResize);
         });
         rootElement.appendChild(dragHandle);
       });
@@ -411,7 +423,7 @@ const tableSchema: Plugin<TableSchema> = {
         },
         headStyles: {
           // TODO i18n
-          title: 'headStyles',
+          title: 'Table Head Style',
           type: 'object',
           widget: 'Card',
           span: 24,
@@ -420,7 +432,7 @@ const tableSchema: Plugin<TableSchema> = {
         },
         bodyStyles: {
           // TODO i18n
-          title: 'bodyStyles',
+          title: 'Table Body Style',
           type: 'object',
           widget: 'Card',
           span: 24,
