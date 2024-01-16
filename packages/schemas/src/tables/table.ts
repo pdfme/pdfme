@@ -427,7 +427,7 @@ const tableSchema: Plugin<TableSchema> = {
           type: 'object',
           widget: 'Card',
           span: 24,
-          // activeSchemaのfontNameがあればfallbackFontNameにそれを使う?
+          // TODO activeSchemaのfontNameがあればfallbackFontNameにそれを使う?
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
         },
         bodyStyles: {

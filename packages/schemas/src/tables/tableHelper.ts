@@ -16,7 +16,6 @@ import cell from './cell';
 const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
 
-// ### function
 export const parseSpacing = (value: MarginPaddingInput | undefined): MarginPadding => {
   const defaultValue = 0;
   value = value || defaultValue;
@@ -147,8 +146,6 @@ const addTableBorder = async (
   });
 };
 
-// ### type alias
-
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
 type MarginPaddingInput =
@@ -197,8 +194,6 @@ type ColumnInput =
       header?: string;
       dataKey?: string | number;
     };
-
-// ### interface
 
 interface StylesProps {
   styles: Partial<Styles>;
@@ -284,7 +279,6 @@ export interface UserOptions {
   body?: RowInput[];
   columns?: ColumnInput[];
 
-  // Styles
   styles?: Partial<Styles>;
   bodyStyles?: Partial<Styles>;
   headStyles?: Partial<Styles>;
@@ -293,7 +287,6 @@ export interface UserOptions {
     [key: string]: Partial<Styles>;
   };
 
-  // Hooks
   /** Called when the plugin finished parsing cell content. Can be used to override content or styles for a specific cell. */
   didParseCell?: CellHook;
   /** Called before a cell or row is drawn. Can be used to call native jspdf styling functions such as `doc.setTextColor` or change position of text etc before it is drawn. */
@@ -305,8 +298,6 @@ export interface UserOptions {
   /** Called after the plugin has finished drawing everything on a page. Can be used to add footers with page numbers or any other content that you want on each page there is an autotable. */
   didDrawPage?: PageHook;
 }
-
-// ### class
 
 class Cell {
   raw: string;
@@ -517,8 +508,6 @@ class CellHookData extends HookData {
     this.section = row.section;
   }
 }
-
-// ------------------------------
 
 async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promise<void> {
   const pageSize = arg.page.getSize();
