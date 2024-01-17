@@ -3,7 +3,7 @@ import { Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplate,
+  getTemplate2,
   readFile,
   cloneDeep,
   getPlugins,
@@ -21,12 +21,12 @@ function App() {
   const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
   const buildDesigner = () => {
-    let template: Template = getTemplate();
+    let template: Template = getTemplate2();
     try {
       const templateString = localStorage.getItem("template");
       const templateJson = templateString
         ? JSON.parse(templateString)
-        : getTemplate();
+        : getTemplate2();
       checkTemplate(templateJson);
       template = templateJson as Template;
     } catch {

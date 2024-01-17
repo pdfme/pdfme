@@ -3,7 +3,7 @@ import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplate,
+  getTemplate2,
   handleLoadTemplate,
   generatePDF,
   getPlugins,
@@ -15,12 +15,12 @@ const headerHeight = 65;
 type Mode = "form" | "viewer";
 
 const initTemplate = () => {
-  let template: Template = getTemplate();
+  let template: Template = getTemplate2();
   try {
     const templateString = localStorage.getItem("template");
     const templateJson = templateString
       ? JSON.parse(templateString)
-      : getTemplate();
+      : getTemplate2();
     checkTemplate(templateJson);
     template = templateJson as Template;
   } catch {
