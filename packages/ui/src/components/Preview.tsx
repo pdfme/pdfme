@@ -43,7 +43,7 @@ const Preview = ({
   }, [inputs]);
 
   useEffect(() => {
-    init();
+    void init();
   }, [init]);
 
   useScrollPageCursor({
@@ -107,8 +107,14 @@ const Preview = ({
                 onChange={(arg) => {
                   const args = Array.isArray(arg) ? arg : [arg];
                   args.forEach(({ key: _key, value }) => {
-                    if (_key !== 'content') return;
-                    handleChangeInput({ key, value: value as string });
+                    if (_key === 'content') {
+                      handleChangeInput({ key, value: value as string });
+                    } else {
+                      const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id);
+                      if (!targetSchema || !targetSchema[_key]) return;
+                      targetSchema[_key] = value as string;
+                      setSchemasList([...schemasList]);
+                    }
                   });
                 }}
                 outline={

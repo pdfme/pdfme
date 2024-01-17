@@ -119,6 +119,7 @@ const renderRowUi = (args: {
           if (!arg.onChange) return;
           const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
           if (section === 'body') {
+            // TODO onChangeを呼び出すと再レンダリングが走ってフォーカスが外れる
             value[rowIndex][colIndex] = newValue;
             arg.onChange({ key: 'content', value: JSON.stringify(value) });
           } else {
