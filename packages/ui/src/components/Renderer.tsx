@@ -90,7 +90,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [value, mode, scale, i18n, onChange, options, pageSize, placeholder, pluginsRegistry, schema, stopEditing, tabIndex, theme]);
+  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
 
   return (
     <Wrapper {...props}>

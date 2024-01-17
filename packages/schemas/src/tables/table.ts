@@ -98,8 +98,7 @@ const renderRowUi = (args: {
       div.style.left = `${colWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
-      div.addEventListener('click', (e) => {
-        e.preventDefault();
+      div.addEventListener('click', () => {
         if (arg.mode !== 'designer') return;
         onChangeEditingPosition({ rowIndex, colIndex });
       });
@@ -114,6 +113,7 @@ const renderRowUi = (args: {
 
       void cellUiRender({
         ...arg,
+        stopEditing: resetEditingPosition,
         mode,
         onChange: (v) => {
           if (!arg.onChange) return;
@@ -185,15 +185,12 @@ const tableSchema: Plugin<TableSchema> = {
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, stopEditing, schema, value, options, mode, pageSize, _cache } =
-      arg;
+    const { rootElement, onChange, schema, value, options, mode, pageSize, _cache } = arg;
     const body = JSON.parse(value || '[]') as string[][];
     const font = options.font || getDefaultFont();
     const tOption = getTableOptions(schema, body);
     const table = await dryRunAutoTable({ pageSize, font, _cache, schema }, tOption);
 
-    // TODO 編集時に文字かがさなるバグは何度もこれが呼び出されているせいかも。しかし、.innerHTML = '';を呼ぶと、うまくいかない。
-    // まずここを治すじゃないと編集モードにちゃんと遷移できていない問題が解消されない
     rootElement.innerHTML = '';
 
     rootElement.style.borderColor = schema.tableBorderColor;
@@ -201,30 +198,28 @@ const tableSchema: Plugin<TableSchema> = {
     rootElement.style.borderStyle = 'solid';
     rootElement.style.boxSizing = 'border-box';
 
+    const handleChangeEditingPosition = (
+      newPosition: { rowIndex: number; colIndex: number },
+      editingPosition: { rowIndex: number; colIndex: number }
+    ) => {
+      resetEditingPosition();
+      editingPosition.rowIndex = newPosition.rowIndex;
+      editingPosition.colIndex = newPosition.colIndex;
+      void tableSchema.ui(arg);
+    };
+
     renderRowUi({
       rows: table.head,
       arg,
       editingPosition: headEditingPosition,
-      onChangeEditingPosition: (p) => {
-        resetEditingPosition();
-        headEditingPosition.rowIndex = p.rowIndex;
-        headEditingPosition.colIndex = p.colIndex;
-        // TODO 一度レンダリングし直さないと、cellが編集モードにならない。
-        // しかしレンダリングするとテーブル自体が編集モードを抜けてしまう。
-        stopEditing && stopEditing();
-      },
+      onChangeEditingPosition: (p) => handleChangeEditingPosition(p, headEditingPosition),
     });
     const offsetY = table.getHeadHeight();
     renderRowUi({
       rows: table.body,
       arg,
       editingPosition: bodyEditingPosition,
-      onChangeEditingPosition: (p) => {
-        resetEditingPosition();
-        bodyEditingPosition.rowIndex = p.rowIndex;
-        bodyEditingPosition.colIndex = p.colIndex;
-        stopEditing && stopEditing();
-      },
+      onChangeEditingPosition: (p) => handleChangeEditingPosition(p, bodyEditingPosition),
       offsetY,
     });
 
