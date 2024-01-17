@@ -434,9 +434,9 @@ const handlePositionSizeChange = (
   } else if (key === 'position.y') {
     schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
   } else if (key === 'width') {
-    schema.width = calcBounds(value, pl, pw - schema.position.x - pr);
+    schema.width = calcBounds(value, 0, pw - schema.position.x - pr);
   } else if (key === 'height') {
-    schema.height = calcBounds(value, pt, ph - schema.position.y - pb);
+    schema.height = calcBounds(value, 0, ph - schema.position.y - pb);
   }
 };
 
