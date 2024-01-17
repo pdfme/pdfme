@@ -11,7 +11,6 @@ type RendererProps = Omit<
   schema: SchemaForUI;
   value: string;
   outline: string;
-  pageSize: Size;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
 };
@@ -91,7 +90,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+  }, [value, mode, scale, i18n, onChange, options, pageSize, placeholder, pluginsRegistry, schema, stopEditing, tabIndex, theme]);
 
   return (
     <Wrapper {...props}>
