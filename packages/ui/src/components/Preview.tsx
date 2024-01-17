@@ -110,8 +110,9 @@ const Preview = ({
                     if (_key === 'content') {
                       handleChangeInput({ key, value: value as string });
                     } else {
-                      const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id);
-                      if (!targetSchema || !targetSchema[_key]) return;
+                      const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI
+                      if (!targetSchema) return;
+                      // @ts-ignore
                       targetSchema[_key] = value as string;
                       setSchemasList([...schemasList]);
                     }
