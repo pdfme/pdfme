@@ -24,7 +24,7 @@ export const getDefaultCellStyles = () => ({
   backgroundColor: '',
   borderColor: '#888888',
   borderWidth: { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 },
-  padding: { top: 1, bottom: 1, left: 1, right: 1 },
+  padding: { top: 5, bottom: 5, left: 5, right: 5 },
 });
 
 const getBoxDimensionProp = (step = 1) => {

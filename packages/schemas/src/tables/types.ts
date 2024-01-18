@@ -29,12 +29,8 @@ export interface TableSchema extends Schema {
   headWidthPercentages: number[];
   headStyles: CellStyle;
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
-  // TODO これ、ないほうがいいかも?
-  // ref [check] ここでschema.fontNameを使っているがそもそもschema.fontNameを削除したいかも
-  // ref [check] activeSchemaのfontNameがあればfallbackFontNameにそれを使う?
-  fontName?: string;
   tableBorderColor: string;
   tableBorderWidth: number;
 
-  // ただのアイデアだがrowのmin,maxがあるといいかも
+  // TODO ただのアイデアだがrowのmin,maxがあるといいかも
 }

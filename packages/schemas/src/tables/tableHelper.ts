@@ -9,6 +9,7 @@ import {
   getDefaultFont,
   mm2pt,
   getFallbackFontName,
+  pt2mm,
 } from '@pdfme/common';
 import type { TableSchema } from './types';
 import cell from './cell';
@@ -77,8 +78,7 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   // 本当はテーブルのボーダーの分を引いた位置に描画したい
   await cellPdfRender({
     ...arg,
-    // TODO 改行がうまく反映されていない
-    value: cell.text.join('\n'),
+    value: cell.raw,
     schema: {
       type: 'cell',
       position: { x: cell.x, y: cell.y },
@@ -95,7 +95,8 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
       borderColor: cell.styles.lineColor,
       borderWidth: {
         top:
-          // TODO  Partial<LineWidths> は統一する
+          // TODO  Partial<LineWidths> top,bottom,left,rightに統一する
+          // また、template.basePdfのpaddingも同様に統一する
           typeof cell.styles.lineWidth === 'number'
             ? cell.styles.lineWidth
             : cell.styles.lineWidth.top ?? 0,
@@ -301,10 +302,9 @@ export interface UserOptions {
 
 class Cell {
   raw: string;
-  styles: Styles;
   text: string[];
+  styles: Styles;
   section: Section;
-
   contentHeight = 0;
   contentWidth = 0;
   wrappedWidth = 0;
@@ -326,7 +326,7 @@ class Cell {
 
   getContentHeight() {
     const lineCount = Array.isArray(this.text) ? this.text.length : 1;
-    const lineHeight = this.styles.fontSize * this.styles.lineHeight;
+    const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
     const height = lineCount * lineHeight + this.padding('vertical');
     return Math.max(height, this.styles.minCellHeight);
   }
@@ -759,12 +759,15 @@ function modifyRowToFit(row: Row, remainingPageSpace: number, table: Table) {
 
 function getRemainingLineCount(cell: Cell, remainingPageSpace: number) {
   const vPadding = cell.padding('vertical');
-  const remainingLines = Math.floor((remainingPageSpace - vPadding) / cell.styles.lineHeight);
-  return Math.max(0, remainingLines);
+  return Math.floor((remainingPageSpace - vPadding) / cell.styles.lineHeight);
 }
 
-function calculateWidths(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
-  calculate(table, pageWidth, fontKitFont);
+async function calculateWidths(
+  table: Table,
+  pageWidth: number,
+  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>
+) {
+  await calculate(table, pageWidth, getFontKitFontByFontName);
 
   const resizableColumns: Column[] = [];
   let initialTableWidth = 0;
@@ -800,7 +803,7 @@ function calculateWidths(table: Table, pageWidth: number, fontKitFont: FontKitFo
   resizeWidth = Math.abs(resizeWidth);
 
   applyColSpans(table);
-  fitContent(table, fontKitFont);
+  await fitContent(table, getFontKitFontByFontName);
   applyRowSpans(table);
 }
 
@@ -868,17 +871,19 @@ function applyColSpans(table: Table) {
   }
 }
 
-function fitContent(table: Table, fontKitFont: FontKitFont) {
+async function fitContent(
+  table: Table,
+  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>
+) {
   const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
     for (const column of table.columns) {
       const cell: Cell = row.cells[column.index];
       if (!cell) continue;
 
+      const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
       cell.text = splitTextToSize({
-        // TODO cell.text がどのようなロジックで配列になっているのか確認するべき
-        // ↑ 改行コードで分割している
-        value: cell.text.join(' '),
+        value: cell.raw,
         characterSpacing: cell.styles.characterSpacing,
         boxWidthInPt: mm2pt(cell.width),
         fontSize: cell.styles.fontSize,
@@ -942,7 +947,11 @@ function resizeColumns(
   return resizeWidth;
 }
 
-function calculate(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
+async function calculate(
+  table: Table,
+  pageWidth: number,
+  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>
+) {
   const availablePageWidth = getPageAvailableWidth(table, pageWidth);
   for (const row of table.allRows()) {
     for (const column of table.columns) {
@@ -952,6 +961,8 @@ function calculate(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
       table.callCellHooks(hooks, cell, row, column, null);
 
       const padding = cell.padding('horizontal');
+      const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
+
       cell.contentWidth = getStringWidth(cell, fontKitFont) + padding;
 
       const longestWordWidth = getStringWidth(
@@ -984,7 +995,7 @@ function calculate(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
     }
   }
 
-  table.allRows().forEach((row) => {
+  for (const row of table.allRows()) {
     for (const column of table.columns) {
       const cell = row.cells[column.index];
 
@@ -1013,7 +1024,7 @@ function calculate(table: Table, pageWidth: number, fontKitFont: FontKitFont) {
         }
       }
     }
-  });
+  }
 }
 
 function getStringWidth(cell: Cell, fontKitFont: FontKitFont) {
@@ -1033,7 +1044,7 @@ function getPageAvailableWidth(table: Table, pageWidth: number) {
   return pageWidth - (margins.left + margins.right);
 }
 
-function parseContent4Table(input: TableInput, font: Font) {
+function parseContent4Table(input: TableInput, fallbackFontName: string) {
   const content = input.content;
   const columns = createColumns(content.columns);
 
@@ -1046,8 +1057,8 @@ function parseContent4Table(input: TableInput, font: Font) {
   const styles = input.styles;
   return {
     columns,
-    head: parseSection('head', content.head, columns, styles, font),
-    body: parseSection('body', content.body, columns, styles, font),
+    head: parseSection('head', content.head, columns, styles, fallbackFontName),
+    body: parseSection('body', content.body, columns, styles, fallbackFontName),
   };
 }
 
@@ -1083,7 +1094,7 @@ function parseSection(
   sectionRows: RowInput[],
   columns: Column[],
   styleProps: StylesProps,
-  font: Font
+  fallbackFontName: string
 ): Row[] {
   const rowSpansLeftForColumn: { [key: string]: { left: number; times: number } } = {};
   const result = sectionRows.map((rawRow, rowIndex) => {
@@ -1104,7 +1115,7 @@ function parseSection(
           } else {
             rawCell = rawRow[column.dataKey];
           }
-          const styles = cellStyles(sectionName, column, rowIndex, styleProps, font);
+          const styles = cellStyles(sectionName, column, rowIndex, styleProps, fallbackFontName);
           const cell = new Cell(rawCell, styles, sectionName);
           cells[column.index] = cell;
 
@@ -1133,7 +1144,7 @@ function cellStyles(
   column: Column,
   rowIndex: number,
   styles: StylesProps,
-  font: Font
+  fallbackFontName: string
 ) {
   let sectionStyles;
   if (sectionName === 'head') {
@@ -1142,20 +1153,18 @@ function cellStyles(
     sectionStyles = styles.bodyStyles;
   }
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
+
   const columnStyles =
     styles.columnStyles[column.dataKey] || styles.columnStyles[column.index] || {};
   const colStyles = sectionName === 'body' ? columnStyles : {};
+
   const rowStyles =
     sectionName === 'body' && rowIndex % 2 === 0
       ? Object.assign({}, styles.alternateRowStyles)
       : {};
-  const defaultStyle = defaultStyles(font);
-  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
-}
 
-function defaultStyles(font: Font): Styles {
-  return {
-    fontName: getFallbackFontName(font),
+  const defaultStyle = {
+    fontName: fallbackFontName,
     backgroundColor: '',
     textColor: '#000000',
     lineHeight: 1,
@@ -1170,6 +1179,7 @@ function defaultStyles(font: Font): Styles {
     minCellHeight: 0,
     minCellWidth: 0,
   };
+  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
 }
 
 function parseInput(current: UserOptions): TableInput {
@@ -1290,13 +1300,16 @@ interface TableArgs {
 }
 
 async function createTable(input: TableInput, args: TableArgs) {
-  const { pageSize, font, _cache, schema } = args;
+  const { pageSize, font, _cache } = args;
   const pageWidth = pageSize.width;
-  // TODO ここでschema.fontNameを使っているがそもそもschema.fontNameを削除したいかも
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
-  const content = parseContent4Table(input, font);
+
+  const getFontKitFontByFontName = (fontName: string | undefined) =>
+    getFontKitFont(fontName, font, _cache);
+  const fallbackFontName = getFallbackFontName(font);
+
+  const content = parseContent4Table(input, fallbackFontName);
   const table = new Table(input, content);
-  calculateWidths(table, pageWidth, fontKitFont);
+  await calculateWidths(table, pageWidth, getFontKitFontByFontName);
   return table;
 }
 

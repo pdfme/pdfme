@@ -128,7 +128,6 @@ const renderRowUi = (args: {
             arg.onChange({ key: 'head', value: newHead });
           }
         },
-        // TODO cell.raw を使うべきではない？
         value: cell.raw,
         placeholder: '',
         rootElement: div,
@@ -178,11 +177,7 @@ const tableSchema: Plugin<TableSchema> = {
     const { schema, value } = arg;
     const body = JSON.parse(value) as string[][];
     const table = await autoTable(arg, getTableOptions(schema, body));
-    const tableSize = {
-      width: schema.width,
-      height: table.getHeight(),
-    };
-    console.log(table);
+    const tableSize = { width: schema.width, height: table.getHeight() };
     return tableSize;
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
@@ -423,7 +418,6 @@ const tableSchema: Plugin<TableSchema> = {
           type: 'object',
           widget: 'Card',
           span: 24,
-          // TODO activeSchemaのfontNameがあればfallbackFontNameにそれを使う?
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
         },
         bodyStyles: {
@@ -448,7 +442,6 @@ const tableSchema: Plugin<TableSchema> = {
 
       head: ['Name', 'City', 'Description'],
       headWidthPercentages: [30, 30, 40],
-      fontName: undefined,
       headStyles: Object.assign(getDefaultCellStyles(), {
         fontColor: '#ffffff',
         backgroundColor: '#2980ba',
