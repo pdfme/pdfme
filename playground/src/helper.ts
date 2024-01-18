@@ -485,13 +485,13 @@ export const getTemplate2 = (): Template => ({
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
       },
-      field9: {
+      line: {
         type: 'line',
         position: {
           x: 137.09,
           y: 190.45,
         },
-        width: 50,
+        width: 52.91,
         height: 0.1,
         rotate: 0,
         opacity: 1,

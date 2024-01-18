@@ -879,7 +879,7 @@ function fitContent(table: Table, fontKitFont: FontKitFont) {
         // TODO cell.text がどのようなロジックで配列になっているのか確認するべき
         // ↑ 改行コードで分割している
         value: cell.text.join(' '),
-        characterSpacing: 0,
+        characterSpacing: cell.styles.characterSpacing,
         boxWidthInPt: mm2pt(cell.width),
         fontSize: cell.styles.fontSize,
         fontKitFont,
