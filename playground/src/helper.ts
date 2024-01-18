@@ -389,7 +389,9 @@ export const getTemplate2 = (): Template => ({
         content:
           '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"],["Floral Cotton Dress","1","$123","$123"]]',
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
-        headWidthPercentages: [48.23529411762679, 17.973856209166804, 20.14887436456442],
+        headWidthPercentages: [
+          49.538325694806396, 17.962830593295262, 19.26354959425127, 13.23529411764708,
+        ],
         fontName: 'NotoSerifJP-Regular',
         headStyles: {
           fontName: 'NotoSerifJP-Regular',

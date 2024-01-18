@@ -91,7 +91,7 @@ function App() {
 
   const onResetTemplate = () => {
     if (designer.current) {
-      designer.current.updateTemplate(getTemplate());
+      designer.current.updateTemplate(getTemplate2());
       localStorage.removeItem("template");
     }
   };
