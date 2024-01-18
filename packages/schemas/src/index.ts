@@ -4,6 +4,7 @@ import svg, { readOnlySvg } from './graphics/svg.js';
 import barcodes from './barcodes/index.js';
 import line from './shapes/line.js';
 import table from './tables/table.js';
+import { dryRunAutoTable } from './tables/tableHelper.js';
 import cell from './tables/cell.js';
 import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
 import { convertForPdfLayoutProps, rotatePoint } from './utils.js';
@@ -22,6 +23,7 @@ export {
   table,
   // TODO 最終的にcellはエクスポートしない
   cell,
+  dryRunAutoTable,
   rectangle,
   ellipse,
   builtInPlugins,

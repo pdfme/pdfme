@@ -4,16 +4,8 @@ import {
   UIRenderProps,
   getFallbackFontName,
   DEFAULT_FONT_NAME,
-  getDefaultFont,
 } from '@pdfme/common';
-import {
-  dryRunAutoTable,
-  autoTable,
-  Styles,
-  UserOptions,
-  RowType,
-  parseSpacing,
-} from './tableHelper.js';
+import { dryRunAutoTable, autoTable, Styles, RowType, parseSpacing } from './tableHelper.js';
 import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
 import type { TableSchema, CellStyle } from './types.js';
 import cell from './cell.js';
@@ -21,21 +13,6 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { px2mm } from '../utils';
 
 const cellUiRender = cell.ui;
-
-const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
-  fontName: style.fontName,
-  alignment: style.alignment,
-  verticalAlignment: style.verticalAlignment,
-  fontSize: style.fontSize,
-  lineHeight: style.lineHeight,
-  characterSpacing: style.characterSpacing,
-  backgroundColor: style.backgroundColor,
-  // ---
-  textColor: style.fontColor,
-  lineColor: style.borderColor,
-  lineWidth: style.borderWidth,
-  cellPadding: style.padding,
-});
 
 const convertToCellStyle = (styles: Styles): CellStyle => ({
   fontName: styles.fontName,
@@ -146,23 +123,6 @@ const renderRowUi = (args: {
   });
 };
 
-const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => ({
-  head: [schema.head],
-  body,
-  startY: schema.position.y,
-  tableWidth: schema.width,
-  tableLineColor: schema.tableBorderColor,
-  tableLineWidth: schema.tableBorderWidth,
-  headStyles: mapCellStyle(schema.headStyles),
-  bodyStyles: mapCellStyle(schema.bodyStyles),
-  alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
-  columnStyles: schema.headWidthPercentages.reduce(
-    (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
-    {} as Record<number, Partial<Styles>>
-  ),
-  margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
-});
-
 const headEditingPosition = { rowIndex: -1, colIndex: -1 };
 const bodyEditingPosition = { rowIndex: -1, colIndex: -1 };
 const resetEditingPosition = () => {
@@ -174,18 +134,14 @@ const resetEditingPosition = () => {
 
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
-    const { schema, value } = arg;
+    const { value } = arg;
     const body = JSON.parse(value) as string[][];
-    const table = await autoTable(arg, getTableOptions(schema, body));
-    const tableSize = { width: schema.width, height: table.getHeight() };
-    return tableSize;
+    await autoTable(arg, body);
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, schema, value, options, mode, pageSize, _cache } = arg;
+    const { rootElement, onChange, schema, value, mode, pageSize } = arg;
     const body = JSON.parse(value || '[]') as string[][];
-    const font = options.font || getDefaultFont();
-    const tOption = getTableOptions(schema, body);
-    const table = await dryRunAutoTable({ pageSize, font, _cache, schema }, tOption);
+    const table = await dryRunAutoTable(body, arg, pageSize.width);
 
     rootElement.innerHTML = '';
 

@@ -2,8 +2,6 @@ import type { Font as FontKitFont } from 'fontkit';
 import { rectangle } from '../shapes/rectAndEllipse';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
 import {
-  Font,
-  Size,
   Schema,
   PDFRenderProps,
   getDefaultFont,
@@ -11,7 +9,7 @@ import {
   getFallbackFontName,
   pt2mm,
 } from '@pdfme/common';
-import type { TableSchema } from './types';
+import type { TableSchema, CellStyle } from './types';
 import cell from './cell';
 
 const rectanglePdfRender = rectangle.pdf;
@@ -267,7 +265,7 @@ interface TableInput {
   content: ContentInput;
 }
 
-export interface UserOptions {
+interface UserOptions {
   startY: number;
   tableWidth: number;
   margin: MarginPaddingInput;
@@ -1182,17 +1180,6 @@ function cellStyles(
   return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
 }
 
-function parseInput(current: UserOptions): TableInput {
-  const options = Object.assign({}, current);
-
-  const styles = parseStyles(current);
-  const hooks = parseHooks(current);
-  const settings = parseSettings(options);
-  const content = parseContent4Input(options);
-
-  return { content, hooks, styles, settings };
-}
-
 function parseStyles(cInput: UserOptions) {
   const styleOptions: StylesProps = {
     styles: {},
@@ -1292,16 +1279,43 @@ function parseColumns(head: RowInput[], body: RowInput[]) {
   return result;
 }
 
-interface TableArgs {
-  pageSize: Size;
-  font: Font;
-  _cache: Map<any, any>;
-  schema: TableSchema;
-}
+const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
+  fontName: style.fontName,
+  alignment: style.alignment,
+  verticalAlignment: style.verticalAlignment,
+  fontSize: style.fontSize,
+  lineHeight: style.lineHeight,
+  characterSpacing: style.characterSpacing,
+  backgroundColor: style.backgroundColor,
+  // ---
+  textColor: style.fontColor,
+  lineColor: style.borderColor,
+  lineWidth: style.borderWidth,
+  cellPadding: style.padding,
+});
 
-async function createTable(input: TableInput, args: TableArgs) {
-  const { pageSize, font, _cache } = args;
-  const pageWidth = pageSize.width;
+const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => ({
+  head: [schema.head],
+  body,
+  startY: schema.position.y,
+  tableWidth: schema.width,
+  tableLineColor: schema.tableBorderColor,
+  tableLineWidth: schema.tableBorderWidth,
+  headStyles: mapCellStyle(schema.headStyles),
+  bodyStyles: mapCellStyle(schema.bodyStyles),
+  alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
+  columnStyles: schema.headWidthPercentages.reduce(
+    (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
+    {} as Record<number, Partial<Styles>>
+  ),
+  margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
+});
+
+type CreateTableArgs = Pick<PDFRenderProps<TableSchema>, 'schema' | 'options' | '_cache'>;
+
+async function createTable(input: TableInput, args: CreateTableArgs, pageWidth: number) {
+  const { options, _cache } = args;
+  const font = options.font || getDefaultFont();
 
   const getFontKitFontByFontName = (fontName: string | undefined) =>
     getFontKitFont(fontName, font, _cache);
@@ -1313,16 +1327,24 @@ async function createTable(input: TableInput, args: TableArgs) {
   return table;
 }
 
-export const dryRunAutoTable = (args: TableArgs, options: UserOptions) => {
-  const input = parseInput(options);
-  return createTable(input, args);
+function parseInput(schema: TableSchema, body: string[][]): TableInput {
+  const options = getTableOptions(schema, body);
+  const styles = parseStyles(options);
+  const hooks = parseHooks(options);
+  const settings = parseSettings(options);
+  const content = parseContent4Input(options);
+
+  return { content, hooks, styles, settings };
+}
+
+export const dryRunAutoTable = (body: string[][], args: CreateTableArgs, pageWidth: number) => {
+  const input = parseInput(args.schema, body);
+  return createTable(input, args, pageWidth);
 };
 
-export async function autoTable(args: PDFRenderProps<TableSchema>, userOptions: UserOptions) {
-  const { page, options, _cache, schema } = args;
-  const input = parseInput(userOptions);
-  const font = options.font || getDefaultFont();
-  const table = await createTable(input, { pageSize: page.getSize(), font, _cache, schema });
+export async function autoTable(args: PDFRenderProps<TableSchema>, body: string[][]) {
+  const input = parseInput(args.schema, body);
+  const table = await createTable(input, args, args.page.getWidth());
   await drawTable(args, table);
   return table;
 }

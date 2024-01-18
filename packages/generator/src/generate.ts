@@ -1,7 +1,8 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps, pt2mm } from '@pdfme/common';
+import type { GenerateProps, Size } from '@pdfme/common';
+import { checkGenerateProps } from '@pdfme/common';
 import { insertPage, preprocessing, postProcessing } from './helper.js';
+import { dryRunAutoTable } from '@pdfme/schemas';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -16,9 +17,32 @@ const generate = async (props: GenerateProps) => {
     userPlugins,
   });
 
+  const _cache = new Map();
+
+  for (const schemaObj of template.schemas) {
+    for (const entry of Object.entries(schemaObj)) {
+      const [key, schema] = entry;
+      if (schema.type !== 'table') continue;
+      console.log(schema);
+      const body = JSON.parse(inputs[0][key] || '[]') as string[][];
+      const pageWidth = (template.basePdf as Size).width;
+      const tableArg = { schema, options, _cache };
+      // @ts-ignore
+      const table = await dryRunAutoTable(body, tableArg, pageWidth);
+
+      const diff = table.getHeight() - schema.height;
+      console.log('table.getHeight()', table.getHeight());
+      console.log('schema.height', schema.height);
+      console.log('diff', diff);
+      // TODO ここから
+      // とりあえずフォームから行数を増やして、改ページできるようにする
+      // ここで schema.y よりも大きい他のスキーマの y を増加させる
+      // さらにオーバーフローした場合は、ページを追加する
+    }
+  }
+
   const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
 
-  const _cache = new Map();
   for (let i = 0; i < inputs.length; i += 1) {
     const inputObj = inputs[i];
     for (let j = 0; j < basePages.length; j += 1) {
@@ -38,11 +62,7 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
         const value = schema.readOnly ? schema.content || '' : inputObj[key];
-        const res = await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
-        if (res) {
-          console.log('width', res.width);
-          console.log('height', res.height);
-        }
+        await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }
