@@ -385,7 +385,7 @@ export const getTemplate2 = (): Template => ({
           y: 110.81,
         },
         width: 170,
-        height: 60,
+        height: 61.345600000000005,
         content:
           '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"],["Floral Cotton Dress","1","$123","$123"]]',
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
@@ -410,9 +410,9 @@ export const getTemplate2 = (): Template => ({
             left: 0,
           },
           padding: {
-            top: 1,
+            top: 5,
             right: 5,
-            bottom: 1,
+            bottom: 5,
             left: 5,
           },
         },
@@ -434,9 +434,9 @@ export const getTemplate2 = (): Template => ({
             left: 0,
           },
           padding: {
-            top: 1,
+            top: 6,
             right: 5,
-            bottom: 1,
+            bottom: 5,
             left: 5,
           },
         },
@@ -696,4 +696,5 @@ export const getTemplate2 = (): Template => ({
     height: 297,
     padding: [20, 20, 20, 20],
   },
+  pdfmeVersion: '4-dev',
 });
