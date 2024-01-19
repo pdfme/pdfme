@@ -8,7 +8,6 @@ import {
   PDFRenderProps,
   Plugin,
   getB64BasePdf,
-  BasePdf,
   isBlankPdf,
   mm2pt,
 } from '@pdfme/common';
@@ -17,15 +16,10 @@ import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pd
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
 
-const getBasePagesAndEmbedPdfBoxes = async (arg: {
-  template: Template;
-  pdfDoc: PDFDocument;
-  basePdf: BasePdf;
-}) => {
+export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDocument }) => {
   const {
-    template: { schemas },
+    template: { schemas, basePdf },
     pdfDoc,
-    basePdf,
   } = arg;
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
@@ -67,14 +61,11 @@ const getBasePagesAndEmbedPdfBoxes = async (arg: {
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { basePdf, schemas } = template;
+  const { schemas } = template;
 
   const pdfDoc = await PDFDocument.create();
   // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
-
-  const basePagesAndBoxes = await getBasePagesAndEmbedPdfBoxes({ template, pdfDoc, basePdf });
-  const { basePages, embedPdfBoxes } = basePagesAndBoxes;
 
   const pluginValues = (
     Object.values(userPlugins).length > 0
@@ -96,7 +87,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return { ...acc, [type]: render.pdf };
   }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
 
-  return { pdfDoc, basePages, embedPdfBoxes, renderObj };
+  return { pdfDoc, renderObj };
 };
 
 export const postProcessing = (props: { pdfDoc: PDFDocument; options: GeneratorOptions }) => {
@@ -157,16 +148,14 @@ interface ModifyTemplateForDynamicTableArg {
 /*
  * テーブルの行数が増えた場合、その分、そのテーブルより下のスキーマの y を増加/減少させる
  */
-export const modifyTemplateForDynamicTable = async (arg: ModifyTemplateForDynamicTableArg) => {
+export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options } = arg;
   const diffMap = await calculateDiffMap({ template, input, _cache, options });
-  updateSchemaPositions(template, diffMap);
-  console.log(diffMap);
+  return updateSchemaPositions(template, diffMap);
 };
 
 async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
   const { template, input, _cache, options } = arg;
-  // TODO 
   const diffMap: { [y: number]: number } = {};
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
@@ -181,17 +170,48 @@ async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
   return diffMap;
 }
 
-function updateSchemaPositions(template: Template, diffMap: { [y: number]: number }) {
-  for (const schemaObj of template.schemas) {
-    for (const schema of Object.values(schemaObj)) {
+function updateSchemaPositions(template: Template, diffMap: { [y: number]: number }): Template {
+  const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
+
+  for (let i = 0; i < template.schemas.length; i += 1) {
+    const schemaObj = template.schemas[i];
+    for (const [key, schema] of Object.entries(schemaObj)) {
       for (const [diffKey, diffValue] of Object.entries(diffMap)) {
         if (schema.position.y > Number(diffKey)) {
-          schema.position.y += diffValue;
-        }
-        // TODO ここから
-        // ここで schema.y + schema.height がページの高さを超えた場合、ページを追加する
+          const newY = schema.position.y + Number(diffValue);
 
+          // TODO paddingを考慮する
+          if (newY > (template.basePdf as Size).height) {
+            // 次のページの存在チェック
+            if (returnTemplate.schemas[i + 1]) {
+              // 次のページに追加する
+              returnTemplate.schemas[i + 1][key] = {
+                ...schema,
+                position: { ...schema.position, y: newY - (template.basePdf as Size).height },
+              };
+            } else {
+              // なければページを追加してから追加する
+              returnTemplate.schemas.push({
+                [key]: {
+                  ...schema,
+                  position: { ...schema.position, y: newY - (template.basePdf as Size).height },
+                },
+              });
+            }
+          } else {
+            returnTemplate.schemas[i] = {
+              ...returnTemplate.schemas[i],
+              [key]: { ...schema, position: { ...schema.position, y: newY } },
+            };
+          }
+        } else {
+          returnTemplate.schemas[i] = {
+            ...returnTemplate.schemas[i],
+            [key]: schema,
+          };
+        }
       }
     }
   }
+  return returnTemplate;
 }

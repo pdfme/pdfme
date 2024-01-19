@@ -5,7 +5,8 @@ import {
   insertPage,
   preprocessing,
   postProcessing,
-  modifyTemplateForDynamicTable,
+  getEmbedPdfPages,
+  getDynamicTemplate,
 } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
@@ -16,26 +17,24 @@ const generate = async (props: GenerateProps) => {
     throw new Error('inputs should not be empty');
   }
 
-  const { pdfDoc, basePages, embedPdfBoxes, renderObj } = await preprocessing({
-    template,
-    userPlugins,
-  });
+  const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
   const _cache = new Map();
 
-  await modifyTemplateForDynamicTable({ template, input: inputs[0], options, _cache });
-
-  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
-
   for (let i = 0; i < inputs.length; i += 1) {
-    const inputObj = inputs[i];
+    const input = inputs[i];
+
+    const dt = await getDynamicTemplate({ template, input, options, _cache });
+    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({ template: dt, pdfDoc });
+    const keys = dt.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schemaObj = template.schemas[j] || {};
+        const schemaObj = dt.schemas[j] || {};
         const schema = schemaObj[key];
         if (!schema) {
           continue;
@@ -45,7 +44,7 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.content || '' : inputObj[key];
+        const value = schema.readOnly ? schema.content || '' : input[key];
         await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
       }
     }
