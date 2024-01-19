@@ -405,7 +405,7 @@ class Row {
   }
 }
 
-class Table {
+export class Table {
   readonly settings: Settings;
   readonly styles: StylesProps;
   readonly hooks: HookProps;
@@ -1337,14 +1337,17 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
   return { content, hooks, styles, settings };
 }
 
-export const dryRunAutoTable = (body: string[][], args: CreateTableArgs, pageWidth: number) => {
+export async function autoTable(
+  body: string[][],
+  args: PDFRenderProps<TableSchema> | CreateTableArgs,
+  pageWidth: number
+) {
   const input = parseInput(args.schema, body);
-  return createTable(input, args, pageWidth);
-};
+  const table = await createTable(input, args, pageWidth);
 
-export async function autoTable(args: PDFRenderProps<TableSchema>, body: string[][]) {
-  const input = parseInput(args.schema, body);
-  const table = await createTable(input, args, args.page.getWidth());
-  await drawTable(args, table);
+  if ('pdfLib' in args) {
+    await drawTable(args, table);
+  }
+
   return table;
 }

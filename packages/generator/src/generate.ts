@@ -1,8 +1,12 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, Size } from '@pdfme/common';
+import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps } from '@pdfme/common';
-import { insertPage, preprocessing, postProcessing } from './helper.js';
-import { dryRunAutoTable } from '@pdfme/schemas';
+import {
+  insertPage,
+  preprocessing,
+  postProcessing,
+  modifyTemplateForDynamicTable,
+} from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -19,27 +23,7 @@ const generate = async (props: GenerateProps) => {
 
   const _cache = new Map();
 
-  for (const schemaObj of template.schemas) {
-    for (const entry of Object.entries(schemaObj)) {
-      const [key, schema] = entry;
-      if (schema.type !== 'table') continue;
-      console.log(schema);
-      const body = JSON.parse(inputs[0][key] || '[]') as string[][];
-      const pageWidth = (template.basePdf as Size).width;
-      const tableArg = { schema, options, _cache };
-      // @ts-ignore
-      const table = await dryRunAutoTable(body, tableArg, pageWidth);
-
-      const diff = table.getHeight() - schema.height;
-      console.log('table.getHeight()', table.getHeight());
-      console.log('schema.height', schema.height);
-      console.log('diff', diff);
-      // TODO ここから
-      // とりあえずフォームから行数を増やして、改ページできるようにする
-      // ここで schema.y よりも大きい他のスキーマの y を増加させる
-      // さらにオーバーフローした場合は、ページを追加する
-    }
-  }
+  await modifyTemplateForDynamicTable({ template, input: inputs[0], options, _cache });
 
   const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
 

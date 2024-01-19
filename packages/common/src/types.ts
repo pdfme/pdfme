@@ -136,9 +136,9 @@ export interface PropPanel<T extends Schema> {
  * @property {function} ui Function for rendering UI.
  * @property {PropPanel} propPanel Object for defining the property panel.
  */
-export type Plugin<T extends Schema & { [key: string]: any }> = {
-  pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
-  ui: (arg: UIRenderProps<T>) => Promise<void> | void;
+export type Plugin<T extends Schema & { [key: string]: any }, T2 = void, T3 = void> = {
+  pdf: (arg: PDFRenderProps<T>) => Promise<T2> | void;
+  ui: (arg: UIRenderProps<T>) => Promise<T3> | void;
   propPanel: PropPanel<T>;
 };
 

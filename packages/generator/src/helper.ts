@@ -12,7 +12,7 @@ import {
   isBlankPdf,
   mm2pt,
 } from '@pdfme/common';
-import { builtInPlugins } from '@pdfme/schemas';
+import { builtInPlugins, autoTable } from '@pdfme/schemas';
 import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
@@ -142,3 +142,56 @@ export const insertPage = (arg: {
 
   return insertedPage;
 };
+
+// TODO ここから
+// とりあえずフォームから行数を増やして、改ページできるようにする
+// ここで schema.y よりも大きい他のスキーマの y を増加させる
+// さらにオーバーフローした場合は、ページを追加する
+
+interface ModifyTemplateForDynamicTableArg {
+  template: Template;
+  input: Record<string, string>;
+  _cache: Map<any, any>;
+  options: GeneratorOptions;
+}
+/*
+ * テーブルの行数が増えた場合、その分、そのテーブルより下のスキーマの y を増加/減少させる
+ */
+export const modifyTemplateForDynamicTable = async (arg: ModifyTemplateForDynamicTableArg) => {
+  const { template, input, _cache, options } = arg;
+  const diffMap = await calculateDiffMap({ template, input, _cache, options });
+  updateSchemaPositions(template, diffMap);
+  console.log(diffMap);
+};
+
+async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
+  const { template, input, _cache, options } = arg;
+  // TODO 
+  const diffMap: { [y: number]: number } = {};
+  for (const schemaObj of template.schemas) {
+    for (const [key, schema] of Object.entries(schemaObj)) {
+      if (schema.type !== 'table') continue;
+      const body = JSON.parse(input[key] || '[]') as string[][];
+      const pageWidth = (template.basePdf as Size).width;
+      const tableArg = { schema, options, _cache };
+      const table = await autoTable(body, tableArg, pageWidth);
+      diffMap[schema.position.y + schema.height] = table.getHeight() - schema.height;
+    }
+  }
+  return diffMap;
+}
+
+function updateSchemaPositions(template: Template, diffMap: { [y: number]: number }) {
+  for (const schemaObj of template.schemas) {
+    for (const schema of Object.values(schemaObj)) {
+      for (const [diffKey, diffValue] of Object.entries(diffMap)) {
+        if (schema.position.y > Number(diffKey)) {
+          schema.position.y += diffValue;
+        }
+        // TODO ここから
+        // ここで schema.y + schema.height がページの高さを超えた場合、ページを追加する
+
+      }
+    }
+  }
+}
