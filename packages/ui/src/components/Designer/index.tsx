@@ -89,7 +89,7 @@ const TemplateEditor = ({
       const _schemasList = cloneDeep(schemasList);
       _schemasList[pageCursor] = newSchemas;
       setSchemasList(_schemasList);
-      onChangeTemplate(schemasList2template(template.basePdf, _schemasList));
+      onChangeTemplate(schemasList2template(_schemasList, template.basePdf));
     },
     [template, schemasList, pageCursor, onChangeTemplate]
   );
@@ -179,7 +179,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
   const updatePage = async (sl: SchemaForUI[][], newPageCursor: number) => {
     setPageCursor(newPageCursor);
-    const newTemplate = schemasList2template(template.basePdf, sl);
+    const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);

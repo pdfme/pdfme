@@ -385,9 +385,9 @@ export const getTemplate2 = (): Template => ({
           y: 110.81,
         },
         width: 170,
-        height: 61.345600000000005,
+        height: 45.75920000000001,
         content:
-          '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"],["Floral Cotton Dress","1","$123","$123"]]',
+          '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"]]',
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
         headWidthPercentages: [
           49.538325694806396, 17.962830593295262, 19.26354959425127, 13.23529411764708,
@@ -447,11 +447,11 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 138.01,
-          y: 173.99,
+          y: 156.89,
         },
         content: 'Subtotal',
         width: 25.42,
-        height: 6.77,
+        height: 8.09,
         rotate: 0,
         alignment: 'center',
         verticalAlignment: 'top',
@@ -468,11 +468,11 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 138.01,
-          y: 182.67,
+          y: 164.98,
         },
         content: 'Tax (0%)',
         width: 25.42,
-        height: 7.3,
+        height: 8.89,
         rotate: 0,
         alignment: 'center',
         verticalAlignment: 'top',
@@ -489,7 +489,7 @@ export const getTemplate2 = (): Template => ({
         type: 'line',
         position: {
           x: 137.09,
-          y: 190.45,
+          y: 174.35,
         },
         width: 52.91,
         height: 0.1,
@@ -503,7 +503,7 @@ export const getTemplate2 = (): Template => ({
         content: '$500',
         position: {
           x: 163.79,
-          y: 173.2,
+          y: 157.1,
         },
         width: 26.21,
         height: 7.56,
@@ -523,7 +523,7 @@ export const getTemplate2 = (): Template => ({
         content: '$0',
         position: {
           x: 163.79,
-          y: 181.08,
+          y: 164.98,
         },
         width: 26.21,
         height: 8.89,
@@ -542,7 +542,7 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 136.94,
-          y: 190.74,
+          y: 174.64,
         },
         content: 'Total',
         width: 27.01,
@@ -564,7 +564,7 @@ export const getTemplate2 = (): Template => ({
         content: '$500',
         position: {
           x: 164.05,
-          y: 190.74,
+          y: 174.64,
         },
         width: 25.95,
         height: 11,
@@ -583,7 +583,7 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 20,
-          y: 207.68,
+          y: 191.58,
         },
         content: 'Thank you!',
         width: 52.67,
@@ -604,7 +604,7 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 20,
-          y: 232.77,
+          y: 232.67,
         },
         content: 'Payment Information',
         width: 84.69,
@@ -627,7 +627,7 @@ export const getTemplate2 = (): Template => ({
           'Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025',
         position: {
           x: 20,
-          y: 242.93,
+          y: 242.83,
         },
         width: 84.95,
         height: 34.07,
@@ -651,7 +651,7 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 119.33,
-          y: 248.49,
+          y: 248.39,
         },
         content: 'Samira Hadid',
         width: 70.67,
@@ -672,7 +672,7 @@ export const getTemplate2 = (): Template => ({
         type: 'readOnlyText',
         position: {
           x: 107.69,
-          y: 257,
+          y: 256.9,
         },
         content: '123 Anywhere St., Any City, ST 12345',
         width: 82.31,
@@ -696,5 +696,4 @@ export const getTemplate2 = (): Template => ({
     height: 297,
     padding: [20, 20, 20, 20],
   },
-  pdfmeVersion: '4-dev',
 });

@@ -30,7 +30,6 @@ const generate = async (props: GenerateProps) => {
         return table.getHeight();
       },
     });
-    console.log('dynamicTemplate.schemas', dynamicTemplate.schemas);
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
       template: dynamicTemplate,
       pdfDoc,

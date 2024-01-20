@@ -310,7 +310,7 @@ export const template2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
-export const schemasList2template = (basePdf: BasePdf, schemasList: SchemaForUI[][]): Template => ({
+export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
   schemas: cloneDeep(schemasList).map((schema) =>
     schema.reduce((acc, cur) => {
       const k = cur.key;

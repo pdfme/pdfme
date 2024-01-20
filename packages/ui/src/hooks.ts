@@ -246,7 +246,8 @@ export const useInitEvents = ({
       },
       redo: () => timeTravel('redo'),
       undo: () => timeTravel('undo'),
-      save: () => onSaveTemplate && onSaveTemplate(schemasList2template(template.basePdf, schemasList)),
+      save: () =>
+        onSaveTemplate && onSaveTemplate(schemasList2template(schemasList, template.basePdf)),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
       esc: onEditEnd,
       selectAll: () => onEdit(schemasList[pageCursor].map((s) => document.getElementById(s.id)!)),

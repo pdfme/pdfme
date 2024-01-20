@@ -111,7 +111,7 @@ describe('schemasList2template test', () => {
       schemas: [{ a: getSchema() }],
     };
     const schemasList: SchemaForUI[][] = [[{ id: uuid(), key: 'b', ...getSchema(), content: 'b' }]];
-    expect(schemasList2template(template.basePdf, schemasList)).toStrictEqual({
+    expect(schemasList2template(schemasList, template.basePdf)).toStrictEqual({
       basePdf: BLANK_PDF,
       schemas: [
         { b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: 'b' } },
@@ -127,7 +127,7 @@ describe('schemasList2template test', () => {
     const schemasList: SchemaForUI[][] = [
       [{ id: uuid(), key: 'b', readOnly: true, ...getSchema(), content: 'b' }],
     ];
-    expect(schemasList2template(template.basePdf, schemasList)).toStrictEqual({
+    expect(schemasList2template(schemasList, template.basePdf)).toStrictEqual({
       basePdf: BLANK_PDF,
       schemas: [
         {
