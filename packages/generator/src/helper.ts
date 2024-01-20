@@ -151,7 +151,7 @@ interface ModifyTemplateForDynamicTableArg {
 export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options } = arg;
   const diffMap = await calculateDiffMap({ template, input, _cache, options });
-  return updateSchemaPositions(template, diffMap);
+  return normalizePositionsAndPageBreak(template, diffMap);
 };
 
 async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
@@ -167,48 +167,62 @@ async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
       diffMap[schema.position.y + schema.height] = table.getHeight() - schema.height;
     }
   }
+  // TODO ここでdiffMap内でyが下にあるものに対してもdiffの値を加算する
+  // じゃないとdiffMapのプロパティが複数あるときに対応できない
   return diffMap;
 }
 
-function updateSchemaPositions(template: Template, diffMap: { [y: number]: number }): Template {
+function normalizePositionsAndPageBreak(
+  template: Template,
+  diffMap: { [y: number]: number }
+): Template {
   const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
+  const basePdf = template.basePdf as {
+    width: number;
+    height: number;
+    padding: [number, number, number, number];
+  };
+  const pageHeight = basePdf.height;
+  const padding = basePdf.padding;
+  const paddingTop = padding[0];
+  const paddingBottom = padding[2];
 
   for (let i = 0; i < template.schemas.length; i += 1) {
     const schemaObj = template.schemas[i];
     for (const [key, schema] of Object.entries(schemaObj)) {
       for (const [diffKey, diffValue] of Object.entries(diffMap)) {
-        if (schema.position.y > Number(diffKey)) {
-          const newY = schema.position.y + Number(diffValue);
+        const { position, height } = schema;
+        const page = returnTemplate.schemas;
+        const isAffected = position.y > Number(diffKey);
+        if (isAffected) {
+          const yPlusDiff = position.y + diffValue;
+          const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
+          if (shouldGoNextPage) {
+            // TODO このnewYの計算がおかしい。マイナスになっている
+            // paddingTopは必要なのか？
+            const newY = Math.max(
+              // これがおかしい
+              paddingTop + yPlusDiff - (pageHeight - paddingBottom),
+              paddingTop
+            );
 
-          // TODO paddingを考慮する
-          if (newY > (template.basePdf as Size).height) {
             // 次のページの存在チェック
-            if (returnTemplate.schemas[i + 1]) {
+            const nextPage = page[i + 1];
+            if (nextPage) {
               // 次のページに追加する
-              returnTemplate.schemas[i + 1][key] = {
-                ...schema,
-                position: { ...schema.position, y: newY - (template.basePdf as Size).height },
-              };
+              nextPage[key] = { ...schema, position: { ...position, y: newY } };
             } else {
               // なければページを追加してから追加する
-              returnTemplate.schemas.push({
-                [key]: {
-                  ...schema,
-                  position: { ...schema.position, y: newY - (template.basePdf as Size).height },
-                },
-              });
+              page.push({ [key]: { ...schema, position: { ...position, y: newY } } });
             }
           } else {
-            returnTemplate.schemas[i] = {
-              ...returnTemplate.schemas[i],
-              [key]: { ...schema, position: { ...schema.position, y: newY } },
-            };
+            // なければページを追加してから追加する
+            if (!page[i]) page[i] = {};
+
+            page[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
           }
         } else {
-          returnTemplate.schemas[i] = {
-            ...returnTemplate.schemas[i],
-            [key]: schema,
-          };
+          page[i] = { ...page[i], [key]: schema };
         }
       }
     }

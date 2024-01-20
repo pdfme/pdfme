@@ -110,7 +110,7 @@ export const Font = z.record(
   })
 );
 
-const CommonOptions = z.object({ font: Font.optional() }).passthrough();
+export const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 
 const CommonProps = z.object({
   template: Template,

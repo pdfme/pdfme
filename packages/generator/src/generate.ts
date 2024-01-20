@@ -24,9 +24,13 @@ const generate = async (props: GenerateProps) => {
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
 
-    const dt = await getDynamicTemplate({ template, input, options, _cache });
-    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({ template: dt, pdfDoc });
-    const keys = dt.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+    const dynamicTemplate = await getDynamicTemplate({ template, input, options, _cache });
+    console.log('dynamicTemplate.schemas', dynamicTemplate.schemas);
+    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
+      template: dynamicTemplate,
+      pdfDoc,
+    });
+    const keys = dynamicTemplate.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
@@ -34,7 +38,7 @@ const generate = async (props: GenerateProps) => {
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schemaObj = dt.schemas[j] || {};
+        const schemaObj = dynamicTemplate.schemas[j] || {};
         const schema = schemaObj[key];
         if (!schema) {
           continue;
