@@ -311,7 +311,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       leftPadding = l * ZOOM;
     }
 
-    const pageWidth = mm2px(pageSizes[pageCursor].width)
+    const pageWidth = mm2px(pageSizes[pageCursor].width);
     const pageHeight = mm2px(pageSizes[pageCursor].height);
 
     const obj: { top?: string; left?: string; width: string; height: string } = {
@@ -334,8 +334,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     if (newTop + height > pageHeight - bottomPadding) {
       obj.height = `${pageHeight - bottomPadding - newTop}px`;
     }
-
-
 
     const d = direction.toString();
     if (isTopLeftResize(d)) {
@@ -491,8 +489,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-              }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
+              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+            }`}
             pageSize={pageSizes[pageCursor]}
             scale={scale}
           />

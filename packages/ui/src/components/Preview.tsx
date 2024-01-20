@@ -9,12 +9,21 @@ import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
-import { template2SchemasList, schemasList2template, getPagesScrollTopByIndex } from '../helper';
+import {
+  template2SchemasList,
+  schemasList2template,
+  getPagesScrollTopByIndex
+} from '../helper';
 import { theme } from 'antd';
 
 const _cache = new Map();
 
-const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, 'domContainer'> & {
+const Preview = ({
+  template,
+  inputs,
+  size,
+  onChangeInput,
+}: Omit<PreviewProps, 'domContainer'> & {
   onChangeInput?: (args: { index: number; value: string; key: string }) => void;
   size: Size;
 }) => {
@@ -31,7 +40,11 @@ const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, '
   const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template: templateRef.current, size, zoomLevel });
+  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
+    template: templateRef.current,
+    size,
+    zoomLevel,
+  });
 
   const isForm = Boolean(onChangeInput);
 
@@ -39,22 +52,25 @@ const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, '
 
   const init = (template: Template) => {
     const options = { font };
-    const arg = { template, input, options, _cache }
     getDynamicTemplate({
-      ...arg,
+      template,
+      input,
+      options,
+      _cache,
       getDynamicHeight: async (value, args, pageWidth) => {
         const body = JSON.parse(value || '[]') as string[][];
         const table = await autoTable(body, args, pageWidth);
         return table.getHeight();
-      }
+      },
     })
       .then(async (dynamicTemplate) => {
+        console.log('dynamicTemplate', dynamicTemplate);
         templateRef.current = dynamicTemplate;
         const sl = await template2SchemasList(dynamicTemplate);
         setSchemasList(sl);
       })
-      .catch(console.error)
-  }
+      .catch(console.error);
+  };
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
@@ -66,7 +82,13 @@ const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, '
     init(templateRef.current);
   }, []);
 
-  useScrollPageCursor({ ref: containerRef, pageSizes, scale, pageCursor, onChangePageCursor: setPageCursor });
+  useScrollPageCursor({
+    ref: containerRef,
+    pageSizes,
+    scale,
+    pageCursor,
+    onChangePageCursor: setPageCursor,
+  });
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, key, value });
@@ -120,7 +142,9 @@ const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, '
                     if (_key === 'content') {
                       handleChangeInput({ key, value: value as string });
                     } else {
-                      const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI
+                      const targetSchema = schemasList[pageCursor].find(
+                        (s) => s.id === schema.id
+                      ) as SchemaForUI;
                       if (!targetSchema) return;
 
                       // @ts-ignore
@@ -130,7 +154,9 @@ const Preview = ({ template, inputs, size, onChangeInput }: Omit<PreviewProps, '
                   });
                   init(schemasList2template(schemasList, templateRef.current.basePdf));
                 }}
-                outline={isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'}
+                outline={
+                  isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
+                }
                 pageSize={pageSizes[pageCursor]}
                 scale={scale}
               />

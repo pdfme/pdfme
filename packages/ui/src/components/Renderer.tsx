@@ -49,7 +49,8 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, value, mode, onChange, stopEditing, tabIndex, placeholder, scale, pageSize } = props;
+  const { schema, value, mode, onChange, stopEditing, tabIndex, placeholder, scale, pageSize } =
+    props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());

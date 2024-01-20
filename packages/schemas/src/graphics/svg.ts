@@ -41,7 +41,7 @@ const svgSchema: Plugin<SVGSchema> = {
 
       textarea.addEventListener('change', (e: Event) => {
         const newValue = (e.target as HTMLTextAreaElement).value;
-        onChange && onChange({key: 'content', value: newValue});
+        onChange && onChange({ key: 'content', value: newValue });
       });
       rootElement.appendChild(container);
       textarea.setSelectionRange(value.length, value.length);
