@@ -1,13 +1,8 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps } from '@pdfme/common';
-import {
-  insertPage,
-  preprocessing,
-  postProcessing,
-  getEmbedPdfPages,
-  getDynamicTemplate,
-} from './helper.js';
+import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
+import { autoTable } from '@pdfme/schemas';
+import { insertPage, preprocessing, postProcessing, getEmbedPdfPages } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -24,7 +19,17 @@ const generate = async (props: GenerateProps) => {
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
 
-    const dynamicTemplate = await getDynamicTemplate({ template, input, options, _cache });
+    const dynamicTemplate = await getDynamicTemplate({
+      template,
+      input,
+      options,
+      _cache,
+      getDynamicHeight: async (value, args, pageWidth) => {
+        const body = JSON.parse(value || '[]') as string[][];
+        const table = await autoTable(body, args, pageWidth);
+        return table.getHeight();
+      },
+    });
     console.log('dynamicTemplate.schemas', dynamicTemplate.schemas);
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
       template: dynamicTemplate,

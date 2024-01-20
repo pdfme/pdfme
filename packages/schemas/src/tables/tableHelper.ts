@@ -3,6 +3,7 @@ import { rectangle } from '../shapes/rectAndEllipse';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
 import {
   Schema,
+  CommonOptions,
   PDFRenderProps,
   getDefaultFont,
   mm2pt,
@@ -1311,7 +1312,11 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
   margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
 });
 
-type CreateTableArgs = Pick<PDFRenderProps<TableSchema>, 'schema' | 'options' | '_cache'>;
+type CreateTableArgs = {
+  schema: Schema;
+  options: CommonOptions;
+  _cache: Map<any, any>;
+};
 
 async function createTable(input: TableInput, args: CreateTableArgs, pageWidth: number) {
   const { options, _cache } = args;
@@ -1342,7 +1347,7 @@ export async function autoTable(
   args: PDFRenderProps<TableSchema> | CreateTableArgs,
   pageWidth: number
 ) {
-  const input = parseInput(args.schema, body);
+  const input = parseInput(args.schema as TableSchema, body);
   const table = await createTable(input, args, pageWidth);
 
   if ('pdfLib' in args) {

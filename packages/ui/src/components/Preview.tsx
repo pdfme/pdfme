@@ -7,7 +7,7 @@ import CtlBar from './CtlBar';
 import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
-import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
+import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
 import { theme } from 'antd';
 
 const Preview = ({
@@ -32,7 +32,7 @@ const Preview = ({
   const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
 
   const init = useCallback(async () => {
-    const sl = await templateSchemas2SchemasList(template);
+    const sl = await template2SchemasList(template);
     setSchemasList(sl);
   }, [template]);
 
@@ -114,6 +114,7 @@ const Preview = ({
                       if (!targetSchema) return;
                       // @ts-ignore
                       targetSchema[_key] = value as string;
+                      // TODO ここから ここでdynamicTemplateを利用する？
                       setSchemasList([...schemasList]);
                     }
                   });

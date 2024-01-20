@@ -1,6 +1,5 @@
 import * as fontkit from 'fontkit';
 import {
-  Size,
   Schema,
   Plugins,
   GeneratorOptions,
@@ -11,7 +10,7 @@ import {
   isBlankPdf,
   mm2pt,
 } from '@pdfme/common';
-import { builtInPlugins, autoTable } from '@pdfme/schemas';
+import { builtInPlugins } from '@pdfme/schemas';
 import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
@@ -133,99 +132,3 @@ export const insertPage = (arg: {
 
   return insertedPage;
 };
-
-// TODO ここから
-// とりあえずフォームから行数を増やして、改ページできるようにする
-// ここで schema.y よりも大きい他のスキーマの y を増加させる
-// さらにオーバーフローした場合は、ページを追加する
-
-interface ModifyTemplateForDynamicTableArg {
-  template: Template;
-  input: Record<string, string>;
-  _cache: Map<any, any>;
-  options: GeneratorOptions;
-}
-/*
- * テーブルの行数が増えた場合、その分、そのテーブルより下のスキーマの y を増加/減少させる
- */
-export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
-  const { template, input, _cache, options } = arg;
-  const diffMap = await calculateDiffMap({ template, input, _cache, options });
-  return normalizePositionsAndPageBreak(template, diffMap);
-};
-
-async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
-  const { template, input, _cache, options } = arg;
-  const diffMap: { [y: number]: number } = {};
-  for (const schemaObj of template.schemas) {
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      if (schema.type !== 'table') continue;
-      const body = JSON.parse(input[key] || '[]') as string[][];
-      const pageWidth = (template.basePdf as Size).width;
-      const tableArg = { schema, options, _cache };
-      const table = await autoTable(body, tableArg, pageWidth);
-      diffMap[schema.position.y + schema.height] = table.getHeight() - schema.height;
-    }
-  }
-  // TODO ここでdiffMap内でyが下にあるものに対してもdiffの値を加算する
-  // じゃないとdiffMapのプロパティが複数あるときに対応できない
-  return diffMap;
-}
-
-function normalizePositionsAndPageBreak(
-  template: Template,
-  diffMap: { [y: number]: number }
-): Template {
-  const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
-  const basePdf = template.basePdf as {
-    width: number;
-    height: number;
-    padding: [number, number, number, number];
-  };
-  const pageHeight = basePdf.height;
-  const padding = basePdf.padding;
-  const paddingTop = padding[0];
-  const paddingBottom = padding[2];
-
-  for (let i = 0; i < template.schemas.length; i += 1) {
-    const schemaObj = template.schemas[i];
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      for (const [diffKey, diffValue] of Object.entries(diffMap)) {
-        const { position, height } = schema;
-        const page = returnTemplate.schemas;
-        const isAffected = position.y > Number(diffKey);
-        if (isAffected) {
-          const yPlusDiff = position.y + diffValue;
-          const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
-          if (shouldGoNextPage) {
-            // TODO このnewYの計算がおかしい。マイナスになっている
-            // paddingTopは必要なのか？
-            const newY = Math.max(
-              // これがおかしい
-              paddingTop + yPlusDiff - (pageHeight - paddingBottom),
-              paddingTop
-            );
-
-            // 次のページの存在チェック
-            const nextPage = page[i + 1];
-            if (nextPage) {
-              // 次のページに追加する
-              nextPage[key] = { ...schema, position: { ...position, y: newY } };
-            } else {
-              // なければページを追加してから追加する
-              page.push({ [key]: { ...schema, position: { ...position, y: newY } } });
-            }
-          } else {
-            // なければページを追加してから追加する
-            if (!page[i]) page[i] = {};
-
-            page[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
-          }
-        } else {
-          page[i] = { ...page[i], [key]: schema };
-        }
-      }
-    }
-  }
-  return returnTemplate;
-}

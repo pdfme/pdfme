@@ -52,6 +52,7 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  getDynamicTemplate,
 } from './helper.js';
 
 export {
@@ -72,6 +73,7 @@ export {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  getDynamicTemplate,
   checkFont,
   checkInputs,
   checkUIOptions,

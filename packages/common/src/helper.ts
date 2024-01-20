@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf, Plugins, BlankPdf } from './types';
+import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -216,3 +216,112 @@ export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
+
+// TODO
+// とりあえずフォームから行数を増やして、改ページできるようにする
+// ここで schema.y よりも大きい他のスキーマの y を増加させる
+// さらにオーバーフローした場合は、ページを追加する
+
+interface ModifyTemplateForDynamicTableArg {
+  template: Template;
+  input: Record<string, string>;
+  _cache: Map<any, any>;
+  options: CommonOptions;
+
+  getDynamicHeight: (
+    value: string,
+    args: { schema: Schema; options: CommonOptions; _cache: Map<any, any> },
+    pageWidth: number
+  ) => Promise<number>;
+}
+/*
+ * テーブルの行数が増えた場合、その分、そのテーブルより下のスキーマの y を増加/減少させる
+ */
+export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
+  const { template } = arg;
+  if (!isBlankPdf(template.basePdf)) {
+    return template;
+  }
+  const diffMap = await calculateDiffMap({ ...arg });
+  return normalizePositionsAndPageBreak(template, diffMap);
+};
+
+async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
+  const { template, input, _cache, options, getDynamicHeight } = arg;
+  if (!isBlankPdf(template.basePdf)) {
+    return {};
+  }
+  const diffMap: { [y: number]: number } = {};
+  for (const schemaObj of template.schemas) {
+    for (const [key, schema] of Object.entries(schemaObj)) {
+      if (schema.type !== 'table') continue;
+      const pageWidth = template.basePdf.width;
+      const dynamicHeight = await getDynamicHeight(
+        input[key],
+        { schema, options, _cache },
+        pageWidth
+      );
+      diffMap[schema.position.y + schema.height] = dynamicHeight - schema.height;
+    }
+  }
+  // TODO ここでdiffMap内でyが下にあるものに対してもdiffの値を加算する
+  // じゃないとdiffMapのプロパティが複数あるときに対応できない
+  return diffMap;
+}
+
+function normalizePositionsAndPageBreak(
+  template: Template,
+  diffMap: { [y: number]: number }
+): Template {
+  const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
+  if (!isBlankPdf(template.basePdf) || Object.keys(diffMap).length === 0) {
+    return template;
+  }
+
+  const pageHeight = template.basePdf.height;
+  const padding = template.basePdf.padding;
+  const paddingTop = padding[0];
+  const paddingBottom = padding[2];
+
+  for (let i = 0; i < template.schemas.length; i += 1) {
+    const schemaObj = template.schemas[i];
+    for (const [key, schema] of Object.entries(schemaObj)) {
+      for (const [diffKey, diffValue] of Object.entries(diffMap)) {
+        const { position, height } = schema;
+        const page = returnTemplate.schemas;
+        const isAffected = position.y > Number(diffKey);
+        if (isAffected) {
+          const yPlusDiff = position.y + diffValue;
+          const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
+          if (shouldGoNextPage) {
+            // TODO このnewYの計算がおかしい。マイナスになっている
+            // paddingTopは必要なのか？
+            const newY = Math.max(
+              // これがおかしい
+              paddingTop + yPlusDiff - (pageHeight - paddingBottom),
+              paddingTop
+            );
+
+            // 次のページの存在チェック
+            const nextPage = page[i + 1];
+            if (nextPage) {
+              // 次のページに追加する
+              nextPage[key] = { ...schema, position: { ...position, y: newY } };
+            } else {
+              // なければページを追加してから追加する
+              page.push({ [key]: { ...schema, position: { ...position, y: newY } } });
+            }
+          } else {
+            // なければページを追加してから追加する
+            if (!page[i]) page[i] = {};
+
+            page[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
+          }
+        } else {
+          page[i] = { ...page[i], [key]: schema };
+        }
+      }
+    }
+  }
+  return returnTemplate;
+}

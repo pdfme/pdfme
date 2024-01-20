@@ -16,10 +16,10 @@ import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
 import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
-  fmtTemplate,
+  schemasList2template,
   uuid,
   cloneDeep,
-  templateSchemas2SchemasList,
+  template2SchemasList,
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
 } from '../../helper';
@@ -89,7 +89,7 @@ const TemplateEditor = ({
       const _schemasList = cloneDeep(schemasList);
       _schemasList[pageCursor] = newSchemas;
       setSchemasList(_schemasList);
-      onChangeTemplate(fmtTemplate(template, _schemasList));
+      onChangeTemplate(schemasList2template(template.basePdf, _schemasList));
     },
     [template, schemasList, pageCursor, onChangeTemplate]
   );
@@ -134,7 +134,7 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
-    const sl = await templateSchemas2SchemasList(newTemplate);
+    const sl = await template2SchemasList(newTemplate);
     setSchemasList(sl);
     onEditEnd();
     setPageCursor(0);
@@ -179,7 +179,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
   const updatePage = async (sl: SchemaForUI[][], newPageCursor: number) => {
     setPageCursor(newPageCursor);
-    const newTemplate = fmtTemplate(template, sl);
+    const newTemplate = schemasList2template(template.basePdf, sl);
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);

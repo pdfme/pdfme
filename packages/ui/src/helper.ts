@@ -267,7 +267,7 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
     return acc;
   }, [] as SchemaForUI[][]);
 };
-export const templateSchemas2SchemasList = async (_template: Template) => {
+export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const { basePdf, schemas } = template;
   const sortedSchemasList = sortSchemasList(template);
@@ -310,7 +310,7 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
-export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => ({
+export const schemasList2template = (basePdf: BasePdf, schemasList: SchemaForUI[][]): Template => ({
   schemas: cloneDeep(schemasList).map((schema) =>
     schema.reduce((acc, cur) => {
       const k = cur.key;
@@ -323,7 +323,7 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
       return acc;
     }, {} as { [key: string]: Schema })
   ),
-  basePdf: template.basePdf,
+  basePdf,
 });
 
 export const getUniqSchemaKey = (arg: {
