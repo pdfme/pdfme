@@ -9,11 +9,7 @@ import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
-import {
-  template2SchemasList,
-  schemasList2template,
-  getPagesScrollTopByIndex
-} from '../helper';
+import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
 import { theme } from 'antd';
 
 const _cache = new Map();
@@ -33,15 +29,14 @@ const Preview = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
-  const templateRef = useRef<Template>(template);
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({
-    template: templateRef.current,
+  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
+    template,
     size,
     zoomLevel,
   });
@@ -64,23 +59,20 @@ const Preview = ({
       },
     })
       .then(async (dynamicTemplate) => {
-        console.log('dynamicTemplate', dynamicTemplate);
-        templateRef.current = dynamicTemplate;
         const sl = await template2SchemasList(dynamicTemplate);
         setSchemasList(sl);
+        await refresh(dynamicTemplate);
       })
-      .catch(console.error);
+      .catch((err) => console.error(`[@pdfme/ui] `, err));
   };
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
       setUnitCursor(inputs.length - 1);
     }
-  }, [inputs]);
 
-  useEffect(() => {
-    init(templateRef.current);
-  }, []);
+    init(template);
+  }, [template, inputs]);
 
   useScrollPageCursor({
     ref: containerRef,
@@ -141,6 +133,8 @@ const Preview = ({
                   args.forEach(({ key: _key, value }) => {
                     if (_key === 'content') {
                       handleChangeInput({ key, value: value as string });
+                      // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
+                      init(template);
                     } else {
                       const targetSchema = schemasList[pageCursor].find(
                         (s) => s.id === schema.id
@@ -149,10 +143,9 @@ const Preview = ({
 
                       // @ts-ignore
                       targetSchema[_key] = value as string;
-                      setSchemasList([...schemasList]);
                     }
                   });
-                  init(schemasList2template(schemasList, templateRef.current.basePdf));
+                  setSchemasList([...schemasList]);
                 }}
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'

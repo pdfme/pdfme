@@ -243,7 +243,18 @@ export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) 
     return template;
   }
   const diffMap = await calculateDiffMap({ ...arg });
-  return normalizePositionsAndPageBreak(template, diffMap);
+  console.log('diffMap', diffMap);
+  const res = normalizePositionsAndPageBreak(template, diffMap);
+  console.log(
+    'getDynamicTemplate',
+    res.schemas.map((s) =>
+      Object.entries(s).map(([k, v]) => ({
+        key: k,
+        y: v.position.y,
+      }))
+    )
+  );
+  return res;
 };
 
 async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
@@ -294,10 +305,7 @@ function normalizePositionsAndPageBreak(
           const yPlusDiff = position.y + diffValue;
           const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
           if (shouldGoNextPage) {
-            // TODO このnewYの計算がおかしい。マイナスになっている
-            // paddingTopは必要なのか？
             const newY = Math.max(
-              // これがおかしい
               paddingTop + yPlusDiff - (pageHeight - paddingBottom),
               paddingTop
             );
