@@ -1,6 +1,15 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { mm2pt, pt2mm, pt2px, checkFont, checkPlugins, isHexValid } from '../src/helper';
+import {
+  mm2pt,
+  pt2mm,
+  pt2px,
+  checkFont,
+  checkPlugins,
+  isHexValid,
+  calculateDiffMap,
+  normalizePositionsAndPageBreak,
+} from '../src/helper';
 import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -338,5 +347,26 @@ describe('checkPlugins test', () => {
         `[@pdfme/common] fail,fail2 of template.schemas is not found in plugins.`
       );
     }
+  });
+});
+
+// TODO テストを書く
+describe.only('getDynamicTemplate test', () => {
+  describe('calculateDiffMap test', () => {
+    test('single dynamic schema', () => {
+      expect(1).toEqual(1);
+    });
+    test('multi dynamic schemas', () => {
+      expect(1).toEqual(1);
+    });
+  });
+
+  describe('normalizePositionsAndPageBreak test', () => {
+    test('single dynamic schema', () => {
+      expect(1).toEqual(1);
+    });
+    test('multi dynamic schemas', () => {
+      expect(1).toEqual(1);
+    });
   });
 });

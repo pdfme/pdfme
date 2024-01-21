@@ -217,11 +217,6 @@ export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewProp
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
-// TODO
-// とりあえずフォームから行数を増やして、改ページできるようにする
-// ここで schema.y よりも大きい他のスキーマの y を増加させる
-// さらにオーバーフローした場合は、ページを追加する
-
 interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
@@ -234,9 +229,7 @@ interface ModifyTemplateForDynamicTableArg {
     pageWidth: number
   ) => Promise<number>;
 }
-/*
- * テーブルの行数が増えた場合、その分、そのテーブルより下のスキーマの y を増加/減少させる
- */
+
 export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {
@@ -244,48 +237,54 @@ export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) 
   }
   const diffMap = await calculateDiffMap({ ...arg });
   console.log('diffMap', diffMap);
+
   const res = normalizePositionsAndPageBreak(template, diffMap);
-  console.log(
-    'getDynamicTemplate',
-    res.schemas.map((s) =>
-      Object.entries(s).map(([k, v]) => ({
-        key: k,
-        y: v.position.y,
-      }))
-    )
+
+  const debug = res.schemas.map((s) =>
+    Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
   );
+  console.log('getDynamicTemplate', debug);
+
   return res;
 };
 
-async function calculateDiffMap(arg: ModifyTemplateForDynamicTableArg) {
+export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options, getDynamicHeight } = arg;
+  const diffMap = new Map<number, number>();
   if (!isBlankPdf(template.basePdf)) {
-    return {};
+    return diffMap;
   }
-  const diffMap: { [y: number]: number } = {};
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
-      if (schema.type !== 'table') continue;
       const pageWidth = template.basePdf.width;
       const dynamicHeight = await getDynamicHeight(
         input[key],
         { schema, options, _cache },
         pageWidth
       );
-      diffMap[schema.position.y + schema.height] = dynamicHeight - schema.height;
+      if (schema.height !== dynamicHeight) {
+        diffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
+      }
     }
   }
-  // TODO ここでdiffMap内でyが下にあるものに対してもdiffの値を加算する
-  // じゃないとdiffMapのプロパティが複数あるときに対応できない
-  return diffMap;
-}
 
-function normalizePositionsAndPageBreak(
+  for (const [y, diff] of diffMap.entries()) {
+    for (const [y2, diff2] of diffMap.entries()) {
+      if (Number(y) < Number(y2)) {
+        diffMap.set(Number(y2), Number(diff) + Number(diff2));
+      }
+    }
+  }
+
+  return diffMap;
+};
+
+export const normalizePositionsAndPageBreak = (
   template: Template,
-  diffMap: { [y: number]: number }
-): Template {
+  diffMap: Map<number, number>
+) => {
   const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
-  if (!isBlankPdf(template.basePdf) || Object.keys(diffMap).length === 0) {
+  if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
     return template;
   }
 
@@ -297,7 +296,7 @@ function normalizePositionsAndPageBreak(
   for (let i = 0; i < template.schemas.length; i += 1) {
     const schemaObj = template.schemas[i];
     for (const [key, schema] of Object.entries(schemaObj)) {
-      for (const [diffKey, diffValue] of Object.entries(diffMap)) {
+      for (const [diffKey, diffValue] of diffMap.entries()) {
         const { position, height } = schema;
         const page = returnTemplate.schemas;
         const isAffected = position.y > Number(diffKey);
@@ -332,4 +331,4 @@ function normalizePositionsAndPageBreak(
     }
   }
   return returnTemplate;
-}
+};

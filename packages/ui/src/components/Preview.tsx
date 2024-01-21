@@ -53,6 +53,7 @@ const Preview = ({
       options,
       _cache,
       getDynamicHeight: async (value, args, pageWidth) => {
+        if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
         const table = await autoTable(body, args, pageWidth);
         return table.getHeight();
