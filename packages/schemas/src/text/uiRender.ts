@@ -32,6 +32,11 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
+const getBackgroundColor = (value: string, schema: Schema) => {
+  if (!value || !schema.backgroundColor) return 'transparent';
+  return schema.backgroundColor as string;
+};
+
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const {
     value,
@@ -77,6 +82,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
+    backgroundColor: getBackgroundColor(value, schema),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
