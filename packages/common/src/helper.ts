@@ -217,7 +217,7 @@ export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewProp
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
-interface ModifyTemplateForDynamicTableArg {
+export interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
   _cache: Map<any, any>;
@@ -250,9 +250,9 @@ export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) 
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options, getDynamicHeight } = arg;
-  const diffMap = new Map<number, number>();
+  const tmpDiffMap = new Map<number, number>();
   if (!isBlankPdf(template.basePdf)) {
-    return diffMap;
+    return tmpDiffMap;
   }
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
@@ -263,17 +263,20 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
         pageWidth
       );
       if (schema.height !== dynamicHeight) {
-        diffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
+        tmpDiffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
       }
     }
   }
 
-  for (const [y, diff] of diffMap.entries()) {
-    for (const [y2, diff2] of diffMap.entries()) {
-      if (Number(y) < Number(y2)) {
-        diffMap.set(Number(y2), Number(diff) + Number(diff2));
-      }
-    }
+  const diffMap = new Map<number, number>();
+  const keys = Array.from(tmpDiffMap.keys()).sort((a, b) => a - b);
+  let additionalHeight = 0;
+
+  for (const key of keys) {
+    const value = tmpDiffMap.get(key) as number;
+    const newValue = value + additionalHeight;
+    diffMap.set(key + additionalHeight, newValue);
+    additionalHeight += newValue;
   }
 
   return diffMap;
@@ -283,10 +286,10 @@ export const normalizePositionsAndPageBreak = (
   template: Template,
   diffMap: Map<number, number>
 ) => {
-  const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
   if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
     return template;
   }
+  const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
 
   const pageHeight = template.basePdf.height;
   const padding = template.basePdf.padding;
@@ -301,9 +304,11 @@ export const normalizePositionsAndPageBreak = (
         const page = returnTemplate.schemas;
         const isAffected = position.y > Number(diffKey);
         if (isAffected) {
+          // y座標が影響を受ける場合
           const yPlusDiff = position.y + diffValue;
           const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
           if (shouldGoNextPage) {
+            // 次のページに行く場合
             const newY = Math.max(
               paddingTop + yPlusDiff - (pageHeight - paddingBottom),
               paddingTop

@@ -10,7 +10,7 @@ import {
   calculateDiffMap,
   normalizePositionsAndPageBreak,
 } from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins } from '../src';
+import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, Schema } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -352,21 +352,170 @@ describe('checkPlugins test', () => {
 
 // TODO テストを書く
 describe.only('getDynamicTemplate test', () => {
+  const options = { font: getSampleFont() };
+  const _cache = new Map();
+  const input = {};
+  const getDynamicHeight = (_: string, args: { schema: Schema }) => {
+    const { schema } = args;
+    if (schema.type === 'test') return Promise.resolve(schema.height + 100);
+    return Promise.resolve(schema.height);
+  };
+  const generateTemplateConfig = (template: Template) => ({
+    template,
+    input,
+    _cache,
+    options,
+    getDynamicHeight,
+  });
+
+  const getTemplateForDynamicTemplate = () => {
+    const template = getTemplate();
+    template.basePdf = { width: 210, height: 297, padding: [10, 10, 10, 10] };
+    const schema = template.schemas[0];
+    const schemaA = schema.a;
+    schemaA.position = { x: 0, y: 50 };
+    schemaA.height = 10;
+    const schemaB = schema.b;
+    schemaB.position = { x: 0, y: 75 };
+    schemaB.height = 10;
+    return template;
+  };
+
+  const getSingleDynamicTemplate = () => {
+    const template = getTemplateForDynamicTemplate();
+    const schema = template.schemas[0];
+    schema.test = { type: 'test', position: { x: 0, y: 10 }, width: 100, height: 10 };
+    return template;
+  };
+
+  const getMultiDynamicTemplate = () => {
+    const template = getTemplateForDynamicTemplate();
+    const schema = template.schemas[0];
+    schema.test = { type: 'test', position: { x: 0, y: 10 }, width: 100, height: 10 };
+    schema.test2 = { type: 'test', position: { x: 0, y: 20 }, width: 100, height: 10 };
+    return template;
+  };
+
   describe('calculateDiffMap test', () => {
-    test('single dynamic schema', () => {
-      expect(1).toEqual(1);
+    test('single dynamic schema', async () => {
+      const template = getSingleDynamicTemplate();
+      const tableConfig = generateTemplateConfig(template);
+
+      const diffMap = await calculateDiffMap(tableConfig);
+      expect(diffMap).toEqual(new Map([[20, 100]]));
     });
-    test('multi dynamic schemas', () => {
-      expect(1).toEqual(1);
+
+    test('multi dynamic schemas', async () => {
+      const template = getMultiDynamicTemplate();
+      const tableConfig = generateTemplateConfig(template);
+
+      const diffMap = await calculateDiffMap(tableConfig);
+      expect(diffMap).toEqual(
+        new Map([
+          [20, 100],
+          [130, 200],
+        ])
+      );
     });
   });
 
-  describe('normalizePositionsAndPageBreak test', () => {
+  describe.only('normalizePositionsAndPageBreak test', () => {
     test('single dynamic schema', () => {
-      expect(1).toEqual(1);
+      const template = getTemplateForDynamicTemplate();
+      const diffMap = new Map([[60, 100]]);
+      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+      expect(newTemplate).toEqual({
+        basePdf: template.basePdf,
+        schemas: [
+          {
+            a: {
+              content: 'a',
+              type: 'text',
+              fontName: 'SauceHanSansJP',
+              position: { x: 0, y: 50 },
+              width: 100,
+              height: 10,
+            },
+            b: {
+              content: 'b',
+              type: 'text',
+              position: { x: 0, y: 175 },
+              width: 100,
+              height: 10,
+            },
+          },
+        ],
+      });
     });
-    test('multi dynamic schemas', () => {
-      expect(1).toEqual(1);
+
+    test('single dynamic schema (page break case1)', () => {
+      const template = getTemplateForDynamicTemplate();
+      const diffMap = new Map([[60, 300]]);
+      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+      expect(newTemplate).toEqual({
+        basePdf: template.basePdf,
+        schemas: [
+          {
+            a: {
+              content: 'a',
+              type: 'text',
+              fontName: 'SauceHanSansJP',
+              position: { x: 0, y: 50 },
+              width: 100,
+              height: 10,
+            },
+          },
+          {
+            b: {
+              content: 'b',
+              type: 'text',
+              position: { x: 0, y: 98 },
+              width: 100,
+              height: 10,
+            },
+          },
+        ],
+      });
     });
+
+    test('single dynamic schema (page break case2)', () => {
+      const template = getTemplateForDynamicTemplate();
+      const diffMap = new Map([[0, 300]]);
+      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+      expect(newTemplate).toEqual({
+        basePdf: template.basePdf,
+        schemas: [
+          // TODO ここから
+          // aのスキーマは次のページに行ったはずなのに、残っている
+          {},
+          {
+            a: {
+              content: 'a',
+              type: 'text',
+              fontName: 'SauceHanSansJP',
+              position: { x: 0, y: 73 },
+              width: 100,
+              height: 10,
+            },
+            b: {
+              content: 'b',
+              type: 'text',
+              position: { x: 0, y: 98 },
+              width: 100,
+              height: 10,
+            },
+          },
+        ],
+      });
+    });
+
+    // test('multi dynamic schemas', () => {
+    //   const template = getTemplateForDynamicTemplate();
+    //   const diffMap = new Map([
+    //     [20, 100],
+    //     [130, 200],
+    //   ]);
+    //   const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+    // });
   });
 });
