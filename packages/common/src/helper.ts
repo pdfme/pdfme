@@ -292,45 +292,42 @@ export const normalizePositionsAndPageBreak = (
   const returnTemplate: Template = { schemas: [], basePdf: template.basePdf };
 
   const pageHeight = template.basePdf.height;
-  const padding = template.basePdf.padding;
-  const paddingTop = padding[0];
-  const paddingBottom = padding[2];
+  const paddingTop = template.basePdf.padding[0];
+  const paddingBottom = template.basePdf.padding[2];
 
   for (let i = 0; i < template.schemas.length; i += 1) {
     const schemaObj = template.schemas[i];
     for (const [key, schema] of Object.entries(schemaObj)) {
       for (const [diffKey, diffValue] of diffMap.entries()) {
         const { position, height } = schema;
-        const page = returnTemplate.schemas;
-        const isAffected = position.y > Number(diffKey);
-        if (isAffected) {
-          // y座標が影響を受ける場合
-          const yPlusDiff = position.y + diffValue;
-          const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
-          if (shouldGoNextPage) {
-            // 次のページに行く場合
-            const newY = Math.max(
-              paddingTop + yPlusDiff - (pageHeight - paddingBottom),
-              paddingTop
-            );
+        const pages = returnTemplate.schemas;
 
-            // 次のページの存在チェック
-            const nextPage = page[i + 1];
-            if (nextPage) {
-              // 次のページに追加する
-              nextPage[key] = { ...schema, position: { ...position, y: newY } };
-            } else {
-              // なければページを追加してから追加する
-              page.push({ [key]: { ...schema, position: { ...position, y: newY } } });
-            }
-          } else {
-            // なければページを追加してから追加する
-            if (!page[i]) page[i] = {};
+        //  y座標が影響を受けない場合
+        if (!(position.y > diffKey)) {
+          const targetSchema = pages[i] && pages[i][key] ? pages[i][key] : schema;
+          pages[i] = { ...pages[i], [key]: targetSchema };
+          continue;
+        }
 
-            page[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
-          }
+        // y座標が影響を受ける場合
+        const yPlusDiff = position.y + diffValue;
+        const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
+        if (!shouldGoNextPage) {
+          if (!pages[i]) pages[i] = {};
+          pages[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
+          continue;
+        }
+
+        const newY = Math.max(paddingTop + yPlusDiff - (pageHeight - paddingBottom), paddingTop);
+        // 次のページの存在チェック
+        // TODO ここから 次のページに行ったら前のページにあるschemaは削除するべき
+        const nextPage = pages[i + 1];
+        if (nextPage) {
+          // 次のページに追加する
+          nextPage[key] = { ...schema, position: { ...position, y: newY } };
         } else {
-          page[i] = { ...page[i], [key]: schema };
+          // なければページを追加してから追加する
+          pages.push({ [key]: { ...schema, position: { ...position, y: newY } } });
         }
       }
     }

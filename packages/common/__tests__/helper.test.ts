@@ -448,7 +448,7 @@ describe.only('getDynamicTemplate test', () => {
       });
     });
 
-    test('single dynamic schema (page break case1)', () => {
+    test('single dynamic schema (page break)', () => {
       const template = getTemplateForDynamicTemplate();
       const diffMap = new Map([[60, 300]]);
       const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
@@ -478,29 +478,31 @@ describe.only('getDynamicTemplate test', () => {
       });
     });
 
-    test('single dynamic schema (page break case2)', () => {
+    test('multi dynamic schemas', () => {
       const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([[0, 300]]);
+      const diffMap = new Map([
+        [45, 10],
+        [65, 30],
+      ]);
       const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
       expect(newTemplate).toEqual({
         basePdf: template.basePdf,
         schemas: [
-          // TODO ここから
-          // aのスキーマは次のページに行ったはずなのに、残っている
-          {},
           {
             a: {
               content: 'a',
               type: 'text',
               fontName: 'SauceHanSansJP',
-              position: { x: 0, y: 73 },
+              // y: 50->60
+              position: { x: 0, y: 60 },
               width: 100,
               height: 10,
             },
             b: {
               content: 'b',
               type: 'text',
-              position: { x: 0, y: 98 },
+              // y: 75->105
+              position: { x: 0, y: 105 },
               width: 100,
               height: 10,
             },
@@ -509,7 +511,8 @@ describe.only('getDynamicTemplate test', () => {
       });
     });
 
-    // test('multi dynamic schemas', () => {
+    // TODO ここから
+    // test('multi dynamic schemas (page break)', () => {
     //   const template = getTemplateForDynamicTemplate();
     //   const diffMap = new Map([
     //     [20, 100],
