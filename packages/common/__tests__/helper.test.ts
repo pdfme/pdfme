@@ -350,7 +350,6 @@ describe('checkPlugins test', () => {
   });
 });
 
-// TODO テストを書く
 describe.only('getDynamicTemplate test', () => {
   const options = { font: getSampleFont() };
   const _cache = new Map();
@@ -419,7 +418,7 @@ describe.only('getDynamicTemplate test', () => {
     });
   });
 
-  describe.only('normalizePositionsAndPageBreak test', () => {
+  describe('normalizePositionsAndPageBreak test', () => {
     test('single dynamic schema', () => {
       const template = getTemplateForDynamicTemplate();
       const diffMap = new Map([[60, 100]]);
@@ -432,6 +431,7 @@ describe.only('getDynamicTemplate test', () => {
               content: 'a',
               type: 'text',
               fontName: 'SauceHanSansJP',
+              // y: 50->50
               position: { x: 0, y: 50 },
               width: 100,
               height: 10,
@@ -439,6 +439,7 @@ describe.only('getDynamicTemplate test', () => {
             b: {
               content: 'b',
               type: 'text',
+              // y: 75->175
               position: { x: 0, y: 175 },
               width: 100,
               height: 10,
@@ -460,6 +461,7 @@ describe.only('getDynamicTemplate test', () => {
               content: 'a',
               type: 'text',
               fontName: 'SauceHanSansJP',
+              // y: 50->50
               position: { x: 0, y: 50 },
               width: 100,
               height: 10,
@@ -469,6 +471,10 @@ describe.only('getDynamicTemplate test', () => {
             b: {
               content: 'b',
               type: 'text',
+              // schema y: 75 + 300
+              // page: 297 - (10 + 10)
+              // (75 + 300) - (297 - (10 + 10)) = 98
+              // y: 75->98
               position: { x: 0, y: 98 },
               width: 100,
               height: 10,
@@ -512,13 +518,45 @@ describe.only('getDynamicTemplate test', () => {
     });
 
     // TODO ここから
-    // test('multi dynamic schemas (page break)', () => {
-    //   const template = getTemplateForDynamicTemplate();
-    //   const diffMap = new Map([
-    //     [20, 100],
-    //     [130, 200],
-    //   ]);
-    //   const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-    // });
+    test.only('multi dynamic schemas (page break)', () => {
+      const template = getTemplateForDynamicTemplate();
+      const diffMap = new Map([
+        [45, 100],
+        [65, 300],
+      ]);
+      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+      expect(newTemplate).toEqual({
+        basePdf: template.basePdf,
+        schemas: [
+          {
+            a: {
+              content: 'a',
+              type: 'text',
+              fontName: 'SauceHanSansJP',
+              // y: 50->150
+              position: { x: 0, y: 150 },
+              width: 100,
+              height: 10,
+            },
+          },
+          {
+            b: {
+              content: 'b',
+              type: 'text',
+              // schema y: 75 + 300
+              // page: 297 - (10 + 10)
+              // (75 + 300) - (297 - (10 + 10)) = 98
+              // y: 75->98
+              position: { x: 0, y: 98 },
+              width: 100,
+              height: 10,
+            },
+          },
+        ],
+      });
+    });
+
+    // TODO 2ページ以上のページブレイクがある場合のテスト
+    // 次のページだけじゃないかもしれない の部分を修正する必要があるはず
   });
 });
