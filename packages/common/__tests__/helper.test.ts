@@ -350,7 +350,7 @@ describe('checkPlugins test', () => {
   });
 });
 
-describe.only('getDynamicTemplate test', () => {
+describe('getDynamicTemplate test', () => {
   const options = { font: getSampleFont() };
   const _cache = new Map();
   const input = {};
@@ -517,8 +517,8 @@ describe.only('getDynamicTemplate test', () => {
       });
     });
 
-    // TODO ここから
-    test.only('multi dynamic schemas (page break)', () => {
+    // TODO テストを通るようにする
+    test('multi dynamic schemas (page break)', () => {
       const template = getTemplateForDynamicTemplate();
       const diffMap = new Map([
         [45, 100],
@@ -556,7 +556,19 @@ describe.only('getDynamicTemplate test', () => {
       });
     });
 
-    // TODO 2ページ以上のページブレイクがある場合のテスト
-    // 次のページだけじゃないかもしれない の部分を修正する必要があるはず
+    test('multi dynamic schemas (page break 2 pages)', () => {
+      const template = getTemplateForDynamicTemplate();
+      const diffMap = new Map([
+        [45, 300],
+        [65, 300],
+      ]);
+      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
+      expect(newTemplate).toEqual({
+        basePdf: template.basePdf,
+        schemas: [
+          // TODO テストを書く
+        ],
+      });
+    });
   });
 });

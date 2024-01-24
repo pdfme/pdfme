@@ -236,14 +236,13 @@ export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) 
     return template;
   }
   const diffMap = await calculateDiffMap({ ...arg });
-  console.log('diffMap', diffMap);
 
   const res = normalizePositionsAndPageBreak(template, diffMap);
 
-  const debug = res.schemas.map((s) =>
-    Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
-  );
-  console.log('getDynamicTemplate', debug);
+  // const debug = res.schemas.map((s) =>
+  //   Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
+  // );
+  // console.log('getDynamicTemplate', debug);
 
   return res;
 };
