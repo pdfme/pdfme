@@ -6,7 +6,11 @@ import {
   DEFAULT_FONT_NAME,
 } from '@pdfme/common';
 import { autoTable, Styles, RowType, parseSpacing, Table } from './tableHelper.js';
-import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
+import {
+  getDefaultCellStyles,
+  getCellPropPanelSchema,
+  getColumnStylesPropPanelSchema,
+} from './helper.js';
 import type { TableSchema, CellStyle } from './types.js';
 import cell from './cell.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
@@ -225,9 +229,12 @@ const tableSchema: Plugin<TableSchema, Table> = {
         const scalingRatio = (100 - newColumnWidthPercentage) / totalCurrentWidth;
         const scaledWidths = schema.headWidthPercentages.map((width) => width * scalingRatio);
         onChange([
-          { key: 'head', value: schema.head.concat('') },
+          { key: 'head', value: schema.head.concat(`Head ${schema.head.length + 1}`) },
           { key: 'headWidthPercentages', value: scaledWidths.concat(newColumnWidthPercentage) },
-          { key: 'content', value: JSON.stringify(body.map((row) => row.concat(''))) },
+          {
+            key: 'content',
+            value: JSON.stringify(body.map((row, i) => row.concat(`Row ${i + 1}`))),
+          },
         ]);
       };
       rootElement.appendChild(addColumnButton);
@@ -248,6 +255,9 @@ const tableSchema: Plugin<TableSchema, Table> = {
             (sum, width, j) => (j !== i ? sum + width : sum),
             0
           );
+
+          // TODO 削除時に削除されたcolumnStylesも削除するべき
+
           onChange([
             { key: 'head', value: schema.head.filter((_, j) => j !== i) },
             {
@@ -348,11 +358,14 @@ const tableSchema: Plugin<TableSchema, Table> = {
     }
   },
   propPanel: {
-    schema: ({ options, i18n }) => {
+    schema: ({ activeSchema, options, i18n }) => {
+      // @ts-ignore
+      const head = (activeSchema.head || []) as string[];
       const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
       const fontNames = Object.keys(font);
       const fallbackFontName = getFallbackFontName(font);
       return {
+        // TODO ここから これもネストさせて Card に入れたい
         tableBorderWidth: {
           // TODO i18n
           title: 'tableBorderWidth',
@@ -384,6 +397,13 @@ const tableSchema: Plugin<TableSchema, Table> = {
           span: 24,
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
         },
+        columnStyles: {
+          title: 'Column Style',
+          type: 'object',
+          widget: 'Card',
+          span: 24,
+          properties: getColumnStylesPropPanelSchema({ head, i18n }),
+        },
       };
     },
     defaultSchema: {
@@ -395,7 +415,6 @@ const tableSchema: Plugin<TableSchema, Table> = {
         ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
         ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
       ]),
-
       head: ['Name', 'City', 'Description'],
       headWidthPercentages: [30, 30, 40],
       headStyles: Object.assign(getDefaultCellStyles(), {
@@ -407,6 +426,7 @@ const tableSchema: Plugin<TableSchema, Table> = {
       bodyStyles: Object.assign(getDefaultCellStyles(), {
         alternateBackgroundColor: '#f5f5f5',
       }),
+      columnStyles: {},
       tableBorderColor: '#000000',
       tableBorderWidth: 0.3,
     },

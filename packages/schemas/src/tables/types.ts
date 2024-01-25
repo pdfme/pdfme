@@ -29,6 +29,9 @@ export interface TableSchema extends Schema {
   headWidthPercentages: number[];
   headStyles: CellStyle;
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
+  columnStyles: {
+    alignment?: { [colIndex: number]: ALIGNMENT };
+  };
   tableBorderColor: string;
   tableBorderWidth: number;
 

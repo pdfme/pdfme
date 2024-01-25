@@ -155,3 +155,36 @@ export const getCellPropPanelSchema = (arg: {
     },
   };
 };
+
+export const getColumnStylesPropPanelSchema = ({
+  head,
+  i18n,
+}: {
+  head: string[];
+  i18n: (key: string) => string;
+}) => ({
+  alignment: {
+    type: 'object',
+    widget: 'lineTitle',
+    title: i18n('schemas.text.textAlign'),
+    column: 3,
+    properties: head.reduce(
+      (acc, cur, i) =>
+        Object.assign(acc, {
+          [i]: {
+            title: cur || 'Column ' + String(i + 1),
+            type: 'string',
+            widget: 'select',
+            props: {
+              options: [
+                { label: i18n('schemas.left'), value: ALIGN_LEFT },
+                { label: i18n('schemas.center'), value: ALIGN_CENTER },
+                { label: i18n('schemas.right'), value: ALIGN_RIGHT },
+              ],
+            },
+          },
+        }),
+      {}
+    ),
+  },
+});

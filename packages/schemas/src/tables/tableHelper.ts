@@ -344,7 +344,7 @@ class Cell {
 
 class Column {
   raw: ColumnInput | null;
-  dataKey: string | number;
+  dataKey: number;
   index: number;
 
   wrappedWidth = 0;
@@ -352,7 +352,7 @@ class Column {
   minWidth = 0;
   width = 0;
 
-  constructor(dataKey: string | number, raw: ColumnInput | null, index: number) {
+  constructor(dataKey: number, raw: ColumnInput | null, index: number) {
     this.dataKey = dataKey;
     this.raw = raw;
     this.index = index;
@@ -1012,10 +1012,7 @@ async function calculate(
 
         // Note that this is not perfect for now since for example row and table styles are
         // not accounted for
-        const columnStyles =
-          table.styles.columnStyles[column.dataKey] ||
-          table.styles.columnStyles[column.index] ||
-          {};
+        const columnStyles = table.styles.columnStyles[column.dataKey] || {};
         const cellWidth = columnStyles.cellWidth || columnStyles.minCellWidth;
         if (cellWidth && typeof cellWidth === 'number') {
           column.minWidth = cellWidth;
@@ -1153,9 +1150,7 @@ function cellStyles(
   }
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
 
-  const columnStyles =
-    styles.columnStyles[column.dataKey] || styles.columnStyles[column.index] || {};
-  const colStyles = sectionName === 'body' ? columnStyles : {};
+  const colStyles = styles.columnStyles[column.dataKey] || styles.columnStyles[column.index] || {};
 
   const rowStyles =
     sectionName === 'body' && rowIndex % 2 === 0
@@ -1295,22 +1290,41 @@ const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
   cellPadding: style.padding,
 });
 
-const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => ({
-  head: [schema.head],
-  body,
-  startY: schema.position.y,
-  tableWidth: schema.width,
-  tableLineColor: schema.tableBorderColor,
-  tableLineWidth: schema.tableBorderWidth,
-  headStyles: mapCellStyle(schema.headStyles),
-  bodyStyles: mapCellStyle(schema.bodyStyles),
-  alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
-  columnStyles: schema.headWidthPercentages.reduce(
-    (acc, cur, i) => Object.assign(acc, { [i]: { cellWidth: schema.width * (cur / 100) } }),
+const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => {
+  const columnStylesWidth = schema.headWidthPercentages.reduce(
+    (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
     {} as Record<number, Partial<Styles>>
-  ),
-  margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
-});
+  );
+
+  const columnStylesAlignment = Object.entries(schema.columnStyles.alignment || {}).reduce(
+    (acc, [key, value]) => ({ ...acc, [key]: { alignment: value } }),
+    {} as Record<number, Partial<Styles>>
+  );
+
+  const allKeys = new Set([
+    ...Object.keys(columnStylesWidth).map(Number),
+    ...Object.keys(columnStylesAlignment).map(Number),
+  ]);
+  const columnStyles = Array.from(allKeys).reduce((acc, key) => {
+    const widthStyle = columnStylesWidth[key] || {};
+    const alignmentStyle = columnStylesAlignment[key] || {};
+    return { ...acc, [key]: { ...widthStyle, ...alignmentStyle } };
+  }, {} as Record<number, Partial<Styles>>);
+
+  return {
+    head: [schema.head],
+    body,
+    startY: schema.position.y,
+    tableWidth: schema.width,
+    tableLineColor: schema.tableBorderColor,
+    tableLineWidth: schema.tableBorderWidth,
+    headStyles: mapCellStyle(schema.headStyles),
+    bodyStyles: mapCellStyle(schema.bodyStyles),
+    alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
+    columnStyles,
+    margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
+  };
+};
 
 type CreateTableArgs = {
   schema: Schema;
