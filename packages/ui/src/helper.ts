@@ -1,7 +1,8 @@
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+// TODO Update pdfjs-dist. (might be able to reduce the bundle size.)
 // @ts-ignore
-import * as pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs';
-GlobalWorkerOptions.workerSrc = pdfWorker;
+import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
+import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
+GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
 import hotkeys from 'hotkeys-js';
 import {
