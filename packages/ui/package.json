@@ -85,8 +85,8 @@
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
-      "^pdfjs-dist$": "<rootDir>/__mocks__/pdfjs-dist.js",
-      "^pdfjs-dist/build/pdf.worker.mjs$": "<rootDir>/__mocks__/pdfjs-dist.js"
+      "^pdfjs-dist/legacy/build/pdf.js$": "<rootDir>/__mocks__/pdfjs-dist.js",
+      "^pdfjs-dist/legacy/build/pdf.worker.entry.js$": "<rootDir>/__mocks__/pdfjs-dist.js"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
