@@ -1,25 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import topLevelAwait from 'vite-plugin-top-level-await';
-import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    tsconfigPaths({root: '.'}),
-    topLevelAwait({
-      promiseExportName: '__tla',
-      promiseImportName: (i) => `__tla_${i}`,
-    }),
-    cssInjectedByJsPlugin(),
-  ],
+  plugins: [react(), tsconfigPaths({ root: '.' }), cssInjectedByJsPlugin()],
   build: {
     lib: {
       entry: 'src/index.ts',
       name: '@pdfme/ui',
-      fileName: () => `index.js`,
-      formats: ['es'],
+      fileName: (format) => `index.${format}.js`,
     },
   },
   optimizeDeps: {
