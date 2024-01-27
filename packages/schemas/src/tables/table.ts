@@ -72,7 +72,6 @@ const renderRowUi = (args: {
     const { cells, height, section } = row;
     let colWidth = 0;
     Object.values(cells).forEach((cell, colIndex) => {
-      // TODO これがあるから編集時に文字かがさなるバグがあるのかも
       const div = document.createElement('div');
       div.style.position = 'absolute';
       div.style.top = `${rowOffsetY}mm`;
@@ -366,23 +365,20 @@ const tableSchema: Plugin<TableSchema, Table> = {
       const fallbackFontName = getFallbackFontName(font);
       return {
         tableStyles: {
-          // TODO i18n
-          title: 'Table Style',
+          title: i18n('schemas.table.tableStyle'),
           type: 'object',
           widget: 'Card',
           span: 24,
           properties: {
             borderWidth: {
-              // TODO i18n
-              title: 'borderWidth',
+              title: i18n('schemas.borderWidth'),
               type: 'number',
               widget: 'inputNumber',
               props: { min: 0, step: 0.1 },
               step: 1,
             },
             borderColor: {
-              // TODO i18n
-              title: 'borderColor',
+              title: i18n('schemas.borderColor'),
               type: 'string',
               widget: 'color',
               rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
@@ -390,24 +386,21 @@ const tableSchema: Plugin<TableSchema, Table> = {
           },
         },
         headStyles: {
-          // TODO i18n
-          title: 'Table Head Style',
+          title: i18n('schemas.table.headStyle'),
           type: 'object',
           widget: 'Card',
           span: 24,
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames }),
         },
         bodyStyles: {
-          // TODO i18n
-          title: 'Table Body Style',
+          title: i18n('schemas.table.bodyStyle'),
           type: 'object',
           widget: 'Card',
           span: 24,
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
         },
         columnStyles: {
-          // TODO i18n
-          title: 'Column Style',
+          title: i18n('schemas.table.columnStyle'),
           type: 'object',
           widget: 'Card',
           span: 24,

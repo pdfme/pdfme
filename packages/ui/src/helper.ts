@@ -1,4 +1,4 @@
-// TODO Update pdfjs-dist. (might be able to reduce the bundle size.)
+// Update pdfjs-dist. (might be able to reduce the bundle size.)
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';

@@ -113,15 +113,13 @@ export const getCellPropPanelSchema = (arg: {
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
     },
     borderColor: {
-      // TODO i18n
-      title: 'borderColor',
+      title: i18n('schemas.borderColor'),
       type: 'string',
       widget: 'color',
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
     },
     backgroundColor: {
-      // TODO i18n
-      title: 'backgroundColor',
+      title: i18n('schemas.backgroundColor'),
       type: 'string',
       widget: 'color',
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
@@ -129,27 +127,26 @@ export const getCellPropPanelSchema = (arg: {
     ...(isBody
       ? {
           alternateBackgroundColor: {
-            // TODO i18n
-            title: 'alternateBackgroundColor',
+            title: i18n('schemas.table.alternateBackgroundColor'),
             type: 'string',
             widget: 'color',
             rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
           },
         }
       : {}),
+    '-': { type: 'void', widget: 'Divider' },
     borderWidth: {
-      // TODO i18n
-      title: 'borderWidth',
+      title: i18n('schemas.borderWidth'),
       type: 'object',
-      widget: 'SubInline',
+      widget: 'lineTitle',
       span: 24,
       properties: getBoxDimensionProp(0.1),
     },
+    '--': { type: 'void', widget: 'Divider' },
     padding: {
-      // TODO i18n
-      title: 'padding',
+      title: i18n('schemas.padding'),
       type: 'object',
-      widget: 'SubInline',
+      widget: 'lineTitle',
       span: 24,
       properties: getBoxDimensionProp(),
     },

@@ -34,6 +34,7 @@ export const Dict = z.object({
   'schemas.color': z.string(),
   'schemas.borderWidth': z.string(),
   'schemas.borderColor': z.string(),
+  'schemas.backgroundColor': z.string(),
   'schemas.textColor': z.string(),
   'schemas.bgColor': z.string(),
   'schemas.horizontal': z.string(),
@@ -44,6 +45,7 @@ export const Dict = z.object({
   'schemas.top': z.string(),
   'schemas.middle': z.string(),
   'schemas.bottom': z.string(),
+  'schemas.padding': z.string(),
 
   'schemas.text.fontName': z.string(),
   'schemas.text.size': z.string(),
@@ -58,6 +60,12 @@ export const Dict = z.object({
 
   'schemas.barcodes.barColor': z.string(),
   'schemas.barcodes.includetext': z.string(),
+
+  'schemas.table.alternateBackgroundColor': z.string(),
+  'schemas.table.tableStyle': z.string(),
+  'schemas.table.headStyle': z.string(),
+  'schemas.table.bodyStyle': z.string(),
+  'schemas.table.columnStyle': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
