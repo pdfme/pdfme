@@ -76,7 +76,9 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     });
     container.appendChild(input);
     input.setSelectionRange(value.length, value.length);
-    input.focus();
+    if (mode === 'designer') {
+      input.focus();
+    }
   }
 
   if (!value) return;
