@@ -27,13 +27,14 @@ export type CellSchema = Schema & CellStyle;
 export interface TableSchema extends Schema {
   head: string[];
   headWidthPercentages: number[];
+  tableStyles: {
+    borderColor: string;
+    borderWidth: number;
+    // TODO ただのアイデアだがrowのmin,maxがあるといいかも
+  };
   headStyles: CellStyle;
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
   };
-  tableBorderColor: string;
-  tableBorderWidth: number;
-
-  // TODO ただのアイデアだがrowのmin,maxがあるといいかも
 }

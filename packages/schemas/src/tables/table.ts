@@ -66,7 +66,7 @@ const renderRowUi = (args: {
   // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
   // border-collapse: collapse; と同じスタイルにする
   // 重なるボーダーは一つにするこれはテーブル自体もそうだが、セルも同じようにする
-  // const tableBorderWidth = arg.schema.tableBorderWidth;
+  // const tableBorderWidth = arg.schema.tableStyles.borderWidth;
   let rowOffsetY = offsetY;
   rows.forEach((row, rowIndex) => {
     const { cells, height, section } = row;
@@ -149,8 +149,8 @@ const tableSchema: Plugin<TableSchema, Table> = {
 
     rootElement.innerHTML = '';
 
-    rootElement.style.borderColor = schema.tableBorderColor;
-    rootElement.style.borderWidth = String(schema.tableBorderWidth) + 'mm';
+    rootElement.style.borderColor = schema.tableStyles.borderColor;
+    rootElement.style.borderWidth = String(schema.tableStyles.borderWidth) + 'mm';
     rootElement.style.borderStyle = 'solid';
     rootElement.style.boxSizing = 'border-box';
 
@@ -365,21 +365,29 @@ const tableSchema: Plugin<TableSchema, Table> = {
       const fontNames = Object.keys(font);
       const fallbackFontName = getFallbackFontName(font);
       return {
-        // TODO ここから これもネストさせて Card に入れたい
-        tableBorderWidth: {
+        tableStyles: {
           // TODO i18n
-          title: 'tableBorderWidth',
-          type: 'number',
-          widget: 'inputNumber',
-          props: { min: 0, step: 0.1 },
-          step: 1,
-        },
-        tableBorderColor: {
-          // TODO i18n
-          title: 'tableBorderColor',
-          type: 'string',
-          widget: 'color',
-          rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+          title: 'Table Style',
+          type: 'object',
+          widget: 'Card',
+          span: 24,
+          properties: {
+            borderWidth: {
+              // TODO i18n
+              title: 'borderWidth',
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 0, step: 0.1 },
+              step: 1,
+            },
+            borderColor: {
+              // TODO i18n
+              title: 'borderColor',
+              type: 'string',
+              widget: 'color',
+              rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+            },
+          },
         },
         headStyles: {
           // TODO i18n
@@ -398,6 +406,7 @@ const tableSchema: Plugin<TableSchema, Table> = {
           properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
         },
         columnStyles: {
+          // TODO i18n
           title: 'Column Style',
           type: 'object',
           widget: 'Card',
@@ -417,6 +426,10 @@ const tableSchema: Plugin<TableSchema, Table> = {
       ]),
       head: ['Name', 'City', 'Description'],
       headWidthPercentages: [30, 30, 40],
+      tableStyles: {
+        borderColor: '#000000',
+        borderWidth: 0.3,
+      },
       headStyles: Object.assign(getDefaultCellStyles(), {
         fontColor: '#ffffff',
         backgroundColor: '#2980ba',
@@ -427,8 +440,6 @@ const tableSchema: Plugin<TableSchema, Table> = {
         alternateBackgroundColor: '#f5f5f5',
       }),
       columnStyles: {},
-      tableBorderColor: '#000000',
-      tableBorderWidth: 0.3,
     },
   },
 };

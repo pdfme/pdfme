@@ -393,6 +393,10 @@ export const getTemplate2 = (): Template => ({
           49.538325694806396, 17.962830593295262, 19.26354959425127, 13.23529411764708,
         ],
         fontName: 'NotoSerifJP-Regular',
+        tableStyles: {
+          borderColor: '#000000',
+          borderWidth: 0,
+        },
         headStyles: {
           fontName: 'NotoSerifJP-Regular',
           fontSize: 13,
@@ -443,8 +447,6 @@ export const getTemplate2 = (): Template => ({
         columnStyles: {
           alignment: { 0: 'left', 3: 'right' },
         },
-        tableBorderColor: '#000000',
-        tableBorderWidth: 0,
       },
       subtotalLabel: {
         type: 'readOnlyText',
