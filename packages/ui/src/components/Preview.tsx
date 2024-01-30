@@ -52,11 +52,11 @@ const Preview = ({
       input,
       options,
       _cache,
-      getDynamicHeight: async (value, args, pageWidth) => {
+      getDynamicHeight: async (value, args) => {
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const table = await autoTable(body, args, pageWidth);
-        return table.getHeight();
+        const tables = await autoTable(body, args);
+        return tables.reduce((acc, table) => acc + table.getHeight(), 0);
       },
     })
       .then(async (dynamicTemplate) => {
@@ -125,6 +125,7 @@ const Preview = ({
               <Renderer
                 key={schema.id}
                 schema={schema}
+                basePdf={template.basePdf}
                 value={content}
                 mode={isForm ? 'form' : 'viewer'}
                 placeholder={schema.content}
@@ -151,7 +152,6 @@ const Preview = ({
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
                 }
-                pageSize={pageSizes[pageCursor]}
                 scale={scale}
               />
             );

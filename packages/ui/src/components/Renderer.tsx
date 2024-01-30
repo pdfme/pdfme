@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
+import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -8,6 +8,7 @@ type RendererProps = Omit<
   UIRenderProps<Schema>,
   'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
+  basePdf: BasePdf;
   schema: SchemaForUI;
   value: string;
   outline: string;
@@ -49,7 +50,7 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, value, mode, onChange, stopEditing, tabIndex, placeholder, scale, pageSize } =
+  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
     props;
 
   const ref = useRef<HTMLDivElement>(null);
@@ -73,6 +74,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         key: schema.key,
         value,
         schema,
+        basePdf,
         rootElement: ref.current,
         mode,
         onChange,
@@ -82,7 +84,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         options,
         theme,
         i18n,
-        pageSize,
         _cache: _cache.current,
       });
     }

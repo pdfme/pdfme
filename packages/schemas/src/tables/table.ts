@@ -5,7 +5,7 @@ import {
   getFallbackFontName,
   DEFAULT_FONT_NAME,
 } from '@pdfme/common';
-import { autoTable, Styles, RowType, parseSpacing, Table } from './tableHelper.js';
+import { autoTable, Styles, RowType, parseSpacing } from './tableHelper.js';
 import {
   getDefaultCellStyles,
   getCellPropPanelSchema,
@@ -135,16 +135,18 @@ const resetEditingPosition = () => {
   bodyEditingPosition.colIndex = -1;
 };
 
-const tableSchema: Plugin<TableSchema, Table> = {
+const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { value } = arg;
     const body = JSON.parse(value) as string[][];
-    return autoTable(body, arg, arg.page.getWidth());
+    await autoTable(body, arg);
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
-    const { rootElement, onChange, schema, value, mode, pageSize } = arg;
+    const { rootElement, onChange, schema, value, mode } = arg;
     const body = JSON.parse(value || '[]') as string[][];
-    const table = await autoTable(body, arg, pageSize.width);
+    const tables = await autoTable(body, arg);
+    // TODO 複数にどうにか対応する必要がある
+    const table = tables[0];
 
     rootElement.innerHTML = '';
 

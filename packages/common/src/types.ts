@@ -31,6 +31,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
  * @property {string} key The key of the schema object.
  * @property {string} value The string used for PDF rendering.
  * @property {T} schema Extended Schema object for rendering.
+ * @property {BasePdf} basePdf Base PDF object for rendering.
  * @property {typeof import('@pdfme/pdf-lib')} pdfLib The pdf-lib library used for rendering.
  * @property {PDFDocument} pdfDoc PDFDocument object from pdf-lib.
  * @property {PDFPage} page PDFPage object from pdf-lib.
@@ -41,6 +42,7 @@ export interface PDFRenderProps<T extends Schema> {
   key: string;
   value: string;
   schema: T;
+  basePdf: BasePdf;
   pdfLib: typeof import('@pdfme/pdf-lib');
   pdfDoc: PDFDocument;
   page: PDFPage;
@@ -54,6 +56,7 @@ export interface PDFRenderProps<T extends Schema> {
  *
  * @template T - Type of the extended Schema object.
  * @property {T} schema - Extended Schema object for rendering.
+ * @property {BasePdf} basePdf Base PDF object for rendering.
  * @property {Mode} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
@@ -70,6 +73,7 @@ export interface PDFRenderProps<T extends Schema> {
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
+  basePdf: BasePdf;
   mode: Mode;
   tabIndex?: number;
   placeholder?: string;
@@ -81,7 +85,6 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
-  pageSize: Size;
   _cache: Map<any, any>;
 };
 
@@ -104,7 +107,6 @@ type PropPanelProps = {
   activeElements: HTMLElement[];
   changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
-  pageSize: Size;
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
@@ -137,9 +139,9 @@ export interface PropPanel<T extends Schema> {
  * @property {function} ui Function for rendering UI.
  * @property {PropPanel} propPanel Object for defining the property panel.
  */
-export type Plugin<T extends Schema & { [key: string]: any }, T2 = void, T3 = void> = {
-  pdf: (arg: PDFRenderProps<T>) => Promise<T2> | void;
-  ui: (arg: UIRenderProps<T>) => Promise<T3> | void;
+export type Plugin<T extends Schema & { [key: string]: any }> = {
+  pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
+  ui: (arg: UIRenderProps<T>) => Promise<void> | void;
   propPanel: PropPanel<T>;
 };
 

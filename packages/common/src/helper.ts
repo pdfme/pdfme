@@ -217,7 +217,7 @@ export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewProp
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
 
-export interface ModifyTemplateForDynamicTableArg {
+interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
   _cache: Map<any, any>;
@@ -225,12 +225,16 @@ export interface ModifyTemplateForDynamicTableArg {
 
   getDynamicHeight: (
     value: string,
-    args: { schema: Schema; options: CommonOptions; _cache: Map<any, any> },
-    pageWidth: number
+    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
   ) => Promise<number>;
 }
 
 export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
+  // TODO ここから
+  // 結局ここの関数内でテーブルを分割する必要がある
+  // まずは、そもそものtableHelper.tsがautoTableがどのようにページブレイクを書いているのか、読む。
+  // それを踏まえた上で自分たちはどうやってテーブルを分割するかを考える。
+
   const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
@@ -249,18 +253,19 @@ export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) 
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options, getDynamicHeight } = arg;
+  const basePdf = template.basePdf;
   const tmpDiffMap = new Map<number, number>();
   if (!isBlankPdf(template.basePdf)) {
     return tmpDiffMap;
   }
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
-      const pageWidth = template.basePdf.width;
-      const dynamicHeight = await getDynamicHeight(
-        input[key],
-        { schema, options, _cache },
-        pageWidth
-      );
+      const dynamicHeight = await getDynamicHeight(input[key], {
+        schema,
+        basePdf,
+        options,
+        _cache,
+      });
       if (schema.height !== dynamicHeight) {
         tmpDiffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
       }

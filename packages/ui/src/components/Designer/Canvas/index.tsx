@@ -477,6 +477,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           <Renderer
             key={schema.id}
             schema={schema}
+            basePdf={basePdf}
             value={schema.content || ''}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             mode={
@@ -489,10 +490,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-            }`}
-            pageSize={pageSizes[pageCursor]}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}

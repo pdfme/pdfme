@@ -7,6 +7,7 @@ import { insertPage, preprocessing, postProcessing, getEmbedPdfPages } from './h
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {}, plugins: userPlugins = {} } = props;
+  const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
     throw new Error('inputs should not be empty');
@@ -24,11 +25,11 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
-      getDynamicHeight: async (value, args, pageWidth) => {
+      getDynamicHeight: async (value, args) => {
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const table = await autoTable(body, args, pageWidth);
-        return table.getHeight();
+        const tables = await autoTable(body, args);
+        return tables.reduce((acc, table) => acc + table.getHeight(), 0);
       },
     });
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
@@ -54,7 +55,7 @@ const generate = async (props: GenerateProps) => {
           continue;
         }
         const value = schema.readOnly ? schema.content || '' : input[key];
-        await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
+        await render({ key, value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }
