@@ -510,51 +510,47 @@ class CellHookData extends HookData {
   }
 }
 
-async function drawTables(arg: PDFRenderProps<TableSchema>, tables: Table[]): Promise<void> {
+export async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promise<void> {
   const pageSize = arg.page.getSize();
+  const settings = table.settings;
+  const startY = settings.startY;
+  const margin = settings.margin;
+  const cursor = { x: margin.left, y: startY };
+  const sectionsHeight = table.getHeadHeight();
+  let minTableBottomPos = startY + margin.bottom + sectionsHeight;
 
-  // TODO ここで複数のテーブルをレンダリングするが、ここでページブレイクする？
-  for (const table of tables) {
-    const settings = table.settings;
-    const startY = settings.startY;
-    const margin = settings.margin;
-    const cursor = { x: margin.left, y: startY };
-    const sectionsHeight = table.getHeadHeight();
-    let minTableBottomPos = startY + margin.bottom + sectionsHeight;
+  if (settings.pageBreak === 'avoid') {
+    const rows = table.body;
+    const tableHeight = rows.reduce((acc, row) => acc + row.height, 0);
 
-    if (settings.pageBreak === 'avoid') {
-      const rows = table.body;
-      const tableHeight = rows.reduce((acc, row) => acc + row.height, 0);
-
-      minTableBottomPos += tableHeight;
-    }
-
-    if (
-      settings.pageBreak === 'always' ||
-      (settings.startY != null && minTableBottomPos > pageSize.height)
-    ) {
-      nextPage();
-      cursor.y = margin.top;
-    }
-    table.callWillDrawPageHooks(cursor);
-
-    const startPos = Object.assign({}, cursor);
-
-    // normal flow
-    if (settings.showHead === 'firstPage' || settings.showHead === 'everyPage') {
-      for (const row of table.head) {
-        await printRow(arg, table, row, cursor, table.columns);
-      }
-    }
-
-    for (const row of table.body) {
-      const isLastRow = row.index === table.body.length - 1;
-      await printFullRow(arg, table, row, isLastRow, startPos, cursor, table.columns, pageSize);
-    }
-
-    await addTableBorder(arg, table, startPos, cursor);
-    table.callEndPageHooks(cursor);
+    minTableBottomPos += tableHeight;
   }
+
+  if (
+    settings.pageBreak === 'always' ||
+    (settings.startY != null && minTableBottomPos > pageSize.height)
+  ) {
+    nextPage();
+    cursor.y = margin.top;
+  }
+  table.callWillDrawPageHooks(cursor);
+
+  const startPos = Object.assign({}, cursor);
+
+  // normal flow
+  if (settings.showHead === 'firstPage' || settings.showHead === 'everyPage') {
+    for (const row of table.head) {
+      await printRow(arg, table, row, cursor, table.columns);
+    }
+  }
+
+  for (const row of table.body) {
+    const isLastRow = row.index === table.body.length - 1;
+    await printFullRow(arg, table, row, isLastRow, startPos, cursor, table.columns, pageSize);
+  }
+
+  await addTableBorder(arg, table, startPos, cursor);
+  table.callEndPageHooks(cursor);
 }
 
 async function printRow(
@@ -1316,6 +1312,7 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
   return {
     head: [schema.head],
     body,
+    showHead: schema.showHead,
     startY: schema.position.y,
     tableWidth: schema.width,
     tableLineColor: schema.tableStyles.borderColor,
@@ -1328,15 +1325,15 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
   };
 };
 
-type CreateTablesArgs = {
+type CreateTableArgs = {
   schema: Schema;
   basePdf: BasePdf;
   options: CommonOptions;
   _cache: Map<any, any>;
 };
 
-async function createTables(input: TableInput, args: CreateTablesArgs) {
-  const { options, _cache, basePdf } = args;
+async function createTables(input: TableInput, args: CreateTableArgs) {
+  const { options, _cache, schema, basePdf } = args;
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
 
   const font = options.font || getDefaultFont();
@@ -1347,11 +1344,34 @@ async function createTables(input: TableInput, args: CreateTablesArgs) {
 
   const content = parseContent4Table(input, fallbackFontName);
 
-  // TODO ここでpageHeightを使って、テーブルの分割を実現する？
+  // TODO ここから ここでpageHeightを使って、テーブルの分割を実現する？
+  // とにかくページの高さを使ってテーブルを分割することをだけを考える
   const table = new Table(input, content);
   await calculateWidths(table, basePdf.width, getFontKitFontByFontName);
-
+  if (!schema.showHead) {
+    table.settings.showHead = 'never';
+  }
   return [table];
+}
+
+async function createTable(input: TableInput, args: CreateTableArgs) {
+  const { options, _cache, schema, basePdf } = args;
+  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+
+  const font = options.font || getDefaultFont();
+
+  const getFontKitFontByFontName = (fontName: string | undefined) =>
+    getFontKitFont(fontName, font, _cache);
+  const fallbackFontName = getFallbackFontName(font);
+
+  const content = parseContent4Table(input, fallbackFontName);
+
+  const table = new Table(input, content);
+  await calculateWidths(table, basePdf.width, getFontKitFontByFontName);
+  if (!schema.showHead) {
+    table.settings.showHead = 'never';
+  }
+  return table;
 }
 
 function parseInput(schema: TableSchema, body: string[][]): TableInput {
@@ -1364,16 +1384,12 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
   return { content, hooks, styles, settings };
 }
 
-export async function autoTable(
-  body: string[][],
-  args: PDFRenderProps<TableSchema> | CreateTablesArgs
-) {
+export async function createMultiTables(body: string[][], args: CreateTableArgs) {
   const input = parseInput(args.schema as TableSchema, body);
-  const tables = await createTables(input, args);
-
-  if ('pdfLib' in args) {
-    await drawTables(args, tables);
-  }
-
-  return tables;
+  return createTables(input, args);
 }
+
+export const createSingleTable = (body: string[][], arg: CreateTableArgs) => {
+  const input = parseInput(arg.schema as TableSchema, body);
+  return createTable(input, arg);
+};

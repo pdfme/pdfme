@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
-import { autoTable } from '@pdfme/schemas';
+import { createMultiTables } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -55,7 +55,8 @@ const Preview = ({
       getDynamicHeight: async (value, args) => {
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const tables = await autoTable(body, args);
+        const tables = await createMultiTables(body, args);
+        // TODO ここで複数のテーブルができたらテンプレートに反映させたい
         return tables.reduce((acc, table) => acc + table.getHeight(), 0);
       },
     })

@@ -1,7 +1,7 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { autoTable } from '@pdfme/schemas';
+import { createMultiTables } from '@pdfme/schemas';
 import { insertPage, preprocessing, postProcessing, getEmbedPdfPages } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
@@ -28,7 +28,8 @@ const generate = async (props: GenerateProps) => {
       getDynamicHeight: async (value, args) => {
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const tables = await autoTable(body, args);
+        const tables = await createMultiTables(body, args);
+        // TODO ここで複数のテーブルができたらテンプレートに反映させたい
         return tables.reduce((acc, table) => acc + table.getHeight(), 0);
       },
     });

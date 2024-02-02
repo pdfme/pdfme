@@ -229,7 +229,10 @@ interface ModifyTemplateForDynamicTableArg {
   ) => Promise<number>;
 }
 
-export const getDynamicTemplate = async (arg: ModifyTemplateForDynamicTableArg) => {
+export const getDynamicTemplate = async (
+  arg: ModifyTemplateForDynamicTableArg
+): Promise<Template> => {
+  console.log('getDynamicTemplate', arg);
   // TODO ここから
   // 結局ここの関数内でテーブルを分割する必要がある
   // まずは、そもそものtableHelper.tsがautoTableがどのようにページブレイクを書いているのか、読む。
@@ -289,7 +292,7 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
 export const normalizePositionsAndPageBreak = (
   template: Template,
   diffMap: Map<number, number>
-) => {
+): Template => {
   if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
     return template;
   }

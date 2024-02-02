@@ -5,7 +5,7 @@ import {
   getFallbackFontName,
   DEFAULT_FONT_NAME,
 } from '@pdfme/common';
-import { autoTable, Styles, RowType, parseSpacing } from './tableHelper.js';
+import { createSingleTable, drawTable, Styles, RowType, parseSpacing } from './tableHelper.js';
 import {
   getDefaultCellStyles,
   getCellPropPanelSchema,
@@ -138,15 +138,14 @@ const resetEditingPosition = () => {
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { value } = arg;
-    const body = JSON.parse(value) as string[][];
-    await autoTable(body, arg);
+    const body = JSON.parse(value || '[]') as string[][];
+    const table = await createSingleTable(body, arg);
+    await drawTable(arg, table);
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
     const { rootElement, onChange, schema, value, mode } = arg;
     const body = JSON.parse(value || '[]') as string[][];
-    const tables = await autoTable(body, arg);
-    // TODO 複数にどうにか対応する必要がある
-    const table = tables[0];
+    const table = await createSingleTable(body, arg);
 
     rootElement.innerHTML = '';
 
@@ -165,13 +164,16 @@ const tableSchema: Plugin<TableSchema> = {
       void tableSchema.ui(arg);
     };
 
-    renderRowUi({
-      rows: table.head,
-      arg,
-      editingPosition: headEditingPosition,
-      onChangeEditingPosition: (p) => handleChangeEditingPosition(p, headEditingPosition),
-    });
-    const offsetY = table.getHeadHeight();
+    if (schema.showHead) {
+      renderRowUi({
+        rows: table.head,
+        arg,
+        editingPosition: headEditingPosition,
+        onChangeEditingPosition: (p) => handleChangeEditingPosition(p, headEditingPosition),
+      });
+    }
+
+    const offsetY = schema.showHead ? table.getHeadHeight() : 0;
     renderRowUi({
       rows: table.body,
       arg,
@@ -194,7 +196,7 @@ const tableSchema: Plugin<TableSchema> = {
       };
       rootElement.appendChild(addRowButton);
 
-      let offsetY = table.getHeadHeight();
+      let offsetY = schema.showHead ? table.getHeadHeight() : 0;
       table.body.forEach((row, i) => {
         offsetY = offsetY + row.height;
         const removeRowButton = document.createElement('button');
@@ -353,7 +355,7 @@ const tableSchema: Plugin<TableSchema> = {
       resetEditingPosition();
     }
 
-    const tableHeight = table.getHeight();
+    const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
     if (schema.height !== tableHeight && onChange) {
       onChange({ key: 'height', value: tableHeight });
     }
@@ -419,6 +421,7 @@ const tableSchema: Plugin<TableSchema> = {
         ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
         ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
       ]),
+      showHead: true,
       head: ['Name', 'City', 'Description'],
       headWidthPercentages: [30, 30, 40],
       tableStyles: {
