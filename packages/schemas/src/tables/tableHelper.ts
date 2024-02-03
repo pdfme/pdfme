@@ -168,7 +168,7 @@ type RowPageBreakType = 'auto' | 'avoid';
 type ShowHeadType = 'everyPage' | 'firstPage' | 'never' | boolean;
 type Color = string;
 
-type RowInput = { [key: string]: string } | string[];
+type RowInput = string[];
 
 type MarginPadding = {
   top: number;
@@ -1042,12 +1042,6 @@ function parseContent4Table(input: TableInput, fallbackFontName: string) {
   const content = input.content;
   const columns = createColumns(content.columns);
 
-  // If no head is set, try generating it with content from columns
-  if (content.head.length === 0) {
-    const sectionRow = generateSectionRow(columns, 'head');
-    if (sectionRow) content.head.push(sectionRow);
-  }
-
   const styles = input.styles;
   return {
     columns,
@@ -1056,26 +1050,6 @@ function parseContent4Table(input: TableInput, fallbackFontName: string) {
   };
 }
 
-function generateSectionRow(columns: Column[], section: Section): RowInput | null {
-  const sectionRow: { [key: string]: string } = {};
-  columns.forEach((col) => {
-    if (col.raw != null) {
-      const title = getSectionTitle(section, col.raw);
-      if (title != null) sectionRow[col.dataKey] = String(title);
-    }
-  });
-  return Object.keys(sectionRow).length > 0 ? sectionRow : null;
-}
-function getSectionTitle(section: Section, column: ColumnInput) {
-  if (section === 'head') {
-    if (typeof column === 'object') {
-      return column.header || null;
-    } else if (typeof column === 'string' || typeof column === 'number') {
-      return column;
-    }
-  }
-  return null;
-}
 function createColumns(columns: ColumnInput[]) {
   return columns.map((input, index) => {
     const key = index;
@@ -1332,31 +1306,85 @@ type CreateTableArgs = {
   _cache: Map<any, any>;
 };
 
-async function createTables(input: TableInput, args: CreateTableArgs) {
-  const { options, _cache, schema, basePdf } = args;
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
-
-  const font = options.font || getDefaultFont();
-
-  const getFontKitFontByFontName = (fontName: string | undefined) =>
-    getFontKitFont(fontName, font, _cache);
-  const fallbackFontName = getFallbackFontName(font);
-
-  const content = parseContent4Table(input, fallbackFontName);
-
-  // TODO ここから ここでpageHeightを使って、テーブルの分割を実現する？
-  // とにかくページの高さを使ってテーブルを分割することをだけを考える
-  const table = new Table(input, content);
-  await calculateWidths(table, basePdf.width, getFontKitFontByFontName);
-  if (!schema.showHead) {
-    table.settings.showHead = 'never';
+function createTableWithAvailableHeight(
+  tableBody: Row[],
+  availableHeight: number,
+  args: CreateTableArgs
+) {
+  let limit = availableHeight;
+  const newTableBody: string[][] = [];
+  let index = 0;
+  while (limit > 0 && index < tableBody.length) {
+    const row = tableBody.slice(0, index + 1).pop();
+    if (!row) break;
+    const rowHeight = row.height;
+    if (limit - rowHeight < 0) {
+      break;
+    }
+    newTableBody.push(row.raw);
+    limit -= rowHeight;
+    index++;
   }
-  return [table];
+  return createSingleTable(newTableBody, args);
 }
 
-async function createTable(input: TableInput, args: CreateTableArgs) {
+function parseInput(schema: TableSchema, body: string[][]): TableInput {
+  const options = getTableOptions(schema, body);
+  const styles = parseStyles(options);
+  const hooks = parseHooks(options);
+  const settings = parseSettings(options);
+  const content = parseContent4Input(options);
+
+  return { content, hooks, styles, settings };
+}
+
+const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+
+export async function createMultiTables(body: string[][], args: CreateTableArgs) {
+  const { basePdf, schema } = args;
+
+  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+  const pageHeight = basePdf.height;
+  const paddingBottom = basePdf.padding[2];
+  const availableHeight = pageHeight - paddingBottom - schema.position.y;
+  const table = await createTable(body, args);
+
+  if (table.getHeight() <= availableHeight) {
+    return [table];
+  }
+
+  const firstTable = await createTableWithAvailableHeight(
+    table.body,
+    availableHeight - table.getHeadHeight(),
+    args
+  );
+  const tables: Table[] = [firstTable];
+
+  const bodyForRestTables = table.body.slice(firstTable.body.length);
+  const paddingTop = basePdf.padding[0];
+  const pageAvailableHeight = pageHeight - paddingTop - paddingBottom;
+
+  const _schema = cloneDeep(schema);
+  _schema.showHead = false;
+  _schema.position.y = paddingTop;
+  args.schema = _schema;
+
+  const secondTable = await createTableWithAvailableHeight(
+    bodyForRestTables,
+    pageAvailableHeight,
+    args
+  );
+  tables.push(secondTable);
+
+  // TODO 現在は2つまでしか対応していない
+  return tables;
+}
+
+export async function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, schema, basePdf } = args;
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+
+  const input = parseInput(args.schema as TableSchema, body);
 
   const font = options.font || getDefaultFont();
 
@@ -1373,23 +1401,3 @@ async function createTable(input: TableInput, args: CreateTableArgs) {
   }
   return table;
 }
-
-function parseInput(schema: TableSchema, body: string[][]): TableInput {
-  const options = getTableOptions(schema, body);
-  const styles = parseStyles(options);
-  const hooks = parseHooks(options);
-  const settings = parseSettings(options);
-  const content = parseContent4Input(options);
-
-  return { content, hooks, styles, settings };
-}
-
-export async function createMultiTables(body: string[][], args: CreateTableArgs) {
-  const input = parseInput(args.schema as TableSchema, body);
-  return createTables(input, args);
-}
-
-export const createSingleTable = (body: string[][], arg: CreateTableArgs) => {
-  const input = parseInput(arg.schema as TableSchema, body);
-  return createTable(input, arg);
-};

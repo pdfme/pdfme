@@ -232,7 +232,6 @@ interface ModifyTemplateForDynamicTableArg {
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  console.log('getDynamicTemplate', arg);
   // TODO ここから
   // 結局ここの関数内でテーブルを分割する必要がある
   // まずは、そもそものtableHelper.tsがautoTableがどのようにページブレイクを書いているのか、読む。
