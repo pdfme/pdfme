@@ -28,10 +28,12 @@ export interface TableSchema extends Schema {
   showHead: boolean;
   head: string[];
   headWidthPercentages: number[];
+
+  __bodyRange?: { start: number; end?: number };
+
   tableStyles: {
     borderColor: string;
     borderWidth: number;
-    // TODO ただのアイデアだがrowのmin,maxがあるといいかも
   };
   headStyles: CellStyle;
   bodyStyles: CellStyle & { alternateBackgroundColor: string };

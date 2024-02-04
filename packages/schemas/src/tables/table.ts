@@ -61,7 +61,7 @@ const renderRowUi = (args: {
   offsetY?: number;
 }) => {
   const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition: ep } = args;
-  const value: string[][] = JSON.parse(arg.value) as string[][];
+  const value = JSON.parse(arg.value || '[]') as string[][];
 
   // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
   // border-collapse: collapse; と同じスタイルにする
@@ -135,16 +135,23 @@ const resetEditingPosition = () => {
   bodyEditingPosition.colIndex = -1;
 };
 
+const getBody = (value: string, schema: TableSchema) => {
+  const range = schema.__bodyRange;
+  const body = JSON.parse(value || '[]') as string[][];
+  if (!range) return body;
+  return body.slice(range.start, range.end);
+};
+
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
-    const { value } = arg;
-    const body = JSON.parse(value || '[]') as string[][];
+    const { value, schema } = arg;
+    const body = getBody(value, schema);
     const table = await createSingleTable(body, arg);
     await drawTable(arg, table);
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
     const { rootElement, onChange, schema, value, mode } = arg;
-    const body = JSON.parse(value || '[]') as string[][];
+    const body = getBody(value, schema);
     const table = await createSingleTable(body, arg);
 
     rootElement.innerHTML = '';
@@ -183,18 +190,20 @@ const tableSchema: Plugin<TableSchema> = {
     });
 
     if (mode === 'form' && onChange) {
-      const addRowButton = document.createElement('button');
-      addRowButton.style.width = '30px';
-      addRowButton.style.height = '30px';
-      addRowButton.style.position = 'absolute';
-      addRowButton.style.bottom = '-30px';
-      addRowButton.style.left = 'calc(50% - 15px)';
-      addRowButton.innerText = '+';
-      addRowButton.onclick = () => {
-        const newRow = Array(schema.head.length).fill('') as string[];
-        onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
-      };
-      rootElement.appendChild(addRowButton);
+      if (schema.__bodyRange?.end === undefined || schema.__bodyRange.end < body.length) {
+        const addRowButton = document.createElement('button');
+        addRowButton.style.width = '30px';
+        addRowButton.style.height = '30px';
+        addRowButton.style.position = 'absolute';
+        addRowButton.style.bottom = '-30px';
+        addRowButton.style.left = 'calc(50% - 15px)';
+        addRowButton.innerText = '+';
+        addRowButton.onclick = () => {
+          const newRow = Array(schema.head.length).fill('') as string[];
+          onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
+        };
+        rootElement.appendChild(addRowButton);
+      }
 
       let offsetY = schema.showHead ? table.getHeadHeight() : 0;
       table.body.forEach((row, i) => {

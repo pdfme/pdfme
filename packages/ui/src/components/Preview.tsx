@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
-import { createMultiTables } from '@pdfme/schemas';
+import { createSingleTable, createMultiTables } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -9,7 +9,7 @@ import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
-import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
+import { template2SchemasList, getPagesScrollTopByIndex, cloneDeep } from '../helper';
 import { theme } from 'antd';
 
 const _cache = new Map();
@@ -52,15 +52,65 @@ const Preview = ({
       input,
       options,
       _cache,
+      // TODO ここから
+      modifyTemplate: async (t: Template) => {
+        console.log('modifyTemplate', t)
+        const template: Template = Object.assign(cloneDeep(t), { schemas: [] });
+        let pageIndex = 0;
+        for (const schemaObj of t.schemas) {
+          const additionalSchemaObj: typeof schemaObj = {};
+          for (const [key, schema] of Object.entries(schemaObj)) {
+            if (schema.type === 'table') {
+              schema.__bodyRange = undefined;
+              const body = JSON.parse(input[key] || '[]') as string[][];
+              const tables = await createMultiTables(body, { schema, basePdf: template.basePdf, options, _cache });
+              console.log('tables', tables)
+              if (tables.length > 1) {
+                const table0 = tables[0];
+                const table1 = tables[1];
+                schema.__bodyRange = { start: 0, end: table0.body.length };
+                // ここから直す必要がある pushされる template.schemasの場所がおかしい
+                additionalSchemaObj[key + '@pdfme/table/${1}'] = {
+                  ...schema,
+                  position: { x: schema.position.x, y: table1.settings.startY },
+                  height: 100,
+                  showHead: false,
+                  __bodyRange: { start: table0.body.length, end: table0.body.length + table1.body.length },
+                  content: input[key],
+                };
+                // input[key + '@pdfme/table/${1}'] = 
+                // TODO ここのキー([key])は変更しないと分離したテーブルが表示されない
+                // また、inputに関しても、分離したテーブルのinputとして処理されるように加工する必要がある
+                // 同じキーで違うページにスキーマを生成する。そして、それぞれでどのinputを使うかを制御する?
+                // とにかくinputを制御し、考慮する<- schema側でどの場所のinputを使うか設定を持つようにするべき
+                // inputRangeのようなものを作って、それを使ってinputを制御する
+              }
+            }
+          }
+          template.schemas.push(schemaObj);
+          // ここで分割したテーブルがある場合は追加するべき？
+          if (Object.keys(additionalSchemaObj).length > 0) {
+            if (!t.schemas[pageIndex + 1]) {
+              template.schemas.push(additionalSchemaObj);
+            } else {
+              template.schemas[pageIndex + 1] = additionalSchemaObj;
+            }
+          }
+          pageIndex++;
+        }
+        console.log('modifyTemplate', template)
+        return template
+      },
       getDynamicHeight: async (value, args) => {
+        console.log('getDynamicHeight', value, args)
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const tables = await createMultiTables(body, args);
-        // TODO ここで複数のテーブルができたらテンプレートに反映させたい
-        return tables.reduce((acc, table) => acc + table.getHeight(), 0);
+        const table = await createSingleTable(body, args);
+        return table.getHeight();
       },
     })
       .then(async (dynamicTemplate) => {
+        console.log('dynamicTemplate', dynamicTemplate)
         const sl = await template2SchemasList(dynamicTemplate);
         setSchemasList(sl);
         await refresh(dynamicTemplate);

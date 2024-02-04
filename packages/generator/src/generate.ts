@@ -1,7 +1,7 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { createMultiTables } from '@pdfme/schemas';
+import { createSingleTable, createMultiTables } from '@pdfme/schemas';
 import { insertPage, preprocessing, postProcessing, getEmbedPdfPages } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
@@ -25,12 +25,15 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
+      modifyTemplate: async (t) => {
+        // TODO 実装する
+        return Promise.resolve(t);
+      },
       getDynamicHeight: async (value, args) => {
         if (args.schema.type !== 'table') return args.schema.height;
         const body = JSON.parse(value || '[]') as string[][];
-        const tables = await createMultiTables(body, args);
-        // TODO ここで複数のテーブルができたらテンプレートに反映させたい
-        return tables.reduce((acc, table) => acc + table.getHeight(), 0);
+        const table = await createSingleTable(body, args);
+        return table.getHeight();
       },
     });
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({

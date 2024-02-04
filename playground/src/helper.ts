@@ -386,6 +386,7 @@ export const getTemplate2 = (): Template => ({
         height: 45.75920000000001,
         content:
           '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"]]',
+        showHead: true,
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
         headWidthPercentages: [
           49.538325694806396, 17.962830593295262, 19.26354959425127, 13.23529411764708,

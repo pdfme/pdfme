@@ -354,6 +354,7 @@ describe('getDynamicTemplate test', () => {
   const options = { font: getSampleFont() };
   const _cache = new Map();
   const input = {};
+  const modifyTemplate = async (t: Template) => Promise.resolve(t);
   const getDynamicHeight = (_: string, args: { schema: Schema }) => {
     const { schema } = args;
     if (schema.type === 'test') return Promise.resolve(schema.height + 100);
@@ -364,6 +365,7 @@ describe('getDynamicTemplate test', () => {
     input,
     _cache,
     options,
+    modifyTemplate,
     getDynamicHeight,
   });
 

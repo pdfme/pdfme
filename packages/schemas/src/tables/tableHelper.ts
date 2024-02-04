@@ -1340,6 +1340,28 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
 
 const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
+export async function createSingleTable(body: string[][], args: CreateTableArgs) {
+  const { options, _cache, schema, basePdf } = args;
+  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+
+  const input = parseInput(args.schema as TableSchema, body);
+
+  const font = options.font || getDefaultFont();
+
+  const getFontKitFontByFontName = (fontName: string | undefined) =>
+    getFontKitFont(fontName, font, _cache);
+  const fallbackFontName = getFallbackFontName(font);
+
+  const content = parseContent4Table(input, fallbackFontName);
+
+  const table = new Table(input, content);
+  await calculateWidths(table, basePdf.width, getFontKitFontByFontName);
+  if (!schema.showHead) {
+    table.settings.showHead = 'never';
+  }
+  return table;
+}
+
 export async function createMultiTables(body: string[][], args: CreateTableArgs) {
   const { basePdf, schema } = args;
 
@@ -1347,7 +1369,7 @@ export async function createMultiTables(body: string[][], args: CreateTableArgs)
   const pageHeight = basePdf.height;
   const paddingBottom = basePdf.padding[2];
   const availableHeight = pageHeight - paddingBottom - schema.position.y;
-  const table = await createTable(body, args);
+  const table = await createSingleTable(body, args);
 
   if (table.getHeight() <= availableHeight) {
     return [table];
@@ -1378,26 +1400,4 @@ export async function createMultiTables(body: string[][], args: CreateTableArgs)
 
   // TODO 現在は2つまでしか対応していない
   return tables;
-}
-
-export async function createSingleTable(body: string[][], args: CreateTableArgs) {
-  const { options, _cache, schema, basePdf } = args;
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
-
-  const input = parseInput(args.schema as TableSchema, body);
-
-  const font = options.font || getDefaultFont();
-
-  const getFontKitFontByFontName = (fontName: string | undefined) =>
-    getFontKitFont(fontName, font, _cache);
-  const fallbackFontName = getFallbackFontName(font);
-
-  const content = parseContent4Table(input, fallbackFontName);
-
-  const table = new Table(input, content);
-  await calculateWidths(table, basePdf.width, getFontKitFontByFontName);
-  if (!schema.showHead) {
-    table.settings.showHead = 'never';
-  }
-  return table;
 }

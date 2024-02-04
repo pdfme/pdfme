@@ -222,6 +222,7 @@ interface ModifyTemplateForDynamicTableArg {
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
+  modifyTemplate: (template: Template) => Promise<Template>;
 
   getDynamicHeight: (
     value: string,
@@ -232,18 +233,17 @@ interface ModifyTemplateForDynamicTableArg {
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  // TODO ここから
-  // 結局ここの関数内でテーブルを分割する必要がある
-  // まずは、そもそものtableHelper.tsがautoTableがどのようにページブレイクを書いているのか、読む。
-  // それを踏まえた上で自分たちはどうやってテーブルを分割するかを考える。
-
-  const { template } = arg;
+  const { template, modifyTemplate } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
+
+  const modifiedTemplate = await modifyTemplate(template);
+  arg.template = modifiedTemplate;
+
   const diffMap = await calculateDiffMap({ ...arg });
 
-  const res = normalizePositionsAndPageBreak(template, diffMap);
+  const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 
   // const debug = res.schemas.map((s) =>
   //   Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
