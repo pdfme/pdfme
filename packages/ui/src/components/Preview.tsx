@@ -54,7 +54,6 @@ const Preview = ({
       _cache,
       // TODO ここから
       modifyTemplate: async (t: Template) => {
-        console.log('modifyTemplate', t)
         const template: Template = Object.assign(cloneDeep(t), { schemas: [] });
         let pageIndex = 0;
         for (const schemaObj of t.schemas) {
@@ -64,26 +63,25 @@ const Preview = ({
               schema.__bodyRange = undefined;
               const body = JSON.parse(input[key] || '[]') as string[][];
               const tables = await createMultiTables(body, { schema, basePdf: template.basePdf, options, _cache });
-              console.log('tables', tables)
               if (tables.length > 1) {
                 const table0 = tables[0];
                 const table1 = tables[1];
                 schema.__bodyRange = { start: 0, end: table0.body.length };
+
+                // const newKey = key + '@pdfme/table/${0}';
+                const newKey = key;
                 // ここから直す必要がある pushされる template.schemasの場所がおかしい
-                additionalSchemaObj[key + '@pdfme/table/${1}'] = {
+                additionalSchemaObj[newKey] = {
                   ...schema,
                   position: { x: schema.position.x, y: table1.settings.startY },
-                  height: 100,
+                  height: table1.getHeight(),
                   showHead: false,
-                  __bodyRange: { start: table0.body.length, end: table0.body.length + table1.body.length },
+                  __bodyRange: { start: table0.body.length },
                   content: input[key],
                 };
-                // input[key + '@pdfme/table/${1}'] = 
-                // TODO ここのキー([key])は変更しないと分離したテーブルが表示されない
-                // また、inputに関しても、分離したテーブルのinputとして処理されるように加工する必要がある
-                // 同じキーで違うページにスキーマを生成する。そして、それぞれでどのinputを使うかを制御する?
-                // とにかくinputを制御し、考慮する<- schema側でどの場所のinputを使うか設定を持つようにするべき
-                // inputRangeのようなものを作って、それを使ってinputを制御する
+                if (input[newKey] !== input[key] && onChangeInput) {
+                  onChangeInput({ index: unitCursor, key: newKey, value: input[key] });
+                }
               }
             }
           }
@@ -98,7 +96,6 @@ const Preview = ({
           }
           pageIndex++;
         }
-        console.log('modifyTemplate', template)
         return template
       },
       getDynamicHeight: async (value, args) => {

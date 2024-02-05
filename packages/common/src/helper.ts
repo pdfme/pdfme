@@ -241,16 +241,17 @@ export const getDynamicTemplate = async (
   const modifiedTemplate = await modifyTemplate(template);
   arg.template = modifiedTemplate;
 
-  const diffMap = await calculateDiffMap({ ...arg });
+  // TODO テーブルの分割の実装がちゃんとできるまで下記はコメントアウト
+  // const diffMap = await calculateDiffMap({ ...arg });
 
-  const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+  // const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 
   // const debug = res.schemas.map((s) =>
   //   Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
   // );
   // console.log('getDynamicTemplate', debug);
 
-  return res;
+  return modifiedTemplate;
 };
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {

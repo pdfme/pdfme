@@ -5,7 +5,7 @@ import {
   getFallbackFontName,
   DEFAULT_FONT_NAME,
 } from '@pdfme/common';
-import { createSingleTable, drawTable, Styles, RowType, parseSpacing } from './tableHelper.js';
+import { createSingleTable, drawTable, Styles, RowType } from './tableHelper.js';
 import {
   getDefaultCellStyles,
   getCellPropPanelSchema,
@@ -29,8 +29,8 @@ const convertToCellStyle = (styles: Styles): CellStyle => ({
   // ---
   fontColor: styles.textColor,
   borderColor: styles.lineColor,
-  borderWidth: parseSpacing(styles.lineWidth),
-  padding: parseSpacing(styles.cellPadding),
+  borderWidth: styles.lineWidth,
+  padding: styles.cellPadding,
 });
 
 const calcResizedHeadWidthPercentages = (arg: {
@@ -190,7 +190,10 @@ const tableSchema: Plugin<TableSchema> = {
     });
 
     if (mode === 'form' && onChange) {
-      if (schema.__bodyRange?.end === undefined || schema.__bodyRange.end < body.length) {
+      if (
+        schema.__bodyRange?.end === undefined ||
+        schema.__bodyRange.end >= (JSON.parse(value || '[]') as string[][]).length
+      ) {
         const addRowButton = document.createElement('button');
         addRowButton.style.width = '30px';
         addRowButton.style.height = '30px';
