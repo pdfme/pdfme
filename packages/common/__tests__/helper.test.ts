@@ -10,7 +10,7 @@ import {
   calculateDiffMap,
   normalizePositionsAndPageBreak,
 } from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, Schema } from '../src';
+import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, Schema, CommonOptions } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -354,7 +354,12 @@ describe('getDynamicTemplate test', () => {
   const options = { font: getSampleFont() };
   const _cache = new Map();
   const input = {};
-  const modifyTemplate = async (t: Template) => Promise.resolve(t);
+  const modifyTemplate = async (arg: {
+    template: Template;
+    input: Record<string, string>;
+    _cache: Map<any, any>;
+    options: CommonOptions;
+  }) => Promise.resolve(arg.template);
   const getDynamicHeight = (_: string, args: { schema: Schema }) => {
     const { schema } = args;
     if (schema.type === 'test') return Promise.resolve(schema.height + 100);

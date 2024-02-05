@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
-import { createSingleTable, createMultiTables } from '@pdfme/schemas';
+import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -52,58 +52,12 @@ const Preview = ({
       input,
       options,
       _cache,
-      // TODO ここから
-      modifyTemplate: async (t: Template) => {
-        const template: Template = Object.assign(cloneDeep(t), { schemas: [] });
-        let pageIndex = 0;
-        for (const schemaObj of t.schemas) {
-          const additionalSchemaObj: typeof schemaObj = {};
-          for (const [key, schema] of Object.entries(schemaObj)) {
-            if (schema.type === 'table') {
-              schema.__bodyRange = undefined;
-              const body = JSON.parse(input[key] || '[]') as string[][];
-              const tables = await createMultiTables(body, { schema, basePdf: template.basePdf, options, _cache });
-              if (tables.length > 1) {
-                const table0 = tables[0];
-                const table1 = tables[1];
-                schema.__bodyRange = { start: 0, end: table0.body.length };
-
-                // const newKey = key + '@pdfme/table/${0}';
-                const newKey = key;
-                // ここから直す必要がある pushされる template.schemasの場所がおかしい
-                additionalSchemaObj[newKey] = {
-                  ...schema,
-                  position: { x: schema.position.x, y: table1.settings.startY },
-                  height: table1.getHeight(),
-                  showHead: false,
-                  __bodyRange: { start: table0.body.length },
-                  content: input[key],
-                };
-                if (input[newKey] !== input[key] && onChangeInput) {
-                  onChangeInput({ index: unitCursor, key: newKey, value: input[key] });
-                }
-              }
-            }
-          }
-          template.schemas.push(schemaObj);
-          // ここで分割したテーブルがある場合は追加するべき？
-          if (Object.keys(additionalSchemaObj).length > 0) {
-            if (!t.schemas[pageIndex + 1]) {
-              template.schemas.push(additionalSchemaObj);
-            } else {
-              template.schemas[pageIndex + 1] = additionalSchemaObj;
-            }
-          }
-          pageIndex++;
-        }
-        return template
+      modifyTemplate: (arg) => {
+        return modifyTemplateForTable(arg);
       },
-      getDynamicHeight: async (value, args) => {
-        console.log('getDynamicHeight', value, args)
-        if (args.schema.type !== 'table') return args.schema.height;
-        const body = JSON.parse(value || '[]') as string[][];
-        const table = await createSingleTable(body, args);
-        return table.getHeight();
+      getDynamicHeight: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+        return getDynamicHeightForTable(value, args);
       },
     })
       .then(async (dynamicTemplate) => {

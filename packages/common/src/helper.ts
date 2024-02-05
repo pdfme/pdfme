@@ -222,8 +222,12 @@ interface ModifyTemplateForDynamicTableArg {
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
-  modifyTemplate: (template: Template) => Promise<Template>;
-
+  modifyTemplate: (arg: {
+    template: Template;
+    input: Record<string, string>;
+    _cache: Map<any, any>;
+    options: CommonOptions;
+  }) => Promise<Template>;
   getDynamicHeight: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
@@ -238,7 +242,7 @@ export const getDynamicTemplate = async (
     return template;
   }
 
-  const modifiedTemplate = await modifyTemplate(template);
+  const modifiedTemplate = await modifyTemplate(arg);
   arg.template = modifiedTemplate;
 
   // TODO テーブルの分割の実装がちゃんとできるまで下記はコメントアウト
