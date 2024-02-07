@@ -246,16 +246,18 @@ export const getDynamicTemplate = async (
   arg.template = modifiedTemplate;
 
   // TODO テーブルの分割の実装がちゃんとできるまで下記はコメントアウト
-  // const diffMap = await calculateDiffMap({ ...arg });
+  const diffMap = await calculateDiffMap({ ...arg });
 
-  // const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+  const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 
   // const debug = res.schemas.map((s) =>
   //   Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
   // );
   // console.log('getDynamicTemplate', debug);
 
-  return modifiedTemplate;
+  return res;
+
+  // return modifiedTemplate;
 };
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
@@ -273,9 +275,11 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
         options,
         _cache,
       });
+      // TODO これって2ページ以降のことを考えられていない
+      // 複数ページのスキーマに対してはなにもしていない
       if (schema.height !== dynamicHeight) {
         tmpDiffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
-      }
+      } // すでにあった場合は加算する？
     }
   }
 

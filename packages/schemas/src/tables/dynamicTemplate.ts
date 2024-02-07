@@ -1,9 +1,43 @@
 import { Template, Schema, BasePdf, CommonOptions } from '@pdfme/common';
-import { createMultiTables } from './tableHelper';
+import { createMultiTables, createSingleTable } from './tableHelper';
 
 const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 // TODO ここから
+// そもそもinputでstringしか渡せないので使いにくい。
+// デバッグも兼ねてjsonで渡せるようにしたいかも
+/*
+[
+    {
+        "billedToInput": "\nImani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036",
+        "info": "Invoice No. 12345\n16 June 2025",
+        "orders": [
+            ["Eggshell Camisole Top","$123","$123","Row 1","Row 1"],
+            ["Cuban Collar Shirt","$127","$254","Row 2","Row 2"],
+            ["","","","",""],
+            ["","","","",""],
+            ["","","","",""],
+            ["","","","","aaaa"]
+        ]
+    }
+]
+---
+[
+    {
+        "billedToInput": "\nImani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036",
+        "info": "Invoice No. 12345\n16 June 2025",
+        "orders": [
+            ["Eggshell Camisole Top","$123","$123","Row 1","Row 1"],
+            ["Cuban Collar Shirt","$127","$254","Row 2","Row 2"],
+            ["","","","",""],
+            ["","","","",""],
+            ["","","","",""],
+            ["","","","","aaaa"]
+        ],
+        "info copy": "Invoice No. 12345\n16 June 2025"
+    }
+]
+*/
 export const modifyTemplateForTable = async (arg: {
   template: Template;
   input: Record<string, string>;
@@ -59,7 +93,7 @@ export const modifyTemplateForTable = async (arg: {
   return template;
 };
 
-export const getDynamicHeightForTable = (
+export const getDynamicHeightForTable = async (
   value: string,
   args: {
     schema: Schema;
@@ -68,7 +102,8 @@ export const getDynamicHeightForTable = (
     _cache: Map<any, any>;
   }
 ): Promise<number> => {
+  if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
   const body = JSON.parse(value || '[]') as string[][];
-
-  return Promise.resolve(0);
+  const table = await createSingleTable(body, args);
+  return table.getHeight();
 };

@@ -108,7 +108,7 @@ export const Template = z
   })
   .passthrough();
 
-export const Inputs = z.array(z.record(z.string())).min(1);
+export const Inputs = z.array(z.record(z.any())).min(1);
 
 export const Font = z.record(
   z.object({
