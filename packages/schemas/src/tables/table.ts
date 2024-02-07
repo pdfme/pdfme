@@ -99,8 +99,9 @@ const renderRowUi = (args: {
           if (!arg.onChange) return;
           const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
           if (section === 'body') {
+            const startRange = arg.schema.__bodyRange?.start ?? 0;
+            value[rowIndex + startRange][colIndex] = newValue;
             // TODO onChangeを呼び出すと再レンダリングが走ってフォーカスが外れる
-            value[rowIndex][colIndex] = newValue;
             arg.onChange({ key: 'content', value: JSON.stringify(value) });
           } else {
             const newHead = [...arg.schema.head];
@@ -135,9 +136,9 @@ const resetEditingPosition = () => {
   bodyEditingPosition.colIndex = -1;
 };
 
-const getBody = (value: string, schema: TableSchema) => {
-  const range = schema.__bodyRange;
-  const body = JSON.parse(value || '[]') as string[][];
+const getBody = (value: string) => JSON.parse(value || '[]') as string[][];
+const getBodyWithRange = (value: string, range?: { start: number; end?: number | undefined }) => {
+  const body = getBody(value);
   if (!range) return body;
   return body.slice(range.start, range.end);
 };
@@ -145,14 +146,15 @@ const getBody = (value: string, schema: TableSchema) => {
 const tableSchema: Plugin<TableSchema> = {
   pdf: async (arg: PDFRenderProps<TableSchema>) => {
     const { value, schema } = arg;
-    const body = getBody(value, schema);
+    const body = getBodyWithRange(value, schema.__bodyRange);
     const table = await createSingleTable(body, arg);
     await drawTable(arg, table);
   },
   ui: async (arg: UIRenderProps<TableSchema>) => {
     const { rootElement, onChange, schema, value, mode } = arg;
-    const body = getBody(value, schema);
-    const table = await createSingleTable(body, arg);
+    const body = getBody(value);
+    const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
+    const table = await createSingleTable(bodyWidthRange, arg);
 
     rootElement.innerHTML = '';
 
@@ -185,7 +187,9 @@ const tableSchema: Plugin<TableSchema> = {
       rows: table.body,
       arg,
       editingPosition: bodyEditingPosition,
-      onChangeEditingPosition: (p) => handleChangeEditingPosition(p, bodyEditingPosition),
+      onChangeEditingPosition: (p) => {
+        handleChangeEditingPosition(p, bodyEditingPosition);
+      },
       offsetY,
     });
 
@@ -248,7 +252,7 @@ const tableSchema: Plugin<TableSchema> = {
           { key: 'headWidthPercentages', value: scaledWidths.concat(newColumnWidthPercentage) },
           {
             key: 'content',
-            value: JSON.stringify(body.map((row, i) => row.concat(`Row ${i + 1}`))),
+            value: JSON.stringify(bodyWidthRange.map((row, i) => row.concat(`Row ${i + 1}`))),
           },
         ]);
       };
@@ -283,7 +287,7 @@ const tableSchema: Plugin<TableSchema> = {
             },
             {
               key: 'content',
-              value: JSON.stringify(body.map((row) => row.filter((_, j) => j !== i))),
+              value: JSON.stringify(bodyWidthRange.map((row) => row.filter((_, j) => j !== i))),
             },
           ]);
         };

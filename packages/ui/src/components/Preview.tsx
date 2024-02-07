@@ -61,7 +61,6 @@ const Preview = ({
       },
     })
       .then(async (dynamicTemplate) => {
-        console.log('dynamicTemplate', dynamicTemplate)
         const sl = await template2SchemasList(dynamicTemplate);
         setSchemasList(sl);
         await refresh(dynamicTemplate);

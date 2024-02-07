@@ -4,8 +4,6 @@ import { createMultiTables, createSingleTable } from './tableHelper';
 const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 // TODO ここから
-// そもそもinputでstringしか渡せないので使いにくい。
-// デバッグも兼ねてjsonで渡せるようにしたいかも
 /*
 [
     {
@@ -14,27 +12,12 @@ const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
         "orders": [
             ["Eggshell Camisole Top","$123","$123","Row 1","Row 1"],
             ["Cuban Collar Shirt","$127","$254","Row 2","Row 2"],
-            ["","","","",""],
-            ["","","","",""],
-            ["","","","",""],
-            ["","","","","aaaa"]
+            ["","",""],
+            ["","",""],
+            ["","",""],
+            ["","","aaaa"],
+            ["","","aaaa"]
         ]
-    }
-]
----
-[
-    {
-        "billedToInput": "\nImani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036",
-        "info": "Invoice No. 12345\n16 June 2025",
-        "orders": [
-            ["Eggshell Camisole Top","$123","$123","Row 1","Row 1"],
-            ["Cuban Collar Shirt","$127","$254","Row 2","Row 2"],
-            ["","","","",""],
-            ["","","","",""],
-            ["","","","",""],
-            ["","","","","aaaa"]
-        ],
-        "info copy": "Invoice No. 12345\n16 June 2025"
     }
 ]
 */
@@ -63,9 +46,9 @@ export const modifyTemplateForTable = async (arg: {
           const table0 = tables[0];
           const table1 = tables[1];
           schema.__bodyRange = { start: 0, end: table0.body.length };
+          schema.height = table0.getHeight();
 
-          const newKey = key;
-          additionalSchemaObj[newKey] = {
+          additionalSchemaObj[key] = {
             ...schema,
             position: { x: schema.position.x, y: table1.settings.startY },
             height: table1.getHeight(),
@@ -73,14 +56,10 @@ export const modifyTemplateForTable = async (arg: {
             __bodyRange: { start: table0.body.length },
             content: input[key],
           };
-          // if (input[newKey] !== input[key] && onChangeInput) {
-          //   onChangeInput({ index: unitCursor, key: newKey, value: input[key] });
-          // }
         }
       }
     }
     template.schemas.push(schemaObj);
-    // ここで分割したテーブルがある場合は追加するべき？
     if (Object.keys(additionalSchemaObj).length > 0) {
       if (!t.schemas[pageIndex + 1]) {
         template.schemas.push(additionalSchemaObj);
