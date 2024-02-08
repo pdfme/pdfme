@@ -14,6 +14,7 @@ import {
 } from '@pdfme/common';
 import type { TableSchema, CellStyle } from './types';
 import cell from './cell';
+import { cloneDeep } from '../utils';
 
 const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
@@ -44,7 +45,7 @@ const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
   });
 };
 
-const addTableBorder = async (
+const drawTableBorder = async (
   arg: PDFRenderProps<TableSchema>,
   table: Table,
   startPos: Pos,
@@ -303,7 +304,7 @@ export async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table):
     await drawRow(arg, table, row, cursor, table.columns);
   }
 
-  await addTableBorder(arg, table, startPos, cursor);
+  await drawTableBorder(arg, table, startPos, cursor);
 }
 
 async function drawRow(
@@ -717,13 +718,8 @@ function parseSettings(options: UserOptions): Settings {
 function parseContent4Input(options: UserOptions) {
   const head = options.head || [];
   const body = options.body || [];
-  const columns = parseColumns(head, body);
+  const columns = (head[0] || body[0] || []).map((_, index) => index);
   return { columns, head, body };
-}
-
-function parseColumns(head: RowInput[], body: RowInput[]) {
-  const firstRow: RowInput = head[0] || body[0] || [];
-  return firstRow.map((_, index) => index);
 }
 
 const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
@@ -815,8 +811,6 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
 
   return { content, styles, settings };
 }
-
-const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 export async function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;

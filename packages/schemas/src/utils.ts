@@ -165,3 +165,5 @@ export const px2mm = (px: number): number => {
   const ratio = 0.26458333333333;
   return parseFloat(String(px)) * ratio;
 };
+
+export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
