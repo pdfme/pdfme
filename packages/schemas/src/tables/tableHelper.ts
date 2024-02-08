@@ -1,5 +1,4 @@
 import type { Font as FontKitFont } from 'fontkit';
-import { rectangle } from '../shapes/rectAndEllipse';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
 import {
   Schema,
@@ -12,131 +11,26 @@ import {
   getFallbackFontName,
   pt2mm,
 } from '@pdfme/common';
-import type { TableSchema, CellStyle } from './types';
-import cell from './cell';
+import type {
+  TableSchema,
+  CellStyle,
+  Styles,
+  Spacing,
+  TableInput,
+  Settings,
+  StylesProps,
+  Section,
+} from './types';
 import { cloneDeep } from '../utils';
-
-const rectanglePdfRender = rectangle.pdf;
-const cellPdfRender = cell.pdf;
-
-const drawCell = async (arg: PDFRenderProps<Schema>, cell: Cell) => {
-  // TODO テーブルのボーダーを考慮できていない気がする
-  // 本当はテーブルのボーダーの分を引いた位置に描画したい
-  await cellPdfRender({
-    ...arg,
-    value: cell.raw,
-    schema: {
-      type: 'cell',
-      position: { x: cell.x, y: cell.y },
-      width: cell.width,
-      height: cell.height,
-      fontName: cell.styles.fontName,
-      alignment: cell.styles.alignment,
-      verticalAlignment: cell.styles.verticalAlignment,
-      fontSize: cell.styles.fontSize,
-      lineHeight: cell.styles.lineHeight,
-      characterSpacing: cell.styles.characterSpacing,
-      backgroundColor: cell.styles.backgroundColor,
-      fontColor: cell.styles.textColor,
-      borderColor: cell.styles.lineColor,
-      borderWidth: cell.styles.lineWidth,
-      padding: cell.styles.cellPadding,
-    },
-  });
-};
-
-const drawTableBorder = async (
-  arg: PDFRenderProps<TableSchema>,
-  table: Table,
-  startPos: Pos,
-  cursor: Pos
-) => {
-  const lineWidth = table.settings.tableLineWidth;
-  const lineColor = table.settings.tableLineColor;
-  if (!lineWidth || !lineColor) return;
-  await rectanglePdfRender({
-    ...arg,
-    schema: {
-      type: 'rectangle',
-      borderWidth: lineWidth,
-      borderColor: lineColor,
-      color: '',
-      position: { x: startPos.x, y: startPos.y },
-      width: table.getWidth(),
-      height: cursor.y - startPos.y,
-      readOnly: true,
-    },
-  });
-};
+import { Cell, Column, Row, Table } from './classes';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
-type Spacing = { top: number; right: number; bottom: number; left: number };
-type BorderInsets = Spacing;
-
-type Color = string;
-type RowInput = string[];
-
-type ContentSettings = {
-  body: Row[];
-  head: Row[];
-  columns: Column[];
-};
-type Section = 'head' | 'body';
-type Pos = { x: number; y: number };
-
-interface StylesProps {
-  styles: Partial<Styles>;
-  headStyles: Partial<Styles>;
-  bodyStyles: Partial<Styles>;
-  alternateRowStyles: Partial<Styles>;
-  columnStyles: { [key: string]: Partial<Styles> };
-}
-
-export interface Styles {
-  fontName: string | undefined;
-  backgroundColor: Color;
-  textColor: Color;
-  lineHeight: number;
-  characterSpacing: number;
-  alignment: 'left' | 'center' | 'right';
-  verticalAlignment: 'top' | 'middle' | 'bottom';
-  fontSize: number;
-  cellPadding: Spacing;
-  lineColor: Color;
-  lineWidth: BorderInsets;
-  cellWidth: number;
-  minCellHeight: number;
-  minCellWidth: number;
-}
-
-interface Settings {
-  startY: number;
-  margin: Spacing;
-  tableWidth: number;
-  showHead: boolean;
-  tableLineWidth: number;
-  tableLineColor: Color;
-}
-
-interface StylesProps {
-  styles: Partial<Styles>;
-  headStyles: Partial<Styles>;
-  bodyStyles: Partial<Styles>;
-  alternateRowStyles: Partial<Styles>;
-  columnStyles: { [key: string]: Partial<Styles> };
-}
-
-interface ContentInput {
-  body: RowInput[];
-  head: RowInput[];
-  columns: number[];
-}
-
-interface TableInput {
-  settings: Settings;
-  styles: StylesProps;
-  content: ContentInput;
+interface CreateTableArgs {
+  schema: Schema;
+  basePdf: BasePdf;
+  options: CommonOptions;
+  _cache: Map<any, any>;
 }
 
 interface UserOptions {
@@ -145,9 +39,9 @@ interface UserOptions {
   margin: Spacing;
   showHead: boolean;
   tableLineWidth?: number;
-  tableLineColor?: Color;
-  head?: RowInput[];
-  body?: RowInput[];
+  tableLineColor?: string;
+  head?: string[][];
+  body?: string[][];
 
   styles?: Partial<Styles>;
   bodyStyles?: Partial<Styles>;
@@ -156,180 +50,6 @@ interface UserOptions {
   columnStyles?: {
     [key: string]: Partial<Styles>;
   };
-}
-
-class Cell {
-  raw: string;
-  text: string[];
-  styles: Styles;
-  section: Section;
-  contentHeight = 0;
-  contentWidth = 0;
-  wrappedWidth = 0;
-  minReadableWidth = 0;
-  minWidth = 0;
-
-  width = 0;
-  height = 0;
-  x = 0;
-  y = 0;
-
-  constructor(raw: string, styles: Styles, section: Section) {
-    this.styles = styles;
-    this.section = section;
-    this.raw = raw;
-    const splitRegex = /\r\n|\r|\n/g;
-    this.text = raw.split(splitRegex);
-  }
-
-  getContentHeight() {
-    const lineCount = Array.isArray(this.text) ? this.text.length : 1;
-    const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
-    const vPadding = this.padding('top') + this.padding('bottom');
-    const height = lineCount * lineHeight + vPadding;
-    return Math.max(height, this.styles.minCellHeight);
-  }
-
-  padding(name: 'top' | 'bottom' | 'left' | 'right') {
-    return this.styles.cellPadding[name];
-  }
-}
-
-class Column {
-  index: number;
-  wrappedWidth = 0;
-  minReadableWidth = 0;
-  minWidth = 0;
-  width = 0;
-
-  constructor(index: number) {
-    this.index = index;
-  }
-
-  getMaxCustomCellWidth(table: Table) {
-    let max = 0;
-    for (const row of table.allRows()) {
-      const cell: Cell = row.cells[this.index];
-      max = Math.max(max, cell.styles.cellWidth);
-    }
-    return max;
-  }
-}
-
-export type RowType = InstanceType<typeof Row>;
-
-class Row {
-  readonly raw: RowInput;
-  readonly index: number;
-  readonly section: Section;
-  readonly cells: { [key: string]: Cell };
-
-  height = 0;
-
-  constructor(raw: RowInput, index: number, section: Section, cells: { [key: string]: Cell }) {
-    this.raw = raw;
-    this.index = index;
-    this.section = section;
-    this.cells = cells;
-  }
-
-  getMaxCellHeight(columns: Column[]) {
-    return columns.reduce((acc, column) => Math.max(acc, this.cells[column.index]?.height || 0), 0);
-  }
-
-  getMinimumRowHeight(columns: Column[]) {
-    return columns.reduce((acc: number, column: Column) => {
-      const cell = this.cells[column.index];
-      if (!cell) return 0;
-      const vPadding = cell.padding('top') + cell.padding('bottom');
-      const oneRowHeight = vPadding + cell.styles.lineHeight;
-      return oneRowHeight > acc ? oneRowHeight : acc;
-    }, 0);
-  }
-}
-
-export class Table {
-  readonly settings: Settings;
-  readonly styles: StylesProps;
-
-  readonly columns: Column[];
-  readonly head: Row[];
-  readonly body: Row[];
-
-  constructor(input: TableInput, content: ContentSettings) {
-    this.settings = input.settings;
-    this.styles = input.styles;
-
-    this.columns = content.columns;
-    this.head = content.head;
-    this.body = content.body;
-  }
-
-  getHeadHeight() {
-    return this.head.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
-  }
-
-  getBodyHeight() {
-    return this.body.reduce((acc, row) => acc + row.getMaxCellHeight(this.columns), 0);
-  }
-
-  allRows() {
-    return this.head.concat(this.body);
-  }
-
-  getWidth() {
-    return this.settings.tableWidth;
-  }
-
-  getHeight() {
-    return (this.settings.showHead ? this.getHeadHeight() : 0) + this.getBodyHeight();
-  }
-}
-
-export async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promise<void> {
-  const settings = table.settings;
-  const startY = settings.startY;
-  const margin = settings.margin;
-  const cursor = { x: margin.left, y: startY };
-
-  const startPos = Object.assign({}, cursor);
-
-  if (settings.showHead) {
-    for (const row of table.head) {
-      await drawRow(arg, table, row, cursor, table.columns);
-    }
-  }
-
-  for (const row of table.body) {
-    await drawRow(arg, table, row, cursor, table.columns);
-  }
-
-  await drawTableBorder(arg, table, startPos, cursor);
-}
-
-async function drawRow(
-  arg: PDFRenderProps<Schema>,
-  table: Table,
-  row: Row,
-  cursor: Pos,
-  columns: Column[]
-) {
-  cursor.x = table.settings.margin.left;
-  for (const column of columns) {
-    const cell = row.cells[column.index];
-    if (!cell) {
-      cursor.x += column.width;
-      continue;
-    }
-
-    cell.x = cursor.x;
-    cell.y = cursor.y;
-
-    await drawCell(arg, cell);
-
-    cursor.x += column.width;
-  }
-  cursor.y += row.height;
 }
 
 async function calculateWidths(
@@ -595,7 +315,7 @@ function parseContent4Table(input: TableInput, fallbackFontName: string) {
 
 function parseSection(
   sectionName: Section,
-  sectionRows: RowInput[],
+  sectionRows: string[][],
   columns: Column[],
   styleProps: StylesProps,
   fallbackFontName: string
@@ -722,22 +442,24 @@ function parseContent4Input(options: UserOptions) {
   return { columns, head, body };
 }
 
-const mapCellStyle = (style: CellStyle): Partial<Styles> => ({
-  fontName: style.fontName,
-  alignment: style.alignment,
-  verticalAlignment: style.verticalAlignment,
-  fontSize: style.fontSize,
-  lineHeight: style.lineHeight,
-  characterSpacing: style.characterSpacing,
-  backgroundColor: style.backgroundColor,
-  // ---
-  textColor: style.fontColor,
-  lineColor: style.borderColor,
-  lineWidth: style.borderWidth,
-  cellPadding: style.padding,
-});
+function mapCellStyle(style: CellStyle): Partial<Styles> {
+  return {
+    fontName: style.fontName,
+    alignment: style.alignment,
+    verticalAlignment: style.verticalAlignment,
+    fontSize: style.fontSize,
+    lineHeight: style.lineHeight,
+    characterSpacing: style.characterSpacing,
+    backgroundColor: style.backgroundColor,
+    // ---
+    textColor: style.fontColor,
+    lineColor: style.borderColor,
+    lineWidth: style.borderWidth,
+    cellPadding: style.padding,
+  };
+}
 
-const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => {
+function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   const columnStylesWidth = schema.headWidthPercentages.reduce(
     (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
     {} as Record<number, Partial<Styles>>
@@ -772,14 +494,7 @@ const getTableOptions = (schema: TableSchema, body: string[][]): UserOptions => 
     columnStyles,
     margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
   };
-};
-
-type CreateTableArgs = {
-  schema: Schema;
-  basePdf: BasePdf;
-  options: CommonOptions;
-  _cache: Map<any, any>;
-};
+}
 
 function createTableWithAvailableHeight(
   tableBody: Row[],
@@ -811,7 +526,6 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
 
   return { content, styles, settings };
 }
-
 export async function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
@@ -826,6 +540,7 @@ export async function createSingleTable(body: string[][], args: CreateTableArgs)
 
   const content = parseContent4Table(input, fallbackFontName);
 
+  // TODO ここから。calculateWidthsをテーブルのコンストラクターに移動する
   const table = new Table(input, content);
   await calculateWidths(table, getFontKitFontByFontName);
   return table;
