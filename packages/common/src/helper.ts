@@ -243,10 +243,8 @@ export const getDynamicTemplate = async (
   }
 
   const modifiedTemplate = await modifyTemplate(arg);
-  console.log('modifiedTemplate', modifiedTemplate);
-  // arg.template = modifiedTemplate;
 
-  const diffMap = await calculateDiffMap({ ...arg });
+  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
 
   const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 
@@ -257,11 +255,9 @@ export const getDynamicTemplate = async (
 
   return res;
 
-  // return modifiedTemplate;
+  // return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 };
 
-// TODO 多分これはオリジナルのテンプレートと、modifiedTemplateテンプレートを受け取って、
-// 差分を読み取ってdiffMapを作成するようにするべき
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options, getDynamicHeight } = arg;
   const basePdf = template.basePdf;
@@ -314,11 +310,9 @@ export const normalizePositionsAndPageBreak = (
   const paddingTop = template.basePdf.padding[0];
   const paddingBottom = template.basePdf.padding[2];
 
-  // TODO ここで作成されるテンプレートに重複したテーブルを削除していまっているかもしれない
   for (let i = 0; i < template.schemas.length; i += 1) {
     const schemaObj = template.schemas[i];
     if (!pages[i]) pages[i] = {};
-    console.log('schemaObj', schemaObj);
     for (const [key, schema] of Object.entries(schemaObj)) {
       const { position, height } = schema;
 
