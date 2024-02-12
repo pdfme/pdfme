@@ -1,7 +1,7 @@
 import { Template, Schema, BasePdf, CommonOptions } from '@pdfme/common';
 import { createMultiTables, createSingleTable } from './tableHelper';
 import { cloneDeep } from '../utils';
-import { getBodyWithRange } from './helper.js';
+import { getBodyWithRange, getBody } from './helper.js';
 import { TableSchema } from './types';
 
 // TODO テスト用
@@ -142,7 +142,8 @@ export const getDynamicHeightForTable = async (
 ): Promise<number> => {
   if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
   const schema = args.schema as TableSchema;
-  const body = getBodyWithRange(value, schema.__bodyRange);
+  const body =
+    schema.__bodyRange?.start === 0 ? getBody(value) : getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(body, args);
   return table.getHeight();
 };

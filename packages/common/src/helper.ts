@@ -243,8 +243,10 @@ export const getDynamicTemplate = async (
   }
 
   const modifiedTemplate = await modifyTemplate(arg);
+  console.log('modifiedTemplate', modifiedTemplate);
 
   const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
+  console.log('diffMap', diffMap);
 
   const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 
@@ -262,9 +264,11 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
   const { template, input, _cache, options, getDynamicHeight } = arg;
   const basePdf = template.basePdf;
   const tmpDiffMap = new Map<number, number>();
-  if (!isBlankPdf(template.basePdf)) {
+  if (!isBlankPdf(basePdf)) {
     return tmpDiffMap;
   }
+  const pageHeight = basePdf.height;
+  let pageIndex = 0;
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
       const dynamicHeight = await getDynamicHeight(input[key], {
@@ -273,13 +277,14 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
         options,
         _cache,
       });
-      // TODO ここから!
-      // これって2ページ以降のことを考えられていない
-      // 複数ページのスキーマに対してはなにもしていない
       if (schema.height !== dynamicHeight) {
-        tmpDiffMap.set(schema.position.y + schema.height, dynamicHeight - schema.height);
-      } // すでにあった場合は加算する？
+        tmpDiffMap.set(
+          schema.position.y + schema.height + pageHeight * pageIndex,
+          dynamicHeight - schema.height
+        );
+      }
     }
+    pageIndex++;
   }
 
   const diffMap = new Map<number, number>();
@@ -316,7 +321,6 @@ export const normalizePositionsAndPageBreak = (
     for (const [key, schema] of Object.entries(schemaObj)) {
       const { position, height } = schema;
 
-      // TODO これが前のdiffMapの値を使えていない
       const closestAffectedDiffMap = Array.from(diffMap.entries()).reduce(
         (acc, cur) => {
           const [diffKey, diffValue] = cur;
@@ -328,25 +332,15 @@ export const normalizePositionsAndPageBreak = (
         },
         [0, 0]
       );
-      const [diffKey, diffValue] = closestAffectedDiffMap;
-
-      //  If the y-coordinate is unaffected
-      if (!(position.y + diffValue > diffKey)) {
-        const targetSchema = pages[i] && pages[i][key] ? pages[i][key] : schema;
-        pages[i] = { ...pages[i], [key]: targetSchema };
-        continue;
-      }
-
-      // If y-coordinate is affected (no page break)
-      const yPlusDiff = position.y + diffValue;
-      const shouldGoNextPage = yPlusDiff + height > pageHeight - paddingBottom;
+      const yPlusDiff = position.y + closestAffectedDiffMap[1];
+      const shouldGoNextPage = yPlusDiff + height >= pageHeight - paddingBottom;
       if (!shouldGoNextPage) {
         pages[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
         continue;
       }
 
       // If y-coordinate is affected (with page break)
-      const newY = Math.max(paddingTop + yPlusDiff - (pageHeight - paddingBottom), paddingTop);
+      const newY = paddingTop + yPlusDiff - (pageHeight - paddingBottom) + paddingTop;
       // TODO 次のページだけじゃないかもしれない
       const pageCursor = i + 1;
       const nextPage = pages[pageCursor];
