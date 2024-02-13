@@ -201,7 +201,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       removeRowButton.style.right = '-30px';
       removeRowButton.innerText = '-';
       removeRowButton.onclick = () => {
-        const newTableBody = body.filter((_, j) => j !== i);
+        const newTableBody = body.filter((_, j) => j !== i + (schema.__bodyRange?.start ?? 0));
         onChange({ key: 'content', value: JSON.stringify(newTableBody) });
       };
       rootElement.appendChild(removeRowButton);
