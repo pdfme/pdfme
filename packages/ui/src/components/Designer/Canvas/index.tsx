@@ -1,4 +1,3 @@
-import type * as CSS from 'csstype';
 import React, {
   Ref,
   useMemo,
@@ -24,6 +23,7 @@ import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
+import Padding from './Padding';
 
 const mm2px = (mm: number) => mm * 3.7795275591;
 
@@ -32,44 +32,6 @@ const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
-const getPaddingStyle = (i: number, p: number, color: string): CSS.Properties => {
-  const style: CSS.Properties = {
-    position: 'absolute',
-    background: color,
-    opacity: 0.25,
-    pointerEvents: 'none',
-  };
-  switch (i) {
-    case 0:
-      style.top = 0;
-      style.height = `${p * ZOOM}px`;
-      style.left = 0;
-      style.right = 0;
-      break;
-    case 1:
-      style.right = 0;
-      style.width = `${p * ZOOM}px`;
-      style.top = 0;
-      style.bottom = 0;
-      break;
-    case 2:
-      style.bottom = 0;
-      style.height = `${p * ZOOM}px`;
-      style.left = 0;
-      style.right = 0;
-      break;
-    case 3:
-      style.left = 0;
-      style.width = `${p * ZOOM}px`;
-      style.top = 0;
-      style.bottom = 0;
-      break;
-    default:
-      break;
-  }
-
-  return style;
-};
 
 const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }) => {
   const { token } = theme.useToken();
@@ -430,10 +392,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             {!editing && activeElements.length > 0 && pageCursor === index && (
               <DeleteButton activeElements={activeElements} />
             )}
-            {isBlankPdf(basePdf) &&
-              basePdf.padding.map((p, i) => (
-                <div key={String(i)} style={getPaddingStyle(i, p, token.colorError)} />
-              ))}
+            <Padding basePdf={basePdf} />
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {

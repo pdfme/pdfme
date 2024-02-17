@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
+import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate, isBlankPdf } from '@pdfme/common';
 import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
@@ -9,8 +9,9 @@ import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
-import { template2SchemasList, getPagesScrollTopByIndex, cloneDeep } from '../helper';
+import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
 import { theme } from 'antd';
+import Padding from '../components/Designer/Canvas/Padding'
 
 const _cache = new Map();
 
@@ -123,38 +124,42 @@ const Preview = ({
             const { key, readOnly } = schema;
             const content = readOnly ? schema.content || '' : (input && input[key]) || '';
             return (
-              <Renderer
-                key={schema.id}
-                schema={schema}
-                basePdf={template.basePdf}
-                value={content}
-                mode={isForm ? 'form' : 'viewer'}
-                placeholder={schema.content}
-                tabIndex={index + 100}
-                onChange={(arg) => {
-                  const args = Array.isArray(arg) ? arg : [arg];
-                  args.forEach(({ key: _key, value }) => {
-                    if (_key === 'content') {
-                      handleChangeInput({ key, value: value as string });
-                      // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
-                      init(template);
-                    } else {
-                      const targetSchema = schemasList[pageCursor].find(
-                        (s) => s.id === schema.id
-                      ) as SchemaForUI;
-                      if (!targetSchema) return;
+              <>
+                {/* TODO 下記はデバッグ用 */}
+                <Padding basePdf={template.basePdf} />
+                <Renderer
+                  key={schema.id}
+                  schema={schema}
+                  basePdf={template.basePdf}
+                  value={content}
+                  mode={isForm ? 'form' : 'viewer'}
+                  placeholder={schema.content}
+                  tabIndex={index + 100}
+                  onChange={(arg) => {
+                    const args = Array.isArray(arg) ? arg : [arg];
+                    args.forEach(({ key: _key, value }) => {
+                      if (_key === 'content') {
+                        handleChangeInput({ key, value: value as string });
+                        // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
+                        init(template);
+                      } else {
+                        const targetSchema = schemasList[pageCursor].find(
+                          (s) => s.id === schema.id
+                        ) as SchemaForUI;
+                        if (!targetSchema) return;
 
-                      // @ts-ignore
-                      targetSchema[_key] = value as string;
-                    }
-                  });
-                  setSchemasList([...schemasList]);
-                }}
-                outline={
-                  isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
-                }
-                scale={scale}
-              />
+                        // @ts-ignore
+                        targetSchema[_key] = value as string;
+                      }
+                    });
+                    setSchemasList([...schemasList]);
+                  }}
+                  outline={
+                    isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
+                  }
+                  scale={scale}
+                />
+              </>
             );
           }}
         />
