@@ -1,5 +1,5 @@
 import type { TableSchema } from './types';
-import type { PDFRenderProps, Schema } from '@pdfme/common';
+import type { PDFRenderProps } from '@pdfme/common';
 import { Cell, Table, Row, Column } from './classes';
 import { rectangle } from '../shapes/rectAndEllipse';
 import cell from './cell';
@@ -11,9 +11,9 @@ type Pos = { x: number; y: number };
 const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
 
-async function drawCell(arg: PDFRenderProps<Schema>, cell: Cell) {
-  // TODO テーブルのボーダーを考慮できていない気がする
-  // 本当はテーブルのボーダーの分を引いた位置に描画したい
+async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
+  // TODO Not considering the table border
+  // The cell's position and size should indeed be shifted to accommodate the table border
   await cellPdfRender({
     ...arg,
     value: cell.raw,
@@ -38,7 +38,7 @@ async function drawCell(arg: PDFRenderProps<Schema>, cell: Cell) {
 }
 
 async function drawRow(
-  arg: PDFRenderProps<Schema>,
+  arg: PDFRenderProps<TableSchema>,
   table: Table,
   row: Row,
   cursor: Pos,

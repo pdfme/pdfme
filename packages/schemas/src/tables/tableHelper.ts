@@ -283,42 +283,40 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   return Table.create({ input, content, font, _cache });
 }
 
-export async function createMultiTables(body: string[][], args: CreateTableArgs) {
+export async function createMultiTables(body: string[][], args: CreateTableArgs): Promise<Table[]> {
   const { basePdf, schema } = args;
 
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
   const pageHeight = basePdf.height;
   const paddingBottom = basePdf.padding[2];
-  const availableHeight = pageHeight - paddingBottom - schema.position.y;
-  const table = await createSingleTable(body, args);
+  const paddingTop = basePdf.padding[0];
+  let availableHeight = pageHeight - paddingBottom - schema.position.y;
 
-  if (table.getHeight() <= availableHeight) {
-    return [table];
+  const testTable = await createSingleTable(body, args);
+  let remainingBody = testTable.body;
+  const tables: Table[] = [];
+
+  while (remainingBody.length > 0) {
+    const tableHeight =
+      tables.length === 0
+        ? availableHeight - testTable.getHeadHeight()
+        : availableHeight - paddingTop;
+
+    const table = await createTableWithAvailableHeight(remainingBody, tableHeight, args);
+
+    tables.push(table);
+
+    remainingBody = remainingBody.slice(table.body.length);
+
+    if (remainingBody.length > 0) {
+      const _schema = cloneDeep(schema);
+      _schema.showHead = false;
+      _schema.position.y = paddingTop;
+      args.schema = _schema;
+
+      availableHeight = pageHeight - paddingTop - paddingBottom;
+    }
   }
 
-  const firstTable = await createTableWithAvailableHeight(
-    table.body,
-    availableHeight - table.getHeadHeight(),
-    args
-  );
-  const tables: Table[] = [firstTable];
-
-  const bodyForRestTables = table.body.slice(firstTable.body.length);
-  const paddingTop = basePdf.padding[0];
-  const pageAvailableHeight = pageHeight - paddingTop - paddingBottom;
-
-  const _schema = cloneDeep(schema);
-  _schema.showHead = false;
-  _schema.position.y = paddingTop;
-  args.schema = _schema;
-
-  const secondTable = await createTableWithAvailableHeight(
-    bodyForRestTables,
-    pageAvailableHeight,
-    args
-  );
-  tables.push(secondTable);
-
-  // TODO 現在は2つまでしか対応していない
   return tables;
 }

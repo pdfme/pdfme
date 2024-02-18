@@ -121,7 +121,7 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderPaper={() => {
-            {/* TODO 下記はデバッグ用 */ }
+            {/* TODO for Debug after development table, remove this */}
             return <Padding basePdf={template.basePdf} />
 
           }}

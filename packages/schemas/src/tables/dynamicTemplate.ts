@@ -3,83 +3,6 @@ import { createMultiTables, createSingleTable } from './tableHelper';
 import { cloneDeep } from '../utils';
 import { getBodyWithRange, getBody } from './helper.js';
 import { TableSchema } from './types';
-
-// TODO テスト用
-/*
-[
-    {
-        "billedToInput": "\nImani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036",
-        "info": "Invoice No. 12345\n16 June 2025",
-        "orders": [
-          [
-              "Eggshell Camisole Top",
-              "1",
-              "$123",
-              "$123"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ],
-          [
-              "Cuban Collar Shirt",
-              "2",
-              "$127",
-              "$254"
-          ]
-        ],
-        "subtotalInput": "$500",
-        "taxInput": "$0",
-        "totalInput": "$500",
-        "paymentInfoInput": "Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025",
-        "field1": "Type Something..."
-    }
-]
-*/
 export const modifyTemplateForTable = async (arg: {
   template: Template;
   input: Record<string, string>;
@@ -90,7 +13,7 @@ export const modifyTemplateForTable = async (arg: {
   const template: Template = Object.assign(cloneDeep(t), { schemas: [] });
   let pageIndex = 0;
   for (const schemaObj of t.schemas) {
-    const additionalSchemaObj: typeof schemaObj = {};
+    const additionalSchemaObjs: (typeof schemaObj)[] = [];
     for (const [key, schema] of Object.entries(schemaObj)) {
       if (schema.type === 'table') {
         schema.__bodyRange = undefined;
@@ -102,30 +25,39 @@ export const modifyTemplateForTable = async (arg: {
           _cache,
         });
         if (tables.length > 1) {
-          // TODO テーブルが2つ以上は考慮されていない
-          const table0 = tables[0];
-          const table1 = tables[1];
-          schema.__bodyRange = { start: 0, end: table0.body.length };
+          const firstTable = tables[0];
+          schema.__bodyRange = { start: 0, end: firstTable.body.length };
+          const allBodies = tables.map((table) => table.body);
+          const from2ndTable = tables.slice(1);
+          from2ndTable.forEach((table, i) => {
+            const additionalPageIndex = pageIndex + i + 1;
 
-          additionalSchemaObj[key] = {
-            ...schema,
-            position: { x: schema.position.x, y: table1.settings.startY },
-            height: table1.getHeight(),
-            showHead: false,
-            __bodyRange: { start: table0.body.length },
-            content: input[key],
-          };
+            const additionalSchemaObj = {
+              [key]: {
+                ...schema,
+                position: { x: schema.position.x, y: table.settings.startY },
+                height: table.getHeight(),
+                showHead: false,
+                __bodyRange: {
+                  start: allBodies.slice(0, i + 1).reduce((acc, cur) => acc + cur.length, 0),
+                  end: allBodies.slice(0, i + 2).reduce((acc, cur) => acc + cur.length, 0),
+                },
+                content: input[key],
+              },
+            };
+            additionalSchemaObjs[additionalPageIndex] = additionalSchemaObj;
+          });
         }
       }
     }
     template.schemas.push(schemaObj);
-    if (Object.keys(additionalSchemaObj).length > 0) {
-      if (!t.schemas[pageIndex + 1]) {
-        template.schemas.push(additionalSchemaObj);
+    additionalSchemaObjs.forEach((obj, index) => {
+      if (!template.schemas[index]) {
+        template.schemas[index] = obj;
       } else {
-        template.schemas[pageIndex + 1] = additionalSchemaObj;
+        template.schemas[index] = { ...template.schemas[index], ...obj };
       }
-    }
+    });
     pageIndex++;
   }
   return template;

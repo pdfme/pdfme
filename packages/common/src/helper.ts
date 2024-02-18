@@ -308,9 +308,9 @@ export const normalizePositionsAndPageBreak = (
   if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
     return template;
   }
+
   const returnTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
   const pages = returnTemplate.schemas;
-
   const pageHeight = template.basePdf.height;
   const paddingTop = template.basePdf.padding[0];
   const paddingBottom = template.basePdf.padding[2];
@@ -318,39 +318,28 @@ export const normalizePositionsAndPageBreak = (
   for (let i = 0; i < template.schemas.length; i += 1) {
     const schemaObj = template.schemas[i];
     if (!pages[i]) pages[i] = {};
+
     for (const [key, schema] of Object.entries(schemaObj)) {
       const { position, height } = schema;
+      let newY = position.y;
+      let pageCursor = i;
 
-      const closestAffectedDiffMap = Array.from(diffMap.entries()).reduce(
-        (acc, cur) => {
-          const [diffKey, diffValue] = cur;
-          const [accKey, accValue] = acc;
-          if (position.y + accValue > diffKey && diffKey > accKey) {
-            return [diffKey, diffValue];
-          }
-          return acc;
-        },
-        [0, 0]
-      );
-      const yPlusDiff = position.y + closestAffectedDiffMap[1];
-      const shouldGoNextPage = yPlusDiff + height >= pageHeight - paddingBottom;
-      if (!shouldGoNextPage) {
-        pages[i][key] = { ...schema, position: { ...position, y: yPlusDiff } };
-        continue;
+      for (const [diffKey, diffValue] of diffMap) {
+        if (newY > diffKey) {
+          newY += diffValue;
+        }
       }
 
-      // If y-coordinate is affected (with page break)
-      const newY = paddingTop + yPlusDiff - (pageHeight - paddingBottom) + paddingTop;
-      // TODO 次のページだけじゃないかもしれない
-      const pageCursor = i + 1;
-      const nextPage = pages[pageCursor];
-      if (nextPage) {
-        nextPage[key] = { ...schema, position: { ...position, y: newY } };
-      } else {
-        pages[pageCursor] = { [key]: { ...schema, position: { ...position, y: newY } } };
+      while (newY + height >= pageHeight - paddingBottom) {
+        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop
+        pageCursor++;
       }
+
+      if (!pages[pageCursor]) pages[pageCursor] = {};
+      pages[pageCursor][key] = { ...schema, position: { ...position, y: newY } };
     }
   }
+
   console.log('returnTemplate', returnTemplate);
   return returnTemplate;
 };
