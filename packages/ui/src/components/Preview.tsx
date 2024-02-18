@@ -120,46 +120,47 @@ const Preview = ({
           schemasList={schemasList}
           pageSizes={pageSizes}
           backgrounds={backgrounds}
+          renderPaper={() => {
+            {/* TODO 下記はデバッグ用 */ }
+            return <Padding basePdf={template.basePdf} />
+
+          }}
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
             const content = readOnly ? schema.content || '' : (input && input[key]) || '';
             return (
-              <>
-                {/* TODO 下記はデバッグ用 */}
-                <Padding basePdf={template.basePdf} />
-                <Renderer
-                  key={schema.id}
-                  schema={schema}
-                  basePdf={template.basePdf}
-                  value={content}
-                  mode={isForm ? 'form' : 'viewer'}
-                  placeholder={schema.content}
-                  tabIndex={index + 100}
-                  onChange={(arg) => {
-                    const args = Array.isArray(arg) ? arg : [arg];
-                    args.forEach(({ key: _key, value }) => {
-                      if (_key === 'content') {
-                        handleChangeInput({ key, value: value as string });
-                        // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
-                        init(template);
-                      } else {
-                        const targetSchema = schemasList[pageCursor].find(
-                          (s) => s.id === schema.id
-                        ) as SchemaForUI;
-                        if (!targetSchema) return;
+              <Renderer
+                key={schema.id}
+                schema={schema}
+                basePdf={template.basePdf}
+                value={content}
+                mode={isForm ? 'form' : 'viewer'}
+                placeholder={schema.content}
+                tabIndex={index + 100}
+                onChange={(arg) => {
+                  const args = Array.isArray(arg) ? arg : [arg];
+                  args.forEach(({ key: _key, value }) => {
+                    if (_key === 'content') {
+                      handleChangeInput({ key, value: value as string });
+                      // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
+                      init(template);
+                    } else {
+                      const targetSchema = schemasList[pageCursor].find(
+                        (s) => s.id === schema.id
+                      ) as SchemaForUI;
+                      if (!targetSchema) return;
 
-                        // @ts-ignore
-                        targetSchema[_key] = value as string;
-                      }
-                    });
-                    setSchemasList([...schemasList]);
-                  }}
-                  outline={
-                    isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
-                  }
-                  scale={scale}
-                />
-              </>
+                      // @ts-ignore
+                      targetSchema[_key] = value as string;
+                    }
+                  });
+                  setSchemasList([...schemasList]);
+                }}
+                outline={
+                  isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
+                }
+                scale={scale}
+              />
             );
           }}
         />
