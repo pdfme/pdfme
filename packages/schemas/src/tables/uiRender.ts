@@ -55,10 +55,9 @@ const renderRowUi = (args: {
   const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition: ep } = args;
   const value = JSON.parse(arg.value || '[]') as string[][];
 
-  // TODO 外側のボーダーが増えた時に内側のサイズを調整する必要がある
-  // border-collapse: collapse; と同じスタイルにする
-  // 重なるボーダーは一つにするこれはテーブル自体もそうだが、セルも同じようにする
-  // const tableBorderWidth = arg.schema.tableStyles.borderWidth;
+  // TODO Need to adjust the inner size when the outer border increases
+  // Want to have the same style as border-collapse: collapse; (overlapping borders should merge into one)
+  // This should apply to the table itself as well as the cells, which should behave similarly.
   let rowOffsetY = offsetY;
   rows.forEach((row, rowIndex) => {
     const { cells, height, section } = row;
@@ -93,7 +92,7 @@ const renderRowUi = (args: {
           if (section === 'body') {
             const startRange = arg.schema.__bodyRange?.start ?? 0;
             value[rowIndex + startRange][colIndex] = newValue;
-            // TODO onChangeを呼び出すと再レンダリングが走ってフォーカスが外れる
+            // TODO Calling onChange triggers re-rendering, causing the focus to be lost
             arg.onChange({ key: 'content', value: JSON.stringify(value) });
           } else {
             const newHead = [...arg.schema.head];
@@ -250,8 +249,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
           0
         );
 
-        // TODO 削除時に削除されたcolumnStylesも削除するべき
-
+        // TODO Should also remove the deleted columnStyles when deleting
         onChange([
           { key: 'head', value: schema.head.filter((_, j) => j !== i) },
           {
@@ -303,7 +301,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
 
         let move = 0;
         const mouseMove = (e: MouseEvent) => {
-          // TODO ドラッグ&ドロップに対してnewLeftがずれていく問題がある
+          // TODO There is an issue where newLeft gets displaced with drag & drop
           let moveX = e.movementX;
           const currentLeft = Number(handle.style.left.replace('mm', ''));
           let newLeft = currentLeft + moveX;

@@ -142,7 +142,7 @@ const Preview = ({
                   args.forEach(({ key: _key, value }) => {
                     if (_key === 'content') {
                       handleChangeInput({ key, value: value as string });
-                      // TODO これが 不要な時(tableの行数が追加された時以外)に動くと無駄にレンダリングが走る
+                      // TODO Running this unnecessarily triggers rendering when it's not needed (except when rows are added to the table)
                       init(template);
                     } else {
                       const targetSchema = schemasList[pageCursor].find(

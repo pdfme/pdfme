@@ -425,6 +425,7 @@ describe('getDynamicTemplate test', () => {
     });
   });
 
+  // TODO Re-verify if the correct tests are written and revise the implementation of normalizePositionsAndPageBreak to pass the tests
   describe('normalizePositionsAndPageBreak test', () => {
     test('single dynamic schema', () => {
       const template = getTemplateForDynamicTemplate();
@@ -524,7 +525,6 @@ describe('getDynamicTemplate test', () => {
       });
     });
 
-    // TODO テストを通るようにする
     test('multi dynamic schemas (page break)', () => {
       const template = getTemplateForDynamicTemplate();
       const diffMap = new Map([
@@ -573,7 +573,7 @@ describe('getDynamicTemplate test', () => {
       expect(newTemplate).toEqual({
         basePdf: template.basePdf,
         schemas: [
-          // TODO テストを書く
+          // TODO Write test
         ],
       });
     });
