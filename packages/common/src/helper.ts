@@ -243,21 +243,10 @@ export const getDynamicTemplate = async (
   }
 
   const modifiedTemplate = await modifyTemplate(arg);
-  console.log('modifiedTemplate', modifiedTemplate);
 
   const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
-  console.log('diffMap', diffMap);
 
-  const res = normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
-
-  // const debug = res.schemas.map((s) =>
-  //   Object.entries(s).map(([k, v]) => ({ key: k, y: v.position.y }))
-  // );
-  // console.log('getDynamicTemplate', debug);
-
-  return res;
-
-  // return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
 };
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
@@ -331,7 +320,7 @@ export const normalizePositionsAndPageBreak = (
       }
 
       while (newY + height >= pageHeight - paddingBottom) {
-        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop
+        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop;
         pageCursor++;
       }
 
@@ -340,6 +329,5 @@ export const normalizePositionsAndPageBreak = (
     }
   }
 
-  console.log('returnTemplate', returnTemplate);
   return returnTemplate;
 };

@@ -117,8 +117,8 @@ const cellSchema: Plugin<CellSchema> = {
   },
   ui: async (arg: UIRenderProps<CellSchema>) => {
     const { schema, rootElement } = arg;
-    const { borderWidth, width, height, borderColor } = schema;
-    rootElement.style.backgroundColor = schema.backgroundColor;
+    const { borderWidth, width, height, borderColor, backgroundColor } = schema;
+    rootElement.style.backgroundColor = backgroundColor;
 
     const textDiv = createTextDiv(schema);
     await textUiRender({

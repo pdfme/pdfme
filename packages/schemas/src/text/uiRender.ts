@@ -89,6 +89,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
+    cursor: isEditable(mode, schema) ? 'text' : 'default',
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';

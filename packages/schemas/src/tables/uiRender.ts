@@ -1,4 +1,4 @@
-import type { UIRenderProps } from '@pdfme/common';
+import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
@@ -52,7 +52,7 @@ const renderRowUi = (args: {
   onChangeEditingPosition: (position: { rowIndex: number; colIndex: number }) => void;
   offsetY?: number;
 }) => {
-  const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition: ep } = args;
+  const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition } = args;
   const value = JSON.parse(arg.value || '[]') as string[][];
 
   // TODO Need to adjust the inner size when the outer border increases
@@ -69,22 +69,31 @@ const renderRowUi = (args: {
       div.style.left = `${colWidth}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
+
+      div.style.cursor =
+        arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
+
       div.addEventListener('click', () => {
-        if (arg.mode !== 'designer') return;
+        if (arg.mode === 'viewer') return;
         onChangeEditingPosition({ rowIndex, colIndex });
       });
       arg.rootElement.appendChild(div);
-      const isEditing = ep.rowIndex === rowIndex && ep.colIndex === colIndex;
-      let mode: 'form' | 'viewer' | 'designer' = 'viewer';
+      const isEditing =
+        editingPosition.rowIndex === rowIndex && editingPosition.colIndex === colIndex;
+      let mode: Mode = 'viewer';
       if (arg.mode === 'form') {
-        mode = section === 'head' ? 'viewer' : 'form';
+        mode = section === 'body' && isEditing ? 'designer' : 'viewer';
       } else if (arg.mode === 'designer') {
-        mode = isEditing ? 'designer' : 'viewer';
+        mode = isEditing ? 'designer' : 'form';
       }
 
       void cellUiRender({
         ...arg,
-        stopEditing: resetEditingPosition,
+        stopEditing: () => {
+          if (arg.mode === 'form') {
+            resetEditingPosition();
+          }
+        },
         mode,
         onChange: (v) => {
           if (!arg.onChange) return;
@@ -128,6 +137,7 @@ const resetEditingPosition = () => {
 };
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
+  console.log('uiRender');
   const { rootElement, onChange, schema, value, mode } = arg;
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
