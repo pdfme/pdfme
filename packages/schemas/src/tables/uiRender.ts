@@ -189,7 +189,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       addRowButton.style.width = '30px';
       addRowButton.style.height = '30px';
       addRowButton.style.position = 'absolute';
-      addRowButton.style.bottom = '-30px';
+      addRowButton.style.top = `${table.getHeight()}mm`;
       addRowButton.style.left = 'calc(50% - 15px)';
       addRowButton.innerText = '+';
       addRowButton.onclick = () => {
@@ -354,8 +354,10 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     resetEditingPosition();
   }
 
-  const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
-  if (schema.height !== tableHeight && onChange) {
-    onChange({ key: 'height', value: tableHeight });
+  if (mode !== 'form') {
+    const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
+    if (schema.height !== tableHeight && onChange) {
+      onChange({ key: 'height', value: tableHeight });
+    }
   }
 };

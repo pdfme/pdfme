@@ -121,7 +121,7 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderPaper={() => {
-            {/* TODO for Debug after development table, remove this */}
+            {/* TODO for Debug after development table, remove this */ }
             return <Padding basePdf={template.basePdf} />
 
           }}
@@ -139,11 +139,14 @@ const Preview = ({
                 tabIndex={index + 100}
                 onChange={(arg) => {
                   const args = Array.isArray(arg) ? arg : [arg];
+                  let isNeedInit = false;
                   args.forEach(({ key: _key, value }) => {
                     if (_key === 'content') {
-                      handleChangeInput({ key, value: value as string });
-                      // TODO Running this unnecessarily triggers rendering when it's not needed (except when rows are added to the table)
-                      init(template);
+                      const newValue = value as string;
+                      const oldValue = (input[key] as string) || '';
+                      if (newValue === oldValue) return;
+                      handleChangeInput({ key, value: newValue });
+                      isNeedInit = true;
                     } else {
                       const targetSchema = schemasList[pageCursor].find(
                         (s) => s.id === schema.id
@@ -154,7 +157,11 @@ const Preview = ({
                       targetSchema[_key] = value as string;
                     }
                   });
-                  setSchemasList([...schemasList]);
+                  if (isNeedInit) {
+                    // TODO Running this unnecessarily triggers rendering when it's not needed (except when rows are added to the table)
+                    init(template);
+                  }
+                  setSchemasList([...schemasList])
                 }}
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
