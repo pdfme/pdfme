@@ -17,7 +17,7 @@ export const modifyTemplateForTable = async (arg: {
     for (const [key, schema] of Object.entries(schemaObj)) {
       if (schema.type === 'table') {
         schema.__bodyRange = undefined;
-        const body = JSON.parse(input[key] || '[]') as string[][];
+        const body = JSON.parse(input?.[key] || '[]') as string[][];
         const tables = await createMultiTables(body, {
           schema,
           basePdf: template.basePdf,

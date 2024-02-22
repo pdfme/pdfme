@@ -131,8 +131,7 @@ export abstract class PreviewUI extends BaseUIClass {
   constructor(props: PreviewProps) {
     super(props);
     checkPreviewProps(props);
-
-    this.inputs = cloneDeep(props.inputs);
+    this.inputs = convertToStingObjectArray(cloneDeep(props.inputs));
   }
 
   public getInputs() {

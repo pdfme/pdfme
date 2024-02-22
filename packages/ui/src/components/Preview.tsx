@@ -127,7 +127,7 @@ const Preview = ({
           }}
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
-            const content = readOnly ? schema.content || '' : (input && input[key]) || '';
+            const content = readOnly ? String(schema.content) || '' : String(input && input[key] || '');
             return (
               <Renderer
                 key={schema.id}
@@ -143,7 +143,7 @@ const Preview = ({
                   args.forEach(({ key: _key, value }) => {
                     if (_key === 'content') {
                       const newValue = value as string;
-                      const oldValue = (input[key] as string) || '';
+                      const oldValue = (input?.[key] as string) || '';
                       if (newValue === oldValue) return;
                       handleChangeInput({ key, value: newValue });
                       isNeedInit = true;
@@ -158,7 +158,6 @@ const Preview = ({
                     }
                   });
                   if (isNeedInit) {
-                    // TODO Running this unnecessarily triggers rendering when it's not needed (except when rows are added to the table)
                     init(template);
                   }
                   setSchemasList([...schemasList])

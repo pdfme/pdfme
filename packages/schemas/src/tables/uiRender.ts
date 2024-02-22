@@ -137,7 +137,6 @@ const resetEditingPosition = () => {
 };
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
-  console.log('uiRender');
   const { rootElement, onChange, schema, value, mode } = arg;
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);

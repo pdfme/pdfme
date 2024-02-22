@@ -260,7 +260,7 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
   let pageIndex = 0;
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeight = await getDynamicHeight(input[key], {
+      const dynamicHeight = await getDynamicHeight(input?.[key] || '', {
         schema,
         basePdf,
         options,
