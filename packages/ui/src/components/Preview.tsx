@@ -75,7 +75,7 @@ const Preview = ({
     }
 
     init(template);
-  }, [template, inputs]);
+  }, [template, inputs, size]);
 
   useScrollPageCursor({
     ref: containerRef,
