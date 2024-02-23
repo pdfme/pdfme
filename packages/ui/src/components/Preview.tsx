@@ -35,11 +35,8 @@ const Preview = ({
   const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
-    template,
-    size,
-    zoomLevel,
-  });
+  const { backgrounds, pageSizes, scale, error, refresh } =
+    useUIPreProcessor({ template, size, zoomLevel });
 
   const isForm = Boolean(onChangeInput);
 

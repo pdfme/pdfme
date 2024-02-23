@@ -1,5 +1,4 @@
 import React, { useRef, useState, useContext, useCallback } from 'react';
-import { theme } from 'antd';
 import {
   ZOOM,
   Template,
@@ -45,7 +44,6 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
-  const { token } = theme.useToken();
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -55,11 +53,8 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
-    template,
-    size,
-    zoomLevel,
-  });
+  const { backgrounds, pageSizes, scale, error, refresh } =
+    useUIPreProcessor({ template, size, zoomLevel });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
