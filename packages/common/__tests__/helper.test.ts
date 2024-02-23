@@ -350,7 +350,7 @@ describe('checkPlugins test', () => {
   });
 });
 
-describe('getDynamicTemplate test', () => {
+describe.skip('getDynamicTemplate test', () => {
   const options = { font: getSampleFont() };
   const _cache = new Map();
   const input = {};

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
-import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate, isBlankPdf } from '@pdfme/common';
+import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
 import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
@@ -11,7 +11,6 @@ import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
 import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
 import { theme } from 'antd';
-import Padding from '../components/Designer/Canvas/Padding'
 
 const _cache = new Map();
 
@@ -120,11 +119,6 @@ const Preview = ({
           schemasList={schemasList}
           pageSizes={pageSizes}
           backgrounds={backgrounds}
-          renderPaper={() => {
-            {/* TODO for Debug after development table, remove this */ }
-            return <Padding basePdf={template.basePdf} />
-
-          }}
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
             const content = readOnly ? String(schema.content) || '' : String(input && input[key] || '');
