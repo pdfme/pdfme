@@ -137,6 +137,7 @@ const Preview = ({
                       const oldValue = (input?.[key] as string) || '';
                       if (newValue === oldValue) return;
                       handleChangeInput({ key, value: newValue });
+                      // TODO Set to true only if the execution of getDynamicTemplate, such as for a table, is required.
                       isNeedInit = true;
                     } else {
                       const targetSchema = schemasList[pageCursor].find(

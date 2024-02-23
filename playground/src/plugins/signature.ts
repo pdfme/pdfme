@@ -44,12 +44,12 @@ export const signature: Plugin<Signature> = {
       clearButton.style.zIndex = '1';
       clearButton.textContent = i18n('clear') || 'x';
       clearButton.addEventListener('click', () => {
-        onChange && onChange('');
+        onChange && onChange({ key: 'content', value: '' });
       });
       rootElement.appendChild(clearButton);
       signaturePad.addEventListener('endStroke', () => {
         const data = signaturePad.toDataURL('image/png');
-        onChange && data && onChange(data);
+        onChange && data && onChange({ key: 'content', value: data });
       });
     }
     rootElement.appendChild(canvas);
