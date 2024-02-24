@@ -31,6 +31,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.color': 'Color',
   'schemas.borderWidth': 'Border Width',
   'schemas.borderColor': 'Border Color',
+  'schemas.backgroundColor': 'Background Color',
   'schemas.textColor': 'Text Color',
   'schemas.bgColor': 'Background Color',
   'schemas.horizontal': 'Horizontal',
@@ -41,6 +42,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.top': 'Top',
   'schemas.middle': 'Middle',
   'schemas.bottom': 'Bottom',
+  'schemas.padding': 'Padding',
   'schemas.text.fontName': 'Font Name',
   'schemas.text.size': 'Size',
   'schemas.text.spacing': 'Spacing',
@@ -53,6 +55,11 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.barcodes.barColor': 'Bar Color',
   'schemas.barcodes.includetext': 'Include Text',
+  'schemas.table.alternateBackgroundColor': 'Alternate Background Color',
+  'schemas.table.tableStyle': 'Table Style',
+  'schemas.table.headStyle': 'Header Style',
+  'schemas.table.bodyStyle': 'Body Style',
+  'schemas.table.columnStyle': 'Column Style',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -84,6 +91,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.color': '色',
   'schemas.borderWidth': '枠線の太さ',
   'schemas.borderColor': '枠線の色',
+  'schemas.backgroundColor': '背景色',
   'schemas.textColor': 'テキストの色',
   'schemas.bgColor': '背景色',
   'schemas.horizontal': '水平',
@@ -94,6 +102,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.top': '上',
   'schemas.middle': '中間',
   'schemas.bottom': '下',
+  'schemas.padding': 'パディング',
   'schemas.text.fontName': 'フォント名',
   'schemas.text.size': 'サイズ',
   'schemas.text.spacing': '間隔',
@@ -106,6 +115,11 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': '動的フォントサイズ',
   'schemas.barcodes.barColor': 'バーの色',
   'schemas.barcodes.includetext': 'テキストを含める',
+  'schemas.table.alternateBackgroundColor': '交互の背景色',
+  'schemas.table.tableStyle': 'テーブルスタイル',
+  'schemas.table.headStyle': 'ヘッダースタイル',
+  'schemas.table.bodyStyle': 'ボディスタイル',
+  'schemas.table.columnStyle': 'カラムスタイル',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -137,6 +151,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.color': 'اللون',
   'schemas.borderWidth': 'عرض الحدود',
   'schemas.borderColor': 'لون الحدود',
+  'schemas.backgroundColor': 'لون الخلفية',
   'schemas.textColor': 'لون الخط',
   'schemas.bgColor': 'لون الخلفية',
   'schemas.horizontal': 'أفقي',
@@ -147,6 +162,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.top': 'أعلى',
   'schemas.middle': 'وسط',
   'schemas.bottom': 'أسفل',
+  'schemas.padding': 'التبطين',
   'schemas.text.fontName': 'اسم الخط',
   'schemas.text.size': 'الحجم',
   'schemas.text.spacing': 'التباعد',
@@ -159,6 +175,11 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
   'schemas.barcodes.barColor': 'لون الشريط',
   'schemas.barcodes.includetext': 'تضمين النص',
+  'schemas.table.alternateBackgroundColor': 'لون الخلفية البديل',
+  'schemas.table.tableStyle': 'أسلوب الجدول',
+  'schemas.table.headStyle': 'أسلوب الرأس',
+  'schemas.table.bodyStyle': 'أسلوب الجسم',
+  'schemas.table.columnStyle': 'أسلوب العمود',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -190,6 +211,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.color': 'สี',
   'schemas.borderWidth': 'ความกว้างของเส้นขอบ',
   'schemas.borderColor': 'สีขอบ',
+  'schemas.backgroundColor': 'สีพื้นหลัง',
   'schemas.textColor': 'สีข้อความ',
   'schemas.bgColor': 'สีพื้นหลัง',
   'schemas.horizontal': 'แนวนอน',
@@ -200,6 +222,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.top': 'ด้านบน',
   'schemas.middle': 'ตรงกลาง',
   'schemas.bottom': 'ด้านล่าง',
+  'schemas.padding': 'การเพิ่มพื้นที่',
   'schemas.text.fontName': 'ชื่อแบบอักษร',
   'schemas.text.size': 'ขนาด',
   'schemas.text.spacing': 'ระยะห่าง',
@@ -212,6 +235,11 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'ขนาดตัวอักษรแบบไดนามิก',
   'schemas.barcodes.barColor': 'สีบาร์',
   'schemas.barcodes.includetext': 'รวมข้อความ',
+  'schemas.table.alternateBackgroundColor': 'สีพื้นหลังสลับกัน',
+  'schemas.table.tableStyle': 'สไตล์ตาราง',
+  'schemas.table.headStyle': 'สไตล์หัวข้อ',
+  'schemas.table.bodyStyle': 'สไตล์เนื้อหา',
+  'schemas.table.columnStyle': 'สไตล์คอลัมน์',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -245,6 +273,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.color': 'Colore',
   'schemas.borderWidth': 'Spessore bordo',
   'schemas.borderColor': 'Colore bordo',
+  'schemas.backgroundColor': 'Colore di Sfondo',
   'schemas.textColor': 'Colore testo',
   'schemas.bgColor': 'Colore sfondo',
   'schemas.horizontal': 'Orizzontale',
@@ -255,6 +284,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.top': 'Sopra',
   'schemas.middle': 'Medio',
   'schemas.bottom': 'Sotto',
+  'schemas.padding': 'Padding',
   'schemas.text.fontName': 'Nome del font',
   'schemas.text.size': 'Dimensione',
   'schemas.text.spacing': 'Spaziatura',
@@ -267,6 +297,11 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
   'schemas.barcodes.barColor': 'Colore barra',
   'schemas.barcodes.includetext': 'Includi testo',
+  'schemas.table.alternateBackgroundColor': 'Colore di Sfondo Alternato',
+  'schemas.table.tableStyle': 'Stile della Tabella',
+  'schemas.table.headStyle': "Stile dell'Intestazione",
+  'schemas.table.bodyStyle': 'Stile del Corpo',
+  'schemas.table.columnStyle': 'Stile della Colonna',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -298,6 +333,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.color': 'Kolor',
   'schemas.borderWidth': 'Szerokość obramowania',
   'schemas.borderColor': 'Kolor obramowania',
+  'schemas.backgroundColor': 'Kolor tła',
   'schemas.textColor': 'Kolor tekstu',
   'schemas.bgColor': 'Kolor tła',
   'schemas.horizontal': 'Poziomo',
@@ -308,6 +344,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.top': 'Góra',
   'schemas.middle': 'Środek',
   'schemas.bottom': 'Dół',
+  'schemas.padding': 'Odsadzenie',
   'schemas.text.fontName': 'Nazwa czcionki',
   'schemas.text.size': 'Rozmiar',
   'schemas.text.spacing': 'Odstępy',
@@ -320,6 +357,11 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'Dynamiczny rozmiar czcionki',
   'schemas.barcodes.barColor': 'Kolor paska',
   'schemas.barcodes.includetext': 'Dołącz tekst',
+  'schemas.table.alternateBackgroundColor': 'Alternatywny kolor tła',
+  'schemas.table.tableStyle': 'Styl tabeli',
+  'schemas.table.headStyle': 'Styl nagłówka',
+  'schemas.table.bodyStyle': 'Styl ciała',
+  'schemas.table.columnStyle': 'Styl kolumny',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -353,6 +395,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.color': 'Farbe',
   'schemas.borderWidth': 'Rahmenbreite',
   'schemas.borderColor': 'Rahmenfarbe',
+  'schemas.backgroundColor': 'Hintergrundfarbe',
   'schemas.textColor': 'Textfarbe',
   'schemas.bgColor': 'Hintergrundfarbe',
   'schemas.horizontal': 'Horizontal',
@@ -363,6 +406,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.top': 'Oben',
   'schemas.middle': 'Mitte',
   'schemas.bottom': 'Unten',
+  'schemas.padding': 'Polsterung',
   'schemas.text.fontName': 'Schriftart',
   'schemas.text.size': 'Größe',
   'schemas.text.spacing': 'Abstand',
@@ -375,6 +419,11 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
   'schemas.barcodes.includetext': 'Text anzeigen',
+  'schemas.table.alternateBackgroundColor': 'Wechselnde Hintergrundfarbe',
+  'schemas.table.tableStyle': 'Tabellenstil',
+  'schemas.table.headStyle': 'Kopfzeilenstil',
+  'schemas.table.bodyStyle': 'Körperstil',
+  'schemas.table.columnStyle': 'Spaltenstil',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

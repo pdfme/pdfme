@@ -11,6 +11,7 @@ interface LineSchema extends Schema {
 const lineSchema: Plugin<LineSchema> = {
   pdf: (arg: PDFRenderProps<LineSchema>) => {
     const { page, schema } = arg;
+    if (schema.width === 0 || schema.height === 0 || !schema.color) return;
     const pageHeight = page.getHeight();
     const {
       width,
@@ -24,14 +25,14 @@ const lineSchema: Plugin<LineSchema> = {
       start: rotatePoint({ x, y: y + height / 2 }, pivot, rotate.angle),
       end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
       thickness: height,
-      color: hex2RgbColor(schema.color ?? DEFAULT_LINE_COLOR),
+      color: hex2RgbColor(schema.color),
       opacity: opacity,
     });
   },
   ui: (arg: UIRenderProps<LineSchema>) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');
-    div.style.backgroundColor = schema.color ?? DEFAULT_LINE_COLOR;
+    div.style.backgroundColor = schema.color ?? 'transparent';
     div.style.width = '100%';
     div.style.height = '100%';
     rootElement.appendChild(div);
@@ -43,12 +44,7 @@ const lineSchema: Plugin<LineSchema> = {
         type: 'string',
         widget: 'color',
         required: true,
-        rules: [
-          {
-            pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
-          },
-        ],
+        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
     }),
     defaultSchema: {

@@ -1,4 +1,4 @@
-// TODO Update pdfjs-dist. (might be able to reduce the bundle size.)
+// Update pdfjs-dist. (might be able to reduce the bundle size.)
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
@@ -268,7 +268,7 @@ const sortSchemasList = (template: Template): SchemaForUI[][] => {
     return acc;
   }, [] as SchemaForUI[][]);
 };
-export const templateSchemas2SchemasList = async (_template: Template) => {
+export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const { basePdf, schemas } = template;
   const sortedSchemasList = sortSchemasList(template);
@@ -311,7 +311,7 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
   return schemasList;
 };
 
-export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => ({
+export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
   schemas: cloneDeep(schemasList).map((schema) =>
     schema.reduce((acc, cur) => {
       const k = cur.key;
@@ -324,7 +324,7 @@ export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): T
       return acc;
     }, {} as { [key: string]: Schema })
   ),
-  basePdf: template.basePdf,
+  basePdf,
 });
 
 export const getUniqSchemaKey = (arg: {
@@ -435,9 +435,9 @@ const handlePositionSizeChange = (
   } else if (key === 'position.y') {
     schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
   } else if (key === 'width') {
-    schema.width = calcBounds(value, pl, pw - schema.position.x - pr);
+    schema.width = calcBounds(value, 0, pw - schema.position.x - pr);
   } else if (key === 'height') {
-    schema.height = calcBounds(value, pt, ph - schema.position.y - pb);
+    schema.height = calcBounds(value, 0, ph - schema.position.y - pb);
   }
 };
 

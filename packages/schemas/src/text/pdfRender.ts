@@ -1,5 +1,5 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
-import type { TextSchema, FontWidthCalcValues } from './types';
+import type { TextSchema } from './types';
 import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
 import {
   VERTICAL_ALIGN_TOP,
@@ -17,8 +17,8 @@ import {
   heightOfFontAtSize,
   getFontDescentInPt,
   getFontKitFont,
-  getSplittedLines,
   widthOfTextAtSize,
+  splitTextToSize,
 } from './helper.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../utils.js';
 
@@ -87,7 +87,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font, _cache }),
-    getFontKitFont(schema, font, _cache),
+    getFontKitFont(schema.fontName, font, _cache),
     getFontProp({ value, font, schema, _cache }),
   ]);
 
@@ -118,16 +118,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
-  const fontWidthCalcValues: FontWidthCalcValues = {
-    font: fontKitFont,
-    fontSize,
+  const lines = splitTextToSize({
+    value,
     characterSpacing,
+    fontSize,
+    fontKitFont,
     boxWidthInPt: width,
-  };
-
-  let lines: string[] = [];
-  value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
-    lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
   });
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down

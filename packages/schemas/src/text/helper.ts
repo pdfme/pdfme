@@ -107,15 +107,18 @@ const getFallbackFont = (font: Font) => {
 
 const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
 
-export const getFontKitFont = async (textSchema: TextSchema, font: Font, _cache: Map<any, any>) => {
-  const fontName = textSchema.fontName || getFallbackFontName(font);
-  const cacheKey = getCacheKey(fontName);
+export const getFontKitFont = async (
+  fontName: string | undefined,
+  font: Font,
+  _cache: Map<any, any>
+) => {
+  const fntNm = fontName || getFallbackFontName(font);
+  const cacheKey = getCacheKey(fntNm);
   if (_cache.has(cacheKey)) {
     return _cache.get(cacheKey) as fontkit.Font;
   }
 
-  const currentFont =
-    font[fontName] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
+  const currentFont = font[fntNm] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
   let fontData = currentFont.data;
   if (typeof fontData === 'string') {
     fontData = fontData.startsWith('http')
@@ -224,7 +227,7 @@ export const calculateDynamicFontSize = async ({
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const fontKitFont = await getFontKitFont(textSchema, font, _cache);
+  const fontKitFont = await getFontKitFont(textSchema.fontName, font, _cache);
   const paragraphs = value.split('\n');
 
   let dynamicFontSize = fontSize;
@@ -317,4 +320,25 @@ export const calculateDynamicFontSize = async ({
   }
 
   return dynamicFontSize;
+};
+
+export const splitTextToSize = (arg: {
+  value: string;
+  characterSpacing: number;
+  boxWidthInPt: number;
+  fontSize: number;
+  fontKitFont: fontkit.Font;
+}) => {
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
+  const fontWidthCalcValues: FontWidthCalcValues = {
+    font: fontKitFont,
+    fontSize,
+    characterSpacing,
+    boxWidthInPt,
+  };
+  let lines: string[] = [];
+  value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
+    lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
+  });
+  return lines;
 };

@@ -8,7 +8,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -b playground"
+    "deploy": "gh-pages -d dist -b playground",
+    "deploy-table": "gh-pages -d dist -b add-dynamic-table-schema-332-preview"
   },
   "dependencies": {
     "@pdfme/common": "file:../packages/common/dist",

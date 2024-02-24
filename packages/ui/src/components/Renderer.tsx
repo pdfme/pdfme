@@ -1,16 +1,16 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
+import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
+  'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
+  basePdf: BasePdf;
   schema: SchemaForUI;
   value: string;
-  onChange: (value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
@@ -50,7 +50,8 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
+    props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
@@ -69,16 +70,15 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       ref.current.innerHTML = '';
 
-      const editable = mode === 'form' || mode === 'designer';
-
-      render({
+      void render({
         key: schema.key,
         value,
         schema,
+        basePdf,
         rootElement: ref.current,
         mode,
-        onChange: editable ? onChange : undefined,
-        stopEditing: editable ? stopEditing : undefined,
+        onChange,
+        stopEditing: stopEditing,
         tabIndex,
         placeholder,
         options,

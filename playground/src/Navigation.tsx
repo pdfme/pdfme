@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Navigation = () => (
-  <div style={{ marginBottom: "0.5rem" }}>
+  <div style={{ margin: "0.5rem 1rem" }}>
     <span style={{ marginRight: "1rem" }}>
       <Link to="/">Designer</Link>
     </span>

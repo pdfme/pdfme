@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf, Plugins, BlankPdf } from './types';
+import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -216,3 +216,118 @@ export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
 export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
+
+interface ModifyTemplateForDynamicTableArg {
+  template: Template;
+  input: Record<string, string>;
+  _cache: Map<any, any>;
+  options: CommonOptions;
+  modifyTemplate: (arg: {
+    template: Template;
+    input: Record<string, string>;
+    _cache: Map<any, any>;
+    options: CommonOptions;
+  }) => Promise<Template>;
+  getDynamicHeight: (
+    value: string,
+    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
+  ) => Promise<number>;
+}
+
+export const getDynamicTemplate = async (
+  arg: ModifyTemplateForDynamicTableArg
+): Promise<Template> => {
+  const { template, modifyTemplate } = arg;
+  if (!isBlankPdf(template.basePdf)) {
+    return template;
+  }
+
+  const modifiedTemplate = await modifyTemplate(arg);
+
+  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
+
+  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+};
+
+export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
+  const { template, input, _cache, options, getDynamicHeight } = arg;
+  const basePdf = template.basePdf;
+  const tmpDiffMap = new Map<number, number>();
+  if (!isBlankPdf(basePdf)) {
+    return tmpDiffMap;
+  }
+  const pageHeight = basePdf.height;
+  let pageIndex = 0;
+  for (const schemaObj of template.schemas) {
+    for (const [key, schema] of Object.entries(schemaObj)) {
+      const dynamicHeight = await getDynamicHeight(input?.[key] || '', {
+        schema,
+        basePdf,
+        options,
+        _cache,
+      });
+      if (schema.height !== dynamicHeight) {
+        tmpDiffMap.set(
+          schema.position.y + schema.height + pageHeight * pageIndex,
+          dynamicHeight - schema.height
+        );
+      }
+    }
+    pageIndex++;
+  }
+
+  const diffMap = new Map<number, number>();
+  const keys = Array.from(tmpDiffMap.keys()).sort((a, b) => a - b);
+  let additionalHeight = 0;
+
+  for (const key of keys) {
+    const value = tmpDiffMap.get(key) as number;
+    const newValue = value + additionalHeight;
+    diffMap.set(key + additionalHeight, newValue);
+    additionalHeight += newValue;
+  }
+
+  return diffMap;
+};
+
+export const normalizePositionsAndPageBreak = (
+  template: Template,
+  diffMap: Map<number, number>
+): Template => {
+  if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
+    return template;
+  }
+
+  const returnTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
+  const pages = returnTemplate.schemas;
+  const pageHeight = template.basePdf.height;
+  const paddingTop = template.basePdf.padding[0];
+  const paddingBottom = template.basePdf.padding[2];
+
+  for (let i = 0; i < template.schemas.length; i += 1) {
+    const schemaObj = template.schemas[i];
+    if (!pages[i]) pages[i] = {};
+
+    for (const [key, schema] of Object.entries(schemaObj)) {
+      const { position, height } = schema;
+      let newY = position.y;
+      let pageCursor = i;
+
+      for (const [diffKey, diffValue] of diffMap) {
+        if (newY > diffKey) {
+          newY += diffValue;
+        }
+      }
+
+      while (newY + height >= pageHeight - paddingBottom) {
+        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop;
+        pageCursor++;
+      }
+
+      if (!pages[pageCursor]) pages[pageCursor] = {};
+      pages[pageCursor][key] = { ...schema, position: { ...position, y: newY } };
+    }
+  }
+
+  return returnTemplate;
+};
