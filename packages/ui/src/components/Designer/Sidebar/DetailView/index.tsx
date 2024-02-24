@@ -131,7 +131,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         disabled: defaultSchema?.rotate === undefined,
         max: 360,
-        min: 0,
+        props: { min: 0 },
         span: 8,
       },
       width: {
@@ -140,7 +140,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
-        min: 0,
+        props: { min: 0 },
       },
       height: {
         title: i18n('height'),
@@ -148,18 +148,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
-        min: 0,
+        props: { min: 0 },
       },
       opacity: {
         title: i18n('opacity'),
         type: 'number',
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
-        props: {
-          step: 0.1,
-        },
-        max: 1,
-        min: 0,
+        props: { step: 0.1, min: 0, max: 1 },
         span: 8,
       },
     },

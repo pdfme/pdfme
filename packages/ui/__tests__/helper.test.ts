@@ -1,5 +1,5 @@
 import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf } from '@pdfme/common';
-import { uuid, getUniqSchemaKey, fmtTemplate, changeSchemas } from '../src/helper';
+import { uuid, getUniqSchemaKey, schemasList2template, changeSchemas } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({
@@ -104,14 +104,14 @@ describe('getUniqSchemaKey test', () => {
   });
 });
 
-describe('fmtTemplate test', () => {
-  test('fmtTemplate normal', () => {
+describe('schemasList2template test', () => {
+  test('schemasList2template normal', () => {
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [{ a: getSchema() }],
     };
     const schemasList: SchemaForUI[][] = [[{ id: uuid(), key: 'b', ...getSchema(), content: 'b' }]];
-    expect(fmtTemplate(template, schemasList)).toStrictEqual({
+    expect(schemasList2template(schemasList, template.basePdf)).toStrictEqual({
       basePdf: BLANK_PDF,
       schemas: [
         { b: { type: 'text', position: { x: 0, y: 0 }, width: 100, height: 100, content: 'b' } },
@@ -119,7 +119,7 @@ describe('fmtTemplate test', () => {
     });
   });
 
-  test('fmtTemplate readOnly', () => {
+  test('schemasList2template readOnly', () => {
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [{ a: getSchema() }],
@@ -127,7 +127,7 @@ describe('fmtTemplate test', () => {
     const schemasList: SchemaForUI[][] = [
       [{ id: uuid(), key: 'b', readOnly: true, ...getSchema(), content: 'b' }],
     ];
-    expect(fmtTemplate(template, schemasList)).toStrictEqual({
+    expect(schemasList2template(schemasList, template.basePdf)).toStrictEqual({
       basePdf: BLANK_PDF,
       schemas: [
         {

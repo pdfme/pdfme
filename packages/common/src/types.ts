@@ -12,6 +12,7 @@ import {
   SchemaForUI,
   BasePdf,
   BlankPdf,
+  CommonOptions,
   Template,
   GeneratorOptions,
   GenerateProps,
@@ -30,6 +31,7 @@ export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }
  * @property {string} key The key of the schema object.
  * @property {string} value The string used for PDF rendering.
  * @property {T} schema Extended Schema object for rendering.
+ * @property {BasePdf} basePdf Base PDF object for rendering.
  * @property {typeof import('@pdfme/pdf-lib')} pdfLib The pdf-lib library used for rendering.
  * @property {PDFDocument} pdfDoc PDFDocument object from pdf-lib.
  * @property {PDFPage} page PDFPage object from pdf-lib.
@@ -40,6 +42,7 @@ export interface PDFRenderProps<T extends Schema> {
   key: string;
   value: string;
   schema: T;
+  basePdf: BasePdf;
   pdfLib: typeof import('@pdfme/pdf-lib');
   pdfDoc: PDFDocument;
   page: PDFPage;
@@ -53,28 +56,31 @@ export interface PDFRenderProps<T extends Schema> {
  *
  * @template T - Type of the extended Schema object.
  * @property {T} schema - Extended Schema object for rendering.
+ * @property {BasePdf} basePdf Base PDF object for rendering.
  * @property {Mode} mode - String indicating the rendering state. 'designer' is only used when the field is in edit mode in the Designer.
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
  * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
- * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
+ * @property {(arg: { key: string; value: any } | { key: string; value: any }[]) => void} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
+ * @property {Size} pageSize - The size of the page being edited.
  * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
+  basePdf: BasePdf;
   mode: Mode;
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
   key: string;
   value: string;
-  onChange?: (value: string) => void;
+  onChange?: (arg: { key: string; value: any } | { key: string; value: any }[]) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;
@@ -101,7 +107,6 @@ type PropPanelProps = {
   activeElements: HTMLElement[];
   changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
-  pageSize: Size;
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
@@ -160,6 +165,7 @@ export type Font = z.infer<typeof Font>;
 export type BasePdf = z.infer<typeof BasePdf>;
 export type BlankPdf = z.infer<typeof BlankPdf>;
 export type Template = z.infer<typeof Template>;
+export type CommonOptions = z.infer<typeof CommonOptions>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 export type GenerateProps = z.infer<typeof GenerateProps> & { plugins?: Plugins };
 export type UIOptions = z.infer<typeof UIOptions> & { theme?: ThemeConfig };

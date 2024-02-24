@@ -1,5 +1,4 @@
 import React, { useRef, useState, useContext, useCallback } from 'react';
-import { theme } from 'antd';
 import {
   ZOOM,
   Template,
@@ -16,10 +15,10 @@ import Canvas from './Canvas/index';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../constants';
 import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
-  fmtTemplate,
+  schemasList2template,
   uuid,
   cloneDeep,
-  templateSchemas2SchemasList,
+  template2SchemasList,
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
 } from '../../helper';
@@ -45,7 +44,6 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
-  const { token } = theme.useToken();
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -55,11 +53,8 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
-    template,
-    size,
-    zoomLevel,
-  });
+  const { backgrounds, pageSizes, scale, error, refresh } =
+    useUIPreProcessor({ template, size, zoomLevel });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -89,7 +84,7 @@ const TemplateEditor = ({
       const _schemasList = cloneDeep(schemasList);
       _schemasList[pageCursor] = newSchemas;
       setSchemasList(_schemasList);
-      onChangeTemplate(fmtTemplate(template, _schemasList));
+      onChangeTemplate(schemasList2template(_schemasList, template.basePdf));
     },
     [template, schemasList, pageCursor, onChangeTemplate]
   );
@@ -134,7 +129,7 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
-    const sl = await templateSchemas2SchemasList(newTemplate);
+    const sl = await template2SchemasList(newTemplate);
     setSchemasList(sl);
     onEditEnd();
     setPageCursor(0);
@@ -179,7 +174,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
   const updatePage = async (sl: SchemaForUI[][], newPageCursor: number) => {
     setPageCursor(newPageCursor);
-    const newTemplate = fmtTemplate(template, sl);
+    const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);

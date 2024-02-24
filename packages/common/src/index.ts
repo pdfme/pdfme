@@ -23,7 +23,9 @@ import type {
   SchemaForUI,
   Font,
   BasePdf,
+  BlankPdf,
   Template,
+  CommonOptions,
   GeneratorOptions,
   Plugins,
   GenerateProps,
@@ -51,6 +53,7 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  getDynamicTemplate,
 } from './helper.js';
 
 export {
@@ -71,6 +74,7 @@ export {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  getDynamicTemplate,
   checkFont,
   checkInputs,
   checkUIOptions,
@@ -89,7 +93,9 @@ export type {
   SchemaForUI,
   Font,
   BasePdf,
+  BlankPdf,
   Template,
+  CommonOptions,
   GeneratorOptions,
   Plugins,
   GenerateProps,

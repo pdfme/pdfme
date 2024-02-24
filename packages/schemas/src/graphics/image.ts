@@ -5,15 +5,9 @@ import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
 import { Buffer } from 'buffer';
 import { UIRenderProps } from '@pdfme/common';
-import { convertForPdfLayoutProps, addAlphaToHex, isEditable, readFile } from '../utils.js';
+import { convertForPdfLayoutProps, addAlphaToHex, isEditable, readFile, px2mm } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
 import { imageSize } from './helper.js';
-
-const px2mm = (px: number): number => {
-  // http://www.endmemo.com/sconvert/millimeterpixel.php
-  const ratio = 0.26458333333333;
-  return parseFloat(String(px)) * ratio;
-};
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };
@@ -133,7 +127,7 @@ const imageSchema: Plugin<ImageSchema> = {
       };
       Object.assign(button.style, buttonStyle);
       button.addEventListener('click', () => {
-        onChange && onChange('');
+        onChange && onChange({ key: 'content', value: '' });
       });
       container.appendChild(button);
     }
@@ -168,7 +162,9 @@ const imageSchema: Plugin<ImageSchema> = {
       input.accept = 'image/jpeg, image/png';
       input.addEventListener('change', (event: Event) => {
         const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
-        readFile(changeEvent.target.files).then((result) => onChange && onChange(result as string));
+        readFile(changeEvent.target.files).then(
+          (result) => onChange && onChange({ key: 'content', value: result as string })
+        );
       });
       input.addEventListener('blur', () => stopEditing && stopEditing());
       label.appendChild(input);

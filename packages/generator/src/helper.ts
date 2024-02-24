@@ -7,7 +7,6 @@ import {
   PDFRenderProps,
   Plugin,
   getB64BasePdf,
-  BasePdf,
   isBlankPdf,
   mm2pt,
 } from '@pdfme/common';
@@ -16,15 +15,10 @@ import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pd
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
 
-const getBasePagesAndEmbedPdfBoxes = async (arg: {
-  template: Template;
-  pdfDoc: PDFDocument;
-  basePdf: BasePdf;
-}) => {
+export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDocument }) => {
   const {
-    template: { schemas },
+    template: { schemas, basePdf },
     pdfDoc,
-    basePdf,
   } = arg;
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
@@ -66,14 +60,11 @@ const getBasePagesAndEmbedPdfBoxes = async (arg: {
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { basePdf, schemas } = template;
+  const { schemas } = template;
 
   const pdfDoc = await PDFDocument.create();
   // @ts-ignore
   pdfDoc.registerFontkit(fontkit);
-
-  const basePagesAndBoxes = await getBasePagesAndEmbedPdfBoxes({ template, pdfDoc, basePdf });
-  const { basePages, embedPdfBoxes } = basePagesAndBoxes;
 
   const pluginValues = (
     Object.values(userPlugins).length > 0
@@ -95,7 +86,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return { ...acc, [type]: render.pdf };
   }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
 
-  return { pdfDoc, basePages, embedPdfBoxes, renderObj };
+  return { pdfDoc, renderObj };
 };
 
 export const postProcessing = (props: { pdfDoc: PDFDocument; options: GeneratorOptions }) => {

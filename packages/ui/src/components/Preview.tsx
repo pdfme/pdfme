@@ -1,5 +1,6 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react';
-import type { SchemaForUI, PreviewProps, Size } from '@pdfme/common';
+import React, { useRef, useState, useEffect, useContext } from 'react';
+import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
+import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -7,8 +8,11 @@ import CtlBar from './CtlBar';
 import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
-import { templateSchemas2SchemasList, getPagesScrollTopByIndex } from '../helper';
+import { FontContext } from '../contexts';
+import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
 import { theme } from 'antd';
+
+const _cache = new Map();
 
 const Preview = ({
   template,
@@ -21,6 +25,8 @@ const Preview = ({
 }) => {
   const { token } = theme.useToken();
 
+  const font = useContext(FontContext);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
@@ -29,37 +35,54 @@ const Preview = ({
   const [zoomLevel, setZoomLevel] = useState(1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error } = useUIPreProcessor({ template, size, zoomLevel });
+  const { backgrounds, pageSizes, scale, error, refresh } =
+    useUIPreProcessor({ template, size, zoomLevel });
 
-  const init = useCallback(async () => {
-    const sl = await templateSchemas2SchemasList(template);
-    setSchemasList(sl);
-  }, [template]);
+  const isForm = Boolean(onChangeInput);
+
+  const input = inputs[unitCursor];
+
+  const init = (template: Template) => {
+    const options = { font };
+    getDynamicTemplate({
+      template,
+      input,
+      options,
+      _cache,
+      modifyTemplate: (arg) => {
+        return modifyTemplateForTable(arg);
+      },
+      getDynamicHeight: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+        return getDynamicHeightForTable(value, args);
+      },
+    })
+      .then(async (dynamicTemplate) => {
+        const sl = await template2SchemasList(dynamicTemplate);
+        setSchemasList(sl);
+        await refresh(dynamicTemplate);
+      })
+      .catch((err) => console.error(`[@pdfme/ui] `, err));
+  };
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
       setUnitCursor(inputs.length - 1);
     }
-  }, [inputs]);
 
-  useEffect(() => {
-    init();
-  }, [init]);
+    init(template);
+  }, [template, inputs, size]);
 
   useScrollPageCursor({
     ref: containerRef,
     pageSizes,
     scale,
     pageCursor,
-    onChangePageCursor: (p) => setPageCursor(p),
+    onChangePageCursor: setPageCursor,
   });
 
   const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, key, value });
-
-  const isForm = Boolean(onChangeInput);
-
-  const input = inputs[unitCursor];
 
   if (error) {
     return <ErrorScreen size={size} error={error} />;
@@ -95,16 +118,42 @@ const Preview = ({
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
             const { key, readOnly } = schema;
-            const content = readOnly ? schema.content || '' : (input && input[key]) || '';
+            const content = readOnly ? String(schema.content) || '' : String(input && input[key] || '');
             return (
               <Renderer
                 key={schema.id}
                 schema={schema}
+                basePdf={template.basePdf}
                 value={content}
                 mode={isForm ? 'form' : 'viewer'}
                 placeholder={schema.content}
                 tabIndex={index + 100}
-                onChange={(value) => handleChangeInput({ key, value })}
+                onChange={(arg) => {
+                  const args = Array.isArray(arg) ? arg : [arg];
+                  let isNeedInit = false;
+                  args.forEach(({ key: _key, value }) => {
+                    if (_key === 'content') {
+                      const newValue = value as string;
+                      const oldValue = (input?.[key] as string) || '';
+                      if (newValue === oldValue) return;
+                      handleChangeInput({ key, value: newValue });
+                      // TODO Set to true only if the execution of getDynamicTemplate, such as for a table, is required.
+                      isNeedInit = true;
+                    } else {
+                      const targetSchema = schemasList[pageCursor].find(
+                        (s) => s.id === schema.id
+                      ) as SchemaForUI;
+                      if (!targetSchema) return;
+
+                      // @ts-ignore
+                      targetSchema[_key] = value as string;
+                    }
+                  });
+                  if (isNeedInit) {
+                    init(template);
+                  }
+                  setSchemasList([...schemasList])
+                }}
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
                 }

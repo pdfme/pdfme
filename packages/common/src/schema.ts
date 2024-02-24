@@ -34,6 +34,7 @@ export const Dict = z.object({
   'schemas.color': z.string(),
   'schemas.borderWidth': z.string(),
   'schemas.borderColor': z.string(),
+  'schemas.backgroundColor': z.string(),
   'schemas.textColor': z.string(),
   'schemas.bgColor': z.string(),
   'schemas.horizontal': z.string(),
@@ -44,6 +45,7 @@ export const Dict = z.object({
   'schemas.top': z.string(),
   'schemas.middle': z.string(),
   'schemas.bottom': z.string(),
+  'schemas.padding': z.string(),
 
   'schemas.text.fontName': z.string(),
   'schemas.text.size': z.string(),
@@ -58,6 +60,12 @@ export const Dict = z.object({
 
   'schemas.barcodes.barColor': z.string(),
   'schemas.barcodes.includetext': z.string(),
+
+  'schemas.table.alternateBackgroundColor': z.string(),
+  'schemas.table.tableStyle': z.string(),
+  'schemas.table.headStyle': z.string(),
+  'schemas.table.bodyStyle': z.string(),
+  'schemas.table.columnStyle': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
@@ -100,7 +108,7 @@ export const Template = z
   })
   .passthrough();
 
-export const Inputs = z.array(z.record(z.string())).min(1);
+export const Inputs = z.array(z.record(z.any())).min(1);
 
 export const Font = z.record(
   z.object({
@@ -110,7 +118,7 @@ export const Font = z.record(
   })
 );
 
-const CommonOptions = z.object({ font: Font.optional() }).passthrough();
+export const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 
 const CommonProps = z.object({
   template: Template,
