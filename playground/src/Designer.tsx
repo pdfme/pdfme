@@ -127,7 +127,7 @@ function App() {
         <strong>Designer</strong>
         <span style={{ margin: "0 1rem" }}>:</span>
         <label>
-          Template Preset
+          Template Preset:{" "}
           <select onChange={onChangeTemplatePresets} value={templatePreset}>
             {templatePresets.map((preset) => (
               <option key={preset.key}
@@ -140,7 +140,7 @@ function App() {
         </label>
         <span style={{ margin: "0 1rem" }}>/</span>
         <label>
-          Lang
+          Lang:{" "}
           <select onChange={(e) => {
             setLang(e.target.value as Lang)
             if (designer.current) {

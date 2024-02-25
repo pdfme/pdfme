@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b playground",
-    "deploy-table": "gh-pages -d dist -b add-dynamic-table-schema-332-preview"
+    "deploy-v4": "gh-pages -d dist -b v4-preview"
   },
   "dependencies": {
     "@pdfme/common": "file:../packages/common/dist",
