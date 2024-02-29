@@ -134,11 +134,7 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
   const pdf = await generate({
     template,
     inputs,
-    options: { 
-      colorType: 'cmyk',
-      font, title: 
-      'pdfme'
-    },
+    options: { font, title: 'pdfme' },
     plugins: getPlugins(),
   });
 
