@@ -31,24 +31,16 @@ As of writing this page, we just released Version 2 two weeks ago. However, we a
 As we aim for the release of the next version, given our limited resources, we anticipate it being a long-term plan. Therefore, to ensure we do not lose sight of our developmental direction and to address our users who are anticipating new features, we have written this document.
 
 - ### [V3 Roadmap](https://github.com/orgs/pdfme/projects/6/views/1)
+  - In this version, we will realize a more customizable pdfme to cater to individual user needs. It will be possible to create custom schemas to cater to various needs and designs that better match user sites. We believe that with this version, users will address niche problems and being open source will further make pdfme a special library.
 
-  In this version, we will realize a more customizable pdfme to cater to individual user needs. It will be possible to create custom schemas to cater to various needs and designs that better match user sites. We believe that with this version, users will address niche problems and being open source will further make pdfme a special library.
+  - [Released on Nov 3, 2023 🎉](https://github.com/pdfme/pdfme/releases/tag/3.0.1)
 
-  - [x] [Custom Schema Plugin](https://github.com/pdfme/pdfme/issues/213)
-    - Allow users to create custom schemas and define PDF and wysiwyg rendering from the outside.
-    - Currently built-in schemas will be packaged separately, and improvements will be made individually.
-  - [x] [Custom Design for UI](https://github.com/pdfme/pdfme/issues/243)
-    - Allow changes to the accent color (currently it's light blue)
-    - Add class names to each UI component to allow customization from the outside.
-  - [x] [Custom Label for UI](https://github.com/pdfme/pdfme/issues/107)
-    - Allow users to change the label of the UI component from the outside.
-    - Overwrite the any language label with the user's own label
 
 - ### [V4 Roadmap](https://github.com/orgs/pdfme/projects/8/views/1)
+  - In this version, we'll try implementing the table.  
+  To support dynamic data tables, we plan to change from the current method of layering elements over basePdf to a different layout approach.
 
-  In this version, we'll try implementing the table.  
-  To support dynamic data tables, we plan to change from the current method of layering elements over basePdf to a different layout approach.  
-  As there is no clear implementation method yet, this plan might change if it's deemed too difficult to implement as part of pdfme.
+  - [Developing pdfme V4](/blog/developing-pdfme-v4).
 
 ## Need technical support?
 
