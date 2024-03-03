@@ -115,14 +115,14 @@ export const hex2CmykColor = (hexString: string | undefined) => {
     hexString = hexString.replace('#', '');
 
     // Extract the hexadecimal color code and the opacity
-    var hexColor = hexString.substring(0, 6);
-    var opacityColor = hexString.substring(6, 8);
-    var opacity = opacityColor ? parseInt(opacityColor, 16) / 255 : 1;
+    const hexColor = hexString.substring(0, 6);
+    const opacityColor = hexString.substring(6, 8);
+    const opacity = opacityColor ? parseInt(opacityColor, 16) / 255 : 1;
 
     // Convert the hex values to decimal
-    var r = parseInt(hexColor.substring(0, 2), 16) / 255;
-    var g = parseInt(hexColor.substring(2, 4), 16) / 255;
-    var b = parseInt(hexColor.substring(4, 6), 16) / 255;
+    let r = parseInt(hexColor.substring(0, 2), 16) / 255;
+    let g = parseInt(hexColor.substring(2, 4), 16) / 255;
+    let b = parseInt(hexColor.substring(4, 6), 16) / 255;
 
     // Apply the opacity
     r = r * opacity + (1 - opacity);
@@ -130,10 +130,10 @@ export const hex2CmykColor = (hexString: string | undefined) => {
     b = b * opacity + (1 - opacity);
 
     // Calculate the CMYK values
-    var k = 1 - Math.max(r, g, b);
-    var c = r === 0 ? 0 : (1 - r - k) / (1 - k);
-    var m = g === 0 ? 0 : (1 - g - k) / (1 - k);
-    var y = b === 0 ? 0 : (1 - b - k) / (1 - k);
+    const k = 1 - Math.max(r, g, b);
+    const c = r === 0 ? 0 : (1 - r - k) / (1 - k);
+    const m = g === 0 ? 0 : (1 - g - k) / (1 - k);
+    const y = b === 0 ? 0 : (1 - b - k) / (1 - k);
 
     return cmyk(c, m, y, k);
   }
