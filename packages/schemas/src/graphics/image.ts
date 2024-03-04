@@ -1,13 +1,13 @@
 import type { ChangeEvent } from 'react';
-import type { PDFImage } from '@pdfme/pdf-lib';
+import type { PDFImage, PDFEmbeddedPage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
-import { Buffer } from 'buffer';
 import { UIRenderProps } from '@pdfme/common';
 import { convertForPdfLayoutProps, addAlphaToHex, isEditable, readFile } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
-import { imageSize } from './helper.js';
+import { getImageDimension } from './imagehelper.js';
+import { isPdf, pdfToImage } from './pdfHelper.js';
 
 const px2mm = (px: number): number => {
   // http://www.endmemo.com/sconvert/millimeterpixel.php
@@ -25,22 +25,24 @@ interface ImageSchema extends Schema {}
 const imageSchema: Plugin<ImageSchema> = {
   pdf: async (arg: PDFRenderProps<ImageSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
-    if (!value || !value.startsWith('data:image/')) return;
+    const isGraphicPdf = isPdf(value);
+    const isImageOrPdf = value.startsWith('data:image/') || isGraphicPdf;
+    if (!value || !isImageOrPdf) return;
 
     const inputImageCacheKey = getCacheKey(schema, value);
-    let image = _cache.get(inputImageCacheKey) as PDFImage;
+    let image = _cache.get(inputImageCacheKey) as PDFImage | PDFEmbeddedPage;
     if (!image) {
-      const isPng = value.startsWith('data:image/png;');
-      image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
+      if (isGraphicPdf) {
+        [image] = await pdfDoc.embedPdf(value);
+      } else {
+        const isPng = value.startsWith('data:image/png;');
+        image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
+      }
       _cache.set(inputImageCacheKey, image);
     }
 
     const _schema = { ...schema, position: { ...schema.position } };
-    const dataUriPrefix = ';base64,';
-    const idx = value.indexOf(dataUriPrefix);
-    const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
-    const dimension = imageSize(Buffer.from(imgBase64, 'base64'));
-
+    const dimension = isGraphicPdf ? image.scale(1) : getImageDimension(value);
     const imageWidth = px2mm(dimension.width);
     const imageHeight = px2mm(dimension.height);
     const boxWidth = _schema.width;
@@ -63,9 +65,13 @@ const imageSchema: Plugin<ImageSchema> = {
     const lProps = convertForPdfLayoutProps({ schema: _schema, pageHeight });
     const { width, height, rotate, position, opacity } = lProps;
     const { x, y } = position;
-    page.drawImage(image, { x, y, rotate, width, height, opacity });
+
+    const drawOptions = { x, y, rotate, width, height, opacity };
+    isGraphicPdf
+      ? page.drawPage(image as PDFEmbeddedPage, drawOptions)
+      : page.drawImage(image as PDFImage, drawOptions);
   },
-  ui: (arg: UIRenderProps<ImageSchema>) => {
+  ui: async (arg: UIRenderProps<ImageSchema>) => {
     const {
       value,
       rootElement,
@@ -76,6 +82,7 @@ const imageSchema: Plugin<ImageSchema> = {
       placeholder,
       theme,
       schema,
+      _cache,
     } = arg;
     const editable = isEditable(mode, schema);
     const isDefault = value === defaultValue;
@@ -99,6 +106,7 @@ const imageSchema: Plugin<ImageSchema> = {
 
     // image tag
     if (value) {
+      let src = isPdf(value) ? await pdfToImage({ schema, value, _cache }) : value;
       const img = document.createElement('img');
       const imgStyle: CSS.Properties = {
         height: '100%',
@@ -107,7 +115,7 @@ const imageSchema: Plugin<ImageSchema> = {
         objectFit: 'contain',
       };
       Object.assign(img.style, imgStyle);
-      img.src = value;
+      img.src = src;
       container.appendChild(img);
     }
 
@@ -165,7 +173,7 @@ const imageSchema: Plugin<ImageSchema> = {
       Object.assign(input.style, inputStyle);
       input.tabIndex = tabIndex || 0;
       input.type = 'file';
-      input.accept = 'image/jpeg, image/png';
+      input.accept = 'image/jpeg, image/png, application/pdf';
       input.addEventListener('change', (event: Event) => {
         const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
         readFile(changeEvent.target.files).then((result) => onChange && onChange(result as string));

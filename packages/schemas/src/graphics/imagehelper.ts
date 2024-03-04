@@ -1,5 +1,7 @@
 // ref: https://github.com/image-size/image-size ----------------------------
 // The following code is adapted from the image-size code. Unnecessary formats and dependencies on Node have been removed.
+import { Buffer } from 'buffer';
+
 type IImage = {
   validate: (input: Uint8Array) => boolean;
   calculate: (input: Uint8Array) => { width: number; height: number } | undefined;
@@ -130,7 +132,14 @@ function detector(input: Uint8Array): imageType | undefined {
   return keys.find((key: imageType) => typeHandlers[key].validate(input));
 }
 
-export const imageSize = (imgBuffer: Buffer): { height: number; width: number } => {
+export const getImageDimension = (value: string): { height: number; width: number } => {
+  const dataUriPrefix = ';base64,';
+  const idx = value.indexOf(dataUriPrefix);
+  const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
+  return imageSize(Buffer.from(imgBase64, 'base64'));
+};
+
+const imageSize = (imgBuffer: Buffer): { height: number; width: number } => {
   const type = detector(imgBuffer);
 
   if (typeof type !== 'undefined' && type in typeHandlers) {
