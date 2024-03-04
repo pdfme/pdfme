@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
-import { degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
-import { Schema, mm2pt, Mode, isHexValid } from '@pdfme/common';
+import { cmyk, degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
+import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
 
 export const convertForPdfLayoutProps = ({
   schema,
@@ -101,6 +101,50 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   }
 
   return undefined;
+};
+
+export const hex2CmykColor = (hexString: string | undefined) => {
+  if (hexString) {
+    const isValid = isHexValid(hexString);
+
+    if (!isValid) {
+      throw new Error(`Invalid hex color value ${hexString}`);
+    }
+
+    // Remove the # if it's present
+    hexString = hexString.replace('#', '');
+
+    // Extract the hexadecimal color code and the opacity
+    const hexColor = hexString.substring(0, 6);
+    const opacityColor = hexString.substring(6, 8);
+    const opacity = opacityColor ? parseInt(opacityColor, 16) / 255 : 1;
+
+    // Convert the hex values to decimal
+    let r = parseInt(hexColor.substring(0, 2), 16) / 255;
+    let g = parseInt(hexColor.substring(2, 4), 16) / 255;
+    let b = parseInt(hexColor.substring(4, 6), 16) / 255;
+
+    // Apply the opacity
+    r = r * opacity + (1 - opacity);
+    g = g * opacity + (1 - opacity);
+    b = b * opacity + (1 - opacity);
+
+    // Calculate the CMYK values
+    const k = 1 - Math.max(r, g, b);
+    const c = r === 0 ? 0 : (1 - r - k) / (1 - k);
+    const m = g === 0 ? 0 : (1 - g - k) / (1 - k);
+    const y = b === 0 ? 0 : (1 - b - k) / (1 - k);
+
+    return cmyk(c, m, y, k);
+  }
+
+  return undefined;
+};
+
+export const hex2PrintingColor = (hexString: string | undefined, colorType?: ColorType) => {
+  return colorType?.toLocaleLowerCase() == 'cmyk'
+    ? hex2CmykColor(hexString)
+    : hex2RgbColor(hexString);
 };
 
 export const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> =>

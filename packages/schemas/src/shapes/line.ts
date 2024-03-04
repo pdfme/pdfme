@@ -1,5 +1,5 @@
 import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
-import { rotatePoint, convertForPdfLayoutProps, hex2RgbColor } from '../utils.js';
+import { rotatePoint, convertForPdfLayoutProps, hex2PrintingColor } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
 const DEFAULT_LINE_COLOR = '#000000';
@@ -10,7 +10,8 @@ interface LineSchema extends Schema {
 
 const lineSchema: Plugin<LineSchema> = {
   pdf: (arg: PDFRenderProps<LineSchema>) => {
-    const { page, schema } = arg;
+    const { page, schema, options } = arg;
+    const { colorType } = options;
     const pageHeight = page.getHeight();
     const {
       width,
@@ -24,7 +25,7 @@ const lineSchema: Plugin<LineSchema> = {
       start: rotatePoint({ x, y: y + height / 2 }, pivot, rotate.angle),
       end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
       thickness: height,
-      color: hex2RgbColor(schema.color ?? DEFAULT_LINE_COLOR),
+      color: hex2PrintingColor(schema.color ?? DEFAULT_LINE_COLOR, colorType),
       opacity: opacity,
     });
   },

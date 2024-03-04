@@ -1,6 +1,13 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import type { TextSchema, FontWidthCalcValues } from './types';
-import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
+import {
+  PDFRenderProps,
+  Font,
+  getDefaultFont,
+  getFallbackFontName,
+  mm2pt,
+  ColorType,
+} from '@pdfme/common';
 import {
   VERTICAL_ALIGN_TOP,
   VERTICAL_ALIGN_MIDDLE,
@@ -20,7 +27,7 @@ import {
   getSplittedLines,
   widthOfTextAtSize,
 } from './helper.js';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../utils.js';
+import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;
@@ -57,17 +64,19 @@ const getFontProp = async ({
   value,
   font,
   schema,
+  colorType,
   _cache,
 }: {
   value: string;
   font: Font;
+  colorType?: ColorType;
   schema: TextSchema;
   _cache: Map<any, any>;
 }) => {
   const fontSize = schema.dynamicFontSize
     ? await calculateDynamicFontSize({ textSchema: schema, font, value, _cache })
     : schema.fontSize ?? DEFAULT_FONT_SIZE;
-  const color = hex2RgbColor(schema.fontColor || DEFAULT_FONT_COLOR);
+  const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
 
   return {
     alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
@@ -83,12 +92,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const { value, pdfDoc, pdfLib, page, options, schema, _cache } = arg;
   if (!value) return;
 
-  const { font = getDefaultFont() } = options;
+  const { font = getDefaultFont(), colorType } = options;
 
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font, _cache }),
     getFontKitFont(schema, font, _cache),
-    getFontProp({ value, font, schema, _cache }),
+    getFontProp({ value, font, schema, _cache, colorType }),
   ]);
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
@@ -108,7 +117,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
   if (schema.backgroundColor) {
-    const color = hex2RgbColor(schema.backgroundColor);
+    const color = hex2PrintingColor(schema.backgroundColor, colorType);
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 

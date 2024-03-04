@@ -58,6 +58,8 @@ export const Dict = z.object({
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
+export const ColorType = z.enum(['rgb', 'cmyk']).optional();
+
 export const Size = z.object({ height: z.number(), width: z.number() });
 
 export const Schema = z
@@ -113,6 +115,7 @@ const CommonProps = z.object({
 // -------------------generate-------------------
 
 export const GeneratorOptions = CommonOptions.extend({
+  colorType: ColorType,
   author: z.string().optional(),
   creationDate: z.date().optional(),
   creator: z.string().optional(),

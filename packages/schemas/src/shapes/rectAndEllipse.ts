@@ -1,6 +1,6 @@
 import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { hex2RgbColor, convertForPdfLayoutProps } from '../utils.js';
+import { hex2PrintingColor, convertForPdfLayoutProps } from '../utils.js';
 
 interface Shape extends Schema {
   type: 'ellipse' | 'rectangle';
@@ -27,7 +27,8 @@ const shape: Plugin<Shape> = {
     rootElement.appendChild(div);
   },
   pdf: (arg) => {
-    const { schema, page } = arg;
+    const { schema, page, options } = arg;
+    const { colorType } = options;
     const pageHeight = page.getHeight();
     const cArg = { schema, pageHeight };
     const { position, width, height, rotate, opacity } = convertForPdfLayoutProps(cArg);
@@ -39,8 +40,8 @@ const shape: Plugin<Shape> = {
     const drawOptions = {
       rotate,
       borderWidth,
-      borderColor: hex2RgbColor(schema.borderColor),
-      color: hex2RgbColor(schema.color),
+      borderColor: hex2PrintingColor(schema.borderColor, colorType),
+      color: hex2PrintingColor(schema.color, colorType),
       opacity,
       borderOpacity: opacity,
     };

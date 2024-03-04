@@ -18,6 +18,7 @@ import {
   UIProps,
   PreviewProps,
   DesignerProps,
+  ColorType,
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
@@ -158,6 +159,7 @@ export type SchemaForUI = z.infer<typeof SchemaForUI>;
  * @property {boolean} [subset] - The default is true (use subset font). So if you don't want to use a subset font, please set it to false.
  */
 export type Font = z.infer<typeof Font>;
+export type ColorType = z.infer<typeof ColorType>;
 export type BasePdf = z.infer<typeof BasePdf>;
 export type Template = z.infer<typeof Template>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
