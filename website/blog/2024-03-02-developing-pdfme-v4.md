@@ -40,7 +40,7 @@ I apologize for the slow development speed. However, the release of V4 is gradua
 
     - Adding a UI that allows dragging schemas from the sidebar.
     - The definition of plugins is changing (adding icons), so I intend to include this in this major version.
-3. [**Placeholder, Expression**](https://github.com/pdfme/pdfme/issues/439)
+3. [**Placeholder, Expression #439**](https://github.com/pdfme/pdfme/issues/439)
     
     ![](https://storage.googleapis.com/zenn-user-upload/4e66257d5d55-20240302.png)
 
