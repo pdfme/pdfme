@@ -1,6 +1,6 @@
-import { Schema } from '@pdfme/common';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.js';
+import { Schema, UIRenderProps } from '@pdfme/common';
 import { getCacheKey } from './cacheKey';
+import { ImageSchema } from './image';
 
 export function isPdf(content: string): boolean {
   return content.startsWith('data:application/pdf;');
@@ -14,17 +14,14 @@ export const pdfToImage = async ({
   schema,
   value,
   _cache,
-}: {
-  schema: Schema;
-  value: string;
-  _cache: Map<any, any>;
-}): Promise<string> => {
+  pdfJs,
+}: UIRenderProps<ImageSchema>): Promise<string> => {
   // using value from cache to prevent rerending pdf to image
   const pdfImageCacheKey = getCacheKey(schema, value);
   const imageSrc = _cache.get(pdfImageCacheKey);
   if (imageSrc) return imageSrc;
 
-  const pdfDoc = await getDocument({ url: value }).promise;
+  const pdfDoc = await pdfJs.getDocument({ url: value }).promise;
   const page = await pdfDoc.getPage(1);
 
   const canvas = document.createElement('canvas');

@@ -79,6 +79,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
+  pdfJs: typeof import('pdfjs-dist/legacy/build/pdf.js');
   _cache: Map<any, any>;
 };
 
