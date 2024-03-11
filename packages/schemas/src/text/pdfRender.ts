@@ -1,6 +1,13 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import type { TextSchema } from './types';
-import { PDFRenderProps, Font, getDefaultFont, getFallbackFontName, mm2pt } from '@pdfme/common';
+import {
+  PDFRenderProps,
+  ColorType,
+  Font,
+  getDefaultFont,
+  getFallbackFontName,
+  mm2pt,
+} from '@pdfme/common';
 import {
   VERTICAL_ALIGN_TOP,
   VERTICAL_ALIGN_MIDDLE,
@@ -89,7 +96,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font, _cache }),
-    getFontKitFont(schema, font, _cache),
+    getFontKitFont(schema.fontName, font, _cache),
     getFontProp({ value, font, schema, _cache }),
   ]);
 
