@@ -3,10 +3,11 @@ import { Dict, ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
+import * as pdfJs from 'pdfjs-dist/legacy/build/pdf.js';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
+  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
 > & {
   schema: SchemaForUI;
   onChange: (value: string) => void;
@@ -83,6 +84,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         options,
         theme,
         i18n,
+        pdfJs,
         _cache: _cache.current,
       });
     }
