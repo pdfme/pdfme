@@ -10,6 +10,13 @@ authors:
 tags: []
 ---
 
+:::info
+Contrary to the plan, we are working on the implementation of the dynamic table in a different way.
+Please see the following blog article for the latest development information.
+- [Developing pdfme V4](/blog/developing-pdfme-v4)
+
+:::
+
 ## Why Dynamic Tables Couldn't Be Implemented in pdfme
 
 Until now, pdfme has been realizing simple [variable data printing](https://en.wikipedia.org/wiki/Variable_data_printing) by embedding PDF data into a property called `basePdf` in the template and overlaying a `schema` on top of this PDF.

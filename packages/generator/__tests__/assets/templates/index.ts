@@ -44,6 +44,7 @@ const verticalAlignmentBottom = require('./verticalAlignmentBottom.json') as Tem
 const test = require('./test.json') as Template;
 const shapes = require('./shapes.json') as Template;
 const pet = require('./pet.json') as Template;
+const pdfImage = require('./pdfImage.json') as Template;
 
 export const label = {
   宛名8面,
@@ -105,6 +106,7 @@ export const other = {
   background,
   rotation,
   pet,
+  pdfImage,
 };
 
 export const shape = {
