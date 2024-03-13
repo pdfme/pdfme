@@ -9,6 +9,7 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
+import { DndContext, useDraggable } from '@dnd-kit/core';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
@@ -64,6 +65,30 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
   );
 };
 
+function Draggable(props: { children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+  } = useDraggable({
+    id: 'draggable',
+    data: { type: 'text' },
+  });
+  const style = transform
+    ? {
+      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    }
+    : undefined;
+
+  return (
+    <button ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      {props.children}
+    </button>
+  );
+}
+
+
 interface GuidesInterface {
   getGuides(): number[];
   scroll(pos: number): void;
@@ -85,6 +110,7 @@ interface Props {
   size: Size;
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
+  addSchema: (position: { x: number; y: number; }) => void
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
@@ -103,6 +129,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     schemasList,
     hoveringSchemaId,
     onEdit,
+    addSchema,
     changeSchemas,
     removeSchemas,
     onChangeHoveringSchemaId,
@@ -111,13 +138,13 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const prevSchemas = usePrevious(schemasList[pageCursor]);
 
@@ -342,7 +369,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       }}
       ref={ref}
     >
-      <Selecto
+      {!dragging && <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
@@ -378,83 +405,119 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             setIsPressShiftKey(false);
           }
         }}
-      />
-      <Paper
-        paperRefs={paperRefs}
-        scale={scale}
-        size={size}
-        schemasList={schemasList}
-        pageSizes={pageSizes}
-        backgrounds={backgrounds}
-        hasRulers={true}
-        renderPaper={({ index, paperSize }) => (
-          <>
-            {!editing && activeElements.length > 0 && pageCursor === index && (
-              <DeleteButton activeElements={activeElements} />
-            )}
-            <Padding basePdf={basePdf} />
-            <Guides
-              paperSize={paperSize}
-              horizontalRef={(e) => {
-                if (e) horizontalGuides.current[index] = e;
-              }}
-              verticalRef={(e) => {
-                if (e) verticalGuides.current[index] = e;
-              }}
-            />
-            {pageCursor !== index ? (
-              <Mask
-                width={paperSize.width + RULER_HEIGHT}
-                height={paperSize.height + RULER_HEIGHT}
+      />}
+      <DndContext
+        onDragEnd={(event) => {
+          console.log('scale', scale)
+          const rect = paperRefs.current[pageCursor].getBoundingClientRect();
+          const paperPosition = { x: rect.left, y: rect.top };
+          console.log('paperPosition', paperPosition)
+          const schemaPosition = { x: event.delta.x + 0, y: event.delta.y + 86 }
+          console.log('schemaPosition', schemaPosition)
+          // TODO FIX position is not correct
+          const result = {
+            x: Math.max(0, schemaPosition.x - paperPosition.x) * scale,
+            y: Math.max(0, schemaPosition.y - paperPosition.y) * scale
+          }
+          
+          // TODO addSchemaに
+          addSchema(result);
+          console.log(result)
+          setDragging(false)
+        }}
+        onDragStart={() => setDragging(true)}
+        onDragCancel={() => setDragging(false)}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            zIndex: 1,
+            height: '100%',
+            background: token.colorBgLayout,
+            width: 74,
+          }}
+        >
+          {/* TODO Draggableを読み込まれているスキーマから作るようにする */}
+          <Draggable>Drag me</Draggable>
+        </div>
+        <Paper
+          paperRefs={paperRefs}
+          scale={scale}
+          size={size}
+          schemasList={schemasList}
+          pageSizes={pageSizes}
+          backgrounds={backgrounds}
+          hasRulers={true}
+          renderPaper={({ index, paperSize }) => (
+            <>
+              {!editing && activeElements.length > 0 && pageCursor === index && (
+                <DeleteButton activeElements={activeElements} />
+              )}
+              <Padding basePdf={basePdf} />
+              <Guides
+                paperSize={paperSize}
+                horizontalRef={(e) => {
+                  if (e) horizontalGuides.current[index] = e;
+                }}
+                verticalRef={(e) => {
+                  if (e) verticalGuides.current[index] = e;
+                }}
               />
-            ) : (
-              !editing && (
-                <Moveable
-                  ref={moveable}
-                  target={activeElements}
-                  bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
-                  horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                  verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                  keepRatio={isPressShiftKey}
-                  rotatable={rotatable}
-                  onDrag={onDrag}
-                  onDragEnd={onDragEnd}
-                  onDragGroupEnd={onDragEnds}
-                  onRotate={onRotate}
-                  onRotateEnd={onRotateEnd}
-                  onRotateGroupEnd={onRotateEnds}
-                  onResize={onResize}
-                  onResizeEnd={onResizeEnd}
-                  onResizeGroupEnd={onResizeEnds}
-                  onClick={onClickMoveable}
+              {pageCursor !== index ? (
+                <Mask
+                  width={paperSize.width + RULER_HEIGHT}
+                  height={paperSize.height + RULER_HEIGHT}
                 />
-              )
-            )}
-          </>
-        )}
-        renderSchema={({ schema }) => (
-          <Renderer
-            key={schema.id}
-            schema={schema}
-            basePdf={basePdf}
-            value={schema.content || ''}
-            onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-            mode={
-              editing && activeElements.map((ae) => ae.id).includes(schema.id)
-                ? 'designer'
-                : 'viewer'
-            }
-            onChange={(arg) => {
-              const args = Array.isArray(arg) ? arg : [arg];
-              changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
-            }}
-            stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-              }`}
-            scale={scale}
-          />
-        )}
-      />
+              ) : (
+                !editing && (
+                  <Moveable
+                    ref={moveable}
+                    target={activeElements}
+                    bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
+                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                    keepRatio={isPressShiftKey}
+                    rotatable={rotatable}
+                    onDrag={onDrag}
+                    onDragEnd={onDragEnd}
+                    onDragGroupEnd={onDragEnds}
+                    onRotate={onRotate}
+                    onRotateEnd={onRotateEnd}
+                    onRotateGroupEnd={onRotateEnds}
+                    onResize={onResize}
+                    onResizeEnd={onResizeEnd}
+                    onResizeGroupEnd={onResizeEnds}
+                    onClick={onClickMoveable}
+                  />
+                )
+              )}
+            </>
+          )}
+          renderSchema={({ schema }) => (
+            <Renderer
+              key={schema.id}
+              schema={schema}
+              basePdf={basePdf}
+              value={schema.content || ''}
+              onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+              mode={
+                editing && activeElements.map((ae) => ae.id).includes(schema.id)
+                  ? 'designer'
+                  : 'viewer'
+              }
+              onChange={(arg) => {
+                const args = Array.isArray(arg) ? arg : [arg];
+                changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
+              }}
+              stopEditing={() => setEditing(false)}
+              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+                }`}
+              scale={scale}
+            />
+          )}
+        />
+      </DndContext>
     </div>
   );
 };

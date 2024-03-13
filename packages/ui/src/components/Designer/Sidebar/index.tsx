@@ -74,7 +74,11 @@ const Sidebar = (props: SidebarProps) => {
               transform: 'translateX(-50%)',
             }}
           >
-            <Button type="primary" style={{ fontWeight: 600 }} onClick={addSchema}>
+            <Button
+              type="primary"
+              style={{ fontWeight: 600 }}
+              // TODO このボタンは削除し、左のサイドバーから追加する方法に統一する
+              onClick={() => addSchema({ x: 0, y: 0 })}>
               {i18n('addNewField')}
             </Button>
           </div>
