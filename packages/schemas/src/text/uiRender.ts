@@ -118,12 +118,21 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   Object.assign(textBlock.style, textBlockStyle);
 
   if (isEditable(mode, schema)) {
-    textBlock.contentEditable = 'plaintext-only';
+    textBlock.contentEditable = 'true';
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
     textBlock.addEventListener('blur', (e: Event) => {
       onChange && onChange((e.target as HTMLDivElement).innerText);
       stopEditing && stopEditing();
+    });
+    textBlock.addEventListener('paste', (e: ClipboardEvent) => {
+      e.preventDefault();
+      const paste = e.clipboardData?.getData('text');
+      const selection = window.getSelection();
+      if (!selection?.rangeCount) return;
+      selection.deleteFromDocument();
+      selection.getRangeAt(0).insertNode(document.createTextNode(paste || ''));
+      selection.collapseToEnd();
     });
 
     if (schema.dynamicFontSize) {
