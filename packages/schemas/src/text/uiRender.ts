@@ -17,6 +17,7 @@ import {
   calculateDynamicFontSize,
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
+  isFirefox,
 } from './helper.js';
 import { addAlphaToHex, isEditable } from '../utils.js';
 
@@ -118,11 +119,17 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   Object.assign(textBlock.style, textBlockStyle);
 
   if (isEditable(mode, schema)) {
-    try {
+    if (!isFirefox()) {
       textBlock.contentEditable = 'plaintext-only';
-    } catch (e) {
-      // Firefox hack to prevent rich text from being pasted.
+    } else {
       textBlock.contentEditable = 'true';
+      textBlock.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('insertLineBreak', false, undefined);
+        }
+      });
+
       textBlock.addEventListener('paste', (e: ClipboardEvent) => {
         e.preventDefault();
         const paste = e.clipboardData?.getData('text');
