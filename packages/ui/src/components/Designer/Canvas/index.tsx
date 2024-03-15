@@ -12,7 +12,7 @@ import React, {
 import { DndContext, useDraggable } from '@dnd-kit/core';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
+import { Plugin, ZOOM, Schema, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
 import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
@@ -25,6 +25,7 @@ import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
 import Padding from './Padding';
+
 
 const mm2px = (mm: number) => mm * 3.7795275591;
 
@@ -65,26 +66,34 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
   );
 };
 
-function Draggable(props: { children: React.ReactNode }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-  } = useDraggable({
-    id: 'draggable',
-    data: { type: 'text' },
-  });
+const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf, children: React.ReactNode }) => {
+  const { scale, basePdf, plugin } = props;
+  const { token } = theme.useToken();
+  const defaultSchema = plugin.propPanel.defaultSchema as Schema;
+  const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
+  const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
   const style = transform
-    ? {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    }
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
     : undefined;
 
   return (
-    <button ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {props.children}
-    </button>
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
+      {isDragging ?
+        <div style={{ transform: `scale(${scale})` }}>
+          <Renderer
+            key={defaultSchema.type}
+            schema={{ ...defaultSchema, id: defaultSchema.type, key: defaultSchema.type }}
+            basePdf={basePdf}
+            value={defaultSchema.content || ''}
+            onChangeHoveringSchemaId={() => { void 0 }}
+            mode={'viewer'}
+            outline={`1px solid ${token.colorPrimary}`}
+            scale={scale}
+          />
+        </div> :
+        props.children
+      }
+    </div>
   );
 }
 
@@ -110,7 +119,7 @@ interface Props {
   size: Size;
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
-  addSchema: (position: { x: number; y: number; }) => void
+  addSchema: (defaultSchema: Schema) => void
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
@@ -408,6 +417,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       />}
       <DndContext
         onDragEnd={(event) => {
+          if (!event.active.data.current) return;
+          const data = event.active.data.current as Schema;
           console.log('scale', scale)
           const rect = paperRefs.current[pageCursor].getBoundingClientRect();
           const paperPosition = { x: rect.left, y: rect.top };
@@ -415,14 +426,13 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const schemaPosition = { x: event.delta.x + 0, y: event.delta.y + 86 }
           console.log('schemaPosition', schemaPosition)
           // TODO FIX position is not correct
-          const result = {
+          const position = {
             x: Math.max(0, schemaPosition.x - paperPosition.x) * scale,
             y: Math.max(0, schemaPosition.y - paperPosition.y) * scale
           }
-          
-          // TODO addSchemaにデフォルトのスキーマを渡せるようにする
-          addSchema(result);
-          console.log(result)
+
+          addSchema({ ...data, position });
+          console.log(position)
           setDragging(false)
         }}
         onDragStart={() => setDragging(true)}
@@ -430,6 +440,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       >
         <div
           style={{
+            // TODO 複数ページの際にも常に右上に表示されるようにする
+            // TODO 高さがはみ出た場合はスクロールにする
             position: 'absolute',
             left: 0,
             zIndex: 1,
@@ -438,8 +450,21 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             width: 74,
           }}
         >
-          {/* TODO Draggableを読み込まれているスキーマから作るようにする */}
-          <Draggable>Drag me</Draggable>
+          {Object.entries(pluginsRegistry).map(([label, plugin]) => {
+            if (!plugin?.propPanel.defaultSchema) return null;
+            return <Draggable
+              key={label}
+              scale={scale}
+              basePdf={basePdf}
+              plugin={plugin}>
+              <button style={{ width: 55, height: 55, margin: '0.25rem', padding: '0.25rem' }}>
+                {/* TODO labelをアイコンにする */}
+                {/* TODO ドラッグ時はレンダリングしたものにしたい */}
+                {label}
+              </button>
+            </Draggable>
+          })}
+
         </div>
         <Paper
           paperRefs={paperRefs}

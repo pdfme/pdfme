@@ -138,31 +138,23 @@ const TemplateEditor = ({
     }
   }, []);
 
-  const addSchema = (position: { x: number, y: number }) => {
-    const propPanel = (Object.values(pluginsRegistry)[0] as Plugin<Schema>)?.propPanel;
-
-    if (!propPanel) {
-      throw new Error(`[@pdfme/ui] addSchema failed: propPanel is empty.
-Check this document: https://pdfme.com/docs/custom-schemas`);
-    }
+  const addSchema = (defaultSchema: Schema) => {
     const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
     const pageSize = pageSizes[pageCursor];
 
     const ensureMiddleValue = (min: number, value: number, max: number) => Math.min(Math.max(min, value), max)
 
-    // TODO defaultSchemaは引数で渡せるようにした方が良さそう
-    const defaultSchema = propPanel.defaultSchema
     const s = {
       id: uuid(),
       key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
       ...defaultSchema,
       position: {
-        x: ensureMiddleValue(paddingLeft, position.x, pageSize.width - paddingRight - defaultSchema.width),
-        y: ensureMiddleValue(paddingTop, position.y, pageSize.height - paddingBottom - defaultSchema.height),
+        x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
+        y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),
       },
     } as SchemaForUI;
 
-    if (position.y === 0) {
+    if (defaultSchema.position.y === 0) {
       const paper = paperRefs.current[pageCursor];
       const rectTop = paper ? paper.getBoundingClientRect().top : 0;
       s.position.y = rectTop > 0 ? paddingTop : pageSizes[pageCursor].height / 2;
