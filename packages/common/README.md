@@ -226,6 +226,7 @@ The designer instance can be manipulated with the following methods.
 - `saveTemplate`
 - `updateTemplate`
 - `getTemplate`
+- `getPageCursor`
 - `onChangeTemplate`
 - `onSaveTemplate`
 - `destroy`

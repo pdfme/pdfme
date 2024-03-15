@@ -31,10 +31,14 @@ const TemplateEditor = ({
   size,
   onSaveTemplate,
   onChangeTemplate,
+  onPageCursorChange,
 }: Omit<DesignerProps, 'domContainer'> & {
   onSaveTemplate: (t: Template) => void;
   size: Size;
-} & { onChangeTemplate: (t: Template) => void }) => {
+} & {
+  onChangeTemplate: (t: Template) => void 
+  onPageCursorChange: (newPageCursor: number) => void
+}) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -70,6 +74,7 @@ const TemplateEditor = ({
     pageCursor,
     onChangePageCursor: (p) => {
       setPageCursor(p);
+      onPageCursorChange(p)
       onEditEnd();
     },
   });
