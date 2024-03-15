@@ -19,7 +19,6 @@ export const Dict = z.object({
   notUniq: z.string(),
   noKeyName: z.string(),
   fieldsList: z.string(),
-  addNewField: z.string(),
   editField: z.string(),
   type: z.string(),
   errorOccurred: z.string(),

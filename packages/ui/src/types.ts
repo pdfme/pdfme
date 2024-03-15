@@ -12,8 +12,6 @@ export type SidebarProps = {
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   changeSchemas: ChangeSchemas;
-  // TODO 修正
-  addSchema: (position: { x: number; y: number }) => void;
   deselectSchema: () => void;
   sidebarOpen: boolean;
   setSidebarOpen: (sidebarOpen: boolean) => void;

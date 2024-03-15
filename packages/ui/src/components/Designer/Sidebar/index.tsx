@@ -1,17 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
 
 const Sidebar = (props: SidebarProps) => {
-  const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
+  const { sidebarOpen, setSidebarOpen, activeElements, schemas } = props;
 
   const { token } = theme.useToken();
-  const i18n = useContext(I18nContext);
   const getActiveSchemas = () =>
     schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id));
   const getLastActiveSchema = () => {
@@ -64,23 +62,6 @@ const Sidebar = (props: SidebarProps) => {
             ) : (
               <DetailView {...props} activeSchema={getLastActiveSchema()} />
             )}
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '1.5rem',
-              marginTop: '1rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <Button
-              type="primary"
-              style={{ fontWeight: 600 }}
-              // TODO このボタンは削除し、左のサイドバーから追加する方法に統一する
-              onClick={() => addSchema({ x: 0, y: 0 })}>
-              {i18n('addNewField')}
-            </Button>
           </div>
         </div>
       </div>

@@ -256,7 +256,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           editingElem && onEdit([editingElem]);
         }}
         onEditEnd={onEditEnd}
-        addSchema={addSchema}
         deselectSchema={onEditEnd}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}

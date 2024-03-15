@@ -420,7 +420,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             y: Math.max(0, schemaPosition.y - paperPosition.y) * scale
           }
           
-          // TODO addSchemaに
+          // TODO addSchemaにデフォルトのスキーマを渡せるようにする
           addSchema(result);
           console.log(result)
           setDragging(false)
