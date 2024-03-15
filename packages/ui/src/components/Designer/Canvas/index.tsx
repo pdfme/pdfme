@@ -28,6 +28,11 @@ import Padding from './Padding';
 
 
 const mm2px = (mm: number) => mm * 3.7795275591;
+const px2mm = (px: number): number => {
+  // http://www.endmemo.com/sconvert/millimeterpixel.php
+  const ratio = 0.26458333333333;
+  return parseFloat(String(px)) * ratio;
+};
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -417,22 +422,25 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       />}
       <DndContext
         onDragEnd={(event) => {
-          if (!event.active.data.current) return;
-          const data = event.active.data.current as Schema;
-          console.log('scale', scale)
+          if (!event.active) return;
+          const active = event.active;
+
+          const data = active.data.current as Schema;
           const rect = paperRefs.current[pageCursor].getBoundingClientRect();
           const paperPosition = { x: rect.left, y: rect.top };
           console.log('paperPosition', paperPosition)
-          const schemaPosition = { x: event.delta.x + 0, y: event.delta.y + 86 }
+          const translated = active.rect.current.translated;
+          const { top, left } = translated || { top: 0, left: 0 }
+          const schemaPosition = { x: left, y: top }
           console.log('schemaPosition', schemaPosition)
           // TODO FIX position is not correct
           const position = {
-            x: Math.max(0, schemaPosition.x - paperPosition.x) * scale,
-            y: Math.max(0, schemaPosition.y - paperPosition.y) * scale
+            x: px2mm(Math.max(0, schemaPosition.x)),
+            y: px2mm(Math.max(0, schemaPosition.y))
           }
 
           addSchema({ ...data, position });
-          console.log(position)
+          // console.log(position)
           setDragging(false)
         }}
         onDragStart={() => setDragging(true)}
@@ -441,8 +449,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
         <div
           style={{
             // TODO 複数ページの際にも常に右上に表示されるようにする
-            // TODO 高さがはみ出た場合はスクロールにする
             position: 'absolute',
+            overflow: dragging ? 'visible' : 'auto',
             left: 0,
             zIndex: 1,
             height: '100%',
