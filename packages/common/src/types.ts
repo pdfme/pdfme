@@ -76,7 +76,7 @@ export type UIRenderProps<T extends Schema> = {
   key: string;
   value: string;
   onChange?: (value: string) => void;
-  onCustomAttributeChange?: (key: string, value: string) => void;
+  onCustomAttributeChange?: (key: string, value: any) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;

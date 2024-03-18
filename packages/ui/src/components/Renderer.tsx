@@ -51,17 +51,16 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, mode, onChange, onCustomAttributeChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
 
-  const flatSchemaWithoutData = JSON.stringify(schema, (key, value) => {
-    // Ignoring the keys which contain the actual data allows onChange to be called in
-    // mid-edit without re-rendering the schema. Changes that only amend these values
-    // should only come from inside the schema UI renderer function
-    return key === 'data' || key == 'content' ? undefined : value;
-  });
+  const editable = mode === 'form' || mode === 'designer';
+
+  // If this schema is actively being edited (e.g. typing into a field)
+  // then we don't want changes to that schema triggering a re-render
+  const schemaRerenderState = editable ? '' : JSON.stringify(schema);
 
   useEffect(() => {
     if (ref.current && schema.type) {
@@ -77,8 +76,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       ref.current.innerHTML = '';
 
-      const editable = mode === 'form' || mode === 'designer';
-
       render({
         key: schema.key,
         value: schema.readOnly ? schema.readOnlyValue || '' : schema.data,
@@ -86,7 +83,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         rootElement: ref.current,
         mode,
         onChange: editable ? onChange : undefined,
-        onCustomAttributeChange: editable ? onChange : undefined,
+        onCustomAttributeChange: editable ? onCustomAttributeChange : undefined,
         stopEditing: editable ? stopEditing : undefined,
         tabIndex,
         placeholder,
@@ -102,7 +99,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [mode, scale, flatSchemaWithoutData, JSON.stringify(options)]);
+  }, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
 
   return (
     <Wrapper {...props}>

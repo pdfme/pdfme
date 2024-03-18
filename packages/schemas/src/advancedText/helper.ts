@@ -10,26 +10,25 @@ export const getUniqueVariableNames = (content: string) => {
   return Array.from(uniqueMatchesSet);
 };
 
-export const substituteVariables = (content: string, variableString: string) => {
-  if (!content || !variableString) {
-    return content;
+export const substituteVariables = (text: string, variablesStr: string): string => {
+  if (!text || !variablesStr) {
+    return text;
   }
 
-  let substitutedContent = content;
+  let substitutedText = text;
 
   try {
-    const variables = JSON.parse(variableString);
+    const variables: Record<string, string> = JSON.parse(variablesStr) || {}
 
-    for (const variableName in variables) {
-      // Ensure we add escape characters for anything that could break the regex
+    Object.keys(variables).forEach((variableName) => {
       const variableForRegex = variableName.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
       const regex = new RegExp('{' + variableForRegex + '}', 'g');
 
-      substitutedContent = substitutedContent.replace(regex, variables[variableName]);
-    }
+      substitutedText = substitutedText.replace(regex, variables[variableName]);
+    });
   } catch (error: any) {
     console.error('Error parsing JSON:', error.message);
   }
 
-  return substitutedContent;
+  return substitutedText;
 };
