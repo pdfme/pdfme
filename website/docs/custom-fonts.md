@@ -19,26 +19,24 @@ The type of font is as follows.
 ```ts
 type Font = {
   [fontName: string]: {
-    data: Uint8Array | ArrayBuffer;
+    data: string | Uint8Array | ArrayBuffer;
     fallback?: boolean;
     subset?: boolean;
   };
 };
 ```
-
+- `data`: If you register a `string` starting with `http`, it will be automatically fetched.Or set binary data directly like `Uint8Array | ArrayBuffer`
 - \*`fallback`: Setting it to true makes it the font to use if not set to a `fontName`. **Only one of the font objects must be set to true.**
 - \*`subset`: The default is true, but it can be set to false to set the font embedding to not subset. (This setting is for a bug in fontkit when embedding certain fonts with subsetting.)
-
-Please read font data by fetch or fs.readFileSync as below.
 
 ```ts
 const font: Font = {
   serif: {
-    data: await fetch('fonts/serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/serif.ttf',
     fallback: true,
   },
   sans_serif: {
-    data: fs.readFileSync('fonts/sans_serif.ttf'),
+    data: 'https://example.com/fonts/sans_serif.ttf',
   },
 };
 ```
@@ -57,11 +55,11 @@ import { generate } from '@pdfme/generator';
 
 const font = {
   serif: {
-    data: await fetch('fonts/serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/serif.ttf',
     fallback: true,
   },
   sans_serif: {
-    data: fs.readFileSync('fonts/sans_serif.ttf'),
+    data: 'https://example.com/fonts/sans_serif.ttf',
   },
 };
 const template: Template = {
@@ -122,11 +120,11 @@ const template = {
 };
 const font = {
   serif: {
-    data: await fetch('fonts/serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/serif.ttf',
     fallback: true,
   },
   sans_serif: {
-    data: await fetch('fonts/sans_serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/sans_serif.ttf',
   },
 };
 
@@ -138,10 +136,10 @@ const designer = new Designer({ domContainer, template, options: { font } });
 ```ts
 const font = {
   serif: {
-    data: await fetch('fonts/serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/serif.ttf',
   },
   sans_serif: {
-    data: await fetch('fonts/sans_serif.ttf').then((res) => res.arrayBuffer()),
+    data: 'https://example.com/fonts/sans_serif.ttf',
     fallback: true,
   },
 };
