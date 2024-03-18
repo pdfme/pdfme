@@ -10,6 +10,7 @@ import { cloneDeep } from './helper.js';
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
+  private pageCursor: number = 0;
 
   constructor(props: DesignerProps) {
     super(props);
@@ -42,6 +43,10 @@ class Designer extends BaseUIClass {
   public onChangeTemplate(cb: (template: Template) => void) {
     this.onChangeTemplateCallback = cb;
   }
+  
+  public getPageCursor() {
+    return this.pageCursor
+  }
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
@@ -65,6 +70,9 @@ class Designer extends BaseUIClass {
             if (this.onChangeTemplateCallback) {
               this.onChangeTemplateCallback(template);
             }
+          }}
+          onPageCursorChange={(newPageCursor: number) => {
+            this.pageCursor = newPageCursor
           }}
           size={this.size}
         />
