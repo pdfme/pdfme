@@ -19,26 +19,38 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     ]);
   }
 
+  var placeholderRowEl = document.getElementById('placeholder-dynamic-var')?.closest('.ant-form-item') as HTMLElement;
+  if (!placeholderRowEl) {
+    console.error('Failed to find Ant form placeholder row to create dynamic variables inputs.');
+    return
+  }
+  placeholderRowEl.style.display = 'none';
+
+  // The wrapping form element has a display:flex which limits the width of the form fields, removing.
+  (rootElement.parentElement as HTMLElement).style.display = 'block';
+
+  const title = document.createElement('span');
+  title.innerHTML = 'Text Variables';
+  rootElement.appendChild(title);
+
+
   if (varNames.length > 0) {
     for (let variableName of varNames) {
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = variables[variableName];
-      // TODO: What can we do about any here?
-      input.onchange = (e: any) => {
-        variables[variableName] = e.target.value;
+      const varRow = placeholderRowEl.cloneNode(true) as HTMLElement;
+
+      const textarea = varRow.querySelector('textarea') as HTMLTextAreaElement;
+      textarea.id = 'dynamic-var-' + variableName;
+      textarea.value = variables[variableName];
+      textarea.addEventListener('change', (e: Event) => {
+        variables[variableName] = (e.target as HTMLTextAreaElement).value;
         changeSchemas([{ key: 'data', value: JSON.stringify(variables), schemaId: activeSchema.id }]);
-      };
-      // This doesn't work because it loses focus on the input box
-      // input.onkeyup = (e: any) => {
-      //   variables[variableName] = e.target.value;
-      //   changeSchemas([{ key: 'data', value: JSON.stringify(variables), schemaId: activeSchema.id }]);
-      // };
-      const label = document.createElement('label');
+      });
+
+      const label = varRow.querySelector('label') as HTMLLabelElement
       label.innerText = variableName;
-      label.style.cssText = 'display: flex; width: 100%;';
-      label.appendChild(input);
-      rootElement.appendChild(label);
+
+      varRow.style.display = 'block';
+      rootElement.appendChild(varRow);
     }
   } else {
     const para = document.createElement('p');
@@ -58,9 +70,6 @@ export const propPanel: PropPanel<AdvancedTextSchema> = {
       dynamicVariables: { type: 'object', widget: 'mapDynamicVariables', bind: false, span: 24 },
       placeholderDynamicVar: {
         title: 'Placeholder Dynamic Variable',
-        // TODO: true
-        //  We will clone this to generate formatted inputs dynamically
-        hidden: false,
         type: 'string',
         format: 'textarea',
         props: {
