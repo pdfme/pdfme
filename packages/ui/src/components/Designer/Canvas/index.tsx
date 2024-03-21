@@ -83,7 +83,7 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {isDragging ?
+      {isDragging &&
         <div style={{ transform: `scale(${scale})` }}>
           <Renderer
             key={defaultSchema.type}
@@ -95,9 +95,11 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
             outline={`1px solid ${token.colorPrimary}`}
             scale={scale}
           />
-        </div> :
-        props.children
+        </div>
       }
+      <div style={{ visibility: isDragging ? 'hidden' : 'visible' }}>
+        {props.children}
+      </div>
     </div>
   );
 }
@@ -124,6 +126,7 @@ interface Props {
   size: Size;
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
+  onEditEnd: () => void;
   addSchema: (defaultSchema: Schema) => void
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
@@ -143,6 +146,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     schemasList,
     hoveringSchemaId,
     onEdit,
+    onEditEnd,
     addSchema,
     changeSchemas,
     removeSchemas,
@@ -422,10 +426,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       />}
       <DndContext
         onDragEnd={(event) => {
+          console.log(event)
           if (!event.active) return;
           const active = event.active;
 
-          const data = active.data.current as Schema;
           const rect = paperRefs.current[pageCursor].getBoundingClientRect();
           const paperPosition = { x: rect.left, y: rect.top };
           console.log('paperPosition', paperPosition)
@@ -439,23 +443,28 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             y: px2mm(Math.max(0, schemaPosition.y))
           }
 
-          addSchema({ ...data, position });
+          addSchema({ ...(active.data.current as Schema), position });
           // console.log(position)
           setDragging(false)
         }}
-        onDragStart={() => setDragging(true)}
+        onDragStart={() => {
+          setDragging(true);
+          onEditEnd();
+        }}
         onDragCancel={() => setDragging(false)}
       >
         <div
           style={{
             // TODO 複数ページの際にも常に右上に表示されるようにする
-            position: 'absolute',
+            position: 'fixed',
             overflow: dragging ? 'visible' : 'auto',
             left: 0,
             zIndex: 1,
             height: '100%',
             background: token.colorBgLayout,
-            width: 74,
+            textAlign: 'center',
+            width: 45,
+            paddingTop: '0.75rem'
           }}
         >
           {Object.entries(pluginsRegistry).map(([label, plugin]) => {
@@ -465,11 +474,15 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               scale={scale}
               basePdf={basePdf}
               plugin={plugin}>
-              <button style={{ width: 55, height: 55, margin: '0.25rem', padding: '0.25rem' }}>
-                {/* TODO labelをアイコンにする */}
-                {/* TODO ドラッグ時はレンダリングしたものにしたい */}
-                {label}
-              </button>
+              <Button
+                title={label}
+                style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
+                {plugin.propPanel.defaultSchema.icon ?
+                  <div dangerouslySetInnerHTML={{ __html: plugin.propPanel.defaultSchema.icon }} />
+                  :
+                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+                }
+              </Button>
             </Draggable>
           })}
 

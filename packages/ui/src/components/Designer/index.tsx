@@ -270,6 +270,7 @@ const TemplateEditor = ({
         removeSchemas={removeSchemas}
         sidebarOpen={sidebarOpen}
         onEdit={onEdit}
+        onEditEnd={onEditEnd}
         addSchema={addSchema}
       />
     </Root>

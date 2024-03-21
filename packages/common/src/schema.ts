@@ -75,6 +75,7 @@ export const Size = z.object({ height: z.number(), width: z.number() });
 export const Schema = z
   .object({
     type: z.string(),
+    icon: z.string().optional(),
     content: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),

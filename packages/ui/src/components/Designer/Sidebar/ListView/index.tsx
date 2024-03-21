@@ -89,15 +89,7 @@ const ListView = (
             onEdit={onEdit}
           />
         )}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            height: headHeight,
-            borderBottom: `1px solid ${token.colorSplit}`,
-          }}
-        >
+        <div style={{ paddingTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
           {isBulkUpdateFieldNamesMode ? (
             <>
               <Button size="small" type="text" onClick={commitBulk}>

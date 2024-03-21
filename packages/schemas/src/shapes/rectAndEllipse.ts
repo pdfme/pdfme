@@ -93,17 +93,26 @@ const shape: Plugin<ShapeSchema> = {
       height: 37.5,
       rotate: 0,
       opacity: 1,
-      borderWidth: 5,
+      borderWidth: 1,
       borderColor: '#000000',
-      color: '#ffffff',
+      color: '',
       readOnly: true,
     },
   },
 };
 
+const rectangleIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>';
+const ellipseIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle"><circle cx="12" cy="12" r="10"/></svg>';
+
 const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   ...shape.propPanel,
-  defaultSchema: { ...shape.propPanel.defaultSchema, type },
+  defaultSchema: {
+    ...shape.propPanel.defaultSchema,
+    type,
+    icon: type === 'rectangle' ? rectangleIcon : ellipseIcon,
+  },
 });
 
 export const rectangle = { ...shape, propPanel: getPropPanelSchema('rectangle') };
