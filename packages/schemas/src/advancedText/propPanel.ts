@@ -3,7 +3,7 @@ import { PropPanel, PropPanelWidgetProps } from '@pdfme/common';
 import { AdvancedTextSchema } from './types';
 
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {
-  const { rootElement, changeSchemas, activeSchema, i18n } = props;
+  const { rootElement, changeSchemas, activeSchema } = props;
 
   const advancedTextSchema = (activeSchema as any);
   const content = advancedTextSchema.content || '';
@@ -19,7 +19,7 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     ]);
   }
 
-  var placeholderRowEl = document.getElementById('placeholder-dynamic-var')?.closest('.ant-form-item') as HTMLElement;
+  const placeholderRowEl = document.getElementById('placeholder-dynamic-var')?.closest('.ant-form-item') as HTMLElement;
   if (!placeholderRowEl) {
     console.error('Failed to find Ant form placeholder row to create dynamic variables inputs.');
     return
@@ -32,7 +32,6 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const title = document.createElement('span');
   title.innerHTML = 'Text Variables';
   rootElement.appendChild(title);
-
 
   if (varNames.length > 0) {
     for (let variableName of varNames) {

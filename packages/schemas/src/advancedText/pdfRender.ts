@@ -6,10 +6,10 @@ import { substituteVariables } from './helper';
 export const pdfRender = async (arg: PDFRenderProps<AdvancedTextSchema>) => {
   const { value, schema, ...rest } = arg;
 
-  const content = substituteVariables(schema.content || '', value);
+  const substitutedText = substituteVariables(schema.content || '', value);
 
   const renderArgs = {
-    value: content,
+    value: substitutedText,
     schema,
     ...rest,
   };

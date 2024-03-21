@@ -2,7 +2,7 @@ import { UIRenderProps } from '@pdfme/common';
 import { AdvancedTextSchema } from './types';
 import { uiRender as parentUiRender } from '../text/uiRender';
 import { isEditable } from '../utils';
-import { substituteVariables, getUniqueVariableNames } from './helper';
+import { substituteVariables } from './helper';
 
 export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
   const { value, schema, rootElement, mode, onChange, onCustomAttributeChange, ...rest } = arg;
@@ -10,7 +10,7 @@ export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
   let content = schema.content;
   let numVariables = schema.variables.length;
 
-  const renderArgs = {
+  const parentRenderArgs = {
     value: isEditable(mode, schema) ? content : substituteVariables(content, value),
     schema,
     mode,
@@ -21,7 +21,7 @@ export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
     ...rest,
   };
 
-  await parentUiRender(renderArgs);
+  await parentUiRender(parentRenderArgs);
 
   const textBlock = rootElement.querySelector('#text-' + schema.id) as HTMLDivElement;
   if (textBlock) {
@@ -39,7 +39,7 @@ export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
       }
     });
   } else {
-    console.error('Text block not found. Ensure the text block has an id of "text-" + schema.id');
+    throw new Error('Text block not found. Ensure the text block has an id of "text-" + schema.id');
   }
 };
 
