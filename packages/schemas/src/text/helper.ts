@@ -318,3 +318,5 @@ export const calculateDynamicFontSize = async ({
 
   return dynamicFontSize;
 };
+
+export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;

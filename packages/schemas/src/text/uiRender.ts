@@ -17,6 +17,7 @@ import {
   calculateDynamicFontSize,
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
+  isFirefox,
 } from './helper.js';
 import { addAlphaToHex, isEditable } from '../utils.js';
 
@@ -118,7 +119,27 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   Object.assign(textBlock.style, textBlockStyle);
 
   if (isEditable(mode, schema)) {
-    textBlock.contentEditable = 'plaintext-only';
+    if (!isFirefox()) {
+      textBlock.contentEditable = 'plaintext-only';
+    } else {
+      textBlock.contentEditable = 'true';
+      textBlock.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.execCommand('insertLineBreak', false, undefined);
+        }
+      });
+
+      textBlock.addEventListener('paste', (e: ClipboardEvent) => {
+        e.preventDefault();
+        const paste = e.clipboardData?.getData('text');
+        const selection = window.getSelection();
+        if (!selection?.rangeCount) return;
+        selection.deleteFromDocument();
+        selection.getRangeAt(0).insertNode(document.createTextNode(paste || ''));
+        selection.collapseToEnd();
+      });
+    }
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
     textBlock.addEventListener('blur', (e: Event) => {
