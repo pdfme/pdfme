@@ -381,7 +381,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             onChange={(value) => {
               changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
             }}
-            onCustomAttributeChange={(key, value) => {
+            onSchemaAttributeChange={(key, value) => {
               changeSchemas([{ key, value, schemaId: schema.id }]);
             }}
             stopEditing={() => setEditing(false)}

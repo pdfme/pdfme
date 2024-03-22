@@ -7,11 +7,11 @@ import * as pdfJs from 'pdfjs-dist/legacy/build/pdf.js';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'onCustomAttributeChange' |'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
+  'value' | 'schema' | 'onChange' | 'onSchemaAttributeChange' |'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
 > & {
   schema: SchemaForUI;
   onChange: (value: string) => void;
-  onCustomAttributeChange?: (key: string, value: string) => void;
+  onSchemaAttributeChange?: (key: string, value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
@@ -51,7 +51,7 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, mode, onChange, onCustomAttributeChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, mode, onChange, onSchemaAttributeChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
@@ -83,7 +83,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         rootElement: ref.current,
         mode,
         onChange: editable ? onChange : undefined,
-        onCustomAttributeChange: editable ? onCustomAttributeChange : undefined,
+        onSchemaAttributeChange: editable ? onSchemaAttributeChange : undefined,
         stopEditing: editable ? stopEditing : undefined,
         tabIndex,
         placeholder,

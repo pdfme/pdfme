@@ -60,7 +60,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
  * @property {(value: string) => void} [onChange] - Used to change the value. Only applicable when the mode is 'form' or 'designer'.
- * @property {(key: string, value: any) => void} [onCustomAttributeChange] - Used to change another attribute for the schema. Only applicable when the mode is 'form' or 'designer'.
+ * @property {(key: string, value: any) => void} [onSchemaAttributeChange] - Used to change another attribute for the schema. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
@@ -76,7 +76,7 @@ export type UIRenderProps<T extends Schema> = {
   key: string;
   value: string;
   onChange?: (value: string) => void;
-  onCustomAttributeChange?: (key: string, value: any) => void;
+  onSchemaAttributeChange?: (key: string, value: any) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;

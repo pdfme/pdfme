@@ -1,9 +1,9 @@
 import { PDFRenderProps } from '@pdfme/common';
-import { AdvancedTextSchema } from './types';
+import { MultiVariableTextSchema } from './types';
 import { pdfRender as parentPdfRender } from '../text/pdfRender';
 import { substituteVariables } from './helper';
 
-export const pdfRender = async (arg: PDFRenderProps<AdvancedTextSchema>) => {
+export const pdfRender = async (arg: PDFRenderProps<MultiVariableTextSchema>) => {
   const { value, schema, ...rest } = arg;
 
   const substitutedText = substituteVariables(schema.content || '', value);

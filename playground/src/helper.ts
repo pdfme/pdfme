@@ -2,7 +2,7 @@ import { Template, Font, checkTemplate } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
 import {
-  advancedText,
+  multiVariableText,
   text,
   readOnlyText,
   barcodes,
@@ -108,7 +108,7 @@ ${e}`);
 
 export const getPlugins = () => {
   return {
-    'Advanced Text': advancedText,
+    'Advanced Text': multiVariableText,
     Text: text,
     ReadOnlyText: readOnlyText,
     Line: line,

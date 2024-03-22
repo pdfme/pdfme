@@ -1,4 +1,4 @@
-import advancedText from './advancedText/index.js'
+import multiVariableText from './multiVariableText/index.js'
 import text, { readOnlyText } from './text/index.js';
 import image, { readOnlyImage } from './graphics/image.js';
 import svg, { readOnlySvg } from './graphics/svg.js';
@@ -10,7 +10,7 @@ import { convertForPdfLayoutProps, rotatePoint } from './utils.js';
 const builtInPlugins = { Text: text };
 
 export {
-  advancedText,
+  multiVariableText,
   text,
   readOnlyText,
   image,

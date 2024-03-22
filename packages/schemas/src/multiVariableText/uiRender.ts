@@ -1,22 +1,25 @@
 import { UIRenderProps } from '@pdfme/common';
-import { AdvancedTextSchema } from './types';
+import { MultiVariableTextSchema } from './types';
 import { uiRender as parentUiRender } from '../text/uiRender';
 import { isEditable } from '../utils';
 import { substituteVariables } from './helper';
 
-export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
-  const { value, schema, rootElement, mode, onChange, onCustomAttributeChange, ...rest } = arg;
+export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
+  const { value, schema, rootElement, mode, onChange, onSchemaAttributeChange, ...rest } = arg;
+
+  // This plugin currently does not support editing in form view, setting as read-only.
+  const mvtMode = mode == 'form' ? 'viewer' : mode;
 
   let content = schema.content;
   let numVariables = schema.variables.length;
 
   const parentRenderArgs = {
-    value: isEditable(mode, schema) ? content : substituteVariables(content, value),
+    value: isEditable(mvtMode, schema) ? content : substituteVariables(content, value),
     schema,
-    mode,
+    mode: mvtMode,
     rootElement,
     onChange: (value: string) => {
-      if (onChange && onCustomAttributeChange) onCustomAttributeChange('content', value);
+      if (onChange && onSchemaAttributeChange) onSchemaAttributeChange('content', value);
     },
     ...rest,
   };
@@ -31,8 +34,8 @@ export const uiRender = async (arg: UIRenderProps<AdvancedTextSchema>) => {
         const newNumVariables = countUniqueVariableNames(content);
         if (numVariables !== newNumVariables) {
           // If variables were modified during this keypress, we trigger a change
-          if (onCustomAttributeChange) {
-            onCustomAttributeChange('content', content);
+          if (onSchemaAttributeChange) {
+            onSchemaAttributeChange('content', content);
           }
           numVariables = newNumVariables;
         }

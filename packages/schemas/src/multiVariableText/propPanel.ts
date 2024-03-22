@@ -1,13 +1,13 @@
 import { propPanel as parentPropPanel } from '../text/propPanel';
 import { PropPanel, PropPanelWidgetProps } from '@pdfme/common';
-import { AdvancedTextSchema } from './types';
+import { MultiVariableTextSchema } from './types';
 
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema } = props;
 
-  const advancedTextSchema = (activeSchema as any);
-  const content = advancedTextSchema.content || '';
-  const variables = JSON.parse(advancedTextSchema.data) || {};
+  const mvtSchema = (activeSchema as any);
+  const content = mvtSchema.content || '';
+  const variables = JSON.parse(mvtSchema.data) || {};
 
   const variablesChanged = updateVariablesFromText(content, variables);
   const varNames = Object.keys(variables);
@@ -58,7 +58,7 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   }
 };
 
-export const propPanel: PropPanel<AdvancedTextSchema> = {
+export const propPanel: PropPanel<MultiVariableTextSchema> = {
   schema: (propPanelProps: Omit<PropPanelWidgetProps, 'rootElement'>) => {
     if (typeof parentPropPanel.schema !== 'function') {
       throw Error('Oops, is text schema no longer a function?');
@@ -86,7 +86,7 @@ export const propPanel: PropPanel<AdvancedTextSchema> = {
   defaultValue: '{}',
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
-    type: 'advancedText',
+    type: 'multiVariableText',
     content: 'Type something...',
     variables: [],
   },
