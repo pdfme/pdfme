@@ -74,23 +74,29 @@ describe('getSplitPosition test with mocked font width calculations', () => {
     expect(getSplittedLines('aaaa', mockCalcValues)).toEqual(['aaaa']);
   });
 
-  it('splits a line to the nearest previous space', () => {
+  it('splits a line to the nearest previous breakable char', () => {
     expect(getSplittedLines('aaa bbb', mockCalcValues)).toEqual(['aaa', 'bbb']);
+    expect(getSplittedLines('top-hat', mockCalcValues)).toEqual(['top-', 'hat']);
+    expect(getSplittedLines('top—hat', mockCalcValues)).toEqual(['top—', 'hat']); // em dash
+    expect(getSplittedLines('top–hat', mockCalcValues)).toEqual(['top–', 'hat']); // en dash
   });
 
-  it('splits a line where the split point is on a space', () => {
+  it('splits a line where the split point is on a breakable char', () => {
     expect(getSplittedLines('aaaaa bbbbb', mockCalcValues)).toEqual(['aaaaa', 'bbbbb']);
+    expect(getSplittedLines('left-hand', mockCalcValues)).toEqual(['left-', 'hand']);
   });
 
   it('splits a long line in the middle of a word if too long', () => {
     expect(getSplittedLines('aaaaaa bbb', mockCalcValues)).toEqual(['aaaaa', 'a bbb']);
+    expect(getSplittedLines('aaaaaa-a b', mockCalcValues)).toEqual(['aaaaa', 'a-a b']);
+    expect(getSplittedLines('aaaaa-aa b', mockCalcValues)).toEqual(['aaaaa', '-aa b']);
   });
 
-  it('splits a long line without spaces at exactly 5 chars', () => {
+  it('splits a long line without breakable chars at exactly 5 chars', () => {
     expect(getSplittedLines('abcdef', mockCalcValues)).toEqual(['abcde', 'f']);
   });
 
-  it('splits a very long line without spaces at exactly 5 chars', () => {
+  it('splits a very long line without breakable chars at exactly 5 chars', () => {
     expect(getSplittedLines('abcdefghijklmn', mockCalcValues)).toEqual(['abcde', 'fghij', 'klmn']);
   });
 
