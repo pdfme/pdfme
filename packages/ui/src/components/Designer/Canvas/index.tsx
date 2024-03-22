@@ -432,7 +432,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const initialTop = (active.rect.current.initial?.top || 0) - rect.top;
           const initialLeft = (active.rect.current.initial?.left || 0) - rect.left;
           const _scale = scale < 1 ? scale + 1 : scale;
-          const moveY = (initialTop + event.delta.y) * _scale;
+          const adjust = 0.915; // TODO: Investigate later as to why it needs to be adjusted.
+          const moveY = (initialTop + event.delta.y) * _scale * adjust;
           const moveX = (initialLeft + event.delta.x) * _scale;
           const position = {
             x: px2mm(Math.max(0, moveX)),
