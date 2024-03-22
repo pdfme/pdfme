@@ -228,6 +228,7 @@ const TemplateEditor = ({
     <Root size={size} scale={scale}>
       <DndContext
         onDragEnd={(event) => {
+          // Triggered after a scheme is dragged & dropped from the left sidebar.
           if (!event.active) return;
           const active = event.active;
 
@@ -238,10 +239,7 @@ const TemplateEditor = ({
           const adjust = 0.915; // TODO: Investigate later as to why it needs to be adjusted.
           const moveY = (initialTop + event.delta.y) * _scale * adjust;
           const moveX = (initialLeft + event.delta.x) * _scale;
-          const position = {
-            x: px2mm(Math.max(0, moveX)),
-            y: px2mm(Math.max(0, moveY))
-          }
+          const position = { x: px2mm(Math.max(0, moveX)), y: px2mm(Math.max(0, moveY)) }
 
           addSchema({ ...(active.data.current as Schema), position });
         }}
@@ -261,7 +259,6 @@ const TemplateEditor = ({
           setZoomLevel={setZoomLevel}
           {...pageManipulation}
         />
-
         <LeftSidebar
           height={mainRef.current ? mainRef.current.clientHeight : 0}
           scale={scale}
