@@ -206,8 +206,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         style={{
           height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
-          overflowX: 'hidden',
-          borderBottom: `1px solid ${token.colorSplit}`,
+          overflowX: 'hidden'
         }}
       >
         <FormRender

@@ -105,8 +105,8 @@ ${e}`);
 export const getPlugins = () => {
   return {
     Text: text,
-    Table: table,
     ReadOnlyText: readOnlyText,
+    Table: table,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,

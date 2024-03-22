@@ -14,7 +14,7 @@ import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
+import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
@@ -25,7 +25,9 @@ import Guides from './Guides';
 import Mask from './Mask';
 import Padding from './Padding';
 
+
 const mm2px = (mm: number) => mm * 3.7795275591;
+
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -111,7 +113,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
@@ -337,7 +338,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       style={{
         position: 'relative',
         overflow: 'auto',
-        marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        marginRight: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
         ...size,
       }}
       ref={ref}
