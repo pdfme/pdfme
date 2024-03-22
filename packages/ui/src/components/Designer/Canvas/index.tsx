@@ -10,6 +10,7 @@ import React, {
   useCallback,
 } from 'react';
 import { DndContext, useDraggable } from '@dnd-kit/core';
+import { CSS } from "@dnd-kit/utilities";
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { Plugin, ZOOM, Schema, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
@@ -77,9 +78,7 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
   const defaultSchema = plugin.propPanel.defaultSchema as Schema;
   const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
   const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
-  const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : undefined;
+  const style = { transform: CSS.Translate.toString(transform) }
 
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
@@ -426,25 +425,21 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       />}
       <DndContext
         onDragEnd={(event) => {
-          console.log(event)
           if (!event.active) return;
           const active = event.active;
 
           const rect = paperRefs.current[pageCursor].getBoundingClientRect();
-          const paperPosition = { x: rect.left, y: rect.top };
-          console.log('paperPosition', paperPosition)
-          const translated = active.rect.current.translated;
-          const { top, left } = translated || { top: 0, left: 0 }
-          const schemaPosition = { x: left, y: top }
-          console.log('schemaPosition', schemaPosition)
-          // TODO FIX position is not correct
+          const initialTop = (active.rect.current.initial?.top || 0) - rect.top;
+          const initialLeft = (active.rect.current.initial?.left || 0) - rect.left;
+          const _scale = scale < 1 ? scale + 1 : scale;
+          const moveY = (initialTop + event.delta.y) * _scale;
+          const moveX = (initialLeft + event.delta.x) * _scale;
           const position = {
-            x: px2mm(Math.max(0, schemaPosition.x)),
-            y: px2mm(Math.max(0, schemaPosition.y))
+            x: px2mm(Math.max(0, moveX)),
+            y: px2mm(Math.max(0, moveY))
           }
 
           addSchema({ ...(active.data.current as Schema), position });
-          // console.log(position)
           setDragging(false)
         }}
         onDragStart={() => {
