@@ -228,7 +228,7 @@ const TemplateEditor = ({
     <Root size={size} scale={scale}>
       <DndContext
         onDragEnd={(event) => {
-          // Triggered after a scheme is dragged & dropped from the left sidebar.
+          // Triggered after a schema is dragged & dropped from the left sidebar.
           if (!event.active) return;
           const active = event.active;
 
