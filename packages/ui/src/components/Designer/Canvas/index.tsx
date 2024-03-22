@@ -9,14 +9,12 @@ import React, {
   forwardRef,
   useCallback,
 } from 'react';
-import { DndContext, useDraggable } from '@dnd-kit/core';
-import { CSS } from "@dnd-kit/utilities";
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import { Plugin, ZOOM, Schema, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
+import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
@@ -29,11 +27,7 @@ import Padding from './Padding';
 
 
 const mm2px = (mm: number) => mm * 3.7795275591;
-const px2mm = (px: number): number => {
-  // http://www.endmemo.com/sconvert/millimeterpixel.php
-  const ratio = 0.26458333333333;
-  return parseFloat(String(px)) * ratio;
-};
+
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -72,38 +66,6 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
   );
 };
 
-const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf, children: React.ReactNode }) => {
-  const { scale, basePdf, plugin } = props;
-  const { token } = theme.useToken();
-  const defaultSchema = plugin.propPanel.defaultSchema as Schema;
-  const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
-  const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
-  const style = { transform: CSS.Translate.toString(transform) }
-
-  return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {isDragging &&
-        <div style={{ transform: `scale(${scale})` }}>
-          <Renderer
-            key={defaultSchema.type}
-            schema={{ ...defaultSchema, id: defaultSchema.type, key: defaultSchema.type }}
-            basePdf={basePdf}
-            value={defaultSchema.content || ''}
-            onChangeHoveringSchemaId={() => { void 0 }}
-            mode={'viewer'}
-            outline={`1px solid ${token.colorPrimary}`}
-            scale={scale}
-          />
-        </div>
-      }
-      <div style={{ visibility: isDragging ? 'hidden' : 'visible' }}>
-        {props.children}
-      </div>
-    </div>
-  );
-}
-
-
 interface GuidesInterface {
   getGuides(): number[];
   scroll(pos: number): void;
@@ -125,8 +87,6 @@ interface Props {
   size: Size;
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
-  onEditEnd: () => void;
-  addSchema: (defaultSchema: Schema) => void
   changeSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
@@ -145,8 +105,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     schemasList,
     hoveringSchemaId,
     onEdit,
-    onEditEnd,
-    addSchema,
     changeSchemas,
     removeSchemas,
     onChangeHoveringSchemaId,
@@ -161,7 +119,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [dragging, setDragging] = useState(false);
 
   const prevSchemas = usePrevious(schemasList[pageCursor]);
 
@@ -381,12 +338,12 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       style={{
         position: 'relative',
         overflow: 'auto',
-        marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        marginRight: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
         ...size,
       }}
       ref={ref}
     >
-      {!dragging && <Selecto
+      <Selecto
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
@@ -422,144 +379,83 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             setIsPressShiftKey(false);
           }
         }}
-      />}
-      <DndContext
-        onDragEnd={(event) => {
-          if (!event.active) return;
-          const active = event.active;
-
-          const rect = paperRefs.current[pageCursor].getBoundingClientRect();
-          const initialTop = (active.rect.current.initial?.top || 0) - rect.top;
-          const initialLeft = (active.rect.current.initial?.left || 0) - rect.left;
-          const _scale = scale < 1 ? scale + 1 : scale;
-          const adjust = 0.915; // TODO: Investigate later as to why it needs to be adjusted.
-          const moveY = (initialTop + event.delta.y) * _scale * adjust;
-          const moveX = (initialLeft + event.delta.x) * _scale;
-          const position = {
-            x: px2mm(Math.max(0, moveX)),
-            y: px2mm(Math.max(0, moveY))
-          }
-
-          addSchema({ ...(active.data.current as Schema), position });
-          setDragging(false)
-        }}
-        onDragStart={() => {
-          setDragging(true);
-          onEditEnd();
-        }}
-        onDragCancel={() => setDragging(false)}
-      >
-        <div
-          style={{
-            // TODO 複数ページの際にも常に右上に表示されるようにする
-            position: 'fixed',
-            overflow: dragging ? 'visible' : 'auto',
-            left: 0,
-            zIndex: 1,
-            height: '100%',
-            background: token.colorBgLayout,
-            textAlign: 'center',
-            width: 45,
-            paddingTop: '0.75rem'
-          }}
-        >
-          {Object.entries(pluginsRegistry).map(([label, plugin]) => {
-            if (!plugin?.propPanel.defaultSchema) return null;
-            return <Draggable
-              key={label}
-              scale={scale}
-              basePdf={basePdf}
-              plugin={plugin}>
-              <Button
-                title={label}
-                style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
-                {plugin.propPanel.defaultSchema.icon ?
-                  <div dangerouslySetInnerHTML={{ __html: plugin.propPanel.defaultSchema.icon }} />
-                  :
-                  <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-                }
-              </Button>
-            </Draggable>
-          })}
-
-        </div>
-        <Paper
-          paperRefs={paperRefs}
-          scale={scale}
-          size={size}
-          schemasList={schemasList}
-          pageSizes={pageSizes}
-          backgrounds={backgrounds}
-          hasRulers={true}
-          renderPaper={({ index, paperSize }) => (
-            <>
-              {!editing && activeElements.length > 0 && pageCursor === index && (
-                <DeleteButton activeElements={activeElements} />
-              )}
-              <Padding basePdf={basePdf} />
-              <Guides
-                paperSize={paperSize}
-                horizontalRef={(e) => {
-                  if (e) horizontalGuides.current[index] = e;
-                }}
-                verticalRef={(e) => {
-                  if (e) verticalGuides.current[index] = e;
-                }}
-              />
-              {pageCursor !== index ? (
-                <Mask
-                  width={paperSize.width + RULER_HEIGHT}
-                  height={paperSize.height + RULER_HEIGHT}
-                />
-              ) : (
-                !editing && (
-                  <Moveable
-                    ref={moveable}
-                    target={activeElements}
-                    bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
-                    horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
-                    verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                    keepRatio={isPressShiftKey}
-                    rotatable={rotatable}
-                    onDrag={onDrag}
-                    onDragEnd={onDragEnd}
-                    onDragGroupEnd={onDragEnds}
-                    onRotate={onRotate}
-                    onRotateEnd={onRotateEnd}
-                    onRotateGroupEnd={onRotateEnds}
-                    onResize={onResize}
-                    onResizeEnd={onResizeEnd}
-                    onResizeGroupEnd={onResizeEnds}
-                    onClick={onClickMoveable}
-                  />
-                )
-              )}
-            </>
-          )}
-          renderSchema={({ schema }) => (
-            <Renderer
-              key={schema.id}
-              schema={schema}
-              basePdf={basePdf}
-              value={schema.content || ''}
-              onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-              mode={
-                editing && activeElements.map((ae) => ae.id).includes(schema.id)
-                  ? 'designer'
-                  : 'viewer'
-              }
-              onChange={(arg) => {
-                const args = Array.isArray(arg) ? arg : [arg];
-                changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
+      />
+      <Paper
+        paperRefs={paperRefs}
+        scale={scale}
+        size={size}
+        schemasList={schemasList}
+        pageSizes={pageSizes}
+        backgrounds={backgrounds}
+        hasRulers={true}
+        renderPaper={({ index, paperSize }) => (
+          <>
+            {!editing && activeElements.length > 0 && pageCursor === index && (
+              <DeleteButton activeElements={activeElements} />
+            )}
+            <Padding basePdf={basePdf} />
+            <Guides
+              paperSize={paperSize}
+              horizontalRef={(e) => {
+                if (e) horizontalGuides.current[index] = e;
               }}
-              stopEditing={() => setEditing(false)}
-              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-                }`}
-              scale={scale}
+              verticalRef={(e) => {
+                if (e) verticalGuides.current[index] = e;
+              }}
             />
-          )}
-        />
-      </DndContext>
+            {pageCursor !== index ? (
+              <Mask
+                width={paperSize.width + RULER_HEIGHT}
+                height={paperSize.height + RULER_HEIGHT}
+              />
+            ) : (
+              !editing && (
+                <Moveable
+                  ref={moveable}
+                  target={activeElements}
+                  bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
+                  horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
+                  verticalGuidelines={getGuideLines(verticalGuides.current, index)}
+                  keepRatio={isPressShiftKey}
+                  rotatable={rotatable}
+                  onDrag={onDrag}
+                  onDragEnd={onDragEnd}
+                  onDragGroupEnd={onDragEnds}
+                  onRotate={onRotate}
+                  onRotateEnd={onRotateEnd}
+                  onRotateGroupEnd={onRotateEnds}
+                  onResize={onResize}
+                  onResizeEnd={onResizeEnd}
+                  onResizeGroupEnd={onResizeEnds}
+                  onClick={onClickMoveable}
+                />
+              )
+            )}
+          </>
+        )}
+        renderSchema={({ schema }) => (
+          <Renderer
+            key={schema.id}
+            schema={schema}
+            basePdf={basePdf}
+            value={schema.content || ''}
+            onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+            mode={
+              editing && activeElements.map((ae) => ae.id).includes(schema.id)
+                ? 'designer'
+                : 'viewer'
+            }
+            onChange={(arg) => {
+              const args = Array.isArray(arg) ? arg : [arg];
+              changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
+            }}
+            stopEditing={() => setEditing(false)}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
+            scale={scale}
+          />
+        )}
+      />
     </div>
   );
 };

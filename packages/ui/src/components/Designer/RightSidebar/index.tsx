@@ -1,7 +1,7 @@
 import React from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types';
-import { SIDEBAR_WIDTH } from '../../../constants';
+import { RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
@@ -24,7 +24,7 @@ const Sidebar = (props: SidebarProps) => {
         right: 0,
         zIndex: 1,
         height: '100%',
-        width: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        width: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
       }}
     >
       <div>
@@ -43,7 +43,7 @@ const Sidebar = (props: SidebarProps) => {
         />
         <div
           style={{
-            width: SIDEBAR_WIDTH,
+            width: RIGHT_SIDEBAR_WIDTH,
             height: '100%',
             display: sidebarOpen ? 'block' : 'none',
             top: 0,
