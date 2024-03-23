@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { Font, Template } from '@pdfme/common';
+import { Font } from '@pdfme/common';
 
 const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
