@@ -156,20 +156,40 @@ const getOverPosition = (textLine: string, calcValues: FontWidthCalcValues) => {
 };
 
 /**
+ * Line breakable chars depend on the language and writing system.
+ * Western writing systems typically use spaces and hyphens as line breakable chars.
+ * Other writing systems often break on word boundaries so the following
+ * does not negatively impact them.
+ * However, this might need to be revisited for broader language support.
+ */
+const isLineBreakableChar = (char: string) => {
+  const lineBreakableChars = [' ', '-', "\u2014", "\u2013"];
+  return lineBreakableChars.includes(char);
+}
+
+/**
  * Gets the position of the split. Splits the exceeding line at
- * the last whitespace prior to it exceeding the bounding box width.
+ * the last breakable char prior to it exceeding the bounding box width.
  */
 const getSplitPosition = (textLine: string, calcValues: FontWidthCalcValues) => {
   const overPos = getOverPosition(textLine, calcValues);
   if (overPos === null) return textLine.length; // input line is shorter than the available space
 
-  let overPosTmp = overPos;
-  while (textLine[overPosTmp] !== ' ' && overPosTmp >= 0) {
+  if (textLine[overPos] === ' ') {
+    // if the character immediately beyond the boundary is a space, split
+    return overPos;
+  }
+
+  let overPosTmp = overPos - 1;
+  while (overPosTmp >= 0) {
+    if (isLineBreakableChar(textLine[overPosTmp])) {
+      return overPosTmp+1;
+    }
     overPosTmp--;
   }
 
-  // For very long lines with no whitespace use the original overPos
-  return overPosTmp > 0 ? overPosTmp : overPos;
+  // For very long lines with no breakable chars use the original overPos
+  return overPos;
 };
 
 /**
@@ -178,7 +198,7 @@ const getSplitPosition = (textLine: string, calcValues: FontWidthCalcValues) => 
  */
 export const getSplittedLines = (textLine: string, calcValues: FontWidthCalcValues): string[] => {
   const splitPos = getSplitPosition(textLine, calcValues);
-  const splittedLine = textLine.substring(0, splitPos);
+  const splittedLine = textLine.substring(0, splitPos).trimEnd();
   const rest = textLine.substring(splitPos).trimStart();
 
   if (rest === textLine) {
@@ -342,3 +362,4 @@ export const splitTextToSize = (arg: {
   });
   return lines;
 };
+export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;

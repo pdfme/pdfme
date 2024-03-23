@@ -31,6 +31,7 @@ test('Designer snapshot', async () => {
               onSaveTemplate={console.log}
               onChangeTemplate={console.log}
               size={{ width: 1200, height: 1200 }}
+              onPageCursorChange={console.log}
             />
           </PluginsRegistry.Provider>
         </FontContext.Provider>
