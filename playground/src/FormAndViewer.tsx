@@ -10,7 +10,7 @@ import {
   isJsonString,
 } from "./helper";
 
-const headerHeight = 65;
+const headerHeight = 71;
 
 type Mode = "form" | "viewer";
 

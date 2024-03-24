@@ -203,11 +203,4 @@ export const createErrorElm = () => {
 
   return container;
 };
-
-export const px2mm = (px: number): number => {
-  // http://www.endmemo.com/sconvert/millimeterpixel.php
-  const ratio = 0.26458333333333;
-  return parseFloat(String(px)) * ratio;
-};
-
 export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));

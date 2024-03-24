@@ -1,9 +1,9 @@
 import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
+import { px2mm } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
-import { px2mm } from '../utils';
 import { Row } from './classes';
 
 type RowType = InstanceType<typeof Row>;

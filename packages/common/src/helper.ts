@@ -53,6 +53,12 @@ export const pt2px = (pt: number): number => {
   return pt * PT_TO_PX_RATIO;
 };
 
+export const px2mm = (px: number): number => {
+  // http://www.endmemo.com/sconvert/millimeterpixel.php
+  const ratio = 0.26458333333333;
+  return parseFloat(String(px)) * ratio;
+};
+
 const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
