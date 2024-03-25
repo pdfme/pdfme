@@ -9,7 +9,6 @@ import AppContextProvider from './components/AppContextProvider';
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
     super(props);
-    this.render();
   }
 
   protected render() {

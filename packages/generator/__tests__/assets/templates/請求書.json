@@ -1,81 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["ビジネス"],
+  "tags": [
+    "ビジネス"
+  ],
   "description": "A4のコピー用紙に請求書が記入される書式です。  <u>印刷サイズ:A4(210mmx297mm)</u></div>",
   "photo": "",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "請求No": "1",
-      "請求日": "2020/01/01",
-      "[請求先]会社名": "株式会社listmake.jp",
-      "[請求先]担当者名": "東京都 出得太",
-      "件名": "印刷代一式御請求書",
-      "[請求元]会社名": "株式会社labelmake.jp",
-      "[請求元]郵便番号": "123-4567",
-      "[請求元]住所": "大阪府大阪1-2-3-4\n大阪マンション123号",
-      "[請求元]TEL": "000-000-0000",
-      "[請求元]FAX": "000-000-0000",
-      "[請求元]Email": "info@labelmake.jp",
-      "[請求元]担当者名": "大阪府 出得太",
-      "合計金額": "13200円",
-      "支払い期限": "2020/02/29",
-      "品目1": "商品A",
-      "数量1": "1個",
-      "単価1": "￥1000",
-      "金額1": "￥1000",
-      "品目2": "商品B",
-      "金額2": "￥1000",
-      "数量2": "1個",
-      "単価2": "￥1000",
-      "品目3": "商品C",
-      "金額3": "￥1000",
-      "数量3": "1個",
-      "単価3": "￥1000",
-      "品目4": "商品D",
-      "金額4": "￥1000",
-      "数量4": "1個",
-      "単価4": "￥1000",
-      "品目5": "商品E",
-      "金額5": "￥1000",
-      "数量5": "1個",
-      "単価5": "￥1000",
-      "品目6": "商品F",
-      "金額6": "￥1000",
-      "数量6": "1個",
-      "単価6": "￥1000",
-      "品目7": "商品G",
-      "金額7": "￥1000",
-      "数量7": "1個",
-      "単価7": "￥1000",
-      "品目8": "商品H",
-      "金額8": "￥1000",
-      "数量8": "1個",
-      "単価8": "￥1000",
-      "品目9": "商品I",
-      "金額9": "￥1000",
-      "数量9": "1個",
-      "単価9": "￥1000",
-      "品目10": "商品J",
-      "金額10": "￥1000",
-      "数量10": "1個",
-      "単価10": "￥1000",
-      "品目11": "商品K",
-      "金額11": "￥1000",
-      "数量11": "1個",
-      "単価11": "￥1000",
-      "品目12": "商品L",
-      "金額12": "￥1000",
-      "数量12": "1個",
-      "単価12": "￥1000",
-      "小計": "￥12000",
-      "消費税": "￥1200",
-      "合計": "￥13200",
-      "振込先": "labelmake銀行 大阪支店\n普通 12345678\nカ)ラベルメイク",
-      "備考": "お振込み手数料は御社ご負担にてお願い致します。"
-    }
-  ],
   "columns": [
     "請求No",
     "請求日",
@@ -152,674 +83,942 @@
   "schemas": [
     {
       "請求No": {
-        "position": { "x": 148, "y": 36 },
+        "position": {
+          "x": 148,
+          "y": 36
+        },
         "width": 57,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1"
       },
       "請求日": {
-        "position": { "x": 148, "y": 46 },
+        "position": {
+          "x": 148,
+          "y": 46
+        },
         "width": 57,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "2020/01/01"
       },
       "[請求先]会社名": {
-        "position": { "x": 5, "y": 34 },
+        "position": {
+          "x": 5,
+          "y": 34
+        },
         "width": 84,
         "height": 10,
         "type": "text",
         "alignment": "center",
         "fontSize": 13.5,
         "characterSpacing": 0,
-        "lineHeight": 0.63
+        "lineHeight": 0.63,
+        "content": "株式会社listmake.jp"
       },
       "[請求先]担当者名": {
-        "position": { "x": 40, "y": 45 },
+        "position": {
+          "x": 40,
+          "y": 45
+        },
         "width": 40,
         "height": 6,
         "type": "text",
         "alignment": "center",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "件名": {
-        "position": { "x": 35, "y": 59 },
+        "position": {
+          "x": 35,
+          "y": 59
+        },
         "width": 85,
         "height": 7,
         "type": "text",
         "alignment": "center",
         "fontSize": 12.5,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "印刷代一式御請求書"
       },
       "[請求元]会社名": {
-        "position": { "x": 123, "y": 55 },
+        "position": {
+          "x": 123,
+          "y": 55
+        },
         "width": 80,
         "height": 7,
         "type": "text",
         "alignment": "left",
         "fontSize": 13,
         "characterSpacing": 0,
-        "lineHeight": 0.8
+        "lineHeight": 0.8,
+        "content": "株式会社labelmake.jp"
       },
       "[請求元]郵便番号": {
-        "position": { "x": 127, "y": 66 },
+        "position": {
+          "x": 127,
+          "y": 66
+        },
         "width": 78,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "123-4567"
       },
       "[請求元]住所": {
-        "position": { "x": 122, "y": 72 },
+        "position": {
+          "x": 122,
+          "y": 72
+        },
         "width": 83,
         "height": 12,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
       },
       "[請求元]TEL": {
-        "position": { "x": 143, "y": 87 },
+        "position": {
+          "x": 143,
+          "y": 87
+        },
         "width": 62,
         "height": 5,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "000-000-0000"
       },
       "[請求元]FAX": {
-        "position": { "x": 143, "y": 94 },
+        "position": {
+          "x": 143,
+          "y": 94
+        },
         "width": 62,
         "height": 5,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "000-000-0000"
       },
       "[請求元]Email": {
-        "position": { "x": 143, "y": 100.5 },
+        "position": {
+          "x": 143,
+          "y": 100.5
+        },
         "width": 62,
         "height": 5,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "info@labelmake.jp"
       },
       "[請求元]担当者名": {
-        "position": { "x": 143, "y": 107.5 },
+        "position": {
+          "x": 143,
+          "y": 107.5
+        },
         "width": 62,
         "height": 5,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪府 出得太"
       },
       "合計金額": {
-        "position": { "x": 42, "y": 120 },
+        "position": {
+          "x": 42,
+          "y": 120
+        },
         "width": 49,
         "height": 7,
         "type": "text",
         "alignment": "center",
         "fontSize": 13,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "13200円"
       },
       "支払い期限": {
-        "position": { "x": 143, "y": 120 },
+        "position": {
+          "x": 143,
+          "y": 120
+        },
         "width": 49,
         "height": 7,
         "type": "text",
         "alignment": "left",
         "fontSize": 13,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "2020/02/29"
       },
       "品目1": {
-        "position": { "x": 16, "y": 141 },
+        "position": {
+          "x": 16,
+          "y": 141
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品A"
       },
       "数量1": {
-        "position": { "x": 112, "y": 141 },
+        "position": {
+          "x": 112,
+          "y": 141
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価1": {
-        "position": { "x": 133, "y": 141 },
+        "position": {
+          "x": 133,
+          "y": 141
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "金額1": {
-        "position": { "x": 164, "y": 141 },
+        "position": {
+          "x": 164,
+          "y": 141
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目2": {
-        "position": { "x": 16, "y": 147.75 },
+        "position": {
+          "x": 16,
+          "y": 147.75
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品B"
       },
       "金額2": {
-        "position": { "x": 164, "y": 147.75 },
+        "position": {
+          "x": 164,
+          "y": 147.75
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量2": {
-        "position": { "x": 112, "y": 147.75 },
+        "position": {
+          "x": 112,
+          "y": 147.75
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価2": {
-        "position": { "x": 133, "y": 147.75 },
+        "position": {
+          "x": 133,
+          "y": 147.75
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目3": {
-        "position": { "x": 16, "y": 154.5 },
+        "position": {
+          "x": 16,
+          "y": 154.5
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品C"
       },
       "金額3": {
-        "position": { "x": 164, "y": 154.5 },
+        "position": {
+          "x": 164,
+          "y": 154.5
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量3": {
-        "position": { "x": 112, "y": 154.5 },
+        "position": {
+          "x": 112,
+          "y": 154.5
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価3": {
-        "position": { "x": 133, "y": 154.5 },
+        "position": {
+          "x": 133,
+          "y": 154.5
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目4": {
-        "position": { "x": 16, "y": 161.25 },
+        "position": {
+          "x": 16,
+          "y": 161.25
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品D"
       },
       "金額4": {
-        "position": { "x": 164, "y": 161.25 },
+        "position": {
+          "x": 164,
+          "y": 161.25
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量4": {
-        "position": { "x": 112, "y": 161.25 },
+        "position": {
+          "x": 112,
+          "y": 161.25
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価4": {
-        "position": { "x": 133, "y": 161.25 },
+        "position": {
+          "x": 133,
+          "y": 161.25
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目5": {
-        "position": { "x": 16, "y": 168 },
+        "position": {
+          "x": 16,
+          "y": 168
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品E"
       },
       "金額5": {
-        "position": { "x": 164, "y": 168 },
+        "position": {
+          "x": 164,
+          "y": 168
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量5": {
-        "position": { "x": 112, "y": 168 },
+        "position": {
+          "x": 112,
+          "y": 168
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価5": {
-        "position": { "x": 133, "y": 168 },
+        "position": {
+          "x": 133,
+          "y": 168
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目6": {
-        "position": { "x": 16, "y": 174.75 },
+        "position": {
+          "x": 16,
+          "y": 174.75
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品F"
       },
       "金額6": {
-        "position": { "x": 164, "y": 174.75 },
+        "position": {
+          "x": 164,
+          "y": 174.75
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量6": {
-        "position": { "x": 112, "y": 174.75 },
+        "position": {
+          "x": 112,
+          "y": 174.75
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価6": {
-        "position": { "x": 133, "y": 174.75 },
+        "position": {
+          "x": 133,
+          "y": 174.75
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目7": {
-        "position": { "x": 16, "y": 181.5 },
+        "position": {
+          "x": 16,
+          "y": 181.5
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品G"
       },
       "金額7": {
-        "position": { "x": 164, "y": 181.5 },
+        "position": {
+          "x": 164,
+          "y": 181.5
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量7": {
-        "position": { "x": 112, "y": 181.5 },
+        "position": {
+          "x": 112,
+          "y": 181.5
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価7": {
-        "position": { "x": 133, "y": 181.5 },
+        "position": {
+          "x": 133,
+          "y": 181.5
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目8": {
-        "position": { "x": 16, "y": 189 },
+        "position": {
+          "x": 16,
+          "y": 189
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品H"
       },
       "金額8": {
-        "position": { "x": 164, "y": 189 },
+        "position": {
+          "x": 164,
+          "y": 189
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量8": {
-        "position": { "x": 112, "y": 189 },
+        "position": {
+          "x": 112,
+          "y": 189
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価8": {
-        "position": { "x": 133, "y": 189 },
+        "position": {
+          "x": 133,
+          "y": 189
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目9": {
-        "position": { "x": 16, "y": 196 },
+        "position": {
+          "x": 16,
+          "y": 196
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品I"
       },
       "金額9": {
-        "position": { "x": 164, "y": 196 },
+        "position": {
+          "x": 164,
+          "y": 196
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量9": {
-        "position": { "x": 112, "y": 196 },
+        "position": {
+          "x": 112,
+          "y": 196
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価9": {
-        "position": { "x": 133, "y": 196 },
+        "position": {
+          "x": 133,
+          "y": 196
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目10": {
-        "position": { "x": 16, "y": 202.3 },
+        "position": {
+          "x": 16,
+          "y": 202.3
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品J"
       },
       "金額10": {
-        "position": { "x": 164, "y": 202.3 },
+        "position": {
+          "x": 164,
+          "y": 202.3
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量10": {
-        "position": { "x": 112, "y": 202.3 },
+        "position": {
+          "x": 112,
+          "y": 202.3
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価10": {
-        "position": { "x": 133, "y": 202.3 },
+        "position": {
+          "x": 133,
+          "y": 202.3
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目11": {
-        "position": { "x": 16, "y": 209.5 },
+        "position": {
+          "x": 16,
+          "y": 209.5
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品K"
       },
       "金額11": {
-        "position": { "x": 164, "y": 209.5 },
+        "position": {
+          "x": 164,
+          "y": 209.5
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量11": {
-        "position": { "x": 112, "y": 209.5 },
+        "position": {
+          "x": 112,
+          "y": 209.5
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価11": {
-        "position": { "x": 133, "y": 209.5 },
+        "position": {
+          "x": 133,
+          "y": 209.5
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "品目12": {
-        "position": { "x": 16, "y": 216 },
+        "position": {
+          "x": 16,
+          "y": 216
+        },
         "width": 93,
         "height": 6,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "商品L"
       },
       "金額12": {
-        "position": { "x": 164, "y": 216 },
+        "position": {
+          "x": 164,
+          "y": 216
+        },
         "width": 30,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "数量12": {
-        "position": { "x": 112, "y": 216 },
+        "position": {
+          "x": 112,
+          "y": 216
+        },
         "width": 18,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1個"
       },
       "単価12": {
-        "position": { "x": 133, "y": 216 },
+        "position": {
+          "x": 133,
+          "y": 216
+        },
         "width": 29,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1000"
       },
       "小計": {
-        "position": { "x": 133, "y": 223 },
+        "position": {
+          "x": 133,
+          "y": 223
+        },
         "width": 61,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥12000"
       },
       "消費税": {
-        "position": { "x": 133, "y": 230 },
+        "position": {
+          "x": 133,
+          "y": 230
+        },
         "width": 61,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥1200"
       },
       "合計": {
-        "position": { "x": 133, "y": 237 },
+        "position": {
+          "x": 133,
+          "y": 237
+        },
         "width": 61,
         "height": 6,
         "type": "text",
         "alignment": "right",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "￥13200"
       },
       "振込先": {
-        "position": { "x": 16, "y": 229 },
+        "position": {
+          "x": 16,
+          "y": 229
+        },
         "width": 92,
         "height": 25,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "labelmake銀行 大阪支店\n普通 12345678\nカ)ラベルメイク"
       },
       "備考": {
-        "position": { "x": 37, "y": 258 },
+        "position": {
+          "x": 37,
+          "y": 258
+        },
         "width": 157,
         "height": 25,
         "type": "text",
         "alignment": "left",
         "fontSize": 12,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "お振込み手数料は御社ご負担にてお願い致します。"
       }
     }
   ]

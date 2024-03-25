@@ -1,11 +1,4 @@
 {
-  "sampledata": [
-    {
-      "a": "a1",
-      "b": "b1",
-      "c": "c1"
-    }
-  ],
   "schemas": [
     {
       "a": {
@@ -15,7 +8,8 @@
           "y": 0
         },
         "width": 10,
-        "height": 10
+        "height": 10,
+        "content": "a1"
       },
       "b": {
         "type": "text",
@@ -24,7 +18,8 @@
           "y": 10
         },
         "width": 10,
-        "height": 10
+        "height": 10,
+        "content": "b1"
       },
       "c": {
         "type": "text",
@@ -33,7 +28,8 @@
           "y": 20
         },
         "width": 10,
-        "height": 10
+        "height": 10,
+        "content": "c1"
       }
     }
   ],

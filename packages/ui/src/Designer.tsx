@@ -1,6 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Template, DesignerProps, checkDesignerProps, checkTemplate } from '@pdfme/common';
+import {
+  Template,
+  DesignerProps,
+  checkDesignerProps,
+  checkTemplate,
+  PDFME_VERSION,
+} from '@pdfme/common';
 import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants.js';
 import DesignerComponent from './components/Designer/index';
@@ -15,8 +21,6 @@ class Designer extends BaseUIClass {
   constructor(props: DesignerProps) {
     super(props);
     checkDesignerProps(props);
-
-    this.render();
   }
 
   public saveTemplate() {
@@ -67,6 +71,7 @@ class Designer extends BaseUIClass {
           }}
           onChangeTemplate={(template) => {
             this.template = template;
+            this.template.pdfmeVersion = PDFME_VERSION;
             if (this.onChangeTemplateCallback) {
               this.onChangeTemplateCallback(template);
             }

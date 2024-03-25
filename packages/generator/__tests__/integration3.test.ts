@@ -1,6 +1,7 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { other, shape } from './assets/templates';
+import { getInputFromTemplate } from '@pdfme/common';
 import {
   text,
   image,
@@ -35,7 +36,7 @@ describe('generate integration test(other, shape)', () => {
 
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        const inputs = template.sampledata!;
+        const inputs = getInputFromTemplate(template);
 
         const font = getFont();
         font.SauceHanSansJP.fallback = false;

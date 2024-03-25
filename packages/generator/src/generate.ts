@@ -1,38 +1,51 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps } from '@pdfme/common';
-import { drawEmbeddedPage, preprocessing, postProcessing } from './helper.js';
+import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
+import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
+import { insertPage, preprocessing, postProcessing, getEmbedPdfPages } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
   const { inputs, template, options = {}, plugins: userPlugins = {} } = props;
+  const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
     throw new Error('inputs should not be empty');
   }
 
-  const { pdfDoc, embeddedPages, embedPdfBoxes, renderObj, readOnlySchemaKeys } =
-    await preprocessing({ template, userPlugins });
-
-  const keys = readOnlySchemaKeys.concat(Object.keys(inputs[0]));
-  if (template.columns) {
-    keys.sort((a, b) => (template.columns ?? []).indexOf(a) - (template.columns ?? []).indexOf(b));
-  }
+  const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
   const _cache = new Map();
+
   for (let i = 0; i < inputs.length; i += 1) {
-    const inputObj = inputs[i];
-    for (let j = 0; j < embeddedPages.length; j += 1) {
-      const embeddedPage = embeddedPages[j];
-      const { width: pageWidth, height: pageHeight } = embeddedPage;
+    const input = inputs[i];
+
+    const dynamicTemplate = await getDynamicTemplate({
+      template,
+      input,
+      options,
+      _cache,
+      modifyTemplate: (arg) => {
+        return modifyTemplateForTable(arg);
+      },
+      getDynamicHeight: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+        return getDynamicHeightForTable(value, args);
+      },
+    });
+    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
+      template: dynamicTemplate,
+      pdfDoc,
+    });
+    const keys = dynamicTemplate.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+
+    for (let j = 0; j < basePages.length; j += 1) {
+      const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
-
-      const page = pdfDoc.addPage([pageWidth, pageHeight]);
-
-      drawEmbeddedPage({ page, embeddedPage, embedPdfBox });
+      const page = insertPage({ basePage, embedPdfBox, pdfDoc });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
-        const schemaObj = template.schemas[j];
+        const schemaObj = dynamicTemplate.schemas[j] || {};
         const schema = schemaObj[key];
         if (!schema) {
           continue;
@@ -42,8 +55,8 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.readOnlyValue || '' : inputObj[key];
-        await render({ key, value, schema, pdfLib, pdfDoc, page, options, _cache });
+        const value = schema.readOnly ? schema.content || '' : input[key];
+        await render({ key, value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

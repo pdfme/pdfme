@@ -1,6 +1,7 @@
 import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { label, envelope } from './assets/templates';
+import { getInputFromTemplate } from '@pdfme/common';
 import { text, image } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
@@ -14,7 +15,7 @@ describe('generate integration test(label, envelope)', () => {
 
       // eslint-disable-next-line no-loop-func
       test(`snapshot ${key}`, async () => {
-        const inputs = template.sampledata!;
+        const inputs = getInputFromTemplate(template);
 
         const font = getFont();
         font.SauceHanSansJP.fallback = false;

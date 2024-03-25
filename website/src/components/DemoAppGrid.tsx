@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Template, checkTemplate } from '@pdfme/common';
+import { Template, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
@@ -40,7 +40,8 @@ const DemoAppGrid = (props: Props) => {
       .then((_) => _.json())
       .then((t) => {
         checkTemplate(t);
-        const emptyDatas = deNormalizeDatas(t.sampledata, t).map((row) =>
+        const inputs = getInputFromTemplate(t);
+        const emptyDatas = deNormalizeDatas(inputs, t).map((row) =>
           Object.fromEntries(Object.entries(row).map(([key]) => [key, '']))
         );
         setDatas(emptyDatas);
@@ -68,8 +69,8 @@ const DemoAppGrid = (props: Props) => {
   };
 
   const loadSampleData = () => {
-    viewer?.setInputs(template.sampledata ?? []);
-    setDatas(deNormalizeDatas(template.sampledata, template));
+    viewer?.setInputs(getInputFromTemplate(template));
+    setDatas(deNormalizeDatas(getInputFromTemplate(template), template));
     alert('Sample Data loaded.\nPlease click "Download" button.');
   };
 

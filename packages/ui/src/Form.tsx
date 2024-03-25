@@ -11,7 +11,6 @@ class Form extends PreviewUI {
 
   constructor(props: PreviewProps) {
     super(props);
-    this.render();
   }
 
   public onChangeInput(cb: (arg: { index: number; value: string; key: string }) => void) {
@@ -36,8 +35,12 @@ class Form extends PreviewUI {
             if (this.onChangeInputCallback) {
               this.onChangeInputCallback({ index, value, key });
             }
-            this.inputs[index][key] = value;
-            this.render();
+            if (this.inputs && this.inputs[index]) {
+              if (this.inputs[index][key] !== value) {
+                this.inputs[index][key] = value;
+                this.render();
+              }
+            }
           }}
         />
       </AppContextProvider>,

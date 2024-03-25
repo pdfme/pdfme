@@ -72,12 +72,14 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'inputNumber',
         span: 6,
         disabled: enableDynamicFont,
+        props: { min: 0 },
       },
       characterSpacing: {
         title: i18n('schemas.text.spacing'),
         type: 'number',
         widget: 'inputNumber',
         span: 6,
+        props: { min: 0 },
       },
       alignment: {
         title: i18n('schemas.text.textAlign'),
@@ -109,9 +111,7 @@ export const propPanel: PropPanel<TextSchema> = {
         title: i18n('schemas.text.lineHeight'),
         type: 'number',
         widget: 'inputNumber',
-        props: {
-          step: 0.1,
-        },
+        props: { step: 0.1, min: 0 },
         span: 8,
       },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
@@ -125,12 +125,14 @@ export const propPanel: PropPanel<TextSchema> = {
             type: 'number',
             widget: 'inputNumber',
             hidden: !enableDynamicFont,
+            props: { min: 0 },
           },
           max: {
             title: i18n('schemas.text.max'),
             type: 'number',
             widget: 'inputNumber',
             hidden: !enableDynamicFont,
+            props: { min: 0 },
           },
           fit: {
             title: i18n('schemas.text.fit'),
@@ -173,9 +175,10 @@ export const propPanel: PropPanel<TextSchema> = {
     return textSchema;
   },
   widgets: { UseDynamicFontSize },
-  defaultValue: 'Type Something...',
   defaultSchema: {
     type: 'text',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-cursor-input"><path d="M5 4h1a3 3 0 0 1 3 3 3 3 0 0 1 3-3h1"/><path d="M13 20h-1a3 3 0 0 1-3-3 3 3 0 0 1-3 3H5"/><path d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"/><path d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"/><path d="M9 7v10"/></svg>',
+    content: 'Type Something...',
     position: { x: 0, y: 0 },
     width: 45,
     height: 10,

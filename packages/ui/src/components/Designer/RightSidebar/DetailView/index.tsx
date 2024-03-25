@@ -75,7 +75,7 @@ const DetailView = (
   const handleWatch = (newSchema: any) => {
     const changes = [];
     for (let key in newSchema) {
-      if (['id', 'data'].includes(key)) continue;
+      if (['id', 'content'].includes(key)) continue;
       if (newSchema[key] !== (activeSchema as any)[key]) {
         let value = newSchema[key];
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
@@ -123,15 +123,15 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       key: { title: i18n('fieldName'), type: 'string', required: true, span: 14 },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
-      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8 },
-      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8 },
+      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
       rotate: {
         title: i18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
         disabled: defaultSchema?.rotate === undefined,
         max: 360,
-        min: 0,
+        props: { min: 0 },
         span: 8,
       },
       width: {
@@ -140,7 +140,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
-        min: 0,
+        props: { min: 0 },
       },
       height: {
         title: i18n('height'),
@@ -148,18 +148,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         required: true,
         span: 8,
-        min: 0,
+        props: { min: 0 },
       },
       opacity: {
         title: i18n('opacity'),
         type: 'number',
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
-        props: {
-          step: 0.1,
-        },
-        max: 1,
-        min: 0,
+        props: { step: 0.1, min: 0, max: 1 },
         span: 8,
       },
     },
@@ -210,8 +206,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         style={{
           height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
-          overflowX: 'hidden',
-          borderBottom: `1px solid ${token.colorSplit}`,
+          overflowX: 'hidden'
         }}
       >
         <FormRender

@@ -1,4 +1,4 @@
-// TODO Update pdfjs-dist. (might be able to reduce the bundle size.)
+// Update pdfjs-dist. (might be able to reduce the bundle size.)
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
@@ -11,9 +11,12 @@ import {
   b64toUint8Array,
   pt2mm,
   Template,
+  BasePdf,
   SchemaForUI,
   Schema,
   Size,
+  isBlankPdf,
+  Plugins,
 } from '@pdfme/common';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -250,39 +253,38 @@ export const b64toBlob = (base64: string) => {
   return new Blob([uniy8Array.buffer], { type: mimeType });
 };
 
-const sortSchemasList = (template: Template, pageNum: number): SchemaForUI[][] =>
-  new Array(pageNum).fill('').reduce((acc, _, i) => {
+const sortSchemasList = (template: Template): SchemaForUI[][] => {
+  const { schemas } = template;
+  const pageNum = schemas.length;
+  const arr = new Array(pageNum).fill('') as SchemaForUI[][];
+  return arr.reduce((acc, _, i) => {
     acc.push(
-      template.schemas[i]
-        ? Object.entries(template.schemas[i])
-            .sort((a, b) => {
-              const aIndex = (template.columns ?? []).findIndex((c) => c === a[0]);
-              const bIndex = (template.columns ?? []).findIndex((c) => c === b[0]);
-
-              return aIndex > bIndex ? 1 : -1;
-            })
-            .map((e) => {
-              const [key, value] = e;
-              const data = template.sampledata?.[0]?.[key] ?? '';
-
-              return Object.assign(value, {
-                key,
-                data,
-                id: uuid(),
-              });
-            })
+      schemas[i]
+        ? Object.entries(schemas[i]).map(([key, schema]) =>
+            Object.assign(schema, { key, content: schema.content, id: uuid() })
+          )
         : []
     );
-
     return acc;
   }, [] as SchemaForUI[][]);
-
-export const templateSchemas2SchemasList = async (_template: Template) => {
+};
+export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
-  const sortedSchemasList = sortSchemasList(template, template.schemas.length);
-  const basePdf = await getB64BasePdf(template.basePdf);
-  const pdfBlob = b64toBlob(basePdf);
-  const pageSizes = await getPdfPageSizes(pdfBlob);
+  const { basePdf, schemas } = template;
+  const sortedSchemasList = sortSchemasList(template);
+
+  let pageSizes: Size[] = [];
+  if (isBlankPdf(basePdf)) {
+    pageSizes = schemas.map(() => ({
+      width: basePdf.width,
+      height: basePdf.height,
+    }));
+  } else {
+    const b64BasePdf = await getB64BasePdf(basePdf);
+    const pdfBlob = b64toBlob(b64BasePdf);
+    pageSizes = await getPdfPageSizes(pdfBlob);
+  }
+
   const ssl = sortedSchemasList.length;
   const psl = pageSizes.length;
   const schemasList = (
@@ -306,90 +308,24 @@ export const templateSchemas2SchemasList = async (_template: Template) => {
 
     return schema;
   });
-
   return schemasList;
 };
 
-export const generateColumnsAndSampledataIfNeeded = (template: Template) => {
-  const { schemas, columns, sampledata } = template;
+export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
+  schemas: cloneDeep(schemasList).map((schema) =>
+    schema.reduce((acc, cur) => {
+      const k = cur.key;
+      // @ts-ignore
+      delete cur.id;
+      // @ts-ignore
+      delete cur.key;
+      acc[k] = cur;
 
-  const flatSchemaLengthForColumns = schemas
-    .map((schema) => Object.keys(schema).length)
-    .reduce((acc, cur) => acc + cur, 0);
-  const needColumns = !columns || flatSchemaLengthForColumns !== columns.length;
-
-  const flatSchemaLengthForSampleData = schemas
-    .map((schema) => Object.keys(schema).filter((key) => !schema[key].readOnly).length)
-    .reduce((acc, cur) => acc + cur, 0);
-  const needSampledata =
-    !sampledata || flatSchemaLengthForSampleData !== Object.keys(sampledata[0]).length;
-
-  // columns
-  if (needColumns) {
-    template.columns = flatten(schemas.map((schema) => Object.keys(schema)));
-  }
-
-  // sampledata
-  if (needSampledata) {
-    template.sampledata = [
-      schemas.reduce(
-        (acc, cur) =>
-          Object.assign(
-            acc,
-            Object.keys(cur).reduce((a, c) => {
-              const { readOnly } = cur[c];
-              if (readOnly) {
-                return a;
-              }
-              return Object.assign(a, { [c]: '' });
-            }, {} as { [key: string]: string })
-          ),
-        {} as { [key: string]: string }
-      ),
-    ];
-  }
-
-  return template;
-};
-
-export const fmtTemplate = (template: Template, schemasList: SchemaForUI[][]): Template => {
-  const schemaAddedTemplate: Template = {
-    ...template,
-    schemas: cloneDeep(schemasList).map((schema) =>
-      schema.reduce((acc, cur) => {
-        const k = cur.key;
-        // @ts-ignore
-        delete cur.id;
-        // @ts-ignore
-        delete cur.key;
-        // @ts-ignore
-        delete cur.data;
-        acc[k] = cur;
-
-        return acc;
-      }, {} as { [key: string]: Schema })
-    ),
-    columns: cloneDeep(schemasList).reduce(
-      (acc, cur) => acc.concat(cur.map((s) => s.key)),
-      [] as string[]
-    ),
-    sampledata: [
-      cloneDeep(schemasList).reduce((acc, cur) => {
-        cur.forEach((c) => {
-          if (c.readOnly) {
-            return;
-          }
-          acc[c.key] = c.data;
-        });
-
-        return acc;
-      }, {} as { [key: string]: string }),
-    ],
-    basePdf: template.basePdf,
-  };
-
-  return schemaAddedTemplate;
-};
+      return acc;
+    }, {} as { [key: string]: Schema })
+  ),
+  basePdf,
+});
 
 export const getUniqSchemaKey = (arg: {
   copiedSchemaKey: string;
@@ -474,18 +410,78 @@ export const moveCommandToChangeSchemasArg = (props: {
   });
 };
 
-export const getPagesScrollTopByIndex = (
-  pageSizes: {
-    width: number;
-    height: number;
-  }[],
-  index: number,
-  scale: number
-) => {
+export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale: number) => {
   return pageSizes
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
 };
 
 export const getSidebarContentHeight = (sidebarHeight: number) =>
-  sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 115;
+  sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 30;
+
+const handlePositionSizeChange = (
+  schema: SchemaForUI,
+  key: string,
+  value: any,
+  basePdf: BasePdf,
+  pageSize: Size
+) => {
+  const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
+  const [pt, pr, pb, pl] = padding;
+  const { width: pw, height: ph } = pageSize;
+  const calcBounds = (v: any, min: number, max: number) => Math.min(Math.max(Number(v), min), max);
+  if (key === 'position.x') {
+    schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
+  } else if (key === 'position.y') {
+    schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
+  } else if (key === 'width') {
+    schema.width = calcBounds(value, 0, pw - schema.position.x - pr);
+  } else if (key === 'height') {
+    schema.height = calcBounds(value, 0, ph - schema.position.y - pb);
+  }
+};
+
+const handleTypeChange = (
+  schema: SchemaForUI,
+  key: string,
+  value: any,
+  pluginsRegistry: Plugins
+) => {
+  if (key !== 'type') return;
+  const keysToKeep = ['id', 'key', 'type', 'position'];
+  Object.keys(schema).forEach((key) => {
+    if (!keysToKeep.includes(key)) {
+      delete schema[key as keyof typeof schema];
+    }
+  });
+  const propPanel = Object.values(pluginsRegistry).find(
+    (plugin) => plugin?.propPanel.defaultSchema.type === value
+  )?.propPanel;
+  Object.assign(schema, propPanel?.defaultSchema || {});
+};
+
+export const changeSchemas = (args: {
+  objs: { key: string; value: any; schemaId: string }[];
+  schemas: SchemaForUI[];
+  basePdf: BasePdf;
+  pluginsRegistry: Plugins;
+  pageSize: { width: number; height: number };
+  commitSchemas: (newSchemas: SchemaForUI[]) => void;
+}) => {
+  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas } = args;
+  const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
+    const tgt = acc.find((s) => s.id === schemaId);
+    if (!tgt) return acc;
+    // Assign to reference
+    set(tgt, key, value);
+
+    if (key === 'type') {
+      handleTypeChange(tgt, key, value, pluginsRegistry);
+    } else if (['position.x', 'position.y', 'width', 'height'].includes(key)) {
+      handlePositionSizeChange(tgt, key, value, basePdf, pageSize);
+    }
+
+    return acc;
+  }, cloneDeep(schemas));
+  commitSchemas(newSchemas);
+};

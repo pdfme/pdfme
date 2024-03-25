@@ -1,44 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["QR・バーコード"],
+  "tags": [
+    "QR・バーコード"
+  ],
   "description": "[A-one エーワン ラベルシール 30面 22シート 72230](https://amzn.to/2IRJAXq)に対応した書式です。30面の短縮タイプ（8桁）JANコードを作成できます。  チェックデジットの入力は不要です。  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "{1}1行": "1234560",
-      "{1}2行": "1234561",
-      "{1}3行": "1234562",
-      "{1}4行": "1234563",
-      "{1}5行": "1234564",
-      "{1}6行": "1234565",
-      "{1}7行": "1234566",
-      "{1}8行": "1234567",
-      "{1}9行": "1234568",
-      "{1}10行": "1234569",
-      "{2}1行": "1234560",
-      "{2}2行": "1234561",
-      "{2}3行": "1234562",
-      "{2}4行": "1234563",
-      "{2}5行": "1234564",
-      "{2}6行": "1234565",
-      "{2}7行": "1234566",
-      "{2}8行": "1234567",
-      "{2}9行": "1234568",
-      "{2}10行": "1234569",
-      "{3}1行": "1234560",
-      "{3}2行": "1234561",
-      "{3}3行": "1234562",
-      "{3}4行": "1234563",
-      "{3}5行": "1234564",
-      "{3}6行": "1234565",
-      "{3}7行": "1234566",
-      "{3}8行": "1234567",
-      "{3}9行": "1234568",
-      "{3}10行": "1234569"
-    }
-  ],
   "columns": [
     "{1}1行",
     "{1}2行",
@@ -78,304 +46,424 @@
   "schemas": [
     {
       "{1}1行": {
-        "position": { "x": 25.25, "y": 24 },
+        "position": {
+          "x": 25.25,
+          "y": 24
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234560"
       },
       "{1}2行": {
-        "position": { "x": 25.25, "y": 49.4 },
+        "position": {
+          "x": 25.25,
+          "y": 49.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234561"
       },
       "{1}3行": {
-        "position": { "x": 25.25, "y": 74.8 },
+        "position": {
+          "x": 25.25,
+          "y": 74.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234562"
       },
       "{1}4行": {
-        "position": { "x": 25.25, "y": 100.2 },
+        "position": {
+          "x": 25.25,
+          "y": 100.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234563"
       },
       "{1}5行": {
-        "position": { "x": 25.25, "y": 125.6 },
+        "position": {
+          "x": 25.25,
+          "y": 125.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234564"
       },
       "{1}6行": {
-        "position": { "x": 25.25, "y": 151 },
+        "position": {
+          "x": 25.25,
+          "y": 151
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234565"
       },
       "{1}7行": {
-        "position": { "x": 25.25, "y": 176.4 },
+        "position": {
+          "x": 25.25,
+          "y": 176.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234566"
       },
       "{1}8行": {
-        "position": { "x": 25.25, "y": 201.8 },
+        "position": {
+          "x": 25.25,
+          "y": 201.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{1}9行": {
-        "position": { "x": 25.25, "y": 227.2 },
+        "position": {
+          "x": 25.25,
+          "y": 227.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234568"
       },
       "{1}10行": {
-        "position": { "x": 25.25, "y": 252.6 },
+        "position": {
+          "x": 25.25,
+          "y": 252.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234569"
       },
       "{2}1行": {
-        "position": { "x": 82.35, "y": 24 },
+        "position": {
+          "x": 82.35,
+          "y": 24
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234560"
       },
       "{2}2行": {
-        "position": { "x": 82.35, "y": 49.4 },
+        "position": {
+          "x": 82.35,
+          "y": 49.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234561"
       },
       "{2}3行": {
-        "position": { "x": 82.35, "y": 74.8 },
+        "position": {
+          "x": 82.35,
+          "y": 74.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234562"
       },
       "{2}4行": {
-        "position": { "x": 82.35, "y": 100.2 },
+        "position": {
+          "x": 82.35,
+          "y": 100.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234563"
       },
       "{2}5行": {
-        "position": { "x": 82.35, "y": 125.6 },
+        "position": {
+          "x": 82.35,
+          "y": 125.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234564"
       },
       "{2}6行": {
-        "position": { "x": 82.35, "y": 151 },
+        "position": {
+          "x": 82.35,
+          "y": 151
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234565"
       },
       "{2}7行": {
-        "position": { "x": 82.35, "y": 176.4 },
+        "position": {
+          "x": 82.35,
+          "y": 176.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234566"
       },
       "{2}8行": {
-        "position": { "x": 82.35, "y": 201.8 },
+        "position": {
+          "x": 82.35,
+          "y": 201.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{2}9行": {
-        "position": { "x": 82.35, "y": 227.2 },
+        "position": {
+          "x": 82.35,
+          "y": 227.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234568"
       },
       "{2}10行": {
-        "position": { "x": 82.35, "y": 252.6 },
+        "position": {
+          "x": 82.35,
+          "y": 252.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234569"
       },
       "{3}1行": {
-        "position": { "x": 139.45, "y": 24 },
+        "position": {
+          "x": 139.45,
+          "y": 24
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234560"
       },
       "{3}2行": {
-        "position": { "x": 139.45, "y": 49.4 },
+        "position": {
+          "x": 139.45,
+          "y": 49.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234561"
       },
       "{3}3行": {
-        "position": { "x": 139.45, "y": 74.8 },
+        "position": {
+          "x": 139.45,
+          "y": 74.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234562"
       },
       "{3}4行": {
-        "position": { "x": 139.45, "y": 100.2 },
+        "position": {
+          "x": 139.45,
+          "y": 100.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234563"
       },
       "{3}5行": {
-        "position": { "x": 139.45, "y": 125.6 },
+        "position": {
+          "x": 139.45,
+          "y": 125.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234564"
       },
       "{3}6行": {
-        "position": { "x": 139.45, "y": 151 },
+        "position": {
+          "x": 139.45,
+          "y": 151
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234565"
       },
       "{3}7行": {
-        "position": { "x": 139.45, "y": 176.4 },
+        "position": {
+          "x": 139.45,
+          "y": 176.4
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234566"
       },
       "{3}8行": {
-        "position": { "x": 139.45, "y": 201.8 },
+        "position": {
+          "x": 139.45,
+          "y": 201.8
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "{3}9行": {
-        "position": { "x": 139.45, "y": 227.2 },
+        "position": {
+          "x": 139.45,
+          "y": 227.2
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234568"
       },
       "{3}10行": {
-        "position": { "x": 139.45, "y": 252.6 },
+        "position": {
+          "x": 139.45,
+          "y": 252.6
+        },
         "width": 40.3,
         "height": 20.15,
         "alignment": "left",
         "type": "ean8",
         "fontSize": 18,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234569"
       }
     }
   ]

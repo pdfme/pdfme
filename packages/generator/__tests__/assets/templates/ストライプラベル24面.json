@@ -1,110 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["宛名ラベル"],
+  "tags": [
+    "宛名ラベル"
+  ],
   "description": "シンプルなストライプが入った66×33.9ｍｍのラベルがA4に24面の書式です。  **A4用紙はもちろん、100円ショップで手に入る、シール用紙でラベルにできます。[詳しくはこちら](https://labelmake.jp/blog/2018-12-05-100%E5%9D%87%E3%82%B7%E3%83%BC%E3%83%AB%E7%94%A8%E7%B4%99%E3%81%A7%E5%AE%9B%E5%90%8D%E3%83%A9%E3%83%99%E3%83%AB%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95-excel-word%E3%81%AF%E4%BD%BF%E3%81%84%E3%81%BE%E3%81%9B%E3%82%93%EF%BC%81/)** また下記のラベルシールにも対応しています。  - [エーワン ラベルシール プリンタ兼用 24面 22枚](https://amzn.to/2xL5Ujn)  - [エーワン 出品者向けFBAラベル 強粘着タイプ 24面 100枚](https://amzn.to/2ILuORN)  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "{1}郵便番号": "〒123-4567",
-      "{1}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{1}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{1}氏名": "東京都 出得太様",
-      "{2}郵便番号": "〒123-4567",
-      "{2}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{2}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{2}氏名": "東京都 出得太様",
-      "{3}郵便番号": "〒123-4567",
-      "{3}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{3}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{3}氏名": "東京都 出得太様",
-      "{4}郵便番号": "〒123-4567",
-      "{4}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{4}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{4}氏名": "東京都 出得太様",
-      "{5}郵便番号": "〒123-4567",
-      "{5}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{5}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{5}氏名": "東京都 出得太様",
-      "{6}郵便番号": "〒123-4567",
-      "{6}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{6}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{6}氏名": "東京都 出得太様",
-      "{7}郵便番号": "〒123-4567",
-      "{7}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{7}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{7}氏名": "東京都 出得太様",
-      "{8}郵便番号": "〒123-4567",
-      "{8}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{8}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{8}氏名": "東京都 出得太様",
-      "{9}郵便番号": "〒123-4567",
-      "{9}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{9}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{9}氏名": "東京都 出得太様",
-      "{10}郵便番号": "〒123-4567",
-      "{10}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{10}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{10}氏名": "東京都 出得太様",
-      "{11}郵便番号": "〒123-4567",
-      "{11}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{11}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{11}氏名": "東京都 出得太様",
-      "{12}郵便番号": "〒123-4567",
-      "{12}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{12}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{12}氏名": "東京都 出得太様",
-      "{13}郵便番号": "〒123-4567",
-      "{13}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{13}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{13}氏名": "東京都 出得太様",
-      "{14}郵便番号": "〒123-4567",
-      "{14}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{14}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{14}氏名": "東京都 出得太様",
-      "{15}郵便番号": "〒123-4567",
-      "{15}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{15}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{15}氏名": "東京都 出得太様",
-      "{16}郵便番号": "〒123-4567",
-      "{16}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{16}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{16}氏名": "東京都 出得太様",
-      "{17}郵便番号": "〒123-4567",
-      "{17}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{17}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{17}氏名": "東京都 出得太様",
-      "{18}郵便番号": "〒123-4567",
-      "{18}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{18}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{18}氏名": "東京都 出得太様",
-      "{19}郵便番号": "〒123-4567",
-      "{19}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{19}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{19}氏名": "東京都 出得太様",
-      "{20}郵便番号": "〒123-4567",
-      "{20}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{20}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{20}氏名": "東京都 出得太様",
-      "{21}郵便番号": "〒123-4567",
-      "{21}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{21}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{21}氏名": "東京都 出得太様",
-      "{22}郵便番号": "〒123-4567",
-      "{22}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{22}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{22}氏名": "東京都 出得太様",
-      "{23}郵便番号": "〒123-4567",
-      "{23}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{23}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{23}氏名": "東京都 出得太様",
-      "{24}郵便番号": "〒123-4567",
-      "{24}住所": "東京都東京1-2-3\n東京マンション123号",
-      "{24}自由": "株式会社labelmake.jp宛名ラベル印刷部",
-      "{24}氏名": "東京都 出得太様"
-    }
-  ],
   "columns": [
     "{1}郵便番号",
     "{1}住所",
@@ -210,964 +112,1348 @@
   "schemas": [
     {
       "{1}郵便番号": {
-        "position": { "x": 9, "y": 17 },
+        "position": {
+          "x": 9,
+          "y": 17
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{1}住所": {
-        "position": { "x": 9, "y": 22.5 },
+        "position": {
+          "x": 9,
+          "y": 22.5
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 0.95
+        "lineHeight": 0.95,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{1}自由": {
-        "position": { "x": 9, "y": 32 },
+        "position": {
+          "x": 9,
+          "y": 32
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{1}氏名": {
-        "position": { "x": 9, "y": 36 },
+        "position": {
+          "x": 9,
+          "y": 36
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{2}郵便番号": {
-        "position": { "x": 9, "y": 50.9 },
+        "position": {
+          "x": 9,
+          "y": 50.9
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{2}住所": {
-        "position": { "x": 9, "y": 56.4 },
+        "position": {
+          "x": 9,
+          "y": 56.4
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{2}自由": {
-        "position": { "x": 9, "y": 65.9 },
+        "position": {
+          "x": 9,
+          "y": 65.9
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{2}氏名": {
-        "position": { "x": 9, "y": 69.9 },
+        "position": {
+          "x": 9,
+          "y": 69.9
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{3}郵便番号": {
-        "position": { "x": 9, "y": 84.8 },
+        "position": {
+          "x": 9,
+          "y": 84.8
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{3}住所": {
-        "position": { "x": 9, "y": 90.3 },
+        "position": {
+          "x": 9,
+          "y": 90.3
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{3}自由": {
-        "position": { "x": 9, "y": 99.8 },
+        "position": {
+          "x": 9,
+          "y": 99.8
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{3}氏名": {
-        "position": { "x": 9, "y": 103.8 },
+        "position": {
+          "x": 9,
+          "y": 103.8
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{4}郵便番号": {
-        "position": { "x": 9, "y": 118.7 },
+        "position": {
+          "x": 9,
+          "y": 118.7
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{4}住所": {
-        "position": { "x": 9, "y": 124.2 },
+        "position": {
+          "x": 9,
+          "y": 124.2
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{4}自由": {
-        "position": { "x": 9, "y": 133.7 },
+        "position": {
+          "x": 9,
+          "y": 133.7
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{4}氏名": {
-        "position": { "x": 9, "y": 137.7 },
+        "position": {
+          "x": 9,
+          "y": 137.7
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{5}郵便番号": {
-        "position": { "x": 9, "y": 152.6 },
+        "position": {
+          "x": 9,
+          "y": 152.6
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{5}住所": {
-        "position": { "x": 9, "y": 158.1 },
+        "position": {
+          "x": 9,
+          "y": 158.1
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{5}自由": {
-        "position": { "x": 9, "y": 167.6 },
+        "position": {
+          "x": 9,
+          "y": 167.6
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{5}氏名": {
-        "position": { "x": 9, "y": 171.6 },
+        "position": {
+          "x": 9,
+          "y": 171.6
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{6}郵便番号": {
-        "position": { "x": 9, "y": 186.5 },
+        "position": {
+          "x": 9,
+          "y": 186.5
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{6}住所": {
-        "position": { "x": 9, "y": 192 },
+        "position": {
+          "x": 9,
+          "y": 192
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{6}自由": {
-        "position": { "x": 9, "y": 201.5 },
+        "position": {
+          "x": 9,
+          "y": 201.5
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{6}氏名": {
-        "position": { "x": 9, "y": 205.5 },
+        "position": {
+          "x": 9,
+          "y": 205.5
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{7}郵便番号": {
-        "position": { "x": 9, "y": 220.4 },
+        "position": {
+          "x": 9,
+          "y": 220.4
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{7}住所": {
-        "position": { "x": 9, "y": 225.9 },
+        "position": {
+          "x": 9,
+          "y": 225.9
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{7}自由": {
-        "position": { "x": 9, "y": 235.4 },
+        "position": {
+          "x": 9,
+          "y": 235.4
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{7}氏名": {
-        "position": { "x": 9, "y": 239.4 },
+        "position": {
+          "x": 9,
+          "y": 239.4
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{8}郵便番号": {
-        "position": { "x": 9, "y": 254.3 },
+        "position": {
+          "x": 9,
+          "y": 254.3
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{8}住所": {
-        "position": { "x": 9, "y": 259.8 },
+        "position": {
+          "x": 9,
+          "y": 259.8
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{8}自由": {
-        "position": { "x": 9, "y": 269.3 },
+        "position": {
+          "x": 9,
+          "y": 269.3
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{8}氏名": {
-        "position": { "x": 9, "y": 273.3 },
+        "position": {
+          "x": 9,
+          "y": 273.3
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{9}郵便番号": {
-        "position": { "x": 74, "y": 17 },
+        "position": {
+          "x": 74,
+          "y": 17
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{9}住所": {
-        "position": { "x": 74, "y": 22.5 },
+        "position": {
+          "x": 74,
+          "y": 22.5
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{9}自由": {
-        "position": { "x": 74, "y": 32 },
+        "position": {
+          "x": 74,
+          "y": 32
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{9}氏名": {
-        "position": { "x": 74, "y": 36 },
+        "position": {
+          "x": 74,
+          "y": 36
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{10}郵便番号": {
-        "position": { "x": 74, "y": 50.9 },
+        "position": {
+          "x": 74,
+          "y": 50.9
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{10}住所": {
-        "position": { "x": 74, "y": 56.4 },
+        "position": {
+          "x": 74,
+          "y": 56.4
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{10}自由": {
-        "position": { "x": 74, "y": 65.9 },
+        "position": {
+          "x": 74,
+          "y": 65.9
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{10}氏名": {
-        "position": { "x": 74, "y": 69.9 },
+        "position": {
+          "x": 74,
+          "y": 69.9
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{11}郵便番号": {
-        "position": { "x": 74, "y": 84.8 },
+        "position": {
+          "x": 74,
+          "y": 84.8
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{11}住所": {
-        "position": { "x": 74, "y": 90.3 },
+        "position": {
+          "x": 74,
+          "y": 90.3
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{11}自由": {
-        "position": { "x": 74, "y": 99.8 },
+        "position": {
+          "x": 74,
+          "y": 99.8
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{11}氏名": {
-        "position": { "x": 74, "y": 103.8 },
+        "position": {
+          "x": 74,
+          "y": 103.8
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{12}郵便番号": {
-        "position": { "x": 74, "y": 118.7 },
+        "position": {
+          "x": 74,
+          "y": 118.7
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{12}住所": {
-        "position": { "x": 74, "y": 124.2 },
+        "position": {
+          "x": 74,
+          "y": 124.2
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{12}自由": {
-        "position": { "x": 74, "y": 133.7 },
+        "position": {
+          "x": 74,
+          "y": 133.7
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{12}氏名": {
-        "position": { "x": 74, "y": 137.7 },
+        "position": {
+          "x": 74,
+          "y": 137.7
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{13}郵便番号": {
-        "position": { "x": 74, "y": 152.6 },
+        "position": {
+          "x": 74,
+          "y": 152.6
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{13}住所": {
-        "position": { "x": 74, "y": 158.1 },
+        "position": {
+          "x": 74,
+          "y": 158.1
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{13}自由": {
-        "position": { "x": 74, "y": 167.6 },
+        "position": {
+          "x": 74,
+          "y": 167.6
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{13}氏名": {
-        "position": { "x": 74, "y": 171.6 },
+        "position": {
+          "x": 74,
+          "y": 171.6
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{14}郵便番号": {
-        "position": { "x": 74, "y": 186.5 },
+        "position": {
+          "x": 74,
+          "y": 186.5
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{14}住所": {
-        "position": { "x": 74, "y": 192 },
+        "position": {
+          "x": 74,
+          "y": 192
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{14}自由": {
-        "position": { "x": 74, "y": 201.5 },
+        "position": {
+          "x": 74,
+          "y": 201.5
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{14}氏名": {
-        "position": { "x": 74, "y": 205.5 },
+        "position": {
+          "x": 74,
+          "y": 205.5
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{15}郵便番号": {
-        "position": { "x": 74, "y": 220.4 },
+        "position": {
+          "x": 74,
+          "y": 220.4
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{15}住所": {
-        "position": { "x": 74, "y": 225.9 },
+        "position": {
+          "x": 74,
+          "y": 225.9
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{15}自由": {
-        "position": { "x": 74, "y": 235.4 },
+        "position": {
+          "x": 74,
+          "y": 235.4
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{15}氏名": {
-        "position": { "x": 74, "y": 239.4 },
+        "position": {
+          "x": 74,
+          "y": 239.4
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{16}郵便番号": {
-        "position": { "x": 74, "y": 254.3 },
+        "position": {
+          "x": 74,
+          "y": 254.3
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{16}住所": {
-        "position": { "x": 74, "y": 259.8 },
+        "position": {
+          "x": 74,
+          "y": 259.8
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{16}自由": {
-        "position": { "x": 74, "y": 269.3 },
+        "position": {
+          "x": 74,
+          "y": 269.3
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{16}氏名": {
-        "position": { "x": 74, "y": 273.3 },
+        "position": {
+          "x": 74,
+          "y": 273.3
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{17}郵便番号": {
-        "position": { "x": 140, "y": 17 },
+        "position": {
+          "x": 140,
+          "y": 17
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{17}住所": {
-        "position": { "x": 140, "y": 22.5 },
+        "position": {
+          "x": 140,
+          "y": 22.5
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{17}自由": {
-        "position": { "x": 140, "y": 32 },
+        "position": {
+          "x": 140,
+          "y": 32
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{17}氏名": {
-        "position": { "x": 140, "y": 36 },
+        "position": {
+          "x": 140,
+          "y": 36
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{18}郵便番号": {
-        "position": { "x": 140, "y": 50.9 },
+        "position": {
+          "x": 140,
+          "y": 50.9
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{18}住所": {
-        "position": { "x": 140, "y": 56.4 },
+        "position": {
+          "x": 140,
+          "y": 56.4
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{18}自由": {
-        "position": { "x": 140, "y": 65.9 },
+        "position": {
+          "x": 140,
+          "y": 65.9
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{18}氏名": {
-        "position": { "x": 140, "y": 69.9 },
+        "position": {
+          "x": 140,
+          "y": 69.9
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{19}郵便番号": {
-        "position": { "x": 140, "y": 84.8 },
+        "position": {
+          "x": 140,
+          "y": 84.8
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{19}住所": {
-        "position": { "x": 140, "y": 90.3 },
+        "position": {
+          "x": 140,
+          "y": 90.3
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{19}自由": {
-        "position": { "x": 140, "y": 99.8 },
+        "position": {
+          "x": 140,
+          "y": 99.8
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{19}氏名": {
-        "position": { "x": 140, "y": 103.8 },
+        "position": {
+          "x": 140,
+          "y": 103.8
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{20}郵便番号": {
-        "position": { "x": 140, "y": 118.7 },
+        "position": {
+          "x": 140,
+          "y": 118.7
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{20}住所": {
-        "position": { "x": 140, "y": 124.2 },
+        "position": {
+          "x": 140,
+          "y": 124.2
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{20}自由": {
-        "position": { "x": 140, "y": 133.7 },
+        "position": {
+          "x": 140,
+          "y": 133.7
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{20}氏名": {
-        "position": { "x": 140, "y": 137.7 },
+        "position": {
+          "x": 140,
+          "y": 137.7
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{21}郵便番号": {
-        "position": { "x": 140, "y": 152.6 },
+        "position": {
+          "x": 140,
+          "y": 152.6
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{21}住所": {
-        "position": { "x": 140, "y": 158.1 },
+        "position": {
+          "x": 140,
+          "y": 158.1
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{21}自由": {
-        "position": { "x": 140, "y": 167.6 },
+        "position": {
+          "x": 140,
+          "y": 167.6
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{21}氏名": {
-        "position": { "x": 140, "y": 171.6 },
+        "position": {
+          "x": 140,
+          "y": 171.6
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{22}郵便番号": {
-        "position": { "x": 140, "y": 186.5 },
+        "position": {
+          "x": 140,
+          "y": 186.5
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{22}住所": {
-        "position": { "x": 140, "y": 192 },
+        "position": {
+          "x": 140,
+          "y": 192
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{22}自由": {
-        "position": { "x": 140, "y": 201.5 },
+        "position": {
+          "x": 140,
+          "y": 201.5
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{22}氏名": {
-        "position": { "x": 140, "y": 205.5 },
+        "position": {
+          "x": 140,
+          "y": 205.5
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{23}郵便番号": {
-        "position": { "x": 140, "y": 220.4 },
+        "position": {
+          "x": 140,
+          "y": 220.4
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{23}住所": {
-        "position": { "x": 140, "y": 225.9 },
+        "position": {
+          "x": 140,
+          "y": 225.9
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{23}自由": {
-        "position": { "x": 140, "y": 235.4 },
+        "position": {
+          "x": 140,
+          "y": 235.4
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{23}氏名": {
-        "position": { "x": 140, "y": 239.4 },
+        "position": {
+          "x": 140,
+          "y": 239.4
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       },
       "{24}郵便番号": {
-        "position": { "x": 140, "y": 254.3 },
+        "position": {
+          "x": 140,
+          "y": 254.3
+        },
         "width": 60,
         "height": 5.23,
         "type": "text",
         "alignment": "center",
         "fontSize": 11,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "〒123-4567"
       },
       "{24}住所": {
-        "position": { "x": 140, "y": 259.8 },
+        "position": {
+          "x": 140,
+          "y": 259.8
+        },
         "width": 60,
         "height": 9.2,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3\n東京マンション123号"
       },
       "{24}自由": {
-        "position": { "x": 140, "y": 269.3 },
+        "position": {
+          "x": 140,
+          "y": 269.3
+        },
         "width": 60,
         "height": 4.44,
         "type": "text",
         "alignment": "center",
         "fontSize": 9,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp宛名ラベル印刷部"
       },
       "{24}氏名": {
-        "position": { "x": 140, "y": 273.3 },
+        "position": {
+          "x": 140,
+          "y": 273.3
+        },
         "width": 60,
         "height": 7.88,
         "type": "text",
         "alignment": "center",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太様"
       }
     }
   ]

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import type { SidebarProps } from '../../../../types';
-import { SIDEBAR_WIDTH } from '../../../../constants';
+import { RIGHT_SIDEBAR_WIDTH } from '../../../../constants';
 import { I18nContext } from '../../../../contexts';
 import { getSidebarContentHeight } from '../../../../helper';
 import { theme, Input, Typography, Divider, Button } from 'antd';
@@ -76,7 +76,7 @@ const ListView = (
             style={{
               paddingLeft: 30,
               height: height - headHeight,
-              width: SIDEBAR_WIDTH - 35,
+              width: RIGHT_SIDEBAR_WIDTH - 35,
               lineHeight: '2.75rem',
             }}
           />
@@ -89,15 +89,7 @@ const ListView = (
             onEdit={onEdit}
           />
         )}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            height: headHeight,
-            borderBottom: `1px solid ${token.colorSplit}`,
-          }}
-        >
+        <div style={{ paddingTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
           {isBulkUpdateFieldNamesMode ? (
             <>
               <Button size="small" type="text" onClick={commitBulk}>

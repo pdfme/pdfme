@@ -1,17 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types';
-import { SIDEBAR_WIDTH } from '../../../constants';
-import { I18nContext } from '../../../contexts';
+import { RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
 
 const Sidebar = (props: SidebarProps) => {
-  const { sidebarOpen, setSidebarOpen, activeElements, schemas, addSchema } = props;
+  const { sidebarOpen, setSidebarOpen, activeElements, schemas } = props;
 
   const { token } = theme.useToken();
-  const i18n = useContext(I18nContext);
   const getActiveSchemas = () =>
     schemas.filter((s) => activeElements.map((ae) => ae.id).includes(s.id));
   const getLastActiveSchema = () => {
@@ -26,7 +24,7 @@ const Sidebar = (props: SidebarProps) => {
         right: 0,
         zIndex: 1,
         height: '100%',
-        width: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        width: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
       }}
     >
       <div>
@@ -45,7 +43,7 @@ const Sidebar = (props: SidebarProps) => {
         />
         <div
           style={{
-            width: SIDEBAR_WIDTH,
+            width: RIGHT_SIDEBAR_WIDTH,
             height: '100%',
             display: sidebarOpen ? 'block' : 'none',
             top: 0,
@@ -64,19 +62,6 @@ const Sidebar = (props: SidebarProps) => {
             ) : (
               <DetailView {...props} activeSchema={getLastActiveSchema()} />
             )}
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '1.5rem',
-              marginTop: '1rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <Button type="primary" style={{ fontWeight: 600 }} onClick={addSchema}>
-              {i18n('addNewField')}
-            </Button>
           </div>
         </div>
       </div>

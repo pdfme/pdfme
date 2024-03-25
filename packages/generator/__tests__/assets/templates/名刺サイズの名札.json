@@ -1,54 +1,12 @@
 {
   "team": "labelmake",
-  "tags": ["その他"],
+  "tags": [
+    "その他"
+  ],
   "description": "イベントなどで使える名刺サイズ(91mmx55mm)の名札です。  A4に10名の情報を入力でき、名刺サイズなので汎用的なケースに入れて使えます。  家庭用のプリンタに差し込み印刷で、すぐに宛名印刷していただけます。  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "",
   "createdAt": null,
   "updatedAt": null,
-  "sampledata": [
-    {
-      "{1}自由1": "株式会社labelmake.jp",
-      "{1}氏名": "東京都 出得太",
-      "{1}自由2": "Email: info@labelmake.jp",
-      "{1}自由3": "Twitter: labelmake",
-      "{2}自由1": "株式会社labelmake.jp",
-      "{2}氏名": "東京都 出得太",
-      "{2}自由2": "Email: info@labelmake.jp",
-      "{2}自由3": "Twitter: labelmake",
-      "{3}自由1": "株式会社labelmake.jp",
-      "{3}氏名": "東京都 出得太",
-      "{3}自由2": "Email: info@labelmake.jp",
-      "{3}自由3": "Twitter: labelmake",
-      "{4}自由1": "株式会社labelmake.jp",
-      "{4}氏名": "東京都 出得太",
-      "{4}自由2": "Email: info@labelmake.jp",
-      "{4}自由3": "Twitter: labelmake",
-      "{5}自由1": "株式会社labelmake.jp",
-      "{5}氏名": "東京都 出得太",
-      "{5}自由2": "Email: info@labelmake.jp",
-      "{5}自由3": "Twitter: labelmake",
-      "{6}自由1": "株式会社labelmake.jp",
-      "{6}氏名": "東京都 出得太",
-      "{6}自由2": "Email: info@labelmake.jp",
-      "{6}自由3": "Twitter: labelmake",
-      "{7}自由1": "株式会社labelmake.jp",
-      "{7}氏名": "東京都 出得太",
-      "{7}自由2": "Email: info@labelmake.jp",
-      "{7}自由3": "Twitter: labelmake",
-      "{8}自由1": "株式会社labelmake.jp",
-      "{8}氏名": "東京都 出得太",
-      "{8}自由2": "Email: info@labelmake.jp",
-      "{8}自由3": "Twitter: labelmake",
-      "{9}自由1": "株式会社labelmake.jp",
-      "{9}氏名": "東京都 出得太",
-      "{9}自由2": "Email: info@labelmake.jp",
-      "{9}自由3": "Twitter: labelmake",
-      "{10}自由1": "株式会社labelmake.jp",
-      "{10}氏名": "東京都 出得太",
-      "{10}自由2": "Email: info@labelmake.jp",
-      "{10}自由3": "Twitter: labelmake"
-    }
-  ],
   "columns": [
     "{1}自由1",
     "{1}氏名",
@@ -98,404 +56,564 @@
   "schemas": [
     {
       "{1}自由1": {
-        "position": { "x": 20, "y": 22 },
+        "position": {
+          "x": 20,
+          "y": 22
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{1}氏名": {
-        "position": { "x": 20, "y": 33 },
+        "position": {
+          "x": 20,
+          "y": 33
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{1}自由2": {
-        "position": { "x": 20, "y": 48 },
+        "position": {
+          "x": 20,
+          "y": 48
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{1}自由3": {
-        "position": { "x": 20, "y": 56 },
+        "position": {
+          "x": 20,
+          "y": 56
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{2}自由1": {
-        "position": { "x": 20, "y": 77 },
+        "position": {
+          "x": 20,
+          "y": 77
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{2}氏名": {
-        "position": { "x": 20, "y": 88 },
+        "position": {
+          "x": 20,
+          "y": 88
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{2}自由2": {
-        "position": { "x": 20, "y": 103 },
+        "position": {
+          "x": 20,
+          "y": 103
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{2}自由3": {
-        "position": { "x": 20, "y": 111 },
+        "position": {
+          "x": 20,
+          "y": 111
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{3}自由1": {
-        "position": { "x": 20, "y": 132 },
+        "position": {
+          "x": 20,
+          "y": 132
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{3}氏名": {
-        "position": { "x": 20, "y": 143 },
+        "position": {
+          "x": 20,
+          "y": 143
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{3}自由2": {
-        "position": { "x": 20, "y": 158 },
+        "position": {
+          "x": 20,
+          "y": 158
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{3}自由3": {
-        "position": { "x": 20, "y": 166 },
+        "position": {
+          "x": 20,
+          "y": 166
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{4}自由1": {
-        "position": { "x": 20, "y": 187 },
+        "position": {
+          "x": 20,
+          "y": 187
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{4}氏名": {
-        "position": { "x": 20, "y": 198 },
+        "position": {
+          "x": 20,
+          "y": 198
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{4}自由2": {
-        "position": { "x": 20, "y": 213 },
+        "position": {
+          "x": 20,
+          "y": 213
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{4}自由3": {
-        "position": { "x": 20, "y": 221 },
+        "position": {
+          "x": 20,
+          "y": 221
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{5}自由1": {
-        "position": { "x": 20, "y": 242 },
+        "position": {
+          "x": 20,
+          "y": 242
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{5}氏名": {
-        "position": { "x": 20, "y": 253 },
+        "position": {
+          "x": 20,
+          "y": 253
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{5}自由2": {
-        "position": { "x": 20, "y": 268 },
+        "position": {
+          "x": 20,
+          "y": 268
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{5}自由3": {
-        "position": { "x": 20, "y": 276 },
+        "position": {
+          "x": 20,
+          "y": 276
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{6}自由1": {
-        "position": { "x": 110, "y": 22 },
+        "position": {
+          "x": 110,
+          "y": 22
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{6}氏名": {
-        "position": { "x": 110, "y": 33 },
+        "position": {
+          "x": 110,
+          "y": 33
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{6}自由2": {
-        "position": { "x": 110, "y": 48 },
+        "position": {
+          "x": 110,
+          "y": 48
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{6}自由3": {
-        "position": { "x": 110, "y": 56 },
+        "position": {
+          "x": 110,
+          "y": 56
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{7}自由1": {
-        "position": { "x": 110, "y": 77 },
+        "position": {
+          "x": 110,
+          "y": 77
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{7}氏名": {
-        "position": { "x": 110, "y": 88 },
+        "position": {
+          "x": 110,
+          "y": 88
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{7}自由2": {
-        "position": { "x": 110, "y": 103 },
+        "position": {
+          "x": 110,
+          "y": 103
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{7}自由3": {
-        "position": { "x": 110, "y": 111 },
+        "position": {
+          "x": 110,
+          "y": 111
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{8}自由1": {
-        "position": { "x": 110, "y": 132 },
+        "position": {
+          "x": 110,
+          "y": 132
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{8}氏名": {
-        "position": { "x": 110, "y": 143 },
+        "position": {
+          "x": 110,
+          "y": 143
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{8}自由2": {
-        "position": { "x": 110, "y": 158 },
+        "position": {
+          "x": 110,
+          "y": 158
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{8}自由3": {
-        "position": { "x": 110, "y": 166 },
+        "position": {
+          "x": 110,
+          "y": 166
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{9}自由1": {
-        "position": { "x": 110, "y": 187 },
+        "position": {
+          "x": 110,
+          "y": 187
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{9}氏名": {
-        "position": { "x": 110, "y": 198 },
+        "position": {
+          "x": 110,
+          "y": 198
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{9}自由2": {
-        "position": { "x": 110, "y": 213 },
+        "position": {
+          "x": 110,
+          "y": 213
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{9}自由3": {
-        "position": { "x": 110, "y": 221 },
+        "position": {
+          "x": 110,
+          "y": 221
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       },
       "{10}自由1": {
-        "position": { "x": 110, "y": 242 },
+        "position": {
+          "x": 110,
+          "y": 242
+        },
         "width": 77.93,
         "height": 9.99,
         "type": "text",
         "alignment": "left",
         "fontSize": 17,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "{10}氏名": {
-        "position": { "x": 110, "y": 253 },
+        "position": {
+          "x": 110,
+          "y": 253
+        },
         "width": 77.93,
         "height": 11.32,
         "type": "text",
         "alignment": "left",
         "fontSize": 24,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "{10}自由2": {
-        "position": { "x": 110, "y": 268 },
+        "position": {
+          "x": 110,
+          "y": 268
+        },
         "width": 77.94,
         "height": 8.4,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Email: info@labelmake.jp"
       },
       "{10}自由3": {
-        "position": { "x": 110, "y": 276 },
+        "position": {
+          "x": 110,
+          "y": 276
+        },
         "width": 77.94,
         "height": 10,
         "type": "text",
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "Twitter: labelmake"
       }
     }
   ]

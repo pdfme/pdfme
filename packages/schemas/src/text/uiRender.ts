@@ -19,7 +19,7 @@ import {
   getBrowserVerticalFontAdjustments,
   isFirefox,
 } from './helper.js';
-import { addAlphaToHex, isEditable } from '../utils.js';
+import { isEditable } from '../utils.js';
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
@@ -33,10 +33,9 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-const getBackgroundColor = (value: string, schema: Schema, defaultBackgroundColor: string) => {
-  if (!value) return 'transparent';
-  if (schema.backgroundColor) return schema.backgroundColor as string;
-  return defaultBackgroundColor;
+const getBackgroundColor = (value: string, schema: Schema) => {
+  if (!value || !schema.backgroundColor) return 'transparent';
+  return schema.backgroundColor as string;
 };
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
@@ -50,7 +49,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     tabIndex,
     placeholder,
     options,
-    theme,
     _cache,
   } = arg;
   const font = options?.font || getDefaultFont();
@@ -67,7 +65,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     dynamicFontSize = await calculateDynamicFontSize(getCdfArg(value));
   }
 
-  const fontKitFont = await getFontKitFont(schema, font, _cache);
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(
@@ -85,13 +83,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const containerStyle: CSS.Properties = {
     padding: 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(value, schema, addAlphaToHex(theme.colorPrimaryBg, 30)),
+    backgroundColor: getBackgroundColor(value, schema),
     border: 'none',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
+    cursor: isEditable(mode, schema) ? 'text' : 'default',
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
@@ -143,7 +142,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     textBlock.tabIndex = tabIndex || 0;
     textBlock.innerText = value;
     textBlock.addEventListener('blur', (e: Event) => {
-      onChange && onChange((e.target as HTMLDivElement).innerText);
+      onChange && onChange({ key: 'content', value: (e.target as HTMLDivElement).innerText });
       stopEditing && stopEditing();
     });
 
@@ -187,15 +186,16 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     container.appendChild(textBlock);
 
     if (mode === 'designer') {
-      textBlock.focus();
-
-      // Set the focus to the end of the editable element when you focus, as we would for a textarea
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(textBlock);
-      range.collapse(false); // Collapse range to the end
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+      setTimeout(() => {
+        textBlock.focus();
+        // Set the focus to the end of the editable element when you focus, as we would for a textarea
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(textBlock);
+        range.collapse(false); // Collapse range to the end
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      });
     }
   } else {
     textBlock.innerHTML = value

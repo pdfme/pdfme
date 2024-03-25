@@ -2,14 +2,14 @@ import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2PrintingColor, convertForPdfLayoutProps } from '../utils.js';
 
-interface Shape extends Schema {
+interface ShapeSchema extends Schema {
   type: 'ellipse' | 'rectangle';
   borderWidth: number;
   borderColor: string;
   color: string;
 }
 
-const shape: Plugin<Shape> = {
+const shape: Plugin<ShapeSchema> = {
   ui: (arg) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');
@@ -28,6 +28,7 @@ const shape: Plugin<Shape> = {
   },
   pdf: (arg) => {
     const { schema, page, options } = arg;
+    if (!schema.color && !schema.borderColor) return;
     const { colorType } = options;
     const pageHeight = page.getHeight();
     const cArg = { schema, pageHeight };
@@ -69,7 +70,7 @@ const shape: Plugin<Shape> = {
         title: i18n('schemas.borderWidth'),
         type: 'number',
         widget: 'inputNumber',
-        min: 0,
+        props: { min: 0 },
         step: 1,
       },
       borderColor: {
@@ -85,7 +86,6 @@ const shape: Plugin<Shape> = {
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
     }),
-    defaultValue: '',
     defaultSchema: {
       type: 'rectangle',
       position: { x: 0, y: 0 },
@@ -93,17 +93,26 @@ const shape: Plugin<Shape> = {
       height: 37.5,
       rotate: 0,
       opacity: 1,
-      borderWidth: 5,
+      borderWidth: 1,
       borderColor: '#000000',
-      color: '#ffffff',
+      color: '',
       readOnly: true,
     },
   },
 };
 
+const rectangleIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>';
+const ellipseIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle"><circle cx="12" cy="12" r="10"/></svg>';
+
 const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   ...shape.propPanel,
-  defaultSchema: { ...shape.propPanel.defaultSchema, type },
+  defaultSchema: {
+    ...shape.propPanel.defaultSchema,
+    type,
+    icon: type === 'rectangle' ? rectangleIcon : ellipseIcon,
+  },
 });
 
 export const rectangle = { ...shape, propPanel: getPropPanelSchema('rectangle') };

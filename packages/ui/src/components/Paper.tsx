@@ -67,8 +67,7 @@ const Paper = (props: {
 
         return (
           <div
-            id={`@pdfme/ui-paper${paperIndex}`}
-            key={paperIndex + JSON.stringify(paperSize)}
+            key={String(paperIndex) + JSON.stringify(paperSize)}
             ref={(e) => {
               if (e) {
                 paperRefs.current[paperIndex] = e;

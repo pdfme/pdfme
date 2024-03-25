@@ -8,10 +8,11 @@ import Divider from '../components/Divider';
 import Code from '../components/Code';
 import GithubStar from '../components/GithubStar';
 import type { Template } from '@pdfme/common';
+import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
 import { generate } from '@pdfme/generator';
 import type { Designer, Viewer, Form } from '@pdfme/ui';
-import { getSampleTemplate, cloneDeep, getGeneratorSampleCode } from '../libs/helper';
+import { getSampleTemplate, getGeneratorSampleCode } from '../libs/helper';
 
 export default function Home(): JSX.Element {
   const designerRef = useRef<HTMLDivElement | null>(null);
@@ -29,15 +30,11 @@ export default function Home(): JSX.Element {
     setTemplate(t);
     if (form.current) {
       form.current.updateTemplate(t);
-      if (t.sampledata) {
-        form.current.setInputs(cloneDeep(t.sampledata));
-      }
+      form.current.setInputs(getInputFromTemplate(t));
     }
     if (viewer.current) {
       viewer.current.updateTemplate(t);
-      if (t.sampledata) {
-        viewer.current.setInputs(cloneDeep(t.sampledata));
-      }
+      viewer.current.setInputs(getInputFromTemplate(t));
     }
   };
 
@@ -66,7 +63,7 @@ export default function Home(): JSX.Element {
           domContainer: viewerRef.current,
           template,
           plugins: { text, image, qrcode: barcodes.qrcode },
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: getInputFromTemplate(template),
         });
       });
 
@@ -78,7 +75,7 @@ export default function Home(): JSX.Element {
           domContainer: formRef.current,
           template,
           plugins: { text, image, qrcode: barcodes.qrcode },
-          inputs: cloneDeep(template.sampledata ?? [{}]),
+          inputs: getInputFromTemplate(template),
         });
 
         form.current.onChangeInput(console.log);
