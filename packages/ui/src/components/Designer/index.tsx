@@ -8,6 +8,7 @@ import {
   DesignerProps,
   Size,
   isBlankPdf,
+  px2mm,
 } from '@pdfme/common';
 import { DndContext } from '@dnd-kit/core';
 import RightSidebar from './RightSidebar/index';
@@ -28,11 +29,16 @@ import Root from '../Root';
 import ErrorScreen from '../ErrorScreen';
 import CtlBar from '../CtlBar';
 
-const px2mm = (px: number): number => {
-  // http://www.endmemo.com/sconvert/millimeterpixel.php
-  const ratio = 0.26458333333333;
-  return parseFloat(String(px)) * ratio;
-};
+/**
+ * When the canvas scales there is a displacement of the starting position of the dragged schema.
+ * It moves left or right from the top-left corner of the drag icon depending on the scale.
+ * This function calculates the adjustment needed to compensate for this displacement.
+ */
+const scaleDragPosAdjustment = (adjustment: number, scale: number): number => {
+  if (scale > 1) return adjustment * (scale - 1);
+  if (scale < 1) return adjustment * -(1 - scale);
+  return 0;
+}
 
 const TemplateEditor = ({
   template,
@@ -50,7 +56,7 @@ const TemplateEditor = ({
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
-  const mainRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const i18n = useContext(I18nContext);
@@ -78,7 +84,7 @@ const TemplateEditor = ({
   };
 
   useScrollPageCursor({
-    ref: mainRef,
+    ref: canvasRef,
     pageSizes,
     scale,
     pageCursor,
@@ -145,8 +151,8 @@ const TemplateEditor = ({
     setSchemasList(sl);
     onEditEnd();
     setPageCursor(0);
-    if (mainRef.current?.scroll) {
-      mainRef.current.scroll({ top: 0, behavior: 'smooth' });
+    if (canvasRef.current?.scroll) {
+      canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
     }
   }, []);
 
@@ -192,8 +198,8 @@ const TemplateEditor = ({
     void refresh(newTemplate);
     setTimeout(
       () =>
-        mainRef.current &&
-        ((mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)), 0)
+        canvasRef.current &&
+        ((canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)), 0)
     );
   };
 
@@ -236,14 +242,17 @@ const TemplateEditor = ({
           // Triggered after a schema is dragged & dropped from the left sidebar.
           if (!event.active) return;
           const active = event.active;
+          const pageRect = paperRefs.current[pageCursor].getBoundingClientRect();
 
-          const rect = paperRefs.current[pageCursor].getBoundingClientRect();
-          const initialTop = (active.rect.current.initial?.top || 0) - rect.top;
-          const initialLeft = (active.rect.current.initial?.left || 0) - rect.left;
-          const _scale = scale < 1 ? scale + 1 : scale;
-          const adjust = 0.915; // TODO: Investigate later as to why it needs to be adjusted.
-          const moveY = (initialTop + event.delta.y) * _scale * adjust;
-          const moveX = (initialLeft + event.delta.x) * _scale;
+          const dragStartLeft = active.rect.current.initial?.left || 0;
+          const dragStartTop = active.rect.current.initial?.top || 0;
+
+          const canvasLeftOffsetFromPageCorner = pageRect.left - dragStartLeft + scaleDragPosAdjustment(20, scale);
+          const canvasTopOffsetFromPageCorner = pageRect.top - dragStartTop;
+
+          const moveY = (event.delta.y - canvasTopOffsetFromPageCorner) / scale;
+          const moveX = (event.delta.x - canvasLeftOffsetFromPageCorner) / scale;
+
           const position = { x: px2mm(Math.max(0, moveX)), y: px2mm(Math.max(0, moveY)) }
 
           addSchema({ ...(active.data.current as Schema), position });
@@ -255,8 +264,8 @@ const TemplateEditor = ({
           pageCursor={pageCursor}
           pageNum={schemasList.length}
           setPageCursor={(p) => {
-            if (!mainRef.current) return;
-            mainRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
+            if (!canvasRef.current) return;
+            canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
             setPageCursor(p);
             onEditEnd();
           }}
@@ -265,7 +274,7 @@ const TemplateEditor = ({
           {...pageManipulation}
         />
         <LeftSidebar
-          height={mainRef.current ? mainRef.current.clientHeight : 0}
+          height={canvasRef.current ? canvasRef.current.clientHeight : 0}
           scale={scale}
           basePdf={template.basePdf}
         />
@@ -273,7 +282,7 @@ const TemplateEditor = ({
         <RightSidebar
           hoveringSchemaId={hoveringSchemaId}
           onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-          height={mainRef.current ? mainRef.current.clientHeight : 0}
+          height={canvasRef.current ? canvasRef.current.clientHeight : 0}
           size={size}
           pageSize={pageSizes[pageCursor] ?? []}
           activeElements={activeElements}
@@ -291,7 +300,7 @@ const TemplateEditor = ({
         />
 
         <Canvas
-          ref={mainRef}
+          ref={canvasRef}
           paperRefs={paperRefs}
           basePdf={template.basePdf}
           hoveringSchemaId={hoveringSchemaId}
