@@ -7,10 +7,11 @@ import * as pdfJs from 'pdfjs-dist/legacy/build/pdf.js';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
+  'value' | 'schema' | 'onChange' | 'onSchemaAttributeChange' |'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
 > & {
   schema: SchemaForUI;
   onChange: (value: string) => void;
+  onSchemaAttributeChange?: (key: string, value: string) => void;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
@@ -50,10 +51,16 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, mode, onChange, onSchemaAttributeChange, stopEditing, tabIndex, placeholder, scale } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
+
+  const editable = mode === 'form' || mode === 'designer';
+
+  // If this schema is actively being edited (e.g. typing into a field)
+  // then we don't want changes to that schema triggering a re-render
+  const schemaRerenderState = editable ? '' : JSON.stringify(schema);
 
   useEffect(() => {
     if (ref.current && schema.type) {
@@ -69,8 +76,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       ref.current.innerHTML = '';
 
-      const editable = mode === 'form' || mode === 'designer';
-
       render({
         key: schema.key,
         value: schema.readOnly ? schema.readOnlyValue || '' : schema.data,
@@ -78,6 +83,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         rootElement: ref.current,
         mode,
         onChange: editable ? onChange : undefined,
+        onSchemaAttributeChange: editable ? onSchemaAttributeChange : undefined,
         stopEditing: editable ? stopEditing : undefined,
         tabIndex,
         placeholder,
@@ -93,7 +99,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+  }, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
 
   return (
     <Wrapper {...props}>
