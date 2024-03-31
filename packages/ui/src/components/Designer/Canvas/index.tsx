@@ -449,6 +449,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               const args = Array.isArray(arg) ? arg : [arg];
               changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
             }}
+            onSchemaAttributeChange={(key, value) => {
+              changeSchemas([{ key, value, schemaId: schema.id }]);
+            }}
             stopEditing={() => setEditing(false)}
             outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
               }`}
