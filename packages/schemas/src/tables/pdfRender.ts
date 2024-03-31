@@ -12,8 +12,6 @@ const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
 
 async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
-  // TODO Not considering the table border
-  // The cell's position and size should indeed be shifted to accommodate the table border
   await cellPdfRender({
     ...arg,
     value: cell.raw,

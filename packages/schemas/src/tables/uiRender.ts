@@ -45,6 +45,45 @@ const calcResizedHeadWidthPercentages = (arg: {
   return headWidthPercentages;
 };
 
+const setBorder = (
+  div: HTMLDivElement,
+  borderPosition: 'Top' | 'Left' | 'Right' | 'Bottom',
+  arg: UIRenderProps<TableSchema>
+) => {
+  div.style[`border${borderPosition}`] = `${String(arg.schema.tableStyles.borderWidth)}mm solid ${
+    arg.schema.tableStyles.borderColor
+  }`;
+};
+
+const drawBorder = (
+  div: HTMLDivElement,
+  row: RowType,
+  colIndex: number,
+  rowIndex: number,
+  rowsLength: number,
+  arg: UIRenderProps<TableSchema>
+) => {
+  const isFirstColumn = colIndex === 0;
+  const isLastColumn = colIndex === Object.values(row.cells).length - 1;
+  const isLastRow = rowIndex === rowsLength - 1;
+
+  if (row.section === 'head') {
+    setBorder(div, 'Top', arg);
+    if (isFirstColumn) setBorder(div, 'Left', arg);
+    if (isLastColumn) setBorder(div, 'Right', arg);
+    if ((JSON.parse(arg.value || '[]') as string[][]).length === 0) {
+      setBorder(div, 'Bottom', arg);
+    }
+  } else if (row.section === 'body') {
+    if (!arg.schema.showHead && rowIndex === 0) {
+      setBorder(div, 'Top', arg);
+    }
+    if (isFirstColumn) setBorder(div, 'Left', arg);
+    if (isLastColumn) setBorder(div, 'Right', arg);
+    if (isLastRow) setBorder(div, 'Bottom', arg);
+  }
+};
+
 const renderRowUi = (args: {
   rows: RowType[];
   arg: UIRenderProps<TableSchema>;
@@ -55,20 +94,20 @@ const renderRowUi = (args: {
   const { rows, arg, onChangeEditingPosition, offsetY = 0, editingPosition } = args;
   const value = JSON.parse(arg.value || '[]') as string[][];
 
-  // TODO Need to adjust the inner size when the outer border increases
-  // Want to have the same style as border-collapse: collapse; (overlapping borders should merge into one)
-  // This should apply to the table itself as well as the cells, which should behave similarly.
   let rowOffsetY = offsetY;
   rows.forEach((row, rowIndex) => {
     const { cells, height, section } = row;
-    let colWidth = 0;
+    let colOffsetX = 0;
     Object.values(cells).forEach((cell, colIndex) => {
       const div = document.createElement('div');
       div.style.position = 'absolute';
       div.style.top = `${rowOffsetY}mm`;
-      div.style.left = `${colWidth}mm`;
+      div.style.left = `${colOffsetX}mm`;
       div.style.width = `${cell.width}mm`;
       div.style.height = `${cell.height}mm`;
+      div.style.boxSizing = 'border-box';
+
+      drawBorder(div, row, colIndex, rowIndex, rows.length, arg);
 
       div.style.cursor =
         arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
@@ -101,7 +140,6 @@ const renderRowUi = (args: {
           if (section === 'body') {
             const startRange = arg.schema.__bodyRange?.start ?? 0;
             value[rowIndex + startRange][colIndex] = newValue;
-            // TODO Calling onChange triggers re-rendering, causing the focus to be lost
             arg.onChange({ key: 'content', value: JSON.stringify(value) });
           } else {
             const newHead = [...arg.schema.head];
@@ -115,13 +153,13 @@ const renderRowUi = (args: {
         schema: {
           type: 'cell',
           content: cell.raw,
-          position: { x: colWidth, y: rowOffsetY },
+          position: { x: colOffsetX, y: rowOffsetY },
           width: cell.width,
           height: cell.height,
           ...convertToCellStyle(cell.styles),
         },
       });
-      colWidth += cell.width;
+      colOffsetX += cell.width;
     });
     rowOffsetY += height;
   });
@@ -143,11 +181,6 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const table = await createSingleTable(bodyWidthRange, arg);
 
   rootElement.innerHTML = '';
-
-  rootElement.style.borderColor = schema.tableStyles.borderColor;
-  rootElement.style.borderWidth = String(schema.tableStyles.borderWidth) + 'mm';
-  rootElement.style.borderStyle = 'solid';
-  rootElement.style.boxSizing = 'border-box';
 
   const handleChangeEditingPosition = (
     newPosition: { rowIndex: number; colIndex: number },
@@ -353,10 +386,8 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     resetEditingPosition();
   }
 
-  if (mode !== 'form') {
-    const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
-    if (schema.height !== tableHeight && onChange) {
-      onChange({ key: 'height', value: tableHeight });
-    }
+  const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
+  if (schema.height !== tableHeight && onChange) {
+    onChange({ key: 'height', value: tableHeight });
   }
 };
