@@ -5,21 +5,26 @@ import { isEditable } from '../utils';
 import { substituteVariables } from './helper';
 
 export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
-  const { value, schema, rootElement, mode, onChange, onSchemaAttributeChange, ...rest } = arg;
+  const { value, schema, rootElement, mode, onChange, ...rest } = arg;
 
   // This plugin currently does not support editing in form view, setting as read-only.
   const mvtMode = mode == 'form' ? 'viewer' : mode;
 
-  let content = schema.content;
+  let text = schema.text;
   let numVariables = schema.variables.length;
 
   const parentRenderArgs = {
-    value: isEditable(mvtMode, schema) ? content : substituteVariables(content, value),
+    value: isEditable(mvtMode, schema) ? text : substituteVariables(text, value),
     schema,
     mode: mvtMode,
     rootElement,
-    onChange: (value: string) => {
-      if (onChange && onSchemaAttributeChange) onSchemaAttributeChange('content', value);
+    onChange: (arg: { key: string; value: any; } | { key: string; value: any; }[]) => {
+      console.log('looking to trigger on change with value: ', arg);
+      if (!Array.isArray(arg)) {
+        onChange && onChange({key: 'text', value: arg.value});
+      } else {
+        console.error('onChange is not an array, the parent text plugin has changed...');
+      }
     },
     ...rest,
   };
@@ -29,13 +34,13 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const textBlock = rootElement.querySelector('#text-' + schema.id) as HTMLDivElement;
   if (textBlock) {
     textBlock.addEventListener('keyup', (event: KeyboardEvent) => {
-      content = textBlock.textContent || '';
+      text = textBlock.textContent || '';
       if (keyPressShouldBeChecked(event)) {
-        const newNumVariables = countUniqueVariableNames(content);
+        const newNumVariables = countUniqueVariableNames(text);
         if (numVariables !== newNumVariables) {
           // If variables were modified during this keypress, we trigger a change
-          if (onSchemaAttributeChange) {
-            onSchemaAttributeChange('content', content);
+          if (onChange) {
+            onChange({key: 'text', value: text});
           }
           numVariables = newNumVariables;
         }

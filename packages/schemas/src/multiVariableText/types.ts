@@ -1,6 +1,6 @@
 import type { TextSchema } from '../text/types';
 
 export interface MultiVariableTextSchema extends TextSchema {
-  content: string;
+  text: string;
   variables: string[];
 }

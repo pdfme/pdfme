@@ -6,15 +6,15 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema } = props;
 
   const mvtSchema = (activeSchema as any);
-  const content = mvtSchema.content || '';
-  const variables = JSON.parse(mvtSchema.data) || {};
+  const text = mvtSchema.text || '';
+  const variables = JSON.parse(mvtSchema.content) || {};
 
-  const variablesChanged = updateVariablesFromText(content, variables);
+  const variablesChanged = updateVariablesFromText(text, variables);
   const varNames = Object.keys(variables);
 
   if (variablesChanged) {
     changeSchemas([
-        { key: 'data', value: JSON.stringify(variables), schemaId: activeSchema.id },
+        { key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id },
         { key: 'variables', value: varNames, schemaId: activeSchema.id }
     ]);
   }
@@ -42,7 +42,7 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
       textarea.value = variables[variableName];
       textarea.addEventListener('change', (e: Event) => {
         variables[variableName] = (e.target as HTMLTextAreaElement).value;
-        changeSchemas([{ key: 'data', value: JSON.stringify(variables), schemaId: activeSchema.id }]);
+        changeSchemas([{ key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id }]);
       });
 
       const label = varRow.querySelector('label') as HTMLLabelElement
@@ -83,11 +83,11 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
     };
   },
   widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
-  defaultValue: '{}',
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
     type: 'multiVariableText',
-    content: 'Type something...',
+    text: 'Type something...',
+    content: '{}',
     variables: [],
   },
 };
