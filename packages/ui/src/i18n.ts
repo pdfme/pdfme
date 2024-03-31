@@ -434,7 +434,6 @@ const dictEs: { [key in keyof Dict]: string } = {
   notUniq: '(Nombre no único)',
   noKeyName: 'Sin nombre',
   fieldsList: 'Lista de campos',
-  addNewField: 'Añadir un nuevo campo',
   editField: 'Editar campo',
   type: 'Tipo',
   errorOccurred: 'Ocurrió un error',
@@ -442,10 +441,15 @@ const dictEs: { [key in keyof Dict]: string } = {
     'No se puede confirmar el cambio porque el número de elementos ha cambiado.',
   commitBulkUpdateFieldName: 'Confirmar cambios',
   bulkUpdateFieldName: 'Actualizar en bloque el nombre de los campos',
+  addPageAfter: 'Insertar página',
+  removePage: 'Eliminar página actual',
+  removePageConfirm:
+    '¿Estás seguro de que quieres eliminar esta página? Esta acción no se puede deshacer.',
   hexColorPrompt: 'Introduce un código de color hexadecimal válido.',
   'schemas.color': 'Color',
   'schemas.borderWidth': 'Ancho del borde',
   'schemas.borderColor': 'Color del borde',
+  'schemas.backgroundColor': 'Color de fondo',
   'schemas.textColor': 'Color del texto',
   'schemas.bgColor': 'Color del fondo',
   'schemas.horizontal': 'Horizontal',
@@ -456,6 +460,7 @@ const dictEs: { [key in keyof Dict]: string } = {
   'schemas.top': 'Arriba',
   'schemas.middle': 'Medio',
   'schemas.bottom': 'Abajo',
+  'schemas.padding': 'Relleno',
   'schemas.text.fontName': 'Nombre de la fuente',
   'schemas.text.size': 'Tamaño',
   'schemas.text.spacing': 'Espaciado',
@@ -468,6 +473,11 @@ const dictEs: { [key in keyof Dict]: string } = {
   'schemas.text.dynamicFontSize': 'Tamaño de fuente dinámico',
   'schemas.barcodes.barColor': 'Color de la barra',
   'schemas.barcodes.includetext': 'Incluir texto',
+  'schemas.table.alternateBackgroundColor': 'Color de fondo alternativo',
+  'schemas.table.tableStyle': 'Estilo de tabla',
+  'schemas.table.headStyle': 'Estilo de cabecera',
+  'schemas.table.bodyStyle': 'Estilo de cuerpo',
+  'schemas.table.columnStyle': 'Estilo de columna',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {
