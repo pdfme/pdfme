@@ -500,7 +500,7 @@ const dictFr: { [key in keyof Dict]: string } = {
   errorOccurred:' Une erreur est survenue',
   errorBulkUpdateFieldName: "Impossible de confirmer le changement car le nombre d'éléments a changé.",
   commitBulkUpdateFieldName: 'Confirmer les changements',
-  bulkUpdateFieldName: 'Mettre à jour en bloc le nom des champs',
+  bulkUpdateFieldName: 'Modifier les noms de champs en masse',
   addPageAfter: 'Ajouter une page après',
   removePage: 'Supprimer la page actuelle',
   removePageConfirm: 'Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible.',
