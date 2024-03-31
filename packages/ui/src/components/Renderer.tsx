@@ -58,7 +58,7 @@ const Renderer = (props: RendererProps) => {
   const _cache = useRef<Map<any, any>>(new Map());
 
   // If this schema is actively being edited (e.g. typing into a field)
-  // then we don't want changes to that schema triggering a re-render
+  // then we don't want changes to that schema made elsewhere to trigger a re-render and lose focus.
   const schemaRerenderState = mode === 'form' || mode === 'designer' ? '' : JSON.stringify(schema);
 
   useEffect(() => {
@@ -98,8 +98,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
-// }, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
+}, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
 
   return (
     <Wrapper {...props}>
