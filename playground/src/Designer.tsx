@@ -153,6 +153,7 @@ function App() {
             <option value="pl">Polish</option>
             <option value="it">Italian</option>
             <option value="de">German</option>
+            <option value="fr">French</option>
           </select>
         </label>
         <span style={{ margin: "0 1rem" }}>/</span>
