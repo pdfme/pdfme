@@ -10,7 +10,7 @@ import {
   svg,
   readOnlySvg,
   line,
-  table,
+  tableBeta,
   rectangle,
   ellipse,
 } from '@pdfme/schemas';
@@ -106,7 +106,7 @@ export const getPlugins = () => {
   return {
     Text: text,
     ReadOnlyText: readOnlyText,
-    Table: table,
+    Table: tableBeta,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,

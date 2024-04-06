@@ -8,6 +8,8 @@ import { modifyTemplateForTable, getDynamicHeightForTable } from './tables/dynam
 import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
 import { convertForPdfLayoutProps, rotatePoint } from './utils.js';
 
+const tableBeta = table;
+
 const builtInPlugins = { Text: text };
 
 export {
@@ -19,7 +21,7 @@ export {
   readOnlySvg,
   barcodes,
   line,
-  table,
+  tableBeta,
   modifyTemplateForTable,
   getDynamicHeightForTable,
   rectangle,
