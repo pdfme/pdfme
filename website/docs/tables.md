@@ -27,7 +27,7 @@ We would also appreciate being informed about any bugs not yet discovered during
 
 ## Related Links
 
-- [Implementation Ideas for Dynamic Tables in pdfme](http://localhost:3000/blog/implementation-Ideas-for-dynamic-tables)
-- [Developing pdfme V4](http://localhost:3000/blog/developing-pdfme-v4)
+- [Implementation Ideas for Dynamic Tables in pdfme](/blog/implementation-Ideas-for-dynamic-tables)
+- [Developing pdfme V4](/blog/developing-pdfme-v4)
 
 ---
