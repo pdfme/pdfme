@@ -11,10 +11,10 @@ import React, {
 } from 'react';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import { ZOOM, SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
-import { RULER_HEIGHT, SIDEBAR_WIDTH } from '../../../constants';
+import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
 import Paper from '../../Paper';
@@ -23,6 +23,11 @@ import Selecto from './Selecto';
 import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
+import Padding from './Padding';
+
+
+const mm2px = (mm: number) => mm * 3.7795275591;
+
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -70,6 +75,7 @@ interface GuidesInterface {
 }
 
 interface Props {
+  basePdf: BasePdf;
   height: number;
   hoveringSchemaId: string | null;
   onChangeHoveringSchemaId: (id: string | null) => void;
@@ -89,6 +95,7 @@ interface Props {
 
 const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const {
+    basePdf,
     pageCursor,
     scale,
     backgrounds,
@@ -106,7 +113,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<any>(null);
@@ -142,7 +148,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   useEffect(() => {
     moveable.current?.updateRect();
-    if (prevSchemas === null) {
+    if (!prevSchemas) {
       return;
     }
 
@@ -154,9 +160,37 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     }
   }, [pageCursor, schemasList, prevSchemas]);
 
-  const onDrag = ({ target, left, top }: OnDrag) => {
-    target.style.left = `${left < 0 ? 0 : left}px`;
-    target.style.top = `${top < 0 ? 0 : top}px`;
+  const onDrag = ({ target, top, left }: OnDrag) => {
+    const { width: _width, height: _height } = target.style;
+    const targetWidth = fmt(_width);
+    const targetHeight = fmt(_height);
+    const actualTop = top / ZOOM;
+    const actualLeft = left / ZOOM;
+    const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
+    let topPadding = 0;
+    let rightPadding = 0;
+    let bottomPadding = 0;
+    let leftPadding = 0;
+
+    if (isBlankPdf(basePdf)) {
+      const [t, r, b, l] = basePdf.padding;
+      topPadding = t * ZOOM;
+      rightPadding = r;
+      bottomPadding = b;
+      leftPadding = l * ZOOM;
+    }
+
+    if (actualTop + targetHeight > pageHeight - bottomPadding) {
+      target.style.top = `${(pageHeight - targetHeight - bottomPadding) * ZOOM}px`;
+    } else {
+      target.style.top = `${top < topPadding ? topPadding : top}px`;
+    }
+
+    if (actualLeft + targetWidth > pageWidth - rightPadding) {
+      target.style.left = `${(pageWidth - targetWidth - rightPadding) * ZOOM}px`;
+    } else {
+      target.style.left = `${left < leftPadding ? leftPadding : left}px`;
+    }
   };
 
   const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
@@ -195,24 +229,24 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
-  const onResizeEnd = async ({ target }: { target: HTMLElement | SVGElement }) => {
+  const onResizeEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
     const { id, style } = target;
     const { width, height, top, left } = style;
     changeSchemas([
+      { key: 'position.x', value: fmt(left), schemaId: id },
+      { key: 'position.y', value: fmt(top), schemaId: id },
       { key: 'width', value: fmt(width), schemaId: id },
       { key: 'height', value: fmt(height), schemaId: id },
-      { key: 'position.y', value: fmt(top), schemaId: id },
-      { key: 'position.x', value: fmt(left), schemaId: id },
     ]);
 
     const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
 
     if (!targetSchema) return;
 
+    targetSchema.position.x = fmt(left);
+    targetSchema.position.y = fmt(top);
     targetSchema.width = fmt(width);
     targetSchema.height = fmt(height);
-    targetSchema.position.y = fmt(top);
-    targetSchema.position.x = fmt(left);
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
@@ -227,13 +261,43 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
-    const s = target.style;
-    const newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
-    const newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
+    let topPadding = 0;
+    let rightPadding = 0;
+    let bottomPadding = 0;
+    let leftPadding = 0;
+
+    if (isBlankPdf(basePdf)) {
+      const [t, r, b, l] = basePdf.padding;
+      topPadding = t * ZOOM;
+      rightPadding = mm2px(r);
+      bottomPadding = mm2px(b);
+      leftPadding = l * ZOOM;
+    }
+
+    const pageWidth = mm2px(pageSizes[pageCursor].width);
+    const pageHeight = mm2px(pageSizes[pageCursor].height);
+
     const obj: { top?: string; left?: string; width: string; height: string } = {
       width: `${width}px`,
       height: `${height}px`,
     };
+
+    const s = target.style;
+    let newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
+    let newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
+    if (newLeft < leftPadding) {
+      newLeft = leftPadding;
+    }
+    if (newTop < topPadding) {
+      newTop = topPadding;
+    }
+    if (newLeft + width > pageWidth - rightPadding) {
+      obj.width = `${pageWidth - rightPadding - newLeft}px`;
+    }
+    if (newTop + height > pageHeight - bottomPadding) {
+      obj.height = `${pageHeight - bottomPadding - newTop}px`;
+    }
+
     const d = direction.toString();
     if (isTopLeftResize(d)) {
       obj.top = `${newTop}px`;
@@ -255,7 +319,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   const rotatable = useMemo(() => {
-    const selectedSchemas = schemasList[pageCursor].filter((s) =>
+    const selectedSchemas = (schemasList[pageCursor] || []).filter((s) =>
       activeElements.map((ae) => ae.id).includes(s.id)
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
@@ -274,7 +338,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       style={{
         position: 'relative',
         overflow: 'auto',
-        marginRight: sidebarOpen ? SIDEBAR_WIDTH : 0,
+        marginRight: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
         ...size,
       }}
       ref={ref}
@@ -329,6 +393,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             {!editing && activeElements.length > 0 && pageCursor === index && (
               <DeleteButton activeElements={activeElements} />
             )}
+            <Padding basePdf={basePdf} />
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {
@@ -372,19 +437,21 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           <Renderer
             key={schema.id}
             schema={schema}
+            basePdf={basePdf}
+            value={schema.content || ''}
             onChangeHoveringSchemaId={onChangeHoveringSchemaId}
             mode={
               editing && activeElements.map((ae) => ae.id).includes(schema.id)
                 ? 'designer'
                 : 'viewer'
             }
-            onChange={(value) => {
-              changeSchemas([{ key: 'data', value, schemaId: schema.id }]);
+            onChange={(arg) => {
+              const args = Array.isArray(arg) ? arg : [arg];
+              changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
             }}
             stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-              schema.readOnly ? 'transparent' : token.colorPrimary
-            }`}
+            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+              }`}
             scale={scale}
           />
         )}

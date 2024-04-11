@@ -11,7 +11,7 @@ exports[`Preview(as Form) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
+        style="display: flex; align-items: center; justify-content: space-evenly; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
           style="display: flex; align-items: center;"
@@ -98,7 +98,6 @@ exports[`Preview(as Form) snapshot 1`] = `
         style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
       >
         <div
-          id="@pdfme/ui-paper0"
           style="font-family: 'Roboto'; top: 20px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div>
@@ -112,7 +111,7 @@ exports[`Preview(as Form) snapshot 1`] = `
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
+                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: text;"
                 >
                   <div
                     style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
@@ -166,7 +165,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       style="position: absolute; bottom: 6%; width: 1200px;"
     >
       <div
-        style="display: flex; align-items: center; justify-content: center; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
+        style="display: flex; align-items: center; justify-content: space-evenly; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
       >
         <div
           style="display: flex; align-items: center;"
@@ -253,7 +252,6 @@ exports[`Preview(as Viewer) snapshot 1`] = `
         style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
       >
         <div
-          id="@pdfme/ui-paper0"
           style="font-family: 'Roboto'; top: 20px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
         >
           <div>
@@ -267,7 +265,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 style="height: 100%; width: 100%;"
               >
                 <div
-                  style="padding: 0px; resize: none; background-color: rgba(230, 244, 255, 0.302); display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%;"
+                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
                 >
                   <div
                     style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"

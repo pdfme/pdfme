@@ -1,26 +1,29 @@
 import { useRef, useState } from "react";
-import { Template, checkTemplate } from "@pdfme/common";
+import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplate,
+  getTemplateByPreset,
   handleLoadTemplate,
   generatePDF,
   getPlugins,
   isJsonString,
 } from "./helper";
 
-const headerHeight = 65;
+const headerHeight = 71;
 
 type Mode = "form" | "viewer";
 
+
+
 const initTemplate = () => {
-  let template: Template = getTemplate();
+  let template: Template = getTemplateByPreset(localStorage.getItem('templatePreset') || "")
   try {
     const templateString = localStorage.getItem("template");
-    const templateJson = templateString
-      ? JSON.parse(templateString)
-      : getTemplate();
+    if (!templateString) {
+      return template;
+    }
+    const templateJson = JSON.parse(templateString)
     checkTemplate(templateJson);
     template = templateJson as Template;
   } catch {
@@ -41,13 +44,13 @@ function App() {
 
   const buildUi = (mode: Mode) => {
     const template = initTemplate();
-    let inputs = template.sampledata ?? [{}];
+    let inputs = getInputFromTemplate(template);
     try {
       const inputsString = localStorage.getItem("inputs");
-      const inputsJson = inputsString
-        ? JSON.parse(inputsString)
-        : template.sampledata ?? [{}];
-      inputs = inputsJson;
+      if (inputsString) {
+        const inputsJson = JSON.parse(inputsString);
+        inputs = inputsJson;
+      }
     } catch {
       localStorage.removeItem("inputs");
     }
@@ -113,7 +116,7 @@ function App() {
     localStorage.removeItem("inputs");
     if (ui.current) {
       const template = initTemplate();
-      ui.current.setInputs(template.sampledata ?? [{}]);
+      ui.current.setInputs(getInputFromTemplate(template));
     }
   };
 
@@ -127,7 +130,7 @@ function App() {
 
   return (
     <div>
-      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginRight: 120, }}>
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: '0 1rem', fontSize: 'small' }}>
         <strong>Form, Viewer</strong>
         <span style={{ margin: "0 1rem" }}>:</span>
         <div>

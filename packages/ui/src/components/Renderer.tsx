@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, Schema } from '@pdfme/common';
+import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -7,10 +7,11 @@ import * as pdfJs from 'pdfjs-dist/legacy/build/pdf.js';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'value' | 'schema' | 'onChange' | 'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
+  'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
 > & {
+  basePdf: BasePdf;
   schema: SchemaForUI;
-  onChange: (value: string) => void;
+  value: string;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
@@ -50,7 +51,8 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, mode, onChange, stopEditing, tabIndex, placeholder, scale } = props;
+  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
+    props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
@@ -69,16 +71,15 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 
       ref.current.innerHTML = '';
 
-      const editable = mode === 'form' || mode === 'designer';
-
-      render({
+      void render({
         key: schema.key,
-        value: schema.readOnly ? schema.readOnlyValue || '' : schema.data,
+        value,
         schema,
+        basePdf,
         rootElement: ref.current,
         mode,
-        onChange: editable ? onChange : undefined,
-        stopEditing: editable ? stopEditing : undefined,
+        onChange,
+        stopEditing: stopEditing,
         tabIndex,
         placeholder,
         options,
@@ -93,7 +94,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
 
   return (
     <Wrapper {...props}>

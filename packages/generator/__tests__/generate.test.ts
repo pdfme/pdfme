@@ -7,6 +7,7 @@ describe('generate integrate test', () => {
   describe('basic generator', () => {
     const textObject = (x: number, y: number): Schema => ({
       type: 'text',
+      content: '',
       position: { x, y },
       width: 100,
       height: 100,
@@ -83,6 +84,7 @@ describe('generate integrate test', () => {
           {
             name: {
               type: 'text',
+              content: '',
               position: { x: 30, y: 30 },
               width: 100,
               height: 20,
@@ -110,6 +112,7 @@ describe('generate integrate test', () => {
           {
             field1: {
               type: 'text',
+              content: '',
               position: { x: 30, y: 30 },
               width: 100,
               height: 20,
@@ -117,6 +120,7 @@ describe('generate integrate test', () => {
             },
             field2: {
               type: 'text',
+              content: '',
               position: { x: 60, y: 60 },
               width: 100,
               height: 20,
@@ -163,6 +167,7 @@ describe('check validation', () => {
         {
           a: {
             type: 'text',
+            content: '',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -189,6 +194,7 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
         {
           a: {
             type: 'text',
+            content: '',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -217,6 +223,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
         {
           a: {
             type: 'text',
+            content: '',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -245,6 +252,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
         {
           a: {
             type: 'text',
+            content: '',
             fontName: 'SauceHanSansJP2',
             position: { x: 0, y: 0 },
             width: 100,
@@ -252,6 +260,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
           },
           b: {
             type: 'text',
+            content: '',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,

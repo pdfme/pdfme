@@ -1,6 +1,8 @@
 {
   "team": "labelmake",
-  "tags": ["郵便局"],
+  "tags": [
+    "郵便局"
+  ],
   "description": "レターパックの書式をレターパックプラスのカラーで使用いただけます。  <u>印刷サイズ:A4(210mmx297mm)</u>",
   "photo": "",
   "createdAt": null,
@@ -8,21 +10,6 @@
   "name": "レターパックプラス",
   "id": "レターパック",
   "fontName": "SauceHanSansJP",
-  "sampledata": [
-    {
-      "[お届け先]郵便番号": "1234567",
-      "[お届け先]住所": "東京都東京1-2-3-4\n東京マンション123号",
-      "[お届け先]社名": "株式会社labelmake.jp",
-      "[お届け先]氏名": "東京都 出得太",
-      "[お届け先]電話番号": "123-3456-7890",
-      "[差出人]郵便番号": "7654321",
-      "[差出人]住所": "大阪府大阪1-2-3-4\n大阪マンション123号",
-      "[差出人]社名": "株式会社listmake.jp",
-      "[差出人]氏名": "大阪府 出得太",
-      "[差出人]電話番号": "098-7654-4321",
-      "品名": "書類"
-    }
-  ],
   "columns": [
     "[お届け先]郵便番号",
     "[お届け先]住所",
@@ -40,114 +27,158 @@
   "schemas": [
     {
       "[お届け先]郵便番号": {
-        "position": { "x": 102.3, "y": 42 },
+        "position": {
+          "x": 102.3,
+          "y": 42
+        },
         "width": 85,
         "alignment": "left",
         "fontSize": 40,
         "characterSpacing": 12.7,
         "type": "text",
         "height": 15.82,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "[お届け先]住所": {
-        "position": { "x": 61.13, "y": 87.5 },
+        "position": {
+          "x": 61.13,
+          "y": 87.5
+        },
         "width": 119.73,
         "alignment": "left",
         "fontSize": 13,
         "characterSpacing": 0,
         "type": "text",
         "height": 26.39,
-        "lineHeight": 1.4
+        "lineHeight": 1.4,
+        "content": "東京都東京1-2-3-4\n東京マンション123号"
       },
       "[お届け先]社名": {
-        "position": { "x": 76.03, "y": 116.79 },
+        "position": {
+          "x": 76.03,
+          "y": 116.79
+        },
         "width": 98.17,
         "alignment": "right",
         "fontSize": 13.5,
         "characterSpacing": 0,
         "type": "text",
         "height": 8.13,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社labelmake.jp"
       },
       "[お届け先]氏名": {
-        "position": { "x": 61, "y": 124.9 },
+        "position": {
+          "x": 61,
+          "y": 124.9
+        },
         "width": 113,
         "alignment": "right",
         "fontSize": 16,
         "characterSpacing": 0,
         "type": "text",
         "height": 7.88,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太"
       },
       "[お届け先]電話番号": {
-        "position": { "x": 91, "y": 136.57 },
+        "position": {
+          "x": 91,
+          "y": 136.57
+        },
         "width": 89.96,
         "alignment": "left",
         "fontSize": 15,
         "characterSpacing": 0,
         "type": "text",
         "height": 6.54,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "123-3456-7890"
       },
       "[差出人]郵便番号": {
-        "position": { "x": 77.9, "y": 146.63 },
+        "position": {
+          "x": 77.9,
+          "y": 146.63
+        },
         "width": 38.7,
         "alignment": "left",
         "fontSize": 18,
         "characterSpacing": 5.8,
         "type": "text",
         "height": 6.28,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "7654321"
       },
       "[差出人]住所": {
-        "position": { "x": 61.13, "y": 153.49 },
+        "position": {
+          "x": 61.13,
+          "y": 153.49
+        },
         "width": 119.73,
         "alignment": "left",
         "fontSize": 13,
         "characterSpacing": 0,
         "type": "text",
         "height": 18.45,
-        "lineHeight": 1.2
+        "lineHeight": 1.2,
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
       },
       "[差出人]社名": {
-        "position": { "x": 76.12, "y": 173.86 },
+        "position": {
+          "x": 76.12,
+          "y": 173.86
+        },
         "width": 104.78,
         "alignment": "left",
         "fontSize": 14,
         "characterSpacing": 0,
         "type": "text",
         "height": 6.54,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "株式会社listmake.jp"
       },
       "[差出人]氏名": {
-        "position": { "x": 73.01, "y": 180.33 },
+        "position": {
+          "x": 73.01,
+          "y": 180.33
+        },
         "width": 107.95,
         "alignment": "left",
         "fontSize": 15,
         "characterSpacing": 0,
         "type": "text",
         "height": 7.07,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪府 出得太"
       },
       "[差出人]電話番号": {
-        "position": { "x": 91, "y": 190.32 },
+        "position": {
+          "x": 91,
+          "y": 190.32
+        },
         "width": 89.96,
         "alignment": "left",
         "fontSize": 15,
         "characterSpacing": 0,
         "type": "text",
         "height": 7.35,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "098-7654-4321"
       },
       "品名": {
-        "position": { "x": 27.8, "y": 213.26 },
+        "position": {
+          "x": 27.8,
+          "y": 213.26
+        },
         "width": 153.1,
         "alignment": "left",
         "fontSize": 18,
         "characterSpacing": 0,
         "type": "text",
         "height": 12.63,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "書類"
       }
     }
   ]

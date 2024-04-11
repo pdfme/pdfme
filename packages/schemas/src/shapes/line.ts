@@ -11,6 +11,7 @@ interface LineSchema extends Schema {
 const lineSchema: Plugin<LineSchema> = {
   pdf: (arg: PDFRenderProps<LineSchema>) => {
     const { page, schema, options } = arg;
+    if (schema.width === 0 || schema.height === 0 || !schema.color) return;
     const { colorType } = options;
     const pageHeight = page.getHeight();
     const {
@@ -32,7 +33,7 @@ const lineSchema: Plugin<LineSchema> = {
   ui: (arg: UIRenderProps<LineSchema>) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');
-    div.style.backgroundColor = schema.color ?? DEFAULT_LINE_COLOR;
+    div.style.backgroundColor = schema.color ?? 'transparent';
     div.style.width = '100%';
     div.style.height = '100%';
     rootElement.appendChild(div);
@@ -44,17 +45,12 @@ const lineSchema: Plugin<LineSchema> = {
         type: 'string',
         widget: 'color',
         required: true,
-        rules: [
-          {
-            pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
-          },
-        ],
+        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
       },
     }),
-    defaultValue: '',
     defaultSchema: {
       type: 'line',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus"><path d="M5 12h14"/></svg>',
       position: { x: 0, y: 0 },
       width: 50,
       height: 1,

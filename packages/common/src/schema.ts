@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it', 'de', 'es'] as const;
+const langs = ['en', 'ja', 'ar', 'th', 'pl', 'it', 'de', 'es', 'fr'] as const;
 
 export const Lang = z.enum(langs);
 export const Dict = z.object({
@@ -19,18 +19,21 @@ export const Dict = z.object({
   notUniq: z.string(),
   noKeyName: z.string(),
   fieldsList: z.string(),
-  addNewField: z.string(),
   editField: z.string(),
   type: z.string(),
   errorOccurred: z.string(),
   errorBulkUpdateFieldName: z.string(),
   commitBulkUpdateFieldName: z.string(),
   bulkUpdateFieldName: z.string(),
+  addPageAfter: z.string(),
+  removePage: z.string(),
+  removePageConfirm: z.string(),
   hexColorPrompt: z.string(),
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
   'schemas.borderWidth': z.string(),
   'schemas.borderColor': z.string(),
+  'schemas.backgroundColor': z.string(),
   'schemas.textColor': z.string(),
   'schemas.bgColor': z.string(),
   'schemas.horizontal': z.string(),
@@ -41,6 +44,7 @@ export const Dict = z.object({
   'schemas.top': z.string(),
   'schemas.middle': z.string(),
   'schemas.bottom': z.string(),
+  'schemas.padding': z.string(),
 
   'schemas.text.fontName': z.string(),
   'schemas.text.size': z.string(),
@@ -55,6 +59,12 @@ export const Dict = z.object({
 
   'schemas.barcodes.barColor': z.string(),
   'schemas.barcodes.includetext': z.string(),
+
+  'schemas.table.alternateBackgroundColor': z.string(),
+  'schemas.table.tableStyle': z.string(),
+  'schemas.table.headStyle': z.string(),
+  'schemas.table.bodyStyle': z.string(),
+  'schemas.table.columnStyle': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
@@ -65,25 +75,42 @@ export const Size = z.object({ height: z.number(), width: z.number() });
 export const Schema = z
   .object({
     type: z.string(),
-    readOnly: z.boolean().optional(),
-    readOnlyValue: z.string().optional(),
+    icon: z.string().optional(),
+    content: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
     width: z.number(),
     height: z.number(),
     rotate: z.number().optional(),
     opacity: z.number().optional(),
+    readOnly: z.boolean().optional(),
   })
   .passthrough();
 
 const SchemaForUIAdditionalInfo = z.object({
   id: z.string(),
   key: z.string(),
-  data: z.string(),
 });
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
+export const BlankPdf = z.object({
+  width: z.number(),
+  height: z.number(),
+  padding: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+});
+
+export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema, BlankPdf]);
+
+export const Template = z
+  .object({
+    schemas: z.array(z.record(Schema)),
+    basePdf: BasePdf,
+    pdfmeVersion: z.string().optional(),
+  })
+  .passthrough();
+
+export const Inputs = z.array(z.record(z.any())).min(1);
 
 export const Font = z.record(
   z.object({
@@ -93,18 +120,7 @@ export const Font = z.record(
   })
 );
 
-export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
-
-export const Template = z.object({
-  schemas: z.array(z.record(Schema)),
-  basePdf: BasePdf,
-  sampledata: z.array(z.record(z.string())).length(1).optional(),
-  columns: z.array(z.string()).optional(),
-});
-
-export const Inputs = z.array(z.record(z.string())).min(1);
-
-const CommonOptions = z.object({ font: Font.optional() }).passthrough();
+export const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 
 const CommonProps = z.object({
   template: Template,

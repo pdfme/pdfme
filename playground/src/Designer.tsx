@@ -3,7 +3,8 @@ import { Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplate,
+  getTemplatePresets,
+  getTemplateByPreset,
   readFile,
   cloneDeep,
   getPlugins,
@@ -14,19 +15,31 @@ import {
 
 const headerHeight = 65;
 
+const initialTemplatePresetKey = "invoice"
+const customTemplatePresetKey = "custom";
+
+const templatePresets = getTemplatePresets();
+
+
+
 function App() {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [lang, setLang] = useState<Lang>('en');
+  const [templatePreset, setTemplatePreset] = useState<string>(localStorage.getItem("templatePreset") || initialTemplatePresetKey);
   const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
   const buildDesigner = () => {
-    let template: Template = getTemplate();
+    let template: Template = getTemplateByPreset(localStorage.getItem('templatePreset') || "");
     try {
       const templateString = localStorage.getItem("template");
+      if (templateString) {
+        setTemplatePreset(customTemplatePresetKey);
+      }
+
       const templateJson = templateString
         ? JSON.parse(templateString)
-        : getTemplate();
+        : getTemplateByPreset(localStorage.getItem('templatePreset') || "");
       checkTemplate(templateJson);
       template = templateJson as Template;
     } catch {
@@ -42,7 +55,6 @@ function App() {
             font,
             lang,
             labels: {
-              addNewField: 'pdfme!', // Update existing labels
               'clear': '🗑️', // Add custom labels to consume them in your own plugins
             },
             theme: {
@@ -54,6 +66,9 @@ function App() {
           plugins: getPlugins(),
         });
         designer.current.onSaveTemplate(onSaveTemplate);
+        designer.current.onChangeTemplate(() => {
+          setTemplatePreset(customTemplatePresetKey);
+        })
       }
     });
   }
@@ -89,12 +104,13 @@ function App() {
     }
   };
 
-  const onResetTemplate = () => {
-    if (designer.current) {
-      designer.current.updateTemplate(getTemplate());
-      localStorage.removeItem("template");
-    }
-  };
+  const onChangeTemplatePresets = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTemplatePreset(e.target.value);
+    localStorage.setItem("template", JSON.stringify(getTemplateByPreset(localStorage.getItem('templatePreset') || "")));
+    localStorage.removeItem("template");
+    localStorage.setItem("templatePreset", e.target.value);
+    buildDesigner();
+  }
 
   if (designerRef != prevDesignerRef) {
     if (prevDesignerRef && designer.current) {
@@ -106,23 +122,40 @@ function App() {
 
   return (
     <div>
-      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginRight: 120, }}>
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: '0 1rem', fontSize: 'small' }}>
         <strong>Designer</strong>
         <span style={{ margin: "0 1rem" }}>:</span>
-        <select onChange={(e) => {
-          setLang(e.target.value as Lang)
-          if (designer.current) {
-            designer.current.updateOptions({ lang: e.target.value as Lang })
-          }
-        }} value={lang}>
-          <option value="en">English</option>
-          <option value="ja">Japanese</option>
-          <option value="ar">Arabic</option>
-          <option value="th">Thai</option>
-          <option value="pl">Polish</option>
-          <option value="it">Italian</option>
-          <option value="de">German</option>
-        </select>
+        <label>
+          Template Preset:{" "}
+          <select onChange={onChangeTemplatePresets} value={templatePreset}>
+            {templatePresets.map((preset) => (
+              <option key={preset.key}
+                disabled={preset.key === customTemplatePresetKey}
+                value={preset.key}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span style={{ margin: "0 1rem" }}>/</span>
+        <label>
+          Lang:{" "}
+          <select onChange={(e) => {
+            setLang(e.target.value as Lang)
+            if (designer.current) {
+              designer.current.updateOptions({ lang: e.target.value as Lang })
+            }
+          }} value={lang}>
+            <option value="en">English</option>
+            <option value="ja">Japanese</option>
+            <option value="ar">Arabic</option>
+            <option value="th">Thai</option>
+            <option value="pl">Polish</option>
+            <option value="it">Italian</option>
+            <option value="de">German</option>
+            <option value="fr">French</option>
+          </select>
+        </label>
         <span style={{ margin: "0 1rem" }}>/</span>
         <label style={{ width: 180 }}>
           Change BasePDF
@@ -131,14 +164,15 @@ function App() {
         <span style={{ margin: "0 1rem" }}>/</span>
         <label style={{ width: 180 }}>
           Load Template
-          <input type="file" accept="application/json" onChange={(e) => handleLoadTemplate(e, designer.current)} />
+          <input type="file" accept="application/json" onChange={(e) => {
+            handleLoadTemplate(e, designer.current);
+            setTemplatePreset(customTemplatePresetKey);
+          }} />
         </label>
         <span style={{ margin: "0 1rem" }}>/</span>
         <button onClick={onDownloadTemplate}>Download Template</button>
         <span style={{ margin: "0 1rem" }}>/</span>
         <button onClick={() => onSaveTemplate()}>Save Template</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onResetTemplate}>Reset Template</button>
         <span style={{ margin: "0 1rem" }}>/</span>
         <button onClick={() => generatePDF(designer.current)}>Generate PDF</button>
       </header>

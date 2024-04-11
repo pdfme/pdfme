@@ -6,7 +6,13 @@ export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
   const pageSizes = [{ height: 297, width: 210 }];
   const mock = jest.spyOn(hooks, 'useUIPreProcessor');
-  mock.mockImplementation(() => ({ backgrounds, pageSizes, scale: 1, error: null }));
+  mock.mockImplementation(() => ({
+    backgrounds,
+    pageSizes,
+    scale: 1,
+    error: null,
+    refresh: () => Promise.resolve(),
+  }));
   (getPdfPageSizes as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(pageSizes));
   (pdf2Pngs as jest.Mock) = jest.fn().mockReturnValue(Promise.resolve(backgrounds));
   (uuid as jest.Mock) = jest
@@ -21,18 +27,12 @@ export const setupUIMock = () => {
 };
 
 export const getSampleTemplate = (): Template => ({
-  columns: ['field1', 'field2'],
-  sampledata: [
-    {
-      field1: 'bb',
-      field2: 'aaaaaaaaaaaa',
-    },
-  ],
   basePdf: BLANK_PDF,
   schemas: [
     {
       field1: {
         type: 'text',
+        content: 'bb',
         position: { x: 20, y: 20 },
         width: 100,
         height: 15,
@@ -43,6 +43,7 @@ export const getSampleTemplate = (): Template => ({
       },
       field2: {
         type: 'image',
+        content: 'aaaaaaaaaaaa',
         position: { x: 20, y: 35 },
         width: 100,
         height: 40,

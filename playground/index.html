@@ -17,6 +17,11 @@
   </a>
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
+  <script>
+    if (window.location.hostname === 'localhost') {
+      document.querySelector('.github-fork-ribbon').remove();
+    }
+  </script>
 </body>
 
 </html>

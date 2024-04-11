@@ -1,6 +1,8 @@
 {
   "team": "labelmake",
-  "tags": ["郵便局"],
+  "tags": [
+    "郵便局"
+  ],
   "description": "家庭用のプリンタに差し込み印刷で、郵便はがきが印刷できます。  私製はがきには対応していませんのでお間違いのないように。  <u>印刷サイズ:はがき(100mmx148mm)</u>",
   "photo": "",
   "createdAt": null,
@@ -8,18 +10,6 @@
   "name": "郵便はがき横書き",
   "id": "郵便はがき横書き",
   "fontName": "SauceHanSansJP",
-  "sampledata": [
-    {
-      "[お届け先]郵便番号": "1234567",
-      "[お届け先]住所1": "東京都東京1-2-3-4",
-      "[お届け先]住所2": "東京マンション123号",
-      "[お届け先]氏名": "東京都 出得太 様",
-      "[差出人]郵便番号": "7654321",
-      "[差出人]住所1": "大阪府大阪1-2-3-4",
-      "[差出人]住所2": "大阪マンション123号\n大阪マンション123号",
-      "[差出人]氏名": "大阪府 出得太"
-    }
-  ],
   "columns": [
     "[お届け先]郵便番号",
     "[お届け先]住所1",
@@ -34,84 +24,116 @@
   "schemas": [
     {
       "[お届け先]郵便番号": {
-        "position": { "x": 45, "y": 10 },
+        "position": {
+          "x": 45,
+          "y": 10
+        },
         "width": 50,
         "alignment": "left",
         "fontSize": 22.9,
         "characterSpacing": 7.4,
         "type": "text",
         "height": 10,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "1234567"
       },
       "[お届け先]住所1": {
-        "position": { "x": 17, "y": 38 },
+        "position": {
+          "x": 17,
+          "y": 38
+        },
         "width": 67.87,
         "alignment": "left",
         "fontSize": 11,
         "characterSpacing": 0,
         "type": "text",
         "height": 6.02,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都東京1-2-3-4"
       },
       "[お届け先]住所2": {
-        "position": { "x": 20, "y": 44 },
+        "position": {
+          "x": 20,
+          "y": 44
+        },
         "width": 64.99,
         "alignment": "left",
         "fontSize": 10,
         "characterSpacing": 0,
         "type": "text",
         "height": 9.73,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京マンション123号"
       },
       "[お届け先]氏名": {
-        "position": { "x": 20, "y": 53.9 },
+        "position": {
+          "x": 20,
+          "y": 53.9
+        },
         "width": 65,
         "alignment": "left",
         "fontSize": 19,
         "characterSpacing": 0,
         "type": "text",
         "height": 53.65,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "東京都 出得太 様"
       },
       "[差出人]郵便番号": {
-        "position": { "x": 6, "y": 136.5 },
+        "position": {
+          "x": 6,
+          "y": 136.5
+        },
         "width": 29.63,
         "alignment": "left",
         "fontSize": 15,
         "characterSpacing": 3.6,
         "type": "text",
         "height": 7.61,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "7654321"
       },
       "[差出人]住所1": {
-        "position": { "x": 6.02, "y": 115 },
+        "position": {
+          "x": 6.02,
+          "y": 115
+        },
         "width": 88.98,
         "alignment": "right",
         "fontSize": 8,
         "characterSpacing": 0,
         "type": "text",
         "height": 5.23,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪府大阪1-2-3-4"
       },
       "[差出人]住所2": {
-        "position": { "x": 5.98, "y": 120 },
+        "position": {
+          "x": 5.98,
+          "y": 120
+        },
         "width": 89.02,
         "alignment": "right",
         "fontSize": 8,
         "characterSpacing": 0,
         "type": "text",
         "height": 8.41,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪マンション123号\n大阪マンション123号"
       },
       "[差出人]氏名": {
-        "position": { "x": 5.98, "y": 128.01 },
+        "position": {
+          "x": 5.98,
+          "y": 128.01
+        },
         "width": 89.02,
         "alignment": "right",
         "fontSize": 17,
         "characterSpacing": 0,
         "type": "text",
         "height": 8.67,
-        "lineHeight": 1
+        "lineHeight": 1,
+        "content": "大阪府 出得太"
       }
     }
   ]

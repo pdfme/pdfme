@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
-import { debounce, generateColumnsAndSampledataIfNeeded, cloneDeep } from './helper.js';
+import { debounce, cloneDeep } from './helper.js';
 import {
   Template,
   Size,
@@ -50,7 +50,7 @@ export abstract class BaseUIClass {
 
     const { domContainer, template, options = {}, plugins = {} } = props;
     this.domContainer = domContainer;
-    this.template = generateColumnsAndSampledataIfNeeded(cloneDeep(template));
+    this.template = cloneDeep(template);
     this.options = options;
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
@@ -131,8 +131,7 @@ export abstract class PreviewUI extends BaseUIClass {
   constructor(props: PreviewProps) {
     super(props);
     checkPreviewProps(props);
-
-    this.inputs = cloneDeep(props.inputs);
+    this.inputs = convertToStingObjectArray(cloneDeep(props.inputs));
   }
 
   public getInputs() {
@@ -144,9 +143,33 @@ export abstract class PreviewUI extends BaseUIClass {
   public setInputs(inputs: { [key: string]: string }[]) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     checkInputs(inputs);
-    this.inputs = cloneDeep(inputs);
+
+    this.inputs = convertToStingObjectArray(inputs);
     this.render();
   }
 
   protected abstract render(): void;
+}
+
+type DataItem = {
+  [key: string]: string | string[][];
+};
+
+type StringifiedDataItem = {
+  [key: string]: string;
+};
+
+function convertToStingObjectArray(data: DataItem[]): StringifiedDataItem[] {
+  return data.map((item) => {
+    const stringifiedItem: StringifiedDataItem = {};
+    Object.keys(item).forEach((key) => {
+      const value = item[key];
+      if (Array.isArray(value)) {
+        stringifiedItem[key] = JSON.stringify(value);
+      } else {
+        stringifiedItem[key] = value;
+      }
+    });
+    return stringifiedItem;
+  });
 }
