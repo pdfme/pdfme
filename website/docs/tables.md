@@ -4,8 +4,13 @@
 
 There are still some bugs with this feature. For more details, please refer to the [related issue on GitHub](https://github.com/pdfme/pdfme/issues?q=is%3Aissue+is%3Aopen+label%3Atable).
 
-:::
+We are working to resolve these issues. 
 
+If you encounter any issues, please let us know.
+Your contributions greatly contribute to the development of pdfme. Contributions for bug fixes are highly welcome.
+Please collaborate with us to resolve these issues.
+
+:::
 [![Preview of Dynamic Tables](/img/table.png)](https://playground.pdfme.com/)
 
 The table schema has been added in beta since [V4](https://github.com/pdfme/pdfme/releases/tag/4.0.0).   
@@ -153,9 +158,22 @@ Set the Template Preset to Invoice and explore the sample using the Table schema
 
 The source code for this playground is available [here](https://github.com/pdfme/pdfme/tree/main/playground).
 
+:::warning
+
+There are still some bugs with this feature. For more details, please refer to the [related issue on GitHub](https://github.com/pdfme/pdfme/issues?q=is%3Aissue+is%3Aopen+label%3Atable).
+
+We are working to resolve these issues. 
+
+If you encounter any issues, please let us know.
+Your contributions greatly contribute to the development of pdfme. Contributions for bug fixes are highly welcome.
+Please collaborate with us to resolve these issues.
+
+:::
+
 :::info
 
 If you have feedback or suggestions regarding the use of the table schema, please let us know via [GitHub issues](https://github.com/pdfme/pdfme/issues) or [Discord](https://discord.gg/xWPTJbmgNV).  
 Your feedback contributes significantly to the development of pdfme.
 
 :::
+
