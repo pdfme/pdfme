@@ -32,6 +32,7 @@ const translations: { label: string, value: string }[] = [
   { value: 'it', label: 'Italian' },
   { value: 'de', label: 'German' },
   { value: 'fr', label: 'French' },
+  { value: 'es', label: 'Spanish' },
 ]
 
 function App() {
