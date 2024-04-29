@@ -21,6 +21,18 @@ const customTemplatePresetKey = "custom";
 const templatePresets = getTemplatePresets();
 
 
+const translations: { label: string, value: string }[] = [
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: 'Chinese' },
+  { value: 'ko', label: 'Korean' },
+  { value: 'ja', label: 'Japanese' },
+  { value: 'ar', label: 'Arabic' },
+  { value: 'th', label: 'Thai' },
+  { value: 'pl', label: 'Polish' },
+  { value: 'it', label: 'Italian' },
+  { value: 'de', label: 'German' },
+  { value: 'fr', label: 'French' },
+]
 
 function App() {
   const designerRef = useRef<HTMLDivElement | null>(null);
@@ -146,14 +158,9 @@ function App() {
               designer.current.updateOptions({ lang: e.target.value as Lang })
             }
           }} value={lang}>
-            <option value="en">English</option>
-            <option value="ja">Japanese</option>
-            <option value="ar">Arabic</option>
-            <option value="th">Thai</option>
-            <option value="pl">Polish</option>
-            <option value="it">Italian</option>
-            <option value="de">German</option>
-            <option value="fr">French</option>
+            {translations.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
           </select>
         </label>
         <span style={{ margin: "0 1rem" }}>/</span>
