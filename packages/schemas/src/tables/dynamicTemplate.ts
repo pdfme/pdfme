@@ -43,8 +43,8 @@ export const modifyTemplateForTable = async (arg: {
                   start: allBodies.slice(0, i + 1).reduce((acc, cur) => acc + cur.length, 0),
                   end: allBodies.slice(0, i + 2).reduce((acc, cur) => acc + cur.length, 0),
                 },
-                content: input[key],
-              },
+                content: Array.isArray(input[key]) ? JSON.stringify(input[key]) : input[key],
+              } as Schema,
             };
             additionalSchemaObjs[additionalPageIndex] = additionalSchemaObj;
           });
