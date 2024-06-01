@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
+/**  @ts-ignore -- optional interface, will gracefully degrade to `any` if `antd` isn't installed **/
 import type { ThemeConfig, GlobalToken } from 'antd';
+/**  @ts-ignore -- optional interface, will gracefully degrade to `any` if `form-render` isn't installed*/
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
   Lang,
