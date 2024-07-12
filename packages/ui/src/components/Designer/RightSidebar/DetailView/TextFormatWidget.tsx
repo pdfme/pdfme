@@ -73,18 +73,21 @@ const TextFormatWidget = (props: PropPanelWidgetProps) => {
   return (
     <Form.Item>
       <Button.Group>
-        {layoutBtns.map((btn) => (
-          <Button 
-            type={isActive(btn.id) ? 'primary' : undefined}
-            ghost={isActive(btn.id)}
-            key={btn.id} 
-            style={{ 
-              padding: 3, 
-              zIndex: isActive(btn.id) ? 2 : 0
-            }} 
-            {...btn} 
-          />
-        ))}
+        {layoutBtns.map((btn) => {
+          const active = isActive(btn.id)
+          return (
+            <Button 
+              type={active ? 'primary' : undefined}
+              ghost={active}
+              key={btn.id} 
+              style={{ 
+                padding: 3, 
+                zIndex: active ? 2 : 0
+              }} 
+              {...btn} 
+            />
+          );
+        })}
       </Button.Group>
     </Form.Item>
   );
