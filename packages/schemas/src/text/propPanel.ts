@@ -58,6 +58,8 @@ export const propPanel: PropPanel<TextSchema> = {
     const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
 
     const textSchema: Record<string, PropPanelSchema> = {
+      format: { type: 'void', widget: 'TextFormatWidget', span: 12 },
+      __: { type: 'void', widget: 'Divider' },
       fontName: {
         title: i18n('schemas.text.fontName'),
         type: 'string',
@@ -195,5 +197,9 @@ export const propPanel: PropPanel<TextSchema> = {
     fontName: undefined,
     backgroundColor: '',
     opacity: DEFAULT_OPACITY,
+    format: {
+      strikethrough: false,
+      underline: false,
+    },
   },
 };

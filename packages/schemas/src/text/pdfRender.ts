@@ -154,6 +154,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   lines.forEach((line, rowIndex) => {
     const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
+    const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
     let xLine = x;
@@ -171,6 +172,32 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
       xLine = rotatedPoint.x;
       yLine = rotatedPoint.y;
+    }
+
+    // draw strikethrough
+    if (schema.format?.strikethrough) {
+      const _y = yLine + textHeight / 3;
+      const textWidth = pdfFontValue.widthOfTextAtSize(line, fontSize);
+      page.drawLine({
+        start: rotatePoint({ x, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: x + textWidth, y: _y }, pivotPoint, rotate.angle),
+        thickness: (1 / 12) * fontSize,
+        color: color,
+        opacity,
+      });
+    }
+
+    // draw underline
+    if (schema.format?.underline) {
+      const _y = yLine - textHeight / 12;
+      const textWidth = pdfFontValue.widthOfTextAtSize(line, fontSize);
+      page.drawLine({
+        start: rotatePoint({ x, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: x + textWidth, y: _y }, pivotPoint, rotate.angle),
+        thickness: (1 / 12) * fontSize,
+        color: color,
+        opacity,
+      });
     }
 
     page.drawText(line, {

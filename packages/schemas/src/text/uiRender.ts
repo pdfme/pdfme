@@ -96,6 +96,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   rootElement.innerHTML = '';
   rootElement.appendChild(container);
 
+  // text decoration
+  const textDecorations = [];
+  if (schema.format?.strikethrough) textDecorations.push('line-through');
+  if (schema.format?.underline) textDecorations.push('underline');
+
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
@@ -113,6 +118,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     marginBottom: `${bottomAdjustment}px`,
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
+    textDecoration: textDecorations.join(' '),
   };
   const textBlock = document.createElement('div');
   Object.assign(textBlock.style, textBlockStyle);

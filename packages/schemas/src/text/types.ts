@@ -17,6 +17,10 @@ export interface TextSchema extends Schema {
   verticalAlignment: VERTICAL_ALIGNMENT;
   fontSize: number;
   lineHeight: number;
+  format?: {
+    strikethrough?: boolean;
+    underline?: boolean;
+  };
   characterSpacing: number;
   dynamicFontSize?: {
     min: number;
