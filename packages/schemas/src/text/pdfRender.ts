@@ -166,14 +166,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
 
-    if (rotate.angle !== 0) {
-      // As we draw each line individually from different points, we must translate each lines position
-      // relative to the UI rotation pivot point. see comments in convertForPdfLayoutProps() for more info.
-      const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
-      xLine = rotatedPoint.x;
-      yLine = rotatedPoint.y;
-    }
-
     // draw strikethrough
     if (schema.format?.strikethrough) {
       const _y = yLine + textHeight / 3;
@@ -198,6 +190,14 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
         color: color,
         opacity,
       });
+    }
+
+    if (rotate.angle !== 0) {
+      // As we draw each line individually from different points, we must translate each lines position
+      // relative to the UI rotation pivot point. see comments in convertForPdfLayoutProps() for more info.
+      const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
+      xLine = rotatedPoint.x;
+      yLine = rotatedPoint.y;
     }
 
     page.drawText(line, {
