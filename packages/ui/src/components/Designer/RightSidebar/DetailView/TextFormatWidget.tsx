@@ -41,7 +41,7 @@ const TextFormatWidget = (props: PropPanelWidgetProps) => {
     const ass = schemas.filter((s) => ids.includes(s.id)) as ExtendedSchemaForUI[];
     changeSchemas(
       ass.map((s) => {
-        const oldValue = s.format && s.format[type] ? s.format[type] : false;
+        const oldValue = s.format ? (s.format[type] ?? false) : false;
         return { key: `format.${type}`, value: !oldValue, schemaId: s.id };
       })
     );
@@ -52,7 +52,7 @@ const TextFormatWidget = (props: PropPanelWidgetProps) => {
     const ids = activeElements.map((ae) => ae.id);
     const ass = schemas.filter((s) => ids.includes(s.id)) as ExtendedSchemaForUI[];
     ass.forEach((s) => {
-      active = s.format && s.format[type] ? s.format[type] : false;
+      active = s.format ? (s.format[type] ?? false) : false;
     })
     return active
   }
