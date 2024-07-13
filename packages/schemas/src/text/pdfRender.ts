@@ -167,12 +167,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
 
     // draw strikethrough
-    if (schema.format?.strikethrough) {
+    if (schema.format?.strikethrough && textWidth > 0) {
+      const _x = x + textWidth + 2
       const _y = yLine + textHeight / 3;
-      const textWidth = pdfFontValue.widthOfTextAtSize(line, fontSize);
       page.drawLine({
         start: rotatePoint({ x, y: _y }, pivotPoint, rotate.angle),
-        end: rotatePoint({ x: x + textWidth, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
         thickness: (1 / 12) * fontSize,
         color: color,
         opacity,
@@ -180,12 +180,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
 
     // draw underline
-    if (schema.format?.underline) {
+    if (schema.format?.underline && textWidth > 0) {
+      const _x = x + textWidth + 2
       const _y = yLine - textHeight / 12;
-      const textWidth = pdfFontValue.widthOfTextAtSize(line, fontSize);
       page.drawLine({
         start: rotatePoint({ x, y: _y }, pivotPoint, rotate.angle),
-        end: rotatePoint({ x: x + textWidth, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
         thickness: (1 / 12) * fontSize,
         color: color,
         opacity,
