@@ -58,6 +58,10 @@ export const Dict = z.object({
   'schemas.text.dynamicFontSize': z.string(),
   'schemas.text.format': z.string(),
 
+  'schemas.mvt.typingInstructions': z.string(),
+  'schemas.mvt.sampleField': z.string(),
+  'schemas.mvt.variablesSampleData': z.string(),
+
   'schemas.barcodes.barColor': z.string(),
   'schemas.barcodes.includetext': z.string(),
 

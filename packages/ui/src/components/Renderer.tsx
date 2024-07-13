@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
+import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -56,24 +56,20 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
+  const plugin = Object.values(pluginsRegistry).find(
+    (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
+  ) as Plugin<any>;
 
-  // If this schema is actively being edited (e.g. typing into a field)
-  // then we don't want changes to that schema made elsewhere to trigger a re-render and lose focus.
-  const schemaRerenderState = mode === 'form' || mode === 'designer' ? '' : JSON.stringify(schema);
+  if (!plugin || !plugin.ui) {
+    console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
+Check this document: https://pdfme.com/docs/custom-schemas`);
+    return <></>;
+  }
 
   useEffect(() => {
     if (ref.current && schema.type) {
-      const render = Object.values(pluginsRegistry).find(
-        (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-      )?.ui;
-
-      if (!render) {
-        console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.
-Check this document: https://pdfme.com/docs/custom-schemas`);
-        return;
-      }
-
       ref.current.innerHTML = '';
+      const render = plugin.ui;
 
       void render({
         key: schema.key,
@@ -83,7 +79,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         rootElement: ref.current,
         mode,
         onChange,
-        stopEditing: stopEditing,
+        stopEditing,
         tabIndex,
         placeholder,
         options,
@@ -98,7 +94,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-}, [mode, scale, schemaRerenderState, JSON.stringify(options)]);
+  }, plugin.shouldRerenderVars ?
+    plugin.shouldRerenderVars({value, mode, scale, schema, options}) :
+    [value, mode, scale, JSON.stringify(schema), JSON.stringify(options)]
+  );
 
   return (
     <Wrapper {...props}>

@@ -105,19 +105,19 @@ ${e}`);
 
 export const getPlugins = () => {
   return {
-    'Advanced Text': multiVariableText,
+    'Multi-Variable Text': multiVariableText,
     Text: text,
-    ReadOnlyText: readOnlyText,
+    'Read-Only Text': readOnlyText,
     Table: tableBeta,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
     Image: image,
-    ReadOnlyImage: readOnlyImage,
+    'Read-Only Image': readOnlyImage,
     SVG: svg,
-    ReadOnlySvg: readOnlySvg,
-    QR: barcodes.qrcode,
-    Code128: barcodes.code128,
+    'Read-Only SVG': readOnlySvg,
+    'QR Code': barcodes.qrcode,
+    'Code128 Barcode': barcodes.code128,
     Signature: plugins.signature,
   };
 };
