@@ -98,8 +98,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
 
   // text decoration
   const textDecorations = [];
-  if (schema.format?.strikethrough) textDecorations.push('line-through');
-  if (schema.format?.underline) textDecorations.push('underline');
+  if (schema.strikethrough) textDecorations.push('line-through');
+  if (schema.underline) textDecorations.push('underline');
 
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles

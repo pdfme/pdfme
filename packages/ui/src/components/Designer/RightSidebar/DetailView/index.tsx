@@ -8,7 +8,7 @@ import { getSidebarContentHeight } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
-import TextFormatWidget from './TextFormatWidget';
+import ButtonGroupWidget from './ButtonGroupWidget';
 
 const { Text } = Typography;
 
@@ -36,10 +36,10 @@ const DetailView = (
   useEffect(() => {
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      TextFormatWidget: (p) => <TextFormatWidget {...p} {...props} options={options} />,
       Divider: () => (
         <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
       ),
+      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
     };
     for (const plugin of Object.values(pluginsRegistry)) {
       const widgets = plugin?.propPanel.widgets || {};
