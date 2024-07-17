@@ -12,19 +12,15 @@ import {
   DEFAULT_VERTICAL_ALIGNMENT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
-  VERTICAL_ALIGN_TOP,
-  VERTICAL_ALIGN_MIDDLE,
-  VERTICAL_ALIGN_BOTTOM,
   DEFAULT_FONT_COLOR,
   DYNAMIC_FIT_VERTICAL,
   DYNAMIC_FIT_HORIZONTAL,
   DEFAULT_DYNAMIC_FIT,
   DEFAULT_DYNAMIC_MIN_FONT_SIZE,
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
-  ALIGN_RIGHT,
-  ALIGN_CENTER,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
+import { getExtraFormatterSchema } from './extraFormatter';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -81,32 +77,7 @@ export const propPanel: PropPanel<TextSchema> = {
         span: 6,
         props: { min: 0 },
       },
-      alignment: {
-        title: i18n('schemas.text.textAlign'),
-        type: 'string',
-        widget: 'select',
-        props: {
-          options: [
-            { label: i18n('schemas.left'), value: DEFAULT_ALIGNMENT },
-            { label: i18n('schemas.center'), value: ALIGN_CENTER },
-            { label: i18n('schemas.right'), value: ALIGN_RIGHT },
-          ],
-        },
-        span: 8,
-      },
-      verticalAlignment: {
-        title: i18n('schemas.text.verticalAlign'),
-        type: 'string',
-        widget: 'select',
-        props: {
-          options: [
-            { label: i18n('schemas.top'), value: VERTICAL_ALIGN_TOP },
-            { label: i18n('schemas.middle'), value: VERTICAL_ALIGN_MIDDLE },
-            { label: i18n('schemas.bottom'), value: VERTICAL_ALIGN_BOTTOM },
-          ],
-        },
-        span: 8,
-      },
+      formatter: getExtraFormatterSchema(i18n),
       lineHeight: {
         title: i18n('schemas.text.lineHeight'),
         type: 'number',
@@ -195,5 +166,7 @@ export const propPanel: PropPanel<TextSchema> = {
     fontName: undefined,
     backgroundColor: '',
     opacity: DEFAULT_OPACITY,
+    strikethrough: false,
+    underline: false,
   },
 };

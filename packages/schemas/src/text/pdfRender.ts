@@ -154,6 +154,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   lines.forEach((line, rowIndex) => {
     const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
+    const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
     let xLine = x;
@@ -164,6 +165,32 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
 
     let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
+
+    // draw strikethrough
+    if (schema.strikethrough && textWidth > 0) {
+      const _x = xLine + textWidth + 1
+      const _y = yLine + textHeight / 3;
+      page.drawLine({
+        start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
+        thickness: (1 / 12) * fontSize,
+        color: color,
+        opacity,
+      });
+    }
+
+    // draw underline
+    if (schema.underline && textWidth > 0) {
+      const _x = xLine + textWidth + 1
+      const _y = yLine - textHeight / 12;
+      page.drawLine({
+        start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
+        end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
+        thickness: (1 / 12) * fontSize,
+        color: color,
+        opacity,
+      });
+    }
 
     if (rotate.angle !== 0) {
       // As we draw each line individually from different points, we must translate each lines position

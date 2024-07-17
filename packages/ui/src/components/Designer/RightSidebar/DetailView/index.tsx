@@ -8,6 +8,7 @@ import { getSidebarContentHeight } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
+import ButtonGroupWidget from './ButtonGroupWidget';
 
 const { Text } = Typography;
 
@@ -38,6 +39,7 @@ const DetailView = (
       Divider: () => (
         <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
       ),
+      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
     };
     for (const plugin of Object.values(pluginsRegistry)) {
       const widgets = plugin?.propPanel.widgets || {};
@@ -206,7 +208,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         style={{
           height: getSidebarContentHeight(size.height),
           overflowY: 'auto',
-          overflowX: 'hidden'
+          overflowX: 'hidden',
         }}
       >
         <FormRender
