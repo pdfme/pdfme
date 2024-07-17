@@ -120,7 +120,9 @@ export const insertPage = (arg: {
 }) => {
   const { basePage, embedPdfBox, pdfDoc } = arg;
   const size = basePage instanceof PDFEmbeddedPage ? basePage.size() : basePage.getSize();
-  const insertedPage = pdfDoc.addPage([size.width, size.height]);
+  const insertedPage = basePage instanceof PDFEmbeddedPage
+      ? pdfDoc.addPage([size.width, size.height])
+      : pdfDoc.addPage(basePage);
 
   if (basePage instanceof PDFEmbeddedPage) {
     insertedPage.drawPage(basePage);
