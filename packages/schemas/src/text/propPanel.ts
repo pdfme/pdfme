@@ -83,7 +83,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'number',
         widget: 'inputNumber',
         props: { step: 0.1, min: 0 },
-        span: 8,
+        span: 7,
       },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
       dynamicFontSize: {

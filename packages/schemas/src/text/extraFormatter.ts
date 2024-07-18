@@ -72,6 +72,6 @@ export function getExtraFormatterSchema(
     title: i18n('schemas.text.format'),
     widget: 'ButtonGroup',
     buttons,
-    span: 16,
+    span: 17,
   };
 }
