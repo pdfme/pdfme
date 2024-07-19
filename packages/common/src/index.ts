@@ -34,7 +34,6 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
-  RerenderCheckProps,
 } from './types.js';
 import {
   getFallbackFontName,
@@ -113,7 +112,6 @@ export type {
   PropPanelSchema,
   PropPanelWidgetProps,
   PDFRenderProps,
-  RerenderCheckProps,
   UIRenderProps,
   Mode,
   Plugin,

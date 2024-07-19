@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin } from '@pdfme/common';
+import React, { useEffect, useMemo, useContext, ReactNode, useRef } from 'react';
+import {Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions} from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -15,6 +15,27 @@ type RendererProps = Omit<
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
+};
+
+type ReRenderCheckProps = {
+  plugin: Plugin<any>,
+  value: string,
+  mode: Mode,
+  scale: number,
+  schema: SchemaForUI,
+  options: UIOptions,
+}
+
+const useRerenderDependencies = ({ plugin, value, mode, scale, schema, options }: ReRenderCheckProps) => {
+  const dependencies = useMemo(() => {
+    if (plugin.uninterruptedEditMode && mode === 'designer') {
+      return [mode];
+    } else {
+      return [value, mode, scale, JSON.stringify(schema), JSON.stringify(options)];
+    }
+  }, [value, mode, scale, schema, options]);
+
+  return dependencies;
 };
 
 const Wrapper = ({
@@ -66,6 +87,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
 
+  const reRenderDependencies = useRerenderDependencies({plugin, value, mode, scale, schema, options});
+
   useEffect(() => {
     if (ref.current && schema.type) {
       ref.current.innerHTML = '';
@@ -94,10 +117,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, plugin.shouldRerenderVars ?
-    plugin.shouldRerenderVars({value, mode, scale, schema, options}) :
-    [value, mode, scale, JSON.stringify(schema), JSON.stringify(options)]
-  );
+  }, reRenderDependencies);
 
   return (
     <Wrapper {...props}>

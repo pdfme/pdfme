@@ -118,14 +118,6 @@ type PropPanelProps = {
 
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
 
-export type RerenderCheckProps = {
-  value: string;
-  mode: Mode;
-  scale: number;
-  schema: SchemaForUI;
-  options: UIOptions;
-};
-
 /**
  * Used for customizing the property panel.
  * @template T - Type of the extended Schema object.
@@ -150,13 +142,13 @@ export interface PropPanel<T extends Schema> {
  * @property {function} pdf Function for rendering PDFs.
  * @property {function} ui Function for rendering UI.
  * @property {PropPanel} propPanel Object for defining the property panel.
- * @property {function} [shouldRerenderVars] Function for determining which variables should be dependencies of the useEffect deciding whether to rerender the schema in the UI
+ * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
 export type Plugin<T extends Schema & { [key: string]: any }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
   ui: (arg: UIRenderProps<T>) => Promise<void> | void;
   propPanel: PropPanel<T>;
-  shouldRerenderVars?: (arg: RerenderCheckProps) => any[];
+  uninterruptedEditMode?: boolean;
 };
 
 export type Plugins = { [key: string]: Plugin<any> | undefined };

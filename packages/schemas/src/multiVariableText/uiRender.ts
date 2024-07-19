@@ -19,7 +19,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     return;
   }
 
-  const parentRenderArgs = {
+  await parentUiRender({
     value: isEditable(mode, schema) ? text : substituteVariables(text, value),
     schema,
     mode: mode == 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
@@ -32,9 +32,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       }
     },
     ...rest,
-  };
-
-  await parentUiRender(parentRenderArgs);
+  });
 
   const textBlock = rootElement.querySelector('#text-' + schema.id) as HTMLDivElement;
   if (!textBlock) {
