@@ -13,7 +13,7 @@ import {
   downloadJsonFile,
 } from "./helper";
 
-const headerHeight = 65;
+const headerHeight = 80;
 
 const initialTemplatePresetKey = "invoice"
 const customTemplatePresetKey = "custom";
