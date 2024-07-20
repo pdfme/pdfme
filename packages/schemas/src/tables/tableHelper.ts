@@ -270,7 +270,7 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
 
 export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
 
   const input = parseInput(args.schema as TableSchema, body);
 
@@ -286,7 +286,7 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
 export async function createMultiTables(body: string[][], args: CreateTableArgs): Promise<Table[]> {
   const { basePdf, schema } = args;
 
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Blank PDF is not supported');
+  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
   const pageHeight = basePdf.height;
   const paddingBottom = basePdf.padding[2];
   const paddingTop = basePdf.padding[0];

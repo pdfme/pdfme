@@ -95,13 +95,16 @@ export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
 const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
+
 export const BlankPdf = z.object({
   width: z.number(),
   height: z.number(),
   padding: z.tuple([z.number(), z.number(), z.number(), z.number()]),
 });
 
-export const BasePdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema, BlankPdf]);
+const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
+
+export const BasePdf = z.union([CustomPdf, BlankPdf]);
 
 export const Template = z
   .object({
