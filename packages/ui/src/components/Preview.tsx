@@ -137,8 +137,8 @@ const Preview = ({
                       const oldValue = (input?.[key] as string) || '';
                       if (newValue === oldValue) return;
                       handleChangeInput({ key, value: newValue });
-                      // TODO Set to true only if the execution of getDynamicTemplate, such as for a table, is required.
-                      isNeedInit = true;
+                      // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
+                      if (schema.type === 'table') isNeedInit = true;
                     } else {
                       const targetSchema = schemasList[pageCursor].find(
                         (s) => s.id === schema.id
