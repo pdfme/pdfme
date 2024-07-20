@@ -46,35 +46,45 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
   const pluginsRegistry = useContext(PluginsRegistry);
 
   return <div
-    style={{
-      left: 0,
-      position: 'absolute',
-      right: 0,
-      zIndex: 1,
-      height,
-      background: token.colorBgLayout,
-      textAlign: 'center',
-      width: 45,
-    }}
-  >
-    {Object.entries(pluginsRegistry).map(([label, plugin]) => {
-      if (!plugin?.propPanel.defaultSchema) return null;
-      return <Draggable
-        key={label}
-        scale={scale}
-        basePdf={basePdf}
-        plugin={plugin}>
-        <Button
-          title={label}
-          style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
-          {plugin.propPanel.defaultSchema.icon ?
-            <div dangerouslySetInnerHTML={{ __html: plugin.propPanel.defaultSchema.icon }} />
-            :
-            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-          }
-        </Button>
-      </Draggable>
-    })}
+      style={{
+          left: 0,
+          position: 'absolute',
+          right: 0,
+          zIndex: 1,
+          height,
+          textAlign: 'center',
+          width: 54,
+          scrollbarWidth: 'thin',
+          overflow: 'hidden auto',
+      }}
+    >
+      <div
+        style={{
+          background: token.colorBgLayout,
+          textAlign: 'center',
+          width: 45,
+          minHeight: '100%',
+        }}
+      >
+        {Object.entries(pluginsRegistry).map(([label, plugin]) => {
+          if (!plugin?.propPanel.defaultSchema) return null;
+          return <Draggable
+            key={label}
+            scale={scale}
+            basePdf={basePdf}
+            plugin={plugin}>
+            <Button
+              title={label}
+              style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
+              {plugin.propPanel.defaultSchema.icon ?
+                <div dangerouslySetInnerHTML={{ __html: plugin.propPanel.defaultSchema.icon }} />
+                :
+                <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+              }
+            </Button>
+          </Draggable>
+        })}
+      </div>
   </div>
 }
 
