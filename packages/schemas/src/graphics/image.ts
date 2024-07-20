@@ -19,9 +19,10 @@ export interface ImageSchema extends Schema {}
 const imageSchema: Plugin<ImageSchema> = {
   pdf: async (arg: PDFRenderProps<ImageSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
+    if (!value) return;
     const isGraphicPdf = isPdf(value);
     const isImageOrPdf = value.startsWith('data:image/') || isGraphicPdf;
-    if (!value || !isImageOrPdf) return;
+    if (!isImageOrPdf) return;
 
     const inputImageCacheKey = getCacheKey(schema, value);
     let image = _cache.get(inputImageCacheKey) as PDFImage | PDFEmbeddedPage;
