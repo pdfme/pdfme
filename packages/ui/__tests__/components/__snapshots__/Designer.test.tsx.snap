@@ -92,7 +92,7 @@ exports[`Designer snapshot 1`] = `
       </div>
     </div>
     <div
-      style="left: 0px; position: absolute; right: 0px; z-index: 1; height: 0px; background: rgb(245, 245, 245); text-align: center; width: 45px;"
+      style="left: 0px; right: 0px; position: absolute; z-index: 1; height: 0px; width: 45px; background: rgb(245, 245, 245); text-align: center; overflow: auto;"
     >
       <div
         aria-describedby="DndDescribedBy-0"

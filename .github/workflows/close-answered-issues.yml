@@ -4,7 +4,7 @@ on:
     - cron: "00 10 * * *"
   workflow_dispatch:
 env:
-  days-before-stale: 30
+  days-before-stale: 14
   days-before-close: 7
 jobs:
   mark-stale-and-close-for-answered:
