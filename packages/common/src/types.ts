@@ -26,7 +26,12 @@ import {
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
-export type ChangeSchemas = (objs: { key: string; value: any; schemaId: string }[]) => void;
+export type ChangeSchemaItem = {
+  key: string,
+  value: any,
+  schemaId: string
+};
+export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
 
 /**
  * Properties used for PDF rendering.

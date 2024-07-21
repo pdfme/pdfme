@@ -8,6 +8,7 @@ import {
   DEFAULT_FONT_NAME,
 } from './constants.js';
 import type {
+  ChangeSchemaItem,
   ChangeSchemas,
   PropPanel,
   PropPanelSchema,
@@ -107,6 +108,7 @@ export type {
   UIProps,
   PreviewProps,
   DesignerProps,
+  ChangeSchemaItem,
   ChangeSchemas,
   PropPanel,
   PropPanelSchema,
