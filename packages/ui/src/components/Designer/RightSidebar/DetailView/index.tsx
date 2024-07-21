@@ -1,6 +1,6 @@
 import FormRender, { useForm } from 'form-render';
 import React, { useContext, useEffect, useState } from 'react';
-import type { Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
+import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
@@ -9,6 +9,7 @@ import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
 import ButtonGroupWidget from './ButtonGroupWidget';
+import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interface";
 
 const { Text } = Typography;
 
@@ -75,22 +76,39 @@ const DetailView = (
   }, [form, activeSchema]);
 
   const handleWatch = (newSchema: any) => {
-    const changes = [];
+    let changes: ChangeSchemaItem[] = [];
     for (let key in newSchema) {
       if (['id', 'content'].includes(key)) continue;
+
+      // [position] Return the flattened position to its original form.
+      if (key === 'x') key = 'position.x';
+      if (key === 'y') key = 'position.y';
+
       if (newSchema[key] !== (activeSchema as any)[key]) {
         let value = newSchema[key];
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
-        // [position] Return the flattened position to its original form.
-        if (key === 'x') key = 'position.x';
-        if (key === 'y') key = 'position.y';
         changes.push({ key, value, schemaId: activeSchema.id });
       }
     }
+
     if (changes.length) {
-      changeSchemas(changes);
+      // Only commit these schema changes if they have passed form validation
+      form.validateFields()
+        .then(() => changeSchemas(changes))
+        .catch((reason: ValidateErrorEntity) => {
+          if (reason.errorFields.length)  {
+            changes = changes.filter((change: ChangeSchemaItem) => !reason.errorFields.find((field: {
+                name: InternalNamePath;
+                errors: string[];
+              }) => field.name.includes(change.key)
+            ));
+          }
+          if (changes.length) {
+            changeSchemas(changes);
+          }
+        });
     }
   };
 
