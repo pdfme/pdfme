@@ -1,5 +1,5 @@
-import React, { useEffect, useContext, ReactNode, useRef } from 'react';
-import { Dict, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
+import React, { useEffect, useMemo, useContext, ReactNode, useRef } from 'react';
+import {Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions} from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -15,6 +15,27 @@ type RendererProps = Omit<
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
+};
+
+type ReRenderCheckProps = {
+  plugin: Plugin<any>,
+  value: string,
+  mode: Mode,
+  scale: number,
+  schema: SchemaForUI,
+  options: UIOptions,
+}
+
+const useRerenderDependencies = ({ plugin, value, mode, scale, schema, options }: ReRenderCheckProps) => {
+  const dependencies = useMemo(() => {
+    if (plugin.uninterruptedEditMode && mode === 'designer') {
+      return [mode];
+    } else {
+      return [value, mode, scale, JSON.stringify(schema), JSON.stringify(options)];
+    }
+  }, [value, mode, scale, schema, options]);
+
+  return dependencies;
 };
 
 const Wrapper = ({
@@ -56,20 +77,22 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
+  const plugin = Object.values(pluginsRegistry).find(
+    (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
+  ) as Plugin<any>;
+
+  if (!plugin || !plugin.ui) {
+    console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
+Check this document: https://pdfme.com/docs/custom-schemas`);
+    return <></>;
+  }
+
+  const reRenderDependencies = useRerenderDependencies({plugin, value, mode, scale, schema, options});
 
   useEffect(() => {
     if (ref.current && schema.type) {
-      const render = Object.values(pluginsRegistry).find(
-        (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-      )?.ui;
-
-      if (!render) {
-        console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found.
-Check this document: https://pdfme.com/docs/custom-schemas`);
-        return;
-      }
-
       ref.current.innerHTML = '';
+      const render = plugin.ui;
 
       void render({
         key: schema.key,
@@ -79,7 +102,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         rootElement: ref.current,
         mode,
         onChange,
-        stopEditing: stopEditing,
+        stopEditing,
         tabIndex,
         placeholder,
         options,
@@ -94,7 +117,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         ref.current.innerHTML = '';
       }
     };
-  }, [value, JSON.stringify(schema), JSON.stringify(options), mode, scale]);
+  }, reRenderDependencies);
 
   return (
     <Wrapper {...props}>

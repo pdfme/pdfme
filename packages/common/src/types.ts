@@ -142,11 +142,13 @@ export interface PropPanel<T extends Schema> {
  * @property {function} pdf Function for rendering PDFs.
  * @property {function} ui Function for rendering UI.
  * @property {PropPanel} propPanel Object for defining the property panel.
+ * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
 export type Plugin<T extends Schema & { [key: string]: any }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
   ui: (arg: UIRenderProps<T>) => Promise<void> | void;
   propPanel: PropPanel<T>;
+  uninterruptedEditMode?: boolean;
 };
 
 export type Plugins = { [key: string]: Plugin<any> | undefined };

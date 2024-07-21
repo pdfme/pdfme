@@ -2,6 +2,7 @@ import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/comm
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
 import {
+  multiVariableText,
   text,
   readOnlyText,
   barcodes,
@@ -104,16 +105,17 @@ ${e}`);
 
 export const getPlugins = () => {
   return {
+    'Multi-Variable Text': multiVariableText,
     Text: text,
-    ReadOnlyText: readOnlyText,
+    'Read-Only Text': readOnlyText,
     Table: tableBeta,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
     Image: image,
-    ReadOnlyImage: readOnlyImage,
+    'Read-Only Image': readOnlyImage,
     SVG: svg,
-    ReadOnlySvg: readOnlySvg,
+    'Read-Only SVG': readOnlySvg,
     Signature: plugins.signature,
     QR: barcodes.qrcode,
     JAPANPOST: barcodes.japanpost,
