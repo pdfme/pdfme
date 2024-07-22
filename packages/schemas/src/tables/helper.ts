@@ -190,7 +190,7 @@ export const getBody = (value: string | string[][]): string[][] => {
   if (typeof value === 'string') {
     return JSON.parse(value || '[]') as string[][];
   }
-  return value;
+  return value || [];
 };
 
 export const getBodyWithRange = (
