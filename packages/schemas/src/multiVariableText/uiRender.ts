@@ -89,7 +89,7 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       makeElementPlainTextContentEditable(span)
       span.textContent = variables[variableIndices[i]];
       span.addEventListener('blur', (e: Event) => {
-        const newValue = (e.target as HTMLSpanElement).innerText;
+        const newValue = (e.target as HTMLSpanElement).textContent || '';
         if (newValue !== variables[variableIndices[i]]) {
           variables[variableIndices[i]] = newValue;
           onChange && onChange({ key: 'content', value: JSON.stringify(variables) });
