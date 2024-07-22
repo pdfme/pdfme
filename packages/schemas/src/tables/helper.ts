@@ -186,10 +186,15 @@ export const getColumnStylesPropPanelSchema = ({
   },
 });
 
-export const getBody = (value: string) => JSON.parse(value || '[]') as string[][];
+export const getBody = (value: string | string[][]): string[][] => {
+  if (typeof value === 'string') {
+    return JSON.parse(value || '[]') as string[][];
+  }
+  return value;
+};
 
 export const getBodyWithRange = (
-  value: string,
+  value: string | string[][],
   range?: { start: number; end?: number | undefined }
 ) => {
   const body = getBody(value);

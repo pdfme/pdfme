@@ -107,7 +107,11 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
 
 export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
   const { value, schema } = arg;
-  const body = getBodyWithRange(value, schema.__bodyRange);
+
+  const body = getBodyWithRange(
+    typeof value !== 'string' ? JSON.stringify(value || '[]') : value,
+    schema.__bodyRange
+  );
   const table = await createSingleTable(body, arg);
   await drawTable(arg, table);
 };

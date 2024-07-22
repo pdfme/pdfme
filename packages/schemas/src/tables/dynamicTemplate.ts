@@ -5,7 +5,7 @@ import { getBodyWithRange, getBody } from './helper.js';
 import { TableSchema } from './types';
 export const modifyTemplateForTable = async (arg: {
   template: Template;
-  input: Record<string, string>;
+  input: Record<string, any>;
   _cache: Map<any, any>;
   options: CommonOptions;
 }): Promise<Template> => {
@@ -17,7 +17,8 @@ export const modifyTemplateForTable = async (arg: {
     for (const [key, schema] of Object.entries(schemaObj)) {
       if (schema.type === 'table') {
         schema.__bodyRange = undefined;
-        const body = JSON.parse(input?.[key] || '[]') as string[][];
+
+        const body = getBody((input?.[key] as string | string[][]) || '[]');
         const tables = await createMultiTables(body, {
           schema,
           basePdf: template.basePdf,
@@ -42,7 +43,10 @@ export const modifyTemplateForTable = async (arg: {
                   start: allBodies.slice(0, i + 1).reduce((acc, cur) => acc + cur.length, 0),
                   end: allBodies.slice(0, i + 2).reduce((acc, cur) => acc + cur.length, 0),
                 },
-                content: input[key],
+                content:
+                  typeof input[key] === 'string'
+                    ? (input[key] as string)
+                    : JSON.stringify(input[key]),
               },
             };
             additionalSchemaObjs[additionalPageIndex] = additionalSchemaObj;
