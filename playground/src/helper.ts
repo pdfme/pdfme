@@ -105,9 +105,9 @@ ${e}`);
 
 export const getPlugins = () => {
   return {
-    'Multi-Variable Text': multiVariableText,
     Text: text,
     'Read-Only Text': readOnlyText,
+    'Multi-Variable Text': multiVariableText,
     Table: tableBeta,
     Line: line,
     Rectangle: rectangle,
