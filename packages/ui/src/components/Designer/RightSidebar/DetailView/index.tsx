@@ -75,21 +75,34 @@ const DetailView = (
     form.setValues(values);
   }, [form, activeSchema]);
 
-  const handleWatch = (newSchema: any) => {
+  const handleWatch = (formSchema: any) => {
+    const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
+      if (typeof formValue === 'object') {
+        return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
+      }
+      return formValue !== schemaValue;
+    }
+
     let changes: ChangeSchemaItem[] = [];
-    for (let key in newSchema) {
+    for (let key in formSchema) {
       if (['id', 'content'].includes(key)) continue;
 
-      // [position] Return the flattened position to its original form.
-      if (key === 'x') key = 'position.x';
-      if (key === 'y') key = 'position.y';
+      let value = formSchema[key];
+      let changed = false;
 
-      if (newSchema[key] !== (activeSchema as any)[key]) {
-        let value = newSchema[key];
+      if (['x', 'y'].includes(key)) {
+        // [position] Return the flattened position to its original form.
+        changed = value !== (activeSchema as any)['position'][key];
+        key = 'position.' + key;
+      } else {
+        changed = formAndSchemaValuesDiffer(value, (activeSchema as any)[key]);
+      }
+
+      if (changed) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
-        changes.push({ key, value, schemaId: activeSchema.id });
+        changes.push({key, value, schemaId: activeSchema.id});
       }
     }
 

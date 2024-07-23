@@ -454,10 +454,15 @@ const handleTypeChange = (
       delete schema[key as keyof typeof schema];
     }
   });
+  // Apply attributes from new defaultSchema
   const propPanel = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === value
   )?.propPanel;
-  Object.assign(schema, propPanel?.defaultSchema || {});
+  Object.keys(propPanel?.defaultSchema || {}).forEach((key) => {
+    if (!schema.hasOwnProperty(key)) {
+      (schema as any)[key] = propPanel?.defaultSchema[key];
+    }
+  });
 };
 
 export const changeSchemas = (args: {
