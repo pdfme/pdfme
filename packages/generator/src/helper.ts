@@ -58,6 +58,16 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
   return { basePages, embedPdfBoxes };
 };
 
+export const validateRequiredFields = (template: Template, inputs: Record<string, any>[]) => {
+  template.schemas.forEach((schemaObj) =>
+    Object.entries(schemaObj).forEach(([fieldName, schema]) => {
+      if (schema.required && !schema.readOnly && !inputs.some((input) => input[fieldName])) {
+        throw new Error(`"${fieldName}" input is required to render this PDF`);
+      }
+    })
+  );
+}
+
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
   const { schemas } = template;

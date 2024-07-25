@@ -14,6 +14,7 @@ export const Dict = z.object({
   height: z.string(),
   rotate: z.string(),
   edit: z.string(),
+  required: z.string(),
   plsInputName: z.string(),
   fieldMustUniq: z.string(),
   notUniq: z.string(),
@@ -87,6 +88,7 @@ export const Schema = z
     rotate: z.number().optional(),
     opacity: z.number().optional(),
     readOnly: z.boolean().optional(),
+    required: z.boolean().optional(),
   })
   .passthrough();
 
