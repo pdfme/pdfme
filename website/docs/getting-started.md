@@ -259,3 +259,18 @@ I definitely could not have created pdfme without these libraries. I am grateful
 
 If you want to contribute to pdfme, please check the [Development Guide](/docs/development-guide) page.  
 We look forward to your contribution!
+
+## Cloud Service Option
+
+While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
+
+**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com/)**
+
+pdfme Cloud provides all the features of the open-source library, plus:
+
+- PDF generation at scale without infrastructure management
+- Hosted WYSIWYG template designer
+- Simple API integration
+- Automatic updates and maintenance
+
+\*pdfme is and will always remain open-source. The cloud service is an optional offering for those who prefer a managed solution.

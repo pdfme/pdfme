@@ -96,8 +96,8 @@ export default function Home(): JSX.Element {
 
   return (
     <Layout
-      title={`Free and Open source PDF generator library!`}
-      description="Free and Open source PDF generator library fully written in TypeScript coming with a React based UI template editor."
+      title="Free and Open source PDF generation library!"
+      description="Free and Open source PDF generation library fully written in TypeScript, featuring a React-based UI template editor for efficient PDF creation."
     >
       <HomepageHeader />
       <main>
@@ -111,7 +111,7 @@ export default function Home(): JSX.Element {
             <div className={clsx('col col--6')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
-                Template
+                PDF Generation Template
                 <a className="hash-link" href="#template"></a>
               </h2>
               <div className="card">
@@ -130,7 +130,7 @@ export default function Home(): JSX.Element {
                     className="button button--lg button--primary button--block"
                     to="/docs/getting-started#template"
                   >
-                    Learn more about Templates
+                    Learn more about PDF Generation Templates
                   </Link>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function Home(): JSX.Element {
             <div className={clsx('col col--6')}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
-                Generator
+                PDF Generation
                 <a className="hash-link" href="#generate"></a>
               </h2>
               <div style={{ maxHeight: 580, overflow: 'scroll' }}>
@@ -158,7 +158,7 @@ export default function Home(): JSX.Element {
                   className="margin-vert--md button button--primary button--lg button--block"
                   to="/docs/getting-started#generator"
                 >
-                  Learn more about the Generator
+                  Learn more about PDF Generation
                 </Link>
               </div>
             </div>
