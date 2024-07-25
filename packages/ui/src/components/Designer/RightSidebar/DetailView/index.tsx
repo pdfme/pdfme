@@ -210,10 +210,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       ...apps,
     };
   }
-  //
-  // if (activeSchema.readOnly) {
-  //   delete propPanelSchema.properties.required
-  // }
 
   return (
     <div>
