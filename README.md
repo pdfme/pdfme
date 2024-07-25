@@ -1,6 +1,16 @@
 # PDFME
 
-<p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/logo.svg" width="300"/>
+</p>
+
+<h4 align="center">
+  <a href="https://pdfme.com/">Website</a> |
+  <a href="https://app.pdfme.com/">pdfme Cloud</a> |
+  <a href="https://discord.gg/xWPTJbmgNV">Discord</a>
+</h4>
+
+<p align="center">
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
@@ -13,26 +23,10 @@
   <a href="https://npmcharts.com/compare/@pdfme/common?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/common.svg" alt="Downloads per month on npm." />
   </a>
-  <a href="https://pdfme.com/docs/development-guide#contribution">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
-  </a>
-  <a href="https://twitter.com/intent/tweet?text=Awesome+pdf+library%21&url=https://pdfme.com">
-    <img src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social" alt="Tweet" />
-  </a>
-    <a href="https://discord.gg/xWPTJbmgNV">
-    <img
-      src="https://img.shields.io/static/v1?label=discord&message=pdfme&color=566fbb&style=flat-square"
-      alt="Discord Badge"
-    />
-  </a>
 </p>
 
-TypeScript base PDF generator and React base UI.
-Open source, developed by the community, and completely free to use under the MIT license!
+<p align="center">TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!</p>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/logo.svg" width="300"/>
-</p>
 
 ## Features
 
@@ -315,3 +309,18 @@ I definitely could not have created pdfme without these libraries. I am grateful
 
 If you want to contribute to pdfme, please check the [Development Guide](https://pdfme.com/docs/development-guide) page.  
 We look forward to your contribution!
+
+## Cloud Service Option
+
+While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
+
+**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com/)**
+
+pdfme Cloud provides all the features of the open-source library, plus:
+
+- PDF generation at scale without infrastructure management
+- Hosted WYSIWYG template designer
+- Simple API integration
+- Automatic updates and maintenance
+
+\*pdfme is and will always remain open-source. The cloud service is an optional offering for those who prefer a managed solution.
