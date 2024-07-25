@@ -9,22 +9,22 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'A fast PDF Generator',
+    title: 'High-Speed PDF Generation',
     description: (
       <>
-        No complex operations are required. Just bring your favorite template and generate all the PDFs you need.
-        Works on node and the browser. 
+        Streamlined PDF generation process with no complex operations required. Use your preferred template 
+        to generate all the PDFs you need. Our PDF generation solution works seamlessly on both Node.js and in the browser.
       </>
     ),
   },
   {
-    title: 'Designer, an easy to use PDF template editor',
-    description: <>Anyone can easily create and modify templates using Designer (UI template editor).</>,
+    title: 'Intuitive PDF Generation Template Editor',
+    description: <>Create and modify PDF generation templates effortlessly with our Designer, a user-friendly UI template editor for efficient PDF creation.</>,
   },
   {
-    title: 'Templates as structured JSON Data',
+    title: 'Structured JSON Data for PDF Generation Templates',
     description: (
-      <>Templates have a JSON document representation, which makes theme easy to understand and easy to work with.</>
+      <>Our PDF generation templates use a JSON document representation, making them easy to understand, manipulate, and integrate into your workflow.</>
     ),
   },
 ];
@@ -48,7 +48,7 @@ export default function HomepageFeatures(): JSX.Element {
           <div className={clsx('col col--12')}>
             <h2>
               <a aria-hidden="true" className="anchor enhancedAnchor" id="features"></a>
-              Features
+              PDF Generation Features
               <a className="hash-link" href="#features" title="Direct link to heading"></a>
             </h2>
           </div>
