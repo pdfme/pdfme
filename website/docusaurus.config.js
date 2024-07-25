@@ -129,6 +129,11 @@ const config = {
           label: 'Discord',
           position: 'right',
         },
+        {
+          href: 'https://app.pdfme.com',
+          label: 'Try pdfme Cloud',
+          position: 'right',
+        }
       ],
     },
     footer: {
