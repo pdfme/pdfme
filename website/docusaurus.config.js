@@ -167,6 +167,10 @@ const config = {
               label: 'Blog',
               to: '/blog',
             },
+            {
+              label: 'Try pdfme Cloud',
+              href: 'https://app.pdfme.com',
+            }
           ],
         },
         {
