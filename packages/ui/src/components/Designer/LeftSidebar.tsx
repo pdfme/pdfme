@@ -8,7 +8,7 @@ import { theme, Button } from 'antd';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from "@dnd-kit/utilities";
 import Renderer from '../Renderer';
-import { PluginsRegistry } from '../../contexts';
+import { PluginsRegistry, OptionsContext } from '../../contexts';
 
 const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf, children: React.ReactNode }) => {
   const { scale, basePdf, plugin } = props;
@@ -44,6 +44,7 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
 const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number, basePdf: BasePdf }) => {
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
+  const options = useContext(OptionsContext);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -76,6 +77,8 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
   >
     {Object.entries(pluginsRegistry).map(([label, plugin]) => {
       if (!plugin?.propPanel.defaultSchema) return null;
+      const icon = options.icons?.[plugin.propPanel.defaultSchema.type] ?? plugin.icon;
+
       return <Draggable
         key={label}
         scale={scale}
@@ -87,8 +90,8 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
             setIsDragging(true);
           }}
           style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
-          {plugin.propPanel.defaultSchema.icon ?
-            <div dangerouslySetInnerHTML={{ __html: plugin.propPanel.defaultSchema.icon }} />
+          {icon ?
+            <div dangerouslySetInnerHTML={{ __html: icon }} />
             :
             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
           }
