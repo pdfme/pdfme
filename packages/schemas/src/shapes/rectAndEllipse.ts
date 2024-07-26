@@ -111,10 +111,17 @@ const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   defaultSchema: {
     ...shape.propPanel.defaultSchema,
     type,
-    icon: type === 'rectangle' ? rectangleIcon : ellipseIcon,
   },
 });
 
-export const rectangle = { ...shape, propPanel: getPropPanelSchema('rectangle') };
+export const rectangle = {
+  ...shape,
+  propPanel: getPropPanelSchema('rectangle'),
+  icon: rectangleIcon
+};
 
-export const ellipse = { ...shape, propPanel: getPropPanelSchema('ellipse') };
+export const ellipse = {
+  ...shape,
+  propPanel: getPropPanelSchema('ellipse'),
+  icon: ellipseIcon
+};

@@ -16,14 +16,11 @@ const defaultIncludetext = { includetext: DEFAULT_BARCODE_INCLUDETEXT };
 const position = { x: 0, y: 0 };
 const default40x20 = { width: 40, height: 20 };
 
-const barcodeIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-barcode"><path d="M3 5v14"/><path d="M8 5v14"/><path d="M12 5v14"/><path d="M17 5v14"/><path d="M21 5v14"/></svg>';
 
 const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'qrcode',
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-qr-code"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>',
       content: 'https://pdfme.com/',
       position,
       ...defaultColors,
@@ -36,7 +33,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'japanpost',
-      icon: barcodeIcon,
       content: '6540123789-A-K-Z',
       position,
       ...defaultColors,
@@ -51,7 +47,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'ean13',
-      icon: barcodeIcon,
       content: '2112345678900',
       position,
       ...defaultColors,
@@ -66,7 +61,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'ean8',
-      icon: barcodeIcon,
       content: '02345673',
       position,
       ...defaultColors,
@@ -80,7 +74,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'code39',
-      icon: barcodeIcon,
       content: 'THIS IS CODE 39',
       position,
       ...defaultColors,
@@ -93,7 +86,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'code128',
-      icon: barcodeIcon,
       content: 'This is Code 128!',
       position,
       ...defaultColors,
@@ -107,7 +99,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'nw7',
-      icon: barcodeIcon,
       content: 'A0123456789B',
       position,
       ...defaultColors,
@@ -121,7 +112,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'itf14',
-      icon: barcodeIcon,
       content: '04601234567893',
       position,
       ...defaultColors,
@@ -136,7 +126,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'upca',
-      icon: barcodeIcon,
       content: '416000336108',
       position,
       ...defaultColors,
@@ -151,7 +140,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'upce',
-      icon: barcodeIcon,
       content: '00123457',
       position,
       ...defaultColors,
@@ -165,7 +153,6 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       type: 'gs1datamatrix',
-      icon: barcodeIcon,
       content: '(01)03453120000011(17)191125(10)ABCD1234',
       position,
       ...defaultColors,
