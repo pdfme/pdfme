@@ -13,14 +13,13 @@ import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interfac
 
 const { Text } = Typography;
 
-const DetailView = (
-  props: Pick<
-    SidebarProps,
+type DetailViewProps = Pick<SidebarProps,
     'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
-  > & {
-    activeSchema: SchemaForUI;
-  }
-) => {
+> & {
+  activeSchema: SchemaForUI;
+};
+
+const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
   const { size, changeSchemas, deselectSchema, activeSchema, activeElements } = props;
@@ -34,46 +33,12 @@ const DetailView = (
     [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
   }>({});
 
-  useEffect(() => {
-    const newWidgets: typeof widgets = {
-      AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-      Divider: () => (
-        <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
-      ),
-      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
-    };
-    for (const plugin of Object.values(pluginsRegistry)) {
-      const widgets = plugin?.propPanel.widgets || {};
-      Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
-        newWidgets[widgetKey] = (p) => (
-          <WidgetRenderer
-            {...p}
-            {...props}
-            options={options}
-            theme={token}
-            i18n={i18n as (key: keyof Dict | string) => string}
-            widget={widgetValue}
-          />
-        );
-      });
-    }
-    setWidgets(newWidgets);
-  }, [activeSchema, activeElements, pluginsRegistry, JSON.stringify(options)]);
-
-  useEffect(() => {
-    const values: any = { ...activeSchema };
-
-    // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
-    values.x = values.position.x;
-    values.y = values.position.y;
-    delete values.position;
-
-    if (values.key !== (form.getValues() || {}).key) {
-      form.resetFields();
-    }
-
-    form.setValues(values);
-  }, [form, activeSchema]);
+  const values: any = { ...activeSchema };
+  // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
+  values.x = values.position.x;
+  values.y = values.position.y;
+  delete values.position;
+  form.setValues(values);
 
   const handleWatch = (formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
@@ -216,6 +181,29 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     };
   }
 
+  const allWidgets: typeof widgets = {
+    AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
+    Divider: () => (
+        <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
+    ),
+    ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
+  };
+  for (const plugin of Object.values(pluginsRegistry)) {
+    const widgets = plugin?.propPanel.widgets || {};
+    Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
+      allWidgets[widgetKey] = (p) => (
+          <WidgetRenderer
+              {...p}
+              {...props}
+              options={options}
+              theme={token}
+              i18n={i18n as (key: keyof Dict | string) => string}
+              widget={widgetValue}
+          />
+      );
+    });
+  }
+
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
@@ -245,7 +233,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         <FormRender
           form={form}
           schema={propPanelSchema}
-          widgets={widgets}
+          widgets={allWidgets}
           watch={{ '#': handleWatch }}
           locale="en-US"
         />
@@ -254,4 +242,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   );
 };
 
-export default DetailView;
+const propsAreUnchanged = (prevProps: DetailViewProps, nextProps: DetailViewProps) => {
+  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema)
+};
+
+export default React.memo(DetailView, propsAreUnchanged);
