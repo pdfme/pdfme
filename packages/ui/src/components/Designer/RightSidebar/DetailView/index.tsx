@@ -30,7 +30,7 @@ const DetailView = (props: DetailViewProps) => {
   const options = useContext(OptionsContext);
 
   useEffect(() => {
-    const values = { ...activeSchema };
+    const values: any = { ...activeSchema };
     // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
     values.x = values.position.x;
     values.y = values.position.y;
