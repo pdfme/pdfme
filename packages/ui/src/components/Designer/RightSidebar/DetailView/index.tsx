@@ -1,10 +1,10 @@
 import FormRender, { useForm } from 'form-render';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { getSidebarContentHeight } from '../../../../helper';
+import { getSidebarContentHeight, isEqual } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
@@ -14,7 +14,7 @@ import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interfac
 const { Text } = Typography;
 
 type DetailViewProps = Pick<SidebarProps,
-    'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
+  'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
 > & {
   activeSchema: SchemaForUI;
 };
@@ -22,28 +22,28 @@ type DetailViewProps = Pick<SidebarProps,
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, changeSchemas, deselectSchema, activeSchema, activeElements } = props;
+  const { size, changeSchemas, deselectSchema, activeSchema } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
-  const [widgets, setWidgets] = useState<{
-    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
-  }>({});
+  useEffect(() => {
+    const values = { ...activeSchema };
+    // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
+    values.x = values.position.x;
+    values.y = values.position.y;
+    delete values.position;
+    form.setValues(values);
 
-  const values: any = { ...activeSchema };
-  // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
-  values.x = values.position.x;
-  values.y = values.position.y;
-  delete values.position;
-  form.setValues(values);
+  }, [activeSchema, form]);
+
 
   const handleWatch = (formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
       if (typeof formValue === 'object') {
-        return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
+        return !isEqual(formValue, schemaValue);
       }
       return formValue !== schemaValue;
     }
@@ -67,7 +67,7 @@ const DetailView = (props: DetailViewProps) => {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
 
-        changes.push({key, value, schemaId: activeSchema.id});
+        changes.push({ key, value, schemaId: activeSchema.id });
       }
     }
 
@@ -76,11 +76,11 @@ const DetailView = (props: DetailViewProps) => {
       form.validateFields()
         .then(() => changeSchemas(changes))
         .catch((reason: ValidateErrorEntity) => {
-          if (reason.errorFields.length)  {
+          if (reason.errorFields.length) {
             changes = changes.filter((change: ChangeSchemaItem) => !reason.errorFields.find((field: {
-                name: InternalNamePath;
-                errors: string[];
-              }) => field.name.includes(change.key)
+              name: InternalNamePath;
+              errors: string[];
+            }) => field.name.includes(change.key)
             ));
           }
           if (changes.length) {
@@ -181,10 +181,12 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     };
   }
 
-  const allWidgets: typeof widgets = {
+  const allWidgets: {
+    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
+  } = {
     AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
     Divider: () => (
-        <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
+      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
     ),
     ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
   };
@@ -192,14 +194,14 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     const widgets = plugin?.propPanel.widgets || {};
     Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
       allWidgets[widgetKey] = (p) => (
-          <WidgetRenderer
-              {...p}
-              {...props}
-              options={options}
-              theme={token}
-              i18n={i18n as (key: keyof Dict | string) => string}
-              widget={widgetValue}
-          />
+        <WidgetRenderer
+          {...p}
+          {...props}
+          options={options}
+          theme={token}
+          i18n={i18n as (key: keyof Dict | string) => string}
+          widget={widgetValue}
+        />
       );
     });
   }
@@ -241,9 +243,4 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     </div>
   );
 };
-
-const propsAreUnchanged = (prevProps: DetailViewProps, nextProps: DetailViewProps) => {
-  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema)
-};
-
-export default React.memo(DetailView, propsAreUnchanged);
+export default React.memo(DetailView, isEqual);
