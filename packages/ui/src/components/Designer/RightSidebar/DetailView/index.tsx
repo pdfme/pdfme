@@ -4,7 +4,7 @@ import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPan
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { getSidebarContentHeight, isEqual } from '../../../../helper';
+import { getSidebarContentHeight } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
@@ -43,7 +43,7 @@ const DetailView = (props: DetailViewProps) => {
   const handleWatch = (formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
       if (typeof formValue === 'object') {
-        return !isEqual(formValue, schemaValue);
+        return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
       }
       return formValue !== schemaValue;
     }
@@ -243,4 +243,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     </div>
   );
 };
-export default React.memo(DetailView, isEqual);
+
+const propsAreUnchanged = (prevProps: DetailViewProps, nextProps: DetailViewProps) => {
+  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema)
+};
+
+export default React.memo(DetailView, propsAreUnchanged);
