@@ -19,6 +19,7 @@ import { I18nContext, PluginsRegistry } from '../../contexts';
 import {
   schemasList2template,
   uuid,
+  round,
   cloneDeep,
   template2SchemasList,
   getPagesScrollTopByIndex,
@@ -51,7 +52,7 @@ const TemplateEditor = ({
   onSaveTemplate: (t: Template) => void;
   onChangeTemplate: (t: Template) => void;
 } & {
-  onChangeTemplate: (t: Template) => void 
+  onChangeTemplate: (t: Template) => void
   onPageCursorChange: (newPageCursor: number) => void
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
@@ -253,7 +254,7 @@ const TemplateEditor = ({
           const moveY = (event.delta.y - canvasTopOffsetFromPageCorner) / scale;
           const moveX = (event.delta.x - canvasLeftOffsetFromPageCorner) / scale;
 
-          const position = { x: px2mm(Math.max(0, moveX)), y: px2mm(Math.max(0, moveY)) }
+          const position = { x: round(px2mm(Math.max(0, moveX)), 2), y: round(px2mm(Math.max(0, moveY)), 2) }
 
           addSchema({ ...(active.data.current as Schema), position });
         }}
