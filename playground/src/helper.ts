@@ -140,15 +140,20 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
       : getInputFromTemplate(template);
   const font = await getFontsData();
 
-  const pdf = await generate({
-    template,
-    inputs,
-    options: { font, title: 'pdfme' },
-    plugins: getPlugins(),
-  });
+  try {
+    const pdf = await generate({
+      template,
+      inputs,
+      options: { font, title: 'pdfme' },
+      plugins: getPlugins(),
+    });
 
-  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-  window.open(URL.createObjectURL(blob));
+    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+    window.open(URL.createObjectURL(blob));
+  } catch (e) {
+    alert(e + '\n\nCheck the console for full stack trace');
+    throw e;
+  }
 };
 
 export const isJsonString = (str: string) => {

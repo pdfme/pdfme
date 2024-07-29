@@ -8,9 +8,11 @@ const { Text } = Typography;
 
 interface Props {
   value: React.ReactNode;
+  icon?: React.ReactNode;
   style?: React.CSSProperties;
   status?: 'is-warning' | 'is-danger';
   title?: string;
+  required?: boolean;
   dragOverlay?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
@@ -26,9 +28,11 @@ const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        icon,
         value,
         status,
         title,
+        required,
         style,
         dragOverlay,
         onClick,
@@ -93,6 +97,7 @@ const Item = React.memo(
               }}
               icon={<HolderOutlined style={{ cursor: 'grab' }} />}
             />
+            {icon}
             <Text
               style={{
                 overflow: 'hidden',
@@ -111,6 +116,7 @@ const Item = React.memo(
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>
               )}
+              {required && <span style={{ color: 'red', marginLeft: '0.5rem' }}>*</span>}
             </Text>
           </div>
         </li>
