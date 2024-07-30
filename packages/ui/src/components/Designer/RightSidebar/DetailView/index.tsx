@@ -65,6 +65,11 @@ const DetailView = (props: DetailViewProps) => {
     values.x = values.position.x;
     values.y = values.position.y;
     delete values.position;
+
+    if (values.key !== (form.getValues() || {}).key) {
+      form.resetFields();
+    }
+
     form.setValues(values);
 
   }, [activeSchema, form]);
@@ -148,7 +153,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         span: 12,
       },
       key: { title: i18n('fieldName'), type: 'string', required: true, span: 12 },
-      required: { title: i18n('required'), type: 'boolean', span: 6, hidden: defaultSchema?.readOnly },
+      required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
       x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
