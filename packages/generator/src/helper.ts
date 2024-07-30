@@ -62,7 +62,7 @@ export const validateRequiredFields = (template: Template, inputs: Record<string
   template.schemas.forEach((schemaObj) =>
     Object.entries(schemaObj).forEach(([fieldName, schema]) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[fieldName])) {
-        throw new Error(`input for '${fieldName}' is required to generate this PDF`);
+        throw new Error(`[@pdfme/generator] input for '${fieldName}' is required to generate this PDF`);
       }
     })
   );

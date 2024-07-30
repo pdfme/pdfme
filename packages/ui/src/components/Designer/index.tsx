@@ -172,7 +172,7 @@ const TemplateEditor = ({
         x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
         y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),
       },
-      required: options.requiredByDefault || defaultSchema.required || false,
+      required: defaultSchema.readOnly ? false : options.requiredByDefault || defaultSchema.required || false,
     } as SchemaForUI;
 
     if (defaultSchema.position.y === 0) {

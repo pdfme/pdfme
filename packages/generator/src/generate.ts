@@ -10,7 +10,7 @@ const generate = async (props: GenerateProps) => {
   const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
-    throw new Error('inputs should not be empty, pass at least an empty object in the array');
+    throw new Error('[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array');
   }
 
   validateRequiredFields(template, inputs);

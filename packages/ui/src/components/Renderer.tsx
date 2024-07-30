@@ -43,7 +43,6 @@ const Wrapper = ({
   outline,
   onChangeHoveringSchemaId,
   schema,
-  mode,
 }: RendererProps & { children: ReactNode }) => (
   <div
     title={schema.key}
@@ -63,7 +62,7 @@ const Wrapper = ({
       outline,
     }}
   >
-    {mode == 'form' && schema.required &&
+    {schema.required &&
       <span style={{
         color: 'red',
         position: 'absolute',
