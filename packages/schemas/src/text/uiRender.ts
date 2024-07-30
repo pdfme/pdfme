@@ -34,6 +34,14 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     _cache,
   } = arg;
   const usePlaceholder = isEditable(mode, schema) && placeholder && !value;
+  const getText = (element: HTMLDivElement) => {
+    let text = element.innerText;
+    if (text.endsWith('\n')) {
+      // contenteditable adds additional newline char retrieved with innerText
+      text = text.slice(0, -1);
+    }
+    return text;
+  };
 
   const textBlock = await buildStyledTextContainer(arg, usePlaceholder ? placeholder : value);
 
@@ -55,7 +63,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   textBlock.tabIndex = tabIndex || 0;
   textBlock.innerText = value;
   textBlock.addEventListener('blur', (e: Event) => {
-    onChange && onChange({ key: 'content', value: (e.target as HTMLDivElement).textContent });
+    onChange && onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
     stopEditing && stopEditing();
   });
 
@@ -71,7 +79,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           dynamicFontSize = await calculateDynamicFontSize({
             textSchema: schema,
             font,
-            value: textBlock.textContent,
+            value: getText(textBlock),
             startingFontSize: dynamicFontSize,
             _cache,
           });
