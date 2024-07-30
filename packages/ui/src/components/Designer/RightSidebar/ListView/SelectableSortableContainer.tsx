@@ -1,4 +1,4 @@
-import React, {useState, useContext, ReactNode} from 'react';
+import React, { useState, useContext, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
   closestCorners,
@@ -153,16 +153,16 @@ const SelectableSortableContainer = (
           <DragOverlay adjustScale>
             {activeId ? (
               <>
-                <ul style={{margin: 0, padding: 0, listStyle: 'none'}}>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   <Item
                     icon={getPluginIcon(activeId)}
                     value={schemas.find((schema) => schema.id === activeId)!.key}
                     required={schemas.find((schema) => schema.id === activeId)!.required}
-                    style={{background: token.colorPrimary}}
+                    style={{ background: token.colorPrimary }}
                     dragOverlay
                   />
                 </ul>
-                <ul style={{margin: 0, padding: 0, listStyle: 'none'}}>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   {selectedSchemas
                     .filter((item) => item.id !== activeId)
                     .map((item) => (
@@ -171,13 +171,13 @@ const SelectableSortableContainer = (
                         key={item.id}
                         value={item.key}
                         required={item.required}
-                        style={{background: token.colorPrimary}}
+                        style={{ background: token.colorPrimary }}
                         dragOverlay
                       />
                     ))}
                 </ul>
               </>
-              ) : null}
+            ) : null}
           </DragOverlay>,
           document.body
         )}
