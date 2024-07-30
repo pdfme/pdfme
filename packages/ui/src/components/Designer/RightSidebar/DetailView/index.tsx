@@ -1,5 +1,5 @@
 import FormRender, { useForm } from 'form-render';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
@@ -29,6 +29,36 @@ const DetailView = (props: DetailViewProps) => {
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
+  const [widgets, setWidgets] = useState<{
+    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
+  }>({});
+
+  useEffect(() => {
+    const newWidgets: typeof widgets = {
+      AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
+      Divider: () => (
+        <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
+      ),
+      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
+    };
+    for (const plugin of Object.values(pluginsRegistry)) {
+      const widgets = plugin?.propPanel.widgets || {};
+      Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
+        newWidgets[widgetKey] = (p) => (
+          <WidgetRenderer
+            {...p}
+            {...props}
+            options={options}
+            theme={token}
+            i18n={i18n as (key: keyof Dict | string) => string}
+            widget={widgetValue}
+          />
+        );
+      });
+    }
+    setWidgets(newWidgets);
+  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+
   useEffect(() => {
     const values: any = { ...activeSchema };
     // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
@@ -38,7 +68,6 @@ const DetailView = (props: DetailViewProps) => {
     form.setValues(values);
 
   }, [activeSchema, form]);
-
 
   const handleWatch = (formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
@@ -181,31 +210,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     };
   }
 
-  const allWidgets: {
-    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
-  } = {
-    AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-    Divider: () => (
-      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
-    ),
-    ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
-  };
-  for (const plugin of Object.values(pluginsRegistry)) {
-    const widgets = plugin?.propPanel.widgets || {};
-    Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
-      allWidgets[widgetKey] = (p) => (
-        <WidgetRenderer
-          {...p}
-          {...props}
-          options={options}
-          theme={token}
-          i18n={i18n as (key: keyof Dict | string) => string}
-          widget={widgetValue}
-        />
-      );
-    });
-  }
-
   return (
     <div>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
@@ -235,7 +239,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         <FormRender
           form={form}
           schema={propPanelSchema}
-          widgets={allWidgets}
+          widgets={widgets}
           watch={{ '#': handleWatch }}
           locale="en-US"
         />
