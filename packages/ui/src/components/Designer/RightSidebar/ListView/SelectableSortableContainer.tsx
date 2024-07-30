@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import {
   closestCorners,
@@ -17,9 +17,11 @@ import {
 } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
+import { PluginsRegistry } from '../../../../contexts';
 import Item from './Item';
 import SelectableSortableItem from './SelectableSortableItem';
 import { theme } from 'antd';
+import PluginIcon from "../../PluginIcon";
 
 const SelectableSortableContainer = (
   props: Pick<
@@ -28,11 +30,11 @@ const SelectableSortableContainer = (
   >
 ) => {
   const { token } = theme.useToken();
-
   const { schemas, onEdit, onSortEnd, hoveringSchemaId, onChangeHoveringSchemaId } = props;
   const [selectedSchemas, setSelectedSchemas] = useState<SchemaForUI[]>([]);
-  const [dragOverlaydItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
+  const [dragOverlaidItems, setClonedItems] = useState<SchemaForUI[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const pluginsRegistry = useContext(PluginsRegistry);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 15 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
@@ -54,6 +56,20 @@ const SelectableSortableContainer = (
     } else {
       setSelectedSchemas([]);
     }
+  };
+
+  const getPluginIcon = (inSchema: string|SchemaForUI): ReactNode => {
+    const thisSchema = (typeof inSchema === 'string') ? schemas.find((schema) => schema.id === inSchema) : inSchema;
+
+    const [pluginLabel, activePlugin] = Object.entries(pluginsRegistry).find(
+      ([label, plugin]) => plugin?.propPanel.defaultSchema.type === thisSchema?.type
+    )!;
+
+    if (!activePlugin) {
+      return <></>
+    }
+
+    return <PluginIcon plugin={activePlugin} label={pluginLabel} size={20} styles={{marginRight: '0.5rem'}}/>
   };
 
   return (
@@ -101,8 +117,8 @@ const SelectableSortableContainer = (
         setActiveId(null);
       }}
       onDragCancel={() => {
-        if (dragOverlaydItems) {
-          onSortEnd(dragOverlaydItems);
+        if (dragOverlaidItems) {
+          onSortEnd(dragOverlaidItems);
         }
 
         setActiveId(null);
@@ -139,7 +155,9 @@ const SelectableSortableContainer = (
               <>
                 <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                   <Item
+                    icon={getPluginIcon(activeId)}
                     value={schemas.find((schema) => schema.id === activeId)!.key}
+                    required={schemas.find((schema) => schema.id === activeId)!.required}
                     style={{ background: token.colorPrimary }}
                     dragOverlay
                   />
@@ -149,8 +167,10 @@ const SelectableSortableContainer = (
                     .filter((item) => item.id !== activeId)
                     .map((item) => (
                       <Item
+                        icon={getPluginIcon(item)}
                         key={item.id}
                         value={item.key}
+                        required={item.required}
                         style={{ background: token.colorPrimary }}
                         dragOverlay
                       />

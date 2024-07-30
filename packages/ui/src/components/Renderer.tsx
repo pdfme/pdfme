@@ -62,6 +62,16 @@ const Wrapper = ({
       outline,
     }}
   >
+    {schema.required &&
+      <span style={{
+        color: 'red',
+        position: 'absolute',
+        top: -12,
+        left: -12,
+        fontSize: 18,
+        fontWeight: 700,
+      }}>*</span>
+    }
     {children}
   </div>
 );

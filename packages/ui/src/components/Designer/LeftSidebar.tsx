@@ -8,7 +8,8 @@ import { theme, Button } from 'antd';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from "@dnd-kit/utilities";
 import Renderer from '../Renderer';
-import { PluginsRegistry, OptionsContext } from '../../contexts';
+import { PluginsRegistry } from '../../contexts';
+import PluginIcon from "./PluginIcon";
 
 const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf, children: React.ReactNode }) => {
   const { scale, basePdf, plugin } = props;
@@ -44,8 +45,6 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
 const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number, basePdf: BasePdf }) => {
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-  const options = useContext(OptionsContext);
-
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -77,7 +76,6 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
   >
     {Object.entries(pluginsRegistry).map(([label, plugin]) => {
       if (!plugin?.propPanel.defaultSchema) return null;
-      const icon = options.icons?.[plugin.propPanel.defaultSchema.type] ?? plugin.icon;
 
       return <Draggable
         key={label}
@@ -85,16 +83,10 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
         basePdf={basePdf}
         plugin={plugin}>
         <Button
-          title={label}
-          onMouseDown={() => {
-            setIsDragging(true);
-          }}
-          style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}>
-          {icon ?
-            <div dangerouslySetInnerHTML={{ __html: icon }} />
-            :
-            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
-          }
+          onMouseDown={() => setIsDragging(true)}
+          style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}
+        >
+          <PluginIcon plugin={plugin} label={label} />
         </Button>
       </Draggable>
     })}

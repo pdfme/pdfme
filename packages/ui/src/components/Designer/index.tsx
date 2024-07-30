@@ -15,7 +15,7 @@ import RightSidebar from './RightSidebar/index';
 import LeftSidebar from './LeftSidebar';
 import Canvas from './Canvas/index';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../constants';
-import { I18nContext, PluginsRegistry } from '../../contexts';
+import { I18nContext, OptionsContext, PluginsRegistry } from '../../contexts';
 import {
   schemasList2template,
   uuid,
@@ -62,6 +62,7 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
+  const options = useContext(OptionsContext);
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -171,6 +172,7 @@ const TemplateEditor = ({
         x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
         y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),
       },
+      required: defaultSchema.readOnly ? false : options.requiredByDefault || defaultSchema.required || false,
     } as SchemaForUI;
 
     if (defaultSchema.position.y === 0) {
