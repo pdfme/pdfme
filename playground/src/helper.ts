@@ -1,4 +1,11 @@
-import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/common';
+import {
+  Template,
+  Font,
+  checkTemplate,
+  getInputFromTemplate,
+  getDefaultFont,
+  DEFAULT_FONT_NAME,
+} from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
 import {
@@ -28,15 +35,20 @@ const fontObjList = [
     label: 'NotoSansJP-Regular',
     url: '/fonts/NotoSansJP-Regular.otf',
   },
+  {
+    fallback: false,
+    label: DEFAULT_FONT_NAME,
+    data: getDefaultFont()[DEFAULT_FONT_NAME].data,
+  },
 ];
 
 export const getFontsData = async () => {
-  const fontDataList = await Promise.all(
+  const fontDataList = (await Promise.all(
     fontObjList.map(async (font) => ({
       ...font,
-      data: await fetch(font.url).then((res) => res.arrayBuffer()),
+      data: font.data || (await fetch(font.url || '').then((res) => res.arrayBuffer())),
     }))
-  );
+  )) as { fallback: boolean; label: string; data: ArrayBuffer }[];
 
   return fontDataList.reduce((acc, font) => ({ ...acc, [font.label]: font }), {} as Font);
 };
@@ -145,7 +157,7 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
       template,
       inputs,
       options: {
-        // font,
+        font,
         title: 'pdfme',
       },
       plugins: getPlugins(),

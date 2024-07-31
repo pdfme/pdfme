@@ -35,23 +35,25 @@ const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string
   };
 
   const segments = text.split(/(\r\n|\n|\r)/);
-  
-  return segments.map(segment => {
-    if (/\r\n|\n|\r/.test(segment)) {
-      return segment;
-    }
-    
-    return segment
-      .split('')
-      .map((char) => {
-        if (/\s/.test(char) || char.charCodeAt(0) < 32) {
-          return char;
-        }
-        
-        return isCharSupported(char) ? char : '〿';
-      })
-      .join('');
-  }).join('');
+
+  return segments
+    .map((segment) => {
+      if (/\r\n|\n|\r/.test(segment)) {
+        return segment;
+      }
+
+      return segment
+        .split('')
+        .map((char) => {
+          if (/\s/.test(char) || char.charCodeAt(0) < 32) {
+            return char;
+          }
+
+          return isCharSupported(char) ? char : '〿';
+        })
+        .join('');
+    })
+    .join('');
 };
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
@@ -67,17 +69,19 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return text;
   };
   const font = options?.font || getDefaultFont();
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
+  const [fontKitFont, textBlock] = await Promise.all([
+    getFontKitFont(schema.fontName, font, _cache),
+    buildStyledTextContainer(arg, usePlaceholder ? placeholder : value),
+  ]);
 
-  const textBlock = await buildStyledTextContainer(arg, usePlaceholder ? placeholder : value);
+  const processedText = replaceUnsupportedChars(value, fontKitFont);
 
   if (!isEditable(mode, schema)) {
     // Read-only mode
-    const processedText = replaceUnsupportedChars(value, fontKitFont);
     textBlock.innerHTML = processedText
       .split('')
       .map(
-        (l: string, i: number) =>
+        (l, i) =>
           `<span style="letter-spacing:${
             String(value).length === i + 1 ? 0 : 'inherit'
           };">${l}</span>`
@@ -88,7 +92,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
 
   makeElementPlainTextContentEditable(textBlock);
   textBlock.tabIndex = tabIndex || 0;
-  textBlock.innerText = replaceUnsupportedChars(value, fontKitFont);
+  textBlock.innerText = mode === 'designer' ? value : processedText;
   textBlock.addEventListener('blur', (e: Event) => {
     onChange && onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
     stopEditing && stopEditing();
@@ -226,7 +230,6 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
   const textBlock = document.createElement('div');
   textBlock.id = 'text-' + schema.id;
   Object.assign(textBlock.style, textBlockStyle);
-  textBlock.innerText = replaceUnsupportedChars(value, fontKitFont);
 
   container.appendChild(textBlock);
 
