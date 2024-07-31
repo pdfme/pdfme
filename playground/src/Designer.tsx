@@ -65,7 +65,7 @@ function App() {
           domContainer: designerRef.current,
           template,
           options: {
-            font,
+            // font,
             lang,
             labels: {
               'clear': '🗑️', // Add custom labels to consume them in your own plugins

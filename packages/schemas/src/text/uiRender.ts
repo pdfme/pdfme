@@ -1,4 +1,5 @@
 import type * as CSS from 'csstype';
+import type { Font as FontKitFont } from 'fontkit';
 import { UIRenderProps, getDefaultFont } from '@pdfme/common';
 import type { TextSchema } from './types';
 import {
@@ -21,18 +22,41 @@ import {
 } from './helper.js';
 import { isEditable } from '../utils.js';
 
+const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
+  const charSupportCache: { [char: string]: boolean } = {};
+
+  const isCharSupported = (char: string): boolean => {
+    if (char in charSupportCache) {
+      return charSupportCache[char];
+    }
+    const isSupported = fontKitFont.hasGlyphForCodePoint(char.codePointAt(0) || 0);
+    charSupportCache[char] = isSupported;
+    return isSupported;
+  };
+
+  const segments = text.split(/(\r\n|\n|\r)/);
+  
+  return segments.map(segment => {
+    if (/\r\n|\n|\r/.test(segment)) {
+      return segment;
+    }
+    
+    return segment
+      .split('')
+      .map((char) => {
+        if (/\s/.test(char) || char.charCodeAt(0) < 32) {
+          return char;
+        }
+        
+        return isCharSupported(char) ? char : '〿';
+      })
+      .join('');
+  }).join('');
+};
+
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
-  const {
-    value,
-    schema,
-    mode,
-    onChange,
-    stopEditing,
-    tabIndex,
-    placeholder,
-    options,
-    _cache,
-  } = arg;
+  const { value, schema, mode, onChange, stopEditing, tabIndex, placeholder, options, _cache } =
+    arg;
   const usePlaceholder = isEditable(mode, schema) && placeholder && !value;
   const getText = (element: HTMLDivElement) => {
     let text = element.innerText;
@@ -42,26 +66,29 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     }
     return text;
   };
+  const font = options?.font || getDefaultFont();
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
 
   const textBlock = await buildStyledTextContainer(arg, usePlaceholder ? placeholder : value);
 
   if (!isEditable(mode, schema)) {
     // Read-only mode
-    textBlock.innerHTML = value
-        .split('')
-        .map(
-            (l: string, i: number) =>
-                `<span style="letter-spacing:${
-                    String(value).length === i + 1 ? 0 : 'inherit'
-                };">${l}</span>`
-        )
-        .join('');
+    const processedText = replaceUnsupportedChars(value, fontKitFont);
+    textBlock.innerHTML = processedText
+      .split('')
+      .map(
+        (l: string, i: number) =>
+          `<span style="letter-spacing:${
+            String(value).length === i + 1 ? 0 : 'inherit'
+          };">${l}</span>`
+      )
+      .join('');
     return;
   }
 
   makeElementPlainTextContentEditable(textBlock);
   textBlock.tabIndex = tabIndex || 0;
-  textBlock.innerText = value;
+  textBlock.innerText = replaceUnsupportedChars(value, fontKitFont);
   textBlock.addEventListener('blur', (e: Event) => {
     onChange && onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
     stopEditing && stopEditing();
@@ -85,13 +112,12 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           });
           textBlock.style.fontSize = `${dynamicFontSize}pt`;
 
-          const { topAdj: newTopAdj, bottomAdj: newBottomAdj } =
-            getBrowserVerticalFontAdjustments(
-              fontKitFont,
-              dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
-              schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
-              schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
-            );
+          const { topAdj: newTopAdj, bottomAdj: newBottomAdj } = getBrowserVerticalFontAdjustments(
+            fontKitFont,
+            dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
+            schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+            schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+          );
           textBlock.style.paddingTop = `${newTopAdj}px`;
           textBlock.style.marginBottom = `${newBottomAdj}px`;
         })();
@@ -126,13 +152,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
 };
 
 export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, value: string) => {
-  const {
-    schema,
-    rootElement,
-    mode,
-    options,
-    _cache,
-  } = arg;
+  const { schema, rootElement, mode, options, _cache } = arg;
   const font = options?.font || getDefaultFont();
 
   let dynamicFontSize: undefined | number = undefined;
@@ -151,10 +171,10 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(
-      fontKitFont,
-      dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
-      schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
-      schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+    fontKitFont,
+    dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
+    schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+    schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
   );
 
   const topAdjustment = topAdj.toString();
@@ -206,6 +226,7 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
   const textBlock = document.createElement('div');
   textBlock.id = 'text-' + schema.id;
   Object.assign(textBlock.style, textBlockStyle);
+  textBlock.innerText = replaceUnsupportedChars(value, fontKitFont);
 
   container.appendChild(textBlock);
 
@@ -239,7 +260,7 @@ export const makeElementPlainTextContentEditable = (element: HTMLElement) => {
     selection.getRangeAt(0).insertNode(document.createTextNode(paste || ''));
     selection.collapseToEnd();
   });
-}
+};
 
 const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
