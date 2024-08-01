@@ -152,7 +152,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         required: true,
         span: 12,
       },
-      key: { title: i18n('fieldName'), type: 'string', required: true, span: 12 },
+      key: { title: i18n('fieldName'), type: 'string', required: true, span: 12, props: { autocomplete: "off"} },
       required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
