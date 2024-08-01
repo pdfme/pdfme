@@ -110,7 +110,7 @@ const Item = React.memo(
               {status === undefined ? (
                 value
               ) : (
-                <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>
                   <ExclamationCircleOutlined width={15} style={{ marginRight: '0.5rem' }} />
                   {status === 'is-warning' ? i18n('noKeyName') : value}
                   {status === 'is-danger' ? i18n('notUniq') : ''}
