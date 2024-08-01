@@ -97,7 +97,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font, _cache }),
     getFontKitFont(schema.fontName, font, _cache),
-    getFontProp({ value, font, schema, _cache }),
+    getFontProp({ value, font, schema, _cache, colorType }),
   ]);
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
