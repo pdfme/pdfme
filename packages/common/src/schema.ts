@@ -29,7 +29,10 @@ export const Dict = z.object({
   addPageAfter: z.string(),
   removePage: z.string(),
   removePageConfirm: z.string(),
-  hexColorPrompt: z.string(),
+  // --------------------validation-------------------
+  'validation.uniqueName': z.string(),
+  'validation.hexColor': z.string(),
+
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
   'schemas.borderWidth': z.string(),

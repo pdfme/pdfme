@@ -77,13 +77,13 @@ const shape: Plugin<ShapeSchema> = {
         title: i18n('schemas.borderColor'),
         type: 'string',
         widget: 'color',
-        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },
       color: {
         title: i18n('schemas.color'),
         type: 'string',
         widget: 'color',
-        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('hexColorPrompt') }],
+        rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },
     }),
     defaultSchema: {
