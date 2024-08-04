@@ -4,7 +4,7 @@ import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPan
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { getSidebarContentHeight } from '../../../../helper';
+import { getSidebarContentHeight, debounce } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
@@ -22,7 +22,7 @@ type DetailViewProps = Pick<SidebarProps,
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, schemas,  changeSchemas, deselectSchema, activeSchema } = props;
+  const { size, schemas, changeSchemas, deselectSchema, activeSchema } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
@@ -85,11 +85,9 @@ const DetailView = (props: DetailViewProps) => {
 
   const uniqueSchemaKey = useRef((value: string): boolean => true);
 
-  const validateUniqueSchemaKey = (_: any, value: string): boolean => {
-    return uniqueSchemaKey.current(value);
-  }
+  const validateUniqueSchemaKey = (_: any, value: string): boolean => uniqueSchemaKey.current(value)
 
-  const handleWatch = (formSchema: any) => {
+  const handleWatch = debounce((formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
       if (typeof formValue === 'object') {
         return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
@@ -137,7 +135,7 @@ const DetailView = (props: DetailViewProps) => {
           }
         });
     }
-  };
+  }, 500);
 
   const activePlugin = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
@@ -176,7 +174,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           validator: validateUniqueSchemaKey,
           message: i18n('validation.uniqueName'),
         }],
-        props: { autocomplete: "off"}
+        props: { autocomplete: "off" }
       },
       required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
       '-': { type: 'void', widget: 'Divider' },
