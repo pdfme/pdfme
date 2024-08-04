@@ -129,7 +129,7 @@ export const propPanel: PropPanel<TextSchema> = {
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
+            message: i18n('validation.hexColor'),
           },
         ],
       },
@@ -140,7 +140,7 @@ export const propPanel: PropPanel<TextSchema> = {
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
+            message: i18n('validation.hexColor'),
           },
         ],
       },
