@@ -174,7 +174,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           validator: validateUniqueSchemaKey,
           message: i18n('validation.uniqueName'),
         }],
-        props: { autocomplete: "off" }
+        props: { autoComplete: "off" }
       },
       required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
       '-': { type: 'void', widget: 'Divider' },
