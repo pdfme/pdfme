@@ -77,6 +77,7 @@ const SelectableSortableItem = ({
       status={status}
       title={title}
       required={schema.required}
+      readOnly={schema.readOnly}
       style={{ ...selectedStyle, ...style }}
       dragging={isDragging}
       sorting={isSorting}

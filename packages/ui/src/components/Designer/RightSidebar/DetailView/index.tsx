@@ -174,9 +174,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           validator: validateUniqueSchemaKey,
           message: i18n('validation.uniqueName'),
         }],
-        props: { autocomplete: "off" }
+        props: { autoComplete: "off" }
       },
-      required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
+      required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly ,disabled: '{{formData.readOnly}}',},
+      readOnly: { title: i18n('readOnly'), type: 'boolean', span: 16, hidden: defaultSchema?.readOnly ,disabled: '{{formData.required}}',},
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
       x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },

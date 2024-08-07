@@ -35,7 +35,7 @@ export const signature: Plugin<Signature> = {
       console.error(e);
     }
 
-    if (mode === 'viewer') {
+    if (mode === 'viewer' || (mode === 'form' && schema.readOnly)) {
       signaturePad.off();
     } else {
       signaturePad.on();
