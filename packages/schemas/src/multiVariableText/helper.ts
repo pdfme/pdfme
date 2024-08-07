@@ -14,5 +14,8 @@ export const substituteVariables = (text: string, variablesIn: string | Record<s
     substitutedText = substitutedText.replace(regex, variables[variableName]);
   });
 
+  // Remove any variables that were not substituted from inputs
+  substitutedText.replace(/{[^{}]+}/g, '');
+
   return substitutedText;
 };
