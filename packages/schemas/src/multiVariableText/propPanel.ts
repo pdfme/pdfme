@@ -115,7 +115,7 @@ const updateVariablesFromText = (text: string, variables: any): boolean => {
     // Add any new variables
     for (const match of matches) {
       const variableName = match.replace('{', '').replace('}', '');
-      if (!variables[variableName]) {
+      if (!(variableName in variables)) {
         // NOTE: We upper case the variable name as the default value
         variables[variableName] = variableName.toUpperCase();
         changed = true;
