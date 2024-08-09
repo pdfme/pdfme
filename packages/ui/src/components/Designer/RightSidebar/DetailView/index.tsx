@@ -174,17 +174,34 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }],
         props: { autoComplete: "off" }
       },
-      editable: { title: i18n('editable'), type: 'boolean', span: 8, bind: false },
+      editable: { title: i18n('editable'), type: 'boolean', span: 8, bind: false, hidden: defaultSchema?.readOnly },
       readOnly: { type: 'boolean', span: 0, hidden: true },
       required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{formData.readOnly}}" },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
       position: {
         type: 'object',
+        widget: 'card',
         properties: {
           x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
           y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
         }
+      },
+      width: {
+        title: i18n('width'),
+        type: 'number',
+        widget: 'inputNumber',
+        required: true,
+        span: 6,
+        props: { min: 0 },
+      },
+      height: {
+        title: i18n('height'),
+        type: 'number',
+        widget: 'inputNumber',
+        required: true,
+        span: 6,
+        props: { min: 0 },
       },
       rotate: {
         title: i18n('rotate'),
@@ -193,23 +210,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         disabled: defaultSchema?.rotate === undefined,
         max: 360,
         props: { min: 0 },
-        span: 8,
-      },
-      width: {
-        title: i18n('width'),
-        type: 'number',
-        widget: 'inputNumber',
-        required: true,
-        span: 8,
-        props: { min: 0 },
-      },
-      height: {
-        title: i18n('height'),
-        type: 'number',
-        widget: 'inputNumber',
-        required: true,
-        span: 8,
-        props: { min: 0 },
+        span: 6,
       },
       opacity: {
         title: i18n('opacity'),
@@ -217,7 +218,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
         props: { step: 0.1, min: 0, max: 1 },
-        span: 8,
+        span: 6,
       },
     },
   };
