@@ -38,10 +38,10 @@ const PluginIcon = (props: PluginIconProps) => {
     if (size) {
       return getWithModifiedSize(icon, label, size, iconStyles);
     }
-    return <div style={iconStyles} title={label}  dangerouslySetInnerHTML={{__html: icon}} />
+    return <div style={iconStyles} title={label} dangerouslySetInnerHTML={{ __html: icon }} />
   }
 
-  return <div style={{...styles, overflow: 'hidden', fontSize: 10, }}>{label}</div>
+  return <div style={{ ...styles, overflow: 'hidden', fontSize: 10, }} title={label} >{label}</div>
 };
 
 export default PluginIcon;

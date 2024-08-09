@@ -58,7 +58,7 @@ const SelectableSortableContainer = (
     }
   };
 
-  const getPluginIcon = (inSchema: string|SchemaForUI): ReactNode => {
+  const getPluginIcon = (inSchema: string | SchemaForUI): ReactNode => {
     const thisSchema = (typeof inSchema === 'string') ? schemas.find((schema) => schema.id === inSchema) : inSchema;
 
     const [pluginLabel, activePlugin] = Object.entries(pluginsRegistry).find(
@@ -69,7 +69,7 @@ const SelectableSortableContainer = (
       return <></>
     }
 
-    return <PluginIcon plugin={activePlugin} label={pluginLabel} size={20} styles={{marginRight: '0.5rem'}}/>
+    return <PluginIcon plugin={activePlugin} label={pluginLabel} size={20} styles={{ marginRight: '0.5rem' }} />
   };
 
   return (
@@ -133,9 +133,8 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    border: `1px solid ${
-                      schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
-                    }`,
+                    border: `1px solid ${schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
+                      }`,
                   }}
                   schema={schema}
                   schemas={schemas}
@@ -152,31 +151,39 @@ const SelectableSortableContainer = (
         {createPortal(
           <DragOverlay adjustScale>
             {activeId ? (
-              <>
-                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                  <Item
-                    icon={getPluginIcon(activeId)}
-                    value={schemas.find((schema) => schema.id === activeId)!.key}
-                    required={schemas.find((schema) => schema.id === activeId)!.required}
-                    style={{ background: token.colorPrimary }}
-                    dragOverlay
-                  />
-                </ul>
-                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                  {selectedSchemas
-                    .filter((item) => item.id !== activeId)
-                    .map((item) => (
+              (() => {
+                const activeSchema = schemas.find((schema) => schema.id === activeId);
+                if (!activeSchema) return null;
+                return (
+                  <>
+                    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                       <Item
-                        icon={getPluginIcon(item)}
-                        key={item.id}
-                        value={item.key}
-                        required={item.required}
+                        icon={getPluginIcon(activeId)}
+                        value={activeSchema.key}
+                        required={activeSchema.required}
+                        readOnly={activeSchema.readOnly}
                         style={{ background: token.colorPrimary }}
                         dragOverlay
                       />
-                    ))}
-                </ul>
-              </>
+                    </ul>
+                    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                      {selectedSchemas
+                        .filter((item) => item.id !== activeId)
+                        .map((item) => (
+                          <Item
+                            icon={getPluginIcon(item)}
+                            key={item.id}
+                            value={item.key}
+                            required={item.required}
+                            readOnly={item.readOnly}
+                            style={{ background: token.colorPrimary }}
+                            dragOverlay
+                          />
+                        ))}
+                    </ul>
+                  </>
+                );
+              })()
             ) : null}
           </DragOverlay>,
           document.body

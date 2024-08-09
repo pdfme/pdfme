@@ -121,7 +121,7 @@ const renderRowUi = (args: {
         editingPosition.rowIndex === rowIndex && editingPosition.colIndex === colIndex;
       let mode: Mode = 'viewer';
       if (arg.mode === 'form') {
-        mode = section === 'body' && isEditing ? 'designer' : 'viewer';
+        mode = section === 'body' && isEditing && !arg.schema.readOnly ? 'designer' : 'viewer';
       } else if (arg.mode === 'designer') {
         mode = isEditing ? 'designer' : 'form';
       }
@@ -212,7 +212,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     offsetY,
   });
 
-  if (mode === 'form' && onChange) {
+  if (mode === 'form' && onChange && !schema.readOnly) {
     if (
       schema.__bodyRange?.end === undefined ||
       schema.__bodyRange.end >= (JSON.parse(value || '[]') as string[][]).length

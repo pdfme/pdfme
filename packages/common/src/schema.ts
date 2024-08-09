@@ -15,6 +15,7 @@ export const Dict = z.object({
   rotate: z.string(),
   edit: z.string(),
   required: z.string(),
+  editable: z.string(),
   plsInputName: z.string(),
   fieldMustUniq: z.string(),
   notUniq: z.string(),
