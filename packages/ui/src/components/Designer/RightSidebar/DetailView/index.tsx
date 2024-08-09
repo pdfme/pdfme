@@ -174,7 +174,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }],
         props: { autoComplete: "off" }
       },
-      editable: { title: i18n('editable'), type: 'boolean', span: 8, bind: false, hidden: defaultSchema?.readOnly },
+      editable: { title: i18n('editable'), type: 'boolean', span: 8, bind: false, hidden: defaultSchema?.readOnly !== undefined },
       readOnly: { type: 'boolean', span: 0, hidden: true },
       required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{formData.readOnly}}" },
       '-': { type: 'void', widget: 'Divider' },
