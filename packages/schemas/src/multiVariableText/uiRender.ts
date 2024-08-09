@@ -14,7 +14,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   let text = schema.text;
   let numVariables = schema.variables.length;
 
-  if (mode === 'form' && numVariables > 0) {
+  if (mode === 'form' && numVariables > 0 && !schema.readOnly) {
     await formUiRender(arg);
     return;
   }
@@ -22,7 +22,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   await parentUiRender({
     value: isEditable(mode, schema) ? text : substituteVariables(text, value),
     schema,
-    mode: mode == 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
+    mode: mode == 'form' || schema.readOnly ? 'viewer' : mode, // if no variables for form it's just a viewer
     rootElement,
     onChange: (arg: { key: string; value: any; } | { key: string; value: any; }[]) => {
       if (!Array.isArray(arg)) {
