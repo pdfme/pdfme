@@ -148,7 +148,7 @@ export const createBarCode = async (arg: {
 
   const bcid = barCodeType2Bcid(type);
   const scale = 5;
-  const bwipjsArg: RenderOptions = { bcid, text: input, width, height, scale, includetext };
+  const bwipjsArg: RenderOptions = { bcid, text: input, width, height, scale, includetext, textxalign: 'center' };
 
   if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
