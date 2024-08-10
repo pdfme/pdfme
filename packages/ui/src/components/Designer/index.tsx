@@ -163,9 +163,9 @@ const TemplateEditor = ({
     const pageSize = pageSizes[pageCursor];
 
     const newSchemaKey = (prefix: string) => {
-      let keyNum = schemasList[pageCursor].length + 1;
+      let keyNum = schemasList.reduce((acc, page) => acc + page.length, 0);
       let newKey = prefix + keyNum;
-      while (schemasList[pageCursor].find((s) => s.key === newKey)) {
+      while (schemasList.some(page => page.find((s) => s.key === newKey))) {
         keyNum++;
         newKey = prefix + keyNum;
       }
@@ -298,6 +298,7 @@ const TemplateEditor = ({
           size={size}
           pageSize={pageSizes[pageCursor] ?? []}
           activeElements={activeElements}
+          schemasList={schemasList}
           schemas={schemasList[pageCursor] ?? []}
           changeSchemas={changeSchemas}
           onSortEnd={onSortEnd}

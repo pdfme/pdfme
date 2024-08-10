@@ -14,7 +14,7 @@ import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interfac
 const { Text } = Typography;
 
 type DetailViewProps = Pick<SidebarProps,
-  'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
+  'size' | 'schemas' | 'schemasList' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
 > & {
   activeSchema: SchemaForUI;
 };
@@ -22,7 +22,7 @@ type DetailViewProps = Pick<SidebarProps,
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, schemas, changeSchemas, deselectSchema, activeSchema } = props;
+  const { size, schemasList, changeSchemas, deselectSchema, activeSchema } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
@@ -74,14 +74,16 @@ const DetailView = (props: DetailViewProps) => {
 
   useEffect(() => {
     uniqueSchemaKey.current = (value: string): boolean => {
-      for (const s of Object.values(schemas)) {
-        if (s.key === value && s.id !== activeSchema.id) {
-          return false;
+      for (const page of schemasList) {
+        for (const s of Object.values(page)) {
+          if (s.key === value && s.id !== activeSchema.id) {
+            return false;
+          }
         }
       }
       return true;
     };
-  }, [schemas, activeSchema]);
+  }, [schemasList, activeSchema]);
 
   const uniqueSchemaKey = useRef((value: string): boolean => true);
 
@@ -218,9 +220,11 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   };
 
   if (typeof activePropPanelSchema === 'function') {
+    const { schemasList: _, ...propPanelProps } = props;
+
     const apps =
       activePropPanelSchema({
-        ...props,
+        ...propPanelProps,
         options,
         theme: token,
         i18n: i18n as (key: keyof Dict | string) => string,
