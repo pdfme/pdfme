@@ -95,9 +95,7 @@ const DetailView = (props: DetailViewProps) => {
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
-      const changed = formAndSchemaValuesDiffer(value, (activeSchema as any)[key]);
-
-      if (changed) {
+      if (formAndSchemaValuesDiffer(value, (activeSchema as any)[key])) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) {
           value = undefined;
@@ -174,9 +172,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }],
         props: { autoComplete: "off" }
       },
-      editable: { title: i18n('editable'), type: 'boolean', span: 8, bind: false, hidden: defaultSchema?.readOnly !== undefined },
-      readOnly: { type: 'boolean', span: 0, hidden: true },
-      required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{formData.readOnly}}" },
+      editable: { title: i18n('editable'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly !== undefined },
+      required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{!formData.editable}}" },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
       position: {
