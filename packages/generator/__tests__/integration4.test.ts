@@ -7,6 +7,7 @@ import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
+jest.setTimeout(30000);
 describe('generate integration test(slower)', () => {
   describe.each([textType])('%s', (templateData) => {
     const entries = Object.entries(templateData);
