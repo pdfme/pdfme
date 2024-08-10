@@ -413,29 +413,5 @@
       10,
       10
     ]
-  },
-  "columns": [
-    "name",
-    "subtitle",
-    "photo",
-    "ageLabel",
-    "age",
-    "sexLabel",
-    "sex",
-    "weightLabel",
-    "weight",
-    "breedLabel",
-    "breed",
-    "line1",
-    "personality",
-    "personalityText",
-    "line2",
-    "health",
-    "healthText",
-    "line3",
-    "owner",
-    "qr",
-    "signature",
-    "badge"
-  ]
+  }
 }

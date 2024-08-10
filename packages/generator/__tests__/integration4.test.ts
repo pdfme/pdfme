@@ -2,11 +2,12 @@ import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { textType } from './assets/templates';
 import {getInputFromTemplate} from "@pdfme/common"
-import { text, image, barcodes } from '@pdfme/schemas';
+import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
+jest.setTimeout(30000);
 describe('generate integration test(slower)', () => {
   describe.each([textType])('%s', (templateData) => {
     const entries = Object.entries(templateData);
@@ -29,7 +30,7 @@ describe('generate integration test(slower)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image, ...barcodes },
+          plugins: { text, image, multiVariableText, ...barcodes },
           options: { font },
         });
 

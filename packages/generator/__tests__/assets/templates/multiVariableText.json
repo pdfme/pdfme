@@ -1,0 +1,251 @@
+{
+  "schemas": [
+    {
+      "static": {
+        "type": "multiVariableText",
+        "content": "{}",
+        "position": {
+          "x": 16.74,
+          "y": 16.73
+        },
+        "width": 65.6,
+        "height": 23.98,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Static text only",
+        "variables": [],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "one var": {
+        "type": "multiVariableText",
+        "content": "{\"number\":\"1\"}",
+        "position": {
+          "x": 111.14,
+          "y": 16.94
+        },
+        "width": 65.6,
+        "height": 23.98,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with {number} variable ",
+        "variables": [
+          "number"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "two vars": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"X\",\"y\":\"Y\"}",
+        "position": {
+          "x": 16.37,
+          "y": 58.95
+        },
+        "width": 65.6,
+        "height": 23.98,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "dynamic font size": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"X\",\"y\":\"Y\"}",
+        "position": {
+          "x": 111.3,
+          "y": 59.16
+        },
+        "width": 65.6,
+        "height": 30.86,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": true,
+        "fontName": "NotoSerifJP-Regular",
+        "dynamicFontSize": {
+          "min": 4,
+          "max": 72,
+          "fit": "vertical"
+        }
+      },
+      "aligned and rotated": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"X\",\"y\":\"Y\"}",
+        "position": {
+          "x": 17.05,
+          "y": 111.49
+        },
+        "width": 65.6,
+        "height": 30.86,
+        "rotate": 37,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "formatting": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"X\",\"y\":\"Y\"}",
+        "position": {
+          "x": 111.98,
+          "y": 119.11
+        },
+        "width": 65.6,
+        "height": 30.86,
+        "rotate": 0,
+        "alignment": "right",
+        "verticalAlignment": "bottom",
+        "fontSize": 16,
+        "lineHeight": 1.8,
+        "characterSpacing": 5,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "colour": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"Blue\",\"y\":\"Green\"}",
+        "position": {
+          "x": 17.11,
+          "y": 180.87
+        },
+        "width": 65.6,
+        "height": 23.98,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#030622",
+        "backgroundColor": "#c1ffc7",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": false,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "strike-through underline": {
+        "type": "multiVariableText",
+        "content": "{\"x\":\"X\",\"y\":\"Y\"}",
+        "position": {
+          "x": 111.83,
+          "y": 181.93
+        },
+        "width": 65.6,
+        "height": 23.98,
+        "rotate": 338,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": true,
+        "readOnly": false,
+        "text": "Text with 2 variables - {x} and {y} ",
+        "variables": [
+          "x",
+          "y"
+        ],
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      }
+    }
+  ],
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "pdfmeVersion": "4.0.0",
+  "fontName": "NotoSerifJP-Regular"
+}
