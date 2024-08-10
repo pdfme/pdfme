@@ -61,13 +61,8 @@ const DetailView = (props: DetailViewProps) => {
 
   useEffect(() => {
     const values: any = { ...activeSchema };
-    // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
-    values.x = values.position.x;
-    values.y = values.position.y;
-    delete values.position;
-
+    values.editable = !(values.readOnly)
     form.setValues(values);
-
   }, [activeSchema, form]);
 
   useEffect(() => form.resetFields(), [activeSchema.id])
@@ -98,23 +93,24 @@ const DetailView = (props: DetailViewProps) => {
     }
 
     let changes: ChangeSchemaItem[] = [];
-    for (let key in formSchema) {
+    for (const key in formSchema) {
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
-      let changed = false;
-
-      if (['x', 'y'].includes(key)) {
-        // [position] Return the flattened position to its original form.
-        changed = value !== (activeSchema as any)['position'][key];
-        key = 'position.' + key;
-      } else {
-        changed = formAndSchemaValuesDiffer(value, (activeSchema as any)[key]);
-      }
-
-      if (changed) {
+      if (formAndSchemaValuesDiffer(value, (activeSchema as any)[key])) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
-        if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
+        if (value === null && ['rotate', 'opacity'].includes(key)) {
+          value = undefined;
+        }
+
+        if (key === 'editable') {
+          const readOnlyValue = !value;
+          changes.push({ key: 'readOnly', value: readOnlyValue, schemaId: activeSchema.id });
+          if (readOnlyValue) {
+            changes.push({ key: 'required', value: false, schemaId: activeSchema.id });
+          }
+          continue;
+        }
 
         changes.push({ key, value, schemaId: activeSchema.id });
       }
@@ -137,7 +133,7 @@ const DetailView = (props: DetailViewProps) => {
           }
         });
     }
-  }, 500);
+  }, 100);
 
   const activePlugin = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
@@ -178,26 +174,24 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         }],
         props: { autoComplete: "off" }
       },
-      required: { title: i18n('required'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly },
+      editable: { title: i18n('editable'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly !== undefined },
+      required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{!formData.editable}}" },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
-      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-      rotate: {
-        title: i18n('rotate'),
-        type: 'number',
-        widget: 'inputNumber',
-        disabled: defaultSchema?.rotate === undefined,
-        max: 360,
-        props: { min: 0 },
-        span: 8,
+      position: {
+        type: 'object',
+        widget: 'card',
+        properties: {
+          x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+          y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+        }
       },
       width: {
         title: i18n('width'),
         type: 'number',
         widget: 'inputNumber',
         required: true,
-        span: 8,
+        span: 6,
         props: { min: 0 },
       },
       height: {
@@ -205,8 +199,17 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'number',
         widget: 'inputNumber',
         required: true,
-        span: 8,
+        span: 6,
         props: { min: 0 },
+      },
+      rotate: {
+        title: i18n('rotate'),
+        type: 'number',
+        widget: 'inputNumber',
+        disabled: defaultSchema?.rotate === undefined,
+        max: 360,
+        props: { min: 0 },
+        span: 6,
       },
       opacity: {
         title: i18n('opacity'),
@@ -214,7 +217,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
         props: { step: 0.1, min: 0, max: 1 },
-        span: 8,
+        span: 6,
       },
     },
   };

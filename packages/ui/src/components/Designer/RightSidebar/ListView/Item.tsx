@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts';
-import { HolderOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { HolderOutlined, ExclamationCircleOutlined, LockOutlined } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
 
 const { Text } = Typography;
@@ -13,6 +13,7 @@ interface Props {
   status?: 'is-warning' | 'is-danger';
   title?: string;
   required?: boolean;
+  readOnly?: boolean;
   dragOverlay?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
@@ -33,6 +34,7 @@ const Item = React.memo(
         status,
         title,
         required,
+        readOnly,
         style,
         dragOverlay,
         onClick,
@@ -116,6 +118,7 @@ const Item = React.memo(
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>
               )}
+              {readOnly && <LockOutlined style={{ marginLeft: '0.5rem' }} />}
               {required && <span style={{ color: 'red', marginLeft: '0.5rem' }}>*</span>}
             </Text>
           </div>

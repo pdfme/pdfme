@@ -11,12 +11,9 @@ import { generate } from '@pdfme/generator';
 import {
   multiVariableText,
   text,
-  readOnlyText,
   barcodes,
   image,
-  readOnlyImage,
   svg,
-  readOnlySvg,
   line,
   tableBeta,
   rectangle,
@@ -118,16 +115,13 @@ ${e}`);
 export const getPlugins = () => {
   return {
     Text: text,
-    'Read-Only Text': readOnlyText,
     'Multi-Variable Text': multiVariableText,
     Table: tableBeta,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
     Image: image,
-    'Read-Only Image': readOnlyImage,
     SVG: svg,
-    'Read-Only SVG': readOnlySvg,
     Signature: plugins.signature,
     QR: barcodes.qrcode,
     JAPANPOST: barcodes.japanpost,
@@ -300,7 +294,7 @@ const getInvoiceTemplate = (): Template => ({
   schemas: [
     {
       logo: {
-        type: 'readOnlySvg',
+        type: 'svg',
         position: {
           x: 20,
           y: 20,
@@ -312,7 +306,7 @@ const getInvoiceTemplate = (): Template => ({
         readOnly: true,
       },
       head: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 120.13,
           y: 20,
@@ -333,7 +327,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       billedToLabel: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 20,
           y: 57.88,
@@ -355,7 +349,7 @@ const getInvoiceTemplate = (): Template => ({
       },
       billedToInput: {
         type: 'text',
-        content: '\nImani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036',
+        content: 'Imani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036',
         position: {
           x: 20,
           y: 67.94,
@@ -379,28 +373,27 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       info: {
-        type: 'text',
-        content: 'Invoice No. 12345\n16 June 2025',
+        type: 'multiVariableText',
         position: {
           x: 119.87,
           y: 67.88,
         },
+        content: '{"InvoiceNo":"12345","Date":"16 June 2025"}',
         width: 70.13,
-        height: 20.31,
+        height: 33.52,
         rotate: 0,
         alignment: 'right',
         verticalAlignment: 'top',
         fontSize: 13,
-        lineHeight: 1,
+        lineHeight: 1.5,
         characterSpacing: 0,
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        dynamicFontSize: {
-          min: 3,
-          max: 13,
-          fit: 'vertical',
-        },
+        strikethrough: false,
+        underline: false,
+        text: 'Invoice No.{InvoiceNo}\n{Date}',
+        variables: ['InvoiceNo', 'Date'],
         fontName: 'NotoSerifJP-Regular',
       },
       orders: {
@@ -471,11 +464,11 @@ const getInvoiceTemplate = (): Template => ({
           },
         },
         columnStyles: {
-          alignment: { 0: 'left', 3: 'right' },
+          alignment: { '0': 'left', '3': 'right' },
         },
       },
       subtotalLabel: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 138.01,
           y: 156.89,
@@ -496,7 +489,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       taxLabel: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 138.01,
           y: 164.98,
@@ -570,7 +563,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       totalLabel: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 136.94,
           y: 174.64,
@@ -611,7 +604,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       thankyou: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 20,
           y: 191.58,
@@ -632,7 +625,7 @@ const getInvoiceTemplate = (): Template => ({
         readOnly: true,
       },
       paymentInfoLabel: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 20,
           y: 232.67,
@@ -679,7 +672,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       shopName: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 119.33,
           y: 248.39,
@@ -700,7 +693,7 @@ const getInvoiceTemplate = (): Template => ({
         fontName: 'NotoSerifJP-Regular',
       },
       shopAddress: {
-        type: 'readOnlyText',
+        type: 'text',
         position: {
           x: 107.69,
           y: 256.9,
@@ -727,6 +720,7 @@ const getInvoiceTemplate = (): Template => ({
     height: 297,
     padding: [20, 20, 20, 20],
   },
+  pdfmeVersion: '4.0.0',
 });
 
 const getBlankTemplate = () =>
