@@ -1,0 +1,161 @@
+{
+  "schemas": [
+    {
+      "underline": {
+        "type": "text",
+        "content": "Underline",
+        "position": {
+          "x": 31.21,
+          "y": 31.05
+        },
+        "width": 52.41,
+        "height": 19.52,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": false,
+        "underline": true,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "strikethrough": {
+        "type": "text",
+        "content": "Strike-through",
+        "position": {
+          "x": 117.94,
+          "y": 30.74
+        },
+        "width": 67.75,
+        "height": 19.52,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": false,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "underline and strikethrough": {
+        "type": "text",
+        "content": "Underline and Strike-through",
+        "position": {
+          "x": 31.37,
+          "y": 74.35
+        },
+        "width": 67.49,
+        "height": 20.31,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": true,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "spacing and line height": {
+        "type": "text",
+        "content": "Underline and strike through with spacing and line-height",
+        "position": {
+          "x": 11.83,
+          "y": 114.07
+        },
+        "width": 82.3,
+        "height": 56.56,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1.5,
+        "characterSpacing": 3,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": true,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "rotated": {
+        "type": "text",
+        "content": "Underline and strike through rotated",
+        "position": {
+          "x": 117.34,
+          "y": 117.99
+        },
+        "width": 82.3,
+        "height": 56.56,
+        "rotate": 45,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1.2,
+        "characterSpacing": 1,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": true,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular"
+      },
+      "dynamic font size": {
+        "type": "text",
+        "content": "Underline and strike through dynamic font",
+        "position": {
+          "x": 40.29,
+          "y": 208.42
+        },
+        "width": 93.41,
+        "height": 56.56,
+        "rotate": 0,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "lineHeight": 1.2,
+        "characterSpacing": 1,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "opacity": 1,
+        "strikethrough": true,
+        "underline": true,
+        "required": false,
+        "fontName": "NotoSerifJP-Regular",
+        "dynamicFontSize": {
+          "min": 4,
+          "max": 66,
+          "fit": "vertical"
+        }
+      }
+    }
+  ],
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "pdfmeVersion": "4.0.0",
+  "fontName": "NotoSerifJP-Regular"
+}
