@@ -110,7 +110,7 @@ exports[`Designer snapshot 1`] = `
             type="button"
           >
             <div
-              style="display: flex; justify-content: center;"
+              style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
               title="text"
             >
               <svg
@@ -162,7 +162,7 @@ exports[`Designer snapshot 1`] = `
             type="button"
           >
             <div
-              style="display: flex; justify-content: center;"
+              style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
               title="image"
             >
               <svg
@@ -303,7 +303,7 @@ exports[`Designer snapshot 1`] = `
                           
                         </button>
                         <div
-                          style="width: 20px; margin-right: 0.5rem; display: flex; justify-content: center;"
+                          style="width: 20px; margin-right: 0.5rem; color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
                           title="text"
                         >
                           <svg
@@ -382,7 +382,7 @@ exports[`Designer snapshot 1`] = `
                           
                         </button>
                         <div
-                          style="width: 20px; margin-right: 0.5rem; display: flex; justify-content: center;"
+                          style="width: 20px; margin-right: 0.5rem; color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
                           title="image"
                         >
                           <svg
