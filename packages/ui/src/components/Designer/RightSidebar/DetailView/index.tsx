@@ -1,10 +1,10 @@
 import FormRender, { useForm } from 'form-render';
-import React, { useContext, useEffect } from 'react';
+import React, { useRef, useContext, useState, useEffect } from 'react';
 import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
 import { MenuOutlined } from '@ant-design/icons';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { getSidebarContentHeight } from '../../../../helper';
+import { getSidebarContentHeight, debounce } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget';
 import WidgetRenderer from './WidgetRenderer';
@@ -14,7 +14,7 @@ import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interfac
 const { Text } = Typography;
 
 type DetailViewProps = Pick<SidebarProps,
-  'size' | 'schemas' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
+  'size' | 'schemas' | 'schemasList' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
 > & {
   activeSchema: SchemaForUI;
 };
@@ -22,25 +22,69 @@ type DetailViewProps = Pick<SidebarProps,
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, changeSchemas, deselectSchema, activeSchema } = props;
+  const { size, schemasList, changeSchemas, deselectSchema, activeSchema } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
+  const [widgets, setWidgets] = useState<{
+    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
+  }>({});
+
+  useEffect(() => {
+    const newWidgets: typeof widgets = {
+      AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
+      Divider: () => (
+        <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
+      ),
+      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
+    };
+    for (const plugin of Object.values(pluginsRegistry)) {
+      const widgets = plugin?.propPanel.widgets || {};
+      Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
+        newWidgets[widgetKey] = (p) => (
+          <WidgetRenderer
+            {...p}
+            {...props}
+            options={options}
+            theme={token}
+            i18n={i18n as (key: keyof Dict | string) => string}
+            widget={widgetValue}
+          />
+        );
+      });
+    }
+    setWidgets(newWidgets);
+  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+
   useEffect(() => {
     const values: any = { ...activeSchema };
-    // [position] Change the nested position object into a flat, as a three-column layout is difficult to implement
-    values.x = values.position.x;
-    values.y = values.position.y;
-    delete values.position;
+    values.editable = !(values.readOnly)
     form.setValues(values);
-
   }, [activeSchema, form]);
 
+  useEffect(() => form.resetFields(), [activeSchema.id])
 
-  const handleWatch = (formSchema: any) => {
+  useEffect(() => {
+    uniqueSchemaKey.current = (value: string): boolean => {
+      for (const page of schemasList) {
+        for (const s of Object.values(page)) {
+          if (s.key === value && s.id !== activeSchema.id) {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+  }, [schemasList, activeSchema]);
+
+  const uniqueSchemaKey = useRef((value: string): boolean => true);
+
+  const validateUniqueSchemaKey = (_: any, value: string): boolean => uniqueSchemaKey.current(value)
+
+  const handleWatch = debounce((formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
       if (typeof formValue === 'object') {
         return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
@@ -49,23 +93,24 @@ const DetailView = (props: DetailViewProps) => {
     }
 
     let changes: ChangeSchemaItem[] = [];
-    for (let key in formSchema) {
+    for (const key in formSchema) {
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
-      let changed = false;
-
-      if (['x', 'y'].includes(key)) {
-        // [position] Return the flattened position to its original form.
-        changed = value !== (activeSchema as any)['position'][key];
-        key = 'position.' + key;
-      } else {
-        changed = formAndSchemaValuesDiffer(value, (activeSchema as any)[key]);
-      }
-
-      if (changed) {
+      if (formAndSchemaValuesDiffer(value, (activeSchema as any)[key])) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
-        if (value === null && ['rotate', 'opacity'].includes(key)) value = undefined;
+        if (value === null && ['rotate', 'opacity'].includes(key)) {
+          value = undefined;
+        }
+
+        if (key === 'editable') {
+          const readOnlyValue = !value;
+          changes.push({ key: 'readOnly', value: readOnlyValue, schemaId: activeSchema.id });
+          if (readOnlyValue) {
+            changes.push({ key: 'required', value: false, schemaId: activeSchema.id });
+          }
+          continue;
+        }
 
         changes.push({ key, value, schemaId: activeSchema.id });
       }
@@ -88,7 +133,7 @@ const DetailView = (props: DetailViewProps) => {
           }
         });
     }
-  };
+  }, 100);
 
   const activePlugin = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
@@ -118,26 +163,35 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         required: true,
         span: 12,
       },
-      key: { title: i18n('fieldName'), type: 'string', required: true, span: 12 },
+      key: {
+        title: i18n('fieldName'),
+        type: 'string',
+        required: true,
+        span: 12,
+        rules: [{
+          validator: validateUniqueSchemaKey,
+          message: i18n('validation.uniqueName'),
+        }],
+        props: { autoComplete: "off" }
+      },
+      editable: { title: i18n('editable'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly !== undefined },
+      required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{!formData.editable}}" },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
-      x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-      y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-      rotate: {
-        title: i18n('rotate'),
-        type: 'number',
-        widget: 'inputNumber',
-        disabled: defaultSchema?.rotate === undefined,
-        max: 360,
-        props: { min: 0 },
-        span: 8,
+      position: {
+        type: 'object',
+        widget: 'card',
+        properties: {
+          x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+          y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+        }
       },
       width: {
         title: i18n('width'),
         type: 'number',
         widget: 'inputNumber',
         required: true,
-        span: 8,
+        span: 6,
         props: { min: 0 },
       },
       height: {
@@ -145,8 +199,17 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'number',
         widget: 'inputNumber',
         required: true,
-        span: 8,
+        span: 6,
         props: { min: 0 },
+      },
+      rotate: {
+        title: i18n('rotate'),
+        type: 'number',
+        widget: 'inputNumber',
+        disabled: defaultSchema?.rotate === undefined,
+        max: 360,
+        props: { min: 0 },
+        span: 6,
       },
       opacity: {
         title: i18n('opacity'),
@@ -154,15 +217,17 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         widget: 'inputNumber',
         disabled: defaultSchema?.opacity === undefined,
         props: { step: 0.1, min: 0, max: 1 },
-        span: 8,
+        span: 6,
       },
     },
   };
 
   if (typeof activePropPanelSchema === 'function') {
+    const { schemasList: _, ...propPanelProps } = props;
+
     const apps =
       activePropPanelSchema({
-        ...props,
+        ...propPanelProps,
         options,
         theme: token,
         i18n: i18n as (key: keyof Dict | string) => string,
@@ -179,31 +244,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } }),
       ...apps,
     };
-  }
-
-  const allWidgets: {
-    [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
-  } = {
-    AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
-    Divider: () => (
-      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
-    ),
-    ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
-  };
-  for (const plugin of Object.values(pluginsRegistry)) {
-    const widgets = plugin?.propPanel.widgets || {};
-    Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
-      allWidgets[widgetKey] = (p) => (
-        <WidgetRenderer
-          {...p}
-          {...props}
-          options={options}
-          theme={token}
-          i18n={i18n as (key: keyof Dict | string) => string}
-          widget={widgetValue}
-        />
-      );
-    });
   }
 
   return (
@@ -235,7 +275,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         <FormRender
           form={form}
           schema={propPanelSchema}
-          widgets={allWidgets}
+          widgets={widgets}
           watch={{ '#': handleWatch }}
           locale="en-US"
         />
@@ -245,7 +285,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
 };
 
 const propsAreUnchanged = (prevProps: DetailViewProps, nextProps: DetailViewProps) => {
-  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema)
+  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema);
 };
 
 export default React.memo(DetailView, propsAreUnchanged);

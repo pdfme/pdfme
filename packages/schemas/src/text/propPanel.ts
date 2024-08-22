@@ -39,9 +39,12 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
     changeSchemas([{ key: 'dynamicFontSize', value: val, schemaId: activeSchema.id }]);
   };
   const label = document.createElement('label');
-  label.innerText = i18n('schemas.text.dynamicFontSize') || '';
+  const span = document.createElement('span');
+  span.innerText = i18n('schemas.text.dynamicFontSize') || '';
+  span.style.cssText = 'margin-left: 0.5rem';
   label.style.cssText = 'display: flex; width: 100%;';
   label.appendChild(checkbox);
+  label.appendChild(span);
   rootElement.appendChild(label);
 };
 
@@ -126,7 +129,7 @@ export const propPanel: PropPanel<TextSchema> = {
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
+            message: i18n('validation.hexColor'),
           },
         ],
       },
@@ -137,7 +140,7 @@ export const propPanel: PropPanel<TextSchema> = {
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
-            message: i18n('hexColorPrompt'),
+            message: i18n('validation.hexColor'),
           },
         ],
       },

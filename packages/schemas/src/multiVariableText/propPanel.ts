@@ -96,8 +96,11 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
   widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
+    readOnly: false,
     type: 'multiVariableText',
-    text: 'Type something...',
+    text: 'Add text here using {} for variables ',
+    width: 50,
+    height: 15,
     content: '{}',
     variables: [],
   },
@@ -113,7 +116,7 @@ const updateVariablesFromText = (text: string, variables: any): boolean => {
     // Add any new variables
     for (const match of matches) {
       const variableName = match.replace('{', '').replace('}', '');
-      if (!variables[variableName]) {
+      if (!(variableName in variables)) {
         // NOTE: We upper case the variable name as the default value
         variables[variableName] = variableName.toUpperCase();
         changed = true;

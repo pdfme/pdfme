@@ -1,16 +1,19 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts';
-import { HolderOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { HolderOutlined, ExclamationCircleOutlined, LockOutlined } from '@ant-design/icons';
 import { Button, Typography } from 'antd';
 
 const { Text } = Typography;
 
 interface Props {
   value: React.ReactNode;
+  icon?: React.ReactNode;
   style?: React.CSSProperties;
   status?: 'is-warning' | 'is-danger';
   title?: string;
+  required?: boolean;
+  readOnly?: boolean;
   dragOverlay?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
@@ -26,9 +29,12 @@ const Item = React.memo(
   React.forwardRef<HTMLLIElement, Props>(
     (
       {
+        icon,
         value,
         status,
         title,
+        required,
+        readOnly,
         style,
         dragOverlay,
         onClick,
@@ -93,6 +99,7 @@ const Item = React.memo(
               }}
               icon={<HolderOutlined style={{ cursor: 'grab' }} />}
             />
+            {icon}
             <Text
               style={{
                 overflow: 'hidden',
@@ -105,12 +112,14 @@ const Item = React.memo(
               {status === undefined ? (
                 value
               ) : (
-                <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>
                   <ExclamationCircleOutlined width={15} style={{ marginRight: '0.5rem' }} />
                   {status === 'is-warning' ? i18n('noKeyName') : value}
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>
               )}
+              {readOnly && <LockOutlined style={{ marginLeft: '0.5rem' }} />}
+              {required && <span style={{ color: 'red', marginLeft: '0.5rem' }}>*</span>}
             </Text>
           </div>
         </li>

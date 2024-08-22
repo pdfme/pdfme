@@ -15,7 +15,7 @@ import RightSidebar from './RightSidebar/index';
 import LeftSidebar from './LeftSidebar';
 import Canvas from './Canvas/index';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../constants';
-import { I18nContext, PluginsRegistry } from '../../contexts';
+import { I18nContext, OptionsContext, PluginsRegistry } from '../../contexts';
 import {
   schemasList2template,
   uuid,
@@ -62,6 +62,7 @@ const TemplateEditor = ({
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
+  const options = useContext(OptionsContext);
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -161,16 +162,26 @@ const TemplateEditor = ({
     const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
     const pageSize = pageSizes[pageCursor];
 
+    const newSchemaKey = (prefix: string) => {
+      let keyNum = schemasList.reduce((acc, page) => acc + page.length, 1);
+      let newKey = prefix + keyNum;
+      while (schemasList.some(page => page.find((s) => s.key === newKey))) {
+        keyNum++;
+        newKey = prefix + keyNum;
+      }
+      return newKey;
+    };
     const ensureMiddleValue = (min: number, value: number, max: number) => Math.min(Math.max(min, value), max)
 
     const s = {
       id: uuid(),
-      key: `${i18n('field')}${schemasList[pageCursor].length + 1}`,
+      key: newSchemaKey(i18n('field')),
       ...defaultSchema,
       position: {
         x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
         y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),
       },
+      required: defaultSchema.readOnly ? false : options.requiredByDefault || defaultSchema.required || false,
     } as SchemaForUI;
 
     if (defaultSchema.position.y === 0) {
@@ -287,6 +298,7 @@ const TemplateEditor = ({
           size={size}
           pageSize={pageSizes[pageCursor] ?? []}
           activeElements={activeElements}
+          schemasList={schemasList}
           schemas={schemasList[pageCursor] ?? []}
           changeSchemas={changeSchemas}
           onSortEnd={onSortEnd}

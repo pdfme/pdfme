@@ -14,6 +14,8 @@ export const Dict = z.object({
   height: z.string(),
   rotate: z.string(),
   edit: z.string(),
+  required: z.string(),
+  editable: z.string(),
   plsInputName: z.string(),
   fieldMustUniq: z.string(),
   notUniq: z.string(),
@@ -28,7 +30,10 @@ export const Dict = z.object({
   addPageAfter: z.string(),
   removePage: z.string(),
   removePageConfirm: z.string(),
-  hexColorPrompt: z.string(),
+  // --------------------validation-------------------
+  'validation.uniqueName': z.string(),
+  'validation.hexColor': z.string(),
+
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
   'schemas.borderWidth': z.string(),
@@ -87,6 +92,7 @@ export const Schema = z
     rotate: z.number().optional(),
     opacity: z.number().optional(),
     readOnly: z.boolean().optional(),
+    required: z.boolean().optional(),
   })
   .passthrough();
 
@@ -162,6 +168,7 @@ export const UIOptions = CommonOptions.extend({
   labels: z.record(z.string(), z.string()).optional(),
   theme: z.record(z.string(), z.unknown()).optional(),
   icons: z.record(z.string(), z.string()).optional(),
+  requiredByDefault: z.boolean().optional(),
 });
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);

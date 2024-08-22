@@ -6,7 +6,7 @@ interface ButtonConfig {
   key: string;
   icon: string;
   type: 'boolean' | 'select';
-  value?: String;
+  value?: string;
 }
 
 const ButtonGroupWidget = (props: PropPanelWidgetProps) => {

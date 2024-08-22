@@ -448,7 +448,7 @@ const handleTypeChange = (
   pluginsRegistry: Plugins
 ) => {
   if (key !== 'type') return;
-  const keysToKeep = ['id', 'key', 'type', 'position'];
+  const keysToKeep = ['id', 'key', 'type', 'position', 'required'];
   Object.keys(schema).forEach((key) => {
     if (!keysToKeep.includes(key)) {
       delete schema[key as keyof typeof schema];
@@ -463,6 +463,9 @@ const handleTypeChange = (
       (schema as any)[key] = propPanel?.defaultSchema[key];
     }
   });
+  if (schema.readOnly) {
+    schema.required = false;
+  }
 };
 
 export const changeSchemas = (args: {

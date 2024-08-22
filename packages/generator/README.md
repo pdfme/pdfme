@@ -88,9 +88,10 @@ The following type, function and classes are available in pdfme.
 
 If your environment uses webpack, import the necessary items as shown below.
 
-````ts
+```ts
 import type { Template } from '@pdfme/common';
-import { generate } from '@pdfme/generator';```
+import { generate } from '@pdfme/generator';
+```
 
 ```ts
 import type { Template } from '@pdfme/common';

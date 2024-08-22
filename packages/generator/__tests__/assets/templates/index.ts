@@ -45,6 +45,8 @@ const test = require('./test.json') as Template;
 const shapes = require('./shapes.json') as Template;
 const pet = require('./pet.json') as Template;
 const pdfImage = require('./pdfImage.json') as Template;
+const underlineStrikethrough = require('./underlineStrikethrough.json') as Template;
+const multiVariableText = require('./multiVariableText.json') as Template;
 
 export const label = {
   宛名8面,
@@ -97,6 +99,8 @@ export const textType = {
   verticalAlignmentTop,
   verticalAlignmentMiddle,
   verticalAlignmentBottom,
+  underlineStrikethrough,
+  multiVariableText,
 };
 
 export const other = {
