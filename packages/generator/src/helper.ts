@@ -11,7 +11,7 @@ import {
   mm2pt,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
-import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
+import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix, Rotation } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types';
 
@@ -20,6 +20,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
     template: { schemas, basePdf },
     pdfDoc,
   } = arg;
+  let rotations: Rotation[] = [];
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
@@ -53,9 +54,10 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
     const transformationMatrices = embedPdfPages.map(
       () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
     );
+    rotations = embedPdfPages.map((p) => p.getRotation())
     basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
-  return { basePages, embedPdfBoxes };
+  return { basePages, embedPdfBoxes, rotations };
 };
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, any>[]) => {
@@ -127,8 +129,9 @@ export const insertPage = (arg: {
   basePage: PDFEmbeddedPage | PDFPage;
   embedPdfBox: EmbedPdfBox;
   pdfDoc: PDFDocument;
+  rotation?: Rotation;
 }) => {
-  const { basePage, embedPdfBox, pdfDoc } = arg;
+  const { basePage, embedPdfBox, pdfDoc, rotation } = arg;
   const size = basePage instanceof PDFEmbeddedPage ? basePage.size() : basePage.getSize();
   const insertedPage = basePage instanceof PDFEmbeddedPage
       ? pdfDoc.addPage([size.width, size.height])
@@ -140,6 +143,10 @@ export const insertPage = (arg: {
     insertedPage.setMediaBox(mediaBox.x, mediaBox.y, mediaBox.width, mediaBox.height);
     insertedPage.setBleedBox(bleedBox.x, bleedBox.y, bleedBox.width, bleedBox.height);
     insertedPage.setTrimBox(trimBox.x, trimBox.y, trimBox.width, trimBox.height);
+  }
+
+  if (rotation) {
+    insertedPage.setRotation(rotation)
   }
 
   return insertedPage;

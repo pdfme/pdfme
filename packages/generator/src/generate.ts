@@ -35,7 +35,7 @@ const generate = async (props: GenerateProps) => {
         return getDynamicHeightForTable(value, args);
       },
     });
-    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
+    const { basePages, embedPdfBoxes, rotations } = await getEmbedPdfPages({
       template: dynamicTemplate,
       pdfDoc,
     });
@@ -43,8 +43,9 @@ const generate = async (props: GenerateProps) => {
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
+      const rotation = rotations[j];
       const embedPdfBox = embedPdfBoxes[j];
-      const page = insertPage({ basePage, embedPdfBox, pdfDoc });
+      const page = insertPage({ basePage, embedPdfBox, pdfDoc, rotation });
       for (let l = 0; l < keys.length; l += 1) {
         const key = keys[l];
         const schemaObj = dynamicTemplate.schemas[j] || {};
