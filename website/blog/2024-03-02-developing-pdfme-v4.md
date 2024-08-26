@@ -2,11 +2,8 @@
 title: Developing pdfme V4
 description: Explore the latest developments in pdfme V4, from dynamic table schemas and UI enhancements to new features like placeholders and expressions. Dive into the challenges and progress, including critical bug fixes and backward compatibility considerations, and learn how you can contribute to this evolving open-source PDF library project.
 slug: developing-pdfme-v4
-authors:
-  - name: Kyohei Fukuda (@hand-dot)
-    title: Author of pdfme
-    url: https://github.com/hand-dot
-    image_url: https://avatars.githubusercontent.com/u/24843808?v=4
+authors: 
+    - kyohei
 tags: []
 ---
 

@@ -8,15 +8,20 @@ export default defineConfig(({ mode }) => {
     define: { 'process.env.NODE_ENV': JSON.stringify(mode) },
     plugins: [react(), tsconfigPaths({ root: '.' }), cssInjectedByJsPlugin()],
     build: {
+      target: 'es2022',
       lib: {
         entry: 'src/index.ts',
         name: '@pdfme/ui',
         fileName: (format) => `index.${format}.js`,
+        formats: ['es'],
       },
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
       exclude: ['@pdfme/common', '@pdfme/schemas'],
+      esbuildOptions: {
+        target: 'esnext',
+      },
     },
   };
 });

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
+import Yoga from 'yoga-layout';
 import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
 import {
   Inputs as InputsSchema,
@@ -243,10 +244,15 @@ interface ModifyTemplateForDynamicTableArg {
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
+  console.log(Yoga);
+
   const { template, modifyTemplate } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
+
+  // TODO ここから計算を頑張る。
+  // ここでYoga上にレンダリングを行い、最終的な高さを計算する。
 
   const modifiedTemplate = await modifyTemplate(arg);
 

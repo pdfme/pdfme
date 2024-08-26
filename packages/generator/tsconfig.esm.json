@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base",
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "ES2022",
     "outDir": "./dist/esm",
     "declaration": true,
     "declarationDir": "dist/types",

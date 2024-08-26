@@ -2,11 +2,8 @@
 title: Why Develop a PDF Library Now?
 description: Exploring the creation of 'pdfme,' a revolutionary TypeScript-based PDF library. Discover the motivations and innovations behind this modern PDF solution.
 slug: why-develop-pdf-library-now
-authors:
-  - name: Kyohei Fukuda (@hand-dot)
-    title: Author of pdfme
-    url: https://github.com/hand-dot
-    image_url: https://avatars.githubusercontent.com/u/24843808?v=4
+authors: 
+    - kyohei
 tags: []
 ---
 

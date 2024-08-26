@@ -2,11 +2,8 @@
 title: Released pdfme V4
 description: Explore the latest features and enhancements in pdfme V4, including a new left sidebar for easy schema placement and the addition of dynamic table generation.
 slug: released-pdfme-v4
-authors:
-  - name: Kyohei Fukuda (@hand-dot)
-    title: Author of pdfme
-    url: https://github.com/hand-dot
-    image_url: https://avatars.githubusercontent.com/u/24843808?v=4
+authors: 
+    - kyohei
 tags: []
 ---
 

@@ -2,11 +2,8 @@
 title: Implementation Ideas for Dynamic Tables in pdfme
 description: Explore the innovative solutions for implementing dynamic tables in pdfme, a comprehensive guide discussing challenges, strategies, and ideas for advanced PDF table rendering, including page breaks, table styling, and layout calculations.
 slug: implementation-Ideas-for-dynamic-tables
-authors:
-  - name: Kyohei Fukuda (@hand-dot)
-    title: Author of pdfme
-    url: https://github.com/hand-dot
-    image_url: https://avatars.githubusercontent.com/u/24843808?v=4
+authors: 
+    - kyohei
 tags: []
 ---
 

@@ -45,6 +45,7 @@
   "dependencies": {
     "@pdfme/pdf-lib": "^1.18.3",
     "buffer": "^6.0.3",
+    "yoga-layout": "^3.1.0",
     "zod": "^3.20.2"
   },
   "peerDependencies": {
