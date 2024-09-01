@@ -158,7 +158,7 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
     });
 
     const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-    window.open(URL.createObjectURL(blob));
+    // window.open(URL.createObjectURL(blob));
   } catch (e) {
     alert(e + '\n\nCheck the console for full stack trace');
     throw e;

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
 import Yoga from 'yoga-layout';
+import type { Node } from 'yoga-layout';
 import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
 import {
   Inputs as InputsSchema,
@@ -19,6 +20,8 @@ import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
+
+const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
@@ -241,24 +244,111 @@ interface ModifyTemplateForDynamicTableArg {
   ) => Promise<number>;
 }
 
+function generateDebugHTML(pages: Node[]): string {
+  let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
+
+  pages.forEach((page, pageIndex) => {
+    const padding = [Yoga.EDGE_TOP, Yoga.EDGE_RIGHT, Yoga.EDGE_BOTTOM, Yoga.EDGE_LEFT].map((edge) =>
+      page.getComputedPadding(edge)
+    );
+    const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] = padding;
+
+    html += `<div style="margin-bottom: 20px;">
+      <h2>Page ${pageIndex + 1}</h2>
+      <div style="position: relative; width: ${page.getComputedWidth()}px; height: ${page.getComputedHeight()}px; border: 1px solid #000; background: #f0f0f0;">
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(255, 255, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
+
+    for (let i = 0; i < page.getChildCount(); i++) {
+      const child = page.getChild(i);
+      const [left, top, width, height] = [
+        child.getComputedLeft(),
+        child.getComputedTop(),
+        child.getComputedWidth(),
+        child.getComputedHeight(),
+      ];
+
+      html += `<div style="position: absolute; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px; background: rgba(255, 0, 0, 0.2); border: 1px solid #f00;">
+        <div style="font-size: 10px; display: flex; align-items: center; justify-content: center; height: 100%;" title="Position: (${left}, ${top}), Size: ${width} x ${height}">
+          ${i + 1}
+        </div>
+      </div>`;
+    }
+
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+  return html;
+}
+
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  console.log(Yoga);
-
-  const { template, modifyTemplate } = arg;
+  const { template, modifyTemplate, getDynamicHeight, input, options, _cache } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
 
-  // TODO ここから計算を頑張る。
-  // ここでYoga上にレンダリングを行い、最終的な高さを計算する。
+  // ---------------------------------------------
+
+  const basePdf = template.basePdf as BlankPdf;
+  const pages: Node[] = [];
+
+  const page = Yoga.Node.create();
+  page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
+  page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
+  page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
+  page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
+
+  const schemaPositions: number[] = [];
+  const schemaEntries = Object.entries(template.schemas[0]);
+  const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
+  const diffMap = new Map<number, number>();
+  for (const [key, schema] of sortedSchemaEntries) {
+    const { position, width } = schema;
+    const node = Yoga.Node.create();
+    node.setWidth(width);
+    const opt = { schema, basePdf, options, _cache };
+    // TODO ここで一発で高さを返すんじゃなくて配列で返すようにする
+    const height = await getDynamicHeight(input?.[key] || '', opt);
+    const originalHeight = schema.height;
+
+    if (height !== originalHeight) {
+      diffMap.set(position.y + originalHeight, height - originalHeight);
+    }
+
+    node.setHeight(height);
+    node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
+
+    let newY = schema.position.y;
+    for (const [diffY, diff] of diffMap.entries()) {
+      if (diffY <= schema.position.y) {
+        newY += diff;
+      }
+    }
+
+    node.setPosition(Yoga.EDGE_LEFT, position.x);
+    node.setPosition(Yoga.EDGE_TOP, newY);
+    schemaPositions.push(newY + height + basePdf.padding[2]);
+    page.insertChild(node, page.getChildCount());
+  }
+
+  const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
+  page.calculateLayout(basePdf.width, pageHeight, Yoga.DIRECTION_LTR);
+
+  pages.push(page);
+
+  // TODO ここからbasePdf.heightを超えたら次のページに移動する処理を追加する
+
+  document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
+
+  // ---------------------------------------------
 
   const modifiedTemplate = await modifyTemplate(arg);
 
-  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
+  const _diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
 
-  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+  return normalizePositionsAndPageBreak(modifiedTemplate, _diffMap);
 };
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {

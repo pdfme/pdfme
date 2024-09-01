@@ -154,7 +154,10 @@ function App() {
         <span style={{ margin: "0 1rem" }}>/</span>
         <button onClick={() => generatePDF(ui.current)}>Generate PDF</button>
       </header>
-      <div ref={uiRef} style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }} />
+      <div style={{ display: 'flex' }}>
+        <div ref={uiRef} style={{ width: '50%', height: `calc(100vh - ${headerHeight}px)` }} />
+        <div id="debug" style={{ width: '50%' }} />
+      </div>
     </div>
   );
 }
