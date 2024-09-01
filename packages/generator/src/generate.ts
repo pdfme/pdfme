@@ -2,7 +2,13 @@ import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
 import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
-import { insertPage, preprocessing, postProcessing, getEmbedPdfPages, validateRequiredFields } from './helper.js';
+import {
+  insertPage,
+  preprocessing,
+  postProcessing,
+  getEmbedPdfPages,
+  validateRequiredFields,
+} from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -10,7 +16,9 @@ const generate = async (props: GenerateProps) => {
   const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
-    throw new Error('[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array');
+    throw new Error(
+      '[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array'
+    );
   }
 
   validateRequiredFields(template, inputs);
@@ -31,7 +39,7 @@ const generate = async (props: GenerateProps) => {
         return modifyTemplateForTable(arg);
       },
       getDynamicHeight: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
         return getDynamicHeightForTable(value, args);
       },
     });

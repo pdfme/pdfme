@@ -73,11 +73,13 @@ export const getDynamicHeightForTable = async (
     options: CommonOptions;
     _cache: Map<any, any>;
   }
-): Promise<number> => {
-  if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+): Promise<number[]> => {
+  if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
   const schema = args.schema as TableSchema;
   const body =
     schema.__bodyRange?.start === 0 ? getBody(value) : getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(body, args);
-  return table.getHeight();
+  const rows = table.allRows();
+
+  return rows.map((row) => row.height);
 };

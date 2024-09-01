@@ -362,8 +362,8 @@ describe.skip('getDynamicTemplate test', () => {
   }) => Promise.resolve(arg.template);
   const getDynamicHeight = (_: string, args: { schema: Schema }) => {
     const { schema } = args;
-    if (schema.type === 'test') return Promise.resolve(schema.height + 100);
-    return Promise.resolve(schema.height);
+    if (schema.type === 'test') return Promise.resolve([schema.height + 100]);
+    return Promise.resolve([schema.height]);
   };
   const generateTemplateConfig = (template: Template) => ({
     template,

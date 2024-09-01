@@ -53,7 +53,7 @@ const Preview = ({
         return modifyTemplateForTable(arg);
       },
       getDynamicHeight: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
+        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
         return getDynamicHeightForTable(value, args);
       },
     })

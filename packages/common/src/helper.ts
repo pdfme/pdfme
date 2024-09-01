@@ -241,7 +241,7 @@ interface ModifyTemplateForDynamicTableArg {
   getDynamicHeight: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
-  ) => Promise<number>;
+  ) => Promise<number[]>;
 }
 
 function generateDebugHTML(pages: Node[]): string {
@@ -294,53 +294,105 @@ export const getDynamicTemplate = async (
   const basePdf = template.basePdf as BlankPdf;
   const pages: Node[] = [];
 
+  // とりあえずスキーマに基づいて一枚のページを作成する処理
   const page = Yoga.Node.create();
   page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
   page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
   page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
   page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
 
-  const schemaPositions: number[] = [];
-  const schemaEntries = Object.entries(template.schemas[0]);
-  const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
-  const diffMap = new Map<number, number>();
-  for (const [key, schema] of sortedSchemaEntries) {
-    const { position, width } = schema;
-    const node = Yoga.Node.create();
-    node.setWidth(width);
-    const opt = { schema, basePdf, options, _cache };
-    // TODO ここで一発で高さを返すんじゃなくて配列で返すようにする
-    const height = await getDynamicHeight(input?.[key] || '', opt);
-    const originalHeight = schema.height;
+  for (const schemaObj of template.schemas) {
+    const schemaEntries = Object.entries(schemaObj);
+    const schemaPositions: number[] = [];
+    const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
+    const diffMap = new Map<number, number>();
+    for (const [key, schema] of sortedSchemaEntries) {
+      const { position, width } = schema;
 
-    if (height !== originalHeight) {
-      diffMap.set(position.y + originalHeight, height - originalHeight);
-    }
+      const opt = { schema, basePdf, options, _cache };
+      const heights = await getDynamicHeight(input?.[key] || '', opt);
 
-    node.setHeight(height);
-    node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
-
-    let newY = schema.position.y;
-    for (const [diffY, diff] of diffMap.entries()) {
-      if (diffY <= schema.position.y) {
-        newY += diff;
+      const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
+      const originalHeight = schema.height;
+      if (heightsSum !== originalHeight) {
+        diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
       }
+      heights.forEach((height, index) => {
+        const node = Yoga.Node.create();
+        node.setWidth(width);
+        node.setHeight(height);
+        node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
+
+        let newY =
+          schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
+        for (const [diffY, diff] of diffMap.entries()) {
+          if (diffY <= schema.position.y) {
+            newY += diff;
+          }
+        }
+
+        node.setPosition(Yoga.EDGE_LEFT, position.x);
+        node.setPosition(Yoga.EDGE_TOP, newY);
+        schemaPositions.push(newY + height + basePdf.padding[2]);
+        page.insertChild(node, page.getChildCount());
+      });
     }
 
-    node.setPosition(Yoga.EDGE_LEFT, position.x);
-    node.setPosition(Yoga.EDGE_TOP, newY);
-    schemaPositions.push(newY + height + basePdf.padding[2]);
-    page.insertChild(node, page.getChildCount());
+    const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
+    page.calculateLayout(basePdf.width, pageHeight, Yoga.DIRECTION_LTR);
+
+    // ページブレイクの処理
+    const pagesWithBreak: Node[] = [];
+    let currentPage = Yoga.Node.create();
+    let currentY = 0;
+    let lastBreakY = 0;
+
+    for (let i = 0; i < page.getChildCount(); i++) {
+      const child = page.getChild(i);
+      const childHeight = child.getComputedHeight();
+      const childTop = child.getComputedTop();
+      // TODO パディングボトム内に要素が入ってしまうバグあり
+      if (currentY + childHeight > basePdf.height - basePdf.padding[2]) {
+        pagesWithBreak.push(currentPage);
+        currentPage = Yoga.Node.create();
+        lastBreakY = childTop;
+        currentY = 0;
+      }
+
+      const node = Yoga.Node.create();
+      node.setWidth(child.getComputedWidth());
+      node.setHeight(childHeight);
+      node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
+      node.setPosition(Yoga.EDGE_LEFT, child.getComputedLeft());
+
+      const adjustedY = Math.max(childTop - lastBreakY, basePdf.padding[0]);
+      if (adjustedY === basePdf.padding[0]) {
+        const diff = childTop - lastBreakY - basePdf.padding[0];
+        lastBreakY += diff;
+      }
+
+      node.setPosition(Yoga.EDGE_TOP, adjustedY);
+
+      currentPage.insertChild(node, currentPage.getChildCount());
+      currentY = adjustedY;
+    }
+    pagesWithBreak.push(currentPage);
+
+    pagesWithBreak.forEach((p) => {
+      p.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
+      p.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
+      p.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
+      p.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
+      p.calculateLayout(basePdf.width, basePdf.height, Yoga.DIRECTION_LTR);
+      pages.push(p);
+    });
   }
 
-  const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
-  page.calculateLayout(basePdf.width, pageHeight, Yoga.DIRECTION_LTR);
-
-  pages.push(page);
-
-  // TODO ここからbasePdf.heightを超えたら次のページに移動する処理を追加する
-
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
+
+  // TODO ここから
+  // Yogaのデータからテンプレートデータのschemaへ復元する処理
+  // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
 
   // ---------------------------------------------
 
@@ -362,12 +414,13 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
   let pageIndex = 0;
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeight = await getDynamicHeight(input?.[key] || '', {
+      const dynamicHeights = await getDynamicHeight(input?.[key] || '', {
         schema,
         basePdf,
         options,
         _cache,
       });
+      const dynamicHeight = dynamicHeights.reduce((acc, cur) => acc + cur, 0);
       if (schema.height !== dynamicHeight) {
         tmpDiffMap.set(
           schema.position.y + schema.height + pageHeight * pageIndex,
