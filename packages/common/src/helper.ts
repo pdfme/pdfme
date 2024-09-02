@@ -238,7 +238,7 @@ interface ModifyTemplateForDynamicTableArg {
     _cache: Map<any, any>;
     options: CommonOptions;
   }) => Promise<Template>;
-  getDynamicHeight: (
+  getDynamicHeights: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
   ) => Promise<number[]>;
@@ -284,7 +284,7 @@ function generateDebugHTML(pages: Node[]): string {
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  const { template, modifyTemplate, getDynamicHeight, input, options, _cache } = arg;
+  const { template, modifyTemplate, getDynamicHeights, input, options, _cache } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
@@ -310,7 +310,7 @@ export const getDynamicTemplate = async (
       const { position, width } = schema;
 
       const opt = { schema, basePdf, options, _cache };
-      const heights = await getDynamicHeight(input?.[key] || '', opt);
+      const heights = await getDynamicHeights(input?.[key] || '', opt);
 
       const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
       const originalHeight = schema.height;
@@ -390,8 +390,7 @@ export const getDynamicTemplate = async (
 
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
 
-  // TODO ここから
-  // Yogaのデータからテンプレートデータのschemaへ復元する処理
+  // TODO Yogaのデータからテンプレートデータのschemaへ復元する処理
   // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
   // Yogaはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
 
@@ -405,7 +404,7 @@ export const getDynamicTemplate = async (
 };
 
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
-  const { template, input, _cache, options, getDynamicHeight } = arg;
+  const { template, input, _cache, options, getDynamicHeights } = arg;
   const basePdf = template.basePdf;
   const tmpDiffMap = new Map<number, number>();
   if (!isBlankPdf(basePdf)) {
@@ -415,7 +414,7 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
   let pageIndex = 0;
   for (const schemaObj of template.schemas) {
     for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeights = await getDynamicHeight(input?.[key] || '', {
+      const dynamicHeights = await getDynamicHeights(input?.[key] || '', {
         schema,
         basePdf,
         options,

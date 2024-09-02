@@ -65,7 +65,7 @@ export const modifyTemplateForTable = async (arg: {
   return template;
 };
 
-export const getDynamicHeightForTable = async (
+export const getDynamicHeightsForTable = async (
   value: string,
   args: {
     schema: Schema;
