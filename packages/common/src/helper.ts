@@ -281,6 +281,27 @@ function generateDebugHTML(pages: Node[]): string {
   return html;
 }
 
+function createPage(basePdf: BlankPdf) {
+  const page = Yoga.Node.create();
+  page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
+  page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
+  page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
+  page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
+  return page;
+}
+
+function createNode(arg: { position: { x: number; y: number }; width: number; height: number }) {
+  const { position, width, height } = arg;
+  const { x, y } = position;
+  const node = Yoga.Node.create();
+  node.setWidth(width);
+  node.setHeight(height);
+  node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
+  node.setPosition(Yoga.EDGE_LEFT, x);
+  node.setPosition(Yoga.EDGE_TOP, y);
+  return node;
+}
+
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
@@ -292,19 +313,20 @@ export const getDynamicTemplate = async (
   // ---------------------------------------------
 
   const basePdf = template.basePdf as BlankPdf;
+  const [paddingTop, paddingBottom] = [basePdf.padding[0], basePdf.padding[2]];
   const pages: Node[] = [];
 
   for (const schemaObj of template.schemas) {
     // とりあえずスキーマに基づいて一枚のページを作成する処理
-    const page = Yoga.Node.create();
-    page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
-    page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
-    page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
-    page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
+    const page = createPage(basePdf);
 
     const schemaEntries = Object.entries(schemaObj);
     const schemaPositions: number[] = [];
-    const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
+    const sortedSchemaEntries = schemaEntries.sort((a, b) => {
+      const aVal = a[1];
+      const bVal = b[1];
+      return aVal.position.y + aVal.height - (bVal.position.y + bVal.height);
+    });
     const diffMap = new Map<number, number>();
     for (const [key, schema] of sortedSchemaEntries) {
       const { position, width } = schema;
@@ -314,64 +336,56 @@ export const getDynamicTemplate = async (
 
       const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
       const originalHeight = schema.height;
-      if (heightsSum !== originalHeight) {
+      if (heightsSum > originalHeight) {
         diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
       }
       heights.forEach((height, index) => {
-        const node = Yoga.Node.create();
-        node.setWidth(width);
-        node.setHeight(height);
-        node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
-
-        let newY =
+        let y =
           schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
         for (const [diffY, diff] of diffMap.entries()) {
           if (diffY <= schema.position.y) {
-            newY += diff;
+            y += diff;
           }
         }
+        const node = createNode({ position: { ...position, y }, width, height });
 
-        node.setPosition(Yoga.EDGE_LEFT, position.x);
-        node.setPosition(Yoga.EDGE_TOP, newY);
-        schemaPositions.push(newY + height + basePdf.padding[2]);
+        schemaPositions.push(y + height + paddingBottom);
         page.insertChild(node, page.getChildCount());
       });
     }
 
-    const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
+    const pageHeight = Math.max(...schemaPositions, basePdf.height - paddingBottom);
     page.calculateLayout(basePdf.width, pageHeight, Yoga.DIRECTION_LTR);
+
+    // -----------------------------------------------------------
 
     // ページブレイクの処理
     const pagesWithBreak: Node[] = [];
-    let currentPage = Yoga.Node.create();
-    let currentY = 0;
+    let currentPage = createPage(basePdf);
+    let currentY = paddingTop;
     let lastBreakY = 0;
 
     for (let i = 0; i < page.getChildCount(); i++) {
       const child = page.getChild(i);
-      const childHeight = child.getComputedHeight();
-      const childTop = child.getComputedTop();
+      const height = child.getComputedHeight();
+      const width = child.getComputedWidth();
+      const top = child.getComputedTop();
       // TODO パディングボトム内に要素が入ってしまうバグあり
-      if (currentY + childHeight > basePdf.height - basePdf.padding[2]) {
+      if (currentY + height > basePdf.height - paddingTop - paddingBottom) {
         pagesWithBreak.push(currentPage);
-        currentPage = Yoga.Node.create();
-        lastBreakY = childTop;
-        currentY = 0;
+        currentPage = createPage(basePdf);
+        lastBreakY = top + height;
+        currentY = paddingTop;
       }
 
-      const node = Yoga.Node.create();
-      node.setWidth(child.getComputedWidth());
-      node.setHeight(childHeight);
-      node.setPositionType(Yoga.POSITION_TYPE_ABSOLUTE);
-      node.setPosition(Yoga.EDGE_LEFT, child.getComputedLeft());
-
-      const adjustedY = Math.max(childTop - lastBreakY, basePdf.padding[0]);
-      if (adjustedY === basePdf.padding[0]) {
-        const diff = childTop - lastBreakY - basePdf.padding[0];
+      const adjustedY = Math.max(top - lastBreakY, paddingTop);
+      if (adjustedY === paddingTop) {
+        const diff = top - lastBreakY - paddingTop;
         lastBreakY += diff;
       }
 
-      node.setPosition(Yoga.EDGE_TOP, adjustedY);
+      const position = { x: child.getComputedLeft(), y: adjustedY };
+      const node = createNode({ position, width, height });
 
       currentPage.insertChild(node, currentPage.getChildCount());
       currentY = adjustedY;
@@ -379,10 +393,6 @@ export const getDynamicTemplate = async (
     pagesWithBreak.push(currentPage);
 
     pagesWithBreak.forEach((p) => {
-      p.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
-      p.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
-      p.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
-      p.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
       p.calculateLayout(basePdf.width, basePdf.height, Yoga.DIRECTION_LTR);
       pages.push(p);
     });
@@ -393,6 +403,7 @@ export const getDynamicTemplate = async (
   // TODO Yogaのデータからテンプレートデータのschemaへ復元する処理
   // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
   // Yogaはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
+  // しかし、ページブレイクの処理にバグがあるので現段階でゴニョゴニョするよりもまずはバグを修正するべき。
 
   // ---------------------------------------------
 
