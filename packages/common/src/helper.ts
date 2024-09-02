@@ -294,14 +294,14 @@ export const getDynamicTemplate = async (
   const basePdf = template.basePdf as BlankPdf;
   const pages: Node[] = [];
 
-  // とりあえずスキーマに基づいて一枚のページを作成する処理
-  const page = Yoga.Node.create();
-  page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
-  page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
-  page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
-  page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
-
   for (const schemaObj of template.schemas) {
+    // とりあえずスキーマに基づいて一枚のページを作成する処理
+    const page = Yoga.Node.create();
+    page.setPadding(Yoga.EDGE_TOP, basePdf.padding[0]);
+    page.setPadding(Yoga.EDGE_RIGHT, basePdf.padding[1]);
+    page.setPadding(Yoga.EDGE_BOTTOM, basePdf.padding[2]);
+    page.setPadding(Yoga.EDGE_LEFT, basePdf.padding[3]);
+
     const schemaEntries = Object.entries(schemaObj);
     const schemaPositions: number[] = [];
     const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
@@ -393,6 +393,7 @@ export const getDynamicTemplate = async (
   // TODO ここから
   // Yogaのデータからテンプレートデータのschemaへ復元する処理
   // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
+  // Yogaはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
 
   // ---------------------------------------------
 
