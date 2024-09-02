@@ -360,9 +360,10 @@ export const getDynamicTemplate = async (
     // -----------------------------------------------------------
 
     // ページブレイクの処理
+    // TODO ここからちゃんとバグを修正する
     const pagesWithBreak: Node[] = [];
     let currentPage = createPage(basePdf);
-    let currentY = paddingTop;
+    let currentY = 0;
     let lastBreakY = 0;
 
     for (let i = 0; i < page.getChildCount(); i++) {
@@ -375,7 +376,7 @@ export const getDynamicTemplate = async (
         pagesWithBreak.push(currentPage);
         currentPage = createPage(basePdf);
         lastBreakY = top + height;
-        currentY = paddingTop;
+        currentY = 0;
       }
 
       const adjustedY = Math.max(top - lastBreakY, paddingTop);
@@ -390,7 +391,10 @@ export const getDynamicTemplate = async (
       currentPage.insertChild(node, currentPage.getChildCount());
       currentY = adjustedY;
     }
-    pagesWithBreak.push(currentPage);
+
+    if (currentPage.getChildCount() > 0) {
+      pagesWithBreak.push(currentPage);
+    }
 
     pagesWithBreak.forEach((p) => {
       p.calculateLayout(basePdf.width, basePdf.height, Yoga.DIRECTION_LTR);
