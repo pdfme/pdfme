@@ -251,7 +251,7 @@ interface NodeStyle {
 }
 
 class Node {
-  private children: Node[] = [];
+  children: Node[] = [];
   style: NodeStyle = {
     width: 0,
     height: 0,
@@ -313,7 +313,7 @@ class Node {
 
 function generateDebugHTML(pages: Node[]) {
   let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
-
+  let counter = 1;
   pages.forEach((page, pageIndex) => {
     const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] =
       page.style.padding;
@@ -325,13 +325,13 @@ function generateDebugHTML(pages: Node[]) {
     }px; border: 1px solid #000; background: #f0f0f0;">
         <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(255, 255, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
 
-    page.children.forEach((child, i) => {
+    page.children.forEach((child) => {
       const { x: left, y: top } = child.style.position;
       const { width, height } = child.style;
 
       html += `<div style="position: absolute; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px; background: rgba(255, 0, 0, 0.2); border: 1px solid #f00;">
         <div style="font-size: 10px; display: flex; align-items: center; justify-content: center; height: 100%;" title="Position: (${left}, ${top}), Size: ${width} x ${height}">
-          ${i + 1}
+          ${counter++}
         </div>
       </div>`;
     });
@@ -463,7 +463,7 @@ export const getDynamicTemplate = async (
   const pages: Node[] = [];
 
   for (const schemaObj of template.schemas) {
-    const lognPage = await createOnePage(
+    const longPage = await createOnePage(
       basePdf,
       schemaObj,
       input,
@@ -471,7 +471,7 @@ export const getDynamicTemplate = async (
       _cache,
       getDynamicHeights
     );
-    const brokenPages = breakIntoPages(lognPage, basePdf);
+    const brokenPages = breakIntoPages(longPage, basePdf);
     pages.push(...brokenPages);
   }
 
