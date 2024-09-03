@@ -360,48 +360,35 @@ async function createOnePage(
   return page;
 }
 
-/*
-・ページから要素の下がはみ出ているケースがあり、正しくページブレイクされていない
-  ・正しくは要素のy座標+heightがページのpaddingBottomを考慮し、ページブレイクする必要がある
-・ページブレイク後に次のページに行った要素が前のページにも残っているケースがある
-  ・正しくは要素のy座標がページのpaddingTopを考慮し、ページブレイクする必要がある
-・つまりはページ外はもちろん、padding内に要素が入ってしまうことがないようにしたい
-・ページブレイクを挟んだ状態で要素を分割したり、増やしたり減らしたりしてはいけない
-*/ 
 function breakIntoPages(lognPage: Node, basePdf: BlankPdf): Node[] {
   const pages: Node[] = [];
+  const [paddingTop, paddingBottom] = [basePdf.padding[0], basePdf.padding[2]];
+  const effectivePageHeight = basePdf.height - paddingTop - paddingBottom;
 
-  const effectivePageHeight = basePdf.height;
-
-  // Calculate the number of pages needed
-  const totalHeight = lognPage.getComputedHeight();
+  const totalHeight = lognPage.getComputedHeight() - paddingTop - paddingBottom;
   const numberOfPages = Math.ceil(totalHeight / effectivePageHeight);
 
-  // Create empty pages
   for (let i = 0; i < numberOfPages; i++) {
     pages.push(createPage(basePdf));
   }
 
-  // Distribute elements across pages
   for (let i = 0; i < lognPage.getChildCount(); i++) {
     const element = lognPage.getChild(i);
-    const elementTop = element.getComputedTop();
-    const elementHeight = element.getComputedHeight();
-    const startPage = Math.floor(elementTop / effectivePageHeight);
-    const endPage = Math.floor((elementTop + elementHeight) / effectivePageHeight);
+    const top = element.getComputedTop();
+    const height = element.getComputedHeight();
+    const width = element.getComputedWidth();
 
-    for (let pageIndex = startPage; pageIndex <= endPage; pageIndex++) {
-      const clonedElement = createNode({
-        position: {
-          x: element.getComputedLeft(),
-          y: elementTop - pageIndex * effectivePageHeight,
-        },
-        width: element.getComputedWidth(),
-        height: elementHeight,
-      });
+    const startPage = top / effectivePageHeight > 1 ? 1 : (top / effectivePageHeight === 1 ? 0 : 0);
+    const y = top - startPage * effectivePageHeight + (startPage > 0 ? paddingTop : 0);
+    const x = element.getComputedLeft();
 
-      pages[pageIndex].insertChild(clonedElement, pages[pageIndex].getChildCount());
+    let clonedElement = createNode({ position: { x, y }, width, height });
+
+    if (startPage >= pages.length) {
+      pages.push(createPage(basePdf));
     }
+
+    pages[startPage].insertChild(clonedElement, pages[startPage].getChildCount());
   }
 
   pages.forEach((p) => p.calculateLayout(basePdf.width, basePdf.height, Yoga.DIRECTION_LTR));
@@ -433,7 +420,6 @@ export const getDynamicTemplate = async (
     );
     const brokenPages = breakIntoPages(lognPage, basePdf);
     pages.push(...brokenPages);
-    // pages.push(lognPage);
   }
 
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
