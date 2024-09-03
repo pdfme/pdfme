@@ -240,21 +240,34 @@ interface ModifyTemplateForDynamicTableArg {
   ) => Promise<number>;
 }
 
+const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  const { template, modifyTemplate } = arg;
-  if (!isBlankPdf(template.basePdf)) {
-    return template;
+  const { template: _template } = arg;
+  const template = cloneDeep(_template);
+
+  // resultant new schemas
+  const updatedSchemas: Template['schemas'] = [];
+
+  for (const schema of template.schemas) {
+    // page by page transformation so one page doesn't interfere with other page's widgets when adjusted according to table data
+    const singlePageTemplate = { ...template, schemas: [schema] };
+
+    // modifyTemplate
+    const modifiedTemplate = await arg.modifyTemplate({
+      ...arg,
+      template: singlePageTemplate,
+    });
+
+    updatedSchemas.push(...modifiedTemplate.schemas);
   }
 
-  const modifiedTemplate = await modifyTemplate(arg);
-
-  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
-
-  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
+  return { ...template, schemas: updatedSchemas };
 };
 
+// NOTE: NOT USED
 export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
   const { template, input, _cache, options, getDynamicHeight } = arg;
   const basePdf = template.basePdf;
@@ -296,6 +309,7 @@ export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) =>
   return diffMap;
 };
 
+// NOTE: NOT USED
 export const normalizePositionsAndPageBreak = (
   template: Template,
   diffMap: Map<number, number>

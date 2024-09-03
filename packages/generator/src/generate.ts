@@ -1,8 +1,9 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
+import { getDynamicHeightForTable, transformTemplateForSinglePageSchemas } from '@pdfme/schemas';
 import { insertPage, preprocessing, postProcessing, getEmbedPdfPages, validateRequiredFields } from './helper.js';
+
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -28,8 +29,9 @@ const generate = async (props: GenerateProps) => {
       options,
       _cache,
       modifyTemplate: (arg) => {
-        return modifyTemplateForTable(arg);
+        return transformTemplateForSinglePageSchemas(arg);
       },
+      //NOTE: no need of this param
       getDynamicHeight: (value, args) => {
         if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
         return getDynamicHeightForTable(value, args);
