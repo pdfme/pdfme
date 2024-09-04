@@ -19,6 +19,8 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
+const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
 export const getFallbackFontName = (font: Font) => {
@@ -460,22 +462,41 @@ export const getDynamicTemplate = async (
   console.log('pages: ', pages);
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
 
-  const newTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
+  const newTemplate: Template = {
+    schemas: Array.from({ length: pages.length }, () => ({} as Record<string, Schema>)),
+    basePdf: template.basePdf,
+  };
   const newSchemas = newTemplate.schemas;
-  pages.forEach((page, pageIndex) => {
+  cloneDeep(pages).forEach((page, pageIndex) => {
     page.children.forEach((child) => {
       const { key, schema } = child;
-
       if (!key || !schema) throw new Error('key or schema is undefined');
-      if (!newSchemas[pageIndex]) newSchemas[pageIndex] = {};
 
-      // TODO ここから
+      const sameKeySchemas = page.children.filter((c) => c.key === key);
+      if (sameKeySchemas.length === 1) {
+        // TODO ここから
+        // 次のページにまたがっているテーブル、同じページに同じキーがないのでこっちに入ってしまう
+        // __bodyRangeもそうだけど、ヘッダーが入るという問題がある
+        schema.__bodyRange = { start: 0, end: 1 }; // 違うかも
 
-      newSchemas[pageIndex][key] = Object.assign(schema, {
-        position: { x: schema.position.x, y: child.position.y },
-      });
+
+        newSchemas[pageIndex][key] = Object.assign(schema, { position: { ...child.position } });
+      } else if (sameKeySchemas.length > 1) {
+        sameKeySchemas.forEach((s, i) => {
+          if (!s.schema) throw new Error('schema is undefined');
+          if (i === 0) {
+            const start = pages[pageIndex - 1]
+              ? pages[pageIndex - 1].children.findIndex((c) => c.key === key)
+              : 0;
+            s.schema.__bodyRange = { start, end: sameKeySchemas.length };
+            newSchemas[pageIndex][key] = Object.assign(s.schema, { position: { ...s.position } });
+          }
+        });
+      }
     });
   });
+
+  console.log('newTemplate: ', newTemplate);
 
   return newTemplate;
 };
