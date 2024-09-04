@@ -305,7 +305,7 @@ function createNode(arg: { position: { x: number; y: number }; width: number; he
 
 function generateDebugHTML(pages: Node[]) {
   let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
-  let counter = 1;
+  let counter = 0;
   pages.forEach((page, pageIndex) => {
     const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] = page.padding;
 
@@ -360,16 +360,15 @@ async function createOnePage(
       diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
     }
     heights.forEach((height, index) => {
-      let newY =
-        schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
+      let y = schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
       for (const [diffY, diff] of diffMap.entries()) {
         if (diffY <= schema.position.y) {
-          newY += diff;
+          y += diff;
         }
       }
-      const node = createNode({ position: { x: position.x, y: newY }, width, height });
+      const node = createNode({ position: { ...position, y }, width, height });
 
-      schemaPositions.push(newY + height + basePdf.padding[2]);
+      schemaPositions.push(y + height + basePdf.padding[2]);
       page.insertChild(node, page.getChildCount());
     });
   }
@@ -380,34 +379,33 @@ async function createOnePage(
 }
 
 function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
-  const pages = [];
+  const pages = [createPage(basePdf)];
   const [paddingTop, paddingBottom] = [basePdf.padding[0], basePdf.padding[2]];
-  const effectivePageHeight = basePdf.height - paddingTop - paddingBottom;
 
-  const totalHeight = longPage.height - paddingTop - paddingBottom;
-  const numberOfPages = Math.ceil(totalHeight / effectivePageHeight);
-
-  for (let i = 0; i < numberOfPages; i++) {
-    pages.push(createPage(basePdf));
-  }
-
+  const yAdjustment = { page: -1, value: 0 };
   for (let i = 0; i < longPage.getChildCount(); i++) {
     const element = longPage.getChild(i);
     const top = element.position.y;
     const height = element.height;
     const width = element.width;
-
-    const startPage = Math.floor(top / effectivePageHeight);
-    const y = top - startPage * effectivePageHeight + (startPage > 0 ? paddingTop : 0);
     const x = element.position.x;
+    const targetPageIndex = Math.floor(
+      (top + height) / (basePdf.height - paddingBottom - (pages.length > 1 ? paddingTop : 0))
+    );
+    let y = top - targetPageIndex * (basePdf.height - paddingTop - paddingBottom);
+    if (!pages[targetPageIndex]) {
+      pages.push(createPage(basePdf));
+      yAdjustment.page = targetPageIndex;
+      yAdjustment.value = (y - paddingTop) * -1;
+    }
+
+    if (yAdjustment.page === targetPageIndex) {
+      y += yAdjustment.value;
+    }
 
     const clonedElement = createNode({ position: { x, y }, width, height });
 
-    if (startPage >= pages.length) {
-      pages.push(createPage(basePdf));
-    }
-
-    pages[startPage].insertChild(clonedElement, pages[startPage].getChildCount());
+    pages[targetPageIndex].insertChild(clonedElement, pages[targetPageIndex].getChildCount());
   }
 
   return pages;
