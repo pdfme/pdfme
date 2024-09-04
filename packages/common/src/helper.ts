@@ -241,40 +241,31 @@ interface ModifyTemplateForDynamicTableArg {
 }
 
 type EdgeName = 'top' | 'right' | 'bottom' | 'left';
-type Position = { x: number; y: number };
-
-interface NodeStyle {
-  width: number;
-  height: number;
-  padding: [number, number, number, number]; // [top, right, bottom, left]
-  position: Position;
-}
 
 class Node {
   children: Node[] = [];
-  style: NodeStyle = {
-    width: 0,
-    height: 0,
-    padding: [0, 0, 0, 0],
-    position: { x: 0, y: 0 },
-  };
+
+  width = 0;
+  height = 0;
+  padding: [number, number, number, number] = [0, 0, 0, 0]; // [top, right, bottom, left]
+  position: { x: number; y: number } = { x: 0, y: 0 };
 
   setWidth(width: number): void {
-    this.style.width = width;
+    this.width = width;
   }
 
   setHeight(height: number): void {
-    this.style.height = height;
+    this.height = height;
   }
 
   setPadding(edge: EdgeName, value: number): void {
     const edgeMap: Record<EdgeName, number> = { top: 0, right: 1, bottom: 2, left: 3 };
-    this.style.padding[edgeMap[edge]] = value;
+    this.padding[edgeMap[edge]] = value;
   }
 
   setPosition(edge: 'left' | 'top', value: number): void {
-    if (edge === 'left') this.style.position.x = value;
-    if (edge === 'top') this.style.position.y = value;
+    if (edge === 'left') this.position.x = value;
+    if (edge === 'top') this.position.y = value;
   }
 
   insertChild(child: Node, index: number): void {
@@ -288,59 +279,6 @@ class Node {
   getChild(index: number): Node {
     return this.children[index];
   }
-
-  getComputedWidth(): number {
-    return this.style.width;
-  }
-
-  getComputedHeight(): number {
-    return this.style.height;
-  }
-
-  getComputedLeft(): number {
-    return this.style.position.x;
-  }
-
-  getComputedTop(): number {
-    return this.style.position.y;
-  }
-
-  getComputedPadding(edge: EdgeName): number {
-    const edgeMap: Record<EdgeName, number> = { top: 0, right: 1, bottom: 2, left: 3 };
-    return this.style.padding[edgeMap[edge]];
-  }
-}
-
-function generateDebugHTML(pages: Node[]) {
-  let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
-  let counter = 1;
-  pages.forEach((page, pageIndex) => {
-    const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] =
-      page.style.padding;
-
-    html += `<div style="margin-bottom: 20px;">
-      <h2>Page ${pageIndex + 1}</h2>
-      <div style="position: relative; width: ${page.style.width}px; height: ${
-      page.style.height
-    }px; border: 1px solid #000; background: #f0f0f0;">
-        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(255, 255, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
-
-    page.children.forEach((child) => {
-      const { x: left, y: top } = child.style.position;
-      const { width, height } = child.style;
-
-      html += `<div style="position: absolute; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px; background: rgba(255, 0, 0, 0.2); border: 1px solid #f00;">
-        <div style="font-size: 10px; display: flex; align-items: center; justify-content: center; height: 100%;" title="Position: (${left}, ${top}), Size: ${width} x ${height}">
-          ${counter++}
-        </div>
-      </div>`;
-    });
-
-    html += `</div></div>`;
-  });
-
-  html += '</div>';
-  return html;
 }
 
 function createPage(basePdf: BlankPdf) {
@@ -363,6 +301,37 @@ function createNode(arg: { position: { x: number; y: number }; width: number; he
   node.setPosition('left', x);
   node.setPosition('top', y);
   return node;
+}
+
+function generateDebugHTML(pages: Node[]) {
+  let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
+  let counter = 1;
+  pages.forEach((page, pageIndex) => {
+    const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] = page.padding;
+
+    html += `<div style="margin-bottom: 20px;">
+      <h2>Page ${pageIndex + 1}</h2>
+      <div style="position: relative; width: ${page.width}px; height: ${
+      page.height
+    }px; border: 1px solid #000; background: #f0f0f0;">
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(255, 255, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
+
+    page.children.forEach((child) => {
+      const { x: left, y: top } = child.position;
+      const { width, height } = child;
+
+      html += `<div style="position: absolute; left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px; background: rgba(255, 0, 0, 0.2); border: 1px solid #f00;">
+        <div style="font-size: 10px; display: flex; align-items: center; justify-content: center; height: 100%;" title="Position: (${left}, ${top}), Size: ${width} x ${height}">
+          ${counter++}
+        </div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  html += '</div>';
+  return html;
 }
 
 async function createOnePage(
@@ -391,10 +360,6 @@ async function createOnePage(
       diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
     }
     heights.forEach((height, index) => {
-      const node = new Node();
-      node.setWidth(width);
-      node.setHeight(height);
-
       let newY =
         schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
       for (const [diffY, diff] of diffMap.entries()) {
@@ -402,9 +367,8 @@ async function createOnePage(
           newY += diff;
         }
       }
+      const node = createNode({ position: { x: position.x, y: newY }, width, height });
 
-      node.setPosition('left', position.x);
-      node.setPosition('top', newY);
       schemaPositions.push(newY + height + basePdf.padding[2]);
       page.insertChild(node, page.getChildCount());
     });
@@ -420,7 +384,7 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
   const [paddingTop, paddingBottom] = [basePdf.padding[0], basePdf.padding[2]];
   const effectivePageHeight = basePdf.height - paddingTop - paddingBottom;
 
-  const totalHeight = longPage.style.height - paddingTop - paddingBottom;
+  const totalHeight = longPage.height - paddingTop - paddingBottom;
   const numberOfPages = Math.ceil(totalHeight / effectivePageHeight);
 
   for (let i = 0; i < numberOfPages; i++) {
@@ -429,13 +393,13 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
 
   for (let i = 0; i < longPage.getChildCount(); i++) {
     const element = longPage.getChild(i);
-    const top = element.style.position.y;
-    const height = element.style.height;
-    const width = element.style.width;
+    const top = element.position.y;
+    const height = element.height;
+    const width = element.width;
 
     const startPage = Math.floor(top / effectivePageHeight);
     const y = top - startPage * effectivePageHeight + (startPage > 0 ? paddingTop : 0);
-    const x = element.style.position.x;
+    const x = element.position.x;
 
     const clonedElement = createNode({ position: { x, y }, width, height });
 
@@ -479,8 +443,7 @@ export const getDynamicTemplate = async (
 
   // TODO Yogaのデータからテンプレートデータのschemaへ復元する処理
   // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
-  // Yogaはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
-  // しかし、ページブレイクの処理にバグがあるので現段階でゴニョゴニョするよりもまずはバグを修正するべき。
+  // pagesはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
 
   // ---------------------------------------------
   // 下記のコードは将来的にリプレースされるので無視してください。
