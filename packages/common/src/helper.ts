@@ -240,15 +240,32 @@ interface ModifyTemplateForDynamicTableArg {
   ) => Promise<number[]>;
 }
 
-type EdgeName = 'top' | 'right' | 'bottom' | 'left';
-
 class Node {
+  index = 0;
+
+  key?: string;
+  schema?: Schema;
+
   children: Node[] = [];
 
   width = 0;
   height = 0;
-  padding: [number, number, number, number] = [0, 0, 0, 0]; // [top, right, bottom, left]
+  padding: [number, number, number, number] = [0, 0, 0, 0];
   position: { x: number; y: number } = { x: 0, y: 0 };
+
+  constructor({ width = 0, height = 0 } = {}) {
+    this.width = width;
+    this.height = height;
+  }
+
+  setIndex(index: number): void {
+    this.index = index;
+  }
+
+  setKeyAndSchema(key: string, schema: Schema): void {
+    this.key = key;
+    this.schema = schema;
+  }
 
   setWidth(width: number): void {
     this.width = width;
@@ -258,17 +275,17 @@ class Node {
     this.height = height;
   }
 
-  setPadding(edge: EdgeName, value: number): void {
-    const edgeMap: Record<EdgeName, number> = { top: 0, right: 1, bottom: 2, left: 3 };
-    this.padding[edgeMap[edge]] = value;
+  setPadding(padding: [number, number, number, number]): void {
+    this.padding = padding;
   }
 
-  setPosition(edge: 'left' | 'top', value: number): void {
-    if (edge === 'left') this.position.x = value;
-    if (edge === 'top') this.position.y = value;
+  setPosition(position: { x: number; y: number }): void {
+    this.position = position;
   }
 
-  insertChild(child: Node, index: number): void {
+  insertChild(child: Node): void {
+    const index = this.getChildCount();
+    child.setIndex(index);
     this.children.splice(index, 0, child);
   }
 
@@ -282,24 +299,22 @@ class Node {
 }
 
 function createPage(basePdf: BlankPdf) {
-  const page = new Node();
-  page.setPadding('top', basePdf.padding[0]);
-  page.setPadding('right', basePdf.padding[1]);
-  page.setPadding('bottom', basePdf.padding[2]);
-  page.setPadding('left', basePdf.padding[3]);
-  page.setWidth(basePdf.width);
-  page.setHeight(basePdf.height);
+  const page = new Node({ ...basePdf });
+  page.setPadding(basePdf.padding);
   return page;
 }
 
-function createNode(arg: { position: { x: number; y: number }; width: number; height: number }) {
-  const { position, width, height } = arg;
-  const { x, y } = position;
-  const node = new Node();
-  node.setWidth(width);
-  node.setHeight(height);
-  node.setPosition('left', x);
-  node.setPosition('top', y);
+function createNode(arg: {
+  key: string;
+  schema: Schema;
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+}) {
+  const { position, width, height, key, schema } = arg;
+  const node = new Node({ width, height });
+  node.setPosition(position);
+  node.setKeyAndSchema(key, schema);
   return node;
 }
 
@@ -366,10 +381,10 @@ async function createOnePage(
           y += diff;
         }
       }
-      const node = createNode({ position: { ...position, y }, width, height });
+      const node = createNode({ key, schema, position: { ...position, y }, width, height });
 
       schemaPositions.push(y + height + basePdf.padding[2]);
-      page.insertChild(node, page.getChildCount());
+      page.insertChild(node);
     });
   }
 
@@ -384,28 +399,33 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
 
   const yAdjustment = { page: -1, value: 0 };
   for (let i = 0; i < longPage.getChildCount(); i++) {
-    const element = longPage.getChild(i);
-    const top = element.position.y;
-    const height = element.height;
-    const width = element.width;
-    const x = element.position.x;
+    const { key, schema, position, height, width } = longPage.getChild(i);
+    const { y, x } = position;
     const targetPageIndex = Math.floor(
-      (top + height) / (basePdf.height - paddingBottom - (pages.length > 1 ? paddingTop : 0))
+      (y + height) / (basePdf.height - paddingBottom - (pages.length > 1 ? paddingTop : 0))
     );
-    let y = top - targetPageIndex * (basePdf.height - paddingTop - paddingBottom);
+    let newY = y - targetPageIndex * (basePdf.height - paddingTop - paddingBottom);
     if (!pages[targetPageIndex]) {
       pages.push(createPage(basePdf));
       yAdjustment.page = targetPageIndex;
-      yAdjustment.value = (y - paddingTop) * -1;
+      yAdjustment.value = (newY - paddingTop) * -1;
     }
 
     if (yAdjustment.page === targetPageIndex) {
-      y += yAdjustment.value;
+      newY += yAdjustment.value;
     }
 
-    const clonedElement = createNode({ position: { x, y }, width, height });
+    if (!key || !schema) throw new Error('key or schema is undefined');
 
-    pages[targetPageIndex].insertChild(clonedElement, pages[targetPageIndex].getChildCount());
+    const clonedElement = createNode({
+      key: key,
+      schema: schema,
+      position: { x, y: newY },
+      width,
+      height,
+    });
+
+    pages[targetPageIndex].insertChild(clonedElement);
   }
 
   return pages;
@@ -437,101 +457,25 @@ export const getDynamicTemplate = async (
     pages.push(...brokenPages);
   }
 
+  console.log('pages: ', pages);
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
 
-  // TODO Yogaのデータからテンプレートデータのschemaへ復元する処理
-  // ページブレイクされたテーブルに関しては複数のスキーマに分割する必要がある
-  // pagesはレイアウト情報は持っているが、スキーマの情報は持っていないため、どうにかする必要がある。
+  const newTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
+  const newSchemas = newTemplate.schemas;
+  pages.forEach((page, pageIndex) => {
+    page.children.forEach((child) => {
+      const { key, schema } = child;
 
-  // ---------------------------------------------
-  // 下記のコードは将来的にリプレースされるので無視してください。
-  const modifiedTemplate = await modifyTemplate(arg);
+      if (!key || !schema) throw new Error('key or schema is undefined');
+      if (!newSchemas[pageIndex]) newSchemas[pageIndex] = {};
 
-  const _diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
+      // TODO ここから
 
-  return normalizePositionsAndPageBreak(modifiedTemplate, _diffMap);
-};
-
-export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
-  const { template, input, _cache, options, getDynamicHeights } = arg;
-  const basePdf = template.basePdf;
-  const tmpDiffMap = new Map<number, number>();
-  if (!isBlankPdf(basePdf)) {
-    return tmpDiffMap;
-  }
-  const pageHeight = basePdf.height;
-  let pageIndex = 0;
-  for (const schemaObj of template.schemas) {
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeights = await getDynamicHeights(input?.[key] || '', {
-        schema,
-        basePdf,
-        options,
-        _cache,
+      newSchemas[pageIndex][key] = Object.assign(schema, {
+        position: { x: schema.position.x, y: child.position.y },
       });
-      const dynamicHeight = dynamicHeights.reduce((acc, cur) => acc + cur, 0);
-      if (schema.height !== dynamicHeight) {
-        tmpDiffMap.set(
-          schema.position.y + schema.height + pageHeight * pageIndex,
-          dynamicHeight - schema.height
-        );
-      }
-    }
-    pageIndex++;
-  }
+    });
+  });
 
-  const diffMap = new Map<number, number>();
-  const keys = Array.from(tmpDiffMap.keys()).sort((a, b) => a - b);
-  let additionalHeight = 0;
-
-  for (const key of keys) {
-    const value = tmpDiffMap.get(key) as number;
-    const newValue = value + additionalHeight;
-    diffMap.set(key + additionalHeight, newValue);
-    additionalHeight += newValue;
-  }
-
-  return diffMap;
-};
-
-export const normalizePositionsAndPageBreak = (
-  template: Template,
-  diffMap: Map<number, number>
-): Template => {
-  if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
-    return template;
-  }
-
-  const returnTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
-  const pages = returnTemplate.schemas;
-  const pageHeight = template.basePdf.height;
-  const paddingTop = template.basePdf.padding[0];
-  const paddingBottom = template.basePdf.padding[2];
-
-  for (let i = 0; i < template.schemas.length; i += 1) {
-    const schemaObj = template.schemas[i];
-    if (!pages[i]) pages[i] = {};
-
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const { position, height } = schema;
-      let newY = position.y;
-      let pageCursor = i;
-
-      for (const [diffKey, diffValue] of diffMap) {
-        if (newY > diffKey) {
-          newY += diffValue;
-        }
-      }
-
-      while (newY + height >= pageHeight - paddingBottom) {
-        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop;
-        pageCursor++;
-      }
-
-      if (!pages[pageCursor]) pages[pageCursor] = {};
-      pages[pageCursor][key] = { ...schema, position: { ...position, y: newY } };
-    }
-  }
-
-  return returnTemplate;
+  return newTemplate;
 };
