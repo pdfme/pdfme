@@ -472,25 +472,27 @@ export const getDynamicTemplate = async (
       if (!key || !schema) throw new Error('key or schema is undefined');
 
       const sameKeySchemas = page.children.filter((c) => c.key === key);
+      const prevPage: Node | undefined = pages[pageIndex - 1];
+      const prevPageSameKeySchemas = prevPage ? prevPage.children.filter((c) => c.key === key) : [];
       if (sameKeySchemas.length === 1) {
         // TODO ここから
         // 次のページにまたがっているテーブル、同じページに同じキーがないのでこっちに入ってしまう
         // __bodyRangeもそうだけど、ヘッダーが入るという問題がある
         schema.__bodyRange = { start: 0, end: 1 }; // 違うかも
-        schema.showHead = false;
-
-        newSchemas[pageIndex][key] = Object.assign(schema, { position: { ...child.position } });
+        schema.showHead = prevPageSameKeySchemas.length === 0;
+        newSchemas[pageIndex][key] = Object.assign(schema, {
+          position: { ...child.position },
+          height: child.height,
+        });
       } else if (sameKeySchemas.length > 1) {
         sameKeySchemas.forEach((s, i) => {
           if (!s.schema) throw new Error('schema is undefined');
           if (i === 0) {
-            const start = pages[pageIndex - 1]
-              ? pages[pageIndex - 1].children.filter((c) => c.key === key).length
-              : 0;
+            const start = prevPageSameKeySchemas.length;
             s.schema.showHead = start === 0;
             s.schema.__bodyRange = {
               start,
-              end: start + sameKeySchemas.length,
+              end: start + sameKeySchemas.length - 1, // headが入っているので-1
             };
             newSchemas[pageIndex][key] = Object.assign(s.schema, { position: { ...s.position } });
           }
@@ -498,8 +500,8 @@ export const getDynamicTemplate = async (
       }
     });
   });
-  console.log('field1.__bodyRange', newTemplate?.schemas?.[0]?.field1.__bodyRange);
-  console.log('field1.__bodyRange', newTemplate?.schemas?.[1]?.field1.__bodyRange);
+  console.log('0: orders.__bodyRange', newTemplate?.schemas?.[0]?.orders?.__bodyRange);
+  console.log('1: orders.__bodyRange', newTemplate?.schemas?.[1]?.orders?.__bodyRange);
   console.log('newTemplate', newTemplate);
   return newTemplate;
 };
