@@ -79,7 +79,7 @@ export const getDynamicHeightsForTable = async (
   const body =
     schema.__bodyRange?.start === 0 ? getBody(value) : getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(body, args);
-  const rows = table.allRows();
+  const rowHeights = table.allRows().map((row) => row.height);
 
-  return rows.map((row) => row.height);
+  return rowHeights.concat(table.getHeadHeight());
 };

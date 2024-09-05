@@ -459,7 +459,6 @@ export const getDynamicTemplate = async (
     pages.push(...brokenPages);
   }
 
-  console.log('pages: ', pages);
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
 
   const newTemplate: Template = {
@@ -478,7 +477,7 @@ export const getDynamicTemplate = async (
         // 次のページにまたがっているテーブル、同じページに同じキーがないのでこっちに入ってしまう
         // __bodyRangeもそうだけど、ヘッダーが入るという問題がある
         schema.__bodyRange = { start: 0, end: 1 }; // 違うかも
-
+        schema.showHead = false;
 
         newSchemas[pageIndex][key] = Object.assign(schema, { position: { ...child.position } });
       } else if (sameKeySchemas.length > 1) {
@@ -486,17 +485,21 @@ export const getDynamicTemplate = async (
           if (!s.schema) throw new Error('schema is undefined');
           if (i === 0) {
             const start = pages[pageIndex - 1]
-              ? pages[pageIndex - 1].children.findIndex((c) => c.key === key)
+              ? pages[pageIndex - 1].children.filter((c) => c.key === key).length
               : 0;
-            s.schema.__bodyRange = { start, end: sameKeySchemas.length };
+            s.schema.showHead = start === 0;
+            s.schema.__bodyRange = {
+              start,
+              end: start + sameKeySchemas.length,
+            };
             newSchemas[pageIndex][key] = Object.assign(s.schema, { position: { ...s.position } });
           }
         });
       }
     });
   });
-
-  console.log('newTemplate: ', newTemplate);
-
+  console.log('field1.__bodyRange', newTemplate?.schemas?.[0]?.field1.__bodyRange);
+  console.log('field1.__bodyRange', newTemplate?.schemas?.[1]?.field1.__bodyRange);
+  console.log('newTemplate', newTemplate);
   return newTemplate;
 };
