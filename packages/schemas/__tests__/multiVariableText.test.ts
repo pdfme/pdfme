@@ -100,4 +100,15 @@ describe('validateVariables', () => {
     const value = '';
     expect(validateVariables(key, value, readOnlyText)).toBe(true);
   });
+
+  it('should return false for a string with variables but no input JSON and required set to false', () => {
+    // @ts-ignore
+    const readOnlyText: MultiVariableTextSchema = {
+      variables: ['var'],
+      required: false,
+    };
+    const key = 'testKey';
+    const value = '';
+    expect(validateVariables(key, value, readOnlyText)).toBe(false);
+  });
 });
