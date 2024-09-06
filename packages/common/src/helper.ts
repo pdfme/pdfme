@@ -472,36 +472,40 @@ export const getDynamicTemplate = async (
       if (!key || !schema) throw new Error('key or schema is undefined');
 
       const sameKeySchemas = page.children.filter((c) => c.key === key);
-      const prevPage: Node | undefined = pages[pageIndex - 1];
-      const prevPageSameKeySchemas = prevPage ? prevPage.children.filter((c) => c.key === key) : [];
+      const prevPages: Node[] = pages.slice(0, pageIndex);
+      const prevPageSameKeySchemas = prevPages.flatMap((p) =>
+        p.children.filter((c) => c.key === key)
+      );
+      const start = prevPageSameKeySchemas.length;
+      const showHead = start === 0;
+
       if (sameKeySchemas.length === 1) {
-        // TODO ここから
-        // 次のページにまたがっているテーブル、同じページに同じキーがないのでこっちに入ってしまう
-        // __bodyRangeもそうだけど、ヘッダーが入るという問題がある
-        schema.__bodyRange = { start: 0, end: 1 }; // 違うかも
-        schema.showHead = prevPageSameKeySchemas.length === 0;
+        schema.__bodyRange = { start: start - 1, end: start };
+        schema.showHead = showHead;
         newSchemas[pageIndex][key] = Object.assign(schema, {
           position: { ...child.position },
           height: child.height,
         });
       } else if (sameKeySchemas.length > 1) {
+        const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
         sameKeySchemas.forEach((s, i) => {
           if (!s.schema) throw new Error('schema is undefined');
           if (i === 0) {
-            const start = prevPageSameKeySchemas.length;
-            s.schema.showHead = start === 0;
+            s.schema.showHead = showHead;
             s.schema.__bodyRange = {
-              start,
-              end: start + sameKeySchemas.length - 1, // headが入っているので-1
+              start: start + (showHead ? 0 : -1),
+              end: start + sameKeySchemas.length + (showHead ? -1 : 1),
             };
-            newSchemas[pageIndex][key] = Object.assign(s.schema, { position: { ...s.position } });
+
+            newSchemas[pageIndex][key] = Object.assign(s.schema, {
+              position: { ...s.position },
+              height,
+            });
           }
         });
       }
     });
   });
-  console.log('0: orders.__bodyRange', newTemplate?.schemas?.[0]?.orders?.__bodyRange);
-  console.log('1: orders.__bodyRange', newTemplate?.schemas?.[1]?.orders?.__bodyRange);
   console.log('newTemplate', newTemplate);
   return newTemplate;
 };
