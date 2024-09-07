@@ -6,26 +6,29 @@ const path = require('path');
 const template = {
   basePdf: BLANK_PDF,
   schemas: [
-    {
-      a: {
+    [
+      {
+        name: 'a',
         type: 'text',
         position: { x: 0, y: 0 },
         width: 10,
         height: 10,
       },
-      b: {
+      {
+        name: 'b',
         type: 'text',
         position: { x: 10, y: 10 },
         width: 10,
         height: 10,
       },
-      c: {
+      {
+        name: 'c',
         type: 'text',
         position: { x: 20, y: 20 },
         width: 10,
         height: 10,
       },
-    },
+    ],
   ],
 };
 

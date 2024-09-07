@@ -2,8 +2,6 @@
 // @ts-ignore
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry.js';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
-GlobalWorkerOptions.workerSrc = PDFJSWorker;
-
 import hotkeys from 'hotkeys-js';
 import {
   cloneDeep,
@@ -14,12 +12,13 @@ import {
   Template,
   BasePdf,
   SchemaForUI,
-  Schema,
   Size,
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
-import { RULER_HEIGHT } from './constants.js';
+import {RULER_HEIGHT} from './constants.js';
+
+GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -201,13 +200,11 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
 
   const promises = Promise.all(
     new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      const pageSize = await pdfDoc.getPage(i + 1).then((page) => {
+      return await pdfDoc.getPage(i + 1).then((page) => {
         const { height, width } = page.getViewport({ scale: 1 });
 
         return { height: pt2mm(height), width: pt2mm(width) };
       });
-
-      return pageSize;
     })
   );
 
@@ -222,7 +219,7 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg
 
   const promises = Promise.all(
     new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      const image = await pdfDoc.getPage(i + 1).then((page) => {
+      return await pdfDoc.getPage(i + 1).then((page) => {
         const canvas = document.createElement('canvas');
         canvas.width = width * 2;
         const canvasContext = canvas.getContext('2d')!;
@@ -234,8 +231,6 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg
           .render({ canvasContext, viewport })
           .promise.then(() => canvas.toDataURL(`image/${imageType}`));
       });
-
-      return image;
     })
   );
   URL.revokeObjectURL(url);
@@ -246,31 +241,27 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg
 export const pdf2Pngs = (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
 
 export const b64toBlob = (base64: string) => {
-  const uniy8Array = b64toUint8Array(base64);
+  const uint8Array = b64toUint8Array(base64);
   const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
 
-  return new Blob([uniy8Array.buffer], { type: mimeType });
+  return new Blob([uint8Array.buffer], { type: mimeType });
 };
 
-const sortSchemasList = (template: Template): SchemaForUI[][] => {
-  const { schemas } = template;
-  const pageNum = schemas.length;
-  const arr = new Array(pageNum).fill('') as SchemaForUI[][];
-  return arr.reduce((acc, _, i) => {
-    acc.push(
-      schemas[i]
-        ? Object.entries(schemas[i]).map(([key, schema]) =>
-            Object.assign(schema, { key, content: schema.content, id: uuid() })
-          )
-        : []
-    );
-    return acc;
-  }, [] as SchemaForUI[][]);
+const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
+  template.schemas.forEach((page, i) => {
+    page.forEach((schema) => {
+      schema.id = uuid();
+      schema.content = schema.content || '';
+    });
+  });
+
+  return template.schemas as SchemaForUI[][];
 };
+
 export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const { basePdf, schemas } = template;
-  const sortedSchemasList = sortSchemasList(template);
+  const schemasForUI = convertSchemasForUI(template);
 
   let pageSizes: Size[] = [];
   if (isBlankPdf(basePdf)) {
@@ -284,12 +275,13 @@ export const template2SchemasList = async (_template: Template) => {
     pageSizes = await getPdfPageSizes(pdfBlob);
   }
 
-  const ssl = sortedSchemasList.length;
+  const ssl = schemasForUI.length;
   const psl = pageSizes.length;
-  const schemasList = (
+
+  return (
     ssl < psl
-      ? sortedSchemasList.concat(new Array(psl - ssl).fill(cloneDeep([])))
-      : sortedSchemasList.slice(0, pageSizes.length)
+      ? schemasForUI.concat(new Array(psl - ssl).fill(cloneDeep([])))
+      : schemasForUI.slice(0, pageSizes.length)
   ).map((schema, i) => {
     Object.values(schema).forEach((value) => {
       const { width, height } = pageSizes[i];
@@ -307,60 +299,54 @@ export const template2SchemasList = async (_template: Template) => {
 
     return schema;
   });
-  return schemasList;
 };
 
 export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
-  schemas: cloneDeep(schemasList).map((schema) =>
-    schema.reduce((acc, cur) => {
-      const k = cur.key;
+  schemas: cloneDeep(schemasList).map((page) =>
+    page.map(schema => {
       // @ts-ignore
-      delete cur.id;
-      // @ts-ignore
-      delete cur.key;
-      acc[k] = cur;
-
-      return acc;
-    }, {} as { [key: string]: Schema })
+      delete schema.id;
+      return schema;
+    })
   ),
   basePdf,
 });
 
-export const getUniqSchemaKey = (arg: {
-  copiedSchemaKey: string;
+export const getUniqueSchemaName = (arg: {
+  copiedSchemaName: string;
   schema: SchemaForUI[];
-  stackUniqSchemaKeys: string[];
+  stackUniqueSchemaNames: string[];
 }) => {
-  const { copiedSchemaKey, schema, stackUniqSchemaKeys } = arg;
-  const schemaKeys = schema.map((s) => s.key).concat(stackUniqSchemaKeys);
-  const tmp: { [originalKey: string]: number } = schemaKeys.reduce(
-    (acc, cur) => Object.assign(acc, { originalKey: cur, copiedNum: 0 }),
+  const { copiedSchemaName, schema, stackUniqueSchemaNames } = arg;
+  const schemaNames = schema.map((s) => s.name).concat(stackUniqueSchemaNames);
+  const tmp: { [originalName: string]: number } = schemaNames.reduce(
+    (acc, cur) => Object.assign(acc, { originalName: cur, copiedNum: 0 }),
     {}
   );
-  const extractOriginalKey = (key: string) => key.replace(/ copy$| copy [0-9]*$/, '');
-  schemaKeys
-    .filter((key) => / copy$| copy [0-9]*$/.test(key))
-    .forEach((key) => {
-      const originalKey = extractOriginalKey(key);
-      const match = key.match(/[0-9]*$/);
+  const extractOriginalName = (name: string) => name.replace(/ copy$| copy [0-9]*$/, '');
+  schemaNames
+    .filter((name) => / copy$| copy [0-9]*$/.test(name))
+    .forEach((name) => {
+      const originalName = extractOriginalName(name);
+      const match = name.match(/[0-9]*$/);
       const copiedNum = match && match[0] ? Number(match[0]) : 1;
-      if ((tmp[originalKey] ?? 0) < copiedNum) {
-        tmp[originalKey] = copiedNum;
+      if ((tmp[originalName] ?? 0) < copiedNum) {
+        tmp[originalName] = copiedNum;
       }
     });
 
-  const originalKey = extractOriginalKey(copiedSchemaKey);
-  if (tmp[originalKey]) {
-    const copiedNum = tmp[originalKey];
-    const uniqKey = `${originalKey} copy ${copiedNum + 1}`;
-    stackUniqSchemaKeys.push(uniqKey);
+  const originalName = extractOriginalName(copiedSchemaName);
+  if (tmp[originalName]) {
+    const copiedNum = tmp[originalName];
+    const uniqueName = `${originalName} copy ${copiedNum + 1}`;
+    stackUniqueSchemaNames.push(uniqueName);
 
-    return uniqKey;
+    return uniqueName;
   }
-  const uniqKey = `${copiedSchemaKey} copy`;
-  stackUniqSchemaKeys.push(uniqKey);
+  const uniqueName = `${copiedSchemaName} copy`;
+  stackUniqueSchemaNames.push(uniqueName);
 
-  return uniqKey;
+  return uniqueName;
 };
 
 export const moveCommandToChangeSchemasArg = (props: {
@@ -447,7 +433,7 @@ const handleTypeChange = (
   pluginsRegistry: Plugins
 ) => {
   if (key !== 'type') return;
-  const keysToKeep = ['id', 'key', 'type', 'position', 'required'];
+  const keysToKeep = ['id', 'name', 'type', 'position', 'required'];
   Object.keys(schema).forEach((key) => {
     if (!keysToKeep.includes(key)) {
       delete schema[key as keyof typeof schema];

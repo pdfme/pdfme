@@ -159,7 +159,7 @@ const SelectableSortableContainer = (
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                       <Item
                         icon={getPluginIcon(activeId)}
-                        value={activeSchema.key}
+                        value={activeSchema.name}
                         required={activeSchema.required}
                         readOnly={activeSchema.readOnly}
                         style={{ background: token.colorPrimary }}
@@ -173,7 +173,7 @@ const SelectableSortableContainer = (
                           <Item
                             icon={getPluginIcon(item)}
                             key={item.id}
-                            value={item.key}
+                            value={item.name}
                             required={item.required}
                             readOnly={item.readOnly}
                             style={{ background: token.colorPrimary }}

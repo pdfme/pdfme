@@ -1,6 +1,16 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
+import {
+  Schema,
+  Template,
+  Font,
+  BasePdf,
+  Plugins,
+  BlankPdf,
+  CommonOptions,
+  LegacySchemaPage,
+  SchemaPage
+} from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -79,12 +89,34 @@ export const isHexValid = (hex: string): boolean => {
   return /^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/i.test(hex);
 };
 
+/**
+ * Migrate from legacy keyed object format to array format
+ * @param template Template
+ */
+export const migrateTemplate = (template: Template) => {
+  if (!template.schemas) {
+    return;
+  }
+
+  if (Array.isArray(template.schemas) && template.schemas.length > 0 && !Array.isArray(template.schemas[0])) {
+    template.schemas = (template.schemas as unknown as LegacySchemaPage).map(
+      (page: Record<string, Schema>) =>
+        Object.entries(page).map(([key, value]) => ({
+          ...value,
+          name: key,
+        }))
+    );
+  }
+};
+
 export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
+  migrateTemplate(template);
+
   const input: { [key: string]: string } = {};
-  template.schemas.forEach((schema) => {
-    Object.entries(schema).forEach(([key, value]) => {
-      if (!value.readOnly) {
-        input[key] = value.content || '';
+  template.schemas.forEach(page => {
+    page.forEach(schema => {
+      if (!schema.readOnly) {
+        input[schema.name] = schema.content || '';
       }
     });
   });
@@ -124,10 +156,10 @@ export const b64toUint8Array = (base64: string) => {
   return unit8arr;
 };
 
-const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
+const getFontNamesInSchemas = (schemas: SchemaPage) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => (v as any).fontName ?? ''))
+      .map((p) => p.map((v) => (v as any).fontName ?? ''))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
@@ -169,7 +201,7 @@ export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
     plugins,
     template: { schemas },
   } = arg;
-  const allSchemaTypes = uniq(schemas.map((s) => Object.values(s).map((v) => v.type)).flat());
+  const allSchemaTypes = uniq(schemas.map((p) => p.map((v) => v.type)).flat());
 
   const pluginsSchemaTypes = Object.values(plugins).map((p) => p?.propPanel.defaultSchema.type);
 
@@ -219,11 +251,24 @@ ${message}`);
 
 export const checkInputs = (data: unknown) => checkProps(data, InputsSchema);
 export const checkUIOptions = (data: unknown) => checkProps(data, UIOptionsSchema);
-export const checkTemplate = (data: unknown) => checkProps(data, TemplateSchema);
-export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
-export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
+export const checkUIProps = (data: unknown) => {
+  if (typeof data === 'object' && data !== null && 'template' in data) {
+    migrateTemplate(data.template as Template);
+  }
+  checkProps(data, UIPropsSchema);
+}
+export const checkTemplate = (template: unknown) => {
+  migrateTemplate(template as Template);
+  checkProps(template, TemplateSchema);
+}
+export const checkGenerateProps = (data: unknown) => {
+  if (typeof data === 'object' && data !== null && 'template' in data) {
+    migrateTemplate(data.template as Template);
+  }
+  checkProps(data, GeneratePropsSchema);
+}
 
 interface ModifyTemplateForDynamicTableArg {
   template: Template;

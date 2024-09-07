@@ -24,7 +24,7 @@ export const substituteVariables = (text: string, variablesIn: string | Record<s
   return substitutedText;
 };
 
-export const validateVariables = (key: string, value: string, schema: MultiVariableTextSchema): boolean => {
+export const validateVariables = (value: string, schema: MultiVariableTextSchema): boolean => {
   if (schema.variables.length == 0) {
     return true;
   }
@@ -33,13 +33,13 @@ export const validateVariables = (key: string, value: string, schema: MultiVaria
   try {
     values = value ? JSON.parse(value) : {};
   } catch (e) {
-    throw new SyntaxError(`[@pdfme/generator] invalid JSON string '${value}' for variables in field ${key}`);
+    throw new SyntaxError(`[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`);
   }
 
   for (const variable of schema.variables) {
     if (!values[variable]) {
       if (schema.required) {
-        throw new Error(`[@pdfme/generator] variable ${variable} is missing for field ${key}`);
+        throw new Error(`[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`);
       }
       // If not required, then simply don't render this field if an input is missing
       return false;

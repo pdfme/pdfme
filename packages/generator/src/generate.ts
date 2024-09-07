@@ -44,18 +44,16 @@ const generate = async (props: GenerateProps) => {
       template: dynamicTemplate,
       pdfDoc,
     });
-    const keys = [
-      ...new Set(dynamicTemplate.schemas.flatMap((schemaObj) => Object.keys(schemaObj))),
-    ];
+    const schemaNames = [...new Set(dynamicTemplate.schemas.flatMap(page => page.map(schema => schema.name)))];
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
-      for (let l = 0; l < keys.length; l += 1) {
-        const key = keys[l];
-        const schemaObj = dynamicTemplate.schemas[j] || {};
-        const schema = schemaObj[key];
+      for (let l = 0; l < schemaNames.length; l += 1) {
+        const name = schemaNames[l];
+        const schemaPage = dynamicTemplate.schemas[j] || [];
+        const schema = schemaPage.find(s => s.name == name);
         if (!schema) {
           continue;
         }
@@ -64,8 +62,8 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.content || '' : input[key];
-        await render({ key, value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
+        const value = schema.readOnly ? schema.content || '' : input[name];
+        await render({ value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }
     }
   }

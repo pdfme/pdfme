@@ -162,21 +162,21 @@ const TemplateEditor = ({
     const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
     const pageSize = pageSizes[pageCursor];
 
-    const newSchemaKey = (prefix: string) => {
-      let keyNum = schemasList.reduce((acc, page) => acc + page.length, 1);
-      let newKey = prefix + keyNum;
-      while (schemasList.some(page => page.find((s) => s.key === newKey))) {
-        keyNum++;
-        newKey = prefix + keyNum;
+    const newSchemaName = (prefix: string) => {
+      let index = schemasList.reduce((acc, page) => acc + page.length, 1);
+      let newName = prefix + index;
+      while (schemasList.some(page => page.find((s) => s.name === newName))) {
+        index++;
+        newName = prefix + index;
       }
-      return newKey;
+      return newName;
     };
     const ensureMiddleValue = (min: number, value: number, max: number) => Math.min(Math.max(min, value), max)
 
     const s = {
       id: uuid(),
-      key: newSchemaKey(i18n('field')),
       ...defaultSchema,
+      name: newSchemaName(i18n('field')),
       position: {
         x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
         y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),

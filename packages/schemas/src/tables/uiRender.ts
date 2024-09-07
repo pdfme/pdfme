@@ -178,6 +178,7 @@ const renderRowUi = (args: {
         placeholder: '',
         rootElement: div,
         schema: {
+          name: '',
           type: 'cell',
           content: cell.raw,
           position: { x: colOffsetX, y: rowOffsetY },

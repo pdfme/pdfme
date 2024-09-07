@@ -150,6 +150,7 @@ export const propPanel: PropPanel<TextSchema> = {
   },
   widgets: { UseDynamicFontSize },
   defaultSchema: {
+    name: '',
     type: 'text',
     content: 'Type Something...',
     position: { x: 0, y: 0 },

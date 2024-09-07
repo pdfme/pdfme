@@ -55,7 +55,7 @@ const ListView = (
   };
 
   const startBulk = () => {
-    setFieldNamesValue(schemas.map((s) => s.key).join('\n'));
+    setFieldNamesValue(schemas.map((s) => s.name).join('\n'));
     setIsBulkUpdateFieldNamesMode(true);
   };
 

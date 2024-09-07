@@ -13,7 +13,7 @@ import {
 import {
   schemasList2template,
   uuid,
-  getUniqSchemaKey,
+  getUniqueSchemaName,
   moveCommandToChangeSchemasArg,
   pdf2Pngs,
   getPdfPageSizes,
@@ -227,10 +227,10 @@ export const useInitEvents = ({
       paste: () => {
         if (!copiedSchemas.current || copiedSchemas.current.length === 0) return;
         const schema = schemasList[pageCursor];
-        const stackUniqSchemaKeys: string[] = [];
+        const stackUniqueSchemaNames: string[] = [];
         const pasteSchemas = copiedSchemas.current.map((cs) => {
           const id = uuid();
-          const key = getUniqSchemaKey({ copiedSchemaKey: cs.key, schema, stackUniqSchemaKeys });
+          const key = getUniqueSchemaName({ copiedSchemaName: cs.name, schema, stackUniqueSchemaNames });
           const { height, width, position: p } = cs;
           const ps = pageSizes[pageCursor];
           const position = {

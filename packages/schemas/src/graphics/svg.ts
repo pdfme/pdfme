@@ -72,6 +72,7 @@ const svgSchema: Plugin<SVGSchema> = {
   propPanel: {
     schema: {},
     defaultSchema: {
+      name: '',
       type: 'svg',
       content: defaultValue,
       position: { x: 0, y: 0 },
