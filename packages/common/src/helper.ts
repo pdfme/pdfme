@@ -321,7 +321,8 @@ function createNode(arg: {
 }
 
 function generateDebugHTML(pages: Node[]) {
-  let html = '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto;">';
+  let html =
+    '<div style="font-family: Arial, sans-serif; width: min-content; margin: 0 auto; overflow-y: scroll; height:100%;">';
   let counter = 0;
   pages.forEach((page, pageIndex) => {
     const [pagePaddingTop, pagePaddingRight, pagePaddingBottom, pagePaddingLeft] = page.padding;
@@ -331,7 +332,7 @@ function generateDebugHTML(pages: Node[]) {
       <div style="position: relative; width: ${page.width}px; height: ${
       page.height
     }px; border: 1px solid #000; background: #f0f0f0;">
-        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(255, 255, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-top: ${pagePaddingTop}px solid rgba(0, 255, 0, 0.2); border-right: ${pagePaddingRight}px solid rgba(0, 0, 255, 0.2); border-bottom: ${pagePaddingBottom}px solid rgba(0, 0, 0, 0.2); border-left: ${pagePaddingLeft}px solid rgba(255, 0, 255, 0.2);"></div>`;
 
     page.children.forEach((child) => {
       const { x: left, y: top } = child.position;
@@ -396,37 +397,37 @@ async function createOnePage(
 }
 
 function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
-  const pages = [createPage(basePdf)];
-  const [paddingTop, paddingBottom] = [basePdf.padding[0], basePdf.padding[2]];
+  const pages: Node[] = [createPage(basePdf)];
+  const [paddingTop, , paddingBottom] = basePdf.padding;
+  const yAdjustments: { page: number; value: number }[] = [];
 
-  const yAdjustment = { page: -1, value: 0 };
+  const getPageHeight = (pageIndex: number) =>
+    basePdf.height - paddingBottom - (pageIndex > 0 ? paddingTop : 0);
+
+  const calculateNewY = (y: number, pageIndex: number) => {
+    const newY = y - pageIndex * (basePdf.height - paddingTop - paddingBottom);
+    if (!pages[pageIndex]) {
+      pages.push(createPage(basePdf));
+      yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
+    }
+    return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
+  };
+
   for (let i = 0; i < longPage.getChildCount(); i++) {
     const { key, schema, position, height, width } = longPage.getChild(i);
     const { y, x } = position;
-    const targetPageIndex = Math.floor(
-      (y + height) / (basePdf.height - paddingBottom - (pages.length > 1 ? paddingTop : 0))
-    );
-    let newY = y - targetPageIndex * (basePdf.height - paddingTop - paddingBottom);
-    if (!pages[targetPageIndex]) {
-      pages.push(createPage(basePdf));
-      yAdjustment.page = targetPageIndex;
-      yAdjustment.value = (newY - paddingTop) * -1;
-    }
 
-    if (yAdjustment.page === targetPageIndex) {
-      newY += yAdjustment.value;
+    let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
+    let newY = calculateNewY(y, targetPageIndex);
+
+    if (newY + height > basePdf.height - paddingBottom) {
+      targetPageIndex++;
+      newY = calculateNewY(y, targetPageIndex);
     }
 
     if (!key || !schema) throw new Error('key or schema is undefined');
 
-    const clonedElement = createNode({
-      key: key,
-      schema: schema,
-      position: { x, y: newY },
-      width,
-      height,
-    });
-
+    const clonedElement = createNode({ key, schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
   }
 
@@ -457,6 +458,7 @@ export const getDynamicTemplate = async (
     );
     const brokenPages = breakIntoPages(longPage, basePdf);
     pages.push(...brokenPages);
+    // pages.push(longPage);
   }
 
   document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
