@@ -105,8 +105,7 @@ describe('validateVariables', () => {
       variables: ['var'],
       required: false,
     };
-    const key = 'testKey';
     const value = '';
-    expect(validateVariables(key, value, readOnlyText)).toBe(false);
+    expect(validateVariables(value, readOnlyText)).toBe(false);
   });
 });

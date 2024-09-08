@@ -12,8 +12,8 @@
   "id": "領収書x4",
   "fontName": "SauceHanSansJP",
   "schemas": [
-    {
-      "{1}No": {
+    [
+      {
         "position": {
           "x": 152.29,
           "y": 24
@@ -25,9 +25,10 @@
         "fontSize": 15,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1"
+        "content": "1",
+        "name": "{1}No"
       },
-      "{1}あて名": {
+      {
         "position": {
           "x": 58.43,
           "y": 24
@@ -39,9 +40,10 @@
         "fontSize": 17,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社◯◯"
+        "content": "株式会社◯◯",
+        "name": "{1}あて名"
       },
-      "{1}金額": {
+      {
         "position": {
           "x": 53,
           "y": 33
@@ -53,9 +55,10 @@
         "fontSize": 18,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "¥56,160"
+        "content": "¥56,160",
+        "name": "{1}金額"
       },
-      "{1}但し書き": {
+      {
         "position": {
           "x": 41,
           "y": 42.2
@@ -67,9 +70,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "印刷代として"
+        "content": "印刷代として",
+        "name": "{1}但し書き"
       },
-      "{1}発行日付": {
+      {
         "position": {
           "x": 41.06,
           "y": 48.5
@@ -81,9 +85,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2019年01月01日"
+        "content": "2019年01月01日",
+        "name": "{1}発行日付"
       },
-      "{1}税抜金額": {
+      {
         "position": {
           "x": 68,
           "y": 64.1
@@ -95,9 +100,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "52,000"
+        "content": "52,000",
+        "name": "{1}税抜金額"
       },
-      "{1}消費税%": {
+      {
         "position": {
           "x": 66.5,
           "y": 73
@@ -109,9 +115,10 @@
         "fontSize": 10.5,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "8"
+        "content": "8",
+        "name": "{1}消費税%"
       },
-      "{1}消費税額": {
+      {
         "position": {
           "x": 76,
           "y": 71.6
@@ -123,9 +130,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "4,160"
+        "content": "4,160",
+        "name": "{1}消費税額"
       },
-      "{1}発行者": {
+      {
         "position": {
           "x": 123,
           "y": 57.5
@@ -137,9 +145,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1.2,
-        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000"
+        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000",
+        "name": "{1}発行者"
       },
-      "{2}No": {
+      {
         "position": {
           "x": 152.29,
           "y": 88
@@ -151,9 +160,10 @@
         "fontSize": 15,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2"
+        "content": "2",
+        "name": "{2}No"
       },
-      "{2}あて名": {
+      {
         "position": {
           "x": 58.43,
           "y": 88
@@ -165,9 +175,10 @@
         "fontSize": 17,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社◯◯"
+        "content": "株式会社◯◯",
+        "name": "{2}あて名"
       },
-      "{2}金額": {
+      {
         "position": {
           "x": 53,
           "y": 97
@@ -179,9 +190,10 @@
         "fontSize": 18,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "¥56,160"
+        "content": "¥56,160",
+        "name": "{2}金額"
       },
-      "{2}但し書き": {
+      {
         "position": {
           "x": 41,
           "y": 106.2
@@ -193,9 +205,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "印刷代として"
+        "content": "印刷代として",
+        "name": "{2}但し書き"
       },
-      "{2}発行日付": {
+      {
         "position": {
           "x": 41.06,
           "y": 112.5
@@ -207,9 +220,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2019年01月01日"
+        "content": "2019年01月01日",
+        "name": "{2}発行日付"
       },
-      "{2}税抜金額": {
+      {
         "position": {
           "x": 68,
           "y": 128.1
@@ -221,9 +235,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "52,000"
+        "content": "52,000",
+        "name": "{2}税抜金額"
       },
-      "{2}消費税%": {
+      {
         "position": {
           "x": 66.5,
           "y": 136.5
@@ -235,9 +250,10 @@
         "fontSize": 10.5,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "8"
+        "content": "8",
+        "name": "{2}消費税%"
       },
-      "{2}消費税額": {
+      {
         "position": {
           "x": 76,
           "y": 135.6
@@ -249,9 +265,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "4,160"
+        "content": "4,160",
+        "name": "{2}消費税額"
       },
-      "{2}発行者": {
+      {
         "position": {
           "x": 123,
           "y": 121.5
@@ -263,9 +280,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1.2,
-        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000"
+        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000",
+        "name": "{2}発行者"
       },
-      "{3}No": {
+      {
         "position": {
           "x": 152.29,
           "y": 152
@@ -277,9 +295,10 @@
         "fontSize": 15,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "3"
+        "content": "3",
+        "name": "{3}No"
       },
-      "{3}あて名": {
+      {
         "position": {
           "x": 58.43,
           "y": 151
@@ -291,9 +310,10 @@
         "fontSize": 17,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社◯◯"
+        "content": "株式会社◯◯",
+        "name": "{3}あて名"
       },
-      "{3}金額": {
+      {
         "position": {
           "x": 53,
           "y": 160
@@ -305,9 +325,10 @@
         "fontSize": 18,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "¥56,160"
+        "content": "¥56,160",
+        "name": "{3}金額"
       },
-      "{3}但し書き": {
+      {
         "position": {
           "x": 41,
           "y": 170.2
@@ -319,9 +340,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "印刷代として"
+        "content": "印刷代として",
+        "name": "{3}但し書き"
       },
-      "{3}発行日付": {
+      {
         "position": {
           "x": 41.06,
           "y": 176.5
@@ -333,9 +355,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2019年01月01日"
+        "content": "2019年01月01日",
+        "name": "{3}発行日付"
       },
-      "{3}税抜金額": {
+      {
         "position": {
           "x": 68,
           "y": 191.7
@@ -347,9 +370,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "52,000"
+        "content": "52,000",
+        "name": "{3}税抜金額"
       },
-      "{3}消費税%": {
+      {
         "position": {
           "x": 66.5,
           "y": 200
@@ -361,9 +385,10 @@
         "fontSize": 10.5,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "8"
+        "content": "8",
+        "name": "{3}消費税%"
       },
-      "{3}消費税額": {
+      {
         "position": {
           "x": 76,
           "y": 199.1
@@ -375,9 +400,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "4,160"
+        "content": "4,160",
+        "name": "{3}消費税額"
       },
-      "{3}発行者": {
+      {
         "position": {
           "x": 123,
           "y": 185.5
@@ -389,9 +415,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1.2,
-        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000"
+        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000",
+        "name": "{3}発行者"
       },
-      "{4}No": {
+      {
         "position": {
           "x": 152.29,
           "y": 217.5
@@ -403,9 +430,10 @@
         "fontSize": 15,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "4"
+        "content": "4",
+        "name": "{4}No"
       },
-      "{4}あて名": {
+      {
         "position": {
           "x": 58.43,
           "y": 217
@@ -417,9 +445,10 @@
         "fontSize": 17,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社◯◯"
+        "content": "株式会社◯◯",
+        "name": "{4}あて名"
       },
-      "{4}金額": {
+      {
         "position": {
           "x": 53,
           "y": 226
@@ -431,9 +460,10 @@
         "fontSize": 18,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "¥56,160"
+        "content": "¥56,160",
+        "name": "{4}金額"
       },
-      "{4}但し書き": {
+      {
         "position": {
           "x": 41,
           "y": 235.2
@@ -445,9 +475,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "印刷代として"
+        "content": "印刷代として",
+        "name": "{4}但し書き"
       },
-      "{4}発行日付": {
+      {
         "position": {
           "x": 41.06,
           "y": 241.5
@@ -459,9 +490,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2019年01月01日"
+        "content": "2019年01月01日",
+        "name": "{4}発行日付"
       },
-      "{4}税抜金額": {
+      {
         "position": {
           "x": 68,
           "y": 257.1
@@ -473,9 +505,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "52,000"
+        "content": "52,000",
+        "name": "{4}税抜金額"
       },
-      "{4}消費税%": {
+      {
         "position": {
           "x": 66.5,
           "y": 265.5
@@ -487,9 +520,10 @@
         "fontSize": 10.5,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "8"
+        "content": "8",
+        "name": "{4}消費税%"
       },
-      "{4}消費税額": {
+      {
         "position": {
           "x": 76,
           "y": 264.6
@@ -501,9 +535,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "4,160"
+        "content": "4,160",
+        "name": "{4}消費税額"
       },
-      "{4}発行者": {
+      {
         "position": {
           "x": 123,
           "y": 251.5
@@ -515,8 +550,9 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1.2,
-        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000"
+        "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000",
+        "name": "{4}発行者"
       }
-    }
+    ]
   ]
 }

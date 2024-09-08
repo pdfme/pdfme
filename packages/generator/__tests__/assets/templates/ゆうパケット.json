@@ -12,8 +12,8 @@
   "id": "ゆうパケット",
   "basePdf": "data:application/pdf;base64,JVBERi0xLjMKJf////8KOSAwIG9iago8PAovVHlwZSAvRXh0R1N0YXRlCi9jYSAxCi9DQSAxCj4+CmVuZG9iago4IDAgb2JqCjw8Ci9UeXBlIC9QYWdlCi9QYXJlbnQgMSAwIFIKL01lZGlhQm94IFswIDAgNTk1LjI2NiA4NDEuODc2Ml0KL0NvbnRlbnRzIDYgMCBSCi9SZXNvdXJjZXMgNyAwIFIKPj4KZW5kb2JqCjcgMCBvYmoKPDwKL1Byb2NTZXQgWy9QREYgL1RleHQgL0ltYWdlQiAvSW1hZ2VDIC9JbWFnZUldCi9FeHRHU3RhdGUgPDwKL0dzMSA5IDAgUgo+PgovWE9iamVjdCA8PAovSTEgNSAwIFIKPj4KPj4KZW5kb2JqCjYgMCBvYmoKPDwKL0xlbmd0aCA2MAovRmlsdGVyIC9GbGF0ZURlY29kZQo+PgpzdHJlYW0KeJwzVDAAQl1DIGFhYqhnYW5mpJCcy6XvXmyokF7MVchlammqZ2RmBlGG4MBYILWehgou+VyBXABMHQ96CmVuZHN0cmVhbQplbmRvYmoKMTEgMCBvYmoKKGxhYmVsbWFrZS5qcCkKZW5kb2JqCjEyIDAgb2JqCihsYWJlbG1ha2UuanApCmVuZG9iagoxMyAwIG9iagooRDoyMDIwMDcxNzEwMTIwOVopCmVuZG9iagoxMCAwIG9iago8PAovUHJvZHVjZXIgMTEgMCBSCi9DcmVhdG9yIDEyIDAgUgovQ3JlYXRpb25EYXRlIDEzIDAgUgo+PgplbmRvYmoKNCAwIG9iago8PAo+PgplbmRvYmoKMyAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMSAwIFIKL05hbWVzIDIgMCBSCj4+CmVuZG9iagoxIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovQ291bnQgMQovS2lkcyBbOCAwIFJdCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9EZXN0cyA8PAogIC9OYW1lcyBbCl0KPj4KPj4KZW5kb2JqCjE0IDAgb2JqCjw8Ci9UeXBlIC9YT2JqZWN0Ci9TdWJ0eXBlIC9JbWFnZQovSGVpZ2h0IDEKL1dpZHRoIDEKL0JpdHNQZXJDb21wb25lbnQgOAovRmlsdGVyIC9GbGF0ZURlY29kZQovQ29sb3JTcGFjZSAvRGV2aWNlR3JheQovRGVjb2RlIFswIDFdCi9MZW5ndGggOQo+PgpzdHJlYW0KeJxjAAAAAQABCmVuZHN0cmVhbQplbmRvYmoKNSAwIG9iago8PAovVHlwZSAvWE9iamVjdAovU3VidHlwZSAvSW1hZ2UKL0JpdHNQZXJDb21wb25lbnQgOAovV2lkdGggMQovSGVpZ2h0IDEKL0ZpbHRlciAvRmxhdGVEZWNvZGUKL0NvbG9yU3BhY2UgL0RldmljZUdyYXkKL1NNYXNrIDE0IDAgUgovTGVuZ3RoIDkKPj4Kc3RyZWFtCnicYwAAAAEAAQplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCAxNQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDA2ODYgMDAwMDAgbiAKMDAwMDAwMDc0MyAwMDAwMCBuIAowMDAwMDAwNjI0IDAwMDAwIG4gCjAwMDAwMDA2MDMgMDAwMDAgbiAKMDAwMDAwMDk3OCAwMDAwMCBuIAowMDAwMDAwMjk4IDAwMDAwIG4gCjAwMDAwMDAxNzggMDAwMDAgbiAKMDAwMDAwMDA2NSAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDA1MjcgMDAwMDAgbiAKMDAwMDAwMDQyOSAwMDAwMCBuIAowMDAwMDAwNDYwIDAwMDAwIG4gCjAwMDAwMDA0OTEgMDAwMDAgbiAKMDAwMDAwMDc5MCAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9TaXplIDE1Ci9Sb290IDMgMCBSCi9JbmZvIDEwIDAgUgovSUQgWzwxN2ZlNzcyNjViMzI5OTJkMDA3YTVkYWM5MjZhNzU5Mz4gPDE3ZmU3NzI2NWIzMjk5MmQwMDdhNWRhYzkyNmE3NTkzPl0KPj4Kc3RhcnR4cmVmCjExNjUKJSVFT0YK",
   "schemas": [
-    {
-      "{1}[お届け先]郵便番号": {
+    [
+      {
         "position": {
           "x": 10,
           "y": 3.4
@@ -25,9 +25,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{1}[お届け先]郵便番号"
       },
-      "{1}[お届け先]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 13.5
@@ -39,9 +40,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{1}[お届け先]住所"
       },
-      "{1}[お届け先]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 30
@@ -53,9 +55,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{1}[お届け先]氏名"
       },
-      "{1}[差出人]郵便番号": {
+      {
         "position": {
           "x": 10,
           "y": 54.5
@@ -67,9 +70,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{1}[差出人]郵便番号"
       },
-      "{1}[差出人]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 63.5
@@ -81,9 +85,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{1}[差出人]住所"
       },
-      "{1}[差出人]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 74
@@ -95,9 +100,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{1}[差出人]氏名"
       },
-      "{2}[お届け先]郵便番号": {
+      {
         "position": {
           "x": 10,
           "y": 102.5
@@ -109,9 +115,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{2}[お届け先]郵便番号"
       },
-      "{2}[お届け先]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 112.1
@@ -123,9 +130,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{2}[お届け先]住所"
       },
-      "{2}[お届け先]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 128.6
@@ -137,9 +145,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{2}[お届け先]氏名"
       },
-      "{2}[差出人]郵便番号": {
+      {
         "position": {
           "x": 10,
           "y": 153.3
@@ -151,9 +160,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{2}[差出人]郵便番号"
       },
-      "{2}[差出人]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 162.3
@@ -165,9 +175,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{2}[差出人]住所"
       },
-      "{2}[差出人]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 173
@@ -179,9 +190,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{2}[差出人]氏名"
       },
-      "{3}[お届け先]郵便番号": {
+      {
         "position": {
           "x": 10,
           "y": 201
@@ -193,9 +205,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{3}[お届け先]郵便番号"
       },
-      "{3}[お届け先]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 211.1
@@ -207,9 +220,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{3}[お届け先]住所"
       },
-      "{3}[お届け先]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 227.6
@@ -221,9 +235,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{3}[お届け先]氏名"
       },
-      "{3}[差出人]郵便番号": {
+      {
         "position": {
           "x": 10,
           "y": 252.5
@@ -235,9 +250,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{3}[差出人]郵便番号"
       },
-      "{3}[差出人]住所": {
+      {
         "position": {
           "x": 9.2,
           "y": 261.3
@@ -249,9 +265,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{3}[差出人]住所"
       },
-      "{3}[差出人]氏名": {
+      {
         "position": {
           "x": 9.2,
           "y": 272
@@ -263,9 +280,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{3}[差出人]氏名"
       },
-      "{4}[お届け先]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 3.4
@@ -277,9 +295,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{4}[お届け先]郵便番号"
       },
-      "{4}[お届け先]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 13.5
@@ -291,9 +310,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{4}[お届け先]住所"
       },
-      "{4}[お届け先]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 30
@@ -305,9 +325,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{4}[お届け先]氏名"
       },
-      "{4}[差出人]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 54.5
@@ -319,9 +340,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{4}[差出人]郵便番号"
       },
-      "{4}[差出人]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 63.5
@@ -333,9 +355,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{4}[差出人]住所"
       },
-      "{4}[差出人]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 74
@@ -347,9 +370,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{4}[差出人]氏名"
       },
-      "{5}[お届け先]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 102.5
@@ -361,9 +385,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{5}[お届け先]郵便番号"
       },
-      "{5}[お届け先]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 112.1
@@ -375,9 +400,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{5}[お届け先]住所"
       },
-      "{5}[お届け先]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 128.6
@@ -389,9 +415,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{5}[お届け先]氏名"
       },
-      "{5}[差出人]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 153.3
@@ -403,9 +430,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{5}[差出人]郵便番号"
       },
-      "{5}[差出人]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 162.3
@@ -417,9 +445,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{5}[差出人]住所"
       },
-      "{5}[差出人]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 173
@@ -431,9 +460,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{5}[差出人]氏名"
       },
-      "{6}[お届け先]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 201
@@ -445,9 +475,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "{6}[お届け先]郵便番号"
       },
-      "{6}[お届け先]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 211.1
@@ -459,9 +490,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "{6}[お届け先]住所"
       },
-      "{6}[お届け先]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 227.6
@@ -473,9 +505,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "{6}[お届け先]氏名"
       },
-      "{6}[差出人]郵便番号": {
+      {
         "position": {
           "x": 115,
           "y": 252.5
@@ -487,9 +520,10 @@
         "fontSize": 15,
         "characterSpacing": 5.3,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "{6}[差出人]郵便番号"
       },
-      "{6}[差出人]住所": {
+      {
         "position": {
           "x": 114.2,
           "y": 261.3
@@ -501,9 +535,10 @@
         "fontSize": 9,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "{6}[差出人]住所"
       },
-      "{6}[差出人]氏名": {
+      {
         "position": {
           "x": 114.2,
           "y": 272
@@ -515,8 +550,9 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "{6}[差出人]氏名"
       }
-    }
+    ]
   ]
 }

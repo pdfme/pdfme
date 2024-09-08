@@ -12,8 +12,8 @@
   "id": "レターパック",
   "fontName": "SauceHanSansJP",
   "schemas": [
-    {
-      "[お届け先]郵便番号": {
+    [
+      {
         "position": {
           "x": 102.3,
           "y": 42
@@ -25,9 +25,10 @@
         "type": "text",
         "height": 15.82,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "[お届け先]郵便番号"
       },
-      "[お届け先]住所": {
+      {
         "position": {
           "x": 61.13,
           "y": 87.5
@@ -39,9 +40,10 @@
         "type": "text",
         "height": 26.39,
         "lineHeight": 1.4,
-        "content": "東京都東京1-2-3-4\n東京マンション123号"
+        "content": "東京都東京1-2-3-4\n東京マンション123号",
+        "name": "[お届け先]住所"
       },
-      "[お届け先]社名": {
+      {
         "position": {
           "x": 76.03,
           "y": 116.79
@@ -53,9 +55,10 @@
         "type": "text",
         "height": 8.13,
         "lineHeight": 1,
-        "content": "株式会社labelmake.jp"
+        "content": "株式会社labelmake.jp",
+        "name": "[お届け先]社名"
       },
-      "[お届け先]氏名": {
+      {
         "position": {
           "x": 61,
           "y": 124.9
@@ -67,9 +70,10 @@
         "type": "text",
         "height": 7.88,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "[お届け先]氏名"
       },
-      "[お届け先]電話番号": {
+      {
         "position": {
           "x": 91,
           "y": 136.57
@@ -81,9 +85,10 @@
         "type": "text",
         "height": 6.54,
         "lineHeight": 1,
-        "content": "123-3456-7890"
+        "content": "123-3456-7890",
+        "name": "[お届け先]電話番号"
       },
-      "[差出人]郵便番号": {
+      {
         "position": {
           "x": 77.9,
           "y": 146.63
@@ -95,9 +100,10 @@
         "type": "text",
         "height": 6.28,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "[差出人]郵便番号"
       },
-      "[差出人]住所": {
+      {
         "position": {
           "x": 61.13,
           "y": 153.49
@@ -109,9 +115,10 @@
         "type": "text",
         "height": 18.45,
         "lineHeight": 1.2,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "[差出人]住所"
       },
-      "[差出人]社名": {
+      {
         "position": {
           "x": 76.12,
           "y": 173.86
@@ -123,9 +130,10 @@
         "type": "text",
         "height": 6.54,
         "lineHeight": 1,
-        "content": "株式会社listmake.jp"
+        "content": "株式会社listmake.jp",
+        "name": "[差出人]社名"
       },
-      "[差出人]氏名": {
+      {
         "position": {
           "x": 73.01,
           "y": 180.33
@@ -137,9 +145,10 @@
         "type": "text",
         "height": 7.07,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "[差出人]氏名"
       },
-      "[差出人]電話番号": {
+      {
         "position": {
           "x": 91,
           "y": 190.32
@@ -151,9 +160,10 @@
         "type": "text",
         "height": 7.35,
         "lineHeight": 1,
-        "content": "098-7654-4321"
+        "content": "098-7654-4321",
+        "name": "[差出人]電話番号"
       },
-      "品名": {
+      {
         "position": {
           "x": 27.8,
           "y": 213.26
@@ -165,8 +175,9 @@
         "type": "text",
         "height": 12.63,
         "lineHeight": 1,
-        "content": "書類"
+        "content": "書類",
+        "name": "品名"
       }
-    }
+    ]
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schemas": [
-    {
-      "static": {
+    [
+      {
         "type": "multiVariableText",
         "content": "{}",
         "position": {
@@ -25,9 +25,10 @@
         "text": "Static text only",
         "variables": [],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "static"
       },
-      "one var": {
+      {
         "type": "multiVariableText",
         "content": "{\"number\":\"1\"}",
         "position": {
@@ -53,9 +54,10 @@
           "number"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "one var"
       },
-      "two vars": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"X\",\"y\":\"Y\"}",
         "position": {
@@ -82,9 +84,10 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "two vars"
       },
-      "dynamic font size": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"X\",\"y\":\"Y\"}",
         "position": {
@@ -116,9 +119,10 @@
           "min": 4,
           "max": 72,
           "fit": "vertical"
-        }
+        },
+        "name": "dynamic font size"
       },
-      "aligned and rotated": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"X\",\"y\":\"Y\"}",
         "position": {
@@ -145,9 +149,10 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "aligned and rotated"
       },
-      "formatting": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"X\",\"y\":\"Y\"}",
         "position": {
@@ -174,9 +179,10 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "formatting"
       },
-      "colour": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"Blue\",\"y\":\"Green\"}",
         "position": {
@@ -203,9 +209,10 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "colour"
       },
-      "strike-through underline": {
+      {
         "type": "multiVariableText",
         "content": "{\"x\":\"X\",\"y\":\"Y\"}",
         "position": {
@@ -232,9 +239,10 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "strike-through underline"
       }
-    }
+    ]
   ],
   "basePdf": {
     "width": 210,

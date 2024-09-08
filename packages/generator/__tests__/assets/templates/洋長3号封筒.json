@@ -12,8 +12,8 @@
   "id": "洋長3号封筒",
   "fontName": "SauceHanSansJP",
   "schemas": [
-    {
-      "[お届け先]郵便番号": {
+    [
+      {
         "position": {
           "x": 24,
           "y": 11.07
@@ -25,9 +25,10 @@
         "type": "text",
         "height": 8.93,
         "lineHeight": 1,
-        "content": "1234567"
+        "content": "1234567",
+        "name": "[お届け先]郵便番号"
       },
-      "[お届け先]住所": {
+      {
         "position": {
           "x": 18,
           "y": 20
@@ -39,9 +40,10 @@
         "type": "text",
         "height": 12.91,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3 東京マンション123号"
+        "content": "東京都東京1-2-3 東京マンション123号",
+        "name": "[お届け先]住所"
       },
-      "[お届け先]自由": {
+      {
         "position": {
           "x": 18,
           "y": 33.5
@@ -53,9 +55,10 @@
         "type": "text",
         "height": 10,
         "lineHeight": 1,
-        "content": "株式会社labelmake.jp ラベル印刷部"
+        "content": "株式会社labelmake.jp ラベル印刷部",
+        "name": "[お届け先]自由"
       },
-      "[お届け先]氏名": {
+      {
         "position": {
           "x": 17.5,
           "y": 44
@@ -67,9 +70,10 @@
         "type": "text",
         "height": 10,
         "lineHeight": 1,
-        "content": "東京都 出得太 様"
+        "content": "東京都 出得太 様",
+        "name": "[お届け先]氏名"
       },
-      "[差出人]社名": {
+      {
         "position": {
           "x": 18,
           "y": 85.5
@@ -81,9 +85,10 @@
         "type": "text",
         "height": 6.82,
         "lineHeight": 1,
-        "content": "株式会社labelmake.jp"
+        "content": "株式会社labelmake.jp",
+        "name": "[差出人]社名"
       },
-      "[差出人]郵便番号": {
+      {
         "position": {
           "x": 21.3,
           "y": 93
@@ -95,9 +100,10 @@
         "type": "text",
         "height": 4.44,
         "lineHeight": 1,
-        "content": "7654321"
+        "content": "7654321",
+        "name": "[差出人]郵便番号"
       },
-      "[差出人]住所": {
+      {
         "position": {
           "x": 18,
           "y": 97.3
@@ -109,9 +115,10 @@
         "type": "text",
         "height": 4.44,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4 大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4 大阪マンション123号",
+        "name": "[差出人]住所"
       },
-      "[差出人]自由1": {
+      {
         "position": {
           "x": 18,
           "y": 102
@@ -123,9 +130,10 @@
         "type": "text",
         "height": 4.97,
         "lineHeight": 1,
-        "content": "TEL : 000-000-0000 / FAX : 000-000-0000"
+        "content": "TEL : 000-000-0000 / FAX : 000-000-0000",
+        "name": "[差出人]自由1"
       },
-      "[差出人]自由2": {
+      {
         "position": {
           "x": 18,
           "y": 106.5
@@ -137,9 +145,10 @@
         "type": "text",
         "height": 4.97,
         "lineHeight": 1,
-        "content": "Email : info@labelmake.jp"
+        "content": "Email : info@labelmake.jp",
+        "name": "[差出人]自由2"
       },
-      "[差出人]自由3": {
+      {
         "position": {
           "x": 18,
           "y": 111
@@ -151,8 +160,9 @@
         "type": "text",
         "height": 8.41,
         "lineHeight": 1,
-        "content": "HP : https://labelmake.jp"
+        "content": "HP : https://labelmake.jp",
+        "name": "[差出人]自由3"
       }
-    }
+    ]
   ]
 }
