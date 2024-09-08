@@ -31,9 +31,9 @@ export const validateVariables = (key: string, value: string, schema: MultiVaria
 
   let values;
   try {
-    values = JSON.parse(value);
+    values = value ? JSON.parse(value) : {};
   } catch (e) {
-    throw new SyntaxError(`[@pdfme/generator] invalid JSON string for variables in field ${key}`);
+    throw new SyntaxError(`[@pdfme/generator] invalid JSON string '${value}' for variables in field ${key}`);
   }
 
   for (const variable of schema.variables) {
