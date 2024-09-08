@@ -496,7 +496,7 @@ export const getDynamicTemplate = async (
             s.schema.showHead = showHead;
             s.schema.__bodyRange = {
               start: start + (showHead ? 0 : -1),
-              end: start + sameKeySchemas.length + (showHead ? -1 : 1),
+              end: start + sameKeySchemas.length - 1,
             };
 
             newSchemas[pageIndex][key] = Object.assign(s.schema, {
