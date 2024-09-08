@@ -230,6 +230,7 @@ interface ModifyTemplateForDynamicTableArg {
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
+  // TODO これを削除する
   modifyTemplate: (arg: {
     template: Template;
     input: Record<string, string>;
@@ -352,14 +353,15 @@ function generateDebugHTML(pages: Node[]) {
   return html;
 }
 
-async function createOnePage(
-  basePdf: BlankPdf,
-  schemaObj: Record<string, Schema>,
-  input: Record<string, string>,
-  options: CommonOptions,
-  _cache: Map<any, any>,
-  getDynamicHeights: ModifyTemplateForDynamicTableArg['getDynamicHeights']
-): Promise<Node> {
+async function createOnePage(arg: {
+  basePdf: BlankPdf;
+  schemaObj: Record<string, Schema>;
+  input: Record<string, string>;
+  options: CommonOptions;
+  _cache: Map<any, any>;
+  getDynamicHeights: ModifyTemplateForDynamicTableArg['getDynamicHeights'];
+}): Promise<Node> {
+  const { basePdf, schemaObj, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
 
   const schemaEntries = Object.entries(schemaObj);
@@ -434,40 +436,13 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
   return pages;
 }
 
-export const getDynamicTemplate = async (
-  arg: ModifyTemplateForDynamicTableArg
-): Promise<Template> => {
-  const { template, modifyTemplate, getDynamicHeights, input, options, _cache } = arg;
-  if (!isBlankPdf(template.basePdf)) {
-    return template;
-  }
-
-  // ---------------------------------------------
-
-  const basePdf = template.basePdf as BlankPdf;
-  const pages: Node[] = [];
-
-  for (const schemaObj of template.schemas) {
-    const longPage = await createOnePage(
-      basePdf,
-      schemaObj,
-      input,
-      options,
-      _cache,
-      getDynamicHeights
-    );
-    const brokenPages = breakIntoPages(longPage, basePdf);
-    pages.push(...brokenPages);
-    // pages.push(longPage);
-  }
-
-  document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
-
+function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
   const newTemplate: Template = {
     schemas: Array.from({ length: pages.length }, () => ({} as Record<string, Schema>)),
-    basePdf: template.basePdf,
+    basePdf: basePdf,
   };
   const newSchemas = newTemplate.schemas;
+
   cloneDeep(pages).forEach((page, pageIndex) => {
     page.children.forEach((child) => {
       const { key, schema } = child;
@@ -481,33 +456,77 @@ export const getDynamicTemplate = async (
       const start = prevPageSameKeySchemas.length;
       const showHead = start === 0;
 
-      if (sameKeySchemas.length === 1) {
-        schema.__bodyRange = { start: start - 1, end: start };
-        schema.showHead = showHead;
-        newSchemas[pageIndex][key] = Object.assign(schema, {
-          position: { ...child.position },
-          height: child.height,
-        });
-      } else if (sameKeySchemas.length > 1) {
-        const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
-        sameKeySchemas.forEach((s, i) => {
-          if (!s.schema) throw new Error('schema is undefined');
-          if (i === 0) {
-            s.schema.showHead = showHead;
-            s.schema.__bodyRange = {
-              start: start + (showHead ? 0 : -1),
-              end: start + sameKeySchemas.length - 1,
-            };
+      const commonArgs = { key, pageIndex, newSchemas, start, showHead };
 
-            newSchemas[pageIndex][key] = Object.assign(s.schema, {
-              position: { ...s.position },
-              height,
-            });
-          }
-        });
+      if (sameKeySchemas.length === 1) {
+        addSingleSchemaToPage({ ...commonArgs, schema, child });
+      } else if (sameKeySchemas.length > 1) {
+        addMultipleSchemasToPage({ ...commonArgs, sameKeySchemas });
       }
     });
   });
-  console.log('newTemplate', newTemplate);
+
   return newTemplate;
+}
+
+type CommonAddSchemaArgs = {
+  key: string;
+  pageIndex: number;
+  newSchemas: Record<string, Schema>[];
+  start: number;
+  showHead: boolean;
+};
+
+function addSingleSchemaToPage(arg: CommonAddSchemaArgs & { schema: Schema; child: Node }) {
+  const { schema, child, start, showHead, key, pageIndex, newSchemas } = arg;
+  schema.__bodyRange = { start: start - 1, end: start };
+  schema.showHead = showHead;
+  const { position, height } = child;
+  newSchemas[pageIndex][key] = Object.assign(schema, { position, height });
+}
+
+function addMultipleSchemasToPage(arg: CommonAddSchemaArgs & { sameKeySchemas: Node[] }) {
+  const { sameKeySchemas, start, showHead, key, pageIndex, newSchemas } = arg;
+  const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
+  sameKeySchemas.forEach((s, i) => {
+    if (!s.schema || i !== 0) return;
+    const { position, schema } = s;
+    schema.showHead = showHead;
+    schema.__bodyRange = {
+      start: start + (showHead ? 0 : -1),
+      end: start + sameKeySchemas.length - 1,
+    };
+    newSchemas[pageIndex][key] = Object.assign(schema, { position: position, height });
+  });
+}
+
+export const getDynamicTemplate = async (
+  arg: ModifyTemplateForDynamicTableArg
+): Promise<Template> => {
+  const { template, getDynamicHeights, input, options, _cache } = arg;
+  if (!isBlankPdf(template.basePdf)) {
+    return template;
+  }
+
+  // ---------------------------------------------
+
+  const basePdf = template.basePdf as BlankPdf;
+  const pages: Node[] = [];
+
+  for (const schemaObj of template.schemas) {
+    const longPage = await createOnePage({
+      basePdf,
+      schemaObj,
+      input,
+      options,
+      _cache,
+      getDynamicHeights,
+    });
+    const brokenPages = breakIntoPages(longPage, basePdf);
+    pages.push(...brokenPages);
+  }
+
+  document.getElementById('debug')!.innerHTML = generateDebugHTML(pages);
+
+  return createNewTemplate(pages, template.basePdf);
 };
