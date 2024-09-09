@@ -1,7 +1,7 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas';
 import { insertPage, preprocessing, postProcessing, getEmbedPdfPages, validateRequiredFields } from './helper.js';
 
 const generate = async (props: GenerateProps) => {
@@ -27,12 +27,9 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
-      modifyTemplate: (arg) => {
-        return modifyTemplateForTable(arg);
-      },
-      getDynamicHeight: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
-        return getDynamicHeightForTable(value, args);
+      getDynamicHeights: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
+        return getDynamicHeightsForTable(value, args);
       },
     });
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({

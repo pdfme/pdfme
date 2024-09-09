@@ -15,7 +15,6 @@ import type {
   StylesProps,
   Section,
 } from './types';
-import { cloneDeep } from '../utils';
 import { Cell, Column, Row, Table } from './classes';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
@@ -281,42 +280,4 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const content = parseContent4Table(input, fallbackFontName);
 
   return Table.create({ input, content, font, _cache });
-}
-
-export async function createMultiTables(body: string[][], args: CreateTableArgs): Promise<Table[]> {
-  const { basePdf, schema } = args;
-
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
-  const pageHeight = basePdf.height;
-  const paddingBottom = basePdf.padding[2];
-  const paddingTop = basePdf.padding[0];
-  let availableHeight = pageHeight - paddingBottom - schema.position.y;
-
-  const testTable = await createSingleTable(body, args);
-  let remainingBody = testTable.body;
-  const tables: Table[] = [];
-
-  while (remainingBody.length > 0) {
-    const tableHeight =
-      tables.length === 0
-        ? availableHeight - testTable.getHeadHeight()
-        : availableHeight - paddingTop;
-
-    const table = await createTableWithAvailableHeight(remainingBody, tableHeight, args);
-
-    tables.push(table);
-
-    remainingBody = remainingBody.slice(table.body.length);
-
-    if (remainingBody.length > 0) {
-      const _schema = cloneDeep(schema);
-      _schema.showHead = false;
-      _schema.position.y = paddingTop;
-      args.schema = _schema;
-
-      availableHeight = pageHeight - paddingTop - paddingBottom;
-    }
-  }
-
-  return tables;
 }
