@@ -121,9 +121,8 @@ The following image is a good illustration of a template.
 **basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`.  
 A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it works.
 
-**schemas** can only utilize text by default, but you can load images and various barcodes like QR codes as plugins from the `@pdfme/schemas` package.  
-Additionally, you can create your own schemas, allowing you to render types other than the ones mentioned above.  
-Check detail about [Custom Schemas](https://pdfme.com/docs/custom-schemas) from here
+**Schemas** can only utilize text by default, but you can load images and various barcodes like QR codes as plugins from the `@pdfme/schemas` package.  
+Additionally, you can create your own schemas, allowing you to render types other than the ones mentioned above. Check detail about [Custom Schemas](https://pdfme.com/docs/custom-schemas) from here.
 
 Let's take a look at some specific data.  
 (If you are using TypeScript, you can import the Template type.)
@@ -136,26 +135,29 @@ import { Template, BLANK_PDF } from '@pdfme/common';
 const template: Template = {
   basePdf: BLANK_PDF,
   schemas: [
-    {
-      a: {
+    [
+      {
+        name: 'a',
         type: 'text',
         position: { x: 0, y: 0 },
         width: 10,
         height: 10,
       },
-      b: {
+      {
+        name: 'a',
         type: 'text',
         position: { x: 10, y: 10 },
         width: 10,
         height: 10,
       },
-      c: {
+      {
+        name: 'c',
         type: 'text',
         position: { x: 20, y: 20 },
         width: 10,
         height: 10,
       },
-    },
+    ],
   ],
 };
 ```
@@ -288,6 +290,67 @@ const viewer = new Viewer({ domContainer, template, inputs });
 ```
 
 ![](https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/viewer.png)
+
+### Using additional schemas and custom plugins
+
+The examples so far use only the `text` schema type. There are many others built-in within the `@pdfme/schemas` package, and you can use your own:
+
+Here's an example using additional schemas from built-in and custom plugins:
+
+```ts
+import { Template, BLANK_PDF } from '@pdfme/common';
+import { text, barcodes, image } from '@pdfme/schemas';
+import myPlugin from './custom-plugins';
+
+const template: Template = {
+  basePdf: BLANK_PDF,
+  schemas: [
+    [
+      {
+        name: 'example_text',
+        type: 'text',
+        position: { x: 0, y: 0 },
+        width: 40,
+        height: 10,
+      },
+      {
+        name: 'example_image',
+        type: 'image',
+        position: { x: 200, y: 200 },
+        width: 60,
+        height: 40,
+      },
+      {
+        name: 'example_qr_code',
+        type: 'qrcode',
+        position: { x: 100, y: 100 },
+        width: 50,
+        height: 50,
+      },
+    ],
+  ],
+};
+
+const plugins = {
+  Text: multiVariableText,
+  'QR Code': barcodes.qrcode,
+  Image: image,
+  MyPlugin: myPlugin
+}
+
+const inputs = [{ 
+  example_text: 'a1', 
+  example_image: 'data:image/png;base64,iVBORw0KG....', 
+  example_qr_code: 'https://pdfme.com/' 
+}];
+
+generate({ template, inputs, plugins }).then((pdf) => {
+    console.log(pdf);
+});
+
+```
+
+
 
 ## Examples using pdfme
 

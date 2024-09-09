@@ -42,6 +42,9 @@ As we aim for the release of the next version, given our limited resources, we a
 
   - [Developing pdfme V4](/blog/developing-pdfme-v4).
 
+- ### [V5 WIP]
+  - **BC BREAK**: Schema structure changed from keyed object to nested array structure to ensure ordering is guaranteed in JSON.  
+
 ## Need technical support?
 
 If you need technical support, please contact the author via [LinkedIn](https://www.linkedin.com/in/hand-dot/).
