@@ -1,7 +1,7 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { modifyTemplateForTable, getDynamicHeightsForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas';
 import {
   insertPage,
   preprocessing,
@@ -35,9 +35,6 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
-      modifyTemplate: (arg) => {
-        return modifyTemplateForTable(arg);
-      },
       getDynamicHeights: (value, args) => {
         if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
         return getDynamicHeightsForTable(value, args);

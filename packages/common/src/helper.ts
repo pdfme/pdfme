@@ -230,13 +230,6 @@ interface ModifyTemplateForDynamicTableArg {
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
-  // TODO これを削除する
-  modifyTemplate: (arg: {
-    template: Template;
-    input: Record<string, string>;
-    _cache: Map<any, any>;
-    options: CommonOptions;
-  }) => Promise<Template>;
   getDynamicHeights: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
@@ -353,14 +346,12 @@ function generateDebugHTML(pages: Node[]) {
   return html;
 }
 
-async function createOnePage(arg: {
-  basePdf: BlankPdf;
-  schemaObj: Record<string, Schema>;
-  input: Record<string, string>;
-  options: CommonOptions;
-  _cache: Map<any, any>;
-  getDynamicHeights: ModifyTemplateForDynamicTableArg['getDynamicHeights'];
-}): Promise<Node> {
+async function createOnePage(
+  arg: {
+    basePdf: BlankPdf;
+    schemaObj: Record<string, Schema>;
+  } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
+): Promise<Node> {
   const { basePdf, schemaObj, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
 
@@ -503,25 +494,16 @@ function addMultipleSchemasToPage(arg: CommonAddSchemaArgs & { sameKeySchemas: N
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  const { template, getDynamicHeights, input, options, _cache } = arg;
+  const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
-
-  // ---------------------------------------------
 
   const basePdf = template.basePdf as BlankPdf;
   const pages: Node[] = [];
 
   for (const schemaObj of template.schemas) {
-    const longPage = await createOnePage({
-      basePdf,
-      schemaObj,
-      input,
-      options,
-      _cache,
-      getDynamicHeights,
-    });
+    const longPage = await createOnePage({ basePdf, schemaObj, ...arg });
     const brokenPages = breakIntoPages(longPage, basePdf);
     pages.push(...brokenPages);
   }
