@@ -1,8 +1,14 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
 import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
-import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
-import { insertPage, preprocessing, postProcessing, getEmbedPdfPages, validateRequiredFields } from './helper.js';
+import { getDynamicHeightsForTable } from '@pdfme/schemas';
+import {
+  insertPage,
+  preprocessing,
+  postProcessing,
+  getEmbedPdfPages,
+  validateRequiredFields,
+} from './helper.js';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -10,7 +16,9 @@ const generate = async (props: GenerateProps) => {
   const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
-    throw new Error('[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array');
+    throw new Error(
+      '[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array'
+    );
   }
 
   validateRequiredFields(template, inputs);
@@ -27,19 +35,18 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
-      modifyTemplate: (arg) => {
-        return modifyTemplateForTable(arg);
-      },
-      getDynamicHeight: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
-        return getDynamicHeightForTable(value, args);
+      getDynamicHeights: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
+        return getDynamicHeightsForTable(value, args);
       },
     });
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
       template: dynamicTemplate,
       pdfDoc,
     });
-    const keys = dynamicTemplate.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+    const keys = [
+      ...new Set(dynamicTemplate.schemas.flatMap((schemaObj) => Object.keys(schemaObj))),
+    ];
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];

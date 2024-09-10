@@ -19,6 +19,8 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
+export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
 export const getFallbackFontName = (font: Font) => {
@@ -228,112 +230,267 @@ interface ModifyTemplateForDynamicTableArg {
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
-  modifyTemplate: (arg: {
-    template: Template;
-    input: Record<string, string>;
-    _cache: Map<any, any>;
-    options: CommonOptions;
-  }) => Promise<Template>;
-  getDynamicHeight: (
+  getDynamicHeights: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
-  ) => Promise<number>;
+  ) => Promise<number[]>;
+}
+
+class Node {
+  index = 0;
+
+  key?: string;
+  schema?: Schema;
+
+  children: Node[] = [];
+
+  width = 0;
+  height = 0;
+  padding: [number, number, number, number] = [0, 0, 0, 0];
+  position: { x: number; y: number } = { x: 0, y: 0 };
+
+  constructor({ width = 0, height = 0 } = {}) {
+    this.width = width;
+    this.height = height;
+  }
+
+  setIndex(index: number): void {
+    this.index = index;
+  }
+
+  setKeyAndSchema(key: string, schema: Schema): void {
+    this.key = key;
+    this.schema = schema;
+  }
+
+  setWidth(width: number): void {
+    this.width = width;
+  }
+
+  setHeight(height: number): void {
+    this.height = height;
+  }
+
+  setPadding(padding: [number, number, number, number]): void {
+    this.padding = padding;
+  }
+
+  setPosition(position: { x: number; y: number }): void {
+    this.position = position;
+  }
+
+  insertChild(child: Node): void {
+    const index = this.getChildCount();
+    child.setIndex(index);
+    this.children.splice(index, 0, child);
+  }
+
+  getChildCount(): number {
+    return this.children.length;
+  }
+
+  getChild(index: number): Node {
+    return this.children[index];
+  }
+}
+
+function createPage(basePdf: BlankPdf) {
+  const page = new Node({ ...basePdf });
+  page.setPadding(basePdf.padding);
+  return page;
+}
+
+function createNode(arg: {
+  key: string;
+  schema: Schema;
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+}) {
+  const { position, width, height, key, schema } = arg;
+  const node = new Node({ width, height });
+  node.setPosition(position);
+  node.setKeyAndSchema(key, schema);
+  return node;
+}
+
+function resortChildren(page: Node, orderMap: Map<string, number>): void {
+  page.children = page.children
+    .sort((a, b) => {
+      const orderA = orderMap.get(a.key!);
+      const orderB = orderMap.get(b.key!);
+      if (orderA === undefined || orderB === undefined) {
+        throw new Error('[@pdfme/common] order is not defined');
+      }
+      return orderA - orderB;
+    })
+    .map((child, index) => {
+      child.setIndex(index);
+      return child;
+    });
+}
+
+async function createOnePage(
+  arg: {
+    basePdf: BlankPdf;
+    schemaObj: Record<string, Schema>;
+    orderMap: Map<string, number>;
+  } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
+): Promise<Node> {
+  const { basePdf, schemaObj, orderMap, input, options, _cache, getDynamicHeights } = arg;
+  const page = createPage(basePdf);
+
+  const schemaPositions: number[] = [];
+  const sortedSchemaEntries = Object.entries(schemaObj).sort(
+    (a, b) => a[1].position.y - b[1].position.y
+  );
+  const diffMap = new Map();
+  for (const [key, schema] of sortedSchemaEntries) {
+    const { position, width } = schema;
+
+    const opt = { schema, basePdf, options, _cache };
+    const heights = await getDynamicHeights(input?.[key] || '', opt);
+
+    const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
+    const originalHeight = schema.height;
+    if (heightsSum !== originalHeight) {
+      diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
+    }
+    heights.forEach((height, index) => {
+      let y = schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
+      for (const [diffY, diff] of diffMap.entries()) {
+        if (diffY <= schema.position.y) {
+          y += diff;
+        }
+      }
+      const node = createNode({ key, schema, position: { ...position, y }, width, height });
+
+      schemaPositions.push(y + height + basePdf.padding[2]);
+      page.insertChild(node);
+    });
+  }
+
+  const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
+  page.setHeight(pageHeight);
+
+  resortChildren(page, orderMap);
+
+  return page;
+}
+
+function breakIntoPages(arg: {
+  longPage: Node;
+  orderMap: Map<string, number>;
+  basePdf: BlankPdf;
+}): Node[] {
+  const { longPage, orderMap, basePdf } = arg;
+  const pages: Node[] = [createPage(basePdf)];
+  const [paddingTop, , paddingBottom] = basePdf.padding;
+  const yAdjustments: { page: number; value: number }[] = [];
+
+  const getPageHeight = (pageIndex: number) =>
+    basePdf.height - paddingBottom - (pageIndex > 0 ? paddingTop : 0);
+
+  const calculateNewY = (y: number, pageIndex: number) => {
+    const newY = y - pageIndex * (basePdf.height - paddingTop - paddingBottom);
+
+    while (pages.length <= pageIndex) {
+      if (!pages[pageIndex]) {
+        pages.push(createPage(basePdf));
+        yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
+      }
+    }
+    return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
+  };
+
+  const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
+  for (let i = 0; i < children.length; i++) {
+    const { key, schema, position, height, width } = children[i];
+    const { y, x } = position;
+
+    let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
+    let newY = calculateNewY(y, targetPageIndex);
+
+    if (newY + height > basePdf.height - paddingBottom) {
+      targetPageIndex++;
+      newY = calculateNewY(y, targetPageIndex);
+    }
+
+    if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
+
+    const clonedElement = createNode({ key, schema, position: { x, y: newY }, width, height });
+    pages[targetPageIndex].insertChild(clonedElement);
+  }
+
+  pages.forEach((page) => resortChildren(page, orderMap));
+
+  return pages;
+}
+
+function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
+  const newTemplate: Template = {
+    schemas: Array.from({ length: pages.length }, () => ({} as Record<string, Schema>)),
+    basePdf: basePdf,
+  };
+
+  const keyToSchemas = new Map<string, Node[]>();
+
+  cloneDeep(pages).forEach((page, pageIndex) => {
+    page.children.forEach((child) => {
+      const { key, schema } = child;
+      if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
+
+      if (!keyToSchemas.has(key)) {
+        keyToSchemas.set(key, []);
+      }
+      keyToSchemas.get(key)!.push(child);
+
+      const sameKeySchemas = page.children.filter((c) => c.key === key);
+      const start = keyToSchemas.get(key)!.length - sameKeySchemas.length;
+
+      if (sameKeySchemas.length > 0) {
+        if (!sameKeySchemas[0].schema) {
+          throw new Error('[@pdfme/common] schema is undefined');
+        }
+
+        // Use the first schema to get the schema and position
+        const schema = sameKeySchemas[0].schema;
+        const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
+        const position = sameKeySchemas[0].position;
+
+        // Currently, __bodyRange exists for table schemas, but if we make it more abstract, 
+        // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
+        schema.__bodyRange = {
+          start: Math.max(start - 1, 0),
+          end: start + sameKeySchemas.length - 1,
+        };
+
+        newTemplate.schemas[pageIndex][key] = Object.assign({}, schema, { position, height });
+      }
+    });
+  });
+
+  return newTemplate;
 }
 
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  const { template, modifyTemplate } = arg;
+  const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
 
-  const modifiedTemplate = await modifyTemplate(arg);
+  const basePdf = template.basePdf as BlankPdf;
+  const pages: Node[] = [];
 
-  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
-
-  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
-};
-
-export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
-  const { template, input, _cache, options, getDynamicHeight } = arg;
-  const basePdf = template.basePdf;
-  const tmpDiffMap = new Map<number, number>();
-  if (!isBlankPdf(basePdf)) {
-    return tmpDiffMap;
-  }
-  const pageHeight = basePdf.height;
-  let pageIndex = 0;
   for (const schemaObj of template.schemas) {
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeight = await getDynamicHeight(input?.[key] || '', {
-        schema,
-        basePdf,
-        options,
-        _cache,
-      });
-      if (schema.height !== dynamicHeight) {
-        tmpDiffMap.set(
-          schema.position.y + schema.height + pageHeight * pageIndex,
-          dynamicHeight - schema.height
-        );
-      }
-    }
-    pageIndex++;
+    const orderMap = new Map(Object.keys(schemaObj).map((key, index) => [key, index]));
+
+    const longPage = await createOnePage({ basePdf, schemaObj, orderMap, ...arg });
+    const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
+    pages.push(...brokenPages);
   }
 
-  const diffMap = new Map<number, number>();
-  const keys = Array.from(tmpDiffMap.keys()).sort((a, b) => a - b);
-  let additionalHeight = 0;
-
-  for (const key of keys) {
-    const value = tmpDiffMap.get(key) as number;
-    const newValue = value + additionalHeight;
-    diffMap.set(key + additionalHeight, newValue);
-    additionalHeight += newValue;
-  }
-
-  return diffMap;
-};
-
-export const normalizePositionsAndPageBreak = (
-  template: Template,
-  diffMap: Map<number, number>
-): Template => {
-  if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
-    return template;
-  }
-
-  const returnTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
-  const pages = returnTemplate.schemas;
-  const pageHeight = template.basePdf.height;
-  const paddingTop = template.basePdf.padding[0];
-  const paddingBottom = template.basePdf.padding[2];
-
-  for (let i = 0; i < template.schemas.length; i += 1) {
-    const schemaObj = template.schemas[i];
-    if (!pages[i]) pages[i] = {};
-
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const { position, height } = schema;
-      let newY = position.y;
-      let pageCursor = i;
-
-      for (const [diffKey, diffValue] of diffMap) {
-        if (newY > diffKey) {
-          newY += diffValue;
-        }
-      }
-
-      while (newY + height >= pageHeight - paddingBottom) {
-        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop;
-        pageCursor++;
-      }
-
-      if (!pages[pageCursor]) pages[pageCursor] = {};
-      pages[pageCursor][key] = { ...schema, position: { ...position, y: newY } };
-    }
-  }
-
-  return returnTemplate;
+  return createNewTemplate(pages, template.basePdf);
 };

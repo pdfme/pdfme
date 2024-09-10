@@ -7,10 +7,16 @@ import {
   checkFont,
   checkPlugins,
   isHexValid,
-  calculateDiffMap,
-  normalizePositionsAndPageBreak,
+  getDynamicTemplate,
 } from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, Schema, CommonOptions } from '../src';
+import {
+  PT_TO_PX_RATIO,
+  BLANK_PDF,
+  Template,
+  Font,
+  Plugins,
+  Schema,
+} from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -350,232 +356,183 @@ describe('checkPlugins test', () => {
   });
 });
 
-describe.skip('getDynamicTemplate test', () => {
+describe('getDynamicTemplate', () => {
+  const height = 10;
+  const aPositionY = 10;
+  const bPositionY = 30;
+  const padding = 10;
+  const template: Template = {
+    schemas: [
+      {
+        a: {
+          content: 'a',
+          type: 'a',
+          position: { x: 10, y: aPositionY },
+          width: 10,
+          height,
+        },
+        b: {
+          content: 'b',
+          type: 'b',
+          position: { x: 10, y: bPositionY },
+          width: 10,
+          height,
+        },
+      },
+    ],
+    basePdf: { width: 100, height: 100, padding: [padding, padding, padding, padding] },
+  };
+
+  const input = { a: 'a', b: 'b' };
   const options = { font: getSampleFont() };
   const _cache = new Map();
-  const input = {};
-  const modifyTemplate = async (arg: {
-    template: Template;
-    input: Record<string, string>;
-    _cache: Map<any, any>;
-    options: CommonOptions;
-  }) => Promise.resolve(arg.template);
-  const getDynamicHeight = (_: string, args: { schema: Schema }) => {
-    const { schema } = args;
-    if (schema.type === 'test') return Promise.resolve(schema.height + 100);
-    return Promise.resolve(schema.height);
-  };
-  const generateTemplateConfig = (template: Template) => ({
-    template,
-    input,
-    _cache,
-    options,
-    modifyTemplate,
-    getDynamicHeight,
+  const getDynamicTemplateArg = { template, input, options, _cache };
+
+  const createGetDynamicTemplateArg = (increaseHeights: number[], bHeight?: number) => ({
+    ...getDynamicTemplateArg,
+    getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+      if (args.schema.type === 'a') {
+        return Promise.resolve(increaseHeights);
+      }
+      return Promise.resolve([bHeight || args.schema.height]);
+    },
   });
 
-  const getTemplateForDynamicTemplate = () => {
-    const template = getTemplate();
-    template.basePdf = { width: 210, height: 297, padding: [10, 10, 10, 10] };
-    const schema = template.schemas[0];
-    const schemaA = schema.a;
-    schemaA.position = { x: 0, y: 50 };
-    schemaA.height = 10;
-    const schemaB = schema.b;
-    schemaB.position = { x: 0, y: 75 };
-    schemaB.height = 10;
-    return template;
-  };
-
-  const getSingleDynamicTemplate = () => {
-    const template = getTemplateForDynamicTemplate();
-    const schema = template.schemas[0];
-    schema.test = { type: 'test', position: { x: 0, y: 10 }, width: 100, height: 10 };
-    return template;
-  };
-
-  const getMultiDynamicTemplate = () => {
-    const template = getTemplateForDynamicTemplate();
-    const schema = template.schemas[0];
-    schema.test = { type: 'test', position: { x: 0, y: 10 }, width: 100, height: 10 };
-    schema.test2 = { type: 'test', position: { x: 0, y: 20 }, width: 100, height: 10 };
-    return template;
-  };
-
-  describe('calculateDiffMap test', () => {
-    test('single dynamic schema', async () => {
-      const template = getSingleDynamicTemplate();
-      const tableConfig = generateTemplateConfig(template);
-
-      const diffMap = await calculateDiffMap(tableConfig);
-      expect(diffMap).toEqual(new Map([[20, 100]]));
+  const verifyBasicStructure = (dynamicTemplate: Template) => {
+    expect(dynamicTemplate.schemas).toBeDefined();
+    expect(Array.isArray(dynamicTemplate.schemas)).toBe(true);
+    expect(dynamicTemplate.basePdf).toEqual({
+      width: 100,
+      height: 100,
+      padding: [padding, padding, padding, padding],
     });
+  };
 
-    test('multi dynamic schemas', async () => {
-      const template = getMultiDynamicTemplate();
-      const tableConfig = generateTemplateConfig(template);
+  describe('Single page scenarios', () => {
+    test('should handle no page break', async () => {
+      const increaseHeights = [10, 10, 10, 10, 10];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
 
-      const diffMap = await calculateDiffMap(tableConfig);
-      expect(diffMap).toEqual(
-        new Map([
-          [20, 100],
-          [130, 200],
-        ])
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0].b.position.y).toEqual(
+        increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY
       );
     });
   });
 
-  // TODO Re-verify if the correct tests are written and revise the implementation of normalizePositionsAndPageBreak to pass the tests
-  describe('normalizePositionsAndPageBreak test', () => {
-    test('single dynamic schema', () => {
-      const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([[60, 100]]);
-      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-      expect(newTemplate).toEqual({
-        basePdf: template.basePdf,
-        schemas: [
-          {
-            a: {
-              content: 'a',
-              type: 'text',
-              fontName: 'SauceHanSansJP',
-              // y: 50->50
-              position: { x: 0, y: 50 },
-              width: 100,
-              height: 10,
-            },
-            b: {
-              content: 'b',
-              type: 'text',
-              // y: 75->175
-              position: { x: 0, y: 175 },
-              width: 100,
-              height: 10,
-            },
-          },
-        ],
-      });
+  describe('Multiple page scenarios', () => {
+    test('should handle page break with a on page 1 and b on page 2', async () => {
+      const increaseHeights = [20, 20, 20, 20];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
+      expect(dynamicTemplate.schemas[1].b.position.y).toEqual(padding);
     });
 
-    test('single dynamic schema (page break)', () => {
-      const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([[60, 300]]);
-      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-      expect(newTemplate).toEqual({
-        basePdf: template.basePdf,
-        schemas: [
-          {
-            a: {
-              content: 'a',
-              type: 'text',
-              fontName: 'SauceHanSansJP',
-              // y: 50->50
-              position: { x: 0, y: 50 },
-              width: 100,
-              height: 10,
-            },
-          },
-          {
-            b: {
-              content: 'b',
-              type: 'text',
-              // schema y: 75 + 300
-              // page: 297 - (10 + 10)
-              // (75 + 300) - (297 - (10 + 10)) = 98
-              // y: 75->98
-              position: { x: 0, y: 98 },
-              width: 100,
-              height: 10,
-            },
-          },
-        ],
-      });
+    test('should handle page break with a on page 1 and 2, b on page 2', async () => {
+      const increaseHeights = [20, 20, 20, 20, 20];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
+      expect(dynamicTemplate.schemas[1].a.position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1].b.position.y).toEqual(
+        increaseHeights.slice(3).reduce((a, b) => a + b, 0) - height + padding
+      );
     });
 
-    test('multi dynamic schemas', () => {
-      const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([
-        [45, 10],
-        [65, 30],
-      ]);
-      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-      expect(newTemplate).toEqual({
-        basePdf: template.basePdf,
-        schemas: [
-          {
-            a: {
-              content: 'a',
-              type: 'text',
-              fontName: 'SauceHanSansJP',
-              // y: 50->60
-              position: { x: 0, y: 60 },
-              width: 100,
-              height: 10,
-            },
-            b: {
-              content: 'b',
-              type: 'text',
-              // y: 75->105
-              position: { x: 0, y: 105 },
-              width: 100,
-              height: 10,
-            },
-          },
-        ],
-      });
+    test('should handle multiple page breaks', async () => {
+      const increaseHeights = [50, 50, 50, 50, 50];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(5);
+
+      // Verify 'a' elements
+      for (let i = 0; i < 4; i++) {
+        expect(dynamicTemplate.schemas[i].a).toBeDefined();
+        expect(dynamicTemplate.schemas[i].a.position.y).toEqual(i === 0 ? aPositionY : padding);
+        expect(dynamicTemplate.schemas[i].a.height).toEqual(i === 3 ? 100 : 50);
+        expect(dynamicTemplate.schemas[i].b).toBeUndefined();
+      }
+
+      // Verify 'b' element
+      expect(dynamicTemplate.schemas[4].b).toBeDefined();
+      expect(dynamicTemplate.schemas[4].b.position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[4].b.height).toEqual(10);
     });
 
-    test('multi dynamic schemas (page break)', () => {
-      const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([
-        [45, 100],
-        [65, 300],
-      ]);
-      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-      expect(newTemplate).toEqual({
-        basePdf: template.basePdf,
-        schemas: [
-          {
-            a: {
-              content: 'a',
-              type: 'text',
-              fontName: 'SauceHanSansJP',
-              // y: 50->150
-              position: { x: 0, y: 150 },
-              width: 100,
-              height: 10,
-            },
-          },
-          {
-            b: {
-              content: 'b',
-              type: 'text',
-              // schema y: 75 + 300
-              // page: 297 - (10 + 10)
-              // (75 + 300) - (297 - (10 + 10)) = 98
-              // y: 75->98
-              position: { x: 0, y: 98 },
-              width: 100,
-              height: 10,
-            },
-          },
-        ],
-      });
+    test('should handle both a and b on next page', async () => {
+      const increaseHeights = [80, 10, 10];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+
+      // Check first page
+      expect(dynamicTemplate.schemas[0].a).toBeDefined();
+      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0].a.height).toEqual(80);
+      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
+
+      // Check second page
+      expect(dynamicTemplate.schemas[1].a).toBeDefined();
+      expect(dynamicTemplate.schemas[1].a.position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1].a.height).toEqual(20);
+
+      expect(dynamicTemplate.schemas[1].b).toBeDefined();
+      expect(dynamicTemplate.schemas[1].b.position.y).toBeGreaterThanOrEqual(
+        dynamicTemplate.schemas[1].a.position.y + dynamicTemplate.schemas[1].a.height
+      );
+    });
+  });
+
+  describe('Element height modifications', () => {
+    test('should handle increased height for b', async () => {
+      const increaseHeights = [10, 10, 10, 10, 10];
+      const bHeight = 30;
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights, bHeight));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+
+      // Check 'a' element
+      expect(dynamicTemplate.schemas[0].a).toBeDefined();
+      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0].a.height).toEqual(50);
+
+      // Check 'b' element
+      const bSchema = dynamicTemplate.schemas.find((schema) => schema.b)!;
+      expect(bSchema).toBeDefined();
+      expect(bSchema.b.position.y).toEqual(padding);
+      expect(bSchema.b.height).toEqual(bHeight);
+    });
+  });
+
+  describe('Edge cases', () => {
+    test('should handle empty increase heights', async () => {
+      const increaseHeights: number[] = [];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      expect(dynamicTemplate.schemas[0].a).toBeUndefined();
+      expect(dynamicTemplate.schemas[0].b).toBeDefined();
     });
 
-    test('multi dynamic schemas (page break 2 pages)', () => {
-      const template = getTemplateForDynamicTemplate();
-      const diffMap = new Map([
-        [45, 300],
-        [65, 300],
-      ]);
-      const newTemplate = normalizePositionsAndPageBreak(template, diffMap);
-      expect(newTemplate).toEqual({
-        basePdf: template.basePdf,
-        schemas: [
-          // TODO Write test
-        ],
-      });
+    test('should handle very large increase heights', async () => {
+      const increaseHeights = [1000, 1000];
+      const dynamicTemplate = await getDynamicTemplate(createGetDynamicTemplateArg(increaseHeights));
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBeGreaterThan(1);
     });
   });
 });

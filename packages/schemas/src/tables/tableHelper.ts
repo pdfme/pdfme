@@ -5,6 +5,7 @@ import {
   CommonOptions,
   getDefaultFont,
   getFallbackFontName,
+  cloneDeep,
 } from '@pdfme/common';
 import type {
   TableSchema,
@@ -15,7 +16,6 @@ import type {
   StylesProps,
   Section,
 } from './types';
-import { cloneDeep } from '../utils';
 import { Cell, Column, Row, Table } from './classes';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
@@ -164,28 +164,6 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
   };
 }
 
-function createTableWithAvailableHeight(
-  tableBody: Row[],
-  availableHeight: number,
-  args: CreateTableArgs
-) {
-  let limit = availableHeight;
-  const newTableBody: string[][] = [];
-  let index = 0;
-  while (limit > 0 && index < tableBody.length) {
-    const row = tableBody.slice(0, index + 1).pop();
-    if (!row) break;
-    const rowHeight = row.height;
-    if (limit - rowHeight < 0) {
-      break;
-    }
-    newTableBody.push(row.raw);
-    limit -= rowHeight;
-    index++;
-  }
-  return createSingleTable(newTableBody, args);
-}
-
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   const columnStylesWidth = schema.headWidthPercentages.reduce(
     (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
@@ -272,7 +250,16 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
 
-  const input = parseInput(args.schema as TableSchema, body);
+  const schema = cloneDeep(args.schema) as TableSchema;
+  const { start } = schema.__bodyRange || { start: 0 };
+  if (start % 2 === 1) {
+    const alternateBackgroundColor = schema.bodyStyles.alternateBackgroundColor;
+    schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
+    schema.bodyStyles.backgroundColor = alternateBackgroundColor;
+  }
+  schema.showHead = start === 0;
+
+  const input = parseInput(schema, body);
 
   const font = options.font || getDefaultFont();
 
@@ -281,42 +268,4 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const content = parseContent4Table(input, fallbackFontName);
 
   return Table.create({ input, content, font, _cache });
-}
-
-export async function createMultiTables(body: string[][], args: CreateTableArgs): Promise<Table[]> {
-  const { basePdf, schema } = args;
-
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
-  const pageHeight = basePdf.height;
-  const paddingBottom = basePdf.padding[2];
-  const paddingTop = basePdf.padding[0];
-  let availableHeight = pageHeight - paddingBottom - schema.position.y;
-
-  const testTable = await createSingleTable(body, args);
-  let remainingBody = testTable.body;
-  const tables: Table[] = [];
-
-  while (remainingBody.length > 0) {
-    const tableHeight =
-      tables.length === 0
-        ? availableHeight - testTable.getHeadHeight()
-        : availableHeight - paddingTop;
-
-    const table = await createTableWithAvailableHeight(remainingBody, tableHeight, args);
-
-    tables.push(table);
-
-    remainingBody = remainingBody.slice(table.body.length);
-
-    if (remainingBody.length > 0) {
-      const _schema = cloneDeep(schema);
-      _schema.showHead = false;
-      _schema.position.y = paddingTop;
-      args.schema = _schema;
-
-      availableHeight = pageHeight - paddingTop - paddingBottom;
-    }
-  }
-
-  return tables;
 }
