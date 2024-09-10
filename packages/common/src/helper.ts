@@ -314,13 +314,30 @@ function createNode(arg: {
   return node;
 }
 
+function resortChildren(page: Node, orderMap: Map<string, number>): void {
+  page.children = page.children
+    .sort((a, b) => {
+      const orderA = orderMap.get(a.key!);
+      const orderB = orderMap.get(b.key!);
+      if (orderA === undefined || orderB === undefined) {
+        throw new Error('[@pdfme/common] order is not defined');
+      }
+      return orderA - orderB;
+    })
+    .map((child, index) => {
+      child.setIndex(index);
+      return child;
+    });
+}
+
 async function createOnePage(
   arg: {
     basePdf: BlankPdf;
     schemaObj: Record<string, Schema>;
+    orderMap: Map<string, number>;
   } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
 ): Promise<Node> {
-  const { basePdf, schemaObj, input, options, _cache, getDynamicHeights } = arg;
+  const { basePdf, schemaObj, orderMap, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
 
   const schemaPositions: number[] = [];
@@ -356,26 +373,17 @@ async function createOnePage(
   const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
   page.setHeight(pageHeight);
 
-  const orderMap = new Map(Object.keys(schemaObj).map((key, index) => [key, index]));
-  // re-sort children by original order
-  page.children = page.children
-    .sort((a, b) => {
-      const orderA = orderMap.get(a.key!);
-      const orderB = orderMap.get(b.key!);
-      if (orderA === undefined || orderB === undefined) {
-        throw new Error('[@pdfme/common] order is not defined');
-      }
-      return orderA - orderB;
-    })
-    .map((child, index) => {
-      child.setIndex(index);
-      return child;
-    });
+  resortChildren(page, orderMap);
 
   return page;
 }
 
-function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
+function breakIntoPages(arg: {
+  longPage: Node;
+  orderMap: Map<string, number>;
+  basePdf: BlankPdf;
+}): Node[] {
+  const { longPage, orderMap, basePdf } = arg;
   const pages: Node[] = [createPage(basePdf)];
   const [paddingTop, , paddingBottom] = basePdf.padding;
   const yAdjustments: { page: number; value: number }[] = [];
@@ -413,6 +421,8 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
     const clonedElement = createNode({ key, schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
   }
+
+  pages.forEach((page) => resortChildren(page, orderMap));
 
   return pages;
 }
@@ -493,8 +503,10 @@ export const getDynamicTemplate = async (
   const pages: Node[] = [];
 
   for (const schemaObj of template.schemas) {
-    const longPage = await createOnePage({ basePdf, schemaObj, ...arg });
-    const brokenPages = breakIntoPages(longPage, basePdf);
+    const orderMap = new Map(Object.keys(schemaObj).map((key, index) => [key, index]));
+
+    const longPage = await createOnePage({ basePdf, schemaObj, orderMap, ...arg });
+    const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
     pages.push(...brokenPages);
   }
 
