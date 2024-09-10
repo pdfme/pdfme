@@ -37,6 +37,7 @@ import type {
   DesignerProps,
 } from './types.js';
 import {
+  cloneDeep,
   getFallbackFontName,
   getDefaultFont,
   getB64BasePdf,
@@ -67,6 +68,7 @@ export {
   BLANK_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
+  cloneDeep,
   getFallbackFontName,
   getDefaultFont,
   getB64BasePdf,

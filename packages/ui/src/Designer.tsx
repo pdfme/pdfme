@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
+  cloneDeep,
   Template,
   DesignerProps,
   checkDesignerProps,
@@ -11,7 +12,6 @@ import { BaseUIClass } from './class';
 import { DESTROYED_ERR_MSG } from './constants.js';
 import DesignerComponent from './components/Designer/index';
 import AppContextProvider from './components/AppContextProvider';
-import { cloneDeep } from './helper.js';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;

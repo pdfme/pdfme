@@ -70,8 +70,6 @@ export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuf
   });
 };
 
-export const cloneDeep = (obj: unknown) => JSON.parse(JSON.stringify(obj));
-
 const getTemplateFromJsonFile = (file: File) => {
   return readFile(file, 'text').then((jsonStr) => {
     const template: Template = JSON.parse(jsonStr as string);

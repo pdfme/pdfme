@@ -6,6 +6,7 @@ GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
 import hotkeys from 'hotkeys-js';
 import {
+  cloneDeep,
   ZOOM,
   getB64BasePdf,
   b64toUint8Array,
@@ -64,8 +65,6 @@ const shift = (number: number, precision: number, reverseShift: boolean) => {
 export const round = (number: number, precision: number) => {
   return shift(Math.round(shift(number, precision, false)), precision, true);
 };
-
-export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 

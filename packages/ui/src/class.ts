@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
-import { debounce, cloneDeep } from './helper.js';
+import { debounce } from './helper.js';
 import {
+  cloneDeep,
   Template,
   Size,
   Lang,

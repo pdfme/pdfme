@@ -1,5 +1,6 @@
 import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
 import {
+  cloneDeep,
   ZOOM,
   Template,
   Size,
@@ -12,7 +13,6 @@ import {
 import {
   schemasList2template,
   uuid,
-  cloneDeep,
   getUniqSchemaKey,
   moveCommandToChangeSchemasArg,
   pdf2Pngs,

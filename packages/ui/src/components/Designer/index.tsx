@@ -1,5 +1,6 @@
 import React, { useRef, useState, useContext, useCallback } from 'react';
 import {
+  cloneDeep,
   ZOOM,
   Template,
   Schema,
@@ -20,7 +21,6 @@ import {
   schemasList2template,
   uuid,
   round,
-  cloneDeep,
   template2SchemasList,
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,

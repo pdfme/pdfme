@@ -19,7 +19,7 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
-const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
