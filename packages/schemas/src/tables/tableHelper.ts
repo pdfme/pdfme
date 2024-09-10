@@ -5,6 +5,7 @@ import {
   CommonOptions,
   getDefaultFont,
   getFallbackFontName,
+  cloneDeep,
 } from '@pdfme/common';
 import type {
   TableSchema,
@@ -163,28 +164,6 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
   };
 }
 
-function createTableWithAvailableHeight(
-  tableBody: Row[],
-  availableHeight: number,
-  args: CreateTableArgs
-) {
-  let limit = availableHeight;
-  const newTableBody: string[][] = [];
-  let index = 0;
-  while (limit > 0 && index < tableBody.length) {
-    const row = tableBody.slice(0, index + 1).pop();
-    if (!row) break;
-    const rowHeight = row.height;
-    if (limit - rowHeight < 0) {
-      break;
-    }
-    newTableBody.push(row.raw);
-    limit -= rowHeight;
-    index++;
-  }
-  return createSingleTable(newTableBody, args);
-}
-
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   const columnStylesWidth = schema.headWidthPercentages.reduce(
     (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
@@ -271,7 +250,15 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;
   if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
 
-  const input = parseInput(args.schema as TableSchema, body);
+  const schema = cloneDeep(args.schema) as TableSchema;
+  const { start } = schema.__bodyRange || { start: 0 };
+  if (start % 2 === 1) {
+    const alternateBackgroundColor = schema.bodyStyles.alternateBackgroundColor;
+    schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
+    schema.bodyStyles.backgroundColor = alternateBackgroundColor;
+  }
+
+  const input = parseInput(schema, body);
 
   const font = options.font || getDefaultFont();
 
