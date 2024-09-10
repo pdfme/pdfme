@@ -385,15 +385,19 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
 
   const calculateNewY = (y: number, pageIndex: number) => {
     const newY = y - pageIndex * (basePdf.height - paddingTop - paddingBottom);
-    if (!pages[pageIndex]) {
-      pages.push(createPage(basePdf));
-      yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
+
+    while (pages.length <= pageIndex) {
+      if (!pages[pageIndex]) {
+        pages.push(createPage(basePdf));
+        yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
+      }
     }
     return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
   };
 
-  for (let i = 0; i < longPage.getChildCount(); i++) {
-    const { key, schema, position, height, width } = longPage.getChild(i);
+  const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
+  for (let i = 0; i < children.length; i++) {
+    const { key, schema, position, height, width } = children[i];
     const { y, x } = position;
 
     let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
