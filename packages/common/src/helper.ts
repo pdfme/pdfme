@@ -323,9 +323,10 @@ async function createOnePage(
   const { basePdf, schemaObj, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
 
-  const schemaEntries = Object.entries(schemaObj);
   const schemaPositions: number[] = [];
-  const sortedSchemaEntries = schemaEntries.sort((a, b) => a[1].position.y - b[1].position.y);
+  const sortedSchemaEntries = Object.entries(schemaObj).sort(
+    (a, b) => a[1].position.y - b[1].position.y
+  );
   const diffMap = new Map();
   for (const [key, schema] of sortedSchemaEntries) {
     const { position, width } = schema;
@@ -354,6 +355,23 @@ async function createOnePage(
 
   const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
   page.setHeight(pageHeight);
+
+  const orderMap = new Map(Object.keys(schemaObj).map((key, index) => [key, index]));
+  // re-sort children by original order
+  page.children = page.children
+    .sort((a, b) => {
+      const orderA = orderMap.get(a.key!);
+      const orderB = orderMap.get(b.key!);
+      if (orderA === undefined || orderB === undefined) {
+        throw new Error('[@pdfme/common] order is not defined');
+      }
+      return orderA - orderB;
+    })
+    .map((child, index) => {
+      child.setIndex(index);
+      return child;
+    });
+
   return page;
 }
 
@@ -386,7 +404,7 @@ function breakIntoPages(longPage: Node, basePdf: BlankPdf): Node[] {
       newY = calculateNewY(y, targetPageIndex);
     }
 
-    if (!key || !schema) throw new Error('key or schema is undefined');
+    if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
 
     const clonedElement = createNode({ key, schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
@@ -405,7 +423,7 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
   cloneDeep(pages).forEach((page, pageIndex) => {
     page.children.forEach((child) => {
       const { key, schema } = child;
-      if (!key || !schema) throw new Error('key or schema is undefined');
+      if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
 
       const sameKeySchemas = page.children.filter((c) => c.key === key);
       const prevPages: Node[] = pages.slice(0, pageIndex);
