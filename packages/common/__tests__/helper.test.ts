@@ -1,5 +1,4 @@
 import { readFileSync } from 'fs';
-import { inspect } from 'util';
 import * as path from 'path';
 import {
   mm2pt,
@@ -17,8 +16,6 @@ import {
   Font,
   Plugins,
   Schema,
-  BasePdf,
-  CommonOptions,
 } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));

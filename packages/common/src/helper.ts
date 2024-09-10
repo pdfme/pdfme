@@ -432,63 +432,45 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
     schemas: Array.from({ length: pages.length }, () => ({} as Record<string, Schema>)),
     basePdf: basePdf,
   };
-  const newSchemas = newTemplate.schemas;
+
+  const keyToSchemas = new Map<string, Node[]>();
 
   cloneDeep(pages).forEach((page, pageIndex) => {
     page.children.forEach((child) => {
       const { key, schema } = child;
       if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
 
+      if (!keyToSchemas.has(key)) {
+        keyToSchemas.set(key, []);
+      }
+      keyToSchemas.get(key)!.push(child);
+
       const sameKeySchemas = page.children.filter((c) => c.key === key);
-      const prevPages: Node[] = pages.slice(0, pageIndex);
-      const prevPageSameKeySchemas = prevPages.flatMap((p) =>
-        p.children.filter((c) => c.key === key)
-      );
-      const start = prevPageSameKeySchemas.length;
-      const showHead = start === 0;
+      const start = keyToSchemas.get(key)!.length - sameKeySchemas.length;
 
-      const commonArgs = { key, pageIndex, newSchemas, start, showHead };
+      if (sameKeySchemas.length > 0) {
+        if (!sameKeySchemas[0].schema) {
+          throw new Error('[@pdfme/common] schema is undefined');
+        }
 
-      if (sameKeySchemas.length === 1) {
-        addSingleSchemaToPage({ ...commonArgs, schema, child });
-      } else if (sameKeySchemas.length > 1) {
-        addMultipleSchemasToPage({ ...commonArgs, sameKeySchemas });
+        // Use the first schema to get the schema and position
+        const schema = sameKeySchemas[0].schema;
+        const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
+        const position = sameKeySchemas[0].position;
+
+        // Currently, __bodyRange exists for table schemas, but if we make it more abstract, 
+        // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
+        schema.__bodyRange = {
+          start: Math.max(start - 1, 0),
+          end: start + sameKeySchemas.length - 1,
+        };
+
+        newTemplate.schemas[pageIndex][key] = Object.assign({}, schema, { position, height });
       }
     });
   });
 
   return newTemplate;
-}
-
-type CommonAddSchemaArgs = {
-  key: string;
-  pageIndex: number;
-  newSchemas: Record<string, Schema>[];
-  start: number;
-  showHead: boolean;
-};
-
-function addSingleSchemaToPage(arg: CommonAddSchemaArgs & { schema: Schema; child: Node }) {
-  const { schema, child, start, showHead, key, pageIndex, newSchemas } = arg;
-  schema.__bodyRange = { start: start - 1, end: start };
-  schema.showHead = showHead;
-  const { position, height } = child;
-  newSchemas[pageIndex][key] = Object.assign(schema, { position, height });
-}
-
-function addMultipleSchemasToPage(arg: CommonAddSchemaArgs & { sameKeySchemas: Node[] }) {
-  const { sameKeySchemas, start, showHead, key, pageIndex, newSchemas } = arg;
-  const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
-  sameKeySchemas.forEach((s, i) => {
-    if (!s.schema || i !== 0) return;
-    const { position, schema } = s;
-    schema.showHead = showHead;
-    schema.__bodyRange = {
-      start: start + (showHead ? 0 : -1),
-      end: start + sameKeySchemas.length - 1,
-    };
-    newSchemas[pageIndex][key] = Object.assign(schema, { position: position, height });
-  });
 }
 
 export const getDynamicTemplate = async (
