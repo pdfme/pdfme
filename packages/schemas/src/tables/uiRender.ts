@@ -194,7 +194,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     void uiRender(arg);
   };
 
-  if (schema.showHead) {
+  if (table.settings.showHead) {
     renderRowUi({
       rows: table.head,
       arg,
@@ -203,7 +203,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     });
   }
 
-  const offsetY = schema.showHead ? table.getHeadHeight() : 0;
+  const offsetY = table.settings.showHead ? table.getHeadHeight() : 0;
   renderRowUi({
     rows: table.body,
     arg,
@@ -233,7 +233,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       rootElement.appendChild(addRowButton);
     }
 
-    let offsetY = schema.showHead ? table.getHeadHeight() : 0;
+    let offsetY = table.settings.showHead ? table.getHeadHeight() : 0;
     table.body.forEach((row, i) => {
       offsetY = offsetY + row.height;
       const removeRowButton = document.createElement('button');
@@ -388,7 +388,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     resetEditingPosition();
   }
 
-  const tableHeight = schema.showHead ? table.getHeight() : table.getBodyHeight();
+  const tableHeight = table.settings.showHead ? table.getHeight() : table.getBodyHeight();
   if (schema.height !== tableHeight && onChange) {
     onChange({ key: 'height', value: tableHeight });
   }
