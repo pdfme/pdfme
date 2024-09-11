@@ -458,12 +458,15 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
         const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
         const position = sameKeySchemas[0].position;
 
-        // Currently, __bodyRange exists for table schemas, but if we make it more abstract, 
+        // Currently, __bodyRange exists for table schemas, but if we make it more abstract,
         // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
         schema.__bodyRange = {
           start: Math.max(start - 1, 0),
           end: start + sameKeySchemas.length - 1,
         };
+
+        // Currently, this is used to determine whether to display the header when a table is split.
+        schema.__isSplit = start > 0;
 
         newTemplate.schemas[pageIndex][key] = Object.assign({}, schema, { position, height });
       }
