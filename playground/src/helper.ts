@@ -722,7 +722,7 @@ const getInvoiceTemplate = (): Template => ({
 });
 
 const getBlankTemplate = () =>
-  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] } } as Template);
+  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] } } as Template);
 export const getTemplatePresets = (): {
   key: string;
   label: string;
