@@ -28,6 +28,8 @@ export interface TableSchema extends Schema {
 
   __bodyRange?: { start: number; end?: number };
 
+  __isSplit?: boolean;
+
   tableStyles: {
     borderColor: string;
     borderWidth: number;
