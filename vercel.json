@@ -1,6 +1,6 @@
 {
   "routes": [
     { "src": "/form-viewer", "dest": "/form-viewer" },
-    { "src": "/(.*)", "dest": "/" }
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
