@@ -248,7 +248,15 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
 
 export function createSingleTable(body: string[][], args: CreateTableArgs) {
   const { options, _cache, basePdf } = args;
-  if (!isBlankPdf(basePdf)) throw new Error('[@pdfme/schema/table] Custom PDF is not supported');
+  if (!isBlankPdf(basePdf)) {
+    console.warn(
+      '[@pdfme/schema/table]' +
+        'When specifying a custom PDF for basePdf, ' +
+        'you cannot use features such as page breaks or re-layout of other elements.' +
+        'To utilize these features, please define basePdf as follows:\n' +
+        '{ width: number; height: number; padding: [number, number, number, number]; }'
+    );
+  }
 
   const schema = cloneDeep(args.schema) as TableSchema;
   const { start } = schema.__bodyRange || { start: 0 };
