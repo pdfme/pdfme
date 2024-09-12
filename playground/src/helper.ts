@@ -15,7 +15,7 @@ import {
   image,
   svg,
   line,
-  tableBeta,
+  table,
   rectangle,
   ellipse,
 } from '@pdfme/schemas';
@@ -114,7 +114,7 @@ export const getPlugins = () => {
   return {
     Text: text,
     'Multi-Variable Text': multiVariableText,
-    Table: tableBeta,
+    Table: table,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,

@@ -24,6 +24,7 @@ export {
   barcodes,
   line,
   tableBeta,
+  table,
   rectangle,
   ellipse,
   // utils
