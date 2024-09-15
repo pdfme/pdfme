@@ -349,7 +349,8 @@ async function createOnePage(
     const { position, width } = schema;
 
     const opt = { schema, basePdf, options, _cache };
-    const heights = await getDynamicHeights(input?.[key] || '', opt);
+    const value = (schema.readOnly ? schema.content : input?.[key]) || '';
+    const heights = await getDynamicHeights(value, opt);
 
     const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
     const originalHeight = schema.height;
