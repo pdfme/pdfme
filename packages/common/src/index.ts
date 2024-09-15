@@ -10,7 +10,7 @@ import {
 import type {
   ChangeSchemaItem,
   ChangeSchemas,
-  SchemaPage,
+  SchemaPageArray,
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
@@ -113,7 +113,7 @@ export type {
   DesignerProps,
   ChangeSchemaItem,
   ChangeSchemas,
-  SchemaPage,
+  SchemaPageArray,
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,

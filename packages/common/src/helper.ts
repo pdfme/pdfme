@@ -8,8 +8,8 @@ import {
   Plugins,
   BlankPdf,
   CommonOptions,
-  LegacySchemaPage,
-  SchemaPage
+  LegacySchemaPageArray,
+  SchemaPageArray
 } from './types';
 import {
   Inputs as InputsSchema,
@@ -99,7 +99,7 @@ export const migrateTemplate = (template: Template) => {
   }
 
   if (Array.isArray(template.schemas) && template.schemas.length > 0 && !Array.isArray(template.schemas[0])) {
-    template.schemas = (template.schemas as unknown as LegacySchemaPage).map(
+    template.schemas = (template.schemas as unknown as LegacySchemaPageArray).map(
       (page: Record<string, Schema>) =>
         Object.entries(page).map(([key, value]) => ({
           ...value,
@@ -156,7 +156,7 @@ export const b64toUint8Array = (base64: string) => {
   return unit8arr;
 };
 
-const getFontNamesInSchemas = (schemas: SchemaPage) =>
+const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
       .map((p) => p.map((v) => (v as any).fontName ?? ''))
@@ -284,7 +284,6 @@ interface ModifyTemplateForDynamicTableArg {
 class Node {
   index = 0;
 
-  key?: string;
   schema?: Schema;
 
   children: Node[] = [];
@@ -303,8 +302,7 @@ class Node {
     this.index = index;
   }
 
-  setKeyAndSchema(key: string, schema: Schema): void {
-    this.key = key;
+  setSchema(schema: Schema): void {
     this.schema = schema;
   }
 
@@ -346,24 +344,23 @@ function createPage(basePdf: BlankPdf) {
 }
 
 function createNode(arg: {
-  key: string;
   schema: Schema;
   position: { x: number; y: number };
   width: number;
   height: number;
 }) {
-  const { position, width, height, key, schema } = arg;
+  const { position, width, height, schema } = arg;
   const node = new Node({ width, height });
   node.setPosition(position);
-  node.setKeyAndSchema(key, schema);
+  node.setSchema(schema);
   return node;
 }
 
 function resortChildren(page: Node, orderMap: Map<string, number>): void {
   page.children = page.children
     .sort((a, b) => {
-      const orderA = orderMap.get(a.key!);
-      const orderB = orderMap.get(b.key!);
+      const orderA = orderMap.get(a.schema?.name!);
+      const orderB = orderMap.get(b.schema?.name!);
       if (orderA === undefined || orderB === undefined) {
         throw new Error('[@pdfme/common] order is not defined');
       }
@@ -378,23 +375,21 @@ function resortChildren(page: Node, orderMap: Map<string, number>): void {
 async function createOnePage(
   arg: {
     basePdf: BlankPdf;
-    schemaObj: Record<string, Schema>;
+    schemaPage: Schema[];
     orderMap: Map<string, number>;
   } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
 ): Promise<Node> {
-  const { basePdf, schemaObj, orderMap, input, options, _cache, getDynamicHeights } = arg;
+  const { basePdf, schemaPage, orderMap, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
 
   const schemaPositions: number[] = [];
-  const sortedSchemaEntries = Object.entries(schemaObj).sort(
-    (a, b) => a[1].position.y - b[1].position.y
-  );
+  const sortedSchemaEntries = schemaPage.sort((a, b) => a.position.y - b.position.y);
   const diffMap = new Map();
-  for (const [key, schema] of sortedSchemaEntries) {
+  for (const schema of sortedSchemaEntries) {
     const { position, width } = schema;
 
     const opt = { schema, basePdf, options, _cache };
-    const value = (schema.readOnly ? schema.content : input?.[key]) || '';
+    const value = (schema.readOnly ? schema.content : input?.[schema.name]) || '';
     const heights = await getDynamicHeights(value, opt);
 
     const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
@@ -409,7 +404,7 @@ async function createOnePage(
           y += diff;
         }
       }
-      const node = createNode({ key, schema, position: { ...position, y }, width, height });
+      const node = createNode({ schema, position: { ...position, y }, width, height });
 
       schemaPositions.push(y + height + basePdf.padding[2]);
       page.insertChild(node);
@@ -451,7 +446,7 @@ function breakIntoPages(arg: {
 
   const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
   for (let i = 0; i < children.length; i++) {
-    const { key, schema, position, height, width } = children[i];
+    const { schema, position, height, width } = children[i];
     const { y, x } = position;
 
     let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
@@ -462,9 +457,9 @@ function breakIntoPages(arg: {
       newY = calculateNewY(y, targetPageIndex);
     }
 
-    if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
+    if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
-    const clonedElement = createNode({ key, schema, position: { x, y: newY }, width, height });
+    const clonedElement = createNode({ schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
   }
 
@@ -475,46 +470,47 @@ function breakIntoPages(arg: {
 
 function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
   const newTemplate: Template = {
-    schemas: Array.from({ length: pages.length }, () => ({} as Record<string, Schema>)),
+    schemas: Array.from({ length: pages.length }, () => ([] as Schema[])),
     basePdf: basePdf,
   };
 
-  const keyToSchemas = new Map<string, Node[]>();
+  const nameToSchemas = new Map<string, Node[]>();
 
   cloneDeep(pages).forEach((page, pageIndex) => {
     page.children.forEach((child) => {
-      const { key, schema } = child;
-      if (!key || !schema) throw new Error('[@pdfme/common] key or schema is undefined');
+      const { schema } = child;
+      if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
-      if (!keyToSchemas.has(key)) {
-        keyToSchemas.set(key, []);
+      const name = schema.name
+      if (!nameToSchemas.has(name)) {
+        nameToSchemas.set(name, []);
       }
-      keyToSchemas.get(key)!.push(child);
+      nameToSchemas.get(name)!.push(child);
 
-      const sameKeySchemas = page.children.filter((c) => c.key === key);
-      const start = keyToSchemas.get(key)!.length - sameKeySchemas.length;
+      const sameNameSchemas = page.children.filter((c) => c.schema?.name === name);
+      const start = nameToSchemas.get(name)!.length - sameNameSchemas.length;
 
-      if (sameKeySchemas.length > 0) {
-        if (!sameKeySchemas[0].schema) {
+      if (sameNameSchemas.length > 0) {
+        if (!sameNameSchemas[0].schema) {
           throw new Error('[@pdfme/common] schema is undefined');
         }
 
         // Use the first schema to get the schema and position
-        const schema = sameKeySchemas[0].schema;
-        const height = sameKeySchemas.reduce((acc, cur) => acc + cur.height, 0);
-        const position = sameKeySchemas[0].position;
+        const schema = sameNameSchemas[0].schema;
+        const height = sameNameSchemas.reduce((acc, cur) => acc + cur.height, 0);
+        const position = sameNameSchemas[0].position;
 
         // Currently, __bodyRange exists for table schemas, but if we make it more abstract,
         // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
         schema.__bodyRange = {
           start: Math.max(start - 1, 0),
-          end: start + sameKeySchemas.length - 1,
+          end: start + sameNameSchemas.length - 1,
         };
 
         // Currently, this is used to determine whether to display the header when a table is split.
         schema.__isSplit = start > 0;
 
-        newTemplate.schemas[pageIndex][key] = Object.assign({}, schema, { position, height });
+        newTemplate.schemas[pageIndex].push(Object.assign({}, schema, { position, height }));
       }
     });
   });
@@ -533,10 +529,10 @@ export const getDynamicTemplate = async (
   const basePdf = template.basePdf as BlankPdf;
   const pages: Node[] = [];
 
-  for (const schemaObj of template.schemas) {
-    const orderMap = new Map(Object.keys(schemaObj).map((key, index) => [key, index]));
+  for (const schemaPage of template.schemas) {
+    const orderMap = new Map(schemaPage.map((schema, index) => [schema.name, index]));
 
-    const longPage = await createOnePage({ basePdf, schemaObj, orderMap, ...arg });
+    const longPage = await createOnePage({ basePdf, schemaPage, orderMap, ...arg });
     const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
     pages.push(...brokenPages);
   }

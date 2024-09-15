@@ -17,7 +17,7 @@ import {
   Font,
   Plugins,
   Schema,
-  SchemaPage,
+  SchemaPageArray,
 } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -427,8 +427,8 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].b.position.y).toEqual(
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][1].position.y).toEqual(
         increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY
       );
     });
@@ -501,7 +501,7 @@ describe('getDynamicTemplate', () => {
 
       expect(dynamicTemplate.schemas[1][1]).toBeDefined();
       expect(dynamicTemplate.schemas[1][1].position.y).toBeGreaterThanOrEqual(
-        dynamicTemplate.schemas[1][0].position.y + dynamicTemplate.schemas[1].a.height
+        dynamicTemplate.schemas[1][0].position.y + dynamicTemplate.schemas[1][0].height
       );
     });
   });
@@ -550,7 +550,7 @@ describe('getDynamicTemplate', () => {
 });
 
 describe('migrateTemplate', () => {
-  it('should convert LegacySchemaPage to SchemaPage', () => {
+  it('should convert LegacySchemaPageArray to SchemaPageArray', () => {
     const legacyTemplate: any = {
       schemas: [
         {
@@ -592,7 +592,7 @@ describe('migrateTemplate', () => {
 
     migrateTemplate(legacyTemplate);
 
-    const expectedSchemaPage: SchemaPage = [
+    const expectedSchemaPageArray: SchemaPageArray = [
       [
         {
           "name": "field1",
@@ -632,10 +632,10 @@ describe('migrateTemplate', () => {
       ]
     ];
 
-    expect(legacyTemplate.schemas).toEqual(expectedSchemaPage);
+    expect(legacyTemplate.schemas).toEqual(expectedSchemaPageArray);
   });
 
-  it('should not modify already SchemaPage', () => {
+  it('should not modify already SchemaPageArray', () => {
     const pagedTemplate: any = {
       schemas: [
         [

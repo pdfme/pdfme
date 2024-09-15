@@ -115,13 +115,13 @@ const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
 export const BasePdf = z.union([CustomPdf, BlankPdf]);
 
-// Legacy keyed structure for BC - we convert to SchemaPage on import
-export const LegacySchemaPage = z.array(z.record(Schema));
-export const SchemaPage = z.array(z.array(Schema));
+// Legacy keyed structure for BC - we convert to SchemaPageArray on import
+export const LegacySchemaPageArray = z.array(z.record(Schema));
+export const SchemaPageArray = z.array(z.array(Schema));
 
 export const Template = z
   .object({
-    schemas: SchemaPage,
+    schemas: SchemaPageArray,
     basePdf: BasePdf,
     pdfmeVersion: z.string().optional(),
   })

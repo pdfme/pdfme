@@ -23,8 +23,8 @@ import {
   PreviewProps,
   DesignerProps,
   ColorType,
-  LegacySchemaPage,
-  SchemaPage,
+  LegacySchemaPageArray,
+  SchemaPageArray,
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
@@ -185,5 +185,5 @@ export type UIOptions = z.infer<typeof UIOptions> & { theme?: ThemeConfig };
 export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
 export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
 export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
-export type SchemaPage = z.infer<typeof SchemaPage>;
-export type LegacySchemaPage = z.infer<typeof LegacySchemaPage>;
+export type SchemaPageArray = z.infer<typeof SchemaPageArray>;
+export type LegacySchemaPageArray = z.infer<typeof LegacySchemaPageArray>;
