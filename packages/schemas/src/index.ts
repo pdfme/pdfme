@@ -14,13 +14,15 @@ const tableBeta = table;
 const builtInPlugins = { Text: text };
 
 export {
+  // TODO remove
+  readOnlyText,
+  readOnlyImage,
+  readOnlySvg,
+  // schemas
   multiVariableText,
   text,
-  readOnlyText,
   image,
-  readOnlyImage,
   svg,
-  readOnlySvg,
   barcodes,
   line,
   tableBeta,
