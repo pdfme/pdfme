@@ -428,9 +428,11 @@ describe('getDynamicTemplate', () => {
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
       expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1].position.y).toEqual(
         increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY
       );
+      expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
     });
   });
 
@@ -442,8 +444,12 @@ describe('getDynamicTemplate', () => {
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(2);
       expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
-      expect(dynamicTemplate.schemas[1][1].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][1]).toBeUndefined();
+
     });
 
     test('should handle page break with a on page 1 and 2, b on page 2', async () => {
@@ -453,11 +459,14 @@ describe('getDynamicTemplate', () => {
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(2);
       expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
       expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[1][1].position.y).toEqual(
         increaseHeights.slice(3).reduce((a, b) => a + b, 0) - height + padding
       );
+      expect(dynamicTemplate.schemas[1][1].name).toEqual('b');
     });
 
     test('should handle multiple page breaks', async () => {
@@ -472,13 +481,15 @@ describe('getDynamicTemplate', () => {
         expect(dynamicTemplate.schemas[i][0]).toBeDefined();
         expect(dynamicTemplate.schemas[i][0].position.y).toEqual(i === 0 ? aPositionY : padding);
         expect(dynamicTemplate.schemas[i][0].height).toEqual(i === 3 ? 100 : 50);
+        expect(dynamicTemplate.schemas[i][0].name).toEqual('a');
         expect(dynamicTemplate.schemas[i][1]).toBeUndefined();
       }
 
       // Verify 'b' element
-      expect(dynamicTemplate.schemas[4][1]).toBeDefined();
-      expect(dynamicTemplate.schemas[4][1].position.y).toEqual(padding);
-      expect(dynamicTemplate.schemas[4][1].height).toEqual(10);
+      expect(dynamicTemplate.schemas[4][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[4][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[4][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[4][0].height).toEqual(10);
     });
 
     test('should handle both a and b on next page', async () => {
@@ -519,12 +530,13 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas[0][0]).toBeDefined();
       expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
       expect(dynamicTemplate.schemas[0][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
 
       // Check 'b' element
-      const bSchema = dynamicTemplate.schemas.find((schema) => schema[1])!;
-      expect(bSchema).toBeDefined();
-      expect(bSchema[1].position.y).toEqual(padding);
-      expect(bSchema[1].height).toEqual(bHeight);
+      expect(dynamicTemplate.schemas[1][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].height).toEqual(bHeight);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
     });
   });
 
@@ -535,8 +547,9 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
-      expect(dynamicTemplate.schemas[0][0]).toBeUndefined();
-      expect(dynamicTemplate.schemas[0][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
     });
 
     test('should handle very large increase heights', async () => {

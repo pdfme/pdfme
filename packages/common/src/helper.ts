@@ -510,7 +510,13 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
         // Currently, this is used to determine whether to display the header when a table is split.
         schema.__isSplit = start > 0;
 
-        newTemplate.schemas[pageIndex].push(Object.assign({}, schema, { position, height }));
+        const existingSchema = newTemplate.schemas[pageIndex].find((s) => s.name === name);
+        if (existingSchema) {
+          existingSchema.height = height;
+          existingSchema.position = position;
+        } else {
+          newTemplate.schemas[pageIndex].push(Object.assign({}, schema, { position, height }));
+        }
       }
     });
   });
@@ -531,7 +537,6 @@ export const getDynamicTemplate = async (
 
   for (const schemaPage of template.schemas) {
     const orderMap = new Map(schemaPage.map((schema, index) => [schema.name, index]));
-
     const longPage = await createOnePage({ basePdf, schemaPage, orderMap, ...arg });
     const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
     pages.push(...brokenPages);
