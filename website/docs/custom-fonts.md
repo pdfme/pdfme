@@ -53,7 +53,7 @@ Set font as option in [generate](/docs/getting-started#generator) function
 import { Template, BLANK_PDF, Font } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 
-const font = {
+const font: Font = {
   serif: {
     data: 'https://example.com/fonts/serif.ttf',
     fallback: true,
