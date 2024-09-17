@@ -488,7 +488,6 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
       nameToSchemas.get(name)!.push(child);
 
       const sameNameSchemas = page.children.filter((c) => c.schema?.name === name);
-      console.log('sameNameSchemas', sameNameSchemas);
       const start = nameToSchemas.get(name)!.length - sameNameSchemas.length;
 
       if (sameNameSchemas.length > 0) {
@@ -500,8 +499,6 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
         const schema = sameNameSchemas[0].schema;
         const height = sameNameSchemas.reduce((acc, cur) => acc + cur.height, 0);
         const position = sameNameSchemas[0].position;
-
-        console.log('length of sameNameSchemas', sameNameSchemas.length);
 
         // Currently, __bodyRange exists for table schemas, but if we make it more abstract,
         // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
