@@ -16,7 +16,7 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
-import {RULER_HEIGHT} from './constants.js';
+import { RULER_HEIGHT } from './constants.js';
 
 GlobalWorkerOptions.workerSrc = PDFJSWorker;
 

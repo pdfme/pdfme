@@ -11,15 +11,15 @@ For using schemas other than the Text schema, please refer to the following docu
 ### Text
 
 - Style-related
-    - Font Size
-    - Letter Spacing
-    - Text Align
-    - Vertical Align
-    - Line Height
-    - Text Color
-    - Background Color
-    - Underline
-    - Strikethrough
+  - Font Size
+  - Letter Spacing
+  - Text Align
+  - Vertical Align
+  - Line Height
+  - Text Color
+  - Background Color
+  - Underline
+  - Strikethrough
 - Font-related
   - TrueType fonts (TTF & TTC)
   - OpenType fonts with PostScript or TrueType outlines (TTF, OTF, & OTC)
