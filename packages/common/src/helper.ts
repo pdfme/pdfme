@@ -488,6 +488,7 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
       nameToSchemas.get(name)!.push(child);
 
       const sameNameSchemas = page.children.filter((c) => c.schema?.name === name);
+      console.log('sameNameSchemas', sameNameSchemas);
       const start = nameToSchemas.get(name)!.length - sameNameSchemas.length;
 
       if (sameNameSchemas.length > 0) {
@@ -500,6 +501,8 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
         const height = sameNameSchemas.reduce((acc, cur) => acc + cur.height, 0);
         const position = sameNameSchemas[0].position;
 
+        console.log('length of sameNameSchemas', sameNameSchemas.length);
+
         // Currently, __bodyRange exists for table schemas, but if we make it more abstract,
         // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
         schema.__bodyRange = {
@@ -510,12 +513,12 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
         // Currently, this is used to determine whether to display the header when a table is split.
         schema.__isSplit = start > 0;
 
-        const existingSchema = newTemplate.schemas[pageIndex].find((s) => s.name === name);
-        if (existingSchema) {
-          existingSchema.height = height;
-          existingSchema.position = position;
+        const newSchema = Object.assign({}, schema, { position, height });
+        const index = newTemplate.schemas[pageIndex].findIndex((s) => s.name === name);
+        if (index !== -1) {
+          newTemplate.schemas[pageIndex][index] = newSchema;
         } else {
-          newTemplate.schemas[pageIndex].push(Object.assign({}, schema, { position, height }));
+          newTemplate.schemas[pageIndex].push(newSchema);
         }
       }
     });
