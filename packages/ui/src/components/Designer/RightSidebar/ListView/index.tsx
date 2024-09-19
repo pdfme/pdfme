@@ -45,7 +45,7 @@ const ListView = (
     } else {
       changeSchemas(
         names.map((value, index) => ({
-          key: 'key',
+          key: 'name',
           value,
           schemaId: schemas[index].id,
         }))
