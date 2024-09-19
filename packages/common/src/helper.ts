@@ -383,7 +383,7 @@ async function createOnePage(
   const page = createPage(basePdf);
 
   const schemaPositions: number[] = [];
-  const sortedSchemaEntries = schemaPage.sort((a, b) => a.position.y - b.position.y);
+  const sortedSchemaEntries = cloneDeep(schemaPage).sort((a, b) => a.position.y - b.position.y);
   const diffMap = new Map();
   for (const schema of sortedSchemaEntries) {
     const { position, width } = schema;
