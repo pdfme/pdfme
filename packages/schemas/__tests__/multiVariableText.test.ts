@@ -55,50 +55,48 @@ describe('substituteVariables', () => {
 describe('validateVariables', () => {
   // @ts-ignore
   const schema: MultiVariableTextSchema = {
+    name: 'test',
     variables: ['var1', 'var2'],
     required: true,
   };
 
   it('should return true for valid input with all required variables', () => {
-    const key = 'testKey';
     const value = JSON.stringify({ var1: 'value1', var2: 'value2' });
-    expect(validateVariables(key, value, schema)).toBe(true);
+    expect(validateVariables(value, schema)).toBe(true);
   });
 
   it('should throw an error for missing required variables', () => {
-    const key = 'testKey';
     const value = JSON.stringify({ var1: 'value1' });
-    expect(() => validateVariables(key, value, schema)).toThrowError(
-      '[@pdfme/generator] variable var2 is missing for field testKey'
+    expect(() => validateVariables(value, schema)).toThrowError(
+      '[@pdfme/generator] variable var2 is missing for field test'
     );
   });
 
   it('should return false for missing non-required variables', () => {
     // @ts-ignore
     const nonRequiredSchema: MultiVariableTextSchema = {
+      name: 'test',
       variables: ['var1', 'var2'],
       required: false,
     };
-    const key = 'testKey';
     const value = JSON.stringify({ var1: 'value1' });
-    expect(validateVariables(key, value, nonRequiredSchema)).toBe(false);
+    expect(validateVariables(value, nonRequiredSchema)).toBe(false);
   });
 
   it('should throw an error for invalid JSON input', () => {
-    const key = 'testKey';
     const value = '{ var1: value1 var2: value2 }'; // Invalid JSON
-    expect(() => validateVariables(key, value, schema)).toThrowError(SyntaxError);
+    expect(() => validateVariables(value, schema)).toThrowError(SyntaxError);
   });
 
   it('should return true for a string with no variables', () => {
     // @ts-ignore
     const readOnlyText: MultiVariableTextSchema = {
+      name: 'test',
       variables: [],
       required: true,
     };
-    const key = 'testKey';
     const value = '';
-    expect(validateVariables(key, value, readOnlyText)).toBe(true);
+    expect(validateVariables(value, readOnlyText)).toBe(true);
   });
 
   it('should return false for a string with variables but no input JSON and required set to false', () => {
@@ -107,8 +105,7 @@ describe('validateVariables', () => {
       variables: ['var'],
       required: false,
     };
-    const key = 'testKey';
     const value = '';
-    expect(validateVariables(key, value, readOnlyText)).toBe(false);
+    expect(validateVariables(value, readOnlyText)).toBe(false);
   });
 });

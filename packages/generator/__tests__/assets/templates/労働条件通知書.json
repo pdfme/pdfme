@@ -12,8 +12,8 @@
   "id": "労働条件通知書",
   "fontName": "SauceHanSerifJP",
   "schemas": [
-    {
-      "記入時(年)": {
+    [
+      {
         "type": "text",
         "position": {
           "x": 134.43,
@@ -25,9 +25,10 @@
         "fontSize": 14,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2020"
+        "content": "2020",
+        "name": "記入時(年)"
       },
-      "記入時(月)": {
+      {
         "type": "text",
         "position": {
           "x": 152.49,
@@ -39,9 +40,10 @@
         "fontSize": 14,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "12"
+        "content": "12",
+        "name": "記入時(月)"
       },
-      "記入時(日)": {
+      {
         "type": "text",
         "position": {
           "x": 167.45,
@@ -53,9 +55,10 @@
         "fontSize": 14,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "31"
+        "content": "31",
+        "name": "記入時(日)"
       },
-      "従業員名": {
+      {
         "type": "text",
         "position": {
           "x": 22.66,
@@ -67,9 +70,10 @@
         "fontSize": 15,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "田中太郎"
+        "content": "田中太郎",
+        "name": "従業員名"
       },
-      "事業場名称・所在地": {
+      {
         "type": "text",
         "position": {
           "x": 98.42,
@@ -81,9 +85,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1.3,
-        "content": "株式会社labelmake.jp\n東京都東京1-2-3-4 東京マンション123号"
+        "content": "株式会社labelmake.jp\n東京都東京1-2-3-4 東京マンション123号",
+        "name": "事業場名称・所在地"
       },
-      "使用者職氏名": {
+      {
         "type": "text",
         "position": {
           "x": 88.9,
@@ -95,9 +100,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "代表取締役 東京都 出得太"
+        "content": "代表取締役 東京都 出得太",
+        "name": "使用者職氏名"
       },
-      "雇用形態": {
+      {
         "type": "text",
         "position": {
           "x": 76.74,
@@ -109,9 +115,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "アルバイト従業員"
+        "content": "アルバイト従業員",
+        "name": "雇用形態"
       },
-      "契約期間": {
+      {
         "type": "text",
         "position": {
           "x": 47.11,
@@ -123,9 +130,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "令和\b1年12月31日から(期限の定めなし)"
+        "content": "令和\b1年12月31日から(期限の定めなし)",
+        "name": "契約期間"
       },
-      "契約更新": {
+      {
         "type": "text",
         "position": {
           "x": 46.86,
@@ -137,9 +145,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "自動的に更新する"
+        "content": "自動的に更新する",
+        "name": "契約更新"
       },
-      "就業場所": {
+      {
         "type": "text",
         "position": {
           "x": 46.81,
@@ -151,9 +160,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都東京1-2-3-4 東京マンション123号"
+        "content": "東京都東京1-2-3-4 東京マンション123号",
+        "name": "就業場所"
       },
-      "業務内容": {
+      {
         "type": "text",
         "position": {
           "x": 47.18,
@@ -165,9 +175,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "営業"
+        "content": "営業",
+        "name": "業務内容"
       },
-      "始業・就業の時刻": {
+      {
         "type": "text",
         "position": {
           "x": 83,
@@ -179,9 +190,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "午前10時 から 午後19時まで"
+        "content": "午前10時 から 午後19時まで",
+        "name": "始業・就業の時刻"
       },
-      "休憩時間": {
+      {
         "type": "text",
         "position": {
           "x": 62.84,
@@ -193,9 +205,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "60"
+        "content": "60",
+        "name": "休憩時間"
       },
-      "所定時間外労働": {
+      {
         "type": "text",
         "position": {
           "x": 75.49,
@@ -207,9 +220,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "有"
+        "content": "有",
+        "name": "所定時間外労働"
       },
-      "休日": {
+      {
         "type": "text",
         "position": {
           "x": 47.01,
@@ -221,9 +235,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "毎週土日・祝祭日"
+        "content": "毎週土日・祝祭日",
+        "name": "休日"
       },
-      "休暇": {
+      {
         "type": "text",
         "position": {
           "x": 46.91,
@@ -235,9 +250,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "お盆休暇、年末年始休暇(会社カレンダーによる)"
+        "content": "お盆休暇、年末年始休暇(会社カレンダーによる)",
+        "name": "休暇"
       },
-      "基本賃金": {
+      {
         "type": "text",
         "position": {
           "x": 47.17,
@@ -249,9 +265,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "時間給 1500円"
+        "content": "時間給 1500円",
+        "name": "基本賃金"
       },
-      "諸手当": {
+      {
         "type": "text",
         "position": {
           "x": 47.01,
@@ -263,9 +280,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "営業手当　10,000円/月、通勤手当　実費(上限 20,000円/月)"
+        "content": "営業手当　10,000円/月、通勤手当　実費(上限 20,000円/月)",
+        "name": "諸手当"
       },
-      "賃金締切日": {
+      {
         "type": "text",
         "position": {
           "x": 77.71,
@@ -277,9 +295,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "末"
+        "content": "末",
+        "name": "賃金締切日"
       },
-      "賃金支払日": {
+      {
         "type": "text",
         "position": {
           "x": 77.66,
@@ -291,9 +310,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "翌15"
+        "content": "翌15",
+        "name": "賃金支払日"
       },
-      "賞与": {
+      {
         "type": "text",
         "position": {
           "x": 47.11,
@@ -305,9 +325,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "無"
+        "content": "無",
+        "name": "賞与"
       },
-      "社会保険": {
+      {
         "type": "text",
         "position": {
           "x": 47.11,
@@ -319,9 +340,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "労災保険\n雇用保険"
+        "content": "労災保険\n雇用保険",
+        "name": "社会保険"
       },
-      "退職に関する事項": {
+      {
         "type": "text",
         "position": {
           "x": 47.11,
@@ -333,9 +355,10 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "自己都合退職の手続: 退職する1カ月以上前に届け出ること\t\t\t\n解雇の事由及び手続: 就業規則の定めによる\t\t\t"
+        "content": "自己都合退職の手続: 退職する1カ月以上前に届け出ること\t\t\t\n解雇の事由及び手続: 就業規則の定めによる\t\t\t",
+        "name": "退職に関する事項"
       },
-      "その他": {
+      {
         "type": "text",
         "position": {
           "x": 46.95,
@@ -347,8 +370,9 @@
         "fontSize": 10,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "以上のほかは、当社就業規則による。"
+        "content": "以上のほかは、当社就業規則による。",
+        "name": "その他"
       }
-    }
+    ]
   ]
 }

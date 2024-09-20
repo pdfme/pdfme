@@ -25,7 +25,6 @@ export interface TextSchema extends Schema {
     max: number;
     fit: DYNAMIC_FONT_SIZE_FIT;
   };
-
   fontColor: string;
   backgroundColor: string;
 }

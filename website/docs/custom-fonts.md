@@ -65,29 +65,32 @@ const font: Font = {
 const template: Template = {
   basePdf: BLANK_PDF,
   schemas: [
-    {
-      a: {
+    [
+      {
+        name: 'a',
         type: 'text',
         fontName: 'serif',
         position: { x: 0, y: 0 },
         width: 10,
         height: 10,
       },
-      b: {
+      {
+        name: 'b',
         type: 'text',
         fontName: 'sans_serif',
         position: { x: 10, y: 10 },
         width: 10,
         height: 10,
       },
-      c: {
+      {
         // <- use fallback font. (serif)
+        name: 'c',
         type: 'text',
         position: { x: 20, y: 20 },
         width: 10,
         height: 10,
       },
-    },
+    ],
   ],
 };
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];

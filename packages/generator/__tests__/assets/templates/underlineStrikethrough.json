@@ -1,7 +1,7 @@
 {
   "schemas": [
-    {
-      "underline": {
+    [
+      {
         "type": "text",
         "content": "Underline",
         "position": {
@@ -22,9 +22,10 @@
         "strikethrough": false,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "underline"
       },
-      "strikethrough": {
+      {
         "type": "text",
         "content": "Strike-through",
         "position": {
@@ -45,9 +46,10 @@
         "strikethrough": true,
         "underline": false,
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "strikethrough"
       },
-      "underline and strikethrough": {
+      {
         "type": "text",
         "content": "Underline and Strike-through",
         "position": {
@@ -68,9 +70,10 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "underline and strikethrough"
       },
-      "spacing and line height": {
+      {
         "type": "text",
         "content": "Underline and strike through with spacing and line-height",
         "position": {
@@ -91,9 +94,10 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "spacing and line height"
       },
-      "rotated": {
+      {
         "type": "text",
         "content": "Underline and strike through rotated",
         "position": {
@@ -114,9 +118,10 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular"
+        "fontName": "NotoSerifJP-Regular",
+        "name": "rotated"
       },
-      "dynamic font size": {
+      {
         "type": "text",
         "content": "Underline and strike through dynamic font",
         "position": {
@@ -142,9 +147,10 @@
           "min": 4,
           "max": 66,
           "fit": "vertical"
-        }
+        },
+        "name": "dynamic font size"
       }
-    }
+    ]
   ],
   "basePdf": {
     "width": 210,

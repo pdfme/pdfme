@@ -181,6 +181,7 @@ const imageSchema: Plugin<ImageSchema> = {
   propPanel: {
     schema: {},
     defaultSchema: {
+      name: '',
       type: 'image',
       content: defaultValue,
       position: { x: 0, y: 0 },

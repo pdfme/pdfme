@@ -8,6 +8,7 @@ import {
   checkPlugins,
   isHexValid,
   getDynamicTemplate,
+  migrateTemplate,
 } from '../src/helper';
 import {
   PT_TO_PX_RATIO,
@@ -16,6 +17,7 @@ import {
   Font,
   Plugins,
   Schema,
+  SchemaPageArray,
 } from '../src';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -29,8 +31,9 @@ const getSampleFont = (): Font => ({
 const getTemplate = (): Template => ({
   basePdf: BLANK_PDF,
   schemas: [
-    {
-      a: {
+    [
+      {
+        name: 'a',
         content: 'a',
         type: 'text',
         fontName: 'SauceHanSansJP',
@@ -38,14 +41,15 @@ const getTemplate = (): Template => ({
         width: 100,
         height: 100,
       },
-      b: {
+      {
+        name: 'b',
         content: 'b',
         type: 'text',
         position: { x: 0, y: 0 },
         width: 100,
         height: 100,
       },
-    },
+    ],
   ],
 });
 
@@ -100,22 +104,24 @@ describe('checkFont test', () => {
     const _getTemplate = (): Template => ({
       basePdf: BLANK_PDF,
       schemas: [
-        {
-          a: {
+        [
+          {
+            name: 'a',
             content: 'a',
             type: 'text',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
-          b: {
+          {
+            name: 'b',
             content: 'b',
             type: 'text',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
-        },
+        ],
       ],
     });
     try {
@@ -187,8 +193,9 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
     const _getTemplate = (): Template => ({
       basePdf: BLANK_PDF,
       schemas: [
-        {
-          a: {
+        [
+          {
+            name: 'a',
             type: 'text',
             content: 'a',
             fontName: 'SauceHanSansJP2',
@@ -196,14 +203,15 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
             width: 100,
             height: 100,
           },
-          b: {
+          {
+            name: 'b',
             type: 'text',
             content: 'b',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
           },
-        },
+        ],
       ],
     });
 
@@ -222,8 +230,9 @@ Check this document: https://pdfme.com/docs/custom-fonts`
     const _getTemplate = (): Template => ({
       basePdf: BLANK_PDF,
       schemas: [
-        {
-          a: {
+        [
+          {
+            name: 'a',
             type: 'text',
             content: 'a',
             fontName: 'SauceHanSansJP2',
@@ -231,7 +240,8 @@ Check this document: https://pdfme.com/docs/custom-fonts`
             width: 100,
             height: 100,
           },
-          b: {
+          {
+            name: 'b',
             type: 'text',
             content: 'b',
             fontName: 'SauceHanSerifJP2',
@@ -239,7 +249,7 @@ Check this document: https://pdfme.com/docs/custom-fonts`
             width: 100,
             height: 100,
           },
-        },
+        ],
       ],
     });
 
@@ -309,8 +319,8 @@ describe('checkPlugins test', () => {
   test('success test: type in Schemas(single)', () => {
     try {
       const template = getTemplate();
-      template.schemas[0].a.type = 'myText';
-      template.schemas[0].b.type = 'myText';
+      template.schemas[0][0].type = 'myText';
+      template.schemas[0][1].type = 'myText';
       checkPlugins({ template, plugins });
       expect.anything();
     } catch (e) {
@@ -320,8 +330,8 @@ describe('checkPlugins test', () => {
   test('success test: type in Schemas(multiple)', () => {
     try {
       const template = getTemplate();
-      template.schemas[0].a.type = 'myText';
-      template.schemas[0].b.type = 'myImage';
+      template.schemas[0][0].type = 'myText';
+      template.schemas[0][1].type = 'myImage';
       checkPlugins({ template, plugins });
       expect.anything();
     } catch (e) {
@@ -331,8 +341,8 @@ describe('checkPlugins test', () => {
   test('fail test: type in Schemas not found in plugins(single)', () => {
     try {
       const template = getTemplate();
-      template.schemas[0].a.type = 'fail';
-      template.schemas[0].b.type = 'myImage';
+      template.schemas[0][0].type = 'fail';
+      template.schemas[0][1].type = 'myImage';
       checkPlugins({ template, plugins });
       fail();
     } catch (e: any) {
@@ -344,8 +354,8 @@ describe('checkPlugins test', () => {
   test('fail test: type in Schemas not found in plugins(multiple)', () => {
     try {
       const template = getTemplate();
-      template.schemas[0].a.type = 'fail';
-      template.schemas[0].b.type = 'fail2';
+      template.schemas[0][0].type = 'fail';
+      template.schemas[0][1].type = 'fail2';
       checkPlugins({ template, plugins });
       fail();
     } catch (e: any) {
@@ -363,22 +373,24 @@ describe('getDynamicTemplate', () => {
   const padding = 10;
   const template: Template = {
     schemas: [
-      {
-        a: {
+      [
+        {
+          name: 'a',
           content: 'a',
           type: 'a',
           position: { x: 10, y: aPositionY },
           width: 10,
           height,
         },
-        b: {
+        {
+          name: 'b',
           content: 'b',
           type: 'b',
           position: { x: 10, y: bPositionY },
           width: 10,
           height,
         },
-      },
+      ],
     ],
     basePdf: { width: 100, height: 100, padding: [padding, padding, padding, padding] },
   };
@@ -415,10 +427,12 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].b.position.y).toEqual(
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[0][1].position.y).toEqual(
         increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY
       );
+      expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
     });
   });
 
@@ -429,9 +443,13 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(2);
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
-      expect(dynamicTemplate.schemas[1].b.position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][1]).toBeUndefined();
+
     });
 
     test('should handle page break with a on page 1 and 2, b on page 2', async () => {
@@ -440,12 +458,15 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(2);
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
-      expect(dynamicTemplate.schemas[1].a.position.y).toEqual(padding);
-      expect(dynamicTemplate.schemas[1].b.position.y).toEqual(
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[1][1].position.y).toEqual(
         increaseHeights.slice(3).reduce((a, b) => a + b, 0) - height + padding
       );
+      expect(dynamicTemplate.schemas[1][1].name).toEqual('b');
     });
 
     test('should handle multiple page breaks', async () => {
@@ -457,16 +478,18 @@ describe('getDynamicTemplate', () => {
 
       // Verify 'a' elements
       for (let i = 0; i < 4; i++) {
-        expect(dynamicTemplate.schemas[i].a).toBeDefined();
-        expect(dynamicTemplate.schemas[i].a.position.y).toEqual(i === 0 ? aPositionY : padding);
-        expect(dynamicTemplate.schemas[i].a.height).toEqual(i === 3 ? 100 : 50);
-        expect(dynamicTemplate.schemas[i].b).toBeUndefined();
+        expect(dynamicTemplate.schemas[i][0]).toBeDefined();
+        expect(dynamicTemplate.schemas[i][0].position.y).toEqual(i === 0 ? aPositionY : padding);
+        expect(dynamicTemplate.schemas[i][0].height).toEqual(i === 3 ? 100 : 50);
+        expect(dynamicTemplate.schemas[i][0].name).toEqual('a');
+        expect(dynamicTemplate.schemas[i][1]).toBeUndefined();
       }
 
       // Verify 'b' element
-      expect(dynamicTemplate.schemas[4].b).toBeDefined();
-      expect(dynamicTemplate.schemas[4].b.position.y).toEqual(padding);
-      expect(dynamicTemplate.schemas[4].b.height).toEqual(10);
+      expect(dynamicTemplate.schemas[4][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[4][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[4][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[4][0].height).toEqual(10);
     });
 
     test('should handle both a and b on next page', async () => {
@@ -477,19 +500,19 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas.length).toBe(2);
 
       // Check first page
-      expect(dynamicTemplate.schemas[0].a).toBeDefined();
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].a.height).toEqual(80);
-      expect(dynamicTemplate.schemas[0].b).toBeUndefined();
+      expect(dynamicTemplate.schemas[0][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].height).toEqual(80);
+      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
 
       // Check second page
-      expect(dynamicTemplate.schemas[1].a).toBeDefined();
-      expect(dynamicTemplate.schemas[1].a.position.y).toEqual(padding);
-      expect(dynamicTemplate.schemas[1].a.height).toEqual(20);
+      expect(dynamicTemplate.schemas[1][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].height).toEqual(20);
 
-      expect(dynamicTemplate.schemas[1].b).toBeDefined();
-      expect(dynamicTemplate.schemas[1].b.position.y).toBeGreaterThanOrEqual(
-        dynamicTemplate.schemas[1].a.position.y + dynamicTemplate.schemas[1].a.height
+      expect(dynamicTemplate.schemas[1][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[1][1].position.y).toBeGreaterThanOrEqual(
+        dynamicTemplate.schemas[1][0].position.y + dynamicTemplate.schemas[1][0].height
       );
     });
   });
@@ -504,15 +527,16 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas.length).toBe(2);
 
       // Check 'a' element
-      expect(dynamicTemplate.schemas[0].a).toBeDefined();
-      expect(dynamicTemplate.schemas[0].a.position.y).toEqual(aPositionY);
-      expect(dynamicTemplate.schemas[0].a.height).toEqual(50);
+      expect(dynamicTemplate.schemas[0][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
 
       // Check 'b' element
-      const bSchema = dynamicTemplate.schemas.find((schema) => schema.b)!;
-      expect(bSchema).toBeDefined();
-      expect(bSchema.b.position.y).toEqual(padding);
-      expect(bSchema.b.height).toEqual(bHeight);
+      expect(dynamicTemplate.schemas[1][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].height).toEqual(bHeight);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
     });
   });
 
@@ -523,8 +547,9 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
-      expect(dynamicTemplate.schemas[0].a).toBeUndefined();
-      expect(dynamicTemplate.schemas[0].b).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('b');
+      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
     });
 
     test('should handle very large increase heights', async () => {
@@ -534,5 +559,142 @@ describe('getDynamicTemplate', () => {
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBeGreaterThan(1);
     });
+  });
+});
+
+describe('migrateTemplate', () => {
+  it('should convert LegacySchemaPageArray to SchemaPageArray', () => {
+    const legacyTemplate: any = {
+      schemas: [
+        {
+          "field1": {
+            "type": "text",
+            "content": "Field 1",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          "field2": {
+            "type": "text",
+            "content": "Field 2",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        },
+        {
+          "field3": {
+            "type": "text",
+            "content": "Field 3",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        }
+      ]
+    };
+
+    migrateTemplate(legacyTemplate);
+
+    const expectedSchemaPageArray: SchemaPageArray = [
+      [
+        {
+          "name": "field1",
+          "type": "text",
+          "content": "Field 1",
+          "width": 45,
+          "height": 10,
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "name": "field2",
+          "type": "text",
+          "content": "Field 2",
+          "width": 45,
+          "height": 10,
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      [
+        {
+          "name": "field3",
+          "type": "text",
+          "content": "Field 3",
+          "width": 45,
+          "height": 10,
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ]
+    ];
+
+    expect(legacyTemplate.schemas).toEqual(expectedSchemaPageArray);
+  });
+
+  it('should not modify already SchemaPageArray', () => {
+    const pagedTemplate: any = {
+      schemas: [
+        [
+          {
+            "name": "field1",
+            "type": "text",
+            "content": "Field 1",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "name": "field2",
+            "type": "text",
+            "content": "Field 2",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        ],
+        [
+          {
+            "name": "field3",
+            "type": "text",
+            "content": "Field 3",
+            "width": 45,
+            "height": 10,
+            "position": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        ]
+      ]
+    };
+
+    const before = JSON.parse(JSON.stringify(pagedTemplate));
+
+    migrateTemplate(pagedTemplate);
+
+    expect(pagedTemplate.schemas).toEqual(before.schemas);
   });
 });

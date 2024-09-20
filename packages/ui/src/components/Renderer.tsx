@@ -45,7 +45,7 @@ const Wrapper = ({
   schema,
 }: RendererProps & { children: ReactNode }) => (
   <div
-    title={schema.key}
+    title={schema.name}
     onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
     onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
     className={SELECTABLE_CLASSNAME}
@@ -105,7 +105,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       const render = plugin.ui;
 
       void render({
-        key: schema.key,
         value,
         schema,
         basePdf,

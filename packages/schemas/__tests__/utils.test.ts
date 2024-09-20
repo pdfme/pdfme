@@ -76,6 +76,7 @@ describe('rotatePoint', () => {
 describe('convertForPdfLayoutProps', () => {
   it('should return correct value without rotation', () => {
     const schema: Schema = {
+      name: 'test',
       type: 'image',
       content: '',
       width: 100,
@@ -104,6 +105,7 @@ describe('convertForPdfLayoutProps', () => {
 
   it('should return correct value with rotation', () => {
     const schema: Schema = {
+      name: 'test',
       type: 'image',
       content: '',
       width: 50,
@@ -132,6 +134,7 @@ describe('convertForPdfLayoutProps', () => {
 
   it('should not rotate if asked not to', () => {
     const schema: Schema = {
+      name: 'test',
       type: 'text',
       content: '',
       width: 50,

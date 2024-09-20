@@ -49,9 +49,9 @@ const SelectableSortableItem = ({
   const iconStyles = { width: 20, marginRight: '0.5rem' };
 
   let status: undefined | 'is-warning' | 'is-danger';
-  if (!schema.key) {
+  if (!schema.name) {
     status = 'is-warning';
-  } else if (schemas.find((s) => schema.key && s.key === schema.key && s.id !== schema.id)) {
+  } else if (schemas.find((s) => schema.name && s.name === schema.name && s.id !== schema.id)) {
     status = 'is-danger';
   }
 
@@ -73,7 +73,7 @@ const SelectableSortableItem = ({
       onMouseLeave={onMouseLeave}
       onClick={() => onEdit(schema.id)}
       icon={thisPlugin && <PluginIcon plugin={thisPlugin} label={pluginLabel} size={20} styles={iconStyles}/>}
-      value={schema.key}
+      value={schema.name}
       status={status}
       title={title}
       required={schema.required}

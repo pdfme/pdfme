@@ -4,8 +4,8 @@
   "id": "735c3b30-da4e-11ea-8da5-b9c6f29dfbdb",
   "fontName": "SauceHanSansJP",
   "schemas": [
-    {
-      "入力項目1": {
+    [
+      {
         "type": "text",
         "position": {
           "x": 0,
@@ -17,8 +17,9 @@
         "fontSize": 18,
         "characterSpacing": 0,
         "lineHeight": 10,
-        "content": "text1\ntext2"
+        "content": "text1\ntext2",
+        "name": "入力項目1"
       }
-    }
+    ]
   ]
 }

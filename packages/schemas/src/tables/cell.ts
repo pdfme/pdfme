@@ -145,6 +145,7 @@ const cellSchema: Plugin<CellSchema> = {
       return getCellPropPanelSchema({ i18n, fontNames, fallbackFontName });
     },
     defaultSchema: {
+      name: '',
       type: 'cell',
       content: 'Type Something...',
       position: { x: 0, y: 0 },

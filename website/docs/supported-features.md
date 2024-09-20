@@ -18,6 +18,8 @@ For using schemas other than the Text schema, please refer to the following docu
   - Line Height
   - Text Color
   - Background Color
+  - Underline
+  - Strikethrough
 - Font-related
   - TrueType fonts (TTF & TTC)
   - OpenType fonts with PostScript or TrueType outlines (TTF, OTF, & OTC)
@@ -27,6 +29,9 @@ For using schemas other than the Text schema, please refer to the following docu
   - Dynamic Font Sizing
     - Detailed options for Min, Max, Fit
 - Support Read only
+
+### Multivariable Text
+- As per text, but supporting 0 to n variables in a single text field
 
 ### Shape
 
@@ -53,6 +58,7 @@ For using schemas other than the Text schema, please refer to the following docu
   - Support Read only
 - SVG
   - Support Read only
+- PDF (embed pdf inside pdf)
 
 ### Barcodes
 

@@ -84,6 +84,7 @@ export const Size = z.object({ height: z.number(), width: z.number() });
 
 export const Schema = z
   .object({
+    name: z.string(),
     type: z.string(),
     content: z.string().optional(),
     position: z.object({ x: z.number(), y: z.number() }),
@@ -98,10 +99,7 @@ export const Schema = z
   })
   .passthrough();
 
-const SchemaForUIAdditionalInfo = z.object({
-  id: z.string(),
-  key: z.string(),
-});
+const SchemaForUIAdditionalInfo = z.object({ id: z.string() });
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
@@ -117,9 +115,13 @@ const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
 export const BasePdf = z.union([CustomPdf, BlankPdf]);
 
+// Legacy keyed structure for BC - we convert to SchemaPageArray on import
+export const LegacySchemaPageArray = z.array(z.record(Schema));
+export const SchemaPageArray = z.array(z.array(Schema));
+
 export const Template = z
   .object({
-    schemas: z.array(z.record(Schema)),
+    schemas: SchemaPageArray,
     basePdf: BasePdf,
     pdfmeVersion: z.string().optional(),
   })

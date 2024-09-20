@@ -21,6 +21,7 @@ const getSampleFont = (): Font => ({
 
 const getTextSchema = () => {
   const textSchema: TextSchema = {
+    name: 'test',
     type: 'text',
     content: 'test',
     position: { x: 0, y: 0 },

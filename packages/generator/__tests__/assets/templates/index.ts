@@ -47,6 +47,7 @@ const pet = require('./pet.json') as Template;
 const pdfImage = require('./pdfImage.json') as Template;
 const underlineStrikethrough = require('./underlineStrikethrough.json') as Template;
 const multiVariableText = require('./multiVariableText.json') as Template;
+const preVersion5Format = require('./preVersion5Format.json') as Template;
 
 export const label = {
   宛名8面,
@@ -105,6 +106,7 @@ export const textType = {
 
 export const other = {
   test,
+  preVersion5Format,
   z97mmx210mm,
   canvasPdf,
   background,
