@@ -116,6 +116,35 @@ If the input data spans multiple pages, automatic page breaks will be inserted.
 
 ![Table with page breaks](/img/table-generated-pdf3.png)
 
+## About Table Settings
+
+Using the Designer, you can easily set the number of columns and rows in a table. You can also freely configure the table's style.
+
+### Column and Row Settings
+
+When you click on a selected table, it enters edit mode.
+
+In this mode, you can delete columns using the "-" button on each column, and add columns using the "+" button at the bottom right of the table.
+You can also change column widths by drag and drop.
+
+For row settings, you can add rows using the "+" button at the bottom of the table, and delete rows using the "-" button on the right side of each row.
+While the actual number of rows will vary depending on the data when creating the PDF, you can use this feature to set the number of rows when creating a non-editable table.
+
+![Table Column, Row Settings](/img/table-column-row-seting.gif)
+
+### Table Styles
+
+Like other schemas, you can set styles from the property panel on the right.
+The styles are broadly categorized into four types:
+- Table Style
+- Head Style
+- Body Style
+- Column Style
+
+For each, you can set borders, fonts, background colors, padding, and more.
+The Body's Alternate Background Color is used to alternate background colors of rows.
+
+
 ## Sample Using Table Schema
 
 You can check out a sample using the table schema at [https://playground.pdfme.com/](https://playground.pdfme.com/).
