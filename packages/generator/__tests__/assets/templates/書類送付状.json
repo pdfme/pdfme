@@ -12,8 +12,8 @@
   "id": "書類送付状",
   "fontName": "SauceHanSerifJP",
   "schemas": [
-    {
-      "日付": {
+    [
+      {
         "position": {
           "x": 148.53,
           "y": 35.18
@@ -25,9 +25,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "2020/01/01"
+        "content": "2020/01/01",
+        "name": "日付"
       },
-      "[送付先]会社名": {
+      {
         "position": {
           "x": 8.44,
           "y": 38.76
@@ -39,9 +40,10 @@
         "fontSize": 13.5,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社listmake.jp\n"
+        "content": "株式会社listmake.jp\n",
+        "name": "[送付先]会社名"
       },
-      "[送付先]担当者名": {
+      {
         "position": {
           "x": 33.65,
           "y": 52
@@ -53,9 +55,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "東京都 出得太"
+        "content": "東京都 出得太",
+        "name": "[送付先]担当者名"
       },
-      "[送付元]会社名": {
+      {
         "position": {
           "x": 122.48,
           "y": 47.92
@@ -67,9 +70,10 @@
         "fontSize": 13,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "株式会社labelmake.jp"
+        "content": "株式会社labelmake.jp",
+        "name": "[送付元]会社名"
       },
-      "[送付元]郵便番号": {
+      {
         "position": {
           "x": 131.23,
           "y": 57.32
@@ -81,9 +85,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "123-4567"
+        "content": "123-4567",
+        "name": "[送付元]郵便番号"
       },
-      "[送付元]住所": {
+      {
         "position": {
           "x": 128.89,
           "y": 62.6
@@ -95,9 +100,10 @@
         "fontSize": 11,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府大阪1-2-3-4\n大阪マンション123号"
+        "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
+        "name": "[送付元]住所"
       },
-      "[送付元]TEL": {
+      {
         "position": {
           "x": 140.94,
           "y": 71.71
@@ -109,9 +115,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "000-000-0000"
+        "content": "000-000-0000",
+        "name": "[送付元]TEL"
       },
-      "[送付元]FAX": {
+      {
         "position": {
           "x": 140.94,
           "y": 77.45
@@ -123,9 +130,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "000-000-0000"
+        "content": "000-000-0000",
+        "name": "[送付元]FAX"
       },
-      "[送付元]Email": {
+      {
         "position": {
           "x": 140.94,
           "y": 85.8
@@ -137,9 +145,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "info@labelmake.jp"
+        "content": "info@labelmake.jp",
+        "name": "[送付元]Email"
       },
-      "[送付元]担当者名": {
+      {
         "position": {
           "x": 140.94,
           "y": 92.48
@@ -151,9 +160,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "大阪府 出得太"
+        "content": "大阪府 出得太",
+        "name": "[送付元]担当者名"
       },
-      "品目1": {
+      {
         "position": {
           "x": 35.13,
           "y": 158.33
@@ -165,9 +175,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "書類1"
+        "content": "書類1",
+        "name": "品目1"
       },
-      "数量1": {
+      {
         "position": {
           "x": 157.09,
           "y": 158.07
@@ -179,9 +190,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1部"
+        "content": "1部",
+        "name": "数量1"
       },
-      "品目2": {
+      {
         "position": {
           "x": 35.13,
           "y": 165.35
@@ -193,9 +205,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "書類2"
+        "content": "書類2",
+        "name": "品目2"
       },
-      "数量2": {
+      {
         "position": {
           "x": 157.09,
           "y": 165.29
@@ -207,9 +220,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1部"
+        "content": "1部",
+        "name": "数量2"
       },
-      "品目3": {
+      {
         "position": {
           "x": 35.13,
           "y": 173.16
@@ -221,9 +235,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "書類3"
+        "content": "書類3",
+        "name": "品目3"
       },
-      "数量3": {
+      {
         "position": {
           "x": 157.09,
           "y": 172.63
@@ -235,9 +250,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1部"
+        "content": "1部",
+        "name": "数量3"
       },
-      "品目4": {
+      {
         "position": {
           "x": 35.05,
           "y": 179.91
@@ -249,9 +265,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "書類4"
+        "content": "書類4",
+        "name": "品目4"
       },
-      "数量4": {
+      {
         "position": {
           "x": 157.09,
           "y": 180.11
@@ -263,9 +280,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1部"
+        "content": "1部",
+        "name": "数量4"
       },
-      "品目5": {
+      {
         "position": {
           "x": 35.05,
           "y": 187.45
@@ -277,9 +295,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "書類5"
+        "content": "書類5",
+        "name": "品目5"
       },
-      "数量5": {
+      {
         "position": {
           "x": 157.51,
           "y": 187.45
@@ -291,9 +310,10 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "1部"
+        "content": "1部",
+        "name": "数量5"
       },
-      "備考": {
+      {
         "position": {
           "x": 10.92,
           "y": 217.34
@@ -305,8 +325,9 @@
         "fontSize": 12,
         "characterSpacing": 0,
         "lineHeight": 1,
-        "content": "ご質問等がございましたら、いつでもお問い合わせください。\n今後ともよろしくお願いいたします。"
+        "content": "ご質問等がございましたら、いつでもお問い合わせください。\n今後ともよろしくお願いいたします。",
+        "name": "備考"
       }
-    }
+    ]
   ]
 }

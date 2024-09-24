@@ -85,8 +85,6 @@ export const getSampleTemplate = (): Template => ({
   basePdf: examplePdfb64,
 });
 
-export const cloneDeep = (obj) => JSON.parse(JSON.stringify(obj));
-
 export const downloadJsonFile = (json: any, title: string) => {
   if (typeof window !== 'undefined') {
     const blob = new Blob([JSON.stringify(json)], {

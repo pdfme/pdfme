@@ -7,14 +7,13 @@ import {
   PreviewOutlined,
 } from '@mui/icons-material';
 import type { Template } from '@pdfme/common';
-import { getInputFromTemplate } from '@pdfme/common';
+import { cloneDeep, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 import { Designer } from '@pdfme/ui';
 import { text, image, barcodes } from '@pdfme/schemas';
 import Layout from '@theme/Layout';
 import {
   getSampleTemplate,
-  cloneDeep,
   downloadJsonFile,
   readFile,
   getTemplateFromJsonFile,

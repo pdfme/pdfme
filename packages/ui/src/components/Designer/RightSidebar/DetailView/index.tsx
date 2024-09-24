@@ -68,10 +68,10 @@ const DetailView = (props: DetailViewProps) => {
   useEffect(() => form.resetFields(), [activeSchema.id])
 
   useEffect(() => {
-    uniqueSchemaKey.current = (value: string): boolean => {
+    uniqueSchemaName.current = (value: string): boolean => {
       for (const page of schemasList) {
         for (const s of Object.values(page)) {
-          if (s.key === value && s.id !== activeSchema.id) {
+          if (s.name === value && s.id !== activeSchema.id) {
             return false;
           }
         }
@@ -80,9 +80,9 @@ const DetailView = (props: DetailViewProps) => {
     };
   }, [schemasList, activeSchema]);
 
-  const uniqueSchemaKey = useRef((value: string): boolean => true);
+  const uniqueSchemaName = useRef((value: string): boolean => true);
 
-  const validateUniqueSchemaKey = (_: any, value: string): boolean => uniqueSchemaKey.current(value)
+  const validateUniqueSchemaName = (_: any, value: string): boolean => uniqueSchemaName.current(value)
 
   const handleWatch = debounce((formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
@@ -163,13 +163,13 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         required: true,
         span: 12,
       },
-      key: {
+      name: {
         title: i18n('fieldName'),
         type: 'string',
         required: true,
         span: 12,
         rules: [{
-          validator: validateUniqueSchemaKey,
+          validator: validateUniqueSchemaName,
           message: i18n('validation.uniqueName'),
         }],
         props: { autoComplete: "off" }

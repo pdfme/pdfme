@@ -16,6 +16,7 @@ async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
     ...arg,
     value: cell.raw,
     schema: {
+      name: '',
       type: 'cell',
       position: { x: cell.x, y: cell.y },
       width: cell.width,
@@ -72,6 +73,7 @@ async function drawTableBorder(
   await rectanglePdfRender({
     ...arg,
     schema: {
+      name: '',
       type: 'rectangle',
       borderWidth: lineWidth,
       borderColor: lineColor,

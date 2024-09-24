@@ -10,6 +10,7 @@ import {
 import type {
   ChangeSchemaItem,
   ChangeSchemas,
+  SchemaPageArray,
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,
@@ -37,6 +38,7 @@ import type {
   DesignerProps,
 } from './types.js';
 import {
+  cloneDeep,
   getFallbackFontName,
   getDefaultFont,
   getB64BasePdf,
@@ -67,6 +69,7 @@ export {
   BLANK_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
+  cloneDeep,
   getFallbackFontName,
   getDefaultFont,
   getB64BasePdf,
@@ -110,6 +113,7 @@ export type {
   DesignerProps,
   ChangeSchemaItem,
   ChangeSchemas,
+  SchemaPageArray,
   PropPanel,
   PropPanelSchema,
   PropPanelWidgetProps,

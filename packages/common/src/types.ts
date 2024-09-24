@@ -23,6 +23,8 @@ import {
   PreviewProps,
   DesignerProps,
   ColorType,
+  LegacySchemaPageArray,
+  SchemaPageArray,
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
@@ -36,7 +38,6 @@ export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
 /**
  * Properties used for PDF rendering.
  * @template T Type of the extended Schema object.
- * @property {string} key The key of the schema object.
  * @property {string} value The string used for PDF rendering.
  * @property {T} schema Extended Schema object for rendering.
  * @property {BasePdf} basePdf Base PDF object for rendering.
@@ -47,7 +48,6 @@ export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
  * @property {Map<any, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
  */
 export interface PDFRenderProps<T extends Schema> {
-  key: string;
   value: string;
   schema: T;
   basePdf: BasePdf;
@@ -86,7 +86,6 @@ export type UIRenderProps<T extends Schema> = {
   tabIndex?: number;
   placeholder?: string;
   stopEditing?: () => void;
-  key: string;
   value: string;
   onChange?: (arg: { key: string; value: any } | { key: string; value: any }[]) => void;
   rootElement: HTMLDivElement;
@@ -186,3 +185,5 @@ export type UIOptions = z.infer<typeof UIOptions> & { theme?: ThemeConfig };
 export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
 export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
 export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
+export type SchemaPageArray = z.infer<typeof SchemaPageArray>;
+export type LegacySchemaPageArray = z.infer<typeof LegacySchemaPageArray>;

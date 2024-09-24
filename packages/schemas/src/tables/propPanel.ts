@@ -61,6 +61,7 @@ export const propPanel: PropPanel<TableSchema> = {
     };
   },
   defaultSchema: {
+    name: '',
     type: 'table',
     position: { x: 0, y: 0 },
     width: 150,

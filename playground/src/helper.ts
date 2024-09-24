@@ -15,7 +15,7 @@ import {
   image,
   svg,
   line,
-  tableBeta,
+  table,
   rectangle,
   ellipse,
 } from '@pdfme/schemas';
@@ -70,8 +70,6 @@ export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuf
   });
 };
 
-export const cloneDeep = (obj: unknown) => JSON.parse(JSON.stringify(obj));
-
 const getTemplateFromJsonFile = (file: File) => {
   return readFile(file, 'text').then((jsonStr) => {
     const template: Template = JSON.parse(jsonStr as string);
@@ -116,7 +114,7 @@ export const getPlugins = () => {
   return {
     Text: text,
     'Multi-Variable Text': multiVariableText,
-    Table: tableBeta,
+    Table: table,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
@@ -724,7 +722,7 @@ const getInvoiceTemplate = (): Template => ({
 });
 
 const getBlankTemplate = () =>
-  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] } } as Template);
+  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] } } as Template);
 export const getTemplatePresets = (): {
   key: string;
   label: string;

@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
-import { Template, checkTemplate, Lang } from "@pdfme/common";
+import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
   getTemplatePresets,
   getTemplateByPreset,
   readFile,
-  cloneDeep,
   getPlugins,
   handleLoadTemplate,
   generatePDF,

@@ -87,6 +87,7 @@ const shape: Plugin<ShapeSchema> = {
       },
     }),
     defaultSchema: {
+      name: '',
       type: 'rectangle',
       position: { x: 0, y: 0 },
       width: 62.5,

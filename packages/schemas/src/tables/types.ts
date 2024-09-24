@@ -26,8 +26,6 @@ export interface TableSchema extends Schema {
   head: string[];
   headWidthPercentages: number[];
 
-  __bodyRange?: { start: number; end?: number };
-
   tableStyles: {
     borderColor: string;
     borderWidth: number;

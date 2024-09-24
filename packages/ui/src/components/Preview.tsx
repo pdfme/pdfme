@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
-import { modifyTemplateForTable, getDynamicHeightForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -20,7 +20,7 @@ const Preview = ({
   size,
   onChangeInput,
 }: Omit<PreviewProps, 'domContainer'> & {
-  onChangeInput?: (args: { index: number; value: string; key: string }) => void;
+  onChangeInput?: (args: { index: number; value: string; name: string }) => void;
   size: Size;
 }) => {
   const { token } = theme.useToken();
@@ -49,13 +49,10 @@ const Preview = ({
       input,
       options,
       _cache,
-      modifyTemplate: (arg) => {
-        return modifyTemplateForTable(arg);
-      },
-      getDynamicHeight: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve(args.schema.height);
-        return getDynamicHeightForTable(value, args);
-      },
+      getDynamicHeights: (value, args) => {
+        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
+        return getDynamicHeightsForTable(value, args);
+      }
     })
       .then(async (dynamicTemplate) => {
         const sl = await template2SchemasList(dynamicTemplate);
@@ -81,8 +78,8 @@ const Preview = ({
     onChangePageCursor: setPageCursor,
   });
 
-  const handleChangeInput = ({ key, value }: { key: string; value: string }) =>
-    onChangeInput && onChangeInput({ index: unitCursor, key, value });
+  const handleChangeInput = ({ name, value }: { name: string; value: string }) =>
+    onChangeInput && onChangeInput({ index: unitCursor, name, value });
 
   if (error) {
     return <ErrorScreen size={size} error={error} />;
@@ -117,8 +114,8 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
-            const { key, readOnly } = schema;
-            const content = readOnly ? String(schema.content) || '' : String(input && input[key] || '');
+            const { name, readOnly } = schema;
+            const content = readOnly ? String(schema.content) || '' : String(input && input[name] || '');
             return (
               <Renderer
                 key={schema.id}
@@ -134,9 +131,9 @@ const Preview = ({
                   args.forEach(({ key: _key, value }) => {
                     if (_key === 'content') {
                       const newValue = value as string;
-                      const oldValue = (input?.[key] as string) || '';
+                      const oldValue = (input?.[name] as string) || '';
                       if (newValue === oldValue) return;
-                      handleChangeInput({ key, value: newValue });
+                      handleChangeInput({ name, value: newValue });
                       // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
                       if (schema.type === 'table') isNeedInit = true;
                     } else {

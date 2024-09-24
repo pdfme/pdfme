@@ -1,6 +1,16 @@
 import { z } from 'zod';
 import { Buffer } from 'buffer';
-import { Schema, Template, Font, BasePdf, Plugins, BlankPdf, CommonOptions } from './types';
+import {
+  Schema,
+  Template,
+  Font,
+  BasePdf,
+  Plugins,
+  BlankPdf,
+  CommonOptions,
+  LegacySchemaPageArray,
+  SchemaPageArray
+} from './types';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,
@@ -18,6 +28,8 @@ import {
   DEFAULT_FONT_NAME,
   DEFAULT_FONT_VALUE,
 } from './constants.js';
+
+export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
@@ -77,12 +89,34 @@ export const isHexValid = (hex: string): boolean => {
   return /^#(?:[A-Fa-f0-9]{3,4}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/i.test(hex);
 };
 
+/**
+ * Migrate from legacy keyed object format to array format
+ * @param template Template
+ */
+export const migrateTemplate = (template: Template) => {
+  if (!template.schemas) {
+    return;
+  }
+
+  if (Array.isArray(template.schemas) && template.schemas.length > 0 && !Array.isArray(template.schemas[0])) {
+    template.schemas = (template.schemas as unknown as LegacySchemaPageArray).map(
+      (page: Record<string, Schema>) =>
+        Object.entries(page).map(([key, value]) => ({
+          ...value,
+          name: key,
+        }))
+    );
+  }
+};
+
 export const getInputFromTemplate = (template: Template): { [key: string]: string }[] => {
+  migrateTemplate(template);
+
   const input: { [key: string]: string } = {};
-  template.schemas.forEach((schema) => {
-    Object.entries(schema).forEach(([key, value]) => {
-      if (!value.readOnly) {
-        input[key] = value.content || '';
+  template.schemas.forEach(page => {
+    page.forEach(schema => {
+      if (!schema.readOnly) {
+        input[schema.name] = schema.content || '';
       }
     });
   });
@@ -122,10 +156,10 @@ export const b64toUint8Array = (base64: string) => {
   return unit8arr;
 };
 
-const getFontNamesInSchemas = (schemas: { [key: string]: Schema }[]) =>
+const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
-      .map((s) => Object.values(s).map((v) => (v as any).fontName ?? ''))
+      .map((p) => p.map((v) => (v as any).fontName ?? ''))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[]
   );
@@ -167,7 +201,7 @@ export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
     plugins,
     template: { schemas },
   } = arg;
-  const allSchemaTypes = uniq(schemas.map((s) => Object.values(s).map((v) => v.type)).flat());
+  const allSchemaTypes = uniq(schemas.map((p) => p.map((v) => v.type)).flat());
 
   const pluginsSchemaTypes = Object.values(plugins).map((p) => p?.propPanel.defaultSchema.type);
 
@@ -217,123 +251,296 @@ ${message}`);
 
 export const checkInputs = (data: unknown) => checkProps(data, InputsSchema);
 export const checkUIOptions = (data: unknown) => checkProps(data, UIOptionsSchema);
-export const checkTemplate = (data: unknown) => checkProps(data, TemplateSchema);
-export const checkUIProps = (data: unknown) => checkProps(data, UIPropsSchema);
 export const checkPreviewProps = (data: unknown) => checkProps(data, PreviewPropsSchema);
 export const checkDesignerProps = (data: unknown) => checkProps(data, DesignerPropsSchema);
-export const checkGenerateProps = (data: unknown) => checkProps(data, GeneratePropsSchema);
+export const checkUIProps = (data: unknown) => {
+  if (typeof data === 'object' && data !== null && 'template' in data) {
+    migrateTemplate(data.template as Template);
+  }
+  checkProps(data, UIPropsSchema);
+}
+export const checkTemplate = (template: unknown) => {
+  migrateTemplate(template as Template);
+  checkProps(template, TemplateSchema);
+}
+export const checkGenerateProps = (data: unknown) => {
+  if (typeof data === 'object' && data !== null && 'template' in data) {
+    migrateTemplate(data.template as Template);
+  }
+  checkProps(data, GeneratePropsSchema);
+}
 
 interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
   _cache: Map<any, any>;
   options: CommonOptions;
-  modifyTemplate: (arg: {
-    template: Template;
-    input: Record<string, string>;
-    _cache: Map<any, any>;
-    options: CommonOptions;
-  }) => Promise<Template>;
-  getDynamicHeight: (
+  getDynamicHeights: (
     value: string,
     args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
-  ) => Promise<number>;
+  ) => Promise<number[]>;
+}
+
+class Node {
+  index = 0;
+
+  schema?: Schema;
+
+  children: Node[] = [];
+
+  width = 0;
+  height = 0;
+  padding: [number, number, number, number] = [0, 0, 0, 0];
+  position: { x: number; y: number } = { x: 0, y: 0 };
+
+  constructor({ width = 0, height = 0 } = {}) {
+    this.width = width;
+    this.height = height;
+  }
+
+  setIndex(index: number): void {
+    this.index = index;
+  }
+
+  setSchema(schema: Schema): void {
+    this.schema = schema;
+  }
+
+  setWidth(width: number): void {
+    this.width = width;
+  }
+
+  setHeight(height: number): void {
+    this.height = height;
+  }
+
+  setPadding(padding: [number, number, number, number]): void {
+    this.padding = padding;
+  }
+
+  setPosition(position: { x: number; y: number }): void {
+    this.position = position;
+  }
+
+  insertChild(child: Node): void {
+    const index = this.getChildCount();
+    child.setIndex(index);
+    this.children.splice(index, 0, child);
+  }
+
+  getChildCount(): number {
+    return this.children.length;
+  }
+
+  getChild(index: number): Node {
+    return this.children[index];
+  }
+}
+
+function createPage(basePdf: BlankPdf) {
+  const page = new Node({ ...basePdf });
+  page.setPadding(basePdf.padding);
+  return page;
+}
+
+function createNode(arg: {
+  schema: Schema;
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+}) {
+  const { position, width, height, schema } = arg;
+  const node = new Node({ width, height });
+  node.setPosition(position);
+  node.setSchema(schema);
+  return node;
+}
+
+function resortChildren(page: Node, orderMap: Map<string, number>): void {
+  page.children = page.children
+    .sort((a, b) => {
+      const orderA = orderMap.get(a.schema?.name!);
+      const orderB = orderMap.get(b.schema?.name!);
+      if (orderA === undefined || orderB === undefined) {
+        throw new Error('[@pdfme/common] order is not defined');
+      }
+      return orderA - orderB;
+    })
+    .map((child, index) => {
+      child.setIndex(index);
+      return child;
+    });
+}
+
+async function createOnePage(
+  arg: {
+    basePdf: BlankPdf;
+    schemaPage: Schema[];
+    orderMap: Map<string, number>;
+  } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
+): Promise<Node> {
+  const { basePdf, schemaPage, orderMap, input, options, _cache, getDynamicHeights } = arg;
+  const page = createPage(basePdf);
+
+  const schemaPositions: number[] = [];
+  const sortedSchemaEntries = cloneDeep(schemaPage).sort((a, b) => a.position.y - b.position.y);
+  const diffMap = new Map();
+  for (const schema of sortedSchemaEntries) {
+    const { position, width } = schema;
+
+    const opt = { schema, basePdf, options, _cache };
+    const value = (schema.readOnly ? schema.content : input?.[schema.name]) || '';
+    const heights = await getDynamicHeights(value, opt);
+
+    const heightsSum = heights.reduce((acc, cur) => acc + cur, 0);
+    const originalHeight = schema.height;
+    if (heightsSum !== originalHeight) {
+      diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
+    }
+    heights.forEach((height, index) => {
+      let y = schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
+      for (const [diffY, diff] of diffMap.entries()) {
+        if (diffY <= schema.position.y) {
+          y += diff;
+        }
+      }
+      const node = createNode({ schema, position: { ...position, y }, width, height });
+
+      schemaPositions.push(y + height + basePdf.padding[2]);
+      page.insertChild(node);
+    });
+  }
+
+  const pageHeight = Math.max(...schemaPositions, basePdf.height - basePdf.padding[2]);
+  page.setHeight(pageHeight);
+
+  resortChildren(page, orderMap);
+
+  return page;
+}
+
+function breakIntoPages(arg: {
+  longPage: Node;
+  orderMap: Map<string, number>;
+  basePdf: BlankPdf;
+}): Node[] {
+  const { longPage, orderMap, basePdf } = arg;
+  const pages: Node[] = [createPage(basePdf)];
+  const [paddingTop, , paddingBottom] = basePdf.padding;
+  const yAdjustments: { page: number; value: number }[] = [];
+
+  const getPageHeight = (pageIndex: number) =>
+    basePdf.height - paddingBottom - (pageIndex > 0 ? paddingTop : 0);
+
+  const calculateNewY = (y: number, pageIndex: number) => {
+    const newY = y - pageIndex * (basePdf.height - paddingTop - paddingBottom);
+
+    while (pages.length <= pageIndex) {
+      if (!pages[pageIndex]) {
+        pages.push(createPage(basePdf));
+        yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
+      }
+    }
+    return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
+  };
+
+  const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
+  for (let i = 0; i < children.length; i++) {
+    const { schema, position, height, width } = children[i];
+    const { y, x } = position;
+
+    let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
+    let newY = calculateNewY(y, targetPageIndex);
+
+    if (newY + height > basePdf.height - paddingBottom) {
+      targetPageIndex++;
+      newY = calculateNewY(y, targetPageIndex);
+    }
+
+    if (!schema) throw new Error('[@pdfme/common] schema is undefined');
+
+    const clonedElement = createNode({ schema, position: { x, y: newY }, width, height });
+    pages[targetPageIndex].insertChild(clonedElement);
+  }
+
+  pages.forEach((page) => resortChildren(page, orderMap));
+
+  return pages;
+}
+
+function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
+  const newTemplate: Template = {
+    schemas: Array.from({ length: pages.length }, () => ([] as Schema[])),
+    basePdf: basePdf,
+  };
+
+  const nameToSchemas = new Map<string, Node[]>();
+
+  cloneDeep(pages).forEach((page, pageIndex) => {
+    page.children.forEach((child) => {
+      const { schema } = child;
+      if (!schema) throw new Error('[@pdfme/common] schema is undefined');
+
+      const name = schema.name
+      if (!nameToSchemas.has(name)) {
+        nameToSchemas.set(name, []);
+      }
+      nameToSchemas.get(name)!.push(child);
+
+      const sameNameSchemas = page.children.filter((c) => c.schema?.name === name);
+      const start = nameToSchemas.get(name)!.length - sameNameSchemas.length;
+
+      if (sameNameSchemas.length > 0) {
+        if (!sameNameSchemas[0].schema) {
+          throw new Error('[@pdfme/common] schema is undefined');
+        }
+
+        // Use the first schema to get the schema and position
+        const schema = sameNameSchemas[0].schema;
+        const height = sameNameSchemas.reduce((acc, cur) => acc + cur.height, 0);
+        const position = sameNameSchemas[0].position;
+
+        // Currently, __bodyRange exists for table schemas, but if we make it more abstract,
+        // it could be used for other schemas as well to render schemas that have been split by page breaks, starting from the middle.
+        schema.__bodyRange = {
+          start: Math.max(start - 1, 0),
+          end: start + sameNameSchemas.length - 1,
+        };
+
+        // Currently, this is used to determine whether to display the header when a table is split.
+        schema.__isSplit = start > 0;
+
+        const newSchema = Object.assign({}, schema, { position, height });
+        const index = newTemplate.schemas[pageIndex].findIndex((s) => s.name === name);
+        if (index !== -1) {
+          newTemplate.schemas[pageIndex][index] = newSchema;
+        } else {
+          newTemplate.schemas[pageIndex].push(newSchema);
+        }
+      }
+    });
+  });
+
+  return newTemplate;
 }
 
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg
 ): Promise<Template> => {
-  const { template, modifyTemplate } = arg;
+  const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {
     return template;
   }
 
-  const modifiedTemplate = await modifyTemplate(arg);
+  const basePdf = template.basePdf as BlankPdf;
+  const pages: Node[] = [];
 
-  const diffMap = await calculateDiffMap({ ...arg, template: modifiedTemplate });
-
-  return normalizePositionsAndPageBreak(modifiedTemplate, diffMap);
-};
-
-export const calculateDiffMap = async (arg: ModifyTemplateForDynamicTableArg) => {
-  const { template, input, _cache, options, getDynamicHeight } = arg;
-  const basePdf = template.basePdf;
-  const tmpDiffMap = new Map<number, number>();
-  if (!isBlankPdf(basePdf)) {
-    return tmpDiffMap;
-  }
-  const pageHeight = basePdf.height;
-  let pageIndex = 0;
-  for (const schemaObj of template.schemas) {
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const dynamicHeight = await getDynamicHeight(input?.[key] || '', {
-        schema,
-        basePdf,
-        options,
-        _cache,
-      });
-      if (schema.height !== dynamicHeight) {
-        tmpDiffMap.set(
-          schema.position.y + schema.height + pageHeight * pageIndex,
-          dynamicHeight - schema.height
-        );
-      }
-    }
-    pageIndex++;
+  for (const schemaPage of template.schemas) {
+    const orderMap = new Map(schemaPage.map((schema, index) => [schema.name, index]));
+    const longPage = await createOnePage({ basePdf, schemaPage, orderMap, ...arg });
+    const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
+    pages.push(...brokenPages);
   }
 
-  const diffMap = new Map<number, number>();
-  const keys = Array.from(tmpDiffMap.keys()).sort((a, b) => a - b);
-  let additionalHeight = 0;
-
-  for (const key of keys) {
-    const value = tmpDiffMap.get(key) as number;
-    const newValue = value + additionalHeight;
-    diffMap.set(key + additionalHeight, newValue);
-    additionalHeight += newValue;
-  }
-
-  return diffMap;
-};
-
-export const normalizePositionsAndPageBreak = (
-  template: Template,
-  diffMap: Map<number, number>
-): Template => {
-  if (!isBlankPdf(template.basePdf) || diffMap.size === 0) {
-    return template;
-  }
-
-  const returnTemplate: Template = { schemas: [{}], basePdf: template.basePdf };
-  const pages = returnTemplate.schemas;
-  const pageHeight = template.basePdf.height;
-  const paddingTop = template.basePdf.padding[0];
-  const paddingBottom = template.basePdf.padding[2];
-
-  for (let i = 0; i < template.schemas.length; i += 1) {
-    const schemaObj = template.schemas[i];
-    if (!pages[i]) pages[i] = {};
-
-    for (const [key, schema] of Object.entries(schemaObj)) {
-      const { position, height } = schema;
-      let newY = position.y;
-      let pageCursor = i;
-
-      for (const [diffKey, diffValue] of diffMap) {
-        if (newY > diffKey) {
-          newY += diffValue;
-        }
-      }
-
-      while (newY + height >= pageHeight - paddingBottom) {
-        newY = newY + paddingTop - (pageHeight - paddingBottom) + paddingTop;
-        pageCursor++;
-      }
-
-      if (!pages[pageCursor]) pages[pageCursor] = {};
-      pages[pageCursor][key] = { ...schema, position: { ...position, y: newY } };
-    }
-  }
-
-  return returnTemplate;
+  return createNewTemplate(pages, template.basePdf);
 };

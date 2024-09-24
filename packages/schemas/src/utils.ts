@@ -203,4 +203,3 @@ export const createErrorElm = () => {
 
   return container;
 };
-export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
