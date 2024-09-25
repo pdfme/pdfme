@@ -5,12 +5,11 @@ import { getInputFromTemplate } from '@pdfme/common';
 import {
   text,
   image,
+  svg,
   line,
   rectangle,
   ellipse,
-  readOnlyText,
   barcodes,
-  readOnlySvg,
 } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
@@ -53,13 +52,12 @@ describe('generate integration test(other, shape)', () => {
           plugins: {
             text,
             image,
+            svg,
             line,
             rectangle,
             ellipse,
             signature,
             qrcode: barcodes.qrcode,
-            readOnlyText,
-            readOnlySvg,
           },
           options: { font },
         });

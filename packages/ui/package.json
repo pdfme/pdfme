@@ -81,6 +81,7 @@
     ],
     "moduleNameMapper": {
       "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^antd/es/": "antd/lib/",
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",

@@ -24,7 +24,7 @@
         "name": "name"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 23.55,
           "y": 45.62
@@ -59,7 +59,7 @@
         "name": "photo"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 23.55,
           "y": 178.33
@@ -103,7 +103,7 @@
         "name": "age"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 23.55,
           "y": 185
@@ -147,7 +147,7 @@
         "name": "sex"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 23.55,
           "y": 191.66
@@ -191,7 +191,7 @@
         "name": "weight"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 23.55,
           "y": 198.33
@@ -249,7 +249,7 @@
         "name": "line1"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 114.24,
           "y": 32.81
@@ -271,7 +271,7 @@
         "name": "personality"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 114.24,
           "y": 41.22
@@ -307,7 +307,7 @@
         "name": "line2"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 114.24,
           "y": 103.4
@@ -329,7 +329,7 @@
         "name": "health"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 114.24,
           "y": 111.81
@@ -365,7 +365,7 @@
         "name": "line3"
       },
       {
-        "type": "readOnlyText",
+        "type": "text",
         "position": {
           "x": 114.24,
           "y": 190.71
@@ -413,7 +413,7 @@
         "name": "signature"
       },
       {
-        "type": "readOnlySvg",
+        "type": "svg",
         "position": {
           "x": 180,
           "y": 10
