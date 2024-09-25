@@ -13,7 +13,7 @@
       "DOM",
       "DOM.Iterable"
     ],
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": [

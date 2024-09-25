@@ -1,5 +1,5 @@
 // TODO: Automatically retrieve and apply the current git tag during the build process.
-export const PDFME_VERSION = '4.0.0';
+export const PDFME_VERSION = '5.0.0';
 export const PT_TO_PX_RATIO = 1.333;
 export const PT_TO_MM_RATIO = 0.3528;
 export const MM_TO_PT_RATIO = 2.8346; // https://www.ddc.co.jp/words/archives/20090701114500.html

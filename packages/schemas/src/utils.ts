@@ -1,6 +1,7 @@
 import type * as CSS from 'csstype';
 import { cmyk, degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
 import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
+import { getDynamicHeightsForTable as _getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
 
 export const convertForPdfLayoutProps = ({
   schema,
@@ -60,6 +61,10 @@ export const rotatePoint = (
   return { x, y };
 };
 
+export const getDynamicHeightsForTable = _getDynamicHeightsForTable;
+
+// ----------------------------------------
+
 export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
   if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/i.test(hex)) {
     throw new Error('Invalid HEX color code');
@@ -103,7 +108,7 @@ export const hex2RgbColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-export const hex2CmykColor = (hexString: string | undefined) => {
+const hex2CmykColor = (hexString: string | undefined) => {
   if (hexString) {
     const isValid = isHexValid(hexString);
 

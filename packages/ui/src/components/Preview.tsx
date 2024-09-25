@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import UnitPager from './UnitPager';
 import Root from './Root';
 import ErrorScreen from './ErrorScreen';
@@ -50,9 +50,13 @@ const Preview = ({
       options,
       _cache,
       getDynamicHeights: (value, args) => {
-        if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
-        return getDynamicHeightsForTable(value, args);
-      }
+        switch (args.schema.type) {
+          case 'table':
+            return getDynamicHeightsForTable(value, args);
+          default:
+            return Promise.resolve([args.schema.height]);
+        }
+      },
     })
       .then(async (dynamicTemplate) => {
         const sl = await template2SchemasList(dynamicTemplate);
