@@ -201,7 +201,7 @@ export const getPdfPageSizes = async (pdfBlob: Blob) => {
   const promises = Promise.all(
     new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
       return await pdfDoc.getPage(i + 1).then((page) => {
-        const { height, width } = page.getViewport({ scale: 1 });
+        const { height, width } = page.getViewport({ scale: 1, rotation: 0 });
 
         return { height: pt2mm(height), width: pt2mm(width) };
       });
@@ -223,8 +223,8 @@ const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg
         const canvas = document.createElement('canvas');
         canvas.width = width * 2;
         const canvasContext = canvas.getContext('2d')!;
-        const scaleRequired = canvas.width / page.getViewport({ scale: 1 }).width;
-        const viewport = page.getViewport({ scale: scaleRequired });
+        const scaleRequired = canvas.width / page.getViewport({ scale: 1, rotation: 0 }).width;
+        const viewport = page.getViewport({ scale: scaleRequired, rotation: 0 });
         canvas.height = viewport.height;
 
         return page
@@ -303,7 +303,7 @@ export const template2SchemasList = async (_template: Template) => {
 
 export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
   schemas: cloneDeep(schemasList).map((page) =>
-    page.map(schema => {
+    page.map((schema) => {
       // @ts-ignore
       delete schema.id;
       return schema;
