@@ -2,21 +2,22 @@ import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/comm
 import { examplePdfb64, dogPngb64 } from './sampleData';
 export const getSampleTemplate = (): Template => ({
   schemas: [
-    {
-      name: {
+    [
+      {
+        name: 'name',
         type: 'text',
         content: 'Pet Name',
         position: {
-          x: 25.06,
-          y: 26.35,
+          x: 24.8,
+          y: 26.61,
         },
         width: 77.77,
         height: 18.7,
         fontSize: 36,
         fontColor: '#14b351',
       },
-
-      photo: {
+      {
+        name: 'photo',
         type: 'image',
         content: dogPngb64,
         position: {
@@ -26,7 +27,8 @@ export const getSampleTemplate = (): Template => ({
         width: 60.66,
         height: 93.78,
       },
-      age: {
+      {
+        name: 'age',
         type: 'text',
         content: '4 years',
         position: {
@@ -37,7 +39,8 @@ export const getSampleTemplate = (): Template => ({
         height: 6.12,
         fontSize: 12,
       },
-      sex: {
+      {
+        name: 'sex',
         type: 'text',
         content: 'Male',
         position: {
@@ -48,7 +51,8 @@ export const getSampleTemplate = (): Template => ({
         height: 6.12,
         fontSize: 12,
       },
-      weight: {
+      {
+        name: 'weight',
         type: 'text',
         content: '33 pounds',
         position: {
@@ -59,7 +63,8 @@ export const getSampleTemplate = (): Template => ({
         height: 6.12,
         fontSize: 12,
       },
-      breed: {
+      {
+        name: 'breed',
         type: 'text',
         content: 'Mutt',
         position: {
@@ -70,7 +75,8 @@ export const getSampleTemplate = (): Template => ({
         height: 6.12,
         fontSize: 12,
       },
-      owner: {
+      {
+        name: 'owner',
         type: 'qrcode',
         content: 'https://pdfme.com/',
         position: {
@@ -80,7 +86,7 @@ export const getSampleTemplate = (): Template => ({
         width: 26.53,
         height: 26.53,
       },
-    },
+    ],
   ],
   basePdf: examplePdfb64,
 });
@@ -223,13 +229,13 @@ const get = (obj: any, path: string | number, defaultValue?: any) => {
 
 const getLabelLengthInPage = (template: Template) => {
   if (!isMultiLabel(template)) return 1;
-  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  const keys = template.schemas.flatMap((schemas) => schemas.map((s) => s.name));
   const rowNums = keys.map((column) => Number(column.match(/^{\d+}/)![0].replace(/{|}/g, '')));
   return Math.max(...rowNums);
 };
 
 const isMultiLabel = (template: Template) => {
-  const keys = template.schemas.flatMap((schemaObj) => Object.keys(schemaObj));
+  const keys = template.schemas.flatMap((schemas) => schemas.map((s) => s.name));
   if (keys.length === 0) return false;
   const regex = RegExp(/^{\d+}.*/);
   return regex.test(keys[0]);
