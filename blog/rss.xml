@@ -34,7 +34,7 @@
 <a href="https://pdfme.com/blog/developing-pdfme-v4#about-backward-compatibility">About Backward Compatibility</a></p></div></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="key-features">Key Features<a href="https://pdfme.com/blog/released-pdfme-v4#key-features" class="hash-link" aria-label="Direct link to Key Features" title="Direct link to Key Features">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-a-left-sidebar-for-placing-schemas">Add a Left Sidebar for Placing Schemas<a href="https://pdfme.com/blog/released-pdfme-v4#add-a-left-sidebar-for-placing-schemas" class="hash-link" aria-label="Direct link to Add a Left Sidebar for Placing Schemas" title="Direct link to Add a Left Sidebar for Placing Schemas">​</a></h3>
-<p><img decoding="async" loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/sidebar-drag&amp;drop-0240dbd9580cd290bf014e5c90eb7eb0.gif" width="800" height="567" class="img_ev3q"></p>
+<p><img loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/sidebar-drag&amp;drop-0240dbd9580cd290bf014e5c90eb7eb0.gif" width="800" height="567" class="img_ev3q"></p>
 <ul>
 <li>You can now place schemas by dragging and dropping.</li>
 <li>Add an icon to the sidebar by including the <code>icon</code> property in the <code>defaultSchema</code> property when defining plugins.<!-- -->
@@ -44,7 +44,7 @@
 </li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-dynamictable-schema">Add DynamicTable Schema<a href="https://pdfme.com/blog/released-pdfme-v4#add-dynamictable-schema" class="hash-link" aria-label="Direct link to Add DynamicTable Schema" title="Direct link to Add DynamicTable Schema">​</a></h3>
-<p><img decoding="async" loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/table-d8de0cc3da2ad7672d370ddb26628dca.png" width="3024" height="1644" class="img_ev3q"></p>
+<p><img loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/table-d8de0cc3da2ad7672d370ddb26628dca.png" width="3024" height="1644" class="img_ev3q"></p>
 <ul>
 <li>Added a schema for dynamically generating tables.</li>
 <li>This is currently released as Beta due to remaining bugs.</li>
@@ -67,7 +67,7 @@
 <ol>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/332" target="_blank" rel="noopener noreferrer"><strong>Add DynamicTable Schema #332</strong></a></p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/3d22843b2486-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/3d22843b2486-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>The table is being implemented differently than planned.<!-- -->
 <ul>
@@ -97,7 +97,7 @@
 </li>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/400" target="_blank" rel="noopener noreferrer"><strong>Add a Left Sidebar for Placing Schemas #400</strong></a></p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/be31a9c03519-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/be31a9c03519-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>Adding a UI that allows dragging schemas from the sidebar.</li>
 <li>The definition of plugins is changing (adding icons), so I intend to include this in this major version.</li>
@@ -105,7 +105,7 @@
 </li>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/439" target="_blank" rel="noopener noreferrer"><strong>Placeholder, Expression #439</strong></a></p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/4e66257d5d55-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/4e66257d5d55-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>I don't have a concrete image of how to realize this yet.<!-- -->
 <ul>
@@ -136,7 +136,7 @@
 <li>
 <p>How to install V4</p>
 <p>Versions tagged with next on <a href="https://www.npmjs.com/package/@pdfme/generator?activeTab=versions" target="_blank" rel="noopener noreferrer">npm's version page</a> are V4 versions. Currently, version 4.0.0-alpha.0 is released for each package.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/65a828e2f2b7-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/65a828e2f2b7-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>The following command can be used for installation:<!-- -->
 <ul>
@@ -162,11 +162,11 @@
 <ul>
 <li>
 <p>Plugins now use <code>defaultSchema.content</code> instead of <code>defaultValue</code> as initial data.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2cb01519cb4a-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2cb01519cb4a-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 <li>
 <p>When onChange occurs within a plugin, instead of rewriting the user input with <code>onChange</code>, it is now possible to also change the schema definition itself in the format <code>{[key:string]:string}</code>. If you want to reflect the user input as before, please write <code>onChange({ key: 'content', value: data });</code>.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/02a5e41c6fb9-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/02a5e41c6fb9-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 <li>
 <p>Modification example: <a href="https://github.com/pdfme/pdfme/pull/427/files#diff-e64985c2bcbfd91c01ab897562721dccc7605499f81432b2e09c167e7a844bb0" target="_blank" rel="noopener noreferrer">https://github.com/pdfme/pdfme/pull/427/files#diff-e64985c2bcbfd91c01ab897562721dccc7605499f81432b2e09c167e7a844bb0</a></p>
@@ -177,7 +177,7 @@
 <ul>
 <li>
 <p>Templates created with the V4 designer will now have versions. Currently, as it is in development, the property <code>pdfmeVersion:"4-dev"</code> will be added.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/51d4bbc4e1c2-20240302.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/51d4bbc4e1c2-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 </ul>
 </li>
@@ -225,7 +225,7 @@ Please see the following blog article for the latest development information.</p
 </ul></div></div>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-dynamic-tables-couldnt-be-implemented-in-pdfme">Why Dynamic Tables Couldn't Be Implemented in pdfme<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#why-dynamic-tables-couldnt-be-implemented-in-pdfme" class="hash-link" aria-label="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme" title="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme">​</a></h2>
 <p>Until now, pdfme has been realizing simple <a href="https://en.wikipedia.org/wiki/Variable_data_printing" target="_blank" rel="noopener noreferrer">variable data printing</a> by embedding PDF data into a property called <code>basePdf</code> in the template and overlaying a <code>schema</code> on top of this PDF.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/b7b9c0b7611e-20240102.png" alt="Image of the pdfme process" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/b7b9c0b7611e-20240102.png" alt="Image of the pdfme process" class="img_ev3q"></p>
 <p>This method is incredibly simple and allows for the easy creation of customized PDFs.</p>
 <p>However, there is a significant need that cannot be ignored for certain use cases in PDF creation.<br>
 <!-- -->That need is table rendering. More specifically, many users want to address cases where the number of rows, like in the red-framed section of the image below, increases, such as in invoices.</p>
@@ -246,7 +246,7 @@ Please see the following blog article for the latest development information.</p
 </ul>
 <p>With ReadOnly Schemas, it's possible to design the static parts of a template within pdfme without loading a PDF designed in basePdf. This allows for the addition of the height of schemas added to the page, adjusting the y-coordinate of all schemas below it by the increased height. Padding also allows control over where to resume rendering after a page break.</p>
 <p>The following figure shows an example where 19 rows of table data are provided, causing a page break, and the 'note' schema being pushed down.</p>
-<p><img decoding="async" loading="lazy" alt="Example of table with page break" src="https://pdfme.com/assets/images/dynamictable-eb7022dddcbdde6eb391b60f751ae4a1.png" width="4705" height="3766" class="img_ev3q"></p>
+<p><img loading="lazy" alt="Example of table with page break" src="https://pdfme.com/assets/images/dynamictable-eb7022dddcbdde6eb391b60f751ae4a1.png" width="4705" height="3766" class="img_ev3q"></p>
 <p>The logic I had in mind was:</p>
 <ul>
 <li>Render the table one row at a time, from Header to Row19.</li>
@@ -259,7 +259,7 @@ Please see the following blog article for the latest development information.</p
 <p>Table settings and rendering can get complex. How should we approach it?<br>
 <!-- -->I want to leverage the simplicity of pdfme, which allows for easy PDF creation, to implement the table functionality.</p>
 <p>For example, consider how to set up the following table.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/5607ddfc06c7-20240102.png" alt="Example of a complex table" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/5607ddfc06c7-20240102.png" alt="Example of a complex table" class="img_ev3q"></p>
 <p>A table is essentially composed of headers (th) and table data (td).<br>
 <!-- -->Table data may be rendered in something other than text. In this example, <code>Name</code> and <code>Category</code> columns are rendered with a Text renderer, while <code>Image</code> column is rendered with an Image renderer.</p>
 <p><strong>Fortunately, pdfme already implements various renderers like Text, Image, SVG, Barcodes, etc. Therefore, there's no need to create new rendering processes for each cell; once the size and position of a cell are determined, existing PDF rendering processes can be used.</strong></p>
@@ -315,7 +315,7 @@ Please see the following blog article for the latest development information.</p
 <ul>
 <li>As explained in the page break section, the increased height needs to be communicated to the generator function.</li>
 <li>As a current issue, the Text renderer, if not using the Dynamic Font Size feature, might render beyond the set height, as shown in the image below.
-<img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2f880c86b4fd-20240102.png" alt="Text rendering spilling over set height" class="img_ev3q"></li>
+<img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2f880c86b4fd-20240102.png" alt="Text rendering spilling over set height" class="img_ev3q"></li>
 <li>Ideally, the row height should be expanded, as shown in the image below. To achieve this, the Text renderer needs to return the rendered height after rendering.<!-- -->
 <img src="https://storage.googleapis.com/zenn-user-upload/3b7065ee2f39-20240102.png" width="500px">
 </li>
@@ -340,7 +340,7 @@ Please see the following blog article for the latest development information.</p
             <pubDate>Wed, 13 Dec 2023 00:00:00 GMT</pubDate>
             <description><![CDATA[Exploring the creation of 'pdfme,' a revolutionary TypeScript-based PDF library. Discover the motivations and innovations behind this modern PDF solution.]]></description>
             <content:encoded><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-pdfme">What is pdfme?<a href="https://pdfme.com/blog/why-develop-pdf-library-now#what-is-pdfme" class="hash-link" aria-label="Direct link to What is pdfme?" title="Direct link to What is pdfme?">​</a></h2>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/e8b30b9c5923-20231206.png" alt="pdfme" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/e8b30b9c5923-20231206.png" alt="pdfme" class="img_ev3q"></p>
 <p>An open-source, free PDF creation library written in TypeScript. It allows for declarative PDF creation using templates and works both on servers and browsers.</p>
 <p>Since its beta release in February 2022, it has reached Version 3 by November 2023. On <a href="https://github.com/pdfme/pdfme" target="_blank" rel="noopener noreferrer">GitHub</a>, it has garnered 1500 stars, and on <a href="https://www.npmjs.com/package/@pdfme/generator" target="_blank" rel="noopener noreferrer">npm</a>, it sees about 10,000 downloads weekly, though there's some variation.</p>
 <p>It's already integrated into various services worldwide, including electronic medical record creation, factory procedure manual production, and e-commerce custom packaging.</p>
@@ -366,7 +366,7 @@ So, why develop pdfme despite these excellent libraries?</p>
 </li>
 <li>
 <p>Added an easy-to-use WYSIWYG, similar to PowerPoint, and rebranded labelmake to pdfme, releasing it as a beta version.</p>
-<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/6e1076e7ddf5-20231206.png" alt="" class="img_ev3q"></p>
+<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/6e1076e7ddf5-20231206.png" alt="" class="img_ev3q"></p>
 </li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-a-desire-to-overhaul-commercial-software-with-oss-currently-here">3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥<a href="https://pdfme.com/blog/why-develop-pdf-library-now#3-a-desire-to-overhaul-commercial-software-with-oss-currently-here" class="hash-link" aria-label="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥" title="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥">​</a></h3>
