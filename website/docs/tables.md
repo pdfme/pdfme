@@ -35,17 +35,24 @@ Adding a table in the Designer will create a template like the following:
 ```json
 {
   "schemas": [
-    {
-      "mytable": {
+    [
+      {
+        "name": "mytable",
         "type": "table",
-        "position": { "x": 28.7, "y": 37.85 },
+        "position": {
+          "x": 28.92,
+          "y": 51.36
+        },
         "width": 150,
-        "height": 57.51,
+        "height": 57.5184,
         "content": "[[\"Alice\",\"New York\",\"Alice is a freelance web designer and developer\"],[\"Bob\",\"Paris\",\"Bob is a freelance illustrator and graphic designer\"]]",
         "showHead": true,
         "head": ["Name", "City", "Description"],
         "headWidthPercentages": [30, 30, 40],
-        "tableStyles": { "borderWidth": 0.3, "borderColor": "#000000" },
+        "tableStyles": {
+          "borderWidth": 0.3,
+          "borderColor": "#000000"
+        },
         "headStyles": {
           "fontName": "NotoSerifJP-Regular",
           "fontSize": 13,
@@ -56,8 +63,18 @@ Adding a table in the Designer will create a template like the following:
           "fontColor": "#ffffff",
           "borderColor": "",
           "backgroundColor": "#2980ba",
-          "borderWidth": { "top": 0, "right": 0, "bottom": 0, "left": 0 },
-          "padding": { "top": 5, "right": 5, "bottom": 5, "left": 5 }
+          "borderWidth": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "padding": {
+            "top": 5,
+            "right": 5,
+            "bottom": 5,
+            "left": 5
+          }
         },
         "bodyStyles": {
           "fontName": "NotoSerifJP-Regular",
@@ -70,14 +87,31 @@ Adding a table in the Designer will create a template like the following:
           "borderColor": "#888888",
           "backgroundColor": "",
           "alternateBackgroundColor": "#f5f5f5",
-          "borderWidth": { "top": 0.1, "right": 0.1, "bottom": 0.1, "left": 0.1 },
-          "padding": { "top": 5, "right": 5, "bottom": 5, "left": 5 }
+          "borderWidth": {
+            "top": 0.1,
+            "right": 0.1,
+            "bottom": 0.1,
+            "left": 0.1
+          },
+          "padding": {
+            "top": 5,
+            "right": 5,
+            "bottom": 5,
+            "left": 5
+          }
         },
-        "columnStyles": {}
+        "columnStyles": {},
+        "required": false,
+        "readOnly": false
       }
-    }
+    ]
   ],
-  "basePdf": { "width": 210, "height": 297, "padding": [10, 10, 10, 10] }
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [20, 20, 20, 20]
+  },
+  "pdfmeVersion": "5.0.0"
 }
 ```
 
@@ -136,6 +170,7 @@ While the actual number of rows will vary depending on the data when creating th
 
 Like other schemas, you can set styles from the property panel on the right.
 The styles are broadly categorized into four types:
+
 - Table Style
 - Head Style
 - Body Style
@@ -143,7 +178,6 @@ The styles are broadly categorized into four types:
 
 For each, you can set borders, fonts, background colors, padding, and more.
 The Body's Alternate Background Color is used to alternate background colors of rows.
-
 
 ## Sample Using Table Schema
 
