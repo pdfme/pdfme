@@ -17,20 +17,36 @@ class Form extends PreviewUI {
     this.onChangeInputCallback = cb;
   }
 
-  public setInputs(inputs: { [key: string]: string; }[]): void {
+  public setInputs(inputs: { [key: string]: string }[]): void {
+    const previousInputs = this.getInputs();
+
     super.setInputs(inputs);
 
-    const transformedInputs =
-      inputs.map((input, index) =>
-        Object.keys(input).map((name) => ({ index, name, value: input[name] }))).flat();
+    const changedInputs: Array<{ index: number; name: string; value: string }> = [];
 
-    transformedInputs.forEach((input) => {
+    inputs.forEach((input, index) => {
+      const prevInput = previousInputs[index] || {};
+
+      const allKeys = new Set([...Object.keys(input), ...Object.keys(prevInput)]);
+
+      allKeys.forEach((name) => {
+        const newValue = input[name];
+        const oldValue = prevInput[name];
+
+        if (newValue !== oldValue) {
+          changedInputs.push({ index, name, value: newValue });
+        }
+      });
+    });
+
+    changedInputs.forEach((input) => {
       if (this.onChangeInputCallback) {
         this.onChangeInputCallback(input);
       }
     });
-
   }
+
+
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
