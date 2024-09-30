@@ -17,6 +17,21 @@ class Form extends PreviewUI {
     this.onChangeInputCallback = cb;
   }
 
+  public setInputs(inputs: { [key: string]: string; }[]): void {
+    super.setInputs(inputs);
+
+    const transformedInputs =
+      inputs.map((input, index) =>
+        Object.keys(input).map((name) => ({ index, name, value: input[name] }))).flat();
+
+    transformedInputs.forEach((input) => {
+      if (this.onChangeInputCallback) {
+        this.onChangeInputCallback(input);
+      }
+    });
+
+  }
+
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     ReactDOM.render(
