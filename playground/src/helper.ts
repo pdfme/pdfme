@@ -18,6 +18,7 @@ import {
   table,
   rectangle,
   ellipse,
+  dateTime
 } from '@pdfme/schemas';
 import plugins from './plugins';
 
@@ -122,16 +123,17 @@ export const getPlugins = () => {
     SVG: svg,
     Signature: plugins.signature,
     QR: barcodes.qrcode,
-    JAPANPOST: barcodes.japanpost,
-    EAN13: barcodes.ean13,
-    EAN8: barcodes.ean8,
-    Code39: barcodes.code39,
-    Code128: barcodes.code128,
-    NW7: barcodes.nw7,
-    ITF14: barcodes.itf14,
-    UPCA: barcodes.upca,
-    UPCE: barcodes.upce,
-    GS1DataMatrix: barcodes.gs1datamatrix,
+    DateTime: dateTime,
+    // JAPANPOST: barcodes.japanpost,
+    // EAN13: barcodes.ean13,
+    // EAN8: barcodes.ean8,
+    // Code39: barcodes.code39,
+    // Code128: barcodes.code128,
+    // NW7: barcodes.nw7,
+    // ITF14: barcodes.itf14,
+    // UPCA: barcodes.upca,
+    // UPCE: barcodes.upce,
+    // GS1DataMatrix: barcodes.gs1datamatrix,
   };
 };
 
