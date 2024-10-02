@@ -79,7 +79,6 @@ export const getPlugin = ({
       Object.assign(textElement.style, textStyle);
       rootElement.innerHTML = '';
       rootElement.appendChild(textElement);
-      console.log(value);
 
       textElement.textContent = format(
         type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value),
