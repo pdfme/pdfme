@@ -228,7 +228,7 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
   };
 
   const textBlock = document.createElement('div');
-  textBlock.id = 'text-' + schema.id;
+  textBlock.id = 'text-' + String(schema.id);
   Object.assign(textBlock.style, textBlockStyle);
 
   container.appendChild(textBlock);
@@ -265,7 +265,7 @@ export const makeElementPlainTextContentEditable = (element: HTMLElement) => {
   });
 };
 
-const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
+export const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   switch (verticalAlignmentValue) {
     case VERTICAL_ALIGN_TOP:
       return 'flex-start';
@@ -277,7 +277,7 @@ const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefined) => {
   return 'flex-start';
 };
 
-const getBackgroundColor = (value: string, schema: TextSchema) => {
+export const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
   if (!value || !schema.backgroundColor) return 'transparent';
-  return schema.backgroundColor as string;
+  return schema.backgroundColor;
 };

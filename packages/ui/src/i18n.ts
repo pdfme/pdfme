@@ -56,7 +56,8 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Fit',
   'schemas.text.dynamicFontSize': 'Dynamic Font Size',
   'schemas.text.format': 'Format',
-  'schemas.mvt.typingInstructions': 'Add variables by typing words surrounded by curly brackets, e.g.',
+  'schemas.mvt.typingInstructions':
+    'Add variables by typing words surrounded by curly brackets, e.g.',
   'schemas.mvt.sampleField': 'name',
   'schemas.mvt.variablesSampleData': 'Variables Sample Data',
   'schemas.barcodes.barColor': 'Bar Color',
@@ -66,6 +67,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'Header Style',
   'schemas.table.bodyStyle': 'Body Style',
   'schemas.table.columnStyle': 'Column Style',
+  'schemas.date.format': 'Date Format',
 };
 
 const dictZh: { [key in keyof Dict]: string } = {
@@ -132,6 +134,7 @@ const dictZh: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': '表头样式',
   'schemas.table.bodyStyle': '表体样式',
   'schemas.table.columnStyle': '列样式',
+  'schemas.date.format': '日期格式',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -198,6 +201,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'ヘッダースタイル',
   'schemas.table.bodyStyle': 'ボディスタイル',
   'schemas.table.columnStyle': 'カラムスタイル',
+  'schemas.date.format': '日付形式',
 };
 
 const dictKo: { [key in keyof Dict]: string } = {
@@ -264,6 +268,7 @@ const dictKo: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': '헤더 스타일',
   'schemas.table.bodyStyle': '본문 스타일',
   'schemas.table.columnStyle': '열 스타일',
+  'schemas.date.format': '날짜 형식',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -276,7 +281,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   opacity: 'الشفافية',
   rotate: 'تدوير',
   required: 'مطلوب',
-  editable:'قابل للتحرير',
+  editable: 'قابل للتحرير',
   edit: 'تعديل',
   plsInputName: 'الرجاء إدخال الاسم',
   fieldMustUniq: 'يجب أن يكون الحقل فريداً',
@@ -320,7 +325,8 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'ملاءمة',
   'schemas.text.dynamicFontSize': 'حجم الخط الديناميكي',
   'schemas.text.format': 'تنسيق',
-  'schemas.mvt.typingInstructions': 'قم بإضافة المتغيرات عن طريق كتابة الكلمات المحاطة بأقواس متعرجة، على سبيل المثال:',
+  'schemas.mvt.typingInstructions':
+    'قم بإضافة المتغيرات عن طريق كتابة الكلمات المحاطة بأقواس متعرجة، على سبيل المثال:',
   'schemas.mvt.sampleField': 'اسم',
   'schemas.mvt.variablesSampleData': 'بيانات عينة المتغيرات',
   'schemas.barcodes.barColor': 'لون الشريط',
@@ -330,6 +336,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'أسلوب الرأس',
   'schemas.table.bodyStyle': 'أسلوب الجسم',
   'schemas.table.columnStyle': 'أسلوب العمود',
+  'schemas.date.format': 'تنسيق التاريخ',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -396,6 +403,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'สไตล์หัวข้อ',
   'schemas.table.bodyStyle': 'สไตล์เนื้อหา',
   'schemas.table.columnStyle': 'สไตล์คอลัมน์',
+  'schemas.date.format': 'รูปแบบวันที่',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -454,7 +462,8 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Adatta',
   'schemas.text.dynamicFontSize': 'Dimensione font dinamica',
   'schemas.text.format': 'Formato',
-  'schemas.mvt.typingInstructions': 'Aggiungi variabili digitando parole circondate da parentesi graffe, ad es.',
+  'schemas.mvt.typingInstructions':
+    'Aggiungi variabili digitando parole circondate da parentesi graffe, ad es.',
   'schemas.mvt.sampleField': 'nome',
   'schemas.mvt.variablesSampleData': 'Dati di esempio variabili',
   'schemas.barcodes.barColor': 'Colore barra',
@@ -464,6 +473,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': "Stile dell'Intestazione",
   'schemas.table.bodyStyle': 'Stile del Corpo',
   'schemas.table.columnStyle': 'Stile della Colonna',
+  'schemas.date.format': 'Formato data',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -530,6 +540,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'Styl nagłówka',
   'schemas.table.bodyStyle': 'Styl ciała',
   'schemas.table.columnStyle': 'Styl kolumny',
+  'schemas.date.format': 'Format daty',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -588,7 +599,8 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Anpassen',
   'schemas.text.dynamicFontSize': 'Dynamische Schriftgröße',
   'schemas.text.format': 'Format',
-  'schemas.mvt.typingInstructions': 'Fügen Sie Variablen hinzu, indem Sie Wörter in geschweiften Klammern eingeben, z. B.',
+  'schemas.mvt.typingInstructions':
+    'Fügen Sie Variablen hinzu, indem Sie Wörter in geschweiften Klammern eingeben, z. B.',
   'schemas.mvt.sampleField': 'Name',
   'schemas.mvt.variablesSampleData': 'Variablen Beispieldaten',
   'schemas.barcodes.barColor': 'Strichcodefarbe',
@@ -598,6 +610,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'Kopfzeilenstil',
   'schemas.table.bodyStyle': 'Körperstil',
   'schemas.table.columnStyle': 'Spaltenstil',
+  'schemas.date.format': 'Datumsformat',
 };
 
 const dictEs: { [key in keyof Dict]: string } = {
@@ -666,6 +679,7 @@ const dictEs: { [key in keyof Dict]: string } = {
   'schemas.table.headStyle': 'Estilo de cabecera',
   'schemas.table.bodyStyle': 'Estilo de cuerpo',
   'schemas.table.columnStyle': 'Estilo de columna',
+  'schemas.date.format': 'Formato de fecha',
 };
 
 const dictFr: { [key in keyof Dict]: string } = {
@@ -681,19 +695,21 @@ const dictFr: { [key in keyof Dict]: string } = {
   editable: 'Modifiable',
   edit: 'Éditer',
   plsInputName: 'Veuillez saisir le nom',
-  fieldMustUniq:"Le nom du champ n'est pas unique",
+  fieldMustUniq: "Le nom du champ n'est pas unique",
   notUniq: '(Nombre non unique)',
   noKeyName: 'Pas de nom',
   fieldsList: 'Liste des champs',
   editField: 'Éditer le champ',
   type: 'Type',
   errorOccurred: 'Une erreur est survenue',
-  errorBulkUpdateFieldName: "Impossible de confirmer le changement car le nombre d'éléments a changé.",
+  errorBulkUpdateFieldName:
+    "Impossible de confirmer le changement car le nombre d'éléments a changé.",
   commitBulkUpdateFieldName: 'Confirmer les changements',
   bulkUpdateFieldName: 'Modifier les noms de champs en masse',
   addPageAfter: 'Ajouter une page après',
   removePage: 'Supprimer la page actuelle',
-  removePageConfirm: 'Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible.',
+  removePageConfirm:
+    'Êtes-vous sûr de vouloir supprimer cette page ? Cette action est irréversible.',
   'validation.hexColor': 'Veuillez entrer un code couleur hexadécimal valide.',
   'validation.uniqueName': 'Veuillez saisir un nom unique.',
   'schemas.color': 'Couleur',
@@ -722,7 +738,8 @@ const dictFr: { [key in keyof Dict]: string } = {
   'schemas.text.fit': 'Ajustement',
   'schemas.text.dynamicFontSize': 'Taille de police dynamique',
   'schemas.text.format': 'Format',
-  'schemas.mvt.typingInstructions': 'Ajoutez des variables en tapant des mots entourés d\'accolades, par ex.',
+  'schemas.mvt.typingInstructions':
+    "Ajoutez des variables en tapant des mots entourés d'accolades, par ex.",
   'schemas.mvt.sampleField': 'nom',
   'schemas.mvt.variablesSampleData': 'Variables Exemples de données',
   'schemas.barcodes.barColor': 'Couleur de la barre',
@@ -731,7 +748,8 @@ const dictFr: { [key in keyof Dict]: string } = {
   'schemas.table.tableStyle': 'Style de tableau',
   'schemas.table.headStyle': "Style d'en-tête",
   'schemas.table.bodyStyle': 'Style de corps',
-  'schemas.table.columnStyle': 'Style de colonne'
+  'schemas.table.columnStyle': 'Style de colonne',
+  'schemas.date.format': 'Format de date',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {

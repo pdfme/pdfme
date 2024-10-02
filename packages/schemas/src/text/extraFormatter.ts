@@ -35,14 +35,17 @@ interface GroupButtonString {
   key: Formatter;
   icon: string;
   type: 'select';
-  value: String;
+  value: string;
 }
 
 export type GroupButton = GroupButtonBoolean | GroupButtonString;
 
-export function getExtraFormatterSchema(
-  i18n: (key: keyof Dict | string) => string
-): Record<string, any> {
+export function getExtraFormatterSchema(i18n: (key: keyof Dict | string) => string): {
+  title: string;
+  widget: string;
+  buttons: GroupButton[];
+  span: number;
+} {
   const buttons: GroupButton[] = [
     { key: Formatter.STRIKETHROUGH, icon: TextStrikethroughIcon, type: 'boolean' },
     { key: Formatter.UNDERLINE, icon: TextUnderlineIcon, type: 'boolean' },

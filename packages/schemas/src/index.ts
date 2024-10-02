@@ -6,7 +6,9 @@ import barcodes from './barcodes/index.js';
 import line from './shapes/line.js';
 import table from './tables/index.js';
 import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
-import dateTime from './date/datetime.js';
+import dateTime from './date/dateTime.js';
+import date from './date/date.js';
+import time from './date/time.js';
 
 const builtInPlugins = { Text: text };
 
@@ -23,4 +25,6 @@ export {
   rectangle,
   ellipse,
   dateTime,
+  date,
+  time,
 };
