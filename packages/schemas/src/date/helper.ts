@@ -9,7 +9,7 @@ import {
   DEFAULT_FONT_NAME,
   PropPanelSchema,
 } from '@pdfme/common';
-import text from '../text/index';
+import text from '../text';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { mapVerticalAlignToFlex, getBackgroundColor } from '../text/uiRender';
 import { getFontKitFont, getBrowserVerticalFontAdjustments } from '../text/helper.js';
@@ -150,7 +150,12 @@ export const getPlugin = ({
       const locale = getLocale(lang);
       const date = schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value);
       const formattedValue = format(date, schema.format, { locale });
-      return text.pdf(Object.assign(arg, { value: formattedValue }));
+      return text.pdf(
+        Object.assign(arg, {
+          value: formattedValue,
+          schema: { ...schema, lineHeight: DEFAULT_LINE_HEIGHT },
+        })
+      );
     },
     propPanel: {
       schema: ({ options, i18n }) => {
@@ -242,7 +247,6 @@ export const getPlugin = ({
         alignment: DEFAULT_ALIGNMENT,
         verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
         fontSize: DEFAULT_FONT_SIZE,
-        lineHeight: DEFAULT_LINE_HEIGHT,
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         fontColor: DEFAULT_FONT_COLOR,
         fontName: undefined,

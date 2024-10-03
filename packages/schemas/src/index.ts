@@ -9,6 +9,7 @@ import { rectangle, ellipse } from './shapes/rectAndEllipse.js';
 import dateTime from './date/dateTime.js';
 import date from './date/date.js';
 import time from './date/time.js';
+import select from './select/index.js';
 
 const builtInPlugins = { Text: text };
 
@@ -27,4 +28,5 @@ export {
   dateTime,
   date,
   time,
+  select,
 };

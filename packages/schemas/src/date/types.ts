@@ -1,6 +1,7 @@
-import { TextSchema, ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types';
+import { Schema } from '@pdfme/common';
+import { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types';
 
-export interface DateSchema extends TextSchema {
+export interface DateSchema extends Schema {
   format: string;
   fontName?: string;
   alignment: ALIGNMENT;
