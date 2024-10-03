@@ -65,8 +65,8 @@ export const getPlugin = ({
         backgroundColor: getBackgroundColor(value, schema),
 
         margin: '0',
-        width: '100%',
-        height: '100%',
+        width: `${schema.width}mm`,
+        height: `${schema.height}mm`,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
@@ -80,13 +80,13 @@ export const getPlugin = ({
       rootElement.innerHTML = '';
       rootElement.appendChild(textElement);
 
-      textElement.textContent = format(
-        type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value),
-        schema.format,
-        {
-          locale: getLocale(options?.lang || 'en'),
-        }
-      );
+      textElement.textContent = value
+        ? format(
+            type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value),
+            schema.format,
+            { locale: getLocale(options?.lang || 'en') }
+          )
+        : '';
 
       const textElementRect = textElement.getBoundingClientRect();
       const textElementHeight = textElementRect.height;
@@ -122,12 +122,30 @@ export const getPlugin = ({
             onChange({ key: 'content', value: e.target.value });
           }
         });
+
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'x';
+        const buttonWidth = 30;
+        const removeButtonStyle: CSS.Properties = {
+          position: 'absolute',
+          top: '0px',
+          right: `-${buttonWidth}px`,
+          padding: '5px',
+          width: `${buttonWidth}px`,
+          height: `${buttonWidth}px`,
+        };
+        Object.assign(removeButton.style, removeButtonStyle);
+        removeButton.addEventListener('click', () => {
+          onChange && onChange({ key: 'content', value: '' });
+        });
+        rootElement.appendChild(removeButton);
       }
 
       rootElement.appendChild(dateTimeInput);
     },
     pdf: (arg) => {
       const { schema, value, options } = arg;
+      if (!value) return void 0;
       const lang = (options.language || 'en') as Lang;
       const locale = getLocale(lang);
       const date = schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value);
