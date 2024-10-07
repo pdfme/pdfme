@@ -18,6 +18,10 @@ import {
   table,
   rectangle,
   ellipse,
+  dateTime,
+  date,
+  time,
+  select,
 } from '@pdfme/schemas';
 import plugins from './plugins';
 
@@ -122,22 +126,27 @@ export const getPlugins = () => {
     SVG: svg,
     Signature: plugins.signature,
     QR: barcodes.qrcode,
-    JAPANPOST: barcodes.japanpost,
-    EAN13: barcodes.ean13,
-    EAN8: barcodes.ean8,
-    Code39: barcodes.code39,
-    Code128: barcodes.code128,
-    NW7: barcodes.nw7,
-    ITF14: barcodes.itf14,
-    UPCA: barcodes.upca,
-    UPCE: barcodes.upce,
-    GS1DataMatrix: barcodes.gs1datamatrix,
+    DateTime: dateTime,
+    Date: date,
+    Time: time,
+    Select: select,
+    // JAPANPOST: barcodes.japanpost,
+    // EAN13: barcodes.ean13,
+    // EAN8: barcodes.ean8,
+    // Code39: barcodes.code39,
+    // Code128: barcodes.code128,
+    // NW7: barcodes.nw7,
+    // ITF14: barcodes.itf14,
+    // UPCA: barcodes.upca,
+    // UPCE: barcodes.upce,
+    // GS1DataMatrix: barcodes.gs1datamatrix,
   };
 };
 
 export const generatePDF = async (currentRef: Designer | Form | Viewer | null) => {
   if (!currentRef) return;
   const template = currentRef.getTemplate();
+  const options = currentRef.getOptions();
   const inputs =
     typeof (currentRef as Viewer | Form).getInputs === 'function'
       ? (currentRef as Viewer | Form).getInputs()
@@ -150,6 +159,7 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
       inputs,
       options: {
         font,
+        language: options.lang,
         title: 'pdfme',
       },
       plugins: getPlugins(),

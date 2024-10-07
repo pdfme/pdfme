@@ -60,7 +60,8 @@
     "resolver": "ts-jest-resolver",
     "globalTeardown": "<rootDir>/teardown.mjs",
     "moduleNameMapper": {
-      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts"
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
+      "^date-fns/locale": "date-fns/locale.cjs"
     },
     "moduleFileExtensions": [
       "js",

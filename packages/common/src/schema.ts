@@ -75,6 +75,11 @@ export const Dict = z.object({
   'schemas.table.headStyle': z.string(),
   'schemas.table.bodyStyle': z.string(),
   'schemas.table.columnStyle': z.string(),
+
+  'schemas.date.format': z.string(),
+
+  'schemas.select.options': z.string(),
+  'schemas.select.optionPlaceholder': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
