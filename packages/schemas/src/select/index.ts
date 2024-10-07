@@ -4,6 +4,9 @@ import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
 import text from '../text';
 import { TextSchema } from '../text/types';
 
+const selectIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>';
+
 interface Select extends TextSchema {
   options: string[];
 }
@@ -115,11 +118,29 @@ const schema: Plugin<Select> = {
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 
     if (mode !== 'viewer' && !(mode === 'form' && schema.readOnly)) {
+      const buttonWidth = 30;
+      const selectButton = document.createElement('button');
+      selectButton.innerHTML = selectIcon;
+      const selectButtonStyle: CSS.Properties = {
+        position: 'absolute',
+        zIndex: -1,
+        right: `-${buttonWidth}px`,
+        top: '0',
+        padding: '0',
+        margin: '0',
+        cursor: 'pointer',
+        height: `${buttonWidth}px`,
+        width: `${buttonWidth}px`,
+      };
+      Object.assign(selectButton.style, selectButtonStyle);
+
+      rootElement.appendChild(selectButton);
+
       const selectElement = document.createElement('select');
       const selectElementStyle: CSS.Properties = {
         opacity: '0',
         position: 'absolute',
-        width: '100%',
+        width: `calc(100% + ${buttonWidth}px)`,
         height: '100%',
         top: '0',
         left: '0',
@@ -172,7 +193,7 @@ const schema: Plugin<Select> = {
       options: ['option1', 'option2'],
     },
   },
-  icon: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>',
+  icon: selectIcon,
 };
 
 export default schema;
