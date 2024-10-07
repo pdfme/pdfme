@@ -43,6 +43,7 @@ export const getPlugin = ({
   const plugin: Plugin<DateSchema> = {
     ui: async (arg) => {
       const { schema, value, onChange, rootElement, mode, options, _cache } = arg;
+      rootElement.innerHTML = '';
 
       const font = options?.font || getDefaultFont();
       const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
@@ -77,7 +78,6 @@ export const getPlugin = ({
 
       const textElement = document.createElement('p');
       Object.assign(textElement.style, textStyle);
-      rootElement.innerHTML = '';
       rootElement.appendChild(textElement);
 
       textElement.textContent = value
@@ -88,39 +88,42 @@ export const getPlugin = ({
           )
         : '';
 
-      const textElementRect = textElement.getBoundingClientRect();
-      const textElementHeight = textElementRect.height;
-
-      const computedStyle = window.getComputedStyle(textElement);
-      const marginBottom = parseFloat(computedStyle.marginBottom);
-      const totalHeight = textElementHeight + marginBottom;
-
-      const dateTimeInput = document.createElement('input');
-      dateTimeInput.type = inputType;
-      dateTimeInput.value = value;
-
-      const dateTimeInputStyle: CSS.Properties = {
-        position: 'absolute',
-        top: `${totalHeight}px`,
-        left: '0',
-        opacity: '0',
-        border: 'none',
-        backgroundColor: 'transparent',
-        cursor: 'pointer',
-        zIndex: -1,
-      };
-
-      Object.assign(dateTimeInput.style, dateTimeInputStyle);
       if (mode !== 'viewer' && !(mode === 'form' && schema.readOnly)) {
+        const dateTimeInput = document.createElement('input');
+        dateTimeInput.type = inputType;
+        dateTimeInput.value = value;
+
+        const dateTimeInputStyle: CSS.Properties = {
+          ...textStyle,
+          opacity: '0',
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          border: 'none',
+          zIndex: '-1',
+        };
+
+        Object.assign(dateTimeInput.style, dateTimeInputStyle);
+        rootElement.appendChild(dateTimeInput);
+
         textElement.style.cursor = 'pointer';
         textElement.addEventListener('click', () => {
           dateTimeInput.showPicker();
+          textElement.style.opacity = '0';
+          dateTimeInput.style.opacity = '1';
+          dateTimeInput.style.zIndex = '1';
         });
 
         dateTimeInput.addEventListener('change', (e) => {
           if (onChange && e.target instanceof HTMLInputElement) {
             onChange({ key: 'content', value: e.target.value });
           }
+        });
+
+        dateTimeInput.addEventListener('blur', () => {
+          textElement.style.opacity = '1';
+          dateTimeInput.style.opacity = '0';
+          dateTimeInput.style.zIndex = '-1';
         });
 
         const removeButton = document.createElement('button');
@@ -140,8 +143,6 @@ export const getPlugin = ({
         });
         rootElement.appendChild(removeButton);
       }
-
-      rootElement.appendChild(dateTimeInput);
     },
     pdf: (arg) => {
       const { schema, value, options } = arg;
