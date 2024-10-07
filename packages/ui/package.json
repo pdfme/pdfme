@@ -87,7 +87,8 @@
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
       "^pdfjs-dist/legacy/build/pdf.js$": "<rootDir>/__mocks__/pdfjs-dist.js",
-      "^pdfjs-dist/legacy/build/pdf.worker.entry.js$": "<rootDir>/__mocks__/pdfjs-dist.js"
+      "^pdfjs-dist/legacy/build/pdf.worker.entry.js$": "<rootDir>/__mocks__/pdfjs-dist.js",
+      "^date-fns/locale": "date-fns/locale.cjs"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
