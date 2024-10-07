@@ -14,16 +14,14 @@ interface Select extends TextSchema {
 const addOptions = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
 
-  rootElement.innerHTML = '';
+  rootElement.style.width = '100%';
 
   const selectSchema = activeSchema as SchemaForUI & Select;
   const currentOptions = selectSchema.options ? [...selectSchema.options] : [];
 
-  const container = document.createElement('div');
-
   const inputStyle = {
-    flexGrow: '1',
-    padding: '8px',
+    width: '100%',
+    padding: '6.25px 11px',
     border: '1px solid #ccc',
     borderRadius: '4px',
   };
@@ -39,6 +37,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
 
   const formContainer = document.createElement('div');
   Object.assign(formContainer.style, {
+    width: '100%',
     display: 'flex',
     alignItems: 'center',
     marginBottom: '10px',
@@ -105,9 +104,8 @@ const addOptions = (props: PropPanelWidgetProps) => {
     });
   };
 
-  container.appendChild(formContainer);
-  container.appendChild(optionsList);
-  rootElement.appendChild(container);
+  rootElement.appendChild(formContainer);
+  rootElement.appendChild(optionsList);
 
   renderOptions();
 };
@@ -182,7 +180,7 @@ const schema: Plugin<Select> = {
           type: 'string',
           widget: 'Card',
           span: 24,
-          properties: { options: { widget: 'addOptions' } },
+          properties: { options: { widget: 'addOptions', span: 24 } },
         },
       };
     },
