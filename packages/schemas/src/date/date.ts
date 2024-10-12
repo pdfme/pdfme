@@ -3,8 +3,6 @@ import { getPlugin } from './helper';
 
 const type = 'date';
 
-const inputType = 'date';
-
 const defaultFormat = 'yyyy/MM/dd';
 
 const formatsByLang: Record<Lang, string[]> = {
@@ -57,4 +55,4 @@ const icon =
   '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>' +
   '</svg>';
 
-export default getPlugin({ type, defaultFormat, icon, inputType, formatsByLang });
+export default getPlugin({ type, defaultFormat, icon, formatsByLang });

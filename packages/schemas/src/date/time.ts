@@ -3,8 +3,6 @@ import { getPlugin } from './helper';
 
 const type = 'time';
 
-const inputType = 'time';
-
 const defaultFormat = 'HH:mm';
 
 const formatsByLang: Record<Lang, string[]> = {
@@ -28,4 +26,4 @@ const icon =
   'class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/>' +
   '<polyline points="12 6 12 12 16 14"/></svg>';
 
-export default getPlugin({ type, defaultFormat, icon, inputType, formatsByLang });
+export default getPlugin({ type, defaultFormat, icon, formatsByLang });

@@ -6,6 +6,7 @@ export const Lang = z.enum(langs);
 export const Dict = z.object({
   // -----------------used in ui-----------------
   cancel: z.string(),
+  close: z.string(),
   field: z.string(),
   fieldName: z.string(),
   align: z.string(),
@@ -158,7 +159,7 @@ export const GeneratorOptions = CommonOptions.extend({
   creationDate: z.date().optional(),
   creator: z.string().optional(),
   keywords: z.array(z.string()).optional(),
-  language: z.string().optional(),
+  lang: Lang.optional(),
   modificationDate: z.date().optional(),
   producer: z.string().optional(),
   subject: z.string().optional(),

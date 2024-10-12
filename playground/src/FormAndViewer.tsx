@@ -63,6 +63,7 @@ function App() {
           inputs,
           options: {
             font,
+            lang: 'ja',
             labels: { 'clear': '消去' },
             theme: {
               token: {

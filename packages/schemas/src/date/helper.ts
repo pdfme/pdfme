@@ -1,6 +1,19 @@
 import type * as CSS from 'csstype';
+import AirDatepicker, { AirDatepickerLocale } from 'air-datepicker';
+import localeEn from 'air-datepicker/locale/en';
+import localeZh from 'air-datepicker/locale/zh';
+import localeJa from 'air-datepicker/locale/ja';
+import localeKo from 'air-datepicker/locale/ko';
+import localeAr from 'air-datepicker/locale/ar';
+import localeTh from 'air-datepicker/locale/th';
+import localePl from 'air-datepicker/locale/pl';
+import localeIt from 'air-datepicker/locale/it';
+import localeDe from 'air-datepicker/locale/de';
+import localeEs from 'air-datepicker/locale/es';
+import localeFr from 'air-datepicker/locale/fr';
+import 'air-datepicker/air-datepicker.css';
 import { format } from 'date-fns';
-import { zhCN, ja, ko, ar, th, pl, it, de, es, fr, Locale } from 'date-fns/locale';
+import { enUS, zhCN, ja, ko, ar, th, pl, it, de, es, fr, Locale } from 'date-fns/locale';
 import {
   Lang,
   Plugin,
@@ -16,34 +29,50 @@ import { getFontKitFont, getBrowserVerticalFontAdjustments } from '../text/helpe
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
-  DEFAULT_VERTICAL_ALIGNMENT,
+  VERTICAL_ALIGN_MIDDLE,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
 } from '../text/constants.js';
 import { DateSchema } from './types';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter';
+import { isEditable } from '../utils';
 
-const getLocale = (lang: Lang): Locale | undefined =>
-  ({ en: undefined, zh: zhCN, ja, ko, ar, th, pl, it, de, es, fr }[lang]);
+const getDateFnsLocale = (lang: Lang): Locale | undefined =>
+  ({ en: enUS, zh: zhCN, ja, ko, ar, th, pl, it, de, es, fr }[lang]);
+
+const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
+  ({
+    en: localeEn,
+    zh: localeZh,
+    ja: localeJa,
+    ko: localeKo,
+    ar: localeAr,
+    th: localeTh,
+    pl: localePl,
+    it: localeIt,
+    de: localeDe,
+    es: localeEs,
+    fr: localeFr,
+  }[lang]);
 
 export const getPlugin = ({
   type,
   defaultFormat,
   icon,
-  inputType,
   formatsByLang,
 }: {
   type: 'date' | 'time' | 'dateTime';
   defaultFormat: string;
   icon: string;
-  inputType: string;
   formatsByLang: Record<Lang, string[]>;
 }) => {
   const plugin: Plugin<DateSchema> = {
     ui: async (arg) => {
-      const { schema, value, onChange, rootElement, mode, options, _cache } = arg;
-      rootElement.innerHTML = '';
+      const { schema, value, onChange, rootElement, mode, options, i18n, _cache } = arg;
+
+      const beforeRemoveEvent = new Event('beforeRemove');
+      rootElement.dispatchEvent(beforeRemoveEvent);
 
       const font = options?.font || getDefaultFont();
       const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
@@ -52,7 +81,7 @@ export const getPlugin = ({
         fontKitFont,
         schema.fontSize ?? DEFAULT_FONT_SIZE,
         DEFAULT_LINE_HEIGHT,
-        schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+        VERTICAL_ALIGN_MIDDLE
       );
 
       const topAdjustment = topAdj.toString();
@@ -66,95 +95,86 @@ export const getPlugin = ({
         backgroundColor: getBackgroundColor(value, schema),
 
         margin: '0',
+        padding: '0',
+        border: 'none',
+        outline: 'none',
         width: `${schema.width}mm`,
         height: `${schema.height}mm`,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
+        justifyContent: mapVerticalAlignToFlex(VERTICAL_ALIGN_MIDDLE),
         paddingTop: `${topAdjustment}px`,
         marginBottom: `${bottomAdjustment}px`,
         position: 'relative',
       };
 
-      const textElement = document.createElement('p');
-      Object.assign(textElement.style, textStyle);
-      rootElement.appendChild(textElement);
+      const input = document.createElement('input');
 
-      textElement.textContent = value
-        ? format(
-            type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value),
-            schema.format,
-            { locale: getLocale(options?.lang || 'en') }
-          )
-        : '';
+      Object.assign(input.style, textStyle);
 
-      if (mode !== 'viewer' && !(mode === 'form' && schema.readOnly)) {
-        const dateTimeInput = document.createElement('input');
-        dateTimeInput.type = inputType;
-        dateTimeInput.value = value;
+      const commitChange = ({ datepicker }: { datepicker: AirDatepicker<HTMLInputElement> }) => {
+        if (onChange) {
+          const date = datepicker.selectedDates;
+          const fmt =
+            type === 'time' ? 'HH:mm' : type === 'date' ? 'yyyy/MM/dd' : 'yyyy/MM/dd HH:mm';
+          const d = Array.isArray(date) ? date[0] : date || '';
+          const value = d ? format(d, fmt) : '';
+          onChange({ key: 'content', value });
+        }
+      };
 
-        const dateTimeInputStyle: CSS.Properties = {
-          ...textStyle,
-          opacity: '0',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          border: 'none',
-          zIndex: '-1',
-        };
+      const airDatepicker = new AirDatepicker(input, {
+        locale: getAirDatepickerLocale(options.lang || 'en'),
+        selectedDates: [schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value)],
+        dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
+        timepicker: type !== 'date',
+        onlyTimepicker: type === 'time',
+        buttons: [
+          'clear',
+          {
+            content: i18n('close'),
+            onClick: (datepicker) => {
+              datepicker.hide();
+              commitChange({ datepicker });
+            },
+          },
+        ],
+        onSelect: ({ datepicker }) => {
+          mode !== 'designer' && commitChange({ datepicker });
+        },
+        onShow: () => {
+          input.disabled = !isEditable(mode, schema);
+        },
+      });
 
-        Object.assign(dateTimeInput.style, dateTimeInputStyle);
-        rootElement.appendChild(dateTimeInput);
+      rootElement.addEventListener('beforeRemove', () => {
+        if (mode === 'designer') {
+          airDatepicker.destroy();
+        }
+      });
+      input.addEventListener('click', () => {
+        if (mode === 'designer') {
+          airDatepicker.show();
+        }
+      });
 
-        textElement.style.cursor = 'pointer';
-        textElement.addEventListener('click', () => {
-          dateTimeInput.showPicker();
-          textElement.style.opacity = '0';
-          dateTimeInput.style.opacity = '1';
-          dateTimeInput.style.zIndex = '1';
-        });
-
-        dateTimeInput.addEventListener('change', (e) => {
-          if (onChange && e.target instanceof HTMLInputElement) {
-            onChange({ key: 'content', value: e.target.value });
-          }
-        });
-
-        dateTimeInput.addEventListener('blur', () => {
-          textElement.style.opacity = '1';
-          dateTimeInput.style.opacity = '0';
-          dateTimeInput.style.zIndex = '-1';
-        });
-
-        const removeButton = document.createElement('button');
-        removeButton.textContent = 'x';
-        const buttonWidth = 30;
-        const removeButtonStyle: CSS.Properties = {
-          position: 'absolute',
-          top: '0px',
-          right: `-${buttonWidth}px`,
-          padding: '5px',
-          width: `${buttonWidth}px`,
-          height: `${buttonWidth}px`,
-        };
-        Object.assign(removeButton.style, removeButtonStyle);
-        removeButton.addEventListener('click', () => {
-          onChange && onChange({ key: 'content', value: '' });
-        });
-        rootElement.appendChild(removeButton);
-      }
+      rootElement.appendChild(input);
     },
     pdf: (arg) => {
       const { schema, value, options } = arg;
       if (!value) return void 0;
-      const lang = (options.language || 'en') as Lang;
-      const locale = getLocale(lang);
+      const lang = (options.lang || 'en') as Lang;
+      const locale = getDateFnsLocale(lang);
       const date = schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value);
       const formattedValue = format(date, schema.format, { locale });
       return text.pdf(
         Object.assign(arg, {
           value: formattedValue,
-          schema: { ...schema, lineHeight: DEFAULT_LINE_HEIGHT },
+          schema: {
+            ...schema,
+            verticalAlignment: VERTICAL_ALIGN_MIDDLE,
+            lineHeight: DEFAULT_LINE_HEIGHT,
+          },
         })
       );
     },
@@ -162,14 +182,14 @@ export const getPlugin = ({
       schema: ({ options, i18n }) => {
         const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
         const lang = options.lang || 'en';
-        const locale = getLocale(lang);
+        const locale = getDateFnsLocale(lang);
 
         const fontNames = Object.keys(font);
         const fallbackFontName = getFallbackFontName(font);
 
         const formatter = getExtraFormatterSchema(i18n);
         formatter.buttons = formatter.buttons.filter(
-          (button) => button.key !== Formatter.STRIKETHROUGH && button.key !== Formatter.UNDERLINE
+          (button) => button.key === Formatter.ALIGNMENT
         );
 
         const currentDate = new Date();
@@ -246,7 +266,6 @@ export const getPlugin = ({
         height: 10,
         rotate: 0,
         alignment: DEFAULT_ALIGNMENT,
-        verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
         fontSize: DEFAULT_FONT_SIZE,
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         fontColor: DEFAULT_FONT_COLOR,

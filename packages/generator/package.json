@@ -61,14 +61,19 @@
     "globalTeardown": "<rootDir>/teardown.mjs",
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^date-fns/locale": "date-fns/locale.cjs"
+      "^date-fns/locale": "date-fns/locale.cjs",
+      "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(air-datepicker)/)"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest"
+      "^.+\\.ts$": "ts-jest",
+      "^.+\\.css$": "<rootDir>/__tests__/cssTransform.js"
     },
     "globals": {
       "ts-jest": {

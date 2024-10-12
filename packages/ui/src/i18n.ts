@@ -3,6 +3,7 @@ import { DEFAULT_LANG } from './constants.js';
 
 const dictEn: { [key in keyof Dict]: string } = {
   cancel: 'Cancel',
+  close: 'Close',
   field: 'field',
   fieldName: 'Name',
   align: 'Align',
@@ -74,6 +75,7 @@ const dictEn: { [key in keyof Dict]: string } = {
 
 const dictZh: { [key in keyof Dict]: string } = {
   cancel: '取消',
+  close: '关闭',
   field: '字段',
   fieldName: '名称',
   align: '对齐',
@@ -143,6 +145,7 @@ const dictZh: { [key in keyof Dict]: string } = {
 
 const dictJa: { [key in keyof Dict]: string } = {
   cancel: 'キャンセル',
+  close: '閉じる',
   field: '入力項目',
   fieldName: '項目名',
   align: '整列',
@@ -212,6 +215,7 @@ const dictJa: { [key in keyof Dict]: string } = {
 
 const dictKo: { [key in keyof Dict]: string } = {
   cancel: '취소',
+  close: '닫기',
   field: '필드',
   fieldName: '이름',
   align: '정렬',
@@ -281,6 +285,7 @@ const dictKo: { [key in keyof Dict]: string } = {
 
 const dictAr: { [key in keyof Dict]: string } = {
   cancel: 'إلغاء',
+  close: 'إغلاق',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
   align: 'محاذاة',
@@ -351,6 +356,7 @@ const dictAr: { [key in keyof Dict]: string } = {
 
 const dictTh: { [key in keyof Dict]: string } = {
   cancel: 'ยกเลิก',
+  close: 'ปิด',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
   align: 'จัดเรียง',
@@ -420,6 +426,7 @@ const dictTh: { [key in keyof Dict]: string } = {
 
 const dictIt: { [key in keyof Dict]: string } = {
   cancel: 'Annulla',
+  close: 'Chiudi',
   field: 'Campo',
   fieldName: 'Nome',
   align: 'Allinea',
@@ -492,6 +499,7 @@ const dictIt: { [key in keyof Dict]: string } = {
 
 const dictPl: { [key in keyof Dict]: string } = {
   cancel: 'Anuluj',
+  close: 'Zamknij',
   field: 'pole',
   fieldName: 'Klucz pola',
   align: 'Wyrównanie',
@@ -561,6 +569,7 @@ const dictPl: { [key in keyof Dict]: string } = {
 
 const dictDe: { [key in keyof Dict]: string } = {
   cancel: 'Abbrechen',
+  close: 'Schließen',
   field: 'Feld',
   fieldName: 'Name',
   align: 'Ausrichten',
@@ -633,6 +642,7 @@ const dictDe: { [key in keyof Dict]: string } = {
 
 const dictEs: { [key in keyof Dict]: string } = {
   cancel: 'Cancelar',
+  close: 'Cerrar',
   field: 'campo',
   fieldName: 'Nombre',
   align: 'Alinear',
@@ -704,6 +714,7 @@ const dictEs: { [key in keyof Dict]: string } = {
 
 const dictFr: { [key in keyof Dict]: string } = {
   cancel: 'Annuler',
+  close: 'Fermer',
   field: 'Champ',
   fieldName: 'Nom',
   align: 'Aligner',
