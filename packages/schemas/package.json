@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "^1.18.3",
+    "air-datepicker": "^3.5.3",
     "bwip-js": "^4.1.1",
     "date-fns": "^4.1.0",
     "fast-xml-parser": "^4.3.2",

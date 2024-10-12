@@ -143,6 +143,20 @@ export const getPlugins = () => {
   };
 };
 
+export const translations: { label: string, value: string }[] = [
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: 'Chinese' },
+  { value: 'ko', label: 'Korean' },
+  { value: 'ja', label: 'Japanese' },
+  { value: 'ar', label: 'Arabic' },
+  { value: 'th', label: 'Thai' },
+  { value: 'pl', label: 'Polish' },
+  { value: 'it', label: 'Italian' },
+  { value: 'de', label: 'German' },
+  { value: 'fr', label: 'French' },
+  { value: 'es', label: 'Spanish' },
+]
+
 export const generatePDF = async (currentRef: Designer | Form | Viewer | null) => {
   if (!currentRef) return;
   const template = currentRef.getTemplate();

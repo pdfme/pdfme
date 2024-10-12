@@ -6,6 +6,7 @@ export const Lang = z.enum(langs);
 export const Dict = z.object({
   // -----------------used in ui-----------------
   cancel: z.string(),
+  close: z.string(),
   field: z.string(),
   fieldName: z.string(),
   align: z.string(),
