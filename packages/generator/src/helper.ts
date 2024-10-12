@@ -104,7 +104,7 @@ export const postProcessing = (props: { pdfDoc: PDFDocument; options: GeneratorO
     creationDate = new Date(),
     creator = TOOL_NAME,
     keywords = [],
-    language = 'en-US',
+    lang = 'en',
     modificationDate = new Date(),
     producer = TOOL_NAME,
     subject = '',
@@ -114,7 +114,7 @@ export const postProcessing = (props: { pdfDoc: PDFDocument; options: GeneratorO
   pdfDoc.setCreationDate(creationDate);
   pdfDoc.setCreator(creator);
   pdfDoc.setKeywords(keywords);
-  pdfDoc.setLanguage(language);
+  pdfDoc.setLanguage(lang);
   pdfDoc.setModificationDate(modificationDate);
   pdfDoc.setProducer(producer);
   pdfDoc.setSubject(subject);

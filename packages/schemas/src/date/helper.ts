@@ -147,7 +147,7 @@ export const getPlugin = ({
     pdf: (arg) => {
       const { schema, value, options } = arg;
       if (!value) return void 0;
-      const lang = (options.language || 'en') as Lang;
+      const lang = (options.lang || 'en') as Lang;
       const locale = getLocale(lang);
       const date = schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value);
       const formattedValue = format(date, schema.format, { locale });

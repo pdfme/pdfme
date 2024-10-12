@@ -158,7 +158,7 @@ export const GeneratorOptions = CommonOptions.extend({
   creationDate: z.date().optional(),
   creator: z.string().optional(),
   keywords: z.array(z.string()).optional(),
-  language: z.string().optional(),
+  lang: Lang.optional(),
   modificationDate: z.date().optional(),
   producer: z.string().optional(),
   subject: z.string().optional(),
