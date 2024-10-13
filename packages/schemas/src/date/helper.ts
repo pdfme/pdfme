@@ -129,6 +129,7 @@ export const getPlugin = ({
         dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
+        isMobile: window.innerWidth < 768,
         buttons: [
           'clear',
           {
