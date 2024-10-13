@@ -56,12 +56,12 @@ const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
     fr: localeFr,
   }[lang]);
 
-  const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime' ): Date => {
-    if (type === 'time') {
-      return new Date(`2021-01-01T${strDate}`);
-    }
-    return new Date(strDate);
+const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Date => {
+  if (type === 'time') {
+    return new Date(`2021-01-01T${strDate}`);
   }
+  return new Date(strDate);
+};
 
 export const getPlugin = ({
   type,
@@ -75,24 +75,12 @@ export const getPlugin = ({
   formatsByLang: Record<Lang, string[]>;
 }) => {
   const plugin: Plugin<DateSchema> = {
-    ui: async (arg) => {
-      const { schema, value, onChange, rootElement, mode, options, i18n, _cache } = arg;
+    ui: (arg) => {
+      const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
 
       const beforeRemoveEvent = new Event('beforeRemove');
       rootElement.dispatchEvent(beforeRemoveEvent);
 
-      const font = options?.font || getDefaultFont();
-      const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
-
-      const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(
-        fontKitFont,
-        schema.fontSize ?? DEFAULT_FONT_SIZE,
-        DEFAULT_LINE_HEIGHT,
-        VERTICAL_ALIGN_MIDDLE
-      );
-
-      const topAdjustment = topAdj.toString();
-      const bottomAdjustment = bottomAdj.toString();
       const textStyle: CSS.Properties = {
         fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
         color: schema.fontColor ?? DEFAULT_FONT_COLOR,
@@ -110,8 +98,6 @@ export const getPlugin = ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: mapVerticalAlignToFlex(VERTICAL_ALIGN_MIDDLE),
-        paddingTop: `${topAdjustment}px`,
-        marginBottom: `${bottomAdjustment}px`,
         position: 'relative',
       };
 
