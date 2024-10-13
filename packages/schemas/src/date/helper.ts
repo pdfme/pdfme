@@ -56,6 +56,13 @@ const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
     fr: localeFr,
   }[lang]);
 
+  const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime' ): Date => {
+    if (type === 'time') {
+      return new Date(`2021-01-01T${strDate}`);
+    }
+    return new Date(strDate);
+  }
+
 export const getPlugin = ({
   type,
   defaultFormat,
@@ -125,7 +132,7 @@ export const getPlugin = ({
 
       const airDatepicker = new AirDatepicker(input, {
         locale: getAirDatepickerLocale(options.lang || 'en'),
-        selectedDates: [schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value)],
+        selectedDates: [strDateToDate(value, type)],
         dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
@@ -162,12 +169,10 @@ export const getPlugin = ({
       rootElement.appendChild(input);
     },
     pdf: (arg) => {
-      const { schema, value, options } = arg;
+      const { schema, value } = arg;
       if (!value) return void 0;
-      const lang = (options.lang || 'en') as Lang;
-      const locale = getDateFnsLocale(lang);
-      const date = schema.type === 'time' ? new Date(`2021-01-01T${value}`) : new Date(value);
-      const formattedValue = format(date, schema.format, { locale });
+      const date = strDateToDate(value, type);
+      const formattedValue = format(date, schema.format);
       return text.pdf(
         Object.assign(arg, {
           value: formattedValue,
