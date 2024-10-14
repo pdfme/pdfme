@@ -231,7 +231,7 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
   textBlock.id = 'text-' + String(schema.id);
 
   if(schema.ariaLabel){
-    textBlock.ariaLabel = schema.ariaLabel
+    textBlock.ariaLabel = String(schema.ariaLabel)
   }
 
   Object.assign(textBlock.style, textBlockStyle);
