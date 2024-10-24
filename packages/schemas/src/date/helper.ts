@@ -11,13 +11,11 @@ import localeIt from 'air-datepicker/locale/it';
 import localeDe from 'air-datepicker/locale/de';
 import localeEs from 'air-datepicker/locale/es';
 import localeFr from 'air-datepicker/locale/fr';
-import 'air-datepicker/air-datepicker.css';
 import { format } from 'date-fns';
 import { enUS, zhCN, ja, ko, ar, th, pl, it, de, es, fr, Locale } from 'date-fns/locale';
 import {
   Lang,
   Plugin,
-  getDefaultFont,
   getFallbackFontName,
   DEFAULT_FONT_NAME,
   PropPanelSchema,
@@ -25,7 +23,6 @@ import {
 import text from '../text';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { mapVerticalAlignToFlex, getBackgroundColor } from '../text/uiRender';
-import { getFontKitFont, getBrowserVerticalFontAdjustments } from '../text/helper.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
@@ -37,6 +34,10 @@ import {
 import { DateSchema } from './types';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter';
 import { isEditable } from '../utils';
+
+if (typeof window !== 'undefined') {
+  import('../css-importer.js');
+}
 
 const getDateFnsLocale = (lang: Lang): Locale | undefined =>
   ({ en: enUS, zh: zhCN, ja, ko, ar, th, pl, it, de, es, fr }[lang]);
