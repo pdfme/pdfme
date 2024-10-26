@@ -45,7 +45,7 @@ const airDatepickerCss = `.air-datepicker-cell.-year-.-other-decade-,.air-datepi
 
 const injectStyles = (css: string) => {
   if (typeof document !== 'undefined') {
-    const styleElementId = 'air-datepicker-styles';
+    const styleElementId = 'pdfme-air-datepicker-styles';
     if (!document.getElementById(styleElementId)) {
       const style = document.createElement('style');
       style.id = styleElementId;
