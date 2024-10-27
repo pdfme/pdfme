@@ -6,7 +6,7 @@ import {
   BLANK_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
-} from './constants.js';
+} from './constants';
 import type {
   ChangeSchemaItem,
   ChangeSchemas,
@@ -36,7 +36,7 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
-} from './types.js';
+} from './types';
 import {
   cloneDeep,
   getFallbackFontName,
@@ -59,7 +59,7 @@ import {
   getInputFromTemplate,
   isBlankPdf,
   getDynamicTemplate,
-} from './helper.js';
+} from './helper';
 
 export {
   PDFME_VERSION,
