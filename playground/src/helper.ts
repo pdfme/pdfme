@@ -131,10 +131,10 @@ export const getPlugins = () => {
     Time: time,
     Select: select,
     // JAPANPOST: barcodes.japanpost,
-    // EAN13: barcodes.ean13,
+    EAN13: barcodes.ean13,
     // EAN8: barcodes.ean8,
     // Code39: barcodes.code39,
-    // Code128: barcodes.code128,
+    Code128: barcodes.code128,
     // NW7: barcodes.nw7,
     // ITF14: barcodes.itf14,
     // UPCA: barcodes.upca,
@@ -143,7 +143,7 @@ export const getPlugins = () => {
   };
 };
 
-export const translations: { label: string, value: string }[] = [
+export const translations: { label: string; value: string }[] = [
   { value: 'en', label: 'English' },
   { value: 'zh', label: 'Chinese' },
   { value: 'ko', label: 'Korean' },
@@ -155,7 +155,7 @@ export const translations: { label: string, value: string }[] = [
   { value: 'de', label: 'German' },
   { value: 'fr', label: 'French' },
   { value: 'es', label: 'Spanish' },
-]
+];
 
 export const generatePDF = async (currentRef: Designer | Form | Viewer | null) => {
   if (!currentRef) return;
@@ -741,12 +741,60 @@ const getInvoiceTemplate = (): Template => ({
     width: 210,
     height: 297,
     padding: [20, 20, 20, 20],
+    staticSchema: [
+      {
+        name: 'field1',
+        type: 'text',
+        content: 'Invoice No.12345',
+        position: {
+          x: 20,
+          y: 282,
+        },
+        width: 45,
+        height: 10,
+        rotate: 0,
+        alignment: 'left',
+        verticalAlignment: 'top',
+        fontSize: 13,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#000000',
+        backgroundColor: '',
+        opacity: 1,
+        strikethrough: false,
+        underline: false,
+        required: false,
+        readOnly: false,
+      },
+      {
+        name: 'field4',
+        type: 'line',
+        position: {
+          x: 20,
+          y: 277,
+        },
+        width: 170,
+        height: 0.2,
+        rotate: 0,
+        opacity: 1,
+        readOnly: true,
+        color: '#999999',
+        required: false,
+      },
+    ]
   },
   pdfmeVersion: '4.0.0',
 });
 
 const getBlankTemplate = () =>
-  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] } } as Template);
+  ({
+    schemas: [{}],
+    basePdf: {
+      width: 210,
+      height: 297,
+      padding: [20, 10, 20, 10],
+    },
+  } as Template);
 export const getTemplatePresets = (): {
   key: string;
   label: string;

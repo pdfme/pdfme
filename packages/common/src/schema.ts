@@ -115,6 +115,7 @@ export const BlankPdf = z.object({
   width: z.number(),
   height: z.number(),
   padding: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  staticSchema: z.array(Schema).optional(),
 });
 
 const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);

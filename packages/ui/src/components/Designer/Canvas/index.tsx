@@ -24,6 +24,7 @@ import Moveable from './Moveable';
 import Guides from './Guides';
 import Mask from './Mask';
 import Padding from './Padding';
+import StaticSchema from '../../StaticSchema';
 
 
 const mm2px = (mm: number) => mm * 3.7795275591;
@@ -394,6 +395,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               <DeleteButton activeElements={activeElements} />
             )}
             <Padding basePdf={basePdf} />
+            <StaticSchema basePdf={basePdf} scale={scale}/>
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {

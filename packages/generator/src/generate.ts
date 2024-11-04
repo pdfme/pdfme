@@ -1,6 +1,6 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
+import { checkGenerateProps, getDynamicTemplate, isBlankPdf } from '@pdfme/common';
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import {
   insertPage,
@@ -56,6 +56,18 @@ const generate = async (props: GenerateProps) => {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
+      
+      if (isBlankPdf(basePdf) && basePdf.staticSchema) {
+        for (let k = 0; k < basePdf.staticSchema.length; k += 1) {
+          const schema = basePdf.staticSchema[k];
+          const render = renderObj[schema.type];
+          if (!render) {
+            continue;
+          }
+          await render({ value: schema.content || '', schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
+        }
+      }
+
       for (let l = 0; l < schemaNames.length; l += 1) {
         const name = schemaNames[l];
         const schemaPage = dynamicTemplate.schemas[j] || [];

@@ -3,6 +3,7 @@ import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate } from '@
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import UnitPager from './UnitPager';
 import Root from './Root';
+import StaticSchema from './StaticSchema';
 import ErrorScreen from './ErrorScreen';
 import CtlBar from './CtlBar';
 import Paper from './Paper';
@@ -162,6 +163,9 @@ const Preview = ({
               />
             );
           }}
+          renderPaper={() => (
+            <StaticSchema basePdf={template.basePdf} scale={scale} />
+          )}
         />
       </div>
     </Root>

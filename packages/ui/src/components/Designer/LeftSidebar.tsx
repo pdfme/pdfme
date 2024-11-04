@@ -24,7 +24,6 @@ const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf
       {isDragging &&
         <div style={{ transform: `scale(${scale})` }}>
           <Renderer
-            key={defaultSchema.type}
             schema={{ ...defaultSchema, id: defaultSchema.type }}
             basePdf={basePdf}
             value={defaultSchema.content || ''}
