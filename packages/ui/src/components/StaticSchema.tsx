@@ -1,6 +1,7 @@
 import React from 'react';
 import { BasePdf, isBlankPdf, replacePlaceholders } from '@pdfme/common';
 import Renderer from './Renderer';
+import { uuid } from '../helper'
 
 const StaticSchema = ({ basePdf, scale, totalPages, currentPage }: { basePdf: BasePdf, scale: number, totalPages: number, currentPage: number }) =>
   <>{
@@ -8,7 +9,7 @@ const StaticSchema = ({ basePdf, scale, totalPages, currentPage }: { basePdf: Ba
       basePdf.staticSchema.map((schema) => (
         <Renderer
           key={schema.name}
-          schema={schema}
+          schema={{ ...schema, id: uuid() }}
           basePdf={basePdf}
           value={replacePlaceholders({ content: schema.content || '', total: totalPages, page: currentPage })}
           onChangeHoveringSchemaId={() => { void 0 }}
