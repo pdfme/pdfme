@@ -9,7 +9,7 @@ import {
   BlankPdf,
   CommonOptions,
   LegacySchemaPageArray,
-  SchemaPageArray
+  SchemaPageArray,
 } from './types';
 import {
   Inputs as InputsSchema,
@@ -98,7 +98,11 @@ export const migrateTemplate = (template: Template) => {
     return;
   }
 
-  if (Array.isArray(template.schemas) && template.schemas.length > 0 && !Array.isArray(template.schemas[0])) {
+  if (
+    Array.isArray(template.schemas) &&
+    template.schemas.length > 0 &&
+    !Array.isArray(template.schemas[0])
+  ) {
     template.schemas = (template.schemas as unknown as LegacySchemaPageArray).map(
       (page: Record<string, Schema>) =>
         Object.entries(page).map(([key, value]) => ({
@@ -113,8 +117,8 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   migrateTemplate(template);
 
   const input: { [key: string]: string } = {};
-  template.schemas.forEach(page => {
-    page.forEach(schema => {
+  template.schemas.forEach((page) => {
+    page.forEach((schema) => {
       if (!schema.readOnly) {
         input[schema.name] = schema.content || '';
       }
@@ -258,17 +262,17 @@ export const checkUIProps = (data: unknown) => {
     migrateTemplate(data.template as Template);
   }
   checkProps(data, UIPropsSchema);
-}
+};
 export const checkTemplate = (template: unknown) => {
   migrateTemplate(template as Template);
   checkProps(template, TemplateSchema);
-}
+};
 export const checkGenerateProps = (data: unknown) => {
   if (typeof data === 'object' && data !== null && 'template' in data) {
     migrateTemplate(data.template as Template);
   }
   checkProps(data, GeneratePropsSchema);
-}
+};
 
 interface ModifyTemplateForDynamicTableArg {
   template: Template;
@@ -470,7 +474,7 @@ function breakIntoPages(arg: {
 
 function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
   const newTemplate: Template = {
-    schemas: Array.from({ length: pages.length }, () => ([] as Schema[])),
+    schemas: Array.from({ length: pages.length }, () => [] as Schema[]),
     basePdf: basePdf,
   };
 
@@ -481,7 +485,7 @@ function createNewTemplate(pages: Node[], basePdf: BlankPdf): Template {
       const { schema } = child;
       if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
-      const name = schema.name
+      const name = schema.name;
       if (!nameToSchemas.has(name)) {
         nameToSchemas.set(name, []);
       }
@@ -547,9 +551,50 @@ export const getDynamicTemplate = async (
 
 export const replacePlaceholders = (arg: {
   content: string;
+  input: Record<string, any>;
   total: number;
   page: number;
 }): string => {
+  const get = <T, K extends keyof any>(
+    obj: T,
+    path: K | K[],
+    defaultValue: string = ''
+  ): string => {
+    let pathArray: string[];
+
+    if (Array.isArray(path)) {
+      pathArray = path.map(String);
+    } else if (typeof path === 'string') {
+      pathArray = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+    } else {
+      pathArray = [String(path)];
+    }
+
+    let result: any = obj;
+    for (const key of pathArray) {
+      if (result === undefined || result === null) {
+        return defaultValue;
+      }
+      result = result[key];
+    }
+
+    return result !== undefined && result !== null ? String(result) : defaultValue;
+  };
+
+  const parseIfJSON = (value: any): any => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  };
+
+  const parseData = (data: {
+    [key: string]: any;
+  }): {
+    [key: string]: string | number | boolean | object | null;
+  } => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, parseIfJSON(value)]));
+
   const date = new Date();
 
   const year = date.getFullYear();
@@ -561,10 +606,15 @@ export const replacePlaceholders = (arg: {
   const formattedDate = `${year}/${month}/${day}`;
   const formattedDateTime = `${formattedDate} ${hours}:${minutes}`;
 
-  return arg.content
-    .replace(/{date}/g, formattedDate)
-    .replace(/{dateTime}/g, formattedDateTime)
-    .replace(/{total}/g, String(arg.total))
-    .replace(/{page}/g, String(arg.page));
-};
+  const parsedInput = parseData(arg.input);
 
+  const context = {
+    date: formattedDate,
+    dateTime: formattedDateTime,
+    total: String(arg.total),
+    page: String(arg.page),
+    ...parsedInput,
+  };
+
+  return arg.content.replace(/{([^}]+)}/g, (match, key) => get(context, key, match));
+};

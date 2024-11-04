@@ -761,7 +761,7 @@ const getInvoiceTemplate = (): Template => ({
       {
         name: 'footerInfo',
         type: 'text',
-        content: '05C3F54C-0026 • $30.00 USD due {date}',
+        content: 'Invoice No.{info.InvoiceNo} • {totalInput} USD due {date}',
         position: {
           x: 20,
           y: 282,

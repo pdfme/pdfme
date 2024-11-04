@@ -395,7 +395,15 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               <DeleteButton activeElements={activeElements} />
             )}
             <Padding basePdf={basePdf} />
-            <StaticSchema basePdf={basePdf} scale={scale} totalPages={schemasList.length} currentPage={index + 1} />
+            <StaticSchema basePdf={basePdf}
+              input={schemasList[index].reduce((acc, schema) => {
+                acc[schema.name] = schema.content || '';
+                return acc;
+              }, {} as Record<string, string>)}
+              scale={scale}
+              totalPages={schemasList.length}
+              currentPage={index + 1}
+            />
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {

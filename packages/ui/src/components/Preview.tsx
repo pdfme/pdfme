@@ -167,6 +167,7 @@ const Preview = ({
             <StaticSchema
               basePdf={template.basePdf}
               scale={scale}
+              input={input}
               totalPages={schemasList.length}
               currentPage={index + 1}
             />

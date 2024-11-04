@@ -70,7 +70,12 @@ const generate = async (props: GenerateProps) => {
             continue;
           }
           await render({
-            value: replacePlaceholders({ content: schema.content || '', total: basePages.length, page: j + 1 }),
+            value: replacePlaceholders({
+              content: schema.content || '',
+              input,
+              total: basePages.length,
+              page: j + 1,
+            }),
             schema,
             basePdf,
             pdfLib,
