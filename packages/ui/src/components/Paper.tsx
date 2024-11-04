@@ -10,7 +10,7 @@ const Paper = (props: {
   schemasList: SchemaForUI[][];
   pageSizes: Size[];
   backgrounds: string[];
-  renderPaper?: (arg: { index: number; paperSize: Size }) => ReactNode;
+  renderPaper: (arg: { index: number; paperSize: Size }) => ReactNode;
   renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
   hasRulers?: boolean;
 }) => {
@@ -93,7 +93,7 @@ const Paper = (props: {
               ...paperSize,
             }}
           >
-            {renderPaper && renderPaper({ paperSize, index: paperIndex })}
+            {renderPaper({ paperSize, index: paperIndex })}
             {schemasList[paperIndex].map((schema, schemaIndex) => {
               return (
                 <div key={schema.id}>

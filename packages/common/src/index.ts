@@ -59,6 +59,7 @@ import {
   getInputFromTemplate,
   isBlankPdf,
   getDynamicTemplate,
+  replacePlaceholders,
 } from './helper.js';
 
 export {
@@ -82,6 +83,7 @@ export {
   getInputFromTemplate,
   isBlankPdf,
   getDynamicTemplate,
+  replacePlaceholders,
   checkFont,
   checkInputs,
   checkUIOptions,

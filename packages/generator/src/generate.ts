@@ -1,6 +1,11 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps, getDynamicTemplate, isBlankPdf } from '@pdfme/common';
+import {
+  checkGenerateProps,
+  getDynamicTemplate,
+  isBlankPdf,
+  replacePlaceholders,
+} from '@pdfme/common';
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import {
   insertPage,
@@ -56,7 +61,7 @@ const generate = async (props: GenerateProps) => {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
-      
+
       if (isBlankPdf(basePdf) && basePdf.staticSchema) {
         for (let k = 0; k < basePdf.staticSchema.length; k += 1) {
           const schema = basePdf.staticSchema[k];
@@ -64,7 +69,16 @@ const generate = async (props: GenerateProps) => {
           if (!render) {
             continue;
           }
-          await render({ value: schema.content || '', schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
+          await render({
+            value: replacePlaceholders({ content: schema.content || '', total: basePages.length, page: j + 1 }),
+            schema,
+            basePdf,
+            pdfLib,
+            pdfDoc,
+            page,
+            options,
+            _cache,
+          });
         }
       }
 

@@ -395,7 +395,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               <DeleteButton activeElements={activeElements} />
             )}
             <Padding basePdf={basePdf} />
-            <StaticSchema basePdf={basePdf} scale={scale}/>
+            <StaticSchema basePdf={basePdf} scale={scale} totalPages={schemasList.length} currentPage={index + 1} />
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {

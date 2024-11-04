@@ -163,8 +163,13 @@ const Preview = ({
               />
             );
           }}
-          renderPaper={() => (
-            <StaticSchema basePdf={template.basePdf} scale={scale} />
+          renderPaper={({ index }) => (
+            <StaticSchema
+              basePdf={template.basePdf}
+              scale={scale}
+              totalPages={schemasList.length}
+              currentPage={index + 1}
+            />
           )}
         />
       </div>
