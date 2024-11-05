@@ -16,6 +16,7 @@ const sidebars = {
       ],
     },
     'tables',
+    'headers-and-footers',
     'development-guide',
   ],
 };
