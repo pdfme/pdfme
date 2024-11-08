@@ -11,7 +11,7 @@ import React, {
 } from 'react';
 import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
-import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf } from '@pdfme/common';
+import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf, replacePlaceholders } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
 import { CloseOutlined } from '@ant-design/icons';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
@@ -396,7 +396,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             )}
             <Padding basePdf={basePdf} />
             <StaticSchema basePdf={basePdf}
-              input={schemasList[index].reduce((acc, schema) => {
+              input={schemasList.flat().reduce((acc, schema) => {
                 acc[schema.name] = schema.content || '';
                 return acc;
               }, {} as Record<string, string>)}
@@ -443,28 +443,47 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             )}
           </>
         )}
-        renderSchema={({ schema }) => (
-          <Renderer
-            key={schema.id}
-            schema={schema}
-            basePdf={basePdf}
-            value={schema.content || ''}
-            onChangeHoveringSchemaId={onChangeHoveringSchemaId}
-            mode={
-              editing && activeElements.map((ae) => ae.id).includes(schema.id)
-                ? 'designer'
-                : 'viewer'
-            }
-            onChange={(arg) => {
-              const args = Array.isArray(arg) ? arg : [arg];
-              changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
-            }}
-            stopEditing={() => setEditing(false)}
-            outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-              }`}
-            scale={scale}
-          />
-        )}
+        renderSchema={({ schema, index }) => {
+          const mode =
+            editing && activeElements.map((ae) => ae.id).includes(schema.id)
+              ? 'designer'
+              : 'viewer'
+
+          const content = schema.content || '';
+          let value = content;
+
+          if (mode !== 'designer' && schema.readOnly) {
+            const variables = {
+              ...schemasList.flat().reduce((acc, currSchema) => {
+                acc[currSchema.name] = currSchema.content || '';
+                return acc;
+              }, {} as Record<string, string>),
+              total: schemasList.length,
+              page: index + 1,
+            };
+
+            value = replacePlaceholders({ content, variables });
+          }
+
+          return (
+            <Renderer
+              key={schema.id}
+              schema={schema}
+              basePdf={basePdf}
+              value={value}
+              onChangeHoveringSchemaId={onChangeHoveringSchemaId}
+              mode={mode}
+              onChange={(arg) => {
+                const args = Array.isArray(arg) ? arg : [arg];
+                changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
+              }}
+              stopEditing={() => setEditing(false)}
+              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
+                }`}
+              scale={scale}
+            />
+          )
+        }}
       />
     </div>
   );

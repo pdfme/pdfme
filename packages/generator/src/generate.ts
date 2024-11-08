@@ -64,26 +64,17 @@ const generate = async (props: GenerateProps) => {
 
       if (isBlankPdf(basePdf) && basePdf.staticSchema) {
         for (let k = 0; k < basePdf.staticSchema.length; k += 1) {
-          const schema = basePdf.staticSchema[k];
-          const render = renderObj[schema.type];
+          const staticSchema = basePdf.staticSchema[k];
+          const render = renderObj[staticSchema.type];
           if (!render) {
             continue;
           }
-          await render({
-            value: replacePlaceholders({
-              content: schema.content || '',
-              input,
-              total: basePages.length,
-              page: j + 1,
-            }),
-            schema,
-            basePdf,
-            pdfLib,
-            pdfDoc,
-            page,
-            options,
-            _cache,
+          const value = replacePlaceholders({
+            content: staticSchema.content || '',
+            variables: { ...input, total: basePages.length, page: j + 1 },
           });
+
+          await render({ value, schema: staticSchema, basePdf, pdfLib, pdfDoc, page, options, _cache });
         }
       }
 
@@ -99,7 +90,11 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.content || '' : input[name];
+        const value = replacePlaceholders({
+          content: schema.readOnly ? schema.content || '' : input[name],
+          variables: { ...input, total: basePages.length, page: j + 1 },
+        });
+
         await render({ value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }
     }

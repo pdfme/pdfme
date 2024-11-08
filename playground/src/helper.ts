@@ -761,7 +761,8 @@ const getInvoiceTemplate = (): Template => ({
       {
         name: 'footerInfo',
         type: 'text',
-        content: 'Invoice No.{info.InvoiceNo} • {totalInput} USD due {date}',
+        // content: 'Invoice No.{info.InvoiceNo} • {totalInput} USD due {date}',
+        content: '{totalInput} USD due {date}',
         position: {
           x: 20,
           y: 282,
@@ -780,6 +781,7 @@ const getInvoiceTemplate = (): Template => ({
         strikethrough: false,
         underline: false,
         required: false,
+        readOnly: true,
       },
       {
         name: 'pageNumber',
@@ -803,6 +805,7 @@ const getInvoiceTemplate = (): Template => ({
         strikethrough: false,
         underline: false,
         required: false,
+        readOnly: true,
       },
     ],
   },

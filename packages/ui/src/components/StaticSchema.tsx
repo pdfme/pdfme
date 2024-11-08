@@ -11,7 +11,7 @@ const StaticSchema = ({ basePdf, scale, totalPages, currentPage, input }: { base
           key={schema.name}
           schema={{ ...schema, id: uuid() }}
           basePdf={basePdf}
-          value={replacePlaceholders({ content: schema.content || '', input, total: totalPages, page: currentPage })}
+          value={replacePlaceholders({ content: schema.content || '', variables: { ...input, total: totalPages, page: currentPage } })}
           onChangeHoveringSchemaId={() => { void 0 }}
           mode={'viewer'}
           outline={`none`}

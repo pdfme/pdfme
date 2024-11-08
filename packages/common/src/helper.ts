@@ -1,3 +1,4 @@
+import ejs from 'ejs';
 import { z } from 'zod';
 import { Buffer } from 'buffer';
 import {
@@ -549,72 +550,93 @@ export const getDynamicTemplate = async (
   return createNewTemplate(pages, template.basePdf);
 };
 
+const parseData = (data: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(data).map(([key, value]) => {
+      if (typeof value === 'string') {
+        try {
+          const parsedValue = JSON.parse(value) as unknown;
+          return [key, parsedValue];
+        } catch {
+          return [key, value];
+        }
+      }
+      return [key, value];
+    })
+  );
+
+const padZero = (num: number): string => String(num).padStart(2, '0');
+
+const formatDate = (date: Date): string =>
+  `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(date.getDate())}`;
+
+const formatDateTime = (date: Date): string =>
+  `${formatDate(date)} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
+
 export const replacePlaceholders = (arg: {
   content: string;
-  input: Record<string, any>;
-  total: number;
-  page: number;
+  variables: Record<string, any>;
 }): string => {
-  const get = <T, K extends keyof any>(
-    obj: T,
-    path: K | K[],
-    defaultValue: string = ''
-  ): string => {
-    let pathArray: string[];
-
-    if (Array.isArray(path)) {
-      pathArray = path.map(String);
-    } else if (typeof path === 'string') {
-      pathArray = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-    } else {
-      pathArray = [String(path)];
-    }
-
-    let result: any = obj;
-    for (const key of pathArray) {
-      if (result === undefined || result === null) {
-        return defaultValue;
-      }
-      result = result[key];
-    }
-
-    return result !== undefined && result !== null ? String(result) : defaultValue;
-  };
-
-  const parseIfJSON = (value: any): any => {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return value;
-    }
-  };
-
-  const parseData = (data: {
-    [key: string]: any;
-  }): {
-    [key: string]: string | number | boolean | object | null;
-  } => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, parseIfJSON(value)]));
-
+  const { content, variables } = arg;
   const date = new Date();
+  const formattedDate = formatDate(date);
+  const formattedDateTime = formatDateTime(date);
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-
-  const formattedDate = `${year}/${month}/${day}`;
-  const formattedDateTime = `${formattedDate} ${hours}:${minutes}`;
-
-  const parsedInput = parseData(arg.input);
+  const parsedInput = parseData(variables);
 
   const context = {
     date: formattedDate,
     dateTime: formattedDateTime,
-    total: String(arg.total),
-    page: String(arg.page),
     ...parsedInput,
   };
 
-  return arg.content.replace(/{([^}]+)}/g, (match, key) => get(context, key, match));
+  let sanitizedContent = '';
+  let index = 0;
+
+  while (index < content.length) {
+    const startIndex = content.indexOf('{', index);
+    if (startIndex === -1) {
+      sanitizedContent += content.slice(index);
+      break;
+    }
+
+    sanitizedContent += content.slice(index, startIndex);
+    let braceCount = 1;
+    let endIndex = startIndex + 1;
+
+    while (endIndex < content.length && braceCount > 0) {
+      if (content[endIndex] === '{') {
+        braceCount++;
+      } else if (content[endIndex] === '}') {
+        braceCount--;
+      }
+      endIndex++;
+    }
+
+    if (braceCount === 0) {
+      const code = content.slice(startIndex + 1, endIndex - 1);
+      sanitizedContent += `<%= ${code.trim()} %>`;
+      index = endIndex;
+    } else {
+      throw new Error('[@pdfme/common] Invalid placeholder');
+    }
+  }
+
+  try {
+    return ejs.render(sanitizedContent, context, { escape: ejs.escapeXML });
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new Error(`[@pdfme/common] ${e.message}`);
+    } else {
+      throw new Error('[@pdfme/common] Invalid placeholder');
+    }
+  }
+};
+
+export const replacePlaceholders2 = () => {
+  // TODO ここから
+  
+  // replacePlaceholdersに渡しているvariablesはreadOnlyのcontentの値も入れるべき。テンプレートから逆算できる。
+  // undefinedで落ちないようにvariablesに入るべき値をテンプレートから逆算して空文字で入れるべき。
+  // ↑テンプレートというかschemasから逆算可能
 };
