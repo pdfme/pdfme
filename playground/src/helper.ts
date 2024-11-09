@@ -587,7 +587,7 @@ const getInvoiceTemplate = (): Template => ({
       },
       {
         type: 'text',
-        content: '{Number(subtotalInput) * Number(taxLabel.taxRate)}',
+        content: '{Number(subtotalInput) * Number(taxLabel.taxRate) / 100}',
         position: {
           x: 163.79,
           y: 164.98,

@@ -573,31 +573,11 @@ const formatDate = (date: Date): string =>
 const formatDateTime = (date: Date): string =>
   `${formatDate(date)} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
 
-export const replacePlaceholders = (arg: {
+const evaluatePlaceholders = (arg: {
   content: string;
-  variables: Record<string, any>;
-  schemas: SchemaPageArray;
+  context: Record<string, unknown>;
 }): string => {
-  const { content, variables, schemas } = arg;
-  const date = new Date();
-  const formattedDate = formatDate(date);
-  const formattedDateTime = formatDateTime(date);
-
-  const data = {
-    // TODO ここから修正
-    // schema.content をそのまま使う場合、評価された値が入らない
-    ...Object.fromEntries(
-      schemas.flat().map((schema) => [schema.name, schema.readOnly ? schema.content : ''])
-    ),
-    ...variables,
-  };
-  const parsedInput = parseData(data);
-
-  const context = {
-    date: formattedDate,
-    dateTime: formattedDateTime,
-    ...parsedInput,
-  };
+  const { content, context } = arg;
 
   let sanitizedContent = '';
   let index = 0;
@@ -635,9 +615,46 @@ export const replacePlaceholders = (arg: {
     return ejs.render(sanitizedContent, context, { escape: ejs.escapeXML });
   } catch (e) {
     if (e instanceof Error) {
-      throw new Error(`[@pdfme/common] ${e.message}`);
+      throw new Error(`[@pdfme/common] Replace placeholder failed: ${e.message}`);
     } else {
       throw new Error('[@pdfme/common] Invalid placeholder');
     }
   }
+};
+
+export const replacePlaceholders = (arg: {
+  content: string;
+  variables: Record<string, any>;
+  schemas: SchemaPageArray;
+}): string => {
+  const { content, variables, schemas } = arg;
+  if (!content || typeof content !== 'string' || !content.includes('{') || !content.includes('}')) {
+    return content;
+  }
+
+  const date = new Date();
+  const formattedDate = formatDate(date);
+  const formattedDateTime = formatDateTime(date);
+
+  const data = {
+    ...Object.fromEntries(
+      schemas.flat().map((schema) => [schema.name, schema.readOnly ? schema.content || '' : ''])
+    ),
+    ...variables,
+  };
+  const parsedInput = parseData(data);
+
+  const context: Record<string, unknown> = {
+    date: formattedDate,
+    dateTime: formattedDateTime,
+    ...parsedInput,
+  };
+
+  Object.entries(context).forEach(([key, value]) => {
+    if (typeof value === 'string' && value.includes('{') && value.includes('}')) {
+      context[key] = evaluatePlaceholders({ content: value, context });
+    }
+  });
+
+  return evaluatePlaceholders({ content, context });
 };
