@@ -72,9 +72,19 @@ const generate = async (props: GenerateProps) => {
           const value = replacePlaceholders({
             content: staticSchema.content || '',
             variables: { ...input, total: basePages.length, page: j + 1 },
+            schemas: dynamicTemplate.schemas,
           });
 
-          await render({ value, schema: staticSchema, basePdf, pdfLib, pdfDoc, page, options, _cache });
+          await render({
+            value,
+            schema: staticSchema,
+            basePdf,
+            pdfLib,
+            pdfDoc,
+            page,
+            options,
+            _cache,
+          });
         }
       }
 
@@ -90,10 +100,13 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = replacePlaceholders({
-          content: schema.readOnly ? schema.content || '' : input[name],
-          variables: { ...input, total: basePages.length, page: j + 1 },
-        });
+        const value = schema.readOnly
+          ? replacePlaceholders({
+              content: schema.content || '',
+              variables: { ...input, total: basePages.length, page: j + 1 },
+              schemas: dynamicTemplate.schemas,
+            })
+          : input[name] || '';
 
         await render({ value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }

@@ -395,11 +395,11 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               <DeleteButton activeElements={activeElements} />
             )}
             <Padding basePdf={basePdf} />
-            <StaticSchema basePdf={basePdf}
-              input={schemasList.flat().reduce((acc, schema) => {
-                acc[schema.name] = schema.content || '';
-                return acc;
-              }, {} as Record<string, string>)}
+            <StaticSchema
+              template={{ schemas: schemasList, basePdf }}
+              input={Object.fromEntries(
+                schemasList.flat().map(({ name, content = '' }) => [name, content])
+              )}
               scale={scale}
               totalPages={schemasList.length}
               currentPage={index + 1}
@@ -462,7 +462,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               page: index + 1,
             };
 
-            value = replacePlaceholders({ content, variables });
+            value = replacePlaceholders({ content, variables, schemas: schemasList });
           }
 
           return (

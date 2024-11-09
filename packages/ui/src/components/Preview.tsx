@@ -147,7 +147,8 @@ const Preview = ({
           renderSchema={({ schema, index }) => {
             const value = schema.readOnly ? replacePlaceholders({
               content: schema.content || '',
-              variables: { ...input, total: schemasList.length, page: index + 1, }
+              variables: { ...input, total: schemasList.length, page: index + 1, },
+              schemas: schemasList
             }) : String(input && input[schema.name] || '');
             return (
               <Renderer
@@ -171,7 +172,7 @@ const Preview = ({
           }}
           renderPaper={({ index }) => (
             <StaticSchema
-              basePdf={template.basePdf}
+              template={template}
               scale={scale}
               input={input}
               totalPages={schemasList.length}

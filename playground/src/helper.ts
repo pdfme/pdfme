@@ -314,8 +314,8 @@ const getCertificateTemplate = (): Template => ({
 
 const getInvoiceTemplate = (): Template => ({
   schemas: [
-    {
-      logo: {
+    [
+      {
         type: 'svg',
         position: {
           x: 20,
@@ -326,8 +326,9 @@ const getInvoiceTemplate = (): Template => ({
         width: 23.86,
         height: 23.86,
         readOnly: true,
+        name: 'logo',
       },
-      head: {
+      {
         type: 'text',
         position: {
           x: 120.13,
@@ -347,8 +348,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'head',
       },
-      billedToLabel: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -368,8 +370,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'billedToLabel',
       },
-      billedToInput: {
+      {
         type: 'text',
         content: 'Imani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036',
         position: {
@@ -393,8 +396,9 @@ const getInvoiceTemplate = (): Template => ({
           fit: 'vertical',
         },
         fontName: 'NotoSerifJP-Regular',
+        name: 'billedToInput',
       },
-      info: {
+      {
         type: 'multiVariableText',
         position: {
           x: 119.87,
@@ -417,8 +421,9 @@ const getInvoiceTemplate = (): Template => ({
         text: 'Invoice No.{InvoiceNo}\n{Date}',
         variables: ['InvoiceNo', 'Date'],
         fontName: 'NotoSerifJP-Regular',
+        name: 'info',
       },
-      orders: {
+      {
         type: 'table',
         position: {
           x: 20,
@@ -427,7 +432,7 @@ const getInvoiceTemplate = (): Template => ({
         width: 170,
         height: 45.75920000000001,
         content:
-          '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"]]',
+          '[["Eggshell Camisole Top","1","123","123"],["Cuban Collar Shirt","2","127","254"]]',
         showHead: true,
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
         headWidthPercentages: [
@@ -486,10 +491,14 @@ const getInvoiceTemplate = (): Template => ({
           },
         },
         columnStyles: {
-          alignment: { '0': 'left', '3': 'right' },
+          alignment: {
+            '0': 'left',
+            '3': 'right',
+          },
         },
+        name: 'orders',
       },
-      subtotalLabel: {
+      {
         type: 'text',
         position: {
           x: 138.01,
@@ -509,18 +518,20 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'subtotalLabel',
       },
-      taxLabel: {
-        type: 'text',
+      {
+        type: 'multiVariableText',
         position: {
-          x: 138.01,
+          x: 127.17,
           y: 164.98,
         },
-        content: 'Tax (0%)',
-        width: 25.42,
-        height: 8.89,
+        name: 'taxLabel',
+        content: '{"taxRate":"10"}',
+        width: 36.76,
+        height: 9.18,
         rotate: 0,
-        alignment: 'center',
+        alignment: 'right',
         verticalAlignment: 'top',
         fontSize: 13,
         lineHeight: 1,
@@ -528,10 +539,14 @@ const getInvoiceTemplate = (): Template => ({
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        strikethrough: false,
+        underline: false,
+        readOnly: false,
+        text: 'Tax ({taxRate}%)',
+        variables: ['taxRate'],
+        required: false,
       },
-      line: {
+      {
         type: 'line',
         position: {
           x: 137.09,
@@ -543,10 +558,13 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         color: '#000000',
+        name: 'line',
+        content: '',
       },
-      subtotalInput: {
+      {
         type: 'text',
-        content: '$500',
+        content:
+          '{orders.reduce((sum, item) => sum + parseFloat(item[1] || 0) * parseFloat(item[2] || 0), 0)}',
         position: {
           x: 163.79,
           y: 157.1,
@@ -563,10 +581,13 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'subtotalInput',
+        readOnly: true,
+        required: false,
       },
-      taxInput: {
+      {
         type: 'text',
-        content: '$0',
+        content: '{Number(subtotalInput) * Number(taxLabel.taxRate)}',
         position: {
           x: 163.79,
           y: 164.98,
@@ -583,8 +604,11 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'taxInput',
+        readOnly: true,
+        required: false,
       },
-      totalLabel: {
+      {
         type: 'text',
         position: {
           x: 136.94,
@@ -604,10 +628,11 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
+        name: 'totalLabel',
       },
-      totalInput: {
+      {
         type: 'text',
-        content: '$500',
+        content: '${Number(subtotalInput) + Number(taxInput)}',
         position: {
           x: 164.05,
           y: 174.64,
@@ -624,8 +649,11 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'totalInput',
+        readOnly: true,
+        required: false,
       },
-      thankyou: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -645,8 +673,9 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
+        name: 'thankyou',
       },
-      paymentInfoLabel: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -666,8 +695,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'paymentInfoLabel',
       },
-      paymentInfoInput: {
+      {
         type: 'text',
         content:
           'Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025',
@@ -692,8 +722,9 @@ const getInvoiceTemplate = (): Template => ({
           fit: 'vertical',
         },
         fontName: 'NotoSerifJP-Regular',
+        name: 'paymentInfoInput',
       },
-      shopName: {
+      {
         type: 'text',
         position: {
           x: 119.33,
@@ -713,8 +744,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'shopName',
       },
-      shopAddress: {
+      {
         type: 'text',
         position: {
           x: 107.69,
@@ -734,8 +766,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'shopAddress',
       },
-    },
+    ],
   ],
   basePdf: {
     width: 210,
@@ -761,8 +794,7 @@ const getInvoiceTemplate = (): Template => ({
       {
         name: 'footerInfo',
         type: 'text',
-        // content: 'Invoice No.{info.InvoiceNo} • {totalInput} USD due {date}',
-        content: '{totalInput} USD due {date}',
+        content: 'Invoice No.{info.InvoiceNo} • {totalInput} due {date}',
         position: {
           x: 20,
           y: 282,
@@ -809,7 +841,7 @@ const getInvoiceTemplate = (): Template => ({
       },
     ],
   },
-  pdfmeVersion: '4.0.0',
+  pdfmeVersion: '5.0.0',
 });
 
 const getBlankTemplate = () =>
