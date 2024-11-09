@@ -1,4 +1,4 @@
-import ejs from 'ejs';
+import { render, escapeXML } from 'ejs';
 import { z } from 'zod';
 import { Buffer } from 'buffer';
 import {
@@ -612,7 +612,7 @@ const evaluatePlaceholders = (arg: {
   }
 
   try {
-    return ejs.render(sanitizedContent, context, { escape: ejs.escapeXML });
+    return render(sanitizedContent, context, { escape: escapeXML });
   } catch (e) {
     if (e instanceof Error) {
       throw new Error(`[@pdfme/common] Replace placeholder failed: ${e.message}`);

@@ -66,6 +66,12 @@ const config = {
         name: 'custom-docusaurus-plugin',
         configureWebpack() {
           const newConfig = {
+            resolve: {
+              fallback: {
+                fs: false,
+                path: require.resolve('path-browserify'),
+              },
+            },
             plugins: [
               new webpack.IgnorePlugin({
                 resourceRegExp: /canvas/,
