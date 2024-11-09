@@ -612,9 +612,12 @@ const evaluatePlaceholders = (arg: {
   }
 
   try {
-    return render(sanitizedContent, context, { escape: escapeXML });
+    // TODO ここで悪意のあるコードを実行される可能性があるため、安全なコードのみを許可する
+    return render(sanitizedContent, context, { async: false, escape: escapeXML });
   } catch (e) {
-    if (e instanceof Error) {
+    if (e instanceof ReferenceError) {
+      return content;
+    } else if (e instanceof Error) {
       throw new Error(`[@pdfme/common] Replace placeholder failed: ${e.message}`);
     } else {
       throw new Error('[@pdfme/common] Invalid placeholder');
