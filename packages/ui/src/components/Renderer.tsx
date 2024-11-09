@@ -3,7 +3,7 @@ import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, 
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
-import * as pdfJs from 'pdfjs-dist/legacy/build/pdf.js';
+import * as pdfJs from 'pdfjs-dist';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,

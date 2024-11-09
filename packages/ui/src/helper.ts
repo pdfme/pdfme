@@ -1,7 +1,4 @@
-// Update pdfjs-dist. (might be able to reduce the bundle size.)
-// @ts-ignore
-import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry.js';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist/legacy/build/pdf.js';
+import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import hotkeys from 'hotkeys-js';
 import {
   cloneDeep,
@@ -18,7 +15,7 @@ import {
 } from '@pdfme/common';
 import { RULER_HEIGHT } from './constants.js';
 
-GlobalWorkerOptions.workerSrc = PDFJSWorker;
+GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
