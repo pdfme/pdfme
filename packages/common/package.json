@@ -46,7 +46,6 @@
     "@pdfme/pdf-lib": "^1.18.3",
     "acorn": "^8.14.0",
     "buffer": "^6.0.3",
-    "ejs": "^3.1.10",
     "zod": "^3.20.2"
   },
   "peerDependencies": {
@@ -75,7 +74,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/ejs": "^3.1.5",
     "@types/estree": "^1.0.6"
   }
 }
