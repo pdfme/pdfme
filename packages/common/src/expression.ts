@@ -89,7 +89,6 @@ const validateAST = (node: AcornNode): void => {
         if (['constructor', '__proto__', 'prototype'].includes(propName)) {
           throw new Error('Access to prohibited property');
         }
-        // 必要に応じて特定のメソッドを禁止
         const prohibitedMethods = ['toLocaleString', 'valueOf'];
         if (typeof propName === 'string' && prohibitedMethods.includes(propName)) {
           throw new Error(`Access to prohibited method: ${propName}`);
