@@ -6,7 +6,7 @@ const sidebars = {
     'getting-started',
     'supported-features',
     'tables',
-    'placeholders',
+    'expression',
     'headers-and-footers',
     {
       type: 'category',
