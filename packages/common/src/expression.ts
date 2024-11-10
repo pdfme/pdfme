@@ -2,8 +2,16 @@ import * as acorn from 'acorn';
 import type { Node as AcornNode, Identifier, Property } from 'estree';
 import type { SchemaPageArray } from './types';
 
-const parseData = (data: Record<string, unknown>): Record<string, unknown> =>
-  Object.fromEntries(
+const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
+const parseDataCache = new Map<string, Record<string, unknown>>();
+
+const parseData = (data: Record<string, unknown>): Record<string, unknown> => {
+  const key = JSON.stringify(data);
+  if (parseDataCache.has(key)) {
+    return parseDataCache.get(key)!;
+  }
+
+  const parsed = Object.fromEntries(
     Object.entries(data).map(([key, value]) => {
       if (typeof value === 'string') {
         try {
@@ -16,6 +24,10 @@ const parseData = (data: Record<string, unknown>): Record<string, unknown> =>
       return [key, value];
     })
   );
+
+  parseDataCache.set(key, parsed);
+  return parsed;
+};
 
 const padZero = (num: number): string => String(num).padStart(2, '0');
 
@@ -310,15 +322,29 @@ const evaluatePlaceholders = (arg: {
     }
 
     if (braceCount === 0) {
-      const code = content.slice(startIndex + 1, endIndex - 1);
-      try {
-        const ast = acorn.parseExpressionAt(code, 0, { ecmaVersion: 'latest' }) as AcornNode;
-        validateAST(ast);
-        const value = evaluateAST(ast, context);
-        resultContent += String(value);
-      } catch {
-        resultContent += content.slice(startIndex, endIndex);
+      const code = content.slice(startIndex + 1, endIndex - 1).trim();
+      
+      if (expressionCache.has(code)) {
+        const evalFunc = expressionCache.get(code)!;
+        try {
+          const value = evalFunc(context);
+          resultContent += String(value);
+        } catch {
+          resultContent += content.slice(startIndex, endIndex);
+        }
+      } else {
+        try {
+          const ast = acorn.parseExpressionAt(code, 0, { ecmaVersion: 'latest' }) as AcornNode;
+          validateAST(ast);
+          const evalFunc = (ctx: Record<string, unknown>) => evaluateAST(ast, ctx);
+          expressionCache.set(code, evalFunc);
+          const value = evalFunc(context);
+          resultContent += String(value);
+        } catch {
+          resultContent += content.slice(startIndex, endIndex);
+        }
       }
+
       index = endIndex;
     } else {
       throw new Error('Invalid placeholder');
@@ -327,6 +353,7 @@ const evaluatePlaceholders = (arg: {
 
   return resultContent;
 };
+
 
 export const replacePlaceholders = (arg: {
   content: string;
