@@ -156,4 +156,154 @@ describe('replacePlaceholders', () => {
     const result = replacePlaceholders({ content, variables, schemas });
     expect(result).toBe('Content: ');
   });
+
+  it('should allow method chaining on permitted global objects', () => {
+    const content = 'Chained: {Math.random().toString()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Math.random() generates a random number, which is then converted to a string using toString()
+    const regex = /^Chained: \d+\.\d+$/;
+    expect(regex.test(result)).toBe(true);
+  });
+});
+
+describe('replacePlaceholders - Security Tests', () => {
+  it('should prevent access to __proto__ property', () => {
+    const content = 'Proto: {__proto__}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Since __proto__ access is prohibited, the placeholder should remain unchanged
+    expect(result).toBe('Proto: {__proto__}');
+  });
+
+  it('should prevent access to constructor property', () => {
+    const content = 'Constructor: {constructor}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'constructor' is allowed if defined in context or globals; assuming it's not, placeholder remains
+    expect(result).toBe('Constructor: {constructor}');
+  });
+
+  it('should prevent access to prototype property', () => {
+    const content = 'Prototype: {prototype}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'prototype' access is prohibited
+    expect(result).toBe('Prototype: {prototype}');
+  });
+
+  it('should prevent access to nested prohibited properties', () => {
+    const content = 'Nested: {user.__proto__.polluted}';
+    const variables = { user: {} };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    // Access to '__proto__' is prohibited; placeholder remains unchanged
+    expect(result).toBe('Nested: {user.__proto__.polluted}');
+  });
+
+  it('should prevent use of Function constructor', () => {
+    const content = 'Function: {Function("return 42")()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Use of Function constructor is not allowed; placeholder remains unchanged
+    expect(result).toBe('Function: {Function("return 42")()}');
+  });
+
+  it('should prevent access to disallowed global variables', () => {
+    const content = 'Process: {process.env}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'process' is not in allowedGlobals; placeholder remains unchanged
+    expect(result).toBe('Process: {process.env}');
+  });
+
+  it('should prevent prototype pollution via JSON.parse', () => {
+    const content = 'Polluted: {JSON.parse(\'{"__proto__":{"polluted":true}}\').polluted}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Even if 'polluted' is accessed, the prototype is not polluted, so undefined is returned.
+    expect(result).toBe('Polluted: undefined');
+  });
+
+  it('should prevent accessing nested prohibited properties in functions', () => {
+    const content = 'Access: {( () => { return this.constructor } )()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Attempting to access 'constructor' via 'this' should be prohibited; placeholder remains unchanged
+    expect(result).toBe('Access: {( () => { return this.constructor } )()}');
+  });
+
+  it('should prevent accessing global objects not in allowedGlobals', () => {
+    const content = 'Global: {global}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'global' is not in allowedGlobals; placeholder remains unchanged
+    expect(result).toBe('Global: {global}');
+  });
+
+  it('should prevent accessing Object constructor via allowed globals', () => {
+    const content = 'ObjectConstructor: {Object.constructor}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Accessing 'constructor' of 'Object' is prohibited
+    expect(result).toBe('ObjectConstructor: {Object.constructor}');
+  });
+
+  it('should prevent accessing Function from allowed globals', () => {
+    const content = 'FunctionAccess: {Function("return 42")()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'Function' is not in allowedGlobals, so this should fail
+    expect(result).toBe('FunctionAccess: {Function("return 42")()}');
+  });
+
+  it('should prevent accessing nested properties via allowed globals', () => {
+    const content = 'NestedAccess: {Math.__proto__.polluted}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Accessing '__proto__' of allowed global 'Math' is prohibited
+    expect(result).toBe('NestedAccess: {Math.__proto__.polluted}');
+  });
+
+  it('should prevent execution of arbitrary code via ternary operator', () => {
+    const content = 'ArbitraryCode: {true ? (() => { return "Hacked" })() : "Safe"}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Execution of arbitrary functions is not allowed; placeholder remains unchanged
+    expect(result).toBe('ArbitraryCode: {true ? (() => { return "Hacked" })() : "Safe"}');
+  });
+
+  it('should handle attempts to override context variables', () => {
+    const content = 'Override: {date = "Hacked"} {date}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Assignment operations are not supported; placeholders remain unchanged
+    const date = new Date();
+    const padZero = (num: number) => String(num).padStart(2, '0');
+    const dateFmt = `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(
+      date.getDate()
+    )}`;
+    expect(result).toBe(`Override: {date = "Hacked"} ${dateFmt}`);
+  });
+
+  it('should prevent using eval-like expressions', () => {
+    const content = 'Eval: {eval("2 + 2")';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'eval' is not in allowedGlobals; placeholder remains unchanged
+    expect(result).toBe('Eval: {eval("2 + 2")');
+  });
+
+  it('should prevent accessing undefined variables', () => {
+    const content = 'Undefined: {undefinedVar}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'undefinedVar' is not defined; placeholder remains unchanged
+    expect(result).toBe('Undefined: {undefinedVar}');
+  });
+
+  it('should prevent accessing nested properties of undefined variables', () => {
+    const content = 'NestedUndefined: {user.name}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // 'user' is undefined; accessing 'name' should fail and placeholder remains unchanged
+    expect(result).toBe('NestedUndefined: {user.name}');
+  });
+
+  it('should prevent accessing nested prohibited properties in objects', () => {
+    const content = 'Nested: {user.__proto__.polluted}';
+    const variables = { user: {} };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    // Since access to '__proto__' is prohibited, the placeholder remains unchanged.
+    expect(result).toBe('Nested: {user.__proto__.polluted}');
+  });
+
+  it('should prevent using Function constructor', () => {
+    const content = 'Function: {Function("return 42")()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Since 'Function' is not included in allowedGlobals, the placeholder remains unchanged.
+    expect(result).toBe('Function: {Function("return 42")()}');
+  });
 });
