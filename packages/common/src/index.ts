@@ -58,9 +58,9 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
-  getDynamicTemplate,
-  replacePlaceholders,
 } from './helper';
+import { getDynamicTemplate } from './dynamicTemplate';
+import { replacePlaceholders } from './expression';
 
 export {
   PDFME_VERSION,
