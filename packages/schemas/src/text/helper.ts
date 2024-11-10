@@ -128,7 +128,7 @@ export const getFontKitFont = async (
 
   const fontKitFont = fontkit.create(
     fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer)
-  );
+  ) as fontkit.Font;
   _cache.set(cacheKey, fontKitFont);
 
   return fontKitFont;
