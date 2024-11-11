@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useContext, ReactNode, useRef } from 'react';
-import {Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions} from '@pdfme/common';
+import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -15,6 +15,7 @@ type RendererProps = Omit<
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
+  selectable?: boolean;
 };
 
 type ReRenderCheckProps = {
@@ -43,12 +44,13 @@ const Wrapper = ({
   outline,
   onChangeHoveringSchemaId,
   schema,
+  selectable = true
 }: RendererProps & { children: ReactNode }) => (
   <div
     title={schema.name}
     onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
     onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
-    className={SELECTABLE_CLASSNAME}
+    className={selectable ? SELECTABLE_CLASSNAME : ''}
     id={schema.id}
     style={{
       position: 'absolute',
@@ -97,7 +99,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
 
-  const reRenderDependencies = useRerenderDependencies({plugin, value, mode, scale, schema, options});
+  const reRenderDependencies = useRerenderDependencies({ plugin, value, mode, scale, schema, options });
 
   useEffect(() => {
     if (ref.current && schema.type) {

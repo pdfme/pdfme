@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "^1.18.3",
+    "acorn": "^8.14.0",
     "buffer": "^6.0.3",
     "zod": "^3.20.2"
   },
@@ -71,5 +72,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "devDependencies": {
+    "@types/estree": "^1.0.6"
   }
 }

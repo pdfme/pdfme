@@ -1,6 +1,11 @@
 import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps } from '@pdfme/common';
-import { checkGenerateProps, getDynamicTemplate } from '@pdfme/common';
+import {
+  checkGenerateProps,
+  getDynamicTemplate,
+  isBlankPdf,
+  replacePlaceholders,
+} from '@pdfme/common';
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import {
   insertPage,
@@ -56,6 +61,33 @@ const generate = async (props: GenerateProps) => {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
+
+      if (isBlankPdf(basePdf) && basePdf.staticSchema) {
+        for (let k = 0; k < basePdf.staticSchema.length; k += 1) {
+          const staticSchema = basePdf.staticSchema[k];
+          const render = renderObj[staticSchema.type];
+          if (!render) {
+            continue;
+          }
+          const value = replacePlaceholders({
+            content: staticSchema.content || '',
+            variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
+            schemas: dynamicTemplate.schemas,
+          });
+
+          await render({
+            value,
+            schema: staticSchema,
+            basePdf,
+            pdfLib,
+            pdfDoc,
+            page,
+            options,
+            _cache,
+          });
+        }
+      }
+
       for (let l = 0; l < schemaNames.length; l += 1) {
         const name = schemaNames[l];
         const schemaPage = dynamicTemplate.schemas[j] || [];
@@ -68,7 +100,14 @@ const generate = async (props: GenerateProps) => {
         if (!render) {
           continue;
         }
-        const value = schema.readOnly ? schema.content || '' : input[name];
+        const value = schema.readOnly
+          ? replacePlaceholders({
+              content: schema.content || '',
+              variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
+              schemas: dynamicTemplate.schemas,
+            })
+          : input[name] || '';
+
         await render({ value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
       }
     }

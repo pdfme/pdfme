@@ -31,6 +31,7 @@ For using schemas other than the Text schema, please refer to the following docu
 - Support Read only
 
 ### Multivariable Text
+
 - As per text, but supporting 0 to n variables in a single text field
 
 ### Shape
@@ -81,7 +82,9 @@ For using schemas other than the Text schema, please refer to the following docu
   - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
 
 ### Table
+
 Details: [Tables with Dynamic Data](/docs/tables)
+
 - Style-related
   - Table
     - Border Width
@@ -101,9 +104,32 @@ Details: [Tables with Dynamic Data](/docs/tables)
   - Column
     - Text Align
 
+### Select
+
+- Options
+- Style-related
+  - Font Name
+  - Font Size
+  - Letter Spacing
+  - Text Align
+  - Vertical Align
+  - Line Height
+  - Text Color
+  - Background Color
+
+### Date / Time / DateTime
+
+- Date Format
+- Style-related
+  - Font Name
+  - Font Size
+  - Letter Spacing
+  - Text Align
+  - Text Color
+  - Background Color
+
 ## Planned Support
 
 - [Radio Button](https://github.com/pdfme/pdfme/issues/570)
 - [Check Box](https://github.com/pdfme/pdfme/issues/457)
-- [Date / Time / DateTime](https://github.com/pdfme/pdfme/issues/571)
 - [HyperLink](https://github.com/pdfme/pdfme/issues/319)

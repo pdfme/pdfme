@@ -131,10 +131,10 @@ export const getPlugins = () => {
     Time: time,
     Select: select,
     // JAPANPOST: barcodes.japanpost,
-    // EAN13: barcodes.ean13,
+    EAN13: barcodes.ean13,
     // EAN8: barcodes.ean8,
     // Code39: barcodes.code39,
-    // Code128: barcodes.code128,
+    Code128: barcodes.code128,
     // NW7: barcodes.nw7,
     // ITF14: barcodes.itf14,
     // UPCA: barcodes.upca,
@@ -143,7 +143,7 @@ export const getPlugins = () => {
   };
 };
 
-export const translations: { label: string, value: string }[] = [
+export const translations: { label: string; value: string }[] = [
   { value: 'en', label: 'English' },
   { value: 'zh', label: 'Chinese' },
   { value: 'ko', label: 'Korean' },
@@ -155,7 +155,7 @@ export const translations: { label: string, value: string }[] = [
   { value: 'de', label: 'German' },
   { value: 'fr', label: 'French' },
   { value: 'es', label: 'Spanish' },
-]
+];
 
 export const generatePDF = async (currentRef: Designer | Form | Viewer | null) => {
   if (!currentRef) return;
@@ -314,8 +314,8 @@ const getCertificateTemplate = (): Template => ({
 
 const getInvoiceTemplate = (): Template => ({
   schemas: [
-    {
-      logo: {
+    [
+      {
         type: 'svg',
         position: {
           x: 20,
@@ -326,8 +326,9 @@ const getInvoiceTemplate = (): Template => ({
         width: 23.86,
         height: 23.86,
         readOnly: true,
+        name: 'logo',
       },
-      head: {
+      {
         type: 'text',
         position: {
           x: 120.13,
@@ -347,8 +348,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'head',
       },
-      billedToLabel: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -368,8 +370,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'billedToLabel',
       },
-      billedToInput: {
+      {
         type: 'text',
         content: 'Imani Olowe \n+123-456-7890 \n63 Ivy Road, Hawkville, GA, USA 31036',
         position: {
@@ -393,8 +396,9 @@ const getInvoiceTemplate = (): Template => ({
           fit: 'vertical',
         },
         fontName: 'NotoSerifJP-Regular',
+        name: 'billedToInput',
       },
-      info: {
+      {
         type: 'multiVariableText',
         position: {
           x: 119.87,
@@ -417,8 +421,9 @@ const getInvoiceTemplate = (): Template => ({
         text: 'Invoice No.{InvoiceNo}\n{Date}',
         variables: ['InvoiceNo', 'Date'],
         fontName: 'NotoSerifJP-Regular',
+        name: 'info',
       },
-      orders: {
+      {
         type: 'table',
         position: {
           x: 20,
@@ -427,7 +432,7 @@ const getInvoiceTemplate = (): Template => ({
         width: 170,
         height: 45.75920000000001,
         content:
-          '[["Eggshell Camisole Top","1","$123","$123"],["Cuban Collar Shirt","2","$127","$254"]]',
+          '[["Eggshell Camisole Top","1","123","123"],["Cuban Collar Shirt","2","127","254"]]',
         showHead: true,
         head: ['Item', 'Quantity', 'Unit Price', 'Total'],
         headWidthPercentages: [
@@ -435,8 +440,8 @@ const getInvoiceTemplate = (): Template => ({
         ],
         fontName: 'NotoSerifJP-Regular',
         tableStyles: {
-          borderColor: '#000000',
           borderWidth: 0,
+          borderColor: '#000000',
         },
         headStyles: {
           fontName: 'NotoSerifJP-Regular',
@@ -486,21 +491,26 @@ const getInvoiceTemplate = (): Template => ({
           },
         },
         columnStyles: {
-          alignment: { '0': 'left', '3': 'right' },
+          alignment: {
+            '0': 'left',
+            '3': 'right',
+          },
         },
+        name: 'orders',
+        readOnly: false,
       },
-      subtotalLabel: {
+      {
         type: 'text',
         position: {
-          x: 138.01,
+          x: 133.01,
           y: 156.89,
         },
         content: 'Subtotal',
         width: 25.42,
         height: 8.09,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 13,
         lineHeight: 1,
         characterSpacing: 0,
@@ -509,32 +519,44 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'subtotalLabel',
       },
-      taxLabel: {
-        type: 'text',
+      {
+        type: 'multiVariableText',
         position: {
-          x: 138.01,
+          x: 118.73,
           y: 164.98,
         },
-        content: 'Tax (0%)',
-        width: 25.42,
-        height: 8.89,
+        name: 'taxInput',
+        content: '{"rate":"10"}',
+        width: 40.2,
+        height: 9.18,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 13,
         lineHeight: 1,
         characterSpacing: 0,
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        readOnly: true,
+        strikethrough: false,
+        underline: false,
+        readOnly: false,
+        text: 'Tax ({rate}%)',
+        variables: ['rate'],
+        required: false,
+        dynamicFontSize: {
+          min: 4,
+          max: 13,
+          fit: 'vertical',
+        },
         fontName: 'NotoSerifJP-Regular',
       },
-      line: {
+      {
         type: 'line',
         position: {
-          x: 137.09,
+          x: 132.09,
           y: 174.35,
         },
         width: 52.91,
@@ -543,19 +565,22 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         color: '#000000',
+        name: 'line',
+        content: '',
       },
-      subtotalInput: {
+      {
         type: 'text',
-        content: '$500',
+        content:
+          '{orders.reduce((sum, item) => sum + parseFloat(item[1] || 0) * parseFloat(item[2] || 0), 0)}',
         position: {
-          x: 163.79,
+          x: 158.79,
           y: 157.1,
         },
         width: 26.21,
         height: 7.56,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 13,
         lineHeight: 1,
         characterSpacing: 0,
@@ -563,19 +588,27 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'subtotal',
+        readOnly: true,
+        required: false,
+        dynamicFontSize: {
+          min: 4,
+          max: 13,
+          fit: 'horizontal',
+        },
       },
-      taxInput: {
+      {
         type: 'text',
-        content: '$0',
+        content: '{Number(subtotal) * Number(taxInput.rate) / 100}',
         position: {
-          x: 163.79,
+          x: 158.79,
           y: 164.98,
         },
         width: 26.21,
         height: 8.89,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 13,
         lineHeight: 1,
         characterSpacing: 0,
@@ -583,19 +616,27 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'tax',
+        readOnly: true,
+        required: false,
+        dynamicFontSize: {
+          min: 4,
+          max: 13,
+          fit: 'horizontal',
+        },
       },
-      totalLabel: {
+      {
         type: 'text',
         position: {
-          x: 136.94,
+          x: 131.94,
           y: 174.64,
         },
         content: 'Total',
         width: 27.01,
         height: 11,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 20,
         lineHeight: 1,
         characterSpacing: 0,
@@ -604,19 +645,20 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
+        name: 'totalLabel',
       },
-      totalInput: {
+      {
         type: 'text',
-        content: '$500',
+        content: '${Number(subtotal) + Number(tax)}',
         position: {
-          x: 164.05,
+          x: 159.05,
           y: 174.64,
         },
         width: 25.95,
         height: 11,
         rotate: 0,
-        alignment: 'center',
-        verticalAlignment: 'top',
+        alignment: 'right',
+        verticalAlignment: 'middle',
         fontSize: 20,
         lineHeight: 1,
         characterSpacing: 0,
@@ -624,8 +666,16 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         fontName: 'NotoSerifJP-Regular',
+        name: 'total',
+        readOnly: true,
+        required: false,
+        dynamicFontSize: {
+          min: 4,
+          max: 20,
+          fit: 'horizontal',
+        },
       },
-      thankyou: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -645,8 +695,9 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
+        name: 'thankyou',
       },
-      paymentInfoLabel: {
+      {
         type: 'text',
         position: {
           x: 20,
@@ -666,8 +717,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'paymentInfoLabel',
       },
-      paymentInfoInput: {
+      {
         type: 'text',
         content:
           'Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025',
@@ -692,8 +744,9 @@ const getInvoiceTemplate = (): Template => ({
           fit: 'vertical',
         },
         fontName: 'NotoSerifJP-Regular',
+        name: 'paymentInfoInput',
       },
-      shopName: {
+      {
         type: 'text',
         position: {
           x: 119.33,
@@ -713,8 +766,9 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'shopName',
       },
-      shopAddress: {
+      {
         type: 'text',
         position: {
           x: 107.69,
@@ -734,19 +788,93 @@ const getInvoiceTemplate = (): Template => ({
         opacity: 1,
         readOnly: true,
         fontName: 'NotoSerifJP-Regular',
+        name: 'shopAddress',
       },
-    },
+    ],
   ],
   basePdf: {
     width: 210,
     height: 297,
     padding: [20, 20, 20, 20],
+    staticSchema: [
+      {
+        name: 'line',
+        type: 'line',
+        position: {
+          x: 20,
+          y: 279,
+        },
+        width: 170,
+        height: 0.2,
+        rotate: 0,
+        opacity: 1,
+        readOnly: true,
+        color: '#999999',
+        required: false,
+        content: '',
+      },
+      {
+        name: 'footerInfo',
+        type: 'text',
+        content: 'Invoice No.{info.InvoiceNo} • {total}USD due {date}',
+        position: {
+          x: 20,
+          y: 282,
+        },
+        width: 122.51,
+        height: 10,
+        rotate: 0,
+        alignment: 'left',
+        verticalAlignment: 'middle',
+        fontSize: 13,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#000000',
+        backgroundColor: '',
+        opacity: 1,
+        strikethrough: false,
+        underline: false,
+        required: false,
+        readOnly: true,
+      },
+      {
+        name: 'pageNumber',
+        type: 'text',
+        content: 'Page {currentPage} of {totalPages}',
+        position: {
+          x: 145,
+          y: 282,
+        },
+        width: 45,
+        height: 10,
+        rotate: 0,
+        alignment: 'right',
+        verticalAlignment: 'middle',
+        fontSize: 13,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#000000',
+        backgroundColor: '',
+        opacity: 1,
+        strikethrough: false,
+        underline: false,
+        required: false,
+        readOnly: true,
+      },
+    ],
   },
-  pdfmeVersion: '4.0.0',
+  pdfmeVersion: '5.0.0',
 });
 
 const getBlankTemplate = () =>
-  ({ schemas: [{}], basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] } } as Template);
+  ({
+    schemas: [{}],
+    basePdf: {
+      width: 210,
+      height: 297,
+      padding: [20, 10, 20, 10],
+    },
+  } as Template);
 export const getTemplatePresets = (): {
   key: string;
   label: string;

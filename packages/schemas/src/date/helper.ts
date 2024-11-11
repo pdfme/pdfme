@@ -76,6 +76,10 @@ const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
 
 const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Date => {
   if (type === 'time') {
+    const dateTimePattern = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
+    if (dateTimePattern.test(strDate)) {
+      return new Date(strDate.replace(/\//g, '-').replace(' ', 'T'));
+    }
     return new Date(`2021-01-01T${strDate}`);
   }
   return new Date(strDate);
