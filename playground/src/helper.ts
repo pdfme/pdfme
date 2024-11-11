@@ -840,7 +840,7 @@ const getInvoiceTemplate = (): Template => ({
       {
         name: 'pageNumber',
         type: 'text',
-        content: 'Page {page} of {total}',
+        content: 'Page {currentPage} of {totalPages}',
         position: {
           x: 145,
           y: 282,
