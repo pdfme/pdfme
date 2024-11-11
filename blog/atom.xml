@@ -13,9 +13,9 @@
         <link href="https://pdfme.com/blog/released-pdfme-v4"/>
         <updated>2024-04-14T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Explore the latest features and enhancements in pdfme V4, including a new left sidebar for easy schema placement and the addition of dynamic table generation.]]></summary>
-        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="overview">Overview<a href="https://pdfme.com/blog/released-pdfme-v4#overview" class="hash-link" aria-label="Direct link to Overview" title="Direct link to Overview">​</a></h2>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="overview">Overview<a class="hash-link" aria-label="Direct link to Overview" title="Direct link to Overview" href="https://pdfme.com/blog/released-pdfme-v4#overview">​</a></h2>
 <p><strong>🚀 Release <a href="https://github.com/pdfme/pdfme/releases/tag/4.0.0" target="_blank" rel="noopener noreferrer">pdfme V4!!</a> 🚀</strong></p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="whats-changed">What's Changed<a href="https://pdfme.com/blog/released-pdfme-v4#whats-changed" class="hash-link" aria-label="Direct link to What's Changed" title="Direct link to What's Changed">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="whats-changed">What's Changed<a class="hash-link" aria-label="Direct link to What's Changed" title="Direct link to What's Changed" href="https://pdfme.com/blog/released-pdfme-v4#whats-changed">​</a></h3>
 <ul>
 <li>V4 by @hand-dot in <a href="https://github.com/pdfme/pdfme/pull/427" target="_blank" rel="noopener noreferrer">https://github.com/pdfme/pdfme/pull/427</a>
 <ul>
@@ -31,9 +31,9 @@
 </ul>
 <div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</div><div class="admonitionContent_BuS1"><p>Users who have been using V3 should be cautious when updating to V4. Please refer to the following article for necessary modifications:
 <a href="https://pdfme.com/blog/developing-pdfme-v4#about-backward-compatibility">About Backward Compatibility</a></p></div></div>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="key-features">Key Features<a href="https://pdfme.com/blog/released-pdfme-v4#key-features" class="hash-link" aria-label="Direct link to Key Features" title="Direct link to Key Features">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-a-left-sidebar-for-placing-schemas">Add a Left Sidebar for Placing Schemas<a href="https://pdfme.com/blog/released-pdfme-v4#add-a-left-sidebar-for-placing-schemas" class="hash-link" aria-label="Direct link to Add a Left Sidebar for Placing Schemas" title="Direct link to Add a Left Sidebar for Placing Schemas">​</a></h3>
-<p><img loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/sidebar-drag&amp;drop-0240dbd9580cd290bf014e5c90eb7eb0.gif" width="800" height="567" class="img_ev3q"></p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="key-features">Key Features<a class="hash-link" aria-label="Direct link to Key Features" title="Direct link to Key Features" href="https://pdfme.com/blog/released-pdfme-v4#key-features">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-a-left-sidebar-for-placing-schemas">Add a Left Sidebar for Placing Schemas<a class="hash-link" aria-label="Direct link to Add a Left Sidebar for Placing Schemas" title="Direct link to Add a Left Sidebar for Placing Schemas" href="https://pdfme.com/blog/released-pdfme-v4#add-a-left-sidebar-for-placing-schemas">​</a></h3>
+<p><img decoding="async" loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/sidebar-drag&amp;drop-0240dbd9580cd290bf014e5c90eb7eb0.gif" width="800" height="567" class="img_ev3q"></p>
 <ul>
 <li>You can now place schemas by dragging and dropping.</li>
 <li>Add an icon to the sidebar by including the <code>icon</code> property in the <code>defaultSchema</code> property when defining plugins.<!-- -->
@@ -42,14 +42,14 @@
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-dynamictable-schema">Add DynamicTable Schema<a href="https://pdfme.com/blog/released-pdfme-v4#add-dynamictable-schema" class="hash-link" aria-label="Direct link to Add DynamicTable Schema" title="Direct link to Add DynamicTable Schema">​</a></h3>
-<p><img loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/table-d8de0cc3da2ad7672d370ddb26628dca.png" width="3024" height="1644" class="img_ev3q"></p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="add-dynamictable-schema">Add DynamicTable Schema<a class="hash-link" aria-label="Direct link to Add DynamicTable Schema" title="Direct link to Add DynamicTable Schema" href="https://pdfme.com/blog/released-pdfme-v4#add-dynamictable-schema">​</a></h3>
+<p><img decoding="async" loading="lazy" alt="Add a Left Sidebar for Placing Schemas" src="https://pdfme.com/assets/images/table-ed8269924478ebe7f05e11dfd15327e7.png" width="3024" height="1644" class="img_ev3q"></p>
 <ul>
 <li>Added a schema for dynamically generating tables.</li>
 <li>This is currently released as Beta due to remaining bugs.</li>
 <li>For more details, please refer to <a href="https://pdfme.com/docs/tables">here</a>.</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="thanks-everyone">Thanks, everyone<a href="https://pdfme.com/blog/released-pdfme-v4#thanks-everyone" class="hash-link" aria-label="Direct link to Thanks, everyone" title="Direct link to Thanks, everyone">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="thanks-everyone">Thanks, everyone<a class="hash-link" aria-label="Direct link to Thanks, everyone" title="Direct link to Thanks, everyone" href="https://pdfme.com/blog/released-pdfme-v4#thanks-everyone">​</a></h2>
 <p>pdfme exists thanks to the contributions of many contributors.<br>
 <!-- -->We express our gratitude to everyone involved in this release.</p>
 <p>We look forward to your continued support for pdfme!</p>]]></content>
@@ -66,11 +66,11 @@
         <summary type="html"><![CDATA[Explore the latest developments in pdfme V4, from dynamic table schemas and UI enhancements to new features like placeholders and expressions. Dive into the challenges and progress, including critical bug fixes and backward compatibility considerations, and learn how you can contribute to this evolving open-source PDF library project.]]></summary>
         <content type="html"><![CDATA[<p>Development of V4 started in December last year, and it's been about 3 months since then.</p>
 <p>I apologize for the slow development speed. However, the release of V4 is gradually becoming a reality.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="features-planned-for-v4">Features Planned for V4<a href="https://pdfme.com/blog/developing-pdfme-v4#features-planned-for-v4" class="hash-link" aria-label="Direct link to Features Planned for V4" title="Direct link to Features Planned for V4">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="features-planned-for-v4">Features Planned for V4<a class="hash-link" aria-label="Direct link to Features Planned for V4" title="Direct link to Features Planned for V4" href="https://pdfme.com/blog/developing-pdfme-v4#features-planned-for-v4">​</a></h2>
 <ol>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/332" target="_blank" rel="noopener noreferrer"><strong>Add DynamicTable Schema #332</strong></a></p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/3d22843b2486-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/3d22843b2486-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>The table is being implemented differently than planned.<!-- -->
 <ul>
@@ -100,7 +100,7 @@
 </li>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/400" target="_blank" rel="noopener noreferrer"><strong>Add a Left Sidebar for Placing Schemas #400</strong></a></p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/be31a9c03519-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/be31a9c03519-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>Adding a UI that allows dragging schemas from the sidebar.</li>
 <li>The definition of plugins is changing (adding icons), so I intend to include this in this major version.</li>
@@ -108,7 +108,7 @@
 </li>
 <li>
 <p><a href="https://github.com/pdfme/pdfme/issues/439" target="_blank" rel="noopener noreferrer"><strong>Placeholder, Expression #439</strong></a></p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/4e66257d5d55-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/4e66257d5d55-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>I don't have a concrete image of how to realize this yet.<!-- -->
 <ul>
@@ -125,13 +125,13 @@
 </ul>
 </li>
 </ol>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="release-timing">Release Timing<a href="https://pdfme.com/blog/developing-pdfme-v4#release-timing" class="hash-link" aria-label="Direct link to Release Timing" title="Direct link to Release Timing">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="release-timing">Release Timing<a class="hash-link" aria-label="Direct link to Release Timing" title="Direct link to Release Timing" href="https://pdfme.com/blog/developing-pdfme-v4#release-timing">​</a></h2>
 <ul>
 <li>I want to release as soon as possible, but I can't determine a release date yet since I don't know when the bugs will be fixed, and I haven't started on the other features.</li>
 <li>Currently, only the implementation of the table is completed, and there are still critical bugs to be resolved before release, so it looks like it will take some more time.</li>
 <li>If you don't particularly plan to use the features announced in V4, please continue to use V3 with confidence. Necessary fixes for V3, including bug support, will continue.</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="access-to-the-alpha-version">Access to the alpha version<a href="https://pdfme.com/blog/developing-pdfme-v4#access-to-the-alpha-version" class="hash-link" aria-label="Direct link to Access to the alpha version" title="Direct link to Access to the alpha version">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="access-to-the-alpha-version">Access to the alpha version<a class="hash-link" aria-label="Direct link to Access to the alpha version" title="Direct link to Access to the alpha version" href="https://pdfme.com/blog/developing-pdfme-v4#access-to-the-alpha-version">​</a></h2>
 <ul>
 <li>
 <p>A preview environment for V4 is prepared: <a href="https://pdfme-playground-v4.vercel.app/" target="_blank" rel="noopener noreferrer">https://pdfme-playground-v4.vercel.app/</a></p>
@@ -139,7 +139,7 @@
 <li>
 <p>How to install V4</p>
 <p>Versions tagged with next on <a href="https://www.npmjs.com/package/@pdfme/generator?activeTab=versions" target="_blank" rel="noopener noreferrer">npm's version page</a> are V4 versions. Currently, version 4.0.0-alpha.0 is released for each package.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/65a828e2f2b7-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/65a828e2f2b7-20240302.png" alt="" class="img_ev3q"></p>
 <ul>
 <li>The following command can be used for installation:<!-- -->
 <ul>
@@ -149,7 +149,7 @@
 </ul>
 </li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="about-backward-compatibility">About Backward Compatibility<a href="https://pdfme.com/blog/developing-pdfme-v4#about-backward-compatibility" class="hash-link" aria-label="Direct link to About Backward Compatibility" title="Direct link to About Backward Compatibility">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="about-backward-compatibility">About Backward Compatibility<a class="hash-link" aria-label="Direct link to About Backward Compatibility" title="Direct link to About Backward Compatibility" href="https://pdfme.com/blog/developing-pdfme-v4#about-backward-compatibility">​</a></h2>
 <p>When using V4, modifications will be necessary for past templates and plugins.</p>
 <ul>
 <li>Templates:<!-- -->
@@ -165,11 +165,11 @@
 <ul>
 <li>
 <p>Plugins now use <code>defaultSchema.content</code> instead of <code>defaultValue</code> as initial data.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2cb01519cb4a-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2cb01519cb4a-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 <li>
 <p>When onChange occurs within a plugin, instead of rewriting the user input with <code>onChange</code>, it is now possible to also change the schema definition itself in the format <code>{[key:string]:string}</code>. If you want to reflect the user input as before, please write <code>onChange({ key: 'content', value: data });</code>.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/02a5e41c6fb9-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/02a5e41c6fb9-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 <li>
 <p>Modification example: <a href="https://github.com/pdfme/pdfme/pull/427/files#diff-e64985c2bcbfd91c01ab897562721dccc7605499f81432b2e09c167e7a844bb0" target="_blank" rel="noopener noreferrer">https://github.com/pdfme/pdfme/pull/427/files#diff-e64985c2bcbfd91c01ab897562721dccc7605499f81432b2e09c167e7a844bb0</a></p>
@@ -180,13 +180,13 @@
 <ul>
 <li>
 <p>Templates created with the V4 designer will now have versions. Currently, as it is in development, the property <code>pdfmeVersion:"4-dev"</code> will be added.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/51d4bbc4e1c2-20240302.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/51d4bbc4e1c2-20240302.png" alt="" class="img_ev3q"></p>
 </li>
 </ul>
 </li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="finally">Finally<a href="https://pdfme.com/blog/developing-pdfme-v4#finally" class="hash-link" aria-label="Direct link to Finally" title="Direct link to Finally">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="help-wanted">Help wanted!<a href="https://pdfme.com/blog/developing-pdfme-v4#help-wanted" class="hash-link" aria-label="Direct link to Help wanted!" title="Direct link to Help wanted!">​</a></h3>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="finally">Finally<a class="hash-link" aria-label="Direct link to Finally" title="Direct link to Finally" href="https://pdfme.com/blog/developing-pdfme-v4#finally">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="help-wanted">Help wanted!<a class="hash-link" aria-label="Direct link to Help wanted!" title="Direct link to Help wanted!" href="https://pdfme.com/blog/developing-pdfme-v4#help-wanted">​</a></h3>
 <p>I can move to the next step if the table bug is resolved, but honestly, I'm stuck and would really appreciate help...</p>
 <ul>
 <li>If anyone is willing to help with the following issue, please let me know. I intend to add the information I know to the issue so that we can fix it efficiently when a collaborator appears.<!-- -->
@@ -200,7 +200,7 @@
 <ul>
 <li><a href="https://github.com/pdfme/pdfme/issues/400" target="_blank" rel="noopener noreferrer"><strong>Add a Left Sidebar for Placing Schemas #400</strong></a></li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="thanks-everyone">Thanks, everyone<a href="https://pdfme.com/blog/developing-pdfme-v4#thanks-everyone" class="hash-link" aria-label="Direct link to Thanks, everyone" title="Direct link to Thanks, everyone">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="thanks-everyone">Thanks, everyone<a class="hash-link" aria-label="Direct link to Thanks, everyone" title="Direct link to Thanks, everyone" href="https://pdfme.com/blog/developing-pdfme-v4#thanks-everyone">​</a></h3>
 <p>I couldn't make good progress in February, but the contributors did an excellent job. Thank you.</p>
 <ul>
 <li><a href="https://github.com/pdfme/pdfme/pull/417" target="_blank" rel="noopener noreferrer">Fix pdf text render overlap by avoiding line breaks in pdflib #417</a></li>
@@ -230,9 +230,9 @@
 Please see the following blog article for the latest development information.</p><ul>
 <li><a href="https://pdfme.com/blog/developing-pdfme-v4">Developing pdfme V4</a></li>
 </ul></div></div>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-dynamic-tables-couldnt-be-implemented-in-pdfme">Why Dynamic Tables Couldn't Be Implemented in pdfme<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#why-dynamic-tables-couldnt-be-implemented-in-pdfme" class="hash-link" aria-label="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme" title="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-dynamic-tables-couldnt-be-implemented-in-pdfme">Why Dynamic Tables Couldn't Be Implemented in pdfme<a class="hash-link" aria-label="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme" title="Direct link to Why Dynamic Tables Couldn't Be Implemented in pdfme" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#why-dynamic-tables-couldnt-be-implemented-in-pdfme">​</a></h2>
 <p>Until now, pdfme has been realizing simple <a href="https://en.wikipedia.org/wiki/Variable_data_printing" target="_blank" rel="noopener noreferrer">variable data printing</a> by embedding PDF data into a property called <code>basePdf</code> in the template and overlaying a <code>schema</code> on top of this PDF.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/b7b9c0b7611e-20240102.png" alt="Image of the pdfme process" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/b7b9c0b7611e-20240102.png" alt="Image of the pdfme process" class="img_ev3q"></p>
 <p>This method is incredibly simple and allows for the easy creation of customized PDFs.</p>
 <p>However, there is a significant need that cannot be ignored for certain use cases in PDF creation.<br>
 <!-- -->That need is table rendering. More specifically, many users want to address cases where the number of rows, like in the red-framed section of the image below, increases, such as in invoices.</p>
@@ -241,7 +241,7 @@ Please see the following blog article for the latest development information.</p
 <p>Therefore, the current version of pdfme cannot support tables where rows dynamically increase.</p>
 <p>I understand this need but was struggling with how exactly to implement it.<br>
 <!-- -->This has been the main blocker in implementing Tables.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-implement-page-breaks">How to Implement Page Breaks<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-implement-page-breaks" class="hash-link" aria-label="Direct link to How to Implement Page Breaks" title="Direct link to How to Implement Page Breaks">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-implement-page-breaks">How to Implement Page Breaks<a class="hash-link" aria-label="Direct link to How to Implement Page Breaks" title="Direct link to How to Implement Page Breaks" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-implement-page-breaks">​</a></h2>
 <p>I've been <a href="https://github.com/pdfme/pdfme/discussions/148" target="_blank" rel="noopener noreferrer">discussing</a> this with users for quite some time, and finally, there seems to be a way to implement page breaks. Two key elements have come together:</p>
 <ul>
 <li>ReadOnly Schemas added in <a href="https://github.com/pdfme/pdfme/releases/tag/3.2.0" target="_blank" rel="noopener noreferrer">V3.2.0</a>
@@ -253,7 +253,7 @@ Please see the following blog article for the latest development information.</p
 </ul>
 <p>With ReadOnly Schemas, it's possible to design the static parts of a template within pdfme without loading a PDF designed in basePdf. This allows for the addition of the height of schemas added to the page, adjusting the y-coordinate of all schemas below it by the increased height. Padding also allows control over where to resume rendering after a page break.</p>
 <p>The following figure shows an example where 19 rows of table data are provided, causing a page break, and the 'note' schema being pushed down.</p>
-<p><img loading="lazy" alt="Example of table with page break" src="https://pdfme.com/assets/images/dynamictable-eb7022dddcbdde6eb391b60f751ae4a1.png" width="4705" height="3766" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" alt="Example of table with page break" src="https://pdfme.com/assets/images/dynamictable-11cffbb9b2e578378515d95081232ba7.png" width="4705" height="3766" class="img_ev3q"></p>
 <p>The logic I had in mind was:</p>
 <ul>
 <li>Render the table one row at a time, from Header to Row19.</li>
@@ -262,18 +262,18 @@ Please see the following blog article for the latest development information.</p
 <li>For all schemas below the increased height schema (in this example, 'note'), add the increased height (190mm) to their y-coordinate. The rendering starts on the second page at a y-coordinate of 140mm.</li>
 </ul>
 <p>The issue is that it doesn't accommodate fixed layouts like headers or footers. In that case, instead of specifying the size of <a href="https://github.com/pdfme/pdfme/blob/c4dfa7023a42d9ab207784a6557f902c078bdcd6/packages/common/src/schema.ts#L87" target="_blank" rel="noopener noreferrer">BlankPDF</a>'s width and height, specify a PDF containing the fixed design of the header or footer. This is planned for further modification.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-tackle-the-complexity-of-table-settings-and-rendering">How to Tackle the Complexity of Table Settings and Rendering<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-tackle-the-complexity-of-table-settings-and-rendering" class="hash-link" aria-label="Direct link to How to Tackle the Complexity of Table Settings and Rendering" title="Direct link to How to Tackle the Complexity of Table Settings and Rendering">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="how-to-tackle-the-complexity-of-table-settings-and-rendering">How to Tackle the Complexity of Table Settings and Rendering<a class="hash-link" aria-label="Direct link to How to Tackle the Complexity of Table Settings and Rendering" title="Direct link to How to Tackle the Complexity of Table Settings and Rendering" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#how-to-tackle-the-complexity-of-table-settings-and-rendering">​</a></h2>
 <p>Table settings and rendering can get complex. How should we approach it?<br>
 <!-- -->I want to leverage the simplicity of pdfme, which allows for easy PDF creation, to implement the table functionality.</p>
 <p>For example, consider how to set up the following table.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/5607ddfc06c7-20240102.png" alt="Example of a complex table" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/5607ddfc06c7-20240102.png" alt="Example of a complex table" class="img_ev3q"></p>
 <p>A table is essentially composed of headers (th) and table data (td).<br>
 <!-- -->Table data may be rendered in something other than text. In this example, <code>Name</code> and <code>Category</code> columns are rendered with a Text renderer, while <code>Image</code> column is rendered with an Image renderer.</p>
 <p><strong>Fortunately, pdfme already implements various renderers like Text, Image, SVG, Barcodes, etc. Therefore, there's no need to create new rendering processes for each cell; once the size and position of a cell are determined, existing PDF rendering processes can be used.</strong></p>
 <p>This leverages the plugin architecture of pdfme's rendering processes, potentially simplifying complex tasks.</p>
 <p>This idea came from an <a href="https://github.com/pdfme/pdfme/issues/332#issuecomment-1872032370" target="_blank" rel="noopener noreferrer">interesting comment</a> left by <a href="https://github.com/MP70" target="_blank" rel="noopener noreferrer">MP70</a> on the dynamic table issue.<br>
 <!-- -->Considering the above, I believe the table should do the following three things:</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-table-styling">1. Table Styling<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#1-table-styling" class="hash-link" aria-label="Direct link to 1. Table Styling" title="Direct link to 1. Table Styling">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-table-styling">1. Table Styling<a class="hash-link" aria-label="Direct link to 1. Table Styling" title="Direct link to 1. Table Styling" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#1-table-styling">​</a></h3>
 <p>The following image shows a QR code setting panel, but similar style settings should be possible for tables as well.</p>
 <img src="https://storage.googleapis.com/zenn-user-upload/9444827add81-20240102.png" width="500px">
 <ul>
@@ -294,7 +294,7 @@ Please see the following blog article for the latest development information.</p
 </li>
 <li>Header Visibility</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-setting-headers-and-columns">2. Setting Headers and Columns<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#2-setting-headers-and-columns" class="hash-link" aria-label="Direct link to 2. Setting Headers and Columns" title="Direct link to 2. Setting Headers and Columns">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-setting-headers-and-columns">2. Setting Headers and Columns<a class="hash-link" aria-label="Direct link to 2. Setting Headers and Columns" title="Direct link to 2. Setting Headers and Columns" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#2-setting-headers-and-columns">​</a></h3>
 <p>Add columns to the header and set how they will be rendered.</p>
 <img src="https://storage.googleapis.com/zenn-user-upload/560ebea7ca2e-20240102.png" width="500px">
 <ul>
@@ -310,7 +310,7 @@ Please see the following blog article for the latest development information.</p
 </li>
 <li>Clicking the gear icon in the image above opens a modal to set the Column and Type</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-calculating-table-layout">3. Calculating Table Layout<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#3-calculating-table-layout" class="hash-link" aria-label="Direct link to 3. Calculating Table Layout" title="Direct link to 3. Calculating Table Layout">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-calculating-table-layout">3. Calculating Table Layout<a class="hash-link" aria-label="Direct link to 3. Calculating Table Layout" title="Direct link to 3. Calculating Table Layout" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#3-calculating-table-layout">​</a></h3>
 <p>Once the style and column rendering settings are determined, calculate the layout and render the cells.</p>
 <ul>
 <li>Calculating and rendering cell positions<!-- -->
@@ -322,7 +322,7 @@ Please see the following blog article for the latest development information.</p
 <ul>
 <li>As explained in the page break section, the increased height needs to be communicated to the generator function.</li>
 <li>As a current issue, the Text renderer, if not using the Dynamic Font Size feature, might render beyond the set height, as shown in the image below.
-<img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2f880c86b4fd-20240102.png" alt="Text rendering spilling over set height" class="img_ev3q"></li>
+<img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/2f880c86b4fd-20240102.png" alt="Text rendering spilling over set height" class="img_ev3q"></li>
 <li>Ideally, the row height should be expanded, as shown in the image below. To achieve this, the Text renderer needs to return the rendered height after rendering.<!-- -->
 <img src="https://storage.googleapis.com/zenn-user-upload/3b7065ee2f39-20240102.png" width="500px">
 </li>
@@ -330,7 +330,7 @@ Please see the following blog article for the latest development information.</p
 </ul>
 </li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="i-would-appreciate-feedback">I Would Appreciate Feedback<a href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#i-would-appreciate-feedback" class="hash-link" aria-label="Direct link to I Would Appreciate Feedback" title="Direct link to I Would Appreciate Feedback">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="i-would-appreciate-feedback">I Would Appreciate Feedback<a class="hash-link" aria-label="Direct link to I Would Appreciate Feedback" title="Direct link to I Would Appreciate Feedback" href="https://pdfme.com/blog/implementation-Ideas-for-dynamic-tables#i-would-appreciate-feedback">​</a></h2>
 <p>The implementation of the table hasn't started yet. Right now, it's just the ideas written in this document.<br>
 <!-- -->I believe there are many oversights and issues with these ideas.</p>
 <p>Being an OSS, I hope it gets seen by many and receives feedback and collaboration. If there seem to be any issues, please let me know.<br>
@@ -350,24 +350,24 @@ Please see the following blog article for the latest development information.</p
         <link href="https://pdfme.com/blog/why-develop-pdf-library-now"/>
         <updated>2023-12-13T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[Exploring the creation of 'pdfme,' a revolutionary TypeScript-based PDF library. Discover the motivations and innovations behind this modern PDF solution.]]></summary>
-        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-pdfme">What is pdfme?<a href="https://pdfme.com/blog/why-develop-pdf-library-now#what-is-pdfme" class="hash-link" aria-label="Direct link to What is pdfme?" title="Direct link to What is pdfme?">​</a></h2>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/e8b30b9c5923-20231206.png" alt="pdfme" class="img_ev3q"></p>
+        <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-is-pdfme">What is pdfme?<a class="hash-link" aria-label="Direct link to What is pdfme?" title="Direct link to What is pdfme?" href="https://pdfme.com/blog/why-develop-pdf-library-now#what-is-pdfme">​</a></h2>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/e8b30b9c5923-20231206.png" alt="pdfme" class="img_ev3q"></p>
 <p>An open-source, free PDF creation library written in TypeScript. It allows for declarative PDF creation using templates and works both on servers and browsers.</p>
 <p>Since its beta release in February 2022, it has reached Version 3 by November 2023. On <a href="https://github.com/pdfme/pdfme" target="_blank" rel="noopener noreferrer">GitHub</a>, it has garnered 1500 stars, and on <a href="https://www.npmjs.com/package/@pdfme/generator" target="_blank" rel="noopener noreferrer">npm</a>, it sees about 10,000 downloads weekly, though there's some variation.</p>
 <p>It's already integrated into various services worldwide, including electronic medical record creation, factory procedure manual production, and e-commerce custom packaging.</p>
 <p>This article aims to explain the motivation behind developing pdfme.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-develop-a-pdf-library">Why Develop a <strong>PDF Library</strong>?<a href="https://pdfme.com/blog/why-develop-pdf-library-now#why-develop-a-pdf-library" class="hash-link" aria-label="Direct link to why-develop-a-pdf-library" title="Direct link to why-develop-a-pdf-library">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-develop-a-pdf-library">Why Develop a <strong>PDF Library</strong>?<a class="hash-link" aria-label="Direct link to why-develop-a-pdf-library" title="Direct link to why-develop-a-pdf-library" href="https://pdfme.com/blog/why-develop-pdf-library-now#why-develop-a-pdf-library">​</a></h2>
 <p>Since 2014, <a href="https://github.com/foliojs/pdfkit" target="_blank" rel="noopener noreferrer">pdfkit</a>, a fantastic library for creating and editing PDF files, has been available. Another library, <a href="https://github.com/Hopding/pdf-lib" target="_blank" rel="noopener noreferrer">pdf-lib</a>, written in TypeScript and offering additional functionalities over pdfkit's PDF creation capabilities, emerged in 2018.</p>
 <p>Both are open-source, free, and available under the MIT License.
 So, why develop pdfme despite these excellent libraries?</p>
 <p>It started as a simple function with no significant motivation, but it evolved into a passion to "<strong>eliminate the tedious task of PDF creation from the world!</strong>" This drive emerged through the following three steps:</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-created-a-function-to-return-pdfs-from-json-input-2020">1. Created a Function to Return PDFs from JSON Input, 2020~<a href="https://pdfme.com/blog/why-develop-pdf-library-now#1-created-a-function-to-return-pdfs-from-json-input-2020" class="hash-link" aria-label="Direct link to 1. Created a Function to Return PDFs from JSON Input, 2020~" title="Direct link to 1. Created a Function to Return PDFs from JSON Input, 2020~">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="1-created-a-function-to-return-pdfs-from-json-input-2020">1. Created a Function to Return PDFs from JSON Input, 2020~<a class="hash-link" aria-label="Direct link to 1. Created a Function to Return PDFs from JSON Input, 2020~" title="Direct link to 1. Created a Function to Return PDFs from JSON Input, 2020~" href="https://pdfme.com/blog/why-develop-pdf-library-now#1-created-a-function-to-return-pdfs-from-json-input-2020">​</a></h3>
 <ul>
 <li>pdfkit and pdf-lib are great but require imperative coding and struggle with scaling template numbers.</li>
 <li>For a personal development project, I created a function to return PDFs from JSON input, which led to the precursor of pdfme, <a href="https://github.com/hand-dot/labelmake" target="_blank" rel="noopener noreferrer">labelmake</a>.</li>
 <li>It seemed convenient, so I published it on npm.</li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-added-wysiwyg-for-ease-of-use-as-a-colleague-struggled-with-pdf-creation-2022">2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~<a href="https://pdfme.com/blog/why-develop-pdf-library-now#2-added-wysiwyg-for-ease-of-use-as-a-colleague-struggled-with-pdf-creation-2022" class="hash-link" aria-label="Direct link to 2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~" title="Direct link to 2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="2-added-wysiwyg-for-ease-of-use-as-a-colleague-struggled-with-pdf-creation-2022">2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~<a class="hash-link" aria-label="Direct link to 2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~" title="Direct link to 2. Added WYSIWYG for Ease of Use as a Colleague Struggled with PDF Creation, 2022~" href="https://pdfme.com/blog/why-develop-pdf-library-now#2-added-wysiwyg-for-ease-of-use-as-a-colleague-struggled-with-pdf-creation-2022">​</a></h3>
 <ul>
 <li>
 <p>A colleague was struggling with creating something like a notice of work conditions using <a href="https://www.jaspersoft.com/" target="_blank" rel="noopener noreferrer">Jaspersoft</a>, which seemed overly complex.</p>
@@ -377,33 +377,33 @@ So, why develop pdfme despite these excellent libraries?</p>
 </li>
 <li>
 <p>Added an easy-to-use WYSIWYG, similar to PowerPoint, and rebranded labelmake to pdfme, releasing it as a beta version.</p>
-<p><img loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/6e1076e7ddf5-20231206.png" alt="" class="img_ev3q"></p>
+<p><img decoding="async" loading="lazy" src="https://storage.googleapis.com/zenn-user-upload/6e1076e7ddf5-20231206.png" alt="" class="img_ev3q"></p>
 </li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-a-desire-to-overhaul-commercial-software-with-oss-currently-here">3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥<a href="https://pdfme.com/blog/why-develop-pdf-library-now#3-a-desire-to-overhaul-commercial-software-with-oss-currently-here" class="hash-link" aria-label="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥" title="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="3-a-desire-to-overhaul-commercial-software-with-oss-currently-here">3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥<a class="hash-link" aria-label="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥" title="Direct link to 3. A Desire to Overhaul Commercial Software with OSS, 💥Currently Here💥" href="https://pdfme.com/blog/why-develop-pdf-library-now#3-a-desire-to-overhaul-commercial-software-with-oss-currently-here">​</a></h3>
 <ul>
 <li>Recognized the inherent problems in PDF creation. Why does it have to be so cumbersome?</li>
 <li>Contemplated why PDF creation remains a tedious task without modern solutions.</li>
 <li>Aimed to contribute to the community at the next level, similar to how pdfkit and pdf-lib did.</li>
 </ul>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-kind-of-pdf-library-are-we-developing">What Kind of PDF Library Are We Developing?<a href="https://pdfme.com/blog/why-develop-pdf-library-now#what-kind-of-pdf-library-are-we-developing" class="hash-link" aria-label="Direct link to What Kind of PDF Library Are We Developing?" title="Direct link to What Kind of PDF Library Are We Developing?">​</a></h2>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="implementing-sufficiently-necessary-features">Implementing Sufficiently Necessary Features<a href="https://pdfme.com/blog/why-develop-pdf-library-now#implementing-sufficiently-necessary-features" class="hash-link" aria-label="Direct link to Implementing Sufficiently Necessary Features" title="Direct link to Implementing Sufficiently Necessary Features">​</a></h3>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="what-kind-of-pdf-library-are-we-developing">What Kind of PDF Library Are We Developing?<a class="hash-link" aria-label="Direct link to What Kind of PDF Library Are We Developing?" title="Direct link to What Kind of PDF Library Are We Developing?" href="https://pdfme.com/blog/why-develop-pdf-library-now#what-kind-of-pdf-library-are-we-developing">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="implementing-sufficiently-necessary-features">Implementing Sufficiently Necessary Features<a class="hash-link" aria-label="Direct link to Implementing Sufficiently Necessary Features" title="Direct link to Implementing Sufficiently Necessary Features" href="https://pdfme.com/blog/why-develop-pdf-library-now#implementing-sufficiently-necessary-features">​</a></h3>
 <p>Focusing on simplicity while providing sufficiently necessary features.
 In Version 3, we released plugins and custom themes/labels, emphasizing "customizability."</p>
 <p>Being Japanese, I ensured our product could easily handle <a href="https://pdfme.com/docs/custom-fonts" target="_blank" rel="noopener noreferrer">custom CJK fonts</a>, unlike others focused only on Latin characters. Interestingly, China is where we get the most website traffic.</p>
 <p>However, we're not yet sufficiently equipped for common use cases like dynamically changing table heights. We plan to support relative coordinate layouts and dynamic tables in <a href="https://github.com/orgs/pdfme/projects/8/views/1" target="_blank" rel="noopener noreferrer">Version 4</a>.</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="open-source-and-community">Open Source and Community<a href="https://pdfme.com/blog/why-develop-pdf-library-now#open-source-and-community" class="hash-link" aria-label="Direct link to Open Source and Community" title="Direct link to Open Source and Community">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="open-source-and-community">Open Source and Community<a class="hash-link" aria-label="Direct link to Open Source and Community" title="Direct link to Open Source and Community" href="https://pdfme.com/blog/why-develop-pdf-library-now#open-source-and-community">​</a></h3>
 <p>Our current motivation is to contribute to the community at the next level, as pdfkit and pdf-lib have done.</p>
 <p>I mainly develop the software, but thankfully, 2-3 people contribute daily.</p>
 <p>Bug reports and feature proposals can be made through <a href="https://github.com/pdfme/pdfme/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>, and we also have an open <a href="https://discord.gg/xWPTJbmgNV" target="_blank" rel="noopener noreferrer">Discord</a> channel. Any clear questions in these open forums usually receive a response within a day or two, including from me.</p>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="free-to-use">Free to Use<a href="https://pdfme.com/blog/why-develop-pdf-library-now#free-to-use" class="hash-link" aria-label="Direct link to Free to Use" title="Direct link to Free to Use">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="free-to-use">Free to Use<a class="hash-link" aria-label="Direct link to Free to Use" title="Direct link to Free to Use" href="https://pdfme.com/blog/why-develop-pdf-library-now#free-to-use">​</a></h3>
 <p>Currently, there's no direct monetization from the library.
 It can be installed via npm install and used for commercial purposes without worry.</p>
 <p>However, development takes time, so I need to earn a living. I'm working full-time and plan to continue this as a side project for the next few years.</p>
 <p>Additionally, I operate a service in Japan using pdfme, <a href="https://labelmake.jp/" target="_blank" rel="noopener noreferrer">labelmake.jp</a>, and occasionally monetize through technical support inquiries.</p>
 <p>Support (including documentation) is where I believe users have the most need, so I plan to</p>
 <p>establish a more reliable system in the future if necessary.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="conclusion">Conclusion<a href="https://pdfme.com/blog/why-develop-pdf-library-now#conclusion" class="hash-link" aria-label="Direct link to Conclusion" title="Direct link to Conclusion">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="conclusion">Conclusion<a class="hash-link" aria-label="Direct link to Conclusion" title="Direct link to Conclusion" href="https://pdfme.com/blog/why-develop-pdf-library-now#conclusion">​</a></h2>
 <ul>
 <li>Creating a future where PDF creation is quick and cost-free.<!-- -->
 <ul>
@@ -417,7 +417,7 @@ It can be installed via npm install and used for commercial purposes without wor
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="thank-you-for-your-interest-in-pdfme">Thank you for your interest in pdfme!<a href="https://pdfme.com/blog/why-develop-pdf-library-now#thank-you-for-your-interest-in-pdfme" class="hash-link" aria-label="Direct link to Thank you for your interest in pdfme!" title="Direct link to Thank you for your interest in pdfme!">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="thank-you-for-your-interest-in-pdfme">Thank you for your interest in pdfme!<a class="hash-link" aria-label="Direct link to Thank you for your interest in pdfme!" title="Direct link to Thank you for your interest in pdfme!" href="https://pdfme.com/blog/why-develop-pdf-library-now#thank-you-for-your-interest-in-pdfme">​</a></h3>
 <p>If you support this project, the easiest contribution you can make is to share this article.<br>
 <!-- -->I would be delighted if you could introduce pdfme to people who struggle with PDF creation.</p>]]></content>
         <author>
