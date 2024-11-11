@@ -71,7 +71,7 @@ const generate = async (props: GenerateProps) => {
           }
           const value = replacePlaceholders({
             content: staticSchema.content || '',
-            variables: { ...input, total: basePages.length, page: j + 1 },
+            variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
             schemas: dynamicTemplate.schemas,
           });
 
@@ -103,7 +103,7 @@ const generate = async (props: GenerateProps) => {
         const value = schema.readOnly
           ? replacePlaceholders({
               content: schema.content || '',
-              variables: { ...input, total: basePages.length, page: j + 1 },
+              variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
               schemas: dynamicTemplate.schemas,
             })
           : input[name] || '';

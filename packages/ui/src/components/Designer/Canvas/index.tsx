@@ -458,8 +458,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                 acc[currSchema.name] = currSchema.content || '';
                 return acc;
               }, {} as Record<string, string>),
-              total: schemasList.length,
-              page: index + 1,
+              totalPages: schemasList.length,
+              currentPage: index + 1,
             };
 
             value = replacePlaceholders({ content, variables, schemas: schemasList });

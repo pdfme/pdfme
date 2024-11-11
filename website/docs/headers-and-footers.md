@@ -29,9 +29,9 @@ Let's explain using the footer section of an invoice template as an example.
       "height": 0.2,
       "rotate": 0,
       "opacity": 1,
-      "readOnly": true,
       "color": "#999999",
       "required": false,
+      "readOnly": true,
       "content": ""
     },
     {
@@ -55,7 +55,8 @@ Let's explain using the footer section of an invoice template as an example.
       "opacity": 1,
       "strikethrough": false,
       "underline": false,
-      "required": false
+      "required": false,
+      "readOnly": true
     },
     {
       "name": "pageNumber",
@@ -78,7 +79,8 @@ Let's explain using the footer section of an invoice template as an example.
       "opacity": 1,
       "strikethrough": false,
       "underline": false,
-      "required": false
+      "required": false,
+      "readOnly": true
     }
   ]
 }
@@ -86,12 +88,7 @@ Let's explain using the footer section of an invoice template as an example.
 
 Notably, you can specify variables like `{info.InvoiceNo}` and `{totalInput}` in the `content` of each schema. These values are obtained from the data specified in `input`. In other words, within `staticSchema`, you can refer to the data specified in `input`.
 
-Additionally, you can use the following embedded variables:
-
-- **total**: Total number of pages
-- **page**: Current page number
-- **date**: Current date (YYYY/MM/DD)
-- **dateTime**: Current date and time (YYYY/MM/DD HH:mm:ss)
+For information about usable variables, please refer to the Expression documentation [here](/docs/expression#variables-that-can-be-used-within-expressions).
 
 ![footer](/img/footer.png)
 

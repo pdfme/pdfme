@@ -147,7 +147,7 @@ const Preview = ({
           renderSchema={({ schema, index }) => {
             const value = schema.readOnly ? replacePlaceholders({
               content: schema.content || '',
-              variables: { ...input, total: schemasList.length, page: index + 1, },
+              variables: { ...input, totalPages: schemasList.length, currentPage: index + 1, },
               schemas: schemasList
             }) : String(input && input[schema.name] || '');
             return (

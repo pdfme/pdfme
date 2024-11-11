@@ -13,7 +13,7 @@ const StaticSchema = (props: { template: Template, input: Record<string, string>
       basePdf={basePdf}
       value={replacePlaceholders({
         content: schema.content || '',
-        variables: { ...input, total: totalPages, page: currentPage },
+        variables: { ...input, totalPages, currentPage },
         schemas
       })}
       onChangeHoveringSchemaId={() => { void 0 }}
