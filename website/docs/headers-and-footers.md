@@ -61,7 +61,7 @@ Let's explain using the footer section of an invoice template as an example.
     {
       "name": "pageNumber",
       "type": "text",
-      "content": "Page {page} of {total}",
+      "content": "Page {currentPage} of {totalPages}",
       "position": {
         "x": 145,
         "y": 282
