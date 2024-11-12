@@ -8,8 +8,10 @@ import { theme, Button } from 'antd';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from "@dnd-kit/utilities";
 import Renderer from '../Renderer';
+import { LEFT_SIDEBAR_WIDTH } from '../../constants';
 import { PluginsRegistry } from '../../contexts';
 import PluginIcon from "./PluginIcon";
+
 
 const Draggable = (props: { plugin: Plugin<any>, scale: number, basePdf: BasePdf, children: React.ReactNode }) => {
   const { scale, basePdf, plugin } = props;
@@ -67,7 +69,7 @@ const LeftSidebar = ({ height, scale, basePdf }: { height: number, scale: number
       position: 'absolute',
       zIndex: 1,
       height,
-      width: 45,
+      width: LEFT_SIDEBAR_WIDTH,
       background: token.colorBgLayout,
       textAlign: 'center',
       overflow: isDragging ? 'visible' : 'auto',
