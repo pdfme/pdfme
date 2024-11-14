@@ -22,6 +22,8 @@ import {
   date,
   time,
   select,
+  checkbox,
+  radioGroup,
 } from '@pdfme/schemas';
 import plugins from './plugins';
 
@@ -130,6 +132,8 @@ export const getPlugins = () => {
     Date: date,
     Time: time,
     Select: select,
+    Checkbox: checkbox,
+    RadioGroup: radioGroup,
     // JAPANPOST: barcodes.japanpost,
     EAN13: barcodes.ean13,
     // EAN8: barcodes.ean8,
