@@ -277,7 +277,7 @@ export const getPlugin = ({
         type,
         content: format(new Date(), defaultFormat),
         position: { x: 0, y: 0 },
-        width: 70,
+        width: 50,
         height: 10,
         rotate: 0,
         alignment: DEFAULT_ALIGNMENT,
