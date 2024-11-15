@@ -33,7 +33,9 @@ const schema: Plugin<RadioGroup> = {
   ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
-
+    container.style.width = '100%';
+    container.style.height = '100%';
+    
     if (onChange) {
       radioButtonStates.set(schema.name, { value, onChange });
     }
