@@ -11,19 +11,19 @@ const uncheckedIcon =
 interface Checkbox extends Schema {}
 
 const schema: Plugin<Checkbox> = {
-  ui: async (arg) => {
+  ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
     container.style.width = '100%';
     container.style.height = '100%';
-
+    
     if (isEditable(mode, schema)) {
       container.addEventListener('click', () => {
         onChange && onChange({ key: 'content', value: value === 'true' ? '' : 'true' });
       });
     }
 
-    await svg.ui({
+    void svg.ui({
       ...arg,
       rootElement: container,
       mode: 'viewer',
