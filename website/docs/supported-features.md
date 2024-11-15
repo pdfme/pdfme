@@ -128,8 +128,11 @@ Details: [Tables with Dynamic Data](/docs/tables)
   - Text Color
   - Background Color
 
+### Radio Button / Check Box
+
+- Style-related
+  - Color
+
 ## Planned Support
 
-- [Radio Button](https://github.com/pdfme/pdfme/issues/570)
-- [Check Box](https://github.com/pdfme/pdfme/issues/457)
 - [HyperLink](https://github.com/pdfme/pdfme/issues/319)
