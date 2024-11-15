@@ -53,7 +53,7 @@ const lineSchema: Plugin<LineSchema> = {
       type: 'line',
       position: { x: 0, y: 0 },
       width: 50,
-      height: 1,
+      height: 0.5,
       rotate: 0,
       opacity: 1,
       readOnly: true,

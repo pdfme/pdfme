@@ -81,6 +81,8 @@ export const Dict = z.object({
 
   'schemas.select.options': z.string(),
   'schemas.select.optionPlaceholder': z.string(),
+
+  'schemas.radioGroup.groupName': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 

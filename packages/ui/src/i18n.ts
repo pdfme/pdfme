@@ -71,6 +71,7 @@ const dictEn: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Date Format',
   'schemas.select.options': 'Options',
   'schemas.select.optionPlaceholder': 'Enter an option',
+  'schemas.radioGroup.groupName': 'Group Name',
 };
 
 const dictZh: { [key in keyof Dict]: string } = {
@@ -141,6 +142,7 @@ const dictZh: { [key in keyof Dict]: string } = {
   'schemas.date.format': '日期格式',
   'schemas.select.options': '选项',
   'schemas.select.optionPlaceholder': '请输入选项',
+  'schemas.radioGroup.groupName': '组名',
 };
 
 const dictJa: { [key in keyof Dict]: string } = {
@@ -211,6 +213,7 @@ const dictJa: { [key in keyof Dict]: string } = {
   'schemas.date.format': '日付形式',
   'schemas.select.options': 'オプション',
   'schemas.select.optionPlaceholder': 'オプションを入力してください',
+  'schemas.radioGroup.groupName': 'グループ名',
 };
 
 const dictKo: { [key in keyof Dict]: string } = {
@@ -281,6 +284,7 @@ const dictKo: { [key in keyof Dict]: string } = {
   'schemas.date.format': '날짜 형식',
   'schemas.select.options': '옵션',
   'schemas.select.optionPlaceholder': '옵션을 입력하세요',
+  'schemas.radioGroup.groupName': '그룹 이름',
 };
 
 const dictAr: { [key in keyof Dict]: string } = {
@@ -352,6 +356,7 @@ const dictAr: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'تنسيق التاريخ',
   'schemas.select.options': 'خيارات',
   'schemas.select.optionPlaceholder': 'أدخل خيارًا',
+  'schemas.radioGroup.groupName': 'اسم المجموعة',
 };
 
 const dictTh: { [key in keyof Dict]: string } = {
@@ -422,6 +427,7 @@ const dictTh: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'รูปแบบวันที่',
   'schemas.select.options': 'ตัวเลือก',
   'schemas.select.optionPlaceholder': 'กรอกตัวเลือก',
+  'schemas.radioGroup.groupName': 'ชื่อกลุ่ม',
 };
 
 const dictIt: { [key in keyof Dict]: string } = {
@@ -495,6 +501,7 @@ const dictIt: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Formato data',
   'schemas.select.options': 'Opzioni',
   'schemas.select.optionPlaceholder': 'Inserisci un\'opzione',
+  'schemas.radioGroup.groupName': 'Nome del Gruppo',
 };
 
 const dictPl: { [key in keyof Dict]: string } = {
@@ -565,6 +572,7 @@ const dictPl: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Format daty',
   'schemas.select.options': 'Opcje',
   'schemas.select.optionPlaceholder': 'Wpisz opcję',
+  'schemas.radioGroup.groupName': 'Nazwa grupy',
 };
 
 const dictDe: { [key in keyof Dict]: string } = {
@@ -638,6 +646,7 @@ const dictDe: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Datumsformat',
   'schemas.select.options': 'Optionen',
   'schemas.select.optionPlaceholder': 'Geben Sie eine Option ein',
+  'schemas.radioGroup.groupName': 'Gruppenname',
 };
 
 const dictEs: { [key in keyof Dict]: string } = {
@@ -710,6 +719,7 @@ const dictEs: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Formato de fecha',
   'schemas.select.options': 'Opciones',
   'schemas.select.optionPlaceholder': 'Ingrese una opción',
+  'schemas.radioGroup.groupName': 'Nombre del grupo',
 };
 
 const dictFr: { [key in keyof Dict]: string } = {
@@ -783,6 +793,7 @@ const dictFr: { [key in keyof Dict]: string } = {
   'schemas.date.format': 'Format de date',
   'schemas.select.options': 'Options',
   'schemas.select.optionPlaceholder': 'Entrez une option',
+  'schemas.radioGroup.groupName': 'Nom du groupe',
 };
 
 const dictionaries: { [key in Lang]: Dict } = {
