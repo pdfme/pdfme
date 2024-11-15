@@ -10,36 +10,32 @@ const uncheckedIcon =
 
 interface Checkbox extends Schema {}
 
+const getIcon = (value: string) => (value === 'true' ? checkedIcon : uncheckedIcon);
+
 const schema: Plugin<Checkbox> = {
   ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
     container.style.width = '100%';
     container.style.height = '100%';
-    
+
     if (isEditable(mode, schema)) {
       container.addEventListener('click', () => {
-        onChange && onChange({ key: 'content', value: value === 'true' ? '' : 'true' });
+        onChange && onChange({ key: 'content', value: value === 'true' ? 'false' : 'true' });
       });
     }
 
-    void svg.ui({
-      ...arg,
-      rootElement: container,
-      mode: 'viewer',
-      value: value === 'true' ? checkedIcon : uncheckedIcon,
-    });
+    void svg.ui({ ...arg, rootElement: container, mode: 'viewer', value: getIcon(value) });
 
     rootElement.appendChild(container);
   },
-  pdf: (arg) =>
-    svg.pdf(Object.assign(arg, { value: arg.value === 'true' ? checkedIcon : uncheckedIcon })),
+  pdf: (arg) => svg.pdf(Object.assign(arg, { value: getIcon(arg.value) })),
   propPanel: {
     schema: {},
     defaultSchema: {
       name: '',
       type: 'checkbox',
-      content: 'true',
+      content: 'false',
       position: { x: 0, y: 0 },
       width: 8,
       height: 8,

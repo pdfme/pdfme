@@ -29,7 +29,9 @@ const schema: Plugin<RadioGroup> = {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
 
-    radioButtonStates.set(schema.name, { value, onChange });
+    if (onChange) {
+      radioButtonStates.set(schema.name, { value, onChange });
+    }
 
     const oldListener = eventListeners.get(schema.name);
     if (oldListener) {
@@ -53,8 +55,8 @@ const schema: Plugin<RadioGroup> = {
 
     if (isEditable(mode, schema)) {
       container.addEventListener('click', () => {
-        if (value !== 'true') {
-          onChange && onChange({ key: 'content', value: 'true' });
+        if (value !== 'true' && onChange) {
+          onChange({ key: 'content', value: 'true' });
           radioButtonStates.set(schema.name, { value: 'true', onChange });
           eventEmitter.dispatchEvent(
             new CustomEvent(`group-${schema.group}`, { detail: schema.name })
