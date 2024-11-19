@@ -207,6 +207,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(bodyWidthRange, arg);
+  const showHead = table.settings.showHead;
 
   rootElement.innerHTML = '';
 
@@ -220,7 +221,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     void uiRender(arg);
   };
 
-  if (table.settings.showHead) {
+  if (showHead) {
     renderRowUi({
       rows: table.head,
       arg,
@@ -229,7 +230,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     });
   }
 
-  const offsetY = table.settings.showHead ? table.getHeadHeight() : 0;
+  const offsetY = showHead ? table.getHeadHeight() : 0;
   renderRowUi({
     rows: table.body,
     arg,
@@ -254,7 +255,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     });
 
   const createRemoveRowButtons = () => {
-    let offsetY = table.settings.showHead ? table.getHeadHeight() : 0;
+    let offsetY = showHead ? table.getHeadHeight() : 0;
     return table.body.map((row, i) => {
       offsetY = offsetY + row.height;
       const removeRowButton = createButton({
@@ -287,7 +288,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     const addColumnButton = createButton({
       width: buttonSize,
       height: buttonSize,
-      top: `${table.getHeadHeight() - px2mm(buttonSize)}mm`,
+      top: `${(showHead ? table.getHeadHeight() : 0) - px2mm(buttonSize)}mm`,
       right: `-${buttonSize}px`,
       text: '+',
       onClick: (e) => {
@@ -427,7 +428,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     resetEditingPosition();
   }
 
-  const tableHeight = table.settings.showHead ? table.getHeight() : table.getBodyHeight();
+  const tableHeight = showHead ? table.getHeight() : table.getBodyHeight();
   if (schema.height !== tableHeight && onChange) {
     onChange({ key: 'height', value: tableHeight });
   }
