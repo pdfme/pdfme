@@ -10,12 +10,21 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
-    // @ts-ignore
-    const head = (activeSchema.head || []) as string[];
+    // @ts-expect-error
+    const tableSchema = activeSchema as TableSchema;
+    const head = tableSchema.head || [];
+    const showHead = tableSchema.showHead || false;
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
     return {
+      showHead: {
+        title: i18n('schemas.table.showHead'),
+        type: 'boolean',
+        widget: 'checkbox',
+        span: 24,
+      },
+      '-------': { type: 'void', widget: 'Divider' },
       tableStyles: {
         title: i18n('schemas.table.tableStyle'),
         type: 'object',
@@ -38,6 +47,7 @@ export const propPanel: PropPanel<TableSchema> = {
         },
       },
       headStyles: {
+        hidden: !showHead,
         title: i18n('schemas.table.headStyle'),
         type: 'object',
         widget: 'Card',
