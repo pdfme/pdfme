@@ -30,7 +30,6 @@ exports[`Designer snapshot 1`] = `
               title="text"
             >
               <svg
-                class="lucide lucide-text-cursor-input"
                 fill="none"
                 height="24"
                 stroke="currentColor"
@@ -81,7 +80,6 @@ exports[`Designer snapshot 1`] = `
               title="image"
             >
               <svg
-                class="lucide lucide-image"
                 fill="none"
                 height="24"
                 stroke="currentColor"
@@ -133,26 +131,22 @@ exports[`Designer snapshot 1`] = `
               <span
                 class="ant-btn-icon"
               >
-                <span
-                  aria-label="minus"
-                  class="anticon anticon-minus"
-                  role="img"
-                  style="color: rgb(255, 255, 255);"
+                <svg
+                  class="lucide lucide-minus"
+                  fill="none"
+                  height="16"
+                  stroke="#fff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    data-icon="minus"
-                    fill="currentColor"
-                    focusable="false"
-                    height="1em"
-                    viewBox="64 64 896 896"
-                    width="1em"
-                  >
-                    <path
-                      d="M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"
-                    />
-                  </svg>
-                </span>
+                  <path
+                    d="M5 12h14"
+                  />
+                </svg>
               </span>
             </button>
             <span
@@ -171,29 +165,25 @@ exports[`Designer snapshot 1`] = `
               <span
                 class="ant-btn-icon"
               >
-                <span
-                  aria-label="plus"
-                  class="anticon anticon-plus"
-                  role="img"
-                  style="color: rgb(255, 255, 255);"
+                <svg
+                  class="lucide lucide-plus"
+                  fill="none"
+                  height="16"
+                  stroke="#fff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
-                  <svg
-                    aria-hidden="true"
-                    data-icon="plus"
-                    fill="currentColor"
-                    focusable="false"
-                    height="1em"
-                    viewBox="64 64 896 896"
-                    width="1em"
-                  >
-                    <path
-                      d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
-                    />
-                    <path
-                      d="M192 474h672q8 0 8 8v60q0 8-8 8H160q-8 0-8-8v-60q0-8 8-8z"
-                    />
-                  </svg>
-                </span>
+                  <path
+                    d="M5 12h14"
+                  />
+                  <path
+                    d="M12 5v14"
+                  />
+                </svg>
               </span>
             </button>
           </div>
@@ -211,25 +201,25 @@ exports[`Designer snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <span
-                aria-label="arrow-right"
-                class="anticon anticon-arrow-right"
-                role="img"
+              <svg
+                class="lucide lucide-arrow-right"
+                fill="none"
+                height="20"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                viewBox="0 0 24 24"
+                width="20"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  data-icon="arrow-right"
-                  fill="currentColor"
-                  focusable="false"
-                  height="1em"
-                  viewBox="64 64 896 896"
-                  width="1em"
-                >
-                  <path
-                    d="M869 487.8L491.2 159.9c-2.9-2.5-6.6-3.9-10.5-3.9h-88.5c-7.4 0-10.8 9.2-5.2 14l350.2 304H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h585.1L386.9 854c-5.6 4.9-2.2 14 5.2 14h91.5c1.9 0 3.8-.7 5.2-2L869 536.2a32.07 32.07 0 000-48.4z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M5 12h14"
+                />
+                <path
+                  d="m12 5 7 7-7 7"
+                />
+              </svg>
             </span>
           </button>
           <div
@@ -267,7 +257,7 @@ exports[`Designer snapshot 1`] = `
                         style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                       >
                         <div
-                          style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
+                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                         >
                           <button
                             class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
@@ -277,34 +267,57 @@ exports[`Designer snapshot 1`] = `
                             <span
                               class="ant-btn-icon"
                             >
-                              <span
-                                aria-label="holder"
-                                class="anticon anticon-holder"
-                                role="img"
+                              <svg
+                                class="lucide lucide-grip-vertical"
+                                fill="none"
+                                height="15"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
                                 style="cursor: grab;"
+                                viewBox="0 0 24 24"
+                                width="15"
+                                xmlns="http://www.w3.org/2000/svg"
                               >
-                                <svg
-                                  aria-hidden="true"
-                                  data-icon="holder"
-                                  fill="currentColor"
-                                  focusable="false"
-                                  height="1em"
-                                  viewBox="64 64 896 896"
-                                  width="1em"
-                                >
-                                  <path
-                                    d="M300 276.5a56 56 0 1056-97 56 56 0 00-56 97zm0 284a56 56 0 1056-97 56 56 0 00-56 97zM640 228a56 56 0 10112 0 56 56 0 00-112 0zm0 284a56 56 0 10112 0 56 56 0 00-112 0zM300 844.5a56 56 0 1056-97 56 56 0 00-56 97zM640 796a56 56 0 10112 0 56 56 0 00-112 0z"
-                                  />
-                                </svg>
-                              </span>
+                                <circle
+                                  cx="9"
+                                  cy="12"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="9"
+                                  cy="5"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="9"
+                                  cy="19"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="12"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="5"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="19"
+                                  r="1"
+                                />
+                              </svg>
                             </span>
                           </button>
                           <div
-                            style="width: 20px; margin-right: 0.5rem; color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
                             title="text"
                           >
                             <svg
-                              class="lucide lucide-text-cursor-input"
                               fill="none"
                               height="20"
                               stroke="currentColor"
@@ -345,7 +358,7 @@ exports[`Designer snapshot 1`] = `
                         style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                       >
                         <div
-                          style="display: flex; align-items: center; cursor: pointer; border: 1px solid transparent;"
+                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                         >
                           <button
                             class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
@@ -355,34 +368,57 @@ exports[`Designer snapshot 1`] = `
                             <span
                               class="ant-btn-icon"
                             >
-                              <span
-                                aria-label="holder"
-                                class="anticon anticon-holder"
-                                role="img"
+                              <svg
+                                class="lucide lucide-grip-vertical"
+                                fill="none"
+                                height="15"
+                                stroke="currentColor"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
                                 style="cursor: grab;"
+                                viewBox="0 0 24 24"
+                                width="15"
+                                xmlns="http://www.w3.org/2000/svg"
                               >
-                                <svg
-                                  aria-hidden="true"
-                                  data-icon="holder"
-                                  fill="currentColor"
-                                  focusable="false"
-                                  height="1em"
-                                  viewBox="64 64 896 896"
-                                  width="1em"
-                                >
-                                  <path
-                                    d="M300 276.5a56 56 0 1056-97 56 56 0 00-56 97zm0 284a56 56 0 1056-97 56 56 0 00-56 97zM640 228a56 56 0 10112 0 56 56 0 00-112 0zm0 284a56 56 0 10112 0 56 56 0 00-112 0zM300 844.5a56 56 0 1056-97 56 56 0 00-56 97zM640 796a56 56 0 10112 0 56 56 0 00-112 0z"
-                                  />
-                                </svg>
-                              </span>
+                                <circle
+                                  cx="9"
+                                  cy="12"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="9"
+                                  cy="5"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="9"
+                                  cy="19"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="12"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="5"
+                                  r="1"
+                                />
+                                <circle
+                                  cx="15"
+                                  cy="19"
+                                  r="1"
+                                />
+                              </svg>
                             </span>
                           </button>
                           <div
-                            style="width: 20px; margin-right: 0.5rem; color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
                             title="image"
                           >
                             <svg
-                              class="lucide lucide-image"
                               fill="none"
                               height="20"
                               stroke="currentColor"

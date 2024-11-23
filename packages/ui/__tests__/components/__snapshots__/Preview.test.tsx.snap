@@ -23,26 +23,22 @@ exports[`Preview(as Form) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <span
-                aria-label="minus"
-                class="anticon anticon-minus"
-                role="img"
-                style="color: rgb(255, 255, 255);"
+              <svg
+                class="lucide lucide-minus"
+                fill="none"
+                height="16"
+                stroke="#fff"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  data-icon="minus"
-                  fill="currentColor"
-                  focusable="false"
-                  height="1em"
-                  viewBox="64 64 896 896"
-                  width="1em"
-                >
-                  <path
-                    d="M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M5 12h14"
+                />
+              </svg>
             </span>
           </button>
           <span
@@ -61,29 +57,25 @@ exports[`Preview(as Form) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <span
-                aria-label="plus"
-                class="anticon anticon-plus"
-                role="img"
-                style="color: rgb(255, 255, 255);"
+              <svg
+                class="lucide lucide-plus"
+                fill="none"
+                height="16"
+                stroke="#fff"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  data-icon="plus"
-                  fill="currentColor"
-                  focusable="false"
-                  height="1em"
-                  viewBox="64 64 896 896"
-                  width="1em"
-                >
-                  <path
-                    d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
-                  />
-                  <path
-                    d="M192 474h672q8 0 8 8v60q0 8-8 8H160q-8 0-8-8v-60q0-8 8-8z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M5 12h14"
+                />
+                <path
+                  d="M12 5v14"
+                />
+              </svg>
             </span>
           </button>
         </div>
@@ -176,26 +168,22 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <span
-                aria-label="minus"
-                class="anticon anticon-minus"
-                role="img"
-                style="color: rgb(255, 255, 255);"
+              <svg
+                class="lucide lucide-minus"
+                fill="none"
+                height="16"
+                stroke="#fff"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  data-icon="minus"
-                  fill="currentColor"
-                  focusable="false"
-                  height="1em"
-                  viewBox="64 64 896 896"
-                  width="1em"
-                >
-                  <path
-                    d="M872 474H152c-4.4 0-8 3.6-8 8v60c0 4.4 3.6 8 8 8h720c4.4 0 8-3.6 8-8v-60c0-4.4-3.6-8-8-8z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M5 12h14"
+                />
+              </svg>
             </span>
           </button>
           <span
@@ -214,29 +202,25 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <span
-                aria-label="plus"
-                class="anticon anticon-plus"
-                role="img"
-                style="color: rgb(255, 255, 255);"
+              <svg
+                class="lucide lucide-plus"
+                fill="none"
+                height="16"
+                stroke="#fff"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <svg
-                  aria-hidden="true"
-                  data-icon="plus"
-                  fill="currentColor"
-                  focusable="false"
-                  height="1em"
-                  viewBox="64 64 896 896"
-                  width="1em"
-                >
-                  <path
-                    d="M482 152h60q8 0 8 8v704q0 8-8 8h-60q-8 0-8-8V160q0-8 8-8z"
-                  />
-                  <path
-                    d="M192 474h672q8 0 8 8v60q0 8-8 8H160q-8 0-8-8v-60q0-8 8-8z"
-                  />
-                </svg>
-              </span>
+                <path
+                  d="M5 12h14"
+                />
+                <path
+                  d="M12 5v14"
+                />
+              </svg>
             </span>
           </button>
         </div>

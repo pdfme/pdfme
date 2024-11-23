@@ -1,12 +1,7 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
-import {
-  MinusOutlined,
-  PlusOutlined,
-  LeftOutlined,
-  RightOutlined,
-  EllipsisOutlined,
-} from '@ant-design/icons';
+import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
+
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts';
@@ -34,7 +29,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
-        icon={<MinusOutlined style={{ color: style.textStyle.color }} />}
+        icon={<Minus size={16} color={style.textStyle.color} />}
       />
       <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
@@ -43,7 +38,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         type="text"
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
-        icon={<PlusOutlined style={{ color: style.textStyle.color }} />}
+        icon={<Plus size={16} color={style.textStyle.color} />}
       />
     </div>
   );
@@ -60,7 +55,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
-        <LeftOutlined style={{ color: style.textStyle.color }} />
+        <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
@@ -70,7 +65,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <RightOutlined style={{ color: style.textStyle.color }} />
+        <ChevronRight size={16} color={style.textStyle.color} />
       </Button>
     </div>
   );
@@ -83,7 +78,7 @@ type ContextMenuProps = {
 const ContextMenu = ({ items, style }: ContextMenuProps) => (
   <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
     <Button type="text">
-      <EllipsisOutlined style={{ color: style.textStyle.color }} />
+      <Ellipsis size={16} color={style.textStyle.color} />
     </Button>
   </Dropdown>
 );

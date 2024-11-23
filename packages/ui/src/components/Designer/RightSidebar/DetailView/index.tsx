@@ -2,7 +2,7 @@ import FormRender, { useForm } from 'form-render';
 import React, { useRef, useContext, useState, useEffect } from 'react';
 import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types';
-import { MenuOutlined } from '@ant-design/icons';
+import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
 import { getSidebarContentHeight, debounce } from '../../../../helper';
 import { theme, Typography, Button, Divider } from 'antd';
@@ -258,7 +258,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
             justifyContent: 'center',
           }}
           onClick={deselectSchema}
-          icon={<MenuOutlined />}
+          icon={<Menu strokeWidth={1.5} size={20} />}
         />
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('editField')}

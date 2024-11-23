@@ -1,15 +1,14 @@
 import { Plugin } from '@pdfme/common';
 import { Schema } from '@pdfme/common';
+import { Circle, CircleDot } from 'lucide';
 import svg from '../graphics/svg';
-import { isEditable } from '../utils.js';
+import { isEditable, createSvgStr } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
 const defaultStroke = 'currentColor';
 
-const getCheckedIcon = (color = defaultStroke) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-dot"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg>`;
-const getUncheckedIcon = (color = defaultStroke) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle"><circle cx="12" cy="12" r="10"/></svg>`;
+const getCheckedIcon = (stroke = defaultStroke) => createSvgStr(CircleDot, { stroke });
+const getUncheckedIcon = (stroke = defaultStroke) => createSvgStr(Circle, { stroke });
 
 interface RadioGroup extends Schema {
   group: string;
@@ -35,7 +34,7 @@ const schema: Plugin<RadioGroup> = {
     const container = document.createElement('div');
     container.style.width = '100%';
     container.style.height = '100%';
-    
+
     if (onChange) {
       radioButtonStates.set(schema.name, { value, onChange });
     }
