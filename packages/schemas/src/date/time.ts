@@ -1,5 +1,7 @@
 import { Lang } from '@pdfme/common';
 import { getPlugin } from './helper';
+import { createSvgStr } from '../utils.js';
+import { Clock } from 'lucide';
 
 const type = 'time';
 
@@ -19,11 +21,6 @@ const formatsByLang: Record<Lang, string[]> = {
   fr: [defaultFormat, 'HH:mm:ss'],
 };
 
-const icon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ' +
-  'viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-  'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
-  'class="lucide lucide-clock"><circle cx="12" cy="12" r="10"/>' +
-  '<polyline points="12 6 12 12 16 14"/></svg>';
+const icon = createSvgStr(Clock);
 
 export default getPlugin({ type, defaultFormat, icon, formatsByLang });

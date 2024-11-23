@@ -1,8 +1,8 @@
 import type * as CSS from 'csstype';
 import { cmyk, degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
 import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
+import { IconNode, createElement } from 'lucide';
 import { getDynamicHeightsForTable as _getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
-
 export const convertForPdfLayoutProps = ({
   schema,
   pageHeight,
@@ -207,4 +207,17 @@ export const createErrorElm = () => {
   container.appendChild(span);
 
   return container;
+};
+
+export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+  const svg = createElement(icon);
+  if (attrs) {
+    Object.entries(attrs).forEach(([key, value]) => {
+      svg.setAttribute(key, value);
+    });
+  }
+  return new XMLSerializer().serializeToString(svg);
 };
