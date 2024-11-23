@@ -46,7 +46,6 @@ const SelectableSortableItem = ({
     ([label, plugin]) => plugin?.propPanel.defaultSchema.type === schema.type
   )!;
 
-  const iconStyles = { width: 20, marginRight: '0.5rem' };
 
   let status: undefined | 'is-warning' | 'is-danger';
   if (!schema.name) {
@@ -72,7 +71,7 @@ const SelectableSortableItem = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onClick={() => onEdit(schema.id)}
-      icon={thisPlugin && <PluginIcon plugin={thisPlugin} label={pluginLabel} size={20} styles={iconStyles}/>}
+      icon={thisPlugin && <PluginIcon plugin={thisPlugin} label={pluginLabel} size={20} />}
       value={schema.name}
       status={status}
       title={title}

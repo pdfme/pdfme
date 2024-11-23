@@ -2,7 +2,7 @@ import React from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types';
 import { RIGHT_SIDEBAR_WIDTH } from '../../../constants';
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import ListView from './ListView/index';
 import DetailView from './DetailView/index';
 
@@ -16,6 +16,8 @@ const Sidebar = (props: SidebarProps) => {
     const activeSchemas = getActiveSchemas();
     return activeSchemas[activeSchemas.length - 1];
   };
+
+  const iconProps = { strokeWidth: 1.5, size: 20 };
 
   return (
     <div
@@ -38,7 +40,7 @@ const Sidebar = (props: SidebarProps) => {
             right: '1rem',
             zIndex: 100,
           }}
-          icon={sidebarOpen ? <ArrowRightOutlined /> : <ArrowLeftOutlined />}
+          icon={sidebarOpen ? <ArrowRight {...iconProps} /> : <ArrowLeft {...iconProps} />}
           onClick={() => setSidebarOpen(!sidebarOpen)}
         />
         <div

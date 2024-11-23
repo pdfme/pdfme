@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts';
-import { HolderOutlined, ExclamationCircleOutlined, LockOutlined } from '@ant-design/icons';
+import { GripVertical, CircleAlert, Lock } from 'lucide-react'
 import { Button, Typography } from 'antd';
 
 const { Text } = Typography;
@@ -82,6 +82,7 @@ const Item = React.memo(
               display: 'flex',
               alignItems: 'center',
               cursor: 'pointer',
+              gap: '0.5rem',
               ...style,
             }}
             {...props}
@@ -97,7 +98,7 @@ const Item = React.memo(
                 border: 'none',
                 paddingLeft: '0.25rem',
               }}
-              icon={<HolderOutlined style={{ cursor: 'grab' }} />}
+              icon={<GripVertical size={15} style={{ cursor: 'grab' }} />}
             />
             {icon}
             <Text
@@ -112,15 +113,15 @@ const Item = React.memo(
               {status === undefined ? (
                 value
               ) : (
-                <span>
-                  <ExclamationCircleOutlined width={15} style={{ marginRight: '0.5rem' }} />
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <CircleAlert size={15} style={{ marginRight: '0.25rem' }} />
                   {status === 'is-warning' ? i18n('noKeyName') : value}
                   {status === 'is-danger' ? i18n('notUniq') : ''}
                 </span>
               )}
-              {readOnly && <LockOutlined style={{ marginLeft: '0.5rem' }} />}
-              {required && <span style={{ color: 'red', marginLeft: '0.5rem' }}>*</span>}
             </Text>
+            {readOnly && <Lock size={15} />}
+            {required && <span style={{ color: 'red' }}>*</span>}
           </div>
         </li>
       );
