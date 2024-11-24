@@ -126,6 +126,11 @@ const config = {
           position: 'right'
         },
         {
+          href: 'https://playground.pdfme.com/',
+          label: 'Playground',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/pdfme/pdfme',
           label: 'GitHub',
           position: 'right',
