@@ -15,7 +15,7 @@ The following tag naming is supported:
 
 The CI will automatically publish the release to NPM if the tag is of the form `x.y.z`, and will publish the release to the `next` tag on NPM if the tag is of the form `x.y.z-rc.n`, `x.y.z-beta.n` or `x.y.z-alpha.n`.
 
-Additonally the CI creates releases to the `dev` tag on NPM for every commit to the `main` branch.
+Additionally the CI creates releases to the `dev` tag on NPM for every commit to the `main` branch.
 Releases to the `dev` tag follow the following naming scheme: 
 
 - `x.y.z-dev.n`, where `x.y.z` is the version of the last stable release and `n` is the number of commits since the last stable release.
