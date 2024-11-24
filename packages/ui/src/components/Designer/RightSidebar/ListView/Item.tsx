@@ -120,8 +120,8 @@ const Item = React.memo(
                 </span>
               )}
             </Text>
-            {readOnly && <Lock size={15} style={{ paddingRight: '0.5rem' }} />}
-            {required && <span style={{ color: 'red', paddingRight: '0.5rem' }}>*</span>}
+            {readOnly && <Lock size={15} style={{ marginRight: '0.5rem' }} />}
+            {required && <span style={{ color: 'red', marginRight: '0.5rem' }}>*</span>}
           </div>
         </li>
       );
