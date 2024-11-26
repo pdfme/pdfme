@@ -82,7 +82,10 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
       : Object.values(builtInPlugins)
   ) as Plugin<Schema>[];
 
-  const schemaTypes = schemas.flatMap(schemaPage => schemaPage.map((schema) => schema.type));
+  let schemaTypes = schemas.flatMap(schemaPage => schemaPage.map((schema) => schema.type));
+  if (schemaTypes.indexOf('text') == -1) {
+    schemaTypes.push('text');
+  }
 
   const renderObj = schemaTypes.reduce((acc, type) => {
     const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
@@ -129,8 +132,8 @@ export const insertPage = (arg: {
   const { basePage, embedPdfBox, pdfDoc } = arg;
   const size = basePage instanceof PDFEmbeddedPage ? basePage.size() : basePage.getSize();
   const insertedPage = basePage instanceof PDFEmbeddedPage
-      ? pdfDoc.addPage([size.width, size.height])
-      : pdfDoc.addPage(basePage);
+    ? pdfDoc.addPage([size.width, size.height])
+    : pdfDoc.addPage(basePage);
 
   if (basePage instanceof PDFEmbeddedPage) {
     insertedPage.drawPage(basePage);
