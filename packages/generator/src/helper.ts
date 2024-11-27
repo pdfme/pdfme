@@ -60,17 +60,20 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, any>[]) => {
   template.schemas.forEach((schemaPage) =>
-    schemaPage.forEach(schema => {
+    schemaPage.forEach((schema) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[schema.name])) {
-        throw new Error(`[@pdfme/generator] input for '${schema.name}' is required to generate this PDF`);
+        throw new Error(
+          `[@pdfme/generator] input for '${schema.name}' is required to generate this PDF`
+        );
       }
     })
   );
-}
+};
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { schemas } = template;
+  const { schemas, basePdf } = template;
+  const staticSchema: Schema[] = isBlankPdf(basePdf) ? (basePdf.staticSchema ?? []) : [];
 
   const pdfDoc = await PDFDocument.create();
   // @ts-ignore
@@ -82,7 +85,13 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
       : Object.values(builtInPlugins)
   ) as Plugin<Schema>[];
 
-  const schemaTypes = schemas.flatMap(schemaPage => schemaPage.map((schema) => schema.type));
+  const schemaTypes = Array.from(
+    new Set(
+      schemas
+        .flatMap((schemaPage) => schemaPage.map((schema) => schema.type))
+        .concat(staticSchema.map((schema) => schema.type))
+    )
+  );
 
   const renderObj = schemaTypes.reduce((acc, type) => {
     const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
@@ -128,7 +137,8 @@ export const insertPage = (arg: {
 }) => {
   const { basePage, embedPdfBox, pdfDoc } = arg;
   const size = basePage instanceof PDFEmbeddedPage ? basePage.size() : basePage.getSize();
-  const insertedPage = basePage instanceof PDFEmbeddedPage
+  const insertedPage =
+    basePage instanceof PDFEmbeddedPage
       ? pdfDoc.addPage([size.width, size.height])
       : pdfDoc.addPage(basePage);
 
