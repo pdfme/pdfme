@@ -97,7 +97,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
       },
       {
         id: 'top',
-        icon: <AlignEndVertical size={15} />,
+        icon: <AlignStartHorizontal size={15} />,
         onClick: () => align('top')
       },
       {
