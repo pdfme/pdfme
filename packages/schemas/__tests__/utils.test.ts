@@ -1,5 +1,6 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor } from '../src/utils';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils';
+import {  SquareCheck } from 'lucide';
 
 describe('hex2RgbColor', () => {
   it('should convert hex to rgb', () => {
@@ -160,4 +161,9 @@ describe('convertForPdfLayoutProps', () => {
     expect(Math.round(pt2mm(y))).toEqual(Math.round(pt2mm(1000) - 100 - 120));
     expect(rotate).toEqual({ angle: -90, type: 'degrees' });
   });
+});
+
+it('createSvgStr', () => {
+  const icon = createSvgStr(SquareCheck, { stroke: 'currentColor' });
+  expect(icon).toBeTruthy();
 });
