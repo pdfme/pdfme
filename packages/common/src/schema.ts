@@ -159,6 +159,7 @@ const CommonProps = z.object({
 
 export const GeneratorOptions = CommonOptions.extend({
   colorType: ColorType,
+  onColor: z.function().args(z.string()).returns(z.promise(z.any())).optional(),
   author: z.string().optional(),
   creationDate: z.date().optional(),
   creator: z.string().optional(),
