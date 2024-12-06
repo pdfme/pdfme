@@ -147,7 +147,7 @@ const hex2CmykColor = (hexString: string | undefined) => {
 };
 
 export const hex2PrintingColor = (hexString: string | undefined, colorType?: ColorType) => {
-  return colorType?.toLocaleLowerCase() == 'cmyk'
+  return colorType?.toLowerCase() == 'cmyk'
     ? hex2CmykColor(hexString)
     : hex2RgbColor(hexString);
 };

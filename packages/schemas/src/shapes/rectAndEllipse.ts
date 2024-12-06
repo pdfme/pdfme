@@ -27,10 +27,10 @@ const shape: Plugin<ShapeSchema> = {
 
     rootElement.appendChild(div);
   },
-  pdf: (arg) => {
+  pdf: async (arg) => {
     const { schema, page, options } = arg;
     if (!schema.color && !schema.borderColor) return;
-    const { colorType } = options;
+    const { colorType, onColor } = options;
     const pageHeight = page.getHeight();
     const cArg = { schema, pageHeight };
     const { position, width, height, rotate, opacity } = convertForPdfLayoutProps(cArg);
@@ -42,8 +42,8 @@ const shape: Plugin<ShapeSchema> = {
     const drawOptions = {
       rotate,
       borderWidth,
-      borderColor: hex2PrintingColor(schema.borderColor, colorType),
-      color: hex2PrintingColor(schema.color, colorType),
+      borderColor: onColor ? await onColor(schema.borderColor) : hex2PrintingColor(schema.borderColor, colorType),
+      color: onColor? await onColor(schema.color) : hex2PrintingColor(schema.color, colorType),
       opacity,
       borderOpacity: opacity,
     };

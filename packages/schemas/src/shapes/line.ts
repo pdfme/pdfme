@@ -15,10 +15,10 @@ interface LineSchema extends Schema {
 }
 
 const lineSchema: Plugin<LineSchema> = {
-  pdf: (arg: PDFRenderProps<LineSchema>) => {
+  pdf: async (arg: PDFRenderProps<LineSchema>) => {
     const { page, schema, options } = arg;
     if (schema.width === 0 || schema.height === 0 || !schema.color) return;
-    const { colorType } = options;
+    const { colorType, onColor } = options;
     const pageHeight = page.getHeight();
     const {
       width,
@@ -32,7 +32,7 @@ const lineSchema: Plugin<LineSchema> = {
       start: rotatePoint({ x, y: y + height / 2 }, pivot, rotate.angle),
       end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
       thickness: height,
-      color: hex2PrintingColor(schema.color ?? DEFAULT_LINE_COLOR, colorType),
+      color: onColor ? await onColor(schema.color) : hex2PrintingColor(schema.color ?? DEFAULT_LINE_COLOR, colorType),
       opacity: opacity,
     });
   },
