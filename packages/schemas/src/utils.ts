@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import { cmyk, degrees, degreesToRadians, rgb } from '@pdfme/pdf-lib';
+import { cmyk, degrees, degreesToRadians, rgb, Color } from '@pdfme/pdf-lib';
 import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
 import { IconNode } from 'lucide';
 import { getDynamicHeightsForTable as _getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
@@ -146,10 +146,12 @@ const hex2CmykColor = (hexString: string | undefined) => {
   return undefined;
 };
 
-export const hex2PrintingColor = (hexString: string | undefined, colorType?: ColorType) => {
-  return colorType?.toLocaleLowerCase() == 'cmyk'
-    ? hex2CmykColor(hexString)
-    : hex2RgbColor(hexString);
+export const hex2PrintingColor = (color?: string | Color, colorType?: ColorType) => {
+  // if color is already CMYK, RGB or Grayscale, does not required to convert
+  if (typeof color === 'object') return color
+  return colorType?.toLowerCase() == 'cmyk'
+    ? hex2CmykColor(color)
+    : hex2RgbColor(color);
 };
 
 export const readFile = (input: File | FileList | null): Promise<string | ArrayBuffer> =>
