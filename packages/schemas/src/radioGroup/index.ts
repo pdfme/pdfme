@@ -88,6 +88,9 @@ const schema: Plugin<RadioGroup> = {
         title: i18n('schemas.color'),
         type: 'string',
         widget: 'color',
+        props: {
+          disabledAlpha: true
+        },
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },

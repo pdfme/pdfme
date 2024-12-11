@@ -189,6 +189,9 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         title: i18n('schemas.barcodes.barColor'),
         type: 'string',
         widget: 'color',
+        props: {
+          disabledAlpha: true
+        },
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
@@ -200,6 +203,9 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         title: i18n('schemas.bgColor'),
         type: 'string',
         widget: 'color',
+        props: {
+          disabledAlpha: true
+        },
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
@@ -209,7 +215,14 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
       },
       ...(barcodeHasText
         ? {
-            textColor: { title: i18n('schemas.textColor'), type: 'string', widget: 'color' },
+            textColor: {
+              title: i18n('schemas.textColor'),
+              type: 'string',
+              widget: 'color',
+              props: {
+                disabledAlpha: true
+              },
+            },
             includetext: {
               title: i18n('schemas.barcodes.includetext'),
               type: 'boolean',
