@@ -110,18 +110,27 @@ export const getCellPropPanelSchema = (arg: {
       title: i18n('schemas.textColor'),
       type: 'string',
       widget: 'color',
+      props: {
+        disabledAlpha: true
+      },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
     borderColor: {
       title: i18n('schemas.borderColor'),
       type: 'string',
       widget: 'color',
+      props: {
+        disabledAlpha: true
+      },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
     backgroundColor: {
       title: i18n('schemas.backgroundColor'),
       type: 'string',
       widget: 'color',
+      props: {
+        disabledAlpha: true
+      },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
     ...(isBody
@@ -130,6 +139,9 @@ export const getCellPropPanelSchema = (arg: {
             title: i18n('schemas.table.alternateBackgroundColor'),
             type: 'string',
             widget: 'color',
+            props: {
+              disabledAlpha: true
+            },
             rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
           },
         }
