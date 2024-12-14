@@ -140,7 +140,7 @@ export const getB64BasePdf = async (
     return customPdf;
   }
 
-  const uint8Array = customPdf instanceof Uint8Array ? customPdf : new Uint8Array(customPdf);
+  const uint8Array = customPdf instanceof Uint8Array ? customPdf : new Uint8Array(Object.values(customPdf));
   return 'data:application/pdf;base64,' + Buffer.from(uint8Array).toString('base64');
 };
 
