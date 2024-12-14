@@ -74,12 +74,12 @@
       "ts"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.esm.json"
-      }
+      "^.+\\.ts?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.esm.json"
+        }
+      ]
     },
     "testMatch": [
       "**/*.test.ts"

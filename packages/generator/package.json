@@ -61,7 +61,6 @@
     "globalTeardown": "<rootDir>/teardown.mjs",
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^date-fns/locale": "date-fns/locale.cjs",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
     "transformIgnorePatterns": [
@@ -72,13 +71,13 @@
       "ts"
     ],
     "transform": {
-      "^.+\\.ts$": "ts-jest",
+      "^.+\\.ts?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.esm.json"
+        }
+      ],
       "^.+\\.css$": "<rootDir>/__tests__/cssTransform.js"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.esm.json"
-      }
     },
     "testMatch": [
       "**/*.test.ts"
