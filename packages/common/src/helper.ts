@@ -28,7 +28,7 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
-export const cloneDeep = <T>(value: T): T => JSON.parse(JSON.stringify(value));
+export const cloneDeep = structuredClone;
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
@@ -127,19 +127,25 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   return [input];
 };
 
-export const getB64BasePdf = (basePdf: BasePdf) => {
-  const needFetchFromNetwork =
-    typeof basePdf === 'string' && !basePdf.startsWith('data:application/pdf;');
-  if (needFetchFromNetwork && typeof window !== 'undefined') {
-    return fetch(basePdf)
-      .then((res) => res.blob())
-      .then(blob2Base64Pdf)
-      .catch((e: Error) => {
-        throw e;
-      });
+export const getB64BasePdf = async (
+  customPdf: ArrayBuffer | Uint8Array | string
+): Promise<string> => {
+  if (
+    typeof customPdf === 'string' &&
+    !customPdf.startsWith('data:application/pdf;') &&
+    typeof window !== 'undefined'
+  ) {
+    const response = await fetch(customPdf);
+    const blob = await response.blob();
+    return blob2Base64Pdf(blob);
   }
 
-  return basePdf as string;
+  if (typeof customPdf === 'string') {
+    return customPdf;
+  }
+
+  const uint8Array = customPdf instanceof Uint8Array ? customPdf : new Uint8Array(customPdf);
+  return 'data:application/pdf;base64,' + Buffer.from(uint8Array).toString('base64');
 };
 
 export const isBlankPdf = (basePdf: BasePdf): basePdf is BlankPdf =>

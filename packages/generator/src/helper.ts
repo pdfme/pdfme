@@ -38,8 +38,8 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
       trimBox: { x: 0, y: 0, width, height },
     }));
   } else {
-    const willLoadPdf = typeof basePdf === 'string' ? await getB64BasePdf(basePdf) : basePdf;
-    const embedPdf = await PDFDocument.load(willLoadPdf as ArrayBuffer | Uint8Array | string);
+    const willLoadPdf = await getB64BasePdf(basePdf);
+    const embedPdf = await PDFDocument.load(willLoadPdf);
     const embedPdfPages = embedPdf.getPages();
     embedPdfBoxes = embedPdfPages.map((p) => ({
       mediaBox: p.getMediaBox(),
