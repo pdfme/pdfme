@@ -139,6 +139,13 @@ export const getB64BasePdf = (basePdf: BasePdf) => {
       });
   }
 
+  if (typeof basePdf === 'object') {
+    // since json stringify in deepClone function convert Uint8Array to object,
+    // we need to revert back to Uint8Array
+    const uint8Array = new Uint8Array(Object.values(basePdf));
+    return 'data:application/pdf;base64,' + Buffer.from(uint8Array).toString('base64');
+  } 
+
   return basePdf as string;
 };
 
