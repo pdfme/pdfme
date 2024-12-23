@@ -2,21 +2,29 @@ import React from 'react';
 import TOC from '@theme-original/TOC';
 import type TOCType from '@theme/TOC';
 import type { WrapperProps } from '@docusaurus/types';
-import { FlashOn } from '@mui/icons-material';
+import { FlashOn, SupportAgent, SvgIconComponent } from '@mui/icons-material';
 
-function SidebarBanner() {
-  const bannerStyle = {
-    background: 'linear-gradient(45deg, rgb(37, 194, 160), rgb(32, 166, 137))',
+type BannerProps = {
+  title: string;
+  subtitle: string;
+  href: string;
+  gradient: string; // 'linear-gradient(45deg, ... )'
+  Icon: SvgIconComponent;
+};
+
+function Banner({ title, subtitle, href, gradient, Icon }: BannerProps) {
+  const bannerStyle: React.CSSProperties = {
+    background: gradient,
     borderRadius: '12px',
     boxShadow: '0 4px 15px rgba(37, 194, 160, 0.3)',
     padding: '16px',
-    position: 'relative' as const,
+    position: 'relative',
     overflow: 'hidden',
     transition: 'all 0.3s ease',
   };
 
-  const blurCircleStyle = {
-    position: 'absolute' as const,
+  const blurCircleStyle: React.CSSProperties = {
+    position: 'absolute',
     width: '100px',
     height: '100px',
     borderRadius: '50%',
@@ -25,20 +33,20 @@ function SidebarBanner() {
     zIndex: 0,
   };
 
-  const contentStyle = {
-    position: 'relative' as const,
+  const contentStyle: React.CSSProperties = {
+    position: 'relative',
     zIndex: 1,
   };
 
-  const linkStyle = {
+  const linkStyle: React.CSSProperties = {
     display: 'flex',
-    flexDirection: 'column' as const,
+    flexDirection: 'column',
     alignItems: 'center',
     color: 'white',
     textDecoration: 'none',
   };
 
-  const titleStyle = {
+  const titleStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     fontWeight: 'bold',
@@ -47,29 +55,23 @@ function SidebarBanner() {
     textShadow: '0 2px 4px rgba(0,0,0,0.1)',
   };
 
-  const iconStyle = {
+  const iconStyle: React.CSSProperties = {
     marginRight: '8px',
     fontSize: '24px',
     filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.1))',
   };
 
-  const subtitleStyle = {
+  const subtitleStyle: React.CSSProperties = {
     color: 'rgba(255, 255, 255, 0.95)',
     fontSize: '12px',
-    textAlign: 'center' as const,
+    textAlign: 'center',
     lineHeight: '1.4',
     textShadow: '0 1px 2px rgba(0,0,0,0.1)',
   };
 
   return (
-    <a
-      href="https://app.pdfme.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      style={linkStyle}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" style={linkStyle}>
       <div
-        className="sidebar-banner"
         style={bannerStyle}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
@@ -84,26 +86,54 @@ function SidebarBanner() {
         <div style={{ ...blurCircleStyle, bottom: '-30px', right: '-30px' }} />
         <div style={contentStyle}>
           <div style={titleStyle}>
-            <FlashOn style={iconStyle} />
-            <span>Try pdfme Cloud</span>
+            <Icon style={iconStyle} />
+            <span>{title}</span>
           </div>
-          <p style={subtitleStyle}>
-            No setup needed. Create PDFs in seconds with pdfme Cloud!
-          </p>
+          <p style={subtitleStyle}>{subtitle}</p>
         </div>
       </div>
     </a>
   );
 }
 
+export function SidebarBannerCloud() {
+  return (
+    <Banner
+      title="Try pdfme Cloud"
+      subtitle="No setup needed. Create PDFs in seconds with pdfme Cloud!"
+      href="https://app.pdfme.com"
+      gradient="linear-gradient(45deg, rgb(37, 194, 160), rgb(32, 166, 137))"
+      Icon={FlashOn}
+    />
+  );
+}
+
+export function SidebarBannerSupport() {
+  return (
+    <Banner
+      title="Technical Support & Consulting"
+      subtitle="Need advanced solutions or professional guidance? Our pdfme experts are here to help."
+      href="https://app.pdfme.com/contact"
+      gradient="linear-gradient(45deg, rgb(113, 37, 194), rgb(32, 70, 166))"
+      Icon={SupportAgent}
+    />
+  );
+}
+
+
 type Props = WrapperProps<typeof TOCType>;
 
 export default function TOCWrapper(props: Props): JSX.Element {
+  console.log(props)
   return (
     <div style={{ position: 'sticky', top: 76 }}>
       <TOC {...props} />
-      <div style={{ height: 32 }} />
-      <SidebarBanner />
+      <div>
+        <div style={{ height: 16 }} />
+        <SidebarBannerCloud />
+        <div style={{ height: 16 }} />
+        <SidebarBannerSupport />
+      </div>
     </div>
   );
 }
