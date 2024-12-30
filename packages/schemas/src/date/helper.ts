@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type * as CSS from 'csstype';
 import AirDatepicker, { AirDatepickerLocale } from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
@@ -139,8 +140,15 @@ export const getPlugin = ({
         }
       };
 
+      let lang: Lang = options.lang || 'en';
+      let parsed = z.string().parse(schema.lang);
+      if (parsed) {
+        lang = parsed as Lang;
+      }
+      const locale = getAirDatepickerLocale(lang);
+
       const airDatepicker = new AirDatepicker(input, {
-        locale: getAirDatepickerLocale(options.lang || 'en'),
+        locale,
         selectedDates: [strDateToDate(value, type)],
         dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
         timepicker: type !== 'date',
