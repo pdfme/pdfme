@@ -1,17 +1,38 @@
-import { z } from 'zod';
 import type * as CSS from 'csstype';
 import AirDatepicker, { AirDatepickerLocale } from 'air-datepicker';
+import localeAr from 'air-datepicker/locale/ar';
+import localeBg from 'air-datepicker/locale/bg';
+import localeCa from 'air-datepicker/locale/ca';
+import localeCs from 'air-datepicker/locale/cs';
+import localeDa from 'air-datepicker/locale/da';
+import localeDe from 'air-datepicker/locale/de';
+import localeEl from 'air-datepicker/locale/el';
 import localeEn from 'air-datepicker/locale/en';
-import localeZh from 'air-datepicker/locale/zh';
+import localeEs from 'air-datepicker/locale/es';
+import localeEu from 'air-datepicker/locale/eu';
+import localeFi from 'air-datepicker/locale/fi';
+import localeFr from 'air-datepicker/locale/fr';
+import localeHr from 'air-datepicker/locale/hr';
+import localeHu from 'air-datepicker/locale/hu';
+import localeId from 'air-datepicker/locale/id';
+import localeIt from 'air-datepicker/locale/it';
 import localeJa from 'air-datepicker/locale/ja';
 import localeKo from 'air-datepicker/locale/ko';
-import localeAr from 'air-datepicker/locale/ar';
+import localeNb from 'air-datepicker/locale/nb';
+import localeNl from 'air-datepicker/locale/nl';
 import localeTh from 'air-datepicker/locale/th';
 import localePl from 'air-datepicker/locale/pl';
-import localeIt from 'air-datepicker/locale/it';
-import localeDe from 'air-datepicker/locale/de';
-import localeEs from 'air-datepicker/locale/es';
-import localeFr from 'air-datepicker/locale/fr';
+import localePtBR from 'air-datepicker/locale/pt-BR';
+import localePt from 'air-datepicker/locale/pt';
+import localeRo from 'air-datepicker/locale/ro';
+import localeRu from 'air-datepicker/locale/ru';
+import localeSi from 'air-datepicker/locale/si';
+import localeSk from 'air-datepicker/locale/sk';
+import localeSl from 'air-datepicker/locale/sl';
+import localeSv from 'air-datepicker/locale/sv';
+import localeTr from 'air-datepicker/locale/tr';
+import localeUk from 'air-datepicker/locale/uk';
+import localeZh from 'air-datepicker/locale/zh';
 import { format } from 'date-fns';
 import { enUS, zhCN, ja, ko, ar, th, pl, it, de, es, fr, Locale } from 'date-fns/locale';
 import {
@@ -60,20 +81,45 @@ const injectStyles = (css: string) => {
 const getDateFnsLocale = (lang: Lang): Locale | undefined =>
   ({ en: enUS, zh: zhCN, ja, ko, ar, th, pl, it, de, es, fr }[lang]);
 
-const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
-  ({
-    en: localeEn,
-    zh: localeZh,
-    ja: localeJa,
-    ko: localeKo,
-    ar: localeAr,
-    th: localeTh,
-    pl: localePl,
-    it: localeIt,
-    de: localeDe,
-    es: localeEs,
-    fr: localeFr,
-  }[lang]);
+const locales: { [locale: string]: { locale: AirDatepickerLocale; close: string } } = {
+  ar: { locale: localeAr, close: 'يغلق' },
+  bg: { locale: localeBg, close: 'близо' },
+  ca: { locale: localeCa, close: 'Fermer' },
+  cs: { locale: localeCs, close: 'Blízko' },
+  da: { locale: localeDa, close: 'Tæt' },
+  de: { locale: localeDe, close: 'Schließen' },
+  el: { locale: localeEl, close: 'κοντά' },
+  en: { locale: localeEn, close: 'Close' },
+  es: { locale: localeEs, close: 'Cerca' },
+  eu: { locale: localeEu, close: 'Itxi' },
+  fi: { locale: localeFi, close: 'Lähellä' },
+  fr: { locale: localeFr, close: 'Fermer' },
+  hr: { locale: localeHr, close: 'Zatvoriti' },
+  hu: { locale: localeHu, close: 'Közeli' },
+  id: { locale: localeId, close: 'Menutup' },
+  it: { locale: localeIt, close: 'Vicino' },
+  ja: { locale: localeJa, close: '閉じる' },
+  ko: { locale: localeKo, close: '닫다' },
+  nb: { locale: localeNb, close: 'Lukke' },
+  nl: { locale: localeNl, close: 'Dichtbij' },
+  pl: { locale: localePl, close: 'Zamknąć' },
+  'pt-Br': { locale: localePtBR, close: 'Fechar' },
+  pt: { locale: localePt, close: 'Fechar' },
+  ro: { locale: localeRo, close: 'Aproape' },
+  ru: { locale: localeRu, close: 'закрывать' },
+  si: { locale: localeSi, close: 'සමීපයි' },
+  sk: { locale: localeSk, close: 'Zavrieť' },
+  sl: { locale: localeSl, close: 'Blizu' },
+  sv: { locale: localeSv, close: 'Nära' },
+  th: { locale: localeTh, close: 'ปิด' },
+  tr: { locale: localeTr, close: 'kapalı' },
+  uk: { locale: localeUk, close: 'Close' },
+  zh: { locale: localeZh, close: '关闭' },
+};
+
+const getAirDatepickerLocale = (locale: string): { locale: AirDatepickerLocale; close: string } => {
+  return locales[locale] || locales['en'];
+};
 
 const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Date => {
   if (type === 'time') {
@@ -99,7 +145,7 @@ export const getPlugin = ({
 }) => {
   const plugin: Plugin<DateSchema> = {
     ui: (arg) => {
-      const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
+      const { schema, value, onChange, rootElement, mode, options } = arg;
       injectStyles(airDatepickerCss);
 
       const beforeRemoveEvent = new Event('beforeRemove');
@@ -140,15 +186,12 @@ export const getPlugin = ({
         }
       };
 
-      let lang: Lang = options.lang || 'en';
-      let parsed = z.string().parse(schema.lang);
-      if (parsed) {
-        lang = parsed as Lang;
-      }
-      const locale = getAirDatepickerLocale(lang);
+      const locale = schema.locale
+        ? getAirDatepickerLocale(schema.locale)
+        : getAirDatepickerLocale(options.lang || 'en');
 
       const airDatepicker = new AirDatepicker(input, {
-        locale,
+        locale: locale.locale,
         selectedDates: [strDateToDate(value, type)],
         dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
         timepicker: type !== 'date',
@@ -157,7 +200,7 @@ export const getPlugin = ({
         buttons: [
           'clear',
           {
-            content: i18n('close'),
+            content: locale.close,
             onClick: (datepicker) => {
               datepicker.hide();
               commitChange({ datepicker });
@@ -258,7 +301,7 @@ export const getPlugin = ({
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [
               {
@@ -272,7 +315,7 @@ export const getPlugin = ({
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [
               {
@@ -280,6 +323,15 @@ export const getPlugin = ({
                 message: i18n('validation.hexColor'),
               },
             ],
+          },
+          locale: {
+            title: i18n('schemas.date.locale'),
+            type: 'string',
+            widget: 'select',
+            props: {
+              options: Object.keys(locales).map((locale) => ({ label: locale, value: locale })),
+            },
+            span: 8,
           },
         };
 
@@ -300,6 +352,7 @@ export const getPlugin = ({
         fontColor: DEFAULT_FONT_COLOR,
         fontName: undefined,
         backgroundColor: '',
+        locale: 'en',
         opacity: DEFAULT_OPACITY,
       },
     },
