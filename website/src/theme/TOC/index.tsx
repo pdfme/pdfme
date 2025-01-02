@@ -124,7 +124,6 @@ export function SidebarBannerSupport() {
 type Props = WrapperProps<typeof TOCType>;
 
 export default function TOCWrapper(props: Props): JSX.Element {
-  console.log(props)
   return (
     <div style={{ position: 'sticky', top: 76 }}>
       <TOC {...props} />

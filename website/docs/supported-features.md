@@ -29,7 +29,7 @@ For elements that are not supported, you can add your own rendering process usin
   - Dynamic Font Sizing
     - Detailed options for Min, Max, Fit
 
-### Multivariable Text (multiVariableText)
+### Multivariable Text (multiVariableText){#multivariable-text}
 
 - As per text, but supporting 0 to n variables in a single text field
 
@@ -78,7 +78,7 @@ For elements that are not supported, you can add your own rendering process usin
   - Text Color
   - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
 
-### Table (table)
+### Table (table){#table}
 
 Details: [Tables with Dynamic Data](/docs/tables)
 

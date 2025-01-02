@@ -24,30 +24,10 @@ If you have any questions or suggestions, please feel free to send them to [GitH
 
 For insights on development: [How to develop pdfme](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
 
-## Roadmap
-
-As of writing this page, we just released Version 2 two weeks ago. However, we already have a plan for how we will proceed with the development of the next version.
-
-As we aim for the release of the next version, given our limited resources, we anticipate it being a long-term plan. Therefore, to ensure we do not lose sight of our developmental direction and to address our users who are anticipating new features, we have written this document.
-
-- ### [V3 Roadmap](https://github.com/orgs/pdfme/projects/6/views/1)
-  - In this version, we will realize a more customizable pdfme to cater to individual user needs. It will be possible to create custom schemas to cater to various needs and designs that better match user sites. We believe that with this version, users will address niche problems and being open source will further make pdfme a special library.
-
-  - [Released on Nov 3, 2023 🎉](https://github.com/pdfme/pdfme/releases/tag/3.0.1)
-
-
-- ### [V4 Roadmap](https://github.com/orgs/pdfme/projects/8/views/1)
-  - In this version, we'll try implementing the table.  
-  To support dynamic data tables, we plan to change from the current method of layering elements over basePdf to a different layout approach.
-
-  - [Developing pdfme V4](/blog/developing-pdfme-v4).
-
-- ### [V5 WIP]
-  - **BC BREAK**: Schema structure changed from keyed object to nested array structure to ensure ordering is guaranteed in JSON.  
 
 ## Need technical support?
 
-If you need technical support, please contact the author via [LinkedIn](https://www.linkedin.com/in/hand-dot/).
+If you need technical support, please contact from [here](https://app.pdfme.com/contact).
 
 ## Become a sponsor to pdfme
 
