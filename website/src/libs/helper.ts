@@ -1,5 +1,6 @@
-import { Template, Font, checkTemplate, getInputFromTemplate } from '@pdfme/common';
+import { Template, Font, getInputFromTemplate } from '@pdfme/common';
 import { examplePdfb64, dogPngb64 } from './sampleData';
+
 export const getSampleTemplate = (): Template => ({
   schemas: [
     [
@@ -91,52 +92,6 @@ export const getSampleTemplate = (): Template => ({
   basePdf: examplePdfb64,
 });
 
-export const downloadJsonFile = (json: any, title: string) => {
-  if (typeof window !== 'undefined') {
-    const blob = new Blob([JSON.stringify(json)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${title}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-};
-
-export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
-    const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && file !== null) {
-        r(e.target.result);
-      }
-    });
-    if (file !== null) {
-      if (type === 'text') {
-        fileReader.readAsText(file);
-      } else if (type === 'dataURL') {
-        fileReader.readAsDataURL(file);
-      } else if (type === 'arrayBuffer') {
-        fileReader.readAsArrayBuffer(file);
-      }
-    }
-  });
-};
-
-export const getTemplateFromJsonFile = (file: File) => {
-  return readFile(file, 'text').then((jsonStr) => {
-    const template: Template = JSON.parse(jsonStr as string);
-    try {
-      checkTemplate(template);
-      return template;
-    } catch (e) {
-      throw e;
-    }
-  });
-};
-
 export const getGeneratorSampleCode = (template: Template) =>
   `import { text, image, barcodes } from "@pdfme/schemas";
 import { generate } from "@pdfme/generator";
@@ -155,38 +110,6 @@ import { generate } from "@pdfme/generator";
   const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   window.open(URL.createObjectURL(blob));
 })();`.trim();
-
-export const getDesignerSampleCode = (template: Template) =>
-  `import { text, image, barcodes } from "@pdfme/schemas";
-import { Designer } from "@pdfme/ui";
-
-const domContainer = document.getElementById('container');
-const template = ${JSON.stringify(template, null, 2)};
-const plugins = { text, image, qrcode: barcodes.qrcode };
-
-const designer = new Designer({ domContainer, template, plugins });`.trim();
-
-export const getFormSampleCode = (template: Template) =>
-  `import { text, image, barcodes } from "@pdfme/schemas";
-import { Form } from "@pdfme/ui";
-
-const domContainer = document.getElementById('container');
-const template = ${JSON.stringify(template, null, 2)};
-const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
-
-const form = new Form({ domContainer, template, plugins, inputs });`.trim();
-
-export const getViewerSampleCode = (template: Template) =>
-  `import { text, image, barcodes } from "@pdfme/schemas";
-import { Viewer } from "@pdfme/ui";
-
-const domContainer = document.getElementById('container');
-const template = ${JSON.stringify(template, null, 2)};
-const plugins = { text, image, qrcode: barcodes.qrcode };
-const inputs = ${JSON.stringify(getInputFromTemplate(template), null, 2)};
-
-const viewer = new Viewer({ domContainer, template, plugins });`.trim();
 
 const fonts = ['Roboto-Regular', 'PinyonScript-Regular'];
 export const getFont = () =>

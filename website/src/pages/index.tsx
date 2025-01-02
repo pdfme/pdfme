@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import HomepageFeatures from '../components/HomepageFeatures';
@@ -108,7 +107,7 @@ export default function Home(): JSX.Element {
               <Divider />
             </div>
 
-            <div className={clsx('col col--6')}>
+            <div className={'col col--6'}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
                 PDF Generation Template
@@ -135,7 +134,7 @@ export default function Home(): JSX.Element {
                 </div>
               </div>
             </div>
-            <div className={clsx('col col--6')}>
+            <div className={'col col--6'}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
                 PDF Generation
@@ -167,7 +166,7 @@ export default function Home(): JSX.Element {
               <Divider />
             </div>
 
-            <div className={clsx('col col--12')}>
+            <div className={'col col--12'}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="designer"></a>
                 Designer
@@ -180,15 +179,15 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={clsx('col col--8')}>
+            <div className={'col col--8'}>
               <div style={{ height: 1000 }} ref={designerRef} />
             </div>
-            <div className={clsx('col col--4')}>
+            <div className={'col col--4'}>
               <div style={{ height: 1000, overflow: 'auto' }}>
                 <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
               </div>
             </div>
-            <div className={clsx('col col--12 margin-vert--lg')}>
+            <div className={'col col--12 margin-vert--lg'}>
               <div className="text--center">
                 <p>It's easy to integrate with an external app.</p>
                 <Link
@@ -203,7 +202,7 @@ export default function Home(): JSX.Element {
               <Divider />
             </div>
 
-            <div className={clsx('col col--4')}>
+            <div className={'col col--4'}>
               <h2>
                 <a aria-hidden="true" className="anchor enhancedAnchor" id="form-viewer"></a>
                 Form / Viewer
@@ -264,7 +263,7 @@ export default function Home(): JSX.Element {
               </div>
             </div>
 
-            <div className={clsx('col col--8')}>
+            <div className={'col col--8'}>
               <ul className="tabs">
                 <li
                   onClick={() => setMode('form')}
@@ -295,7 +294,7 @@ export default function Home(): JSX.Element {
         <div className="col col--12 margin-vert--lg text--center">
           <Divider />
         </div>
-        <div className={clsx('col col--12 margin-vert--lg')}>
+        <div className={'col col--12 margin-vert--lg'}>
           <div className="text--center">
             <p>
               Let's check out applications that you can make with pdfme and how it works by actually
