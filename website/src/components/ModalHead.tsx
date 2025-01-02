@@ -1,5 +1,5 @@
 import React from 'react';
-import { CloseOutlined } from '@mui/icons-material';
+import { X } from 'lucide-react';
 
 const ModalHead = ({ title, descriptionElem, handleClose }: { title: string; descriptionElem?: React.ReactElement; handleClose: () => void }) => (
   <>
@@ -17,7 +17,7 @@ const ModalHead = ({ title, descriptionElem, handleClose }: { title: string; des
         className="button button--sm button--link"
         onClick={handleClose}
       >
-        <CloseOutlined fontSize="small" />
+        <X />
       </button>
     </div>
     <div>

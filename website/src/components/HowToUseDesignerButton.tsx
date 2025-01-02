@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
-import { HelpOutline, ChangeCircleOutlined } from '@mui/icons-material';
+import { CircleHelp, RefreshCcw } from 'lucide-react';
 import Link from '@docusaurus/Link';
 import ModalHead from './ModalHead';
 import Divider from './Divider';
@@ -30,7 +30,7 @@ const HowToUseDesignerButton = () => {
         className="button button--sm button--outline button--primary"
         onClick={handleOpen}
       >
-        <HelpOutline fontSize="small" style={{ marginRight: '0.25rem' }} />
+        <CircleHelp size={20} style={{ marginRight: '0.25rem' }} />
         How to use
       </button>
       <Modal open={open} onClose={handleClose}>
@@ -62,7 +62,7 @@ const HowToUseDesignerButton = () => {
                 style={{ display: 'inline-flex', alignItems: 'center' }}
                 className="button button--sm button--outline button--success"
               >
-                <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                <RefreshCcw size={20} style={{ marginRight: '0.25rem' }} />
                 Change BasePDF
               </label>{' '}
               to change the background PDF, and click{' '}

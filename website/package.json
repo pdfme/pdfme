@@ -21,7 +21,6 @@
     "@docusaurus/plugin-google-gtag": "^3.6.3",
     "@docusaurus/preset-classic": "^3.6.3",
     "@handsontable/react": "^12.0.1",
-    "@mui/icons-material": "^5.3.0",
     "@mui/material": "^5.3.0",
     "@pdfme/common": "file:../packages/common/dist",
     "@pdfme/generator": "file:../packages/generator/dist",
@@ -29,11 +28,11 @@
     "@pdfme/ui": "file:../packages/ui/dist",
     "clsx": "^1.1.1",
     "handsontable": "^12.0.1",
+    "lucide-react": "^0.469.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-github-btn": "^1.2.1",
-    "sass": "^1.47.0"
+    "react-github-btn": "^1.2.1"
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "^2.0.3",

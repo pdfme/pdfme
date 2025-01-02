@@ -2,14 +2,13 @@ import React from 'react';
 import TOC from '@theme-original/TOC';
 import type TOCType from '@theme/TOC';
 import type { WrapperProps } from '@docusaurus/types';
-import { FlashOn, SupportAgent, SvgIconComponent } from '@mui/icons-material';
-
+import { Zap, LifeBuoy } from 'lucide-react';
 type BannerProps = {
   title: string;
   subtitle: string;
   href: string;
   gradient: string; // 'linear-gradient(45deg, ... )'
-  Icon: SvgIconComponent;
+  Icon: any;
 };
 
 function Banner({ title, subtitle, href, gradient, Icon }: BannerProps) {
@@ -103,7 +102,7 @@ export function SidebarBannerCloud() {
       subtitle="No setup needed. Create PDFs in seconds with pdfme Cloud!"
       href="https://app.pdfme.com"
       gradient="linear-gradient(45deg, rgb(37, 194, 160), rgb(32, 166, 137))"
-      Icon={FlashOn}
+      Icon={Zap}
     />
   );
 }
@@ -115,7 +114,7 @@ export function SidebarBannerSupport() {
       subtitle="Need advanced solutions or professional guidance? Our pdfme experts are here to help."
       href="https://app.pdfme.com/contact"
       gradient="linear-gradient(45deg, rgb(113, 37, 194), rgb(32, 70, 166))"
-      Icon={SupportAgent}
+      Icon={LifeBuoy}
     />
   );
 }

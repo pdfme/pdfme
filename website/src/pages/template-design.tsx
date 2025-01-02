@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  ChangeCircleOutlined,
-  UploadFileOutlined,
-  FileDownloadOutlined,
-  CodeOutlined,
-  PreviewOutlined,
-} from '@mui/icons-material';
+  RefreshCcw,
+  FileUp,
+  FileDown,
+  Code,
+  Eye,
+} from 'lucide-react';
 import type { Template } from '@pdfme/common';
 import { cloneDeep, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
@@ -133,7 +133,7 @@ ${e}`);
             <ul className="dropdown__menu">
               <li>
                 <label style={{ display: 'flex', alignItems: 'center' }} className="dropdown__link">
-                  <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  <RefreshCcw size={20} style={{ marginRight: '0.25rem' }} />
                   Change BasePDF
                   <input
                     style={{ display: 'none' }}
@@ -152,7 +152,7 @@ ${e}`);
               </li>
               <li>
                 <label style={{ display: 'flex', alignItems: 'center' }} className="dropdown__link">
-                  <UploadFileOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  <FileUp size={20} style={{ marginRight: '0.25rem' }} />
                   Load Template
                   <input
                     style={{ display: 'none' }}
@@ -175,7 +175,7 @@ ${e}`);
                   onClick={downloadTemplate}
                   className="dropdown__link"
                 >
-                  <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  <FileDown size={20} style={{ marginRight: '0.25rem' }} />
                   Download Template
                 </div>
               </li>
@@ -185,7 +185,7 @@ ${e}`);
                   onClick={handleCodeModalOpen}
                   className="dropdown__link"
                 >
-                  <CodeOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  <Code size={20} style={{ marginRight: '0.25rem' }} />
                   Get Code
                 </div>
               </li>
@@ -195,7 +195,7 @@ ${e}`);
                   onClick={generatePdf}
                   className="dropdown__link"
                 >
-                  <PreviewOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+                  <Eye size={20} style={{ marginRight: '0.25rem' }} />
                   Preview PDF
                 </div>
               </li>
@@ -207,7 +207,7 @@ ${e}`);
               style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
               className="button button--sm button--outline button--success"
             >
-              <ChangeCircleOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              <RefreshCcw size={20} style={{ marginRight: '0.25rem' }} />
               Change BasePDF
               <input
                 style={{ display: 'none' }}
@@ -228,7 +228,7 @@ ${e}`);
               style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
               className="button button--sm button--outline button--info"
             >
-              <UploadFileOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              <FileUp size={20} style={{ marginRight: '0.25rem' }} />
               Load Template
               <input
                 style={{ display: 'none' }}
@@ -250,25 +250,23 @@ ${e}`);
               onClick={downloadTemplate}
               className="button button--sm button--outline button--warning"
             >
-              <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              <FileDown size={20} style={{ marginRight: '0.25rem' }} />
               Download Template
             </button>
-            <div style={{ marginRight: '1rem' }}>
-              <button
-                style={{ display: 'flex', alignItems: 'center' }}
-                className="button button--sm button--outline button--danger"
-                onClick={handleCodeModalOpen}
-              >
-                <CodeOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-                Get Code
-              </button>
-            </div>
+            <button
+              style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}
+              className="button button--sm button--outline button--danger"
+              onClick={handleCodeModalOpen}
+            >
+              <Code size={20} style={{ marginRight: '0.25rem' }} />
+              Get Code
+            </button>
             <button
               style={{ display: 'flex', alignItems: 'center' }}
               onClick={generatePdf}
               className="button button--sm button--outline button--secondary"
             >
-              <PreviewOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
+              <Eye size={20} style={{ marginRight: '0.25rem' }} />
               Preview PDF
             </button>
           </div>

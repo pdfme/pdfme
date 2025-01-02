@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import { FileDownloadOutlined } from '@mui/icons-material';
 import styles from './DemoApp.module.css';
 
 type Props = {
@@ -27,10 +26,7 @@ const DemoAppFormHeader = (props: Props) => {
             </span>
             and click the
             <button disabled className="button margin-horiz--sm button--success">
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-                <span>Download</span>
-              </div>
+              PDF Download
             </button>
             button.
           </p>
@@ -44,10 +40,7 @@ const DemoAppFormHeader = (props: Props) => {
           </button>
           <span className="margin-horiz--md">/</span>
           <button onClick={downloadPdf} className="button button--success">
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <FileDownloadOutlined fontSize="small" style={{ marginRight: '0.25rem' }} />
-              <span>Download</span>
-            </div>
+            PDF Download
           </button>
         </div>
       </div>
