@@ -6,7 +6,7 @@
 
 <h4 align="center">
   <a href="https://pdfme.com/">Website</a> |
-  <a href="https://app.pdfme.com/">pdfme Cloud</a> |
+  <a href="https://app.pdfme.com?utm_source=github&utm_content=readme-top">pdfme Cloud</a> |
   <a href="https://discord.gg/xWPTJbmgNV">Discord</a>
 </h4>
 
@@ -47,7 +47,7 @@ If you are looking for code examples using pdfme to get started, please check ou
 
 While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
 
-**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com/)**
+**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com?utm_source=github&utm_content=readme-cloud)**
 
 pdfme Cloud provides all the features of the open-source library, plus:
 
