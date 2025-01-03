@@ -9,8 +9,9 @@ import {
   getPlugins,
   isJsonString,
 } from "./helper";
-
-const headerHeight = 71;
+import { Disclosure } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { NavItem, NavBar } from "./NavBar";
 
 type Mode = "form" | "viewer";
 
@@ -32,7 +33,7 @@ const initTemplate = () => {
   return template;
 };
 
-function App() {
+function FormAndViewerApp() {
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
   const [prevUiRef, setPrevUiRef] = useState<Form | Viewer | null>(null);
@@ -129,35 +130,92 @@ function App() {
     setPrevUiRef(uiRef);
   }
 
-  return (
-    <div>
-      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: '0 1rem', fontSize: 'small' }}>
-        <strong>Form, Viewer</strong>
-        <span style={{ margin: "0 1rem" }}>:</span>
-        <div>
-          <input type="radio" onChange={onChangeMode} id="form" value="form" checked={mode === "form"} />
-          <label htmlFor="form">Form</label>
-          <input type="radio" onChange={onChangeMode} id="viewer" value="viewer" checked={mode === "viewer"} />
-          <label htmlFor="viewer">Viewer</label>
+  const navItems: NavItem[] = [
+    {
+      label: "Mode",
+      content: (
+        <div className="mt-2">
+          <input
+            type="radio"
+            id="form"
+            value="form"
+            checked={mode === "form"}
+            onChange={onChangeMode}
+          />
+          <label htmlFor="form" className="mr-2"> Form </label>
+          <input
+            type="radio"
+            id="viewer"
+            value="viewer"
+            checked={mode === "viewer"}
+            onChange={onChangeMode}
+          />
+          <label htmlFor="viewer"> Viewer </label>
         </div>
-        <label style={{ width: 180 }}>
-          Load Template
-          <input type="file" accept="application/json" onChange={(e) => handleLoadTemplate(e, ui.current)} />
-        </label>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onGetInputs}>Get Inputs</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onSetInputs}>Set Inputs</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onSaveInputs}>Save Inputs</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onResetInputs}>Reset Inputs</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={() => generatePDF(ui.current)}>Generate PDF</button>
-      </header>
-      <div ref={uiRef} style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }} />
+      ),
+    },
+    {
+      label: "Load Template",
+      content: (
+        <input
+          type="file"
+          accept="application/json"
+          onChange={(e) => handleLoadTemplate(e, ui.current)}
+          className="w-full text-sm border"
+        />
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button className="px-2 py-1 border" onClick={onGetInputs}>
+          Get Inputs
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button className="px-2 py-1 border" onClick={onSetInputs}>
+          Set Inputs
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button className="px-2 py-1 border" onClick={onSaveInputs}>
+          Save Inputs
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button className="px-2 py-1 border" onClick={onResetInputs}>
+          Reset Inputs
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border"
+          onClick={() => generatePDF(ui.current)}
+        >
+          Generate PDF
+        </button>
+      ),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <NavBar items={navItems} />
+      <div ref={uiRef} className="flex-1 w-full" />
     </div>
   );
 }
 
-export default App;
+export default FormAndViewerApp;

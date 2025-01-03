@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 import Designer from "./Designer";
 import FormAndViewer from "./FormAndViewer";
-import Navigation from "./Navigation";
+import Header from "./Header";
 
 
 const container = document.getElementById('root')!;
@@ -12,7 +12,7 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Navigation />
+      <Header />
       <Routes>
         <Route path="/" element={<Designer />}></Route>
         <Route path="/form-viewer" element={<FormAndViewer />}></Route>

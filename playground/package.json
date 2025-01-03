@@ -12,6 +12,8 @@
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\""
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@pdfme/common": "file:../packages/common/dist",
     "@pdfme/generator": "file:../packages/generator/dist",
     "@pdfme/schemas": "file:../packages/schemas/dist",
