@@ -100,7 +100,7 @@ export function SidebarBannerCloud() {
     <Banner
       title="Try pdfme Cloud"
       subtitle="No setup needed. Create PDFs in seconds with pdfme Cloud!"
-      href="https://app.pdfme.com"
+      href="https://app.pdfme.com?utm_source=website&utm_content=banner-cloud"
       gradient="linear-gradient(45deg, rgb(37, 194, 160), rgb(32, 166, 137))"
       Icon={Zap}
     />
@@ -112,7 +112,7 @@ export function SidebarBannerSupport() {
     <Banner
       title="Technical Support & Consulting"
       subtitle="Need advanced solutions or professional guidance? Our pdfme experts are here to help."
-      href="https://app.pdfme.com/contact"
+      href="https://app.pdfme.com/contact?utm_source=website&utm_content=banner-support"
       gradient="linear-gradient(45deg, rgb(113, 37, 194), rgb(32, 70, 166))"
       Icon={LifeBuoy}
     />

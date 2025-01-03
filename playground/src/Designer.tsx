@@ -207,7 +207,7 @@ function DesignerApp() {
           className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={() => onSaveTemplate()}
         >
-          Save Template Local
+          Save Template
         </button>
       ),
     },

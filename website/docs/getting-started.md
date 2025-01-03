@@ -346,7 +346,7 @@ We look forward to your contribution!
 
 While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
 
-**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com/)**
+**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com?utm_source=website&utm_content=getting-started)**
 
 pdfme Cloud provides all the features of the open-source library, plus:
 

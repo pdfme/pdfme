@@ -41,7 +41,7 @@ const faqList = [
     answer: (
       <p>
         If you need technical support, please contact from {' '}
-        <a target="_blank" rel="noopener noreferrer" href={'https://app.pdfme.com/contact'}>
+        <a target="_blank" rel="noopener noreferrer" href={'https://app.pdfme.com/contact?utm_source=website&utm_content=demo-app'}>
           here
         </a>
         .
