@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_pdfme_website=self.webpackChunk_pdfme_website||[]).push([[9647],{7121:(e,s,r)=>{r.r(s),r.d(s,{default:()=>p});r(96540);var t=r(18215),u=r(45500),a=r(17559),c=r(22831),d=r(41957),n=r(74848);function p(e){return(0,n.jsx)(u.e3,{className:(0,t.A)(a.G.wrapper.docsPages),children:(0,n.jsx)(d.A,{children:(0,c.v)(e.route.routes)})})}}}]);
