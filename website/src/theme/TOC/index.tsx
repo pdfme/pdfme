@@ -2,14 +2,13 @@ import React from 'react';
 import TOC from '@theme-original/TOC';
 import type TOCType from '@theme/TOC';
 import type { WrapperProps } from '@docusaurus/types';
-import { FlashOn, SupportAgent, SvgIconComponent } from '@mui/icons-material';
-
+import { Zap, LifeBuoy } from 'lucide-react';
 type BannerProps = {
   title: string;
   subtitle: string;
   href: string;
   gradient: string; // 'linear-gradient(45deg, ... )'
-  Icon: SvgIconComponent;
+  Icon: any;
 };
 
 function Banner({ title, subtitle, href, gradient, Icon }: BannerProps) {
@@ -101,9 +100,9 @@ export function SidebarBannerCloud() {
     <Banner
       title="Try pdfme Cloud"
       subtitle="No setup needed. Create PDFs in seconds with pdfme Cloud!"
-      href="https://app.pdfme.com"
+      href="https://app.pdfme.com?utm_source=website&utm_content=banner-cloud"
       gradient="linear-gradient(45deg, rgb(37, 194, 160), rgb(32, 166, 137))"
-      Icon={FlashOn}
+      Icon={Zap}
     />
   );
 }
@@ -113,9 +112,9 @@ export function SidebarBannerSupport() {
     <Banner
       title="Technical Support & Consulting"
       subtitle="Need advanced solutions or professional guidance? Our pdfme experts are here to help."
-      href="https://app.pdfme.com/contact"
+      href="https://app.pdfme.com/contact?utm_source=website&utm_content=banner-support"
       gradient="linear-gradient(45deg, rgb(113, 37, 194), rgb(32, 70, 166))"
-      Icon={SupportAgent}
+      Icon={LifeBuoy}
     />
   );
 }
@@ -124,7 +123,6 @@ export function SidebarBannerSupport() {
 type Props = WrapperProps<typeof TOCType>;
 
 export default function TOCWrapper(props: Props): JSX.Element {
-  console.log(props)
   return (
     <div style={{ position: 'sticky', top: 76 }}>
       <TOC {...props} />

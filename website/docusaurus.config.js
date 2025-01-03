@@ -27,11 +27,6 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/pdfme/pdfme/tree/main/website/',
         },
-        blog: {
-          postsPerPage: 'ALL',
-          blogSidebarTitle: 'All posts',
-          blogSidebarCount: 'ALL',
-        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -121,11 +116,6 @@ const config = {
           label: 'Template Design',
         },
         {
-          to: '/blog',
-          label: 'Blog',
-          position: 'right'
-        },
-        {
           href: 'https://playground.pdfme.com/',
           label: 'Playground',
           position: 'right',
@@ -141,7 +131,7 @@ const config = {
           position: 'right',
         },
         {
-          href: 'https://app.pdfme.com',
+          href: 'https://app.pdfme.com?utm_source=website&utm_content=navbar',
           label: 'Try pdfme Cloud',
           position: 'right',
         }
@@ -175,12 +165,8 @@ const config = {
               to: '/template-design',
             },
             {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
               label: 'Try pdfme Cloud',
-              href: 'https://app.pdfme.com',
+              href: 'https://app.pdfme.com?utm_source=website&utm_content=footer',
             }
           ],
         },

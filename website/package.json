@@ -12,39 +12,36 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "knip": "knip"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.4.0",
-    "@docusaurus/module-type-aliases": "^3.4.0",
-    "@docusaurus/plugin-client-redirects": "^3.4.0",
-    "@docusaurus/plugin-google-gtag": "^3.4.0",
-    "@docusaurus/preset-classic": "^3.4.0",
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
+    "@docusaurus/core": "^3.6.3",
+    "@docusaurus/module-type-aliases": "^3.6.3",
+    "@docusaurus/plugin-client-redirects": "^3.6.3",
+    "@docusaurus/plugin-google-gtag": "^3.6.3",
+    "@docusaurus/preset-classic": "^3.6.3",
     "@handsontable/react": "^12.0.1",
-    "@mdx-js/react": "^3.0.0",
-    "@mui/icons-material": "^5.3.0",
-    "@mui/material": "^5.3.0",
     "@pdfme/common": "file:../packages/common/dist",
     "@pdfme/generator": "file:../packages/generator/dist",
     "@pdfme/schemas": "file:../packages/schemas/dist",
     "@pdfme/ui": "file:../packages/ui/dist",
     "clsx": "^1.1.1",
     "handsontable": "^12.0.1",
+    "lucide-react": "^0.469.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-github-btn": "^1.2.1",
-    "react-share": "^4.4.0",
-    "sass": "^1.47.0"
+    "react-github-btn": "^1.2.1"
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "^2.0.3",
+    "@types/node": "^22.10.3",
     "atob": "^2.1.2",
     "buffer": "^6.0.3",
+    "knip": "^5.41.1",
     "path-browserify": "^1.0.1",
-    "typescript": "^4.5.4"
+    "typescript": "^5.7.2"
   },
   "browserslist": {
     "production": [

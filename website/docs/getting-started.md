@@ -202,7 +202,7 @@ If you need a schema type that isn’t built-in, you can define your own. Check 
 
 The PDF generator function, `generate`, takes 2 arguments of `template` and `inputs` for generate a PDF. It works both in Node.js and in the browser.
 
-The code to generate a PDF file using the [template created above](/docs/getting-started#sample-template) is shown below.
+The code to generate a PDF file using the [template created above](/docs/getting-started#minimal-template) is shown below.
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -346,7 +346,7 @@ We look forward to your contribution!
 
 While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
 
-**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com/)**
+**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com?utm_source=website&utm_content=getting-started)**
 
 pdfme Cloud provides all the features of the open-source library, plus:
 

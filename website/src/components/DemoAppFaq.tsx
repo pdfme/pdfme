@@ -40,9 +40,9 @@ const faqList = [
     question: 'Need technical support',
     answer: (
       <p>
-        If you need technical support, please contact the author via{' '}
-        <a target="_blank" rel="noopener noreferrer" href={'https://www.linkedin.com/in/hand-dot/'}>
-          LinkedIn
+        If you need technical support, please contact from {' '}
+        <a target="_blank" rel="noopener noreferrer" href={'https://app.pdfme.com/contact?utm_source=website&utm_content=demo-app'}>
+          here
         </a>
         .
       </p>

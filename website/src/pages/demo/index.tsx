@@ -1,7 +1,6 @@
 import React from 'react';
 import Head from '@docusaurus/Head';
 import Link from '@docusaurus/Link';
-import clsx from 'clsx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import DemoAppCard from '../../components/DemoAppCard';
@@ -100,10 +99,10 @@ const Demo = () => (
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
-            <div className={clsx('col col--12 margin-vert--lg')}>
+            <div className={'col col--12 margin-vert--lg'}>
               <div className="text--center">
                 <p>
-                Let's see how to use pdfme. Let's check the document!
+                  Let's see how to use pdfme. Let's check the document!
                 </p>
                 <Link className="button button--primary button--lg" to="/docs/getting-started">
                   Check the document

@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import styles from './HomepageFeatures.module.css';
 
 type FeatureItem = {
@@ -12,7 +11,7 @@ const FeatureList: FeatureItem[] = [
     title: 'High-Speed PDF Generation',
     description: (
       <>
-        Streamlined PDF generation process with no complex operations required. Use your preferred template 
+        Streamlined PDF generation process with no complex operations required. Use your preferred template
         to generate all the PDFs you need. Our PDF generation solution works seamlessly on both Node.js and in the browser.
       </>
     ),
@@ -31,7 +30,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({ title, description }: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={'col col--4'}>
       <div className="padding-horiz--md">
         <h3>{title}</h3>
         <p>{description}</p>
@@ -45,7 +44,7 @@ export default function HomepageFeatures(): JSX.Element {
     <section className={styles.features}>
       <div className="container">
         <div className="row">
-          <div className={clsx('col col--12')}>
+          <div className={'col col--12'}>
             <h2>
               <a aria-hidden="true" className="anchor enhancedAnchor" id="features"></a>
               PDF Generation Features

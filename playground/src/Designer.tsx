@@ -12,23 +12,26 @@ import {
   downloadJsonFile,
   translations,
 } from "./helper";
+import { NavBar, NavItem } from "./NavBar";
 
-const headerHeight = 80;
-
-const initialTemplatePresetKey = "invoice"
+const initialTemplatePresetKey = "invoice";
 const customTemplatePresetKey = "custom";
 
 const templatePresets = getTemplatePresets();
 
-function App() {
+function DesignerApp() {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
-  const [lang, setLang] = useState<Lang>('en');
-  const [templatePreset, setTemplatePreset] = useState<string>(localStorage.getItem("templatePreset") || initialTemplatePresetKey);
+  const [lang, setLang] = useState<Lang>("en");
+  const [templatePreset, setTemplatePreset] = useState<string>(
+    localStorage.getItem("templatePreset") || initialTemplatePresetKey
+  );
   const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
   const buildDesigner = () => {
-    let template: Template = getTemplateByPreset(localStorage.getItem('templatePreset') || "");
+    let template: Template = getTemplateByPreset(
+      localStorage.getItem("templatePreset") || ""
+    );
     try {
       const templateString = localStorage.getItem("template");
       if (templateString) {
@@ -37,7 +40,7 @@ function App() {
 
       const templateJson = templateString
         ? JSON.parse(templateString)
-        : getTemplateByPreset(localStorage.getItem('templatePreset') || "");
+        : getTemplateByPreset(localStorage.getItem("templatePreset") || "");
       checkTemplate(templateJson);
       template = templateJson as Template;
     } catch {
@@ -53,15 +56,16 @@ function App() {
             font,
             lang,
             labels: {
-              'clear': '🗑️', // Add custom labels to consume them in your own plugins
+              clear: "🗑️",
             },
             theme: {
               token: {
-                colorPrimary: '#25c2a0',
+                colorPrimary: "#25c2a0",
               },
             },
             icons: {
-              multiVariableText: '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>'
+              multiVariableText:
+                '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>',
             },
           },
           plugins: getPlugins(),
@@ -69,10 +73,10 @@ function App() {
         designer.current.onSaveTemplate(onSaveTemplate);
         designer.current.onChangeTemplate(() => {
           setTemplatePreset(customTemplatePresetKey);
-        })
+        });
       }
     });
-  }
+  };
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target && e.target.files) {
@@ -95,7 +99,7 @@ function App() {
     }
   };
 
-  const onSaveTemplate = (template?: Template) => {
+  const onSaveTemplate = (template?: Template | undefined) => {
     if (designer.current) {
       localStorage.setItem(
         "template",
@@ -107,13 +111,18 @@ function App() {
 
   const onChangeTemplatePresets = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTemplatePreset(e.target.value);
-    localStorage.setItem("template", JSON.stringify(getTemplateByPreset(localStorage.getItem('templatePreset') || "")));
+    localStorage.setItem(
+      "template",
+      JSON.stringify(
+        getTemplateByPreset(localStorage.getItem("templatePreset") || "")
+      )
+    );
     localStorage.removeItem("template");
     localStorage.setItem("templatePreset", e.target.value);
     buildDesigner();
-  }
+  };
 
-  if (designerRef != prevDesignerRef) {
+  if (designerRef !== prevDesignerRef) {
     if (prevDesignerRef && designer.current) {
       designer.current.destroy();
     }
@@ -121,60 +130,106 @@ function App() {
     setPrevDesignerRef(designerRef);
   }
 
+  const navItems: NavItem[] = [
+    {
+      label: "Template Preset",
+      content: (
+        <select
+          className="w-full border rounded px-2 py-1"
+          onChange={onChangeTemplatePresets}
+          value={templatePreset}
+        >
+          {templatePresets.map((preset) => (
+            <option key={preset.key} value={preset.key}>
+              {preset.label}
+            </option>
+          ))}
+        </select>
+      ),
+    },
+    {
+      label: "Lang",
+      content: (
+        <select
+          className="w-full border rounded px-2 py-1"
+          onChange={(e) => {
+            setLang(e.target.value as Lang);
+            designer.current?.updateOptions({ lang: e.target.value as Lang });
+          }}
+          value={lang}
+        >
+          {translations.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      ),
+    },
+
+    {
+      label: "Change BasePDF",
+      content: (
+        <input
+          type="file"
+          accept="application/pdf"
+          className="w-full text-sm border"
+          onChange={onChangeBasePDF}
+        />
+      ),
+    },
+    {
+      label: "Load Template",
+      content: (
+        <input
+          type="file"
+          accept="application/json"
+          className="w-full text-sm border"
+          onChange={(e) => handleLoadTemplate(e, designer.current)}
+        />
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border rounded hover:bg-gray-100"
+          onClick={onDownloadTemplate}
+        >
+          Download Template
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border rounded hover:bg-gray-100"
+          onClick={() => onSaveTemplate()}
+        >
+          Save Template
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border rounded hover:bg-gray-100"
+          onClick={() => generatePDF(designer.current)}
+        >
+          Generate PDF
+        </button>
+      ),
+    },
+  ];
+
   return (
-    <div>
-      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: '0 1rem', fontSize: 'small' }}>
-        <strong>Designer</strong>
-        <span style={{ margin: "0 1rem" }}>:</span>
-        <label>
-          Template Preset:{" "}
-          <select onChange={onChangeTemplatePresets} value={templatePreset}>
-            {templatePresets.map((preset) => (
-              <option key={preset.key}
-                disabled={preset.key === customTemplatePresetKey}
-                value={preset.key}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <label>
-          Lang:{" "}
-          <select onChange={(e) => {
-            setLang(e.target.value as Lang)
-            if (designer.current) {
-              designer.current.updateOptions({ lang: e.target.value as Lang })
-            }
-          }} value={lang}>
-            {translations.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
-            ))}
-          </select>
-        </label>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <label style={{ width: 180 }}>
-          Change BasePDF
-          <input type="file" accept="application/pdf" onChange={onChangeBasePDF} />
-        </label>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <label style={{ width: 180 }}>
-          Load Template
-          <input type="file" accept="application/json" onChange={(e) => {
-            handleLoadTemplate(e, designer.current);
-            setTemplatePreset(customTemplatePresetKey);
-          }} />
-        </label>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={onDownloadTemplate}>Download Template</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={() => onSaveTemplate()}>Save Template</button>
-        <span style={{ margin: "0 1rem" }}>/</span>
-        <button onClick={() => generatePDF(designer.current)}>Generate PDF</button>
-      </header>
-      <div ref={designerRef} style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }} />
+    <div className="min-h-screen flex flex-col">
+      <NavBar items={navItems} />
+      <div ref={designerRef} className="flex-1 w-full" />
     </div>
   );
 }
 
-export default App;
+export default DesignerApp;
