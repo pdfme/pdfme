@@ -9,8 +9,6 @@ import {
   getPlugins,
   isJsonString,
 } from "./helper";
-import { Disclosure } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { NavItem, NavBar } from "./NavBar";
 
 type Mode = "form" | "viewer";
@@ -211,10 +209,10 @@ function FormAndViewerApp() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <NavBar items={navItems} />
       <div ref={uiRef} className="flex-1 w-full" />
-    </div>
+    </>
   );
 }
 

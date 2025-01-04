@@ -225,10 +225,10 @@ function DesignerApp() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <NavBar items={navItems} />
       <div ref={designerRef} className="flex-1 w-full" />
-    </div>
+    </>
   );
 }
 
