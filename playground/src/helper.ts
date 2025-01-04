@@ -27,34 +27,17 @@ import {
 } from '@pdfme/schemas';
 import plugins from './plugins';
 
-const fontObjList = [
-  {
-    fallback: true,
-    label: 'NotoSerifJP-Regular',
-    url: '/fonts/NotoSerifJP-Regular.otf',
-  },
-  {
+export const getFontsData = (): Font => ({
+  ...getDefaultFont(),
+  NotoSerifJP: {
     fallback: false,
-    label: 'NotoSansJP-Regular',
-    url: '/fonts/NotoSansJP-Regular.otf',
+    data: 'https://fonts.gstatic.com/s/notoserifjp/v30/xn71YHs72GKoTvER4Gn3b5eMRtWGkp6o7MjQ2bwxOubAILO5wBCU.ttf',
   },
-  {
+  NotoSansJP: {
     fallback: false,
-    label: DEFAULT_FONT_NAME,
-    data: getDefaultFont()[DEFAULT_FONT_NAME].data,
+    data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
   },
-];
-
-export const getFontsData = async () => {
-  const fontDataList = (await Promise.all(
-    fontObjList.map(async (font) => ({
-      ...font,
-      data: font.data || (await fetch(font.url || '').then((res) => res.arrayBuffer())),
-    }))
-  )) as { fallback: boolean; label: string; data: ArrayBuffer }[];
-
-  return fontDataList.reduce((acc, font) => ({ ...acc, [font.label]: font }), {} as Font);
-};
+});
 
 export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
   return new Promise<string | ArrayBuffer>((r) => {
@@ -216,7 +199,7 @@ const getCertificateTemplate = (): Template => ({
         opacity: 1,
         fontSize: 36,
         fontColor: '#14b351',
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       photo: {
         type: 'image',
@@ -243,7 +226,7 @@ const getCertificateTemplate = (): Template => ({
         rotate: 0,
         opacity: 1,
         fontSize: 12,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       sex: {
         type: 'text',
@@ -257,7 +240,7 @@ const getCertificateTemplate = (): Template => ({
         rotate: 0,
         opacity: 1,
         fontSize: 12,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       weight: {
         type: 'text',
@@ -271,7 +254,7 @@ const getCertificateTemplate = (): Template => ({
         rotate: 0,
         opacity: 1,
         fontSize: 12,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       breed: {
         type: 'text',
@@ -285,7 +268,7 @@ const getCertificateTemplate = (): Template => ({
         rotate: 0,
         opacity: 1,
         fontSize: 12,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       owner: {
         type: 'qrcode',
@@ -342,7 +325,7 @@ const getInvoiceTemplate = (): Template => ({
         width: 69.87,
         height: 22.68,
         rotate: 0,
-        alignment: 'left',
+        alignment: 'right',
         verticalAlignment: 'middle',
         fontSize: 40,
         lineHeight: 1,
@@ -351,7 +334,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'head',
       },
       {
@@ -373,7 +356,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'billedToLabel',
       },
       {
@@ -399,7 +382,7 @@ const getInvoiceTemplate = (): Template => ({
           max: 13,
           fit: 'vertical',
         },
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'billedToInput',
       },
       {
@@ -424,7 +407,7 @@ const getInvoiceTemplate = (): Template => ({
         underline: false,
         text: 'Invoice No.{InvoiceNo}\n{Date}',
         variables: ['InvoiceNo', 'Date'],
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'info',
       },
       {
@@ -442,13 +425,13 @@ const getInvoiceTemplate = (): Template => ({
         headWidthPercentages: [
           49.538325694806396, 17.962830593295262, 19.26354959425127, 13.23529411764708,
         ],
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         tableStyles: {
           borderWidth: 0,
           borderColor: '#000000',
         },
         headStyles: {
-          fontName: 'NotoSerifJP-Regular',
+          fontName: '',
           fontSize: 13,
           characterSpacing: 0,
           alignment: 'center',
@@ -471,7 +454,7 @@ const getInvoiceTemplate = (): Template => ({
           },
         },
         bodyStyles: {
-          fontName: 'NotoSerifJP-Regular',
+          fontName: '',
           fontSize: 13,
           characterSpacing: 0,
           alignment: 'center',
@@ -522,7 +505,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'subtotalLabel',
       },
       {
@@ -555,7 +538,7 @@ const getInvoiceTemplate = (): Template => ({
           max: 13,
           fit: 'vertical',
         },
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
       },
       {
         type: 'line',
@@ -591,7 +574,7 @@ const getInvoiceTemplate = (): Template => ({
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'subtotal',
         readOnly: true,
         required: false,
@@ -619,7 +602,7 @@ const getInvoiceTemplate = (): Template => ({
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'tax',
         readOnly: true,
         required: false,
@@ -645,7 +628,7 @@ const getInvoiceTemplate = (): Template => ({
         lineHeight: 1,
         characterSpacing: 0,
         fontColor: '#000000',
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
@@ -669,7 +652,7 @@ const getInvoiceTemplate = (): Template => ({
         fontColor: '#000000',
         backgroundColor: '',
         opacity: 1,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'total',
         readOnly: true,
         required: false,
@@ -695,7 +678,7 @@ const getInvoiceTemplate = (): Template => ({
         lineHeight: 1,
         characterSpacing: 0,
         fontColor: '#000000',
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
@@ -720,7 +703,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'paymentInfoLabel',
       },
       {
@@ -747,7 +730,7 @@ const getInvoiceTemplate = (): Template => ({
           max: 13,
           fit: 'vertical',
         },
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'paymentInfoInput',
       },
       {
@@ -769,7 +752,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'shopName',
       },
       {
@@ -791,7 +774,7 @@ const getInvoiceTemplate = (): Template => ({
         backgroundColor: '',
         opacity: 1,
         readOnly: true,
-        fontName: 'NotoSerifJP-Regular',
+        fontName: '',
         name: 'shopAddress',
       },
     ],

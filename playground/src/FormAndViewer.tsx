@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
@@ -12,7 +12,6 @@ import {
 import { NavItem, NavBar } from "./NavBar";
 
 type Mode = "form" | "viewer";
-
 
 
 const initTemplate = () => {
@@ -34,14 +33,12 @@ const initTemplate = () => {
 function FormAndViewerApp() {
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
-  const [prevUiRef, setPrevUiRef] = useState<Form | Viewer | null>(null);
-
 
   const [mode, setMode] = useState<Mode>(
     (localStorage.getItem("mode") as Mode) ?? "form"
   );
 
-  const buildUi = (mode: Mode) => {
+  const buildUi = useCallback((mode: Mode) => {
     const template = initTemplate();
     let inputs = getInputFromTemplate(template);
     try {
@@ -54,27 +51,25 @@ function FormAndViewerApp() {
       localStorage.removeItem("inputs");
     }
 
-    getFontsData().then((font) => {
-      if (uiRef.current) {
-        ui.current = new (mode === "form" ? Form : Viewer)({
-          domContainer: uiRef.current,
-          template,
-          inputs,
-          options: {
-            font,
-            lang: 'ja',
-            labels: { 'clear': '消去' },
-            theme: {
-              token: {
-                colorPrimary: '#25c2a0',
-              },
+    if (uiRef.current) {
+      ui.current = new (mode === "form" ? Form : Viewer)({
+        domContainer: uiRef.current,
+        template,
+        inputs,
+        options: {
+          font: getFontsData(),
+          lang: 'ja',
+          labels: { 'clear': '消去' },
+          theme: {
+            token: {
+              colorPrimary: '#25c2a0',
             },
           },
-          plugins: getPlugins(),
-        });
-      }
-    });
-  };
+        },
+        plugins: getPlugins(),
+      });
+    }
+  }, []);
 
   const onChangeMode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value as Mode;
@@ -120,13 +115,14 @@ function FormAndViewerApp() {
     }
   };
 
-  if (uiRef != prevUiRef) {
-    if (prevUiRef && ui.current) {
-      ui.current.destroy();
-    }
+  useEffect(() => {
     buildUi(mode);
-    setPrevUiRef(uiRef);
-  }
+    return () => {
+      if (ui.current) {
+        ui.current.destroy();
+      }
+    };
+  }, [mode, uiRef, buildUi]);
 
   const navItems: NavItem[] = [
     {
