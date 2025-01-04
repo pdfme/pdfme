@@ -12,10 +12,12 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Designer />}></Route>
-        <Route path="/form-viewer" element={<FormAndViewer />}></Route>
-      </Routes>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <Routes>
+          <Route path="/" element={<Designer />}></Route>
+          <Route path="/form-viewer" element={<FormAndViewer />}></Route>
+        </Routes>
+      </div>
     </BrowserRouter>
   </React.StrictMode>);

@@ -7,10 +7,10 @@ function classNames(...classes: string[]) {
 
 function Navigation() {
   return (
-    <div className="border-b border-gray-200 mb-1">
+    <div className="border-b border-gray-200 my-1">
       <nav aria-label="Tabs" className="-mb-px flex items-center space-x-3 px-4">
-        <span className="text-sm text-gray-500 select-none">
-          <span>PDFME_VERSION:</span> {PDFME_VERSION}
+        <span className="text-xs text-gray-500 select-none">
+          <span>Version:</span> {PDFME_VERSION}
         </span>
 
         <NavLink

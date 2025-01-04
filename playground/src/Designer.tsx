@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
@@ -26,9 +26,8 @@ function DesignerApp() {
   const [templatePreset, setTemplatePreset] = useState<string>(
     localStorage.getItem("templatePreset") || initialTemplatePresetKey
   );
-  const [prevDesignerRef, setPrevDesignerRef] = useState<Designer | null>(null);
 
-  const buildDesigner = () => {
+  const buildDesigner = useCallback(() => {
     let template: Template = getTemplateByPreset(
       localStorage.getItem("templatePreset") || ""
     );
@@ -47,36 +46,34 @@ function DesignerApp() {
       localStorage.removeItem("template");
     }
 
-    getFontsData().then((font) => {
-      if (designerRef.current) {
-        designer.current = new Designer({
-          domContainer: designerRef.current,
-          template,
-          options: {
-            font,
-            lang,
-            labels: {
-              clear: "🗑️",
-            },
-            theme: {
-              token: {
-                colorPrimary: "#25c2a0",
-              },
-            },
-            icons: {
-              multiVariableText:
-                '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>',
+    if (designerRef.current) {
+      designer.current = new Designer({
+        domContainer: designerRef.current,
+        template,
+        options: {
+          font: getFontsData(),
+          lang,
+          labels: {
+            clear: "🗑️",
+          },
+          theme: {
+            token: {
+              colorPrimary: "#25c2a0",
             },
           },
-          plugins: getPlugins(),
-        });
-        designer.current.onSaveTemplate(onSaveTemplate);
-        designer.current.onChangeTemplate(() => {
-          setTemplatePreset(customTemplatePresetKey);
-        });
-      }
-    });
-  };
+          icons: {
+            multiVariableText:
+              '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>',
+          },
+        },
+        plugins: getPlugins(),
+      });
+      designer.current.onSaveTemplate(onSaveTemplate);
+      designer.current.onChangeTemplate(() => {
+        setTemplatePreset(customTemplatePresetKey);
+      });
+    }
+  }, []);
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target && e.target.files) {
@@ -122,13 +119,17 @@ function DesignerApp() {
     buildDesigner();
   };
 
-  if (designerRef !== prevDesignerRef) {
-    if (prevDesignerRef && designer.current) {
-      designer.current.destroy();
+
+  useEffect(() => {
+    if (designerRef.current) {
+      buildDesigner();
     }
-    buildDesigner();
-    setPrevDesignerRef(designerRef);
-  }
+    return () => {
+      if (designer.current) {
+        designer.current.destroy();
+      }
+    }
+  }, [designerRef, buildDesigner]);
 
   const navItems: NavItem[] = [
     {
@@ -196,7 +197,7 @@ function DesignerApp() {
           className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={onDownloadTemplate}
         >
-          Download Template
+          DL Template
         </button>
       ),
     },
@@ -225,10 +226,10 @@ function DesignerApp() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <NavBar items={navItems} />
       <div ref={designerRef} className="flex-1 w-full" />
-    </div>
+    </>
   );
 }
 
