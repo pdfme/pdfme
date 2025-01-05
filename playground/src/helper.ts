@@ -1,11 +1,4 @@
-import {
-  Template,
-  Font,
-  checkTemplate,
-  getInputFromTemplate,
-  getDefaultFont,
-  DEFAULT_FONT_NAME,
-} from '@pdfme/common';
+import { Template, Font, checkTemplate, getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
 import {
@@ -26,6 +19,13 @@ import {
   radioGroup,
 } from '@pdfme/schemas';
 import plugins from './plugins';
+
+export function fromKebabCase(str: string): string {
+  return str
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
 export const getFontsData = (): Font => ({
   ...getDefaultFont(),
