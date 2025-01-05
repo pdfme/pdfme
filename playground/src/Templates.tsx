@@ -18,6 +18,18 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
         <h2 className="text-xl font-bold text-gray-900">Sample Templates</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          If you can’t find the template you’re looking for, or if you have any feedback on existing templates, you can request one or share your feedback{" "}
+          <a
+            href="https://github.com/pdfme/pdfme/discussions/670"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            here
+          </a>
+          .
+        </p>
         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
           {templateIds.map((templateId) => (
             <div key={templateId}>
