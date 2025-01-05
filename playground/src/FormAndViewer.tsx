@@ -3,7 +3,7 @@ import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplateByPreset,
+  getBlankTemplate,
   handleLoadTemplate,
   generatePDF,
   getPlugins,
@@ -15,7 +15,7 @@ type Mode = "form" | "viewer";
 
 
 const initTemplate = () => {
-  let template: Template = getTemplateByPreset(localStorage.getItem('templatePreset') || "")
+  let template = getBlankTemplate();
   try {
     const templateString = localStorage.getItem("template");
     if (!templateString) {

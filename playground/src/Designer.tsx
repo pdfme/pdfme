@@ -1,10 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
-  getTemplatePresets,
-  getTemplateByPreset,
+  getTemplateById,
+  getBlankTemplate,
   readFile,
   getPlugins,
   handleLoadTemplate,
@@ -14,39 +15,32 @@ import {
 } from "./helper";
 import { NavBar, NavItem } from "./NavBar";
 
-const initialTemplatePresetKey = "invoice";
-const customTemplatePresetKey = "custom";
-
-const templatePresets = getTemplatePresets();
-
 function DesignerApp() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const [lang, setLang] = useState<Lang>("en");
-  const [templatePreset, setTemplatePreset] = useState<string>(
-    localStorage.getItem("templatePreset") || initialTemplatePresetKey
-  );
 
-  const buildDesigner = useCallback(() => {
-    let template: Template = getTemplateByPreset(
-      localStorage.getItem("templatePreset") || ""
-    );
+
+  const buildDesigner = useCallback(async () => {
+    if (!designerRef.current) return;
     try {
-      const templateString = localStorage.getItem("template");
-      if (templateString) {
-        setTemplatePreset(customTemplatePresetKey);
+      let template: Template = getBlankTemplate();
+      const templateIdFromQuery = searchParams.get("template");
+      const templateFromLocal = localStorage.getItem("template");
+
+      if (templateIdFromQuery) {
+        const templateJson = await getTemplateById(templateIdFromQuery);
+        checkTemplate(templateJson);
+        template = templateJson;
+        searchParams.delete("template");
+        setSearchParams(searchParams);
+      } else if (templateFromLocal) {
+        const templateJson = JSON.parse(templateFromLocal) as Template;
+        checkTemplate(templateJson);
+        template = templateJson;
       }
 
-      const templateJson = templateString
-        ? JSON.parse(templateString)
-        : getTemplateByPreset(localStorage.getItem("templatePreset") || "");
-      checkTemplate(templateJson);
-      template = templateJson as Template;
-    } catch {
-      localStorage.removeItem("template");
-    }
-
-    if (designerRef.current) {
       designer.current = new Designer({
         domContainer: designerRef.current,
         template,
@@ -69,9 +63,11 @@ function DesignerApp() {
         plugins: getPlugins(),
       });
       designer.current.onSaveTemplate(onSaveTemplate);
-      designer.current.onChangeTemplate(() => {
-        setTemplatePreset(customTemplatePresetKey);
-      });
+
+    } catch {
+      searchParams.delete("template");
+      setSearchParams(searchParams);
+      localStorage.removeItem("template");
     }
   }, []);
 
@@ -106,20 +102,6 @@ function DesignerApp() {
     }
   };
 
-  const onChangeTemplatePresets = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTemplatePreset(e.target.value);
-    localStorage.setItem(
-      "template",
-      JSON.stringify(
-        getTemplateByPreset(localStorage.getItem("templatePreset") || "")
-      )
-    );
-    localStorage.removeItem("template");
-    localStorage.setItem("templatePreset", e.target.value);
-    buildDesigner();
-  };
-
-
   useEffect(() => {
     if (designerRef.current) {
       buildDesigner();
@@ -132,22 +114,6 @@ function DesignerApp() {
   }, [designerRef, buildDesigner]);
 
   const navItems: NavItem[] = [
-    {
-      label: "Template Preset",
-      content: (
-        <select
-          className="w-full border rounded px-2 py-1"
-          onChange={onChangeTemplatePresets}
-          value={templatePreset}
-        >
-          {templatePresets.map((preset) => (
-            <option key={preset.key} value={preset.key}>
-              {preset.label}
-            </option>
-          ))}
-        </select>
-      ),
-    },
     {
       label: "Lang",
       content: (
@@ -208,7 +174,7 @@ function DesignerApp() {
           className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={() => onSaveTemplate()}
         >
-          Save Template
+          Save Local
         </button>
       ),
     },
