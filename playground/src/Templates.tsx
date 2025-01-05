@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fromKebabCase } from "./helper"
 
-function TemplatesApp() {
+function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
+  const navigate = useNavigate();
+
   const [templateIds, setTemplateIds] = useState<string[]>([]);
   useEffect(() => {
     fetch('/templates/index.json')
@@ -26,12 +29,18 @@ function TemplatesApp() {
                   <h3 className="text-md font-bold text-gray-900">{fromKebabCase(templateId)}</h3>
                 </div>
                 <div className="mt-6">
-                  <a
-                    href={`/?template=${templateId}`}
-                    className="relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                  <button
+                    onClick={() => {
+                      if (isEmbedded) {
+                        window.parent.postMessage({ type: 'navigate', payload: { templateId } }, '*');
+                      } else {
+                        navigate(`/?template=${templateId}`)
+                      }
+                    }}
+                    className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
                   >
                     Go to Designer
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

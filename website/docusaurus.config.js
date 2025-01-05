@@ -106,9 +106,9 @@ const config = {
           label: 'Docs',
         },
         {
-          to: '/demo',
+          to: '/templates',
           position: 'right',
-          label: 'Demo Apps',
+          label: 'Sample Templates',
         },
         {
           to: '/template-design',
@@ -154,6 +154,10 @@ const config = {
             {
               label: 'Demo Apps',
               to: '/demo',
+            },
+            {
+              label: 'Sample Templates',
+              to: '/templates',
             },
             {
               label: 'Template Design',

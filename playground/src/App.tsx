@@ -6,15 +6,15 @@ import Header from "./Header";
 
 function App() {
   const [searchParams] = useSearchParams();
-  const hideHeader = searchParams.get("hideHeader") === "true";
+  const isEmbedded = searchParams.get("embed") === "true";
 
   return (
     <div className="min-h-screen flex flex-col">
-      {!hideHeader && <Header />}
+      {!isEmbedded && <Header />}
       <Routes>
         <Route path="/" element={<Designer />} />
         <Route path="/form-viewer" element={<FormAndViewer />} />
-        <Route path="/templates" element={<Templates />} />
+        <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
       </Routes>
     </div>
   );

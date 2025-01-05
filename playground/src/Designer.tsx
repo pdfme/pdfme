@@ -27,14 +27,18 @@ function DesignerApp() {
     try {
       let template: Template = getBlankTemplate();
       const templateIdFromQuery = searchParams.get("template");
+      searchParams.delete("template");
+      setSearchParams(searchParams, { replace: true });
       const templateFromLocal = localStorage.getItem("template");
 
       if (templateIdFromQuery) {
         const templateJson = await getTemplateById(templateIdFromQuery);
         checkTemplate(templateJson);
         template = templateJson;
-        searchParams.delete("template");
-        setSearchParams(searchParams);
+
+        if (!templateFromLocal || window.confirm("Would you like to overwrite the locally saved template?")) {
+          localStorage.setItem("template", JSON.stringify(templateJson));
+        }
       } else if (templateFromLocal) {
         const templateJson = JSON.parse(templateFromLocal) as Template;
         checkTemplate(templateJson);
@@ -65,8 +69,6 @@ function DesignerApp() {
       designer.current.onSaveTemplate(onSaveTemplate);
 
     } catch {
-      searchParams.delete("template");
-      setSearchParams(searchParams);
       localStorage.removeItem("template");
     }
   }, []);
@@ -175,6 +177,22 @@ function DesignerApp() {
           onClick={() => onSaveTemplate()}
         >
           Save Local
+        </button>
+      ),
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border rounded hover:bg-gray-100"
+          onClick={() => {
+            localStorage.removeItem("template");
+            if (designer.current) {
+              designer.current.updateTemplate(getBlankTemplate());
+            }
+          }}
+        >
+          Reset
         </button>
       ),
     },
