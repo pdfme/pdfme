@@ -10,8 +10,8 @@ const TemplateDesign = () => {
   return (
     <Layout title="Template Design">
       <iframe
-        // src="http://localhost:5173/"
-        src="https://playground.pdfme.com/"
+        src="http://localhost:5173/?template=invoice"
+        // src="https://playground.pdfme.com/?template=invoice"
         style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
       />
     </Layout>
