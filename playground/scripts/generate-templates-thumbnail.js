@@ -181,6 +181,7 @@ async function main() {
     const thumbnailPngPath = path.join(templatesPath, dir, 'thumbnail.png');
     await createThumbnailFromTemplate(templateJsonPath, thumbnailPngPath);
   }
+  console.log(`Thumbnails generated from template.json for ${dirs.join(', ')}`);
 }
 
 main().catch((err) => {

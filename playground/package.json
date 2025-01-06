@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run copy-vercel-config",
+    "build": "npm run generate-templates-assets && vite build && npm run copy-vercel-config",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b playground",
-    "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\""
+    "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
+    "generate-templates-assets": "node scripts/generate-templates-list-json.js && node scripts/generate-templates-thumbnail.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
