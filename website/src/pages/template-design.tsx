@@ -1,18 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
+import { useLocation, useHistory } from '@docusaurus/router';
+import { playgroundUrl } from '../constants';
 
 const headerHeight = 60;
-const controllerHeight = 0;
 
 const TemplateDesign = () => {
+  const location = useLocation();
+  const history = useHistory();
 
+  const [template, setTemplate] = useState('');
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const param = query.get('template');
+
+    if (param) {
+      setTemplate(param);
+
+      query.delete('template');
+      history.replace({
+        pathname: location.pathname,
+        search: query.toString(),
+      });
+    }
+  }, [location, history]);
 
   return (
     <Layout title="Template Design">
       <iframe
-        // src="http://localhost:5173/"
-        src="https://playground.pdfme.com/"
-        style={{ width: '100%', height: `calc(100vh - ${headerHeight + controllerHeight}px)` }}
+        src={`${playgroundUrl}?template=${template}`}
+        style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }}
       />
     </Layout>
   );
