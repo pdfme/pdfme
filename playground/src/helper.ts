@@ -194,7 +194,7 @@ export const getBlankTemplate = () =>
   } as Template);
 
 export const getTemplateById = async (templateId: string): Promise<Template> => {
-  const template = await fetch(`/templates/${templateId}/template.json`).then((res) => res.json());
+  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) => res.json());
   checkTemplate(template);
   return template as Template;
 };

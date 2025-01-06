@@ -165,7 +165,7 @@ async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
 
 async function main() {
   const playgroundPath = path.resolve(__dirname, '..');
-  const templatesPath = path.join(playgroundPath, 'public', 'templates');
+  const templatesPath = path.join(playgroundPath, 'public', 'template-assets');
 
   const dirs = fs
     .readdirSync(templatesPath, { withFileTypes: true })

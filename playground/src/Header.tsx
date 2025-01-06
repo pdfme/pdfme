@@ -14,6 +14,21 @@ function Navigation() {
         </span>
 
         <NavLink
+          to="/templates"
+          end
+          className={({ isActive }) =>
+            classNames(
+              isActive
+                ? "border-green-500 text-green-600"
+                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+              "whitespace-nowrap border-b-2 px-1 py-2 text-sm font-medium"
+            )
+          }
+        >
+          Templates
+        </NavLink>
+
+        <NavLink
           to="/"
           end
           className={({ isActive }) =>

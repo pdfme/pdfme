@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const templatesDir = path.join(__dirname, '..', 'public', 'templates');
+const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
 
 function generateTemplatesListJson() {

@@ -7,7 +7,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
   const [templateIds, setTemplateIds] = useState<string[]>([]);
   useEffect(() => {
-    fetch('/templates/index.json')
+    fetch('/template-assets/index.json')
       .then((response) => response.json())
       .then((data) => {
         setTemplateIds(data);
@@ -35,7 +35,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
             <div key={templateId}>
               <div className="relative border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
                 <div className="relative h-72 w-full overflow-hidden">
-                  <img alt={fromKebabCase(templateId)} src={`/templates/${templateId}/thumbnail.png`} className="border border-gray-100 size-full object-contain" />
+                  <img alt={fromKebabCase(templateId)} src={`/template-assets/${templateId}/thumbnail.png`} className="border border-gray-100 size-full object-contain" />
                 </div>
                 <div className="relative mt-4">
                   <h3 className="text-md font-bold text-gray-900">{fromKebabCase(templateId)}</h3>
