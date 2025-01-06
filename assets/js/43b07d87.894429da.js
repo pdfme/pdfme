@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_pdfme_website=self.webpackChunk_pdfme_website||[]).push([[692],{13739:(e,s,t)=>{t.r(s),t.d(s,{default:()=>h});t(96540);var p=t(41957),c=t(74848);const h=()=>(0,c.jsx)(p.A,{title:"Template Design",children:(0,c.jsx)("iframe",{src:"https://playground.pdfme.com/",style:{width:"100%",height:"calc(100vh - 60px)"}})})}}]);
