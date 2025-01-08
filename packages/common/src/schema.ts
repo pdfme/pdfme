@@ -34,6 +34,7 @@ export const Dict = z.object({
   // --------------------validation-------------------
   'validation.uniqueName': z.string(),
   'validation.hexColor': z.string(),
+  'validation.dateTimeFormat': z.string(),
 
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
@@ -79,6 +80,7 @@ export const Dict = z.object({
   'schemas.table.columnStyle': z.string(),
 
   'schemas.date.format': z.string(),
+  'schemas.date.locale': z.string(),
 
   'schemas.select.options': z.string(),
   'schemas.select.optionPlaceholder': z.string(),

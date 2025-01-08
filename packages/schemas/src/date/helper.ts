@@ -1,20 +1,8 @@
 import type * as CSS from 'csstype';
-import AirDatepicker, { AirDatepickerLocale } from 'air-datepicker';
-import localeEn from 'air-datepicker/locale/en';
-import localeZh from 'air-datepicker/locale/zh';
-import localeJa from 'air-datepicker/locale/ja';
-import localeKo from 'air-datepicker/locale/ko';
-import localeAr from 'air-datepicker/locale/ar';
-import localeTh from 'air-datepicker/locale/th';
-import localePl from 'air-datepicker/locale/pl';
-import localeIt from 'air-datepicker/locale/it';
-import localeDe from 'air-datepicker/locale/de';
-import localeEs from 'air-datepicker/locale/es';
-import localeFr from 'air-datepicker/locale/fr';
+import AirDatepicker from 'air-datepicker';
+
 import { format } from 'date-fns';
-import { enUS, zhCN, ja, ko, ar, th, pl, it, de, es, fr, Locale } from 'date-fns/locale';
 import {
-  Lang,
   Plugin,
   getFallbackFontName,
   DEFAULT_FONT_NAME,
@@ -34,6 +22,7 @@ import {
 import { DateSchema } from './types';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter';
 import { isEditable } from '../utils';
+import * as Locale from './locale.js';
 
 const airDatepickerCss = `.air-datepicker-cell.-year-.-other-decade-,.air-datepicker-cell.-day-.-other-month-{color:var(--adp-color-other-month)}.air-datepicker-cell.-year-.-other-decade-:hover,.air-datepicker-cell.-day-.-other-month-:hover{color:var(--adp-color-other-month-hover)}.-disabled-.-focus-.air-datepicker-cell.-year-.-other-decade-,.-disabled-.-focus-.air-datepicker-cell.-day-.-other-month-{color:var(--adp-color-other-month)}.-selected-.air-datepicker-cell.-year-.-other-decade-,.-selected-.air-datepicker-cell.-day-.-other-month-{color:#fff;background:var(--adp-background-color-selected-other-month)}.-selected-.-focus-.air-datepicker-cell.-year-.-other-decade-,.-selected-.-focus-.air-datepicker-cell.-day-.-other-month-{background:var(--adp-background-color-selected-other-month-focused)}.-in-range-.air-datepicker-cell.-year-.-other-decade-,.-in-range-.air-datepicker-cell.-day-.-other-month-{background-color:var(--adp-background-color-in-range);color:var(--adp-color)}.-in-range-.-focus-.air-datepicker-cell.-year-.-other-decade-,.-in-range-.-focus-.air-datepicker-cell.-day-.-other-month-{background-color:var(--adp-background-color-in-range-focused)}.air-datepicker-cell.-year-.-other-decade-:empty,.air-datepicker-cell.-day-.-other-month-:empty{background:none;border:none}.air-datepicker-cell{border-radius:var(--adp-cell-border-radius);box-sizing:border-box;cursor:pointer;display:flex;position:relative;align-items:center;justify-content:center;z-index:1}.air-datepicker-cell.-focus-{background:var(--adp-cell-background-color-hover)}.air-datepicker-cell.-current-{color:var(--adp-color-current-date)}.air-datepicker-cell.-current-.-focus-{color:var(--adp-color)}.air-datepicker-cell.-current-.-in-range-{color:var(--adp-color-current-date)}.air-datepicker-cell.-disabled-{cursor:default;color:var(--adp-color-disabled)}.air-datepicker-cell.-disabled-.-focus-{color:var(--adp-color-disabled)}.air-datepicker-cell.-disabled-.-in-range-{color:var(--adp-color-disabled-in-range)}.air-datepicker-cell.-disabled-.-current-.-focus-{color:var(--adp-color-disabled)}.air-datepicker-cell.-in-range-{background:var(--adp-cell-background-color-in-range);border-radius:0}.air-datepicker-cell.-in-range-:hover,.air-datepicker-cell.-in-range-.-focus-{background:var(--adp-cell-background-color-in-range-hover)}.air-datepicker-cell.-range-from-{border:1px solid var(--adp-cell-border-color-in-range);background-color:var(--adp-cell-background-color-in-range);border-radius:var(--adp-cell-border-radius) 0 0 var(--adp-cell-border-radius)}.air-datepicker-cell.-range-to-{border:1px solid var(--adp-cell-border-color-in-range);background-color:var(--adp-cell-background-color-in-range);border-radius:0 var(--adp-cell-border-radius) var(--adp-cell-border-radius) 0}.air-datepicker-cell.-range-to-.-range-from-{border-radius:var(--adp-cell-border-radius)}.air-datepicker-cell.-selected-{color:#fff;border:none;background:var(--adp-cell-background-color-selected)}.air-datepicker-cell.-selected-.-current-{color:#fff;background:var(--adp-cell-background-color-selected)}.air-datepicker-cell.-selected-.-focus-{background:var(--adp-cell-background-color-selected-hover)}
 .air-datepicker-body{transition:all var(--adp-transition-duration) var(--adp-transition-ease)}.air-datepicker-body.-hidden-{display:none}.air-datepicker-body--day-names{display:grid;grid-template-columns:repeat(7, var(--adp-day-cell-width));margin:8px 0 3px}.air-datepicker-body--day-name{color:var(--adp-day-name-color);display:flex;align-items:center;justify-content:center;flex:1;text-align:center;text-transform:uppercase;font-size:.8em}.air-datepicker-body--day-name.-clickable-{cursor:pointer}.air-datepicker-body--day-name.-clickable-:hover{color:var(--adp-day-name-color-hover)}.air-datepicker-body--cells{display:grid}.air-datepicker-body--cells.-days-{grid-template-columns:repeat(7, var(--adp-day-cell-width));grid-auto-rows:var(--adp-day-cell-height)}.air-datepicker-body--cells.-months-{grid-template-columns:repeat(3, 1fr);grid-auto-rows:var(--adp-month-cell-height)}.air-datepicker-body--cells.-years-{grid-template-columns:repeat(4, 1fr);grid-auto-rows:var(--adp-year-cell-height)}
@@ -56,23 +45,6 @@ const injectStyles = (css: string) => {
   }
 };
 
-const getDateFnsLocale = (lang: Lang): Locale | undefined =>
-  ({ en: enUS, zh: zhCN, ja, ko, ar, th, pl, it, de, es, fr }[lang]);
-
-const getAirDatepickerLocale = (lang: Lang): AirDatepickerLocale | undefined =>
-  ({
-    en: localeEn,
-    zh: localeZh,
-    ja: localeJa,
-    ko: localeKo,
-    ar: localeAr,
-    th: localeTh,
-    pl: localePl,
-    it: localeIt,
-    de: localeDe,
-    es: localeEs,
-    fr: localeFr,
-  }[lang]);
 
 const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Date => {
   if (type === 'time') {
@@ -85,20 +57,36 @@ const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Dat
   return new Date(strDate);
 };
 
+const getFormat = (type: 'date' | 'time' | 'dateTime', locale: Locale.Locale): string => {
+  switch (type) {
+    case 'date': {
+      return locale.adLocale.dateFormat;
+    }
+    case 'time': {
+      return locale.adLocale.timeFormat;
+    }
+    case 'dateTime': {
+      return `${locale.adLocale.dateFormat} ${locale.adLocale.timeFormat}`;
+    }
+    default: {
+      return `${locale.adLocale.dateFormat} ${locale.adLocale.timeFormat}`;
+    }
+  }
+};
+
 export const getPlugin = ({
   type,
   defaultFormat,
   icon,
-  formatsByLang,
 }: {
   type: 'date' | 'time' | 'dateTime';
   defaultFormat: string;
   icon: string;
-  formatsByLang: Record<Lang, string[]>;
 }) => {
   const plugin: Plugin<DateSchema> = {
     ui: (arg) => {
-      const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
+      const { schema, value, onChange, rootElement, mode, options } = arg;
+      console.log(`value at ui ${value}`);
       injectStyles(airDatepickerCss);
 
       const beforeRemoveEvent = new Event('beforeRemove');
@@ -128,6 +116,8 @@ export const getPlugin = ({
 
       Object.assign(input.style, textStyle);
 
+      const locale = Locale.getAirDatepickerLocale(schema.locale || options.lang || 'en');
+
       const commitChange = ({ datepicker }: { datepicker: AirDatepicker<HTMLInputElement> }) => {
         if (onChange) {
           const date = datepicker.selectedDates;
@@ -139,17 +129,28 @@ export const getPlugin = ({
         }
       };
 
+      const formatted = (date: string | Date): string => {
+        try {
+          return (schema.format ? format(date, schema.format, { locale: locale.formatLocale }) : '');
+        }
+        catch (e) {
+          return `Datetime format error ${e}`;
+
+        }
+      }
+
       const airDatepicker = new AirDatepicker(input, {
-        locale: getAirDatepickerLocale(options.lang || 'en'),
+        locale: locale.adLocale,
         selectedDates: [strDateToDate(value, type)],
         dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
+        // dateFormat: formatted,
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: [
           'clear',
           {
-            content: i18n('close'),
+            content: locale.close,
             onClick: (datepicker) => {
               datepicker.hide();
               commitChange({ datepicker });
@@ -194,32 +195,38 @@ export const getPlugin = ({
       );
     },
     propPanel: {
-      schema: ({ options, i18n }) => {
+      schema: ({ options, i18n, activeSchema }) => {
         const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
-        const lang = options.lang || 'en';
-        const locale = getDateFnsLocale(lang);
-
         const fontNames = Object.keys(font);
         const fallbackFontName = getFallbackFontName(font);
+
+        const locale = Locale.getAirDatepickerLocale((activeSchema as any).locale || options.lang || 'en')
 
         const formatter = getExtraFormatterSchema(i18n);
         formatter.buttons = formatter.buttons.filter(
           (button) => button.key === Formatter.ALIGNMENT
         );
 
-        const currentDate = new Date();
+        const validateDateTimeFormat = (rule: any, formatString: string): boolean => {
+          try {
+            format('Thu Jan 01 1970 00:00:00 GMT+0000', formatString, { locale: locale.formatLocale });
+            return true;
+          } catch (e) {
+            return false;
+          }
+        }
 
         const dateSchema: Record<string, PropPanelSchema> = {
           format: {
             title: i18n('schemas.date.format'),
             type: 'string',
-            widget: 'select',
-            props: {
-              options: formatsByLang[lang].map((formatString) => ({
-                label: `${formatString} (${format(currentDate, formatString, { locale })})`,
-                value: formatString,
-              })),
-            },
+            default: getFormat(type, locale),
+            rules: [
+              {
+                validator: validateDateTimeFormat,
+                message: i18n('validation.dateTimeFormat'),
+              },
+            ],
             span: 24,
           },
           fontName: {
@@ -250,7 +257,7 @@ export const getPlugin = ({
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [
               {
@@ -264,7 +271,7 @@ export const getPlugin = ({
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [
               {
@@ -272,6 +279,15 @@ export const getPlugin = ({
                 message: i18n('validation.hexColor'),
               },
             ],
+          },
+          locale: {
+            title: i18n('schemas.date.locale'),
+            type: 'string',
+            widget: 'select',
+            props: {
+              options: Locale.locales.map((locale) => ({ label: locale, value: locale })),
+            },
+            span: 8,
           },
         };
 
@@ -292,6 +308,7 @@ export const getPlugin = ({
         fontColor: DEFAULT_FONT_COLOR,
         fontName: undefined,
         backgroundColor: '',
+        locale: 'en',
         opacity: DEFAULT_OPACITY,
       },
     },
