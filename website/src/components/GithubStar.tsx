@@ -5,7 +5,7 @@ const GithubStar = () => (
   <div className="col col--12 margin-vert--lg padding-vert--lg text--center">
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: 'fit-content' }}>
-        <div style={{ display: 'flex', maxWidth: 400 }}>
+        <div style={{ display: 'flex', maxWidth: 350 }}>
           <img src={'/img/please-star.png'} alt="pleaseStar" />
         </div>
         <div

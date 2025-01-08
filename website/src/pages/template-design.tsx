@@ -27,7 +27,7 @@ const TemplateDesign = () => {
   }, [location, history]);
 
   return (
-    <Layout title="Template Design">
+    <Layout title="Template Design" description='Design your PDF template with the playground editor.'>
       <iframe
         src={`${playgroundUrl}?template=${template}`}
         style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }}
