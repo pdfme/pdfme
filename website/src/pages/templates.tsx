@@ -23,7 +23,7 @@ const TemplateDesign = () => {
   }, [history]);
 
   return (
-    <Layout title="Templates">
+    <Layout title="Sample Templates" description="Explore sample templates with our interactive playground.">
       <iframe src={`${playgroundUrl}/templates?embed=true`} style={{ width: '100%', height: '100vh' }} />
     </Layout>
   );

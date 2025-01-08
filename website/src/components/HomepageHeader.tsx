@@ -29,12 +29,7 @@ export default function HomepageHeader() {
         <div className="row row--no-gutters" style={{ alignItems: 'center' }}>
           <div className="col col--3" style={{ marginTop: '1rem' }}>
             <Link className="button button--lg button--success " to="/docs/getting-started">
-              Start PDF Generation
-            </Link>
-          </div>
-          <div className="col col--3" style={{ marginTop: '1rem' }}>
-            <Link className="button button--lg button--secondary " to="/demo">
-              PDF Generation Demos
+              Documentation
             </Link>
           </div>
           <div className="col col--3" style={{ marginTop: '1rem' }}>
@@ -43,7 +38,7 @@ export default function HomepageHeader() {
               href="https://playground.pdfme.com"
               target={'_blank'}
             >
-              PDF Generation Playground
+              Playground
             </a>
           </div>
           <div className="col col--6" />

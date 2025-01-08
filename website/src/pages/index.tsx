@@ -300,9 +300,19 @@ export default function Home(): JSX.Element {
               Let's check out applications that you can make with pdfme and how it works by actually
               using it.
             </p>
-            <Link className="button button--primary button--lg" to="/demo">
-              Check out the Demo Apps
-            </Link>
+            <div className="row row--no-gutters" style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <div className="col col--3" style={{ marginTop: '1rem' }}>
+                <Link className="button button--primary button--lg" to="/demo">
+                  Check out the Demo Apps
+                </Link>
+              </div>
+              <div className="col col--3" style={{ marginTop: '1rem' }}>
+                <Link className="button button--info button--lg" to="/templates">
+                   Sample Templates
+                </Link>
+              </div>
+            </div>
+
           </div>
         </div>
         <GithubStar />
