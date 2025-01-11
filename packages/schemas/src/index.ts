@@ -12,6 +12,7 @@ import time from './date/time';
 import select from './select/index';
 import radioGroup from './radioGroup/index';
 import checkbox from './checkbox/index';
+import richText from './richText/index';
 
 const builtInPlugins = { Text: text };
 
@@ -33,4 +34,5 @@ export {
   select,
   radioGroup,
   checkbox,
+  richText,
 };

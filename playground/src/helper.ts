@@ -17,6 +17,7 @@ import {
   select,
   checkbox,
   radioGroup,
+  richText,
 } from '@pdfme/schemas';
 import plugins from './plugins';
 
@@ -36,6 +37,22 @@ export const getFontsData = (): Font => ({
   NotoSansJP: {
     fallback: false,
     data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
+  },
+  'NotoSans-Regular': {
+    fallback: false,
+    data: 'http://localhost:5173/fonts/NotoSans/NotoSans-Regular.ttf',
+  },
+  'NotoSans-Bold': {
+    fallback: false,
+    data: 'http://localhost:5173/fonts/NotoSans/NotoSans-Bold.ttf',
+  },
+  'NotoSans-Italic': {
+    fallback: false,
+    data: 'http://localhost:5173/fonts/NotoSans/NotoSans-Italic.ttf',
+  },
+  'NotoSans-BoldItalic': {
+    fallback: false,
+    data: 'http://localhost:5173/fonts/NotoSans/NotoSans-BoldItalic.ttf',
   },
 });
 
@@ -127,6 +144,7 @@ export const getPlugins = () => {
     // UPCA: barcodes.upca,
     // UPCE: barcodes.upce,
     // GS1DataMatrix: barcodes.gs1datamatrix,
+    RichText: richText,
   };
 };
 
@@ -194,7 +212,9 @@ export const getBlankTemplate = () =>
   } as Template);
 
 export const getTemplateById = async (templateId: string): Promise<Template> => {
-  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) => res.json());
+  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) =>
+    res.json()
+  );
   checkTemplate(template);
   return template as Template;
 };
