@@ -58,6 +58,7 @@ export const Dict = z.object({
   'schemas.text.textAlign': z.string(),
   'schemas.text.verticalAlign': z.string(),
   'schemas.text.lineHeight': z.string(),
+  'schemas.text.textIndent': z.string(),
   'schemas.text.min': z.string(),
   'schemas.text.max': z.string(),
   'schemas.text.fit': z.string(),

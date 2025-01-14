@@ -27,4 +27,5 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
+  textIndent?: number;
 }

@@ -13,6 +13,7 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
   PLACEHOLDER_FONT_COLOR,
+  DEFAULT_TEXT_INDENT,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -225,6 +226,7 @@ export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, v
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
+    textIndent: `${schema.textIndent ?? DEFAULT_TEXT_INDENT}em`,
   };
 
   const textBlock = document.createElement('div');
