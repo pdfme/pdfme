@@ -18,6 +18,7 @@ import {
   DEFAULT_DYNAMIC_FIT,
   DEFAULT_DYNAMIC_MIN_FONT_SIZE,
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
+  DEFAULT_TEXT_INDENT,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter';
@@ -150,6 +151,13 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      textIndent: {
+        title: i18n('schemas.text.textIndent'),
+        type: 'number',
+        widget: 'inputNumber',
+        props: { step: 1, min: 0 },
+        span: 7,
+      },
     };
 
     return textSchema;
@@ -177,5 +185,6 @@ export const propPanel: PropPanel<TextSchema> = {
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,
+    textIndent: DEFAULT_TEXT_INDENT,
   },
 };
