@@ -43,9 +43,9 @@ export const locales = [
     'ko', 'nb', 'nl', 'pl', 'pt-Br', 'pt', 'ro', 'ru', 'si', 'sk', 'sl', 'sv', 'th', 'tr', 'uk', 'zh',
 ] as const;
 const localeSchema = z.enum(locales);
-export type LocaleEnum = (typeof locales)[number];
 
 export interface Locale {
+    label: string,
     adLocale: AirDatepickerLocale,
     close: string,
     formatLocale: dateFns.Locale
@@ -55,39 +55,40 @@ export const getAirDatepickerLocale = (locale: string): Locale => {
     const parsed = localeSchema.parse(locale);
 
     switch (parsed) {
-        case 'ar': { return { adLocale: localeAr, close: 'يغلق', formatLocale: dateFns.ar } }
-        case 'bg': { return { adLocale: localeBg, close: 'близо', formatLocale: dateFns.bg } }
-        case 'ca': { return { adLocale: localeCa, close: 'Fermer', formatLocale: dateFns.ca } }
-        case 'cs': { return { adLocale: localeCs, close: 'Blízko', formatLocale: dateFns.cs } }
-        case 'da': { return { adLocale: localeDa, close: 'Tæt', formatLocale: dateFns.da } }
-        case 'de': { return { adLocale: localeDe, close: 'Schließen', formatLocale: dateFns.de } }
-        case 'el': { return { adLocale: localeEl, close: 'κοντά', formatLocale: dateFns.el } }
-        case 'en': { return { adLocale: localeEn, close: 'Close', formatLocale: dateFns.enUS } }
-        case 'es': { return { adLocale: localeEs, close: 'Cerca', formatLocale: dateFns.es } }
-        case 'eu': { return { adLocale: localeEu, close: 'Itxi', formatLocale: dateFns.eu } }
-        case 'fi': { return { adLocale: localeFi, close: 'Lähellä', formatLocale: dateFns.fi } }
-        case 'fr': { return { adLocale: localeFr, close: 'Fermer', formatLocale: dateFns.fr } }
-        case 'hr': { return { adLocale: localeHr, close: 'Zatvoriti', formatLocale: dateFns.hr } }
-        case 'hu': { return { adLocale: localeHu, close: 'Közeli', formatLocale: dateFns.hu } }
-        case 'id': { return { adLocale: localeId, close: 'Menutup', formatLocale: dateFns.id } }
-        case 'it': { return { adLocale: localeIt, close: 'Vicino', formatLocale: dateFns.it } }
-        case 'ja': { return { adLocale: localeJa, close: '閉じる', formatLocale: dateFns.ja } }
-        case 'ko': { return { adLocale: localeKo, close: '닫다', formatLocale: dateFns.ko } }
-        case 'nb': { return { adLocale: localeNb, close: 'Lukke', formatLocale: dateFns.nb } }
-        case 'nl': { return { adLocale: localeNl, close: 'Dichtbij', formatLocale: dateFns.nl } }
-        case 'pl': { return { adLocale: localePl, close: 'Zamknąć', formatLocale: dateFns.pl } }
-        case 'pt-Br': { return { adLocale: localePtBR, close: 'Fechar', formatLocale: dateFns.ptBR } }
-        case 'pt': { return { adLocale: localePt, close: 'Fechar', formatLocale: dateFns.pt } }
-        case 'ro': { return { adLocale: localeRo, close: 'Aproape', formatLocale: dateFns.ro } }
-        case 'ru': { return { adLocale: localeRu, close: 'закрывать', formatLocale: dateFns.ru } }
-        case 'si': { return { adLocale: localeSi, close: 'සමීපයි', formatLocale: dateFns.enUS } }
-        case 'sk': { return { adLocale: localeSk, close: 'Zavrieť', formatLocale: dateFns.sk } }
-        case 'sl': { return { adLocale: localeSl, close: 'Blizu', formatLocale: dateFns.sl } }
-        case 'sv': { return { adLocale: localeSv, close: 'Nära', formatLocale: dateFns.sv } }
-        case 'th': { return { adLocale: localeTh, close: 'ปิด', formatLocale: dateFns.th } }
-        case 'tr': { return { adLocale: localeTr, close: 'kapalı', formatLocale: dateFns.tr } }
-        case 'uk': { return { adLocale: localeUk, close: 'Close', formatLocale: dateFns.uk } }
-        case 'zh': { return { adLocale: localeZh, close: '关闭', formatLocale: dateFns.zhCN } }
+        case 'ar': { return {label: 'Arabic', adLocale: localeAr, close: 'يغلق', formatLocale: dateFns.ar } }
+        case 'bg': { return {label: 'Bulgarian', adLocale: localeBg, close: 'близо', formatLocale: dateFns.bg } }
+        case 'ca': { return {label: 'Catalan', adLocale: localeCa, close: 'Fermer', formatLocale: dateFns.ca } }
+        case 'cs': { return {label: 'Czech', adLocale: localeCs, close: 'Blízko', formatLocale: dateFns.cs } }
+        case 'da': { return {label: 'Danish', adLocale: localeDa, close: 'Tæt', formatLocale: dateFns.da } }
+        case 'de': { return {label: 'German', adLocale: localeDe, close: 'Schließen', formatLocale: dateFns.de } }
+        case 'el': { return {label: 'Greek', adLocale: localeEl, close: 'κοντά', formatLocale: dateFns.el } }
+        case 'en': { return {label: 'English', adLocale: localeEn, close: 'Close', formatLocale: dateFns.enUS } }
+        case 'es': { return {label: 'Spanish', adLocale: localeEs, close: 'Cerca', formatLocale: dateFns.es } }
+        case 'eu': { return {label: 'Basque', adLocale: localeEu, close: 'Itxi', formatLocale: dateFns.eu } }
+        case 'fi': { return {label: 'Finnish', adLocale: localeFi, close: 'Lähellä', formatLocale: dateFns.fi } }
+        case 'fr': { return {label: 'French', adLocale: localeFr, close: 'Fermer', formatLocale: dateFns.fr } }
+        case 'hr': { return {label: 'Croatian', adLocale: localeHr, close: 'Zatvoriti', formatLocale: dateFns.hr } }
+        case 'hu': { return {label: 'Hungarian', adLocale: localeHu, close: 'Közeli', formatLocale: dateFns.hu } }
+        case 'id': { return {label: 'Indonesian', adLocale: localeId, close: 'Menutup', formatLocale: dateFns.id } }
+        case 'it': { return {label: 'Italian', adLocale: localeIt, close: 'Vicino', formatLocale: dateFns.it } }
+        case 'ja': { return {label: 'Japanese', adLocale: localeJa, close: '閉じる', formatLocale: dateFns.ja } }
+        case 'ko': { return {label: 'Korean', adLocale: localeKo, close: '닫다', formatLocale: dateFns.ko } }
+        case 'nb': { return {label: 'Norwegian Bokmål', adLocale: localeNb, close: 'Lukke', formatLocale: dateFns.nb } }
+        case 'nl': { return {label: 'Dutch', adLocale: localeNl, close: 'Dichtbij', formatLocale: dateFns.nl } }
+        case 'pl': { return {label: 'Polish', adLocale: localePl, close: 'Zamknąć', formatLocale: dateFns.pl } }
+        case 'pt-Br': { return {label: 'Portuguese', adLocale: localePtBR, close: 'Fechar', formatLocale: dateFns.ptBR } }
+        case 'pt': { return {label: 'Portuguese', adLocale: localePt, close: 'Fechar', formatLocale: dateFns.pt } }
+        case 'ro': { return {label: 'Romanian', adLocale: localeRo, close: 'Aproape', formatLocale: dateFns.ro } }
+        case 'ru': { return {label: 'Russian', adLocale: localeRu, close: 'закрывать', formatLocale: dateFns.ru } }
+        // Using enUS for Sinhala since it is not supported in dateFns atm.
+        case 'si': { return {label: 'Sinhala', adLocale: localeSi, close: 'සමීපයි', formatLocale: dateFns.enUS } }
+        case 'sk': { return {label: 'Slovak', adLocale: localeSk, close: 'Zavrieť', formatLocale: dateFns.sk } }
+        case 'sl': { return {label: 'Slovenian', adLocale: localeSl, close: 'Blizu', formatLocale: dateFns.sl } }
+        case 'sv': { return {label: 'Swedish', adLocale: localeSv, close: 'Nära', formatLocale: dateFns.sv } }
+        case 'th': { return {label: 'Thai', adLocale: localeTh, close: 'ปิด', formatLocale: dateFns.th } }
+        case 'tr': { return {label: 'Turkish', adLocale: localeTr, close: 'kapalı', formatLocale: dateFns.tr } }
+        case 'uk': { return {label: 'Ukrainian', adLocale: localeUk, close: 'Закрити', formatLocale: dateFns.uk } }
+        case 'zh': { return {label: 'Chinese', adLocale: localeZh, close: '关闭', formatLocale: dateFns.zhCN } }
         default: {
             throw new Error(`Unsupported locale: ${locale}`);
         }

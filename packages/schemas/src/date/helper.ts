@@ -45,7 +45,6 @@ const injectStyles = (css: string) => {
   }
 };
 
-
 const strDateToDate = (strDate: string, type: 'date' | 'time' | 'dateTime'): Date => {
   if (type === 'time') {
     const dateTimePattern = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
@@ -85,8 +84,8 @@ export const getPlugin = ({
 }) => {
   const plugin: Plugin<DateSchema> = {
     ui: (arg) => {
-      const { schema, value, onChange, rootElement, mode, options } = arg;
-      console.log(`value at ui ${value}`);
+      const { schema, value, onChange, rootElement, mode } = arg;
+
       injectStyles(airDatepickerCss);
 
       const beforeRemoveEvent = new Event('beforeRemove');
@@ -116,7 +115,7 @@ export const getPlugin = ({
 
       Object.assign(input.style, textStyle);
 
-      const locale = Locale.getAirDatepickerLocale(schema.locale || options.lang || 'en');
+      const localeForUI = Locale.getAirDatepickerLocale(schema.localeForUI || 'en');
 
       const commitChange = ({ datepicker }: { datepicker: AirDatepicker<HTMLInputElement> }) => {
         if (onChange) {
@@ -129,28 +128,18 @@ export const getPlugin = ({
         }
       };
 
-      const formatted = (date: string | Date): string => {
-        try {
-          return (schema.format ? format(date, schema.format, { locale: locale.formatLocale }) : '');
-        }
-        catch (e) {
-          return `Datetime format error ${e}`;
-
-        }
-      }
-
       const airDatepicker = new AirDatepicker(input, {
-        locale: locale.adLocale,
+        locale: localeForUI.adLocale,
         selectedDates: [strDateToDate(value, type)],
-        dateFormat: (date) => (schema.format ? format(date, schema.format) : ''),
-        // dateFormat: formatted,
+        dateFormat: (date) =>
+          schema.format ? format(date, schema.format, { locale: localeForUI.formatLocale }) : '',
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: [
           'clear',
           {
-            content: locale.close,
+            content: localeForUI.close,
             onClick: (datepicker) => {
               datepicker.hide();
               commitChange({ datepicker });
@@ -182,7 +171,9 @@ export const getPlugin = ({
       const { schema, value } = arg;
       if (!value) return void 0;
       const date = strDateToDate(value, type);
-      const formattedValue = format(date, schema.format);
+      const localeForUI = Locale.getAirDatepickerLocale(schema.localeForUI || 'en');
+      const formattedValue = format(date, schema.format, { locale: localeForUI.formatLocale });
+
       return text.pdf(
         Object.assign(arg, {
           value: formattedValue,
@@ -200,27 +191,38 @@ export const getPlugin = ({
         const fontNames = Object.keys(font);
         const fallbackFontName = getFallbackFontName(font);
 
-        const locale = Locale.getAirDatepickerLocale((activeSchema as any).locale || options.lang || 'en')
+        const localeForUI = Locale.getAirDatepickerLocale((activeSchema as any).localeForUI || 'en');
 
         const formatter = getExtraFormatterSchema(i18n);
         formatter.buttons = formatter.buttons.filter(
           (button) => button.key === Formatter.ALIGNMENT
         );
 
-        const validateDateTimeFormat = (rule: any, formatString: string): boolean => {
+        const validateDateTimeFormat = (_rule: any, formatString: string): boolean => {
           try {
-            format('Thu Jan 01 1970 00:00:00 GMT+0000', formatString, { locale: locale.formatLocale });
+            format('Thu Jan 01 1970 00:00:00 GMT+0000', formatString, { locale: localeForUI.formatLocale });
             return true;
-          } catch (e) {
+          } catch (_err) {
             return false;
           }
-        }
+        };
+
+        let localeOptions: { label: string; value: string | undefined }[] = [
+          { label: '', value: undefined },
+        ];
+        localeOptions = localeOptions.concat(
+          Locale.locales.map((locale) => {
+            const localeForUI = Locale.getAirDatepickerLocale(locale);
+            return { label: `${locale} (${localeForUI.label})`, value: locale }
+          })
+        );
 
         const dateSchema: Record<string, PropPanelSchema> = {
           format: {
             title: i18n('schemas.date.format'),
             type: 'string',
-            default: getFormat(type, locale),
+            default: getFormat(type, localeForUI),
+            placeholder: getFormat(type, localeForUI),
             rules: [
               {
                 validator: validateDateTimeFormat,
@@ -234,6 +236,7 @@ export const getPlugin = ({
             type: 'string',
             widget: 'select',
             default: fallbackFontName,
+            placeholder: fallbackFontName,
             props: { options: fontNames.map((name) => ({ label: name, value: name })) },
             span: 12,
           },
@@ -280,14 +283,14 @@ export const getPlugin = ({
               },
             ],
           },
-          locale: {
-            title: i18n('schemas.date.locale'),
+          localeForUI: {
+            title: i18n('schemas.date.localeForUI'),
             type: 'string',
             widget: 'select',
             props: {
-              options: Locale.locales.map((locale) => ({ label: locale, value: locale })),
+              options: localeOptions,
             },
-            span: 8,
+            span: 16,
           },
         };
 
@@ -297,7 +300,7 @@ export const getPlugin = ({
         name: '',
         format: defaultFormat,
         type,
-        content: format(new Date(), defaultFormat),
+        content: format(new Date(), defaultFormat, { locale: Locale.getAirDatepickerLocale('en').formatLocale }),
         position: { x: 0, y: 0 },
         width: 50,
         height: 10,
@@ -306,9 +309,9 @@ export const getPlugin = ({
         fontSize: DEFAULT_FONT_SIZE,
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         fontColor: DEFAULT_FONT_COLOR,
-        fontName: undefined,
+        fontName: DEFAULT_FONT_NAME,
         backgroundColor: '',
-        locale: 'en',
+        localeForUI: 'en',
         opacity: DEFAULT_OPACITY,
       },
     },

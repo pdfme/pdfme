@@ -80,7 +80,7 @@ export const Dict = z.object({
   'schemas.table.columnStyle': z.string(),
 
   'schemas.date.format': z.string(),
-  'schemas.date.locale': z.string(),
+  'schemas.date.localeForUI': z.string(),
 
   'schemas.select.options': z.string(),
   'schemas.select.optionPlaceholder': z.string(),

@@ -9,5 +9,5 @@ export interface DateSchema extends Schema {
   characterSpacing: number;
   fontColor: string;
   backgroundColor: string;
-  locale?: string;
+  localeForUI?: string;
 }
