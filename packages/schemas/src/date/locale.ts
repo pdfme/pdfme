@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 import { AirDatepickerLocale } from 'air-datepicker';
 
 import localeAr from 'air-datepicker/locale/ar';
@@ -42,7 +40,6 @@ export const locales = [
     'ar', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'eu', 'fi', 'fr', 'hr', 'hu', 'id', 'it', 'ja',
     'ko', 'nb', 'nl', 'pl', 'pt-Br', 'pt', 'ro', 'ru', 'si', 'sk', 'sl', 'sv', 'th', 'tr', 'uk', 'zh',
 ] as const;
-const localeSchema = z.enum(locales);
 
 export interface Locale {
     label: string,
@@ -52,9 +49,7 @@ export interface Locale {
 }
 
 export const getAirDatepickerLocale = (locale: string): Locale => {
-    const parsed = localeSchema.parse(locale);
-
-    switch (parsed) {
+    switch (locale) {
         case 'ar': { return {label: 'Arabic', adLocale: localeAr, close: 'يغلق', formatLocale: dateFns.ar } }
         case 'bg': { return {label: 'Bulgarian', adLocale: localeBg, close: 'близо', formatLocale: dateFns.bg } }
         case 'ca': { return {label: 'Catalan', adLocale: localeCa, close: 'Fermer', formatLocale: dateFns.ca } }

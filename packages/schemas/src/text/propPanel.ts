@@ -62,6 +62,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'string',
         widget: 'select',
         default: fallbackFontName,
+        placeholder: fallbackFontName,
         props: { options: fontNames.map((name) => ({ label: name, value: name })) },
         span: 12,
       },
