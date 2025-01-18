@@ -307,3 +307,66 @@ describe('replacePlaceholders - Security Tests', () => {
     expect(result).toBe('Function: {Function("return 42")()}');
   });
 });
+
+describe('replacePlaceholders - Comparison Operators Tests', () => {
+  it('should evaluate expressions with == operator', () => {
+    const content = 'Equals: {1 == 1}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Equals: true');
+  });
+
+  it('should evaluate expressions with != operator', () => {
+    const content = 'NotEquals: {1 != 2}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('NotEquals: true');
+  });
+
+  it('should evaluate expressions with === operator', () => {
+    const content = 'StrictEquals: {1 === 1}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('StrictEquals: true');
+  });
+
+  it('should evaluate expressions with !== operator', () => {
+    const content = 'StrictNotEquals: {1 !== "1"}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('StrictNotEquals: true');
+  });
+
+  it('should evaluate expressions with < operator', () => {
+    const content = 'LessThan: {1 < 2}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('LessThan: true');
+  });
+
+  it('should evaluate expressions with > operator', () => {
+    const content = 'GreaterThan: {2 > 1}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('GreaterThan: true');
+  });
+
+  it('should evaluate expressions with <= operator', () => {
+    const content = 'LessThanOrEquals: {1 <= 1}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('LessThanOrEquals: true');
+  });
+
+  it('should evaluate expressions with >= operator', () => {
+    const content = 'GreaterThanOrEquals: {2 >= 1}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('GreaterThanOrEquals: true');
+  });
+
+  it('should handle complex expressions with comparison operators', () => {
+    const content = 'Complex: {1 + 2 > 2 && 4 - 1 < 5}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Complex: true');
+  });
+
+  it('should prevent execution of arbitrary code via comparison operators', () => {
+    const content = 'ArbitraryCode: {1 < (() => { return "Hacked" })()}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Execution of arbitrary functions is not allowed; placeholder remains unchanged
+    expect(result).toBe('ArbitraryCode: {1 < (() => { return "Hacked" })()}');
+  });
+});
