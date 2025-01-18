@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 
 import AirDatepicker from 'air-datepicker';
-import type { AirDatepickerLocale } from 'air-datepicker';
+import type { AirDatepickerLocale, AirDatepickerButton } from 'air-datepicker';
 import localeAr from 'air-datepicker/locale/ar';
 import localeBg from 'air-datepicker/locale/bg';
 import localeCa from 'air-datepicker/locale/ca';
@@ -234,6 +234,32 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         }
       };
 
+      const adButtons: AirDatepickerButton[] = [
+        {
+          content: i18n('cancel'),
+          onClick: (datepicker) => {
+            datepicker.hide();
+          },
+        },
+        {
+          content: i18n('clear'),
+          onClick: (datepicker) => {
+            datepicker.hide();
+            commitChange(null);
+          },
+        },
+      ];
+      if (type !== 'date') {
+        adButtons.push({
+          content: i18n('set'),
+          onClick: (datepicker) => {
+            datepicker.hide();
+            const date = datepicker.selectedDates.length ? datepicker.selectedDates[0] : null;
+            commitChange(date);
+          },
+        });
+      }
+
       const airDatepicker = new AirDatepicker(input, {
         locale: locale.adLocale,
         selectedDates: [strDateToDate(value, type)],
@@ -241,25 +267,10 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
-        buttons: [
-          {
-            content: i18n('clear'),
-            onClick: (datepicker) => {
-              datepicker.hide();
-              commitChange(null);
-            },
-          },
-          {
-            content: i18n('set'),
-            onClick: (datepicker) => {
-              datepicker.hide();
-              const date = datepicker.selectedDates.length ? datepicker.selectedDates[0] : null;
-              commitChange(date);
-            },
-          },
-        ],
-        onShow: () => {
-          input.disabled = !isEditable(mode, schema);
+        buttons: adButtons,
+        onSelect: ({ datepicker }) => {
+          type === 'date' &&
+            commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
         },
       });
 
