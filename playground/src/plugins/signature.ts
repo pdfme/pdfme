@@ -42,7 +42,7 @@ export const signature: Plugin<Signature> = {
       const clearButton = document.createElement('button');
       clearButton.style.position = 'absolute';
       clearButton.style.zIndex = '1';
-      clearButton.textContent = i18n('clear') || 'x';
+      clearButton.textContent = i18n('signature.clear') || 'x';
       clearButton.addEventListener('click', () => {
         onChange && onChange({ key: 'content', value: '' });
       });

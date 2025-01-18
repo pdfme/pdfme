@@ -52,7 +52,7 @@ function DesignerApp() {
           font: getFontsData(),
           lang,
           labels: {
-            clear: "🗑️",
+            'signature.clear': "🗑️",
           },
           theme: {
             token: {

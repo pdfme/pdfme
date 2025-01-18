@@ -60,62 +60,43 @@ type PickerType = 'date' | 'time' | 'dateTime';
 interface Locale {
   label: string;
   adLocale: AirDatepickerLocale;
-  close: string;
   formatLocale: dateFns.Locale;
 }
 
-const LOCALE_MAP: Record<
-  string,
-  {
-    label: string;
-    adLocale: AirDatepickerLocale;
-    close: string;
-    formatLocale: dateFns.Locale;
-  }
-> = {
-  ar: { label: 'Arabic', adLocale: localeAr, close: 'يغلق', formatLocale: dateFns.ar },
-  bg: { label: 'Bulgarian', adLocale: localeBg, close: 'близо', formatLocale: dateFns.bg },
-  ca: { label: 'Catalan', adLocale: localeCa, close: 'Fermer', formatLocale: dateFns.ca },
-  cs: { label: 'Czech', adLocale: localeCs, close: 'Blízko', formatLocale: dateFns.cs },
-  da: { label: 'Danish', adLocale: localeDa, close: 'Tæt', formatLocale: dateFns.da },
-  de: { label: 'German', adLocale: localeDe, close: 'Schließen', formatLocale: dateFns.de },
-  el: { label: 'Greek', adLocale: localeEl, close: 'κοντά', formatLocale: dateFns.el },
-  en: { label: 'English', adLocale: localeEn, close: 'Close', formatLocale: dateFns.enUS },
-  es: { label: 'Spanish', adLocale: localeEs, close: 'Cerca', formatLocale: dateFns.es },
-  eu: { label: 'Basque', adLocale: localeEu, close: 'Itxi', formatLocale: dateFns.eu },
-  fi: { label: 'Finnish', adLocale: localeFi, close: 'Lähellä', formatLocale: dateFns.fi },
-  fr: { label: 'French', adLocale: localeFr, close: 'Fermer', formatLocale: dateFns.fr },
-  hr: { label: 'Croatian', adLocale: localeHr, close: 'Zatvoriti', formatLocale: dateFns.hr },
-  hu: { label: 'Hungarian', adLocale: localeHu, close: 'Közeli', formatLocale: dateFns.hu },
-  id: { label: 'Indonesian', adLocale: localeId, close: 'Menutup', formatLocale: dateFns.id },
-  it: { label: 'Italian', adLocale: localeIt, close: 'Vicino', formatLocale: dateFns.it },
-  ja: { label: 'Japanese', adLocale: localeJa, close: '閉じる', formatLocale: dateFns.ja },
-  ko: { label: 'Korean', adLocale: localeKo, close: '닫다', formatLocale: dateFns.ko },
-  nb: { label: 'Norwegian Bokmål', adLocale: localeNb, close: 'Lukke', formatLocale: dateFns.nb },
-  nl: { label: 'Dutch', adLocale: localeNl, close: 'Dichtbij', formatLocale: dateFns.nl },
-  pl: { label: 'Polish', adLocale: localePl, close: 'Zamknąć', formatLocale: dateFns.pl },
-  'pt-Br': {
-    label: 'Portuguese',
-    adLocale: localePtBR,
-    close: 'Fechar',
-    formatLocale: dateFns.ptBR,
-  },
-  pt: { label: 'Portuguese', adLocale: localePt, close: 'Fechar', formatLocale: dateFns.pt },
-  ro: { label: 'Romanian', adLocale: localeRo, close: 'Aproape', formatLocale: dateFns.ro },
-  ru: { label: 'Russian', adLocale: localeRu, close: 'закрывать', formatLocale: dateFns.ru },
-  si: {
-    label: 'Sinhala',
-    adLocale: localeSi,
-    close: 'සමීපයි',
-    formatLocale: dateFns.enUS,
-  },
-  sk: { label: 'Slovak', adLocale: localeSk, close: 'Zavrieť', formatLocale: dateFns.sk },
-  sl: { label: 'Slovenian', adLocale: localeSl, close: 'Blizu', formatLocale: dateFns.sl },
-  sv: { label: 'Swedish', adLocale: localeSv, close: 'Nära', formatLocale: dateFns.sv },
-  th: { label: 'Thai', adLocale: localeTh, close: 'ปิด', formatLocale: dateFns.th },
-  tr: { label: 'Turkish', adLocale: localeTr, close: 'kapalı', formatLocale: dateFns.tr },
-  uk: { label: 'Ukrainian', adLocale: localeUk, close: 'Закрити', formatLocale: dateFns.uk },
-  zh: { label: 'Chinese', adLocale: localeZh, close: '关闭', formatLocale: dateFns.zhCN },
+const LOCALE_MAP: Record<string, Locale> = {
+  ar: { label: 'Arabic', adLocale: localeAr, formatLocale: dateFns.ar },
+  bg: { label: 'Bulgarian', adLocale: localeBg, formatLocale: dateFns.bg },
+  ca: { label: 'Catalan', adLocale: localeCa, formatLocale: dateFns.ca },
+  cs: { label: 'Czech', adLocale: localeCs, formatLocale: dateFns.cs },
+  da: { label: 'Danish', adLocale: localeDa, formatLocale: dateFns.da },
+  de: { label: 'German', adLocale: localeDe, formatLocale: dateFns.de },
+  el: { label: 'Greek', adLocale: localeEl, formatLocale: dateFns.el },
+  en: { label: 'English', adLocale: localeEn, formatLocale: dateFns.enUS },
+  es: { label: 'Spanish', adLocale: localeEs, formatLocale: dateFns.es },
+  eu: { label: 'Basque', adLocale: localeEu, formatLocale: dateFns.eu },
+  fi: { label: 'Finnish', adLocale: localeFi, formatLocale: dateFns.fi },
+  fr: { label: 'French', adLocale: localeFr, formatLocale: dateFns.fr },
+  hr: { label: 'Croatian', adLocale: localeHr, formatLocale: dateFns.hr },
+  hu: { label: 'Hungarian', adLocale: localeHu, formatLocale: dateFns.hu },
+  id: { label: 'Indonesian', adLocale: localeId, formatLocale: dateFns.id },
+  it: { label: 'Italian', adLocale: localeIt, formatLocale: dateFns.it },
+  ja: { label: 'Japanese', adLocale: localeJa, formatLocale: dateFns.ja },
+  ko: { label: 'Korean', adLocale: localeKo, formatLocale: dateFns.ko },
+  nb: { label: 'Norwegian Bokmål', adLocale: localeNb, formatLocale: dateFns.nb },
+  nl: { label: 'Dutch', adLocale: localeNl, formatLocale: dateFns.nl },
+  pl: { label: 'Polish', adLocale: localePl, formatLocale: dateFns.pl },
+  'pt-Br': { label: 'Portuguese', adLocale: localePtBR, formatLocale: dateFns.ptBR },
+  pt: { label: 'Portuguese', adLocale: localePt, formatLocale: dateFns.pt },
+  ro: { label: 'Romanian', adLocale: localeRo, formatLocale: dateFns.ro },
+  ru: { label: 'Russian', adLocale: localeRu, formatLocale: dateFns.ru },
+  si: { label: 'Sinhala', adLocale: localeSi, formatLocale: dateFns.enUS },
+  sk: { label: 'Slovak', adLocale: localeSk, formatLocale: dateFns.sk },
+  sl: { label: 'Slovenian', adLocale: localeSl, formatLocale: dateFns.sl },
+  sv: { label: 'Swedish', adLocale: localeSv, formatLocale: dateFns.sv },
+  th: { label: 'Thai', adLocale: localeTh, formatLocale: dateFns.th },
+  tr: { label: 'Turkish', adLocale: localeTr, formatLocale: dateFns.tr },
+  uk: { label: 'Ukrainian', adLocale: localeUk, formatLocale: dateFns.uk },
+  zh: { label: 'Chinese', adLocale: localeZh, formatLocale: dateFns.zhCN },
 };
 
 const getAirDatepickerLocale = (locale: string) => {
@@ -190,7 +171,7 @@ const getFmtValue = (
     : '';
 };
 
-const getFmtContent = (date: Date[], type: PickerType) => {
+const getFmtContent = (date: Date | null, type: PickerType) => {
   const fmt = (() => {
     switch (type) {
       case 'date': {
@@ -204,7 +185,7 @@ const getFmtContent = (date: Date[], type: PickerType) => {
       }
     }
   })();
-  return date[0] ? format(date[0], fmt) : '';
+  return date ? format(date, fmt) : '';
 };
 
 export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) => {
@@ -213,7 +194,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
 
   const plugin: Plugin<DateSchema> = {
     ui: async (arg) => {
-      const { schema, value, onChange, rootElement, mode, options } = arg;
+      const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
 
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
 
@@ -247,9 +228,9 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
       const input = document.createElement('input');
       Object.assign(input.style, { visibility: 'hidden', position: 'absolute' });
 
-      const commitChange = ({ datepicker }: { datepicker: AirDatepicker<HTMLInputElement> }) => {
+      const commitChange = (date: Date | null) => {
         if (onChange) {
-          onChange({ key: 'content', value: getFmtContent(datepicker.selectedDates, type) });
+          onChange({ key: 'content', value: getFmtContent(date, type) });
         }
       };
 
@@ -261,18 +242,22 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: [
-          'clear',
           {
-            content: locale.close,
+            content: i18n('clear'),
             onClick: (datepicker) => {
               datepicker.hide();
-              commitChange({ datepicker });
+              commitChange(null);
+            },
+          },
+          {
+            content: i18n('set'),
+            onClick: (datepicker) => {
+              datepicker.hide();
+              const date = datepicker.selectedDates.length ? datepicker.selectedDates[0] : null;
+              commitChange(date);
             },
           },
         ],
-        onSelect: ({ datepicker }) => {
-          mode !== 'designer' && commitChange({ datepicker });
-        },
         onShow: () => {
           input.disabled = !isEditable(mode, schema);
         },
@@ -430,7 +415,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         name: '',
         format: defaultFormat,
         type,
-        content: getFmtContent([new Date()], type),
+        content: getFmtContent(new Date(), type),
         position: { x: 0, y: 0 },
         width: 50,
         height: 10,
