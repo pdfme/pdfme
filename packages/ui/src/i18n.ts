@@ -4,6 +4,8 @@ import { DEFAULT_LANG } from './constants.js';
 const dictEn: { [key in keyof Dict]: string } = {
   cancel: 'Cancel',
   close: 'Close',
+  clear: 'Clear',
+  set: 'Set',
   field: 'field',
   fieldName: 'Name',
   align: 'Align',
@@ -80,6 +82,8 @@ const dictEn: { [key in keyof Dict]: string } = {
 const dictZh: { [key in keyof Dict]: string } = {
   cancel: '取消',
   close: '关闭',
+  clear: '清除',
+  set: '设置',
   field: '字段',
   fieldName: '名称',
   align: '对齐',
@@ -154,6 +158,8 @@ const dictZh: { [key in keyof Dict]: string } = {
 const dictJa: { [key in keyof Dict]: string } = {
   cancel: 'キャンセル',
   close: '閉じる',
+  clear: 'クリア',
+  set: '設定',
   field: '入力項目',
   fieldName: '項目名',
   align: '整列',
@@ -228,6 +234,8 @@ const dictJa: { [key in keyof Dict]: string } = {
 const dictKo: { [key in keyof Dict]: string } = {
   cancel: '취소',
   close: '닫기',
+  clear: '지우기',
+  set: '설정',
   field: '필드',
   fieldName: '이름',
   align: '정렬',
@@ -302,6 +310,8 @@ const dictKo: { [key in keyof Dict]: string } = {
 const dictAr: { [key in keyof Dict]: string } = {
   cancel: 'إلغاء',
   close: 'إغلاق',
+  clear: 'مسح',
+  set: 'تعيين',
   field: 'الحقل',
   fieldName: 'اسم الحقل',
   align: 'محاذاة',
@@ -377,6 +387,8 @@ const dictAr: { [key in keyof Dict]: string } = {
 const dictTh: { [key in keyof Dict]: string } = {
   cancel: 'ยกเลิก',
   close: 'ปิด',
+  clear: 'ล้าง',
+  set: 'ตั้งค่า',
   field: 'ฟิลด์',
   fieldName: 'ชื่อฟิลด์',
   align: 'จัดเรียง',
@@ -451,6 +463,8 @@ const dictTh: { [key in keyof Dict]: string } = {
 const dictIt: { [key in keyof Dict]: string } = {
   cancel: 'Annulla',
   close: 'Chiudi',
+  clear: 'Wyczyść',
+  set: 'Ustaw',
   field: 'Campo',
   fieldName: 'Nome',
   align: 'Allinea',
@@ -528,6 +542,8 @@ const dictIt: { [key in keyof Dict]: string } = {
 const dictPl: { [key in keyof Dict]: string } = {
   cancel: 'Anuluj',
   close: 'Zamknij',
+  clear: 'Cancella',
+  set: 'Imposta',
   field: 'pole',
   fieldName: 'Klucz pola',
   align: 'Wyrównanie',
@@ -602,6 +618,8 @@ const dictPl: { [key in keyof Dict]: string } = {
 const dictDe: { [key in keyof Dict]: string } = {
   cancel: 'Abbrechen',
   close: 'Schließen',
+  clear: 'Löschen',
+  set: 'Festlegen',
   field: 'Feld',
   fieldName: 'Name',
   align: 'Ausrichten',
@@ -679,6 +697,8 @@ const dictDe: { [key in keyof Dict]: string } = {
 const dictEs: { [key in keyof Dict]: string } = {
   cancel: 'Cancelar',
   close: 'Cerrar',
+  clear: 'Limpiar',
+  set: 'Establecer',
   field: 'campo',
   fieldName: 'Nombre',
   align: 'Alinear',
@@ -755,6 +775,8 @@ const dictEs: { [key in keyof Dict]: string } = {
 const dictFr: { [key in keyof Dict]: string } = {
   cancel: 'Annuler',
   close: 'Fermer',
+  clear: 'Effacer',
+  set: 'Définir',
   field: 'Champ',
   fieldName: 'Nom',
   align: 'Aligner',

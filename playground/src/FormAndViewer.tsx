@@ -59,7 +59,7 @@ function FormAndViewerApp() {
         options: {
           font: getFontsData(),
           lang: 'ja',
-          labels: { 'clear': '消去' },
+          labels: { 'signature.clear': '消去' },
           theme: {
             token: {
               colorPrimary: '#25c2a0',
