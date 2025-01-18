@@ -56,6 +56,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'string',
       widget: 'select',
       default: fallbackFontName,
+      placeholder: fallbackFontName,
       props: { options: fontNames.map((name) => ({ label: name, value: name })) },
       span: 12,
     },
