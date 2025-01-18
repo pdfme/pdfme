@@ -167,6 +167,22 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
           return left % right;
         case '**':
           return left ** right;
+        case '==':
+          return left == right;
+        case '!=':
+          return left != right;
+        case '===':
+          return left === right;
+        case '!==':
+          return left !== right;
+        case '<':
+          return left < right;
+        case '>':
+          return left > right;
+        case '<=':
+          return left <= right;
+        case '>=':
+          return left >= right;
         default:
           throw new Error(`Unsupported operator: ${binaryNode.operator}`);
       }
