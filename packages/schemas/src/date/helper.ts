@@ -227,18 +227,17 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
       };
       Object.assign(textElement.style, textElementStyle);
 
-      await text.ui(
-        Object.assign(arg, {
-          rootElement: textElement,
-          mode: 'viewer',
-          value: getFmtValue(value, type, schema, locale),
-          schema: {
-            ...arg.schema,
-            verticalAlignment: VERTICAL_ALIGN_MIDDLE,
-            lineHeight: DEFAULT_LINE_HEIGHT,
-          },
-        })
-      );
+      await text.ui({
+        ...arg,
+        rootElement: textElement,
+        mode: 'viewer',
+        value: getFmtValue(value, type, schema, locale),
+        schema: {
+          ...schema,
+          verticalAlignment: VERTICAL_ALIGN_MIDDLE,
+          lineHeight: DEFAULT_LINE_HEIGHT,
+        },
+      });
 
       injectStyles(airDatepickerCss);
 
