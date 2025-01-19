@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Template, checkTemplate, getInputFromTemplate } from "@pdfme/common";
+import { Template, checkTemplate, getInputFromTemplate, Lang } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
@@ -8,6 +8,7 @@ import {
   generatePDF,
   getPlugins,
   isJsonString,
+  translations,
 } from "./helper";
 import { NavItem, NavBar } from "./NavBar";
 
@@ -58,7 +59,7 @@ function FormAndViewerApp() {
         inputs,
         options: {
           font: getFontsData(),
-          lang: 'ja',
+          lang: 'en',
           labels: { 'signature.clear': '消去' },
           theme: {
             token: {
@@ -125,6 +126,23 @@ function FormAndViewerApp() {
   }, [mode, uiRef, buildUi]);
 
   const navItems: NavItem[] = [
+    {
+      label: "Lang",
+      content: (
+        <select
+          className="w-full border rounded px-2 py-1"
+          onChange={(e) => {
+            ui.current?.updateOptions({ lang: e.target.value as Lang });
+          }}
+        >
+          {translations.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      ),
+    },
     {
       label: "Mode",
       content: (

@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
@@ -19,7 +19,6 @@ function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
-  const [lang, setLang] = useState<Lang>("en");
 
 
   const buildDesigner = useCallback(async () => {
@@ -50,7 +49,7 @@ function DesignerApp() {
         template,
         options: {
           font: getFontsData(),
-          lang,
+          lang: 'en',
           labels: {
             'signature.clear': "🗑️",
           },
@@ -122,10 +121,8 @@ function DesignerApp() {
         <select
           className="w-full border rounded px-2 py-1"
           onChange={(e) => {
-            setLang(e.target.value as Lang);
             designer.current?.updateOptions({ lang: e.target.value as Lang });
           }}
-          value={lang}
         >
           {translations.map((t) => (
             <option key={t.value} value={t.value}>
