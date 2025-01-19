@@ -1,7 +1,6 @@
-import { Button, Form } from 'antd';
+import { Button, Form, theme } from 'antd';
 import React from 'react';
 import type { PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
-
 interface ButtonConfig {
   key: string;
   icon: string;
@@ -11,6 +10,7 @@ interface ButtonConfig {
 
 const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
   const { activeElements, changeSchemas, schemas, schema } = props;
+  const { token } = theme.useToken();
 
   const apply = (btn: ButtonConfig) => {
     const key = btn.key;
@@ -38,8 +38,13 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
     return active;
   };
 
+  const replaceCurrentColor = (svgString: string, color?: string) =>
+    color ? svgString.replace(/="currentColor"/g, `="${color}"`) : svgString;
+
   const svgIcon = (svgString: string) => {
-    const svgDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgString)}`;
+    const svgDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(
+      replaceCurrentColor(svgString, token.colorText)
+    )}`;
     return <img width={17} height={17} src={svgDataUrl} />;
   };
 
