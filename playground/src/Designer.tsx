@@ -35,7 +35,7 @@ function DesignerApp() {
         checkTemplate(templateJson);
         template = templateJson;
 
-        if (!templateFromLocal || window.confirm("Would you like to overwrite the locally saved template?")) {
+        if (!templateFromLocal) {
           localStorage.setItem("template", JSON.stringify(templateJson));
         }
       } else if (templateFromLocal) {
