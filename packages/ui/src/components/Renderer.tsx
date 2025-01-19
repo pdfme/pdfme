@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useContext, ReactNode, useRef } from 'react';
-import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions } from '@pdfme/common';
+import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react';
+import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions, cloneDeep } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
@@ -27,17 +27,25 @@ type ReRenderCheckProps = {
   options: UIOptions,
 }
 
-const useRerenderDependencies = ({ plugin, value, mode, scale, schema, options }: ReRenderCheckProps) => {
-  const dependencies = useMemo(() => {
+export const useRerenderDependencies = (arg: ReRenderCheckProps) => {
+  const { plugin, value, mode, scale, schema, options } = arg;
+  const _options = cloneDeep(options);
+  if (_options.font) {
+    Object.values(_options.font).forEach((fontObj) => {
+      (fontObj as { data: string }).data = '...';
+    });
+  }
+  const optionStr = JSON.stringify(_options);
+
+  return useMemo(() => {
     if (plugin.uninterruptedEditMode && mode === 'designer') {
       return [mode];
     } else {
-      return [value, mode, scale, JSON.stringify(schema), JSON.stringify(options)];
+      return [value, mode, scale, JSON.stringify(schema), optionStr];
     }
-  }, [value, mode, scale, schema, options]);
-
-  return dependencies;
+  }, [plugin.uninterruptedEditMode, value, mode, scale, schema, optionStr]);
 };
+
 
 const Wrapper = ({
   children,
@@ -79,13 +87,14 @@ const Wrapper = ({
 );
 
 const Renderer = (props: RendererProps) => {
+  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
+    props;
+
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
-    props;
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
@@ -93,13 +102,13 @@ const Renderer = (props: RendererProps) => {
     (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
   ) as Plugin<any>;
 
+  const reRenderDependencies = useRerenderDependencies({ plugin, value, mode, scale, schema, options });
+
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
-
-  const reRenderDependencies = useRerenderDependencies({ plugin, value, mode, scale, schema, options });
 
   useEffect(() => {
     if (ref.current && schema.type) {
