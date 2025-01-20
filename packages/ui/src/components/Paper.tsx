@@ -95,14 +95,16 @@ const Paper = (props: {
           >
             {renderPaper({ paperSize, index: paperIndex })}
             {schemasList[paperIndex].map((schema, schemaIndex) => {
+            // find the base index by adding the length of the all the previous pages schemas
+              const baseIndex = schemasList
+                .slice(0, paperIndex)
+                .reduce((acc, curr) => acc + curr.length, 0);
+              const index = baseIndex + schemaIndex;
               return (
                 <div key={schema.id}>
                   {renderSchema({
                     schema,
-                    index:
-                      paperIndex === 0
-                        ? schemaIndex
-                        : schemaIndex + schemasList[paperIndex - 1].length,
+                    index,
                   })}
                 </div>
               );
