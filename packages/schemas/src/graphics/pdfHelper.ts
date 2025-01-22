@@ -1,4 +1,4 @@
-import { Schema, UIRenderProps } from '@pdfme/common';
+import { UIRenderProps } from '@pdfme/common';
 import { getCacheKey } from './cacheKey';
 import { ImageSchema } from './image';
 
@@ -14,27 +14,29 @@ export const pdfToImage = async ({
   schema,
   value,
   _cache,
-  pdfJs,
-}: UIRenderProps<ImageSchema>): Promise<string> => {
+}: // TODO pdfJsは削除されているので、代替案を検討する
+// pdfJs,
+UIRenderProps<ImageSchema>): Promise<string> => {
   // using value from cache to prevent rerending pdf to image
-  const pdfImageCacheKey = getCacheKey(schema, value);
-  const imageSrc = _cache.get(pdfImageCacheKey);
-  if (imageSrc) return imageSrc;
+  // const pdfImageCacheKey = getCacheKey(schema, value);
+  // const imageSrc = _cache.get(pdfImageCacheKey);
+  // if (imageSrc) return imageSrc;
 
-  const pdfDoc = await pdfJs.getDocument({ url: value }).promise;
-  const page = await pdfDoc.getPage(1);
+  // const pdfDoc = await pdfJs.getDocument({ url: value }).promise;
+  // const page = await pdfDoc.getPage(1);
 
-  const canvas = document.createElement('canvas');
-  const viewport = page.getViewport({ scale: 1 });
-  canvas.width = viewport.width;
-  canvas.height = viewport.height;
-  const canvasContext = canvas.getContext('2d')!;
+  // const canvas = document.createElement('canvas');
+  // const viewport = page.getViewport({ scale: 1 });
+  // canvas.width = viewport.width;
+  // canvas.height = viewport.height;
+  // const canvasContext = canvas.getContext('2d')!;
 
-  await page.render({ canvasContext, viewport }).promise;
-  const image = await _canvasToObjectUrl(canvas);
+  // await page.render({ canvasContext, viewport }).promise;
+  // const image = await _canvasToObjectUrl(canvas);
 
-  _cache.set(pdfImageCacheKey, image);
-  return image;
+  // _cache.set(pdfImageCacheKey, image);
+  // return image;
+  return '';
 };
 
 /**

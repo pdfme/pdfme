@@ -9,15 +9,15 @@ import {
   ChangeSchemas,
   isBlankPdf,
 } from '@pdfme/common';
+import { pdf2img, pdf2sizes } from '@pdfme/converter';
 
 import {
   schemasList2template,
   uuid,
   getUniqueSchemaName,
   moveCommandToChangeSchemasArg,
-  pdf2Pngs,
-  getPdfPageSizes,
-  b64toBlob,
+  base64ToArrayBuffer,
+  arrayBufferToBase64,
   initShortCuts,
   destroyShortCuts,
 } from './helper.js';
@@ -61,11 +61,12 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       _pageSizes = schemas.map(() => ({ width, height }));
     } else {
       const _basePdf = await getB64BasePdf(basePdf);
-      const pdfBlob = b64toBlob(_basePdf);
-      _pageSizes = await getPdfPageSizes(pdfBlob);
+      const pdfBuffer = base64ToArrayBuffer(_basePdf);
+      _pageSizes = await pdf2sizes(pdfBuffer);
       paperWidth = _pageSizes[0].width * ZOOM;
       paperHeight = _pageSizes[0].height * ZOOM;
-      _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
+      const imgBuffers = await pdf2img(pdfBuffer);
+      _backgrounds = imgBuffers.map(arrayBufferToBase64);
     }
     const _scale = Math.min(
       getScale(size.width, paperWidth),
@@ -82,7 +83,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       })
       .catch((err: Error) => {
         setError(err);
-        console.error(`[@pdfme/ui] ${err}`);
+        console.error('[@pdfme/ui]', err);
       });
   }, [template, size]);
 
@@ -230,7 +231,11 @@ export const useInitEvents = ({
         const stackUniqueSchemaNames: string[] = [];
         const pasteSchemas = copiedSchemas.current.map((cs) => {
           const id = uuid();
-          const name = getUniqueSchemaName({ copiedSchemaName: cs.name, schema, stackUniqueSchemaNames });
+          const name = getUniqueSchemaName({
+            copiedSchemaName: cs.name,
+            schema,
+            stackUniqueSchemaNames,
+          });
           const { height, width, position: p } = cs;
           const ps = pageSizes[pageCursor];
           const position = {

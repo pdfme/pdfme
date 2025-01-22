@@ -23,13 +23,13 @@
   },
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
       "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js", 
+      "node": "./dist/cjs/src/index.node.js",
       "default": "./dist/esm/src/index.browser.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/types/src/index.node.d.ts"
     }
   },
   "optionalDependencies": {
@@ -47,15 +47,12 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.3",
-    "acorn": "^8.14.0",
-    "buffer": "^6.0.3",
-    "pdfjs-dist": "^3.11.174",
-    "zod": "^3.20.2"
+    "@pdfme/common": "file:../common",
+    "pdfjs-dist": "^3.11.174"
   },
-  "peerDependencies": {
-    "antd": "^5.11.2",
-    "form-render": "^2.2.20"
+  "devDependencies": {
+    "@pdfme/generator": "file:../generator",
+    "@types/estree": "^1.0.6"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
@@ -77,8 +74,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "devDependencies": {
-    "@types/estree": "^1.0.6"
   }
 }

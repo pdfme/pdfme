@@ -69,14 +69,12 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {number} [tabIndex] - Tab index for Form.
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
- * @property {string} key - The key of the schema object.
  * @property {string} value - The string used for UI rendering.
  * @property {(arg: { key: string; value: any } | { key: string; value: any }[]) => void} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
- * @property {Size} pageSize - The size of the page being edited.
  * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
@@ -92,7 +90,6 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: keyof Dict | string) => string;
-  pdfJs: typeof import('pdfjs-dist');
   _cache: Map<any, any>;
 };
 

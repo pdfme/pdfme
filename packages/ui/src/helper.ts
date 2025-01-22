@@ -1,11 +1,9 @@
-import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import hotkeys from 'hotkeys-js';
 import {
   cloneDeep,
   ZOOM,
   getB64BasePdf,
   b64toUint8Array,
-  pt2mm,
   Template,
   BasePdf,
   SchemaForUI,
@@ -13,9 +11,8 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
+import { pdf2sizes } from '@pdfme/converter';
 import { RULER_HEIGHT } from './constants.js';
-
-GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -191,57 +188,24 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
-export const getPdfPageSizes = async (pdfBlob: Blob) => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await getDocument({ url }).promise;
+export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
 
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      return await pdfDoc.getPage(i + 1).then((page) => {
-        const { height, width } = page.getViewport({ scale: 1, rotation: 0 });
-
-        return { height: pt2mm(height), width: pt2mm(width) };
-      });
-    })
-  );
-
-  URL.revokeObjectURL(url);
-
-  return promises;
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes.buffer;
 };
 
-const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg') => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await getDocument({ url }).promise;
-
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      return await pdfDoc.getPage(i + 1).then((page) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = width * 2;
-        const canvasContext = canvas.getContext('2d')!;
-        const scaleRequired = canvas.width / page.getViewport({ scale: 1, rotation: 0 }).width;
-        const viewport = page.getViewport({ scale: scaleRequired, rotation: 0 });
-        canvas.height = viewport.height;
-
-        return page
-          .render({ canvasContext, viewport })
-          .promise.then(() => canvas.toDataURL(`image/${imageType}`));
-      });
-    })
-  );
-  URL.revokeObjectURL(url);
-
-  return promises;
-};
-
-export const pdf2Pngs = (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
-
-export const b64toBlob = (base64: string) => {
-  const uint8Array = b64toUint8Array(base64);
-  const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
-
-  return new Blob([uint8Array.buffer], { type: mimeType });
+export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
@@ -268,8 +232,7 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    const pdfBlob = b64toBlob(b64BasePdf);
-    pageSizes = await getPdfPageSizes(pdfBlob);
+    pageSizes = await pdf2sizes(base64ToArrayBuffer(b64BasePdf));
   }
 
   const ssl = schemasForUI.length;

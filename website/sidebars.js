@@ -18,6 +18,7 @@ const sidebars = {
         'custom-schemas',
       ],
     },
+    'converter',
     'development-guide',
   ],
 };
