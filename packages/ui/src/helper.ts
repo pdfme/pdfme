@@ -188,28 +188,59 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
-export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
+/**
+ * Guess the MIME type by checking the first few bytes of the ArrayBuffer.
+ * Currently checks for PNG, JPEG, and GIF signatures.
+ */
+function detectMimeType(arrayBuffer: ArrayBuffer): string {
+  const dataView = new DataView(arrayBuffer);
 
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  // Check for PNG signature: 0x89 0x50 0x4E 0x47
+  if (
+    dataView.getUint8(0) === 0x89 &&
+    dataView.getUint8(1) === 0x50 &&
+    dataView.getUint8(2) === 0x4e &&
+    dataView.getUint8(3) === 0x47
+  ) {
+    return 'image/png';
   }
-  return bytes.buffer;
-};
+
+  // Check for JPEG signature: 0xFF 0xD8 0xFF
+  if (
+    dataView.getUint8(0) === 0xff &&
+    dataView.getUint8(1) === 0xd8 &&
+    dataView.getUint8(2) === 0xff
+  ) {
+    return 'image/jpeg';
+  }
+
+  return ''; // Unknown type
+}
 
 export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
+  // Detect the MIME type
+  const mimeType = detectMimeType(arrayBuffer);
+
+  // Convert ArrayBuffer to raw Base64
   const bytes = new Uint8Array(arrayBuffer);
   let binary = '';
   for (let i = 0; i < bytes.length; i++) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary);
+  const base64String = btoa(binary);
+
+  // Optionally prepend a data: URL if a known MIME type is found;
+  // otherwise just return the raw Base64.
+  if (mimeType) {
+    return `data:${mimeType};base64,${base64String}`;
+  } else {
+    // or you can default to `application/octet-stream` if unknown
+    return `data:application/octet-stream;base64,${base64String}`;
+  }
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
-  template.schemas.forEach((page, i) => {
+  template.schemas.forEach((page) => {
     page.forEach((schema) => {
       schema.id = uuid();
       schema.content = schema.content || '';
@@ -232,7 +263,7 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    pageSizes = await pdf2sizes(base64ToArrayBuffer(b64BasePdf));
+    pageSizes = await pdf2sizes(b64toUint8Array(b64BasePdf));
   }
 
   const ssl = schemasForUI.length;
