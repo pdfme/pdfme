@@ -16,6 +16,7 @@
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@pdfme/common": "file:../packages/common/dist",
+    "@pdfme/converter": "file:../packages/converter/dist",
     "@pdfme/generator": "file:../packages/generator/dist",
     "@pdfme/schemas": "file:../packages/schemas/dist",
     "@pdfme/ui": "file:../packages/ui/dist",

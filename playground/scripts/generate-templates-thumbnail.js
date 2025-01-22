@@ -3,12 +3,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const pdfjsDist = require('pdfjs-dist/legacy/build/pdf');
-const pdfjsWorker = require('pdfjs-dist/build/pdf.worker');
 
-const Canvas = require('canvas');
-const { strict: invariant } = require('node:assert');
 const { generate } = require('@pdfme/generator');
+const { pdf2img } = require('@pdfme/converter');
 const { getInputFromTemplate, getDefaultFont } = require('@pdfme/common');
 const {
   multiVariableText,
@@ -76,87 +73,26 @@ const font = {
   },
 }
 
-
-pdfjsDist.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
-
-class NodeCanvasFactory {
-  canvas = null;
-  context = null;
-  getOrCreateCanvas(
-    width,
-    height,
-  ) {
-    invariant(width > 0 && height > 0, 'Invalid canvas size');
-    if (!this.canvas) {
-      this.canvas = Canvas.createCanvas(width, height);
-      this.context = this.canvas.getContext('2d');
-    } else {
-      this.canvas.width = width;
-      this.canvas.height = height;
-    }
-    return { canvas: this.canvas, context: this.context };
-  }
-}
-
-async function pdf2Pngs(pdf) {
-  const filePath = path.resolve('./public', 'cmaps');
-
-  try {
-    const pdfDocument = await pdfjsDist.getDocument({
-      data: new Uint8Array(pdf.buffer, pdf.byteOffset, pdf.byteLength),
-      cMapUrl: filePath,
-      cMapPacked: true,
-    }).promise;
-
-    const canvasFactory = new NodeCanvasFactory();
-
-    const pages = async function* () {
-      const limit = pdfDocument.numPages;
-      for (let pg = 1; pg <= pdfDocument.numPages && pg <= limit; pg++) {
-        try {
-          const page = await pdfDocument.getPage(pg);
-          const viewport = page.getViewport({ scale: 1 });
-
-          const { canvas, context: canvasContext } = canvasFactory.getOrCreateCanvas(viewport.width, viewport.height);
-
-          await page.render({ canvasContext, viewport, canvasFactory }).promise;
-          yield canvas.toBuffer('image/png');
-        } catch (error) {
-          throw new Error(`Failed to process page ${pg}: ${error instanceof Error ? error.message : String(error)}`);
-        }
-      }
-    };
-
-    const imageStream = await pages();
-
-    const images = [];
-
-    for await (const image of imageStream) {
-      images.push(image);
-    }
-
-    return images;
-  } catch (error) {
-    throw new Error(`Failed to convert PDF to PNGs: ${error instanceof Error ? error.message : String(error)}`);
-  }
-}
-
 async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
   try {
     const templateJsonStr = fs.readFileSync(templatePath, 'utf-8');
     const templateJson = JSON.parse(templateJsonStr);
 
-    const pdfBuffer = await generate({
+    const pdf = await generate({
       template: templateJson,
       inputs: getInputFromTemplate(templateJson),
       options: { font },
       plugins
     });
 
-    const pngBuffers = await pdf2Pngs(pdfBuffer);
+    const images = await pdf2img(pdf.buffer, {
+      imageType: 'png',
+      range: { end: 1 }
+    });
 
-    fs.writeFileSync(thumbnailPath, pngBuffers[0]);
+    const thumbnail = images[0];
+
+    fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
   } catch (err) {
     console.error(`Failed to create thumbnail from ${templatePath}:`, err);
   }

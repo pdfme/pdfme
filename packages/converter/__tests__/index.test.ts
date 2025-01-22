@@ -1,3 +1,4 @@
+// @ts-ignore
 import { generate } from '@pdfme/generator';
 import { pdf2img as nodePdf2Img, pdf2sizes as nodePdf2Sizes } from '../src/index.node';
 
