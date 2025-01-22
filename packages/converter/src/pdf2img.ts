@@ -2,7 +2,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 
 type ImageType = 'jpeg' | 'png';
 
-export interface Environment {
+interface Environment {
   getDocument: (pdf: ArrayBuffer) => Promise<PDFDocumentProxy>;
   createCanvas: (width: number, height: number) => HTMLCanvasElement | OffscreenCanvas;
   canvasToArrayBuffer: (
@@ -20,15 +20,17 @@ export interface Pdf2ImgOptions {
   };
 }
 
-export async function pdf2imgCore(
+export async function pdf2img(
   pdf: ArrayBuffer,
+  options: Pdf2ImgOptions = {},
   env: Environment,
-  options: Pdf2ImgOptions = {}
 ): Promise<ArrayBuffer[]> {
   const { scale = 1, imageType = 'jpeg', range = {} } = options;
   const { start = 0, end = Infinity } = range;
 
-  const pdfDoc = await env.getDocument(pdf);
+  const { getDocument, createCanvas, canvasToArrayBuffer } = env;
+
+  const pdfDoc = await getDocument(pdf);
   const numPages = pdfDoc.numPages;
 
   const startPage = Math.max(start + 1, 1);
@@ -40,7 +42,7 @@ export async function pdf2imgCore(
     const page = await pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale });
 
-    const canvas = env.createCanvas(viewport.width, viewport.height);
+    const canvas = createCanvas(viewport.width, viewport.height);
     if (!canvas) {
       throw new Error('Failed to create canvas');
     }
@@ -51,7 +53,7 @@ export async function pdf2imgCore(
     }
 
     await page.render({ canvasContext: context, viewport }).promise;
-    const arrayBuffer = env.canvasToArrayBuffer(canvas, imageType);
+    const arrayBuffer = canvasToArrayBuffer(canvas, imageType);
     results.push(arrayBuffer);
   }
 
