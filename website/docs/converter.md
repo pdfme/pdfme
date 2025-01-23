@@ -1,6 +1,6 @@
 # Converter
 
-`@pdfme/converter` is an independent package within the [pdfme](https://github.com/pdfme/pdfme) ecosystem. Unlike the other packages such as `@pdfme/ui`, `@pdfme/generator`, and `@pdfme/schemas`, you can use `@pdfme/converter` on its own.
+`@pdfme/converter` can be used in both Node.js and in the browser.  
 
 Its primary purpose is to convert PDFs into other formats (like images) or to convert various data formats (like Markdown) into PDFs.
 
@@ -19,8 +19,7 @@ Planned conversion features include:
 npm install @pdfme/converter
 ```
 
-`@pdfme/converter` can be used in both Node.js and in the browser.  
-However, if you want to convert PDFs to images (`pdf2img`) in Node.js, you’ll need [node-canvas](https://github.com/Automattic/node-canvas) (^2.11.2), which requires an additional step:
+If you want to convert PDFs to images (`pdf2img`) in Node.js, you’ll need [node-canvas](https://github.com/Automattic/node-canvas) (^2.11.2), which requires an additional step:
 
 ```bash
 npm install canvas@^2.11.2

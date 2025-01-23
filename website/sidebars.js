@@ -18,7 +18,16 @@ const sidebars = {
         'custom-schemas',
       ],
     },
-    'converter',
+    {
+      type: 'category',
+      collapsed: true,
+      label: 'Tools',
+      items: [
+        'converter',
+        'manipulator',
+        'optimizer',
+      ],
+    },
     'development-guide',
   ],
 };
