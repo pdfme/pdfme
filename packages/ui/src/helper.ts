@@ -11,7 +11,7 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
-import { pdf2sizes } from '@pdfme/converter';
+import { pdf2size } from '@pdfme/converter';
 import { RULER_HEIGHT } from './constants.js';
 
 export const uuid = () =>
@@ -263,7 +263,7 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    pageSizes = await pdf2sizes(b64toUint8Array(b64BasePdf));
+    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf));
   }
 
   const ssl = schemasForUI.length;

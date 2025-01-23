@@ -10,7 +10,7 @@ import {
   ChangeSchemas,
   isBlankPdf,
 } from '@pdfme/common';
-import { pdf2img, pdf2sizes } from '@pdfme/converter';
+import { pdf2img, pdf2size } from '@pdfme/converter';
 
 import {
   schemasList2template,
@@ -67,7 +67,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       const _basePdf = await getB64BasePdf(basePdf);
 
       const [_pages, imgBuffers] = await Promise.all([
-        pdf2sizes(b64toUint8Array(_basePdf)),
+        pdf2size(b64toUint8Array(_basePdf)),
         pdf2img(b64toUint8Array(_basePdf), { scale: MAX_ZOOM }),
       ]);
 

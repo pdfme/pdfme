@@ -5,13 +5,13 @@ interface Environment {
   getDocument: (pdf: ArrayBuffer) => Promise<PDFDocumentProxy>;
 }
 
-export interface Pdf2SizesOptions {
+export interface Pdf2SizeOptions {
   scale?: number;
 }
 
-export async function pdf2sizes(
+export async function pdf2size(
   pdf: ArrayBuffer,
-  options: Pdf2SizesOptions = {},
+  options: Pdf2SizeOptions = {},
   env: Environment
 ): Promise<Size[]> {
   const { scale = 1 } = options;

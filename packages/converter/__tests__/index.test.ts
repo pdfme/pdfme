@@ -1,6 +1,6 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
-import { pdf2img as nodePdf2Img, pdf2sizes as nodePdf2Sizes } from '../src/index.node';
+import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node';
 
 describe('pdf2img tests', () => {
   let pdfArrayBuffer: ArrayBuffer;
@@ -64,7 +64,7 @@ describe('pdf2img tests', () => {
   });
 });
 
-describe('pdf2sizes tests', () => {
+describe('pdf2size tests', () => {
   let pdfArrayBuffer: ArrayBuffer;
 
   beforeAll(async () => {
@@ -91,7 +91,7 @@ describe('pdf2sizes tests', () => {
   });
 
   test('returns array of page sizes', async () => {
-    const sizes = await nodePdf2Sizes(pdfArrayBuffer, { scale: 1 });
+    const sizes = await nodePdf2Size(pdfArrayBuffer, { scale: 1 });
     expect(Array.isArray(sizes)).toBe(true);
     expect(sizes.length).toBe(4);
     sizes.forEach((size) => {
@@ -104,7 +104,7 @@ describe('pdf2sizes tests', () => {
 
   test('scale option - properly adjusts size', async () => {
     const scale = 0.5;
-    const sizes = await nodePdf2Sizes(pdfArrayBuffer, { scale });
+    const sizes = await nodePdf2Size(pdfArrayBuffer, { scale });
     sizes.forEach((size) => {
       expect(size.width).toBeLessThan(200);
       expect(size.height).toBeLessThan(300);
@@ -113,12 +113,12 @@ describe('pdf2sizes tests', () => {
 
   test('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
-    await expect(nodePdf2Sizes(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
+    await expect(nodePdf2Size(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
   });
 
   test('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
-    await expect(nodePdf2Sizes(emptyBuffer, { scale: 1 })).rejects.toThrow(
+    await expect(nodePdf2Size(emptyBuffer, { scale: 1 })).rejects.toThrow(
       'The PDF file is empty, i.e. its size is zero by'
     );
   });
