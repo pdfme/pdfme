@@ -84,13 +84,12 @@
     ],
     "moduleNameMapper": {
       "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^antd/es/": "antd/lib/",
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
-      "^lodash-es$": "lodash",
-      "^pdfjs-dist/legacy/build/pdf.js$": "<rootDir>/__mocks__/pdfjs-dist.js",
-      "^pdfjs-dist/legacy/build/pdf.worker.entry.js$": "<rootDir>/__mocks__/pdfjs-dist.js"
+      "^lodash-es$": "lodash"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
