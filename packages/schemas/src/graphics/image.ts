@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import type { PDFImage, PDFEmbeddedPage } from '@pdfme/pdf-lib';
+import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { PDFRenderProps, Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
@@ -14,7 +14,6 @@ import {
 } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
 import { getImageDimension } from './imagehelper.js';
-import { isPdf, pdfToImage } from './pdfHelper.js';
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };
@@ -27,24 +26,17 @@ const imageSchema: Plugin<ImageSchema> = {
   pdf: async (arg: PDFRenderProps<ImageSchema>) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value) return;
-    const isGraphicPdf = isPdf(value);
-    const isImageOrPdf = value.startsWith('data:image/') || isGraphicPdf;
-    if (!isImageOrPdf) return;
 
     const inputImageCacheKey = getCacheKey(schema, value);
-    let image = _cache.get(inputImageCacheKey) as PDFImage | PDFEmbeddedPage;
+    let image = _cache.get(inputImageCacheKey) as PDFImage;
     if (!image) {
-      if (isGraphicPdf) {
-        [image] = await pdfDoc.embedPdf(value);
-      } else {
-        const isPng = value.startsWith('data:image/png;');
-        image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
-      }
+      const isPng = value.startsWith('data:image/png;');
+      image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
       _cache.set(inputImageCacheKey, image);
     }
 
     const _schema = { ...schema, position: { ...schema.position } };
-    const dimension = isGraphicPdf ? image.scale(1) : getImageDimension(value);
+    const dimension = getImageDimension(value);
     const imageWidth = px2mm(dimension.width);
     const imageHeight = px2mm(dimension.height);
     const boxWidth = _schema.width;
@@ -69,11 +61,9 @@ const imageSchema: Plugin<ImageSchema> = {
     const { x, y } = position;
 
     const drawOptions = { x, y, rotate, width, height, opacity };
-    isGraphicPdf
-      ? page.drawPage(image as PDFEmbeddedPage, drawOptions)
-      : page.drawImage(image as PDFImage, drawOptions);
+    page.drawImage(image, drawOptions);
   },
-  ui: async (arg: UIRenderProps<ImageSchema>) => {
+  ui: (arg: UIRenderProps<ImageSchema>) => {
     const {
       value,
       rootElement,
@@ -107,7 +97,6 @@ const imageSchema: Plugin<ImageSchema> = {
 
     // image tag
     if (value) {
-      let src = isPdf(value) ? await pdfToImage(arg) : value;
       const img = document.createElement('img');
       const imgStyle: CSS.Properties = {
         height: '100%',
@@ -116,7 +105,7 @@ const imageSchema: Plugin<ImageSchema> = {
         objectFit: 'contain',
       };
       Object.assign(img.style, imgStyle);
-      img.src = src;
+      img.src = value;
       container.appendChild(img);
     }
 
@@ -174,12 +163,16 @@ const imageSchema: Plugin<ImageSchema> = {
       Object.assign(input.style, inputStyle);
       input.tabIndex = tabIndex || 0;
       input.type = 'file';
-      input.accept = 'image/jpeg, image/png, application/pdf';
+      input.accept = 'image/jpeg, image/png';
       input.addEventListener('change', (event: Event) => {
         const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
-        readFile(changeEvent.target.files).then(
-          (result) => onChange && onChange({ key: 'content', value: result as string })
-        );
+        readFile(changeEvent.target.files)
+          .then((result) => {
+            onChange && onChange({ key: 'content', value: result as string });
+          })
+          .catch((error) => {
+            console.error('Error reading file:', error);
+          });
       });
       input.addEventListener('blur', () => stopEditing && stopEditing());
       label.appendChild(input);

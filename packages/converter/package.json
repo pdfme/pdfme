@@ -44,7 +44,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/common": "file:../common",
+    "@pdfme/common": "*",
     "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {

@@ -44,7 +44,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.3",
+    "@pdfme/pdf-lib": "*",
     "acorn": "^8.14.0",
     "buffer": "^6.0.3",
     "zod": "^3.20.2"
