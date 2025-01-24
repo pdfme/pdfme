@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Template, checkTemplate, getInputFromTemplate } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
-import { text, image, barcodes } from '@pdfme/schemas';
+import { text, barcodes } from '@pdfme/schemas';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
@@ -51,7 +51,7 @@ const DemoApp = (props: Props) => {
     const t0 = performance.now();
     const pdf = await generate({
       template,
-      plugins: { text, image, ...barcodes },
+      plugins: { text, ...barcodes },
       inputs,
       options: { font }
     });
