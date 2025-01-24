@@ -66,8 +66,7 @@
     "pngjs": "^7.0.0"
   },
   "peerDependencies": {
-    "@pdfme/common": "latest",
-    "@pdfme/converter": "latest"
+    "@pdfme/common": "latest"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

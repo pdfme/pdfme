@@ -32,9 +32,6 @@
       "types": "./dist/types/src/index.node.d.ts"
     }
   },
-  "optionalDependencies": {
-    "canvas": "^2.11.0"
-  },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
     "build": "npm-run-all --parallel build:cjs build:esm",
@@ -53,6 +50,9 @@
   "devDependencies": {
     "@pdfme/generator": "file:../generator",
     "@types/estree": "^1.0.6"
+  },
+  "optionalDependencies": {
+    "canvas": "^2.11.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",

@@ -71,8 +71,7 @@
   },
   "peerDependencies": {
     "@pdfme/common": "latest",
-    "@pdfme/schemas": "latest",
-    "@pdfme/converter": "latest"
+    "@pdfme/schemas": "latest"
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom",
