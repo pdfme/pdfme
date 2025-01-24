@@ -10,5 +10,8 @@ for dir in generator ui; do
     cd "$dir"
     npm link @pdfme/common
     npm link @pdfme/schemas
+    if [ "$dir" = "ui" ]; then
+        npm link @pdfme/converter
+    fi
     cd ..
 done

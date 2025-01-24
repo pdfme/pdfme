@@ -1,5 +1,5 @@
 {
-  "name": "@pdfme/common",
+  "name": "@pdfme/converter",
   "version": "0.0.0",
   "sideEffects": false,
   "author": "hand-dot",
@@ -23,17 +23,17 @@
   },
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "browser": "./dist/esm/src/index.browser.js",
+      "node": "./dist/cjs/src/index.node.js",
+      "default": "./dist/esm/src/index.browser.js",
+      "types": "./dist/types/src/index.node.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "prebuild": "node replace-version.js",
     "build": "npm-run-all --parallel build:cjs build:esm",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
@@ -44,14 +44,15 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.3",
-    "acorn": "^8.14.0",
-    "buffer": "^6.0.3",
-    "zod": "^3.20.2"
+    "@pdfme/common": "file:../common",
+    "pdfjs-dist": "^3.11.174"
   },
-  "peerDependencies": {
-    "antd": "^5.11.2",
-    "form-render": "^2.2.20"
+  "devDependencies": {
+    "@pdfme/generator": "file:../generator",
+    "@types/estree": "^1.0.6"
+  },
+  "optionalDependencies": {
+    "canvas": "^2.11.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
@@ -73,8 +74,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "devDependencies": {
-    "@types/estree": "^1.0.6"
   }
 }
