@@ -194,7 +194,7 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={'col col--9'}>
+            <div className={'col col--9'} style={{ padding: 0 }}>
               <div style={{ height: 700 }} ref={designerRef} />
             </div>
             <div className={'col col--3'}>
