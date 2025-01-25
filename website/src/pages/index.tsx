@@ -194,11 +194,11 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={'col col--8'}>
-              <div style={{ height: 1000 }} ref={designerRef} />
+            <div className={'col col--9'}>
+              <div style={{ height: 700 }} ref={designerRef} />
             </div>
-            <div className={'col col--4'}>
-              <div style={{ height: 1000, overflow: 'auto' }}>
+            <div className={'col col--3'}>
+              <div style={{ height: 700, overflow: 'auto' }}>
                 <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
               </div>
             </div>
@@ -294,9 +294,9 @@ export default function Home(): JSX.Element {
                 </li>
               </ul>
               {mode === 'form' ? (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
               ) : (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
               )}
               <div className="margin-vert--lg text--center">
                 <button className="button button--lg button--secondary" onClick={generatePDF}>
@@ -311,32 +311,38 @@ export default function Home(): JSX.Element {
           <Divider />
         </div>
 
-        <div className={'col col--12 margin-vert--lg'}>
-          <div className="text--center">
-            <p>
-              Let's check out applications that you can make with pdfme and how it works by actually
-              using it.
-            </p>
-            <div
-              className="row row--no-gutters"
-              style={{ alignItems: 'center', justifyContent: 'center' }}
-            >
-              <div className="col col--3" style={{ marginTop: '1rem' }}>
-                <Link className="button button--primary button--lg" to="/demo">
-                  Check out the Demo Apps
-                </Link>
-              </div>
-              <div className="col col--3" style={{ marginTop: '1rem' }}>
-                <Link className="button button--info button--lg" to="/templates">
-                  Sample Templates
-                </Link>
-              </div>
+        <div className="col col--12 margin-vert--lg text--center">
+          <h2>We are Open Source❤️</h2>
+          <p>
+            pdfme is an open source project and we love contributions.
+            <br />
+            We are always looking for contributors to help us improve our project.
+          </p>
+
+          <div className="margin-vert--lg">
+            <h3 style={{ marginBottom: '20px' }}>Contributors</h3>
+            <div>
+              <a href="https://github.com/pdfme/pdfme/graphs/contributors">
+                <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
+              </a>
             </div>
           </div>
-        </div>
 
-        <GithubStar />
+          <div className="margin-vert--lg">
+            <h3>Support pdfme</h3>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <a href="https://github.com/sponsors/pdfme" target="_blank" style={{ margin: '20px' }}>
+                <img alt="GitHub Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" width={190} />
+              </a>
+              <a href="https://opencollective.com/pdfme/donate" target="_blank" style={{ margin: '20px' }}>
+                <img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" width={250} />
+              </a>
+            </div>
+          </div>
+
+          <GithubStar />
+        </div>
       </main>
-    </Layout>
+    </Layout >
   );
 }

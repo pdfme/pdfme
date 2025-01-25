@@ -21,7 +21,7 @@ const sidebars = {
     {
       type: 'category',
       collapsed: true,
-      label: 'Tools',
+      label: 'Tools(New)',
       items: [
         'converter',
         'manipulator',

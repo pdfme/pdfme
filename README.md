@@ -29,11 +29,10 @@
 
 ## Features
 
-| Fast PDF Generator                                                                             | Easy PDF Template Design                              | Simple JSON Template                                           |
-| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
-| Works on Node and browser. Use templates to generate PDFs; complex operations are not needed.  | Anyone can easily create templates with the designer. | Templates are JSON data that is easy to understand and handle. |
+| Fast PDF Generator | Easy PDF Template Design | Simple JSON Template |
+| --- |  --- | --- |
+| Works on Node and browser. Use templates to generate PDFs; complex operations are not needed. | Anyone can easily create templates with the designer. | Templates are JSON data that is easy to understand and handle. |
 
----
 
 ## Documentation
 
@@ -66,9 +65,13 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 | :---: | :---: | :---: |
 | [ProgressLab](https://github.com/ProgressLabIT) | [PhotoQuest](https://photoquest.wedding/) | [New Sponsor](https://github.com/sponsors/pdfme) |
 
----
 
 
+## Contributors
+
+<a href="https://github.com/pdfme/pdfme/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
+</a>
 
 ## Special Thanks
 
