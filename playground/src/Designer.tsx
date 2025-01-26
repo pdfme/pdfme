@@ -203,9 +203,8 @@ function DesignerApp() {
     {
       label: "",
       content: (
-        // TODO 正しいリンクを貼る
         <ExternalButton
-          href="https://github.com/pdfme/pdfme/issues/new?template=template_request.yml"
+          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml"
           title="Feedback this template"
         />)
     }
