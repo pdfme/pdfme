@@ -11,6 +11,7 @@ import {
   translations,
 } from "./helper";
 import { NavItem, NavBar } from "./NavBar";
+import ExternalButton from "./ExternalButton"
 
 type Mode = "form" | "viewer";
 
@@ -173,53 +174,66 @@ function FormAndViewerApp() {
           type="file"
           accept="application/json"
           onChange={(e) => handleLoadTemplate(e, ui.current)}
-          className="w-full text-sm border"
+          className="w-full text-sm border rounded"
         />
       ),
     },
     {
       label: "",
       content: (
-        <button className="px-2 py-1 border" onClick={onGetInputs}>
-          Get Inputs
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={onGetInputs}>
+            Get Inputs
+          </button>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={onSetInputs}>
+            Set Inputs
+          </button>
+        </div>
       ),
     },
     {
       label: "",
       content: (
-        <button className="px-2 py-1 border" onClick={onSetInputs}>
-          Set Inputs
-        </button>
-      ),
-    },
-    {
-      label: "",
-      content: (
-        <button className="px-2 py-1 border" onClick={onSaveInputs}>
-          Save Inputs
-        </button>
-      ),
-    },
-    {
-      label: "",
-      content: (
-        <button className="px-2 py-1 border" onClick={onResetInputs}>
-          Reset Inputs
-        </button>
+        <div className="flex gap-2">
+
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={onSaveInputs}>
+            Save Inputs
+          </button>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={onResetInputs}>
+            Reset Inputs
+          </button>
+        </div>
+
       ),
     },
     {
       label: "",
       content: (
         <button
-          className="px-2 py-1 border"
+          className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={() => generatePDF(ui.current)}
         >
           Generate PDF
         </button>
       ),
     },
+    {
+      label: "",
+      content: (
+        // TODO 正しいリンクを貼る
+        <ExternalButton
+          href="https://github.com/pdfme/pdfme/issues/new?template=template_request.yml"
+          title="Feedback this template"
+        />)
+    }
   ];
 
   return (
