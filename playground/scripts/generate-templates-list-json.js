@@ -19,7 +19,7 @@ function generateTemplatesListJson() {
       const templateJson = JSON.parse(fs.readFileSync(templateJsonPath, 'utf8'));
       return {
         name: item.name,
-        author: templateJson.author || 'unknown'
+        author: templateJson.author || 'pdfme'
       };
     });
 
