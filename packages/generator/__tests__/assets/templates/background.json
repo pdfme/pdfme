@@ -7,7 +7,6 @@
   ],
   "photo": "https://firebasestorage.googleapis.com/v0/b/labelmake-a43f2.appspot.com/o/templates%2Fphoto%2F0d0050f0-e377-11eb-9f1b-577526b1de8f.png?alt=media&token=c3195c45-a4bf-408a-a6d9-fab1dfceb19d",
   "basePdf": "data:application/pdf;base64,JVBERi0xLjcKJeLjz9MKNSAwIG9iago8PAovRmlsdGVyIC9GbGF0ZURlY29kZQovTGVuZ3RoIDM4Cj4+CnN0cmVhbQp4nCvkMlAwUDC1NNUzMVGwMDHUszRSKErlCtfiyuMK5AIAXQ8GCgplbmRzdHJlYW0KZW5kb2JqCjQgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL01lZGlhQm94IFswIDAgNTk1LjQ0IDg0MS45Ml0KL1Jlc291cmNlcyA8PAo+PgovQ29udGVudHMgNSAwIFIKL1BhcmVudCAyIDAgUgo+PgplbmRvYmoKMiAwIG9iago8PAovVHlwZSAvUGFnZXMKL0tpZHMgWzQgMCBSXQovQ291bnQgMQo+PgplbmRvYmoKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL3RyYXBwZWQgKGZhbHNlKQovQ3JlYXRvciAoU2VyaWYgQWZmaW5pdHkgRGVzaWduZXIgMS4xMC40KQovVGl0bGUgKFVudGl0bGVkLnBkZikKL0NyZWF0aW9uRGF0ZSAoRDoyMDIyMDEwNjE0MDg1OCswOScwMCcpCi9Qcm9kdWNlciAoaUxvdmVQREYpCi9Nb2REYXRlIChEOjIwMjIwMTA2MDUwOTA5WikKPj4KZW5kb2JqCjYgMCBvYmoKPDwKL1NpemUgNwovUm9vdCAxIDAgUgovSW5mbyAzIDAgUgovSUQgWzwyODhCM0VENTAyOEU0MDcyNERBNzNCOUE0Nzk4OUEwQT4gPEY1RkJGNjg4NkVERDZBQUNBNDRCNEZDRjBBRDUxRDlDPl0KL1R5cGUgL1hSZWYKL1cgWzEgMiAyXQovRmlsdGVyIC9GbGF0ZURlY29kZQovSW5kZXggWzAgN10KL0xlbmd0aCAzNgo+PgpzdHJlYW0KeJxjYGD4/5+RUZmBgZHhFZBgDAGxakAEP5BgEmFgAABlRwQJCmVuZHN0cmVhbQplbmRvYmoKc3RhcnR4cmVmCjUzMgolJUVPRgo=",
-  "fontName": "SauceHanSansJP",
   "schemas": [
     [
       {
@@ -25,7 +24,8 @@
         "backgroundColor": "",
         "fontColor": "",
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{1}[お届け先]住所"
+        "name": "{1}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "type": "text",
@@ -42,7 +42,8 @@
           "x": 23.5
         },
         "content": "東京都 出得太",
-        "name": "{1}[お届け先]氏名"
+        "name": "{1}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "type": "text",
@@ -59,7 +60,8 @@
         "backgroundColor": "",
         "characterSpacing": 0,
         "content": "1234567",
-        "name": "{1}[お届け先]郵便番号"
+        "name": "{1}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "position": {
@@ -76,7 +78,8 @@
         "lineHeight": 1,
         "type": "text",
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{1}**credit**"
+        "name": "{1}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 13.96,
@@ -93,7 +96,8 @@
         "alignment": "left",
         "lineHeight": 0.9,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{2}[お届け先]住所"
+        "name": "{2}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -110,7 +114,8 @@
         "characterSpacing": 0,
         "lineHeight": 0.85,
         "content": "東京都 出得太",
-        "name": "{2}[お届け先]氏名"
+        "name": "{2}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -127,7 +132,8 @@
         "characterSpacing": 0,
         "fontSize": 14.5,
         "content": "1234567",
-        "name": "{2}[お届け先]郵便番号"
+        "name": "{2}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "#000000",
@@ -144,7 +150,8 @@
         "width": 52.45,
         "fontSize": 7,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{2}**credit**"
+        "name": "{2}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 14.49,
@@ -161,7 +168,8 @@
         "backgroundColor": "",
         "characterSpacing": 0,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{3}[お届け先]住所"
+        "name": "{3}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "width": 77.8,
@@ -178,7 +186,8 @@
         "lineHeight": 0.85,
         "type": "text",
         "content": "東京都 出得太",
-        "name": "{3}[お届け先]氏名"
+        "name": "{3}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -195,7 +204,8 @@
         "backgroundColor": "",
         "height": 6.03,
         "content": "1234567",
-        "name": "{3}[お届け先]郵便番号"
+        "name": "{3}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "#c8c8c8",
@@ -212,7 +222,8 @@
         "width": 52.45,
         "alignment": "center",
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{3}**credit**"
+        "name": "{3}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "type": "text",
@@ -229,7 +240,8 @@
         "lineHeight": 0.9,
         "characterSpacing": 0,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{4}[お届け先]住所"
+        "name": "{4}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -246,7 +258,8 @@
         "width": 77.8,
         "fontSize": 14.5,
         "content": "東京都 出得太",
-        "name": "{4}[お届け先]氏名"
+        "name": "{4}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 6.03,
@@ -263,7 +276,8 @@
         "fontColor": "",
         "lineHeight": 1,
         "content": "1234567",
-        "name": "{4}[お届け先]郵便番号"
+        "name": "{4}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "type": "text",
@@ -280,7 +294,8 @@
         "height": 3.02,
         "lineHeight": 1,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{4}**credit**"
+        "name": "{4}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -297,7 +312,8 @@
           "x": 23.5
         },
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{5}[お届け先]住所"
+        "name": "{5}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 10,
@@ -314,7 +330,8 @@
           "x": 23.5
         },
         "content": "東京都 出得太",
-        "name": "{5}[お届け先]氏名"
+        "name": "{5}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -331,7 +348,8 @@
         "width": 77.8,
         "type": "text",
         "content": "1234567",
-        "name": "{5}[お届け先]郵便番号"
+        "name": "{5}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -348,7 +366,8 @@
         "alignment": "center",
         "width": 52.45,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{5}**credit**"
+        "name": "{5}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -365,7 +384,8 @@
         "alignment": "left",
         "fontSize": 14.5,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{6}[お届け先]住所"
+        "name": "{6}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "alignment": "left",
@@ -382,7 +402,8 @@
         "width": 77.8,
         "lineHeight": 0.85,
         "content": "東京都 出得太",
-        "name": "{6}[お届け先]氏名"
+        "name": "{6}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "position": {
@@ -399,7 +420,8 @@
         "type": "text",
         "lineHeight": 1,
         "content": "1234567",
-        "name": "{6}[お届け先]郵便番号"
+        "name": "{6}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "width": 52.45,
@@ -416,7 +438,8 @@
         "fontSize": 7,
         "height": 3.02,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{6}**credit**"
+        "name": "{6}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 15.02,
@@ -433,7 +456,8 @@
         "lineHeight": 0.9,
         "fontSize": 14.5,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{7}[お届け先]住所"
+        "name": "{7}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "alignment": "left",
@@ -450,7 +474,8 @@
         "lineHeight": 0.85,
         "height": 10,
         "content": "東京都 出得太",
-        "name": "{7}[お届け先]氏名"
+        "name": "{7}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "lineHeight": 1,
@@ -467,7 +492,8 @@
         "alignment": "left",
         "fontSize": 14.5,
         "content": "1234567",
-        "name": "{7}[お届け先]郵便番号"
+        "name": "{7}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -484,7 +510,8 @@
         "width": 52.45,
         "fontSize": 7,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{7}**credit**"
+        "name": "{7}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -501,7 +528,8 @@
         "lineHeight": 0.9,
         "fontSize": 14.5,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{8}[お届け先]住所"
+        "name": "{8}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -518,7 +546,8 @@
         "fontSize": 14.5,
         "height": 10,
         "content": "東京都 出得太",
-        "name": "{8}[お届け先]氏名"
+        "name": "{8}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -535,7 +564,8 @@
         "backgroundColor": "",
         "lineHeight": 1,
         "content": "1234567",
-        "name": "{8}[お届け先]郵便番号"
+        "name": "{8}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "height": 3.02,
@@ -552,7 +582,8 @@
           "y": 98.15
         },
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{8}**credit**"
+        "name": "{8}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "type": "text",
@@ -569,7 +600,8 @@
         "height": 14.49,
         "fontColor": "",
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{9}[お届け先]住所"
+        "name": "{9}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -586,7 +618,8 @@
         "lineHeight": 0.85,
         "fontColor": "",
         "content": "東京都 出得太",
-        "name": "{9}[お届け先]氏名"
+        "name": "{9}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -603,7 +636,8 @@
         "fontColor": "",
         "type": "text",
         "content": "1234567",
-        "name": "{9}[お届け先]郵便番号"
+        "name": "{9}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "#c8c8c8",
@@ -620,7 +654,8 @@
         "fontSize": 7,
         "width": 52.45,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{9}**credit**"
+        "name": "{9}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "alignment": "left",
@@ -637,7 +672,8 @@
         "width": 77.8,
         "characterSpacing": 0,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{10}[お届け先]住所"
+        "name": "{10}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "",
@@ -654,7 +690,8 @@
         "characterSpacing": 0,
         "backgroundColor": "",
         "content": "東京都 出得太",
-        "name": "{10}[お届け先]氏名"
+        "name": "{10}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "alignment": "left",
@@ -671,7 +708,8 @@
         "fontColor": "",
         "lineHeight": 1,
         "content": "1234567",
-        "name": "{10}[お届け先]郵便番号"
+        "name": "{10}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -688,7 +726,8 @@
         "type": "text",
         "backgroundColor": "#c8c8c8",
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{10}**credit**"
+        "name": "{10}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "fontSize": 14.5,
@@ -705,7 +744,8 @@
         "height": 14.49,
         "fontColor": "",
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{11}[お届け先]住所"
+        "name": "{11}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -722,7 +762,8 @@
         },
         "fontColor": "",
         "content": "東京都 出得太",
-        "name": "{11}[お届け先]氏名"
+        "name": "{11}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "alignment": "left",
@@ -739,7 +780,8 @@
         "backgroundColor": "",
         "fontSize": 14.5,
         "content": "1234567",
-        "name": "{11}[お届け先]郵便番号"
+        "name": "{11}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "fontColor": "#000000",
@@ -756,7 +798,8 @@
         "characterSpacing": 0,
         "width": 52.45,
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{11}**credit**"
+        "name": "{11}**credit**",
+        "fontName": "NotoSansJP"
       },
       {
         "width": 77.8,
@@ -773,7 +816,8 @@
         "lineHeight": 0.9,
         "fontSize": 14.5,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "{12}[お届け先]住所"
+        "name": "{12}[お届け先]住所",
+        "fontName": "NotoSansJP"
       },
       {
         "backgroundColor": "",
@@ -790,7 +834,8 @@
         "characterSpacing": 0,
         "fontSize": 14.5,
         "content": "東京都 出得太",
-        "name": "{12}[お届け先]氏名"
+        "name": "{12}[お届け先]氏名",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -807,7 +852,8 @@
         },
         "width": 77.8,
         "content": "1234567",
-        "name": "{12}[お届け先]郵便番号"
+        "name": "{12}[お届け先]郵便番号",
+        "fontName": "NotoSansJP"
       },
       {
         "characterSpacing": 0,
@@ -824,7 +870,8 @@
         "alignment": "center",
         "type": "text",
         "content": "このラベルは labelmake.jp で作成されました",
-        "name": "{12}**credit**"
+        "name": "{12}**credit**",
+        "fontName": "NotoSansJP"
       }
     ]
   ]

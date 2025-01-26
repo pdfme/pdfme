@@ -18,9 +18,11 @@ import {
   DEFAULT_DYNAMIC_FIT,
   DEFAULT_DYNAMIC_MIN_FONT_SIZE,
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
+  DEFAULT_LOCALE,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter';
+import { validateSegmenterLocale } from './helper.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -87,7 +89,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'number',
         widget: 'inputNumber',
         props: { step: 0.1, min: 0 },
-        span: 7,
+        span: 8,
       },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
       dynamicFontSize: {
@@ -151,6 +153,17 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      locale: {
+        title: i18n('schemas.text.locale'),
+        type: 'string',
+        default: 'en',
+        rules: [
+          {
+            validator: validateSegmenterLocale,
+            message: i18n('validation.locale'),
+          },
+        ],
+      },
     };
 
     return textSchema;
@@ -178,5 +191,6 @@ export const propPanel: PropPanel<TextSchema> = {
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,
+    locale: DEFAULT_LOCALE,
   },
 };

@@ -21,6 +21,9 @@ import {
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
   VERTICAL_ALIGN_TOP,
+  DEFAULT_LOCALE,
+  LINE_END_FORBIDDEN_CHARS,
+  LINE_START_FORBIDDEN_CHARS,
 } from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
@@ -268,12 +271,18 @@ export const calculateDynamicFontSize = async ({
     const otherRowHeightInMm = pt2mm(size * lineHeight);
 
     paragraphs.forEach((paragraph, paraIndex) => {
-      const lines = getSplittedLines(paragraph, {
-        font: fontKitFont,
-        fontSize: size,
-        characterSpacing,
-        boxWidthInPt,
-      });
+      const lines = getSplittedLinesBySegmenter(
+        paragraph,
+        {
+          font: fontKitFont,
+          fontSize: size,
+          characterSpacing,
+          boxWidthInPt,
+        },
+        textSchema.locale ?? DEFAULT_LOCALE,
+        'word'
+      );
+
       lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
           // For vertical fit we want to consider the width of text lines where we detect a split
@@ -348,8 +357,9 @@ export const splitTextToSize = (arg: {
   boxWidthInPt: number;
   fontSize: number;
   fontKitFont: fontkit.Font;
+  segmenterLocale: string;
 }) => {
-  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt, segmenterLocale } = arg;
   const fontWidthCalcValues: FontWidthCalcValues = {
     font: fontKitFont,
     fontSize,
@@ -358,8 +368,130 @@ export const splitTextToSize = (arg: {
   };
   let lines: string[] = [];
   value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
-    lines = lines.concat(getSplittedLines(line, fontWidthCalcValues));
+    lines = lines.concat(
+      getSplittedLinesBySegmenter(line, fontWidthCalcValues, segmenterLocale ?? 'en', 'word')
+    );
   });
   return lines;
 };
 export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+const getSplittedLinesBySegmenter = (
+  line: string,
+  calcValues: FontWidthCalcValues,
+  segmenterLocale: string,
+  granularity: 'word' | 'grapheme' | 'sentence' | undefined
+): string[] => {
+  // nothing to process but need to keep this for new lines.
+  if (line === '') {
+    return [''];
+  }
+
+  // Skip processing if the locale is invalid
+  if (!isLocaleSupported(segmenterLocale)) {
+    return [line];
+  }
+
+  const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
+  const segmenter = new Intl.Segmenter(segmenterLocale, { granularity: granularity ?? 'word' });
+  const iterator = segmenter.segment(line)[Symbol.iterator]();
+
+  let lines: string[] = [];
+  let lineCounter: number = 0;
+  let currentTextSize: number = 0;
+
+  while (true) {
+    const chunk = iterator.next();
+    if (chunk.done) break;
+    const segment = chunk.value.segment;
+    const textWidth = widthOfTextAtSize(segment, font, fontSize, characterSpacing);
+
+    if (currentTextSize + textWidth <= boxWidthInPt) {
+      // the size of boxWidth is large enough to add the segment
+      lines[lineCounter] = (lines[lineCounter] ?? '') + segment;
+      currentTextSize += textWidth;
+    } else if (textWidth <= boxWidthInPt) {
+      // the segment is small enough to be added to the next line
+      lines[++lineCounter] = segment;
+      currentTextSize = textWidth;
+    } else {
+      // the segment is too large to fit in the boxWidth, we wrap the segment
+      for (const char of segment) {
+        const size = widthOfTextAtSize(char, font, fontSize, characterSpacing);
+        if (currentTextSize + size <= boxWidthInPt) {
+          lines[lineCounter] += char;
+          currentTextSize += size;
+        } else {
+          lines[++lineCounter] = char;
+          currentTextSize = size;
+        }
+      }
+    }
+  }
+
+  //
+  // 日本語禁則処理
+  //
+  // https://www.morisawa.co.jp/blogs/MVP/8760
+  //
+  if (segmenterLocale === 'ja') {
+    // 行頭禁則
+    const filterStart = (lines: string[], charToAppend: string | null, acc: string[]): string[] => {
+      const row: string = lines[0];
+
+      if (row && row.trim().length > 0) {
+        const charAtStart = row.charAt(0);
+        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
+          acc.push(row.slice(1) + (charToAppend ?? ''));
+          return filterStart(lines.slice(1), charAtStart, acc);
+        } else {
+          acc.push(row + (charToAppend ?? ''));
+          return filterStart(lines.slice(1), null, acc);
+        }
+      } else {
+        return acc;
+      }
+    };
+
+    // 行末禁則
+    const filterEnd = (lines: string[], charToPrepend: string | null, acc: string[]): string[] => {
+      const row: string = lines[0];
+      if (row && row.trim().length > 0) {
+        const chartAtEnd = row.slice(-1);
+        if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
+          acc.push((charToPrepend ?? '') + row.slice(0, -1));
+          return filterEnd(lines.slice(1), chartAtEnd, acc);
+        } else {
+          acc.push((charToPrepend ?? '') + row);
+          return filterEnd(lines.slice(1), null, acc);
+        }
+      } else {
+        return acc;
+      }
+    };
+
+    const startFiltered = filterStart(lines.reverse(), null, []).reverse();
+    const endFiltered = filterEnd(startFiltered, null, []);
+    return endFiltered.map((line) => line.trimEnd());
+  } else {
+    return lines.map((line) => line.trimEnd());
+  }
+};
+
+const isLocaleSupported = (segmenterLocale: string): boolean => {
+  try {
+    const options: Intl.SegmenterOptions = { localeMatcher: 'lookup' };
+    const supportedLocales = Intl.Segmenter.supportedLocalesOf(segmenterLocale, options);
+    if (supportedLocales.length == 0) {
+      return false;
+    } else {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+};
+
+export const validateSegmenterLocale = (_rule: any, segmenterLocale: string): boolean => {
+  return isLocaleSupported(segmenterLocale);
+};

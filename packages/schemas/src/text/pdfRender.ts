@@ -121,8 +121,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 
-  page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing ?? DEFAULT_CHARACTER_SPACING));
-
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
@@ -133,6 +131,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     fontSize,
     fontKitFont,
     boxWidthInPt: width,
+    segmenterLocale: schema.locale,
   });
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down
@@ -151,9 +150,11 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   }
 
   const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+  const segmenter = new Intl.Segmenter(schema.locale, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
-    const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
+    const adjusted = alignment === 'right' ? line.trimEnd() : line;
+    const textWidth = widthOfTextAtSize(adjusted, fontKitFont, fontSize, characterSpacing);
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
@@ -198,6 +199,23 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
       xLine = rotatedPoint.x;
       yLine = rotatedPoint.y;
+    }
+
+    // adjust spacing depending on the alignment
+    let spacing = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+
+    if (alignment === 'justify' && (lines[rowIndex + 1] ?? '' !== '')) {
+      // If we reach the last line of each paragraph, skip justifying. This is the most common format in Japanese.
+      // Adobe Illustrator has 'align center', 'align right', and 'justify' on last line options too.
+      // Not sure if this works as well in Arabic languages.
+      const iterator = segmenter.segment(line)[Symbol.iterator]();
+      const len = Array.from(iterator).length;
+
+      spacing += (width - textWidth) / len;
+
+      page.pushOperators(pdfLib.setCharacterSpacing(spacing));
+    } else {
+      page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     }
 
     page.drawText(line, {

@@ -1,7 +1,7 @@
 import type { Schema } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 
-export type ALIGNMENT = 'left' | 'center' | 'right';
+export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
 export type VERTICAL_ALIGNMENT = 'top' | 'middle' | 'bottom';
 export type DYNAMIC_FONT_SIZE_FIT = 'horizontal' | 'vertical';
 
@@ -27,4 +27,5 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
+  locale: string;
 }

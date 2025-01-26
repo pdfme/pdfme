@@ -9,7 +9,8 @@
     "lib": [
       "ES2020",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ESNext"
     ],
     "moduleResolution": "node16",
     "allowSyntheticDefaultImports": true,

@@ -272,6 +272,7 @@ async function fitContent(
         boxWidthInPt: mm2pt(cell.width),
         fontSize: cell.styles.fontSize,
         fontKitFont,
+        segmenterLocale: table.settings.locale,
       });
 
       cell.contentHeight = cell.getContentHeight();

@@ -34,6 +34,7 @@ const getTextSchema = () => {
     lineHeight: 1,
     characterSpacing: 1,
     fontSize: 14,
+    locale: 'en',
   };
   return textSchema;
 };
@@ -287,7 +288,7 @@ describe('calculateDynamicFontSize with Custom font', () => {
     const _cache = new Map();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'あいうあいうあい';
-    
+
     const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
 
     expect(result).toBe(16.75);

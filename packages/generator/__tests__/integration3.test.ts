@@ -2,15 +2,7 @@ import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { other, shape } from './assets/templates';
 import { getInputFromTemplate } from '@pdfme/common';
-import {
-  text,
-  image,
-  svg,
-  line,
-  rectangle,
-  ellipse,
-  barcodes,
-} from '@pdfme/schemas';
+import { text, image, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 const signature = {
@@ -41,8 +33,8 @@ describe('generate integration test(other, shape)', () => {
         font.SauceHanSansJP.fallback = false;
         font.SauceHanSerifJP.fallback = false;
         font['NotoSerifJP-Regular'].fallback = false;
-        // @ts-ignore
-        font[template.fontName].fallback = true;
+        font.NotoSerifJP.fallback = false;
+        font.NotoSansJP.fallback = false;
 
         const hrstart = process.hrtime();
 

@@ -11,6 +11,7 @@ import line from '../shapes/line.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
 import type { CellSchema } from './types';
 import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
+import { DEFAULT_LOCALE } from '../text/constants.js';
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
 
@@ -123,7 +124,7 @@ const cellSchema: Plugin<CellSchema> = {
     const textDiv = createTextDiv(schema);
     await textUiRender({
       ...arg,
-      schema: { ...schema, backgroundColor: '' },
+      schema: { ...schema, backgroundColor: '', locale: schema.locale },
       rootElement: textDiv,
     });
     rootElement.appendChild(textDiv);
@@ -151,6 +152,7 @@ const cellSchema: Plugin<CellSchema> = {
       position: { x: 0, y: 0 },
       width: 50,
       height: 15,
+      locale: DEFAULT_LOCALE,
       ...getDefaultCellStyles(),
     },
   },

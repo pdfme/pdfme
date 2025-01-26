@@ -21,8 +21,8 @@ describe('generate integration test(label, envelope)', () => {
         font.SauceHanSansJP.fallback = false;
         font.SauceHanSerifJP.fallback = false;
         font['NotoSerifJP-Regular'].fallback = false;
-        // @ts-ignore
-        font[template.fontName].fallback = true;
+        font.NotoSerifJP.fallback = false;
+        font.NotoSansJP.fallback = false;
 
         const hrstart = process.hrtime();
 

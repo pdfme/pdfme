@@ -26,7 +26,9 @@
         "height": 15.82,
         "lineHeight": 1,
         "content": "1234567",
-        "name": "[お届け先]郵便番号"
+        "name": "[お届け先]郵便番号",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -41,7 +43,9 @@
         "height": 26.39,
         "lineHeight": 1.4,
         "content": "東京都東京1-2-3-4\n東京マンション123号",
-        "name": "[お届け先]住所"
+        "name": "[お届け先]住所",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -56,7 +60,9 @@
         "height": 8.13,
         "lineHeight": 1,
         "content": "株式会社labelmake.jp",
-        "name": "[お届け先]社名"
+        "name": "[お届け先]社名",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -71,7 +77,9 @@
         "height": 7.88,
         "lineHeight": 1,
         "content": "東京都 出得太",
-        "name": "[お届け先]氏名"
+        "name": "[お届け先]氏名",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -86,7 +94,9 @@
         "height": 6.54,
         "lineHeight": 1,
         "content": "123-3456-7890",
-        "name": "[お届け先]電話番号"
+        "name": "[お届け先]電話番号",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -101,7 +111,9 @@
         "height": 6.28,
         "lineHeight": 1,
         "content": "7654321",
-        "name": "[差出人]郵便番号"
+        "name": "[差出人]郵便番号",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -116,7 +128,9 @@
         "height": 18.45,
         "lineHeight": 1.2,
         "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
-        "name": "[差出人]住所"
+        "name": "[差出人]住所",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -131,7 +145,9 @@
         "height": 6.54,
         "lineHeight": 1,
         "content": "株式会社listmake.jp",
-        "name": "[差出人]社名"
+        "name": "[差出人]社名",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -146,7 +162,9 @@
         "height": 7.07,
         "lineHeight": 1,
         "content": "大阪府 出得太",
-        "name": "[差出人]氏名"
+        "name": "[差出人]氏名",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -161,7 +179,9 @@
         "height": 7.35,
         "lineHeight": 1,
         "content": "098-7654-4321",
-        "name": "[差出人]電話番号"
+        "name": "[差出人]電話番号",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       },
       {
         "position": {
@@ -176,7 +196,9 @@
         "height": 12.63,
         "lineHeight": 1,
         "content": "書類",
-        "name": "品名"
+        "name": "品名",
+        "fontName": "NotoSerifJP",
+        "locale": "ja"
       }
     ]
   ]

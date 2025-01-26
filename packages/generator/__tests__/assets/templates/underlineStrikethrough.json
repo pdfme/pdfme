@@ -22,7 +22,7 @@
         "strikethrough": false,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "underline"
       },
       {
@@ -46,7 +46,7 @@
         "strikethrough": true,
         "underline": false,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "strikethrough"
       },
       {
@@ -70,7 +70,7 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "underline and strikethrough"
       },
       {
@@ -94,7 +94,7 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "spacing and line height"
       },
       {
@@ -118,7 +118,7 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "rotated"
       },
       {
@@ -142,7 +142,7 @@
         "strikethrough": true,
         "underline": true,
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "dynamicFontSize": {
           "min": 4,
           "max": 66,
@@ -162,6 +162,5 @@
       0
     ]
   },
-  "pdfmeVersion": "4.0.0",
-  "fontName": "NotoSerifJP-Regular"
+  "pdfmeVersion": "4.0.0"
 }

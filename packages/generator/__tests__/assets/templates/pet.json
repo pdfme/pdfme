@@ -1,5 +1,4 @@
 {
-  "fontName": "NotoSerifJP-Regular",
   "schemas": [
     [
       {
@@ -19,7 +18,7 @@
         "fontColor": "#14b351",
         "backgroundColor": "",
         "opacity": 1,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Pet Name",
         "name": "name"
       },
@@ -41,7 +40,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "My best friend",
         "name": "subtitle"
       },
@@ -76,7 +75,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Age:",
         "name": "ageLabel"
       },
@@ -98,7 +97,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "content": "4 years",
         "name": "age"
       },
@@ -120,7 +119,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Sex:",
         "name": "sexLabel"
       },
@@ -142,7 +141,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "content": "Male",
         "name": "sex"
       },
@@ -164,7 +163,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Weight: ",
         "name": "weightLabel"
       },
@@ -186,7 +185,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "content": "33 pounds",
         "name": "weight"
       },
@@ -208,7 +207,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Breed:",
         "name": "breedLabel"
       },
@@ -230,7 +229,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "content": "Mutt",
         "name": "breed"
       },
@@ -266,7 +265,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "PERSONALITY",
         "name": "personality"
       },
@@ -288,7 +287,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do eiusmod tempor\nincididunt ut labore et dolore magna aliqua.\nUt enim ad minim veniam, quis nostrud\nexercitation ullamco laboris nisi ut aliquip ex\nea commodo consequat.\n\nDuis aute irure dolor in reprehenderit. Enim\nad minim veniam.",
         "name": "personalityText"
       },
@@ -324,7 +323,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "HEALTH & GROOMING",
         "name": "health"
       },
@@ -346,7 +345,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed do tempor incididunt ut\nlabore et dolore magna aliqua. Ut enim ad\nminim veniam, quis nostrud exercitation\nullamco laboris nisi ut aliquip ex ea\ncommodo consequat. Lorem ipsum dolor sit\namet, consectetur adipiscing elit, sed dolore\neiusmod tempor.\n\nLorem ipsum dolor sit amet, consectetur\nadipiscing elit, sed dolore eiusmod tempor\nincididunt ut labore et dolore magna aliqua.",
         "name": "healthText"
       },
@@ -382,7 +381,7 @@
         "backgroundColor": "",
         "opacity": 1,
         "readOnly": true,
-        "fontName": "NotoSansJP-Regular",
+        "fontName": "NotoSansJP",
         "content": "ABOUT THE OWNER",
         "name": "owner"
       },

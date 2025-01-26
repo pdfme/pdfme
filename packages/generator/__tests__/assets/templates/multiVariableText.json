@@ -25,7 +25,7 @@
         "text": "Static text only",
         "variables": [],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "static"
       },
       {
@@ -54,7 +54,7 @@
           "number"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "one var"
       },
       {
@@ -84,7 +84,7 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "two vars"
       },
       {
@@ -114,7 +114,7 @@
           "y"
         ],
         "required": true,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "dynamicFontSize": {
           "min": 4,
           "max": 72,
@@ -149,7 +149,7 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "aligned and rotated"
       },
       {
@@ -179,7 +179,7 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "formatting"
       },
       {
@@ -209,7 +209,7 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "colour"
       },
       {
@@ -239,7 +239,7 @@
           "y"
         ],
         "required": false,
-        "fontName": "NotoSerifJP-Regular",
+        "fontName": "NotoSerifJP",
         "name": "strike-through underline"
       }
     ]
@@ -254,6 +254,5 @@
       0
     ]
   },
-  "pdfmeVersion": "4.0.0",
-  "fontName": "NotoSerifJP-Regular"
+  "pdfmeVersion": "4.0.0"
 }

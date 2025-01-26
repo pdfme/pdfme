@@ -17,6 +17,7 @@ export interface CellStyle {
   borderColor: string;
   borderWidth: BoxDimensions;
   padding: BoxDimensions;
+  locale: string;
 }
 
 export type CellSchema = Schema & CellStyle;
@@ -35,6 +36,7 @@ export interface TableSchema extends Schema {
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
   };
+  locale: string;
 }
 
 export interface Styles {
@@ -43,7 +45,7 @@ export interface Styles {
   textColor: string;
   lineHeight: number;
   characterSpacing: number;
-  alignment: 'left' | 'center' | 'right';
+  alignment: 'left' | 'center' | 'right' | 'justify';
   verticalAlignment: 'top' | 'middle' | 'bottom';
   fontSize: number;
   cellPadding: Spacing;
@@ -52,6 +54,7 @@ export interface Styles {
   cellWidth: number;
   minCellHeight: number;
   minCellWidth: number;
+  locale: string;
 }
 
 export interface TableInput {
@@ -73,6 +76,7 @@ export interface Settings {
   showHead: boolean;
   tableLineWidth: number;
   tableLineColor: string;
+  locale: string;
 }
 
 export interface StylesProps {
