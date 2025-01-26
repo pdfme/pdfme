@@ -1,0 +1,48 @@
+name: "Template request"
+description: "Request for creating a PDF template"
+title: "[Template request]: "
+labels:
+  - "template request"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Background of the Request (Required)
+        Please describe the purpose, usage, and background of the template you want to create.
+        Vague requests are difficult to fulfill and may be denied.
+  - type: input
+    id: background
+    attributes:
+      label: Request Background
+      description: "Provide details on how the template will be used, why it's needed, etc."
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Template Requirements (Optional)
+        List any required input fields, constraints, or other specifications. Use bullet points if possible.
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Template Requirements
+      description: "List relevant input fields, design constraints, or any other points to consider."
+      placeholder: |
+        - Mandatory input fields (e.g. Name, Address, etc.)
+        - Design constraints (e.g. Font, Size)
+        - Other considerations
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Attachments (BasePdf / Reference PDF) (Optional)
+        Including a sample or reference PDF will greatly help clarify what needs to be created.
+        If you do not attach a file, your request may be canceled due to lack of detail.
+  - type: input
+    id: attachments
+    attributes:
+      label: Attachments
+      description: |
+        Attach any BasePdf or sample PDF here (after creating the issue, you can drag & drop files in a comment).
+      required: false
