@@ -1,0 +1,90 @@
+name: "[website] Template feedback"
+description: "Feedback to improve existing templates on https://pdfme.com/templates"
+title: "[Template feedback]: "
+labels:
+  - "template feedback"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Prerequisites
+        Please provide constructive feedback to help improve templates showcased on https://pdfme.com/templates.
+        Your input will help enhance usability and functionality for all users.
+
+  - type: input
+    id: template-name
+    attributes:
+      label: "Template name"
+      description: "Provide template name"
+      placeholder: "Invoice"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Feedback Context
+        Help us understand how you're using this template and the context of your feedback.
+
+  - type: textarea
+    id: usage-context
+    attributes:
+      label: "Usage Scenario"
+      description: "Describe how you're using this template and in what environment"
+      placeholder: "Example: Using for client invoices in accounting software integration"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issues
+    attributes:
+      label: "Specific Issues/Challenges"
+      description: "Describe any functional problems, usability issues, or design limitations you've encountered (use bullet points if possible)"
+      placeholder: |
+        - Text alignment issues when generating long content
+        - Missing critical field for [specific use case]
+        - Font size readability problems in printed version
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: "Improvement Suggestions (Optional)"
+      description: "Share your ideas for enhancements or modifications"
+      placeholder: |
+        - Add customizable header section
+        - Implement dynamic table expansion
+        - Improve mobile display compatibility
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Supporting Materials (Optional)
+        Attachments that help illustrate your feedback (screenshots, modified PDF examples, etc.) are highly appreciated.
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: "Attachments"
+      description: "Drag & drop files or paste screenshots showing issues/suggestions"
+      placeholder: "Attach files or insert image URLs here"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional Context
+        Any other information that might help us understand and implement your feedback?
+        
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: "Extra Information"
+      description: "Technical requirements, compatibility needs, or other relevant details"
+      placeholder: "Example: Needs to support RTL languages / Requires embedded font support"
+    validations:
+      required: false
