@@ -229,7 +229,7 @@ function FormAndViewerApp() {
       label: "",
       content: (
         <ExternalButton
-          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml"
+          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
           title="Feedback this template"
         />)
     }
