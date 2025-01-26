@@ -1,5 +1,7 @@
 name: Bug Report
 description: Create a report with a procedure for reproducing the bug
+labels:
+  - "bug"
 body:
   - type: textarea
     id: description

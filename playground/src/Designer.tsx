@@ -14,6 +14,7 @@ import {
   translations,
 } from "./helper";
 import { NavBar, NavItem } from "./NavBar";
+import ExternalButton from "./ExternalButton"
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -139,7 +140,7 @@ function DesignerApp() {
         <input
           type="file"
           accept="application/pdf"
-          className="w-full text-sm border"
+          className="w-full text-sm border rounded"
           onChange={onChangeBasePDF}
         />
       ),
@@ -150,7 +151,7 @@ function DesignerApp() {
         <input
           type="file"
           accept="application/json"
-          className="w-full text-sm border"
+          className="w-full text-sm border rounded"
           onChange={(e) => handleLoadTemplate(e, designer.current)}
         />
       ),
@@ -158,52 +159,55 @@ function DesignerApp() {
     {
       label: "",
       content: (
-        <button
-          className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={onDownloadTemplate}
-        >
-          DL Template
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={() => onSaveTemplate()}
+          >
+            Save Local
+          </button>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={() => {
+              localStorage.removeItem("template");
+              if (designer.current) {
+                designer.current.updateTemplate(getBlankTemplate());
+              }
+            }}
+          >
+            Reset
+          </button>
+        </div>
       ),
     },
     {
       label: "",
       content: (
-        <button
-          className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={() => onSaveTemplate()}
-        >
-          Save Local
-        </button>
+        <div className="flex gap-2">
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={onDownloadTemplate}
+          >
+            DL Template
+          </button>
+
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100"
+            onClick={() => generatePDF(designer.current)}
+          >
+            Generate PDF
+          </button>
+        </div>
       ),
     },
     {
       label: "",
       content: (
-        <button
-          className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={() => {
-            localStorage.removeItem("template");
-            if (designer.current) {
-              designer.current.updateTemplate(getBlankTemplate());
-            }
-          }}
-        >
-          Reset
-        </button>
-      ),
-    },
-    {
-      label: "",
-      content: (
-        <button
-          className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={() => generatePDF(designer.current)}
-        >
-          Generate PDF
-        </button>
-      ),
-    },
+        <ExternalButton
+          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
+          title="Feedback this template"
+        />)
+    }
   ];
 
   return (

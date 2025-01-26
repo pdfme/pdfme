@@ -1,5 +1,5 @@
-name: "Template request"
-description: "Request for creating a PDF template"
+name: "[website] Template request"
+description: "Request to create a template for https://pdfme.com/templates"
 title: "[Template request]: "
 labels:
   - "template request"
