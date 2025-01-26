@@ -7,11 +7,19 @@ body:
   - type: markdown
     attributes:
       value: |
+        ## Prerequisites
+        Please request templates that would be appropriate to showcase on https://pdfme.com/templates.
+        The template list should include templates that help users understand PDFME's use cases and demonstrate its core functionality.
+        In other words, please request templates that would be valuable to other users as well.
+
+  - type: markdown
+    attributes:
+      value: |
         ## Background of the Request
         Please describe the purpose, usage, and background of the template you want to create.
         Vague requests are difficult to fulfill and may be denied.
 
-  - type: input
+  - type: textarea
     id: background
     attributes:
       label: "Request Background"
@@ -45,12 +53,12 @@ body:
         Including a sample or reference PDF will greatly help clarify what needs to be created.
         If you do not attach a file, your request may be canceled due to lack of detail.
 
-  - type: input
+  - type: textarea
     id: attachments
     attributes:
       label: "Attachments"
       description: |
-        Attach any BasePdf or sample PDF here (after creating the issue, you can drag & drop files in a comment).
-      placeholder: "Paste links or references here (if any)."
+        Attach any BasePdf or sample PDF here to help clarify your request. image files are also accepted.
+      placeholder: "Attach a sample PDF or reference file"
     validations:
       required: false
