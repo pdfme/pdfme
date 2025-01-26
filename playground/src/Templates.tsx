@@ -48,7 +48,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
           </p>
           <div className="mt-4 ml-auto">
             <ExternalButton
-              href="https://github.com/pdfme/pdfme/issues/new?template=template_request.yml"
+              href="https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title={{TEMPLATE_NAME}}"
               title="Request a Template"
             />
           </div>
