@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 
 test.pdf
+public/template-assets/**/thumbnail.png
