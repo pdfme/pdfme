@@ -29,6 +29,7 @@ const sidebars = {
       ],
     },
     'development-guide',
+    'template-contribution-guide',
   ],
 };
 

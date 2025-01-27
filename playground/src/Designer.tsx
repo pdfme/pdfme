@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
 import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
@@ -91,6 +92,28 @@ function DesignerApp() {
     if (designer.current) {
       downloadJsonFile(designer.current.getTemplate(), "template");
       console.log(designer.current.getTemplate());
+      toast.dismiss();
+      toast.success(<div>
+        <p>
+          You can contribute this template to the public template repository ❤️
+        </p>
+        <a
+          className="text-blue-500 underline"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://pdfme.com/docs/template-contribution-guide"
+        >
+          See: Template Contribution Guide
+        </a>
+      </div>, {
+        position: "bottom-right",
+        autoClose: 10000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     }
   };
 
@@ -214,6 +237,7 @@ function DesignerApp() {
     <>
       <NavBar items={navItems} />
       <div ref={designerRef} className="flex-1 w-full" />
+      <ToastContainer />
     </>
   );
 }

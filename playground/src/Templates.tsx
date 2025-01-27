@@ -101,6 +101,33 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
               </div>
             </div>
           ))}
+          <div className="flex items-center justify-center">
+            <div className="relative border-2 border-green-300 rounded-lg p-6 bg-green-50 shadow-md">
+              <div className="relative mt-4">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://pdfme.com/docs/template-contribution-guide"
+                  className="text-md font-extrabold text-green-700 underline decoration-green-400 hover:text-green-600 hover:decoration-green-500 transition duration-300"
+                >
+                  Contribute Your Template ❤️
+                </a>
+                <p className="mt-2 text-sm text-green-800 flex items-center gap-2 font-medium">
+                  Share the templates you've created! Contributing your templates is extremely beneficial for other users.
+                </p>
+              </div>
+              <div className="mt-6">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://pdfme.com/docs/template-contribution-guide"
+                  className="w-full relative flex items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-sm font-semibold text-white hover:opacity-90 transition duration-300"
+                >
+                  See Contribution Guide
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
