@@ -71,6 +71,10 @@ const font = {
     fallback: false,
     data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
   },
+  "PinyonScript-Regular": {
+    fallback: false,
+    data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
+  }
 }
 
 async function createThumbnailFromTemplate(templatePath, thumbnailPath) {

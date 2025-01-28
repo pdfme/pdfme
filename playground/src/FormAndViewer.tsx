@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
@@ -219,7 +220,15 @@ function FormAndViewerApp() {
       content: (
         <button
           className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={() => generatePDF(ui.current)}
+          onClick={async () => {
+            const startTimer = performance.now()
+            await generatePDF(ui.current);
+            const endTimer = performance.now()
+            toast.dismiss();
+            toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`, {
+              position: "bottom-right",
+            });
+          }}
         >
           Generate PDF
         </button>

@@ -1,4 +1,5 @@
 import { Routes, Route, useSearchParams } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
 import Designer from "./Designer";
 import FormAndViewer from "./FormAndViewer";
 import Templates from "./Templates";
@@ -16,6 +17,7 @@ function App() {
         <Route path="/form-viewer" element={<FormAndViewer />} />
         <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }

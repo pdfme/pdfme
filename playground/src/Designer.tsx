@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
@@ -95,7 +95,7 @@ function DesignerApp() {
       toast.dismiss();
       toast.success(<div>
         <p>
-          You can contribute this template to the public template repository ❤️
+          Can you share the template you created? ❤️
         </p>
         <a
           className="text-blue-500 underline"
@@ -216,7 +216,15 @@ function DesignerApp() {
 
           <button
             className="px-2 py-1 border rounded hover:bg-gray-100"
-            onClick={() => generatePDF(designer.current)}
+            onClick={async () => {
+              const startTimer = performance.now()
+              await generatePDF(designer.current)
+              const endTimer = performance.now()
+              toast.dismiss();
+              toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`, {
+                position: "bottom-right",
+              });
+            }}
           >
             Generate PDF
           </button>
@@ -237,7 +245,6 @@ function DesignerApp() {
     <>
       <NavBar items={navItems} />
       <div ref={designerRef} className="flex-1 w-full" />
-      <ToastContainer />
     </>
   );
 }
