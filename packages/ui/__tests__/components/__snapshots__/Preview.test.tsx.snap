@@ -17,7 +17,7 @@ exports[`Preview(as Form) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1htoz2s ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -40,9 +40,10 @@ exports[`Preview(as Form) snapshot 1`] = `
                 />
               </svg>
             </span>
+            
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-apn68"
+            class="ant-typography css-dev-only-do-not-override-1htoz2s"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -51,7 +52,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1htoz2s ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -77,6 +78,7 @@ exports[`Preview(as Form) snapshot 1`] = `
                 />
               </svg>
             </span>
+            
           </button>
         </div>
       </div>
@@ -162,7 +164,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1htoz2s ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -185,9 +187,10 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 />
               </svg>
             </span>
+            
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-apn68"
+            class="ant-typography css-dev-only-do-not-override-1htoz2s"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -196,7 +199,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-apn68 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1htoz2s ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
@@ -222,6 +225,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
                 />
               </svg>
             </span>
+            
           </button>
         </div>
       </div>

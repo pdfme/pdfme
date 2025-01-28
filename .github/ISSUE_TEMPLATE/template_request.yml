@@ -1,0 +1,64 @@
+name: "[website] Template request"
+description: "Request to create a template for https://pdfme.com/templates"
+title: "[Template request]: "
+labels:
+  - "template request"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Prerequisites
+        Please request templates that would be appropriate to showcase on https://pdfme.com/templates.
+        The template list should include templates that help users understand PDFME's use cases and demonstrate its core functionality.
+        In other words, please request templates that would be valuable to other users as well.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Background of the Request
+        Please describe the purpose, usage, and background of the template you want to create.
+        Vague requests are difficult to fulfill and may be denied.
+
+  - type: textarea
+    id: background
+    attributes:
+      label: "Request Background"
+      description: "Provide details on how the template will be used, why it's needed, etc."
+      placeholder: "Describe the context, purpose, and goals of your request"
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Template Requirements (Optional)
+        List any required input fields, design constraints, or other specifications. Use bullet points if possible.
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: "Template Requirements"
+      description: "List relevant input fields, design constraints, or any other points to consider."
+      placeholder: |
+        - Mandatory input fields (e.g. Name, Address, etc.)
+        - Design constraints (e.g. Font, Size)
+        - Other considerations
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Attachments (BasePdf / Reference PDF) (Optional)
+        Including a sample or reference PDF will greatly help clarify what needs to be created.
+        If you do not attach a file, your request may be canceled due to lack of detail.
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: "Attachments"
+      description: |
+        Attach any BasePdf or sample PDF here to help clarify your request. image files are also accepted.
+      placeholder: "Attach a sample PDF or reference file"
+    validations:
+      required: false

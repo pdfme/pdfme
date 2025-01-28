@@ -29,11 +29,10 @@
 
 ## Features
 
-| Fast PDF Generator                                                                             | Easy PDF Template Design                              | Simple JSON Template                                           |
-| ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
-| Works on Node and browser. Use templates to generate PDFs; complex operations are not needed.  | Anyone can easily create templates with the designer. | Templates are JSON data that is easy to understand and handle. |
+| Fast PDF Generator | Easy PDF Template Design | Simple JSON Template |
+| --- |  --- | --- |
+| Works on Node and browser. Use templates to generate PDFs; complex operations are not needed. | Anyone can easily create templates with the designer. | Templates are JSON data that is easy to understand and handle. |
 
----
 
 ## Documentation
 
@@ -62,9 +61,17 @@ pdfme Cloud provides all the features of the open-source library, plus:
 
 Support this project by becoming a sponsor. Your logo will show up here with a link to your website.
 
-| [![ProgressLab](https://avatars.githubusercontent.com/u/103434180?s=120&v=4)](https://github.com/ProgressLabIT) | [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/pdfme) |
-| :------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------: |
-|                                 [ProgressLab](https://github.com/ProgressLabIT)                                 |                                 [New Sponsor](https://github.com/sponsors/pdfme)                                  |
+| [![ProgressLab](https://avatars.githubusercontent.com/u/103434180?s=120&v=4)](https://github.com/ProgressLabIT) | [<img src="https://github.com/user-attachments/assets/e5b1bbbe-bcc2-41bd-9d04-fcd886e62105" alt="photoquest_logo" width="150">](https://photoquest.wedding/) | [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/pdfme) |
+| :---: | :---: | :---: |
+| [ProgressLab](https://github.com/ProgressLabIT) | [PhotoQuest](https://photoquest.wedding/) | [New Sponsor](https://github.com/sponsors/pdfme) |
+
+
+
+## Contributors
+
+<a href="https://github.com/pdfme/pdfme/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
+</a>
 
 ## Special Thanks
 

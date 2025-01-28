@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run generate-template-assets && vite",
     "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
@@ -16,15 +16,16 @@
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@pdfme/common": "file:../packages/common/dist",
+    "@pdfme/converter": "file:../packages/converter/dist",
     "@pdfme/generator": "file:../packages/generator/dist",
     "@pdfme/schemas": "file:../packages/schemas/dist",
     "@pdfme/ui": "file:../packages/ui/dist",
     "canvas": "^2.11.2",
     "esbuild": "^0.19.10",
-    "pdfjs-dist": "^3.11.174",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0",
+    "react-toastify": "^11.0.3",
     "signature_pad": "^4.1.6"
   },
   "devDependencies": {

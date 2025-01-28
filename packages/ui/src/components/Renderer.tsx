@@ -3,11 +3,10 @@ import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, 
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
 import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
-import * as pdfJs from 'pdfjs-dist';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
-  'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | 'pdfJs' | '_cache'
+  'schema' | 'rootElement' | 'options' | 'theme' | 'i18n' | '_cache'
 > & {
   basePdf: BasePdf;
   schema: SchemaForUI;
@@ -128,7 +127,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         options,
         theme,
         i18n,
-        pdfJs,
         _cache: _cache.current,
       });
     }

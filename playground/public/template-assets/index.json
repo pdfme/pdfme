@@ -1,5 +1,14 @@
 [
-  "blank",
-  "certificate",
-  "invoice"
+  {
+    "name": "blank",
+    "author": "hand-dot"
+  },
+  {
+    "name": "invoice",
+    "author": "hand-dot"
+  },
+  {
+    "name": "pedigree",
+    "author": "hand-dot"
+  }
 ]

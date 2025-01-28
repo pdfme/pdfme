@@ -48,7 +48,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/pdf-lib": "^1.18.3",
+    "@pdfme/pdf-lib": "*",
     "air-datepicker": "^3.5.3",
     "bwip-js": "^4.1.1",
     "date-fns": "^4.1.0",

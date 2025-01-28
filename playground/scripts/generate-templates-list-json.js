@@ -10,14 +10,21 @@ function generateTemplatesListJson() {
   const result = items
     .filter((item) => {
       if (!item.isDirectory() || item.name.startsWith('.')) return false;
-      
+
       const templateJsonPath = path.join(templatesDir, item.name, 'template.json');
       return fs.existsSync(templateJsonPath);
     })
-    .map((item) => item.name);
+    .map((item) => {
+      const templateJsonPath = path.join(templatesDir, item.name, 'template.json');
+      const templateJson = JSON.parse(fs.readFileSync(templateJsonPath, 'utf8'));
+      return {
+        name: item.name,
+        author: templateJson.author || 'pdfme'
+      };
+    });
 
   fs.writeFileSync(indexFilePath, JSON.stringify(result, null, 2));
-  console.log(`Generated index.json with templates: ${result.join(', ')}`);
+  console.log(`Generated index.json with templates: ${result.map(t => t.name).join(', ')}`);
 }
 
 generateTemplatesListJson();

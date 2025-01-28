@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Template } from '@pdfme/common';
 import type { Form, Viewer } from '@pdfme/ui';
-import { text, image, barcodes } from '@pdfme/schemas';
+import { text, barcodes } from '@pdfme/schemas';
 import { getFont } from './libs/helper';
 
 const useForceUpdate = () => {
@@ -23,7 +23,7 @@ export const useForm = (props: {
         form.current = new Form({
           domContainer: formRef.current,
           template,
-          plugins: { text, image, ...barcodes },
+          plugins: { text, ...barcodes },
           inputs: [{}],
           options: { font },
         });
@@ -54,7 +54,7 @@ export const useViewer = (props: {
         viewer.current = new Viewer({
           domContainer: viewerRef.current,
           template,
-          plugins: { text, image, ...barcodes },
+          plugins: { text, ...barcodes },
           inputs: [{}],
           options: { font },
         });
