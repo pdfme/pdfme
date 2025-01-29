@@ -1,7 +1,27 @@
 [
   {
+    "name": "invoice",
+    "author": "hand-dot"
+  },
+  {
+    "name": "pedigree",
+    "author": "hand-dot"
+  },
+  {
+    "name": "certificate-black",
+    "author": "pdfme"
+  },
+  {
     "name": "a4-blank",
     "author": "hand-dot"
+  },
+  {
+    "name": "QR-lines",
+    "author": "pdfme"
+  },
+  {
+    "name": "QR-title",
+    "author": "pdfme"
   },
   {
     "name": "address-label-10",
@@ -16,10 +36,6 @@
     "author": "pdfme"
   },
   {
-    "name": "certificate-black",
-    "author": "pdfme"
-  },
-  {
     "name": "certificate-blue",
     "author": "pdfme"
   },
@@ -30,10 +46,6 @@
   {
     "name": "certificate-white",
     "author": "pdfme"
-  },
-  {
-    "name": "invoice",
-    "author": "hand-dot"
   },
   {
     "name": "invoice-blue",
@@ -53,18 +65,6 @@
   },
   {
     "name": "location-number",
-    "author": "pdfme"
-  },
-  {
-    "name": "pedigree",
-    "author": "hand-dot"
-  },
-  {
-    "name": "qr-lines",
-    "author": "pdfme"
-  },
-  {
-    "name": "qr-title",
     "author": "pdfme"
   }
 ]
