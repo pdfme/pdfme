@@ -3,33 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { fromKebabCase } from "./helper"
 import ExternalButton from "./ExternalButton"
 
-const ContributeCard = () => <div className="flex items-center justify-center">
-  <div className="relative border-2 border-green-300 rounded-lg p-6 bg-green-50 shadow-md">
-    <div className="relative mt-4">
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://pdfme.com/docs/template-contribution-guide"
-        className="text-md font-extrabold text-green-700 underline decoration-green-400 hover:text-green-600 hover:decoration-green-500 transition duration-300"
-      >
-        Contribute Your Template ❤️
-      </a>
-      <p className="mt-2 text-sm text-green-800 flex items-center gap-2 font-medium">
-        Share the templates you've created! Contributing your templates is extremely beneficial for other users.
-      </p>
-    </div>
-    <div className="mt-6">
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://pdfme.com/docs/template-contribution-guide"
-        className="w-full relative flex items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-sm font-semibold text-white hover:opacity-90 transition duration-300"
-      >
-        See Contribution Guide
-      </a>
-    </div>
-  </div>
-</div>
 
 function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
   const navigate = useNavigate();
@@ -59,9 +32,18 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
   const navigateToDesigner = (name: string) => {
     if (isEmbedded) {
-      window.parent.postMessage({ type: 'navigate', payload: { name } }, '*');
+      window.parent.postMessage({ type: 'navigate', payload: { name, ui: 'designer' } }, '*');
     } else {
       navigate(`/?template=${name}`)
+    }
+  }
+
+
+  const navigateToFormViewer = (name: string) => {
+    if (isEmbedded) {
+      window.parent.postMessage({ type: 'navigate', payload: { name, ui: 'form-viewer' } }, '*');
+    } else {
+      navigate(`/form-viewer?template=${name}`)
     }
   }
 
@@ -82,8 +64,6 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-          <ContributeCard />
-
           {templates.map(({ name, author }) => (
             <div key={name}>
               <div className="relative border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
@@ -97,8 +77,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                 </div>
                 <div className="relative mt-4">
                   <h3
-                    onClick={() => { navigateToDesigner(name) }}
-                    className="text-md font-bold text-green-600 cursor-pointer hover:text-green-500"
+                    className="text-md font-bold text-green-600"
                   >
                     {fromKebabCase(name)}
                   </h3>
@@ -128,10 +107,44 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     Go to Designer
                   </button>
                 </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => { navigateToFormViewer(name) }}
+                    className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                  >
+                    Go to Form/Viewer
+                  </button>
+                </div>
               </div>
             </div>
           ))}
-          <ContributeCard />
+          <div className="flex items-center justify-center">
+            <div className="relative border-2 border-green-300 rounded-lg p-6 bg-green-50 shadow-md">
+              <div className="relative mt-4">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://pdfme.com/docs/template-contribution-guide"
+                  className="text-md font-extrabold text-green-700 underline decoration-green-400 hover:text-green-600 hover:decoration-green-500 transition duration-300"
+                >
+                  Contribute Your Template ❤️
+                </a>
+                <p className="mt-2 text-sm text-green-800 flex items-center gap-2 font-medium">
+                  Share the templates you've created! Contributing your templates is extremely beneficial for other users.
+                </p>
+              </div>
+              <div className="mt-6">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://pdfme.com/docs/template-contribution-guide"
+                  className="w-full relative flex items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-sm font-semibold text-white hover:opacity-90 transition duration-300"
+                >
+                  See Contribution Guide
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

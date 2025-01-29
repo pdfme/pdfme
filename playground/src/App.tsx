@@ -13,7 +13,8 @@ function App() {
     <div className="min-h-screen flex flex-col">
       {!isEmbedded && <Header />}
       <Routes>
-        <Route path="/" element={<Designer />} />
+        <Route path={"/"} element={<Designer />} />
+        <Route path={"/designer"} element={<Designer />} />
         <Route path="/form-viewer" element={<FormAndViewer />} />
         <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
       </Routes>

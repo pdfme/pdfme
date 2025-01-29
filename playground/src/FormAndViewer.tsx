@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from "@pdfme/common";
 import { Form, Viewer } from "@pdfme/ui";
 import {
   getFontsData,
+  getTemplateById,
   getBlankTemplate,
   handleLoadTemplate,
   generatePDF,
@@ -17,23 +19,8 @@ import ExternalButton from "./ExternalButton"
 type Mode = "form" | "viewer";
 
 
-const initTemplate = () => {
-  let template = getBlankTemplate();
-  try {
-    const templateString = localStorage.getItem("template");
-    if (!templateString) {
-      return template;
-    }
-    const templateJson = JSON.parse(templateString)
-    checkTemplate(templateJson);
-    template = templateJson as Template;
-  } catch {
-    localStorage.removeItem("template");
-  }
-  return template;
-};
-
 function FormAndViewerApp() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
 
@@ -41,20 +28,36 @@ function FormAndViewerApp() {
     (localStorage.getItem("mode") as Mode) ?? "form"
   );
 
-  const buildUi = useCallback((mode: Mode) => {
-    const template = initTemplate();
-    let inputs = getInputFromTemplate(template);
+  const buildUi = useCallback(async (mode: Mode) => {
+    if (!uiRef.current) return;
     try {
+      let template: Template = getBlankTemplate();
+      const templateIdFromQuery = searchParams.get("template");
+      searchParams.delete("template");
+      setSearchParams(searchParams, { replace: true });
+      const templateFromLocal = localStorage.getItem("template");
+
+      if (templateIdFromQuery) {
+        const templateJson = await getTemplateById(templateIdFromQuery);
+        checkTemplate(templateJson);
+        template = templateJson;
+
+        if (!templateFromLocal) {
+          localStorage.setItem("template", JSON.stringify(templateJson));
+        }
+      } else if (templateFromLocal) {
+        const templateJson = JSON.parse(templateFromLocal) as Template;
+        checkTemplate(templateJson);
+        template = templateJson;
+      }
+
+      let inputs = getInputFromTemplate(template);
       const inputsString = localStorage.getItem("inputs");
       if (inputsString) {
         const inputsJson = JSON.parse(inputsString);
         inputs = inputsJson;
       }
-    } catch {
-      localStorage.removeItem("inputs");
-    }
 
-    if (uiRef.current) {
       ui.current = new (mode === "form" ? Form : Viewer)({
         domContainer: uiRef.current,
         template,
@@ -71,6 +74,9 @@ function FormAndViewerApp() {
         },
         plugins: getPlugins(),
       });
+    } catch {
+      localStorage.removeItem("inputs");
+      localStorage.removeItem("template");
     }
   }, []);
 
@@ -113,7 +119,7 @@ function FormAndViewerApp() {
   const onResetInputs = () => {
     localStorage.removeItem("inputs");
     if (ui.current) {
-      const template = initTemplate();
+      const template = ui.current.getTemplate();
       ui.current.setInputs(getInputFromTemplate(template));
     }
   };
