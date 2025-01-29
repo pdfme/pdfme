@@ -18,7 +18,6 @@ import {
   DEFAULT_DYNAMIC_FIT,
   DEFAULT_DYNAMIC_MIN_FONT_SIZE,
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
-  DEFAULT_LOCALE,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter';
@@ -130,7 +129,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [
           {
@@ -144,23 +143,12 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
             message: i18n('validation.hexColor'),
-          },
-        ],
-      },
-      locale: {
-        title: i18n('schemas.text.locale'),
-        type: 'string',
-        default: 'en',
-        rules: [
-          {
-            validator: validateSegmenterLocale,
-            message: i18n('validation.locale'),
           },
         ],
       },
@@ -191,6 +179,5 @@ export const propPanel: PropPanel<TextSchema> = {
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,
-    locale: DEFAULT_LOCALE,
   },
 };

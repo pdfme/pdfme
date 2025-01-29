@@ -21,7 +21,6 @@ import {
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
   VERTICAL_ALIGN_TOP,
-  DEFAULT_LOCALE,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
 } from './constants.js';
@@ -279,7 +278,6 @@ export const calculateDynamicFontSize = async ({
           characterSpacing,
           boxWidthInPt,
         },
-        textSchema.locale ?? DEFAULT_LOCALE,
         'word'
       );
 
@@ -362,9 +360,8 @@ export const splitTextToSize = (arg: {
   boxWidthInPt: number;
   fontSize: number;
   fontKitFont: fontkit.Font;
-  segmenterLocale: string;
 }) => {
-  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt, segmenterLocale } = arg;
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
   const fontWidthCalcValues: FontWidthCalcValues = {
     font: fontKitFont,
     fontSize,
@@ -373,9 +370,7 @@ export const splitTextToSize = (arg: {
   };
   let lines: string[] = [];
   value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
-    lines = lines.concat(
-      getSplittedLinesBySegmenter(line, fontWidthCalcValues, segmenterLocale ?? 'en', 'word')
-    );
+    lines = lines.concat(getSplittedLinesBySegmenter(line, fontWidthCalcValues, 'word'));
   });
   return lines;
 };
@@ -384,17 +379,11 @@ export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefo
 const getSplittedLinesBySegmenter = (
   line: string,
   calcValues: FontWidthCalcValues,
-  segmenterLocale: string,
   granularity: 'word' | 'grapheme' | 'sentence' | undefined
 ): string[] => {
   // nothing to process but need to keep this for new lines.
   if (line === '') {
     return [''];
-  }
-
-  // Skip processing if the locale is invalid
-  if (!isLocaleSupported(segmenterLocale)) {
-    return [line];
   }
 
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
@@ -439,7 +428,7 @@ const getSplittedLinesBySegmenter = (
   //
   // https://www.morisawa.co.jp/blogs/MVP/8760
   //
-  if (segmenterLocale === 'ja') {
+  if (true) {
     // 行頭禁則
     const filterStart = (lines: string[], charToAppend: string | null, acc: string[]): string[] => {
       const row: string = lines[0];

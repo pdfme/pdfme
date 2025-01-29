@@ -44,7 +44,6 @@ interface UserOptions {
   columnStyles?: {
     [key: string]: Partial<Styles>;
   };
-  locale: string;
 }
 
 function parseSection(
@@ -199,7 +198,6 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
     columnStyles,
     margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
-    locale: schema.locale,
   };
 }
 
@@ -241,7 +239,6 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
     showHead: options.showHead,
     tableLineWidth: options.tableLineWidth ?? 0,
     tableLineColor: options.tableLineColor ?? '',
-    locale: options.locale,
   };
 
   const content = parseContent4Input(options);

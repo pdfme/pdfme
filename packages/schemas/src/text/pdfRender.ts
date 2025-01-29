@@ -131,7 +131,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     fontSize,
     fontKitFont,
     boxWidthInPt: width,
-    segmenterLocale: schema.locale,
   });
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down
@@ -150,7 +149,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   }
 
   const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
-  const segmenter = new Intl.Segmenter(schema.locale, { granularity: 'grapheme' });
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
     const adjusted = alignment === 'right' ? line.trimEnd() : line;

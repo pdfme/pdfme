@@ -50,7 +50,6 @@ const convertToCellStyle = (styles: Styles): CellStyle => ({
   borderColor: styles.lineColor,
   borderWidth: styles.lineWidth,
   padding: styles.cellPadding,
-  locale: styles.locale,
 });
 
 const calcResizedHeadWidthPercentages = (arg: {

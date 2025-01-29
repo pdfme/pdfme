@@ -50,7 +50,6 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
-  DEFAULT_LOCALE,
 } from '../text/constants.js';
 import { DateSchema } from './types';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter';
@@ -218,7 +217,6 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           ...schema,
           verticalAlignment: VERTICAL_ALIGN_MIDDLE,
           lineHeight: DEFAULT_LINE_HEIGHT,
-          locale: DEFAULT_LOCALE,
         },
       });
 
@@ -301,7 +299,6 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           ...schema,
           verticalAlignment: VERTICAL_ALIGN_MIDDLE,
           lineHeight: DEFAULT_LINE_HEIGHT,
-          locale: DEFAULT_LOCALE,
         },
       });
     },

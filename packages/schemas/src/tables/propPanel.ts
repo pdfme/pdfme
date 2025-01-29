@@ -8,7 +8,6 @@ import {
 } from './helper.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { validateSegmenterLocale } from '../text/helper.js';
-import { DEFAULT_LOCALE } from '../text/constants';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
@@ -109,13 +108,10 @@ export const propPanel: PropPanel<TableSchema> = {
       backgroundColor: '#2980ba',
       borderColor: '',
       borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
-      locale: DEFAULT_LOCALE,
     }),
     bodyStyles: Object.assign(getDefaultCellStyles(), {
       alternateBackgroundColor: '#f5f5f5',
-      locale: DEFAULT_LOCALE,
     }),
     columnStyles: {},
-    locale: DEFAULT_LOCALE,
   },
 };
