@@ -8,8 +8,6 @@ import Code from '../components/Code';
 import GithubStar from '../components/GithubStar';
 import type { Template } from '@pdfme/common';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, image, barcodes } from '@pdfme/schemas';
-import { generate } from '@pdfme/generator';
 import type { Designer, Viewer, Form } from '@pdfme/ui';
 import { getSampleTemplate, getGeneratorSampleCode } from '../libs/helper';
 
@@ -27,71 +25,93 @@ export default function Home(): JSX.Element {
 
   const onSaveTemplate = (t: Template) => {
     setTemplate(t);
-    if (form.current) {
-      form.current.updateTemplate(t);
-      form.current.setInputs(getInputFromTemplate(t));
+    const inputData = getInputFromTemplate(t);
+    form.current?.updateTemplate(t);
+    form.current?.setInputs(inputData);
+    viewer.current?.updateTemplate(t);
+    viewer.current?.setInputs(inputData);
+  };
+
+  const initializeDesigner = async (domContainer: HTMLDivElement) => {
+    const [{ Designer }, schemasModule] = await Promise.all([
+      import('@pdfme/ui'),
+      import('@pdfme/schemas'),
+    ]);
+    const { text, image, barcodes } = schemasModule;
+    const plugins = { text, image, qrcode: barcodes.qrcode };
+
+    const d = new Designer({
+      domContainer,
+      template,
+      plugins,
+    });
+
+    d.onSaveTemplate(onSaveTemplate);
+    d.onChangeTemplate(() => d.saveTemplate());
+    return d;
+  };
+
+  const initializeUIComponent = async (
+    domContainer: HTMLDivElement,
+    componentType: 'Viewer' | 'Form',
+    tmpl: Template
+  ) => {
+    const [uiModule, schemasModule] = await Promise.all([
+      import('@pdfme/ui'),
+      import('@pdfme/schemas'),
+    ]);
+
+    const { text, image, barcodes } = schemasModule;
+    const { Viewer, Form } = uiModule;
+    const plugins = { text, image, qrcode: barcodes.qrcode };
+    const inputs = getInputFromTemplate(tmpl);
+
+    if (componentType === 'Viewer') {
+      const v = new Viewer({ domContainer, template: tmpl, plugins, inputs });
+      return v;
+    } else {
+      const f = new Form({ domContainer, template: tmpl, plugins, inputs });
+      f.onChangeInput(console.log);
+      return f;
     }
-    if (viewer.current) {
-      viewer.current.updateTemplate(t);
-      viewer.current.setInputs(getInputFromTemplate(t));
-    }
+  };
+
+  const generatePDF = async () => {
+    if (!form.current) return;
+    const [{ text, image, barcodes }, { generate }] = await Promise.all([
+      import('@pdfme/schemas'),
+      import('@pdfme/generator'),
+    ]);
+
+    const pdf = await generate({
+      template,
+      plugins: { text, image, qrcode: barcodes.qrcode },
+      inputs: form.current.getInputs(),
+    });
+
+    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+    window.open(URL.createObjectURL(blob));
   };
 
   useEffect(() => {
     if (designerRef.current) {
-      import('@pdfme/ui').then(({ Designer }) => {
-        designer.current = new Designer({
-          domContainer: designerRef.current,
-          template,
-          plugins: { text, image, qrcode: barcodes.qrcode },
-        });
-
-        designer.current.onSaveTemplate(onSaveTemplate);
-
-        designer.current.onChangeTemplate(() => {
-          designer.current.saveTemplate();
-        });
-      })
+      initializeDesigner(designerRef.current).then((d) => {
+        designer.current = d;
+      });
     }
   }, [designerRef]);
 
+
   useEffect(() => {
-    if (viewerRef.current) {
-      import('@pdfme/ui').then(({ Viewer }) => {
-        viewer.current = new Viewer({
-          domContainer: viewerRef.current,
-          template,
-          plugins: { text, image, qrcode: barcodes.qrcode },
-          inputs: getInputFromTemplate(template),
-        });
-      });
-
-    }
-
-    if (formRef.current) {
-      import('@pdfme/ui').then(({ Form }) => {
-        form.current = new Form({
-          domContainer: formRef.current,
-          template,
-          plugins: { text, image, qrcode: barcodes.qrcode },
-          inputs: getInputFromTemplate(template),
-        });
-
-        form.current.onChangeInput(console.log);
-      })
-    }
-  }, [viewerRef, formRef, mode]);
-
-  const generatePDF = () => {
-    generate({
-      template,
-      plugins: { text, image, qrcode: barcodes.qrcode },
-      inputs: form.current.getInputs(),
-    }).then((pdf) => {
-      const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-      window.open(URL.createObjectURL(blob));
-    });
-  };
+    (async () => {
+      if (viewerRef.current) {
+        viewer.current = (await initializeUIComponent(viewerRef.current, 'Viewer', template)) as Viewer;
+      }
+      if (formRef.current) {
+        form.current = (await initializeUIComponent(formRef.current, 'Form', template)) as Form;
+      }
+    })();
+  }, [viewerRef, formRef, template, mode]);
 
   return (
     <Layout
@@ -108,10 +128,8 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className={'col col--6'}>
-              <h2>
-                <a aria-hidden="true" className="anchor enhancedAnchor" id="template"></a>
+              <h2 id="template">
                 PDF Generation Template
-                <a className="hash-link" href="#template"></a>
               </h2>
               <div className="card">
                 <div className="card__image">
@@ -134,11 +152,10 @@ export default function Home(): JSX.Element {
                 </div>
               </div>
             </div>
+
             <div className={'col col--6'}>
-              <h2>
-                <a aria-hidden="true" className="anchor enhancedAnchor" id="generate"></a>
+              <h2 id="generate">
                 PDF Generation
-                <a className="hash-link" href="#generate"></a>
               </h2>
               <div style={{ maxHeight: 580, overflow: 'scroll' }}>
                 <Code
@@ -167,10 +184,8 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className={'col col--12'}>
-              <h2>
-                <a aria-hidden="true" className="anchor enhancedAnchor" id="designer"></a>
+              <h2 id="designer">
                 Designer
-                <a className="hash-link" href="#designer"></a>
               </h2>
               <p>
                 A template can be easily created using Designer (UI template editor). It supports
@@ -179,14 +194,15 @@ export default function Home(): JSX.Element {
               </p>
             </div>
 
-            <div className={'col col--8'}>
-              <div style={{ height: 1000 }} ref={designerRef} />
+            <div className={'col col--9'} style={{ padding: 0 }}>
+              <div style={{ height: 700 }} ref={designerRef} />
             </div>
-            <div className={'col col--4'}>
-              <div style={{ height: 1000, overflow: 'auto' }}>
+            <div className={'col col--3'}>
+              <div style={{ height: 700, overflow: 'auto' }}>
                 <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
               </div>
             </div>
+
             <div className={'col col--12 margin-vert--lg'}>
               <div className="text--center">
                 <p>It's easy to integrate with an external app.</p>
@@ -198,15 +214,14 @@ export default function Home(): JSX.Element {
                 </Link>
               </div>
             </div>
+
             <div className="col col--12 margin-vert--lg text--center">
               <Divider />
             </div>
 
             <div className={'col col--4'}>
-              <h2>
-                <a aria-hidden="true" className="anchor enhancedAnchor" id="form-viewer"></a>
+              <h2 id="form-viewer">
                 Form / Viewer
-                <a className="hash-link" href="#form-viewer"></a>
               </h2>
               <div>
                 <div className="card">
@@ -279,9 +294,9 @@ export default function Home(): JSX.Element {
                 </li>
               </ul>
               {mode === 'form' ? (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
               ) : (
-                <div style={{ height: 800, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
+                <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
               )}
               <div className="margin-vert--lg text--center">
                 <button className="button button--lg button--secondary" onClick={generatePDF}>
@@ -291,32 +306,43 @@ export default function Home(): JSX.Element {
             </div>
           </div>
         </div>
+
         <div className="col col--12 margin-vert--lg text--center">
           <Divider />
         </div>
-        <div className={'col col--12 margin-vert--lg'}>
-          <div className="text--center">
-            <p>
-              Let's check out applications that you can make with pdfme and how it works by actually
-              using it.
-            </p>
-            <div className="row row--no-gutters" style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <div className="col col--3" style={{ marginTop: '1rem' }}>
-                <Link className="button button--primary button--lg" to="/demo">
-                  Check out the Demo Apps
-                </Link>
-              </div>
-              <div className="col col--3" style={{ marginTop: '1rem' }}>
-                <Link className="button button--info button--lg" to="/templates">
-                   Sample Templates
-                </Link>
-              </div>
-            </div>
 
+        <div className="col col--12 margin-vert--lg text--center">
+          <h2>We are Open Source❤️</h2>
+          <p>
+            pdfme is an open source project and we love contributions.
+            <br />
+            We are always looking for contributors to help us improve our project.
+          </p>
+
+          <div className="margin-vert--lg">
+            <h3 style={{ marginBottom: '20px' }}>Contributors</h3>
+            <div>
+              <a href="https://github.com/pdfme/pdfme/graphs/contributors">
+                <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
+              </a>
+            </div>
           </div>
+
+          <div className="margin-vert--lg">
+            <h3>Support pdfme</h3>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <a href="https://github.com/sponsors/pdfme" target="_blank" style={{ margin: '20px' }}>
+                <img alt="GitHub Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" width={190} />
+              </a>
+              <a href="https://opencollective.com/pdfme/donate" target="_blank" style={{ margin: '20px' }}>
+                <img src="https://opencollective.com/webpack/donate/button@2x.png?color=blue" width={250} />
+              </a>
+            </div>
+          </div>
+
+          <GithubStar />
         </div>
-        <GithubStar />
       </main>
-    </Layout>
+    </Layout >
   );
 }

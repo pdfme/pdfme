@@ -2,6 +2,7 @@
 .DS_Store
 /node_modules
 /packages/*/node_modules
+/packages/common/src/version.ts
 .cache
 dist
 coverage/

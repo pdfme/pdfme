@@ -103,12 +103,12 @@ const config = {
           type: 'doc',
           docId: 'getting-started',
           position: 'right',
-          label: 'Docs',
+          label: 'Documentation',
         },
         {
           to: '/templates',
           position: 'right',
-          label: 'Sample Templates',
+          label: 'Examples',
         },
         {
           to: '/template-design',
@@ -136,7 +136,7 @@ const config = {
       style: 'dark',
       links: [
         {
-          title: 'Docs',
+          title: 'Documentation',
           items: [
             {
               label: 'Getting Started',
@@ -156,7 +156,7 @@ const config = {
               to: '/demo',
             },
             {
-              label: 'Sample Templates',
+              label: 'Examples',
               to: '/templates',
             },
             {

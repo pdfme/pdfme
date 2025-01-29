@@ -5,23 +5,23 @@ import {
   Template,
   Size,
   getB64BasePdf,
+  b64toUint8Array,
   SchemaForUI,
   ChangeSchemas,
   isBlankPdf,
 } from '@pdfme/common';
+import { pdf2img, pdf2size } from '@pdfme/converter';
 
 import {
   schemasList2template,
   uuid,
   getUniqueSchemaName,
   moveCommandToChangeSchemasArg,
-  pdf2Pngs,
-  getPdfPageSizes,
-  b64toBlob,
+  arrayBufferToBase64,
   initShortCuts,
   destroyShortCuts,
 } from './helper.js';
-import { RULER_HEIGHT } from './constants.js';
+import { RULER_HEIGHT, MAX_ZOOM } from './constants.js';
 
 export const usePrevious = <T>(value: T) => {
   const ref = useRef<T | null>(null);
@@ -48,7 +48,11 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       template: { basePdf, schemas },
       size,
     } = prop;
-    let paperWidth, paperHeight, _backgrounds, _pageSizes;
+
+    let paperWidth: number;
+    let paperHeight: number;
+    let _backgrounds: string[];
+    let _pageSizes: { width: number; height: number }[];
 
     if (isBlankPdf(basePdf)) {
       const { width, height } = basePdf;
@@ -61,18 +65,28 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       _pageSizes = schemas.map(() => ({ width, height }));
     } else {
       const _basePdf = await getB64BasePdf(basePdf);
-      const pdfBlob = b64toBlob(_basePdf);
-      _pageSizes = await getPdfPageSizes(pdfBlob);
+
+      const [_pages, imgBuffers] = await Promise.all([
+        pdf2size(b64toUint8Array(_basePdf)),
+        pdf2img(b64toUint8Array(_basePdf), { scale: MAX_ZOOM }),
+      ]);
+
+      _pageSizes = _pages;
       paperWidth = _pageSizes[0].width * ZOOM;
       paperHeight = _pageSizes[0].height * ZOOM;
-      _backgrounds = await pdf2Pngs(pdfBlob, paperWidth);
+      _backgrounds = imgBuffers.map(arrayBufferToBase64);
     }
+
     const _scale = Math.min(
       getScale(size.width, paperWidth),
       getScale(size.height - RULER_HEIGHT, paperHeight)
     );
 
-    return { backgrounds: _backgrounds, pageSizes: _pageSizes, scale: _scale };
+    return {
+      backgrounds: _backgrounds,
+      pageSizes: _pageSizes,
+      scale: _scale,
+    };
   };
 
   useEffect(() => {
@@ -82,7 +96,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
       })
       .catch((err: Error) => {
         setError(err);
-        console.error(`[@pdfme/ui] ${err}`);
+        console.error('[@pdfme/ui]', err);
       });
   }, [template, size]);
 
@@ -230,7 +244,11 @@ export const useInitEvents = ({
         const stackUniqueSchemaNames: string[] = [];
         const pasteSchemas = copiedSchemas.current.map((cs) => {
           const id = uuid();
-          const name = getUniqueSchemaName({ copiedSchemaName: cs.name, schema, stackUniqueSchemaNames });
+          const name = getUniqueSchemaName({
+            copiedSchemaName: cs.name,
+            schema,
+            stackUniqueSchemaNames,
+          });
           const { height, width, position: p } = cs;
           const ps = pageSizes[pageCursor];
           const position = {

@@ -1,5 +1,5 @@
+import {PDFME_VERSION} from './version';
 import {
-  PDFME_VERSION,
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,

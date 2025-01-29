@@ -1,11 +1,9 @@
-import { getDocument, GlobalWorkerOptions, version } from 'pdfjs-dist';
 import hotkeys from 'hotkeys-js';
 import {
   cloneDeep,
   ZOOM,
   getB64BasePdf,
   b64toUint8Array,
-  pt2mm,
   Template,
   BasePdf,
   SchemaForUI,
@@ -13,9 +11,8 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
+import { pdf2size } from '@pdfme/converter';
 import { RULER_HEIGHT } from './constants.js';
-
-GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -191,61 +188,59 @@ export const destroyShortCuts = () => {
   hotkeys.unbind(keys.join());
 };
 
-export const getPdfPageSizes = async (pdfBlob: Blob) => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await getDocument({ url }).promise;
+/**
+ * Guess the MIME type by checking the first few bytes of the ArrayBuffer.
+ * Currently checks for PNG, JPEG, and GIF signatures.
+ */
+function detectMimeType(arrayBuffer: ArrayBuffer): string {
+  const dataView = new DataView(arrayBuffer);
 
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      return await pdfDoc.getPage(i + 1).then((page) => {
-        const { height, width } = page.getViewport({ scale: 1, rotation: 0 });
+  // Check for PNG signature: 0x89 0x50 0x4E 0x47
+  if (
+    dataView.getUint8(0) === 0x89 &&
+    dataView.getUint8(1) === 0x50 &&
+    dataView.getUint8(2) === 0x4e &&
+    dataView.getUint8(3) === 0x47
+  ) {
+    return 'image/png';
+  }
 
-        return { height: pt2mm(height), width: pt2mm(width) };
-      });
-    })
-  );
+  // Check for JPEG signature: 0xFF 0xD8 0xFF
+  if (
+    dataView.getUint8(0) === 0xff &&
+    dataView.getUint8(1) === 0xd8 &&
+    dataView.getUint8(2) === 0xff
+  ) {
+    return 'image/jpeg';
+  }
 
-  URL.revokeObjectURL(url);
+  return ''; // Unknown type
+}
 
-  return promises;
-};
+export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
+  // Detect the MIME type
+  const mimeType = detectMimeType(arrayBuffer);
 
-const pdf2Images = async (pdfBlob: Blob, width: number, imageType: 'png' | 'jpeg') => {
-  const url = URL.createObjectURL(pdfBlob);
-  const pdfDoc = await getDocument({ url }).promise;
+  // Convert ArrayBuffer to raw Base64
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64String = btoa(binary);
 
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      return await pdfDoc.getPage(i + 1).then((page) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = width * 2;
-        const canvasContext = canvas.getContext('2d')!;
-        const scaleRequired = canvas.width / page.getViewport({ scale: 1, rotation: 0 }).width;
-        const viewport = page.getViewport({ scale: scaleRequired, rotation: 0 });
-        canvas.height = viewport.height;
-
-        return page
-          .render({ canvasContext, viewport })
-          .promise.then(() => canvas.toDataURL(`image/${imageType}`));
-      });
-    })
-  );
-  URL.revokeObjectURL(url);
-
-  return promises;
-};
-
-export const pdf2Pngs = (pdfBlob: Blob, width: number) => pdf2Images(pdfBlob, width, 'png');
-
-export const b64toBlob = (base64: string) => {
-  const uint8Array = b64toUint8Array(base64);
-  const [, , mimeType] = base64.match(/(:)([a-z/]+)(;)/)!;
-
-  return new Blob([uint8Array.buffer], { type: mimeType });
+  // Optionally prepend a data: URL if a known MIME type is found;
+  // otherwise just return the raw Base64.
+  if (mimeType) {
+    return `data:${mimeType};base64,${base64String}`;
+  } else {
+    // or you can default to `application/octet-stream` if unknown
+    return `data:application/octet-stream;base64,${base64String}`;
+  }
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
-  template.schemas.forEach((page, i) => {
+  template.schemas.forEach((page) => {
     page.forEach((schema) => {
       schema.id = uuid();
       schema.content = schema.content || '';
@@ -268,8 +263,7 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    const pdfBlob = b64toBlob(b64BasePdf);
-    pageSizes = await getPdfPageSizes(pdfBlob);
+    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf));
   }
 
   const ssl = schemasForUI.length;
