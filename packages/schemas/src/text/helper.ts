@@ -166,9 +166,9 @@ const getOverPosition = (textLine: string, calcValues: FontWidthCalcValues) => {
  * However, this might need to be revisited for broader language support.
  */
 const isLineBreakableChar = (char: string) => {
-  const lineBreakableChars = [' ', '-', "\u2014", "\u2013"];
+  const lineBreakableChars = [' ', '-', '\u2014', '\u2013'];
   return lineBreakableChars.includes(char);
-}
+};
 
 /**
  * Gets the position of the split. Splits the exceeding line at
@@ -186,7 +186,7 @@ const getSplitPosition = (textLine: string, calcValues: FontWidthCalcValues) => 
   let overPosTmp = overPos - 1;
   while (overPosTmp >= 0) {
     if (isLineBreakableChar(textLine[overPosTmp])) {
-      return overPosTmp+1;
+      return overPosTmp + 1;
     }
     overPosTmp--;
   }
@@ -286,7 +286,12 @@ export const calculateDynamicFontSize = async ({
       lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
           // For vertical fit we want to consider the width of text lines where we detect a split
-          const textWidth = widthOfTextAtSize(line, fontKitFont, size, characterSpacing);
+          const textWidth = widthOfTextAtSize(
+            line.replace('\n', ''),
+            fontKitFont,
+            size,
+            characterSpacing
+          );
           const textWidthInMm = pt2mm(textWidth);
           totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
         }
@@ -393,7 +398,7 @@ const getSplittedLinesBySegmenter = (
   }
 
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
-  const segmenter = new Intl.Segmenter(segmenterLocale, { granularity: granularity ?? 'word' });
+  const segmenter = new Intl.Segmenter(undefined, { granularity: granularity ?? 'word' });
   const iterator = segmenter.segment(line)[Symbol.iterator]();
 
   let lines: string[] = [];
@@ -472,10 +477,21 @@ const getSplittedLinesBySegmenter = (
 
     const startFiltered = filterStart(lines.reverse(), null, []).reverse();
     const endFiltered = filterEnd(startFiltered, null, []);
-    return endFiltered.map((line) => line.trimEnd());
+
+    return adjustEndOfLine(endFiltered);
   } else {
-    return lines.map((line) => line.trimEnd());
+    return adjustEndOfLine(lines);
   }
+};
+
+const adjustEndOfLine = (lines: string[]): string[] => {
+  return lines.map((line, index) => {
+    if (index === lines.length - 1) {
+      return line.trimEnd() + '\n';
+    } else {
+      return line.trimEnd();
+    }
+  });
 };
 
 const isLocaleSupported = (segmenterLocale: string): boolean => {

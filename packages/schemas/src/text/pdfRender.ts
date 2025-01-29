@@ -169,7 +169,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
-      const _x = xLine + textWidth + 1
+      const _x = xLine + textWidth + 1;
       const _y = yLine + textHeight / 3;
       page.drawLine({
         start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
@@ -182,7 +182,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     // draw underline
     if (schema.underline && textWidth > 0) {
-      const _x = xLine + textWidth + 1
+      const _x = xLine + textWidth + 1;
       const _y = yLine - textHeight / 12;
       page.drawLine({
         start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
@@ -203,22 +203,19 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     // adjust spacing depending on the alignment
     let spacing = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
-
-    if (alignment === 'justify' && (lines[rowIndex + 1] ?? '' !== '')) {
-      // If we reach the last line of each paragraph, skip justifying. This is the most common format in Japanese.
-      // Adobe Illustrator has 'align center', 'align right', and 'justify' on last line options too.
-      // Not sure if this works as well in Arabic languages.
-      const iterator = segmenter.segment(line)[Symbol.iterator]();
+    let purifiedLine = '';
+    if (alignment === 'justify' && line.slice(-1) !== '\n') {
+      purifiedLine = line;
+      const iterator = segmenter.segment(purifiedLine)[Symbol.iterator]();
       const len = Array.from(iterator).length;
-
       spacing += (width - textWidth) / len;
-
       page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     } else {
+      purifiedLine = line.slice(-1) === '\n' ? line.slice(0, -1) : line;
       page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     }
 
-    page.drawText(line, {
+    page.drawText(purifiedLine, {
       x: xLine,
       y: yLine,
       rotate,
