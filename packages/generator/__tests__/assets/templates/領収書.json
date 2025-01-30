@@ -27,8 +27,7 @@
         "lineHeight": 1,
         "content": "1",
         "name": "No",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -44,8 +43,7 @@
         "lineHeight": 1,
         "content": "2020/01/01",
         "name": "発行日",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -61,8 +59,7 @@
         "lineHeight": 1,
         "content": "¥56,160",
         "name": "金額",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -78,8 +75,7 @@
         "lineHeight": 1,
         "content": "株式会社◯◯ 御中",
         "name": "あて名",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -95,8 +91,7 @@
         "lineHeight": 1,
         "content": "印刷代として",
         "name": "但し書き",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -112,8 +107,7 @@
         "lineHeight": 1,
         "content": "〒123-4567\n東京都東京1-2-3\n東京マンション123号\n株式会社labelmake.jp\nTEL : 000-000-0000",
         "name": "発行者",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

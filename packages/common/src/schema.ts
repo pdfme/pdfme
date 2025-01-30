@@ -37,7 +37,6 @@ export const Dict = z.object({
   'validation.uniqueName': z.string(),
   'validation.hexColor': z.string(),
   'validation.dateTimeFormat': z.string(),
-  'validation.segmenterLocale': z.string(),
 
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),
@@ -67,7 +66,6 @@ export const Dict = z.object({
   'schemas.text.fit': z.string(),
   'schemas.text.dynamicFontSize': z.string(),
   'schemas.text.format': z.string(),
-  'schemas.text.locale': z.string(),
 
   'schemas.mvt.typingInstructions': z.string(),
   'schemas.mvt.sampleField': z.string(),
@@ -82,7 +80,6 @@ export const Dict = z.object({
   'schemas.table.headStyle': z.string(),
   'schemas.table.bodyStyle': z.string(),
   'schemas.table.columnStyle': z.string(),
-  'schemas.table.locale': z.string(),
 
   'schemas.date.format': z.string(),
   'schemas.date.locale': z.string(),

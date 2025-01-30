@@ -27,8 +27,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "記入時(年)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -44,8 +43,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "記入時(月)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -61,8 +59,7 @@
         "lineHeight": 1,
         "content": "31",
         "name": "記入時(日)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -78,8 +75,7 @@
         "lineHeight": 1,
         "content": "田中太郎",
         "name": "従業員名",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -95,8 +91,7 @@
         "lineHeight": 1.3,
         "content": "株式会社labelmake.jp\n東京都東京1-2-3-4 東京マンション123号",
         "name": "事業場名称・所在地",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -112,8 +107,7 @@
         "lineHeight": 1,
         "content": "代表取締役 東京都 出得太",
         "name": "使用者職氏名",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -129,8 +123,7 @@
         "lineHeight": 1,
         "content": "アルバイト従業員",
         "name": "雇用形態",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -146,8 +139,7 @@
         "lineHeight": 1,
         "content": "令和\b1年12月31日から(期限の定めなし)",
         "name": "契約期間",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -163,8 +155,7 @@
         "lineHeight": 1,
         "content": "自動的に更新する",
         "name": "契約更新",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -180,8 +171,7 @@
         "lineHeight": 1,
         "content": "東京都東京1-2-3-4 東京マンション123号",
         "name": "就業場所",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -197,8 +187,7 @@
         "lineHeight": 1,
         "content": "営業",
         "name": "業務内容",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -214,8 +203,7 @@
         "lineHeight": 1,
         "content": "午前10時 から 午後19時まで",
         "name": "始業・就業の時刻",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -231,8 +219,7 @@
         "lineHeight": 1,
         "content": "60",
         "name": "休憩時間",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -248,8 +235,7 @@
         "lineHeight": 1,
         "content": "有",
         "name": "所定時間外労働",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -265,8 +251,7 @@
         "lineHeight": 1,
         "content": "毎週土日・祝祭日",
         "name": "休日",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -282,8 +267,7 @@
         "lineHeight": 1,
         "content": "お盆休暇、年末年始休暇(会社カレンダーによる)",
         "name": "休暇",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -299,8 +283,7 @@
         "lineHeight": 1,
         "content": "時間給 1500円",
         "name": "基本賃金",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -316,8 +299,7 @@
         "lineHeight": 1,
         "content": "営業手当　10,000円/月、通勤手当　実費(上限 20,000円/月)",
         "name": "諸手当",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -333,8 +315,7 @@
         "lineHeight": 1,
         "content": "末",
         "name": "賃金締切日",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -350,8 +331,7 @@
         "lineHeight": 1,
         "content": "翌15",
         "name": "賃金支払日",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -367,8 +347,7 @@
         "lineHeight": 1,
         "content": "無",
         "name": "賞与",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -384,8 +363,7 @@
         "lineHeight": 1,
         "content": "労災保険\n雇用保険",
         "name": "社会保険",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -401,8 +379,7 @@
         "lineHeight": 1,
         "content": "自己都合退職の手続: 退職する1カ月以上前に届け出ること\t\t\t\n解雇の事由及び手続: 就業規則の定めによる\t\t\t",
         "name": "退職に関する事項",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -418,8 +395,7 @@
         "lineHeight": 1,
         "content": "以上のほかは、当社就業規則による。",
         "name": "その他",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

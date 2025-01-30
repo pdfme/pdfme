@@ -34,7 +34,6 @@ const getTextSchema = () => {
     lineHeight: 1,
     characterSpacing: 1,
     fontSize: 14,
-    locale: 'en',
   };
   return textSchema;
 };

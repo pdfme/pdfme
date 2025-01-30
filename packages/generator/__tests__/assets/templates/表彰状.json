@@ -27,8 +27,7 @@
         "lineHeight": 1,
         "content": "表彰状",
         "name": "表題",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -44,8 +43,7 @@
         "lineHeight": 1,
         "content": "山田花子 殿",
         "name": "受取人",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -61,8 +59,7 @@
         "lineHeight": 1,
         "content": "あなたは入社以来三〇年の永きにわたり当社の業績の発展に寄与されました\n\nよってその功績をたたえここに表彰いたします",
         "name": "本文",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -78,8 +75,7 @@
         "lineHeight": 1,
         "content": "令和二年一月一日",
         "name": "日付",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -95,8 +91,7 @@
         "lineHeight": 1,
         "content": "株式会社labelmake.jp\n代表取締役 田中太郎",
         "name": "差出人",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

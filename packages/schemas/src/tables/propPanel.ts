@@ -7,7 +7,6 @@ import {
   getColumnStylesPropPanelSchema,
 } from './helper.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { validateSegmenterLocale } from '../text/helper.js';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
@@ -47,18 +46,6 @@ export const propPanel: PropPanel<TableSchema> = {
               disabledAlpha: true,
             },
             rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
-          },
-          segmenterLocale: {
-            title: i18n('schemas.table.locale'),
-            type: 'string',
-            span: 8,
-            default: 'en',
-            rules: [
-              {
-                validator: validateSegmenterLocale,
-                message: i18n('validation.segmenterLocale'),
-              },
-            ],
           },
         },
       },

@@ -152,8 +152,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
-    const adjusted = alignment === 'right' ? line.trimEnd() : line;
-    const textWidth = widthOfTextAtSize(adjusted, fontKitFont, fontSize, characterSpacing);
+    const trimmed = line.replace('\n', '');
+    const textWidth = widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing);
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
@@ -200,21 +200,18 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       yLine = rotatedPoint.y;
     }
 
-    // adjust spacing depending on the alignment
-    let spacing = characterSpacing ?? DEFAULT_CHARACTER_SPACING;
-    let purifiedLine = '';
+    let spacing = characterSpacing;
     if (alignment === 'justify' && line.slice(-1) !== '\n') {
-      purifiedLine = line;
-      const iterator = segmenter.segment(purifiedLine)[Symbol.iterator]();
+      // if alignment is `justify` but the end of line is not newline, then adjust the spacing
+      const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
       spacing += (width - textWidth) / len;
       page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     } else {
-      purifiedLine = line.slice(-1) === '\n' ? line.slice(0, -1) : line;
       page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     }
 
-    page.drawText(purifiedLine, {
+    page.drawText(trimmed, {
       x: xLine,
       y: yLine,
       rotate,

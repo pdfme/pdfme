@@ -27,8 +27,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "記入時(年)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -44,8 +43,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "記入時(月)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -61,8 +59,7 @@
         "lineHeight": 1,
         "content": "31",
         "name": "記入時(日)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -78,8 +75,7 @@
         "lineHeight": 1,
         "content": "とうきょうとでえた",
         "name": "ふりがな",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -95,8 +91,7 @@
         "lineHeight": 1,
         "content": "東京都 出得太",
         "name": "名前",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -112,8 +107,7 @@
         "lineHeight": 1,
         "content": "1993",
         "name": "生年月日(年)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -129,8 +123,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "生年月日(月)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -146,8 +139,7 @@
         "lineHeight": 1,
         "content": "31",
         "name": "生年月日(日)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -163,8 +155,7 @@
         "lineHeight": 1,
         "content": "26",
         "name": "生年月日(歳)",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -180,8 +171,7 @@
         "lineHeight": 1,
         "content": "男",
         "name": "性別",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -212,8 +202,7 @@
         "lineHeight": 0.9,
         "content": "とうきょうととうきょういちにちさんし\nとうきょうまんしょんいちにさんごう",
         "name": "住所ふりがな",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -229,8 +218,7 @@
         "lineHeight": 1,
         "content": "123-4567",
         "name": "郵便番号",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -246,8 +234,7 @@
         "lineHeight": 1,
         "content": "東京都東京1-2-3-4 東京マンション123号",
         "name": "住所",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -263,8 +250,7 @@
         "lineHeight": 1,
         "content": "123-3456-7890",
         "name": "電話番号",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -280,8 +266,7 @@
         "lineHeight": 1,
         "content": "support@labelmake.jp",
         "name": "メールアドレス",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -297,8 +282,7 @@
         "lineHeight": 0.9,
         "content": "とうきょうととうきょういちにちさんし\nとうきょうまんしょんいちにさんごう",
         "name": "住所ふりがな2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -314,8 +298,7 @@
         "lineHeight": 1,
         "content": "123-4567",
         "name": "郵便番号2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -331,8 +314,7 @@
         "lineHeight": 1,
         "content": "東京都東京1-2-3-4 東京マンション123号",
         "name": "住所2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -348,8 +330,7 @@
         "lineHeight": 1,
         "content": "123-3456-7890",
         "name": "電話番号2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -365,8 +346,7 @@
         "lineHeight": 1,
         "content": "support@labelmake.jp",
         "name": "メールアドレス2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -382,8 +362,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "学歴・職歴(年)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -399,8 +378,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "学歴・職歴(月)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -416,8 +394,7 @@
         "lineHeight": 1,
         "content": "普通自動車第一種運転免許（AT限定）取得",
         "name": "学歴・職歴(内容)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -433,8 +410,7 @@
         "lineHeight": 1,
         "content": "2012",
         "name": "学歴・職歴(年)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -450,8 +426,7 @@
         "lineHeight": 1,
         "content": "3",
         "name": "学歴・職歴(月)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -467,8 +442,7 @@
         "lineHeight": 1,
         "content": "私立labelmake.jp高等学校卒業",
         "name": "学歴・職歴(内容)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -484,8 +458,7 @@
         "lineHeight": 1,
         "content": "2012",
         "name": "学歴・職歴(年)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -501,8 +474,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -518,8 +490,7 @@
         "lineHeight": 1,
         "content": "私立labelmake.jp大学入学",
         "name": "学歴・職歴(内容)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -535,8 +506,7 @@
         "lineHeight": 1,
         "content": "2016",
         "name": "学歴・職歴(年)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -552,8 +522,7 @@
         "lineHeight": 1,
         "content": "3",
         "name": "学歴・職歴(月)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -569,8 +538,7 @@
         "lineHeight": 1,
         "content": "私立labelmake.jp大学卒業",
         "name": "学歴・職歴(内容)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -586,8 +554,7 @@
         "lineHeight": 1,
         "content": "2016",
         "name": "学歴・職歴(年)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -603,8 +570,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -620,8 +586,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -637,8 +602,7 @@
         "lineHeight": 1,
         "content": "2017",
         "name": "学歴・職歴(年)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -654,8 +618,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -671,8 +634,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社退社",
         "name": "学歴・職歴(内容)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -688,8 +650,7 @@
         "lineHeight": 1,
         "content": "2017",
         "name": "学歴・職歴(年)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -705,8 +666,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -722,8 +682,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -739,8 +698,7 @@
         "lineHeight": 1,
         "content": "2018",
         "name": "学歴・職歴(年)8",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -756,8 +714,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)8",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -773,8 +730,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社退社",
         "name": "学歴・職歴(内容)8",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -790,8 +746,7 @@
         "lineHeight": 1,
         "content": "2018",
         "name": "学歴・職歴(年)9",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -822,8 +777,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)9",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -839,8 +793,7 @@
         "lineHeight": 1,
         "content": "2019",
         "name": "学歴・職歴(年)10",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -856,8 +809,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)10",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -873,8 +825,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社退社",
         "name": "学歴・職歴(内容)10",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -890,8 +841,7 @@
         "lineHeight": 1,
         "content": "2019",
         "name": "学歴・職歴(年)11",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -907,8 +857,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)11",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -924,8 +873,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)11",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -941,8 +889,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "学歴・職歴(年)12",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -958,8 +905,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)12",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -975,8 +921,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社退社",
         "name": "学歴・職歴(内容)12",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -992,8 +937,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "学歴・職歴(年)13",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1009,8 +953,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)13",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1026,8 +969,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)13",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1043,8 +985,7 @@
         "lineHeight": 1,
         "content": "2021",
         "name": "学歴・職歴(年)14",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1060,8 +1001,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)14",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1077,8 +1017,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社退社",
         "name": "学歴・職歴(内容)14",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1094,8 +1033,7 @@
         "lineHeight": 1,
         "content": "2021",
         "name": "学歴・職歴(年)15",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1111,8 +1049,7 @@
         "lineHeight": 1,
         "content": "4",
         "name": "学歴・職歴(月)15",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1128,8 +1065,7 @@
         "lineHeight": 1,
         "content": "〇〇株式会社入社",
         "name": "学歴・職歴(内容)15",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       }
     ],
     [
@@ -1147,8 +1083,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1164,8 +1099,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1181,8 +1115,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)1",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1198,8 +1131,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1215,8 +1147,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1232,8 +1163,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)2",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1249,8 +1179,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1266,8 +1195,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1283,8 +1211,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)3",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1300,8 +1227,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1317,8 +1243,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1334,8 +1259,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)4",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1351,8 +1275,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1368,8 +1291,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1385,8 +1307,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)5",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1402,8 +1323,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1419,8 +1339,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1436,8 +1355,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)6",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1453,8 +1371,7 @@
         "lineHeight": 1,
         "content": "2020",
         "name": "免許・資格(年)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1470,8 +1387,7 @@
         "lineHeight": 1,
         "content": "12",
         "name": "免許・資格(月)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1487,8 +1403,7 @@
         "lineHeight": 1,
         "content": "〇〇取得",
         "name": "免許・資格(内容)7",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1504,8 +1419,7 @@
         "lineHeight": 1,
         "content": "学生時代から現在まで、個人的な趣味でスマートフォン向けのゲームづくりをしてきました。\n\n現在、在籍するインターネット系の広告代理店では企画営業を3年経験してきましたが、社会人としての基礎的なスキルは一通り身についた今、改めて今後のキャリアを考えた時に、好きなゲームづくりを仕事にしたいと考え、転職活動をしています。\n\n御社では、これまでにVRを取り入れたゲームを３作品リリースされています。\n新しい技術を用いて、これまでにないゲームを開発したいと思い、御社を志望しました。\n開発だけでなく、広告の営業を通して身につけたWebマーケティングの知見を活かして、「売れる」ゲームの企画に携わりたいと考えています。",
         "name": "志望動機・特技・アピールポイントなど",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1521,8 +1435,7 @@
         "lineHeight": 1,
         "content": "1時間30分",
         "name": "通勤時間",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1538,8 +1451,7 @@
         "lineHeight": 1,
         "content": "0人",
         "name": "扶養家族人数",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1555,8 +1467,7 @@
         "lineHeight": 1,
         "content": "無\n",
         "name": "配偶者",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1572,8 +1483,7 @@
         "lineHeight": 1,
         "content": "無\n",
         "name": "配偶者の扶養義務",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       },
       {
         "type": "text",
@@ -1589,8 +1499,7 @@
         "lineHeight": 1,
         "content": "勤務可能日：月・火・水・土。週3～4日勤務希望です。",
         "name": "本人希望欄",
-        "fontName": "NotoSerifJP",
-        "locale": "ja"
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

@@ -399,15 +399,19 @@ const getSplittedLinesBySegmenter = (
     if (chunk.done) break;
     const segment = chunk.value.segment;
     const textWidth = widthOfTextAtSize(segment, font, fontSize, characterSpacing);
-
     if (currentTextSize + textWidth <= boxWidthInPt) {
       // the size of boxWidth is large enough to add the segment
       lines[lineCounter] = (lines[lineCounter] ?? '') + segment;
       currentTextSize += textWidth;
     } else if (textWidth <= boxWidthInPt) {
       // the segment is small enough to be added to the next line
-      lines[++lineCounter] = segment;
-      currentTextSize = textWidth;
+      if (isLineBreakableChar(segment)) {
+        lines[++lineCounter] = '';
+        currentTextSize = 0;
+      } else {
+        lines[++lineCounter] = segment;
+        currentTextSize = textWidth;
+      }
     } else {
       // the segment is too large to fit in the boxWidth, we wrap the segment
       for (const char of segment) {
@@ -473,6 +477,7 @@ const getSplittedLinesBySegmenter = (
   }
 };
 
+// add a newline if the line is the end of the paragraph
 const adjustEndOfLine = (lines: string[]): string[] => {
   return lines.map((line, index) => {
     if (index === lines.length - 1) {
@@ -481,22 +486,4 @@ const adjustEndOfLine = (lines: string[]): string[] => {
       return line.trimEnd();
     }
   });
-};
-
-const isLocaleSupported = (segmenterLocale: string): boolean => {
-  try {
-    const options: Intl.SegmenterOptions = { localeMatcher: 'lookup' };
-    const supportedLocales = Intl.Segmenter.supportedLocalesOf(segmenterLocale, options);
-    if (supportedLocales.length == 0) {
-      return false;
-    } else {
-      return true;
-    }
-  } catch {
-    return false;
-  }
-};
-
-export const validateSegmenterLocale = (_rule: any, segmenterLocale: string): boolean => {
-  return isLocaleSupported(segmenterLocale);
 };

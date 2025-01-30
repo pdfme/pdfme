@@ -21,7 +21,6 @@ import {
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter';
-import { validateSegmenterLocale } from './helper.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
