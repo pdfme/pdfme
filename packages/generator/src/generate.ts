@@ -65,8 +65,10 @@ const generate = async (props: GenerateProps) => {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
 
-      const boundingBoxLeft = basePage.embedder ? pt2mm(basePage.embedder.boundingBox.left) : 0;
-      const boundingBoxBottom = basePage.embedder ? pt2mm(basePage.embedder.boundingBox.bottom) : 0;
+      const boundingBoxLeft =
+        basePage instanceof pdfLib.PDFEmbeddedPage ? pt2mm(embedPdfBox.mediaBox.x) : 0;
+      const boundingBoxBottom =
+        basePage instanceof pdfLib.PDFEmbeddedPage ? pt2mm(embedPdfBox.mediaBox.y) : 0;
 
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
 
