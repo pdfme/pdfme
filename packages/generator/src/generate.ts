@@ -5,6 +5,8 @@ import {
   getDynamicTemplate,
   isBlankPdf,
   replacePlaceholders,
+  pt2mm,
+  cloneDeep,
 } from '@pdfme/common';
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
 import {
@@ -17,7 +19,9 @@ import {
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
-  const { inputs, template, options = {}, plugins: userPlugins = {} } = props;
+  const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
+  const template = cloneDeep(_template);
+
   const basePdf = template.basePdf;
 
   if (inputs.length === 0) {
@@ -60,6 +64,10 @@ const generate = async (props: GenerateProps) => {
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
       const embedPdfBox = embedPdfBoxes[j];
+
+      const boundingBoxLeft = basePage.embedder ? pt2mm(basePage.embedder.boundingBox.left) : 0;
+      const boundingBoxBottom = basePage.embedder ? pt2mm(basePage.embedder.boundingBox.bottom) : 0;
+
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
 
       if (isBlankPdf(basePdf) && basePdf.staticSchema) {
@@ -74,6 +82,11 @@ const generate = async (props: GenerateProps) => {
             variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
             schemas: dynamicTemplate.schemas,
           });
+
+          staticSchema.position = {
+            x: staticSchema.position.x + boundingBoxLeft,
+            y: staticSchema.position.y - boundingBoxBottom,
+          };
 
           await render({
             value,
@@ -108,7 +121,21 @@ const generate = async (props: GenerateProps) => {
             })
           : input[name] || '';
 
-        await render({ value, schema, basePdf, pdfLib, pdfDoc, page, options, _cache });
+        schema.position = {
+          x: schema.position.x + boundingBoxLeft,
+          y: schema.position.y - boundingBoxBottom,
+        };
+
+        await render({
+          value,
+          schema,
+          basePdf,
+          pdfLib,
+          pdfDoc,
+          page,
+          options,
+          _cache,
+        });
       }
     }
   }
