@@ -29,7 +29,7 @@ const TemplateDesign = () => {
 
     history.replace({ pathname: location.pathname, search: query.toString() });
 
-  }, [location, history]);
+  }, []);
 
   return (
     <Layout title="Template Design" description='Design your PDF template with the playground editor.'>
