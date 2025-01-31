@@ -269,8 +269,10 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         isMobile: window.innerWidth < 768,
         buttons: adButtons,
         onSelect: ({ datepicker }) => {
-          type === 'date' &&
+          if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
+            datepicker.hide();
+          }
         },
       });
 
