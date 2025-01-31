@@ -75,7 +75,7 @@ function DesignerApp() {
   }, []);
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target && e.target.files) {
+    if (e.target && e.target.files && e.target.files[0]) {
       readFile(e.target.files[0], "dataURL").then(async (basePdf) => {
         if (designer.current) {
           designer.current.updateTemplate(

@@ -89,7 +89,7 @@ export const handleLoadTemplate = (
   e: React.ChangeEvent<HTMLInputElement>,
   currentRef: Designer | Form | Viewer | null
 ) => {
-  if (e.target && e.target.files) {
+  if (e.target && e.target.files && e.target.files[0]) {
     getTemplateFromJsonFile(e.target.files[0])
       .then((t) => {
         if (!currentRef) return;
