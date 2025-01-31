@@ -1,9 +1,7 @@
-// TODO refactor. plugins and font should be reused
-// playground/src/helper.ts
-
 const fs = require('fs');
 const path = require('path');
-
+const crypto = require('crypto');
+const pLimit = require('p-limit');
 const { generate } = require('@pdfme/generator');
 const { pdf2img } = require('@pdfme/converter');
 const { getInputFromTemplate, getDefaultFont } = require('@pdfme/common');
@@ -57,9 +55,9 @@ const plugins = {
         width: 62.5,
         height: 37.5,
       },
-    }
-  }
-}
+    },
+  },
+};
 
 const font = {
   ...getDefaultFont(),
@@ -71,11 +69,18 @@ const font = {
     fallback: false,
     data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
   },
-  "PinyonScript-Regular": {
+  'PinyonScript-Regular': {
     fallback: false,
     data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
-  }
+  },
+};
+
+const limit = pLimit(4);
+
+function calcHash(content) {
+  return crypto.createHash('md5').update(content, 'utf8').digest('hex');
 }
+
 
 async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
   try {
@@ -86,42 +91,65 @@ async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
       template: templateJson,
       inputs: getInputFromTemplate(templateJson),
       options: { font },
-      plugins
+      plugins,
     });
 
     const images = await pdf2img(pdf.buffer, {
       imageType: 'png',
-      range: { end: 1 }
+      range: { end: 1 },
     });
 
     const thumbnail = images[0];
-
     fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
   } catch (err) {
     console.error(`Failed to create thumbnail from ${templatePath}:`, err);
   }
 }
 
-
 async function main() {
   const playgroundPath = path.resolve(__dirname, '..');
   const templatesPath = path.join(playgroundPath, 'public', 'template-assets');
+
+  const hashMapPath = path.join(__dirname, 'thumbnail-hash-map.json');
+  let hashMap = {};
+  if (fs.existsSync(hashMapPath)) {
+    try {
+      hashMap = JSON.parse(fs.readFileSync(hashMapPath, 'utf-8'));
+    } catch (error) {
+      console.warn('Failed to parse thumbnail-hash-map.json. Initializing empty map.');
+    }
+  }
 
   const dirs = fs
     .readdirSync(templatesPath, { withFileTypes: true })
     .filter((dirent) => dirent.isDirectory())
     .map((dirent) => dirent.name);
 
-  for (const dir of dirs) {
+  const processDir = async (dir) => {
     const templateJsonPath = path.join(templatesPath, dir, 'template.json');
     if (!fs.existsSync(templateJsonPath)) {
-      continue;
+      return;
+    }
+
+    const templateJsonStr = fs.readFileSync(templateJsonPath, 'utf-8');
+    const currentHash = calcHash(templateJsonStr);
+
+    if (hashMap[dir] && hashMap[dir] === currentHash) {
+      console.log(`No changes in ${dir}. Skipping thumbnail generation.`);
+      return;
     }
 
     const thumbnailPngPath = path.join(templatesPath, dir, 'thumbnail.png');
     await createThumbnailFromTemplate(templateJsonPath, thumbnailPngPath);
-  }
-  console.log(`Thumbnails generated from template.json for ${dirs.join(', ')}`);
+
+    hashMap[dir] = currentHash;
+    console.log(`Generated thumbnail for ${dir}.`);
+  };
+
+  await Promise.all(dirs.map((dir) => limit(() => processDir(dir))));
+
+  fs.writeFileSync(hashMapPath, JSON.stringify(hashMap, null, 2), 'utf-8');
+  console.log('Thumbnails generation process completed!');
 }
 
 main().catch((err) => {
