@@ -1,6 +1,6 @@
 import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
-import { px2mm } from '@pdfme/common';
+import { px2mm, replacePlaceholders } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
@@ -204,9 +204,25 @@ const resetEditingPosition = () => {
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const { rootElement, onChange, schema, value, mode } = arg;
+  console.log({mode, change:1})
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
-  const table = await createSingleTable(bodyWidthRange, arg);
+  
+  let finalBody: string[][] = bodyWidthRange;
+  if (mode !== 'designer') {
+    const { head } = schema;
+    finalBody = bodyWidthRange.map((row: string[]) => {
+      const rowContext = row.reduce((acc, currValue, currIdx) => {
+        acc[head[currIdx]] = currValue;
+        return acc;
+      }, {} as Record<string, unknown>);
+      return row.map((cell: string) => {
+        return replacePlaceholders({ content: cell, variables: rowContext, schemas: [] }) ?? cell;
+      });
+    });
+  }
+
+  const table = await createSingleTable(finalBody, arg);
   const showHead = table.settings.showHead;
 
   rootElement.innerHTML = '';

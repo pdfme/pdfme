@@ -1,5 +1,6 @@
 import type { TableSchema } from './types';
 import type { PDFRenderProps } from '@pdfme/common';
+import { replacePlaceholders } from '@pdfme/common';
 import { Cell, Table, Row, Column } from './classes';
 import { rectangle } from '../shapes/rectAndEllipse';
 import cell from './cell';
@@ -114,6 +115,18 @@ export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
     typeof value !== 'string' ? JSON.stringify(value || '[]') : value,
     schema.__bodyRange
   );
+
+  const { head } = schema;
+  const parsedBody = body.map((row: string[]) => {
+    const rowContext = row.reduce((acc, currValue, currIdx) => {
+      acc[head[currIdx]] = currValue;
+      return acc;
+    }, {} as Record<string, unknown>);
+    return row.map((cell: string) => {
+      return replacePlaceholders({ content: cell, variables: rowContext, schemas: [] }) ?? cell;
+    });
+  });
+
   const table = await createSingleTable(body, arg);
   await drawTable(arg, table);
 };
