@@ -1,7 +1,7 @@
 import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../utils.js';
-import { toDegrees, toRadians } from '@pdfme/pdf-lib';
+import { toRadians } from '@pdfme/pdf-lib';
 import { Circle, Square } from 'lucide';
 
 interface ShapeSchema extends Schema {
@@ -35,11 +35,6 @@ const shape: Plugin<ShapeSchema> = {
     const pageHeight = page.getHeight();
     const cArg = { schema, pageHeight };
     const { position, width, height, rotate, opacity } = convertForPdfLayoutProps(cArg);
-    const rotateDegrees = toDegrees(rotate);
-    const rotateRadians = toRadians(rotate);
-    const tanFactor = Math.tan(rotateRadians);
-    const adjustedTan = Math.abs(tanFactor) > 1 ? tanFactor / Math.PI : tanFactor;
-    const degreeOctant = Math.floor(rotateDegrees / 45);
     const {
       position: { x: x4Ellipse, y: y4Ellipse },
     } = convertForPdfLayoutProps({ ...cArg, applyRotateTranslate: false });
@@ -63,8 +58,8 @@ const shape: Plugin<ShapeSchema> = {
       });
     } else if (schema.type === 'rectangle') {
       page.drawRectangle({
-        x: position.x + borderWidth * ((1 / 2) - (Math.sin(rotateRadians) / 3)) + adjustedTan * (Math.PI ** 2) - (Math.PI * degreeOctant),
-        y: position.y + borderWidth * ((1 / 2) + (Math.sin(rotateRadians) / 3)) + adjustedTan * (Math.PI ** 2) - (Math.PI * 6 * degreeOctant),
+        x: position.x + borderWidth * ((1 / 2) - (Math.sin(toRadians(rotate)) / 3)) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
+        y: position.y + borderWidth * ((1 / 2) + (Math.sin(toRadians(rotate)) / 3)) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
         width: width - borderWidth,
         height: height - borderWidth,
         ...drawOptions,
