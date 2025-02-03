@@ -58,8 +58,8 @@ const shape: Plugin<ShapeSchema> = {
       });
     } else if (schema.type === 'rectangle') {
       page.drawRectangle({
-        x: position.x + borderWidth * ((1 / 2) - (Math.sin(toRadians(rotate)) / 3)) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
-        y: position.y + borderWidth * ((1 / 2) + (Math.sin(toRadians(rotate)) / 3)) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
+        x: position.x + borderWidth * ((1 - Math.sin(toRadians(rotate))) / 2) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
+        y: position.y + borderWidth * ((1 + Math.sin(toRadians(rotate))) / 2) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
         width: width - borderWidth,
         height: height - borderWidth,
         ...drawOptions,
