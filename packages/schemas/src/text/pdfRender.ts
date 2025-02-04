@@ -201,15 +201,13 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
 
     let spacing = characterSpacing;
-    if (alignment === 'justify' && line.slice(-1) !== '\n') {
+    if ((alignment === 'justify' && line.slice(-1) !== '\n') || textWidth > width) {
       // if alignment is `justify` but the end of line is not newline, then adjust the spacing
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
       spacing += (width - textWidth) / len;
-      page.pushOperators(pdfLib.setCharacterSpacing(spacing));
-    } else {
-      page.pushOperators(pdfLib.setCharacterSpacing(spacing));
     }
+    page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
     page.drawText(trimmed, {
       x: xLine,
