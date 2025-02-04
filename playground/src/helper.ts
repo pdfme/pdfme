@@ -37,6 +37,10 @@ export const getFontsData = (): Font => ({
     fallback: false,
     data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
   },
+  'PinyonScript-Regular': {
+    fallback: false,
+    data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
+  },
 });
 
 export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
@@ -85,7 +89,7 @@ export const handleLoadTemplate = (
   e: React.ChangeEvent<HTMLInputElement>,
   currentRef: Designer | Form | Viewer | null
 ) => {
-  if (e.target && e.target.files) {
+  if (e.target && e.target.files && e.target.files[0]) {
     getTemplateFromJsonFile(e.target.files[0])
       .then((t) => {
         if (!currentRef) return;
@@ -194,7 +198,9 @@ export const getBlankTemplate = () =>
   } as Template);
 
 export const getTemplateById = async (templateId: string): Promise<Template> => {
-  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) => res.json());
+  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) =>
+    res.json()
+  );
   checkTemplate(template);
   return template as Template;
 };

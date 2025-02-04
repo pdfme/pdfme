@@ -94,20 +94,26 @@ const Renderer = (props: RendererProps) => {
   const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
   const { token: theme } = antdTheme.useToken();
 
-
+  
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useRef<Map<any, any>>(new Map());
   const plugin = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
   ) as Plugin<any>;
 
-  const reRenderDependencies = useRerenderDependencies({ plugin, value, mode, scale, schema, options });
-
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
+  const reRenderDependencies = useRerenderDependencies({
+    plugin,
+    value,
+    mode,
+    scale,
+    schema,
+    options,
+  });
 
   useEffect(() => {
     if (ref.current && schema.type) {

@@ -58,7 +58,6 @@
   },
   "jest": {
     "resolver": "ts-jest-resolver",
-    "globalTeardown": "<rootDir>/teardown.mjs",
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
