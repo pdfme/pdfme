@@ -9,9 +9,9 @@ const TemplateDesign = () => {
   useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === 'navigate') {
-        const name = e.data?.payload?.name;
-        if (name) {
-          history.push(`/template-design?template=${name}`);
+        const { name = "", ui = "" } = e.data?.payload;
+        if (name && ui) {
+          history.push(`/template-design?template=${name}&ui=${ui}`);
         }
       }
     };

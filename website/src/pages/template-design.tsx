@@ -10,26 +10,31 @@ const TemplateDesign = () => {
   const history = useHistory();
 
   const [template, setTemplate] = useState('');
+  const [ui, setUi] = useState('');
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const param = query.get('template');
+    const templateQuery = query.get('template');
+    const uiQuery = query.get('ui');
 
-    if (param) {
-      setTemplate(param);
-
+    if (templateQuery) {
+      setTemplate(templateQuery);
       query.delete('template');
-      history.replace({
-        pathname: location.pathname,
-        search: query.toString(),
-      });
     }
-  }, [location, history]);
+
+    if (uiQuery) {
+      setUi(uiQuery);
+      query.delete('ui');
+    }
+
+    history.replace({ pathname: location.pathname, search: query.toString() });
+
+  }, []);
 
   return (
     <Layout title="Template Design" description='Design your PDF template with the playground editor.'>
       <iframe
-        src={`${playgroundUrl}?template=${template}`}
+        src={`${playgroundUrl}/${ui}?template=${template}`}
         style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }}
       />
     </Layout>

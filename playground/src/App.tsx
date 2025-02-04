@@ -1,4 +1,5 @@
 import { Routes, Route, useSearchParams } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
 import Designer from "./Designer";
 import FormAndViewer from "./FormAndViewer";
 import Templates from "./Templates";
@@ -12,10 +13,12 @@ function App() {
     <div className="min-h-screen flex flex-col">
       {!isEmbedded && <Header />}
       <Routes>
-        <Route path="/" element={<Designer />} />
+        <Route path={"/"} element={<Designer />} />
+        <Route path={"/designer"} element={<Designer />} />
         <Route path="/form-viewer" element={<FormAndViewer />} />
         <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }

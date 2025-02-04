@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { fromKebabCase } from "./helper"
 import ExternalButton from "./ExternalButton"
 
+
 function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
   const navigate = useNavigate();
 
@@ -31,9 +32,18 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
   const navigateToDesigner = (name: string) => {
     if (isEmbedded) {
-      window.parent.postMessage({ type: 'navigate', payload: { name } }, '*');
+      window.parent.postMessage({ type: 'navigate', payload: { name, ui: 'designer' } }, '*');
     } else {
       navigate(`/?template=${name}`)
+    }
+  }
+
+
+  const navigateToFormViewer = (name: string) => {
+    if (isEmbedded) {
+      window.parent.postMessage({ type: 'navigate', payload: { name, ui: 'form-viewer' } }, '*');
+    } else {
+      navigate(`/form-viewer?template=${name}`)
     }
   }
 
@@ -67,8 +77,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                 </div>
                 <div className="relative mt-4">
                   <h3
-                    onClick={() => { navigateToDesigner(name) }}
-                    className="text-md font-bold text-green-600 cursor-pointer hover:text-green-500"
+                    className="text-md font-bold text-green-600"
                   >
                     {fromKebabCase(name)}
                   </h3>
@@ -77,14 +86,14 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     {avatarUrlMap[author] && <img
                       src={avatarUrlMap[author]}
                       alt={author}
-                      className="inline-block w-5 h-5 rounded-full"
+                      className="inline-block w-10 h-10 rounded-full bg-gray-100"
                     />}
                     {" "}
                     <a
                       href={`https://github.com/${author}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 underline"
+                      className="text-blue-600 underline text-md font-bold hover:text-blue-400 transition duration-300"
                     >
                       {author}
                     </a>
@@ -96,6 +105,14 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
                   >
                     Go to Designer
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={() => { navigateToFormViewer(name) }}
+                    className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                  >
+                    Go to Form/Viewer
                   </button>
                 </div>
               </div>

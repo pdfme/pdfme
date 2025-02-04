@@ -25,3 +25,4 @@ dist-ssr
 
 test.pdf
 public/template-assets/**/thumbnail.png
+scripts/thumbnail-hash-map.json
