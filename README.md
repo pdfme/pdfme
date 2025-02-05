@@ -41,6 +41,9 @@ While pdfme is an open-source project released under the MIT License, we are ope
 **If you are willing to pay, we can evaluate and implement your requested features.**  
 Please note that any additional functionality will always be released as open source. If this approach works for you, please [contact us](https://app.pdfme.com/contact).
 
+For a detailed list of supported features, please refer to the [Supported Features](https://pdfme.com/docs/supported-features) page.
+
+
 ## Documentation
 
 For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide.
