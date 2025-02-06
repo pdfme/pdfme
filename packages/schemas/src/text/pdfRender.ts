@@ -157,6 +157,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
+    // Adobe Acrobat Reader shows an error if `drawLine` is called with an empty text
+    if (line === '') {
+      // return; // this also works
+      line = '\r\n';
+    }
+
     let xLine = x;
     if (alignment === 'center') {
       xLine += (width - textWidth) / 2;

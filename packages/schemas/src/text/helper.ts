@@ -402,7 +402,7 @@ const getSplittedLinesBySegmenter = (
     if (currentTextSize + textWidth <= boxWidthInPt) {
       // the size of boxWidth is large enough to add the segment
       lines[lineCounter] = (lines[lineCounter] ?? '') + segment;
-      currentTextSize += textWidth;
+      currentTextSize += textWidth + characterSpacing;
     } else if (textWidth <= boxWidthInPt) {
       // the segment is small enough to be added to the next line
       if (isLineBreakableChar(segment)) {
@@ -410,7 +410,7 @@ const getSplittedLinesBySegmenter = (
         currentTextSize = 0;
       } else {
         lines[++lineCounter] = segment;
-        currentTextSize = textWidth;
+        currentTextSize = textWidth + characterSpacing;
       }
     } else {
       // the segment is too large to fit in the boxWidth, we wrap the segment
@@ -418,10 +418,10 @@ const getSplittedLinesBySegmenter = (
         const size = widthOfTextAtSize(char, font, fontSize, characterSpacing);
         if (currentTextSize + size <= boxWidthInPt) {
           lines[lineCounter] += char;
-          currentTextSize += size;
+          currentTextSize += size + characterSpacing;
         } else {
           lines[++lineCounter] = char;
-          currentTextSize = size;
+          currentTextSize = size + characterSpacing;
         }
       }
     }
