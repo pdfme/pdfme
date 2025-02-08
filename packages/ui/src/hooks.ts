@@ -20,8 +20,9 @@ import {
   arrayBufferToBase64,
   initShortCuts,
   destroyShortCuts,
+  getMaxZoom,
 } from './helper.js';
-import { RULER_HEIGHT, MAX_ZOOM } from './constants.js';
+import { RULER_HEIGHT } from './constants.js';
 
 export const usePrevious = <T>(value: T) => {
   const ref = useRef<T | null>(null);
@@ -68,7 +69,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
 
       const [_pages, imgBuffers] = await Promise.all([
         pdf2size(b64toUint8Array(_basePdf)),
-        pdf2img(b64toUint8Array(_basePdf), { scale: MAX_ZOOM }),
+        pdf2img(b64toUint8Array(_basePdf), { scale: getMaxZoom() }),
       ]);
 
       _pageSizes = _pages;
