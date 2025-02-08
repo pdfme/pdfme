@@ -1,4 +1,4 @@
-import { UIRenderProps } from '@pdfme/common';
+import { getDefaultFont, UIRenderProps } from '@pdfme/common';
 import { MultiVariableTextSchema } from './types';
 import {
   uiRender as parentUiRender,
@@ -6,6 +6,7 @@ import {
   makeElementPlainTextContentEditable
 } from '../text/uiRender';
 import { isEditable } from '../utils';
+import { getFontKitFont } from '../text/helper';
 import { substituteVariables } from './helper';
 
 export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
@@ -65,6 +66,8 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     onChange,
     stopEditing,
     theme,
+    _cache,
+    options,
   } = arg;
   const rawText = schema.text;
 
@@ -76,8 +79,10 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const variables: Record<string, string> = JSON.parse(value) || {}
   const variableIndices = getVariableIndices(rawText);
   const substitutedText = substituteVariables(rawText, variables);
+  const font = options?.font || getDefaultFont();
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
 
-  const textBlock = await buildStyledTextContainer(arg, substitutedText);
+  const textBlock = buildStyledTextContainer(arg, fontKitFont, substitutedText);
 
   // Construct content-editable spans for each variable within the string
   let inVarString = false;
