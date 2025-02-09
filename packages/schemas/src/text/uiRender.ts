@@ -69,10 +69,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return text;
   };
   const font = options?.font || getDefaultFont();
-  const [fontKitFont, textBlock] = await Promise.all([
-    getFontKitFont(schema.fontName, font, _cache),
-    buildStyledTextContainer(arg, usePlaceholder ? placeholder : value),
-  ]);
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
+  const textBlock = buildStyledTextContainer(arg, fontKitFont, usePlaceholder ? placeholder : value);
 
   const processedText = replaceUnsupportedChars(value, fontKitFont);
 
@@ -100,19 +98,16 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
 
   if (schema.dynamicFontSize) {
     let dynamicFontSize: undefined | number = undefined;
-    const font = options?.font || getDefaultFont();
-    const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
 
     textBlock.addEventListener('keyup', () => {
       setTimeout(() => {
         void (async () => {
           if (!textBlock.textContent) return;
-          dynamicFontSize = await calculateDynamicFontSize({
+          dynamicFontSize = calculateDynamicFontSize({
             textSchema: schema,
-            font,
+            fontKitFont,
             value: getText(textBlock),
             startingFontSize: dynamicFontSize,
-            _cache,
           });
           textBlock.style.fontSize = `${dynamicFontSize}pt`;
 
@@ -155,23 +150,21 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   }
 };
 
-export const buildStyledTextContainer = async (arg: UIRenderProps<TextSchema>, value: string) => {
+export const buildStyledTextContainer = (arg: UIRenderProps<TextSchema>, fontKitFont: FontKitFont, value: string) => {
   const { schema, rootElement, mode, options, _cache } = arg;
   const font = options?.font || getDefaultFont();
 
   let dynamicFontSize: undefined | number = undefined;
 
   if (schema.dynamicFontSize && value) {
-    dynamicFontSize = await calculateDynamicFontSize({
+    dynamicFontSize = calculateDynamicFontSize({
       textSchema: schema,
-      font,
+      fontKitFont,
       value,
       startingFontSize: dynamicFontSize,
-      _cache,
     });
   }
 
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(

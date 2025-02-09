@@ -10,7 +10,7 @@ import Paper from './Paper';
 import Renderer from './Renderer';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
 import { FontContext } from '../contexts';
-import { template2SchemasList, getPagesScrollTopByIndex } from '../helper';
+import { template2SchemasList, getPagesScrollTopByIndex, getMaxZoom } from '../helper';
 import { theme } from 'antd';
 
 const _cache = new Map();
@@ -27,6 +27,7 @@ const Preview = ({
   const { token } = theme.useToken();
 
   const font = useContext(FontContext);
+  const maxZoom = getMaxZoom();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
@@ -37,7 +38,7 @@ const Preview = ({
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
   const { backgrounds, pageSizes, scale, error, refresh } =
-    useUIPreProcessor({ template, size, zoomLevel });
+    useUIPreProcessor({ template, size, zoomLevel, maxZoom });
 
   const isForm = Boolean(onChangeInput);
 

@@ -154,12 +154,15 @@ describe('getSplittedLines test with real font width calculations', () => {
 });
 
 describe('calculateDynamicFontSize with Default font', () => {
-  const font = getDefaultFont();
-  const _cache = new Map();
+  let fontKitFont: FontKitFont;
+
+  beforeAll(async () => {
+    fontKitFont = await getFontKitFont('SauceHanSansJP', getDefaultFont(), new Map());
+  });
 
   it('should return default font size when dynamicFontSizeSetting is not provided', async () => {
     const textSchema = getTextSchema();
-    const result = await calculateDynamicFontSize({ textSchema, font, value: 'test', _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value: 'test' });
 
     expect(result).toBe(14);
   });
@@ -167,7 +170,7 @@ describe('calculateDynamicFontSize with Default font', () => {
   it('should return default font size when dynamicFontSizeSetting max is less than min', async () => {
     const textSchema = getTextSchema();
     textSchema.dynamicFontSize = { min: 11, max: 10, fit: 'vertical' };
-    const result = await calculateDynamicFontSize({ textSchema, font, value: 'test', _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value: 'test' });
 
     expect(result).toBe(14);
   });
@@ -176,7 +179,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     const textSchema = getTextSchema();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(19.25);
   });
@@ -185,7 +188,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     const textSchema = getTextSchema();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'test with a length string\n and a new line';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(11.25);
   });
@@ -195,12 +198,12 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.fontSize = 2;
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
-    let result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    let result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(19.25);
 
     textSchema.fontSize = 40;
-    result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(19.25);
   });
@@ -210,7 +213,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.width = 10;
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(10);
   });
@@ -221,7 +224,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.height = 200;
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(30);
   });
@@ -232,7 +235,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.width = 4;
     textSchema.height = 1;
     const value = 'a very \nlong \nmulti-line \nstring\nto';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBeGreaterThan(0);
   });
@@ -242,13 +245,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 18;
-    const result = await calculateDynamicFontSize({
-      textSchema,
-      font,
-      value,
-      startingFontSize,
-      _cache,
-    });
+    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
 
     expect(result).toBe(19.25);
   });
@@ -258,13 +255,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 36;
-    const result = await calculateDynamicFontSize({
-      textSchema,
-      font,
-      value,
-      startingFontSize,
-      _cache,
-    });
+    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
 
     expect(result).toBe(11.25);
   });
@@ -273,62 +264,60 @@ describe('calculateDynamicFontSize with Default font', () => {
     const textSchema = getTextSchema();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(19.25);
   });
 });
 
 describe('calculateDynamicFontSize with Custom font', () => {
-  const font = getSampleFont();
+  let fontKitFont: FontKitFont;
+  beforeAll(async () => {
+    fontKitFont = await getFontKitFont('SauceHanSansJP',  getSampleFont(), new Map());
+  });
+
 
   it('should return smaller font size when dynamicFontSizeSetting is provided with horizontal fit', async () => {
     const textSchema = getTextSchema();
-    const _cache = new Map();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'あいうあいうあい';
-
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(16.75);
   });
 
   it('should return smaller font size when dynamicFontSizeSetting is provided with vertical fit', async () => {
     const textSchema = getTextSchema();
-    const _cache = new Map();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'あいうあいうあい';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(26);
   });
 
   it('should return min font size when content is too big to fit given constraints', async () => {
     const textSchema = getTextSchema();
-    const _cache = new Map();
     textSchema.dynamicFontSize = { min: 20, max: 30, fit: 'vertical' };
     const value = 'あいうあいうあいうあいうあいうあいうあいうあいうあいう';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = await calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(20);
   });
 
   it('should return max font size when content is too small to fit given constraints', async () => {
     const textSchema = getTextSchema();
-    const _cache = new Map();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'あ';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = await calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(30);
   });
 
   it('should return min font size when content is multi-line with too many lines for the container', async () => {
     const textSchema = getTextSchema();
-    const _cache = new Map();
     textSchema.dynamicFontSize = { min: 5, max: 20, fit: 'vertical' };
     const value = 'あ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう\nあ\nいう';
-    const result = await calculateDynamicFontSize({ textSchema, font, value, _cache });
+    const result = await calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(5);
   });

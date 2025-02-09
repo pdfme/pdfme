@@ -2,7 +2,7 @@ import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react'
 import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions, cloneDeep } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants';
-import { PluginsRegistry, OptionsContext, I18nContext } from '../contexts';
+import { PluginsRegistry, OptionsContext, I18nContext, CacheContext } from '../contexts';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
@@ -96,7 +96,7 @@ const Renderer = (props: RendererProps) => {
 
   
   const ref = useRef<HTMLDivElement>(null);
-  const _cache = useRef<Map<any, any>>(new Map());
+  const _cache = useContext(CacheContext);
   const plugin = Object.values(pluginsRegistry).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
   ) as Plugin<any>;
@@ -133,7 +133,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         options,
         theme,
         i18n,
-        _cache: _cache.current,
+        _cache,
       });
     }
     return () => {

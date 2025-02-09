@@ -1,4 +1,5 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
+import type { Font as FontKitFont } from 'fontkit';
 import type { TextSchema } from './types';
 import {
   PDFRenderProps,
@@ -60,21 +61,19 @@ const embedAndGetFontObj = async (arg: {
   return fontObj;
 };
 
-const getFontProp = async ({
+const getFontProp = ({
   value,
-  font,
+  fontKitFont,
   schema,
   colorType,
-  _cache,
 }: {
   value: string;
-  font: Font;
+  fontKitFont: FontKitFont;
   colorType?: ColorType;
   schema: TextSchema;
-  _cache: Map<any, any>;
 }) => {
   const fontSize = schema.dynamicFontSize
-    ? await calculateDynamicFontSize({ textSchema: schema, font, value, _cache })
+    ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
     : schema.fontSize ?? DEFAULT_FONT_SIZE;
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
 
@@ -94,11 +93,11 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const { font = getDefaultFont(), colorType } = options;
 
-  const [pdfFontObj, fontKitFont, fontProp] = await Promise.all([
+  const [pdfFontObj, fontKitFont] = await Promise.all([
     embedAndGetFontObj({ pdfDoc, font, _cache }),
     getFontKitFont(schema.fontName, font, _cache),
-    getFontProp({ value, font, schema, _cache, colorType }),
   ]);
+  const fontProp = getFontProp({ value, fontKitFont, schema, colorType });
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
