@@ -24,6 +24,7 @@ import {
   template2SchemasList,
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
+  getMaxZoom,
 } from '../../helper';
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks';
 import Root from '../Root';
@@ -63,6 +64,7 @@ const TemplateEditor = ({
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
+  const maxZoom = getMaxZoom();
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -73,7 +75,7 @@ const TemplateEditor = ({
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
   const { backgrounds, pageSizes, scale, error, refresh } =
-    useUIPreProcessor({ template, size, zoomLevel });
+    useUIPreProcessor({ template, size, zoomLevel, maxZoom });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
