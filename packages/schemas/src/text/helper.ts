@@ -270,16 +270,12 @@ export const calculateDynamicFontSize = async ({
     const otherRowHeightInMm = pt2mm(size * lineHeight);
 
     paragraphs.forEach((paragraph, paraIndex) => {
-      const lines = getSplittedLinesBySegmenter(
-        paragraph,
-        {
-          font: fontKitFont,
-          fontSize: size,
-          characterSpacing,
-          boxWidthInPt,
-        },
-        'word'
-      );
+      const lines = getSplittedLinesBySegmenter(paragraph, {
+        font: fontKitFont,
+        fontSize: size,
+        characterSpacing,
+        boxWidthInPt,
+      });
 
       lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
@@ -370,25 +366,21 @@ export const splitTextToSize = (arg: {
   };
   let lines: string[] = [];
   value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
-    lines = lines.concat(getSplittedLinesBySegmenter(line, fontWidthCalcValues, 'word'));
+    lines = lines.concat(getSplittedLinesBySegmenter(line, fontWidthCalcValues));
   });
   return lines;
 };
 export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-const getSplittedLinesBySegmenter = (
-  line: string,
-  calcValues: FontWidthCalcValues,
-  granularity: 'word' | 'grapheme' | 'sentence' | undefined
-): string[] => {
+const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValues): string[] => {
   // nothing to process but need to keep this for new lines.
-  if (line === '') {
+  if (line.trim() === '') {
     return [''];
   }
 
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
-  const segmenter = new Intl.Segmenter(undefined, { granularity: granularity ?? 'word' });
-  const iterator = segmenter.segment(line)[Symbol.iterator]();
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+  const iterator = segmenter.segment(line.trimEnd())[Symbol.iterator]();
 
   let lines: string[] = [];
   let lineCounter: number = 0;
@@ -401,24 +393,34 @@ const getSplittedLinesBySegmenter = (
     const textWidth = widthOfTextAtSize(segment, font, fontSize, characterSpacing);
     if (currentTextSize + textWidth <= boxWidthInPt) {
       // the size of boxWidth is large enough to add the segment
-      lines[lineCounter] = (lines[lineCounter] ?? '') + segment;
-      currentTextSize += textWidth + characterSpacing;
-    } else if (textWidth <= boxWidthInPt) {
-      // the segment is small enough to be added to the next line
-      if (isLineBreakableChar(segment)) {
-        lines[++lineCounter] = '';
-        currentTextSize = 0;
+      if (lines[lineCounter]) {
+        lines[lineCounter] += segment;
+        currentTextSize += textWidth + characterSpacing;
       } else {
-        lines[++lineCounter] = segment;
+        lines[lineCounter] = segment;
         currentTextSize = textWidth + characterSpacing;
       }
+    } else if (segment.trim() === '') {
+      // a segment can be consist of multiple spaces like '     '
+      // if they overflow the box, treat them as a line break and move to the next line
+      lines[++lineCounter] = '';
+      currentTextSize = 0;
+    } else if (textWidth <= boxWidthInPt) {
+      // the segment is small enough to be added to the next line
+      lines[++lineCounter] = segment;
+      currentTextSize = textWidth + characterSpacing;
     } else {
       // the segment is too large to fit in the boxWidth, we wrap the segment
       for (const char of segment) {
         const size = widthOfTextAtSize(char, font, fontSize, characterSpacing);
         if (currentTextSize + size <= boxWidthInPt) {
-          lines[lineCounter] += char;
-          currentTextSize += size + characterSpacing;
+          if (lines[lineCounter]) {
+            lines[lineCounter] += char;
+            currentTextSize += size + characterSpacing;
+          } else {
+            lines[lineCounter] = char;
+            currentTextSize = size + characterSpacing;
+          }
         } else {
           lines[++lineCounter] = char;
           currentTextSize = size + characterSpacing;
@@ -427,51 +429,8 @@ const getSplittedLinesBySegmenter = (
     }
   }
 
-  //
-  // 日本語禁則処理
-  //
-  // https://www.morisawa.co.jp/blogs/MVP/8760
-  //
   if (true) {
-    // 行頭禁則
-    const filterStart = (lines: string[], charToAppend: string | null, acc: string[]): string[] => {
-      const row: string = lines[0];
-
-      if (row && row.trim().length > 0) {
-        const charAtStart = row.charAt(0);
-        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
-          acc.push(row.slice(1) + (charToAppend ?? ''));
-          return filterStart(lines.slice(1), charAtStart, acc);
-        } else {
-          acc.push(row + (charToAppend ?? ''));
-          return filterStart(lines.slice(1), null, acc);
-        }
-      } else {
-        return acc;
-      }
-    };
-
-    // 行末禁則
-    const filterEnd = (lines: string[], charToPrepend: string | null, acc: string[]): string[] => {
-      const row: string = lines[0];
-      if (row && row.trim().length > 0) {
-        const chartAtEnd = row.slice(-1);
-        if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
-          acc.push((charToPrepend ?? '') + row.slice(0, -1));
-          return filterEnd(lines.slice(1), chartAtEnd, acc);
-        } else {
-          acc.push((charToPrepend ?? '') + row);
-          return filterEnd(lines.slice(1), null, acc);
-        }
-      } else {
-        return acc;
-      }
-    };
-
-    const startFiltered = filterStart(lines.reverse(), null, []).reverse();
-    const endFiltered = filterEnd(startFiltered, null, []);
-
-    return adjustEndOfLine(endFiltered);
+    return adjustEndOfLine(filterEndJP(filterStartJP(lines)));
   } else {
     return adjustEndOfLine(lines);
   }
@@ -486,4 +445,93 @@ const adjustEndOfLine = (lines: string[]): string[] => {
       return line.trimEnd();
     }
   });
+};
+
+//
+// 日本語禁則処理
+//
+// https://www.morisawa.co.jp/blogs/MVP/8760
+//
+// 行頭禁則
+export const filterStartJP = (lines: string[]): string[] => {
+  let filtered: string[] = [];
+  let charToAppend: string | null = null;
+
+  lines
+    .slice()
+    .reverse()
+    .forEach((line) => {
+      if (line.trim().length === 0) {
+        filtered.push('');
+      } else {
+        const charAtStart: string = line.charAt(0);
+        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
+          if (line.trim().length === 1) {
+            filtered.push(line);
+            charToAppend = null;
+          } else {
+            if (charToAppend) {
+              filtered.push(line.slice(1) + charToAppend);
+            } else {
+              filtered.push(line.slice(1));
+            }
+            charToAppend = charAtStart;
+          }
+        } else {
+          if (charToAppend) {
+            filtered.push(line + charToAppend);
+            charToAppend = null;
+          } else {
+            filtered.push(line);
+          }
+        }
+      }
+    });
+
+  if (charToAppend) {
+    return [charToAppend + filtered.slice(0, 1)[0], ...filtered.slice(1)].reverse();
+  } else {
+    return filtered.reverse();
+  }
+};
+
+// 行末禁則
+export const filterEndJP = (lines: string[]): string[] => {
+  let filtered: string[] = [];
+  let charToPrepend: string | null = null;
+
+  lines.forEach((line) => {
+    if (line.trim().length === 0) {
+      filtered.push('');
+    } else {
+      const chartAtEnd = line.slice(-1);
+
+      if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
+        if (line.trim().length === 1) {
+          filtered.push(line);
+          charToPrepend = null;
+        } else {
+          if (charToPrepend) {
+            filtered.push(charToPrepend + line.slice(0, -1));
+          } else {
+            filtered.push(line.slice(0, -1));
+          }
+          charToPrepend = chartAtEnd;
+        }
+      } else {
+        if (charToPrepend) {
+          filtered.push(charToPrepend + line);
+          charToPrepend = null;
+        } else {
+          filtered.push(line);
+        }
+      }
+    }
+  });
+
+  if (charToPrepend) {
+    return [...filtered.slice(0, -1), filtered.slice(-1)[0] + charToPrepend];
+  } else {
+    return filtered;
+  }
 };

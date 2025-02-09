@@ -157,7 +157,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
-    // Adobe Acrobat Reader shows an error if `drawLine` is called with an empty text
+    // Adobe Acrobat Reader shows an error if `drawText` is called with an empty text
     if (line === '') {
       // return; // this also works
       line = '\r\n';
@@ -207,7 +207,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
 
     let spacing = characterSpacing;
-    if ((alignment === 'justify' && line.slice(-1) !== '\n') || textWidth > width) {
+    if (alignment === 'justify' && line.slice(-1) !== '\n') {
       // if alignment is `justify` but the end of line is not newline, then adjust the spacing
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
