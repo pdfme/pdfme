@@ -73,8 +73,12 @@ The following image is a good illustration of a template.
 - **basePdf**: PDF data for the fixed part of the PDF to be generated.
 - **schemas**: Definition data for the variable part of the PDF to be generated.
 
-**basePdf** can be given a `string`(base64), `ArrayBuffer`, or `Uint8Array`.  
-A blank A4 PDF can be imported with `BLANK_PDF`. You can use it to check how it works.
+The **basePdf** property accepts PDF data as a `string` (base64 encoded), an `ArrayBuffer`, or a `Uint8Array`. You can import a blank A4 PDF using `BLANK_PDF` to see how it works. Alternatively, you can define an empty PDF as shown below. When using schemas—such as tables that require page breaks—ensure you specify the PDF in the following format:
+
+```json
+basePdf: { "width": 210, "height": 297, "padding": [10, 10, 10, 10] }
+```
+
 
 **schemas** can only utilize text by default, but you can load images and various barcodes like QR codes as plugins from the `@pdfme/schemas` package.  
 Additionally, you can create your own schemas, allowing you to render types other than the ones mentioned above.  
