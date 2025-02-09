@@ -10,3 +10,5 @@ export const FontContext = createContext(getDefaultFont());
 export const PluginsRegistry = createContext<Plugins>(builtInPlugins);
 
 export const OptionsContext = createContext<UIOptions>({});
+
+export const CacheContext = createContext<Map<any, any>>(new Map());

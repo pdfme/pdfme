@@ -19,8 +19,7 @@ import {
   moveCommandToChangeSchemasArg,
   arrayBufferToBase64,
   initShortCuts,
-  destroyShortCuts,
-  getMaxZoom,
+  destroyShortCuts
 } from './helper.js';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -36,9 +35,9 @@ export const usePrevious = <T>(value: T) => {
 const getScale = (n: number, paper: number) =>
   Math.floor((n / paper > 1 ? 1 : n / paper) * 100) / 100;
 
-type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number };
+type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number; maxZoom: number };
 
-export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorProps) => {
+export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreProcessorProps) => {
   const [backgrounds, setBackgrounds] = useState<string[]>([]);
   const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);
@@ -69,7 +68,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel }: UIPreProcessorP
 
       const [_pages, imgBuffers] = await Promise.all([
         pdf2size(b64toUint8Array(_basePdf)),
-        pdf2img(b64toUint8Array(_basePdf), { scale: getMaxZoom() }),
+        pdf2img(b64toUint8Array(_basePdf), { scale: maxZoom }),
       ]);
 
       _pageSizes = _pages;
