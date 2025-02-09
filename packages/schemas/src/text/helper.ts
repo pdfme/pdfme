@@ -426,7 +426,7 @@ const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValu
     }
   }
 
-  if (true) {
+  if (lines.some(containsJapanese)) {
     return adjustEndOfLine(filterEndJP(filterStartJP(lines)));
   } else {
     return adjustEndOfLine(lines);
@@ -444,6 +444,9 @@ const adjustEndOfLine = (lines: string[]): string[] => {
   });
 };
 
+function containsJapanese(text: string): boolean {
+  return /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u.test(text);
+}
 //
 // 日本語禁則処理
 //
@@ -451,7 +454,7 @@ const adjustEndOfLine = (lines: string[]): string[] => {
 //
 // 行頭禁則
 export const filterStartJP = (lines: string[]): string[] => {
-  let filtered: string[] = [];
+  const filtered: string[] = [];
   let charToAppend: string | null = null;
 
   lines
@@ -494,7 +497,7 @@ export const filterStartJP = (lines: string[]): string[] => {
 
 // 行末禁則
 export const filterEndJP = (lines: string[]): string[] => {
-  let filtered: string[] = [];
+  const filtered: string[] = [];
   let charToPrepend: string | null = null;
 
   lines.forEach((line) => {
