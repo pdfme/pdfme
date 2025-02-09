@@ -3,6 +3,7 @@ import {
   TextAlignCenterIcon,
   TextAlignLeftIcon,
   TextAlignRightIcon,
+  TextAlignJustifyIcon,
   TextStrikethroughIcon,
   TextUnderlineIcon,
   TextVerticalAlignBottomIcon,
@@ -16,6 +17,7 @@ import {
   DEFAULT_VERTICAL_ALIGNMENT,
   VERTICAL_ALIGN_BOTTOM,
   VERTICAL_ALIGN_MIDDLE,
+  ALIGN_JUSTIFY,
 } from './constants';
 
 export enum Formatter {
@@ -52,6 +54,7 @@ export function getExtraFormatterSchema(i18n: (key: keyof Dict | string) => stri
     { key: Formatter.ALIGNMENT, icon: TextAlignLeftIcon, type: 'select', value: DEFAULT_ALIGNMENT },
     { key: Formatter.ALIGNMENT, icon: TextAlignCenterIcon, type: 'select', value: ALIGN_CENTER },
     { key: Formatter.ALIGNMENT, icon: TextAlignRightIcon, type: 'select', value: ALIGN_RIGHT },
+    { key: Formatter.ALIGNMENT, icon: TextAlignJustifyIcon, type: 'select', value: ALIGN_JUSTIFY },
     {
       key: Formatter.VERTICAL_ALIGNMENT,
       icon: TextVerticalAlignTopIcon,
@@ -75,6 +78,6 @@ export function getExtraFormatterSchema(i18n: (key: keyof Dict | string) => stri
     title: i18n('schemas.text.format'),
     widget: 'ButtonGroup',
     buttons,
-    span: 17,
+    span: 24,
   };
 }

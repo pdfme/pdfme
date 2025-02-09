@@ -48,6 +48,8 @@ const pdfImage = require('./pdfImage.json') as Template;
 const underlineStrikethrough = require('./underlineStrikethrough.json') as Template;
 const multiVariableText = require('./multiVariableText.json') as Template;
 const preVersion5Format = require('./preVersion5Format.json') as Template;
+const segmenterEnglish = require('./segmenterEnglish.json') as Template;
+const segmenterJapanese = require('./segmenterJapanese.json') as Template;
 
 export const label = {
   宛名8面,
@@ -117,4 +119,9 @@ export const other = {
 
 export const shape = {
   shapes,
+};
+
+export const segmenter = {
+  segmenterEnglish,
+  segmenterJapanese,
 };

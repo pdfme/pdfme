@@ -6,6 +6,7 @@ import {
   AlignRight,
   ArrowUpToLine,
   ArrowDownToLine,
+  AlignJustify,
 } from 'lucide';
 import { createSvgStr } from '../../utils.js';
 
@@ -18,6 +19,8 @@ export const TextAlignLeftIcon = createSvgStr(AlignLeft);
 export const TextAlignCenterIcon = createSvgStr(AlignCenter);
 
 export const TextAlignRightIcon = createSvgStr(AlignRight);
+
+export const TextAlignJustifyIcon = createSvgStr(AlignJustify);
 
 export const TextVerticalAlignTopIcon = createSvgStr(ArrowUpToLine);
 

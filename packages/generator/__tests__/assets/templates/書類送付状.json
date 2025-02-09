@@ -26,7 +26,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "2020/01/01",
-        "name": "日付"
+        "name": "日付",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -41,7 +42,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "株式会社listmake.jp\n",
-        "name": "[送付先]会社名"
+        "name": "[送付先]会社名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -56,7 +58,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "東京都 出得太",
-        "name": "[送付先]担当者名"
+        "name": "[送付先]担当者名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -71,7 +74,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "株式会社labelmake.jp",
-        "name": "[送付元]会社名"
+        "name": "[送付元]会社名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -86,7 +90,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "123-4567",
-        "name": "[送付元]郵便番号"
+        "name": "[送付元]郵便番号",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -101,7 +106,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
-        "name": "[送付元]住所"
+        "name": "[送付元]住所",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -116,7 +122,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "000-000-0000",
-        "name": "[送付元]TEL"
+        "name": "[送付元]TEL",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -131,7 +138,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "000-000-0000",
-        "name": "[送付元]FAX"
+        "name": "[送付元]FAX",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -146,7 +154,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "info@labelmake.jp",
-        "name": "[送付元]Email"
+        "name": "[送付元]Email",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -161,7 +170,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "大阪府 出得太",
-        "name": "[送付元]担当者名"
+        "name": "[送付元]担当者名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -176,7 +186,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "書類1",
-        "name": "品目1"
+        "name": "品目1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -191,7 +202,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1部",
-        "name": "数量1"
+        "name": "数量1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -206,7 +218,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "書類2",
-        "name": "品目2"
+        "name": "品目2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -221,7 +234,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1部",
-        "name": "数量2"
+        "name": "数量2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -236,7 +250,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "書類3",
-        "name": "品目3"
+        "name": "品目3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -251,7 +266,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1部",
-        "name": "数量3"
+        "name": "数量3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -266,7 +282,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "書類4",
-        "name": "品目4"
+        "name": "品目4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -281,7 +298,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1部",
-        "name": "数量4"
+        "name": "数量4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -296,7 +314,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "書類5",
-        "name": "品目5"
+        "name": "品目5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -311,7 +330,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1部",
-        "name": "数量5"
+        "name": "数量5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -326,7 +346,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "ご質問等がございましたら、いつでもお問い合わせください。\n今後ともよろしくお願いいたします。",
-        "name": "備考"
+        "name": "備考",
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

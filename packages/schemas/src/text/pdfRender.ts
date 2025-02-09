@@ -120,8 +120,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 
-  page.pushOperators(pdfLib.setCharacterSpacing(characterSpacing ?? DEFAULT_CHARACTER_SPACING));
-
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
@@ -150,11 +148,19 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   }
 
   const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
-    const textWidth = widthOfTextAtSize(line, fontKitFont, fontSize, characterSpacing);
+    const trimmed = line.replace('\n', '');
+    const textWidth = widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing);
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
+
+    // Adobe Acrobat Reader shows an error if `drawText` is called with an empty text
+    if (line === '') {
+      // return; // this also works
+      line = '\r\n';
+    }
 
     let xLine = x;
     if (alignment === 'center') {
@@ -167,7 +173,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
-      const _x = xLine + textWidth + 1
+      const _x = xLine + textWidth + 1;
       const _y = yLine + textHeight / 3;
       page.drawLine({
         start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
@@ -180,7 +186,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     // draw underline
     if (schema.underline && textWidth > 0) {
-      const _x = xLine + textWidth + 1
+      const _x = xLine + textWidth + 1;
       const _y = yLine - textHeight / 12;
       page.drawLine({
         start: rotatePoint({ x: xLine, y: _y }, pivotPoint, rotate.angle),
@@ -199,7 +205,16 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       yLine = rotatedPoint.y;
     }
 
-    page.drawText(line, {
+    let spacing = characterSpacing;
+    if (alignment === 'justify' && line.slice(-1) !== '\n') {
+      // if alignment is `justify` but the end of line is not newline, then adjust the spacing
+      const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
+      const len = Array.from(iterator).length;
+      spacing += (width - textWidth) / len;
+    }
+    page.pushOperators(pdfLib.setCharacterSpacing(spacing));
+
+    page.drawText(trimmed, {
       x: xLine,
       y: yLine,
       rotate,

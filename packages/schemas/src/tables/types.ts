@@ -43,7 +43,7 @@ export interface Styles {
   textColor: string;
   lineHeight: number;
   characterSpacing: number;
-  alignment: 'left' | 'center' | 'right';
+  alignment: 'left' | 'center' | 'right' | 'justify';
   verticalAlignment: 'top' | 'middle' | 'bottom';
   fontSize: number;
   cellPadding: Spacing;

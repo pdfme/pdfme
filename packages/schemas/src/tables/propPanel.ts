@@ -43,7 +43,7 @@ export const propPanel: PropPanel<TableSchema> = {
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
           },

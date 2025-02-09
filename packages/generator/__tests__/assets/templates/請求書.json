@@ -26,7 +26,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1",
-        "name": "請求No"
+        "name": "請求No",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -41,7 +42,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "2020/01/01",
-        "name": "請求日"
+        "name": "請求日",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -56,7 +58,8 @@
         "characterSpacing": 0,
         "lineHeight": 0.63,
         "content": "株式会社listmake.jp",
-        "name": "[請求先]会社名"
+        "name": "[請求先]会社名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -71,7 +74,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "東京都 出得太",
-        "name": "[請求先]担当者名"
+        "name": "[請求先]担当者名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -86,7 +90,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "印刷代一式御請求書",
-        "name": "件名"
+        "name": "件名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -101,7 +106,8 @@
         "characterSpacing": 0,
         "lineHeight": 0.8,
         "content": "株式会社labelmake.jp",
-        "name": "[請求元]会社名"
+        "name": "[請求元]会社名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -116,7 +122,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "123-4567",
-        "name": "[請求元]郵便番号"
+        "name": "[請求元]郵便番号",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -131,7 +138,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "大阪府大阪1-2-3-4\n大阪マンション123号",
-        "name": "[請求元]住所"
+        "name": "[請求元]住所",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -146,7 +154,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "000-000-0000",
-        "name": "[請求元]TEL"
+        "name": "[請求元]TEL",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -161,7 +170,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "000-000-0000",
-        "name": "[請求元]FAX"
+        "name": "[請求元]FAX",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -176,7 +186,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "info@labelmake.jp",
-        "name": "[請求元]Email"
+        "name": "[請求元]Email",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -191,7 +202,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "大阪府 出得太",
-        "name": "[請求元]担当者名"
+        "name": "[請求元]担当者名",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -206,7 +218,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "13200円",
-        "name": "合計金額"
+        "name": "合計金額",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -221,7 +234,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "2020/02/29",
-        "name": "支払い期限"
+        "name": "支払い期限",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -236,7 +250,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品A",
-        "name": "品目1"
+        "name": "品目1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -251,7 +266,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量1"
+        "name": "数量1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -266,7 +282,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価1"
+        "name": "単価1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -281,7 +298,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額1"
+        "name": "金額1",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -296,7 +314,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品B",
-        "name": "品目2"
+        "name": "品目2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -311,7 +330,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額2"
+        "name": "金額2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -326,7 +346,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量2"
+        "name": "数量2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -341,7 +362,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価2"
+        "name": "単価2",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -356,7 +378,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品C",
-        "name": "品目3"
+        "name": "品目3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -371,7 +394,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額3"
+        "name": "金額3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -386,7 +410,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量3"
+        "name": "数量3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -401,7 +426,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価3"
+        "name": "単価3",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -416,7 +442,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品D",
-        "name": "品目4"
+        "name": "品目4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -431,7 +458,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額4"
+        "name": "金額4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -446,7 +474,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量4"
+        "name": "数量4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -461,7 +490,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価4"
+        "name": "単価4",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -476,7 +506,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品E",
-        "name": "品目5"
+        "name": "品目5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -491,7 +522,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額5"
+        "name": "金額5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -506,7 +538,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量5"
+        "name": "数量5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -521,7 +554,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価5"
+        "name": "単価5",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -536,7 +570,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品F",
-        "name": "品目6"
+        "name": "品目6",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -551,7 +586,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額6"
+        "name": "金額6",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -566,7 +602,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量6"
+        "name": "数量6",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -581,7 +618,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価6"
+        "name": "単価6",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -596,7 +634,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品G",
-        "name": "品目7"
+        "name": "品目7",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -611,7 +650,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額7"
+        "name": "金額7",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -626,7 +666,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量7"
+        "name": "数量7",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -641,7 +682,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価7"
+        "name": "単価7",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -656,7 +698,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品H",
-        "name": "品目8"
+        "name": "品目8",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -671,7 +714,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額8"
+        "name": "金額8",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -686,7 +730,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量8"
+        "name": "数量8",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -701,7 +746,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価8"
+        "name": "単価8",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -716,7 +762,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品I",
-        "name": "品目9"
+        "name": "品目9",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -731,7 +778,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額9"
+        "name": "金額9",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -746,7 +794,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量9"
+        "name": "数量9",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -761,7 +810,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価9"
+        "name": "単価9",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -776,7 +826,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品J",
-        "name": "品目10"
+        "name": "品目10",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -791,7 +842,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額10"
+        "name": "金額10",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -806,7 +858,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量10"
+        "name": "数量10",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -821,7 +874,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価10"
+        "name": "単価10",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -836,7 +890,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品K",
-        "name": "品目11"
+        "name": "品目11",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -851,7 +906,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額11"
+        "name": "金額11",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -866,7 +922,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量11"
+        "name": "数量11",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -881,7 +938,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価11"
+        "name": "単価11",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -896,7 +954,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "商品L",
-        "name": "品目12"
+        "name": "品目12",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -911,7 +970,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "金額12"
+        "name": "金額12",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -926,7 +986,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "1個",
-        "name": "数量12"
+        "name": "数量12",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -941,7 +1002,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1000",
-        "name": "単価12"
+        "name": "単価12",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -956,7 +1018,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥12000",
-        "name": "小計"
+        "name": "小計",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -971,7 +1034,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥1200",
-        "name": "消費税"
+        "name": "消費税",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -986,7 +1050,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "￥13200",
-        "name": "合計"
+        "name": "合計",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1001,7 +1066,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "labelmake銀行 大阪支店\n普通 12345678\nカ)ラベルメイク",
-        "name": "振込先"
+        "name": "振込先",
+        "fontName": "NotoSerifJP"
       },
       {
         "position": {
@@ -1016,7 +1082,8 @@
         "characterSpacing": 0,
         "lineHeight": 1,
         "content": "お振込み手数料は御社ご負担にてお願い致します。",
-        "name": "備考"
+        "name": "備考",
+        "fontName": "NotoSerifJP"
       }
     ]
   ]

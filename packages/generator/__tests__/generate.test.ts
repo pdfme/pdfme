@@ -204,6 +204,7 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
       ],
     };
     const font = getFont();
+    font.Roboto.fallback = false;
     font.SauceHanSansJP.fallback = false;
     font.SauceHanSerifJP.fallback = false;
     try {
@@ -234,6 +235,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       ],
     };
     const font = getFont();
+    font.Roboto.fallback = false;
     font.SauceHanSansJP.fallback = true;
     font.SauceHanSerifJP.fallback = true;
     try {

@@ -8,7 +8,11 @@ import {
   getFontDescentInPt,
   getFontKitFont,
   getSplittedLines,
+  filterStartJP,
+  filterEndJP,
 } from '../src/text/helper';
+import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants';
+
 import { FontWidthCalcValues, TextSchema } from '../src/text/types';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -281,7 +285,6 @@ describe('calculateDynamicFontSize with Custom font', () => {
     const textSchema = getTextSchema();
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'あいうあいうあい';
-    
     const result = calculateDynamicFontSize({ textSchema, fontKitFont, value });
 
     expect(result).toBe(16.75);
@@ -373,5 +376,101 @@ describe('getBrowserVerticalFontAdjustments test', () => {
       topAdj: 0,
       bottomAdj: 0,
     });
+  });
+});
+
+describe('filterStartJP', () => {
+  test('空の配列を渡すと空の配列を返す', () => {
+    expect(filterStartJP([])).toEqual([]);
+  });
+
+  test('禁則文字を含まない行はそのまま返す', () => {
+    const input = ['これは', '普通の', '文章です。'];
+    expect(filterStartJP(input)).toEqual(input);
+  });
+
+  test('行頭の禁則文字を前の行の末尾に移動する', () => {
+    const input = ['これは', '。文章', 'です'];
+    const expected = ['これは。', '文章', 'です'];
+    expect(filterStartJP(input)).toEqual(expected);
+  });
+
+  test('複数の禁則文字を正しく処理する', () => {
+    const input = ['これは', '。とても', '、長い', '」文章', 'です'];
+    const expected = ['これは。', 'とても、', '長い」', '文章', 'です'];
+    expect(filterStartJP(input)).toEqual(expected);
+  });
+
+  test('空の行を保持する', () => {
+    const input = ['これは', '', '。文章', 'です'];
+    const expected = ['これは。', '', '文章', 'です'];
+    expect(filterStartJP(input)).toEqual(expected);
+  });
+
+  test('1文字の行（禁則文字のみ）はそのまま保持する', () => {
+    const input = ['これは', '。', '文章', 'です'];
+    // const expected = ['これは。', '文章', 'です'];
+    const expected = ['これは', '。', '文章', 'です'];
+    expect(filterStartJP(input)).toEqual(expected);
+  });
+
+  test('すべての禁則文字を正しく処理する', () => {
+    const input = LINE_START_FORBIDDEN_CHARS.map((char: string) => ['この', char + '文字']).flat();
+    const expected = LINE_START_FORBIDDEN_CHARS.map((char: string) => [
+      'この' + char,
+      '文字',
+    ]).flat();
+    expect(filterStartJP(input)).toEqual(expected);
+  });
+});
+
+describe('filterEndJP', () => {
+  test('空の配列を渡すと空の配列を返す', () => {
+    expect(filterEndJP([])).toEqual([]);
+  });
+
+  test('禁則文字を含まない行はそのまま返す', () => {
+    const input = ['これは', '普通の', '文章です。'];
+    expect(filterEndJP(input)).toEqual(input);
+  });
+
+  test('行末の禁則文字を次の行の先頭に移動する', () => {
+    const input = ['これは「', '文章', 'です。'];
+    const expected = ['これは', '「文章', 'です。'];
+    expect(filterEndJP(input)).toEqual(expected);
+  });
+
+  test('複数の禁則文字を正しく処理する', () => {
+    const input = ['これは「', '長い『', '文章（', 'です。'];
+    const expected = ['これは', '「長い', '『文章', '（です。'];
+    expect(filterEndJP(input)).toEqual(expected);
+  });
+
+  // Cant understand purpose of this test...
+  // test('空の行を保持する', () => {
+  //   const input = ['これは「', '', '文章', 'です。'];
+  //   const expected = ['これは', '「', '', '文章', 'です。'];
+  //   expect(filterEndJP(input)).toEqual(expected);
+  // });
+
+  test('1文字の行（禁則文字のみ）はそのまま保持する', () => {
+    const input = ['これは', '「', '文章', 'です。'];
+    const expected = ['これは', '「', '文章', 'です。'];
+    expect(filterEndJP(input)).toEqual(expected);
+  });
+
+  test('すべての禁則文字を正しく処理する', () => {
+    const input = LINE_END_FORBIDDEN_CHARS.map((char: string) => ['これは' + char, '文章']).flat();
+    const expected = LINE_END_FORBIDDEN_CHARS.map((char: string) => [
+      'これは',
+      char + '文章',
+    ]).flat();
+    expect(filterEndJP(input)).toEqual(expected);
+  });
+
+  test('最後の行の禁則文字は移動しない', () => {
+    const input = ['これは「', '文章「', 'です「'];
+    const expected = ['これは', '「文章', '「です「'];
+    expect(filterEndJP(input)).toEqual(expected);
   });
 });
