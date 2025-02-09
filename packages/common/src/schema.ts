@@ -187,6 +187,7 @@ export const UIOptions = CommonOptions.extend({
   theme: z.record(z.string(), z.unknown()).optional(),
   icons: z.record(z.string(), z.string()).optional(),
   requiredByDefault: z.boolean().optional(),
+  maxZoom: z.number().optional(),
 });
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);

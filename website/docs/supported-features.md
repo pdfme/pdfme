@@ -133,3 +133,9 @@ Details: [Tables with Dynamic Data](/docs/tables)
 ## Planned Support
 
 - [HyperLink](https://github.com/pdfme/pdfme/issues/319)
+
+## Custom Feature Requests
+
+While pdfme is an open-source project released under the MIT License, we are open to considering custom feature additions for a fee.  
+**If you are willing to pay, we can evaluate and implement your requested features.**  
+Please note that any additional functionality will always be released as open source. If this approach works for you, please [contact us](https://app.pdfme.com/contact).

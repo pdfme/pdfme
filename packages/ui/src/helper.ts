@@ -1,4 +1,5 @@
 import hotkeys from 'hotkeys-js';
+import { useContext } from 'react';
 import {
   cloneDeep,
   ZOOM,
@@ -12,7 +13,8 @@ import {
   Plugins,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
-import { RULER_HEIGHT } from './constants.js';
+import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
+import { OptionsContext } from './contexts';
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -469,3 +471,9 @@ export const changeSchemas = (args: {
   }, cloneDeep(schemas));
   commitSchemas(newSchemas);
 };
+
+export const getMaxZoom = () => {
+  const options = useContext(OptionsContext);
+
+  return options.maxZoom ? (options.maxZoom as number) / 100 : DEFAULT_MAX_ZOOM;
+}
