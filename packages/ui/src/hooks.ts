@@ -19,8 +19,7 @@ import {
   moveCommandToChangeSchemasArg,
   arrayBufferToBase64,
   initShortCuts,
-  destroyShortCuts,
-  getMaxZoom,
+  destroyShortCuts
 } from './helper.js';
 import { RULER_HEIGHT } from './constants.js';
 
