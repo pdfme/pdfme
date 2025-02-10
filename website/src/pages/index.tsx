@@ -4,114 +4,115 @@ import Link from '@docusaurus/Link';
 import HomepageFeatures from '../components/HomepageFeatures';
 import HomepageHeader from '../components/HomepageHeader';
 import Divider from '../components/Divider';
-import Code from '../components/Code';
+// import Code from '../components/Code';
 import GithubStar from '../components/GithubStar';
-import type { Template } from '@pdfme/common';
-import { getInputFromTemplate } from '@pdfme/common';
-import type { Designer, Viewer, Form } from '@pdfme/ui';
-import { getSampleTemplate, getGeneratorSampleCode } from '../libs/helper';
+// import type { Template } from '@pdfme/common';
+// import { getInputFromTemplate } from '@pdfme/common';
+// import type { Designer, Viewer, Form } from '@pdfme/ui';
+// import { getSampleTemplate, getGeneratorSampleCode } from '../libs/helper';
 
+// TODO トップページを作り直す
 export default function Home(): JSX.Element {
-  const designerRef = useRef<HTMLDivElement | null>(null);
-  const viewerRef = useRef<HTMLDivElement | null>(null);
-  const formRef = useRef<HTMLDivElement | null>(null);
+  // const designerRef = useRef<HTMLDivElement | null>(null);
+  // const viewerRef = useRef<HTMLDivElement | null>(null);
+  // const formRef = useRef<HTMLDivElement | null>(null);
 
-  const designer = useRef<Designer | null>(null);
-  const viewer = useRef<Viewer | null>(null);
-  const form = useRef<Form | null>(null);
+  // const designer = useRef<Designer | null>(null);
+  // const viewer = useRef<Viewer | null>(null);
+  // const form = useRef<Form | null>(null);
 
-  const [template, setTemplate] = useState<Template>(getSampleTemplate());
-  const [mode, setMode] = useState<'viewer' | 'form'>('form');
+  // const [template, setTemplate] = useState<Template>(getSampleTemplate());
+  // const [mode, setMode] = useState<'viewer' | 'form'>('form');
 
-  const onSaveTemplate = (t: Template) => {
-    setTemplate(t);
-    const inputData = getInputFromTemplate(t);
-    form.current?.updateTemplate(t);
-    form.current?.setInputs(inputData);
-    viewer.current?.updateTemplate(t);
-    viewer.current?.setInputs(inputData);
-  };
+  // const onSaveTemplate = (t: Template) => {
+  //   setTemplate(t);
+  //   const inputData = getInputFromTemplate(t);
+  //   form.current?.updateTemplate(t);
+  //   form.current?.setInputs(inputData);
+  //   viewer.current?.updateTemplate(t);
+  //   viewer.current?.setInputs(inputData);
+  // };
 
-  const initializeDesigner = async (domContainer: HTMLDivElement) => {
-    const [{ Designer }, schemasModule] = await Promise.all([
-      import('@pdfme/ui'),
-      import('@pdfme/schemas'),
-    ]);
-    const { text, image, barcodes } = schemasModule;
-    const plugins = { text, image, qrcode: barcodes.qrcode };
+  // const initializeDesigner = async (domContainer: HTMLDivElement) => {
+  //   const [{ Designer }, schemasModule] = await Promise.all([
+  //     import('@pdfme/ui'),
+  //     import('@pdfme/schemas'),
+  //   ]);
+  //   const { text, image, barcodes } = schemasModule;
+  //   const plugins = { text, image, qrcode: barcodes.qrcode };
 
-    const d = new Designer({
-      domContainer,
-      template,
-      plugins,
-    });
+  //   const d = new Designer({
+  //     domContainer,
+  //     template,
+  //     plugins,
+  //   });
 
-    d.onSaveTemplate(onSaveTemplate);
-    d.onChangeTemplate(() => d.saveTemplate());
-    return d;
-  };
+  //   d.onSaveTemplate(onSaveTemplate);
+  //   d.onChangeTemplate(() => d.saveTemplate());
+  //   return d;
+  // };
 
-  const initializeUIComponent = async (
-    domContainer: HTMLDivElement,
-    componentType: 'Viewer' | 'Form',
-    tmpl: Template
-  ) => {
-    const [uiModule, schemasModule] = await Promise.all([
-      import('@pdfme/ui'),
-      import('@pdfme/schemas'),
-    ]);
+  // const initializeUIComponent = async (
+  //   domContainer: HTMLDivElement,
+  //   componentType: 'Viewer' | 'Form',
+  //   tmpl: Template
+  // ) => {
+  //   const [uiModule, schemasModule] = await Promise.all([
+  //     import('@pdfme/ui'),
+  //     import('@pdfme/schemas'),
+  //   ]);
 
-    const { text, image, barcodes } = schemasModule;
-    const { Viewer, Form } = uiModule;
-    const plugins = { text, image, qrcode: barcodes.qrcode };
-    const inputs = getInputFromTemplate(tmpl);
+  //   const { text, image, barcodes } = schemasModule;
+  //   const { Viewer, Form } = uiModule;
+  //   const plugins = { text, image, qrcode: barcodes.qrcode };
+  //   const inputs = getInputFromTemplate(tmpl);
 
-    if (componentType === 'Viewer') {
-      const v = new Viewer({ domContainer, template: tmpl, plugins, inputs });
-      return v;
-    } else {
-      const f = new Form({ domContainer, template: tmpl, plugins, inputs });
-      f.onChangeInput(console.log);
-      return f;
-    }
-  };
+  //   if (componentType === 'Viewer') {
+  //     const v = new Viewer({ domContainer, template: tmpl, plugins, inputs });
+  //     return v;
+  //   } else {
+  //     const f = new Form({ domContainer, template: tmpl, plugins, inputs });
+  //     f.onChangeInput(console.log);
+  //     return f;
+  //   }
+  // };
 
-  const generatePDF = async () => {
-    if (!form.current) return;
-    const [{ text, image, barcodes }, { generate }] = await Promise.all([
-      import('@pdfme/schemas'),
-      import('@pdfme/generator'),
-    ]);
+  // const generatePDF = async () => {
+  //   if (!form.current) return;
+  //   const [{ text, image, barcodes }, { generate }] = await Promise.all([
+  //     import('@pdfme/schemas'),
+  //     import('@pdfme/generator'),
+  //   ]);
 
-    const pdf = await generate({
-      template,
-      plugins: { text, image, qrcode: barcodes.qrcode },
-      inputs: form.current.getInputs(),
-    });
+  //   const pdf = await generate({
+  //     template,
+  //     plugins: { text, image, qrcode: barcodes.qrcode },
+  //     inputs: form.current.getInputs(),
+  //   });
 
-    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-    window.open(URL.createObjectURL(blob));
-  };
+  //   const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+  //   window.open(URL.createObjectURL(blob));
+  // };
 
-  useEffect(() => {
-    if (designerRef.current) {
-      initializeDesigner(designerRef.current).then((d) => {
-        designer.current = d;
-      });
-    }
-  }, [designerRef]);
+  // useEffect(() => {
+  //   if (designerRef.current) {
+  //     initializeDesigner(designerRef.current).then((d) => {
+  //       designer.current = d;
+  //     });
+  //   }
+  // }, [designerRef]);
 
 
-  useEffect(() => {
-    (async () => {
-      if (viewerRef.current) {
-        viewer.current = (await initializeUIComponent(viewerRef.current, 'Viewer', template)) as Viewer;
-      }
-      if (formRef.current) {
-        form.current = (await initializeUIComponent(formRef.current, 'Form', template)) as Form;
-      }
-    })();
-  }, [viewerRef, formRef, template, mode]);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (viewerRef.current) {
+  //       viewer.current = (await initializeUIComponent(viewerRef.current, 'Viewer', template)) as Viewer;
+  //     }
+  //     if (formRef.current) {
+  //       form.current = (await initializeUIComponent(formRef.current, 'Form', template)) as Form;
+  //     }
+  //   })();
+  // }, [viewerRef, formRef, template, mode]);
 
   return (
     <Layout
@@ -158,15 +159,15 @@ export default function Home(): JSX.Element {
                 PDF Generation
               </h2>
               <div style={{ maxHeight: 580, overflow: 'scroll' }}>
-                <Code
+                {/* <Code
                   code={getGeneratorSampleCode(getSampleTemplate())}
                   language="typescript"
-                ></Code>
+                ></Code> */}
               </div>
               <div>
                 <button
                   className="margin-vert--md button button--lg button--secondary button--block"
-                  onClick={generatePDF}
+                // onClick={generatePDF}
                 >
                   Generate PDF
                 </button>
@@ -195,11 +196,11 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className={'col col--9'} style={{ padding: 0 }}>
-              <div style={{ height: 700 }} ref={designerRef} />
+              {/* <div style={{ height: 700 }} ref={designerRef} /> */}
             </div>
             <div className={'col col--3'}>
               <div style={{ height: 700, overflow: 'auto' }}>
-                <Code code={JSON.stringify(template, null, 2).trim()} language="json" />
+                {/* <Code code={JSON.stringify(template, null, 2).trim()} language="json" /> */}
               </div>
             </div>
 
@@ -228,30 +229,30 @@ export default function Home(): JSX.Element {
                   <div className="card__image">
                     <img
                       loading="lazy"
-                      src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
-                      alt={`${mode === 'form' ? 'Form' : 'Viewer'} image`}
+                    // src={mode === 'form' ? '/img/form.gif' : '/img/viewer.png'}
+                    // alt={`${mode === 'form' ? 'Form' : 'Viewer'} image`}
                     />
                   </div>
                   <div className="card__body">
                     <h3>
                       <span
                         style={{ cursor: 'pointer' }}
-                        className={`${mode === 'form' ? 'text--primary' : ''}`}
-                        onClick={() => setMode('form')}
+                      // className={`${mode === 'form' ? 'text--primary' : ''}`}
+                      // onClick={() => setMode('form')}
                       >
                         Form
                       </span>
                       <span style={{ margin: '1rem' }}>/</span>
                       <span
                         style={{ cursor: 'pointer' }}
-                        className={`${mode === 'viewer' ? 'text--primary' : ''}`}
-                        onClick={() => setMode('viewer')}
+                      // className={`${mode === 'viewer' ? 'text--primary' : ''}`}
+                      // onClick={() => setMode('viewer')}
                       >
                         Viewer
                       </span>
                     </h3>
                     <small>
-                      {mode === 'form' ? (
+                      {/* {mode === 'form' ? (
                         <div>
                           Starting from a template you can generate a fillable form. Then you will
                           need a few seconds to generate a Pdf
@@ -263,15 +264,15 @@ export default function Home(): JSX.Element {
                           Mobile browsers doesn't allow a user to view a PDF from an iframe, for
                           this reason the Viewer is the perfect solution for mobile users.
                         </div>
-                      )}
+                      )} */}
                     </small>
                   </div>
                   <div className="card__footer">
                     <Link
                       className="button button--primary button--lg"
-                      to={`/docs/getting-started#${mode}`}
+                    // to={`/docs/getting-started#${mode}`}
                     >
-                      Learn more about the {mode === 'form' ? 'Form' : 'Viewer'}
+                      {/* Learn more about the {mode === 'form' ? 'Form' : 'Viewer'} */}
                     </Link>
                   </div>
                 </div>
@@ -281,25 +282,27 @@ export default function Home(): JSX.Element {
             <div className={'col col--8'}>
               <ul className="tabs">
                 <li
-                  onClick={() => setMode('form')}
-                  className={`tabs__item ${mode === 'form' ? 'tabs__item--active' : ''}`}
+                // onClick={() => setMode('form')}
+                // className={`tabs__item ${mode === 'form' ? 'tabs__item--active' : ''}`}
                 >
                   Form
                 </li>
                 <li
-                  onClick={() => setMode('viewer')}
-                  className={`tabs__item  ${mode === 'viewer' ? 'tabs__item--active' : ''}`}
+                // onClick={() => setMode('viewer')}
+                // className={`tabs__item  ${mode === 'viewer' ? 'tabs__item--active' : ''}`}
                 >
                   Viewer
                 </li>
               </ul>
-              {mode === 'form' ? (
+              {/* {mode === 'form' ? (
                 <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={formRef}></div>
               ) : (
                 <div style={{ height: 700, background: 'rgb(74, 74, 74)' }} ref={viewerRef}></div>
-              )}
+              )} */}
               <div className="margin-vert--lg text--center">
-                <button className="button button--lg button--secondary" onClick={generatePDF}>
+                <button className="button button--lg button--secondary"
+                // onClick={generatePDF}
+                >
                   Generate PDF
                 </button>
               </div>

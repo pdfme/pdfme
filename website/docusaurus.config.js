@@ -1,11 +1,6 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const path = require('path');
-const webpack = require('webpack');
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'pdfme',
@@ -53,34 +48,29 @@ const config = {
             to: '/docs/development-guide',
             from: '/development-guide',
           },
+          {
+            to: '/templates',
+            from: '/demo'
+          },
+          {
+            to: '/templates',
+            from: '/demo/address-label-maker'
+          },
+          {
+            to: '/templates',
+            from: '/demo/barcode-qrcode-generator'
+          },
+          {
+            to: '/templates',
+            from: '/demo/free-invoice-generator'
+          },
+          {
+            to: '/templates',
+            from: '/demo/online-certificate-maker'
+          }
         ],
       },
-    ],
-    function myPlugin() {
-      return {
-        name: 'custom-docusaurus-plugin',
-        configureWebpack() {
-          const newConfig = {
-            resolve: {
-              fallback: {
-                fs: false,
-                path: require.resolve('path-browserify'),
-              },
-            },
-            plugins: [
-              new webpack.IgnorePlugin({
-                resourceRegExp: /canvas/,
-              }),
-              new webpack.ProvidePlugin({
-                Buffer: ['buffer', 'Buffer'],
-                process: 'process/browser.js',
-              }),
-            ],
-          };
-          return newConfig;
-        },
-      };
-    },
+    ]
   ],
   themeConfig:
   /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
@@ -152,10 +142,6 @@ const config = {
           title: 'More',
           items: [
             {
-              label: 'Demo Apps',
-              to: '/demo',
-            },
-            {
               label: 'Examples',
               to: '/templates',
             },
@@ -184,10 +170,6 @@ const config = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} pdfme`,
-    },
-    prism: {
-      theme: lightCodeTheme,
-      darkTheme: darkCodeTheme,
     },
     algolia: {
       appId: 'V6YWG1D4SV',

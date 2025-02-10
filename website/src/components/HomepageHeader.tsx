@@ -1,5 +1,4 @@
 import React from 'react';
-import clsx from 'clsx';
 import styles from './HomepageHeader.module.css';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Link from '@docusaurus/Link';
@@ -8,7 +7,8 @@ export default function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
 
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+    // hero hero--primary, styles.heroBanner
+    <header className={"hero hero--primary"}>
       <div className="container">
         <div className="row" style={{ alignItems: 'center', flexDirection: 'row-reverse' }}>
           <div className="col col--6" style={{ textAlign: 'center' }}>
