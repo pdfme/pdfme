@@ -122,7 +122,7 @@ const template: Template = {
 };
 ```
 
-You can create a template from [Template Design page](/template-design). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](/docs/getting-started#designer).
+You can create a template from [Template Design page](/template-design?ui=designer&template=a4-blank). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](/docs/getting-started#designer).
 
 ### Using Plugins
 
@@ -243,7 +243,7 @@ The UI is composed of the [Designer](/docs/getting-started#designer), [Form](/do
 
 The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.
 
-You can design your own template from [Template Design page](/template-design), or you can integrate the designer into your application.
+You can design your own template from [Template Design page](/template-design?ui=designer&template=a4-blank), or you can integrate the designer into your application.
 
 Let's integrate the designer using the template created above as the default template.
 
@@ -278,6 +278,8 @@ The designer instance can be manipulated with the following methods.
 You can use templates to create forms and PDF viewers.
 
 The Form creates a UI for the user to enter schemas based on the template.
+
+You can try out the form that uses the invoice template from [here](/template-design?ui=form-viewer&template=invoice).
 
 ```ts
 import type { Template } from '@pdfme/common';

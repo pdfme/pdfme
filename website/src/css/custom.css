@@ -6,8 +6,6 @@
 
 /* You can override the default Infima variables here. */
 
-@import 'handsontable/dist/handsontable.full.css';
-
 :root {
   --ifm-color-primary: #25c2a0;
   --ifm-color-primary-dark: rgb(33, 175, 144);

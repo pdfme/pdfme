@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ClipboardCopy } from 'lucide-react';
+import { toast } from 'react-toastify';
 import { fromKebabCase } from "./helper"
 import ExternalButton from "./ExternalButton"
 
@@ -100,20 +102,44 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                   </p>
                 </div>
                 <div className="mt-6">
-                  <button
-                    onClick={() => { navigateToDesigner(name) }}
-                    className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
-                  >
-                    Go to Designer
-                  </button>
+                  <div className="flex gap-1 items-center">
+                    <button
+                      onClick={() => { navigateToDesigner(name) }}
+                      className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                    >
+                      Go to Designer
+                    </button>
+                    <button className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`http://pdfme.com/template-design?ui=designer&template=${name}`);
+                        toast.info('Copied shareable link to clipboard', {
+                          position: "bottom-right",
+                        });
+                      }}
+                    >
+                      <ClipboardCopy size={20} />
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-3">
-                  <button
-                    onClick={() => { navigateToFormViewer(name) }}
-                    className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
-                  >
-                    Go to Form/Viewer
-                  </button>
+                  <div className="flex gap-1 items-center">
+                    <button
+                      onClick={() => { navigateToFormViewer(name) }}
+                      className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                    >
+                      Go to Form/Viewer
+                    </button>
+                    <button className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`http://pdfme.com/template-design?ui=form-viewer&template=${name}`);
+                        toast.info('Copied shareable link to clipboard', {
+                          position: "bottom-right",
+                        });
+                      }}
+                    >
+                      <ClipboardCopy size={20} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
