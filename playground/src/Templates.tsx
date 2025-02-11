@@ -5,6 +5,43 @@ import { toast } from 'react-toastify';
 import { fromKebabCase } from "./helper"
 import ExternalButton from "./ExternalButton"
 
+const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string }) => {
+  const handleCopy = async () => {
+    const shareableUrl = `http://pdfme.com/template-design?ui=${ui}&template=${name}`;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareableUrl);
+      } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = shareableUrl;
+        textArea.style.position = "fixed";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        if (!document.execCommand("copy")) {
+          throw new Error("Fallback: Copying text command was unsuccessful");
+        }
+        document.body.removeChild(textArea);
+      }
+      toast.info("Copied shareable link to clipboard", { position: "bottom-right" });
+    } catch (error) {
+      toast.error("Failed to copy shareable link", { position: "bottom-right" });
+      console.error("Copy failed:", error);
+    }
+  };
+
+  return (
+    <button
+      className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+      onClick={handleCopy}
+      aria-label="Copy shareable link"
+    >
+      <ClipboardCopy size={20} />
+    </button>
+  );
+};
+
+
 
 function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
   const navigate = useNavigate();
@@ -109,16 +146,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     >
                       Go to Designer
                     </button>
-                    <button className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`http://pdfme.com/template-design?ui=designer&template=${name}`);
-                        toast.info('Copied shareable link to clipboard', {
-                          position: "bottom-right",
-                        });
-                      }}
-                    >
-                      <ClipboardCopy size={20} />
-                    </button>
+                    <CopyButton ui="designer" name={name} />
                   </div>
                 </div>
                 <div className="mt-3">
@@ -129,16 +157,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     >
                       Go to Form/Viewer
                     </button>
-                    <button className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`http://pdfme.com/template-design?ui=form-viewer&template=${name}`);
-                        toast.info('Copied shareable link to clipboard', {
-                          position: "bottom-right",
-                        });
-                      }}
-                    >
-                      <ClipboardCopy size={20} />
-                    </button>
+                    <CopyButton ui="form-viewer" name={name} />
                   </div>
                 </div>
               </div>
