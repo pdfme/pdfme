@@ -97,3 +97,7 @@ I definitely could not have created pdfme without these libraries. I am grateful
 
 If you want to contribute to pdfme, please refer to the [Development Guide](https://pdfme.com/docs/development-guide).  
 We look forward to your contributions!
+
+---
+
+This project is tested with BrowserStack
