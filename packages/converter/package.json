@@ -45,14 +45,12 @@
   },
   "dependencies": {
     "@pdfme/common": "*",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^3.11.174",
+    "canvas": "^3.1.0"
   },
   "devDependencies": {
     "@pdfme/generator": "file:../generator",
     "@types/estree": "^1.0.6"
-  },
-  "optionalDependencies": {
-    "canvas": "^2.11.0"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
