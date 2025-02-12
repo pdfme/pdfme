@@ -8,14 +8,14 @@ import {
   getTemplateById,
   getBlankTemplate,
   readFile,
-  getPlugins,
   handleLoadTemplate,
   generatePDF,
   downloadJsonFile,
   translations,
-} from "./helper";
-import { NavBar, NavItem } from "./NavBar";
-import ExternalButton from "./ExternalButton"
+} from "../helper";
+import { getPlugins } from '../plugins';
+import { NavBar, NavItem } from "../components/NavBar";
+import ExternalButton from "../components/ExternalButton"
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCopy } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fromKebabCase } from "./helper"
-import ExternalButton from "./ExternalButton"
+import { fromKebabCase } from "../helper"
+import ExternalButton from "../components/ExternalButton"
 
 const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string }) => {
   const handleCopy = async () => {

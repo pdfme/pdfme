@@ -1,24 +1,7 @@
 import { Template, Font, checkTemplate, getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
-import {
-  multiVariableText,
-  text,
-  barcodes,
-  image,
-  svg,
-  line,
-  table,
-  rectangle,
-  ellipse,
-  dateTime,
-  date,
-  time,
-  select,
-  checkbox,
-  radioGroup,
-} from '@pdfme/schemas';
-import plugins from './plugins';
+import { getPlugins } from './plugins';
 
 export function fromKebabCase(str: string): string {
   return str
@@ -101,37 +84,6 @@ export const handleLoadTemplate = (
 ${e}`);
       });
   }
-};
-
-export const getPlugins = () => {
-  return {
-    Text: text,
-    'Multi-Variable Text': multiVariableText,
-    Table: table,
-    Line: line,
-    Rectangle: rectangle,
-    Ellipse: ellipse,
-    Image: image,
-    SVG: svg,
-    Signature: plugins.signature,
-    QR: barcodes.qrcode,
-    DateTime: dateTime,
-    Date: date,
-    Time: time,
-    Select: select,
-    Checkbox: checkbox,
-    RadioGroup: radioGroup,
-    // JAPANPOST: barcodes.japanpost,
-    EAN13: barcodes.ean13,
-    // EAN8: barcodes.ean8,
-    // Code39: barcodes.code39,
-    Code128: barcodes.code128,
-    // NW7: barcodes.nw7,
-    // ITF14: barcodes.itf14,
-    // UPCA: barcodes.upca,
-    // UPCE: barcodes.upce,
-    // GS1DataMatrix: barcodes.gs1datamatrix,
-  };
 };
 
 export const translations: { label: string; value: string }[] = [

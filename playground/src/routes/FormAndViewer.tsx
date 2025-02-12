@@ -9,12 +9,12 @@ import {
   getBlankTemplate,
   handleLoadTemplate,
   generatePDF,
-  getPlugins,
   isJsonString,
   translations,
-} from "./helper";
-import { NavItem, NavBar } from "./NavBar";
-import ExternalButton from "./ExternalButton"
+} from "../helper";
+import { getPlugins } from '../plugins';
+import { NavItem, NavBar } from "../components/NavBar";
+import ExternalButton from "../components/ExternalButton"
 
 type Mode = "form" | "viewer";
 
