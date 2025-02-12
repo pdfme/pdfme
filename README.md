@@ -100,4 +100,5 @@ We look forward to your contributions!
 
 ---
 
-This project is tested with BrowserStack
+This project is tested with BrowserStack.
+
