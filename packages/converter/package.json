@@ -45,7 +45,9 @@
   },
   "dependencies": {
     "@pdfme/common": "*",
-    "pdfjs-dist": "^3.11.174",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "optionalDependencies": {
     "canvas": "^3.1.0"
   },
   "devDependencies": {
