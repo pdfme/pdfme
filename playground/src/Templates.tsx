@@ -7,7 +7,7 @@ import ExternalButton from "./ExternalButton"
 
 const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string }) => {
   const handleCopy = async () => {
-    const shareableUrl = `http://pdfme.com/template-design?ui=${ui}&template=${name}`;
+    const shareableUrl = `https://pdfme.com/template-design?ui=${ui}&template=${name}`;
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareableUrl);
