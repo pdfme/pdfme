@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from 'react-toastify';
-import { cloneDeep, Template, checkTemplate, Lang } from "@pdfme/common";
+import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from "@pdfme/common";
 import { Designer } from "@pdfme/ui";
 import {
   getFontsData,
@@ -17,23 +17,11 @@ import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from "../components/NavBar";
 import ExternalButton from "../components/ExternalButton"
 
-/*
-MEMO
-- [x]  Edit static schemasボタンを押すとテンプレートが切り替わる
-    1. Designerのテンプレートをアップデートしてstatic schemasをテンプレートとして利用する
-    2. basePdfとしてはpadding: 0, sizeはbasePdfから取得したものを使おう
-- [x]  Edit static schemasボタンを → End editing static schemas にする
-    1. 他のボタンは非活性にした方がいいかも？
-    2. ↑ editing static schemasモードと呼ぼう
-- [x]  End editing static schemas をクリックしたらモードを抜けてもとのテンプレートとマージする
-*/
-
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
 
-  // static schemas用の編集モードと元テンプレートを管理
   const [editingStaticSchemas, setEditingStaticSchemas] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
 
@@ -144,53 +132,35 @@ function DesignerApp() {
     }
   };
 
-  // staticSchemas編集用のフロー
   const toggleEditingStaticSchemas = () => {
     if (!designer.current) return;
 
     if (!editingStaticSchemas) {
-      // 「Edit Static Schemas」をクリックした場合: 編集モード開始
       const currentTemplate = cloneDeep(designer.current.getTemplate());
-      setOriginalTemplate(currentTemplate);
-
-      // basePdfのタイプがオブジェクトか確認 (width, height, paddingがある)
-      if (typeof currentTemplate.basePdf !== "object") {
-        alert("staticSchemaは basePdf を既存PDFではなく width/heightで指定している場合のみ利用できます。");
-        return;
+      if (!isBlankPdf(currentTemplate.basePdf)) {
+        alert("The current template cannot edit the static schema.");
+        return; 
       }
 
-      // staticSchemaをschemasとして編集できるようにする
+      setOriginalTemplate(currentTemplate);
+
       const { width, height } = currentTemplate.basePdf;
       const staticSchema = currentTemplate.basePdf.staticSchema || [];
-
-      const editingTemplate: Template = {
+      designer.current.updateTemplate({
         ...currentTemplate,
-        // DesignerのschemasとしてstaticSchemaを設定
         schemas: [staticSchema],
-        // basePdfはwidth, heightのみ継承し、paddingは0に
-        basePdf: {
-          width,
-          height,
-          padding: [0, 0, 0, 0],
-        },
-      };
-      // 一旦 staticSchema は取り除く (編集対象はschemasに)
-      delete editingTemplate.basePdf.staticSchema;
+        basePdf: { width, height, padding: [0, 0, 0, 0] },
+      });
 
-      designer.current.updateTemplate(editingTemplate);
       setEditingStaticSchemas(true);
 
     } else {
-      // 「End Editing Static Schemas」をクリックした場合: 編集モード終了
       const editedTemplate = designer.current.getTemplate();
       if (!originalTemplate) return;
-
-      // schemasに反映されたstaticSchemaを元のtemplateへマージ
       const merged = cloneDeep(originalTemplate);
-      if (typeof merged.basePdf === "object") {
-        merged.basePdf.staticSchema = editedTemplate.schemas[0];
-      }
-      // Designerを元のベースPDFを使ったテンプレートに戻す
+      if (!isBlankPdf(merged.basePdf)) return;
+
+      merged.basePdf.staticSchema = editedTemplate.schemas[0];
       designer.current.updateTemplate(merged);
 
       setOriginalTemplate(null);
@@ -210,11 +180,11 @@ function DesignerApp() {
   const navItems: NavItem[] = [
     {
       label: "Lang",
-      // staticSchemas編集中はdisable
       content: (
         <select
           disabled={editingStaticSchemas}
-          className="w-full border rounded px-2 py-1"
+          className={`w-full border rounded px-2 py-1 ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           onChange={(e) => {
             designer.current?.updateOptions({ lang: e.target.value as Lang });
           }}
@@ -234,7 +204,8 @@ function DesignerApp() {
           disabled={editingStaticSchemas}
           type="file"
           accept="application/pdf"
-          className="w-full text-sm border rounded"
+          className={`w-full text-sm border rounded ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           onChange={onChangeBasePDF}
         />
       ),
@@ -246,20 +217,20 @@ function DesignerApp() {
           disabled={editingStaticSchemas}
           type="file"
           accept="application/json"
-          className="w-full text-sm border rounded"
+          className={`w-full text-sm border rounded ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           onChange={(e) => handleLoadTemplate(e, designer.current)}
         />
       ),
     },
-    // Edit static schemasボタン
     {
-      label: editingStaticSchemas ? "End editing static schemas" : "Edit static schemas",
+      label: "Edit static schema",
       content: (
         <button
-          className="px-2 py-1 border rounded hover:bg-gray-100 w-full"
+          className={`px-2 py-1 border rounded hover:bg-gray-100 w-full disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={toggleEditingStaticSchemas}
         >
-          {editingStaticSchemas ? "End editing static schemas" : "Edit static schemas"}
+          {editingStaticSchemas ? "End editing" : "Start editing"}
         </button>
       ),
     },
@@ -269,14 +240,16 @@ function DesignerApp() {
         <div className="flex gap-2">
           <button
             disabled={editingStaticSchemas}
-            className="px-2 py-1 border rounded hover:bg-gray-100"
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={() => onSaveTemplate()}
           >
             Save Local
           </button>
           <button
             disabled={editingStaticSchemas}
-            className="px-2 py-1 border rounded hover:bg-gray-100"
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={onResetTemplate}
           >
             Reset
@@ -290,14 +263,16 @@ function DesignerApp() {
         <div className="flex gap-2">
           <button
             disabled={editingStaticSchemas}
-            className="px-2 py-1 border rounded hover:bg-gray-100"
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={onDownloadTemplate}
           >
             DL Template
           </button>
           <button
             disabled={editingStaticSchemas}
-            className="px-2 py-1 border rounded hover:bg-gray-100"
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             onClick={async () => {
               const startTimer = performance.now();
               await generatePDF(designer.current);
@@ -317,7 +292,6 @@ function DesignerApp() {
       label: "",
       content: (
         <ExternalButton
-          // disabled={editingStaticSchemas}
           href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
           title="Feedback this template"
         />
