@@ -36,6 +36,7 @@ const TemplateDesign = () => {
       <iframe
         src={`${playgroundUrl}/${ui}?template=${template}`}
         style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }}
+        allow="clipboard-write"
       />
     </Layout>
   );
