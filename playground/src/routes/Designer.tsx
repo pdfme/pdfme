@@ -89,7 +89,6 @@ function DesignerApp() {
   const onDownloadTemplate = () => {
     if (designer.current) {
       downloadJsonFile(designer.current.getTemplate(), "template");
-      toast.dismiss();
       toast.success(
         <div>
           <p>Can you share the template you created? ❤️</p>
@@ -101,16 +100,7 @@ function DesignerApp() {
           >
             See: Template Contribution Guide
           </a>
-        </div>,
-        {
-          position: "bottom-right",
-          autoClose: 10000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "light",
-        }
+        </div>
       );
     }
   };
@@ -121,7 +111,7 @@ function DesignerApp() {
         "template",
         JSON.stringify(template || designer.current.getTemplate())
       );
-      alert("Saved!");
+      toast.success("Saved on local storage");
     }
   };
 
@@ -138,8 +128,18 @@ function DesignerApp() {
     if (!editingStaticSchemas) {
       const currentTemplate = cloneDeep(designer.current.getTemplate());
       if (!isBlankPdf(currentTemplate.basePdf)) {
-        alert("The current template cannot edit the static schema.");
-        return; 
+        toast.error( <div>
+          <p>The current template cannot edit the static schema.</p>
+          <a
+            className="text-blue-500 underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://pdfme.com/docs/headers-and-footers"
+          >
+            See: Headers and Footers
+          </a>
+        </div>);
+        return;
       }
 
       setOriginalTemplate(currentTemplate);
@@ -158,7 +158,10 @@ function DesignerApp() {
       const editedTemplate = designer.current.getTemplate();
       if (!originalTemplate) return;
       const merged = cloneDeep(originalTemplate);
-      if (!isBlankPdf(merged.basePdf)) return;
+      if (!isBlankPdf(merged.basePdf)) {
+        toast.error("Invalid basePdf format");
+        return;
+      }
 
       merged.basePdf.staticSchema = editedTemplate.schemas[0];
       designer.current.updateTemplate(merged);
@@ -277,10 +280,7 @@ function DesignerApp() {
               const startTimer = performance.now();
               await generatePDF(designer.current);
               const endTimer = performance.now();
-              toast.dismiss();
-              toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`, {
-                position: "bottom-right",
-              });
+              toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`);
             }}
           >
             Generate PDF

@@ -6,7 +6,11 @@ Specifically, in cases where page breaks occur—such as with [dynamic tables](/
 
 For simplicity, we've described these as headers and footers. In reality, by adding a property called `staticSchema` to `basePdf`, you can place elements that are displayed on every page and are not affected by page breaks.
 
+:::warning
+
 This feature cannot be used when `basePdf` specifies an existing PDF. It can only be used when `basePdf` is specified with properties of the type `{ width: number, height: number, padding: [number, number, number, number] }`.
+
+:::
 
 ## Example of a Footer
 

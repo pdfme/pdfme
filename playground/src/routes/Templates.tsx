@@ -23,9 +23,9 @@ const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string
         }
         document.body.removeChild(textArea);
       }
-      toast.info("Copied shareable link to clipboard", { position: "bottom-right" });
+      toast.info(`Copied shareable link to clipboard - "${fromKebabCase(name)}"`);
     } catch (error) {
-      toast.error("Failed to copy shareable link", { position: "bottom-right" });
+      toast.error("Failed to copy shareable link");
       console.error("Copy failed:", error);
     }
   };

@@ -90,8 +90,7 @@ function FormAndViewerApp() {
   const onGetInputs = () => {
     if (ui.current) {
       const inputs = ui.current.getInputs();
-      alert(JSON.stringify(inputs, null, 2));
-      alert("Dumped as console.log");
+      toast.info("Dumped as console.log");
       console.log(inputs);
     }
   };
@@ -112,7 +111,7 @@ function FormAndViewerApp() {
     if (ui.current) {
       const inputs = ui.current.getInputs();
       localStorage.setItem("inputs", JSON.stringify(inputs));
-      alert("Saved!");
+      toast.success("Saved on local storage");
     }
   };
 
@@ -230,10 +229,7 @@ function FormAndViewerApp() {
             const startTimer = performance.now()
             await generatePDF(ui.current);
             const endTimer = performance.now()
-            toast.dismiss();
-            toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`, {
-              position: "bottom-right",
-            });
+            toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`);
           }}
         >
           Generate PDF
