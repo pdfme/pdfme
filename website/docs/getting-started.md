@@ -8,8 +8,6 @@ pdfme was created to simplify the design and generation process of a PDF. It is 
 - Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
 
-As an example, the author's service [https://labelmake.jp/](https://labelmake.jp/) can create more than 100 varieties of PDFs and generates more than 100,000 PDF files per month. Notably, the monthly server cost, utilizing Cloud Functions For Firebase, remains below $10.
-
 ## Installation
 
 The operating requirements should be the node environment `>=16`.  

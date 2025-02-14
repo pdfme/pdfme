@@ -5,8 +5,13 @@ For elements that are not supported, you can add your own rendering process usin
 
 ## Currently Supported
 
-**For using schemas other than the Text schema, please refer to the following documentation.  
-[Using Schemas from @pdfme/schemas](/docs/custom-schemas#using-schemas-from-pdfmeschemas)**
+:::info
+
+For using schemas other than the Text schema, please refer to the following documentation.  
+[Using Schemas from @pdfme/schemas](/docs/custom-schemas#using-schemas-from-pdfmeschemas)
+
+:::
+
 
 ### Text (text)
 

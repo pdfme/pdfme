@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCopy } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fromKebabCase } from "./helper"
-import ExternalButton from "./ExternalButton"
+import { fromKebabCase } from "../helper"
+import ExternalButton from "../components/ExternalButton"
 
 const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string }) => {
   const handleCopy = async () => {
@@ -23,9 +23,9 @@ const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string
         }
         document.body.removeChild(textArea);
       }
-      toast.info("Copied shareable link to clipboard", { position: "bottom-right" });
+      toast.info(`Copied shareable link to clipboard - "${fromKebabCase(name)}"`);
     } catch (error) {
-      toast.error("Failed to copy shareable link", { position: "bottom-right" });
+      toast.error("Failed to copy shareable link");
       console.error("Copy failed:", error);
     }
   };
