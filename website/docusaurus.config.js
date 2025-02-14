@@ -82,7 +82,7 @@ const config = {
     image: 'img/ogimage.png',
     docs: {
       sidebar: {
-        hideable: true,
+        hideable: false,
       },
     },
     hideOnScroll: true,
@@ -177,6 +177,12 @@ const config = {
       indexName: 'pdfme',
     },
   },
+  scripts: [
+    {
+      src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
+      async: true,
+    },
+  ],
 };
 
 module.exports = config;

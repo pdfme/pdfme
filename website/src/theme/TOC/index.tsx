@@ -95,7 +95,7 @@ function Banner({ title, subtitle, href, gradient, Icon }: BannerProps) {
   );
 }
 
-export function SidebarBannerCloud() {
+function SidebarBannerCloud() {
   return (
     <Banner
       title="Try pdfme Cloud"
@@ -107,7 +107,7 @@ export function SidebarBannerCloud() {
   );
 }
 
-export function SidebarBannerSupport() {
+function SidebarBannerSupport() {
   return (
     <Banner
       title="Technical Support & Consulting"
