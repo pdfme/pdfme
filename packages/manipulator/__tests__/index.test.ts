@@ -1,4 +1,4 @@
-import { merge, split, remove, insert, extract, rotate } from '../src/index';
+import { merge, split, remove, insert, extract, rotate, organize } from '../src/index';
 import { createTestPDF, getPDFPageCount } from './utils';
 
 describe('merge', () => {
@@ -110,5 +110,90 @@ describe('rotate', () => {
     await expect(rotate(pdf, 45)).rejects.toThrow(
       '[@pdfme/manipulator] Rotation degrees must be a multiple of 90'
     );
+  });
+});
+
+describe('organize', () => {
+  test('performs single remove operation', async () => {
+    const pdf = await createTestPDF(5);
+    const result = await organize(pdf, [
+      { type: 'remove', data: { pages: [1, 3] } }
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs single insert operation', async () => {
+    const pdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(2);
+    const result = await organize(pdf, [
+      { type: 'insert', data: { pdfs: [insertPdf], position: 1 } }
+    ]);
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('performs single replace operation', async () => {
+    const pdf = await createTestPDF(3);
+    const replacePdf = await createTestPDF(1);
+    const result = await organize(pdf, [
+      { type: 'replace', data: { targetPage: 1, pdf: replacePdf } }
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs single rotate operation', async () => {
+    const pdf = await createTestPDF(3);
+    const result = await organize(pdf, [
+      { type: 'rotate', data: { pages: [0, 2], degrees: 90 } }
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs multiple operations in sequence', async () => {
+    const pdf = await createTestPDF(5);
+    const insertPdf = await createTestPDF(2);
+    const replacePdf = await createTestPDF(1);
+    const result = await organize(pdf, [
+      { type: 'remove', data: { pages: [1, 3] } },      // 5 -> 3 pages
+      { type: 'insert', data: { pdfs: [insertPdf], position: 1 } }, // 3 -> 5 pages
+      { type: 'replace', data: { targetPage: 2, pdf: replacePdf } }, // Still 5 pages
+      { type: 'rotate', data: { pages: [0, 3], degrees: 90 } }      // Still 5 pages
+    ]);
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('throws error for invalid page numbers', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [
+      { type: 'remove', data: { pages: [3] } }
+    ])).rejects.toThrow('[@pdfme/manipulator] Invalid page number');
+  });
+
+  test('throws error for invalid position', async () => {
+    const pdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(1);
+    await expect(organize(pdf, [
+      { type: 'insert', data: { pdfs: [insertPdf], position: 4 } }
+    ])).rejects.toThrow('[@pdfme/manipulator] Invalid position');
+  });
+
+  test('throws error for invalid rotation degrees', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [
+      { type: 'rotate', data: { pages: [0], degrees: 45 } }
+    ])).rejects.toThrow('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
+  });
+
+  test('throws error for empty actions array', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [])).rejects.toThrow(
+      '[@pdfme/manipulator] At least one action is required'
+    );
+  });
+
+  test('throws error for unknown action type', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [
+      { type: 'invalid' as any, data: { pages: [] } }
+    ])).rejects.toThrow('[@pdfme/manipulator] Unknown action type: invalid');
   });
 });
