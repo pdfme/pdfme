@@ -68,8 +68,8 @@ export const insert = async (
 ): Promise<ArrayBuffer> => {
   inserts.sort((a, b) => a.position - b.position);
 
-  let currentPdf = basePdf; 
-  let offset = 0; 
+  let currentPdf = basePdf;
+  let offset = 0;
 
   for (let i = 0; i < inserts.length; i++) {
     const { pdf, position } = inserts[i];
@@ -157,27 +157,31 @@ export const rotate = async (
 
 export const move = async (
   pdf: ArrayBuffer,
-  operations: { from: number; to: number }[]
+  operation: { from: number; to: number }
 ): Promise<ArrayBuffer> => {
+  const { from, to } = operation;
   const pdfDoc = await PDFDocument.load(pdf);
+  const currentPageCount = pdfDoc.getPageCount();
 
-  for (const { from, to } of operations) {
-    const currentPageCount = pdfDoc.getPageCount();
-    if (from < 0 || from >= currentPageCount || to < 0 || to >= currentPageCount) {
-      throw new Error(
-        `[@pdfme/manipulator] Invalid page number: from=${from}, to=${to}, total pages=${currentPageCount}`
-      );
-    }
-    
-    const adjustedTo = from < to ? to - 1 : to;
-    const page = pdfDoc.getPage(from);
-    
-    pdfDoc.removePage(from);
-    pdfDoc.insertPage(adjustedTo, page);
+  if (from < 0 || from >= currentPageCount || to < 0 || to >= currentPageCount) {
+    throw new Error(
+      `[@pdfme/manipulator] Invalid page number: from=${from}, to=${to}, total pages=${currentPageCount}`
+    );
   }
+
+  if (from === to) {
+    return pdf;
+  }
+
+  const page = pdfDoc.getPage(from);
+  pdfDoc.removePage(from);
+
+  const adjustedTo = from < to ? to - 1 : to;
+  pdfDoc.insertPage(adjustedTo, page);
 
   return pdfDoc.save();
 };
+
 
 export const organize = async (
   pdf: ArrayBuffer,
@@ -220,7 +224,7 @@ export const organize = async (
         break;
 
       case 'move':
-        currentPdf = await PDFDocument.load(await move(currentBuffer, [action.data]));
+        currentPdf = await PDFDocument.load(await move(currentBuffer, action.data));
         break;
 
       default:

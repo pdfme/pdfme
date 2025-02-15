@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { merge, split, remove, insert, rotate, move, organize } from '../src/index.js';
 import { createTestPDF, getPDFPageCount } from './utils.js';
 
@@ -90,13 +92,13 @@ describe('rotate', () => {
 describe('move', () => {
   test('moves page from one position to another', async () => {
     const pdf = await createTestPDF(3);
-    const result = await move(pdf, [{ from: 0, to: 2 }]);
+    const result = await move(pdf, { from: 0, to: 2 });
     expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('throws error for invalid page numbers', async () => {
     const pdf = await createTestPDF(3);
-    await expect(move(pdf, [{ from: 3, to: 0 }])).rejects.toThrow(
+    await expect(move(pdf, { from: 3, to: 0 })).rejects.toThrow(
       '[@pdfme/manipulator] Invalid page number: from=3, to=0, total pages=3'
     );
   });
@@ -171,10 +173,8 @@ describe('organize', () => {
   test('throws error for invalid rotation degrees', async () => {
     const pdf = await createTestPDF(3);
     await expect(
-      organize(pdf, [
-        // @ts-expect-error
-        { type: 'rotate', data: { pages: [0], degrees: 45 } },
-      ])
+      // @ts-expect-error
+      organize(pdf, [{ type: 'rotate', data: { pages: [0], degrees: 45 } }])
     ).rejects.toThrow('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   });
 
@@ -188,11 +188,262 @@ describe('organize', () => {
   test('throws error for unknown action type', async () => {
     const pdf = await createTestPDF(3);
     // @ts-expect-error
-    await expect(organize(pdf, [{ type: 'invalid' as any, data: { pages: [] } }])).rejects.toThrow(
+    await expect(organize(pdf, [{ type: 'invalid', data: { pages: [] } }])).rejects.toThrow(
       '[@pdfme/manipulator] Unknown action type: invalid'
     );
   });
 });
 
+describe('PDF manipulator E2E Tests with real PDF files', () => {
+  const assetPath = (fileName: string) => path.join(__dirname, 'assets/pdfs', fileName);
+  const tmpPath = (fileName: string) => path.join(__dirname, 'assets/tmp', fileName);
 
-// TODO ここからちゃんとしたテストを書く
+  function toArrayBuffer(buf: Buffer): ArrayBuffer {
+    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  }
+
+  const fiveP = toArrayBuffer(fs.readFileSync(assetPath('5p.pdf')));
+  const aPdf = toArrayBuffer(fs.readFileSync(assetPath('a.pdf')));
+  const bPdf = toArrayBuffer(fs.readFileSync(assetPath('b.pdf')));
+  const cPdf = toArrayBuffer(fs.readFileSync(assetPath('c.pdf')));
+
+  //
+  // merge
+  //
+  test('merge: merge a.pdf, b.pdf, c.pdf in order', async () => {
+    const mergedBuffer = await merge([aPdf, bPdf, cPdf]);
+    fs.writeFileSync(tmpPath('merged_abc.pdf'), Buffer.from(mergedBuffer));
+
+    expect(await getPDFPageCount(mergedBuffer)).toBe(3);
+  });
+
+  //
+  // split
+  //
+  test('split: split 5p.pdf into pages 1-2 and 3-5', async () => {
+    const [split12, split35] = await split(fiveP, [
+      { start: 0, end: 1 }, // pages 1-2
+      { start: 2, end: 4 }, // pages 3-5
+    ]);
+
+    fs.writeFileSync(tmpPath('split_5p_1-2.pdf'), Buffer.from(split12));
+    fs.writeFileSync(tmpPath('split_5p_3-5.pdf'), Buffer.from(split35));
+
+    expect(await getPDFPageCount(split12)).toBe(2);
+    expect(await getPDFPageCount(split35)).toBe(3);
+  });
+
+  //
+  // remove
+  //
+  test('remove: remove the 1st page of 5p.pdf', async () => {
+    const removed = await remove(fiveP, [0]);
+    fs.writeFileSync(tmpPath('remove_5p_page1.pdf'), Buffer.from(removed));
+
+    // 4 pages remain
+    expect(await getPDFPageCount(removed)).toBe(4);
+  });
+
+  test('remove: remove the 1st and 3rd pages of 5p.pdf', async () => {
+    // Note: This assumes removing all at once, not one by one with index shifting
+    const removed = await remove(fiveP, [0, 2]);
+    fs.writeFileSync(tmpPath('remove_5p_pages1-3.pdf'), Buffer.from(removed));
+
+    // 3 pages remain
+    expect(await getPDFPageCount(removed)).toBe(3);
+  });
+
+  //
+  // insert
+  //
+  test('insert: insert a.pdf at position 0 in 5p.pdf', async () => {
+    const inserted = await insert(fiveP, [{ pdf: aPdf, position: 0 }]);
+    fs.writeFileSync(tmpPath('insert_5p_a_at_0.pdf'), Buffer.from(inserted));
+
+    // 5 pages + a.pdf(1 page) = 6 pages
+    expect(await getPDFPageCount(inserted)).toBe(6);
+  });
+
+  test('insert: insert a.pdf at position 0 and 2 in 5p.pdf', async () => {
+    // Note: the second insert is done in the same buffer, so the offset changes after the first insert
+    const inserted = await insert(fiveP, [
+      { pdf: aPdf, position: 0 },
+      { pdf: aPdf, position: 2 }, // The PDF is 6 pages after the first insert
+    ]);
+    fs.writeFileSync(tmpPath('insert_5p_a_at_0_and_2.pdf'), Buffer.from(inserted));
+
+    // 5 pages + a.pdf(1 page) + a.pdf(1 page) = 7 pages
+    expect(await getPDFPageCount(inserted)).toBe(7);
+  });
+
+  //
+  // rotate
+  //
+  test('rotate: rotate all pages of 5p.pdf by 90 degrees', async () => {
+    const rotated = await rotate(fiveP, 90);
+    fs.writeFileSync(tmpPath('rotate_5p_90deg_all.pdf'), Buffer.from(rotated));
+
+    // Page count remains the same
+    expect(await getPDFPageCount(rotated)).toBe(5);
+  });
+
+  test('rotate: rotate only the 2nd page of 5p.pdf by 180 degrees', async () => {
+    // pageNumbers=[1] -> only the 2nd page is rotated by 180 degrees
+    const rotated = await rotate(fiveP, 180, [1]);
+    fs.writeFileSync(tmpPath('rotate_5p_180deg_page1.pdf'), Buffer.from(rotated));
+
+    expect(await getPDFPageCount(rotated)).toBe(5);
+  });
+
+  test('rotate: rotate pages 2 and 4 of 5p.pdf by 270 degrees', async () => {
+    // Rotate the 2nd and 4th pages by 270 degrees
+    const rotated = await rotate(fiveP, 270, [1, 3]);
+    fs.writeFileSync(tmpPath('rotate_5p_270deg_pages1-3.pdf'), Buffer.from(rotated));
+
+    expect(await getPDFPageCount(rotated)).toBe(5);
+  });
+
+  //
+  // move
+  //
+  test('move: move the 1st page (index:0) of 5p.pdf to the 3rd position (index:2)', async () => {
+    const moved = await move(fiveP, { from: 0, to: 2 });
+    fs.writeFileSync(tmpPath('move_5p_page0_to_2.pdf'), Buffer.from(moved));
+
+    expect(await getPDFPageCount(moved)).toBe(5);
+  });
+
+  //
+  // organize (single operation)
+  //
+  test('organize: single remove (remove the 2nd page)', async () => {
+    const result = await organize(fiveP, [{ type: 'remove', data: { position: 1 } }]);
+    fs.writeFileSync(tmpPath('organize_remove_only.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(4);
+  });
+
+  test('organize: single insert (insert a.pdf at page 1)', async () => {
+    const result = await organize(fiveP, [{ type: 'insert', data: { pdf: aPdf, position: 0 } }]);
+    fs.writeFileSync(tmpPath('organize_insert_only.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(6);
+  });
+
+  test('organize: single replace (replace 2nd page with a.pdf)', async () => {
+    const result = await organize(fiveP, [{ type: 'replace', data: { pdf: aPdf, position: 1 } }]);
+    fs.writeFileSync(tmpPath('organize_replace_only.pdf'), Buffer.from(result));
+
+    // remove->insert means the page count stays at 5
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('organize: single rotate (rotate pages 1 and 3 by 90 degrees)', async () => {
+    const result = await organize(fiveP, [
+      { type: 'rotate', data: { position: 0, degrees: 90 } },
+      { type: 'rotate', data: { position: 2, degrees: 90 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_rotate_only.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('organize: multiple operations (remove -> remove -> insert -> replace -> rotate -> rotate)', async () => {
+    const insertPdf = aPdf;
+    const replacePdf = bPdf;
+    const result = await organize(fiveP, [
+      { type: 'remove', data: { position: 1 } },
+      { type: 'remove', data: { position: 3 } }, // 5 -> 3 pages
+      { type: 'insert', data: { pdf: insertPdf, position: 1 } }, // 3 -> 4 pages
+      { type: 'replace', data: { position: 2, pdf: replacePdf } }, // still 4 pages
+      { type: 'rotate', data: { position: 0, degrees: 90 } },
+      { type: 'rotate', data: { position: 3, degrees: 90 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_multiple_ops.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(4);
+  });
+
+  //
+  // organize - complex examples
+  //
+  test('organize: Remove -> Insert -> Move (check index changes)', async () => {
+    // Remove the 2nd page (index:1) => 4 pages
+    // Insert a.pdf at the 2nd page (index:1) => 5 pages
+    // Move the newly inserted page (index:1) to the 1st page (index:0) => 5 pages
+
+    const result = await organize(fiveP, [
+      { type: 'remove', data: { position: 1 } },
+      { type: 'insert', data: { pdf: aPdf, position: 1 } },
+      { type: 'move', data: { from: 1, to: 0 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_composite_1.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('organize: Replace -> Rotate -> Remove', async () => {
+    // Replace the 3rd page with a.pdf => 5 pages
+    // Rotate the 3rd page by 180 => 5 pages
+    // Remove the 1st page => 4 pages
+
+    const result = await organize(fiveP, [
+      { type: 'replace', data: { pdf: aPdf, position: 2 } },
+      { type: 'rotate', data: { position: 2, degrees: 180 } },
+      { type: 'remove', data: { position: 0 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_composite_2.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(4);
+  });
+
+  test('organize: Insert -> Insert -> Move -> Move', async () => {
+    // Insert a.pdf at the end (index:5) => 6 pages
+    // Insert b.pdf at the start (index:0) => 7 pages
+    // Move the 3rd page (index:2) to the 6th page (index:5) => 7 pages
+    // Move the 4th page (index:3) to the 2nd page (index:1) => 7 pages
+
+    const result = await organize(fiveP, [
+      { type: 'insert', data: { pdf: aPdf, position: 5 } },
+      { type: 'insert', data: { pdf: bPdf, position: 0 } },
+      { type: 'move', data: { from: 2, to: 5 } },
+      { type: 'move', data: { from: 3, to: 1 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_composite_3.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(7);
+  });
+
+  test('organize: Rotate -> Rotate -> Remove', async () => {
+    // Rotate the 2nd and 4th pages by 90 => 5 pages
+    // Rotate the 3rd page by 270 => 5 pages
+    // Remove the 1st page => 4 pages
+
+    const result = await organize(fiveP, [
+      { type: 'rotate', data: { position: 1, degrees: 90 } },
+      { type: 'rotate', data: { position: 3, degrees: 90 } },
+      { type: 'rotate', data: { position: 2, degrees: 270 } },
+      { type: 'remove', data: { position: 0 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_composite_4.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(4);
+  });
+
+  test('organize: Remove -> Insert -> Remove -> Insert (multiple times)', async () => {
+    // Remove the 5th page (index:4) => 4 pages
+    // Insert a.pdf at the 2nd page (index:1) => 5 pages
+    // Remove the 1st page (index:0) => 4 pages
+    // Insert b.pdf at the end (index:4) => 5 pages
+
+    const result = await organize(fiveP, [
+      { type: 'remove', data: { position: 4 } },
+      { type: 'insert', data: { pdf: aPdf, position: 1 } },
+      { type: 'remove', data: { position: 0 } },
+      { type: 'insert', data: { pdf: bPdf, position: 4 } },
+    ]);
+    fs.writeFileSync(tmpPath('organize_composite_5.pdf'), Buffer.from(result));
+
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+});

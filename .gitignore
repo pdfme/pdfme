@@ -7,5 +7,6 @@
 dist
 coverage/
 packages/generator/__tests__/assets/pdfs/tmp/*.pdf
+packages/manipulator/__tests__/assets/tmp/*.pdf
 
 **/repomix-output.txt
