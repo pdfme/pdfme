@@ -1,4 +1,4 @@
-import type { Schema } from '@pdfme/common';
+import type { Schema } from '@pdfme/common/dist/esm/index.js';
 import type { Font as FontKitFont } from 'fontkit';
 
 export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
@@ -27,4 +27,8 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
+  width: number;
+  height: number;
+  position: { x: number; y: number };
+  readOnly?: boolean;
 }

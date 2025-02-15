@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@pdfme/common": "file:../common"
+    "@pdfme/common": "file:../common",
+    "air-datepicker": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/air-datepicker": "^3.4.0"
   },
   "sideEffects": false,
   "author": "hand-dot",

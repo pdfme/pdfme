@@ -1,5 +1,5 @@
-import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types';
-import type { Schema } from '@pdfme/common';
+import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types.js';
+import type { Schema } from '@pdfme/common/dist/esm/index.js';
 
 export type Spacing = { top: number; right: number; bottom: number; left: number };
 type BorderInsets = Spacing;
@@ -26,6 +26,10 @@ export interface TableSchema extends Schema {
   showHead: boolean;
   head: string[];
   headWidthPercentages: number[];
+  width: number;
+  height: number;
+  position: { x: number; y: number };
+  __isSplit?: boolean;
 
   tableStyles: {
     borderColor: string;
