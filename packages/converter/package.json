@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "@pdfme/common": "workspace:*",
+    "@pdfme/common": "*",
     "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {
@@ -50,41 +50,15 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src",
-    "test": "jest",
+    "test": "vitest run",
+  "test:watch": "vitest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
-  },
-  "dependencies": {
-    "@pdfme/common": "workspace:*",
-    "pdfjs-dist": "^3.11.174"
-  },
-  "devDependencies": {
-    "@pdfme/generator": "file:../generator",
-    "@types/estree": "^1.0.6",
-    "@types/pdfjs-dist": "^2.10.378",
-    "canvas": "^2.11.2"
   },
   "optionalDependencies": {
     "canvas": "^2.11.0"
   },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.esm.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ]
-  },
+
   "publishConfig": {
     "access": "public"
   }
