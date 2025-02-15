@@ -1,5 +1,5 @@
-import { replacePlaceholders } from '../src/expression';
-import { SchemaPageArray } from '../src';
+import { replacePlaceholders } from '../src/expression.js';
+import { SchemaPageArray } from '../src/index.js';
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {

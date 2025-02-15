@@ -8,9 +8,9 @@ import {
   checkPlugins,
   isHexValid,
   migrateTemplate,
-} from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, SchemaPageArray } from '../src';
-import { getB64BasePdf } from '../src';
+} from '../src/helper.js';
+import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, SchemaPageArray } from '../src/index.js';
+import { getB64BasePdf } from '../src/index.js';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
