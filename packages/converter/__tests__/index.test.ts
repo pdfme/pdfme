@@ -1,6 +1,6 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node';
+import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node.js';
 
 describe('pdf2img tests', () => {
   let pdfArrayBuffer: ArrayBuffer;
