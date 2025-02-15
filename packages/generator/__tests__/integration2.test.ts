@@ -3,7 +3,9 @@ import generate from '../src/generate';
 import { barcode, business } from './assets/templates';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { getFont, getPdfTmpPath } from './utils';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { pdf2img } from '@pdfme/converter';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.0');
 
@@ -41,13 +43,12 @@ describe('generate integration test(barcode, business)', () => {
           console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
         }
 
-        const tmpFile = getPdfTmpPath(`${key}.pdf`);
-        const assertFile = getPdfAssertPath(`${key}.pdf`);
-
-        writeFileSync(tmpFile, pdf);
-        const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
-        const [a, e] = res;
-        expect(a.Pages).toEqual(e.Pages);
+        // Convert PDF to image and compare with snapshot
+        const pdfImage = await pdf2img(pdf);
+        expect(pdfImage).toMatchImageSnapshot({
+          customSnapshotsDir: __dirname + '/__image_snapshots__',
+          customSnapshotIdentifier: `${key}-snapshot`
+        });
       });
     }
   });
