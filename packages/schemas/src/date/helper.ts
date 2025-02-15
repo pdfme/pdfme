@@ -227,8 +227,8 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
   const defaultLocale = 'en';
   const defaultFormat = getFormat(type, getAirDatepickerLocale(defaultLocale));
 
-  const plugin: Plugin<DateSchema> = {
-    ui: async (arg: { schema: DateSchema; value: string; onChange?: (arg: { key: string; value: string }) => void; rootElement: HTMLElement; mode: string; options: any; i18n: any }) => {
+  const plugin: Plugin<TextSchema> = {
+    ui: async (arg: UIRenderProps<TextSchema>) => {
       const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
 
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
@@ -326,7 +326,7 @@ const airDatepicker = new AirDatepicker(input, {
       rootElement.appendChild(input);
       rootElement.appendChild(textElement);
     },
-    pdf: (arg: { schema: DateSchema; value: string; options: any }) => {
+    pdf: (arg: PDFRenderProps<TextSchema>) => {
       const { schema, value, options } = arg;
       if (!value) return void 0;
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
@@ -463,7 +463,7 @@ const airDatepicker = new AirDatepicker(input, {
       defaultSchema: {
         name: '',
         format: defaultFormat,
-        type,
+        type: 'text',
         content: getFmtContent(new Date(), type),
         position: { x: 0, y: 0 },
         width: 50,
