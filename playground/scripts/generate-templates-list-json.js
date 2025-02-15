@@ -4,7 +4,7 @@ const path = require('path');
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
 
-const featuredTemplates = ['invoice', 'pedigree', 'certificate-black', 'a4-blank'];
+const featuredTemplates = ['invoice', 'pedigree', 'certificate-black', 'a4-blank', 'QR-lines'];
 
 function generateTemplatesListJson() {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });

@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCopy } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fromKebabCase } from "../helper"
 import ExternalButton from "../components/ExternalButton"
+
+declare global {
+  interface Window {
+    ethicalads?: {
+      load: () => void;
+      wait?: Promise<any>;
+    };
+  }
+}
 
 const CopyButton = ({ ui, name }: { ui: 'designer' | 'form-viewer', name: string }) => {
   const handleCopy = async () => {
@@ -69,6 +78,14 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
       });
   }, []);
 
+  useEffect(() => {
+    if (window.ethicalads && typeof window.ethicalads.load === "function") {
+      window.ethicalads.load();
+    } else {
+      console.warn("EthicalAds script is not loaded yet.");
+    }
+  }, [templates]);
+
   const navigateToDesigner = (name: string) => {
     if (isEmbedded) {
       window.parent.postMessage({ type: 'navigate', payload: { name, ui: 'designer' } }, '*');
@@ -103,8 +120,13 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-          {templates.map(({ name, author }) => (
-            <div key={name}>
+          {templates.map(({ name, author }, index) => <React.Fragment key={name}>
+            {index === 3 && <div
+              data-ea-publisher="pdfmecom"
+              data-ea-type="image"
+              style={{ width: '100%', display: 'flex', justifyContent: 'center', }}
+            />}
+            <div >
               <div className="relative border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
                 <div className="relative h-72 w-full overflow-hidden">
                   <img
@@ -162,7 +184,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                 </div>
               </div>
             </div>
-          ))}
+          </React.Fragment>)}
           <div className="flex items-center justify-center">
             <div className="relative border-2 border-green-300 rounded-lg p-6 bg-green-50 shadow-md">
               <div className="relative mt-4">
