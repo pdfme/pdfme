@@ -42,27 +42,26 @@
     "build:schemas": "npm run -w packages/schemas build",
     "build:generator": "npm run -w packages/generator build",
     "build:ui": "npm run -w packages/ui build",
-    "test": "npm run test --workspaces",
+    "test": "npm run test:common",
+    "test:common": "npm run -w packages/common test",
     "lint": "npm run lint --workspaces",
     "prettier": "npm run prettier --workspaces"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
-    "@types/jest": "^29.5.14",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
+    "@vitest/coverage-v8": "^1.2.2",
     "babel-loader": "^8.2.2",
     "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^29.7.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.8",
     "rimraf": "^3.0.2",
-    "ts-jest": "^29.2.5",
-    "ts-jest-resolver": "^2.0.1",
     "ts-loader": "^9.2.5",
     "ts-prune": "^0.10.3",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "vitest": "^1.2.2"
   }
 }

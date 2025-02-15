@@ -39,7 +39,8 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src",
-    "test": "jest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -53,24 +54,7 @@
     "antd": "^5.11.2",
     "form-render": "^2.2.20"
   },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.esm.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ]
-  },
+
   "publishConfig": {
     "access": "public"
   },
