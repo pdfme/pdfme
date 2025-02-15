@@ -2,11 +2,23 @@ import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { label, envelope } from './assets/templates';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, image } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { text, imagePlugin } from '@pdfme/schemas';
+import { getFont, getPdfTmpPath } from './utils';
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { pdf2img } from '@pdfme/converter';
+import type { MatchImageSnapshotMatcher } from 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
 
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toMatchImageSnapshot(): R;
+    }
+  }
+}
+
+expect.extend({ toMatchImageSnapshot });
 describe('generate integration test(label, envelope)', () => {
   describe.each([label, envelope])('%s', (templateData) => {
     const entries = Object.entries(templateData);
@@ -29,7 +41,7 @@ describe('generate integration test(label, envelope)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image },
+          plugins: { text, image: imagePlugin },
           options: { font },
         });
 
@@ -41,13 +53,12 @@ describe('generate integration test(label, envelope)', () => {
           console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
         }
 
-        const tmpFile = getPdfTmpPath(`${key}.pdf`);
-        const assertFile = getPdfAssertPath(`${key}.pdf`);
-
-        writeFileSync(tmpFile, pdf);
-        const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
-        const [a, e] = res;
-        expect(a.Pages).toEqual(e.Pages);
+        // Convert PDF to image and compare with snapshot
+        const pdfImage = await pdf2img(pdf);
+        expect(pdfImage).toMatchImageSnapshot({
+          customSnapshotsDir: __dirname + '/__image_snapshots__',
+          customSnapshotIdentifier: `${key}-snapshot`
+        });
       });
     }
   });
