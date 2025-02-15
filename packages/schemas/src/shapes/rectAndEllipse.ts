@@ -1,4 +1,4 @@
-import { Plugin, Schema, mm2pt } from '@pdfme/common';
+import { Plugin, Schema, mm2pt } from '@pdfme/common/dist/esm/index.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../utils.js';
 import { toRadians } from '@pdfme/pdf-lib';

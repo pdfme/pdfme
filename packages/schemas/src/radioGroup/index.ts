@@ -1,5 +1,5 @@
-import { Plugin } from '@pdfme/common';
-import { Schema } from '@pdfme/common';
+import { Plugin } from '@pdfme/common/dist/esm/index.js';
+import { Schema } from '@pdfme/common/dist/esm/index.js';
 import { Circle, CircleDot } from 'lucide';
 import svg from '../graphics/svg';
 import { isEditable, createSvgStr } from '../utils.js';

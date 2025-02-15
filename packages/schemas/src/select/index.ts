@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel';
-import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import type { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
 import text from '../text';
 import { TextSchema } from '../text/types';
 import { ChevronDown } from 'lucide';

@@ -1,4 +1,4 @@
-import { Plugin, Schema } from '@pdfme/common';
+import { Plugin, Schema } from '@pdfme/common/dist/esm/index.js';
 import { XMLValidator } from 'fast-xml-parser';
 import {
   convertForPdfLayoutProps,

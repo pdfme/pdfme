@@ -1,5 +1,4 @@
-import { Plugin } from '@pdfme/common';
-import { Schema } from '@pdfme/common';
+import { Plugin, Schema } from '@pdfme/common/dist/esm/index.js';
 import svg from '../graphics/svg';
 import { isEditable } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';

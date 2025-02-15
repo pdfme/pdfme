@@ -23,7 +23,7 @@ import {
   VERTICAL_ALIGN_TOP,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
-} from './constants.js';
+} from './constants';
 
 export const getBrowserVerticalFontAdjustments = (
   fontKitFont: FontKitFont,

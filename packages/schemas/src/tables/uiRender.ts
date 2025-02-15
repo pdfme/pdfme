@@ -4,7 +4,7 @@ import { px2mm } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
-import { Row } from './classes';
+import { Row } from './classes.js';
 
 const buttonSize = 30;
 
@@ -161,7 +161,7 @@ const renderRowUi = (args: {
           }
         },
         mode,
-        onChange: (v) => {
+        onChange: (v: { key: string; value: unknown } | Array<{ key: string; value: unknown }>) => {
           if (!arg.onChange) return;
           const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
           if (section === 'body') {

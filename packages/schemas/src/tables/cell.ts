@@ -4,12 +4,12 @@ import {
   PDFRenderProps,
   UIRenderProps,
   getFallbackFontName,
-} from '@pdfme/common';
+} from '@pdfme/common/dist/esm/index.js';
 import { uiRender as textUiRender } from '../text/uiRender.js';
 import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import line from '../shapes/line.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
-import type { CellSchema } from './types';
+import type { CellSchema } from './types.js';
 import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
@@ -138,7 +138,7 @@ const cellSchema: Plugin<CellSchema> = {
     lines.forEach((line) => rootElement.appendChild(line));
   },
   propPanel: {
-    schema: ({ options, i18n }) => {
+    schema: ({ options, i18n }: { options: { font?: Record<string, { data: string; fallback?: boolean }> }; i18n: (key: string) => string }) => {
       const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
       const fontNames = Object.keys(font);
       const fallbackFontName = getFallbackFontName(font);

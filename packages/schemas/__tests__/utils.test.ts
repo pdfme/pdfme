@@ -1,5 +1,5 @@
-import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils';
+import { Schema, mm2pt, pt2mm } from '@pdfme/common/dist/esm/index.js';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils.js';
 import {  SquareCheck } from 'lucide';
 
 describe('hex2RgbColor', () => {

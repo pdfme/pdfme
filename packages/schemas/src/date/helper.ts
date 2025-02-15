@@ -39,10 +39,10 @@ import localeZh from 'air-datepicker/locale/zh';
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
 
-import { Plugin, getFallbackFontName, DEFAULT_FONT_NAME, PropPanelSchema } from '@pdfme/common';
-import text from '../text';
+import { Plugin, getFallbackFontName, DEFAULT_FONT_NAME, PropPanelSchema } from '@pdfme/common/dist/esm/index.js';
+import text from '../text/index.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
-import { mapVerticalAlignToFlex } from '../text/uiRender';
+import { mapVerticalAlignToFlex } from '../text/uiRender.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
@@ -51,9 +51,9 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
 } from '../text/constants.js';
-import { DateSchema } from './types';
-import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter';
-import { isEditable } from '../utils';
+import { DateSchema } from './types.js';
+import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter.js';
+import { isEditable } from '../utils.js';
 
 type PickerType = 'date' | 'time' | 'dateTime';
 

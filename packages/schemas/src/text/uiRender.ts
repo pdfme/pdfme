@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
 import { UIRenderProps, getDefaultFont } from '@pdfme/common';
-import type { TextSchema } from './types';
+import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,

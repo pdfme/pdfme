@@ -1,5 +1,5 @@
-import { substituteVariables, validateVariables } from '../src/multiVariableText/helper';
-import { MultiVariableTextSchema } from '../src/multiVariableText/types';
+import { substituteVariables, validateVariables } from '../src/multiVariableText/helper.js';
+import { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
 
 
 describe('substituteVariables', () => {

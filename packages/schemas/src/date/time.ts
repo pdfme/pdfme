@@ -1,4 +1,4 @@
-import { getPlugin } from './helper';
+import { getPlugin } from './helper.js';
 import { createSvgStr } from '../utils.js';
 import { Clock } from 'lucide';
 

@@ -1,16 +1,15 @@
-import type { PropPanel } from '@pdfme/common';
+import type { PropPanel, PropPanelSchemaProps } from '@pdfme/common';
 import type { TableSchema } from './types';
 import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common';
 import {
   getDefaultCellStyles,
   getCellPropPanelSchema,
   getColumnStylesPropPanelSchema,
-} from './helper.js';
-import { HEX_COLOR_PATTERN } from '../constants.js';
+} from './helper';
+import { HEX_COLOR_PATTERN } from '../constants';
 
 export const propPanel: PropPanel<TableSchema> = {
-  schema: ({ activeSchema, options, i18n }) => {
-    // @ts-expect-error
+  schema: ({ activeSchema, options, i18n }: PropPanelSchemaProps) => {
     const tableSchema = activeSchema as TableSchema;
     const head = tableSchema.head || [];
     const showHead = tableSchema.showHead || false;

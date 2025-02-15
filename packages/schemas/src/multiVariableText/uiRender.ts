@@ -1,13 +1,13 @@
 import { getDefaultFont, UIRenderProps } from '@pdfme/common';
-import { MultiVariableTextSchema } from './types';
+import { MultiVariableTextSchema } from './types.js';
 import {
   uiRender as parentUiRender,
   buildStyledTextContainer,
   makeElementPlainTextContentEditable
-} from '../text/uiRender';
-import { isEditable } from '../utils';
-import { getFontKitFont } from '../text/helper';
-import { substituteVariables } from './helper';
+} from '../text/uiRender.js';
+import { isEditable } from '../utils.js';
+import { getFontKitFont } from '../text/helper.js';
+import { substituteVariables } from './helper.js';
 
 export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const { value, schema, rootElement, mode, onChange, ...rest } = arg;

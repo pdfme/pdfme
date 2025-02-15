@@ -1,6 +1,6 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import type { Font as FontKitFont } from 'fontkit';
-import type { TextSchema } from './types';
+import type { TextSchema } from './types.js';
 import {
   PDFRenderProps,
   ColorType,
@@ -41,7 +41,7 @@ const embedAndGetFontObj = async (arg: {
   }
 
   const fontValues = await Promise.all(
-    Object.values(font).map(async (v) => {
+    Object.values(font).map(async (v: { data: string | ArrayBuffer; subset?: boolean }) => {
       let fontData = v.data;
       if (typeof fontData === 'string' && fontData.startsWith('http')) {
         fontData = await fetch(fontData).then((res) => res.arrayBuffer());

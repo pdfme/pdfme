@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import type { Font as FontKitFont } from 'fontkit';
-import { Font, getDefaultFont } from '@pdfme/common';
+import { Font, getDefaultFont } from '@pdfme/common/dist/esm/index.js';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
@@ -10,10 +10,10 @@ import {
   getSplittedLines,
   filterStartJP,
   filterEndJP,
-} from '../src/text/helper';
-import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants';
+} from '../src/text/helper.js';
+import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
-import { FontWidthCalcValues, TextSchema } from '../src/text/types';
+import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -53,7 +53,7 @@ describe('getSplitPosition test with mocked font width calculations', () => {
 
   beforeAll(() => {
     // @ts-ignore
-    widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper'), 'widthOfTextAtSize');
+    widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper.js'), 'widthOfTextAtSize');
     widthOfTextAtSizeSpy.mockImplementation((text) => {
       return text.length;
     });

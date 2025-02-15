@@ -1,5 +1,5 @@
-import type { PropPanel } from '@pdfme/common';
-import type { BarcodeSchema } from './types';
+import type { PropPanel, I18n } from '@pdfme/common/dist/esm/index.js';
+import type { BarcodeSchema } from './types.js';
 import {
   DEFAULT_BARCODE_COLOR,
   DEFAULT_BARCODE_BG_COLOR,
@@ -184,7 +184,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
     throw new Error(`[@pdfme/schemas/barcodes] No default for barcode type ${barcodeType}`);
 
   return {
-    schema: ({ i18n }) => ({
+    schema: ({ i18n }: { i18n: I18n }) => ({
       barColor: {
         title: i18n('schemas.barcodes.barColor'),
         type: 'string',
