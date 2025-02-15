@@ -1,4 +1,4 @@
-import { merge, split } from '../src/index';
+import { merge, split, remove, insert } from '../src/index';
 import { createTestPDF, getPDFPageCount } from './utils';
 
 describe('merge', () => {
@@ -30,6 +30,45 @@ describe('split', () => {
     const pdf = await createTestPDF(3);
     await expect(split(pdf, [{ start: 1, end: 0 }])).rejects.toThrow(
       '[@pdfme/manipulator] Invalid range'
+    );
+  });
+});
+
+describe('remove', () => {
+  test('removes specified pages from PDF', async () => {
+    const pdf = await createTestPDF(5);
+    const result = await remove(pdf, [1, 3]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('throws error when no pages provided', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(remove(pdf, [])).rejects.toThrow(
+      '[@pdfme/manipulator] At least one page number is required'
+    );
+  });
+
+  test('throws error for invalid page numbers', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(remove(pdf, [3])).rejects.toThrow(
+      '[@pdfme/manipulator] Invalid page number'
+    );
+  });
+});
+
+describe('insert', () => {
+  test('inserts PDF at specified position', async () => {
+    const basePdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(2);
+    const result = await insert(basePdf, insertPdf, 1);
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('throws error for invalid position', async () => {
+    const basePdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(2);
+    await expect(insert(basePdf, insertPdf, 4)).rejects.toThrow(
+      '[@pdfme/manipulator] Invalid position'
     );
   });
 });

@@ -76,12 +76,23 @@ export const split = async (
  * @returns ページ削除後の PDF の ArrayBuffer
  */
 export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBuffer> => {
-  // 例:
-  //   const pdfDoc = await PDFDocument.load(pdf);
-  //   // pagesをソート（降順）してremovePageしないとインデックスがずれる
-  //   pages.sort((a, b) => b - a).forEach((pageIndex) => pdfDoc.removePage(pageIndex));
-  //   return pdfDoc.save();
-  return new ArrayBuffer(0);
+  if (!pages.length) {
+    throw new Error('[@pdfme/manipulator] At least one page number is required for removal');
+  }
+
+  const pdfDoc = await PDFDocument.load(pdf);
+  const numPages = pdfDoc.getPageCount();
+
+  // Validate page numbers
+  if (pages.some(page => page < 0 || page >= numPages)) {
+    throw new Error(
+      `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
+    );
+  }
+
+  // Sort pages in descending order to avoid index shifting
+  pages.sort((a, b) => b - a).forEach((pageIndex) => pdfDoc.removePage(pageIndex));
+  return pdfDoc.save();
 };
 
 /**
@@ -97,10 +108,38 @@ export const insert = async (
   insertPdf: ArrayBuffer,
   position: number
 ): Promise<ArrayBuffer> => {
-  // 例:
-  //   const basePdf = await PDFDocument.load(pdf);
-  //   // 挿入先より前後のページを copyPages して新規 PDF として再度組み立てる など
-  return new ArrayBuffer(0);
+  const basePdf = await PDFDocument.load(pdf);
+  const insertDoc = await PDFDocument.load(insertPdf);
+  const numPages = basePdf.getPageCount();
+
+  if (position < 0 || position > numPages) {
+    throw new Error(
+      `[@pdfme/manipulator] Invalid position: must be between 0 and ${numPages}`
+    );
+  }
+
+  const newPdf = await PDFDocument.create();
+  
+  // Copy pages before insertion point
+  if (position > 0) {
+    const beforePages = await newPdf.copyPages(basePdf, Array.from({ length: position }, (_, i) => i));
+    beforePages.forEach(page => newPdf.addPage(page));
+  }
+
+  // Copy pages from insertPdf
+  const insertPages = await newPdf.copyPages(insertDoc, insertDoc.getPageIndices());
+  insertPages.forEach(page => newPdf.addPage(page));
+
+  // Copy remaining pages from original
+  if (position < numPages) {
+    const afterPages = await newPdf.copyPages(
+      basePdf,
+      Array.from({ length: numPages - position }, (_, i) => i + position)
+    );
+    afterPages.forEach(page => newPdf.addPage(page));
+  }
+
+  return newPdf.save();
 };
 
 /**
