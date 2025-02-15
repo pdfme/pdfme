@@ -329,7 +329,7 @@ describe('calculateDynamicFontSize with Custom font', () => {
 });
 
 describe('getFontDescentInPt test', () => {
-  test('it gets a descent size relative to the font size', () => {
+  it('it gets a descent size relative to the font size', () => {
     expect(getFontDescentInPt({ descent: -400, unitsPerEm: 1000 } as FontKitFont, 12)).toBe(
       -4.800000000000001
     );
