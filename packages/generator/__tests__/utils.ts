@@ -27,7 +27,16 @@ const JuliusSansOneRegularData = readFileSync(
 
 export const getFont = (): Font => {
   if (fontCache) {
-    return fontCache;
+    // Return a new object to avoid modifying the cache
+    return {
+      ...fontCache,
+      ...Object.fromEntries(
+        Object.entries(fontCache).map(([key, value]) => [
+          key,
+          { ...value }
+        ])
+      )
+    };
   }
   
   fontCache = {
@@ -43,7 +52,7 @@ export const getFont = (): Font => {
     NotoSansJP: { data: NotoSansJPRegularData },
   };
   
-  return fontCache;
+  return getFont(); // Call recursively to get a clean copy
 };
 
 export const getPdf = (pdfFilePath: string) => {
