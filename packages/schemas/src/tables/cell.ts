@@ -4,7 +4,7 @@ import {
   PDFRenderProps,
   UIRenderProps,
   getFallbackFontName,
-} from '@pdfme/common/dist/esm/index.js';
+} from '@pdfme/common';
 import { uiRender as textUiRender } from '../text/uiRender.js';
 import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import line from '../shapes/line.js';

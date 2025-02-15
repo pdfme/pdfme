@@ -295,11 +295,11 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         e.preventDefault();
         const newColumnWidthPercentage = 25;
         const totalCurrentWidth = schema.headWidthPercentages.reduce(
-          (acc, width) => acc + width,
+          (acc: number, width: number) => acc + width,
           0
         );
         const scalingRatio = (100 - newColumnWidthPercentage) / totalCurrentWidth;
-        const scaledWidths = schema.headWidthPercentages.map((width) => width * scalingRatio);
+        const scaledWidths = schema.headWidthPercentages.map((width: number) => width * scalingRatio);
         onChange([
           { key: 'head', value: schema.head.concat(`Head ${schema.head.length + 1}`) },
           { key: 'headWidthPercentages', value: scaledWidths.concat(newColumnWidthPercentage) },
@@ -328,18 +328,18 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         text: '-',
         onClick: () => {
           const totalWidthMinusRemoved = schema.headWidthPercentages.reduce(
-            (sum, width, j) => (j !== i ? sum + width : sum),
+            (sum: number, width: number, j: number) => (j !== i ? sum + width : sum),
             0
           );
 
           // TODO Should also remove the deleted columnStyles when deleting
           onChange([
-            { key: 'head', value: schema.head.filter((_, j) => j !== i) },
+            { key: 'head', value: schema.head.filter((_: string, j: number) => j !== i) },
             {
               key: 'headWidthPercentages',
               value: schema.headWidthPercentages
-                .filter((_, j) => j !== i)
-                .map((width) => (width / totalWidthMinusRemoved) * 100),
+                .filter((_: number, j: number) => j !== i)
+                .map((width: number) => (width / totalWidthMinusRemoved) * 100),
             },
             {
               key: 'content',

@@ -22,6 +22,7 @@ export interface CellStyle {
 export type CellSchema = Schema & CellStyle;
 
 export interface TableSchema extends Schema {
+  __bodyRange?: { start: number; end?: number };
   showHead: boolean;
   head: string[];
   headWidthPercentages: number[];

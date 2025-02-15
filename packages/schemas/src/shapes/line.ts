@@ -1,4 +1,4 @@
-import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
+import type { Schema, Plugin, PDFRenderProps, UIRenderProps, I18n } from '@pdfme/common/dist/esm/index.js';
 import {
   rotatePoint,
   convertForPdfLayoutProps,
@@ -45,7 +45,7 @@ const lineSchema: Plugin<LineSchema> = {
     rootElement.appendChild(div);
   },
   propPanel: {
-    schema: ({ i18n }) => ({
+    schema: ({ i18n }: { i18n: I18n }) => ({
       color: {
         title: i18n('schemas.color'),
         type: 'string',

@@ -1,7 +1,6 @@
-import { Plugin } from '@pdfme/common/dist/esm/index.js';
-import { Schema } from '@pdfme/common/dist/esm/index.js';
+import { Plugin, Schema, UIRenderProps, PDFRenderProps, PropPanelSchemaProps } from '@pdfme/common';
 import { Circle, CircleDot } from 'lucide';
-import svg from '../graphics/svg';
+import svg from '../graphics/svg.js';
 import { isEditable, createSvgStr } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
@@ -29,7 +28,7 @@ const radioButtonStates = new Map<string, RadioButtonState>();
 const eventListeners = new Map<string, EventListener>();
 
 const schema: Plugin<RadioGroup> = {
-  ui: (arg) => {
+  ui: (arg: UIRenderProps<RadioGroup>) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
     container.style.width = '100%';
@@ -80,10 +79,10 @@ const schema: Plugin<RadioGroup> = {
 
     rootElement.appendChild(container);
   },
-  pdf: (arg) =>
+  pdf: (arg: PDFRenderProps<RadioGroup>) =>
     svg.pdf(Object.assign(arg, { value: getIcon({ value: arg.value, color: arg.schema.color }) })),
   propPanel: {
-    schema: ({ i18n }) => ({
+    schema: ({ i18n }: PropPanelSchemaProps) => ({
       color: {
         title: i18n('schemas.color'),
         type: 'string',

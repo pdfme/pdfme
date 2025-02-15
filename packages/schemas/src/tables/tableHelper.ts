@@ -6,7 +6,7 @@ import {
   getDefaultFont,
   getFallbackFontName,
   cloneDeep,
-} from '@pdfme/common';
+} from '@pdfme/common/dist/esm/index.js';
 import type {
   TableSchema,
   CellStyle,
@@ -15,8 +15,11 @@ import type {
   TableInput,
   StylesProps,
   Section,
-} from './types';
-import { Cell, Column, Row, Table } from './classes';
+  TablePosition,
+  TableDimensions,
+  TableInternals
+} from './types.js';
+import { Cell, Column, Row, Table } from './classes.js';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
@@ -98,7 +101,7 @@ function parseSection(
 
 function parseContent4Table(input: TableInput, fallbackFontName: string) {
   const content = input.content;
-  const columns = content.columns.map((index) => new Column(index));
+  const columns = content.columns.map((index: number) => new Column(index));
   const styles = input.styles;
   return {
     columns,
@@ -166,7 +169,7 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
 
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   const columnStylesWidth = schema.headWidthPercentages.reduce(
-    (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
+    (acc: Record<number, Partial<Styles>>, cur: number, i: number) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
     {} as Record<number, Partial<Styles>>
   );
 

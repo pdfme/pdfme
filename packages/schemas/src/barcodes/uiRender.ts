@@ -16,8 +16,14 @@ const blobToDataURL = (blob: Blob): Promise<string> =>
 
 const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
   const imageBuf = await createBarCode({
-    ...schema,
+    type: schema.type,
     input: value,
+    width: schema.width || 40,
+    height: schema.height || 20,
+    backgroundColor: schema.backgroundColor,
+    barColor: schema.barColor,
+    textColor: schema.textColor,
+    includetext: schema.includetext
   });
   const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
   const barcodeDataURL = await blobToDataURL(barcodeData);

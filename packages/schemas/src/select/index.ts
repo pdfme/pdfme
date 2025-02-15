@@ -1,8 +1,8 @@
 import type * as CSS from 'csstype';
-import { propPanel as parentPropPanel } from '../text/propPanel';
+import { propPanel as parentPropPanel } from '../text/propPanel.js';
 import type { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
-import text from '../text';
-import { TextSchema } from '../text/types';
+import text from '../text/index.js';
+import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
 import { createSvgStr } from '../utils.js';
 
@@ -112,7 +112,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
 };
 
 const schema: Plugin<Select> = {
-  ui: async (arg) => {
+  ui: async (arg: { schema: Select; value: string; onChange?: (arg: { key: string; value: string }) => void; rootElement: HTMLElement; mode: string }) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 
@@ -156,7 +156,7 @@ const schema: Plugin<Select> = {
 
       selectElement.innerHTML = schema.options
         .map(
-          (option) =>
+          (option: string) =>
             `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`
         )
         .join('');

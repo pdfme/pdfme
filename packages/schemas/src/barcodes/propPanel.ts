@@ -1,5 +1,6 @@
-import type { PropPanel, I18n } from '@pdfme/common/dist/esm/index.js';
+import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types.js';
+type I18n = (key: string) => string;
 import {
   DEFAULT_BARCODE_COLOR,
   DEFAULT_BARCODE_BG_COLOR,

@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
-import { UIRenderProps, getDefaultFont } from '@pdfme/common';
+import { UIRenderProps, getDefaultFont } from '@pdfme/common/dist/esm/index.js';
 import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,

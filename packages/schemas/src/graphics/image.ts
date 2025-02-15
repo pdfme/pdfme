@@ -1,9 +1,9 @@
 import type { ChangeEvent } from 'react';
 import type { PDFImage } from '@pdfme/pdf-lib';
-import type { Plugin } from '@pdfme/common';
-import type { PDFRenderProps, Schema } from '@pdfme/common';
+import type { Plugin } from '@pdfme/common/dist/esm/index.js';
+import type { PDFRenderProps, Schema } from '@pdfme/common/dist/esm/index.js';
 import type * as CSS from 'csstype';
-import { UIRenderProps, px2mm } from '@pdfme/common';
+import { UIRenderProps, px2mm } from '@pdfme/common/dist/esm/index.js';
 import { Image } from 'lucide';
 import {
   convertForPdfLayoutProps,
@@ -13,7 +13,7 @@ import {
   createSvgStr,
 } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
-import { getImageDimension } from './imagehelper.js';
+import { getImageDimension } from './imageHelper.js';
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };

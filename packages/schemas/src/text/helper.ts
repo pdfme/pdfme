@@ -9,9 +9,9 @@ import {
   getFallbackFontName,
   getDefaultFont,
   DEFAULT_FONT_NAME,
-} from '@pdfme/common';
+} from '@pdfme/common/dist/esm/index.js';
 import { Buffer } from 'buffer';
-import type { TextSchema, FontWidthCalcValues } from './types';
+import type { TextSchema, FontWidthCalcValues } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -23,7 +23,7 @@ import {
   VERTICAL_ALIGN_TOP,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
-} from './constants';
+} from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
   fontKitFont: FontKitFont,

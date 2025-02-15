@@ -8,7 +8,7 @@ import {
   getDefaultFont,
   getFallbackFontName,
   mm2pt,
-} from '@pdfme/common';
+} from '@pdfme/common/dist/esm/index.js';
 import {
   VERTICAL_ALIGN_TOP,
   VERTICAL_ALIGN_MIDDLE,
@@ -41,13 +41,14 @@ const embedAndGetFontObj = async (arg: {
   }
 
   const fontValues = await Promise.all(
-    Object.values(font).map(async (v: { data: string | ArrayBuffer; subset?: boolean }) => {
-      let fontData = v.data;
+    Object.values(font).map(async (v) => {
+      const fontValue = v as { data: string | ArrayBuffer; subset?: boolean };
+      let fontData = fontValue.data;
       if (typeof fontData === 'string' && fontData.startsWith('http')) {
         fontData = await fetch(fontData).then((res) => res.arrayBuffer());
       }
       return pdfDoc.embedFont(fontData, {
-        subset: typeof v.subset === 'undefined' ? true : v.subset,
+        subset: typeof fontValue.subset === 'undefined' ? true : fontValue.subset,
       });
     })
   );
