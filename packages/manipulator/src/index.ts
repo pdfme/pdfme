@@ -1,22 +1,5 @@
-/**
- * @file Manipulator.ts
- * @description
- * PDF のマージ、分割、ページ削除、挿入、抽出、回転、再編成などをまとめたインターフェース。
- * すべて `pdf-lib` を利用して実装可能。
- *
- * 注意:
- * - `pdf-lib` はバイナリ単位での合成ではなく、ページの複製と再配置イメージ。
- * - 添付ファイルやアウトラインなど一部メタ情報はうまく継承されない場合がある。
- */
-
 import { PDFDocument, RotationTypes } from '@pdfme/pdf-lib';
 
-/**
- * 複数の PDF を結合する。
- *
- * @param pdfs - 結合対象の PDF (ArrayBuffer) の配列
- * @returns 結合された PDF の ArrayBuffer
- */
 export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
   if (!pdfs.length) {
     throw new Error('[@pdfme/manipulator] At least one PDF is required for merging');
@@ -31,13 +14,6 @@ export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
   return mergedPdf.save();
 };
 
-/**
- * PDF を指定したページ範囲ごとに分割する。
- *
- * @param pdf - 分割対象の PDF
- * @param ranges - ページ範囲の配列 (start/end は0-based想定)
- * @returns 分割後の PDF の ArrayBuffer の配列
- */
 export const split = async (
   pdf: ArrayBuffer,
   ranges: { start?: number; end?: number }[]
@@ -68,13 +44,6 @@ export const split = async (
   return result;
 };
 
-/**
- * PDF から指定ページを削除する。
- *
- * @param pdf - 削除対象の PDF
- * @param pages - 削除したいページ番号 (0-based)
- * @returns ページ削除後の PDF の ArrayBuffer
- */
 export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBuffer> => {
   if (!pages.length) {
     throw new Error('[@pdfme/manipulator] At least one page number is required for removal');
@@ -83,105 +52,66 @@ export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBu
   const pdfDoc = await PDFDocument.load(pdf);
   const numPages = pdfDoc.getPageCount();
 
-  // Validate page numbers
   if (pages.some((page) => page < 0 || page >= numPages)) {
     throw new Error(
       `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
     );
   }
 
-  // Sort pages in descending order to avoid index shifting
   pages.sort((a, b) => b - a).forEach((pageIndex) => pdfDoc.removePage(pageIndex));
   return pdfDoc.save();
 };
 
-/**
- * ある PDF に、複数ページ (PDF) を特定の位置へ挿入する。
- *
- * @param pdf - 挿入対象の PDF
- * @param insertPdf - 挿入したい PDF (ArrayBuffer)
- * @param position - 挿入先のページインデックス (0-based)
- * @returns 挿入完了後の PDF の ArrayBuffer
- */
 export const insert = async (
-  pdf: ArrayBuffer,
-  insertPdf: ArrayBuffer,
-  position: number
+  basePdf: ArrayBuffer,
+  inserts: { pdf: ArrayBuffer; position: number }[]
 ): Promise<ArrayBuffer> => {
-  const basePdf = await PDFDocument.load(pdf);
-  const insertDoc = await PDFDocument.load(insertPdf);
-  const numPages = basePdf.getPageCount();
+  inserts.sort((a, b) => a.position - b.position);
 
-  if (position < 0 || position > numPages) {
-    throw new Error(`[@pdfme/manipulator] Invalid position: must be between 0 and ${numPages}`);
+  let currentPdf = basePdf; 
+  let offset = 0; 
+
+  for (let i = 0; i < inserts.length; i++) {
+    const { pdf, position } = inserts[i];
+    const actualPos = position + offset;
+
+    const basePdfDoc = await PDFDocument.load(currentPdf);
+    const insertDoc = await PDFDocument.load(pdf);
+    const numPages = basePdfDoc.getPageCount();
+
+    if (actualPos < 0 || actualPos > numPages) {
+      throw new Error(`[@pdfme/manipulator] Invalid position: must be between 0 and ${numPages}`);
+    }
+
+    const newPdfDoc = await PDFDocument.create();
+
+    if (actualPos > 0) {
+      const beforePages = await newPdfDoc.copyPages(
+        basePdfDoc,
+        Array.from({ length: actualPos }, (_, idx) => idx)
+      );
+      beforePages.forEach((page) => newPdfDoc.addPage(page));
+    }
+
+    const insertPages = await newPdfDoc.copyPages(insertDoc, insertDoc.getPageIndices());
+    insertPages.forEach((page) => newPdfDoc.addPage(page));
+
+    if (actualPos < numPages) {
+      const afterPages = await newPdfDoc.copyPages(
+        basePdfDoc,
+        Array.from({ length: numPages - actualPos }, (_, idx) => idx + actualPos)
+      );
+      afterPages.forEach((page) => newPdfDoc.addPage(page));
+    }
+
+    currentPdf = await newPdfDoc.save();
+
+    offset += insertDoc.getPageCount();
   }
 
-  const newPdf = await PDFDocument.create();
-
-  // Copy pages before insertion point
-  if (position > 0) {
-    const beforePages = await newPdf.copyPages(
-      basePdf,
-      Array.from({ length: position }, (_, i) => i)
-    );
-    beforePages.forEach((page) => newPdf.addPage(page));
-  }
-
-  // Copy pages from insertPdf
-  const insertPages = await newPdf.copyPages(insertDoc, insertDoc.getPageIndices());
-  insertPages.forEach((page) => newPdf.addPage(page));
-
-  // Copy remaining pages from original
-  if (position < numPages) {
-    const afterPages = await newPdf.copyPages(
-      basePdf,
-      Array.from({ length: numPages - position }, (_, i) => i + position)
-    );
-    afterPages.forEach((page) => newPdf.addPage(page));
-  }
-
-  return newPdf.save();
+  return currentPdf;
 };
 
-/**
- * PDF から指定ページだけを抽出する。
- *
- * @param pdf - 抽出対象の PDF
- * @param pages - 抽出したいページ番号 (0-based)
- * @returns 抽出ページだけを含む PDF の ArrayBuffer の配列
- */
-export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBuffer[]> => {
-  if (!pages.length) {
-    throw new Error('[@pdfme/manipulator] At least one page number is required for extraction');
-  }
-
-  const original = await PDFDocument.load(pdf);
-  const numPages = original.getPageCount();
-
-  // Validate page numbers
-  if (pages.some((page) => page < 0 || page >= numPages)) {
-    throw new Error(
-      `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
-    );
-  }
-
-  return Promise.all(
-    pages.map(async (pageIndex) => {
-      const newPdf = await PDFDocument.create();
-      const [copiedPage] = await newPdf.copyPages(original, [pageIndex]);
-      newPdf.addPage(copiedPage);
-      return newPdf.save();
-    })
-  );
-};
-
-/**
- * PDF 全ページを回転させる (一律)。
- *
- * @param pdf - 回転対象の PDF
- * @param degrees - 回転角度 (度数法)。90,180,270など
- * @returns 回転後の PDF の ArrayBuffer
- */
 export const rotate = async (
   pdf: ArrayBuffer,
   degrees: 0 | 90 | 180 | 270 | 360,
@@ -198,15 +128,12 @@ export const rotate = async (
     throw new Error('[@pdfme/manipulator] PDF has no pages to rotate');
   }
 
-  // Normalize degrees to be between 0 and 360
   const normalizedDegrees = ((degrees % 360) + 360) % 360;
 
-  // Ensure rotation is a multiple of 90 degrees
   if (normalizedDegrees % 90 !== 0) {
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   }
 
-  // If pageNumbers is provided, validate them
   if (pageNumbers) {
     if (pageNumbers.some((page) => page < 0 || page >= pages.length)) {
       throw new Error(
@@ -215,7 +142,6 @@ export const rotate = async (
     }
   }
 
-  // Set rotation in degrees for specified pages or all pages
   const pagesToRotate = pageNumbers || pages.map((_, i) => i);
   pagesToRotate.forEach((pageNum) => {
     const page = pages[pageNum];
@@ -229,20 +155,38 @@ export const rotate = async (
   return pdfDoc.save();
 };
 
-/**
- * PDF 内のページをまとめて操作する (削除・挿入・差し替え・回転など)。
- *
- * @param pdf - 操作対象の PDF
- * @param actions - 操作の配列 (例: { type: 'remove', data: { pages: number[] } } など)
- * @returns 操作後の PDF の ArrayBuffer
- */
+export const move = async (
+  pdf: ArrayBuffer,
+  operations: { from: number; to: number }[]
+): Promise<ArrayBuffer> => {
+  const pdfDoc = await PDFDocument.load(pdf);
+
+  for (const { from, to } of operations) {
+    const currentPageCount = pdfDoc.getPageCount();
+    if (from < 0 || from >= currentPageCount || to < 0 || to >= currentPageCount) {
+      throw new Error(
+        `[@pdfme/manipulator] Invalid page number: from=${from}, to=${to}, total pages=${currentPageCount}`
+      );
+    }
+    
+    const adjustedTo = from < to ? to - 1 : to;
+    const page = pdfDoc.getPage(from);
+    
+    pdfDoc.removePage(from);
+    pdfDoc.insertPage(adjustedTo, page);
+  }
+
+  return pdfDoc.save();
+};
+
 export const organize = async (
   pdf: ArrayBuffer,
   actions: Array<
-    | { type: 'remove'; data: { pages: number[] } }
-    | { type: 'insert'; data: { pdfs: ArrayBuffer[]; position: number } }
-    | { type: 'replace'; data: { targetPage: number; pdf: ArrayBuffer } }
-    | { type: 'rotate'; data: { pages: number[]; degrees: 0 | 90 | 180 | 270 | 360 } }
+    | { type: 'remove'; data: { position: number } }
+    | { type: 'insert'; data: { pdf: ArrayBuffer; position: number } }
+    | { type: 'replace'; data: { pdf: ArrayBuffer; position: number } }
+    | { type: 'rotate'; data: { position: number; degrees: 0 | 90 | 180 | 270 | 360 } }
+    | { type: 'move'; data: { from: number; to: number } }
   >
 ): Promise<ArrayBuffer> => {
   if (!actions.length) {
@@ -252,34 +196,31 @@ export const organize = async (
   let currentPdf = await PDFDocument.load(pdf);
 
   for (const action of actions) {
-    // Convert Uint8Array to ArrayBuffer after each save operation
     const currentBuffer = (await currentPdf.save()).buffer;
 
     switch (action.type) {
       case 'remove':
-        currentPdf = await PDFDocument.load(await remove(currentBuffer, action.data.pages));
+        currentPdf = await PDFDocument.load(await remove(currentBuffer, [action.data.position]));
         break;
 
       case 'insert':
-        currentPdf = await PDFDocument.load(
-          await insert(currentBuffer, action.data.pdfs[0], action.data.position)
-        );
+        currentPdf = await PDFDocument.load(await insert(currentBuffer, [action.data]));
         break;
 
       case 'replace': {
-        // First remove the target page
-        const withoutTarget = await remove(currentBuffer, [action.data.targetPage]);
-        // Then insert the new page at the same position
-        currentPdf = await PDFDocument.load(
-          await insert(withoutTarget, action.data.pdf, action.data.targetPage)
-        );
+        const withoutTarget = await remove(currentBuffer, [action.data.position]);
+        currentPdf = await PDFDocument.load(await insert(withoutTarget, [action.data]));
         break;
       }
 
       case 'rotate':
         currentPdf = await PDFDocument.load(
-          await rotate(currentBuffer, action.data.degrees, action.data.pages)
+          await rotate(currentBuffer, action.data.degrees, [action.data.position])
         );
+        break;
+
+      case 'move':
+        currentPdf = await PDFDocument.load(await move(currentBuffer, [action.data]));
         break;
 
       default:
