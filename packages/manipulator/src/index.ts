@@ -10,6 +10,7 @@
  */
 
 import { PDFDocument } from '@pdfme/pdf-lib';
+import { RotationTypes } from '@pdfme/pdf-lib';
 
 /**
  * 複数の PDF を結合する。
@@ -150,17 +151,28 @@ export const insert = async (
  * @returns 抽出ページだけを含む PDF の ArrayBuffer の配列
  */
 export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBuffer[]> => {
-  // 例:
-  //   const original = await PDFDocument.load(pdf);
-  //   return Promise.all(
-  //     pages.map(async (pageIndex) => {
-  //       const newPdf = await PDFDocument.create();
-  //       const [copiedPage] = await newPdf.copyPages(original, [pageIndex]);
-  //       newPdf.addPage(copiedPage);
-  //       return newPdf.save();
-  //     })
-  //   );
-  return [];
+  if (!pages.length) {
+    throw new Error('[@pdfme/manipulator] At least one page number is required for extraction');
+  }
+
+  const original = await PDFDocument.load(pdf);
+  const numPages = original.getPageCount();
+
+  // Validate page numbers
+  if (pages.some(page => page < 0 || page >= numPages)) {
+    throw new Error(
+      `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
+    );
+  }
+
+  return Promise.all(
+    pages.map(async (pageIndex) => {
+      const newPdf = await PDFDocument.create();
+      const [copiedPage] = await newPdf.copyPages(original, [pageIndex]);
+      newPdf.addPage(copiedPage);
+      return newPdf.save();
+    })
+  );
 };
 
 /**
@@ -171,13 +183,34 @@ export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayB
  * @returns 回転後の PDF の ArrayBuffer
  */
 export const rotate = async (pdf: ArrayBuffer, degrees: number): Promise<ArrayBuffer> => {
-  // 例:
-  //   const pdfDoc = await PDFDocument.load(pdf);
-  //   pdfDoc.getPages().forEach((page) => {
-  //     page.setRotation(degrees * (Math.PI / 180));
-  //   });
-  //   return pdfDoc.save();
-  return new ArrayBuffer(0);
+  if (!Number.isInteger(degrees) || degrees % 90 !== 0) {
+    throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
+  }
+
+  const pdfDoc = await PDFDocument.load(pdf);
+  const pages = pdfDoc.getPages();
+
+  if (!pages.length) {
+    throw new Error('[@pdfme/manipulator] PDF has no pages to rotate');
+  }
+
+  // Normalize degrees to be between 0 and 360
+  const normalizedDegrees = ((degrees % 360) + 360) % 360;
+  
+  // Ensure rotation is a multiple of 90 degrees
+  if (normalizedDegrees % 90 !== 0) {
+    throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
+  }
+
+  // Set rotation in degrees
+  pages.forEach((page) => {
+    // Set rotation using the Rotation type
+    page.setRotation({
+      type: RotationTypes.Degrees,
+      angle: normalizedDegrees % 360
+    });
+  });
+  return pdfDoc.save();
 };
 
 /**
