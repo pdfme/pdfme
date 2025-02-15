@@ -9,8 +9,7 @@
  * - 添付ファイルやアウトラインなど一部メタ情報はうまく継承されない場合がある。
  */
 
-import { PDFDocument } from '@pdfme/pdf-lib';
-import { RotationTypes } from '@pdfme/pdf-lib';
+import { PDFDocument, RotationTypes } from '@pdfme/pdf-lib';
 
 /**
  * 複数の PDF を結合する。
@@ -85,7 +84,7 @@ export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBu
   const numPages = pdfDoc.getPageCount();
 
   // Validate page numbers
-  if (pages.some(page => page < 0 || page >= numPages)) {
+  if (pages.some((page) => page < 0 || page >= numPages)) {
     throw new Error(
       `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
     );
@@ -114,22 +113,23 @@ export const insert = async (
   const numPages = basePdf.getPageCount();
 
   if (position < 0 || position > numPages) {
-    throw new Error(
-      `[@pdfme/manipulator] Invalid position: must be between 0 and ${numPages}`
-    );
+    throw new Error(`[@pdfme/manipulator] Invalid position: must be between 0 and ${numPages}`);
   }
 
   const newPdf = await PDFDocument.create();
-  
+
   // Copy pages before insertion point
   if (position > 0) {
-    const beforePages = await newPdf.copyPages(basePdf, Array.from({ length: position }, (_, i) => i));
-    beforePages.forEach(page => newPdf.addPage(page));
+    const beforePages = await newPdf.copyPages(
+      basePdf,
+      Array.from({ length: position }, (_, i) => i)
+    );
+    beforePages.forEach((page) => newPdf.addPage(page));
   }
 
   // Copy pages from insertPdf
   const insertPages = await newPdf.copyPages(insertDoc, insertDoc.getPageIndices());
-  insertPages.forEach(page => newPdf.addPage(page));
+  insertPages.forEach((page) => newPdf.addPage(page));
 
   // Copy remaining pages from original
   if (position < numPages) {
@@ -137,7 +137,7 @@ export const insert = async (
       basePdf,
       Array.from({ length: numPages - position }, (_, i) => i + position)
     );
-    afterPages.forEach(page => newPdf.addPage(page));
+    afterPages.forEach((page) => newPdf.addPage(page));
   }
 
   return newPdf.save();
@@ -159,7 +159,7 @@ export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayB
   const numPages = original.getPageCount();
 
   // Validate page numbers
-  if (pages.some(page => page < 0 || page >= numPages)) {
+  if (pages.some((page) => page < 0 || page >= numPages)) {
     throw new Error(
       `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
     );
@@ -184,7 +184,7 @@ export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayB
  */
 export const rotate = async (
   pdf: ArrayBuffer,
-  degrees: number,
+  degrees: 0 | 90 | 180 | 270 | 360,
   pageNumbers?: number[]
 ): Promise<ArrayBuffer> => {
   if (!Number.isInteger(degrees) || degrees % 90 !== 0) {
@@ -200,7 +200,7 @@ export const rotate = async (
 
   // Normalize degrees to be between 0 and 360
   const normalizedDegrees = ((degrees % 360) + 360) % 360;
-  
+
   // Ensure rotation is a multiple of 90 degrees
   if (normalizedDegrees % 90 !== 0) {
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
@@ -208,7 +208,7 @@ export const rotate = async (
 
   // If pageNumbers is provided, validate them
   if (pageNumbers) {
-    if (pageNumbers.some(page => page < 0 || page >= pages.length)) {
+    if (pageNumbers.some((page) => page < 0 || page >= pages.length)) {
       throw new Error(
         `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${pages.length - 1}`
       );
@@ -222,7 +222,7 @@ export const rotate = async (
     if (page) {
       page.setRotation({
         type: RotationTypes.Degrees,
-        angle: normalizedDegrees % 360
+        angle: normalizedDegrees % 360,
       });
     }
   });
@@ -242,7 +242,7 @@ export const organize = async (
     | { type: 'remove'; data: { pages: number[] } }
     | { type: 'insert'; data: { pdfs: ArrayBuffer[]; position: number } }
     | { type: 'replace'; data: { targetPage: number; pdf: ArrayBuffer } }
-    | { type: 'rotate'; data: { pages: number[]; degrees: number } }
+    | { type: 'rotate'; data: { pages: number[]; degrees: 0 | 90 | 180 | 270 | 360 } }
   >
 ): Promise<ArrayBuffer> => {
   if (!actions.length) {
@@ -250,7 +250,7 @@ export const organize = async (
   }
 
   let currentPdf = await PDFDocument.load(pdf);
-  
+
   for (const action of actions) {
     // Convert Uint8Array to ArrayBuffer after each save operation
     const currentBuffer = (await currentPdf.save()).buffer;
@@ -259,13 +259,13 @@ export const organize = async (
       case 'remove':
         currentPdf = await PDFDocument.load(await remove(currentBuffer, action.data.pages));
         break;
-      
+
       case 'insert':
         currentPdf = await PDFDocument.load(
           await insert(currentBuffer, action.data.pdfs[0], action.data.position)
         );
         break;
-      
+
       case 'replace': {
         // First remove the target page
         const withoutTarget = await remove(currentBuffer, [action.data.targetPage]);
@@ -275,17 +275,17 @@ export const organize = async (
         );
         break;
       }
-      
+
       case 'rotate':
         currentPdf = await PDFDocument.load(
           await rotate(currentBuffer, action.data.degrees, action.data.pages)
         );
         break;
-      
+
       default:
         throw new Error(`[@pdfme/manipulator] Unknown action type: ${(action as any).type}`);
     }
   }
-  
+
   return currentPdf.save();
 };

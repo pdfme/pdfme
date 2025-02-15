@@ -1,5 +1,5 @@
-import { merge, split, remove, insert, extract, rotate, organize } from '../src/index';
-import { createTestPDF, getPDFPageCount } from './utils';
+import { merge, split, remove, insert, extract, rotate, organize } from '../src/index.js';
+import { createTestPDF, getPDFPageCount } from './utils.js';
 
 describe('merge', () => {
   test('merges multiple PDFs', async () => {
@@ -107,6 +107,7 @@ describe('rotate', () => {
 
   test('throws error for non-90-degree rotation', async () => {
     const pdf = await createTestPDF(2);
+    // @ts-expect-error
     await expect(rotate(pdf, 45)).rejects.toThrow(
       '[@pdfme/manipulator] Rotation degrees must be a multiple of 90'
     );
@@ -179,6 +180,7 @@ describe('organize', () => {
   test('throws error for invalid rotation degrees', async () => {
     const pdf = await createTestPDF(3);
     await expect(organize(pdf, [
+      // @ts-expect-error
       { type: 'rotate', data: { pages: [0], degrees: 45 } }
     ])).rejects.toThrow('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   });
