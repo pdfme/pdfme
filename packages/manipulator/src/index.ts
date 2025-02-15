@@ -18,15 +18,17 @@ import { PDFDocument } from '@pdfme/pdf-lib';
  * @returns 結合された PDF の ArrayBuffer
  */
 export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
-  // 例:
-  //   const mergedPdf = await PDFDocument.create();
-  //   for (const buffer of pdfs) {
-  //     const srcDoc = await PDFDocument.load(buffer);
-  //     const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
-  //     copiedPages.forEach((page) => mergedPdf.addPage(page));
-  //   }
-  //   return mergedPdf.save();
-  return new ArrayBuffer(0);
+  if (!pdfs.length) {
+    throw new Error('[@pdfme/manipulator] At least one PDF is required for merging');
+  }
+
+  const mergedPdf = await PDFDocument.create();
+  for (const buffer of pdfs) {
+    const srcDoc = await PDFDocument.load(buffer);
+    const copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
+    copiedPages.forEach((page) => mergedPdf.addPage(page));
+  }
+  return mergedPdf.save();
 };
 
 /**
@@ -40,19 +42,30 @@ export const split = async (
   pdf: ArrayBuffer,
   ranges: { start?: number; end?: number }[]
 ): Promise<ArrayBuffer[]> => {
-  // 例:
-  //   const originalPdf = await PDFDocument.load(pdf);
-  //   const result: ArrayBuffer[] = [];
-  //   const numPages = originalPdf.getPages().length;
-  //   for (const { start = 0, end = numPages } of ranges) {
-  //     const newPdf = await PDFDocument.create();
-  //     const pages = await newPdf.copyPages(originalPdf, Array.from({ length: end - start + 1 }, (_, i) => i + start));
-  //     pages.forEach((page) => newPdf.addPage(page));
-  //     result.push(await newPdf.save());
-  //   }
-  //
-  //   return result;
-  return [];
+  if (!ranges.length) {
+    throw new Error('[@pdfme/manipulator] At least one range is required for splitting');
+  }
+
+  const originalPdf = await PDFDocument.load(pdf);
+  const numPages = originalPdf.getPages().length;
+  const result: ArrayBuffer[] = [];
+
+  for (const { start = 0, end = numPages - 1 } of ranges) {
+    if (start < 0 || end >= numPages || start > end) {
+      throw new Error(
+        `[@pdfme/manipulator] Invalid range: start=${start}, end=${end}, total pages=${numPages}`
+      );
+    }
+
+    const newPdf = await PDFDocument.create();
+    const pages = await newPdf.copyPages(
+      originalPdf,
+      Array.from({ length: end - start + 1 }, (_, i) => i + start)
+    );
+    pages.forEach((page) => newPdf.addPage(page));
+    result.push(await newPdf.save());
+  }
+  return result;
 };
 
 /**
