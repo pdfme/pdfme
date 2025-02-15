@@ -1,8 +1,8 @@
-import { b64toUint8Array } from '@pdfme/common';
-import bwipjs, { RenderOptions } from 'bwip-js';
-import { Buffer } from 'buffer';
-import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
-import { BarcodeTypes } from './types';
+import {b64toUint8Array} from '@pdfme/common';
+import bwipjs, {RenderOptions} from 'bwip-js';
+import {Buffer} from 'buffer';
+import {BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT} from './constants.js';
+import {BarcodeTypes} from './types';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {
@@ -63,7 +63,7 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
     // 有効文字は漢字、ひらがな、カタカナ以外。
     // https://qiita.com/graminume/items/2ac8dd9c32277fa9da64
     return !input.match(
-      /([\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]|[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜　])+/
+        /([\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]|[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜　])+/
     );
   }
   if (type === 'nw7') {
@@ -98,10 +98,10 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
     const regexp = /\((01)\)(\d*)(\(|$)/;
     let res = input.match(regexp);
     if (
-      res != null &&
-      input.length <= 52 && // 52 is the max length of a GS1 DataMatrix barcode before bwip-js throws an error
-      res[1] === '01' &&
-      (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
+        res != null &&
+        input.length <= 52 && // 52 is the max length of a GS1 DataMatrix barcode before bwip-js throws an error
+        res[1] === '01' &&
+        (res[2].length === 14 || res[2].length === 8 || res[2].length === 12 || res[2].length === 13)
     ) {
       let gtin = res[2];
       ret = validateCheckDigit(gtin, gtin.length);
@@ -117,13 +117,13 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
  * The bwip.js lib has a different name for nw7 type barcodes
  */
 export const barCodeType2Bcid = (type: BarcodeTypes) =>
-  type === 'nw7' ? 'rationalizedCodabar' : type;
+    type === 'nw7' ? 'rationalizedCodabar' : type;
 
 /**
  *  Strip hash from the beginning of HTML hex color codes for the bwip.js lib
  */
 export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
-  color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
+    color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
 export const createBarCode = async (arg: {
   type: BarcodeTypes;
@@ -169,6 +169,20 @@ export const createBarCode = async (arg: {
     // @ts-ignore
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
+    res = b64toUint8Array(dataUrl).buffer as Buffer;
+  } else if (typeof self !== 'undefined') {
+    // Web Worker environment
+    const canvas = new OffscreenCanvas(256, 256);
+    // @ts-ignore
+    bwipjs.toCanvas(canvas, bwipjsArg);
+    const blob = await canvas.convertToBlob();
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = _e => resolve(reader.result as string);
+      reader.onerror = _e => reject(reader.error);
+      reader.onabort = _e => reject(new Error("Read aborted"));
+      reader.readAsDataURL(blob);
+    });
     res = b64toUint8Array(dataUrl).buffer as Buffer;
   } else {
     res = await bwipjs.toBuffer(bwipjsArg);

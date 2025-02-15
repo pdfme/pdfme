@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
+    "@types/offscreencanvas": "^2019.7.3",
     "air-datepicker": "^3.5.3",
     "bwip-js": "^4.1.1",
     "date-fns": "^4.1.0",
