@@ -182,7 +182,11 @@ export const extract = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayB
  * @param degrees - 回転角度 (度数法)。90,180,270など
  * @returns 回転後の PDF の ArrayBuffer
  */
-export const rotate = async (pdf: ArrayBuffer, degrees: number): Promise<ArrayBuffer> => {
+export const rotate = async (
+  pdf: ArrayBuffer,
+  degrees: number,
+  pageNumbers?: number[]
+): Promise<ArrayBuffer> => {
   if (!Number.isInteger(degrees) || degrees % 90 !== 0) {
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   }
@@ -202,13 +206,25 @@ export const rotate = async (pdf: ArrayBuffer, degrees: number): Promise<ArrayBu
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   }
 
-  // Set rotation in degrees
-  pages.forEach((page) => {
-    // Set rotation using the Rotation type
-    page.setRotation({
-      type: RotationTypes.Degrees,
-      angle: normalizedDegrees % 360
-    });
+  // If pageNumbers is provided, validate them
+  if (pageNumbers) {
+    if (pageNumbers.some(page => page < 0 || page >= pages.length)) {
+      throw new Error(
+        `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${pages.length - 1}`
+      );
+    }
+  }
+
+  // Set rotation in degrees for specified pages or all pages
+  const pagesToRotate = pageNumbers || pages.map((_, i) => i);
+  pagesToRotate.forEach((pageNum) => {
+    const page = pages[pageNum];
+    if (page) {
+      page.setRotation({
+        type: RotationTypes.Degrees,
+        angle: normalizedDegrees % 360
+      });
+    }
   });
   return pdfDoc.save();
 };
@@ -229,13 +245,47 @@ export const organize = async (
     | { type: 'rotate'; data: { pages: number[]; degrees: number } }
   >
 ): Promise<ArrayBuffer> => {
-  // 例:
-  //   const pdfDoc = await PDFDocument.load(pdf);
-  //   // actions を順に実行
-  //   // remove の場合 → removePage
-  //   // insert の場合 → copyPages() & insertPage()
-  //   // replace の場合 → removePage() & insertPage()
-  //   // rotate の場合 → 対象ページを setRotation()
-  //   return pdfDoc.save();
-  return new ArrayBuffer(0);
+  if (!actions.length) {
+    throw new Error('[@pdfme/manipulator] At least one action is required');
+  }
+
+  let currentPdf = await PDFDocument.load(pdf);
+  
+  for (const action of actions) {
+    // Convert Uint8Array to ArrayBuffer after each save operation
+    const currentBuffer = (await currentPdf.save()).buffer;
+
+    switch (action.type) {
+      case 'remove':
+        currentPdf = await PDFDocument.load(await remove(currentBuffer, action.data.pages));
+        break;
+      
+      case 'insert':
+        currentPdf = await PDFDocument.load(
+          await insert(currentBuffer, action.data.pdfs[0], action.data.position)
+        );
+        break;
+      
+      case 'replace': {
+        // First remove the target page
+        const withoutTarget = await remove(currentBuffer, [action.data.targetPage]);
+        // Then insert the new page at the same position
+        currentPdf = await PDFDocument.load(
+          await insert(withoutTarget, action.data.pdf, action.data.targetPage)
+        );
+        break;
+      }
+      
+      case 'rotate':
+        currentPdf = await PDFDocument.load(
+          await rotate(currentBuffer, action.data.degrees, action.data.pages)
+        );
+        break;
+      
+      default:
+        throw new Error(`[@pdfme/manipulator] Unknown action type: ${(action as any).type}`);
+    }
+  }
+  
+  return currentPdf.save();
 };
