@@ -9,6 +9,15 @@ import { pdf2img } from '@pdfme/converter';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.0');
 
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toMatchImageSnapshot(): R;
+    }
+  }
+}
+
+expect.extend({ toMatchImageSnapshot });
 describe('generate integration test(barcode, business)', () => {
   describe.each([barcode, business])('%s', (templateData) => {
     const entries = Object.entries(templateData);
