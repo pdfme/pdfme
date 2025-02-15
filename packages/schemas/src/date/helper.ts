@@ -75,7 +75,6 @@ import { format } from 'date-fns';
 import type { Plugin, PropPanelSchema } from '@pdfme/common/dist/esm/index.js';
 import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common/dist/esm/index.js';
 import type { TextSchema } from '../text/types.js';
-import type { DateSchema } from './types.js';
 import text from '../text/index.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { mapVerticalAlignToFlex } from '../text/uiRender.js';
