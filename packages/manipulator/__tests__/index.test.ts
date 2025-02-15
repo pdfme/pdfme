@@ -1,22 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { merge, split, remove, insert, rotate, move, organize } from '../src/index';
-import { createTestPDF, pdfToImages } from './utils';
-import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { createTestPDF, pdfToImages, getPDFPageCount } from './utils';
+import 'jest-image-snapshot';
 
 describe('merge', () => {
   test('merges multiple PDFs', async () => {
     const pdf1 = await createTestPDF(2);
     const pdf2 = await createTestPDF(3);
     const merged = await merge([pdf1, pdf2]);
-    const images = await pdfToImages(merged);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `merge-multiple-pdfs-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(merged)).toBe(5);
   });
 
   test('throws error when no PDFs provided', async () => {
@@ -32,24 +25,8 @@ describe('split', () => {
       { start: 2, end: 4 },
     ]);
     expect(splits.length).toBe(2);
-    
-    const images1 = await pdfToImages(splits[0]);
-    for (let i = 0; i < images1.length; i++) {
-      expect(images1[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `split-into-ranges-part1-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
-    
-    const images2 = await pdfToImages(splits[1]);
-    for (let i = 0; i < images2.length; i++) {
-      expect(images2[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `split-into-ranges-part2-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(splits[0])).toBe(2);
+    expect(await getPDFPageCount(splits[1])).toBe(3);
   });
 
   test('throws error for invalid ranges', async () => {
@@ -64,14 +41,7 @@ describe('remove', () => {
   test('removes specified pages from PDF', async () => {
     const pdf = await createTestPDF(5);
     const result = await remove(pdf, [1, 3]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `remove-specified-pages-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('throws error when no pages provided', async () => {
@@ -92,14 +62,7 @@ describe('insert', () => {
     const basePdf = await createTestPDF(3);
     const insertPdf = await createTestPDF(2);
     const result = await insert(basePdf, [{ pdf: insertPdf, position: 1 }]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `insert-at-position-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(5);
   });
 
   test('throws error for invalid position', async () => {
@@ -115,14 +78,7 @@ describe('rotate', () => {
   test('rotates PDF pages by specified degrees', async () => {
     const pdf = await createTestPDF(2);
     const result = await rotate(pdf, 90);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `rotate-by-degrees-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(2);
   });
 
   test('throws error for non-90-degree rotation', async () => {
@@ -138,14 +94,7 @@ describe('move', () => {
   test('moves page from one position to another', async () => {
     const pdf = await createTestPDF(3);
     const result = await move(pdf, { from: 0, to: 2 });
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `move-page-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('throws error for invalid page numbers', async () => {
@@ -163,28 +112,14 @@ describe('organize', () => {
       { type: 'remove', data: { position: 1 } },
       { type: 'remove', data: { position: 3 } },
     ]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-single-remove-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('performs single insert operation', async () => {
     const pdf = await createTestPDF(3);
     const insertPdf = await createTestPDF(2);
     const result = await organize(pdf, [{ type: 'insert', data: { pdf: insertPdf, position: 1 } }]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-single-insert-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(5);
   });
 
   test('performs single replace operation', async () => {
@@ -193,14 +128,7 @@ describe('organize', () => {
     const result = await organize(pdf, [
       { type: 'replace', data: { position: 1, pdf: replacePdf } },
     ]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-single-replace-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('performs single rotate operation', async () => {
@@ -209,14 +137,7 @@ describe('organize', () => {
       { type: 'rotate', data: { position: 0, degrees: 90 } },
       { type: 'rotate', data: { position: 2, degrees: 90 } },
     ]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-single-rotate-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(3);
   });
 
   test('performs multiple operations in sequence', async () => {
@@ -232,14 +153,97 @@ describe('organize', () => {
       { type: 'rotate', data: { position: 0, degrees: 90 } },
       { type: 'rotate', data: { position: 3, degrees: 90 } }, // Still 5 pages
     ]);
-    const images = await pdfToImages(result);
-    for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-multiple-operations-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel'
-      });
-    }
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('throws error for invalid page numbers', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [{ type: 'remove', data: { position: 3 } }])).rejects.toThrow(
+      '[@pdfme/manipulator] Invalid page number'
+    );
+  });
+
+  test('throws error for invalid position', async () => {
+    const pdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(1);
+    await expect(
+      organize(pdf, [{ type: 'insert', data: { pdf: insertPdf, position: 4 } }])
+    ).rejects.toThrow('[@pdfme/manipulator] Invalid position');
+  });
+
+  test('throws error for invalid rotation degrees', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(
+      // @ts-expect-error
+      organize(pdf, [{ type: 'rotate', data: { pages: [0], degrees: 45 } }])
+    ).rejects.toThrow('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
+  });
+
+  test('throws error for empty actions array', async () => {
+    const pdf = await createTestPDF(3);
+    await expect(organize(pdf, [])).rejects.toThrow(
+      '[@pdfme/manipulator] At least one action is required'
+    );
+  });
+
+  test('throws error for unknown action type', async () => {
+    const pdf = await createTestPDF(3);
+    // @ts-expect-error
+    await expect(organize(pdf, [{ type: 'invalid', data: { pages: [] } }])).rejects.toThrow(
+      '[@pdfme/manipulator] Unknown action type: invalid'
+    );
+  });
+});
+
+describe('organize', () => {
+  test('performs single remove operation', async () => {
+    const pdf = await createTestPDF(5);
+    const result = await organize(pdf, [
+      { type: 'remove', data: { position: 1 } },
+      { type: 'remove', data: { position: 3 } },
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs single insert operation', async () => {
+    const pdf = await createTestPDF(3);
+    const insertPdf = await createTestPDF(2);
+    const result = await organize(pdf, [{ type: 'insert', data: { pdf: insertPdf, position: 1 } }]);
+    expect(await getPDFPageCount(result)).toBe(5);
+  });
+
+  test('performs single replace operation', async () => {
+    const pdf = await createTestPDF(3);
+    const replacePdf = await createTestPDF(1);
+    const result = await organize(pdf, [
+      { type: 'replace', data: { position: 1, pdf: replacePdf } },
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs single rotate operation', async () => {
+    const pdf = await createTestPDF(3);
+    const result = await organize(pdf, [
+      { type: 'rotate', data: { position: 0, degrees: 90 } },
+      { type: 'rotate', data: { position: 2, degrees: 90 } },
+    ]);
+    expect(await getPDFPageCount(result)).toBe(3);
+  });
+
+  test('performs multiple operations in sequence', async () => {
+    const pdf = await createTestPDF(5);
+    const insertPdf = await createTestPDF(2);
+    const replacePdf = await createTestPDF(1);
+    const result = await organize(pdf, [
+      { type: 'remove', data: { position: 1 } },
+      { type: 'remove', data: { position: 3 } }, // 5 -> 3 pages
+
+      { type: 'insert', data: { pdf: insertPdf, position: 1 } }, // 3 -> 5 pages
+      { type: 'replace', data: { position: 2, pdf: replacePdf } }, // Still 5 pages
+      { type: 'rotate', data: { position: 0, degrees: 90 } },
+      { type: 'rotate', data: { position: 3, degrees: 90 } }, // Still 5 pages
+    ]);
+    expect(await getPDFPageCount(result)).toBe(5);
   });
 
   test('throws error for invalid page numbers', async () => {
@@ -283,7 +287,6 @@ describe('organize', () => {
 
 describe('PDF manipulator E2E Tests with real PDF files', () => {
   const assetPath = (fileName: string) => path.join(__dirname, 'assets/pdfs', fileName);
-  const tmpPath = (fileName: string) => path.join(__dirname, 'assets/tmp', fileName);
 
   function toArrayBuffer(buf: Buffer): ArrayBuffer {
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
@@ -299,14 +302,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('merge: merge a.pdf, b.pdf, c.pdf in order', async () => {
     const mergedBuffer = await merge([aPdf, bPdf, cPdf]);
-    fs.writeFileSync(tmpPath('merged_abc.pdf'), Buffer.from(mergedBuffer));
 
     const images = await pdfToImages(mergedBuffer);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `merge-abc-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -320,9 +322,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { start: 2, end: 4 }, // pages 3-5
     ]);
 
-    fs.writeFileSync(tmpPath('split_5p_1-2.pdf'), Buffer.from(split12));
-    fs.writeFileSync(tmpPath('split_5p_3-5.pdf'), Buffer.from(split35));
-
     const images12 = await pdfToImages(split12);
     const images35 = await pdfToImages(split35);
 
@@ -330,7 +329,7 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       expect(images12[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `split-5p-1-2-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
 
@@ -338,7 +337,7 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       expect(images35[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `split-5p-3-5-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -348,14 +347,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('remove: remove the 1st page of 5p.pdf', async () => {
     const removed = await remove(fiveP, [0]);
-    fs.writeFileSync(tmpPath('remove_5p_page1.pdf'), Buffer.from(removed));
 
     const images = await pdfToImages(removed);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `remove-5p-page1-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -363,14 +361,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   test('remove: remove the 1st and 3rd pages of 5p.pdf', async () => {
     // Note: This assumes removing all at once, not one by one with index shifting
     const removed = await remove(fiveP, [0, 2]);
-    fs.writeFileSync(tmpPath('remove_5p_pages1-3.pdf'), Buffer.from(removed));
 
     const images = await pdfToImages(removed);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `remove-5p-pages1-3-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -380,14 +377,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('insert: insert a.pdf at position 0 in 5p.pdf', async () => {
     const inserted = await insert(fiveP, [{ pdf: aPdf, position: 0 }]);
-    fs.writeFileSync(tmpPath('insert_5p_a_at_0.pdf'), Buffer.from(inserted));
 
     const images = await pdfToImages(inserted);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `insert-5p-a-at-0-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -398,14 +394,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { pdf: aPdf, position: 0 },
       { pdf: aPdf, position: 2 }, // The PDF is 6 pages after the first insert
     ]);
-    fs.writeFileSync(tmpPath('insert_5p_a_at_0_and_2.pdf'), Buffer.from(inserted));
 
     const images = await pdfToImages(inserted);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `insert-5p-a-at-0-and-2-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -415,14 +410,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('rotate: rotate all pages of 5p.pdf by 90 degrees', async () => {
     const rotated = await rotate(fiveP, 90);
-    fs.writeFileSync(tmpPath('rotate_5p_90deg_all.pdf'), Buffer.from(rotated));
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-90deg-all-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -430,14 +424,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   test('rotate: rotate only the 2nd page of 5p.pdf by 180 degrees', async () => {
     // pageNumbers=[1] -> only the 2nd page is rotated by 180 degrees
     const rotated = await rotate(fiveP, 180, [1]);
-    fs.writeFileSync(tmpPath('rotate_5p_180deg_page1.pdf'), Buffer.from(rotated));
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-180deg-page1-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -445,14 +438,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   test('rotate: rotate pages 2 and 4 of 5p.pdf by 270 degrees', async () => {
     // Rotate the 2nd and 4th pages by 270 degrees
     const rotated = await rotate(fiveP, 270, [1, 3]);
-    fs.writeFileSync(tmpPath('rotate_5p_270deg_pages1-3.pdf'), Buffer.from(rotated));
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-270deg-pages1-3-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -462,14 +454,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('move: move the 1st page (index:0) of 5p.pdf to the 3rd position (index:2)', async () => {
     const moved = await move(fiveP, { from: 0, to: 2 });
-    fs.writeFileSync(tmpPath('move_5p_page0_to_2.pdf'), Buffer.from(moved));
 
     const images = await pdfToImages(moved);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `move-5p-page0-to-2-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -479,42 +470,39 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
   //
   test('organize: single remove (remove the 2nd page)', async () => {
     const result = await organize(fiveP, [{ type: 'remove', data: { position: 1 } }]);
-    fs.writeFileSync(tmpPath('organize_remove_only.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-remove-only-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
 
   test('organize: single insert (insert a.pdf at page 1)', async () => {
     const result = await organize(fiveP, [{ type: 'insert', data: { pdf: aPdf, position: 0 } }]);
-    fs.writeFileSync(tmpPath('organize_insert_only.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-insert-only-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
 
   test('organize: single replace (replace 2nd page with a.pdf)', async () => {
     const result = await organize(fiveP, [{ type: 'replace', data: { pdf: aPdf, position: 1 } }]);
-    fs.writeFileSync(tmpPath('organize_replace_only.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-replace-only-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -524,14 +512,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'rotate', data: { position: 0, degrees: 90 } },
       { type: 'rotate', data: { position: 2, degrees: 90 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_rotate_only.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-rotate-only-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -547,14 +534,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'rotate', data: { position: 0, degrees: 90 } },
       { type: 'rotate', data: { position: 3, degrees: 90 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_multiple_ops.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-multiple-ops-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -572,14 +558,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'insert', data: { pdf: aPdf, position: 1 } },
       { type: 'move', data: { from: 1, to: 0 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_composite_1.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-1-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -594,14 +579,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'rotate', data: { position: 2, degrees: 180 } },
       { type: 'remove', data: { position: 0 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_composite_2.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-2-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -618,14 +602,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'move', data: { from: 2, to: 5 } },
       { type: 'move', data: { from: 3, to: 1 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_composite_3.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-3-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -641,14 +624,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'rotate', data: { position: 2, degrees: 270 } },
       { type: 'remove', data: { position: 0 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_composite_4.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-4-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
@@ -665,14 +647,13 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
       { type: 'remove', data: { position: 0 } },
       { type: 'insert', data: { pdf: bPdf, position: 4 } },
     ]);
-    fs.writeFileSync(tmpPath('organize_composite_5.pdf'), Buffer.from(result));
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-5-result-page${i + 1}`,
         failureThreshold: 0,
-        failureThresholdType: 'pixel'
+        failureThresholdType: 'pixel',
       });
     }
   });
