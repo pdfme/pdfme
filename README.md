@@ -33,7 +33,7 @@
 
 | Fast PDF Generator | Easy PDF Template Design | Simple JSON Template |
 | --- | --- | --- |
-| Works on Node and in the browser. Use templates to generate PDFs—complex operations are not required. | Anyone can easily create templates using the designer. | Templates are JSON data that is easy to understand and work with. |
+| Works on Node and in the browser. Use templates to generate PDFs—complex operations are not required. | Anyone can easily create templates using the designer. | Templates are JSON data that is easy to understand and work with. Built with TypeScript for excellent type safety. |
 
 ## Custom Feature Requests
 
