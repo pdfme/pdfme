@@ -1,4 +1,4 @@
-import { Schema } from '@pdfme/common/dist/esm/index.js';
+import type { Schema } from '@pdfme/common/dist/esm/index.js';
 import { BARCODE_TYPES } from './constants.js';
 
 export interface BarcodeSchema extends Schema {
