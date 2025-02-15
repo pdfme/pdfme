@@ -2,12 +2,23 @@
   "name": "@pdfme/schemas",
   "version": "0.0.0",
   "type": "module",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/esm/src/index.js",
+      "require": "./dist/cjs/src/index.js",
+      "default": "./dist/esm/src/index.js"
+    }
+  },
   "dependencies": {
     "@pdfme/common": "file:../common",
     "air-datepicker": "^3.4.0"
   },
   "devDependencies": {
-    "@types/air-datepicker": "^3.4.0"
+    "@types/air-datepicker": "^3.4.0",
+    "@vitest/coverage-v8": "^1.2.2",
+    "vitest": "^1.2.2"
   },
   "sideEffects": false,
   "author": "hand-dot",

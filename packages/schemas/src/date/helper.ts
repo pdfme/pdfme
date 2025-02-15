@@ -72,7 +72,7 @@ import localeZh from 'air-datepicker/locale/zh';
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
 
-import type { Plugin, PropPanelSchema } from '@pdfme/common/dist/esm/index.js';
+import type { Plugin, PropPanelSchema, UIRenderProps, PDFRenderProps } from '@pdfme/common/dist/esm/index.js';
 import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common/dist/esm/index.js';
 import type { TextSchema } from '../text/types.js';
 import text from '../text/index.js';

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import type { Font as FontKitFont } from 'fontkit';
 import { Font, getDefaultFont } from '@pdfme/common/dist/esm/index.js';
-import { describe, test, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
