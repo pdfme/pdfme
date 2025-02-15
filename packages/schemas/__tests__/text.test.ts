@@ -2,6 +2,8 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import type { Font as FontKitFont } from 'fontkit';
 import { Font, getDefaultFont } from '@pdfme/common/dist/esm/index.js';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, test, expect, beforeAll, afterAll, vi } from 'vitest';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
@@ -49,12 +51,12 @@ describe('getSplitPosition test with mocked font width calculations', () => {
    * Therefore, setting the boxWidthInPt to 5 should result in a split after 5 characters.
    */
 
-  let widthOfTextAtSizeSpy: jest.SpyInstance<number, [string]>;
+  let widthOfTextAtSizeSpy: any;
 
   beforeAll(() => {
     // @ts-ignore
-    widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper.js'), 'widthOfTextAtSize');
-    widthOfTextAtSizeSpy.mockImplementation((text) => {
+    widthOfTextAtSizeSpy = vi.spyOn(require('../src/text/helper.js'), 'widthOfTextAtSize');
+    widthOfTextAtSizeSpy.mockImplementation((text: string) => {
       return text.length;
     });
   });
