@@ -1,10 +1,13 @@
 {
   "extends": "../../tsconfig.base",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "outDir": "./dist/cjs",
     "declaration": true,
     "declarationDir": "dist/types",
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   }
 }
