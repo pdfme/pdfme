@@ -1,6 +1,6 @@
 import * as acorn from 'acorn';
 import type { Node as AcornNode, Identifier, Property } from 'estree';
-import type { SchemaPageArray } from './types';
+import type { SchemaPageArray, Schema } from './types.js';
 
 const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
 const parseDataCache = new Map<string, Record<string, unknown>>();
@@ -372,7 +372,7 @@ const evaluatePlaceholders = (arg: {
 
 export const replacePlaceholders = (arg: {
   content: string;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   schemas: SchemaPageArray;
 }): string => {
   const { content, variables, schemas } = arg;
