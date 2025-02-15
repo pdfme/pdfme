@@ -2,6 +2,13 @@
   "name": "@pdfme/converter",
   "version": "0.0.0",
   "type": "module",
+  "dependencies": {
+    "@pdfme/common": "workspace:*",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "devDependencies": {
+    "@types/pdfjs-dist": "^2.10.378"
+  },
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -45,12 +52,13 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/common": "*",
+    "@pdfme/common": "workspace:*",
     "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {
     "@pdfme/generator": "file:../generator",
     "@types/estree": "^1.0.6",
+    "@types/pdfjs-dist": "^2.10.378",
     "canvas": "^2.11.2"
   },
   "optionalDependencies": {

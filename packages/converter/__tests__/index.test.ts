@@ -1,6 +1,6 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node';
+import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node.js';
 
 describe('pdf2img tests', () => {
   let pdfArrayBuffer: ArrayBuffer;
@@ -45,7 +45,7 @@ describe('pdf2img tests', () => {
     expect(Array.isArray(images)).toBe(true);
     expect(images.length).toBe(2);
 
-    images.forEach((img) => {
+    images.forEach((img: ArrayBuffer) => {
       expect(img).toBeInstanceOf(ArrayBuffer);
       expect(img.byteLength).toBeGreaterThan(0);
     });
@@ -94,7 +94,7 @@ describe('pdf2size tests', () => {
     const sizes = await nodePdf2Size(pdfArrayBuffer, { scale: 1 });
     expect(Array.isArray(sizes)).toBe(true);
     expect(sizes.length).toBe(4);
-    sizes.forEach((size) => {
+    sizes.forEach((size: { width: number; height: number }) => {
       expect(typeof size.width).toBe('number');
       expect(typeof size.height).toBe('number');
       expect(size.width).toBeGreaterThan(0);
@@ -105,7 +105,7 @@ describe('pdf2size tests', () => {
   test('scale option - properly adjusts size', async () => {
     const scale = 0.5;
     const sizes = await nodePdf2Size(pdfArrayBuffer, { scale });
-    sizes.forEach((size) => {
+    sizes.forEach((size: { width: number; height: number }) => {
       expect(size.width).toBeLessThan(200);
       expect(size.height).toBeLessThan(300);
     });
