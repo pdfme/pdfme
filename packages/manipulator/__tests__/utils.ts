@@ -1,4 +1,5 @@
 import { PDFDocument } from '@pdfme/pdf-lib';
+import { pdf2img } from '@pdfme/converter';
 
 export const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => {
   const pdfDoc = await PDFDocument.create();
@@ -13,7 +14,6 @@ export const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => 
   return pdfDoc.save();
 };
 
-export const getPDFPageCount = async (pdf: ArrayBuffer): Promise<number> => {
-  const pdfDoc = await PDFDocument.load(pdf);
-  return pdfDoc.getPageCount();
+export const pdfToImages = async (pdf: ArrayBuffer): Promise<ArrayBuffer[]> => {
+  return pdf2img(pdf, { scale: 2, imageType: 'png' });
 };

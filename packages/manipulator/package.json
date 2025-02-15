@@ -39,34 +39,20 @@
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src",
     "test": "jest",
+    "test:update-snapshots": "jest --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
+    "@pdfme/converter": "^0.0.0",
     "@pdfme/pdf-lib": "*"
-  },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.esm.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ]
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@types/estree": "^1.0.6"
+    "@types/estree": "^1.0.6",
+    "@types/jest-image-snapshot": "^6.4.0",
+    "jest-image-snapshot": "^6.4.0"
   }
 }
