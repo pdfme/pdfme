@@ -1,5 +1,5 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-import { Size, pt2mm } from '@pdfme/common';
+import { Size, pt2mm } from '@pdfme/common/dist/esm/src/index.js';
 
 interface Environment {
   getDocument: (pdf: ArrayBuffer) => Promise<PDFDocumentProxy>;
