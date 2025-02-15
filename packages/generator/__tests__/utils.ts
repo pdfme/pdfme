@@ -2,6 +2,8 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import { Font, getDefaultFont } from '@pdfme/common';
 
+let fontCache: Font | null = null;
+
 const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -23,18 +25,26 @@ const JuliusSansOneRegularData = readFileSync(
   path.join(__dirname, `/assets/fonts/JuliusSansOne-Regular.ttf`)
 );
 
-export const getFont = (): Font => ({
-  ...getDefaultFont(),
-  SauceHanSansJP: { data: SauceHanSansJPData },
-  SauceHanSerifJP: { data: SauceHanSerifJPData },
-  'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
-  'NotoSansJP-Regular': { data: NotoSansJPRegularData },
-  'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
-  'GreatVibes-Regular': { data: GreatVibesRegularData },
-  'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },
-  NotoSerifJP: { data: NotoSerifJPRegularData },
-  NotoSansJP: { data: NotoSansJPRegularData },
-});
+export const getFont = (): Font => {
+  if (fontCache) {
+    return fontCache;
+  }
+  
+  fontCache = {
+    ...getDefaultFont(),
+    SauceHanSansJP: { data: SauceHanSansJPData },
+    SauceHanSerifJP: { data: SauceHanSerifJPData },
+    'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
+    'NotoSansJP-Regular': { data: NotoSansJPRegularData },
+    'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
+    'GreatVibes-Regular': { data: GreatVibesRegularData },
+    'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },
+    NotoSerifJP: { data: NotoSerifJPRegularData },
+    NotoSansJP: { data: NotoSansJPRegularData },
+  };
+  
+  return fontCache;
+};
 
 export const getPdf = (pdfFilePath: string) => {
   const pdfParser = new PDFParser();

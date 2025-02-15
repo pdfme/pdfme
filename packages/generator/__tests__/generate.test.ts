@@ -4,6 +4,12 @@ import { Template, BLANK_PDF, Schema } from '@pdfme/common';
 import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 
 describe('generate integrate test', () => {
+  let cachedFonts: any;
+  
+  beforeAll(() => {
+    cachedFonts = getFont();
+  });
+
   describe('basic generator', () => {
     const textObject = (x: number, y: number, name: string = 'a'): Schema => ({
       name,
@@ -128,8 +134,7 @@ describe('generate integrate test', () => {
           ],
         ],
       };
-      jest.setTimeout(30000);
-      const { SauceHanSansJP, SauceHanSerifJP } = getFont();
+      const { SauceHanSansJP, SauceHanSerifJP } = cachedFonts;
       const pdf = await generate({
         inputs,
         template,

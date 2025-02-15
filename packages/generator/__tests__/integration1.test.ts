@@ -8,6 +8,12 @@ import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
 
 describe('generate integration test(label, envelope)', () => {
+  let cachedFonts: any;
+  
+  beforeAll(() => {
+    cachedFonts = getFont();
+  });
+
   describe.each([label, envelope])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
@@ -17,7 +23,7 @@ describe('generate integration test(label, envelope)', () => {
       test(`snapshot ${key}`, async () => {
         const inputs = getInputFromTemplate(template);
 
-        const font = getFont();
+        const font = { ...cachedFonts };
         font.SauceHanSansJP.fallback = false;
         font.SauceHanSerifJP.fallback = false;
         font['NotoSerifJP-Regular'].fallback = false;
