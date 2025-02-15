@@ -35,7 +35,7 @@
         "packages/schemas/dist/esm/src"
       ]
     },
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",

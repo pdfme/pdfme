@@ -5,6 +5,6 @@
     "outDir": "./dist/cjs",
     "declaration": true,
     "declarationDir": "dist/types",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }
