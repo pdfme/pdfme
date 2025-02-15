@@ -1,6 +1,10 @@
 {
   "name": "@pdfme/schemas",
   "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@pdfme/common": "file:../common"
+  },
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
