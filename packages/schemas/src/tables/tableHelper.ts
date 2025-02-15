@@ -14,10 +14,7 @@ import type {
   Spacing,
   TableInput,
   StylesProps,
-  Section,
-  TablePosition,
-  TableDimensions,
-  TableInternals
+  Section
 } from './types.js';
 import { Cell, Column, Row, Table } from './classes.js';
 

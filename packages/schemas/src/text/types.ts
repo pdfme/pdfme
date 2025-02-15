@@ -12,6 +12,7 @@ export type FontWidthCalcValues = {
   boxWidthInPt: number;
 };
 export interface TextSchema extends Schema {
+  type: 'text';
   fontName?: string;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
@@ -31,4 +32,5 @@ export interface TextSchema extends Schema {
   height: number;
   position: { x: number; y: number };
   readOnly?: boolean;
+  content: string;
 }

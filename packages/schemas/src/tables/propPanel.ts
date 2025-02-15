@@ -1,6 +1,6 @@
-import type { PropPanel, PropPanelSchema } from '@pdfme/common';
+import type { PropPanel, PropPanelSchema } from '@pdfme/common/dist/esm/index.js';
 import type { TableSchema } from './types.js';
-import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common';
+import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common/dist/esm/index.js';
 import {
   getDefaultCellStyles,
   getCellPropPanelSchema,

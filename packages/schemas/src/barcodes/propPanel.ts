@@ -1,12 +1,13 @@
-import type { PropPanel } from '@pdfme/common';
+import type { PropPanel } from '@pdfme/common/dist/esm/index.js';
 import type { BarcodeSchema } from './types.js';
-type I18n = (key: string) => string;
 import {
   DEFAULT_BARCODE_COLOR,
   DEFAULT_BARCODE_BG_COLOR,
   DEFAULT_BARCODE_INCLUDETEXT,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
+
+type I18n = (key: string) => string;
 
 const defaultColors = {
   backgroundColor: DEFAULT_BARCODE_BG_COLOR,

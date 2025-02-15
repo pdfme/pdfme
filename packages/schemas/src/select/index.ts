@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import type { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import type { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common/dist/esm/index.js';
 import text from '../text/index.js';
 import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
@@ -10,6 +10,7 @@ const selectIcon = createSvgStr(ChevronDown);
 
 interface Select extends TextSchema {
   options: string[];
+  readOnly?: boolean;
 }
 
 const addOptions = (props: PropPanelWidgetProps) => {

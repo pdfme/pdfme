@@ -1,4 +1,4 @@
-import { Plugin, Schema, UIRenderProps, PDFRenderProps, PropPanelSchemaProps } from '@pdfme/common';
+import { Plugin, Schema, UIRenderProps, PDFRenderProps, PropPanelSchema } from '@pdfme/common/dist/esm/index.js';
 import { Circle, CircleDot } from 'lucide';
 import svg from '../graphics/svg.js';
 import { isEditable, createSvgStr } from '../utils.js';
@@ -82,7 +82,7 @@ const schema: Plugin<RadioGroup> = {
   pdf: (arg: PDFRenderProps<RadioGroup>) =>
     svg.pdf(Object.assign(arg, { value: getIcon({ value: arg.value, color: arg.schema.color }) })),
   propPanel: {
-    schema: ({ i18n }: PropPanelSchemaProps) => ({
+    schema: ({ i18n }: PropPanelSchema) => ({
       color: {
         title: i18n('schemas.color'),
         type: 'string',

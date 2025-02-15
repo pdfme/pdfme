@@ -17,10 +17,15 @@ const defaultValue = `<svg viewBox="0 0 488 600" version="1.1" xmlns="http://www
     </g>
 </svg>`;
 
-interface SVGSchema extends Schema {}
+interface SVGSchema extends Schema {
+  content: string;
+  width: number;
+  height: number;
+  position: { x: number; y: number };
+}
 
 const svgSchema: Plugin<SVGSchema> = {
-  ui: (arg) => {
+  ui: (arg: { rootElement: HTMLElement; value: string; mode: string; onChange?: (v: { key: string; value: string }) => void; theme: { colorPrimaryBg: string }; schema: SVGSchema }) => {
     const { rootElement, value, mode, onChange, theme, schema } = arg;
     const container = document.createElement(isEditable(mode, schema) ? 'textarea' : 'div');
     container.style.width = '100%';
@@ -68,7 +73,7 @@ const svgSchema: Plugin<SVGSchema> = {
       }
     }
   },
-  pdf: async (arg) => {
+  pdf: async (arg: { page: { getHeight: () => number; drawSvg: (svg: string, opts: { x: number; y: number; width: number; height: number }) => Promise<void> }; schema: SVGSchema; value: string }) => {
     const { page, schema, value } = arg;
     if (!value || !isValidSVG(value)) return;
     const pageHeight = page.getHeight();

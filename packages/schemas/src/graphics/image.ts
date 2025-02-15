@@ -13,7 +13,7 @@ import {
   createSvgStr,
 } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
-import { getImageDimension } from './imageHelper.js';
+import { getImageDimension } from './imagehelper.js';
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };

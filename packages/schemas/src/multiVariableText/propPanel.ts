@@ -1,5 +1,5 @@
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import { PropPanel, PropPanelWidgetProps } from '@pdfme/common';
+import { PropPanel, PropPanelWidgetProps } from '@pdfme/common/dist/esm/index.js';
 import { MultiVariableTextSchema } from './types.js';
 
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {

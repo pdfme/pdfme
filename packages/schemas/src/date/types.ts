@@ -1,4 +1,4 @@
-import { Schema } from '@pdfme/common';
+import { Schema } from '@pdfme/common/dist/esm/index.js';
 import { ALIGNMENT } from '../text/types.js';
 
 export interface DateSchema extends Schema {

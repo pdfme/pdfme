@@ -9,7 +9,7 @@ import {
   TextVerticalAlignBottomIcon,
   TextVerticalAlignMiddleIcon,
   TextVerticalAlignTopIcon,
-} from './icons.js';
+} from './icons';
 import {
   ALIGN_CENTER,
   ALIGN_RIGHT,
@@ -18,7 +18,7 @@ import {
   VERTICAL_ALIGN_BOTTOM,
   VERTICAL_ALIGN_MIDDLE,
   ALIGN_JUSTIFY,
-} from './constants.js';
+} from './constants';
 
 export enum Formatter {
   STRIKETHROUGH = 'strikethrough',

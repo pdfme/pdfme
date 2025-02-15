@@ -1,4 +1,4 @@
-import type { Plugin } from '@pdfme/common';
+import type { Plugin } from '@pdfme/common/dist/esm/index.js';
 import { pdfRender } from './pdfRender.js';
 import { propPanel } from './propPanel.js';
 import { uiRender } from './uiRender.js';

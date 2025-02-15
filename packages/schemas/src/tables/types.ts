@@ -36,7 +36,7 @@ export interface TableSchema extends Schema {
     borderWidth: number;
   };
   headStyles: CellStyle;
-  bodyStyles: CellStyle & { alternateBackgroundColor: string };
+  bodyStyles: CellStyle & { alternateBackgroundColor: string; backgroundColor: string };
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
   };

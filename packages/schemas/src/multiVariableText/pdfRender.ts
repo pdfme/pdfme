@@ -1,4 +1,4 @@
-import { PDFRenderProps } from '@pdfme/common';
+import { PDFRenderProps } from '@pdfme/common/dist/esm/index.js';
 import { MultiVariableTextSchema } from './types.js';
 import { pdfRender as parentPdfRender } from '../text/pdfRender.js';
 import { substituteVariables, validateVariables } from './helper.js';

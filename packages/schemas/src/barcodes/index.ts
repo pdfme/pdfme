@@ -4,7 +4,7 @@ import { uiRender } from './uiRender.js';
 import type { BarcodeSchema, BarcodeTypes } from './types.js';
 import { BARCODE_TYPES } from './constants.js';
 import { createSvgStr } from '../utils.js';
-import type { Plugin } from '@pdfme/common';
+import type { Plugin } from '@pdfme/common/dist/esm/index.js';
 import { QrCode, Barcode } from 'lucide';
 
 const barcodes = BARCODE_TYPES.reduce(

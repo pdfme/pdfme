@@ -1,4 +1,5 @@
-import { Plugin, Schema, mm2pt, PDFRenderProps, UIRenderProps, I18n } from '@pdfme/common';
+import type { Plugin, Schema, PDFRenderProps, UIRenderProps } from '@pdfme/common/dist/esm/index.js';
+import { mm2pt } from '@pdfme/common/dist/esm/index.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../utils.js';
 import { toRadians } from '@pdfme/pdf-lib';
@@ -67,7 +68,7 @@ const shape: Plugin<ShapeSchema> = {
     }
   },
   propPanel: {
-    schema: ({ i18n }: { i18n: I18n }) => ({
+    schema: ({ i18n }: { i18n: (key: string) => string }) => ({
       borderWidth: {
         title: i18n('schemas.borderWidth'),
         type: 'number',
