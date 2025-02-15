@@ -3,7 +3,6 @@ import { ALIGNMENT } from '../text/types.js';
 
 export interface DateSchema extends Schema {
   [key: string]: unknown;
-  type: 'text';
   type: 'date' | 'time' | 'dateTime';
   name: string;
   content: string;
