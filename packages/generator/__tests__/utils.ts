@@ -39,18 +39,19 @@ export const getFont = (): Font => {
     };
   }
   
-  fontCache = {
-    ...getDefaultFont(),
-    SauceHanSansJP: { data: SauceHanSansJPData },
-    SauceHanSerifJP: { data: SauceHanSerifJPData },
-    'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
-    'NotoSansJP-Regular': { data: NotoSansJPRegularData },
-    'GloriaHallelujah-Regular': { data: GloriaHallelujahRegularData },
-    'GreatVibes-Regular': { data: GreatVibesRegularData },
-    'JuliusSansOne-Regular': { data: JuliusSansOneRegularData },
-    NotoSerifJP: { data: NotoSerifJPRegularData },
-    NotoSansJP: { data: NotoSansJPRegularData },
-  };
+  // Initialize cache with default font first
+  fontCache = getDefaultFont();
+  
+  // Add custom fonts one by one to avoid memory pressure
+  fontCache.SauceHanSansJP = { data: SauceHanSansJPData };
+  fontCache.SauceHanSerifJP = { data: SauceHanSerifJPData };
+  fontCache['NotoSerifJP-Regular'] = { data: NotoSerifJPRegularData };
+  fontCache['NotoSansJP-Regular'] = { data: NotoSansJPRegularData };
+  fontCache['GloriaHallelujah-Regular'] = { data: GloriaHallelujahRegularData };
+  fontCache['GreatVibes-Regular'] = { data: GreatVibesRegularData };
+  fontCache['JuliusSansOne-Regular'] = { data: JuliusSansOneRegularData };
+  fontCache.NotoSerifJP = { data: NotoSerifJPRegularData };
+  fontCache.NotoSansJP = { data: NotoSansJPRegularData };
   
   return getFont(); // Call recursively to get a clean copy
 };
