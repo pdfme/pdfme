@@ -2,9 +2,13 @@
   "extends": "../../tsconfig.base",
   "compilerOptions": {
     "module": "ESNext",
+    "moduleResolution": "node16",
     "outDir": "./dist/esm",
     "declaration": true,
     "declarationDir": "dist/types",
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   }
 }
