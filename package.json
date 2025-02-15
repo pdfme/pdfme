@@ -26,6 +26,7 @@
     "packages/converter",
     "packages/schemas",
     "packages/generator",
+    "packages/manipulator",
     "packages/ui"
   ],
   "scripts": {
