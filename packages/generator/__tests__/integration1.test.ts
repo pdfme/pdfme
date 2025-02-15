@@ -2,11 +2,10 @@ import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { label, envelope } from './assets/templates';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, imagePlugin } from '@pdfme/schemas';
+import { text, image } from '@pdfme/schemas';
 import { getFont, getPdfTmpPath } from './utils';
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 import { pdf2img } from '@pdfme/converter';
-import type { MatchImageSnapshotMatcher } from 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
 
@@ -41,7 +40,7 @@ describe('generate integration test(label, envelope)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image: imagePlugin },
+          plugins: { text, image },
           options: { font },
         });
 
