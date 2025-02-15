@@ -2,13 +2,6 @@
   "name": "@pdfme/converter",
   "version": "0.0.0",
   "type": "module",
-  "dependencies": {
-    "@pdfme/common": "workspace:*",
-    "pdfjs-dist": "^3.11.174"
-  },
-  "devDependencies": {
-    "@types/pdfjs-dist": "^2.10.378"
-  },
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
