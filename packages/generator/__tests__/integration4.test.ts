@@ -1,9 +1,9 @@
-import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { textType } from './assets/templates';
-import {getInputFromTemplate} from "@pdfme/common"
+import { getInputFromTemplate } from '@pdfme/common';
 import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { getFont, pdfToImages } from './utils';
+import 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
@@ -24,7 +24,7 @@ describe('generate integration test(slower)', () => {
         font['NotoSerifJP-Regular'].fallback = false;
         font.NotoSerifJP.fallback = false;
         font.NotoSansJP.fallback = false;
-        
+
         const hrstart = process.hrtime();
 
         const pdf = await generate({
@@ -39,16 +39,17 @@ describe('generate integration test(slower)', () => {
         if (process.env.CI) {
           expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
         } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
-          console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
+          console.warn(
+            `Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`
+          );
         }
 
-        const tmpFile = getPdfTmpPath(`${key}.pdf`);
-        const assertFile = getPdfAssertPath(`${key}.pdf`);
-
-        writeFileSync(tmpFile, pdf);
-        const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
-        const [a, e] = res;
-        expect(a.Pages).toEqual(e.Pages);
+        const images = await pdfToImages(pdf);
+        for (let i = 0; i < images.length; i++) {
+          expect(images[i]).toMatchImageSnapshot({
+            customSnapshotIdentifier: `${key}-${i + 1}`,
+          });
+        }
       });
     }
   });

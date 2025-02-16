@@ -1,9 +1,9 @@
-import { writeFileSync } from 'fs';
 import generate from '../src/generate';
 import { other, shape } from './assets/templates';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
-import { getFont, getPdf, getPdfTmpPath, getPdfAssertPath } from './utils';
+import { getFont, pdfToImages } from './utils';
+import 'jest-image-snapshot';
 
 const signature = {
   pdf: image.pdf,
@@ -59,16 +59,17 @@ describe('generate integration test(other, shape)', () => {
         if (process.env.CI) {
           expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
         } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
-          console.warn(`Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`);
+          console.warn(
+            `Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`
+          );
         }
 
-        const tmpFile = getPdfTmpPath(`${key}.pdf`);
-        const assertFile = getPdfAssertPath(`${key}.pdf`);
-
-        writeFileSync(tmpFile, pdf);
-        const res: any = await Promise.all([getPdf(tmpFile), getPdf(assertFile)]);
-        const [a, e] = res;
-        expect(a.Pages).toEqual(e.Pages);
+        const images = await pdfToImages(pdf);
+        for (let i = 0; i < images.length; i++) {
+          expect(images[i]).toMatchImageSnapshot({
+            customSnapshotIdentifier: `${key}-${i + 1}`,
+          });
+        }
       });
     }
   });

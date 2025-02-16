@@ -39,6 +39,7 @@
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src",
     "test": "jest",
+    "test:update-snapshots": "jest --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -49,8 +50,8 @@
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",
-    "@pdfme/schemas": "file:../schemas",
-    "pdf2json": "^2.0.0"
+    "@pdfme/converter": "file:../converter",
+    "@pdfme/schemas": "file:../schemas"
   },
   "peerDependencies": {
     "@pdfme/common": "latest",
@@ -58,6 +59,9 @@
   },
   "jest": {
     "resolver": "ts-jest-resolver",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"

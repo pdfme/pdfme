@@ -15,8 +15,8 @@ export const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => 
 };
 
 export const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
-  const arrayBuffers = await pdf2img(pdf, { scale: 2, imageType: 'png' });
-  return arrayBuffers.map(buf => Buffer.from(new Uint8Array(buf)));
+  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 
 export const getPDFPageCount = async (pdf: ArrayBuffer): Promise<number> => {
