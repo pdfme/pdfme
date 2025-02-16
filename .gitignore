@@ -6,6 +6,5 @@
 .cache
 dist
 coverage/
-packages/generator/__tests__/assets/pdfs/tmp/*.pdf
 
 **/repomix-output.txt

@@ -1,8 +1,8 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import { Font, getDefaultFont } from '@pdfme/common';
+import { pdf2img } from '@pdfme/converter';
 
-const PDFParser = require('pdf2json');
 const SauceHanSansJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const SauceHanSerifJPData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 const NotoSerifJPRegularData = readFileSync(
@@ -35,19 +35,7 @@ export const getFont = (): Font => ({
   NotoSerifJP: { data: NotoSerifJPRegularData },
   NotoSansJP: { data: NotoSansJPRegularData },
 });
-
-export const getPdf = (pdfFilePath: string) => {
-  const pdfParser = new PDFParser();
-
-  return new Promise((resolve, reject) => {
-    pdfParser.on('pdfParser_dataError', reject);
-    pdfParser.on('pdfParser_dataReady', resolve);
-    pdfParser.loadPDF(pdfFilePath);
-  });
+export const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
+  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
-
-const getPdfPath = (dir: string, fileName: string) =>
-  path.join(__dirname, `assets/pdfs/${dir}/${fileName}`);
-
-export const getPdfTmpPath = (fileName: string) => getPdfPath('tmp', fileName);
-export const getPdfAssertPath = (fileName: string) => getPdfPath('assert', fileName);

@@ -307,8 +307,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `merge-abc-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -328,16 +326,12 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images12.length; i++) {
       expect(images12[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `split-5p-1-2-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
 
     for (let i = 0; i < images35.length; i++) {
       expect(images35[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `split-5p-3-5-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -352,8 +346,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `remove-5p-page1-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -366,8 +358,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `remove-5p-pages1-3-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -382,8 +372,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `insert-5p-a-at-0-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -399,8 +387,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `insert-5p-a-at-0-and-2-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -415,8 +401,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-90deg-all-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -429,8 +413,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-180deg-page1-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -443,8 +425,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `rotate-5p-270deg-pages1-3-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -459,8 +439,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `move-5p-page0-to-2-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -475,8 +453,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-remove-only-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -488,8 +464,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-insert-only-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -501,8 +475,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-replace-only-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -517,8 +489,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-rotate-only-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -539,8 +509,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-multiple-ops-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -563,8 +531,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-1-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -584,8 +550,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-2-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -607,8 +571,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-3-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -629,8 +591,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-4-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });
@@ -652,8 +612,6 @@ describe('PDF manipulator E2E Tests with real PDF files', () => {
     for (let i = 0; i < images.length; i++) {
       expect(images[i]).toMatchImageSnapshot({
         customSnapshotIdentifier: `organize-composite-5-result-page${i + 1}`,
-        failureThreshold: 0,
-        failureThresholdType: 'pixel',
       });
     }
   });

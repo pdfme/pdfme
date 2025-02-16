@@ -44,15 +44,31 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/converter": "^0.0.0",
     "@pdfme/pdf-lib": "*"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@types/estree": "^1.0.6",
-    "@types/jest-image-snapshot": "^6.4.0",
-    "jest-image-snapshot": "^6.4.0"
+    "@pdfme/converter": "*",
+    "@types/estree": "^1.0.6"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "./tsconfig.json"
+        }
+      ]
+    }
   }
 }
