@@ -36,5 +36,5 @@ const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
 generate({ template, inputs }).then((pdf) => {
   console.log(pdf);
-  fs.writeFileSync(path.join(__dirname, `test.pdf`), pdf);
+  fs.writeFileSync(path.join(__dirname, `test-generate.pdf`), pdf);
 });
