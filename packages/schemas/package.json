@@ -26,21 +26,28 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
+      "import": {
+        "node": "./dist/node/src/index.js",
+        "default": "./dist/esm/src/index.js"
+      },
       "require": "./dist/cjs/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     },
     "./utils": {
-      "import": "./dist/esm/src/utils.js",
+      "import": {
+        "node": "./dist/node/src/utils.js",
+        "default": "./dist/esm/src/utils.js"
+      },
       "require": "./dist/cjs/src/utils.js",
       "types": "./dist/types/src/utils.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
+    "build": "npm-run-all --parallel build:cjs build:esm build:node",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
+    "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src",
     "test": "jest",
