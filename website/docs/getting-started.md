@@ -1,5 +1,41 @@
 # Getting Started
 
+## Quick Start
+
+```ts
+import { Template, BLANK_PDF } from '@pdfme/common';
+import { generate } from '@pdfme/generator';
+
+// 1. Define a simple template
+const template: Template = {
+  basePdf: BLANK_PDF,
+  schemas: [
+    [
+      {
+        name: 'hello',
+        type: 'text',
+        position: { x: 0, y: 0 },
+        width: 100,
+        height: 20,
+      }
+    ]
+  ]
+};
+
+// 2. Prepare your data
+const inputs = [{ hello: 'Hello, PDF!' }];
+
+// 3. Generate PDF
+generate({ template, inputs }).then((pdf) => {
+  // Browser: Open PDF in new window
+  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+  window.open(URL.createObjectURL(blob));
+  
+  // Node.js: Save to file
+  // fs.writeFileSync('output.pdf', pdf);
+});
+```
+
 ## Introduction
 
 pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:

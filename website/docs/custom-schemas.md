@@ -1,6 +1,33 @@
 # Custom Schemas(Plugins)
 
 By default, pdfme allows you to use a text schema. However, some users may want to utilize schemas for images or QR codes.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Plugin Not Loading**
+   - Ensure you've installed `@pdfme/schemas` package
+   - Check import statements are correct
+   - Verify plugin is properly registered in options
+
+2. **Rendering Issues**
+   - Check if the schema type matches exactly
+   - Verify input data format matches schema requirements
+   - Ensure all required properties are set
+
+3. **Performance Problems**
+   - Consider using plugin caching for repeated elements
+   - Check input data size
+   - Monitor memory usage with large documents
+
+### Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `Invalid schema type` | Schema type not registered | Register plugin before use |
+| `Plugin render error` | Invalid input data | Check data format matches schema |
+| `Memory limit exceeded` | Too many elements | Use pagination or reduce elements |
 These can be loaded as plugins from the `@pdfme/schemas` package.
 
 You can also create your own schemas and load them similarly as plugins.

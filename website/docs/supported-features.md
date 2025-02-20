@@ -3,6 +3,19 @@
 In pdfme, the following elements can be rendered.  
 For elements that are not supported, you can add your own rendering process using the [plugin mechanism](/docs/custom-schemas).
 
+## Feature Comparison
+
+| Feature | Basic Text | Multi-variable Text | Image | Barcode | Table |
+|---------|------------|---------------------|-------|----------|--------|
+| Font Customization | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Color Support | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Background | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Rotation | ✅ | ✅ | ✅ | ✅ | ❌ |
+| Dynamic Sizing | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Page Break Support | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Expression Support | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Cache Support | ✅ | ✅ | ✅ | ✅ | ❌ |
+
 ## Currently Supported
 
 :::info
