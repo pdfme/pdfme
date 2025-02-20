@@ -4,16 +4,40 @@ import type { ImageType } from './types.js';
 export interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
-  merge?: boolean;
 }
 
-
-export async function imgs2pdf(
+export async function img2pdf(
   imgs: ArrayBuffer[],
   options: Img2PdfOptions = {},
-): Promise<ArrayBuffer[]> {
-  // TODO: 画像をPDFに変換する
-  // pdf-libで可能（単ページ or 複数画像を1ファイル）画像を embedJpg() / embedPng() で取り込み、drawImage やページ追加により「画像を敷き詰めたPDF」を作る。
-  // merge オプションが true の場合は、複数画像を1ファイルにまとめる
-  return [];
+): Promise<ArrayBuffer> {
+  try {
+    const { scale = 1 } = options;
+    
+    if (!Array.isArray(imgs) || imgs.length === 0) {
+      throw new Error('Input must be a non-empty array of image buffers');
+    }
+
+    const doc = await PDFDocument.create();
+    for (const img of imgs) {
+      try {
+        const image = await doc.embedJpg(img).catch(async () => {
+          return await doc.embedPng(img);
+        });
+        const page = doc.addPage();
+        const { width, height } = image.scale(scale);
+        page.setSize(width, height);
+        page.drawImage(image, {
+          x: 0,
+          y: 0,
+          width,
+          height,
+        });
+      } catch (error) {
+        throw new Error(`Failed to process image: ${(error as Error).message}`);
+      }
+    }
+    return await doc.save();
+  } catch (error) {
+    throw new Error(`[@pdfme/converter] img2pdf failed: ${(error as Error).message}`);
+  }
 }

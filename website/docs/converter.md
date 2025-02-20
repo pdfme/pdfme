@@ -4,10 +4,11 @@
 
 Its primary purpose is to convert PDFs into other formats (like images) or to convert various data formats (like Markdown) into PDFs.
 
-Although it’s still under development, you can already use the following features:
+Although it's still under development, you can already use the following features:
 
 - **Convert PDF to Images**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
-- **Retrieve Each Page’s Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
+- **Retrieve Each Page's Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
+- **Convert Images to PDF**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
 
 Planned conversion features include:
 - **Markdown to PDF**: `md2pdf`
@@ -63,6 +64,40 @@ async function generateThumbnail(pdfPath: string, thumbnailPath: string): Promis
 ```
 
 For reference, check out the [thumbnail generation script](https://github.com/pdfme/pdfme/blob/main/playground/scripts/generate-templates-thumbnail.js) in the repository’s playground directory.
+
+## img2pdf
+
+The `img2pdf` function converts one or more images (JPEG or PNG) into a single PDF file. Each image becomes a page in the output PDF. It has the following TypeScript interface:
+
+```ts
+img2pdf(imgs: ArrayBuffer[], options?: Img2PdfOptions): Promise<ArrayBuffer>
+```
+
+Options:
+- `scale`: (optional) Scale factor for the output PDF pages (default: 1)
+- `imageType`: (optional) Specify the image type ('jpeg' or 'png') if known
+
+Example usage:
+```ts
+import fs from 'fs';
+import { imgs2pdf } from '@pdfme/converter';
+
+async function convertImagesToPDF(imagePaths: string[], outputPath: string): Promise<void> {
+  try {
+    const images = imagePaths.map(path => {
+      const img = fs.readFileSync(path);
+      return img.buffer.slice(img.byteOffset, img.byteOffset + img.byteLength);
+    });
+
+    const pdf = await img2pdf(images);
+    fs.writeFileSync(outputPath, Buffer.from(pdf));
+    console.log(`PDF saved to ${outputPath}`);
+  } catch (err) {
+    console.error('Failed to convert images to PDF:', err);
+  }
+}
+```
+
 
 ## Contact
 
