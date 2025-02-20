@@ -1,6 +1,34 @@
 # Headers and Footers
 
-You can place elements like headers and footers that are displayed on every page and are not affected by page breaks.
+## Overview
+
+Headers and footers are special elements that:
+- Display consistently on every page
+- Remain unaffected by page breaks
+- Support dynamic content through expressions
+- Work with custom templates
+
+## Quick Start
+
+```ts
+const template = {
+  basePdf: { 
+    width: 210, 
+    height: 297, 
+    padding: [20, 20, 20, 20],
+    staticSchema: [
+      {
+        name: 'pageNumber',
+        type: 'text',
+        content: 'Page {currentPage} of {totalPages}',
+        position: { x: 145, y: 282 },
+        width: 45,
+        height: 10
+      }
+    ]
+  }
+};
+```
 
 Specifically, in cases where page breaks occur—such as with [dynamic tables](/docs/tables)—you can use this feature to place elements that are not pushed down by data.
 

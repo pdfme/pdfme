@@ -1,6 +1,31 @@
 # Tables with Dynamic Data
 
+## Overview
+
+The table schema enables dynamic table generation with features like:
+- Automatic page breaks
+- Custom styling per column
+- Header repetition
+- Dynamic row generation
+- Expression support
+
 [![Preview of Dynamic Tables](/img/table.png)](https://playground.pdfme.com/)
+
+## Quick Start
+
+```ts
+const template = {
+  schemas: [[{
+    name: 'myTable',
+    type: 'table',
+    position: { x: 20, y: 20 },
+    width: 170,
+    showHead: true,
+    head: ['Name', 'Age', 'City'],
+    content: '[["John", "30", "New York"],["Jane", "25", "London"]]'
+  }]]
+};
+```
 
 The table schema has been added in since [V4.5.0](https://github.com/pdfme/pdfme/releases/tag/4.5.0).  
 This schema allows you to add tables to PDFs and dynamically modify the table data.

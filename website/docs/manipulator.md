@@ -1,6 +1,28 @@
 # Manipulator
 
-The `@pdfme/manipulator` package provides powerful utilities for manipulating PDF files. It can be used in both Node.js and browser environments.
+## Overview
+
+The `@pdfme/manipulator` package provides powerful utilities for PDF manipulation in both Node.js and browser environments. Key features include:
+- Merging multiple PDFs
+- Splitting PDFs into separate documents
+- Removing specific pages
+- Rotating pages
+- Inserting pages at specific positions
+
+## Quick Start
+
+```ts
+import { merge, split } from '@pdfme/manipulator';
+
+// Merge PDFs
+const merged = await merge([pdf1, pdf2]);
+
+// Split PDF
+const splits = await split(pdf, [
+  { start: 0, end: 1 }, // Pages 1-2
+  { start: 2, end: 4 }  // Pages 3-5
+]);
+```
 
 ## Installation
 
