@@ -4,10 +4,11 @@
 
 Its primary purpose is to convert PDFs into other formats (like images) or to convert various data formats (like Markdown) into PDFs.
 
-Although it’s still under development, you can already use the following features:
+Although it's still under development, you can already use the following features:
 
 - **Convert PDF to Images**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
-- **Retrieve Each Page’s Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
+- **Retrieve Each Page's Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
+- **Convert Images to PDF**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
 
 Planned conversion features include:
 - **Markdown to PDF**: `md2pdf`
@@ -25,44 +26,84 @@ If you want to convert PDFs to images (`pdf2img`) in Node.js, you’ll need [nod
 npm install canvas@^2.11.2
 ```
 
-## Usage
+## Features
 
-For instance, the `pdf2img` function has the following TypeScript interface:
-
-```ts
-pdf2img(pdf: ArrayBuffer, options?: Pdf2ImgOptions): Promise<ArrayBuffer[]>
-```
-See the details here:  
-[https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
-
-Below is an example in TypeScript that reads a local PDF, converts the first page into a PNG, and saves it as a thumbnail:
+### pdf2img
+Converts PDF pages into images (JPEG or PNG format).
 
 ```ts
-import fs from 'fs';
-import path from 'path';
 import { pdf2img } from '@pdfme/converter';
 
-async function generateThumbnail(pdfPath: string, thumbnailPath: string): Promise<void> {
-  try {
-    const pdf = fs.readFileSync(pdfPath);
-    const pdfArrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
-
-    const images = await pdf2img(pdfArrayBuffer, {
-      imageType: 'png',
-      range: { end: 1 },
-    });
-
-    const thumbnail = images[0];
-    fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
-
-    console.log(`Thumbnail saved to ${thumbnailPath}`);
-  } catch (err) {
-    console.error(`Failed to generate thumbnail from ${pdfPath} to ${thumbnailPath}`, err);
-  }
-}
+const pdf = new ArrayBuffer(...); // Source PDF
+const images = await pdf2img(pdf, {
+  imageType: 'png',
+  scale: 1,
+  range: { start: 0, end: 1 },
+});
 ```
 
-For reference, check out the [thumbnail generation script](https://github.com/pdfme/pdfme/blob/main/playground/scripts/generate-templates-thumbnail.js) in the repository’s playground directory.
+### pdf2size
+Retrieves the width and height of each page in a PDF.
+
+```ts
+import { pdf2size } from '@pdfme/converter';
+
+const pdf = new ArrayBuffer(...); // Source PDF
+const sizes = await pdf2size(pdf, {
+  scale: 1, // Scale factor (default: 1)
+});
+// sizes: Array<{ width: number, height: number }>
+```
+
+### img2pdf
+Converts one or more images (JPEG or PNG) into a single PDF file.
+
+```ts
+import { img2pdf } from '@pdfme/converter';
+
+const image1 = new ArrayBuffer(...); // First image
+const image2 = new ArrayBuffer(...); // Second image
+const pdf = await img2pdf([image1, image2], {
+  scale: 1,
+  imageType: 'jpeg',
+});
+```
+
+## Error Handling
+
+All functions throw descriptive errors when invalid parameters are provided:
+
+- Invalid PDF: `[@pdfme/converter] Invalid PDF`
+- Empty PDF: `[@pdfme/converter] The PDF file is empty`
+- Invalid page range: `[@pdfme/converter] Invalid page range`
+- Empty image array: `[@pdfme/converter] Input must be a non-empty array of image buffers`
+- Invalid image: `[@pdfme/converter] Failed to process image`
+
+## Types
+
+```ts
+type ImageType = 'jpeg' | 'png';
+
+interface PageRange {
+  start?: number;
+  end?: number;
+}
+
+interface Pdf2ImgOptions {
+  scale?: number;
+  imageType?: ImageType;
+  range?: PageRange;
+}
+
+interface Pdf2SizeOptions {
+  scale?: number;
+}
+
+interface Img2PdfOptions {
+  scale?: number;
+  imageType?: ImageType;
+}
+```
 
 ## Contact
 

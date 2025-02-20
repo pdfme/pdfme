@@ -1,6 +1,8 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size } from '../src/index.node';
+import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node';
+import fs from 'fs';
+import path from 'path';
 
 describe('pdf2img tests', () => {
   let pdfArrayBuffer: ArrayBuffer;
@@ -61,6 +63,62 @@ describe('pdf2img tests', () => {
     await expect(nodePdf2Img(emptyBuffer, { scale: 1 })).rejects.toThrow(
       'The PDF file is empty, i.e. its size is zero by'
     );
+  });
+});
+describe('img2pdf tests', () => {
+  let jpegImage: ArrayBuffer;
+  let pngImage: ArrayBuffer;
+
+  beforeAll(async () => {
+    // Create test images using pdf2img for testing
+    const pdf = await generate({
+      template: {
+        schemas: [
+          [
+            {
+              name: 'field1',
+              type: 'text',
+              content: 'Type Something...',
+              position: { x: 10, y: 20 },
+              width: 45,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
+        pdfmeVersion: '5.2.16',
+      },
+      inputs: [{}],
+    });
+    const images = await nodePdf2Img(pdf.buffer, { scale: 1 });
+    jpegImage = images[0];
+    pngImage = images[0]; // Using same image for both tests
+  });
+
+  test('converts single image to PDF', async () => {
+    const pdf = await img2pdf([jpegImage]);
+    expect(pdf).toBeInstanceOf(ArrayBuffer);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+
+  test('converts multiple images to single PDF', async () => {
+    const pdf = await img2pdf([jpegImage, pngImage]);
+    expect(pdf).toBeInstanceOf(ArrayBuffer);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+
+  test('handles scale option', async () => {
+    const pdf = await img2pdf([jpegImage], { scale: 0.5 });
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+
+  test('throws error for empty input', async () => {
+    await expect(img2pdf([])).rejects.toThrow('Input must be a non-empty array');
+  });
+
+  test('throws error for invalid image', async () => {
+    const invalidImage = new ArrayBuffer(10);
+    await expect(img2pdf([invalidImage])).rejects.toThrow('Failed to process image');
   });
 });
 
