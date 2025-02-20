@@ -8,11 +8,11 @@ export interface Img2PdfOptions {
 
 export async function img2pdf(
   imgs: ArrayBuffer[],
-  options: Img2PdfOptions = {},
+  options: Img2PdfOptions = {}
 ): Promise<ArrayBuffer> {
   try {
     const { scale = 1 } = options;
-    
+
     if (!Array.isArray(imgs) || imgs.length === 0) {
       throw new Error('Input must be a non-empty array of image buffers');
     }
@@ -36,7 +36,11 @@ export async function img2pdf(
         throw new Error(`Failed to process image: ${(error as Error).message}`);
       }
     }
-    return await doc.save();
+    const pdfUint8Array = await doc.save();
+    return pdfUint8Array.buffer.slice(
+      pdfUint8Array.byteOffset,
+      pdfUint8Array.byteOffset + pdfUint8Array.byteLength
+    );
   } catch (error) {
     throw new Error(`[@pdfme/converter] img2pdf failed: ${(error as Error).message}`);
   }
