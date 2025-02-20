@@ -1,8 +1,29 @@
 # Converter
 
-`@pdfme/converter` can be used in both Node.js and in the browser.  
+## Overview
 
-Its primary purpose is to convert PDFs into other formats (like images) or to convert various data formats (like Markdown) into PDFs.
+`@pdfme/converter` is a powerful utility package that enables PDF conversion in both Node.js and browser environments. It provides functionality to:
+- Convert PDFs to images
+- Convert images to PDFs
+- Extract PDF page dimensions
+- (Planned) Convert between PDF and Markdown
+
+## Quick Start
+
+```ts
+import { pdf2img, img2pdf } from '@pdfme/converter';
+
+// Convert PDF to images
+const images = await pdf2img(pdfBuffer, {
+  imageType: 'png',
+  scale: 1
+});
+
+// Convert images to PDF
+const pdf = await img2pdf([imageBuffer1, imageBuffer2], {
+  scale: 1
+});
+```
 
 Although it's still under development, you can already use the following features:
 

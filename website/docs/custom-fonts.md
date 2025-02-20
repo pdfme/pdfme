@@ -1,6 +1,24 @@
 # Custom Fonts
 
-pdfme uses the [Roboto Regular 400](https://fonts.google.com/specimen/Roboto) font by default, but you can use any font you like.
+## Overview
+
+pdfme uses the [Roboto Regular 400](https://fonts.google.com/specimen/Roboto) font by default, but supports custom font integration for enhanced typography control. This feature enables:
+- Using your preferred fonts
+- Supporting multiple languages and character sets
+- Maintaining consistent branding
+
+## Quick Start
+
+```ts
+import { Font } from '@pdfme/common';
+
+const font: Font = {
+  custom_font: {
+    data: 'https://example.com/fonts/custom.ttf',
+    fallback: true
+  }
+};
+```
 
 To prioritize design, you can use your favorite fonts, and if you're using characters not included in the default Roboto font, such as Japanese or Chinese characters, they will be rendered as [Tofu](https://fonts.google.com/knowledge/glossary/tofu) in the PDF.
 
