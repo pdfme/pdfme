@@ -24,3 +24,5 @@ export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) 
   _pdf2size(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
   });
+
+export { img2pdf } from './img2pdf.js';

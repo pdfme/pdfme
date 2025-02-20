@@ -2,28 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-try {
-  const gitTag = execSync('git describe --tags $(git rev-list --tags --max-count=1)', { encoding: 'utf8' }).trim();
-  
+const updateVersion = (version) => {
   const filePath = path.join(__dirname, 'src/version.ts');
   let content = '';
 
   if (!fs.existsSync(filePath)) {
-    content = `export const PDFME_VERSION = '${gitTag}';\n`;
+    content = `export const PDFME_VERSION = '${version}';\n`;
   } else {
     content = fs.readFileSync(filePath, 'utf8');
     const versionRegex = /export const PDFME_VERSION = '.*';/;
-
     if (versionRegex.test(content)) {
-      content = content.replace(versionRegex, `export const PDFME_VERSION = '${gitTag}';`);
+      content = content.replace(versionRegex, `export const PDFME_VERSION = '${version}';`);
     } else {
-      content += `\nexport const PDFME_VERSION = '${gitTag}';\n`;
+      content += `\nexport const PDFME_VERSION = '${version}';\n`;
     }
   }
 
   fs.writeFileSync(filePath, content, 'utf8');
-  console.log(`Replaced PDFME_VERSION with '${gitTag}' in ${filePath}`);
+  console.log(`Replaced PDFME_VERSION with '${version}' in ${filePath}`);
+};
+
+try {
+  const gitTag = execSync('git describe --tags $(git rev-list --tags --max-count=1)', { encoding: 'utf8' }).trim();
+  updateVersion(gitTag);
 } catch (error) {
   console.error('Error replacing PDFME_VERSION:', error);
-  process.exit(1);
+  updateVersion('x.x.x');
 }
