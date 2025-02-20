@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Arial; }
+    .module { fill: #2980ba; }
+    .submodule { fill: #3498db; }
+    .arrow { fill: none; stroke: #666; stroke-width: 2; }
+  </style>
+  
+  <!-- Core -->
+  <rect x="300" y="50" width="200" height="80" rx="5" class="module"/>
+  <text x="400" y="95" text-anchor="middle" fill="white">@pdfme/common</text>
+  
+  <!-- Generator -->
+  <rect x="50" y="200" width="200" height="80" rx="5" class="module"/>
+  <text x="150" y="245" text-anchor="middle" fill="white">@pdfme/generator</text>
+  
+  <!-- UI -->
+  <rect x="300" y="200" width="200" height="80" rx="5" class="module"/>
+  <text x="400" y="245" text-anchor="middle" fill="white">@pdfme/ui</text>
+  
+  <!-- Schemas -->
+  <rect x="550" y="200" width="200" height="80" rx="5" class="module"/>
+  <text x="650" y="245" text-anchor="middle" fill="white">@pdfme/schemas</text>
+  
+  <!-- Arrows -->
+  <path d="M400 130 L150 200" class="arrow" marker-end="url(#arrow)"/>
+  <path d="M400 130 L400 200" class="arrow" marker-end="url(#arrow)"/>
+  <path d="M400 130 L650 200" class="arrow" marker-end="url(#arrow)"/>
+  
+  <!-- Arrow Marker -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+      markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

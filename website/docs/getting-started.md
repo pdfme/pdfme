@@ -40,6 +40,14 @@ generate({ template, inputs }).then((pdf) => {
 
 pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:
 
+### Workflow Overview
+
+![PDF Generation Workflow - From template design through data input to final PDF generation](/img/workflow.svg)
+
+### Architecture
+
+![pdfme Architecture - Showing relationships between @pdfme/common, generator, ui, and schemas packages](/img/architecture.svg)
+
 - Need to create a designed PDF with short code.
 - Need to integrate PDF editor features into an application.
 - Need to create a large number of PDFs without compromising performance
