@@ -28,6 +28,7 @@ const sidebars = {
         'optimizer',
       ],
     },
+    'troubleshooting',
     'development-guide',
     'template-contribution-guide',
   ],
