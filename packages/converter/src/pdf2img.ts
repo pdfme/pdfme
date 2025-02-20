@@ -1,6 +1,5 @@
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-
-type ImageType = 'jpeg' | 'png';
+import type { ImageType } from './types.js';
 
 interface Environment {
   getDocument: (pdf: ArrayBuffer) => Promise<PDFDocumentProxy>;
