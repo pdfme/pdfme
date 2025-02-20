@@ -36,26 +36,27 @@ import { pdf2img } from '@pdfme/converter';
 
 const pdf = new ArrayBuffer(...); // Source PDF
 const images = await pdf2img(pdf, {
-  imageType: 'png', // 'jpeg' or 'png' (default: 'jpeg')
-  scale: 1, // Scale factor (default: 1)
-  range: { start: 0, end: 1 }, // Convert specific pages (default: all pages)
+  imageType: 'png',
+  scale: 1,
+  range: { start: 0, end: 1 },
 });
 ```
 
-Options:
-- `imageType`: Output image format ('jpeg' or 'png')
-- `scale`: Scale factor for the output images
-- `range`: Page range to convert
-  - `start`: First page to convert (0-based index)
-  - `end`: Last page to convert (0-based index)
+### pdf2size
+Retrieves the width and height of each page in a PDF.
 
-Error handling:
-- Invalid PDF: `[@pdfme/converter] Invalid PDF`
-- Empty PDF: `[@pdfme/converter] The PDF file is empty`
-- Invalid page range: `[@pdfme/converter] Invalid page range`
+```ts
+import { pdf2size } from '@pdfme/converter';
+
+const pdf = new ArrayBuffer(...); // Source PDF
+const sizes = await pdf2size(pdf, {
+  scale: 1, // Scale factor (default: 1)
+});
+// sizes: Array<{ width: number, height: number }>
+```
 
 ### img2pdf
-Converts one or more images (JPEG or PNG) into a single PDF file. Each image becomes a page in the output PDF.
+Converts one or more images (JPEG or PNG) into a single PDF file.
 
 ```ts
 import { img2pdf } from '@pdfme/converter';
@@ -63,35 +64,44 @@ import { img2pdf } from '@pdfme/converter';
 const image1 = new ArrayBuffer(...); // First image
 const image2 = new ArrayBuffer(...); // Second image
 const pdf = await img2pdf([image1, image2], {
-  scale: 1, // Scale factor (default: 1)
-  imageType: 'jpeg', // 'jpeg' or 'png' (optional, auto-detected if not specified)
+  scale: 1,
+  imageType: 'jpeg',
 });
 ```
 
-Options:
-- `scale`: Scale factor for the output PDF pages
-- `imageType`: Specify the image type if known ('jpeg' or 'png')
+## Error Handling
 
-Error handling:
-- Empty input: `[@pdfme/converter] Input must be a non-empty array of image buffers`
+All functions throw descriptive errors when invalid parameters are provided:
+
+- Invalid PDF: `[@pdfme/converter] Invalid PDF`
+- Empty PDF: `[@pdfme/converter] The PDF file is empty`
+- Invalid page range: `[@pdfme/converter] Invalid page range`
+- Empty image array: `[@pdfme/converter] Input must be a non-empty array of image buffers`
 - Invalid image: `[@pdfme/converter] Failed to process image`
-
 
 ## Types
 
 ```ts
+type ImageType = 'jpeg' | 'png';
+
+interface PageRange {
+  start?: number;
+  end?: number;
+}
+
 interface Pdf2ImgOptions {
   scale?: number;
-  imageType?: 'jpeg' | 'png';
-  range?: {
-    start?: number;
-    end?: number;
-  };
+  imageType?: ImageType;
+  range?: PageRange;
+}
+
+interface Pdf2SizeOptions {
+  scale?: number;
 }
 
 interface Img2PdfOptions {
   scale?: number;
-  imageType?: 'jpeg' | 'png';
+  imageType?: ImageType;
 }
 ```
 
