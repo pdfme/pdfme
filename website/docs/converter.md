@@ -26,78 +26,74 @@ If you want to convert PDFs to images (`pdf2img`) in Node.js, you’ll need [nod
 npm install canvas@^2.11.2
 ```
 
-## Usage
+## Features
 
-For instance, the `pdf2img` function has the following TypeScript interface:
-
-```ts
-pdf2img(pdf: ArrayBuffer, options?: Pdf2ImgOptions): Promise<ArrayBuffer[]>
-```
-See the details here:  
-[https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
-
-Below is an example in TypeScript that reads a local PDF, converts the first page into a PNG, and saves it as a thumbnail:
+### pdf2img
+Converts PDF pages into images (JPEG or PNG format).
 
 ```ts
-import fs from 'fs';
-import path from 'path';
 import { pdf2img } from '@pdfme/converter';
 
-async function generateThumbnail(pdfPath: string, thumbnailPath: string): Promise<void> {
-  try {
-    const pdf = fs.readFileSync(pdfPath);
-    const pdfArrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
-
-    const images = await pdf2img(pdfArrayBuffer, {
-      imageType: 'png',
-      range: { end: 1 },
-    });
-
-    const thumbnail = images[0];
-    fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
-
-    console.log(`Thumbnail saved to ${thumbnailPath}`);
-  } catch (err) {
-    console.error(`Failed to generate thumbnail from ${pdfPath} to ${thumbnailPath}`, err);
-  }
-}
-```
-
-For reference, check out the [thumbnail generation script](https://github.com/pdfme/pdfme/blob/main/playground/scripts/generate-templates-thumbnail.js) in the repository’s playground directory.
-
-## img2pdf
-
-The `img2pdf` function converts one or more images (JPEG or PNG) into a single PDF file. Each image becomes a page in the output PDF. It has the following TypeScript interface:
-
-```ts
-img2pdf(imgs: ArrayBuffer[], options?: Img2PdfOptions): Promise<ArrayBuffer>
+const pdf = new ArrayBuffer(...); // Source PDF
+const images = await pdf2img(pdf, {
+  imageType: 'png', // 'jpeg' or 'png' (default: 'jpeg')
+  scale: 1, // Scale factor (default: 1)
+  range: { start: 0, end: 1 }, // Convert specific pages (default: all pages)
+});
 ```
 
 Options:
-- `scale`: (optional) Scale factor for the output PDF pages (default: 1)
-- `imageType`: (optional) Specify the image type ('jpeg' or 'png') if known
+- `imageType`: Output image format ('jpeg' or 'png')
+- `scale`: Scale factor for the output images
+- `range`: Page range to convert
+  - `start`: First page to convert (0-based index)
+  - `end`: Last page to convert (0-based index)
 
-Example usage:
+Error handling:
+- Invalid PDF: `[@pdfme/converter] Invalid PDF`
+- Empty PDF: `[@pdfme/converter] The PDF file is empty`
+- Invalid page range: `[@pdfme/converter] Invalid page range`
+
+### img2pdf
+Converts one or more images (JPEG or PNG) into a single PDF file. Each image becomes a page in the output PDF.
+
 ```ts
-import fs from 'fs';
-import { imgs2pdf } from '@pdfme/converter';
+import { img2pdf } from '@pdfme/converter';
 
-async function convertImagesToPDF(imagePaths: string[], outputPath: string): Promise<void> {
-  try {
-    const images = imagePaths.map(path => {
-      const img = fs.readFileSync(path);
-      return img.buffer.slice(img.byteOffset, img.byteOffset + img.byteLength);
-    });
-
-    const pdf = await img2pdf(images);
-    fs.writeFileSync(outputPath, Buffer.from(pdf));
-    console.log(`PDF saved to ${outputPath}`);
-  } catch (err) {
-    console.error('Failed to convert images to PDF:', err);
-  }
-}
+const image1 = new ArrayBuffer(...); // First image
+const image2 = new ArrayBuffer(...); // Second image
+const pdf = await img2pdf([image1, image2], {
+  scale: 1, // Scale factor (default: 1)
+  imageType: 'jpeg', // 'jpeg' or 'png' (optional, auto-detected if not specified)
+});
 ```
 
+Options:
+- `scale`: Scale factor for the output PDF pages
+- `imageType`: Specify the image type if known ('jpeg' or 'png')
+
+Error handling:
+- Empty input: `[@pdfme/converter] Input must be a non-empty array of image buffers`
+- Invalid image: `[@pdfme/converter] Failed to process image`
+
+
+## Types
+
+```ts
+interface Pdf2ImgOptions {
+  scale?: number;
+  imageType?: 'jpeg' | 'png';
+  range?: {
+    start?: number;
+    end?: number;
+  };
+}
+
+interface Img2PdfOptions {
+  scale?: number;
+  imageType?: 'jpeg' | 'png';
+}
+```
 
 ## Contact
 
