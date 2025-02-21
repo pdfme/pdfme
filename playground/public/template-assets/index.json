@@ -16,6 +16,14 @@
     "author": "hand-dot"
   },
   {
+    "name": "QR-lines",
+    "author": "pdfme"
+  },
+  {
+    "name": "QR-title",
+    "author": "pdfme"
+  },
+  {
     "name": "address-label-10",
     "author": "pdfme"
   },
@@ -57,14 +65,6 @@
   },
   {
     "name": "location-number",
-    "author": "pdfme"
-  },
-  {
-    "name": "QR-lines",
-    "author": "pdfme"
-  },
-  {
-    "name": "QR-title",
     "author": "pdfme"
   }
 ]
