@@ -1,0 +1,3 @@
+dist
+generator/__tests__/assets/templates/*.json
+ui/__tests__/components/__snapshots__/*.snap

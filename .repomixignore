@@ -1,0 +1,5 @@
+packages/generator/__tests__/assets/templates/*.json
+packages/ui/__tests__/components/__snapshots__/*.snap
+playground/public/template-assets/**/*.json
+.github/**
+*.svg
