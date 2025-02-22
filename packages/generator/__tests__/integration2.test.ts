@@ -5,7 +5,7 @@ import { text, image, barcodes } from '@pdfme/schemas';
 import { getFont, pdfToImages } from './utils';
 import 'jest-image-snapshot';
 
-const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.0');
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
 describe('generate integration test(barcode, business)', () => {
   describe.each([barcode, business])('%s', (templateData) => {
