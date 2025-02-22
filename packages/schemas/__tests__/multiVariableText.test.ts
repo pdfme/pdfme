@@ -11,9 +11,16 @@ describe('substituteVariables', () => {
   });
 
   it('should handle special characters in variable names', () => {
-    const text = 'Hello, {na-me}!';
-    const variables = { 'na-me': 'World' };
+    const text = 'Hello, {*na-me}!';
+    const variables = { '*na-me': 'World' };
     const result = substituteVariables(text, variables);
+    expect(result).toBe('Hello, World!');
+  });
+
+  it('should handle numeric variable names', () => {
+    let text = 'Hello, {123}!';
+    let variables = { '123': 'World' };
+    let result = substituteVariables(text, variables);
     expect(result).toBe('Hello, World!');
   });
 

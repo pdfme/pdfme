@@ -13,7 +13,7 @@ export const substituteVariables = (text: string, variablesIn: string | Record<s
     Object.keys(variables).forEach((variableName) => {
       // handle special characters in variable name
       const variableForRegex = variableName.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
-      const regex = new RegExp('{' + variableForRegex + '}', 'g');
+      const regex = new RegExp('\\{' + variableForRegex + '\\}', 'g');
       substitutedText = substitutedText.replace(regex, variables[variableName]);
     });
   }
