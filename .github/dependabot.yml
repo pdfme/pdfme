@@ -9,7 +9,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Common package
   - package-ecosystem: "npm"
     directory: "/packages/common"
@@ -18,7 +18,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Converter package
   - package-ecosystem: "npm"
     directory: "/packages/converter"
@@ -27,7 +27,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Generator package
   - package-ecosystem: "npm"
     directory: "/packages/generator"
@@ -36,7 +36,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Manipulator package
   - package-ecosystem: "npm"
     directory: "/packages/manipulator"
@@ -45,7 +45,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Schemas package
   - package-ecosystem: "npm"
     directory: "/packages/schemas"
@@ -54,7 +54,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # UI package
   - package-ecosystem: "npm"
     directory: "/packages/ui"
@@ -63,7 +63,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Playground
   - package-ecosystem: "npm"
     directory: "/playground"
@@ -72,7 +72,7 @@ updates:
     labels:
       - "dependencies"
       - "npm"
-    
+  
   # Website
   - package-ecosystem: "npm"
     directory: "/website"
