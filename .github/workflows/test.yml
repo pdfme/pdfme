@@ -23,3 +23,30 @@ jobs:
       - run: npm run test
         env:
           CI: true
+
+  playground-test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Build root project
+        run: npm run build
+      - name: Install playground dependencies
+        run: cd playground && npm install
+      - name: Run playground tests
+        run: cd playground && npm run test
+        env:
+          CI: true
