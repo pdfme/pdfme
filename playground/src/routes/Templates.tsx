@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipboardCopy } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fromKebabCase } from "../helper"
-import ExternalButton from "../components/ExternalButton"
+import { fromKebabCase } from "../helper";
+import ExternalButton from "../components/ExternalButton";
 
 declare global {
   interface Window {
     ethicalads?: {
       load: () => void;
-      wait?: Promise<any>;
+      wait?: Promise<unknown>;
     };
   }
 }
@@ -113,10 +113,10 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
           </p>
           <div className="mt-4 ml-auto">
-            <ExternalButton
-              href="https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title={{TEMPLATE_NAME}}"
-              title="Request a Template"
-            />
+            {React.createElement(ExternalButton, {
+              href: "https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title=TEMPLATE_NAME",
+              title: "Request a Template"
+            })}
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">

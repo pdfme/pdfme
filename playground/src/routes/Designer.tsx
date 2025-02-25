@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from "@pdfme/common";
@@ -15,7 +15,7 @@ import {
 } from "../helper";
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from "../components/NavBar";
-import ExternalButton from "../components/ExternalButton"
+import ExternalButton from "../components/ExternalButton";
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -290,12 +290,10 @@ function DesignerApp() {
     },
     {
       label: "",
-      content: (
-        <ExternalButton
-          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
-          title="Feedback this template"
-        />
-      ),
+      content: React.createElement(ExternalButton, {
+        href: "https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME",
+        title: "Feedback this template"
+      }),
     },
   ];
 
