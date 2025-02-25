@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # npm依存関係の更新設定
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # 最大10個のPRを同時に開く
+    open-pull-requests-limit: 10
+    # PRにラベルを追加
+    labels:
+      - "dependencies"
+      - "npm"
+    # 開発依存関係のみを更新する場合は以下を追加
+    # allow:
+    #   - dependency-type: "development"
+    # セキュリティアップデートを優先
+    ignore:
+      # パッチバージョンのみ自動更新する場合
+      # - dependency-name: "*"
+      #   update-types: ["version-update:semver-major", "version-update:semver-minor"]
