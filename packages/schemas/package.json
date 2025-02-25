@@ -59,7 +59,7 @@
     "air-datepicker": "^3.5.3",
     "bwip-js": "^4.1.1",
     "date-fns": "^4.1.0",
-    "fast-xml-parser": "^4.3.2",
+    "fast-xml-parser": "^5.0.6",
     "fontkit": "^2.0.2",
     "lucide": "^0.460.0"
   },
