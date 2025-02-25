@@ -43,7 +43,7 @@
     "antd": "^5.9.4",
     "form-render": "^2.2.16",
     "hotkeys-js": "^3.8.7",
-    "lucide-react": "^0.460.0",
+    "lucide-react": "^0.475.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-moveable": "^0.30.3",
