@@ -18,6 +18,7 @@
     "types": [
       "node",
       "jest",
+      "offscreencanvas"
     ],
     "typeRoots": [
       "node_modules/@types"
