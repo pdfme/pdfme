@@ -26,9 +26,15 @@ describe('Playground E2E Tests', () => {
 
     // Launch the browser
     browser = await puppeteer.launch({
-      headless: true,
+      headless: process.env.LOCAL !== "true",
     });
     page = await browser.newPage();
+    
+    // Set viewport size to match a typical 13-inch laptop screen
+    await page.setViewport({
+      width: 1366,
+      height: 768,
+    });
   }, 60000); // Increase timeout to 60 seconds for build process
 
   afterAll(async () => {

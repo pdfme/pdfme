@@ -11,7 +11,8 @@
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.js && node scripts/generate-templates-thumbnail.js",
-    "test": "jest"
+    "test": "jest",
+    "test:local": "LOCAL=true jest"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
