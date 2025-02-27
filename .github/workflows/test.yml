@@ -24,7 +24,7 @@ jobs:
         env:
           CI: true
 
-  playground-test:
+  playground-e2e:
     runs-on: ubuntu-latest
     needs: build
 
@@ -40,10 +40,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        run: npm install
-      - name: Build root project
-        run: npm run build
       - name: Install playground dependencies
         run: cd playground && npm install
       - name: Run playground tests
