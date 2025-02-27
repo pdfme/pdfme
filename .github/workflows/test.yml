@@ -1,9 +1,9 @@
-name: Unit Testing
+name: Testing
 
 on: [pull_request]
 
 jobs:
-  build-and-test:
+  pdfme-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
