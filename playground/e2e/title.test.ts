@@ -27,6 +27,7 @@ describe('Playground E2E Tests', () => {
     // Launch the browser
     browser = await puppeteer.launch({
       headless: process.env.LOCAL !== "true",
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     page = await browser.newPage();
     
