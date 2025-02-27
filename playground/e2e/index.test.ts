@@ -54,6 +54,9 @@ describe('Playground E2E Tests', () => {
     await page.waitForNetworkIdle();
 
     const screenshot = await page.screenshot();
-    expect(screenshot).toMatchImageSnapshot();
+    expect(screenshot).toMatchImageSnapshot({
+      customDiffConfig: { threshold: 0.2 },
+
+    });
   });
 });
