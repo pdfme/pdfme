@@ -26,7 +26,7 @@ describe('Playground E2E Tests', () => {
 
     // Launch the browser
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
     });
     page = await browser.newPage();
   }, 60000); // Increase timeout to 60 seconds for build process
