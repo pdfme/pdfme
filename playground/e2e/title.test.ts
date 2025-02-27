@@ -2,17 +2,22 @@ import puppeteer, { Browser, Page, ElementHandle } from 'puppeteer';
 import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe('Playground E2E Tests', () => {
+  const isRunningLocal = process.env.LOCAL === 'true';
   let browser: Browser | undefined;
   let page: Page | undefined;
   let previewProcess: ChildProcessWithoutNullStreams | undefined;
 
   beforeAll(async () => {
     // Build the playground
-    console.log('Building playground...');
-    execSync('npm run build', { stdio: 'inherit' });
+    if (isRunningLocal) {
+      console.log('Skip Building playground in local mode');
+    } else {
+      console.log('Building playground...');
+      execSync('npm run build', { stdio: 'inherit' });
+    }
 
     // Start the preview server
     console.log('Starting preview server...');
@@ -22,25 +27,22 @@ describe('Playground E2E Tests', () => {
     });
 
     // Wait for the server to start
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Launch the browser
     browser = await puppeteer.launch({
-      headless: process.env.LOCAL !== "true",
+      headless: !isRunningLocal,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     page = await browser.newPage();
-    
+
     // Set viewport size to match a typical 13-inch laptop screen
-    await page.setViewport({
-      width: 1366,
-      height: 768,
-    });
+    await page.setViewport({ width: 1366, height: 768 });
   }, 60000); // Increase timeout to 60 seconds for build process
 
   afterAll(async () => {
     // Close the browser
-    if (browser) {
+    if (browser && !isRunningLocal) {
       await browser.close();
     }
 
@@ -55,6 +57,9 @@ describe('Playground E2E Tests', () => {
     await page.goto('http://localhost:4173/');
     const title = await page.title();
     expect(title).toBe('pdfme Playground');
+
+    const screenshot = await page.screenshot();
+    expect(screenshot).toMatchImageSnapshot();
   });
 
   describe.skip('Templates Page', () => {
@@ -62,7 +67,7 @@ describe('Playground E2E Tests', () => {
       if (!page) throw new Error('Page not initialized');
       await page.goto('http://localhost:4173/templates');
       // Wait for templates to load
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     test('Templates page loads with template items', async () => {
@@ -118,10 +123,10 @@ describe('Playground E2E Tests', () => {
       }
       if (!designerButton) throw new Error('No designer button found');
       await designerButton.click();
-      
+
       // Wait for navigation to complete
       await page.waitForNavigation();
-      
+
       // Check the URL
       const url = page.url();
       expect(url).toContain('/designer');
@@ -133,7 +138,7 @@ describe('Playground E2E Tests', () => {
       if (!page) throw new Error('Page not initialized');
       await page.goto('http://localhost:4173/designer');
       // Wait for designer to load
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     test('Designer page loads with UI elements', async () => {
@@ -148,7 +153,7 @@ describe('Playground E2E Tests', () => {
       let resetButton: ElementHandle<Element> | null = null;
       let downloadButton: ElementHandle<Element> | null = null;
       let generateButton: ElementHandle<Element> | null = null;
-      
+
       for (const button of buttons) {
         const text = await button.evaluate((el: Element) => el.textContent);
         if (text && text.includes('Save Local')) {
@@ -161,7 +166,7 @@ describe('Playground E2E Tests', () => {
           generateButton = button;
         }
       }
-      
+
       expect(saveButton).not.toBeNull();
       expect(resetButton).not.toBeNull();
       expect(downloadButton).not.toBeNull();
@@ -172,10 +177,10 @@ describe('Playground E2E Tests', () => {
       if (!page) throw new Error('Page not initialized');
       // Select a different language
       await page.select('select', 'ja');
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Verify language change (this is a basic check, could be enhanced)
       const currentValue = await page.$eval('select', (el: HTMLSelectElement) => el.value);
       expect(currentValue).toBe('ja');
@@ -195,9 +200,9 @@ describe('Playground E2E Tests', () => {
       }
       if (!resetButton) throw new Error('Reset button not found');
       await resetButton.click();
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     });
 
     test('Can save template locally', async () => {
@@ -214,10 +219,10 @@ describe('Playground E2E Tests', () => {
       }
       if (!saveButton) throw new Error('Save button not found');
       await saveButton.click();
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Check for toast notification (success message)
       const toastMessage = await page.$('.Toastify__toast');
       expect(toastMessage).not.toBeNull();
@@ -229,7 +234,7 @@ describe('Playground E2E Tests', () => {
       if (!page) throw new Error('Page not initialized');
       await page.goto('http://localhost:4173/form-and-viewer');
       // Wait for form to load
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     test('Form & Viewer page loads with UI elements', async () => {
@@ -252,7 +257,7 @@ describe('Playground E2E Tests', () => {
       let saveInputsButton: ElementHandle<Element> | null = null;
       let resetInputsButton: ElementHandle<Element> | null = null;
       let generateButton: ElementHandle<Element> | null = null;
-      
+
       for (const button of buttons) {
         const text = await button.evaluate((el: Element) => el.textContent);
         if (text && text.includes('Get Inputs')) {
@@ -267,7 +272,7 @@ describe('Playground E2E Tests', () => {
           generateButton = button;
         }
       }
-      
+
       expect(getInputsButton).not.toBeNull();
       expect(setInputsButton).not.toBeNull();
       expect(saveInputsButton).not.toBeNull();
@@ -278,17 +283,23 @@ describe('Playground E2E Tests', () => {
     test('Can switch between Form and Viewer modes', async () => {
       if (!page) throw new Error('Page not initialized');
       // Check that Form mode is selected by default
-      const formRadioChecked = await page.$eval('input[type="radio"][value="form"]', (el: HTMLInputElement) => el.checked);
+      const formRadioChecked = await page.$eval(
+        'input[type="radio"][value="form"]',
+        (el: HTMLInputElement) => el.checked
+      );
       expect(formRadioChecked).toBe(true);
 
       // Switch to Viewer mode
       await page.click('input[type="radio"][value="viewer"]');
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Check that Viewer mode is now selected
-      const viewerRadioChecked = await page.$eval('input[type="radio"][value="viewer"]', (el: HTMLInputElement) => el.checked);
+      const viewerRadioChecked = await page.$eval(
+        'input[type="radio"][value="viewer"]',
+        (el: HTMLInputElement) => el.checked
+      );
       expect(viewerRadioChecked).toBe(true);
     });
 
@@ -306,10 +317,10 @@ describe('Playground E2E Tests', () => {
       }
       if (!saveInputsButton) throw new Error('Save inputs button not found');
       await saveInputsButton.click();
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       // Check for toast notification (success message)
       const toastMessage = await page.$('.Toastify__toast');
       expect(toastMessage).not.toBeNull();
@@ -329,9 +340,9 @@ describe('Playground E2E Tests', () => {
       }
       if (!resetInputsButton) throw new Error('Reset inputs button not found');
       await resetInputsButton.click();
-      
+
       // Wait for UI to update
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     });
   });
 
@@ -347,10 +358,10 @@ describe('Playground E2E Tests', () => {
       const designerLink = await page.waitForSelector('a[href="/designer"]');
       if (!designerLink) throw new Error('Designer link not found');
       await designerLink.click();
-      
+
       // Wait for navigation to complete
       await page.waitForNavigation();
-      
+
       // Check the URL
       const url = page.url();
       expect(url).toContain('/designer');
@@ -362,10 +373,10 @@ describe('Playground E2E Tests', () => {
       const formViewerLink = await page.waitForSelector('a[href="/form-and-viewer"]');
       if (!formViewerLink) throw new Error('Form & Viewer link not found');
       await formViewerLink.click();
-      
+
       // Wait for navigation to complete
       await page.waitForNavigation();
-      
+
       // Check the URL
       const url = page.url();
       expect(url).toContain('/form-and-viewer');
@@ -377,10 +388,10 @@ describe('Playground E2E Tests', () => {
       const templatesLink = await page.waitForSelector('a[href="/templates"]');
       if (!templatesLink) throw new Error('Templates link not found');
       await templatesLink.click();
-      
+
       // Wait for navigation to complete
       await page.waitForNavigation();
-      
+
       // Check the URL
       const url = page.url();
       expect(url).toContain('/templates');
