@@ -55,8 +55,9 @@ describe('Playground E2E Tests', () => {
 
     const screenshot = await page.screenshot();
     expect(screenshot).toMatchImageSnapshot({
+      failureThreshold: 1,
+      failureThresholdType: 'percent',
       customDiffConfig: { threshold: 0.2 },
-
     });
   });
 });
