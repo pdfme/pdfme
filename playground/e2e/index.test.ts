@@ -93,6 +93,8 @@ describe('Playground E2E Tests', () => {
     if (!browser) throw new Error('Browser not initialized');
     if (!page) throw new Error('Page not initialized');
 
+    const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
+
     try {
       console.log('1. テンプレート一覧画面に遷移');
       await page.goto(`${baseUrl}/templates`);
@@ -135,10 +137,7 @@ describe('Playground E2E Tests', () => {
 
       console.log('10. templateCreationRecord の操作手順を再生して要素を追加');
       const templateCreationUserFlow = parse(templateCreationRecord);
-      const templateCreationRunner = await createRunner(
-        templateCreationUserFlow,
-        new PuppeteerRunnerExtension(browser, page, { timeout })
-      );
+      const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
       await templateCreationRunner.run();
 
       console.log('11. デザイナーで再度スクリーンショット');
@@ -160,10 +159,7 @@ describe('Playground E2E Tests', () => {
 
       console.log('15. formInputRecord の手順でフォームに入力');
       const formInputUserFlow = parse(formInputRecord);
-      const formInputRunner = await createRunner(
-        formInputUserFlow,
-        new PuppeteerRunnerExtension(browser, page, { timeout })
-      );
+      const formInputRunner = await createRunner(formInputUserFlow, extension);
       await formInputRunner.run();
 
       console.log('16. PDFを生成し、スクリーンショットを撮り、スナップショットと比較');
