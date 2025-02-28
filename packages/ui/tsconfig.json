@@ -14,7 +14,7 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": [
