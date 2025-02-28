@@ -12,11 +12,11 @@
       },
       {
           "type": "navigate",
-          "url": "https://playground.pdfme.com/form-viewer",
+          "url": "http://localhost:4173/form-viewer",
           "assertedEvents": [
               {
                   "type": "navigation",
-                  "url": "https://playground.pdfme.com/form-viewer",
+                  "url": "http://localhost:4173/form-viewer",
                   "title": "pdfme Playground"
               }
           ]

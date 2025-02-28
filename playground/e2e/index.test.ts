@@ -38,8 +38,8 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
 
   await newPage.setViewport(viewport);
   await newPage.bringToFront();
-  // await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
-  await newPage.waitForNetworkIdle();
+  await page.waitForNavigation({ waitUntil: 'networkidle2', timeout });
+
   await sleep(2000);
 
   const screenshot = await newPage.screenshot();
@@ -78,6 +78,18 @@ describe('Playground E2E Tests', () => {
     page = await browser.newPage();
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
+    page.on('request', (req) => {
+      const ignoreDomains = [
+        'https://fonts.gstatic.com/',
+        'https://media.ethicalads.io/',
+      ];
+      if (ignoreDomains.some((d) => req.url().startsWith(d))) {
+        console.log(`[Request Ignored]: ${req.url()}`);
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
   });
 
   afterAll(async () => {
