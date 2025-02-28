@@ -212,51 +212,70 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
+  // In lucide 0.475.0, the icon is an array of elements, not a single SVG element
+  // We need to create an SVG wrapper and add the elements as children
+  
   // Handle non-array input
   if (!Array.isArray(icon)) {
     return String(icon);
   }
-
-  // In lucide 0.475.0, IconNode is [tag, attributes, children]
-  // Extract the components with proper defaults
-  const [tag, attributes = {}, children = []] = icon;
   
-  // Ensure tag is a string
-  const tagName = String(tag);
-
-  // Merge custom attributes with SVG element if this is the root SVG
-  const isSvg = tagName === 'svg';
-  const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
-
-  // Format attributes string
-  const attrString = Object.entries(mergedAttributes)
+  // Create default SVG attributes
+  const svgAttrs = {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "24",
+    height: "24",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    "stroke-width": "2",
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round",
+    ...(attrs || {})
+  };
+  
+  // Format SVG attributes string
+  const svgAttrString = Object.entries(svgAttrs)
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ');
-
-  // Process children recursively
-  let childrenString = '';
   
-  if (Array.isArray(children) && children.length > 0) {
-    childrenString = children
-      .map(child => {
-        if (typeof child === 'string') {
-          return child;
-        } else if (Array.isArray(child)) {
-          // Recursively process nested IconNode
-          return createSvgStr(child);
-        } else {
-          // Handle any other type
-          return String(child);
-        }
-      })
-      .join('');
-  }
-
-  // Return properly formatted SVG string
-  if (childrenString) {
-    return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
-  } else {
-    // Self-closing tag for empty children
-    return `<${tagName}${attrString ? ' ' + attrString : ''}/>`;
-  }
+  // Helper function to process a single element
+  const processElement = (element: IconNode): string => {
+    if (!Array.isArray(element)) {
+      return String(element);
+    }
+    
+    const [tag, attributes = {}, children = []] = element;
+    const tagName = String(tag);
+    
+    // Format attributes string
+    const attrString = Object.entries(attributes)
+      .map(([key, value]) => `${key}="${value}"`)
+      .join(' ');
+    
+    // Process children recursively
+    let childrenString = '';
+    
+    if (Array.isArray(children) && children.length > 0) {
+      childrenString = children
+        .map(child => processElement(child))
+        .join('');
+    }
+    
+    // Return properly formatted element string
+    if (childrenString) {
+      return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
+    } else {
+      // Self-closing tag for empty children
+      return `<${tagName}${attrString ? ' ' + attrString : ''}/>`;
+    }
+  };
+  
+  // Process all elements and join them
+  const elementsString = Array.isArray(icon) 
+    ? icon.map(element => processElement(element)).join('')
+    : processElement(icon);
+  
+  // Return the complete SVG string
+  return `<svg ${svgAttrString}>${elementsString}</svg>`;
 };
