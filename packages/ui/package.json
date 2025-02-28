@@ -58,7 +58,7 @@
     "@types/react-dom": "^17.0.18",
     "@vitejs/plugin-react": "^4.2.0",
     "csstype": "^3.1.2",
-    "esbuild": "^0.19.5",
+    "esbuild": "^0.25.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "jest-canvas-mock": "^2.3.1",
