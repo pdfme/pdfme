@@ -97,22 +97,26 @@ const Renderer = (props: RendererProps) => {
   
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
+  // Find the plugin that matches the schema type
   const plugin = Object.values(pluginsRegistry || {}).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-  ) as Plugin<any> | undefined;
+  ) as Plugin<Schema> | undefined;
 
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
+  
+  // Ensure options is properly typed for the useRerenderDependencies hook
+  const typedOptions = options as UIOptions;
   const reRenderDependencies = useRerenderDependencies({
     plugin,
     value,
     mode,
     scale,
     schema,
-    options: options as UIOptions,
+    options: typedOptions,
   });
 
   useEffect(() => {
@@ -130,10 +134,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         stopEditing,
         tabIndex,
         placeholder,
-        options: options as UIOptions,
+        options: typedOptions,
         theme,
         i18n,
-        _cache: _cache as Map<any, any>,
+        _cache: _cache as Map<string, any>,
       });
     }
     return () => {

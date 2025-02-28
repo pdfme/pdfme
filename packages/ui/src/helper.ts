@@ -16,19 +16,27 @@ import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
 import { OptionsContext } from './contexts.js';
 
-// Create a simple mock for hotkeys to avoid TypeScript errors
-const hotkeys = function(keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void) {
-  return (hotkeysJs as any)(keys, callback);
-};
+// Define a proper interface for the hotkeys library
+interface HotkeysHandler {
+  (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void): void;
+  shift: boolean;
+  unbind: (keys: string) => void;
+}
 
-// Add properties to the hotkeys function
-(hotkeys as any).shift = false;
-(hotkeys as any).unbind = function(keys: string) {
-  // Do nothing if hotkeysJs doesn't have unbind
-  if (typeof (hotkeysJs as any).unbind === 'function') {
-    (hotkeysJs as any).unbind(keys);
+// Create a properly typed wrapper for hotkeys
+const hotkeys: HotkeysHandler = Object.assign(
+  (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void) => {
+    return hotkeysJs(keys, callback);
+  },
+  {
+    shift: false,
+    unbind: (keys: string) => {
+      if (typeof hotkeysJs.unbind === 'function') {
+        hotkeysJs.unbind(keys);
+      }
+    }
   }
-};
+);
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -144,22 +152,22 @@ export const initShortCuts = (arg: {
       case up:
       case shiftUp:
         e.preventDefault();
-        arg.move('up', (hotkeys as any).shift);
+        arg.move('up', hotkeys.shift);
         break;
       case down:
       case shiftDown:
         e.preventDefault();
-        arg.move('down', (hotkeys as any).shift);
+        arg.move('down', hotkeys.shift);
         break;
       case left:
       case shiftLeft:
         e.preventDefault();
-        arg.move('left', (hotkeys as any).shift);
+        arg.move('left', hotkeys.shift);
         break;
       case right:
       case shiftRight:
         e.preventDefault();
-        arg.move('right', (hotkeys as any).shift);
+        arg.move('right', hotkeys.shift);
         break;
       case rmWin:
       case rmMac:
@@ -201,7 +209,7 @@ export const initShortCuts = (arg: {
 };
 
 export const destroyShortCuts = () => {
-  (hotkeys as any).unbind(keys.join());
+  hotkeys.unbind(keys.join());
 };
 
 /**
@@ -279,8 +287,9 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // Use the Uint8Array directly as pdf2size should accept it
-    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf) as any);
+    // Convert base64 to Uint8Array for pdf2size
+    const pdfData = b64toUint8Array(b64BasePdf);
+    pageSizes = await pdf2size(pdfData);
   }
 
   const ssl = schemasForUI.length;

@@ -1,7 +1,7 @@
 declare module '@scena/react-guides' {
-  import { Component, ForwardRefExoticComponent, RefAttributes } from 'react';
+  import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
-  interface GuidesInterface {
+  export interface GuidesInterface {
     getGuides(): number[];
     scroll(pos: number): void;
     scrollGuides(pos: number): void;
@@ -9,10 +9,16 @@ declare module '@scena/react-guides' {
     resize(): void;
   }
 
-  interface GuidesProps {
+  export interface GuidesProps {
     zoom?: number;
     style?: React.CSSProperties;
     type?: 'horizontal' | 'vertical';
+    className?: string;
+    snapThreshold?: number;
+    snaps?: number[];
+    displayDragPos?: boolean;
+    dragPosFormat?: (value: number) => string | number;
+    textFormat?: (value: number) => string | number;
   }
 
   // Define the component as a ForwardRefExoticComponent to support refs
