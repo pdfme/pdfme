@@ -240,9 +240,14 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
 
     let childrenString = '';
     if (Array.isArray(children)) {
-      childrenString = children.map(child => createElementString(child)).join('');
+      // Ensure each child is treated as IconNode or string
+      childrenString = children.map(child => {
+        // Explicitly cast child to IconNode | string to satisfy TypeScript
+        return createElementString(child as IconNode | string);
+      }).join('');
     } else {
-      childrenString = createElementString(children);
+      // Explicitly cast non-array children to IconNode | string
+      childrenString = createElementString(children as IconNode | string);
     }
 
     return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
