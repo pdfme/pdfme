@@ -212,16 +212,19 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  // Handle non-array input (should not happen with proper IconNode)
+  // Handle non-array input
   if (!Array.isArray(icon)) {
     return String(icon);
   }
 
-  // Destructure the IconNode array
-  const [tagName, attributes = {}, children = []] = icon;
+  // In lucide 0.475.0, IconNode is [tag, attributes, children]
+  const [tag, attributes = {}, children = []] = icon;
+
+  // Ensure tag is a string
+  const tagName = String(tag);
 
   // Merge custom attributes with SVG element if this is the root SVG
-  const isSvg = String(tagName) === 'svg';
+  const isSvg = tagName === 'svg';
   const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
 
   // Format attributes string
@@ -229,29 +232,26 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ');
 
-  // Process children
+  // Process children recursively
   let childrenString = '';
   
-  if (Array.isArray(children) && children.length > 0) {
+  if (Array.isArray(children)) {
     childrenString = children
       .map(child => {
-        // Handle string children
         if (typeof child === 'string') {
           return child;
-        }
-        
-        // Handle array children (nested IconNode)
-        if (Array.isArray(child)) {
+        } else if (Array.isArray(child)) {
+          // Recursively process nested IconNode
           return createSvgStr(child);
+        } else {
+          // Handle any other type
+          return String(child);
         }
-        
-        // Fallback for any other type
-        return String(child);
       })
       .join('');
   }
 
-  // Return SVG string with proper opening/closing tags
+  // Return properly formatted SVG string
   if (childrenString) {
     return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
   } else {
