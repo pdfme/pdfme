@@ -1,4 +1,4 @@
-import { ALIGNMENT, VERTICAL_ALIGNMENT, DYNAMIC_FONT_SIZE_FIT } from './types';
+import { ALIGNMENT, VERTICAL_ALIGNMENT, DYNAMIC_FONT_SIZE_FIT } from './types.js';
 
 export const DEFAULT_FONT_SIZE = 13;
 

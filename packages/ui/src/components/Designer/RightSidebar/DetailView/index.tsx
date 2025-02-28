@@ -1,15 +1,18 @@
-import FormRender, { useForm } from 'form-render';
+import { useForm } from 'form-render';
 import React, { useRef, useContext, useState, useEffect } from 'react';
 import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
-import type { SidebarProps } from '../../../../types';
+import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
-import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts';
-import { getSidebarContentHeight, debounce } from '../../../../helper';
+import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
+import { getSidebarContentHeight, debounce } from '../../../../helper.js';
 import { theme, Typography, Button, Divider } from 'antd';
-import AlignWidget from './AlignWidget';
-import WidgetRenderer from './WidgetRenderer';
-import ButtonGroupWidget from './ButtonGroupWidget';
-import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interface";
+import AlignWidget from './AlignWidget.js';
+import WidgetRenderer from './WidgetRenderer.js';
+import ButtonGroupWidget from './ButtonGroupWidget.js';
+import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interface.js";
+
+// Import FormRender as a default import
+import FormRenderComponent from 'form-render';
 
 const { Text } = Typography;
 
@@ -272,7 +275,8 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           overflowX: 'hidden',
         }}
       >
-        <FormRender
+        {/* @ts-ignore */}
+        <FormRenderComponent
           form={form}
           schema={propPanelSchema}
           widgets={widgets}

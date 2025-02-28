@@ -1,8 +1,8 @@
 import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react';
 import { Dict, Mode, ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema, Plugin, UIOptions, cloneDeep } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
-import { SELECTABLE_CLASSNAME } from '../constants';
-import { PluginsRegistry, OptionsContext, I18nContext, CacheContext } from '../contexts';
+import { SELECTABLE_CLASSNAME } from '../constants.js';
+import { PluginsRegistry, OptionsContext, I18nContext, CacheContext } from '../contexts.js';
 
 type RendererProps = Omit<
   UIRenderProps<Schema>,
@@ -97,9 +97,9 @@ const Renderer = (props: RendererProps) => {
   
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
-  const plugin = Object.values(pluginsRegistry).find(
+  const plugin = Object.values(pluginsRegistry || {}).find(
     (plugin) => plugin?.propPanel.defaultSchema.type === schema.type
-  ) as Plugin<any>;
+  ) as Plugin<any> | undefined;
 
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
@@ -112,7 +112,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
     mode,
     scale,
     schema,
-    options,
+    options: options as UIOptions,
   });
 
   useEffect(() => {
@@ -130,10 +130,10 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         stopEditing,
         tabIndex,
         placeholder,
-        options,
+        options: options as UIOptions,
         theme,
         i18n,
-        _cache,
+        _cache: _cache as Map<any, any>,
       });
     }
     return () => {

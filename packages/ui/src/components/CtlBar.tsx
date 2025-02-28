@@ -6,8 +6,8 @@ import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
-import { I18nContext } from '../contexts';
-import { getMaxZoom } from "../helper";
+import { I18nContext } from '../contexts.js';
+import { getMaxZoom } from "../helper.js";
 
 const { Text } = Typography;
 

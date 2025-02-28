@@ -8,9 +8,16 @@ import {
   checkPlugins,
   isHexValid,
   migrateTemplate,
-} from '../src/helper';
-import { PT_TO_PX_RATIO, BLANK_PDF, Template, Font, Plugins, SchemaPageArray } from '../src';
-import { getB64BasePdf } from '../src';
+} from '../src/helper.js';
+import {
+  PT_TO_PX_RATIO,
+  BLANK_PDF,
+  Template,
+  Font,
+  Plugins,
+  SchemaPageArray,
+  getB64BasePdf,
+} from '../src/index.js';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
@@ -497,12 +504,12 @@ describe('migrateTemplate', () => {
 
 describe('getB64BasePdf', () => {
   test('base64 string', async () => {
-    const result = await getB64BasePdf(BLANK_PDF)
+    const result = await getB64BasePdf(BLANK_PDF);
     expect(typeof result).toBe('string');
   });
 
   test('Uint8Array', async () => {
-    const result = await getB64BasePdf(new Uint8Array([10, 20, 30, 40, 50]))
+    const result = await getB64BasePdf(new Uint8Array([10, 20, 30, 40, 50]));
     expect(typeof result).toBe('string');
   });
-})
+});

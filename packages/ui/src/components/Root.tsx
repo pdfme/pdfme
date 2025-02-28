@@ -1,8 +1,8 @@
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { Size } from '@pdfme/common';
-import { FontContext } from '../contexts';
-import { BACKGROUND_COLOR } from '../constants';
-import Spinner from './Spinner';
+import { FontContext } from '../contexts.js';
+import { BACKGROUND_COLOR } from '../constants.js';
+import Spinner from './Spinner.js';
 
 type Props = { size: Size; scale: number; children: ReactNode };
 

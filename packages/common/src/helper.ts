@@ -9,7 +9,7 @@ import {
   BlankPdf,
   LegacySchemaPageArray,
   SchemaPageArray,
-} from './types';
+} from './types.js';
 import {
   Inputs as InputsSchema,
   UIOptions as UIOptionsSchema,

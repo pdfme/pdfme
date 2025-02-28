@@ -1,8 +1,8 @@
-import generate from '../src/generate';
-import { textType } from './assets/templates';
+import generate from '../src/generate.js';
+import { textType } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
-import { getFont, pdfToImages } from './utils';
+import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');

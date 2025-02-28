@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@pdfme/manipulator",
   "version": "0.0.0",
   "sideEffects": false,
@@ -54,21 +55,28 @@
     "@types/estree": "^1.0.6"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
-    "testMatch": [
-      "**/__tests__/**/*.test.ts"
+    "extensionsToTreatAsEsm": [
+      ".ts"
     ],
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "./tsconfig.json"
+          "tsconfig": "./tsconfig.json",
+          "useESM": true
         }
       ]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
     }
   }
 }

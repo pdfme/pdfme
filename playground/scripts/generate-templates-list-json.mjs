@@ -1,5 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');

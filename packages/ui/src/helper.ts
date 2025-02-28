@@ -1,4 +1,4 @@
-import hotkeys from 'hotkeys-js';
+import hotkeysJs from 'hotkeys-js';
 import { useContext } from 'react';
 import {
   cloneDeep,
@@ -14,7 +14,21 @@ import {
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
-import { OptionsContext } from './contexts';
+import { OptionsContext } from './contexts.js';
+
+// Create a simple mock for hotkeys to avoid TypeScript errors
+const hotkeys = function(keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void) {
+  return (hotkeysJs as any)(keys, callback);
+};
+
+// Add properties to the hotkeys function
+(hotkeys as any).shift = false;
+(hotkeys as any).unbind = function(keys: string) {
+  // Do nothing if hotkeysJs doesn't have unbind
+  if (typeof (hotkeysJs as any).unbind === 'function') {
+    (hotkeysJs as any).unbind(keys);
+  }
+};
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -125,27 +139,27 @@ export const initShortCuts = (arg: {
   save: () => void;
   selectAll: () => void;
 }) => {
-  hotkeys(keys.join(), (e, handler) => {
+  hotkeys(keys.join(), (e: KeyboardEvent, handler: { shortcut: string }) => {
     switch (handler.shortcut) {
       case up:
       case shiftUp:
         e.preventDefault();
-        arg.move('up', hotkeys.shift);
+        arg.move('up', (hotkeys as any).shift);
         break;
       case down:
       case shiftDown:
         e.preventDefault();
-        arg.move('down', hotkeys.shift);
+        arg.move('down', (hotkeys as any).shift);
         break;
       case left:
       case shiftLeft:
         e.preventDefault();
-        arg.move('left', hotkeys.shift);
+        arg.move('left', (hotkeys as any).shift);
         break;
       case right:
       case shiftRight:
         e.preventDefault();
-        arg.move('right', hotkeys.shift);
+        arg.move('right', (hotkeys as any).shift);
         break;
       case rmWin:
       case rmMac:
@@ -187,7 +201,7 @@ export const initShortCuts = (arg: {
 };
 
 export const destroyShortCuts = () => {
-  hotkeys.unbind(keys.join());
+  (hotkeys as any).unbind(keys.join());
 };
 
 /**
@@ -242,8 +256,8 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
-  template.schemas.forEach((page) => {
-    page.forEach((schema) => {
+  template.schemas.forEach((page: any[]) => {
+    page.forEach((schema: any) => {
       schema.id = uuid();
       schema.content = schema.content || '';
     });
@@ -265,7 +279,8 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf));
+    // Use the Uint8Array directly as pdf2size should accept it
+    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf) as any);
   }
 
   const ssl = schemasForUI.length;

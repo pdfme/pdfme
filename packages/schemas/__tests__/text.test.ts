@@ -10,10 +10,10 @@ import {
   getSplittedLines,
   filterStartJP,
   filterEndJP,
-} from '../src/text/helper';
-import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants';
+} from '../src/text/helper.js';
+import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
-import { FontWidthCalcValues, TextSchema } from '../src/text/types';
+import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));

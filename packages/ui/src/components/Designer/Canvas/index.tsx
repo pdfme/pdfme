@@ -10,22 +10,74 @@ import React, {
   useCallback,
 } from 'react';
 import { theme, Button } from 'antd';
-import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf, replacePlaceholders } from '@pdfme/common';
-import { PluginsRegistry } from '../../../contexts';
+import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
-import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
-import { usePrevious } from '../../../hooks';
-import { uuid, round, flatten } from '../../../helper';
-import Paper from '../../Paper';
-import Renderer from '../../Renderer';
-import Selecto from './Selecto';
-import Moveable from './Moveable';
-import Guides from './Guides';
-import Mask from './Mask';
-import Padding from './Padding';
-import StaticSchema from '../../StaticSchema';
+import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
+import { usePrevious } from '../../../hooks.js';
+import { uuid, round, flatten } from '../../../helper.js';
+import Paper from '../../Paper.js';
+import Renderer from '../../Renderer.js';
+import Selecto from './Selecto.js';
+import Moveable from './Moveable.js';
+import Guides from './Guides.js';
+import Mask from './Mask.js';
+import Padding from './Padding.js';
+import StaticSchema from '../../StaticSchema.js';
 
+// Define the interfaces locally since they're not exported properly
+interface OnDrag {
+  target: HTMLElement | SVGElement;
+  left: number;
+  top: number;
+  // Add additional properties that might be used in the original library
+  beforeDelta: any;
+  beforeDist: any;
+  beforeTranslate: any;
+  delta: any;
+  dist: any;
+  transform: any;
+  translate: any;
+}
+
+interface OnResize {
+  target: HTMLElement | SVGElement;
+  width: number;
+  height: number;
+  direction: string;
+  // Add additional properties that might be used in the original library
+  offsetWidth: number;
+  offsetHeight: number;
+  dist: any;
+  delta: any;
+  transform: any;
+  translate: any;
+}
+
+interface OnRotate {
+  target: HTMLElement | SVGElement;
+  rotate: number;
+  // Add additional properties that might be used in the original library
+  beforeDist: any;
+  beforeDelta: any;
+  beforeRotate: any;
+  dist: any;
+  delta: any;
+  transform: any;
+}
+
+interface OnClick {
+  inputEvent: MouseEvent;
+  // Add additional properties that might be used in the original library
+  inputTarget: any;
+  isTarget: boolean;
+  containsTarget: boolean;
+  isDouble: boolean;
+  datas: any;
+  targets: any[];
+  clientX: number;
+  clientY: number;
+}
 
 const mm2px = (mm: number) => mm * 3.7795275591;
 
@@ -357,7 +409,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (paperRefs.current[pageCursor] === inputEvent.target) {
             onEdit([]);
           }
-          if (inputEvent.target?.id === DELETE_BTN_ID) {
+          // Check if the target is an HTMLElement and has an id property
+          const targetElement = inputEvent.target as HTMLElement;
+          if (targetElement && targetElement.id === DELETE_BTN_ID) {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}

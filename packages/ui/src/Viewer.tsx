@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { PreviewProps } from '@pdfme/common';
-import { PreviewUI } from './class';
+import { PreviewUI } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
-import Preview from './components/Preview';
-import AppContextProvider from './components/AppContextProvider';
+import Preview from './components/Preview.js';
+import AppContextProvider from './components/AppContextProvider.js';
 
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
