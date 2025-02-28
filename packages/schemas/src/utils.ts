@@ -240,7 +240,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     .join(' ');
   
   // Helper function to process a single element
-  const processElement = (element: IconNode): string => {
+  const processElement = (element: any): string => {
     if (!Array.isArray(element)) {
       return String(element);
     }
