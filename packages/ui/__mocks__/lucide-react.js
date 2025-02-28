@@ -1,5 +1,5 @@
 // Mock for lucide-react
-module.exports = {
+const icons = {
   Plus: () => 'Plus',
   Minus: () => 'Minus',
   ChevronLeft: () => 'ChevronLeft',
@@ -17,3 +17,25 @@ module.exports = {
   LoaderCircle: () => 'LoaderCircle',
   // Add any other icons used in the codebase
 };
+
+// Export each icon individually to match the ES Module pattern
+export const {
+  Plus,
+  Minus,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Ellipsis,
+  X,
+  Menu,
+  GripVertical,
+  CircleAlert,
+  Lock,
+  ArrowLeft,
+  ArrowRight,
+  LoaderCircle
+} = icons;
+
+// Default export for compatibility
+export default icons;
