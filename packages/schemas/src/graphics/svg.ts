@@ -10,11 +10,27 @@ import { Route } from 'lucide';
 
 const isValidSVG = (svgString: string): boolean => {
   try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, 'image/svg+xml');
-    // Check if parsing error occurred
-    const parserError = doc.querySelector('parsererror');
-    return parserError === null;
+    // Basic validation checks that work in both Node.js and browser
+    if (!svgString || typeof svgString !== 'string') {
+      return false;
+    }
+    
+    // Check for basic SVG structure
+    if (!svgString.includes('<svg') || !svgString.includes('</svg>')) {
+      return false;
+    }
+    
+    // Additional browser-specific validation if DOMParser is available
+    if (typeof DOMParser !== 'undefined') {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(svgString, 'image/svg+xml');
+      const parserError = doc.querySelector('parsererror');
+      if (parserError !== null) {
+        return false;
+      }
+    }
+    
+    return true;
   } catch (error) {
     return false;
   }
