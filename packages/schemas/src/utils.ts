@@ -213,16 +213,22 @@ export const createErrorElm = () => {
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
   const createElementString = (node: IconNode): string => {
-    const [tag, attributes, children = []] = node;
+    if (!Array.isArray(node)) {
+      return String(node);
+    }
 
-    const mergedAttributes = tag === 'svg' ? { ...attributes, ...attrs } : attributes;
+    const [tag, attributes = {}, children = []] = node;
 
-    const attrString = Object.entries(mergedAttributes)
+    // Use type assertion to handle the comparison
+    const isSvg = String(tag) === 'svg';
+    const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
+
+    const attrString = Object.entries(mergedAttributes || {})
       .map(([key, value]) => `${key}="${value}"`)
       .join(' ');
 
-    const childrenString = children
-      .map((child) => createElementString(child))
+    const childrenString = (children as (IconNode | string)[])
+      .map((child) => createElementString(child as IconNode))
       .join('');
 
     return `<${tag} ${attrString}>${childrenString}</${tag}>`;

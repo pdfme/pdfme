@@ -23,22 +23,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-minus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-              </svg>
+              Minus
             </span>
             
           </button>
@@ -58,25 +43,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-plus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-                <path
-                  d="M12 5v14"
-                />
-              </svg>
+              Plus
             </span>
             
           </button>
@@ -170,22 +137,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-minus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-              </svg>
+              Minus
             </span>
             
           </button>
@@ -205,25 +157,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-plus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-                <path
-                  d="M12 5v14"
-                />
-              </svg>
+              Plus
             </span>
             
           </button>

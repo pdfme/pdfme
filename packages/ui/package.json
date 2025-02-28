@@ -87,7 +87,8 @@
       "^antd/es/": "antd/lib/",
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
-      "^lodash-es$": "lodash"
+      "^lodash-es$": "lodash",
+      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
@@ -106,6 +107,9 @@
     "testMatch": [
       "**/*.test.ts",
       "**/*.test.tsx"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!lucide-react)"
     ]
   },
   "publishConfig": {
