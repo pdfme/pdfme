@@ -5,7 +5,7 @@ import {
   PropPanelSchema,
   getFallbackFontName,
 } from '@pdfme/common';
-import type { TextSchema } from './types';
+import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_ALIGNMENT,
@@ -20,7 +20,7 @@ import {
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
-import { getExtraFormatterSchema } from './extraFormatter';
+import { getExtraFormatterSchema } from './extraFormatter.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;

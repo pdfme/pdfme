@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from "@pdfme/common";
@@ -15,7 +15,7 @@ import {
 } from "../helper";
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from "../components/NavBar";
-import ExternalButton from "../components/ExternalButton"
+import ExternalButton from "../components/ExternalButton";
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -128,7 +128,7 @@ function DesignerApp() {
     if (!editingStaticSchemas) {
       const currentTemplate = cloneDeep(designer.current.getTemplate());
       if (!isBlankPdf(currentTemplate.basePdf)) {
-        toast.error( <div>
+        toast.error(<div>
           <p>The current template cannot edit the static schema.</p>
           <a
             className="text-blue-500 underline"
@@ -242,6 +242,7 @@ function DesignerApp() {
       content: (
         <div className="flex gap-2">
           <button
+            id="save-local"
             disabled={editingStaticSchemas}
             className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -250,6 +251,7 @@ function DesignerApp() {
             Save Local
           </button>
           <button
+            id="reset-template"
             disabled={editingStaticSchemas}
             className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -273,6 +275,7 @@ function DesignerApp() {
             DL Template
           </button>
           <button
+            id="generate-pdf"
             disabled={editingStaticSchemas}
             className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
               }`}
@@ -290,12 +293,10 @@ function DesignerApp() {
     },
     {
       label: "",
-      content: (
-        <ExternalButton
-          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
-          title="Feedback this template"
-        />
-      ),
+      content: React.createElement(ExternalButton, {
+        href: "https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME",
+        title: "Feedback this template"
+      }),
     },
   ];
 

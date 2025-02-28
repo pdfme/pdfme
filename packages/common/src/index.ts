@@ -1,4 +1,4 @@
-import {PDFME_VERSION} from './version';
+import {PDFME_VERSION} from './version.js';
 import {
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,
@@ -6,7 +6,7 @@ import {
   BLANK_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
-} from './constants';
+} from './constants.js';
 import type {
   ChangeSchemaItem,
   ChangeSchemas,
@@ -36,7 +36,7 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
-} from './types';
+} from './types.js';
 import {
   cloneDeep,
   getFallbackFontName,
@@ -58,9 +58,9 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
-} from './helper';
-import { getDynamicTemplate } from './dynamicTemplate';
-import { replacePlaceholders } from './expression';
+} from './helper.js';
+import { getDynamicTemplate } from './dynamicTemplate.js';
+import { replacePlaceholders } from './expression.js';
 
 export {
   PDFME_VERSION,

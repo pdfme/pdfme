@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
-import type { BarcodeSchema } from './types';
+import type { BarcodeSchema } from './types.js';
 import { validateBarcodeInput, createBarCode } from './helper.js';
 import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 

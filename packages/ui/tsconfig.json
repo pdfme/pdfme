@@ -14,7 +14,7 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": [
@@ -45,6 +45,6 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.spec.ts",
+    "**/*.spec.ts"
   ]
 }

@@ -1,5 +1,5 @@
-import { Schema, Template, BasePdf, BlankPdf, CommonOptions } from './types';
-import { cloneDeep, isBlankPdf } from './helper';
+import { Schema, Template, BasePdf, BlankPdf, CommonOptions } from './types.js';
+import { cloneDeep, isBlankPdf } from './helper.js';
 
 interface ModifyTemplateForDynamicTableArg {
   template: Template;

@@ -1,0 +1,144 @@
+{
+  "title": "Recording 2/28/2025 at 11:09:20 AM",
+  "steps": [
+      {
+          "type": "setViewport",
+          "width": 1366,
+          "height": 768,
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "isLandscape": false
+      },
+      {
+          "type": "navigate",
+          "url": "http://localhost:4173/",
+          "assertedEvents": [
+              {
+                  "type": "navigation",
+                  "url": "http://localhost:4173/",
+                  "title": "pdfme Playground"
+              }
+          ]
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div.flex-1 > div > div > div:nth-of-type(1) > div:nth-of-type(1) path:nth-of-type(2)"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[1]/div/button/div/svg/path[2]"
+              ],
+              [
+                  "pierce/div.flex-1 > div > div > div:nth-of-type(1) > div:nth-of-type(1) path:nth-of-type(2)"
+              ]
+          ],
+          "offsetY": 2.5,
+          "offsetX": 4.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div.flex-1 > div > div > div:nth-of-type(1) > div:nth-of-type(3) svg"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[3]/div/button/div/svg"
+              ],
+              [
+                  "pierce/div.flex-1 > div > div > div:nth-of-type(1) > div:nth-of-type(3) svg"
+              ]
+          ],
+          "offsetY": 18.5,
+          "offsetX": 9.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div:nth-of-type(7) rect"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[7]/div/button/div/svg/rect"
+              ],
+              [
+                  "pierce/div:nth-of-type(7) rect"
+              ]
+          ],
+          "offsetY": 0.5,
+          "offsetX": 6.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div > div:nth-of-type(1) > div:nth-of-type(10) svg"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[10]/div/button/div/svg"
+              ],
+              [
+                  "pierce/div > div:nth-of-type(1) > div:nth-of-type(10) svg"
+              ]
+          ],
+          "offsetY": 9.5,
+          "offsetX": 9.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div:nth-of-type(14) svg"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[14]/div/button/div/svg"
+              ],
+              [
+                  "pierce/div:nth-of-type(14) svg"
+              ]
+          ],
+          "offsetY": 7.5,
+          "offsetX": 11.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div > div:nth-of-type(1) > div:nth-of-type(15) svg"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[15]/div/button/div/svg"
+              ],
+              [
+                  "pierce/div > div:nth-of-type(1) > div:nth-of-type(15) svg"
+              ]
+          ],
+          "offsetY": 22,
+          "offsetX": 14.5
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div:nth-of-type(16) svg"
+              ],
+              [
+                  "xpath///*[@id=\"root\"]/div/div[2]/div/div/div[1]/div[16]/div/button/div/svg"
+              ],
+              [
+                  "pierce/div:nth-of-type(16) svg"
+              ]
+          ],
+          "offsetY": 15.5,
+          "offsetX": 12.5
+      }
+  ]
+}

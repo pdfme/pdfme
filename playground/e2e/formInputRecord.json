@@ -1,0 +1,239 @@
+{
+    "title": "Recording 2/28/2025 at 3:03:22 PM",
+    "steps": [
+        {
+            "type": "setViewport",
+            "width": 1366,
+            "height": 768,
+            "deviceScaleFactor": 1,
+            "isMobile": false,
+            "hasTouch": false,
+            "isLandscape": false
+        },
+        {
+            "type": "navigate",
+            "url": "http://localhost:4173/form-viewer",
+            "assertedEvents": [
+                {
+                    "type": "navigation",
+                    "url": "http://localhost:4173/form-viewer",
+                    "title": "pdfme Playground"
+                }
+            ]
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "#text-6a2ff299-3076-4fa7-ac9b-3461ba32e204"
+                ],
+                [
+                    "xpath///*[@id=\"text-6a2ff299-3076-4fa7-ac9b-3461ba32e204\"]"
+                ],
+                [
+                    "pierce/#text-6a2ff299-3076-4fa7-ac9b-3461ba32e204"
+                ],
+                [
+                    "text/Type Something..."
+                ]
+            ],
+            "offsetY": 4.432037353515625,
+            "offsetX": 63.49609375
+        },
+        {
+            "type": "keyDown",
+            "target": "main",
+            "key": "Meta"
+        },
+        {
+            "type": "keyDown",
+            "target": "main",
+            "key": "a"
+        },
+        {
+            "type": "keyUp",
+            "key": "Meta",
+            "target": "main"
+        },
+        {
+            "type": "keyUp",
+            "key": "a",
+            "target": "main"
+        },
+        {
+            "type": "change",
+            "value": "Test!",
+            "selectors": [
+                [
+                    "#text-6a2ff299-3076-4fa7-ac9b-3461ba32e204"
+                ],
+                [
+                    "xpath///*[@id=\"text-6a2ff299-3076-4fa7-ac9b-3461ba32e204\"]"
+                ],
+                [
+                    "pierce/#text-6a2ff299-3076-4fa7-ac9b-3461ba32e204"
+                ],
+                [
+                    "text/Type Something..."
+                ]
+            ],
+            "target": "main"
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/+"
+                ],
+                [
+                    "div.flex-1 > div > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) button:nth-of-type(1)"
+                ],
+                [
+                    "xpath///*[@id=\"3bdc5a9b-0ba3-4095-84a8-7fc01d4d71ac\"]/div/button[1]"
+                ],
+                [
+                    "pierce/div.flex-1 > div > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) button:nth-of-type(1)"
+                ],
+                [
+                    "text/+"
+                ]
+            ],
+            "offsetY": 8.47186279296875,
+            "offsetX": 10.84686279296875
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "aria/https://pdfme.com/"
+                ],
+                [
+                    "div:nth-of-type(4) input"
+                ],
+                [
+                    "xpath///*[@id=\"d34f9a49-8174-48b2-a08e-0d937b17331b\"]/div/div/input"
+                ],
+                [
+                    "pierce/div:nth-of-type(4) input"
+                ],
+                [
+                    "text/https://pdfme.com/"
+                ]
+            ],
+            "offsetY": 5.6038818359375,
+            "offsetX": 35.49609375
+        },
+        {
+            "type": "keyDown",
+            "target": "main",
+            "key": "Meta"
+        },
+        {
+            "type": "keyDown",
+            "target": "main",
+            "key": "a"
+        },
+        {
+            "type": "keyUp",
+            "key": "Meta",
+            "target": "main"
+        },
+        {
+            "type": "keyUp",
+            "key": "a",
+            "target": "main"
+        },
+        {
+            "type": "change",
+            "value": "A",
+            "selectors": [
+                [
+                    "aria/https://pdfme.com/"
+                ],
+                [
+                    "div:nth-of-type(4) input"
+                ],
+                [
+                    "xpath///*[@id=\"d34f9a49-8174-48b2-a08e-0d937b17331b\"]/div/div/input"
+                ],
+                [
+                    "pierce/div:nth-of-type(4) input"
+                ],
+                [
+                    "text/https://pdfme.com/"
+                ]
+            ],
+            "target": "main"
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "#root > div > div.flex-1 select"
+                ],
+                [
+                    "xpath///*[@id=\"b7e5d4d8-dfa6-40d4-9037-d1e8788f1f67\"]/div/select"
+                ],
+                [
+                    "pierce/#root > div > div.flex-1 select"
+                ]
+            ],
+            "offsetY": 0.17730712890625,
+            "offsetX": 32.49609375
+        },
+        {
+            "type": "change",
+            "value": "option2",
+            "selectors": [
+                [
+                    "#root > div > div.flex-1 select"
+                ],
+                [
+                    "xpath///*[@id=\"b7e5d4d8-dfa6-40d4-9037-d1e8788f1f67\"]/div/select"
+                ],
+                [
+                    "pierce/#root > div > div.flex-1 select"
+                ]
+            ],
+            "target": "main"
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(1) svg"
+                ],
+                [
+                    "xpath///*[@id=\"f5628ac2-e9c8-4b4b-9f3c-8d524def9a82\"]/div/div/div/svg"
+                ],
+                [
+                    "pierce/div:nth-of-type(2) > div > div:nth-of-type(2) > div:nth-of-type(1) svg"
+                ]
+            ],
+            "offsetY": 6.04840087890625,
+            "offsetX": 8.49609375
+        },
+        {
+            "type": "click",
+            "target": "main",
+            "selectors": [
+                [
+                    "div:nth-of-type(2) > div:nth-of-type(2) svg"
+                ],
+                [
+                    "xpath///*[@id=\"62d08ac1-996c-46bb-932a-4d43f0c4124e\"]/div/div/div/svg"
+                ],
+                [
+                    "pierce/div:nth-of-type(2) > div:nth-of-type(2) svg"
+                ]
+            ],
+            "offsetY": 1.87109375,
+            "offsetX": 7.49609375
+        }
+    ]
+}
