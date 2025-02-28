@@ -18,8 +18,10 @@ export async function loadModule(modulePath: string) {
       // @ts-ignore
       const module = require(modulePath);
       return module;
-    } catch (e2) {
-      throw new Error(`Failed to load module ${modulePath}: ${e2.message}`);
+    } catch (e2: unknown) {
+      // Properly type the error
+      const errorMessage = e2 instanceof Error ? e2.message : String(e2);
+      throw new Error(`Failed to load module ${modulePath}: ${errorMessage}`);
     }
   }
 }

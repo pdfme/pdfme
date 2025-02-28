@@ -16,8 +16,9 @@ export async function loadUPNG() {
         // @ts-ignore
         upngModule = require('@pdf-lib/upng');
         return upngModule;
-      } catch (e2) {
-        throw new Error(`Failed to load UPNG module: ${e2.message}`);
+      } catch (e2: unknown) {
+        const errorMessage = e2 instanceof Error ? e2.message : String(e2);
+        throw new Error(`Failed to load UPNG module: ${errorMessage}`);
       }
     }
   }
