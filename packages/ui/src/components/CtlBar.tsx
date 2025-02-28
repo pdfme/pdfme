@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 // Import icons from lucide-react dynamically to avoid CommonJS/ESM compatibility issues
 // Note: In tests, these will be mocked by the mock file in __mocks__/lucide-react.js
@@ -7,9 +7,6 @@ import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts';
 import { getMaxZoom } from "../helper";
-
-// Using dynamic imports for lucide-react icons
-const { Text } = Typography;
 
 // Define a type for the icon components
 type IconComponent = React.FC<{ size?: number; color?: string }>;
