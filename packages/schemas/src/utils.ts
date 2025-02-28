@@ -288,8 +288,38 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     }
   };
   
-  // Process all elements and join them
-  const elementsString = icon.map(element => processElement(element)).join('');
+  // For the new lucide icon structure (>= 0.476.0), we need to extract the elements
+  // and include them directly in the SVG rather than wrapping each in its own SVG tag
+  let elementsString = '';
+  
+  // Process each element in the icon array
+  for (const element of icon) {
+    if (Array.isArray(element)) {
+      const [tag, attributes = {}, children = []] = element;
+      
+      // Format attributes string
+      const attrString = Object.entries(attributes)
+        .map(([key, value]) => `${key}="${value}"`)
+        .join(' ');
+      
+      // Process children if any
+      let childrenString = '';
+      if (Array.isArray(children) && children.length > 0) {
+        childrenString = children
+          .map(child => processElement(child))
+          .join('');
+      }
+      
+      // Add the element to the SVG content
+      if (childrenString) {
+        elementsString += `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
+      } else {
+        elementsString += `<${tag}${attrString ? ' ' + attrString : ''}/>`;
+      }
+    } else {
+      elementsString += String(element);
+    }
+  }
   
   // Return the complete SVG string
   return `<svg ${svgAttrString}>${elementsString}</svg>`;
