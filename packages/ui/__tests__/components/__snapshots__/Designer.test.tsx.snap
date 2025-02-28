@@ -383,12 +383,12 @@ exports[`Designer snapshot 1`] = `
               style="position: absolute; top: -30px; left: -30px; height: 30px; width: 30px; background: rgb(51, 51, 51);"
             />
             <div
-              class="scena-guides-manager scena-guides-horizontal  rCS1dv2ewo"
+              class="scena-manager scena-horizontal  rCS1dv2ewo"
               data-styled-id="rCS1dv2ewo"
               style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px; background: rgb(51, 51, 51);"
             >
               <div
-                class="scena-guides-guide-origin"
+                class="scena-guide-origin"
               />
               <canvas
                 height="0"
@@ -396,21 +396,21 @@ exports[`Designer snapshot 1`] = `
                 width="0"
               />
               <div
-                class="scena-guides-guides"
+                class="scena-guides"
                 style="transform: translateY(0px);"
               >
                 <div
-                  class="scena-guides-guide scena-guides-adder"
+                  class="scena-guide scena-adder"
                 />
               </div>
             </div>
             <div
-              class="scena-guides-manager scena-guides-vertical  rCS1dv2ewo"
+              class="scena-manager scena-vertical  rCS1dv2ewo"
               data-styled-id="rCS1dv2ewo"
               style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px; background: rgb(51, 51, 51);"
             >
               <div
-                class="scena-guides-guide-origin"
+                class="scena-guide-origin"
               />
               <canvas
                 height="0"
@@ -418,11 +418,11 @@ exports[`Designer snapshot 1`] = `
                 width="0"
               />
               <div
-                class="scena-guides-guides"
+                class="scena-guides"
                 style="transform: translateX(0px);"
               >
                 <div
-                  class="scena-guides-guide scena-guides-adder"
+                  class="scena-guide scena-adder"
                 />
               </div>
             </div>
