@@ -1,6 +1,6 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils';
-import {  SquareCheck } from 'lucide';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils.js';
+import { SquareCheck, IconNode } from 'lucide';
 
 describe('hex2RgbColor', () => {
   it('should convert hex to rgb', () => {
@@ -163,7 +163,80 @@ describe('convertForPdfLayoutProps', () => {
   });
 });
 
-it('createSvgStr', () => {
-  const icon = createSvgStr(SquareCheck, { stroke: 'currentColor' });
-  expect(icon).toBeTruthy();
+describe('createSvgStr', () => {
+  it('should convert a Lucide icon to SVG string', () => {
+    const icon = createSvgStr(SquareCheck, { stroke: 'currentColor' });
+    expect(icon).toBeTruthy();
+    expect(icon).toContain('<svg');
+    expect(icon).toContain('stroke="currentColor"');
+    expect(icon).toContain('</svg>');
+  });
+
+  it('should merge custom attributes with SVG element', () => {
+    const icon = createSvgStr(SquareCheck, { 
+      stroke: 'red', 
+      fill: 'blue',
+      width: '24',
+      height: '24'
+    });
+    expect(icon).toContain('stroke="red"');
+    expect(icon).toContain('fill="blue"');
+    expect(icon).toContain('width="24"');
+    expect(icon).toContain('height="24"');
+  });
+
+  it('should handle custom attributes overriding default ones', () => {
+    // SquareCheck likely has default stroke attribute
+    const defaultIcon = createSvgStr(SquareCheck);
+    const customIcon = createSvgStr(SquareCheck, { stroke: 'purple' });
+    
+    expect(customIcon).toContain('stroke="purple"');
+    // The custom stroke should replace the default one
+    expect(customIcon).not.toBe(defaultIcon);
+  });
+
+  it('should handle different icons', () => {
+    // Test with a different icon from lucide
+    const icon1 = createSvgStr(SquareCheck);
+    
+    expect(icon1).toBeTruthy();
+    expect(icon1).toContain('<svg');
+    expect(icon1).toContain('</svg>');
+  });
+
+  it('should produce valid SVG output', () => {
+    const svgStr = createSvgStr(SquareCheck);
+    
+    // Check that the output is a valid SVG string
+    expect(svgStr).toContain('<svg');
+    expect(svgStr).toContain('</svg>');
+    
+    // Check that attributes are properly formatted
+    expect(svgStr.includes('="')).toBeTruthy();
+    
+    // Check that tags are properly closed
+    const openTags = svgStr.match(/<[^/][^>]*>/g) || [];
+    const closeTags = svgStr.match(/<\/[^>]+>/g) || [];
+    expect(openTags.length).toBeGreaterThan(0);
+    expect(closeTags.length).toBeGreaterThan(0);
+  });
+
+  it('should handle multiple custom attributes', () => {
+    const customAttrs = {
+      width: '48',
+      height: '48',
+      fill: 'none',
+      stroke: 'blue',
+      'stroke-width': '1.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round'
+    };
+    
+    const svgStr = createSvgStr(SquareCheck, customAttrs);
+    
+    // Check that all custom attributes are included
+    Object.entries(customAttrs).forEach(([key, value]) => {
+      expect(svgStr).toContain(`${key}="${value}"`);
+    });
+  });
 });
