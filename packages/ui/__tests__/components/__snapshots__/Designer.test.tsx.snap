@@ -383,8 +383,8 @@ exports[`Designer snapshot 1`] = `
               style="position: absolute; top: -30px; left: -30px; height: 30px; width: 30px; background: rgb(51, 51, 51);"
             />
             <div
-              class="scena-guides-manager scena-guides-horizontal  rCS1c864qp"
-              data-styled-id="rCS1c864qp"
+              class="scena-guides-manager scena-guides-horizontal  rCS1dv2ewo"
+              data-styled-id="rCS1dv2ewo"
               style="position: absolute; top: -30px; left: 0px; height: 30px; width: 793.700787411px; background: rgb(51, 51, 51);"
             >
               <div
@@ -405,8 +405,8 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="scena-guides-manager scena-guides-vertical  rCS1c864qp"
-              data-styled-id="rCS1c864qp"
+              class="scena-guides-manager scena-guides-vertical  rCS1dv2ewo"
+              data-styled-id="rCS1dv2ewo"
               style="position: absolute; top: 0px; left: -30px; height: 1122.5196850527px; width: 30px; background: rgb(51, 51, 51);"
             >
               <div
