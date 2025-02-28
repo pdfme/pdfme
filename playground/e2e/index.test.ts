@@ -137,7 +137,7 @@ describe('Playground E2E Tests', () => {
       const templateCreationUserFlow = parse(templateCreationRecord);
       const templateCreationRunner = await createRunner(
         templateCreationUserFlow,
-        new PuppeteerRunnerExtension(browser, page)
+        new PuppeteerRunnerExtension(browser, page, { timeout })
       );
       await templateCreationRunner.run();
 
@@ -162,7 +162,7 @@ describe('Playground E2E Tests', () => {
       const formInputUserFlow = parse(formInputRecord);
       const formInputRunner = await createRunner(
         formInputUserFlow,
-        new PuppeteerRunnerExtension(browser, page)
+        new PuppeteerRunnerExtension(browser, page, { timeout })
       );
       await formInputRunner.run();
 
@@ -174,6 +174,7 @@ describe('Playground E2E Tests', () => {
       console.error(e);
       const screenshot = await page.screenshot();
       fs.writeFileSync('e2e-error-screenshot.png', screenshot, 'base64');
+      throw e;
     }
   });
 });
