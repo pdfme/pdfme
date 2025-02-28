@@ -13,8 +13,24 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head ref (if triggered by /retest comment)
+        if: github.event_name == 'issue_comment'
+        id: pr
+        uses: actions/github-script@v6
         with:
+          script: |
+            const prUrl = context.payload.issue.pull_request.url;
+            const prNumber = prUrl.split('/').pop();
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(prNumber)
+            });
+            return pr.head.ref;
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event_name == 'issue_comment' ? steps.pr.outputs.result : github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -33,8 +49,24 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v2
+      - name: Get PR head ref (if triggered by /retest comment)
+        if: github.event_name == 'issue_comment'
+        id: pr
+        uses: actions/github-script@v6
         with:
+          script: |
+            const prUrl = context.payload.issue.pull_request.url;
+            const prNumber = prUrl.split('/').pop();
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: Number(prNumber)
+            });
+            return pr.head.ref;
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event_name == 'issue_comment' ? steps.pr.outputs.result : github.event.pull_request.head.ref }}
           fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
