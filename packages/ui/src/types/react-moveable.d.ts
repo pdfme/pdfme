@@ -7,6 +7,11 @@ declare module 'react-moveable' {
     translate: [number, number];
     delta: [number, number];
     dist: [number, number];
+    left: number;
+    top: number;
+    beforeDelta: number;
+    beforeDist: number;
+    transform: string;
   }
 
   export interface OnResize {
@@ -17,6 +22,10 @@ declare module 'react-moveable' {
     dist: [number, number];
     direction: [number, number];
     beforeDirection: [number, number];
+    offsetWidth: number;
+    offsetHeight: number;
+    transform: string;
+    translate: [number, number];
   }
 
   export interface OnRotate {
@@ -25,10 +34,13 @@ declare module 'react-moveable' {
     delta: number;
     dist: number;
     rotate: number;
+    beforeDist: number;
+    beforeRotate: number;
+    transform: string;
   }
 
   export interface MoveableProps {
-    target?: HTMLElement | ReactElement | null;
+    target?: HTMLElement[] | HTMLElement | ReactElement | null;
     container?: HTMLElement | null;
     draggable?: boolean;
     resizable?: boolean;
@@ -44,15 +56,15 @@ declare module 'react-moveable' {
     throttleScale?: number;
     snappable?: boolean;
     bounds?: { left?: number; top?: number; right?: number; bottom?: number };
-    onDragStart?: (e: OnDrag) => void;
-    onDrag?: (e: OnDrag) => void;
-    onDragEnd?: (e: OnDrag) => void;
-    onResizeStart?: (e: OnResize) => void;
-    onResize?: (e: OnResize) => void;
-    onResizeEnd?: (e: OnResize) => void;
-    onRotateStart?: (e: OnRotate) => void;
-    onRotate?: (e: OnRotate) => void;
-    onRotateEnd?: (e: OnRotate) => void;
+    onDragStart?: (e: any) => void;
+    onDrag?: (e: any) => void;
+    onDragEnd?: (e: any) => void;
+    onResizeStart?: (e: any) => void;
+    onResize?: (e: any) => void;
+    onResizeEnd?: (e: any) => void;
+    onRotateStart?: (e: any) => void;
+    onRotate?: (e: any) => void;
+    onRotateEnd?: (e: any) => void;
   }
 
   export interface MoveableInterface {

@@ -1,4 +1,3 @@
-import hotkeysJs from 'hotkeys-js';
 import { useContext } from 'react';
 import {
   cloneDeep,
@@ -12,31 +11,13 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
+import hotkeys from 'hotkeys-js';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
 import { OptionsContext } from './contexts.js';
 
-// Define a proper interface for the hotkeys library
-interface HotkeysHandler {
-  (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void): void;
-  shift: boolean;
-  unbind: (keys: string) => void;
-}
-
-// Create a properly typed wrapper for hotkeys
-const hotkeys: HotkeysHandler = Object.assign(
-  (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void) => {
-    return hotkeysJs(keys, callback);
-  },
-  {
-    shift: false,
-    unbind: (keys: string) => {
-      if (typeof hotkeysJs.unbind === 'function') {
-        hotkeysJs.unbind(keys);
-      }
-    }
-  }
-);
+// Define shift property for type safety
+hotkeys.shift = false;
 
 export const uuid = () =>
   'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
