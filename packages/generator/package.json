@@ -85,7 +85,7 @@
           "tsconfig": "tsconfig.esm.json"
         }
       ],
-      "^.+\\.css$": "<rootDir>/__tests__/cssTransform.js"
+      "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
     },
     "testMatch": [
       "**/*.test.ts"

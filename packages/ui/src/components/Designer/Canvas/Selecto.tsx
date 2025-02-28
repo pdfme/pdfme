@@ -39,7 +39,6 @@ const _Selecto = (props: Props) => {
   }, [props.container]);
 
   return (
-    // @ts-ignore
     <SelectoComponent
       className={className}
       selectFromInside={false}
@@ -50,7 +49,7 @@ const _Selecto = (props: Props) => {
       container={props.container}
       continueSelect={props.continueSelect}
       onDragStart={props.onDragStart}
-      onSelect={props.onSelect}
+      onSelect={(e: any) => props.onSelect(e as OnSelect)}
     />
   );
 };

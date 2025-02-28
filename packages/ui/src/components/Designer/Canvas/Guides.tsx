@@ -40,19 +40,17 @@ const _Guides = ({
       className="ruler-container"
       style={guideStyle(-RULER_HEIGHT, -RULER_HEIGHT, RULER_HEIGHT, RULER_HEIGHT)}
     />
-    {/* @ts-ignore */}
     <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
-      ref={horizontalRef}
+      ref={horizontalRef as any}
     />
-    {/* @ts-ignore */}
     <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"
-      ref={verticalRef}
+      ref={verticalRef as any}
     />
   </>
 );

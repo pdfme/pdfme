@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const pLimit = require('p-limit');
-const { generate } = require('@pdfme/generator');
-const { pdf2img } = require('@pdfme/converter');
-const { getInputFromTemplate, getDefaultFont } = require('@pdfme/common');
-const {
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import pLimit from 'p-limit';
+import { generate } from '../../packages/generator/dist/esm/src/index.js';
+import { pdf2img } from '../../packages/converter/dist/esm/src/index.node.js';
+import { getInputFromTemplate, getDefaultFont } from '../../packages/common/dist/esm/src/index.js';
+import {
   multiVariableText,
   text,
   barcodes,
@@ -21,7 +21,9 @@ const {
   select,
   checkbox,
   radioGroup,
-} = require('@pdfme/schemas');
+} from '../../packages/schemas/dist/esm/src/index.js';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const plugins = {
   multiVariableText,

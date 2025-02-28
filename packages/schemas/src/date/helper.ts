@@ -12,71 +12,71 @@ interface AirDatepickerInstance {
   show: () => void;
 }
 // @ts-ignore
-import localeAr from 'air-datepicker/locale/ar';
+import localeAr from 'air-datepicker/locale/ar.js';
 // @ts-ignore
-import localeBg from 'air-datepicker/locale/bg';
+import localeBg from 'air-datepicker/locale/bg.js';
 // @ts-ignore
-import localeCa from 'air-datepicker/locale/ca';
+import localeCa from 'air-datepicker/locale/ca.js';
 // @ts-ignore
-import localeCs from 'air-datepicker/locale/cs';
+import localeCs from 'air-datepicker/locale/cs.js';
 // @ts-ignore
-import localeDa from 'air-datepicker/locale/da';
+import localeDa from 'air-datepicker/locale/da.js';
 // @ts-ignore
-import localeDe from 'air-datepicker/locale/de';
+import localeDe from 'air-datepicker/locale/de.js';
 // @ts-ignore
-import localeEl from 'air-datepicker/locale/el';
+import localeEl from 'air-datepicker/locale/el.js';
 // @ts-ignore
-import localeEn from 'air-datepicker/locale/en';
+import localeEn from 'air-datepicker/locale/en.js';
 // @ts-ignore
-import localeEs from 'air-datepicker/locale/es';
+import localeEs from 'air-datepicker/locale/es.js';
 // @ts-ignore
-import localeEu from 'air-datepicker/locale/eu';
+import localeEu from 'air-datepicker/locale/eu.js';
 // @ts-ignore
-import localeFi from 'air-datepicker/locale/fi';
+import localeFi from 'air-datepicker/locale/fi.js';
 // @ts-ignore
-import localeFr from 'air-datepicker/locale/fr';
+import localeFr from 'air-datepicker/locale/fr.js';
 // @ts-ignore
-import localeHr from 'air-datepicker/locale/hr';
+import localeHr from 'air-datepicker/locale/hr.js';
 // @ts-ignore
-import localeHu from 'air-datepicker/locale/hu';
+import localeHu from 'air-datepicker/locale/hu.js';
 // @ts-ignore
-import localeId from 'air-datepicker/locale/id';
+import localeId from 'air-datepicker/locale/id.js';
 // @ts-ignore
-import localeIt from 'air-datepicker/locale/it';
+import localeIt from 'air-datepicker/locale/it.js';
 // @ts-ignore
-import localeJa from 'air-datepicker/locale/ja';
+import localeJa from 'air-datepicker/locale/ja.js';
 // @ts-ignore
-import localeKo from 'air-datepicker/locale/ko';
+import localeKo from 'air-datepicker/locale/ko.js';
 // @ts-ignore
-import localeNb from 'air-datepicker/locale/nb';
+import localeNb from 'air-datepicker/locale/nb.js';
 // @ts-ignore
-import localeNl from 'air-datepicker/locale/nl';
+import localeNl from 'air-datepicker/locale/nl.js';
 // @ts-ignore
-import localeTh from 'air-datepicker/locale/th';
+import localeTh from 'air-datepicker/locale/th.js';
 // @ts-ignore
-import localePl from 'air-datepicker/locale/pl';
+import localePl from 'air-datepicker/locale/pl.js';
 // @ts-ignore
-import localePtBR from 'air-datepicker/locale/pt-BR';
+import localePtBR from 'air-datepicker/locale/pt-BR.js';
 // @ts-ignore
-import localePt from 'air-datepicker/locale/pt';
+import localePt from 'air-datepicker/locale/pt.js';
 // @ts-ignore
-import localeRo from 'air-datepicker/locale/ro';
+import localeRo from 'air-datepicker/locale/ro.js';
 // @ts-ignore
-import localeRu from 'air-datepicker/locale/ru';
+import localeRu from 'air-datepicker/locale/ru.js';
 // @ts-ignore
-import localeSi from 'air-datepicker/locale/si';
+import localeSi from 'air-datepicker/locale/si.js';
 // @ts-ignore
-import localeSk from 'air-datepicker/locale/sk';
+import localeSk from 'air-datepicker/locale/sk.js';
 // @ts-ignore
-import localeSl from 'air-datepicker/locale/sl';
+import localeSl from 'air-datepicker/locale/sl.js';
 // @ts-ignore
-import localeSv from 'air-datepicker/locale/sv';
+import localeSv from 'air-datepicker/locale/sv.js';
 // @ts-ignore
-import localeTr from 'air-datepicker/locale/tr';
+import localeTr from 'air-datepicker/locale/tr.js';
 // @ts-ignore
-import localeUk from 'air-datepicker/locale/uk';
+import localeUk from 'air-datepicker/locale/uk.js';
 // @ts-ignore
-import localeZh from 'air-datepicker/locale/zh';
+import localeZh from 'air-datepicker/locale/zh.js';
 
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';

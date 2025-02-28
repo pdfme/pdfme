@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { merge, split, remove, insert, rotate, move, organize } from '../src/index.js';
-import { createTestPDF, pdfToImages, getPDFPageCount } from './utils.js';
+import { merge, split, remove, insert, rotate, move, organize } from '../src/index';
+import { createTestPDF, pdfToImages, getPDFPageCount } from './utils';
 import 'jest-image-snapshot';
 
 describe('merge', () => {
