@@ -212,7 +212,13 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  const createElementString = (node: IconNode): string => {
+  const createElementString = (node: IconNode | string): string => {
+    // Handle string nodes (text content)
+    if (typeof node === 'string') {
+      return node;
+    }
+    
+    // Handle non-array nodes (should not happen with proper IconNode, but handle for safety)
     if (!Array.isArray(node)) {
       return String(node);
     }
@@ -232,9 +238,12 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
       return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
     }
 
-    const childrenString = Array.isArray(children)
-      ? (children as (IconNode | string)[]).map((child) => createElementString(child as IconNode)).join('')
-      : createElementString(children as IconNode);
+    let childrenString = '';
+    if (Array.isArray(children)) {
+      childrenString = children.map(child => createElementString(child)).join('');
+    } else {
+      childrenString = createElementString(children);
+    }
 
     return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
   };
