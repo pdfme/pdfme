@@ -42,3 +42,27 @@ jobs:
         run: npm publish --workspaces --access public --tag ${{ env.NPM_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  playground-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies and build project
+        run: |
+          npm ci
+          npm run build
+
+      - name: Run playground tests
+        run: |
+          cd playground
+          npm install
+          npm run test
+        env:
+          CI: true
