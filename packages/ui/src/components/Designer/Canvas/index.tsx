@@ -13,7 +13,7 @@ import { theme, Button } from 'antd';
 import { OnDrag, OnResize, OnClick, OnRotate } from 'react-moveable';
 import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf, replacePlaceholders } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts';
-import { X } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants';
 import { usePrevious } from '../../../hooks';
 import { uuid, round, flatten } from '../../../helper';
@@ -62,7 +62,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
         background: token.colorPrimary,
       }}
     >
-      <X style={{ pointerEvents: 'none' }} />
+      <LucideIcons.X style={{ pointerEvents: 'none' }} />
     </Button>
   );
 };

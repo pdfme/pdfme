@@ -1,6 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Size } from '@pdfme/common';
-import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
+// Import icons from lucide-react
+// Note: In tests, these will be mocked by the mock file in __mocks__/lucide-react.js
+import * as LucideIcons from 'lucide-react';
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts';
@@ -29,7 +31,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
-        icon={<Minus size={16} color={style.textStyle.color} />}
+        icon={<LucideIcons.Minus size={16} color={style.textStyle.color} />}
       />
       <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
@@ -38,7 +40,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         type="text"
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
-        icon={<Plus size={16} color={style.textStyle.color} />}
+        icon={<LucideIcons.Plus size={16} color={style.textStyle.color} />}
       />
     </div>
   );
@@ -55,7 +57,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
-        <ChevronLeft size={16} color={style.textStyle.color} />
+        <LucideIcons.ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
@@ -65,7 +67,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
       >
-        <ChevronRight size={16} color={style.textStyle.color} />
+        <LucideIcons.ChevronRight size={16} color={style.textStyle.color} />
       </Button>
     </div>
   );
@@ -78,7 +80,7 @@ type ContextMenuProps = {
 const ContextMenu = ({ items, style }: ContextMenuProps) => (
   <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
     <Button type="text">
-      <Ellipsis size={16} color={style.textStyle.color} />
+      <LucideIcons.Ellipsis size={16} color={style.textStyle.color} />
     </Button>
   </Dropdown>
 );
