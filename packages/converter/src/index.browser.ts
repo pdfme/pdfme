@@ -1,11 +1,13 @@
-import * as pdfjsLib from 'pdfjs-dist';
-// @ts-expect-error
-import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
+import { loadPdfJs, loadPdfJsWorker } from './utils/module-loader.js';
+
+// Load PDF.js libraries
+const pdfjsLib = await loadPdfJs(false);
+const PDFJSWorker = await loadPdfJsWorker(false);
 
 // @ts-ignore
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker.default || PDFJSWorker;
 
 function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   // Split out the actual base64 string from the data URL scheme
@@ -25,6 +27,12 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   return arrayBuffer;
 }
 
+
+// Import the PDF-lib patch
+import { PatchedPNG } from './patches/pdf-lib-patch.js';
+
+// Apply the patch before using pdf2img
+await PatchedPNG.patchPdfLib();
 
 export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) =>
   _pdf2img(pdf, options, {

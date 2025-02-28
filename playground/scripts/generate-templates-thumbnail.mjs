@@ -2,10 +2,15 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import pLimit from 'p-limit';
-import { generate } from '../../packages/generator/dist/esm/src/index.js';
-import { pdf2img } from '../../packages/converter/dist/esm/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '../../packages/common/dist/esm/src/index.js';
-import {
+
+// Ensure PDF.js and UPNG are properly loaded
+// Use dynamic imports to ensure proper ESM loading
+const { generate } = await import('../../packages/generator/dist/esm/src/index.js');
+const { pdf2img } = await import('../../packages/converter/dist/esm/src/index.node.js');
+const { getInputFromTemplate, getDefaultFont } = await import('../../packages/common/dist/esm/src/index.js');
+// Use dynamic import for schemas to ensure proper ESM loading
+const schemas = await import('../../packages/schemas/dist/esm/src/index.js');
+const {
   multiVariableText,
   text,
   barcodes,
@@ -21,7 +26,7 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '../../packages/schemas/dist/esm/src/index.js';
+} = schemas;
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 

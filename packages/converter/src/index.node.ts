@@ -1,13 +1,21 @@
 import { createCanvas } from 'canvas';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-// @ts-expect-error
-import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
+import { loadPdfJs, loadPdfJsWorker } from './utils/module-loader.js';
+
+// Load PDF.js libraries
+const pdfjsLib = await loadPdfJs(true);
+const PDFJSWorker = await loadPdfJsWorker(true);
 
 if (typeof window !== 'undefined' && pdfjsLib.GlobalWorkerOptions) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker.default || PDFJSWorker;
 }
+
+// Import the PDF-lib patch
+import { PatchedPNG } from './patches/pdf-lib-patch.js';
+
+// Apply the patch before using pdf2img
+await PatchedPNG.patchPdfLib();
 
 export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) =>
   _pdf2img(pdf, options, {
