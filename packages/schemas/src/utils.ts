@@ -212,46 +212,74 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  const createElementString = (node: IconNode | string): string => {
-    // Handle string nodes (text content)
-    if (typeof node === 'string') {
-      return node;
-    }
-    
-    // Handle non-array nodes (should not happen with proper IconNode, but handle for safety)
-    if (!Array.isArray(node)) {
-      return String(node);
-    }
+  // Handle the case where icon is directly a string (should not happen with proper IconNode)
+  if (typeof icon === 'string') {
+    return icon;
+  }
 
-    const [tag, attributes = {}, children = []] = node;
+  // Handle the case where icon is not an array (should not happen with proper IconNode)
+  if (!Array.isArray(icon)) {
+    return String(icon);
+  }
 
-    // Use type assertion to handle the comparison
-    const isSvg = String(tag) === 'svg';
-    const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
+  // In lucide 0.475.0, the icon structure is [tag, attributes, children]
+  const [tag, attributes = {}, children = []] = icon;
 
-    const attrString = Object.entries(mergedAttributes || {})
-      .map(([key, value]) => `${key}="${value}"`)
-      .join(' ');
+  // Merge custom attributes with SVG element if this is the root SVG
+  const isSvg = String(tag) === 'svg';
+  const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
 
-    // Handle empty children array
-    if (!children || (Array.isArray(children) && children.length === 0)) {
-      return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
-    }
+  // Format attributes string
+  const attrString = Object.entries(mergedAttributes || {})
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
 
-    let childrenString = '';
-    if (Array.isArray(children)) {
-      // Ensure each child is treated as IconNode or string
-      childrenString = children.map(child => {
-        // Explicitly cast child to IconNode | string to satisfy TypeScript
-        return createElementString(child as IconNode | string);
-      }).join('');
-    } else {
-      // Explicitly cast non-array children to IconNode | string
-      childrenString = createElementString(children as IconNode | string);
-    }
+  // Handle empty children (self-closing tag)
+  if (!children || (Array.isArray(children) && children.length === 0)) {
+    return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
+  }
 
-    return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
-  };
+  // Process children
+  let childrenString = '';
+  if (Array.isArray(children)) {
+    childrenString = children.map(child => {
+      // Recursively process each child
+      if (typeof child === 'string') {
+        return child;
+      } else if (Array.isArray(child)) {
+        // Child is another IconNode array [tag, attributes, children]
+        const [childTag, childAttrs = {}, childChildren = []] = child;
+        
+        // Format child attributes
+        const childAttrString = Object.entries(childAttrs)
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(' ');
+        
+        // Handle empty children for child element
+        if (!childChildren || (Array.isArray(childChildren) && childChildren.length === 0)) {
+          return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}/>`;
+        }
+        
+        // Process child's children recursively
+        const nestedChildrenString = Array.isArray(childChildren) 
+          ? childChildren.map(c => createSvgStr(c as IconNode)).join('')
+          : createSvgStr(childChildren as IconNode);
+        
+        return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTag}>`;
+      } else {
+        // Fallback for unexpected child type
+        return String(child);
+      }
+    }).join('');
+  } else if (typeof children === 'string') {
+    childrenString = children;
+  } else if (Array.isArray(children)) {
+    // This is a nested IconNode
+    childrenString = createSvgStr(children as IconNode);
+  } else {
+    // Fallback for unexpected children type
+    childrenString = String(children);
+  }
 
-  return createElementString(icon);
+  return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
 };
