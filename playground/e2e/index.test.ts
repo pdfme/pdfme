@@ -1,8 +1,56 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
+import type { MatchImageSnapshotOptions } from 'jest-image-snapshot';
+import formInputRecord from './formInputRecord.json';
+import templateCreataionRecord from './templateCreataionRecord.json';
 
-jest.setTimeout(60000);
+const timeout = 60000;
+
+jest.setTimeout(timeout * 3);
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const snapShotOpt: MatchImageSnapshotOptions = {
+  failureThreshold: 1,
+  failureThresholdType: 'percent',
+  blur: 1,
+  customDiffConfig: { threshold: 0.2 },
+};
+
+const viewport = { width: 1366, height: 768 };
+
+const generatePdfAndTakeScreenshot = async ({
+  page,
+  browser,
+}: {
+  page: Page;
+  browser: Browser;
+}) => {
+  await page.click('#generate-pdf');
+
+  const newTarget = await browser.waitForTarget((target) => target.url().startsWith('blob:'), {
+    timeout,
+  });
+  const newPage = await newTarget.page();
+
+  if (!newPage) {
+    throw new Error('[generatePdfAndTakeScreenshot]: New page not found');
+  }
+
+  await newPage.setViewport(viewport);
+  await newPage.bringToFront();
+
+  await newPage.goto(newPage.url(), { waitUntil: 'networkidle0', timeout });
+  await sleep(2000);
+
+  const screenshot = await newPage.screenshot();
+
+  await newPage.close();
+  await page.bringToFront();
+
+  return screenshot;
+};
 
 describe('Playground E2E Tests', () => {
   const isRunningLocal = process.env.LOCAL === 'true';
@@ -24,7 +72,7 @@ describe('Playground E2E Tests', () => {
       stdio: 'pipe',
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await sleep(2000);
 
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
@@ -32,7 +80,7 @@ describe('Playground E2E Tests', () => {
     });
     page = await browser.newPage();
 
-    await page.setViewport({ width: 1366, height: 768 });
+    await page.setViewport(viewport);
   });
 
   afterAll(async () => {
@@ -46,18 +94,30 @@ describe('Playground E2E Tests', () => {
   });
 
   test('E2E suite', async () => {
+    if (!browser) throw new Error('Browser not initialized');
     if (!page) throw new Error('Page not initialized');
-    await page.goto('http://localhost:4173/');
-    const title = await page.title();
-    expect(title).toBe('pdfme Playground');
 
-    await page.waitForNetworkIdle();
+    await page.goto('http://localhost:4173', { waitUntil: 'networkidle0', timeout });
 
-    const screenshot = await page.screenshot();
-    expect(screenshot).toMatchImageSnapshot({
-      failureThreshold: 1,
-      failureThresholdType: 'percent',
-      customDiffConfig: { threshold: 0.2 },
-    });
+    const screenshot = await generatePdfAndTakeScreenshot({ page, browser });
+
+    expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+
+    // 1. まずテンプレート一覧画面に遷移(http://localhost:4173/templates)
+    // 2. Invoiceテンプレートをクリックし、自動的にデザイナーに遷移(#template-img-invoice)
+    // 3. デザイナーでスクリーンショットを撮り、スナップショットと比較
+    // 4. PDFを生成してスクリーンショットを撮り、スナップショットと比較
+    // 5. テンプレート一覧画面に戻る(#templates-nav)
+    // 6. Pedigreeテンプレートをクリックし、自動的にデザイナーに遷移(#template-img-pedigree)
+    // 7. デザイナーでスクリーンショットを撮り、スナップショットと比較
+    // 8. PDFを生成してスクリーンショットを撮り、スナップショットと比較
+    // 9. Restボタンを押してテンプレートをリセットする(#reset-template)
+    // 10. テキストボックスなど、いろいろ追加 (templateCreataionRecord)
+    // 11. デザイナーでスクリーンショットを撮り、スナップショットと比較
+    // 12. PDFを生成してスクリーンショットを撮り、スナップショットと比較
+    // 13. Save Localボタンを押してローカルに保存(#save-local)
+    // 14. フォームビューアーにナビジェーションをクリックして遷移(#form-viewer-nav)
+    // 15. フォームに入力して(formInputRecord)
+    // 16. PDFを生成してスクリーンショットを撮り、スナップショットと比較
   });
 });

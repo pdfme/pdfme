@@ -1,0 +1,219 @@
+{
+  "title": "Recording 2/28/2025 at 11:14:02 AM",
+  "steps": [
+      {
+          "type": "setViewport",
+          "width": 1366,
+          "height": 768,
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "isLandscape": false
+      },
+      {
+          "type": "navigate",
+          "url": "https://playground.pdfme.com/form-viewer",
+          "assertedEvents": [
+              {
+                  "type": "navigation",
+                  "url": "https://playground.pdfme.com/form-viewer",
+                  "title": "pdfme Playground"
+              }
+          ]
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "#text-4d0203c9-5535-443d-b1cb-40abaf7d9a15"
+              ],
+              [
+                  "xpath///*[@id=\"text-4d0203c9-5535-443d-b1cb-40abaf7d9a15\"]"
+              ],
+              [
+                  "pierce/#text-4d0203c9-5535-443d-b1cb-40abaf7d9a15"
+              ],
+              [
+                  "text/Type Something..."
+              ]
+          ],
+          "offsetY": 7.6484375,
+          "offsetX": 87.94061279296875
+      },
+      {
+          "type": "change",
+          "value": "Type asdfghjkl!!!!!!",
+          "selectors": [
+              [
+                  "#text-4d0203c9-5535-443d-b1cb-40abaf7d9a15"
+              ],
+              [
+                  "xpath///*[@id=\"text-4d0203c9-5535-443d-b1cb-40abaf7d9a15\"]"
+              ],
+              [
+                  "pierce/#text-4d0203c9-5535-443d-b1cb-40abaf7d9a15"
+              ],
+              [
+                  "text/Type Something..."
+              ]
+          ],
+          "target": "main"
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "aria/+"
+              ],
+              [
+                  "div.flex-1 > div > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) button:nth-of-type(1)"
+              ],
+              [
+                  "xpath///*[@id=\"f00e174a-6991-43db-905e-36664db25b0e\"]/div/button[1]"
+              ],
+              [
+                  "pierce/div.flex-1 > div > div > div:nth-of-type(2) > div > div > div:nth-of-type(2) button:nth-of-type(1)"
+              ],
+              [
+                  "text/+"
+              ]
+          ],
+          "offsetY": 7.96875,
+          "offsetX": 7.864013671875
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "aria/https://pdfme.com/"
+              ],
+              [
+                  "div:nth-of-type(4) input"
+              ],
+              [
+                  "xpath///*[@id=\"c0656e79-e625-47b7-8070-07eef7102655\"]/div/div/input"
+              ],
+              [
+                  "pierce/div:nth-of-type(4) input"
+              ],
+              [
+                  "text/https://pdfme.com/"
+              ]
+          ],
+          "offsetY": 5.10467529296875,
+          "offsetX": 28.94061279296875
+      },
+      {
+          "type": "keyDown",
+          "target": "main",
+          "key": "Meta"
+      },
+      {
+          "type": "keyDown",
+          "target": "main",
+          "key": "a"
+      },
+      {
+          "type": "keyUp",
+          "key": "Meta",
+          "target": "main"
+      },
+      {
+          "type": "keyUp",
+          "key": "a",
+          "target": "main"
+      },
+      {
+          "type": "change",
+          "value": "Test!!",
+          "selectors": [
+              [
+                  "aria/https://pdfme.com/"
+              ],
+              [
+                  "div:nth-of-type(4) input"
+              ],
+              [
+                  "xpath///*[@id=\"c0656e79-e625-47b7-8070-07eef7102655\"]/div/div/input"
+              ],
+              [
+                  "pierce/div:nth-of-type(4) input"
+              ],
+              [
+                  "text/https://pdfme.com/"
+              ]
+          ],
+          "target": "main"
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "#root > div > div.flex-1 select"
+              ],
+              [
+                  "xpath///*[@id=\"c63e0ebd-b95b-453d-9114-37f0b4722ba7\"]/div/select"
+              ],
+              [
+                  "pierce/#root > div > div.flex-1 select"
+              ]
+          ],
+          "offsetY": 6.92498779296875,
+          "offsetX": 54.94061279296875
+      },
+      {
+          "type": "change",
+          "value": "option2",
+          "selectors": [
+              [
+                  "#root > div > div.flex-1 select"
+              ],
+              [
+                  "xpath///*[@id=\"c63e0ebd-b95b-453d-9114-37f0b4722ba7\"]/div/select"
+              ],
+              [
+                  "pierce/#root > div > div.flex-1 select"
+              ]
+          ],
+          "target": "main"
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "div:nth-of-type(6) svg"
+              ],
+              [
+                  "xpath///*[@id=\"eb4399d5-a1ad-4dba-95c5-645803ccaec2\"]/div/div/div/svg"
+              ],
+              [
+                  "pierce/div:nth-of-type(6) svg"
+              ]
+          ],
+          "offsetY": 6.42340087890625,
+          "offsetX": 7.94061279296875
+      },
+      {
+          "type": "click",
+          "target": "main",
+          "selectors": [
+              [
+                  "#root > div > div.flex-1 div:nth-of-type(7) svg"
+              ],
+              [
+                  "xpath///*[@id=\"2f26abc1-4314-4688-903c-bdd489d3c963\"]/div/div/div/svg"
+              ],
+              [
+                  "pierce/#root > div > div.flex-1 div:nth-of-type(7) svg"
+              ]
+          ],
+          "offsetY": 7.921875,
+          "offsetX": 9.94061279296875
+      }
+  ]
+}

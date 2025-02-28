@@ -130,6 +130,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
               <div className="relative border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
                 <div className="relative h-72 w-full overflow-hidden">
                   <img
+                    id={`template-img-${name}`}
                     onClick={() => { navigateToDesigner(name) }}
                     alt={fromKebabCase(name)}
                     src={`/template-assets/${name}/thumbnail.png`}

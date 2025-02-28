@@ -224,6 +224,7 @@ function FormAndViewerApp() {
       label: "",
       content: (
         <button
+          id="generate-pdf"
           className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={async () => {
             const startTimer = performance.now()
