@@ -17,8 +17,7 @@
     "strict": true,
     "types": [
       "node",
-      "jest",
-      "offscreencanvas"
+      "jest"
     ],
     "typeRoots": [
       "node_modules/@types"
