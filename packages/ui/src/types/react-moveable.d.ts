@@ -60,6 +60,9 @@ declare module 'react-moveable' {
     className?: string;
     rootContainer?: HTMLElement | null;
     snapCenter?: boolean;
+    horizontalGuidelines?: number[];
+    verticalGuidelines?: number[];
+    elementGuidelines?: HTMLElement[];
     onClick?: (e: any) => void;
     onDragStart?: (e: any) => void;
     onDrag?: (e: any) => void;
