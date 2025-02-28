@@ -212,6 +212,9 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
+  // Adapt the icon structure if it's in the new format (lucide >= 0.476.0)
+  const adaptedIcon = adaptIconNode(icon);
+  
   const createElementString = (node: IconNode): string => {
     if (!Array.isArray(node)) {
       return String(node);
@@ -234,5 +237,34 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     return `<${tag} ${attrString}>${childrenString}</${tag}>`;
   };
 
-  return createElementString(icon);
+  return createElementString(adaptedIcon);
 };
+
+// Helper function to adapt the new lucide icon structure (>= 0.476.0) to the old format
+function adaptIconNode(iconNode: IconNode): IconNode {
+  if (!Array.isArray(iconNode)) {
+    return iconNode;
+  }
+  
+  // If it's already in the old format (has 'svg' as first element), return as is
+  if (iconNode[0] === 'svg') {
+    return iconNode;
+  }
+  
+  // Create a new structure with 'svg' as the first element and default attributes
+  return [
+    'svg',
+    {
+      'xmlns': 'http://www.w3.org/2000/svg',
+      'width': 24,
+      'height': 24,
+      'viewBox': '0 0 24 24',
+      'fill': 'none',
+      'stroke': 'currentColor',
+      'stroke-width': 2,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round'
+    },
+    iconNode
+  ];
+}
