@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from "@pdfme/common";
@@ -14,7 +14,7 @@ import {
 } from "../helper";
 import { getPlugins } from '../plugins';
 import { NavItem, NavBar } from "../components/NavBar";
-import ExternalButton from "../components/ExternalButton"
+import ExternalButton from "../components/ExternalButton";
 
 type Mode = "form" | "viewer";
 
@@ -224,6 +224,7 @@ function FormAndViewerApp() {
       label: "",
       content: (
         <button
+          id="generate-pdf"
           className="px-2 py-1 border rounded hover:bg-gray-100"
           onClick={async () => {
             const startTimer = performance.now()
@@ -238,11 +239,10 @@ function FormAndViewerApp() {
     },
     {
       label: "",
-      content: (
-        <ExternalButton
-          href="https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title={{TEMPLATE_NAME}}"
-          title="Feedback this template"
-        />)
+      content: React.createElement(ExternalButton, {
+        href: "https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME",
+        title: "Feedback this template"
+      })
     }
   ];
 

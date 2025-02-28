@@ -233,7 +233,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     }
 
     const childrenString = Array.isArray(children)
-      ? children.map((child) => createElementString(child as IconNode)).join('')
+      ? (children as (IconNode | string)[]).map((child) => createElementString(child as IconNode)).join('')
       : createElementString(children as IconNode);
 
     return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;

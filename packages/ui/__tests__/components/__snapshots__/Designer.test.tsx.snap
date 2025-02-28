@@ -133,22 +133,7 @@ exports[`Designer snapshot 1`] = `
               <span
                 class="ant-btn-icon"
               >
-                <svg
-                  class="lucide lucide-minus"
-                  fill="none"
-                  height="16"
-                  stroke="#fff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5 12h14"
-                  />
-                </svg>
+                Minus
               </span>
               
             </button>
@@ -168,25 +153,7 @@ exports[`Designer snapshot 1`] = `
               <span
                 class="ant-btn-icon"
               >
-                <svg
-                  class="lucide lucide-plus"
-                  fill="none"
-                  height="16"
-                  stroke="#fff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5 12h14"
-                  />
-                  <path
-                    d="M12 5v14"
-                  />
-                </svg>
+                Plus
               </span>
               
             </button>
@@ -205,25 +172,7 @@ exports[`Designer snapshot 1`] = `
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-arrow-right"
-                fill="none"
-                height="20"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-                width="20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-                <path
-                  d="m12 5 7 7-7 7"
-                />
-              </svg>
+              ArrowRight
             </span>
             
           </button>
@@ -272,50 +221,7 @@ exports[`Designer snapshot 1`] = `
                             <span
                               class="ant-btn-icon"
                             >
-                              <svg
-                                class="lucide lucide-grip-vertical"
-                                fill="none"
-                                height="15"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                style="cursor: grab;"
-                                viewBox="0 0 24 24"
-                                width="15"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx="9"
-                                  cy="12"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="9"
-                                  cy="5"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="9"
-                                  cy="19"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="12"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="5"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="19"
-                                  r="1"
-                                />
-                              </svg>
+                              GripVertical
                             </span>
                             
                           </button>
@@ -374,50 +280,7 @@ exports[`Designer snapshot 1`] = `
                             <span
                               class="ant-btn-icon"
                             >
-                              <svg
-                                class="lucide lucide-grip-vertical"
-                                fill="none"
-                                height="15"
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                style="cursor: grab;"
-                                viewBox="0 0 24 24"
-                                width="15"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <circle
-                                  cx="9"
-                                  cy="12"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="9"
-                                  cy="5"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="9"
-                                  cy="19"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="12"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="5"
-                                  r="1"
-                                />
-                                <circle
-                                  cx="15"
-                                  cy="19"
-                                  r="1"
-                                />
-                              </svg>
+                              GripVertical
                             </span>
                             
                           </button>

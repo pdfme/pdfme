@@ -1,6 +1,6 @@
 import { PDFRenderProps } from '@pdfme/common';
 import { convertForPdfLayoutProps } from '../utils.js';
-import type { BarcodeSchema } from './types';
+import type { BarcodeSchema } from './types.js';
 import { createBarCode, validateBarcodeInput } from './helper.js';
 
 const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
