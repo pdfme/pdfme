@@ -23,10 +23,7 @@ export default defineConfig(({ mode }) => {
       exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter', 'lucide-react'],
     },
     resolve: {
-      dedupe: ['react', 'react-dom'],
-      alias: {
-        'lucide-react': require.resolve('./node_modules/lucide-react')
-      }
+      dedupe: ['react', 'react-dom', 'lucide-react']
     },
   };
 });

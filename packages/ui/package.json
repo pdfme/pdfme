@@ -1,7 +1,6 @@
 {
   "name": "@pdfme/ui",
   "version": "0.0.0",
-  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
