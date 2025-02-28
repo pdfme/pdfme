@@ -3,6 +3,9 @@ import SelectoComponent from 'react-selecto';
 import { SELECTABLE_CLASSNAME } from '../../../constants.js';
 import { theme } from 'antd';
 
+// Ensure SelectoComponent is recognized as a valid JSX element
+const SelectoComponentElement = SelectoComponent as unknown as React.ComponentType<any>;
+
 // Define the types locally to match what's expected in Canvas/index.tsx
 interface OnDragStart {
   inputEvent: MouseEvent;
@@ -39,7 +42,7 @@ const _Selecto = (props: Props) => {
   }, [props.container]);
 
   return (
-    <SelectoComponent
+    <SelectoComponentElement
       className={className}
       selectFromInside={false}
       selectByClick

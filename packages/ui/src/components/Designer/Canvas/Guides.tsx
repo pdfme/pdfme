@@ -3,6 +3,9 @@ import GuidesComponent from '@scena/react-guides';
 import { ZOOM, Size } from '@pdfme/common';
 import { RULER_HEIGHT } from '../../../constants.js';
 
+// Ensure GuidesComponent is recognized as a valid JSX element
+const GuidesComponentElement = GuidesComponent as unknown as React.ComponentType<any>;
+
 const guideStyle = (
   top: number,
   left: number,
@@ -40,13 +43,13 @@ const _Guides = ({
       className="ruler-container"
       style={guideStyle(-RULER_HEIGHT, -RULER_HEIGHT, RULER_HEIGHT, RULER_HEIGHT)}
     />
-    <GuidesComponent
+    <GuidesComponentElement
       zoom={ZOOM}
       style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
       ref={horizontalRef as any}
     />
-    <GuidesComponent
+    <GuidesComponentElement
       zoom={ZOOM}
       style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"
