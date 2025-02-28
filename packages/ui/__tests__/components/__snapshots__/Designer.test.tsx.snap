@@ -422,7 +422,7 @@ exports[`Designer snapshot 1`] = `
                 style="transform: translateX(0px);"
               >
                 <div
-                  class="scena-guide scena-adder"
+                  class="scena-guides-guide scena-guides-adder"
                 />
               </div>
             </div>
