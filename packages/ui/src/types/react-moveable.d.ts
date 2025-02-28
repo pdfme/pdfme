@@ -73,6 +73,9 @@ declare module 'react-moveable' {
     onRotateStart?: (e: any) => void;
     onRotate?: (e: any) => void;
     onRotateEnd?: (e: any) => void;
+    onRotateGroup?: (e: any) => void;
+    onDragGroup?: (e: any) => void;
+    onResizeGroup?: (e: any) => void;
   }
 
   export interface MoveableInterface {
