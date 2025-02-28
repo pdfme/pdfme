@@ -9,7 +9,7 @@ import formInputRecord from './formInputRecord.json';
 
 const baseUrl = 'http://localhost:4173';
 
-const timeout = 60000;
+const timeout = 20000;
 jest.setTimeout(timeout * 5);
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,6 +25,7 @@ const viewport = { width: 1366, height: 768 };
 
 const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser }) => {
   const { page, browser } = arg;
+  await page.waitForSelector('#generate-pdf', { timeout });
   await page.click('#generate-pdf');
 
   const newTarget = await browser.waitForTarget((target) => target.url().startsWith('blob:'), {
@@ -38,7 +39,7 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
 
   await newPage.setViewport(viewport);
   await newPage.bringToFront();
-  await page.waitForNavigation({ waitUntil: 'networkidle2', timeout });
+  await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
 
   await sleep(2000);
 
@@ -81,7 +82,7 @@ describe('Playground E2E Tests', () => {
     page.setDefaultNavigationTimeout(timeout);
     page.on('request', (req) => {
       const ignoreDomains = [
-        'https://fonts.gstatic.com/',
+        // 'https://fonts.gstatic.com/',
         'https://media.ethicalads.io/',
       ];
       if (ignoreDomains.some((d) => req.url().startsWith(d))) {
@@ -114,7 +115,11 @@ describe('Playground E2E Tests', () => {
       console.log('2. Invoiceテンプレートをクリック');
       await page.waitForSelector('#template-img-invoice', { timeout });
       await page.click('#template-img-invoice');
-      await page.waitForNavigation({ waitUntil: 'networkidle2', timeout });
+      
+      await page.waitForFunction(() => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('INVOICE') : false;
+      }, { timeout });
       await sleep(1000);
 
       console.log('3. デザイナーでスクリーンショット');
@@ -128,11 +133,15 @@ describe('Playground E2E Tests', () => {
       console.log('5. テンプレート一覧画面に戻る');
       await page.click('#templates-nav');
       await sleep(1000);
+      await page.reload();
 
       console.log('6. Pedigreeテンプレートをクリック');
       await page.waitForSelector('#template-img-pedigree', { timeout });
       await page.click('#template-img-pedigree');
-      await page.waitForNavigation({ waitUntil: 'networkidle2', timeout });
+      await page.waitForFunction(() => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('Pet Name') : false;
+      }, { timeout });
       await sleep(1000);
 
       console.log('7. デザイナーでスクリーンショット');
@@ -166,7 +175,10 @@ describe('Playground E2E Tests', () => {
 
       console.log('14. form-viewer-nav をクリックしてフォームビューアーに遷移');
       await page.click('#form-viewer-nav');
-      await page.waitForNavigation({ waitUntil: 'networkidle2', timeout });
+      await page.waitForFunction(() => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('Type Something...') : false;
+      }, { timeout });
       await sleep(1000);
 
       console.log('15. formInputRecord の手順でフォームに入力');
