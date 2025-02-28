@@ -13,10 +13,17 @@ export default defineConfig(({ mode }) => {
         name: '@pdfme/ui',
         fileName: (format) => `index.${format}.js`,
       },
+      commonjsOptions: {
+        include: [/lucide-react/, /node_modules/],
+        transformMixedEsModules: true,
+      },
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
+      include: ['react', 'react-dom', 'pdfjs-dist', 'antd', 'lucide-react'],
       exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter'],
+    },
+    resolve: {
+      dedupe: ['lucide-react'],
     },
   };
 });

@@ -1,4 +1,5 @@
 // Mock for lucide-react
+// This mock supports both CommonJS and ES Module import patterns
 const icons = {
   Plus: () => 'Plus',
   Minus: () => 'Minus',
@@ -18,8 +19,10 @@ const icons = {
   // Add any other icons used in the codebase
 };
 
-// Use CommonJS module.exports but structure it to be compatible with ES Module imports
+// Support for named imports (import { X } from 'lucide-react')
+// and default import (import LucideIcons from 'lucide-react')
 module.exports = {
   ...icons,
-  default: icons
+  default: icons,
+  __esModule: true // This helps some bundlers recognize this as an ES module
 };

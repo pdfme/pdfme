@@ -1,35 +1,6 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
-// Import icons from lucide-react dynamically to avoid CommonJS/ESM compatibility issues
-// Note: In tests, these will be mocked by the mock file in __mocks__/lucide-react.js
-
-import type { MenuProps } from 'antd';
-import { theme, Typography, Button, Dropdown } from 'antd';
-import { I18nContext } from '../contexts';
-import { getMaxZoom } from "../helper";
-
-// Define a type for the icon components
-type IconComponent = React.FC<{ size?: number; color?: string }>;
-
-// Create placeholder components that will be replaced once dynamic imports complete
-let Plus: IconComponent = () => null;
-let Minus: IconComponent = () => null;
-let ChevronLeft: IconComponent = () => null;
-let ChevronRight: IconComponent = () => null;
-let Ellipsis: IconComponent = () => null;
-
-// Load the icons dynamically
-if (typeof window !== 'undefined') {
-  // Only run in browser environment
-  import('lucide-react').then((icons) => {
-    Plus = icons.Plus;
-    Minus = icons.Minus;
-    ChevronLeft = icons.ChevronLeft;
-    ChevronRight = icons.ChevronRight;
-    Ellipsis = icons.Ellipsis;
-  });
-}
-
+import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts';
