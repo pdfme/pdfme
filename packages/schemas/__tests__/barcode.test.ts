@@ -1,6 +1,11 @@
 import jsQR, { QRCode } from 'jsqr';
 import { PNG } from 'pngjs';
-import { validateBarcodeInput, createBarCode, barCodeType2Bcid, mapHexColorForBwipJsLib } from "../src/barcodes/helper"
+import {
+  validateBarcodeInput,
+  createBarCode,
+  barCodeType2Bcid,
+  mapHexColorForBwipJsLib,
+} from '../src/barcodes/helper.js';
 
 describe('validateBarcodeInput test', () => {
   test('qrcode', () => {
@@ -234,14 +239,14 @@ describe('validateBarcodeInput test', () => {
   });
   test('gs1datamatrix', () => {
     // https://www.gs1.org/docs/barcodes/GS1_DataMatrix_Guideline.pdf
-    // find the GTIN application identifier, regex for "(01)" and the digits after it until 
+    // find the GTIN application identifier, regex for "(01)" and the digits after it until
     // another "(" or end of string
     const type = 'gs1datamatrix';
 
-    let valid = "(01)12244668801011(17)250712(10)22322SSD3";
-    let valid_12 = "(01)1224466880108(17)250712(10)22322SSD3";
-    let invalid_bad_checkdigit = "(01)12244668801014(17)250712(10)22322SSD3";
-    let invalid_input_length = "(01)12244668801011(17)250712(10)22322SSD3(10)22322SSD3";
+    let valid = '(01)12244668801011(17)250712(10)22322SSD3';
+    let valid_12 = '(01)1224466880108(17)250712(10)22322SSD3';
+    let invalid_bad_checkdigit = '(01)12244668801014(17)250712(10)22322SSD3';
+    let invalid_input_length = '(01)12244668801011(17)250712(10)22322SSD3(10)22322SSD3';
 
     const blank = '';
     expect(validateBarcodeInput(type, valid)).toEqual(true);
@@ -282,6 +287,7 @@ describe('createBarCode', () => {
         })) as Buffer;
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
+        // @ts-ignore
         const qr = jsQR(pngData, png.width, png.height) as QRCode;
         expect(qr).not.toBeNull();
         const dataBuffer = Buffer.from(qr.binaryData);
@@ -304,6 +310,7 @@ describe('createBarCode', () => {
         })) as Buffer;
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
+        // @ts-ignore
         const qr = jsQR(pngData, png.width, png.height) as QRCode;
         expect(qr).not.toBeNull();
         const dataBuffer = Buffer.from(qr.binaryData);
@@ -346,5 +353,3 @@ describe('mapHexColorForBwipJsLib text', () => {
     expect(mapHexColorForBwipJsLib(undefined)).toEqual('000000');
   });
 });
-
-

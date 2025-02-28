@@ -1,7 +1,7 @@
 import React from 'react';
 import { isBlankPdf, replacePlaceholders, Template } from '@pdfme/common';
-import Renderer from './Renderer';
-import { uuid } from '../helper'
+import Renderer from './Renderer.js';
+import { uuid } from '../helper.js';
 
 const StaticSchema = (props: { template: Template, input: Record<string, string>, scale: number, totalPages: number, currentPage: number }) => {
   const { template: { schemas, basePdf }, input, scale, totalPages, currentPage } = props;

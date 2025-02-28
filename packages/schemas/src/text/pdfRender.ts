@@ -1,6 +1,6 @@
 import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import type { Font as FontKitFont } from 'fontkit';
-import type { TextSchema } from './types';
+import type { TextSchema } from './types.js';
 import {
   PDFRenderProps,
   ColorType,

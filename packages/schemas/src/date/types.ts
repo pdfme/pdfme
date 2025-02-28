@@ -10,4 +10,10 @@ export interface DateSchema extends Schema {
   fontColor: string;
   backgroundColor: string;
   locale?: string;
+  // Explicitly include these properties from Schema for TypeScript
+  width: number;
+  height: number;
+  name: string;
+  type: string;
+  content?: string;
 }

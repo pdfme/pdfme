@@ -1,16 +1,16 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import { Template, SchemaForUI, PreviewProps, Size, getDynamicTemplate, replacePlaceholders } from '@pdfme/common';
 import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
-import UnitPager from './UnitPager';
-import Root from './Root';
-import StaticSchema from './StaticSchema';
-import ErrorScreen from './ErrorScreen';
-import CtlBar from './CtlBar';
-import Paper from './Paper';
-import Renderer from './Renderer';
-import { useUIPreProcessor, useScrollPageCursor } from '../hooks';
-import { FontContext } from '../contexts';
-import { template2SchemasList, getPagesScrollTopByIndex, getMaxZoom } from '../helper';
+import UnitPager from './UnitPager.js';
+import Root from './Root.js';
+import StaticSchema from './StaticSchema.js';
+import ErrorScreen from './ErrorScreen.js';
+import CtlBar from './CtlBar.js';
+import Paper from './Paper.js';
+import Renderer from './Renderer.js';
+import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
+import { FontContext } from '../contexts.js';
+import { template2SchemasList, getPagesScrollTopByIndex, getMaxZoom } from '../helper.js';
 import { theme } from 'antd';
 
 const _cache = new Map();

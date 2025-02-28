@@ -1,8 +1,8 @@
 import type * as CSS from 'csstype';
-import { propPanel as parentPropPanel } from '../text/propPanel';
+import { propPanel as parentPropPanel } from '../text/propPanel.js';
 import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
-import text from '../text';
-import { TextSchema } from '../text/types';
+import text from '../text/index.js';
+import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
 import { createSvgStr } from '../utils.js';
 

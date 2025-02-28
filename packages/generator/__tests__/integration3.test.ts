@@ -1,8 +1,8 @@
-import generate from '../src/generate';
-import { other, shape } from './assets/templates';
+import generate from '../src/generate.js';
+import { other, shape } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
-import { getFont, pdfToImages } from './utils';
+import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
 const signature = {

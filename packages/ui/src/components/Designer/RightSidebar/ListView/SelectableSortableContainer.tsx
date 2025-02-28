@@ -16,12 +16,12 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SchemaForUI } from '@pdfme/common';
-import type { SidebarProps } from '../../../../types';
-import { PluginsRegistry } from '../../../../contexts';
-import Item from './Item';
-import SelectableSortableItem from './SelectableSortableItem';
+import type { SidebarProps } from '../../../../types.js';
+import { PluginsRegistry } from '../../../../contexts.js';
+import Item from './Item.js';
+import SelectableSortableItem from './SelectableSortableItem.js';
 import { theme } from 'antd';
-import PluginIcon from "../../PluginIcon";
+import PluginIcon from "../../PluginIcon.js";
 
 const SelectableSortableContainer = (
   props: Pick<

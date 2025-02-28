@@ -1,10 +1,10 @@
 import React from 'react';
 import { theme, Button } from 'antd';
-import type { SidebarProps } from '../../../types';
-import { RIGHT_SIDEBAR_WIDTH } from '../../../constants';
+import type { SidebarProps } from '../../../types.js';
+import { RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import ListView from './ListView/index';
-import DetailView from './DetailView/index';
+import ListView from './ListView/index.js';
+import DetailView from './DetailView/index.js';
 
 const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas } = props;
