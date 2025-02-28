@@ -218,10 +218,8 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
   }
 
   // In lucide 0.475.0, IconNode is [tag, attributes, children]
-  const [tag, attributes = {}, children = []] = icon;
-
-  // Ensure tag is a string
-  const tagName = String(tag);
+  // Extract the components with proper defaults
+  const [tagName, attributes = {}, children = []] = icon;
 
   // Merge custom attributes with SVG element if this is the root SVG
   const isSvg = tagName === 'svg';
@@ -235,7 +233,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
   // Process children recursively
   let childrenString = '';
   
-  if (Array.isArray(children)) {
+  if (Array.isArray(children) && children.length > 0) {
     childrenString = children
       .map(child => {
         if (typeof child === 'string') {
