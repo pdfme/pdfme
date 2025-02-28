@@ -1,5 +1,4 @@
 import { Plugin, Schema } from '@pdfme/common';
-import { XMLValidator } from 'fast-xml-parser';
 import {
   convertForPdfLayoutProps,
   isEditable,
@@ -9,7 +8,17 @@ import {
 } from '../utils.js';
 import { Route } from 'lucide';
 
-const isValidSVG = (svgString: string) => XMLValidator.validate(svgString) === true;
+const isValidSVG = (svgString: string): boolean => {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    // Check if parsing error occurred
+    const parserError = doc.querySelector('parsererror');
+    return parserError === null;
+  } catch (error) {
+    return false;
+  }
+};
 
 const defaultValue = `<svg viewBox="0 0 488 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <g transform="matrix(1,0,0,1,-56,0)" fill="#000000" stroke="none">
