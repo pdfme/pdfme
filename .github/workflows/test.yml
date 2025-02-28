@@ -1,9 +1,13 @@
 name: Testing
 
-on: [pull_request]
+on:
+  pull_request:
+  issue_comment:
+    types: [created]
 
 jobs:
   pdfme-test:
+    if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/retest'))
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,6 +27,7 @@ jobs:
           CI: true
 
   playground-test:
+    if: github.event_name == 'pull_request' || (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/retest'))
     runs-on: ubuntu-latest
     strategy:
       matrix:
