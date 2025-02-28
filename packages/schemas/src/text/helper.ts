@@ -11,7 +11,7 @@ import {
   DEFAULT_FONT_NAME,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import type { TextSchema, FontWidthCalcValues } from './types';
+import type { TextSchema, FontWidthCalcValues } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,

@@ -1,6 +1,6 @@
-import generate from '../src/generate';
+import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema } from '@pdfme/common';
-import { getFont, pdfToImages } from './utils';
+import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
 describe('generate integrate test', () => {

@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import type { SidebarProps } from '../../../../types';
-import { RIGHT_SIDEBAR_WIDTH } from '../../../../constants';
-import { I18nContext } from '../../../../contexts';
-import { getSidebarContentHeight } from '../../../../helper';
+import type { SidebarProps } from '../../../../types.js';
+import { RIGHT_SIDEBAR_WIDTH } from '../../../../constants.js';
+import { I18nContext } from '../../../../contexts.js';
+import { getSidebarContentHeight } from '../../../../helper.js';
 import { theme, Input, Typography, Divider, Button } from 'antd';
-import SelectableSortableContainer from './SelectableSortableContainer';
+import SelectableSortableContainer from './SelectableSortableContainer.js';
 
 const { Text } = Typography;
 const { TextArea } = Input;

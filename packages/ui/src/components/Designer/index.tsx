@@ -12,11 +12,11 @@ import {
   px2mm,
 } from '@pdfme/common';
 import { DndContext } from '@dnd-kit/core';
-import RightSidebar from './RightSidebar/index';
-import LeftSidebar from './LeftSidebar';
-import Canvas from './Canvas/index';
-import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, LEFT_SIDEBAR_WIDTH } from '../../constants';
-import { I18nContext, OptionsContext, PluginsRegistry } from '../../contexts';
+import RightSidebar from './RightSidebar/index.js';
+import LeftSidebar from './LeftSidebar.js';
+import Canvas from './Canvas/index.js';
+import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, LEFT_SIDEBAR_WIDTH } from '../../constants.js';
+import { I18nContext, OptionsContext, PluginsRegistry } from '../../contexts.js';
 import {
   schemasList2template,
   uuid,
@@ -25,11 +25,11 @@ import {
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
   getMaxZoom,
-} from '../../helper';
-import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks';
-import Root from '../Root';
-import ErrorScreen from '../ErrorScreen';
-import CtlBar from '../CtlBar';
+} from '../../helper.js';
+import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks.js';
+import Root from '../Root.js';
+import ErrorScreen from '../ErrorScreen.js';
+import CtlBar from '../CtlBar.js';
 
 /**
  * When the canvas scales there is a displacement of the starting position of the dragged schema.

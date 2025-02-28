@@ -1,7 +1,7 @@
 import { pdfRender } from './pdfRender.js';
 import { getPropPanelByBarcodeType } from './propPanel.js';
 import { uiRender } from './uiRender.js';
-import type { BarcodeSchema, BarcodeTypes } from './types';
+import type { BarcodeSchema, BarcodeTypes } from './types.js';
 import { BARCODE_TYPES } from './constants.js';
 import { createSvgStr } from '../utils.js';
 import { Plugin } from '@pdfme/common';

@@ -1,6 +1,6 @@
 import * as acorn from 'acorn';
 import type { Node as AcornNode, Identifier, Property } from 'estree';
-import type { SchemaPageArray } from './types';
+import type { SchemaPageArray } from './types.js';
 
 const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
 const parseDataCache = new Map<string, Record<string, unknown>>();

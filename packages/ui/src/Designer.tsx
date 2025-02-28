@@ -8,10 +8,10 @@ import {
   checkTemplate,
   PDFME_VERSION,
 } from '@pdfme/common';
-import { BaseUIClass } from './class';
+import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
-import DesignerComponent from './components/Designer/index';
-import AppContextProvider from './components/AppContextProvider';
+import DesignerComponent from './components/Designer/index.js';
+import AppContextProvider from './components/AppContextProvider.js';
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;

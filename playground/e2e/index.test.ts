@@ -41,6 +41,9 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
 
   const screenshot = await newPage.screenshot({ encoding: 'base64' });
 
+  // TODO ここから
+  // pdfダウンロードしてスナップショットテストしたい
+
   await newPage.close();
   await page.bringToFront();
 

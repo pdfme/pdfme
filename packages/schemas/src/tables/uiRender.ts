@@ -4,7 +4,7 @@ import { px2mm } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
-import { Row } from './classes';
+import { Row } from './classes.js';
 
 const buttonSize = 30;
 

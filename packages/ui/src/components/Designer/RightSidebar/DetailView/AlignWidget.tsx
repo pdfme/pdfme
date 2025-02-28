@@ -11,7 +11,7 @@ import {
   AlignVerticalSpaceAround,
   AlignHorizontalSpaceAround,
 } from 'lucide-react'
-import { round } from '../../../../helper';
+import { round } from '../../../../helper.js';
 
 const AlignWidget = (props: PropPanelWidgetProps) => {
   const { activeElements, changeSchemas, schemas, pageSize, schema } = props;

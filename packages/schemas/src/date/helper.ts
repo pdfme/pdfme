@@ -2,38 +2,80 @@ import type * as CSS from 'csstype';
 
 import AirDatepicker from 'air-datepicker';
 import type { AirDatepickerLocale, AirDatepickerButton } from 'air-datepicker';
+
+// Define custom interfaces for AirDatepicker types
+interface AirDatepickerDate extends Date {}
+interface AirDatepickerInstance {
+  selectedDates: Date[];
+  hide: () => void;
+  destroy: () => void;
+  show: () => void;
+}
+// @ts-ignore
 import localeAr from 'air-datepicker/locale/ar';
+// @ts-ignore
 import localeBg from 'air-datepicker/locale/bg';
+// @ts-ignore
 import localeCa from 'air-datepicker/locale/ca';
+// @ts-ignore
 import localeCs from 'air-datepicker/locale/cs';
+// @ts-ignore
 import localeDa from 'air-datepicker/locale/da';
+// @ts-ignore
 import localeDe from 'air-datepicker/locale/de';
+// @ts-ignore
 import localeEl from 'air-datepicker/locale/el';
+// @ts-ignore
 import localeEn from 'air-datepicker/locale/en';
+// @ts-ignore
 import localeEs from 'air-datepicker/locale/es';
+// @ts-ignore
 import localeEu from 'air-datepicker/locale/eu';
+// @ts-ignore
 import localeFi from 'air-datepicker/locale/fi';
+// @ts-ignore
 import localeFr from 'air-datepicker/locale/fr';
+// @ts-ignore
 import localeHr from 'air-datepicker/locale/hr';
+// @ts-ignore
 import localeHu from 'air-datepicker/locale/hu';
+// @ts-ignore
 import localeId from 'air-datepicker/locale/id';
+// @ts-ignore
 import localeIt from 'air-datepicker/locale/it';
+// @ts-ignore
 import localeJa from 'air-datepicker/locale/ja';
+// @ts-ignore
 import localeKo from 'air-datepicker/locale/ko';
+// @ts-ignore
 import localeNb from 'air-datepicker/locale/nb';
+// @ts-ignore
 import localeNl from 'air-datepicker/locale/nl';
+// @ts-ignore
 import localeTh from 'air-datepicker/locale/th';
+// @ts-ignore
 import localePl from 'air-datepicker/locale/pl';
+// @ts-ignore
 import localePtBR from 'air-datepicker/locale/pt-BR';
+// @ts-ignore
 import localePt from 'air-datepicker/locale/pt';
+// @ts-ignore
 import localeRo from 'air-datepicker/locale/ro';
+// @ts-ignore
 import localeRu from 'air-datepicker/locale/ru';
+// @ts-ignore
 import localeSi from 'air-datepicker/locale/si';
+// @ts-ignore
 import localeSk from 'air-datepicker/locale/sk';
+// @ts-ignore
 import localeSl from 'air-datepicker/locale/sl';
+// @ts-ignore
 import localeSv from 'air-datepicker/locale/sv';
+// @ts-ignore
 import localeTr from 'air-datepicker/locale/tr';
+// @ts-ignore
 import localeUk from 'air-datepicker/locale/uk';
+// @ts-ignore
 import localeZh from 'air-datepicker/locale/zh';
 
 import * as dateFns from 'date-fns/locale';
@@ -260,15 +302,15 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         });
       }
 
-      const airDatepicker = new AirDatepicker(input, {
+      const airDatepicker = new (AirDatepicker as any)(input, {
         locale: locale.adLocale,
         selectedDates: [strDateToDate(value, type)],
-        dateFormat: (date) => format(date, schema.format, { locale: locale.formatLocale }),
+        dateFormat: (date: AirDatepickerDate) => format(date, schema.format, { locale: locale.formatLocale }),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: adButtons,
-        onSelect: ({ datepicker }) => {
+        onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
           if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
             datepicker.hide();
@@ -429,7 +471,6 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         format: defaultFormat,
         type,
         content: getFmtContent(new Date(), type),
-        position: { x: 0, y: 0 },
         width: 50,
         height: 10,
         rotate: 0,
@@ -441,7 +482,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         backgroundColor: '',
         locale: undefined,
         opacity: DEFAULT_OPACITY,
-      },
+      } as DateSchema,
     },
     icon,
   };

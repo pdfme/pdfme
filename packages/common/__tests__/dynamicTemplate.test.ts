@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import { getDynamicTemplate } from '../src/dynamicTemplate';
-import { Template, Schema, Font } from '../src';
+import { getDynamicTemplate } from '../src/dynamicTemplate.js';
+import { Template, Schema, Font } from '../src/index.js';
 
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));

@@ -1,7 +1,7 @@
 import React, { Ref } from 'react';
-import Guides from '@scena/react-guides';
+import GuidesComponent from '@scena/react-guides';
 import { ZOOM, Size } from '@pdfme/common';
-import { RULER_HEIGHT } from '../../../constants';
+import { RULER_HEIGHT } from '../../../constants.js';
 
 const guideStyle = (
   top: number,
@@ -17,27 +17,38 @@ const guideStyle = (
   background: '#333333',
 });
 
+// Define the interface for the Guides component
+interface GuidesInterface {
+  getGuides(): number[];
+  scroll(pos: number): void;
+  scrollGuides(pos: number): void;
+  loadGuides(guides: number[]): void;
+  resize(): void;
+}
+
 const _Guides = ({
   paperSize,
   horizontalRef,
   verticalRef,
 }: {
   paperSize: Size;
-  horizontalRef: Ref<Guides> | undefined;
-  verticalRef: Ref<Guides> | undefined;
+  horizontalRef: Ref<GuidesInterface> | undefined;
+  verticalRef: Ref<GuidesInterface> | undefined;
 }) => (
   <>
     <div
       className="ruler-container"
       style={guideStyle(-RULER_HEIGHT, -RULER_HEIGHT, RULER_HEIGHT, RULER_HEIGHT)}
     />
-    <Guides
+    {/* @ts-ignore */}
+    <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
       ref={horizontalRef}
     />
-    <Guides
+    {/* @ts-ignore */}
+    <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"

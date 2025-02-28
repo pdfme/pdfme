@@ -13,7 +13,7 @@ import {
 import { builtInPlugins } from '@pdfme/schemas';
 import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
-import type { EmbedPdfBox } from './types';
+import type { EmbedPdfBox } from './types.js';
 
 export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDocument }) => {
   const {
