@@ -60,7 +60,7 @@
     "bwip-js": "^4.1.1",
     "date-fns": "^4.1.0",
     "fontkit": "^2.0.2",
-    "lucide": "^0.460.0"
+    "lucide": "^0.475.0"
   },
   "devDependencies": {
     "@pdfme/common": "file:../common",

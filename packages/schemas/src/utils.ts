@@ -212,27 +212,70 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  const createElementString = (node: IconNode): string => {
-    if (!Array.isArray(node)) {
-      return String(node);
+  // In lucide 0.475.0, the icon is an array of elements, not a single SVG element
+  // We need to create an SVG wrapper and add the elements as children
+  
+  // Handle non-array input
+  if (!Array.isArray(icon)) {
+    return String(icon);
+  }
+  
+  // Create default SVG attributes
+  const svgAttrs = {
+    xmlns: "http://www.w3.org/2000/svg",
+    width: "24",
+    height: "24",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    "stroke-width": "2",
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round",
+    ...(attrs || {})
+  };
+  
+  // Format SVG attributes string
+  const svgAttrString = Object.entries(svgAttrs)
+    .map(([key, value]) => `${key}="${value}"`)
+    .join(' ');
+  
+  // Helper function to process a single element
+  const processElement = (element: any): string => {
+    if (!Array.isArray(element)) {
+      return String(element);
     }
-
-    const [tag, attributes = {}, children = []] = node;
-
-    // Use type assertion to handle the comparison
-    const isSvg = String(tag) === 'svg';
-    const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
-
-    const attrString = Object.entries(mergedAttributes || {})
+    
+    const [tag, attributes = {}, children = []] = element;
+    const tagName = String(tag);
+    
+    // Format attributes string
+    const attrString = Object.entries(attributes)
       .map(([key, value]) => `${key}="${value}"`)
       .join(' ');
-
-    const childrenString = (children as (IconNode | string)[])
-      .map((child) => createElementString(child as IconNode))
-      .join('');
-
-    return `<${tag} ${attrString}>${childrenString}</${tag}>`;
+    
+    // Process children recursively
+    let childrenString = '';
+    
+    if (Array.isArray(children) && children.length > 0) {
+      childrenString = children
+        .map(child => processElement(child))
+        .join('');
+    }
+    
+    // Return properly formatted element string
+    if (childrenString) {
+      return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
+    } else {
+      // Self-closing tag for empty children
+      return `<${tagName}${attrString ? ' ' + attrString : ''}/>`;
+    }
   };
-
-  return createElementString(icon);
+  
+  // Process all elements and join them
+  const elementsString = Array.isArray(icon) 
+    ? icon.map(element => processElement(element)).join('')
+    : processElement(icon);
+  
+  // Return the complete SVG string
+  return `<svg ${svgAttrString}>${elementsString}</svg>`;
 };
