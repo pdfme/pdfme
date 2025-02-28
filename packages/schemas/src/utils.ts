@@ -218,7 +218,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
   }
   
   // Check if the icon is already in the old format (has 'svg' as first element)
-  if (icon[0] === 'svg') {
+  if (typeof icon[0] === 'string' && icon[0] === 'svg') {
     // Process using the original approach for backward compatibility
     const [tag, attributes = {}, children = []] = icon;
     
