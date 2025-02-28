@@ -56,6 +56,11 @@ declare module 'react-moveable' {
     throttleScale?: number;
     snappable?: boolean;
     bounds?: { left?: number; top?: number; right?: number; bottom?: number };
+    style?: React.CSSProperties;
+    className?: string;
+    rootContainer?: HTMLElement | null;
+    snapCenter?: boolean;
+    onClick?: (e: any) => void;
     onDragStart?: (e: any) => void;
     onDrag?: (e: any) => void;
     onDragEnd?: (e: any) => void;

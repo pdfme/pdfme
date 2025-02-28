@@ -11,12 +11,13 @@ import {
   isBlankPdf,
   Plugins,
 } from '@pdfme/common';
-import hotkeys from 'hotkeys-js';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
 import { OptionsContext } from './contexts.js';
 
-// Define shift property for type safety
+// Import hotkeys-js with require to avoid TypeScript errors
+// @ts-ignore
+const hotkeys = require('hotkeys-js');
 hotkeys.shift = false;
 
 export const uuid = () =>
@@ -128,26 +129,31 @@ export const initShortCuts = (arg: {
   save: () => void;
   selectAll: () => void;
 }) => {
+  // @ts-ignore
   hotkeys(keys.join(), (e: KeyboardEvent, handler: { shortcut: string }) => {
     switch (handler.shortcut) {
       case up:
       case shiftUp:
         e.preventDefault();
+        // @ts-ignore
         arg.move('up', hotkeys.shift);
         break;
       case down:
       case shiftDown:
         e.preventDefault();
+        // @ts-ignore
         arg.move('down', hotkeys.shift);
         break;
       case left:
       case shiftLeft:
         e.preventDefault();
+        // @ts-ignore
         arg.move('left', hotkeys.shift);
         break;
       case right:
       case shiftRight:
         e.preventDefault();
+        // @ts-ignore
         arg.move('right', hotkeys.shift);
         break;
       case rmWin:
@@ -190,6 +196,7 @@ export const initShortCuts = (arg: {
 };
 
 export const destroyShortCuts = () => {
+  // @ts-ignore
   hotkeys.unbind(keys.join());
 };
 
