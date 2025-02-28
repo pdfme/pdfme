@@ -2,12 +2,21 @@ import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
 import { loadPdfJs, loadPdfJsWorker } from './utils/module-loader.js';
 
-// Load PDF.js libraries
-const pdfjsLib = await loadPdfJs(false);
-const PDFJSWorker = await loadPdfJsWorker(false);
+// Initialize variables to hold loaded modules
+let pdfjsLib: any = null;
+let PDFJSWorker: any = null;
 
-// @ts-ignore
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker.default || PDFJSWorker;
+// Function to initialize modules
+async function initModules() {
+  if (!pdfjsLib) {
+    pdfjsLib = await loadPdfJs(false);
+    PDFJSWorker = await loadPdfJsWorker(false);
+    
+    // @ts-ignore
+    pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker.default || PDFJSWorker;
+  }
+  return { pdfjsLib, PDFJSWorker };
+}
 
 function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   // Split out the actual base64 string from the data URL scheme
@@ -31,11 +40,14 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
 // Import the PDF-lib patch
 import { PatchedPNG } from './patches/pdf-lib-patch.js';
 
-// Apply the patch before using pdf2img
-await PatchedPNG.patchPdfLib();
-
-export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) =>
-  _pdf2img(pdf, options, {
+export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) => {
+  // Initialize modules if needed
+  const { pdfjsLib } = await initModules();
+  
+  // Apply the patch before using pdf2img
+  await PatchedPNG.patchPdfLib();
+  
+  return _pdf2img(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
     createCanvas: (width, height) => {
       const canvas = document.createElement('canvas');
@@ -47,10 +59,15 @@ export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) =>
       // @ts-ignore
       dataURLToArrayBuffer(canvas.toDataURL(`image/${imageType}`)),
   });
+};
 
-export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) =>
-  _pdf2size(pdf, options, {
+export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) => {
+  // Initialize modules if needed
+  const { pdfjsLib } = await initModules();
+  
+  return _pdf2size(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
   });
+};
 
   export { img2pdf } from './img2pdf.js';
