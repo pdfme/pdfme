@@ -27,7 +27,7 @@ const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 
-const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser }) => {
+const generatePdf = async (arg: { page: Page; browser: Browser }) => {
   const { page, browser } = arg;
   await page.waitForSelector('#generate-pdf', { timeout });
   await page.click('#generate-pdf');
@@ -38,23 +38,21 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
   const newPage = await newTarget.page();
 
   if (!newPage) {
-    throw new Error('[generatePdfAndTakeScreenshot]: New page not found');
+    throw new Error('[generatePdf]: New page not found');
   }
-
   await newPage.setViewport(viewport);
   await newPage.bringToFront();
+
   await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
 
-  const screenshot = await newPage.screenshot({ encoding: 'base64' });
-
-  // TODO ここから
-  // pdfをデータとしてダウンロードしてスナップショットテストしたい
-  // pdfToImagesを使って画像に変換してスナップショットテストする
+  const pdfArrayBuffer = await newPage.evaluate(async () => {
+    const response = await fetch(location.href);
+    return await response.arrayBuffer();
+  });
 
   await newPage.close();
   await page.bringToFront();
-
-  return screenshot;
+  return pdfArrayBuffer;
 };
 
 describe('Playground E2E Tests', () => {
@@ -130,9 +128,17 @@ describe('Playground E2E Tests', () => {
       let screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('4. Generate PDF and capture screenshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+      console.log('4. Generate PDF, convert to images, and compare with snapshot');
+      {
+        const pdfBuffer = await generatePdf({ page, browser });
+        const pdfImages = await pdfToImages(pdfBuffer);
+        pdfImages.forEach((imageBuffer, idx) => {
+          expect(imageBuffer).toMatchImageSnapshot({
+            ...snapShotOpt,
+            customSnapshotIdentifier: `invoice-pdf-page-${idx}`,
+          });
+        });
+      }
 
       console.log('5. Return to template list screen');
       await page.click('#templates-nav');
@@ -153,9 +159,17 @@ describe('Playground E2E Tests', () => {
       screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('8. Generate PDF and capture screenshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+      console.log('8. Generate PDF, convert to images, and compare with snapshot');
+      {
+        const pdfBuffer = await generatePdf({ page, browser });
+        const pdfImages = await pdfToImages(pdfBuffer);
+        pdfImages.forEach((imageBuffer, idx) => {
+          expect(imageBuffer).toMatchImageSnapshot({
+            ...snapShotOpt,
+            customSnapshotIdentifier: `pedigree-pdf-page-${idx}`,
+          });
+        });
+      }
 
       console.log('9. Press Reset button to reset template');
       await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
@@ -169,9 +183,17 @@ describe('Playground E2E Tests', () => {
       screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('12. Generate PDF, take screenshot, and compare with snapshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+      console.log('12. Generate PDF, convert to images, and compare with snapshot');
+      {
+        const pdfBuffer = await generatePdf({ page, browser });
+        const pdfImages = await pdfToImages(pdfBuffer);
+        pdfImages.forEach((imageBuffer, idx) => {
+          expect(imageBuffer).toMatchImageSnapshot({
+            ...snapShotOpt,
+            customSnapshotIdentifier: `modified-template-pdf-page-${idx}`,
+          });
+        });
+      }
 
       console.log('13. Save locally using Save Local button');
       await page.click('#save-local');
@@ -191,9 +213,17 @@ describe('Playground E2E Tests', () => {
       const formInputRunner = await createRunner(formInputUserFlow, extension);
       await formInputRunner.run();
 
-      console.log('16. Generate PDF, take screenshot, and compare with snapshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+      console.log('16. Generate PDF, convert to images, and compare with snapshot');
+      {
+        const pdfBuffer = await generatePdf({ page, browser });
+        const pdfImages = await pdfToImages(pdfBuffer);
+        pdfImages.forEach((imageBuffer, idx) => {
+          expect(imageBuffer).toMatchImageSnapshot({
+            ...snapShotOpt,
+            customSnapshotIdentifier: `final-form-pdf-page-${idx}`,
+          });
+        });
+      }
     } catch (e) {
       console.error(e);
       const screenshot = await page.screenshot({ encoding: 'base64' });
