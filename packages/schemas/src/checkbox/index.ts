@@ -1,6 +1,6 @@
 import { Plugin } from '@pdfme/common';
 import { Schema } from '@pdfme/common';
-import svg from '../graphics/svg';
+import svg from '../graphics/svg.js';
 import { isEditable } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { Square, SquareCheck } from 'lucide';

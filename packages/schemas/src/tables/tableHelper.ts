@@ -15,8 +15,8 @@ import type {
   TableInput,
   StylesProps,
   Section,
-} from './types';
-import { Cell, Column, Row, Table } from './classes';
+} from './types.js';
+import { Cell, Column, Row, Table } from './classes.js';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 

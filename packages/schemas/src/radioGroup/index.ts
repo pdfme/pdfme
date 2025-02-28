@@ -1,7 +1,7 @@
 import { Plugin } from '@pdfme/common';
 import { Schema } from '@pdfme/common';
 import { Circle, CircleDot } from 'lucide';
-import svg from '../graphics/svg';
+import svg from '../graphics/svg.js';
 import { isEditable, createSvgStr } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
