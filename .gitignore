@@ -8,3 +8,5 @@ dist
 coverage/
 
 **/repomix-output.txt
+
+**/__diff_output__/**
