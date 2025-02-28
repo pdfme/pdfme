@@ -1,8 +1,32 @@
 import fs from 'fs';
 import path from 'path';
-import { merge, split, remove, insert, rotate, move, organize } from '../src/index';
-import { createTestPDF, pdfToImages, getPDFPageCount } from './utils';
+import { PDFDocument } from '@pdfme/pdf-lib';
+import { pdf2img } from '@pdfme/converter';
+import { merge, split, remove, insert, rotate, move, organize } from '../src/index.js';
 import 'jest-image-snapshot';
+
+const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => {
+  const pdfDoc = await PDFDocument.create();
+  for (let i = 0; i < pageCount; i++) {
+    const page = pdfDoc.addPage([500, 500]);
+    page.drawText(`Page ${i + 1}`, {
+      x: 50,
+      y: 450,
+      size: 20,
+    });
+  }
+  return pdfDoc.save();
+};
+
+const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
+  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
+};
+
+const getPDFPageCount = async (pdf: ArrayBuffer): Promise<number> => {
+  const pdfDoc = await PDFDocument.load(pdf);
+  return pdfDoc.getPageCount();
+};
 
 describe('merge', () => {
   test('merges multiple PDFs', async () => {
