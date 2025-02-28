@@ -227,11 +227,16 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
       .map(([key, value]) => `${key}="${value}"`)
       .join(' ');
 
-    const childrenString = (children as (IconNode | string)[])
-      .map((child) => createElementString(child as IconNode))
-      .join('');
+    // Handle empty children array
+    if (!children || (Array.isArray(children) && children.length === 0)) {
+      return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
+    }
 
-    return `<${tag} ${attrString}>${childrenString}</${tag}>`;
+    const childrenString = Array.isArray(children)
+      ? children.map((child) => createElementString(child as IconNode)).join('')
+      : createElementString(children as IconNode);
+
+    return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
   };
 
   return createElementString(icon);
