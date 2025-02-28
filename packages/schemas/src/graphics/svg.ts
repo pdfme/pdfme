@@ -1,5 +1,6 @@
 import { Plugin, Schema } from '@pdfme/common';
-import { XMLValidator } from 'fast-xml-parser';
+// Using top-level await with dynamic import for ESM compatibility
+const { XMLValidator } = await import('fast-xml-parser');
 import {
   convertForPdfLayoutProps,
   isEditable,
