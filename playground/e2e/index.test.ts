@@ -12,8 +12,6 @@ const baseUrl = 'http://localhost:4173';
 const timeout = 20000;
 jest.setTimeout(timeout * 5);
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const snapShotOpt: MatchImageSnapshotOptions = {
   failureThreshold: 1,
   failureThresholdType: 'percent',
@@ -41,9 +39,7 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
   await newPage.bringToFront();
   await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
 
-  await sleep(2000);
-
-  const screenshot = await newPage.screenshot();
+  const screenshot = await newPage.screenshot({ encoding: 'base64' });
 
   await newPage.close();
   await page.bringToFront();
@@ -70,7 +66,6 @@ describe('Playground E2E Tests', () => {
       detached: true,
       stdio: 'pipe',
     });
-    await sleep(2000);
 
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
@@ -81,10 +76,7 @@ describe('Playground E2E Tests', () => {
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
     page.on('request', (req) => {
-      const ignoreDomains = [
-        // 'https://fonts.gstatic.com/',
-        'https://media.ethicalads.io/',
-      ];
+      const ignoreDomains = ['https://media.ethicalads.io/'];
       if (ignoreDomains.some((d) => req.url().startsWith(d))) {
         req.abort();
       } else {
@@ -109,90 +101,92 @@ describe('Playground E2E Tests', () => {
     const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
 
     try {
-      console.log('1. テンプレート一覧画面に遷移');
+      console.log('1. Navigate to template list screen');
       await page.goto(`${baseUrl}/templates`);
 
-      console.log('2. Invoiceテンプレートをクリック');
+      console.log('2. Click on Invoice template');
       await page.waitForSelector('#template-img-invoice', { timeout });
       await page.click('#template-img-invoice');
-      
-      await page.waitForFunction(() => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('INVOICE') : false;
-      }, { timeout });
-      await sleep(1000);
 
-      console.log('3. デザイナーでスクリーンショット');
-      let screenshot = await page.screenshot();
+      await page.waitForFunction(
+        () => {
+          const container = document.querySelector('div.flex-1.w-full');
+          return container ? container.textContent?.includes('INVOICE') : false;
+        },
+        { timeout }
+      );
+
+      console.log('3. Take screenshot in designer');
+      let screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('4. PDFを生成してスクリーンショット取得');
+      console.log('4. Generate PDF and capture screenshot');
       screenshot = await generatePdfAndTakeScreenshot({ page, browser });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('5. テンプレート一覧画面に戻る');
+      console.log('5. Return to template list screen');
       await page.click('#templates-nav');
-      await sleep(1000);
       await page.reload();
 
-      console.log('6. Pedigreeテンプレートをクリック');
+      console.log('6. Click on Pedigree template');
       await page.waitForSelector('#template-img-pedigree', { timeout });
       await page.click('#template-img-pedigree');
-      await page.waitForFunction(() => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('Pet Name') : false;
-      }, { timeout });
-      await sleep(1000);
+      await page.waitForFunction(
+        () => {
+          const container = document.querySelector('div.flex-1.w-full');
+          return container ? container.textContent?.includes('Pet Name') : false;
+        },
+        { timeout }
+      );
 
-      console.log('7. デザイナーでスクリーンショット');
-      screenshot = await page.screenshot();
+      console.log('7. Take screenshot in designer');
+      screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('8. PDFを生成してスクリーンショット取得');
+      console.log('8. Generate PDF and capture screenshot');
       screenshot = await generatePdfAndTakeScreenshot({ page, browser });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('9. Resetボタンを押してテンプレートをリセット');
+      console.log('9. Press Reset button to reset template');
       await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
-      await sleep(500);
 
-      console.log('10. templateCreationRecord の操作手順を再生して要素を追加');
+      console.log('10. Replay templateCreationRecord operations to add elements');
       const templateCreationUserFlow = parse(templateCreationRecord);
       const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
       await templateCreationRunner.run();
 
-      console.log('11. デザイナーで再度スクリーンショット');
-      screenshot = await page.screenshot();
+      console.log('11. Take another screenshot in designer');
+      screenshot = await page.screenshot({ encoding: 'base64' });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('12. PDFを生成してスクリーンショットを撮り、スナップショットと比較');
+      console.log('12. Generate PDF, take screenshot, and compare with snapshot');
       screenshot = await generatePdfAndTakeScreenshot({ page, browser });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
 
-      console.log('13. Save Localボタンでローカル保存 ');
+      console.log('13. Save locally using Save Local button');
       await page.click('#save-local');
-      await sleep(500);
 
-      console.log('14. form-viewer-nav をクリックしてフォームビューアーに遷移');
+      console.log('14. Click on form-viewer-nav to navigate to form viewer');
       await page.click('#form-viewer-nav');
-      await page.waitForFunction(() => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('Type Something...') : false;
-      }, { timeout });
-      await sleep(1000);
+      await page.waitForFunction(
+        () => {
+          const container = document.querySelector('div.flex-1.w-full');
+          return container ? container.textContent?.includes('Type Something...') : false;
+        },
+        { timeout }
+      );
 
-      console.log('15. formInputRecord の手順でフォームに入力');
+      console.log('15. Input form data following formInputRecord steps');
       const formInputUserFlow = parse(formInputRecord);
       const formInputRunner = await createRunner(formInputUserFlow, extension);
       await formInputRunner.run();
 
-      console.log('16. PDFを生成し、スクリーンショットを撮り、スナップショットと比較');
+      console.log('16. Generate PDF, take screenshot, and compare with snapshot');
       screenshot = await generatePdfAndTakeScreenshot({ page, browser });
       expect(screenshot).toMatchImageSnapshot(snapShotOpt);
     } catch (e) {
-      // テストで失敗した瞬間のスクリーンショットを取得し、保存
       console.error(e);
-      const screenshot = await page.screenshot();
+      const screenshot = await page.screenshot({ encoding: 'base64' });
       fs.writeFileSync('e2e-error-screenshot.png', screenshot, 'base64');
       throw e;
     }
