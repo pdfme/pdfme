@@ -18,24 +18,8 @@ const icons = {
   // Add any other icons used in the codebase
 };
 
-// Export each icon individually to match the ES Module pattern
-export const {
-  Plus,
-  Minus,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Ellipsis,
-  X,
-  Menu,
-  GripVertical,
-  CircleAlert,
-  Lock,
-  ArrowLeft,
-  ArrowRight,
-  LoaderCircle
-} = icons;
-
-// Default export for compatibility
-export default icons;
+// Use CommonJS module.exports but structure it to be compatible with ES Module imports
+module.exports = {
+  ...icons,
+  default: icons
+};
