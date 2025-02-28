@@ -1,7 +1,7 @@
 import { Font, mm2pt, pt2mm } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
-import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper';
-import type { Styles, TableInput, Settings, Section, StylesProps } from './types';
+import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper.js';
+import type { Styles, TableInput, Settings, Section, StylesProps } from './types.js';
 
 type ContentSettings = { body: Row[]; head: Row[]; columns: Column[] };
 
