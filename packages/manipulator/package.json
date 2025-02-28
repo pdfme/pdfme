@@ -55,7 +55,7 @@
     "@types/estree": "^1.0.6"
   },
   "jest": {
-    "preset": "ts-jest",
+    "preset": "ts-jest/presets/js-with-ts-esm",
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
@@ -67,9 +67,11 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "./tsconfig.json"
+          "tsconfig": "./tsconfig.json",
+          "useESM": true
         }
       ]
-    }
+    },
+    "extensionsToTreatAsEsm": [".ts", ".tsx"]
   }
 }
