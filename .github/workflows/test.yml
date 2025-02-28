@@ -1,15 +1,13 @@
-name: Unit Testing
+name: Testing
 
 on: [pull_request]
 
 jobs:
-  build:
+  pdfme-test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [20.x]
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -21,5 +19,30 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run test
+        env:
+          CI: true
+
+  playground-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies and build project
+        run: |
+          npm install
+          npm run build
+      - name: Run playground tests
+        run: |
+          cd playground
+          npm install
+          npm run test
         env:
           CI: true
