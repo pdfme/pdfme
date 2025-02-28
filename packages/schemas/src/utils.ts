@@ -217,10 +217,10 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     return String(icon);
   }
 
-  const [tag, attributes = {}, children = []] = icon;
+  const [tagName, attributes = {}, children = []] = icon;
 
   // Merge custom attributes with SVG element if this is the root SVG
-  const isSvg = tag === 'svg';
+  const isSvg = String(tagName) === 'svg';
   const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
 
   // Format attributes string
@@ -235,7 +235,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     childrenString = children.map(child => {
       if (Array.isArray(child)) {
         // Child is another IconNode array [tag, attributes, children]
-        const [childTag, childAttrs = {}, childChildren = []] = child;
+        const [childTagName, childAttrs = {}, childChildren = []] = child;
         
         // Format child attributes
         const childAttrString = Object.entries(childAttrs)
@@ -244,14 +244,14 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
         
         if (Array.isArray(childChildren) && childChildren.length === 0) {
           // Self-closing tag for empty children
-          return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}/>`;
+          return `<${childTagName}${childAttrString ? ' ' + childAttrString : ''}/>`;
         } else {
           // Process nested children
           const nestedChildrenString = Array.isArray(childChildren) && childChildren.length > 0
             ? childChildren.map(c => createSvgStr(c as IconNode)).join('')
             : '';
           
-          return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTag}>`;
+          return `<${childTagName}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTagName}>`;
         }
       } else if (typeof child === 'string') {
         return child;
@@ -263,9 +263,9 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
 
   // Return SVG string with proper opening/closing tags
   if (childrenString) {
-    return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
+    return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
   } else {
     // Self-closing tag for empty children
-    return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
+    return `<${tagName}${attrString ? ' ' + attrString : ''}/>`;
   }
 };
