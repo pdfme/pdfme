@@ -212,41 +212,28 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  // Handle the case where icon is directly a string (should not happen with proper IconNode)
-  if (typeof icon === 'string') {
-    return icon;
-  }
-
-  // Handle the case where icon is not an array (should not happen with proper IconNode)
+  // Lucide 0.475.0 icon structure is [tag, attributes, children]
   if (!Array.isArray(icon)) {
     return String(icon);
   }
 
-  // In lucide 0.475.0, the icon structure is [tag, attributes, children]
   const [tag, attributes = {}, children = []] = icon;
 
   // Merge custom attributes with SVG element if this is the root SVG
-  const isSvg = String(tag) === 'svg';
+  const isSvg = tag === 'svg';
   const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
 
   // Format attributes string
-  const attrString = Object.entries(mergedAttributes || {})
+  const attrString = Object.entries(mergedAttributes)
     .map(([key, value]) => `${key}="${value}"`)
     .join(' ');
 
-  // Handle empty children (self-closing tag)
-  if (!children || (Array.isArray(children) && children.length === 0)) {
-    return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
-  }
-
   // Process children
   let childrenString = '';
-  if (Array.isArray(children)) {
+  
+  if (Array.isArray(children) && children.length > 0) {
     childrenString = children.map(child => {
-      // Recursively process each child
-      if (typeof child === 'string') {
-        return child;
-      } else if (Array.isArray(child)) {
+      if (Array.isArray(child)) {
         // Child is another IconNode array [tag, attributes, children]
         const [childTag, childAttrs = {}, childChildren = []] = child;
         
@@ -255,31 +242,30 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
           .map(([key, value]) => `${key}="${value}"`)
           .join(' ');
         
-        // Handle empty children for child element
-        if (!childChildren || (Array.isArray(childChildren) && childChildren.length === 0)) {
+        if (Array.isArray(childChildren) && childChildren.length === 0) {
+          // Self-closing tag for empty children
           return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}/>`;
+        } else {
+          // Process nested children
+          const nestedChildrenString = Array.isArray(childChildren) && childChildren.length > 0
+            ? childChildren.map(c => createSvgStr(c as IconNode)).join('')
+            : '';
+          
+          return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTag}>`;
         }
-        
-        // Process child's children recursively
-        const nestedChildrenString = Array.isArray(childChildren) 
-          ? childChildren.map(c => createSvgStr(c as IconNode)).join('')
-          : createSvgStr(childChildren as IconNode);
-        
-        return `<${childTag}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTag}>`;
+      } else if (typeof child === 'string') {
+        return child;
       } else {
-        // Fallback for unexpected child type
         return String(child);
       }
     }).join('');
-  } else if (typeof children === 'string') {
-    childrenString = children;
-  } else if (Array.isArray(children)) {
-    // This is a nested IconNode
-    childrenString = createSvgStr(children as IconNode);
-  } else {
-    // Fallback for unexpected children type
-    childrenString = String(children);
   }
 
-  return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
+  // Return SVG string with proper opening/closing tags
+  if (childrenString) {
+    return `<${tag}${attrString ? ' ' + attrString : ''}>${childrenString}</${tag}>`;
+  } else {
+    // Self-closing tag for empty children
+    return `<${tag}${attrString ? ' ' + attrString : ''}/>`;
+  }
 };
