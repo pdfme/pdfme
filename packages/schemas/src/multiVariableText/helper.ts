@@ -1,14 +1,18 @@
-import { MultiVariableTextSchema } from "./types";
+import { MultiVariableTextSchema } from './types.js';
 
-export const substituteVariables = (text: string, variablesIn: string | Record<string, string>): string => {
+export const substituteVariables = (
+  text: string,
+  variablesIn: string | Record<string, string>
+): string => {
   if (!text) {
-    return "";
+    return '';
   }
 
   let substitutedText = text;
 
   if (variablesIn) {
-    const variables: Record<string, string> = (typeof variablesIn === "string") ? JSON.parse(variablesIn) || {} : variablesIn;
+    const variables: Record<string, string> =
+      typeof variablesIn === 'string' ? JSON.parse(variablesIn) || {} : variablesIn;
 
     Object.keys(variables).forEach((variableName) => {
       // handle special characters in variable name
@@ -33,13 +37,17 @@ export const validateVariables = (value: string, schema: MultiVariableTextSchema
   try {
     values = value ? JSON.parse(value) : {};
   } catch (e) {
-    throw new SyntaxError(`[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`);
+    throw new SyntaxError(
+      `[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`
+    );
   }
 
   for (const variable of schema.variables) {
     if (!values[variable]) {
       if (schema.required) {
-        throw new Error(`[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`);
+        throw new Error(
+          `[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`
+        );
       }
       // If not required, then simply don't render this field if an input is missing
       return false;
@@ -47,4 +55,4 @@ export const validateVariables = (value: string, schema: MultiVariableTextSchema
   }
 
   return true;
-}
+};

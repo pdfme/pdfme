@@ -1,7 +1,7 @@
 import { PDFRenderProps } from '@pdfme/common';
-import { MultiVariableTextSchema } from './types';
-import { pdfRender as parentPdfRender } from '../text/pdfRender';
-import { substituteVariables, validateVariables } from './helper';
+import { MultiVariableTextSchema } from './types.js';
+import { pdfRender as parentPdfRender } from '../text/pdfRender.js';
+import { substituteVariables, validateVariables } from './helper.js';
 
 export const pdfRender = async (arg: PDFRenderProps<MultiVariableTextSchema>) => {
   const { value, schema, ...rest } = arg;
