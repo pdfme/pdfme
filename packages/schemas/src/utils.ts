@@ -212,11 +212,12 @@ export const createErrorElm = () => {
 };
 
 export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): string => {
-  // Lucide 0.475.0 icon structure is [tag, attributes, children]
+  // Handle non-array input (should not happen with proper IconNode)
   if (!Array.isArray(icon)) {
     return String(icon);
   }
 
+  // Destructure the IconNode array
   const [tagName, attributes = {}, children = []] = icon;
 
   // Merge custom attributes with SVG element if this is the root SVG
@@ -232,33 +233,22 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
   let childrenString = '';
   
   if (Array.isArray(children) && children.length > 0) {
-    childrenString = children.map(child => {
-      if (Array.isArray(child)) {
-        // Child is another IconNode array [tag, attributes, children]
-        const [childTagName, childAttrs = {}, childChildren = []] = child;
-        
-        // Format child attributes
-        const childAttrString = Object.entries(childAttrs)
-          .map(([key, value]) => `${key}="${value}"`)
-          .join(' ');
-        
-        if (Array.isArray(childChildren) && childChildren.length === 0) {
-          // Self-closing tag for empty children
-          return `<${childTagName}${childAttrString ? ' ' + childAttrString : ''}/>`;
-        } else {
-          // Process nested children
-          const nestedChildrenString = Array.isArray(childChildren) && childChildren.length > 0
-            ? childChildren.map(c => createSvgStr(c as IconNode)).join('')
-            : '';
-          
-          return `<${childTagName}${childAttrString ? ' ' + childAttrString : ''}>${nestedChildrenString}</${childTagName}>`;
+    childrenString = children
+      .map(child => {
+        // Handle string children
+        if (typeof child === 'string') {
+          return child;
         }
-      } else if (typeof child === 'string') {
-        return child;
-      } else {
+        
+        // Handle array children (nested IconNode)
+        if (Array.isArray(child)) {
+          return createSvgStr(child);
+        }
+        
+        // Fallback for any other type
         return String(child);
-      }
-    }).join('');
+      })
+      .join('');
   }
 
   // Return SVG string with proper opening/closing tags
