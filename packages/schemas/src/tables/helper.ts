@@ -10,7 +10,7 @@ import {
   VERTICAL_ALIGN_TOP,
   VERTICAL_ALIGN_MIDDLE,
   VERTICAL_ALIGN_BOTTOM,
-} from '../text/constants';
+} from '../text/constants.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 
 export const getDefaultCellStyles = () => ({

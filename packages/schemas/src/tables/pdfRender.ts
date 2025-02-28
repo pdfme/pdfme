@@ -1,10 +1,10 @@
-import type { TableSchema } from './types';
+import type { TableSchema } from './types.js';
 import type { PDFRenderProps } from '@pdfme/common';
-import { Cell, Table, Row, Column } from './classes';
-import { rectangle } from '../shapes/rectAndEllipse';
-import cell from './cell';
-import { getBodyWithRange } from './helper';
-import { createSingleTable } from './tableHelper';
+import { Cell, Table, Row, Column } from './classes.js';
+import { rectangle } from '../shapes/rectAndEllipse.js';
+import cell from './cell.js';
+import { getBodyWithRange } from './helper.js';
+import { createSingleTable } from './tableHelper.js';
 
 type Pos = { x: number; y: number };
 

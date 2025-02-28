@@ -1,4 +1,4 @@
-import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types';
+import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types.js';
 import type { Schema } from '@pdfme/common';
 
 export type Spacing = { top: number; right: number; bottom: number; left: number };

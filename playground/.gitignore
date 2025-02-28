@@ -27,3 +27,4 @@ node-playground/test-generate.pdf
 node-playground/test-merge.pdf
 public/template-assets/**/thumbnail.png
 scripts/thumbnail-hash-map.json
+e2e-error-screenshot.png

@@ -17,33 +17,18 @@ exports[`Preview(as Form) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-1yacf91 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1v613y0 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-minus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-              </svg>
+              Minus
             </span>
             
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-1yacf91"
+            class="ant-typography css-dev-only-do-not-override-1v613y0"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -52,31 +37,13 @@ exports[`Preview(as Form) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-1yacf91 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1v613y0 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-plus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-                <path
-                  d="M12 5v14"
-                />
-              </svg>
+              Plus
             </span>
             
           </button>
@@ -164,33 +131,18 @@ exports[`Preview(as Viewer) snapshot 1`] = `
           style="display: flex; align-items: center;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-1yacf91 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1v613y0 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-minus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-              </svg>
+              Minus
             </span>
             
           </button>
           <span
-            class="ant-typography css-dev-only-do-not-override-1yacf91"
+            class="ant-typography css-dev-only-do-not-override-1v613y0"
             style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
           >
             <strong>
@@ -199,31 +151,13 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             </strong>
           </span>
           <button
-            class="ant-btn css-dev-only-do-not-override-1yacf91 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-1v613y0 ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
             type="button"
           >
             <span
               class="ant-btn-icon"
             >
-              <svg
-                class="lucide lucide-plus"
-                fill="none"
-                height="16"
-                stroke="#fff"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M5 12h14"
-                />
-                <path
-                  d="M12 5v14"
-                />
-              </svg>
+              Plus
             </span>
             
           </button>

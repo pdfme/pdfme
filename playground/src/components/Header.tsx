@@ -96,9 +96,9 @@ export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
 
   const navLinks = [
-    { to: '/templates', label: 'Templates' },
-    { to: '/designer', label: 'Designer' },
-    { to: '/form-viewer', label: 'Form/Viewer' },
+    { id: 'templates-nav', to: '/templates', label: 'Templates' },
+    { id: 'designer-nav', to: '/designer', label: 'Designer' },
+    { id: 'form-viewer-nav', to: '/form-viewer', label: 'Form/Viewer' },
   ];
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -117,7 +117,7 @@ export default function Navigation() {
         </span>
 
         {navLinks.map((item) => (
-          <NavLink key={item.to} to={item.to} end className={linkClass}>
+          <NavLink id={item.id} key={item.to} to={item.to} end className={linkClass}>
             {item.label}
           </NavLink>
         ))}
