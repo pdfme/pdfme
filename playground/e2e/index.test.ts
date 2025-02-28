@@ -1,5 +1,6 @@
 import fs from 'fs';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
 import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
@@ -20,6 +21,11 @@ const snapShotOpt: MatchImageSnapshotOptions = {
 };
 
 const viewport = { width: 1366, height: 768 };
+
+const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
+  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
+};
 
 const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser }) => {
   const { page, browser } = arg;
@@ -42,7 +48,8 @@ const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser 
   const screenshot = await newPage.screenshot({ encoding: 'base64' });
 
   // TODO ここから
-  // pdfダウンロードしてスナップショットテストしたい
+  // pdfをデータとしてダウンロードしてスナップショットテストしたい
+  // pdfToImagesを使って画像に変換してスナップショットテストする
 
   await newPage.close();
   await page.bringToFront();
