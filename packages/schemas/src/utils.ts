@@ -222,8 +222,8 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
 
     const [tag, attributes = {}, children = []] = node;
 
-    // Use type assertion to handle the comparison
-    const isSvg = String(tag) === 'svg';
+    // Check if the tag is 'svg'
+    const isSvg = tag === 'svg';
     const mergedAttributes = isSvg ? { ...attributes, ...(attrs || {}) } : attributes;
 
     const attrString = Object.entries(mergedAttributes || {})
