@@ -1,5 +1,6 @@
 import fs from 'fs';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { pdf2img } from '../../packages/converter/dist/esm/src/index.node.js';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
 import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
