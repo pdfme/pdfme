@@ -14,16 +14,19 @@ export default defineConfig(({ mode }) => {
         fileName: (format) => `index.${format}.js`,
       },
       commonjsOptions: {
-        include: [/lucide-react/, /node_modules/],
+        include: [/node_modules/],
         transformMixedEsModules: true,
       },
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'pdfjs-dist', 'antd', 'lucide-react'],
-      exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter'],
+      include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
+      exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter', 'lucide-react'],
     },
     resolve: {
-      dedupe: ['lucide-react'],
+      dedupe: ['react', 'react-dom'],
+      alias: {
+        'lucide-react': require.resolve('./node_modules/lucide-react')
+      }
     },
   };
 });

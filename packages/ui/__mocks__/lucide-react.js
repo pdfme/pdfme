@@ -1,28 +1,43 @@
 // Mock for lucide-react
-// This mock supports both CommonJS and ES Module import patterns
-const icons = {
-  Plus: () => 'Plus',
-  Minus: () => 'Minus',
-  ChevronLeft: () => 'ChevronLeft',
-  ChevronRight: () => 'ChevronRight',
-  ChevronsLeft: () => 'ChevronsLeft',
-  ChevronsRight: () => 'ChevronsRight',
-  Ellipsis: () => 'Ellipsis',
-  X: () => 'X',
-  Menu: () => 'Menu',
-  GripVertical: () => 'GripVertical',
-  CircleAlert: () => 'CircleAlert',
-  Lock: () => 'Lock',
-  ArrowLeft: () => 'ArrowLeft',
-  ArrowRight: () => 'ArrowRight',
-  LoaderCircle: () => 'LoaderCircle',
-  // Add any other icons used in the codebase
+// Create a factory function for icon components to ensure consistent behavior
+const createIconComponent = (name) => {
+  const IconComponent = () => name;
+  IconComponent.displayName = name;
+  return IconComponent;
 };
 
-// Support for named imports (import { X } from 'lucide-react')
-// and default import (import LucideIcons from 'lucide-react')
+// Define all icons used in the codebase
+const icons = {
+  Plus: createIconComponent('Plus'),
+  Minus: createIconComponent('Minus'),
+  ChevronLeft: createIconComponent('ChevronLeft'),
+  ChevronRight: createIconComponent('ChevronRight'),
+  ChevronsLeft: createIconComponent('ChevronsLeft'),
+  ChevronsRight: createIconComponent('ChevronsRight'),
+  Ellipsis: createIconComponent('Ellipsis'),
+  X: createIconComponent('X'),
+  Menu: createIconComponent('Menu'),
+  GripVertical: createIconComponent('GripVertical'),
+  CircleAlert: createIconComponent('CircleAlert'),
+  Lock: createIconComponent('Lock'),
+  ArrowLeft: createIconComponent('ArrowLeft'),
+  ArrowRight: createIconComponent('ArrowRight'),
+  LoaderCircle: createIconComponent('LoaderCircle'),
+  // Add any other icons used in the codebase
+  AlignLeft: createIconComponent('AlignLeft'),
+  AlignCenter: createIconComponent('AlignCenter'),
+  AlignRight: createIconComponent('AlignRight'),
+  AlignJustify: createIconComponent('AlignJustify'),
+  Bold: createIconComponent('Bold'),
+  Italic: createIconComponent('Italic'),
+  Underline: createIconComponent('Underline'),
+  Copy: createIconComponent('Copy'),
+  Trash: createIconComponent('Trash')
+};
+
+// Support for CommonJS
 module.exports = {
   ...icons,
   default: icons,
-  __esModule: true // This helps some bundlers recognize this as an ES module
+  __esModule: true // This helps bundlers recognize this as an ES module
 };
