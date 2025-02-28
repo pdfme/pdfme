@@ -90,7 +90,8 @@
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
       "^lucide-react$": "<rootDir>/__mocks__/lucide-react.js",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
+      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js",
+      "^\\lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
