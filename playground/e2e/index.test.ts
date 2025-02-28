@@ -76,6 +76,7 @@ describe('Playground E2E Tests', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     page = await browser.newPage();
+    await page.setRequestInterception(true);
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
     page.on('request', (req) => {
@@ -84,7 +85,6 @@ describe('Playground E2E Tests', () => {
         'https://media.ethicalads.io/',
       ];
       if (ignoreDomains.some((d) => req.url().startsWith(d))) {
-        console.log(`[Request Ignored]: ${req.url()}`);
         req.abort();
       } else {
         req.continue();
