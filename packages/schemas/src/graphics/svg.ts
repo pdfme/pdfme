@@ -1,6 +1,4 @@
 import { Plugin, Schema } from '@pdfme/common';
-// Using top-level await with dynamic import for ESM compatibility
-const { XMLValidator } = await import('fast-xml-parser');
 import {
   convertForPdfLayoutProps,
   isEditable,
@@ -9,6 +7,15 @@ import {
   createSvgStr,
 } from '../utils.js';
 import { Route } from 'lucide';
+// Import fast-xml-parser in a way that works with both CommonJS and ESM
+import * as fastXmlParserImport from 'fast-xml-parser';
+
+// Handle both ESM and CommonJS module formats
+const XMLValidator = 
+  // For ESM (imported as namespace)
+  (fastXmlParserImport && fastXmlParserImport.XMLValidator) || 
+  // For CommonJS (imported with default export)
+  (fastXmlParserImport.default && fastXmlParserImport.default.XMLValidator);
 
 const isValidSVG = (svgString: string) => XMLValidator.validate(svgString) === true;
 
