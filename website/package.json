@@ -33,7 +33,7 @@
     "buffer": "^6.0.3",
     "knip": "^5.41.1",
     "path-browserify": "^1.0.1",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "browserslist": {
     "production": [
