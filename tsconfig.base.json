@@ -3,7 +3,7 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "module": "Node16",
+    "module": "ESNext",
     "target": "ES2020",
     "useDefineForClassFields": true,
     "lib": [
@@ -12,7 +12,7 @@
       "DOM.Iterable",
       "ESNext"
     ],
-    "moduleResolution": "node16",
+    "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": [
