@@ -173,7 +173,7 @@ export const createBarCode = async (arg: {
     // @ts-ignore
   } else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
     // Web Worker environment
-    let canvas
+    const canvas = new OffscreenCanvas(width, height);
     if(bwipjsArg.width != undefined && bwipjsArg.height != undefined){
       canvas = new OffscreenCanvas(bwipjsArg.width, bwipjsArg.height);
     }else {
