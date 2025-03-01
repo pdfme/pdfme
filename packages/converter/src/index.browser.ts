@@ -13,20 +13,22 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
 
   // Decode the Base64 string to get the binary data
   const byteString = atob(base64String);
-  
+
   // Create a typed array from the binary string
   const arrayBuffer = new ArrayBuffer(byteString.length);
   const uintArray = new Uint8Array(arrayBuffer);
-  
+
   for (let i = 0; i < byteString.length; i++) {
     uintArray[i] = byteString.charCodeAt(i);
   }
-  
+
   return arrayBuffer;
 }
 
-
-export const pdf2img = async (pdf: ArrayBuffer, options: Pdf2ImgOptions = {}) =>
+export const pdf2img = async (
+  pdf: ArrayBuffer,
+  options: Pdf2ImgOptions = {}
+): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
     createCanvas: (width, height) => {
@@ -45,4 +47,4 @@ export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) 
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
   });
 
-  export { img2pdf } from './img2pdf.js';
+export { img2pdf } from './img2pdf.js';

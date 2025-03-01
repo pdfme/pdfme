@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import pLimit from 'p-limit';
-import { generate } from '../../packages/generator/dist/esm/src/index.js';
-import { pdf2img } from '../../packages/converter/dist/esm/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '../../packages/common/dist/esm/src/index.js';
+import { generate } from '@pdfme/generator/cjs/src/index.js';
+import { pdf2img } from '@pdfme/converter/cjs/src/index.node.js';
+import { getInputFromTemplate, getDefaultFont } from '@pdfme/common/cjs/src/index.js';
 import {
   multiVariableText,
   text,
@@ -21,7 +21,7 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '../../packages/schemas/dist/esm/src/index.js';
+} from '@pdfme/schemas/cjs/src/index.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -97,6 +97,7 @@ async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
     fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
   } catch (err) {
     console.error(`Failed to create thumbnail from ${templatePath}:`, err);
+    throw err;
   }
 }
 
