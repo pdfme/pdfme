@@ -23,7 +23,7 @@ const snapShotOpt: MatchImageSnapshotOptions = {
 const viewport = { width: 1366, height: 768 };
 
 const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
-  const arrayBuffers = await pdf2img(pdf, { imageType: 'png', range: {} });
+  const arrayBuffers = await pdf2img(pdf, { imageType: 'png', range: { start: 0, end: 0 } });
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 
