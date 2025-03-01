@@ -1,5 +1,5 @@
-import fs from 'fs';
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
 import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
@@ -8,9 +8,10 @@ import templateCreationRecord from './templateCreationRecord.json';
 import formInputRecord from './formInputRecord.json';
 
 const baseUrl = 'http://localhost:4173';
-
 const timeout = 20000;
 jest.setTimeout(timeout * 5);
+
+const isRunningLocal = process.env.LOCAL === 'true';
 
 const snapShotOpt: MatchImageSnapshotOptions = {
   failureThreshold: 1,
@@ -21,37 +22,66 @@ const snapShotOpt: MatchImageSnapshotOptions = {
 
 const viewport = { width: 1366, height: 768 };
 
-const generatePdfAndTakeScreenshot = async (arg: { page: Page; browser: Browser }) => {
-  const { page, browser } = arg;
+async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
   await page.waitForSelector('#generate-pdf', { timeout });
   await page.click('#generate-pdf');
 
-  const newTarget = await browser.waitForTarget((target) => target.url().startsWith('blob:'), {
-    timeout,
-  });
-  const newPage = await newTarget.page();
-
+  const newTarget = await browser.waitForTarget(
+    (target) => target.url().startsWith('blob:'),
+    { timeout }
+  );
+  const newPage = await newTarget?.page();
   if (!newPage) {
-    throw new Error('[generatePdfAndTakeScreenshot]: New page not found');
+    throw new Error('[generatePdf]: New page not found');
   }
 
   await newPage.setViewport(viewport);
   await newPage.bringToFront();
   await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
 
-  const screenshot = await newPage.screenshot({ encoding: 'base64' });
+  const pdfArray = await newPage.evaluate(async () => {
+    const response = await fetch(location.href);
+    const buffer = await response.arrayBuffer();
+    return Array.from(new Uint8Array(buffer));
+  });
 
-  // TODO ここから
-  // pdfダウンロードしてスナップショットテストしたい
+  const pdfBuffer = Buffer.from(pdfArray);
 
   await newPage.close();
   await page.bringToFront();
+  return pdfBuffer;
+}
 
-  return screenshot;
-};
+async function pdfToImages(pdf: Buffer): Promise<Buffer[]> {
+  const arrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+  const arrayBuffers = await pdf2img(
+    { data: arrayBuffer } as unknown as ArrayBuffer,
+    { imageType: 'png' }
+  );
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
+}
+
+async function captureAndCompareScreenshot(page: Page, label?: string) {
+  const screenshot = await page.screenshot({ encoding: 'base64' });
+  expect(screenshot).toMatchImageSnapshot({
+    ...snapShotOpt,
+    customSnapshotIdentifier: label ? `${label}` : undefined,
+  });
+}
+
+async function generateAndComparePDF(page: Page, browser: Browser, labelPrefix: string) {
+  const pdfBuffer = await generatePdf(page, browser);
+  const pdfImages = await pdfToImages(pdfBuffer);
+
+  pdfImages.forEach((imageBuffer, idx) => {
+    expect(imageBuffer).toMatchImageSnapshot({
+      ...snapShotOpt,
+      customSnapshotIdentifier: `${labelPrefix}-pdf-page-${idx}`,
+    });
+  });
+}
 
 describe('Playground E2E Tests', () => {
-  const isRunningLocal = process.env.LOCAL === 'true';
   let browser: Browser | undefined;
   let page: Page | undefined;
   let previewProcess: ChildProcessWithoutNullStreams | undefined;
@@ -78,6 +108,7 @@ describe('Playground E2E Tests', () => {
     await page.setRequestInterception(true);
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
+
     page.on('request', (req) => {
       const ignoreDomains = ['https://media.ethicalads.io/'];
       if (ignoreDomains.some((d) => req.url().startsWith(d))) {
@@ -97,101 +128,84 @@ describe('Playground E2E Tests', () => {
     }
   });
 
-  test('E2E suite', async () => {
-    if (!browser) throw new Error('Browser not initialized');
-    if (!page) throw new Error('Page not initialized');
+  it('should select Invoice template and compare PDF snapshot', async () => {
+    if (!browser || !page) throw new Error('Browser/Page not initialized');
 
+    // 1. Navigate to templates list & click on Invoice template
+    await page.goto(`${baseUrl}/templates`);
+    await page.waitForSelector('#template-img-invoice', { timeout });
+    await page.click('#template-img-invoice');
+
+    // 2. Check that "INVOICE" text is present
+    await page.waitForFunction(() => {
+      const container = document.querySelector('div.flex-1.w-full');
+      return container ? container.textContent?.includes('INVOICE') : false;
+    }, { timeout });
+
+    // 3. Screenshot & compare
+    await captureAndCompareScreenshot(page, 'invoice-designer');
+
+    // 4. Generate PDF & compare
+    await generateAndComparePDF(page, browser, 'invoice');
+  });
+
+  it('should select Pedigree template and compare PDF snapshot', async () => {
+    if (!browser || !page) throw new Error('Browser/Page not initialized');
+
+    // 5. Return to template list screen
+    await page.click('#templates-nav');
+    await page.reload();
+
+    // 6. Select Pedigree template
+    await page.waitForSelector('#template-img-pedigree', { timeout });
+    await page.click('#template-img-pedigree');
+
+    await page.waitForFunction(() => {
+      const container = document.querySelector('div.flex-1.w-full');
+      return container ? container.textContent?.includes('Pet Name') : false;
+    }, { timeout });
+
+    // 7. Screenshot & compare
+    await captureAndCompareScreenshot(page, 'pedigree-designer');
+
+    // 8. Generate PDF & compare
+    await generateAndComparePDF(page, browser, 'pedigree');
+  });
+
+  it('should modify template, generate PDF and compare, then input form data', async () => {
+    if (!browser || !page) throw new Error('Browser/Page not initialized');
     const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
 
-    try {
-      console.log('1. Navigate to template list screen');
-      await page.goto(`${baseUrl}/templates`);
+    // 9. Press Reset button
+    await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
 
-      console.log('2. Click on Invoice template');
-      await page.waitForSelector('#template-img-invoice', { timeout });
-      await page.click('#template-img-invoice');
+    // 10. Replay templateCreationRecord operations to add elements
+    const templateCreationUserFlow = parse(templateCreationRecord);
+    const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
+    await templateCreationRunner.run();
 
-      await page.waitForFunction(
-        () => {
-          const container = document.querySelector('div.flex-1.w-full');
-          return container ? container.textContent?.includes('INVOICE') : false;
-        },
-        { timeout }
-      );
+    // 11. Screenshot & compare
+    await captureAndCompareScreenshot(page, 'modified-template-designer');
 
-      console.log('3. Take screenshot in designer');
-      let screenshot = await page.screenshot({ encoding: 'base64' });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+    // 12. Generate PDF & compare
+    await generateAndComparePDF(page, browser, 'modified-template');
 
-      console.log('4. Generate PDF and capture screenshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
+    // 13. Save locally
+    await page.click('#save-local');
 
-      console.log('5. Return to template list screen');
-      await page.click('#templates-nav');
-      await page.reload();
+    // 14. Move to form viewer
+    await page.click('#form-viewer-nav');
+    await page.waitForFunction(() => {
+      const container = document.querySelector('div.flex-1.w-full');
+      return container ? container.textContent?.includes('Type Something...') : false;
+    }, { timeout });
 
-      console.log('6. Click on Pedigree template');
-      await page.waitForSelector('#template-img-pedigree', { timeout });
-      await page.click('#template-img-pedigree');
-      await page.waitForFunction(
-        () => {
-          const container = document.querySelector('div.flex-1.w-full');
-          return container ? container.textContent?.includes('Pet Name') : false;
-        },
-        { timeout }
-      );
+    // 15. Input form data
+    const formInputUserFlow = parse(formInputRecord);
+    const formInputRunner = await createRunner(formInputUserFlow, extension);
+    await formInputRunner.run();
 
-      console.log('7. Take screenshot in designer');
-      screenshot = await page.screenshot({ encoding: 'base64' });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
-
-      console.log('8. Generate PDF and capture screenshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
-
-      console.log('9. Press Reset button to reset template');
-      await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
-
-      console.log('10. Replay templateCreationRecord operations to add elements');
-      const templateCreationUserFlow = parse(templateCreationRecord);
-      const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
-      await templateCreationRunner.run();
-
-      console.log('11. Take another screenshot in designer');
-      screenshot = await page.screenshot({ encoding: 'base64' });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
-
-      console.log('12. Generate PDF, take screenshot, and compare with snapshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
-
-      console.log('13. Save locally using Save Local button');
-      await page.click('#save-local');
-
-      console.log('14. Click on form-viewer-nav to navigate to form viewer');
-      await page.click('#form-viewer-nav');
-      await page.waitForFunction(
-        () => {
-          const container = document.querySelector('div.flex-1.w-full');
-          return container ? container.textContent?.includes('Type Something...') : false;
-        },
-        { timeout }
-      );
-
-      console.log('15. Input form data following formInputRecord steps');
-      const formInputUserFlow = parse(formInputRecord);
-      const formInputRunner = await createRunner(formInputUserFlow, extension);
-      await formInputRunner.run();
-
-      console.log('16. Generate PDF, take screenshot, and compare with snapshot');
-      screenshot = await generatePdfAndTakeScreenshot({ page, browser });
-      expect(screenshot).toMatchImageSnapshot(snapShotOpt);
-    } catch (e) {
-      console.error(e);
-      const screenshot = await page.screenshot({ encoding: 'base64' });
-      fs.writeFileSync('e2e-error-screenshot.png', screenshot, 'base64');
-      throw e;
-    }
+    // 16. Generate PDF & compare
+    await generateAndComparePDF(page, browser, 'final-form');
   });
 });
