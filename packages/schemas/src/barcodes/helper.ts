@@ -170,26 +170,6 @@ export const createBarCode = async (arg: {
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = b64toUint8Array(dataUrl).buffer as Buffer;
-  } else if (typeof self !== 'undefined') {
-    // Web Worker environment
-    let canvas
-    if(bwipjsArg.width != undefined && bwipjsArg.height != undefined){
-      canvas = new OffscreenCanvas(bwipjsArg.width, bwipjsArg.height);
-    }else {
-      canvas = new OffscreenCanvas(250,250);
-    }
-    // @ts-ignore
-    bwipjs.toCanvas(canvas, bwipjsArg);
-    // @ts-ignore
-    const blob = await canvas.convertToBlob();
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = _e => resolve(reader.result as string);
-      reader.onerror = _e => reject(reader.error);
-      reader.onabort = _e => reject(new Error("Read aborted"));
-      reader.readAsDataURL(blob);
-    });
-    res = b64toUint8Array(dataUrl).buffer as Buffer;
   } else {
     res = await bwipjs.toBuffer(bwipjsArg);
   }

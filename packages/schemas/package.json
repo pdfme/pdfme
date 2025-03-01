@@ -63,7 +63,6 @@
     "lucide": "^0.476.0"
   },
   "devDependencies": {
-    "@types/offscreencanvas": "^2019.7.3",
     "@pdfme/common": "file:../common",
     "@types/bwip-js": "^3.2.1",
     "@types/fontkit": "^2.0.4",
