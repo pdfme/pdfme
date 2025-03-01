@@ -170,7 +170,8 @@ export const createBarCode = async (arg: {
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = b64toUint8Array(dataUrl).buffer as Buffer;
-  } else if (typeof self !== 'undefined') {
+    // @ts-ignore
+  } else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
     // Web Worker environment
     let canvas
     if(bwipjsArg.width != undefined && bwipjsArg.height != undefined){
