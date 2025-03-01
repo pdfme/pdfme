@@ -22,37 +22,37 @@ const snapShotOpt: MatchImageSnapshotOptions = {
 
 const viewport = { width: 1366, height: 768 };
 
-const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
-  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
-  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
-};
-
-const generatePdf = async (arg: { page: Page; browser: Browser }) => {
+const generatePdf = async (arg: { page: Page; browser: Browser }): Promise<Buffer> => {
   const { page, browser } = arg;
   await page.waitForSelector('#generate-pdf', { timeout });
   await page.click('#generate-pdf');
 
-  const newTarget = await browser.waitForTarget((target) => target.url().startsWith('blob:'), {
-    timeout,
-  });
+  const newTarget = await browser.waitForTarget(
+    (target) => target.url().startsWith('blob:'), { timeout }
+  );
   const newPage = await newTarget.page();
+  if (!newPage) throw new Error('[generatePdf]: New page not found');
 
-  if (!newPage) {
-    throw new Error('[generatePdf]: New page not found');
-  }
   await newPage.setViewport(viewport);
   await newPage.bringToFront();
-
   await newPage.goto(newPage.url(), { waitUntil: 'networkidle2', timeout });
 
-  const pdfArrayBuffer = await newPage.evaluate(async () => {
+  const pdfArray = await newPage.evaluate(async () => {
     const response = await fetch(location.href);
-    return await response.arrayBuffer();
+    const buffer = await response.arrayBuffer();
+    return Array.from(new Uint8Array(buffer));
   });
+  const pdfBuffer = Buffer.from(pdfArray);
 
   await newPage.close();
   await page.bringToFront();
-  return pdfArrayBuffer;
+  return pdfBuffer;
+};
+
+const pdfToImages = async (pdf: Buffer): Promise<Buffer[]> => {
+  const arrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+  const arrayBuffers = await pdf2img({ data: arrayBuffer } as unknown as ArrayBuffer, { imageType: 'png' });
+  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 
 describe('Playground E2E Tests', () => {
