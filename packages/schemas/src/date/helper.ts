@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 
 import AirDatepicker from 'air-datepicker';
-import type { AirDatepickerLocale, AirDatepickerButton } from 'air-datepicker';
+import type { AirDatepickerLocale, AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
 import localeAr from 'air-datepicker/locale/ar';
 import localeBg from 'air-datepicker/locale/bg';
 import localeCa from 'air-datepicker/locale/ca';
@@ -54,6 +54,13 @@ import {
 import { DateSchema } from './types.js';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter.js';
 import { isEditable } from '../utils.js';
+
+interface AirDatepickerInstance {
+  selectedDates: Date[];
+  hide: () => void;
+  destroy: () => void;
+  show: () => void;
+}
 
 type PickerType = 'date' | 'time' | 'dateTime';
 
@@ -259,16 +266,16 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           },
         });
       }
-
       const airDatepicker = new AirDatepicker(input, {
         locale: locale.adLocale,
         selectedDates: [strDateToDate(value, type)],
-        dateFormat: (date) => format(date, schema.format, { locale: locale.formatLocale }),
+        dateFormat: (date: AirDatepickerDate) =>
+          format(date, schema.format, { locale: locale.formatLocale }),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: adButtons,
-        onSelect: ({ datepicker }) => {
+        onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
           if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
             datepicker.hide();
@@ -441,7 +448,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         backgroundColor: '',
         locale: undefined,
         opacity: DEFAULT_OPACITY,
-      },
+      } as DateSchema,
     },
     icon,
   };
