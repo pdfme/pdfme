@@ -272,22 +272,19 @@ describe('createBarCode', () => {
     ['タイ語', 'สวัสดีปีใหม่', 'สวัสดีปีใหม่'],
   ];
 
-  const upcaCode = '416000336108';
-
   describe('generate qrcode with default colours', () => {
     for (const t of tests) {
       // eslint-disable-next-line no-loop-func
       test(`${t[0]}: ${t[1]}`, async () => {
-        const buffer = (await createBarCode({
+        const buffer = await createBarCode({
           type: 'qrcode',
           input: t[1],
           width: 10, // mm
           height: 10, // mm
           backgroundColor: '00000000', // 背景色を指定しないとjsQRでうまく解析できない
-        })) as Buffer;
+        });
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
-        // @ts-ignore
         const qr = jsQR(pngData, png.width, png.height) as QRCode;
         expect(qr).not.toBeNull();
         const dataBuffer = Buffer.from(qr.binaryData);
@@ -300,17 +297,16 @@ describe('createBarCode', () => {
     for (const t of tests) {
       // eslint-disable-next-line no-loop-func
       test(`${t[0]}: ${t[1]}`, async () => {
-        const buffer = (await createBarCode({
+        const buffer = await createBarCode({
           type: 'qrcode',
           input: t[1],
           width: 10, // mm
           height: 10, // mm
           backgroundColor: 'ffffff',
           barColor: 'f50505',
-        })) as Buffer;
+        });
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
-        // @ts-ignore
         const qr = jsQR(pngData, png.width, png.height) as QRCode;
         expect(qr).not.toBeNull();
         const dataBuffer = Buffer.from(qr.binaryData);
