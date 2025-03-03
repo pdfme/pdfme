@@ -13,7 +13,7 @@ const rootConfig = await import(rootConfigPath);
 export default [
   ...rootConfig.default,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.json'],
@@ -24,8 +24,13 @@ export default [
       },
     },
     plugins: {
-      'react': reactPlugin,
+      react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,

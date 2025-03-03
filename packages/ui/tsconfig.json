@@ -7,7 +7,7 @@
     "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
-    "module": "ESNext",
+    "module": "NodeNext",
     "lib": [
       "ES2020",
       "DOM",
