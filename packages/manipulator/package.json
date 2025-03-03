@@ -37,7 +37,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
-    "lint": "eslint --ext .ts src",
+    "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
     "test:update-snapshots": "jest --updateSnapshot",
     "prune": "ts-prune src",

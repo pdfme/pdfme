@@ -275,7 +275,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           overflowX: 'hidden',
         }}
       >
-        {/* @ts-ignore */}
         <FormRenderComponent
           form={form}
           schema={propPanelSchema}
