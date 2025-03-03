@@ -31,7 +31,7 @@
     "@types/node": "^22.13.5",
     "atob": "^2.1.2",
     "buffer": "^6.0.3",
-    "knip": "^5.41.1",
+    "knip": "^5.45.0",
     "path-browserify": "^1.0.1",
     "typescript": "^5.8.2"
   },
