@@ -39,13 +39,5 @@ export default [
       ...typescriptPlugin.configs['recommended'].rules,
       ...typescriptPlugin.configs['recommended-requiring-type-checking'].rules,
     },
-  },
-  {
-    files: ['**/*.ts'],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.esm.json'],
-      },
-    },
-  },
+  }
 ];
