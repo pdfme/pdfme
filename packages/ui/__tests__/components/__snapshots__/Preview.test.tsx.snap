@@ -25,7 +25,6 @@ exports[`Preview(as Form) snapshot 1`] = `
             >
               Minus
             </span>
-            
           </button>
           <span
             class="ant-typography css-dev-only-do-not-override-1v613y0"
@@ -45,7 +44,6 @@ exports[`Preview(as Form) snapshot 1`] = `
             >
               Plus
             </span>
-            
           </button>
         </div>
       </div>
@@ -68,17 +66,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             >
               <div
                 style="height: 100%; width: 100%;"
-              >
-                <div
-                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: text;"
-                >
-                  <div
-                    id="text-1"
-                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
-                    tabindex="100"
-                  />
-                </div>
-              </div>
+              />
             </div>
           </div>
           <div>
@@ -90,21 +78,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             >
               <div
                 style="height: 100%; width: 100%;"
-              >
-                <div
-                  style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center;"
-                >
-                  <img
-                    src="field2"
-                    style="height: 100%; width: 100%; border-radius: 0; object-fit: contain;"
-                  />
-                  <button
-                    style="position: absolute; top: 0px; left: 0px; z-index: 1; display: flex; justify-content: center; align-items: center; color: rgb(51, 51, 51); background: rgb(242, 242, 242); border-radius: 2px; border: 1px solid #767676; cursor: pointer; height: 24px; width: 24px;"
-                  >
-                    x
-                  </button>
-                </div>
-              </div>
+              />
             </div>
           </div>
         </div>
@@ -139,7 +113,6 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             >
               Minus
             </span>
-            
           </button>
           <span
             class="ant-typography css-dev-only-do-not-override-1v613y0"
@@ -159,7 +132,6 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             >
               Plus
             </span>
-            
           </button>
         </div>
       </div>
@@ -172,81 +144,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
       >
         <div
           style="font-family: 'Roboto'; top: 20px; left: 203.14960629450002px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
-        >
-          <div>
-            <div
-              class="selectable"
-              id="1"
-              style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: transparent;"
-              title="field1"
-            >
-              <div
-                style="height: 100%; width: 100%;"
-              >
-                <div
-                  style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
-                >
-                  <div
-                    id="text-1"
-                    style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
-                  >
-                    <span
-                      style="letter-spacing:inherit;"
-                    >
-                      f
-                    </span>
-                    <span
-                      style="letter-spacing:inherit;"
-                    >
-                      i
-                    </span>
-                    <span
-                      style="letter-spacing:inherit;"
-                    >
-                      e
-                    </span>
-                    <span
-                      style="letter-spacing:inherit;"
-                    >
-                      l
-                    </span>
-                    <span
-                      style="letter-spacing:inherit;"
-                    >
-                      d
-                    </span>
-                    <span
-                      style="letter-spacing:0;"
-                    >
-                      1
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div
-              class="selectable"
-              id="2"
-              style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: transparent;"
-              title="field2"
-            >
-              <div
-                style="height: 100%; width: 100%;"
-              >
-                <div
-                  style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center;"
-                >
-                  <img
-                    src="field2"
-                    style="height: 100%; width: 100%; border-radius: 0; object-fit: contain;"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        />
       </div>
     </div>
   </div>
