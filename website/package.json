@@ -12,8 +12,7 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc",
-    "knip": "knip"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@docusaurus/core": "^3.7.0",
@@ -31,7 +30,6 @@
     "@types/node": "^22.13.5",
     "atob": "^2.1.2",
     "buffer": "^6.0.3",
-    "knip": "^5.41.1",
     "path-browserify": "^1.0.1",
     "typescript": "^5.8.2"
   },
