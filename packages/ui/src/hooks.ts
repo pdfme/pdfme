@@ -113,7 +113,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
 };
 
 type ScrollPageCursorProps = {
-  ref: RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement | null>;
   pageSizes: Size[];
   scale: number;
   pageCursor: number;

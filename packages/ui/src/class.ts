@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
 import { debounce } from './helper.js';
 import {
@@ -22,6 +22,8 @@ import { builtInPlugins } from '@pdfme/schemas';
 
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;
+  
+  protected root: ReactDOM.Root | null = null;
 
   protected template!: Template;
 
@@ -118,7 +120,10 @@ export abstract class BaseUIClass {
 
   public destroy() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.unmountComponentAtNode(this.domContainer);
+    if (this.root) {
+      this.root.unmount();
+      this.root = null;
+    }
 
     this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;

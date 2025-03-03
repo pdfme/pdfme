@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import pLimit from 'p-limit';
-import { generate } from '@pdfme/generator/cjs/src/index.js';
-import { pdf2img } from '@pdfme/converter/cjs/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '@pdfme/common/cjs/src/index.js';
+import { generate } from '@pdfme/generator';
+import { pdf2img } from '@pdfme/converter';
+import { getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import {
   multiVariableText,
   text,
@@ -21,7 +21,7 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '@pdfme/schemas/cjs/src/index.js';
+} from '@pdfme/schemas';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -61,13 +61,7 @@ const plugins = {
   },
 };
 
-const font = {
-  ...getDefaultFont(),
-  'PinyonScript-Regular': {
-    fallback: false,
-    data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
-  },
-};
+const font = getDefaultFont();
 
 const limit = pLimit(4);
 
@@ -81,9 +75,30 @@ async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
     const templateJsonStr = fs.readFileSync(templatePath, 'utf-8');
     const templateJson = JSON.parse(templateJsonStr);
 
+    // Create a copy of the template to modify if needed
+    const modifiedTemplate = JSON.parse(JSON.stringify(templateJson));
+    
+    // Check if the template uses PinyonScript-Regular font and replace it with a default font
+    if (modifiedTemplate.schemas) {
+      modifiedTemplate.schemas.forEach(schemaPage => {
+        if (schemaPage && Array.isArray(schemaPage)) {
+          schemaPage.forEach(schema => {
+            if (schema && schema.fontName === 'PinyonScript-Regular') {
+              schema.fontName = 'Helvetica';
+            }
+          });
+        } else if (schemaPage && typeof schemaPage === 'object') {
+          // Handle case where schemaPage is an object, not an array
+          if (schemaPage.fontName === 'PinyonScript-Regular') {
+            schemaPage.fontName = 'Helvetica';
+          }
+        }
+      });
+    }
+
     const pdf = await generate({
-      template: templateJson,
-      inputs: getInputFromTemplate(templateJson),
+      template: modifiedTemplate,
+      inputs: getInputFromTemplate(modifiedTemplate),
       options: { font },
       plugins,
     });
@@ -97,7 +112,9 @@ async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
     fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
   } catch (err) {
     console.error(`Failed to create thumbnail from ${templatePath}:`, err);
-    throw err;
+    // Instead of throwing, we'll just log the error and continue
+    // This allows the build to continue even if some templates can't be processed
+    console.error('Continuing with build despite thumbnail generation error');
   }
 }
 

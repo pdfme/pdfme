@@ -312,7 +312,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     changeSchemas(flatten(arg));
   };
 
-  const onResize = ({ target, width, height, direction }: OnResize) => {
+  const onResize = (e: import("react-moveable/declaration/types").OnResize) => {
+    const { target, width, height, direction } = e;
     if (!target) return;
     let topPadding = 0;
     let rightPadding = 0;
@@ -366,7 +367,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
-  const onClickMoveable = (e: OnClick) => {
+  const onClickMoveable = (e: import("react-moveable/declaration/types").OnClick) => {
     e.inputEvent.stopPropagation();
     setEditing(true);
   };

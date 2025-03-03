@@ -55,7 +55,7 @@ interface OnClick {
   containsTarget: boolean;
   isDouble: boolean;
   datas: any;
-  targets: any[];
+  targets?: any[];
   clientX: number;
   clientY: number;
 }
@@ -73,10 +73,10 @@ type Props = {
   onRotate: ({ target, rotate }: OnRotate) => void;
   onRotateEnd: ({ target }: OnRotateEnd) => void;
   onRotateGroupEnd: ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void;
-  onResize: ({ target, width, height, direction }: OnResize) => void;
+  onResize: (e: import("react-moveable/declaration/types").OnResize) => any;
   onResizeEnd: ({ target }: { target: HTMLElement | SVGElement }) => void;
   onResizeGroupEnd: ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => void;
-  onClick: (e: OnClick) => void;
+  onClick: (e: import("react-moveable/declaration/types").OnClick) => any;
 };
 
 const className = 'pdfme-moveable';

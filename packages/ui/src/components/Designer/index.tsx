@@ -88,7 +88,7 @@ const TemplateEditor = ({
   };
 
   useScrollPageCursor({
-    ref: canvasRef,
+    ref: canvasRef as React.RefObject<HTMLDivElement>,
     pageSizes,
     scale,
     pageCursor,

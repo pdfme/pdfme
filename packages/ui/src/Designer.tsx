@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import {
   cloneDeep,
   Template,
@@ -54,7 +54,12 @@ class Designer extends BaseUIClass {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.render(
+    
+    if (!this.root) {
+      this.root = ReactDOM.createRoot(this.domContainer);
+    }
+    
+    this.root.render(
       <AppContextProvider
         lang={this.getLang()}
         font={this.getFont()}
@@ -82,8 +87,7 @@ class Designer extends BaseUIClass {
           }}
           size={this.size}
         />
-      </AppContextProvider>,
-      this.domContainer
+      </AppContextProvider>
     );
   }
 }

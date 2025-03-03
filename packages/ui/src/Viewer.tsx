@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { PreviewProps } from '@pdfme/common';
 import { PreviewUI } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
@@ -13,7 +13,12 @@ class Viewer extends PreviewUI {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.render(
+    
+    if (!this.root) {
+      this.root = ReactDOM.createRoot(this.domContainer);
+    }
+    
+    this.root.render(
       <AppContextProvider
         lang={this.getLang()}
         font={this.getFont()}
@@ -21,8 +26,7 @@ class Viewer extends PreviewUI {
         options={this.getOptions()}
       >
         <Preview template={this.template} size={this.size} inputs={this.inputs} />
-      </AppContextProvider>,
-      this.domContainer
+      </AppContextProvider>
     );
   }
 }
