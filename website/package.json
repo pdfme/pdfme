@@ -21,7 +21,7 @@
     "@docusaurus/plugin-client-redirects": "^3.7.0",
     "@docusaurus/plugin-google-gtag": "^3.7.0",
     "@docusaurus/preset-classic": "^3.7.0",
-    "lucide-react": "^0.475.0",
+    "lucide-react": "^0.477.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-github-btn": "^1.2.1"
