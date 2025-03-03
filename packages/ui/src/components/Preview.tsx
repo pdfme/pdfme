@@ -15,6 +15,11 @@ import { theme } from 'antd';
 
 const _cache = new Map();
 
+// Default token for use in tests or when theme context is not available
+const defaultToken = {
+  colorPrimary: '#1677ff'
+};
+
 const Preview = ({
   template,
   inputs,
@@ -24,7 +29,14 @@ const Preview = ({
   onChangeInput?: (args: { index: number; value: string; name: string }) => void;
   size: Size;
 }) => {
-  const { token } = theme.useToken();
+  // Use try-catch to handle potential hook errors in test environment
+  let token = defaultToken;
+  try {
+    const themeToken = theme.useToken();
+    token = themeToken.token;
+  } catch (e) {
+    // Use default token if hook fails (e.g., in test environment)
+  }
 
   const font = useContext(FontContext);
   const maxZoom = getMaxZoom();

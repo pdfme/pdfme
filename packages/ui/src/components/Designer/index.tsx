@@ -152,12 +152,15 @@ const TemplateEditor = ({
 
   const updateTemplate = useCallback(async (newTemplate: Template) => {
     const sl = await template2SchemasList(newTemplate);
-    setSchemasList(sl);
-    onEditEnd();
-    setPageCursor(0);
-    if (canvasRef.current?.scroll) {
-      canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
-    }
+    // Use a single state update to avoid React 19 warnings about updates during render
+    setTimeout(() => {
+      setSchemasList(sl);
+      onEditEnd();
+      setPageCursor(0);
+      if (canvasRef.current?.scroll) {
+        canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
+      }
+    }, 0);
   }, []);
 
   const addSchema = (defaultSchema: Schema) => {

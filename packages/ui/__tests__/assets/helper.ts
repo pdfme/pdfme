@@ -2,6 +2,17 @@ import * as hooks from '../../src/hooks';
 import { uuid } from '../../src/helper';
 import { BLANK_PDF, Template } from '@pdfme/common';
 
+// Mock for theme.useToken to avoid React hook errors in tests
+jest.mock('antd', () => ({
+  theme: {
+    useToken: () => ({
+      token: {
+        colorPrimary: '#1677ff'
+      }
+    })
+  }
+}));
+
 export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
   const pageSizes = [{ height: 297, width: 210 }];
