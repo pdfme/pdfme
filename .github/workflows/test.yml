@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
+      - run: npm install --legacy-peer-deps
       - run: npm run build
       - run: npm run test
         env:
@@ -37,12 +37,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies and build project
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
       - name: Run playground tests
         run: |
           cd playground
-          npm install
+          npm install --legacy-peer-deps
           npm run test
         env:
           CI: true
