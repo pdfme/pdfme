@@ -1,5 +1,5 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, Template, Schema, PDFRenderProps } from '@pdfme/common';
+import type { GenerateProps, Template, Schema, PDFRenderProps, BasePdf, CommonOptions } from '@pdfme/common';
 import {
   checkGenerateProps,
   getDynamicTemplate,
@@ -45,7 +45,15 @@ const generate = async (props: GenerateProps) => {
       input,
       options,
       _cache,
-      getDynamicHeights: (value, args) => {
+      getDynamicHeights: (
+        value: any,
+        args: {
+          schema: Schema;
+          basePdf: BasePdf;
+          options: CommonOptions;
+          _cache: Map<any, any>;
+        }
+      ) => {
         switch (args.schema.type) {
           case 'table':
             return getDynamicHeightsForTable(value, args);
