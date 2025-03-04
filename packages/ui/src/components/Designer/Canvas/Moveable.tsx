@@ -86,12 +86,12 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
   useEffect(() => {
     const containerElement = document.querySelector(`.${className}`) as HTMLElement | null;
     const containerElement2 = document.querySelectorAll(
-      `.${className} .moveable-line`
+      `.${className} .moveable-line`,
     ) as NodeListOf<HTMLElement>;
     if (containerElement) {
       containerElement.style.setProperty('--moveable-color', token.colorPrimary);
       Array.from(containerElement2).map((e) =>
-        e.style.setProperty('--moveable-color', token.colorPrimary)
+        e.style.setProperty('--moveable-color', token.colorPrimary),
       );
     }
   }, [props.target]);

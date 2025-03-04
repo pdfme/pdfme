@@ -22,7 +22,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
         const oldValue = s[key] ?? false;
         const newValue = type === 'boolean' ? !oldValue : btn.value;
         return { key, value: newValue, schemaId: s.id };
-      })
+      }),
     );
   };
 
@@ -33,7 +33,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
     const ids = activeElements.map((ae) => ae.id);
     const ass = schemas.filter((s) => ids.includes(s.id)) as SchemaForUI[];
     ass.forEach((s: Record<string, any>) => {
-      active = type === 'boolean' ? s[key] ?? false : s[key] === btn.value;
+      active = type === 'boolean' ? (s[key] ?? false) : s[key] === btn.value;
     });
     return active;
   };
@@ -43,7 +43,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
 
   const svgIcon = (svgString: string) => {
     const svgDataUrl = `data:image/svg+xml;utf8,${encodeURIComponent(
-      replaceCurrentColor(svgString, token.colorText)
+      replaceCurrentColor(svgString, token.colorText),
     )}`;
     return <img width={17} height={17} src={svgDataUrl} />;
   };

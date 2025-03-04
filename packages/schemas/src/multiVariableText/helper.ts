@@ -2,7 +2,7 @@ import { MultiVariableTextSchema } from './types.js';
 
 export const substituteVariables = (
   text: string,
-  variablesIn: string | Record<string, string>
+  variablesIn: string | Record<string, string>,
 ): string => {
   if (!text) {
     return '';
@@ -38,7 +38,7 @@ export const validateVariables = (value: string, schema: MultiVariableTextSchema
     values = value ? JSON.parse(value) : {};
   } catch (e) {
     throw new SyntaxError(
-      `[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`
+      `[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`,
     );
   }
 
@@ -46,7 +46,7 @@ export const validateVariables = (value: string, schema: MultiVariableTextSchema
     if (!values[variable]) {
       if (schema.required) {
         throw new Error(
-          `[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`
+          `[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`,
         );
       }
       // If not required, then simply don't render this field if an input is missing

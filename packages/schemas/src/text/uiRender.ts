@@ -70,7 +70,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   };
   const font = options?.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
-  const textBlock = buildStyledTextContainer(arg, fontKitFont, usePlaceholder ? placeholder : value);
+  const textBlock = buildStyledTextContainer(
+    arg,
+    fontKitFont,
+    usePlaceholder ? placeholder : value,
+  );
 
   const processedText = replaceUnsupportedChars(value, fontKitFont);
 
@@ -82,7 +86,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
         (l, i) =>
           `<span style="letter-spacing:${
             String(value).length === i + 1 ? 0 : 'inherit'
-          };">${l}</span>`
+          };">${l}</span>`,
       )
       .join('');
     return;
@@ -115,7 +119,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
             fontKitFont,
             dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
             schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
-            schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+            schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT,
           );
           textBlock.style.paddingTop = `${newTopAdj}px`;
           textBlock.style.marginBottom = `${newBottomAdj}px`;
@@ -150,7 +154,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   }
 };
 
-export const buildStyledTextContainer = (arg: UIRenderProps<TextSchema>, fontKitFont: FontKitFont, value: string) => {
+export const buildStyledTextContainer = (
+  arg: UIRenderProps<TextSchema>,
+  fontKitFont: FontKitFont,
+  value: string,
+) => {
   const { schema, rootElement, mode, options, _cache } = arg;
   const font = options?.font || getDefaultFont();
 
@@ -171,7 +179,7 @@ export const buildStyledTextContainer = (arg: UIRenderProps<TextSchema>, fontKit
     fontKitFont,
     dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
     schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
-    schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT
+    schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT,
   );
 
   const topAdjustment = topAdj.toString();

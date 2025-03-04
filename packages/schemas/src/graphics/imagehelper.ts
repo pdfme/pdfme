@@ -150,7 +150,7 @@ const imageSize = (imgBuffer: Buffer): { height: number; width: number } => {
   }
 
   throw new TypeError(
-    '[@pdfme/schemas/images] Unsupported file type: ' + (type === undefined ? 'undefined' : type)
+    '[@pdfme/schemas/images] Unsupported file type: ' + (type === undefined ? 'undefined' : type),
   );
 };
 // ----------------------------

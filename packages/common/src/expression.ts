@@ -22,7 +22,7 @@ const parseData = (data: Record<string, unknown>): Record<string, unknown> => {
         }
       }
       return [key, value];
-    })
+    }),
   );
 
   parseDataCache.set(key, parsed);
@@ -338,7 +338,7 @@ const evaluatePlaceholders = (arg: {
 
     if (braceCount === 0) {
       const code = content.slice(startIndex + 1, endIndex - 1).trim();
-      
+
       if (expressionCache.has(code)) {
         const evalFunc = expressionCache.get(code)!;
         try {
@@ -369,7 +369,6 @@ const evaluatePlaceholders = (arg: {
   return resultContent;
 };
 
-
 export const replacePlaceholders = (arg: {
   content: string;
   variables: Record<string, any>;
@@ -386,7 +385,7 @@ export const replacePlaceholders = (arg: {
 
   const data = {
     ...Object.fromEntries(
-      schemas.flat().map((schema) => [schema.name, schema.readOnly ? schema.content || '' : ''])
+      schemas.flat().map((schema) => [schema.name, schema.readOnly ? schema.content || '' : '']),
     ),
     ...variables,
   };

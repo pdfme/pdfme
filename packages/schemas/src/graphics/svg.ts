@@ -14,12 +14,12 @@ const isValidSVG = (svgString: string): boolean => {
     if (!svgString || typeof svgString !== 'string') {
       return false;
     }
-    
+
     // Check for basic SVG structure
     if (!svgString.includes('<svg') || !svgString.includes('</svg>')) {
       return false;
     }
-    
+
     // Additional browser-specific validation if DOMParser is available
     if (typeof DOMParser !== 'undefined') {
       const parser = new DOMParser();
@@ -29,7 +29,7 @@ const isValidSVG = (svgString: string): boolean => {
         return false;
       }
     }
-    
+
     return true;
   } catch (error) {
     return false;

@@ -169,7 +169,7 @@ const getFmtValue = (
   value: string,
   type: PickerType,
   schema: DateSchema,
-  locale: Locale
+  locale: Locale,
 ): string => {
   return value
     ? format(strDateToDate(value, type), schema.format, {
@@ -318,7 +318,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         const fallbackFontName = getFallbackFontName(font);
 
         const locale = getAirDatepickerLocale(
-          (activeSchema as any).locale || options.lang || defaultLocale
+          (activeSchema as any).locale || options.lang || defaultLocale,
         );
 
         if (
@@ -333,7 +333,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
 
         const formatter = getExtraFormatterSchema(i18n);
         formatter.buttons = formatter.buttons.filter(
-          (button) => button.key === Formatter.ALIGNMENT
+          (button) => button.key === Formatter.ALIGNMENT,
         );
 
         const validateDateTimeFormat = (_rule: any, formatString: string): boolean => {

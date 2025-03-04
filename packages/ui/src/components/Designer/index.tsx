@@ -40,7 +40,7 @@ const scaleDragPosAdjustment = (adjustment: number, scale: number): number => {
   if (scale > 1) return adjustment * (scale - 1);
   if (scale < 1) return adjustment * -(1 - scale);
   return 0;
-}
+};
 
 const TemplateEditor = ({
   template,
@@ -53,8 +53,8 @@ const TemplateEditor = ({
   onSaveTemplate: (t: Template) => void;
   onChangeTemplate: (t: Template) => void;
 } & {
-  onChangeTemplate: (t: Template) => void
-  onPageCursorChange: (newPageCursor: number) => void
+  onChangeTemplate: (t: Template) => void;
+  onPageCursorChange: (newPageCursor: number) => void;
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
@@ -74,8 +74,12 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const { backgrounds, pageSizes, scale, error, refresh } =
-    useUIPreProcessor({ template, size, zoomLevel, maxZoom });
+  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
+    template,
+    size,
+    zoomLevel,
+    maxZoom,
+  });
 
   const onEdit = (targets: HTMLElement[]) => {
     setActiveElements(targets);
@@ -94,7 +98,7 @@ const TemplateEditor = ({
     pageCursor,
     onChangePageCursor: (p) => {
       setPageCursor(p);
-      onPageCursorChange(p)
+      onPageCursorChange(p);
       onEditEnd();
     },
   });
@@ -108,7 +112,7 @@ const TemplateEditor = ({
       setSchemasList(_schemasList);
       onChangeTemplate(schemasList2template(_schemasList, template.basePdf));
     },
-    [template, schemasList, pageCursor, onChangeTemplate]
+    [template, schemasList, pageCursor, onChangeTemplate],
   );
 
   const removeSchemas = useCallback(
@@ -116,7 +120,7 @@ const TemplateEditor = ({
       commitSchemas(schemasList[pageCursor].filter((schema) => !ids.includes(schema.id)));
       onEditEnd();
     },
-    [schemasList, pageCursor, commitSchemas]
+    [schemasList, pageCursor, commitSchemas],
   );
 
   const changeSchemas: ChangeSchemas = useCallback(
@@ -130,7 +134,7 @@ const TemplateEditor = ({
         commitSchemas,
       });
     },
-    [commitSchemas, pageCursor, schemasList, pluginsRegistry, pageSizes, template.basePdf]
+    [commitSchemas, pageCursor, schemasList, pluginsRegistry, pageSizes, template.basePdf],
   );
 
   useInitEvents({
@@ -161,29 +165,42 @@ const TemplateEditor = ({
   }, []);
 
   const addSchema = (defaultSchema: Schema) => {
-    const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0, 0, 0, 0];
+    const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf)
+      ? template.basePdf.padding
+      : [0, 0, 0, 0];
     const pageSize = pageSizes[pageCursor];
 
     const newSchemaName = (prefix: string) => {
       let index = schemasList.reduce((acc, page) => acc + page.length, 1);
       let newName = prefix + index;
-      while (schemasList.some(page => page.find((s) => s.name === newName))) {
+      while (schemasList.some((page) => page.find((s) => s.name === newName))) {
         index++;
         newName = prefix + index;
       }
       return newName;
     };
-    const ensureMiddleValue = (min: number, value: number, max: number) => Math.min(Math.max(min, value), max)
+    const ensureMiddleValue = (min: number, value: number, max: number) =>
+      Math.min(Math.max(min, value), max);
 
     const s = {
       id: uuid(),
       ...defaultSchema,
       name: newSchemaName(i18n('field')),
       position: {
-        x: ensureMiddleValue(paddingLeft, defaultSchema.position.x, pageSize.width - paddingRight - defaultSchema.width),
-        y: ensureMiddleValue(paddingTop, defaultSchema.position.y, pageSize.height - paddingBottom - defaultSchema.height),
+        x: ensureMiddleValue(
+          paddingLeft,
+          defaultSchema.position.x,
+          pageSize.width - paddingRight - defaultSchema.width,
+        ),
+        y: ensureMiddleValue(
+          paddingTop,
+          defaultSchema.position.y,
+          pageSize.height - paddingBottom - defaultSchema.height,
+        ),
       },
-      required: defaultSchema.readOnly ? false : options.requiredByDefault || defaultSchema.required || false,
+      required: defaultSchema.readOnly
+        ? false
+        : options.requiredByDefault || defaultSchema.required || false,
     } as SchemaForUI;
 
     if (defaultSchema.position.y === 0) {
@@ -213,7 +230,8 @@ const TemplateEditor = ({
     setTimeout(
       () =>
         canvasRef.current &&
-        ((canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)), 0)
+        ((canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)),
+        0),
     );
   };
 
@@ -262,13 +280,17 @@ const TemplateEditor = ({
           const dragStartLeft = active.rect.current.initial?.left || 0;
           const dragStartTop = active.rect.current.initial?.top || 0;
 
-          const canvasLeftOffsetFromPageCorner = pageRect.left - dragStartLeft + scaleDragPosAdjustment(20, scale);
+          const canvasLeftOffsetFromPageCorner =
+            pageRect.left - dragStartLeft + scaleDragPosAdjustment(20, scale);
           const canvasTopOffsetFromPageCorner = pageRect.top - dragStartTop;
 
           const moveY = (event.delta.y - canvasTopOffsetFromPageCorner) / scale;
           const moveX = (event.delta.x - canvasLeftOffsetFromPageCorner) / scale;
 
-          const position = { x: round(px2mm(Math.max(0, moveX)), 2), y: round(px2mm(Math.max(0, moveY)), 2) }
+          const position = {
+            x: round(px2mm(Math.max(0, moveX)), 2),
+            y: round(px2mm(Math.max(0, moveY)), 2),
+          };
 
           addSchema({ ...(active.data.current as Schema), position });
         }}
@@ -307,7 +329,7 @@ const TemplateEditor = ({
             schemas={schemasList[pageCursor] ?? []}
             changeSchemas={changeSchemas}
             onSortEnd={onSortEnd}
-            onEdit={id => {
+            onEdit={(id) => {
               const editingElem = document.getElementById(id);
               editingElem && onEdit([editingElem]);
             }}

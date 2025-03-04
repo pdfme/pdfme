@@ -26,7 +26,7 @@ const generate = async (props: GenerateProps) => {
 
   if (inputs.length === 0) {
     throw new Error(
-      '[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array'
+      '[@pdfme/generator] inputs should not be empty, pass at least an empty object in the array',
     );
   }
 

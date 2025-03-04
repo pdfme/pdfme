@@ -22,7 +22,7 @@ class Viewer extends PreviewUI {
       >
         <Preview template={this.template} size={this.size} inputs={this.inputs} />
       </AppContextProvider>,
-      this.domContainer
+      this.domContainer,
     );
   }
 }

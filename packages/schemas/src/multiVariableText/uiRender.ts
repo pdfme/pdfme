@@ -3,7 +3,7 @@ import { MultiVariableTextSchema } from './types.js';
 import {
   uiRender as parentUiRender,
   buildStyledTextContainer,
-  makeElementPlainTextContentEditable
+  makeElementPlainTextContentEditable,
 } from '../text/uiRender.js';
 import { isEditable } from '../utils.js';
 import { getFontKitFont } from '../text/helper.js';
@@ -25,10 +25,14 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     schema,
     mode: mode == 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
     rootElement,
-    onChange: (arg: { key: string; value: any; } | { key: string; value: any; }[]) => {
+    onChange: (arg: { key: string; value: any } | { key: string; value: any }[]) => {
       if (!Array.isArray(arg)) {
         const numVariables = countUniqueVariableNames(arg.value);
-        onChange && onChange([{key: 'text', value: arg.value}, {key: 'readOnly', value: numVariables == 0}]);
+        onChange &&
+          onChange([
+            { key: 'text', value: arg.value },
+            { key: 'readOnly', value: numVariables == 0 },
+          ]);
       } else {
         throw new Error('onChange is not an array, the parent text plugin has changed...');
       }
@@ -49,7 +53,10 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
         if (numVariables !== newNumVariables) {
           // If variables were modified during this keypress, we trigger a change
           if (onChange) {
-            onChange([{key: 'text', value: text}, {key: 'readOnly', value: newNumVariables == 0}]);
+            onChange([
+              { key: 'text', value: text },
+              { key: 'readOnly', value: newNumVariables == 0 },
+            ]);
           }
           numVariables = newNumVariables;
         }
@@ -59,16 +66,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 };
 
 const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
-  const {
-    value,
-    schema,
-    rootElement,
-    onChange,
-    stopEditing,
-    theme,
-    _cache,
-    options,
-  } = arg;
+  const { value, schema, rootElement, onChange, stopEditing, theme, _cache, options } = arg;
   const rawText = schema.text;
 
   if (rootElement.parentElement) {
@@ -92,7 +90,7 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       inVarString = true;
       let span = document.createElement('span');
       span.style.outline = `${theme.colorPrimary} dashed 1px`;
-      makeElementPlainTextContentEditable(span)
+      makeElementPlainTextContentEditable(span);
       span.textContent = variables[variableIndices[i]];
       span.addEventListener('blur', (e: Event) => {
         const newValue = (e.target as HTMLSpanElement).textContent || '';
@@ -114,7 +112,7 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       textBlock.appendChild(span);
     }
   }
-}
+};
 
 const getVariableIndices = (content: string) => {
   const regex = /\{([^}]+)}/g;
@@ -146,7 +144,12 @@ const countUniqueVariableNames = (content: string) => {
  * Regex would otherwise be performed on every key press (which isn't terrible, but this code helps).
  */
 const keyPressShouldBeChecked = (event: KeyboardEvent) => {
-  if (event.key == "ArrowUp" || event.key == "ArrowDown" || event.key == "ArrowLeft" || event.key == "ArrowRight") {
+  if (
+    event.key == 'ArrowUp' ||
+    event.key == 'ArrowDown' ||
+    event.key == 'ArrowLeft' ||
+    event.key == 'ArrowRight'
+  ) {
     return false;
   }
 
@@ -164,4 +167,4 @@ const keyPressShouldBeChecked = (event: KeyboardEvent) => {
   }
 
   return true;
-}
+};

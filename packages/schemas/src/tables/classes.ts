@@ -175,7 +175,7 @@ async function calculateWidths(arg: { table: Table; font: Font; _cache: Map<any,
   // first resize attempt: with respect to minReadableWidth and minWidth
   if (resizeWidth) {
     resizeWidth = resizeColumns(resizableColumns, resizeWidth, (column) =>
-      Math.max(column.minReadableWidth, column.minWidth)
+      Math.max(column.minReadableWidth, column.minWidth),
     );
   }
 
@@ -257,7 +257,7 @@ function applyColSpans(table: Table) {
 
 async function fitContent(
   table: Table,
-  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>
+  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>,
 ) {
   const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
@@ -293,7 +293,7 @@ async function fitContent(
 function resizeColumns(
   columns: Column[],
   resizeWidth: number,
-  getMinWidth: (column: Column) => number
+  getMinWidth: (column: Column) => number,
 ) {
   const initialResizeWidth = resizeWidth;
   const sumWrappedWidth = columns.reduce((acc, column) => acc + column.wrappedWidth, 0);
@@ -333,7 +333,7 @@ function resizeColumns(
 
 async function calculate(
   table: Table,
-  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>
+  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>,
 ) {
   for (const row of table.allRows()) {
     for (const column of table.columns) {
@@ -347,7 +347,7 @@ async function calculate(
 
       const longestWordWidth = getStringWidth(
         Object.assign(cell, { text: cell.text.join(' ').split(/\s+/) }),
-        fontKitFont
+        fontKitFont,
       );
       cell.minReadableWidth = longestWordWidth + hPadding;
 

@@ -8,7 +8,7 @@ interface ModifyTemplateForDynamicTableArg {
   options: CommonOptions;
   getDynamicHeights: (
     value: string,
-    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> }
+    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> },
   ) => Promise<number[]>;
 }
 
@@ -108,7 +108,7 @@ async function createOnePage(
     basePdf: BlankPdf;
     schemaPage: Schema[];
     orderMap: Map<string, number>;
-  } & Omit<ModifyTemplateForDynamicTableArg, 'template'>
+  } & Omit<ModifyTemplateForDynamicTableArg, 'template'>,
 ): Promise<LayoutNode> {
   const { basePdf, schemaPage, orderMap, input, options, _cache, getDynamicHeights } = arg;
   const page = createPage(basePdf);
@@ -256,7 +256,7 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
 }
 
 export const getDynamicTemplate = async (
-  arg: ModifyTemplateForDynamicTableArg
+  arg: ModifyTemplateForDynamicTableArg,
 ): Promise<Template> => {
   const { template } = arg;
   if (!isBlankPdf(template.basePdf)) {

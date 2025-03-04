@@ -29,7 +29,7 @@ export const getBrowserVerticalFontAdjustments = (
   fontKitFont: FontKitFont,
   fontSize: number,
   lineHeight: number,
-  verticalAlignment: string
+  verticalAlignment: string,
 ) => {
   const { ascent, descent, unitsPerEm } = fontKitFont;
 
@@ -92,7 +92,7 @@ export const widthOfTextAtSize = (
   text: string,
   fontKitFont: FontKitFont,
   fontSize: number,
-  characterSpacing: number
+  characterSpacing: number,
 ) => {
   const { glyphs } = fontKitFont.layout(text);
   const scale = 1000 / fontKitFont.unitsPerEm;
@@ -112,7 +112,7 @@ const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
 export const getFontKitFont = async (
   fontName: string | undefined,
   font: Font,
-  _cache: Map<any, any>
+  _cache: Map<any, any>,
 ) => {
   const fntNm = fontName || getFallbackFontName(font);
   const cacheKey = getCacheKey(fntNm);
@@ -129,7 +129,7 @@ export const getFontKitFont = async (
   }
 
   const fontKitFont = fontkit.create(
-    fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer)
+    fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer),
   ) as fontkit.Font;
   _cache.set(cacheKey, fontKitFont);
 
@@ -281,7 +281,7 @@ export const calculateDynamicFontSize = ({
             line.replace('\n', ''),
             fontKitFont,
             size,
-            characterSpacing
+            characterSpacing,
           );
           const textWidthInMm = pt2mm(textWidth);
           totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);

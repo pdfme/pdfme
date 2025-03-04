@@ -8,7 +8,7 @@ export interface Img2PdfOptions {
 
 export async function img2pdf(
   imgs: ArrayBuffer[],
-  options: Img2PdfOptions = {}
+  options: Img2PdfOptions = {},
 ): Promise<ArrayBuffer> {
   try {
     const { scale = 1 } = options;

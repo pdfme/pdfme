@@ -21,13 +21,13 @@ import { PluginsRegistry } from '../../../../contexts.js';
 import Item from './Item.js';
 import SelectableSortableItem from './SelectableSortableItem.js';
 import { theme } from 'antd';
-import PluginIcon from "../../PluginIcon.js";
+import PluginIcon from '../../PluginIcon.js';
 
 const SelectableSortableContainer = (
   props: Pick<
     SidebarProps,
     'schemas' | 'onEdit' | 'onSortEnd' | 'hoveringSchemaId' | 'onChangeHoveringSchemaId'
-  >
+  >,
 ) => {
   const { token } = theme.useToken();
   const { schemas, onEdit, onSortEnd, hoveringSchemaId, onChangeHoveringSchemaId } = props;
@@ -37,7 +37,7 @@ const SelectableSortableContainer = (
   const pluginsRegistry = useContext(PluginsRegistry);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 15 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const isItemSelected = (itemId: string): boolean =>
@@ -59,17 +59,25 @@ const SelectableSortableContainer = (
   };
 
   const getPluginIcon = (inSchema: string | SchemaForUI): ReactNode => {
-    const thisSchema = (typeof inSchema === 'string') ? schemas.find((schema) => schema.id === inSchema) : inSchema;
+    const thisSchema =
+      typeof inSchema === 'string' ? schemas.find((schema) => schema.id === inSchema) : inSchema;
 
     const [pluginLabel, activePlugin] = Object.entries(pluginsRegistry).find(
-      ([label, plugin]) => plugin?.propPanel.defaultSchema.type === thisSchema?.type
+      ([label, plugin]) => plugin?.propPanel.defaultSchema.type === thisSchema?.type,
     )!;
 
     if (!activePlugin) {
-      return <></>
+      return <></>;
     }
 
-    return <PluginIcon plugin={activePlugin} label={pluginLabel} size={20} styles={{ marginRight: '0.5rem' }} />
+    return (
+      <PluginIcon
+        plugin={activePlugin}
+        label={pluginLabel}
+        size={20}
+        styles={{ marginRight: '0.5rem' }}
+      />
+    );
   };
 
   return (
@@ -90,7 +98,7 @@ const SelectableSortableContainer = (
                 return ret;
               }
               return ret.filter((schema) => schema !== selectedItem);
-            }, schemas)
+            }, schemas),
           );
         }
       }}
@@ -106,7 +114,7 @@ const SelectableSortableContainer = (
           newSchemas.splice(
             overIndex + 1,
             0,
-            ...selectedSchemas.filter((item) => item.id !== activeId)
+            ...selectedSchemas.filter((item) => item.id !== activeId),
           );
           onSortEnd(newSchemas);
           setSelectedSchemas([]);
@@ -133,8 +141,9 @@ const SelectableSortableContainer = (
                 <SelectableSortableItem
                   key={schema.id}
                   style={{
-                    border: `1px solid ${schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
-                      }`,
+                    border: `1px solid ${
+                      schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
+                    }`,
                   }}
                   schema={schema}
                   schemas={schemas}
@@ -150,43 +159,43 @@ const SelectableSortableContainer = (
         </div>
         {createPortal(
           <DragOverlay adjustScale>
-            {activeId ? (
-              (() => {
-                const activeSchema = schemas.find((schema) => schema.id === activeId);
-                if (!activeSchema) return null;
-                return (
-                  <>
-                    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                      <Item
-                        icon={getPluginIcon(activeId)}
-                        value={activeSchema.name}
-                        required={activeSchema.required}
-                        readOnly={activeSchema.readOnly}
-                        style={{ background: token.colorPrimary }}
-                        dragOverlay
-                      />
-                    </ul>
-                    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                      {selectedSchemas
-                        .filter((item) => item.id !== activeId)
-                        .map((item) => (
-                          <Item
-                            icon={getPluginIcon(item)}
-                            key={item.id}
-                            value={item.name}
-                            required={item.required}
-                            readOnly={item.readOnly}
-                            style={{ background: token.colorPrimary }}
-                            dragOverlay
-                          />
-                        ))}
-                    </ul>
-                  </>
-                );
-              })()
-            ) : null}
+            {activeId
+              ? (() => {
+                  const activeSchema = schemas.find((schema) => schema.id === activeId);
+                  if (!activeSchema) return null;
+                  return (
+                    <>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                        <Item
+                          icon={getPluginIcon(activeId)}
+                          value={activeSchema.name}
+                          required={activeSchema.required}
+                          readOnly={activeSchema.readOnly}
+                          style={{ background: token.colorPrimary }}
+                          dragOverlay
+                        />
+                      </ul>
+                      <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                        {selectedSchemas
+                          .filter((item) => item.id !== activeId)
+                          .map((item) => (
+                            <Item
+                              icon={getPluginIcon(item)}
+                              key={item.id}
+                              value={item.name}
+                              required={item.required}
+                              readOnly={item.readOnly}
+                              style={{ background: token.colorPrimary }}
+                              dragOverlay
+                            />
+                          ))}
+                      </ul>
+                    </>
+                  );
+                })()
+              : null}
           </DragOverlay>,
-          document.body
+          document.body,
         )}
       </>
     </DndContext>

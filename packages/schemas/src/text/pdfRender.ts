@@ -49,12 +49,12 @@ const embedAndGetFontObj = async (arg: {
       return pdfDoc.embedFont(fontData, {
         subset: typeof v.subset === 'undefined' ? true : v.subset,
       });
-    })
+    }),
   );
 
   const fontObj = Object.keys(font).reduce(
     (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
-    {} as { [key: string]: PDFFont }
+    {} as { [key: string]: PDFFont },
   );
 
   _cache.set(pdfDoc, fontObj);
@@ -74,7 +74,7 @@ const getFontProp = ({
 }) => {
   const fontSize = schema.dynamicFontSize
     ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
-    : schema.fontSize ?? DEFAULT_FONT_SIZE;
+    : (schema.fontSize ?? DEFAULT_FONT_SIZE);
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
 
   return {

@@ -17,7 +17,7 @@ const barcodes = BARCODE_TYPES.reduce(
         icon: createSvgStr(type == 'qrcode' ? QrCode : Barcode),
       },
     }),
-  {} as Record<BarcodeTypes, Plugin<BarcodeSchema>>
+  {} as Record<BarcodeTypes, Plugin<BarcodeSchema>>,
 );
 
 export default barcodes;

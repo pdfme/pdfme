@@ -5,7 +5,7 @@ import { MultiVariableTextSchema } from './types.js';
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n, options } = props;
 
-  const mvtSchema = (activeSchema as any);
+  const mvtSchema = activeSchema as any;
   const text = mvtSchema.text || '';
   const variables = JSON.parse(mvtSchema.content) || {};
   const variablesChanged = updateVariablesFromText(text, variables);
@@ -14,11 +14,13 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   if (variablesChanged) {
     changeSchemas([
       { key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id },
-      { key: 'variables', value: varNames, schemaId: activeSchema.id }
+      { key: 'variables', value: varNames, schemaId: activeSchema.id },
     ]);
   }
 
-  const placeholderRowEl = document.getElementById('placeholder-dynamic-var')?.closest('.ant-form-item') as HTMLElement;
+  const placeholderRowEl = document
+    .getElementById('placeholder-dynamic-var')
+    ?.closest('.ant-form-item') as HTMLElement;
   if (!placeholderRowEl) {
     throw new Error('Failed to find Ant form placeholder row to create dynamic variables inputs.');
   }
@@ -36,10 +38,12 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
       textarea.value = variables[variableName];
       textarea.addEventListener('change', (e: Event) => {
         variables[variableName] = (e.target as HTMLTextAreaElement).value;
-        changeSchemas([{ key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id }]);
+        changeSchemas([
+          { key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id },
+        ]);
       });
 
-      const label = varRow.querySelector('label') as HTMLLabelElement
+      const label = varRow.querySelector('label') as HTMLLabelElement;
       label.innerText = variableName;
 
       varRow.style.display = 'block';
@@ -47,10 +51,11 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     }
   } else {
     const para = document.createElement('p');
-    para.innerHTML = i18n('schemas.mvt.typingInstructions')
-        + ` <code style="color:${options?.theme?.token?.colorPrimary || "#168fe3"}; font-weight:bold;">{`
-        + i18n('schemas.mvt.sampleField')
-        + '}</code>';
+    para.innerHTML =
+      i18n('schemas.mvt.typingInstructions') +
+      ` <code style="color:${options?.theme?.token?.colorPrimary || '#168fe3'}; font-weight:bold;">{` +
+      i18n('schemas.mvt.sampleField') +
+      '}</code>';
     rootElement.appendChild(para);
   }
 };
@@ -73,7 +78,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
             type: 'object',
             widget: 'mapDynamicVariables',
             bind: false,
-            span: 24
+            span: 24,
           },
           placeholderDynamicVar: {
             title: 'Placeholder Dynamic Variable',
@@ -88,9 +93,8 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
             },
             span: 24,
           },
-        }
+        },
       },
-
     };
   },
   widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
@@ -105,7 +109,6 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
     variables: [],
   },
 };
-
 
 const updateVariablesFromText = (text: string, variables: any): boolean => {
   const regex = /\{([^{}]+)}/g;
@@ -138,4 +141,4 @@ const updateVariablesFromText = (text: string, variables: any): boolean => {
   }
 
   return changed;
-}
+};

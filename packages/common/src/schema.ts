@@ -148,7 +148,7 @@ export const Font = z.record(
     data: z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]),
     fallback: z.boolean().optional(),
     subset: z.boolean().optional(),
-  })
+  }),
 );
 
 export const CommonOptions = z.object({ font: Font.optional() }).passthrough();

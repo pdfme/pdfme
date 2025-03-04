@@ -7,7 +7,7 @@ const guideStyle = (
   top: number,
   left: number,
   height: number,
-  width: number
+  width: number,
 ): React.CSSProperties => ({
   position: 'absolute',
   top,

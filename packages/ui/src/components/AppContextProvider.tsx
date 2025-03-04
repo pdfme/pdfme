@@ -18,7 +18,7 @@ const isObject = (item: any): item is Record<string, any> =>
 
 const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>(
   target: T,
-  source: U
+  source: U,
 ): T & U => {
   let output = { ...target } as T & U;
 

@@ -112,7 +112,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'string',
       widget: 'color',
       props: {
-        disabledAlpha: true
+        disabledAlpha: true,
       },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
@@ -121,7 +121,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'string',
       widget: 'color',
       props: {
-        disabledAlpha: true
+        disabledAlpha: true,
       },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
@@ -130,7 +130,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'string',
       widget: 'color',
       props: {
-        disabledAlpha: true
+        disabledAlpha: true,
       },
       rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
     },
@@ -141,7 +141,7 @@ export const getCellPropPanelSchema = (arg: {
             type: 'string',
             widget: 'color',
             props: {
-              disabledAlpha: true
+              disabledAlpha: true,
             },
             rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
           },
@@ -194,7 +194,7 @@ export const getColumnStylesPropPanelSchema = ({
             },
           },
         }),
-      {}
+      {},
     ),
   },
 });
@@ -208,7 +208,7 @@ export const getBody = (value: string | string[][]): string[][] => {
 
 export const getBodyWithRange = (
   value: string | string[][],
-  range?: { start: number; end?: number | undefined }
+  range?: { start: number; end?: number | undefined },
 ) => {
   const body = getBody(value);
   if (!range) return body;

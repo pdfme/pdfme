@@ -12,7 +12,7 @@ export interface Pdf2SizeOptions {
 export async function pdf2size(
   pdf: ArrayBuffer,
   options: Pdf2SizeOptions = {},
-  env: Environment
+  env: Environment,
 ): Promise<Size[]> {
   const { scale = 1 } = options;
   const { getDocument } = env;
@@ -26,7 +26,7 @@ export async function pdf2size(
 
         return { height: pt2mm(height), width: pt2mm(width) };
       });
-    })
+    }),
   );
 
   return promises;

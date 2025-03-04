@@ -1,6 +1,12 @@
 import { useForm } from 'form-render';
 import React, { useRef, useContext, useState, useEffect } from 'react';
-import type { ChangeSchemaItem, Dict, SchemaForUI, PropPanelWidgetProps, PropPanelSchema } from '@pdfme/common';
+import type {
+  ChangeSchemaItem,
+  Dict,
+  SchemaForUI,
+  PropPanelWidgetProps,
+  PropPanelSchema,
+} from '@pdfme/common';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
@@ -9,15 +15,22 @@ import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
 import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
-import { InternalNamePath, ValidateErrorEntity } from "rc-field-form/es/interface.js";
+import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
 
 // Import FormRender as a default import
 import FormRenderComponent from 'form-render';
 
 const { Text } = Typography;
 
-type DetailViewProps = Pick<SidebarProps,
-  'size' | 'schemas' | 'schemasList' | 'pageSize' | 'changeSchemas' | 'activeElements' | 'deselectSchema'
+type DetailViewProps = Pick<
+  SidebarProps,
+  | 'size'
+  | 'schemas'
+  | 'schemasList'
+  | 'pageSize'
+  | 'changeSchemas'
+  | 'activeElements'
+  | 'deselectSchema'
 > & {
   activeSchema: SchemaForUI;
 };
@@ -64,11 +77,11 @@ const DetailView = (props: DetailViewProps) => {
 
   useEffect(() => {
     const values: any = { ...activeSchema };
-    values.editable = !(values.readOnly)
+    values.editable = !values.readOnly;
     form.setValues(values);
   }, [activeSchema, form]);
 
-  useEffect(() => form.resetFields(), [activeSchema.id])
+  useEffect(() => form.resetFields(), [activeSchema.id]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {
@@ -85,7 +98,8 @@ const DetailView = (props: DetailViewProps) => {
 
   const uniqueSchemaName = useRef((value: string): boolean => true);
 
-  const validateUniqueSchemaName = (_: any, value: string): boolean => uniqueSchemaName.current(value)
+  const validateUniqueSchemaName = (_: any, value: string): boolean =>
+    uniqueSchemaName.current(value);
 
   const handleWatch = debounce((formSchema: any) => {
     const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
@@ -93,7 +107,7 @@ const DetailView = (props: DetailViewProps) => {
         return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
       }
       return formValue !== schemaValue;
-    }
+    };
 
     let changes: ChangeSchemaItem[] = [];
     for (const key in formSchema) {
@@ -121,15 +135,17 @@ const DetailView = (props: DetailViewProps) => {
 
     if (changes.length) {
       // Only commit these schema changes if they have passed form validation
-      form.validateFields()
+      form
+        .validateFields()
         .then(() => changeSchemas(changes))
         .catch((reason: ValidateErrorEntity) => {
           if (reason.errorFields.length) {
-            changes = changes.filter((change: ChangeSchemaItem) => !reason.errorFields.find((field: {
-              name: InternalNamePath;
-              errors: string[];
-            }) => field.name.includes(change.key)
-            ));
+            changes = changes.filter(
+              (change: ChangeSchemaItem) =>
+                !reason.errorFields.find((field: { name: InternalNamePath; errors: string[] }) =>
+                  field.name.includes(change.key),
+                ),
+            );
           }
           if (changes.length) {
             changeSchemas(changes);
@@ -139,7 +155,7 @@ const DetailView = (props: DetailViewProps) => {
   }, 100);
 
   const activePlugin = Object.values(pluginsRegistry).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type
+    (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type,
   )!;
 
   const activePropPanelSchema = activePlugin?.propPanel.schema;
@@ -171,14 +187,26 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         type: 'string',
         required: true,
         span: 12,
-        rules: [{
-          validator: validateUniqueSchemaName,
-          message: i18n('validation.uniqueName'),
-        }],
-        props: { autoComplete: "off" }
+        rules: [
+          {
+            validator: validateUniqueSchemaName,
+            message: i18n('validation.uniqueName'),
+          },
+        ],
+        props: { autoComplete: 'off' },
       },
-      editable: { title: i18n('editable'), type: 'boolean', span: 8, hidden: defaultSchema?.readOnly !== undefined },
-      required: { title: i18n('required'), type: 'boolean', span: 16, hidden: "{{!formData.editable}}" },
+      editable: {
+        title: i18n('editable'),
+        type: 'boolean',
+        span: 8,
+        hidden: defaultSchema?.readOnly !== undefined,
+      },
+      required: {
+        title: i18n('required'),
+        type: 'boolean',
+        span: 16,
+        hidden: '{{!formData.editable}}',
+      },
       '-': { type: 'void', widget: 'Divider' },
       align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
       position: {
@@ -187,7 +215,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         properties: {
           x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
           y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-        }
+        },
       },
       width: {
         title: i18n('width'),

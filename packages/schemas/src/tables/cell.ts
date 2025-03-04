@@ -19,7 +19,7 @@ const renderLine = async (
   schema: CellSchema,
   position: { x: number; y: number },
   width: number,
-  height: number
+  height: number,
 ) =>
   linePdfRender({
     ...arg,
@@ -45,7 +45,7 @@ const createLineDiv = (
   right: string | null,
   bottom: string | null,
   left: string | null,
-  borderColor: string
+  borderColor: string,
 ) => {
   const div = document.createElement('div');
   div.style.width = width;
@@ -86,7 +86,7 @@ const cellSchema: Plugin<CellSchema> = {
         schema,
         { x: position.x + width - borderWidth.right, y: position.y },
         borderWidth.right,
-        height
+        height,
       ),
       // BOTTOM
       renderLine(
@@ -94,7 +94,7 @@ const cellSchema: Plugin<CellSchema> = {
         schema,
         { x: position.x, y: position.y + height - borderWidth.bottom },
         width,
-        borderWidth.bottom
+        borderWidth.bottom,
       ),
       // LEFT
       renderLine(arg, schema, { x: position.x, y: position.y }, borderWidth.left, height),

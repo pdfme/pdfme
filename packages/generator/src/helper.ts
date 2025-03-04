@@ -51,7 +51,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
       return { left: x, bottom: y, right: width, top: height + y };
     });
     const transformationMatrices = embedPdfPages.map(
-      () => [1, 0, 0, 1, 0, 0] as TransformationMatrix
+      () => [1, 0, 0, 1, 0, 0] as TransformationMatrix,
     );
     basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
@@ -63,10 +63,10 @@ export const validateRequiredFields = (template: Template, inputs: Record<string
     schemaPage.forEach((schema) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[schema.name])) {
         throw new Error(
-          `[@pdfme/generator] input for '${schema.name}' is required to generate this PDF`
+          `[@pdfme/generator] input for '${schema.name}' is required to generate this PDF`,
         );
       }
-    })
+    }),
   );
 };
 
@@ -89,19 +89,22 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
     new Set(
       schemas
         .flatMap((schemaPage) => schemaPage.map((schema) => schema.type))
-        .concat(staticSchema.map((schema) => schema.type))
-    )
+        .concat(staticSchema.map((schema) => schema.type)),
+    ),
   );
 
-  const renderObj = schemaTypes.reduce((acc, type) => {
-    const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
+  const renderObj = schemaTypes.reduce(
+    (acc, type) => {
+      const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
 
-    if (!render) {
-      throw new Error(`[@pdfme/generator] Renderer for type ${type} not found.
+      if (!render) {
+        throw new Error(`[@pdfme/generator] Renderer for type ${type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
-    }
-    return { ...acc, [type]: render.pdf };
-  }, {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>);
+      }
+      return { ...acc, [type]: render.pdf };
+    },
+    {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>,
+  );
 
   return { pdfDoc, renderObj };
 };

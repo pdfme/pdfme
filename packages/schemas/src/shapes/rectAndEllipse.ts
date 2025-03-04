@@ -58,8 +58,14 @@ const shape: Plugin<ShapeSchema> = {
       });
     } else if (schema.type === 'rectangle') {
       page.drawRectangle({
-        x: position.x + borderWidth * ((1 - Math.sin(toRadians(rotate))) / 2) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
-        y: position.y + borderWidth * ((1 + Math.sin(toRadians(rotate))) / 2) + Math.tan(toRadians(rotate)) * (Math.PI ** 2),
+        x:
+          position.x +
+          borderWidth * ((1 - Math.sin(toRadians(rotate))) / 2) +
+          Math.tan(toRadians(rotate)) * Math.PI ** 2,
+        y:
+          position.y +
+          borderWidth * ((1 + Math.sin(toRadians(rotate))) / 2) +
+          Math.tan(toRadians(rotate)) * Math.PI ** 2,
         width: width - borderWidth,
         height: height - borderWidth,
         ...drawOptions,
@@ -80,7 +86,7 @@ const shape: Plugin<ShapeSchema> = {
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },
@@ -89,7 +95,7 @@ const shape: Plugin<ShapeSchema> = {
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },

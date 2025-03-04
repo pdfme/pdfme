@@ -65,7 +65,7 @@ const schema: Plugin<RadioGroup> = {
           onChange({ key: 'content', value: 'true' });
           radioButtonStates.set(schema.name, { value: 'true', onChange });
           eventEmitter.dispatchEvent(
-            new CustomEvent(`group-${schema.group}`, { detail: schema.name })
+            new CustomEvent(`group-${schema.group}`, { detail: schema.name }),
           );
         }
       });
@@ -89,7 +89,7 @@ const schema: Plugin<RadioGroup> = {
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],

@@ -16,7 +16,6 @@ const defaultIncludetext = { includetext: DEFAULT_BARCODE_INCLUDETEXT };
 const position = { x: 0, y: 0 };
 const default40x20 = { width: 40, height: 20 };
 
-
 const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
@@ -190,7 +189,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [
           {
@@ -204,7 +203,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         type: 'string',
         widget: 'color',
         props: {
-          disabledAlpha: true
+          disabledAlpha: true,
         },
         rules: [
           {
@@ -220,7 +219,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
               type: 'string',
               widget: 'color',
               props: {
-                disabledAlpha: true
+                disabledAlpha: true,
               },
             },
             includetext: {

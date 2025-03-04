@@ -51,7 +51,7 @@ function parseSection(
   sectionRows: string[][],
   columns: Column[],
   styleProps: StylesProps,
-  fallbackFontName: string
+  fallbackFontName: string,
 ): Row[] {
   const rowSpansLeftForColumn: { [key: string]: { left: number; times: number } } = {};
   const result = sectionRows.map((rawRow, rowIndex) => {
@@ -112,7 +112,7 @@ function cellStyles(
   column: Column,
   rowIndex: number,
   styles: StylesProps,
-  fallbackFontName: string
+  fallbackFontName: string,
 ) {
   let sectionStyles;
   if (sectionName === 'head') {
@@ -167,23 +167,26 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   const columnStylesWidth = schema.headWidthPercentages.reduce(
     (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
-    {} as Record<number, Partial<Styles>>
+    {} as Record<number, Partial<Styles>>,
   );
 
   const columnStylesAlignment = Object.entries(schema.columnStyles.alignment || {}).reduce(
     (acc, [key, value]) => ({ ...acc, [key]: { alignment: value } }),
-    {} as Record<number, Partial<Styles>>
+    {} as Record<number, Partial<Styles>>,
   );
 
   const allKeys = new Set([
     ...Object.keys(columnStylesWidth).map(Number),
     ...Object.keys(columnStylesAlignment).map(Number),
   ]);
-  const columnStyles = Array.from(allKeys).reduce((acc, key) => {
-    const widthStyle = columnStylesWidth[key] || {};
-    const alignmentStyle = columnStylesAlignment[key] || {};
-    return { ...acc, [key]: { ...widthStyle, ...alignmentStyle } };
-  }, {} as Record<number, Partial<Styles>>);
+  const columnStyles = Array.from(allKeys).reduce(
+    (acc, key) => {
+      const widthStyle = columnStylesWidth[key] || {};
+      const alignmentStyle = columnStylesAlignment[key] || {};
+      return { ...acc, [key]: { ...widthStyle, ...alignmentStyle } };
+    },
+    {} as Record<number, Partial<Styles>>,
+  );
 
   return {
     head: [schema.head],
@@ -254,7 +257,7 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
         'When specifying a custom PDF for basePdf, ' +
         'you cannot use features such as page breaks or re-layout of other elements.' +
         'To utilize these features, please define basePdf as follows:\n' +
-        '{ width: number; height: number; padding: [number, number, number, number]; }'
+        '{ width: number; height: number; padding: [number, number, number, number]; }',
     );
   }
 

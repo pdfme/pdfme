@@ -6,7 +6,7 @@ interface Environment {
   createCanvas: (width: number, height: number) => HTMLCanvasElement | OffscreenCanvas;
   canvasToArrayBuffer: (
     canvas: HTMLCanvasElement | OffscreenCanvas,
-    imageType: ImageType
+    imageType: ImageType,
   ) => ArrayBuffer;
 }
 
@@ -22,7 +22,7 @@ export interface Pdf2ImgOptions {
 export async function pdf2img(
   pdf: ArrayBuffer,
   options: Pdf2ImgOptions = {},
-  env: Environment
+  env: Environment,
 ): Promise<ArrayBuffer[]> {
   try {
     const { scale = 1, imageType = 'jpeg', range = {} } = options;

@@ -19,7 +19,7 @@ import {
   moveCommandToChangeSchemasArg,
   arrayBufferToBase64,
   initShortCuts,
-  destroyShortCuts
+  destroyShortCuts,
 } from './helper.js';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -60,7 +60,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
       paperHeight = height * ZOOM;
       _backgrounds = schemas.map(
         () =>
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII='
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=',
       );
       _pageSizes = schemas.map(() => ({ width, height }));
     } else {
@@ -83,7 +83,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
 
     const _scale = Math.min(
       getScale(size.width, paperWidth),
-      getScale(size.height - RULER_HEIGHT, paperHeight)
+      getScale(size.height - RULER_HEIGHT, paperHeight),
     );
 
     return {

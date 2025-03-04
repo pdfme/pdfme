@@ -43,12 +43,14 @@ const getPaddingStyle = (i: number, p: number, color: string): CSS.Properties =>
 };
 
 const Padding = ({ basePdf }: { basePdf: BasePdf }) => {
-  return <>
-    {isBlankPdf(basePdf) &&
-      basePdf.padding.map((p, i) => (
-        <div key={String(i)} style={getPaddingStyle(i, p, theme.useToken().token.colorError)} />
-      ))}
-  </>
-}
+  return (
+    <>
+      {isBlankPdf(basePdf) &&
+        basePdf.padding.map((p, i) => (
+          <div key={String(i)} style={getPaddingStyle(i, p, theme.useToken().token.colorError)} />
+        ))}
+    </>
+  );
+};
 
 export default Padding;

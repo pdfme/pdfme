@@ -15,7 +15,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
       ([key, { data }]) =>
         new FontFace(key, typeof data === 'string' ? `url(${data})` : data, {
           display: 'swap',
-        })
+        }),
     );
     const newFontFaces = fontFaces.filter((fontFace) => !document.fonts.has(fontFace));
 

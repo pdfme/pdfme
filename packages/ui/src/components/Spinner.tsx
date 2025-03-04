@@ -14,7 +14,7 @@ const Spinner: React.FC = () => {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: '50%',
-    color: token.colorPrimary
+    color: token.colorPrimary,
   };
 
   const loaderStyle: React.CSSProperties = {

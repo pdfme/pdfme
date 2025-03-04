@@ -19,7 +19,7 @@ import { OptionsContext } from './contexts.js';
 // Create a simple mock for hotkeys to avoid TypeScript errors
 const hotkeys = function (
   keys: string,
-  callback: (e: KeyboardEvent, handler: { shortcut: string }) => void
+  callback: (e: KeyboardEvent, handler: { shortcut: string }) => void,
 ) {
   return (hotkeysJs as any)(keys, callback);
 };
@@ -284,7 +284,7 @@ export const template2SchemasList = async (_template: Template) => {
     const b64BasePdf = await getB64BasePdf(basePdf);
     // @ts-expect-error
     const pdfArrayBuffer = b64toUint8Array(b64BasePdf) as ArrayBuffer;
-    
+
     pageSizes = await pdf2size(pdfArrayBuffer);
   }
 
@@ -320,7 +320,7 @@ export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: Base
       // @ts-ignore
       delete schema.id;
       return schema;
-    })
+    }),
   ),
   basePdf,
 });
@@ -334,7 +334,7 @@ export const getUniqueSchemaName = (arg: {
   const schemaNames = schema.map((s) => s.name).concat(stackUniqueSchemaNames);
   const tmp: { [originalName: string]: number } = schemaNames.reduce(
     (acc, cur) => Object.assign(acc, { originalName: cur, copiedNum: 0 }),
-    {}
+    {},
   );
   const extractOriginalName = (name: string) => name.replace(/ copy$| copy [0-9]*$/, '');
   schemaNames
@@ -422,7 +422,7 @@ const handlePositionSizeChange = (
   key: string,
   value: any,
   basePdf: BasePdf,
-  pageSize: Size
+  pageSize: Size,
 ) => {
   const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
   const [pt, pr, pb, pl] = padding;
@@ -443,7 +443,7 @@ const handleTypeChange = (
   schema: SchemaForUI,
   key: string,
   value: any,
-  pluginsRegistry: Plugins
+  pluginsRegistry: Plugins,
 ) => {
   if (key !== 'type') return;
   const keysToKeep = ['id', 'name', 'type', 'position', 'required'];
@@ -454,7 +454,7 @@ const handleTypeChange = (
   });
   // Apply attributes from new defaultSchema
   const propPanel = Object.values(pluginsRegistry).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === value
+    (plugin) => plugin?.propPanel.defaultSchema.type === value,
   )?.propPanel;
   Object.keys(propPanel?.defaultSchema || {}).forEach((key) => {
     if (!schema.hasOwnProperty(key)) {

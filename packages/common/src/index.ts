@@ -1,4 +1,4 @@
-import {PDFME_VERSION} from './version.js';
+import { PDFME_VERSION } from './version.js';
 import {
   MM_TO_PT_RATIO,
   PT_TO_MM_RATIO,

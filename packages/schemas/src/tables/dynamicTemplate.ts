@@ -10,7 +10,7 @@ export const getDynamicHeightsForTable = async (
     basePdf: BasePdf;
     options: CommonOptions;
     _cache: Map<any, any>;
-  }
+  },
 ): Promise<number[]> => {
   if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
   const schema = args.schema as TableSchema;

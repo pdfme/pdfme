@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import { DraggableSyntheticListeners } from '@dnd-kit/core';
 import { I18nContext } from '../../../../contexts.js';
-import { GripVertical, CircleAlert, Lock } from 'lucide-react'
+import { GripVertical, CircleAlert, Lock } from 'lucide-react';
 import { Button, Typography } from 'antd';
 
 const { Text } = Typography;
@@ -48,7 +48,7 @@ const Item = React.memo(
         transform,
         ...props
       },
-      ref
+      ref,
     ) => {
       const i18n = useContext(I18nContext);
 
@@ -125,8 +125,8 @@ const Item = React.memo(
           </div>
         </li>
       );
-    }
-  )
+    },
+  ),
 );
 
 export default Item;

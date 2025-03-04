@@ -10,7 +10,15 @@ import React, {
   useCallback,
 } from 'react';
 import { theme, Button } from 'antd';
-import { ZOOM, SchemaForUI, Size, ChangeSchemas, BasePdf, isBlankPdf, replacePlaceholders } from '@pdfme/common';
+import {
+  ZOOM,
+  SchemaForUI,
+  Size,
+  ChangeSchemas,
+  BasePdf,
+  isBlankPdf,
+  replacePlaceholders,
+} from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
@@ -80,7 +88,6 @@ interface OnClick {
 }
 
 const mm2px = (mm: number) => mm * 3.7795275591;
-
 
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
@@ -373,16 +380,16 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const rotatable = useMemo(() => {
     const selectedSchemas = (schemasList[pageCursor] || []).filter((s) =>
-      activeElements.map((ae) => ae.id).includes(s.id)
+      activeElements.map((ae) => ae.id).includes(s.id),
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
     const uniqueSchemaTypes = [...new Set(schemaTypes)];
     const defaultSchemas = Object.values(pluginsRegistry).map(
-      (plugin) => plugin?.propPanel.defaultSchema
+      (plugin) => plugin?.propPanel.defaultSchema,
     );
 
     return uniqueSchemaTypes.every(
-      (type) => defaultSchemas.find((ds) => ds.type === type)?.rotate !== undefined
+      (type) => defaultSchemas.find((ds) => ds.type === type)?.rotate !== undefined,
     );
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
 
@@ -452,7 +459,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             <StaticSchema
               template={{ schemas: schemasList, basePdf }}
               input={Object.fromEntries(
-                schemasList.flat().map(({ name, content = '' }) => [name, content])
+                schemasList.flat().map(({ name, content = '' }) => [name, content]),
               )}
               scale={scale}
               totalPages={schemasList.length}
@@ -501,17 +508,20 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const mode =
             editing && activeElements.map((ae) => ae.id).includes(schema.id)
               ? 'designer'
-              : 'viewer'
+              : 'viewer';
 
           const content = schema.content || '';
           let value = content;
 
           if (mode !== 'designer' && schema.readOnly) {
             const variables = {
-              ...schemasList.flat().reduce((acc, currSchema) => {
-                acc[currSchema.name] = currSchema.content || '';
-                return acc;
-              }, {} as Record<string, string>),
+              ...schemasList.flat().reduce(
+                (acc, currSchema) => {
+                  acc[currSchema.name] = currSchema.content || '';
+                  return acc;
+                },
+                {} as Record<string, string>,
+              ),
               totalPages: schemasList.length,
               currentPage: index + 1,
             };
@@ -532,11 +542,14 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                 changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
               }}
               stopEditing={() => setEditing(false)}
-              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id ? 'transparent' : token.colorPrimary
-                }`}
+              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
+                schema.readOnly && hoveringSchemaId !== schema.id
+                  ? 'transparent'
+                  : token.colorPrimary
+              }`}
               scale={scale}
             />
-          )
+          );
         }}
       />
     </div>

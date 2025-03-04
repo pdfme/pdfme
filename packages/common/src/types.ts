@@ -27,9 +27,9 @@ import {
 
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemaItem = {
-  key: string,
-  value: any,
-  schemaId: string
+  key: string;
+  value: any;
+  schemaId: string;
 };
 export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
 

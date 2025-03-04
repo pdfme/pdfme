@@ -157,7 +157,7 @@ const schema: Plugin<Select> = {
       selectElement.innerHTML = schema.options
         .map(
           (option) =>
-            `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`
+            `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`,
         )
         .join('');
       rootElement.appendChild(selectElement);

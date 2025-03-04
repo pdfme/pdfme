@@ -17,6 +17,6 @@ declare module '@scena/react-guides' {
 
   // Define the component as a ForwardRefExoticComponent to support refs
   const GuidesComponent: ForwardRefExoticComponent<GuidesProps & RefAttributes<GuidesInterface>>;
-  
+
   export default GuidesComponent;
 }

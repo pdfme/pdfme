@@ -16,7 +16,7 @@ export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
 
 export const split = async (
   pdf: ArrayBuffer,
-  ranges: { start?: number; end?: number }[]
+  ranges: { start?: number; end?: number }[],
 ): Promise<ArrayBuffer[]> => {
   if (!ranges.length) {
     throw new Error('[@pdfme/manipulator] At least one range is required for splitting');
@@ -29,14 +29,14 @@ export const split = async (
   for (const { start = 0, end = numPages - 1 } of ranges) {
     if (start < 0 || end >= numPages || start > end) {
       throw new Error(
-        `[@pdfme/manipulator] Invalid range: start=${start}, end=${end}, total pages=${numPages}`
+        `[@pdfme/manipulator] Invalid range: start=${start}, end=${end}, total pages=${numPages}`,
       );
     }
 
     const newPdf = await PDFDocument.create();
     const pages = await newPdf.copyPages(
       originalPdf,
-      Array.from({ length: end - start + 1 }, (_, i) => i + start)
+      Array.from({ length: end - start + 1 }, (_, i) => i + start),
     );
     pages.forEach((page) => newPdf.addPage(page));
     result.push(await newPdf.save());
@@ -54,7 +54,7 @@ export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBu
 
   if (pages.some((page) => page < 0 || page >= numPages)) {
     throw new Error(
-      `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`
+      `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${numPages - 1}`,
     );
   }
 
@@ -64,7 +64,7 @@ export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBu
 
 export const insert = async (
   basePdf: ArrayBuffer,
-  inserts: { pdf: ArrayBuffer; position: number }[]
+  inserts: { pdf: ArrayBuffer; position: number }[],
 ): Promise<ArrayBuffer> => {
   inserts.sort((a, b) => a.position - b.position);
 
@@ -88,7 +88,7 @@ export const insert = async (
     if (actualPos > 0) {
       const beforePages = await newPdfDoc.copyPages(
         basePdfDoc,
-        Array.from({ length: actualPos }, (_, idx) => idx)
+        Array.from({ length: actualPos }, (_, idx) => idx),
       );
       beforePages.forEach((page) => newPdfDoc.addPage(page));
     }
@@ -99,7 +99,7 @@ export const insert = async (
     if (actualPos < numPages) {
       const afterPages = await newPdfDoc.copyPages(
         basePdfDoc,
-        Array.from({ length: numPages - actualPos }, (_, idx) => idx + actualPos)
+        Array.from({ length: numPages - actualPos }, (_, idx) => idx + actualPos),
       );
       afterPages.forEach((page) => newPdfDoc.addPage(page));
     }
@@ -115,7 +115,7 @@ export const insert = async (
 export const rotate = async (
   pdf: ArrayBuffer,
   degrees: 0 | 90 | 180 | 270 | 360,
-  pageNumbers?: number[]
+  pageNumbers?: number[],
 ): Promise<ArrayBuffer> => {
   if (!Number.isInteger(degrees) || degrees % 90 !== 0) {
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
@@ -137,7 +137,7 @@ export const rotate = async (
   if (pageNumbers) {
     if (pageNumbers.some((page) => page < 0 || page >= pages.length)) {
       throw new Error(
-        `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${pages.length - 1}`
+        `[@pdfme/manipulator] Invalid page number: pages must be between 0 and ${pages.length - 1}`,
       );
     }
   }
@@ -157,7 +157,7 @@ export const rotate = async (
 
 export const move = async (
   pdf: ArrayBuffer,
-  operation: { from: number; to: number }
+  operation: { from: number; to: number },
 ): Promise<ArrayBuffer> => {
   const { from, to } = operation;
   const pdfDoc = await PDFDocument.load(pdf);
@@ -165,7 +165,7 @@ export const move = async (
 
   if (from < 0 || from >= currentPageCount || to < 0 || to >= currentPageCount) {
     throw new Error(
-      `[@pdfme/manipulator] Invalid page number: from=${from}, to=${to}, total pages=${currentPageCount}`
+      `[@pdfme/manipulator] Invalid page number: from=${from}, to=${to}, total pages=${currentPageCount}`,
     );
   }
 
@@ -182,7 +182,6 @@ export const move = async (
   return pdfDoc.save();
 };
 
-
 export const organize = async (
   pdf: ArrayBuffer,
   actions: Array<
@@ -191,7 +190,7 @@ export const organize = async (
     | { type: 'replace'; data: { pdf: ArrayBuffer; position: number } }
     | { type: 'rotate'; data: { position: number; degrees: 0 | 90 | 180 | 270 | 360 } }
     | { type: 'move'; data: { from: number; to: number } }
-  >
+  >,
 ): Promise<ArrayBuffer> => {
   if (!actions.length) {
     throw new Error('[@pdfme/manipulator] At least one action is required');
@@ -219,7 +218,7 @@ export const organize = async (
 
       case 'rotate':
         currentPdf = await PDFDocument.load(
-          await rotate(currentBuffer, action.data.degrees, [action.data.position])
+          await rotate(currentBuffer, action.data.degrees, [action.data.position]),
         );
         break;
 
