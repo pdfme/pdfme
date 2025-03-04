@@ -44,7 +44,7 @@
     "form-render": "^2.2.16",
     "hotkeys-js": "^3.8.7",
     "lucide-react": "^0.460.0",
-    "react": "^16.14.0",
+    "react": "^19.0.0",
     "react-dom": "^16.14.0",
     "react-moveable": "^0.30.3",
     "react-selecto": "^1.12.0"
