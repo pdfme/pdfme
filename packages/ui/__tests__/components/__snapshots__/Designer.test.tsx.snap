@@ -427,15 +427,16 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="moveable-control-box   pdfme-moveable rCSuehiy8"
+              class="moveable-control-box   pdfme-moveable rCS1bhdyl6"
+              data-able-clickable="true"
               data-able-draggable="true"
               data-able-origin="true"
               data-able-padding="true"
               data-able-resizable="true"
               data-able-rotatable="true"
               data-able-snappable="true"
-              data-styled-id="rCSuehiy8"
-              style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px; --moveable-color: #1677ff;"
+              data-styled-id="rCS1bhdyl6"
+              style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px; --moveable-color: #1677ff; visibility: visible;"
             >
               <div
                 class="moveable-rotation"
@@ -503,32 +504,32 @@ exports[`Designer snapshot 1`] = `
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-line moveable-direction "
+                class="moveable-line moveable-direction  "
                 data-direction=""
-                data-line-index="0"
+                data-line-key="render-line-0"
                 data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
+                style="transform: translateY(-50%) translate(-0.5px, 0px) rotate(0rad) scaleY(1); width: 1px; --moveable-color: #1677ff;"
               />
               <div
-                class="moveable-line moveable-direction "
+                class="moveable-line moveable-direction  "
                 data-direction=""
-                data-line-index="1"
+                data-line-key="render-line-1"
                 data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
+                style="transform: translateY(-50%) translate(0px, -0.5px) rotate(1.5707963267948966rad) scaleY(1); width: 1px; --moveable-color: #1677ff;"
               />
               <div
-                class="moveable-line moveable-direction "
+                class="moveable-line moveable-direction  "
                 data-direction=""
-                data-line-index="2"
+                data-line-key="render-line-2"
                 data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
+                style="transform: translateY(-50%) translate(0.5px, 0px) rotate(3.141592653589793rad) scaleY(1); width: 1px; --moveable-color: #1677ff;"
               />
               <div
-                class="moveable-line moveable-direction "
+                class="moveable-line moveable-direction  "
                 data-direction=""
-                data-line-index="3"
+                data-line-key="render-line-3"
                 data-rotation="-1"
-                style="transform: translateY(-50%) translate(0px, 0px) rotate(0rad) scaleY(1); width: 0px; --moveable-color: #1677ff;"
+                style="transform: translateY(-50%) translate(0px, 0.5px) rotate(4.71238898038469rad) scaleY(1); width: 1px; --moveable-color: #1677ff;"
               />
             </div>
             <div>
