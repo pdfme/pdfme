@@ -37,10 +37,11 @@ export async function img2pdf(
       }
     }
     const pdfUint8Array = await doc.save();
-    return pdfUint8Array.buffer.slice(
-      pdfUint8Array.byteOffset,
-      pdfUint8Array.byteOffset + pdfUint8Array.byteLength
-    );
+    // Create a new ArrayBuffer from the Uint8Array to ensure we return only ArrayBuffer
+    const buffer = new ArrayBuffer(pdfUint8Array.byteLength);
+    const view = new Uint8Array(buffer);
+    view.set(pdfUint8Array);
+    return buffer;
   } catch (error) {
     throw new Error(`[@pdfme/converter] img2pdf failed: ${(error as Error).message}`);
   }

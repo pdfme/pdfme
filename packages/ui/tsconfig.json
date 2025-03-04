@@ -17,7 +17,7 @@
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": [],
+    "types": ["jest"],
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",
@@ -37,12 +37,12 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "__tests__/**/*.ts",
+    "__tests__/**/*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "dist"
   ]
 }

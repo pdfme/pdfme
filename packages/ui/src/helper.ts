@@ -17,13 +17,16 @@ import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
 import { OptionsContext } from './contexts.js';
 
 // Create a simple mock for hotkeys to avoid TypeScript errors
-const hotkeys = function(keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void) {
+const hotkeys = function (
+  keys: string,
+  callback: (e: KeyboardEvent, handler: { shortcut: string }) => void
+) {
   return (hotkeysJs as any)(keys, callback);
 };
 
 // Add properties to the hotkeys function
 (hotkeys as any).shift = false;
-(hotkeys as any).unbind = function(keys: string) {
+(hotkeys as any).unbind = function (keys: string) {
   // Do nothing if hotkeysJs doesn't have unbind
   if (typeof (hotkeysJs as any).unbind === 'function') {
     (hotkeysJs as any).unbind(keys);
@@ -279,8 +282,10 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // Use the Uint8Array directly as pdf2size should accept it
-    pageSizes = await pdf2size(b64toUint8Array(b64BasePdf) as any);
+    // @ts-expect-error
+    const pdfArrayBuffer = b64toUint8Array(b64BasePdf) as ArrayBuffer;
+    
+    pageSizes = await pdf2size(pdfArrayBuffer);
   }
 
   const ssl = schemasForUI.length;
@@ -491,4 +496,4 @@ export const getMaxZoom = () => {
   const options = useContext(OptionsContext);
 
   return options.maxZoom ? (options.maxZoom as number) / 100 : DEFAULT_MAX_ZOOM;
-}
+};
