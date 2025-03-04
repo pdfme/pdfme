@@ -49,7 +49,6 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
-    "atob": "^2.1.2",
     "fontkit": "^2.0.2"
   },
   "devDependencies": {
