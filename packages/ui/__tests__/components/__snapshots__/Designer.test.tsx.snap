@@ -488,13 +488,13 @@ exports[`Designer snapshot 1`] = `
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-sw "
+                class="moveable-control moveable-direction moveable-sw moveable-resizable"
                 data-direction="sw"
                 data-rotation="45"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-se "
+                class="moveable-control moveable-direction moveable-se moveable-resizable"
                 data-direction="se"
                 data-rotation="135"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
