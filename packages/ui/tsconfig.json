@@ -17,13 +17,11 @@
     "moduleResolution": "nodenext",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": [
-      "node",
-      "jest",
-      "@types/jest"
-    ],
+    "types": [],
     "typeRoots": [
-      "../node_modules/@types"
+      "../node_modules/@types",
+      "./node_modules/@types",
+      "../../node_modules/@types"
     ],
     "sourceMap": true,
     "baseUrl": ".",

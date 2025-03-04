@@ -66,9 +66,12 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
     } else {
       const _basePdf = await getB64BasePdf(basePdf);
 
+      const uint8Array = b64toUint8Array(_basePdf);
+      const arrayBuffer = uint8Array.buffer as ArrayBuffer;
+      
       const [_pages, imgBuffers] = await Promise.all([
-        pdf2size(b64toUint8Array(_basePdf)),
-        pdf2img(b64toUint8Array(_basePdf), { scale: maxZoom }),
+        pdf2size(arrayBuffer),
+        pdf2img(arrayBuffer, { scale: maxZoom }),
       ]);
 
       _pageSizes = _pages;
@@ -92,7 +95,9 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   useEffect(() => {
     init({ template, size })
       .then(({ pageSizes, scale, backgrounds }) => {
-        setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
+        setPageSizes(pageSizes);
+        setScale(scale);
+        setBackgrounds(backgrounds);
       })
       .catch((err: Error) => {
         setError(err);
@@ -107,7 +112,9 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
     error,
     refresh: (template: Template) =>
       init({ template, size }).then(({ pageSizes, scale, backgrounds }) => {
-        setPageSizes(pageSizes), setScale(scale), setBackgrounds(backgrounds);
+        setPageSizes(pageSizes);
+        setScale(scale);
+        setBackgrounds(backgrounds);
       }),
   };
 };
