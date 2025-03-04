@@ -19,7 +19,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
   const {
     template: { schemas, basePdf },
     pdfDoc,
-  } = arg;
+  } = arg as { template: { schemas: Schema[][]; basePdf: any }; pdfDoc: PDFDocument };
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
@@ -59,8 +59,8 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
 };
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, any>[]) => {
-  template.schemas.forEach((schemaPage) =>
-    schemaPage.forEach((schema) => {
+  ((template as any).schemas as Schema[][]).forEach((schemaPage: Schema[]) =>
+    schemaPage.forEach((schema: Schema) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[schema.name])) {
         throw new Error(
           `[@pdfme/generator] input for '${schema.name}' is required to generate this PDF`,
@@ -72,7 +72,7 @@ export const validateRequiredFields = (template: Template, inputs: Record<string
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { schemas, basePdf } = template;
+  const { schemas, basePdf } = template as { schemas: Schema[][]; basePdf: any };
   const staticSchema: Schema[] = isBlankPdf(basePdf) ? (basePdf.staticSchema ?? []) : [];
 
   const pdfDoc = await PDFDocument.create();
@@ -88,13 +88,13 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
   const schemaTypes = Array.from(
     new Set(
       schemas
-        .flatMap((schemaPage) => schemaPage.map((schema) => schema.type))
-        .concat(staticSchema.map((schema) => schema.type)),
+        .flatMap((schemaPage: Schema[]) => schemaPage.map((schema: Schema) => schema.type))
+        .concat(staticSchema.map((schema: Schema) => schema.type)),
     ),
   );
 
   const renderObj = schemaTypes.reduce(
-    (acc, type) => {
+    (acc: Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>, type: string) => {
       const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
 
       if (!render) {

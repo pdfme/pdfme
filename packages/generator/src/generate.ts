@@ -1,5 +1,5 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps } from '@pdfme/common';
+import type { GenerateProps, Template, Schema, PDFRenderProps } from '@pdfme/common';
 import {
   checkGenerateProps,
   getDynamicTemplate,
@@ -8,7 +8,7 @@ import {
   pt2mm,
   cloneDeep,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
+import { getDynamicHeightsForTable } from '@pdfme/schemas';
 import {
   insertPage,
   preprocessing,
@@ -16,6 +16,7 @@ import {
   getEmbedPdfPages,
   validateRequiredFields,
 } from './helper.js';
+import { PDFDocument } from '@pdfme/pdf-lib';
 
 const generate = async (props: GenerateProps) => {
   checkGenerateProps(props);
@@ -32,14 +33,14 @@ const generate = async (props: GenerateProps) => {
 
   validateRequiredFields(template, inputs);
 
-  const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
+  const { pdfDoc, renderObj }: { pdfDoc: PDFDocument; renderObj: Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void> } = await preprocessing({ template, userPlugins });
 
   const _cache = new Map();
 
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
 
-    const dynamicTemplate = await getDynamicTemplate({
+    const dynamicTemplate: Template = await getDynamicTemplate({
       template,
       input,
       options,
@@ -54,11 +55,11 @@ const generate = async (props: GenerateProps) => {
       },
     });
     const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
-      template: dynamicTemplate,
+      template: dynamicTemplate as Template,
       pdfDoc,
     });
     const schemaNames = [
-      ...new Set(dynamicTemplate.schemas.flatMap((page) => page.map((schema) => schema.name))),
+      ...new Set((dynamicTemplate as Template).schemas.flatMap((page: Schema[]) => page.map((schema: Schema) => schema.name))),
     ];
 
     for (let j = 0; j < basePages.length; j += 1) {
@@ -82,7 +83,7 @@ const generate = async (props: GenerateProps) => {
           const value = replacePlaceholders({
             content: staticSchema.content || '',
             variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-            schemas: dynamicTemplate.schemas,
+            schemas: (dynamicTemplate as Template).schemas,
           });
 
           staticSchema.position = {
@@ -105,8 +106,8 @@ const generate = async (props: GenerateProps) => {
 
       for (let l = 0; l < schemaNames.length; l += 1) {
         const name = schemaNames[l];
-        const schemaPage = dynamicTemplate.schemas[j] || [];
-        const schema = schemaPage.find((s) => s.name == name);
+        const schemaPage: Schema[] = (dynamicTemplate as Template).schemas[j] || [];
+        const schema = schemaPage.find((s: Schema) => s.name == name);
         if (!schema) {
           continue;
         }
@@ -119,9 +120,9 @@ const generate = async (props: GenerateProps) => {
           ? replacePlaceholders({
               content: schema.content || '',
               variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-              schemas: dynamicTemplate.schemas,
+              schemas: (dynamicTemplate as Template).schemas,
             })
-          : input[name] || '';
+          : (input as Record<string, string>)[name] || '';
 
         schema.position = {
           x: schema.position.x + boundingBoxLeft,

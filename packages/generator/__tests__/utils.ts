@@ -35,7 +35,7 @@ export const getFont = (): Font => ({
   NotoSerifJP: { data: NotoSerifJPRegularData },
   NotoSansJP: { data: NotoSansJPRegularData },
 });
-export const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
+export const pdfToImages = async (pdf: ArrayBuffer | Uint8Array): Promise<Buffer[]> => {
   const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };

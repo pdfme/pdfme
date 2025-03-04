@@ -2,7 +2,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist';
 import type { ImageType } from './types.js';
 
 interface Environment {
-  getDocument: (pdf: ArrayBuffer) => Promise<PDFDocumentProxy>;
+  getDocument: (pdf: ArrayBuffer | Uint8Array) => Promise<PDFDocumentProxy>;
   createCanvas: (width: number, height: number) => HTMLCanvasElement | OffscreenCanvas;
   canvasToArrayBuffer: (
     canvas: HTMLCanvasElement | OffscreenCanvas,
@@ -20,7 +20,7 @@ export interface Pdf2ImgOptions {
 }
 
 export async function pdf2img(
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   options: Pdf2ImgOptions = {},
   env: Environment,
 ): Promise<ArrayBuffer[]> {

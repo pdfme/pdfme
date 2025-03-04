@@ -5,7 +5,7 @@ import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 export const pdf2img = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   options: Pdf2ImgOptions = {},
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
@@ -19,7 +19,7 @@ export const pdf2img = async (
     },
   });
 
-export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) =>
+export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
   });

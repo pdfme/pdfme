@@ -1,6 +1,6 @@
 import { PDFDocument, RotationTypes } from '@pdfme/pdf-lib';
 
-export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
+export const merge = async (pdfs: (ArrayBuffer | Uint8Array)[]): Promise<Uint8Array> => {
   if (!pdfs.length) {
     throw new Error('[@pdfme/manipulator] At least one PDF is required for merging');
   }
@@ -15,16 +15,16 @@ export const merge = async (pdfs: ArrayBuffer[]): Promise<ArrayBuffer> => {
 };
 
 export const split = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   ranges: { start?: number; end?: number }[],
-): Promise<ArrayBuffer[]> => {
+): Promise<Uint8Array[]> => {
   if (!ranges.length) {
     throw new Error('[@pdfme/manipulator] At least one range is required for splitting');
   }
 
   const originalPdf = await PDFDocument.load(pdf);
   const numPages = originalPdf.getPages().length;
-  const result: ArrayBuffer[] = [];
+  const result: Uint8Array[] = [];
 
   for (const { start = 0, end = numPages - 1 } of ranges) {
     if (start < 0 || end >= numPages || start > end) {
@@ -44,7 +44,7 @@ export const split = async (
   return result;
 };
 
-export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBuffer> => {
+export const remove = async (pdf: ArrayBuffer | Uint8Array, pages: number[]): Promise<Uint8Array> => {
   if (!pages.length) {
     throw new Error('[@pdfme/manipulator] At least one page number is required for removal');
   }
@@ -63,9 +63,9 @@ export const remove = async (pdf: ArrayBuffer, pages: number[]): Promise<ArrayBu
 };
 
 export const insert = async (
-  basePdf: ArrayBuffer,
-  inserts: { pdf: ArrayBuffer; position: number }[],
-): Promise<ArrayBuffer> => {
+  basePdf: ArrayBuffer | Uint8Array,
+  inserts: { pdf: ArrayBuffer | Uint8Array; position: number }[],
+): Promise<Uint8Array> => {
   inserts.sort((a, b) => a.position - b.position);
 
   let currentPdf = basePdf;
@@ -109,14 +109,15 @@ export const insert = async (
     offset += insertDoc.getPageCount();
   }
 
-  return currentPdf;
+  const pdfDoc = await PDFDocument.load(currentPdf);
+  return pdfDoc.save();
 };
 
 export const rotate = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   degrees: 0 | 90 | 180 | 270 | 360,
   pageNumbers?: number[],
-): Promise<ArrayBuffer> => {
+): Promise<Uint8Array> => {
   if (!Number.isInteger(degrees) || degrees % 90 !== 0) {
     throw new Error('[@pdfme/manipulator] Rotation degrees must be a multiple of 90');
   }
@@ -156,9 +157,9 @@ export const rotate = async (
 };
 
 export const move = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   operation: { from: number; to: number },
-): Promise<ArrayBuffer> => {
+): Promise<Uint8Array> => {
   const { from, to } = operation;
   const pdfDoc = await PDFDocument.load(pdf);
   const currentPageCount = pdfDoc.getPageCount();
@@ -170,7 +171,7 @@ export const move = async (
   }
 
   if (from === to) {
-    return pdf;
+    return pdfDoc.save();
   }
 
   const page = pdfDoc.getPage(from);
@@ -183,15 +184,15 @@ export const move = async (
 };
 
 export const organize = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   actions: Array<
     | { type: 'remove'; data: { position: number } }
-    | { type: 'insert'; data: { pdf: ArrayBuffer; position: number } }
-    | { type: 'replace'; data: { pdf: ArrayBuffer; position: number } }
+    | { type: 'insert'; data: { pdf: ArrayBuffer | Uint8Array; position: number } }
+    | { type: 'replace'; data: { pdf: ArrayBuffer | Uint8Array; position: number } }
     | { type: 'rotate'; data: { position: number; degrees: 0 | 90 | 180 | 270 | 360 } }
     | { type: 'move'; data: { from: number; to: number } }
   >,
-): Promise<ArrayBuffer> => {
+): Promise<Uint8Array> => {
   if (!actions.length) {
     throw new Error('[@pdfme/manipulator] At least one action is required');
   }
@@ -199,7 +200,7 @@ export const organize = async (
   let currentPdf = await PDFDocument.load(pdf);
 
   for (const action of actions) {
-    const currentBuffer = (await currentPdf.save()).buffer;
+    const currentBuffer = await currentPdf.save();
 
     switch (action.type) {
       case 'remove':
