@@ -427,7 +427,7 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="moveable-control-box   pdfme-moveable rCS1bhdyl6"
+              class="moveable-control-box    pdfme-moveable rCS1bhdyl6"
               data-able-clickable="true"
               data-able-draggable="true"
               data-able-origin="true"
@@ -436,47 +436,34 @@ exports[`Designer snapshot 1`] = `
               data-able-rotatable="true"
               data-able-snappable="true"
               data-styled-id="rCS1bhdyl6"
-              style="position: absolute; display: none; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px; --moveable-color: #1677ff; visibility: visible;"
+              style="position: absolute; display: none; visibility: visible; transform: translate3d(0px, 0px, 0); --zoom: 1; --zoompx: 1px; --moveable-color: #1677ff;"
             >
               <div
-                class="moveable-rotation"
-                style="transform: translate(-50%) translate(0px, 0px) rotate(0rad);"
-              >
-                <div
-                  class="moveable-line moveable-rotation-line"
-                  style="transform: scaleX(1); --moveable-color: #1677ff;"
-                />
-                <div
-                  class="moveable-control moveable-rotation-control"
-                  style="transform: translate(0.5px) scale(1);"
-                />
-              </div>
-              <div
-                class="moveable-control moveable-direction moveable-n "
+                class="moveable-control moveable-direction moveable-n moveable-resizable"
                 data-direction="n"
                 data-rotation="0"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-w "
+                class="moveable-control moveable-direction moveable-w moveable-resizable"
                 data-direction="w"
                 data-rotation="90"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-s "
+                class="moveable-control moveable-direction moveable-s moveable-resizable"
                 data-direction="s"
                 data-rotation="0"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-e "
+                class="moveable-control moveable-direction moveable-e moveable-resizable"
                 data-direction="e"
                 data-rotation="90"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
               <div
-                class="moveable-control moveable-direction moveable-nw "
+                class="moveable-control moveable-direction moveable-nw moveable-resizable"
                 data-direction="nw"
                 data-rotation="135"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
@@ -499,6 +486,19 @@ exports[`Designer snapshot 1`] = `
                 data-rotation="135"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
               />
+              <div
+                class="moveable-rotation"
+                style="transform: translate(-50%) translate(0px, 0px) rotate(0rad);"
+              >
+                <div
+                  class="moveable-line moveable-rotation-line"
+                  style="transform: scaleX(1); --moveable-color: #1677ff;"
+                />
+                <div
+                  class="moveable-control moveable-rotation-control"
+                  style="transform: translate(0.5px) scale(1);"
+                />
+              </div>
               <div
                 class="moveable-control moveable-origin"
                 style="transform: translateZ(0px) translate(0px, 0px) rotate(0rad) scale(1);"
