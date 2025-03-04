@@ -46,7 +46,7 @@
     "lucide-react": "^0.460.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "react-moveable": "^0.30.3",
+    "react-moveable": "^0.56.0",
     "react-selecto": "^1.12.0"
   },
   "devDependencies": {
