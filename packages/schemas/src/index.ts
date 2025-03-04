@@ -34,3 +34,6 @@ export {
   radioGroup,
   checkbox,
 };
+
+// Export utility functions
+export { getDynamicHeightsForTable } from './tables/dynamicTemplate.js';

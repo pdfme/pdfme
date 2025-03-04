@@ -26,7 +26,7 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
 }
 
 export const pdf2img = async (
-  pdf: ArrayBuffer,
+  pdf: ArrayBuffer | Uint8Array,
   options: Pdf2ImgOptions = {},
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
@@ -42,7 +42,7 @@ export const pdf2img = async (
       dataURLToArrayBuffer(canvas.toDataURL(`image/${imageType}`)),
   });
 
-export const pdf2size = async (pdf: ArrayBuffer, options: Pdf2SizeOptions = {}) =>
+export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
   });

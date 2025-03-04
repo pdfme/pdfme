@@ -3,7 +3,7 @@ import { generate } from '@pdfme/generator';
 import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
 
 describe('pdf2img tests', () => {
-  let pdfArrayBuffer: ArrayBuffer;
+  let pdfArrayBuffer: ArrayBuffer | Uint8Array;
 
   beforeAll(async () => {
     const pdf = await generate({
@@ -25,7 +25,7 @@ describe('pdf2img tests', () => {
       },
       inputs: [{}, {}, {}, {}],
     });
-    pdfArrayBuffer = pdf.buffer;
+    pdfArrayBuffer = new Uint8Array(pdf.buffer);
   });
 
   test('Node.js version - returns array of images', async () => {
@@ -88,7 +88,7 @@ describe('img2pdf tests', () => {
       },
       inputs: [{}],
     });
-    const images = await nodePdf2Img(pdf.buffer, { scale: 1 });
+    const images = await nodePdf2Img(new Uint8Array(pdf.buffer), { scale: 1 });
     jpegImage = images[0];
     pngImage = images[0]; // Using same image for both tests
   });
@@ -121,7 +121,7 @@ describe('img2pdf tests', () => {
 });
 
 describe('pdf2size tests', () => {
-  let pdfArrayBuffer: ArrayBuffer;
+  let pdfArrayBuffer: ArrayBuffer | Uint8Array;
 
   beforeAll(async () => {
     const pdf = await generate({
@@ -143,7 +143,7 @@ describe('pdf2size tests', () => {
       },
       inputs: [{}, {}, {}, {}],
     });
-    pdfArrayBuffer = pdf.buffer;
+    pdfArrayBuffer = new Uint8Array(pdf.buffer);
   });
 
   test('returns array of page sizes', async () => {

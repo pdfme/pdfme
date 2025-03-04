@@ -169,7 +169,7 @@ export const createBarCode = async (arg: {
     // @ts-ignore
     bwipjs.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
-    res = b64toUint8Array(dataUrl).buffer as Buffer;
+    res = Buffer.from(b64toUint8Array(dataUrl).buffer);
   } else {
     res = await bwipjs.toBuffer(bwipjsArg);
   }

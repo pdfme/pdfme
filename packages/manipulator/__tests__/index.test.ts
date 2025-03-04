@@ -5,7 +5,7 @@ import { pdf2img } from '@pdfme/converter';
 import { merge, split, remove, insert, rotate, move, organize } from '../src/index.js';
 import 'jest-image-snapshot';
 
-const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => {
+const createTestPDF = async (pageCount: number): Promise<Uint8Array> => {
   const pdfDoc = await PDFDocument.create();
   for (let i = 0; i < pageCount; i++) {
     const page = pdfDoc.addPage([500, 500]);
@@ -18,12 +18,12 @@ const createTestPDF = async (pageCount: number): Promise<ArrayBuffer> => {
   return pdfDoc.save();
 };
 
-const pdfToImages = async (pdf: ArrayBuffer): Promise<Buffer[]> => {
+const pdfToImages = async (pdf: ArrayBuffer | Uint8Array): Promise<Buffer[]> => {
   const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 
-const getPDFPageCount = async (pdf: ArrayBuffer): Promise<number> => {
+const getPDFPageCount = async (pdf: ArrayBuffer | Uint8Array): Promise<number> => {
   const pdfDoc = await PDFDocument.load(pdf);
   return pdfDoc.getPageCount();
 };
@@ -312,8 +312,8 @@ describe('organize', () => {
 describe('PDF manipulator E2E Tests with real PDF files', () => {
   const assetPath = (fileName: string) => path.join(__dirname, 'assets/pdfs', fileName);
 
-  function toArrayBuffer(buf: Buffer): ArrayBuffer {
-    return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  function toArrayBuffer(buf: Buffer): Uint8Array {
+    return new Uint8Array(buf);
   }
 
   const fiveP = toArrayBuffer(fs.readFileSync(assetPath('5p.pdf')));
