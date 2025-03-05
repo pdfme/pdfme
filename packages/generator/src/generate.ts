@@ -47,14 +47,8 @@ const generate = async (props: GenerateProps) => {
       _cache,
       getDynamicHeights: (value, args) => {
         switch (args.schema.type) {
-          case 'table': {
-            // Type assertion to ensure the function call is safe
-            const safeGetDynamicHeights = getDynamicHeightsForTable as (
-              value: unknown, 
-              args: unknown
-            ) => Promise<number[]>;
-            return safeGetDynamicHeights(value, args);
-          }
+          case 'table':
+            return getDynamicHeightsForTable(value, args);
           default:
             return Promise.resolve([args.schema.height]);
         }
