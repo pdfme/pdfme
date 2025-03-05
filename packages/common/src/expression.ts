@@ -353,6 +353,8 @@ const evaluatePlaceholders = (arg: {
         }
       } else {
         try {
+          // Use a safer approach to parse the expression
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           const ast = acorn.parseExpressionAt(code, 0, { ecmaVersion: 'latest' }) as AcornNode;
           validateAST(ast);
           const evalFunc = (ctx: Record<string, unknown>) => evaluateAST(ast, ctx);
