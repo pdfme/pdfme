@@ -38,14 +38,9 @@ export const pdf2img = async (
       return canvas;
     },
     canvasToArrayBuffer: (canvas, imageType) => {
-      try {
-        // Using type assertion to handle the canvas method
-        const dataUrl = (canvas as HTMLCanvasElement).toDataURL(`image/${imageType}`);
-        return dataURLToArrayBuffer(dataUrl);
-      } catch (error) {
-        console.error('Error converting canvas to array buffer:', error);
-        return new ArrayBuffer(0);
-      }
+      // Using type assertion to handle the canvas method
+      const dataUrl = (canvas as HTMLCanvasElement).toDataURL(`image/${imageType}`);
+      return dataURLToArrayBuffer(dataUrl);
     },
   });
 
