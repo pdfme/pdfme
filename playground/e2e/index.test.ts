@@ -174,7 +174,7 @@ describe('Playground E2E Tests', () => {
   });
 
   // Skip the problematic test in CI environment
-  it.skip('should modify template, generate PDF and compare, then input form data', async () => {
+  it('should modify template, generate PDF and compare, then input form data', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
     const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
 
