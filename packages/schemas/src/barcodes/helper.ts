@@ -1,6 +1,18 @@
 import { b64toUint8Array } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
+
+// Extend the bwipjs type to include browser-specific methods
+declare module 'bwip-js' {
+  interface BwipJs {
+    toCanvas(canvas: HTMLCanvasElement, options: any): void;
+  }
+  
+  export default interface BwipJsModule {
+    toCanvas(canvas: HTMLCanvasElement, options: any): void;
+    toBuffer(options: any): Promise<Buffer>;
+  }
+}
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
 import { BarcodeTypes } from './types.js';
 
@@ -166,8 +178,8 @@ export const createBarCode = async (arg: {
 
   if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
-    // Using HTMLCanvasElement type for canvas to match bwipjs.toCanvas parameter
-    bwipjs.toCanvas(canvas as unknown as HTMLCanvasElement, bwipjsArg);
+    // Using any type for bwipjs to avoid type errors with toCanvas method
+    (bwipjs as any).toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = Buffer.from(b64toUint8Array(dataUrl).buffer);
   } else {
