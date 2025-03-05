@@ -47,8 +47,8 @@ const DetailView = (props: DetailViewProps) => {
   
   // Define a type-safe i18n function that accepts string keys
   const typedI18n = (key: string): string => {
-    // Use a type assertion that preserves the string type
-    return typeof i18n === 'function' ? i18n(key) : key;
+    // Use a type assertion to satisfy the union type constraint
+    return typeof i18n === 'function' ? i18n(key as any) : key;
   };
 
   const [widgets, setWidgets] = useState<{
