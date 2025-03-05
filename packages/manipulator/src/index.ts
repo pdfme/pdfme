@@ -228,7 +228,7 @@ export const organize = async (
         break;
 
       default:
-        throw new Error(`[@pdfme/manipulator] Unknown action type: ${(action as any).type}`);
+        throw new Error(`[@pdfme/manipulator] Unknown action type: ${(action as { type: string }).type}`);
     }
   }
 
