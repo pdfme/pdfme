@@ -19,7 +19,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
   const {
     template: { schemas, basePdf },
     pdfDoc,
-  } = arg as { template: { schemas: Schema[][]; basePdf: any }; pdfDoc: PDFDocument };
+  } = arg as { template: { schemas: Schema[][]; basePdf: unknown }; pdfDoc: PDFDocument };
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
@@ -58,8 +58,8 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
   return { basePages, embedPdfBoxes };
 };
 
-export const validateRequiredFields = (template: Template, inputs: Record<string, any>[]) => {
-  ((template as any).schemas as Schema[][]).forEach((schemaPage: Schema[]) =>
+export const validateRequiredFields = (template: Template, inputs: Record<string, unknown>[]) => {
+  ((template as unknown).schemas as Schema[][]).forEach((schemaPage: Schema[]) =>
     schemaPage.forEach((schema: Schema) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[schema.name])) {
         throw new Error(
@@ -72,11 +72,11 @@ export const validateRequiredFields = (template: Template, inputs: Record<string
 
 export const preprocessing = async (arg: { template: Template; userPlugins: Plugins }) => {
   const { template, userPlugins } = arg;
-  const { schemas, basePdf } = template as { schemas: Schema[][]; basePdf: any };
+  const { schemas, basePdf } = template as { schemas: Schema[][]; basePdf: unknown };
   const staticSchema: Schema[] = isBlankPdf(basePdf) ? (basePdf.staticSchema ?? []) : [];
 
   const pdfDoc = await PDFDocument.create();
-  // @ts-ignore
+  // @ts-expect-error registerFontkit method is not in type definitions but exists at runtime
   pdfDoc.registerFontkit(fontkit);
 
   const pluginValues = (
