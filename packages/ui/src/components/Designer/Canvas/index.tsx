@@ -10,6 +10,7 @@ import React, {
   useCallback,
 } from 'react';
 import { theme, Button } from 'antd';
+import MoveableComponent, { OnDrag, OnRotate, OnRotateEnd, OnClick, OnResize } from 'react-moveable';
 import {
   ZOOM,
   SchemaForUI,
@@ -32,60 +33,6 @@ import Guides from './Guides.js';
 import Mask from './Mask.js';
 import Padding from './Padding.js';
 import StaticSchema from '../../StaticSchema.js';
-
-// Define the interfaces locally since they're not exported properly
-interface OnDrag {
-  target: HTMLElement | SVGElement;
-  left: number;
-  top: number;
-  // Add additional properties that might be used in the original library
-  beforeDelta: any;
-  beforeDist: any;
-  beforeTranslate: any;
-  delta: any;
-  dist: any;
-  transform: any;
-  translate: any;
-}
-
-interface OnResize {
-  target: HTMLElement | SVGElement;
-  width: number;
-  height: number;
-  direction: string;
-  // Add additional properties that might be used in the original library
-  offsetWidth: number;
-  offsetHeight: number;
-  dist: any;
-  delta: any;
-  transform: any;
-  translate: any;
-}
-
-interface OnRotate {
-  target: HTMLElement | SVGElement;
-  rotate: number;
-  // Add additional properties that might be used in the original library
-  beforeDist: any;
-  beforeDelta: any;
-  beforeRotate: any;
-  dist: any;
-  delta: any;
-  transform: any;
-}
-
-interface OnClick {
-  inputEvent: MouseEvent;
-  // Add additional properties that might be used in the original library
-  inputTarget: any;
-  isTarget: boolean;
-  containsTarget: boolean;
-  isDouble: boolean;
-  datas: any;
-  targets: any[];
-  clientX: number;
-  clientY: number;
-}
 
 const mm2px = (mm: number) => mm * 3.7795275591;
 
@@ -175,7 +122,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const pluginsRegistry = useContext(PluginsRegistry);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
-  const moveable = useRef<any>(null);
+  const moveable = useRef<MoveableComponent>(null);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -408,7 +355,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
           const { inputEvent } = e;
-          const isMoveableElement = moveable.current?.isMoveableElement(inputEvent.target);
+          const isMoveableElement = moveable.current?.isMoveableElement(inputEvent.target as Element);
           if ((inputEvent.type === 'touchstart' && e.isTrusted) || isMoveableElement) {
             e.stop();
           }

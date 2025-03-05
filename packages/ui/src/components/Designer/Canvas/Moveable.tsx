@@ -1,64 +1,6 @@
 import React, { useEffect, forwardRef, Ref } from 'react';
-import MoveableComponent from 'react-moveable';
+import MoveableComponent, { OnDrag, OnRotate, OnRotateEnd, OnClick, OnResize } from 'react-moveable';
 import { theme } from 'antd';
-
-// Define the types locally since they're not exported properly
-interface OnDrag {
-  target: HTMLElement | SVGElement;
-  left: number;
-  top: number;
-  // Add additional properties that might be used in the original library
-  beforeDelta: [number, number];
-  beforeDist: [number, number];
-  beforeTranslate: [number, number];
-  delta: [number, number];
-  dist: [number, number];
-  transform: string;
-  translate: [number, number];
-}
-
-interface OnResize {
-  target: HTMLElement | SVGElement;
-  width: number;
-  height: number;
-  direction: string;
-  // Add additional properties that might be used in the original library
-  offsetWidth: number;
-  offsetHeight: number;
-  dist: any;
-  delta: any;
-  transform: any;
-  translate: any;
-}
-
-interface OnRotate {
-  target: HTMLElement | SVGElement;
-  rotate: number;
-  // Add additional properties that might be used in the original library
-  beforeDist: any;
-  beforeDelta: any;
-  beforeRotate: any;
-  dist: any;
-  delta: any;
-  transform: any;
-}
-
-interface OnRotateEnd {
-  target: HTMLElement | SVGElement;
-}
-
-interface OnClick {
-  inputEvent: MouseEvent;
-  // Add additional properties that might be used in the original library
-  inputTarget: any;
-  isTarget: boolean;
-  containsTarget: boolean;
-  isDouble: boolean;
-  datas: any;
-  targets: any[];
-  clientX: number;
-  clientY: number;
-}
 
 type Props = {
   target: HTMLElement[];
@@ -99,13 +41,10 @@ const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   }, [props.target, token.colorPrimary]);
 
   return (
-    // @ts-expect-error Third-party library type definitions are incomplete
     <MoveableComponent
-      style={{ zIndex: 1 }}
       className={className}
       rootContainer={document ? document.body : undefined}
       snappable
-      snapCenter
       draggable
       rotatable={props.rotatable}
       resizable
