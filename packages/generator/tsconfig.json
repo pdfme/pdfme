@@ -2,6 +2,7 @@
   "extends": "./tsconfig.esm",
   "compilerOptions": {
     "outDir": "./dist",
+    "baseUrl": ".",
     "paths": {
       "@pdfme/common": [
         "packages/common/dist/esm/src"

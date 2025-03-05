@@ -1,4 +1,4 @@
-import { Dict } from '@pdfme/common';
+// No imports needed from @pdfme/common
 import {
   TextAlignCenterIcon,
   TextAlignLeftIcon,
@@ -40,9 +40,9 @@ interface GroupButtonString {
   value: string;
 }
 
-export type GroupButton = GroupButtonBoolean | GroupButtonString;
+type GroupButton = GroupButtonBoolean | GroupButtonString;
 
-export function getExtraFormatterSchema(i18n: (key: keyof Dict | string) => string): {
+export function getExtraFormatterSchema(i18n: (key: string) => string): {
   title: string;
   widget: string;
   buttons: GroupButton[];

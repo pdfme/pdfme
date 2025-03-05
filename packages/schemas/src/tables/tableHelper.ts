@@ -7,6 +7,7 @@ import {
   getFallbackFontName,
   cloneDeep,
 } from '@pdfme/common';
+import type { Font as FontKitFont } from 'fontkit';
 import type {
   TableSchema,
   CellStyle,
@@ -24,7 +25,7 @@ interface CreateTableArgs {
   schema: Schema;
   basePdf: BasePdf;
   options: CommonOptions;
-  _cache: Map<any, any>;
+  _cache: Map<string, unknown>;
 }
 
 interface UserOptions {
@@ -278,5 +279,5 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
 
   const content = parseContent4Table(input, fallbackFontName);
 
-  return Table.create({ input, content, font, _cache });
+  return Table.create({ input, content, font, _cache: _cache as Map<string, FontKitFont> });
 }

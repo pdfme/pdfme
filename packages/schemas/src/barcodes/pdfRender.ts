@@ -13,11 +13,13 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   if (!validateBarcodeInput(schema.type, value)) return;
 
   const inputBarcodeCacheKey = getBarcodeCacheKey(schema, value);
-  let image = _cache.get(inputBarcodeCacheKey);
+  let image = _cache.get(inputBarcodeCacheKey) as PDFImage | undefined;
   if (!image) {
-    const imageBuf = await createBarCode(
-      Object.assign(schema, { type: schema.type, input: value }),
-    );
+    const imageBuf = await createBarCode({
+      ...schema,
+      type: schema.type,
+      input: value,
+    });
     image = await pdfDoc.embedPng(imageBuf);
     _cache.set(inputBarcodeCacheKey, image);
   }

@@ -69,7 +69,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return text;
   };
   const font = options?.font || getDefaultFont();
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache as Map<string, import('fontkit').Font>);
   const textBlock = buildStyledTextContainer(
     arg,
     fontKitFont,
@@ -96,8 +96,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   textBlock.tabIndex = tabIndex || 0;
   textBlock.innerText = mode === 'designer' ? value : processedText;
   textBlock.addEventListener('blur', (e: Event) => {
-    onChange && onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
-    stopEditing && stopEditing();
+    if (onChange) onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
+    if (stopEditing) stopEditing();
   });
 
   if (schema.dynamicFontSize) {
@@ -105,7 +105,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
 
     textBlock.addEventListener('keyup', () => {
       setTimeout(() => {
-        void (async () => {
+        // Use a regular function instead of an async one since we don't need await
+        (() => {
           if (!textBlock.textContent) return;
           dynamicFontSize = calculateDynamicFontSize({
             textSchema: schema,
@@ -159,8 +160,7 @@ export const buildStyledTextContainer = (
   fontKitFont: FontKitFont,
   value: string,
 ) => {
-  const { schema, rootElement, mode, options, _cache } = arg;
-  const font = options?.font || getDefaultFont();
+  const { schema, rootElement, mode } = arg;
 
   let dynamicFontSize: undefined | number = undefined;
 
@@ -278,7 +278,7 @@ export const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefine
   return 'flex-start';
 };
 
-export const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
+const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
   if (!value || !schema.backgroundColor) return 'transparent';
   return schema.backgroundColor;
 };

@@ -37,7 +37,7 @@ type ReRenderCheckProps = {
   options: UIOptions;
 };
 
-export const useRerenderDependencies = (arg: ReRenderCheckProps) => {
+const useRerenderDependencies = (arg: ReRenderCheckProps) => {
   const { plugin, value, mode, scale, schema, options } = arg;
   const _options = cloneDeep(options);
   if (_options.font) {
