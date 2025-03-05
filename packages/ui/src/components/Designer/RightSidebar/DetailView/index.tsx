@@ -76,8 +76,11 @@ const DetailView = (props: DetailViewProps) => {
   }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
 
   useEffect(() => {
-    const values: any = { ...activeSchema };
-    values.editable = !values.readOnly;
+    // Create a type-safe copy of the schema with editable property
+    const values: Record<string, unknown> = { ...activeSchema };
+    // Safely access and set properties
+    const readOnly = typeof values.readOnly === 'boolean' ? values.readOnly : false;
+    values.editable = !readOnly;
     form.setValues(values);
   }, [activeSchema, form]);
 
@@ -96,14 +99,26 @@ const DetailView = (props: DetailViewProps) => {
     };
   }, [schemasList, activeSchema]);
 
-  const uniqueSchemaName = useRef((value: string): boolean => true);
+  // Reference to a function that validates schema name uniqueness
+  const uniqueSchemaName = useRef(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_unused: string): boolean => true
+  );
 
-  const validateUniqueSchemaName = (_: any, value: string): boolean =>
-    uniqueSchemaName.current(value);
+  // Use proper type for validator function parameter
+  const validateUniqueSchemaName = (
+    _: unknown, 
+    value: string
+  ): boolean => uniqueSchemaName.current(value);
 
-  const handleWatch = debounce((formSchema: any) => {
-    const formAndSchemaValuesDiffer = (formValue: any, schemaValue: any): boolean => {
-      if (typeof formValue === 'object') {
+  // Use explicit type for debounce function that matches the expected signature
+  const handleWatch = debounce(function(...args: unknown[]) {
+    const formSchema = args[0] as Record<string, unknown>;
+    const formAndSchemaValuesDiffer = (
+      formValue: unknown, 
+      schemaValue: unknown
+    ): boolean => {
+      if (typeof formValue === 'object' && formValue !== null) {
         return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
       }
       return formValue !== schemaValue;
@@ -114,7 +129,7 @@ const DetailView = (props: DetailViewProps) => {
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
-      if (formAndSchemaValuesDiffer(value, (activeSchema as any)[key])) {
+      if (formAndSchemaValuesDiffer(value, (activeSchema as Record<string, unknown>)[key])) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) {
           value = undefined;
@@ -154,21 +169,47 @@ const DetailView = (props: DetailViewProps) => {
     }
   }, 100);
 
+  // Find the active plugin with proper type safety
   const activePlugin = Object.values(pluginsRegistry).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === activeSchema.type,
-  )!;
+    (plugin) => {
+      if (!plugin || typeof plugin !== 'object') return false;
+      if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
+      if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object') return false;
+      
+      const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
+      return 'type' in defaultSchema && 
+             typeof defaultSchema.type === 'string' && 
+             defaultSchema.type === activeSchema.type;
+    }
+  );
 
-  const activePropPanelSchema = activePlugin?.propPanel.schema;
+  // Safely access the propPanel schema
+  const activePropPanelSchema = activePlugin?.propPanel?.schema;
   if (!activePropPanelSchema) {
     console.error(`[@pdfme/ui] No propPanel.schema for ${activeSchema.type}.
 Check this document: https://pdfme.com/docs/custom-schemas`);
   }
 
-  const typeOptions = Object.entries(pluginsRegistry).map(([label, value]) => ({
-    label,
-    value: value?.propPanel.defaultSchema.type,
-  }));
-  const defaultSchema = activePlugin.propPanel.defaultSchema;
+  // Create type-safe options for the type dropdown
+  const typeOptions = Object.entries(pluginsRegistry).map(([label, value]) => {
+    // Default value if plugin is invalid
+    const defaultValue = { label, value: undefined };
+    
+    // Skip invalid plugins
+    if (!value || typeof value !== 'object') return defaultValue;
+    if (!value.propPanel || typeof value.propPanel !== 'object') return defaultValue;
+    if (!value.propPanel.defaultSchema || typeof value.propPanel.defaultSchema !== 'object') return defaultValue;
+    
+    // Safely extract the type
+    const defaultSchema = value.propPanel.defaultSchema as Record<string, unknown>;
+    const schemaType = 'type' in defaultSchema && typeof defaultSchema.type === 'string' 
+      ? defaultSchema.type 
+      : undefined;
+    
+    return { label, value: schemaType };
+  });
+  // Safely access the default schema with proper null checking
+  const defaultSchema = activePlugin?.propPanel?.defaultSchema || {};
 
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
@@ -199,7 +240,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         title: i18n('editable'),
         type: 'boolean',
         span: 8,
-        hidden: defaultSchema?.readOnly !== undefined,
+        hidden: typeof (defaultSchema as Record<string, unknown>).readOnly !== 'undefined',
       },
       required: {
         title: i18n('required'),
@@ -237,7 +278,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         title: i18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
-        disabled: defaultSchema?.rotate === undefined,
+        disabled: typeof (defaultSchema as Record<string, unknown>).rotate === 'undefined',
         max: 360,
         props: { min: 0 },
         span: 6,
@@ -246,7 +287,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         title: i18n('opacity'),
         type: 'number',
         widget: 'inputNumber',
-        disabled: defaultSchema?.opacity === undefined,
+        disabled: typeof (defaultSchema as Record<string, unknown>).opacity === 'undefined',
         props: { step: 0.1, min: 0, max: 1 },
         span: 6,
       },
@@ -254,7 +295,9 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   };
 
   if (typeof activePropPanelSchema === 'function') {
-    const { schemasList: _, ...propPanelProps } = props;
+    // Create a new object without the schemasList property
+    const { size, schemas, pageSize, changeSchemas, activeElements, deselectSchema, activeSchema } = props;
+    const propPanelProps = { size, schemas, pageSize, changeSchemas, activeElements, deselectSchema, activeSchema };
 
     const apps =
       activePropPanelSchema({

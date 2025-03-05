@@ -49,7 +49,7 @@ const _Selecto = (props: Props) => {
       container={props.container}
       continueSelect={props.continueSelect}
       onDragStart={props.onDragStart}
-      onSelect={(e: any) => props.onSelect(e as OnSelect)}
+      onSelect={props.onSelect}
     />
   );
 };

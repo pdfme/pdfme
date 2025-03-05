@@ -59,12 +59,31 @@ const SelectableSortableContainer = (
   };
 
   const getPluginIcon = (inSchema: string | SchemaForUI): ReactNode => {
+    // Get schema by ID or use directly
     const thisSchema =
       typeof inSchema === 'string' ? schemas.find((schema) => schema.id === inSchema) : inSchema;
-
-    const [pluginLabel, activePlugin] = Object.entries(pluginsRegistry).find(
-      ([label, plugin]) => plugin?.propPanel.defaultSchema.type === thisSchema?.type,
-    )!;
+    
+    if (!thisSchema) return <></>;
+    
+    // Safely extract schema type
+    const schemaType = typeof thisSchema.type === 'string' ? thisSchema.type : '';
+    
+    // Find matching plugin with type-safe approach
+    const pluginEntry = Object.entries(pluginsRegistry).find(
+      ([, plugin]) => {
+        if (!plugin || typeof plugin !== 'object') return false;
+        if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
+        if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object') return false;
+        
+        // Use Record<string, unknown> to safely access properties
+        const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
+        return 'type' in defaultSchema && 
+               typeof defaultSchema.type === 'string' && 
+               defaultSchema.type === schemaType;
+      }
+    );
+    
+    const [pluginLabel, activePlugin] = pluginEntry || ['', undefined];
 
     if (!activePlugin) {
       return <></>;

@@ -7,7 +7,7 @@ import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts.js';
-import { getMaxZoom } from '../helper.js';
+import { useMaxZoom } from '../helper.js';
 
 const { Text } = Typography;
 
@@ -20,7 +20,7 @@ type ZoomProps = {
 
 const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   const zoomStep = 0.25;
-  const maxZoom = getMaxZoom();
+  const maxZoom = useMaxZoom();
   const minZoom = 0.25;
 
   const nextZoomOut = zoomLevel - zoomStep;

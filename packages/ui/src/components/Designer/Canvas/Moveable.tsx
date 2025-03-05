@@ -8,13 +8,13 @@ interface OnDrag {
   left: number;
   top: number;
   // Add additional properties that might be used in the original library
-  beforeDelta: any;
-  beforeDist: any;
-  beforeTranslate: any;
-  delta: any;
-  dist: any;
-  transform: any;
-  translate: any;
+  beforeDelta: [number, number];
+  beforeDist: [number, number];
+  beforeTranslate: [number, number];
+  delta: [number, number];
+  dist: [number, number];
+  transform: string;
+  translate: [number, number];
 }
 
 interface OnResize {
@@ -81,7 +81,7 @@ type Props = {
 
 const className = 'pdfme-moveable';
 
-const _Moveable = (props: Props, ref: Ref<any>) => {
+const _Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   const { token } = theme.useToken();
   useEffect(() => {
     const containerElement = document.querySelector(`.${className}`) as HTMLElement | null;
@@ -97,7 +97,7 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
   }, [props.target]);
 
   return (
-    // @ts-ignore
+    // @ts-expect-error Third-party library type definitions are incomplete
     <MoveableComponent
       style={{ zIndex: 1 }}
       className={className}
@@ -118,18 +118,18 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
       keepRatio={props.keepRatio}
       onRotate={props.onRotate}
       onRotateEnd={props.onRotateEnd}
-      onRotateGroup={({ events }: { events: any[] }) => {
+      onRotateGroup={({ events }: { events: OnRotate[] }) => {
         events.forEach(props.onRotate);
       }}
       onRotateGroupEnd={props.onRotateGroupEnd}
       onDrag={props.onDrag}
-      onDragGroup={({ events }: { events: any[] }) => {
+      onDragGroup={({ events }: { events: OnDrag[] }) => {
         events.forEach(props.onDrag);
       }}
       onDragEnd={props.onDragEnd}
       onDragGroupEnd={props.onDragGroupEnd}
       onResize={props.onResize}
-      onResizeGroup={({ events }: { events: any[] }) => {
+      onResizeGroup={({ events }: { events: OnResize[] }) => {
         events.forEach(props.onResize);
       }}
       onResizeEnd={props.onResizeEnd}
@@ -139,4 +139,4 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
   );
 };
 
-export default forwardRef<any, Props>(_Moveable);
+export default forwardRef<MoveableComponent, Props>(_Moveable);

@@ -24,7 +24,7 @@ import {
   template2SchemasList,
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
-  getMaxZoom,
+  useMaxZoom,
 } from '../../helper.js';
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks.js';
 import Root from '../Root.js';
@@ -64,7 +64,7 @@ const TemplateEditor = ({
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
-  const maxZoom = getMaxZoom();
+  const maxZoom = useMaxZoom();
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -227,12 +227,13 @@ const TemplateEditor = ({
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);
-    setTimeout(
-      () =>
-        canvasRef.current &&
-        ((canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale)),
-        0),
-    );
+    
+    // Use setTimeout to update scroll position after render
+    setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, newPageCursor, scale);
+      }
+    }, 0);
   };
 
   const handleRemovePage = () => {
@@ -262,6 +263,7 @@ const TemplateEditor = ({
   };
 
   if (error) {
+    // Pass the error directly to ErrorScreen
     return <ErrorScreen size={size} error={error} />;
   }
   const pageManipulation = isBlankPdf(template.basePdf)
@@ -309,6 +311,7 @@ const TemplateEditor = ({
             pageNum={schemasList.length}
             setPageCursor={(p) => {
               if (!canvasRef.current) return;
+              // Update scroll position and state
               canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
               setPageCursor(p);
               onEditEnd();
@@ -331,7 +334,9 @@ const TemplateEditor = ({
             onSortEnd={onSortEnd}
             onEdit={(id) => {
               const editingElem = document.getElementById(id);
-              editingElem && onEdit([editingElem]);
+              if (editingElem) {
+                onEdit([editingElem]);
+              }
             }}
             onEditEnd={onEditEnd}
             deselectSchema={onEditEnd}

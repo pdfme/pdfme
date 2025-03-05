@@ -17,7 +17,7 @@ import Paper from './Paper.js';
 import Renderer from './Renderer.js';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
 import { FontContext } from '../contexts.js';
-import { template2SchemasList, getPagesScrollTopByIndex, getMaxZoom } from '../helper.js';
+import { template2SchemasList, getPagesScrollTopByIndex, useMaxZoom } from '../helper.js';
 import { theme } from 'antd';
 
 const _cache = new Map();
@@ -34,7 +34,7 @@ const Preview = ({
   const { token } = theme.useToken();
 
   const font = useContext(FontContext);
-  const maxZoom = getMaxZoom();
+  const maxZoom = useMaxZoom();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
@@ -98,7 +98,7 @@ const Preview = ({
   const handleChangeInput = ({ name, value }: { name: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, name, value });
 
-  const handleOnChangeRenderer = (args: { key: string; value: any }[], schema: SchemaForUI) => {
+  const handleOnChangeRenderer = (args: { key: string; value: unknown }[], schema: SchemaForUI) => {
     let isNeedInit = false;
     args.forEach(({ key: _key, value }) => {
       if (_key === 'content') {
@@ -112,7 +112,7 @@ const Preview = ({
         const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI;
         if (!targetSchema) return;
 
-        // @ts-ignore
+        // @ts-expect-error Dynamic property assignment
         targetSchema[_key] = value as string;
       }
     });

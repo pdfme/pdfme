@@ -29,7 +29,7 @@ declare module 'react-selecto' {
   }
 
   // Define the component as a ForwardRefExoticComponent
-  const SelectoComponent: ForwardRefExoticComponent<SelectoProps & RefAttributes<any>>;
+  const SelectoComponent: ForwardRefExoticComponent<SelectoProps & RefAttributes<HTMLElement>>;
 
   export default SelectoComponent;
 }

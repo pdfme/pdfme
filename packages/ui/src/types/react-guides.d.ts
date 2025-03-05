@@ -1,5 +1,5 @@
 declare module '@scena/react-guides' {
-  import { Component, ForwardRefExoticComponent, RefAttributes } from 'react';
+  import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
   interface GuidesInterface {
     getGuides(): number[];

@@ -29,7 +29,7 @@ type RendererProps = Omit<
 };
 
 type ReRenderCheckProps = {
-  plugin: Plugin<any>;
+  plugin: Plugin<Schema>;
   value: string;
   mode: Mode;
   scale: number;
@@ -100,7 +100,7 @@ const Wrapper = ({
 );
 
 const Renderer = (props: RendererProps) => {
-  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
+  const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder } =
     props;
 
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -110,51 +110,73 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
+  // Safely extract schema type
+  const schemaType = typeof schema.type === 'string' ? schema.type : '';
+  
+  // Find plugin with matching schema type using a type-safe approach
   const plugin = Object.values(pluginsRegistry || {}).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === schema.type,
-  ) as Plugin<any> | undefined;
+    (plugin) => {
+      if (!plugin || typeof plugin !== 'object') return false;
+      if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
+      if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object') return false;
+      
+      // Use Record<string, unknown> to safely access properties
+      const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
+      return 'type' in defaultSchema && 
+             typeof defaultSchema.type === 'string' && 
+             defaultSchema.type === schemaType;
+    }
+  );
+
+  // Always call hooks at the top level
+  // Create a memoized render function to avoid dependency issues
+  const renderUI = useMemo(() => {
+    // Return the render function
+    return () => {
+      if (ref.current && schema.type && plugin && plugin.ui) {
+        ref.current.innerHTML = '';
+        void plugin.ui({
+          value,
+          schema,
+          basePdf,
+          rootElement: ref.current,
+          mode,
+          onChange,
+          stopEditing,
+          tabIndex,
+          placeholder,
+          options,
+          theme,
+          i18n,
+          _cache,
+        });
+      }
+    };
+  }, [
+    value, schema, basePdf, mode, onChange, 
+    stopEditing, tabIndex, placeholder, options, 
+    theme, i18n, _cache, plugin
+  ]);
+  
+  // Use effect with simpler dependencies
+  useEffect(() => {
+    // Call the memoized render function
+    renderUI();
+    
+    // Store ref.current in a variable to avoid React hooks exhaustive-deps warning
+    const currentRef = ref.current;
+    return () => {
+      if (currentRef) {
+        currentRef.innerHTML = '';
+      }
+    };
+  }, [renderUI]);
 
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
-  const reRenderDependencies = useRerenderDependencies({
-    plugin,
-    value,
-    mode,
-    scale,
-    schema,
-    options: options as UIOptions,
-  });
-
-  useEffect(() => {
-    if (ref.current && schema.type) {
-      ref.current.innerHTML = '';
-      const render = plugin.ui;
-
-      void render({
-        value,
-        schema,
-        basePdf,
-        rootElement: ref.current,
-        mode,
-        onChange,
-        stopEditing,
-        tabIndex,
-        placeholder,
-        options: options as UIOptions,
-        theme,
-        i18n,
-        _cache: _cache as Map<any, any>,
-      });
-    }
-    return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
-      }
-    };
-  }, reRenderDependencies);
 
   return (
     <Wrapper {...props}>

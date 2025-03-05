@@ -44,13 +44,13 @@ const _Guides = ({
       zoom={ZOOM}
       style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
-      ref={horizontalRef as any}
+      ref={horizontalRef}
     />
     <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"
-      ref={verticalRef as any}
+      ref={verticalRef}
     />
   </>
 );

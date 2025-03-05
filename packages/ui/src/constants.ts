@@ -1,4 +1,4 @@
-export const DEFAULT_LANG = 'en' as const;
+export const DEFAULT_LANG = 'en';
 
 export const DESTROYED_ERR_MSG = '[@pdfme/ui] this instance is already destroyed';
 

@@ -13,25 +13,32 @@ type Props = {
   options: UIOptions;
 };
 
-const isObject = (item: any): item is Record<string, any> =>
-  item && typeof item === 'object' && !Array.isArray(item);
+const isObject = (item: unknown): item is Record<string, unknown> =>
+  Boolean(item) && typeof item === 'object' && !Array.isArray(item);
 
-const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>(
+const deepMerge = <T extends Record<string, unknown>, U extends Record<string, unknown>>(
   target: T,
   source: U,
 ): T & U => {
   let output = { ...target } as T & U;
 
   if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach((key: keyof U) => {
-      if (isObject(source[key])) {
+    Object.keys(source).forEach((key) => {
+      const sourceValue = source[key];
+      if (isObject(sourceValue)) {
         if (!(key in target)) {
-          Object.assign(output, { [key]: source[key] });
+          Object.assign(output, { [key]: sourceValue });
         } else {
-          output[key as keyof T & U] = deepMerge(target[key as keyof T] as any, source[key] as any);
+          const targetValue = target[key];
+          if (isObject(targetValue)) {
+            // Using Record<string, unknown> for recursive type
+            (output as Record<string, unknown>)[key] = deepMerge(targetValue, sourceValue);
+          } else {
+            Object.assign(output, { [key]: sourceValue });
+          }
         }
       } else {
-        Object.assign(output, { [key]: source[key] });
+        Object.assign(output, { [key]: sourceValue });
       }
     });
   }
@@ -41,12 +48,12 @@ const deepMerge = <T extends Record<string, any>, U extends Record<string, any>>
 const AppContextProvider = ({ children, lang, font, plugins, options }: Props) => {
   let theme = defaultTheme;
   if (options.theme) {
-    theme = deepMerge(theme, options.theme);
+    theme = deepMerge(theme as unknown as Record<string, unknown>, options.theme as unknown as Record<string, unknown>) as typeof theme;
   }
 
   let dict = getDict(lang);
   if (options.labels) {
-    dict = deepMerge(dict, options.labels);
+    dict = deepMerge(dict as unknown as Record<string, unknown>, options.labels as unknown as Record<string, unknown>) as typeof dict;
   }
 
   return (

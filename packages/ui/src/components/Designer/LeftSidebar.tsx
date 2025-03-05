@@ -9,14 +9,14 @@ import { PluginsRegistry } from '../../contexts.js';
 import PluginIcon from './PluginIcon.js';
 
 const Draggable = (props: {
-  plugin: Plugin<any>;
+  plugin: Plugin<Schema>;
   scale: number;
   basePdf: BasePdf;
   children: React.ReactNode;
 }) => {
   const { scale, basePdf, plugin } = props;
   const { token } = theme.useToken();
-  const defaultSchema = plugin.propPanel.defaultSchema as Schema;
+  const defaultSchema = plugin.propPanel.defaultSchema;
   const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
   const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
   const style = { transform: CSS.Translate.toString(transform) };
