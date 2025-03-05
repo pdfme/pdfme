@@ -1,16 +1,5 @@
 import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react';
-import {
-  Dict,
-  Mode,
-  ZOOM,
-  UIRenderProps,
-  SchemaForUI,
-  BasePdf,
-  Schema,
-  Plugin,
-  UIOptions,
-  cloneDeep,
-} from '@pdfme/common';
+import { ZOOM, UIRenderProps, SchemaForUI, BasePdf, Schema } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants.js';
 import { PluginsRegistry, OptionsContext, I18nContext, CacheContext } from '../contexts.js';
@@ -26,34 +15,6 @@ type RendererProps = Omit<
   onChangeHoveringSchemaId?: (id: string | null) => void;
   scale: number;
   selectable?: boolean;
-};
-
-type ReRenderCheckProps = {
-  plugin: Plugin<Schema>;
-  value: string;
-  mode: Mode;
-  scale: number;
-  schema: SchemaForUI;
-  options: UIOptions;
-};
-
-const useRerenderDependencies = (arg: ReRenderCheckProps) => {
-  const { plugin, value, mode, scale, schema, options } = arg;
-  const _options = cloneDeep(options);
-  if (_options.font) {
-    Object.values(_options.font).forEach((fontObj) => {
-      (fontObj as { data: string }).data = '...';
-    });
-  }
-  const optionStr = JSON.stringify(_options);
-
-  return useMemo(() => {
-    if (plugin.uninterruptedEditMode && mode === 'designer') {
-      return [mode];
-    } else {
-      return [value, mode, scale, JSON.stringify(schema), optionStr];
-    }
-  }, [plugin.uninterruptedEditMode, value, mode, scale, schema, optionStr]);
 };
 
 const Wrapper = ({
@@ -105,26 +66,26 @@ const Renderer = (props: RendererProps) => {
 
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
-  const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
+  const i18n = useContext(I18nContext) as (key: string) => string;
   const { token: theme } = antdTheme.useToken();
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
   // Safely extract schema type
   const schemaType = typeof schema.type === 'string' ? schema.type : '';
-  
+
   // Find plugin with matching schema type using a type-safe approach
   const plugin = Object.values(pluginsRegistry || {}).find(
     (plugin) => {
       if (!plugin || typeof plugin !== 'object') return false;
       if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
       if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object') return false;
-      
+
       // Use Record<string, unknown> to safely access properties
       const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
-      return 'type' in defaultSchema && 
-             typeof defaultSchema.type === 'string' && 
-             defaultSchema.type === schemaType;
+      return 'type' in defaultSchema &&
+        typeof defaultSchema.type === 'string' &&
+        defaultSchema.type === schemaType;
     }
   );
 
@@ -153,16 +114,16 @@ const Renderer = (props: RendererProps) => {
       }
     };
   }, [
-    value, schema, basePdf, mode, onChange, 
-    stopEditing, tabIndex, placeholder, options, 
+    value, schema, basePdf, mode, onChange,
+    stopEditing, tabIndex, placeholder, options,
     theme, i18n, _cache, plugin
   ]);
-  
+
   // Use effect with simpler dependencies
   useEffect(() => {
     // Call the memoized render function
     renderUI();
-    
+
     // Store ref.current in a variable to avoid React hooks exhaustive-deps warning
     const currentRef = ref.current;
     return () => {
