@@ -168,10 +168,8 @@ export const b64toUint8Array = (base64: string) => {
 const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
-      .map((p) => p.map((v) => ('fontName' in v ? v.fontName : undefined) ?? ''))
-      .flat()
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
-      .filter(Boolean) as string[],
+      .flatMap((p) => p.map((v) => ('fontName' in v ? v.fontName : undefined) ?? ''))
+      .filter((name): name is string => Boolean(name)),
   );
 
 export const checkFont = (arg: { font: Font; template: Template }) => {
