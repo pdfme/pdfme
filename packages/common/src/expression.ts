@@ -259,7 +259,8 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
             throw new Error('Invalid object in member function call');
           }
         } else {
-          return callee(...args);
+          // Use a type assertion to tell TypeScript this is a safe function call
+          return (callee as (...args: unknown[]) => unknown)(...args);
         }
       } else {
         throw new Error('Attempted to call a non-function');
@@ -371,7 +372,7 @@ const evaluatePlaceholders = (arg: {
 
 export const replacePlaceholders = (arg: {
   content: string;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   schemas: SchemaPageArray;
 }): string => {
   const { content, variables, schemas } = arg;

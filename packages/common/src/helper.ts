@@ -168,7 +168,9 @@ export const b64toUint8Array = (base64: string) => {
 const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
-      .map((p) => p.map((v) => (v as any).fontName ?? ''))
+      .map((p) => p.map((v) => {
+        return 'fontName' in v ? v.fontName ?? '' : '';
+      }))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[],
   );

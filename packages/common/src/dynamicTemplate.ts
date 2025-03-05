@@ -4,11 +4,11 @@ import { cloneDeep, isBlankPdf } from './helper.js';
 interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
-  _cache: Map<any, any>;
+  _cache: Map<string, unknown>;
   options: CommonOptions;
   getDynamicHeights: (
     value: string,
-    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> },
+    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<string, unknown> },
   ) => Promise<number[]>;
 }
 
@@ -90,8 +90,8 @@ function createNode(arg: {
 function resortChildren(page: LayoutNode, orderMap: Map<string, number>): void {
   page.children = page.children
     .sort((a, b) => {
-      const orderA = orderMap.get(a.schema?.name!);
-      const orderB = orderMap.get(b.schema?.name!);
+      const orderA = orderMap.get(a.schema?.name ?? '');
+      const orderB = orderMap.get(b.schema?.name ?? '');
       if (orderA === undefined || orderB === undefined) {
         throw new Error('[@pdfme/common] order is not defined');
       }
@@ -263,7 +263,7 @@ export const getDynamicTemplate = async (
     return template;
   }
 
-  const basePdf = template.basePdf as BlankPdf;
+  const basePdf = template.basePdf;
   const pages: LayoutNode[] = [];
 
   for (const schemaPage of template.schemas) {
