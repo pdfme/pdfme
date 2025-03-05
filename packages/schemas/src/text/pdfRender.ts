@@ -33,11 +33,11 @@ import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../uti
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;
   font: Font;
-  _cache: Map<any, any>;
+  _cache: Map<string, unknown>;
 }) => {
   const { pdfDoc, font, _cache } = arg;
-  if (_cache.has(pdfDoc)) {
-    return _cache.get(pdfDoc) as { [key: string]: PDFFont };
+  if (_cache.has(String(pdfDoc))) {
+    return _cache.get(String(pdfDoc)) as { [key: string]: PDFFont };
   }
 
   const fontValues = await Promise.all(
@@ -57,7 +57,7 @@ const embedAndGetFontObj = async (arg: {
     {} as { [key: string]: PDFFont },
   );
 
-  _cache.set(pdfDoc, fontObj);
+  _cache.set(String(pdfDoc), fontObj);
   return fontObj;
 };
 
