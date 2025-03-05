@@ -14,8 +14,9 @@ export const pdf2img = async (
       try {
         // Using a more specific type for the canvas from the 'canvas' package
         const nodeCanvas = canvas as unknown as import('canvas').Canvas;
-        // Get buffer from the canvas with proper method signature
-        const buffer = nodeCanvas.toBuffer(`image/${imageType}`, undefined, undefined);
+        // Get buffer from the canvas - using the synchronous version without parameters
+        // This will use the default PNG format
+        const buffer = nodeCanvas.toBuffer();
         // Convert to ArrayBuffer
         return new Uint8Array(buffer).buffer;
       } catch (error) {
