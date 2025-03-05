@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { Plugin, PropPanelWidgetProps, SchemaForUI, UIRenderProps } from '@pdfme/common';
 import text from '../text/index.js';
 import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
@@ -112,14 +112,8 @@ const addOptions = (props: PropPanelWidgetProps) => {
 };
 
 const schema: Plugin<Select> = {
-  ui: async (arg) => {
-    const { schema, value, onChange, rootElement, mode } = arg as { 
-      schema: SchemaForUI & Select; 
-      value: string; 
-      onChange?: (change: { key: string; value: string }) => void; 
-      rootElement: HTMLElement; 
-      mode: string 
-    };
+  ui: async (arg: UIRenderProps<Select>) => {
+    const { schema, value, onChange, rootElement, mode } = arg;
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 
     if (mode !== 'viewer' && !(mode === 'form' && schema.readOnly)) {
@@ -182,7 +176,7 @@ const schema: Plugin<Select> = {
 
       // Safely call the parent schema function with proper type checking
       const parentSchema = parentPropPanel.schema(propPanelProps);
-      
+
       // Create a type-safe return object
       return {
         ...parentSchema,
@@ -200,10 +194,8 @@ const schema: Plugin<Select> = {
     // Create a type-safe defaultSchema by first creating a safe copy of the text.propPanel.defaultSchema
     get defaultSchema() {
       // Create a safe copy of the text.propPanel.defaultSchema
-      const baseSchema = text.propPanel.defaultSchema ? 
-        { ...text.propPanel.defaultSchema as Record<string, unknown> } : 
-        {};
-      
+      const baseSchema = text.propPanel.defaultSchema as TextSchema;
+
       // Add our properties
       return {
         ...baseSchema,

@@ -144,15 +144,16 @@ export interface PropPanel<T extends Schema> {
  * @property {string} [icon] Icon SVG for the plugin.
  * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
-export type Plugin<T extends Schema & { [key: string]: unknown }> = {
-  pdf: (arg: PDFRenderProps<any>) => Promise<void> | void;
-  ui: (arg: UIRenderProps<any>) => Promise<void> | void;
-  propPanel: PropPanel<any>;
+export type Plugin<T extends Schema = Schema & { [key: string]: unknown }> = {
+  pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
+  ui: (arg: UIRenderProps<T>) => Promise<void> | void;
+  propPanel: PropPanel<T>;
   icon?: string;
   uninterruptedEditMode?: boolean;
 };
 
-export type Plugins = { [key: string]: Plugin<any> | undefined };
+
+export type Plugins = { [key: string]: Plugin | undefined };
 
 export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;

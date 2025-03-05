@@ -1,4 +1,4 @@
-import { Plugin, Schema, mm2pt } from '@pdfme/common';
+import { Plugin, Schema, mm2pt, UIRenderProps, PDFRenderProps } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../utils.js';
 import { toRadians } from '@pdfme/pdf-lib';
@@ -12,7 +12,7 @@ interface ShapeSchema extends Schema {
 }
 
 const shape: Plugin<ShapeSchema> = {
-  ui: (arg) => {
+  ui: (arg: UIRenderProps<ShapeSchema>) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');
     div.style.width = '100%';
@@ -28,7 +28,7 @@ const shape: Plugin<ShapeSchema> = {
 
     rootElement.appendChild(div);
   },
-  pdf: (arg) => {
+  pdf: (arg: PDFRenderProps<ShapeSchema>) => {
     const { schema, page, options } = arg;
     if (!schema.color && !schema.borderColor) return;
     const { colorType } = options;
@@ -119,7 +119,7 @@ const shape: Plugin<ShapeSchema> = {
 const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   ...shape.propPanel,
   defaultSchema: {
-    ...shape.propPanel.defaultSchema,
+    ...shape.propPanel.defaultSchema as ShapeSchema,
     type,
   },
 });
