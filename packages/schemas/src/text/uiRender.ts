@@ -278,7 +278,7 @@ export const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefine
   return 'flex-start';
 };
 
-export const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
+const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
   if (!value || !schema.backgroundColor) return 'transparent';
   return schema.backgroundColor;
 };

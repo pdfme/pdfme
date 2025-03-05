@@ -48,7 +48,8 @@ export const uuid = () =>
     return v.toString(16);
   });
 
-export const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
+
+const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
   path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
   let src: Record<string, unknown> = obj as Record<string, unknown>;
   path.forEach((key, index, array) => {
