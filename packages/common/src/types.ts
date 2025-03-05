@@ -28,7 +28,7 @@ import {
 export type PropPanelSchema = _PropPanelSchema;
 export type ChangeSchemaItem = {
   key: string;
-  value: any;
+  value: unknown;
   schemaId: string;
 };
 export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
@@ -83,11 +83,11 @@ export type UIRenderProps<T extends Schema> = {
   placeholder?: string;
   stopEditing?: () => void;
   value: string;
-  onChange?: (arg: { key: string; value: any } | { key: string; value: any }[]) => void;
+  onChange?: (arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
   theme: GlobalToken;
-  i18n: (key: keyof Dict | string) => string;
+  i18n: (key: string) => string;
   _cache: Map<any, any>;
 };
 
@@ -112,7 +112,7 @@ type PropPanelProps = {
   schemas: SchemaForUI[];
   options: UIOptions;
   theme: GlobalToken;
-  i18n: (key: keyof Dict | string) => string;
+  i18n: (key: string) => string;
 };
 
 export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
@@ -144,7 +144,7 @@ export interface PropPanel<T extends Schema> {
  * @property {string} [icon] Icon SVG for the plugin.
  * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
-export type Plugin<T extends Schema & { [key: string]: any }> = {
+export type Plugin<T extends Schema & { [key: string]: unknown }> = {
   pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
   ui: (arg: UIRenderProps<T>) => Promise<void> | void;
   propPanel: PropPanel<T>;

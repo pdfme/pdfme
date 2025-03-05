@@ -273,6 +273,7 @@ describe('checkPlugins test', () => {
         schema: {},
         defaultSchema: {
           type: 'myText',
+          name: 'myText',
           content: '',
           position: { x: 0, y: 0 },
           width: 100,
@@ -287,6 +288,7 @@ describe('checkPlugins test', () => {
         schema: {},
         defaultSchema: {
           type: 'myImage',
+          name: 'myImage',
           content: '',
           position: { x: 0, y: 0 },
           width: 100,

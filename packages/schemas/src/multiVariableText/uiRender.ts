@@ -25,9 +25,9 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     schema,
     mode: mode === 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
     rootElement,
-    onChange: (arg: { key: string; value: string } | { key: string; value: string }[]) => {
+    onChange: (arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => {
       if (!Array.isArray(arg)) {
-        const numVariables = countUniqueVariableNames(arg.value);
+        const numVariables = countUniqueVariableNames(arg.value as string);
         if (onChange) {
           onChange([
             { key: 'text', value: arg.value },
