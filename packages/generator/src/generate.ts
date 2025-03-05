@@ -1,5 +1,5 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, Schema, PDFRenderProps, BasePdf } from '@pdfme/common';
+import type { GenerateProps, Schema, PDFRenderProps, Template } from '@pdfme/common';
 import {
   checkGenerateProps,
   getDynamicTemplate,
@@ -39,7 +39,8 @@ const generate = async (props: GenerateProps) => {
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
 
-    const dynamicTemplate = await getDynamicTemplate({
+    // Get the dynamic template with proper typing
+    const dynamicTemplate: Template = await getDynamicTemplate({
       template,
       input,
       options,
