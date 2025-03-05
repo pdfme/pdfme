@@ -12,7 +12,7 @@ export const substituteVariables = (
 
   if (variablesIn) {
     const variables: Record<string, string> =
-      typeof variablesIn === 'string' ? JSON.parse(variablesIn) || {} : variablesIn;
+      typeof variablesIn === 'string' ? JSON.parse(variablesIn || '{}') as Record<string, string> : variablesIn;
 
     Object.keys(variables).forEach((variableName) => {
       // handle special characters in variable name
@@ -29,14 +29,14 @@ export const substituteVariables = (
 };
 
 export const validateVariables = (value: string, schema: MultiVariableTextSchema): boolean => {
-  if (schema.variables.length == 0) {
+  if (schema.variables.length === 0) {
     return true;
   }
 
   let values;
   try {
-    values = value ? JSON.parse(value) : {};
-  } catch (e) {
+    values = value ? JSON.parse(value) as Record<string, string> : {};
+  } catch {
     throw new SyntaxError(
       `[@pdfme/generator] invalid JSON string '${value}' for variables in field ${schema.name}`,
     );

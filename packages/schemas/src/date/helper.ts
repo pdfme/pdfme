@@ -318,12 +318,12 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         const fallbackFontName = getFallbackFontName(font);
 
         const locale = getAirDatepickerLocale(
-          (activeSchema as any).locale || options.lang || defaultLocale,
+          (activeSchema as { locale?: string }).locale || options.lang || defaultLocale,
         );
 
         if (
-          (activeSchema as any).locale === undefined &&
-          (activeSchema as any).locale !== options.lang
+          (activeSchema as { locale?: string }).locale === undefined &&
+          (activeSchema as { locale?: string }).locale !== options.lang
         ) {
           changeSchemas([
             { schemaId: activeSchema.id, key: 'locale', value: options.lang },
@@ -336,13 +336,13 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           (button) => button.key === Formatter.ALIGNMENT,
         );
 
-        const validateDateTimeFormat = (_rule: any, formatString: string): boolean => {
+        const validateDateTimeFormat = (_rule: unknown, formatString: string): boolean => {
           try {
             format('Thu Jan 01 1970 00:00:00 GMT+0000', formatString, {
               locale: locale.formatLocale,
             });
             return true;
-          } catch (_err) {
+          } catch {
             return false;
           }
         };

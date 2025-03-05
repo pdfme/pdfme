@@ -112,7 +112,7 @@ const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
 export const getFontKitFont = async (
   fontName: string | undefined,
   font: Font,
-  _cache: Map<any, any>,
+  _cache: Map<string, fontkit.Font>,
 ) => {
   const fntNm = fontName || getFallbackFontName(font);
   const cacheKey = getCacheKey(fntNm);
@@ -128,9 +128,14 @@ export const getFontKitFont = async (
       : b64toUint8Array(fontData);
   }
 
-  const fontKitFont = fontkit.create(
-    fontData instanceof Buffer ? fontData : Buffer.from(fontData as ArrayBuffer),
-  ) as fontkit.Font;
+  // Convert fontData to Buffer if it's not already a Buffer
+  let fontDataBuffer: Buffer;
+  if (fontData instanceof Buffer) {
+    fontDataBuffer = fontData;
+  } else {
+    fontDataBuffer = Buffer.from(fontData as ArrayBufferLike);
+  }
+  const fontKitFont = fontkit.create(fontDataBuffer) as fontkit.Font;
   _cache.set(cacheKey, fontKitFont);
 
   return fontKitFont;
@@ -489,7 +494,11 @@ export const filterStartJP = (lines: string[]): string[] => {
     });
 
   if (charToAppend) {
-    return [charToAppend + filtered.slice(0, 1)[0], ...filtered.slice(1)].reverse();
+    // Handle the case where filtered might be empty
+    const firstItem = filtered.length > 0 ? filtered[0] : '';
+    // Ensure we're concatenating strings
+    const combinedItem = String(charToAppend) + String(firstItem);
+    return [combinedItem, ...filtered.slice(1)].reverse();
   } else {
     return filtered.reverse();
   }
@@ -530,7 +539,11 @@ export const filterEndJP = (lines: string[]): string[] => {
   });
 
   if (charToPrepend) {
-    return [...filtered.slice(0, -1), filtered.slice(-1)[0] + charToPrepend];
+    // Handle the case where filtered might be empty
+    const lastItem = filtered.length > 0 ? filtered[filtered.length - 1] : '';
+    // Ensure we're concatenating strings
+    const combinedItem = String(lastItem) + String(charToPrepend);
+    return [...filtered.slice(0, -1), combinedItem];
   } else {
     return filtered;
   }

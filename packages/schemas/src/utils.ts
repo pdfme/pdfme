@@ -162,7 +162,7 @@ export const readFile = (input: File | FileList | null): Promise<string | ArrayB
       }
     };
 
-    fileReader.onerror = (e) => {
+    fileReader.onerror = () => {
       reject(new Error('[@pdfme/schemas] File reading failed'));
     };
 
@@ -238,12 +238,12 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     .join(' ');
 
   // Helper function to process a single element
-  const processElement = (element: any): string => {
+  const processElement = (element: unknown): string => {
     if (!Array.isArray(element)) {
       return String(element);
     }
 
-    const [tag, attributes = {}, children = []] = element;
+    const [tag, attributes = {}, children = []] = element as [unknown, Record<string, string>, unknown[]];
     const tagName = String(tag);
 
     // Format attributes string
@@ -260,10 +260,10 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
 
     // Return properly formatted element string
     if (childrenString) {
-      return `<${tagName}${attrString ? ' ' + attrString : ''}>${childrenString}</${tagName}>`;
+      return `<${String(tagName)}${attrString ? ' ' + String(attrString) : ''}>${childrenString}</${String(tagName)}>`;
     } else {
       // Self-closing tag for empty children
-      return `<${tagName}${attrString ? ' ' + attrString : ''}/>`;
+      return `<${String(tagName)}${attrString ? ' ' + String(attrString) : ''}/>`;
     }
   };
 

@@ -166,8 +166,8 @@ export const createBarCode = async (arg: {
 
   if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
-    // @ts-ignore
-    bwipjs.toCanvas(canvas, bwipjsArg);
+    // Using HTMLCanvasElement type for canvas to match bwipjs.toCanvas parameter
+    bwipjs.toCanvas(canvas as unknown as HTMLCanvasElement, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = Buffer.from(b64toUint8Array(dataUrl).buffer);
   } else {
