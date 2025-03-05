@@ -23,7 +23,6 @@ declare module 'puppeteer' {
     url(): string;
   }
 
-  export default {
-    launch: (options?: any) => Promise<Browser>
-  };
+  export function launch(options?: any): Promise<Browser>;
+  export default launch;
 }
