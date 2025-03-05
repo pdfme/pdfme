@@ -1,7 +1,7 @@
 import { PDFDocument } from '@pdfme/pdf-lib';
 import type { ImageType } from './types.js';
 
-export interface Img2PdfOptions {
+interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
 }
