@@ -95,16 +95,30 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
   );
 
   const renderObj = schemaTypes.reduce(
-    (acc: Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>, type: string) => {
-      const render = pluginValues.find((pv) => pv.propPanel.defaultSchema.type === type);
+    (acc: Record<string, (arg: PDFRenderProps<any>) => Promise<void> | void>, type: string) => {
+      const render = pluginValues.find((pv) => {
+        // Safely check if propPanel and defaultSchema exist and have a type property
+        return pv && 
+               typeof pv === 'object' && 
+               'propPanel' in pv && 
+               pv.propPanel && 
+               typeof pv.propPanel === 'object' &&
+               'defaultSchema' in pv.propPanel && 
+               pv.propPanel.defaultSchema && 
+               typeof pv.propPanel.defaultSchema === 'object' &&
+               'type' in pv.propPanel.defaultSchema && 
+               pv.propPanel.defaultSchema.type === type;
+      });
 
       if (!render) {
         throw new Error(`[@pdfme/generator] Renderer for type ${type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
       }
-      return { ...acc, [type]: render.pdf };
+      
+      // Use type assertion to handle the pdf function with any schema type
+      return { ...acc, [type]: render.pdf as (arg: PDFRenderProps<any>) => Promise<void> | void };
     },
-    {} as Record<string, (arg: PDFRenderProps<Schema>) => Promise<void> | void>,
+    {} as Record<string, (arg: PDFRenderProps<any>) => Promise<void> | void>,
   );
 
   return { pdfDoc, renderObj };

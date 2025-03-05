@@ -43,7 +43,7 @@ export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
  * @property {PDFDocument} pdfDoc PDFDocument object from pdf-lib.
  * @property {PDFPage} page PDFPage object from pdf-lib.
  * @property {GeneratorOptions} options Options object passed from the generator.
- * @property {Map<any, any>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
+ * @property {Map<string | number, unknown>} _cache Cache shared only during the execution of the generate function (useful for caching images, etc. if needed).
  */
 export interface PDFRenderProps<T extends Schema> {
   value: string;
@@ -54,7 +54,7 @@ export interface PDFRenderProps<T extends Schema> {
   page: PDFPage;
   options: GeneratorOptions;
 
-  _cache: Map<any, any>;
+  _cache: Map<string | number, unknown>;
 }
 
 /**
@@ -68,12 +68,12 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {string} [placeholder] - Placeholder text for Form.
  * @property {() => void} [stopEditing] - Stops editing mode, can be used when the mode is 'designer'.
  * @property {string} value - The string used for UI rendering.
- * @property {(arg: { key: string; value: any } | { key: string; value: any }[]) => void} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
+ * @property {(arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => void} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
- * @property {Map<any, any>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
+ * @property {Map<string | number, unknown>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
   schema: T;
@@ -88,7 +88,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: string) => string;
-  _cache: Map<any, any>;
+  _cache: Map<string | number, unknown>;
 };
 
 /**
@@ -145,9 +145,9 @@ export interface PropPanel<T extends Schema> {
  * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
 export type Plugin<T extends Schema & { [key: string]: unknown }> = {
-  pdf: (arg: PDFRenderProps<T>) => Promise<void> | void;
-  ui: (arg: UIRenderProps<T>) => Promise<void> | void;
-  propPanel: PropPanel<T>;
+  pdf: (arg: PDFRenderProps<any>) => Promise<void> | void;
+  ui: (arg: UIRenderProps<any>) => Promise<void> | void;
+  propPanel: PropPanel<any>;
   icon?: string;
   uninterruptedEditMode?: boolean;
 };

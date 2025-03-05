@@ -2,10 +2,10 @@ import { useForm } from 'form-render';
 import React, { useRef, useContext, useState, useEffect } from 'react';
 import type {
   ChangeSchemaItem,
-  Dict,
   SchemaForUI,
   PropPanelWidgetProps,
   PropPanelSchema,
+  Schema,
 } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
@@ -44,6 +44,12 @@ const DetailView = (props: DetailViewProps) => {
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
+  
+  // Define a type-safe i18n function that accepts any string key
+  const typedI18n = (key: string): string => {
+    // Cast the key to any to avoid type constraints
+    return typeof i18n === 'function' ? i18n(key as any) : key;
+  };
 
   const [widgets, setWidgets] = useState<{
     [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
@@ -66,7 +72,7 @@ const DetailView = (props: DetailViewProps) => {
             {...props}
             options={options}
             theme={token}
-            i18n={i18n as (key: keyof Dict | string) => string}
+            i18n={typedI18n}
             widget={widgetValue}
           />
         );
@@ -191,32 +197,76 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   }
 
   // Create type-safe options for the type dropdown
-  const typeOptions = Object.entries(pluginsRegistry).map(([label, value]) => {
-    // Default value if plugin is invalid
-    const defaultValue = { label, value: undefined };
-    
+  // Create a type-safe options array for the dropdown
+  const typeOptions: Array<{ label: string; value: string | undefined }> = [];
+  
+  // Safely populate the options array
+  Object.entries(pluginsRegistry).forEach(([label, value]) => {
     // Skip invalid plugins
-    if (!value || typeof value !== 'object') return defaultValue;
-    if (!value.propPanel || typeof value.propPanel !== 'object') return defaultValue;
-    if (!value.propPanel.defaultSchema || typeof value.propPanel.defaultSchema !== 'object') return defaultValue;
+    if (!value || typeof value !== 'object') {
+      typeOptions.push({ label, value: undefined });
+      return;
+    }
+    
+    if (!('propPanel' in value) || 
+        !value.propPanel || 
+        typeof value.propPanel !== 'object') {
+      typeOptions.push({ label, value: undefined });
+      return;
+    }
+    
+    if (!('defaultSchema' in value.propPanel) || 
+        !value.propPanel.defaultSchema || 
+        typeof value.propPanel.defaultSchema !== 'object') {
+      typeOptions.push({ label, value: undefined });
+      return;
+    }
     
     // Safely extract the type
     const defaultSchema = value.propPanel.defaultSchema as Record<string, unknown>;
-    const schemaType = 'type' in defaultSchema && typeof defaultSchema.type === 'string' 
-      ? defaultSchema.type 
-      : undefined;
+    let schemaType: string | undefined = undefined;
     
-    return { label, value: schemaType };
+    if ('type' in defaultSchema && typeof defaultSchema.type === 'string') {
+      schemaType = defaultSchema.type;
+    }
+    
+    typeOptions.push({ label, value: schemaType });
   });
+  // Create a safe empty schema as fallback
+  const emptySchema: Record<string, unknown> = {};
+  
   // Safely access the default schema with proper null checking
-  const defaultSchema = activePlugin?.propPanel?.defaultSchema || {};
+  const defaultSchema: Record<string, unknown> = 
+    activePlugin?.propPanel?.defaultSchema ? 
+    // Create a safe copy of the schema
+    (() => {
+      // First check if the defaultSchema is an object
+      if (typeof activePlugin.propPanel.defaultSchema !== 'object' || 
+          activePlugin.propPanel.defaultSchema === null) {
+        return emptySchema;
+      }
+      
+      // Create a safe copy
+      const result: Record<string, unknown> = {};
+      
+      // Only copy properties that exist on the object
+      for (const key in activePlugin.propPanel.defaultSchema) {
+        if (Object.prototype.hasOwnProperty.call(activePlugin.propPanel.defaultSchema, key)) {
+          result[key] = (activePlugin.propPanel.defaultSchema as Record<string, unknown>)[key];
+        }
+      }
+      
+      return result;
+    })() : 
+    emptySchema;
 
+  // Create a type-safe schema object
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
     column: 2,
     properties: {
       type: {
-        title: i18n('type'),
+        title: typedI18n('type'),
         type: 'string',
         widget: 'select',
         props: { options: typeOptions },
@@ -224,32 +274,32 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         span: 12,
       },
       name: {
-        title: i18n('fieldName'),
+        title: typedI18n('fieldName'),
         type: 'string',
         required: true,
         span: 12,
         rules: [
           {
             validator: validateUniqueSchemaName,
-            message: i18n('validation.uniqueName'),
+            message: typedI18n('validation.uniqueName'),
           },
         ],
         props: { autoComplete: 'off' },
       },
       editable: {
-        title: i18n('editable'),
+        title: typedI18n('editable'),
         type: 'boolean',
         span: 8,
-        hidden: typeof (defaultSchema as Record<string, unknown>).readOnly !== 'undefined',
+        hidden: typeof defaultSchema.readOnly !== 'undefined',
       },
       required: {
-        title: i18n('required'),
+        title: typedI18n('required'),
         type: 'boolean',
         span: 16,
         hidden: '{{!formData.editable}}',
       },
       '-': { type: 'void', widget: 'Divider' },
-      align: { title: i18n('align'), type: 'void', widget: 'AlignWidget' },
+      align: { title: typedI18n('align'), type: 'void', widget: 'AlignWidget' },
       position: {
         type: 'object',
         widget: 'card',
@@ -259,7 +309,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         },
       },
       width: {
-        title: i18n('width'),
+        title: typedI18n('width'),
         type: 'number',
         widget: 'inputNumber',
         required: true,
@@ -267,7 +317,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         props: { min: 0 },
       },
       height: {
-        title: i18n('height'),
+        title: typedI18n('height'),
         type: 'number',
         widget: 'inputNumber',
         required: true,
@@ -275,48 +325,65 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
         props: { min: 0 },
       },
       rotate: {
-        title: i18n('rotate'),
+        title: typedI18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
-        disabled: typeof (defaultSchema as Record<string, unknown>).rotate === 'undefined',
+        disabled: typeof defaultSchema.rotate === 'undefined',
         max: 360,
         props: { min: 0 },
         span: 6,
       },
       opacity: {
-        title: i18n('opacity'),
+        title: typedI18n('opacity'),
         type: 'number',
         widget: 'inputNumber',
-        disabled: typeof (defaultSchema as Record<string, unknown>).opacity === 'undefined',
+        disabled: typeof defaultSchema.opacity === 'undefined',
         props: { step: 0.1, min: 0, max: 1 },
         span: 6,
       },
     },
   };
 
+  // Create a safe copy of the properties
+  const safeProperties = { ...propPanelSchema.properties };
+  
   if (typeof activePropPanelSchema === 'function') {
     // Create a new object without the schemasList property
     const { size, schemas, pageSize, changeSchemas, activeElements, deselectSchema, activeSchema } = props;
     const propPanelProps = { size, schemas, pageSize, changeSchemas, activeElements, deselectSchema, activeSchema };
 
-    const apps =
-      activePropPanelSchema({
-        ...propPanelProps,
-        options,
-        theme: token,
-        i18n: i18n as (key: keyof Dict | string) => string,
-      }) || {};
+    // Use the typedI18n function to avoid type issues
+    const functionResult = activePropPanelSchema({
+      ...propPanelProps,
+      options,
+      theme: token,
+      i18n: typedI18n,
+    });
+    
+    // Safely handle the result
+    const apps = functionResult && typeof functionResult === 'object' ? functionResult : {};
+    
+    // Create a divider if needed
+    const dividerObj = Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } };
+    
+    // Assign properties safely - use type assertion to satisfy TypeScript
     propPanelSchema.properties = {
-      ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } }),
-      ...apps,
+      ...safeProperties,
+      ...(dividerObj as Record<string, Partial<Schema>>),
+      ...(apps as Record<string, Partial<Schema>>),
     };
   } else {
-    const apps = activePropPanelSchema || {};
+    // Handle non-function case
+    const apps = activePropPanelSchema && typeof activePropPanelSchema === 'object' ? activePropPanelSchema : {};
+    
+    // Create a divider if needed
+    const dividerObj = Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } };
+    
+    // Assign properties safely - use type assertion to satisfy TypeScript
     propPanelSchema.properties = {
-      ...propPanelSchema.properties,
-      ...(Object.keys(apps).length === 0 ? {} : { '--': { type: 'void', widget: 'Divider' } }),
-      ...apps,
+      ...safeProperties,
+      ...(dividerObj as Record<string, Partial<Schema>>),
+      ...(apps as Record<string, Partial<Schema>>),
     };
   }
 
@@ -335,7 +402,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
           icon={<Menu strokeWidth={1.5} size={20} />}
         />
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
-          {i18n('editField')}
+          {typedI18n('editField')}
         </Text>
       </div>
       <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />

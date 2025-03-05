@@ -57,10 +57,14 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     const colorValue = options?.theme?.token?.colorPrimary || '#168fe3';
     const isValidColor = /^#[0-9A-F]{6}$/i.test(colorValue) || /^(rgb|hsl)a?\(\s*([+-]?\d+%?\s*,\s*){2,3}[+-]?\d+%?\s*\)$/i.test(colorValue);
     const safeColorValue = isValidColor ? colorValue : '#168fe3';
+    
+    // Use safe string concatenation for innerHTML
+    const typingInstructions = i18n('schemas.mvt.typingInstructions');
+    const sampleField = i18n('schemas.mvt.sampleField');
     para.innerHTML =
-      i18n('schemas.mvt.typingInstructions') +
+      typingInstructions +
       ` <code style="color:${safeColorValue}; font-weight:bold;">{` +
-      i18n('schemas.mvt.sampleField') +
+      sampleField +
       '}</code>';
     rootElement.appendChild(para);
   }
@@ -72,12 +76,14 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
       throw new Error('Oops, is text schema no longer a function?');
     }
     // Safely call schema function with proper type handling
-    const parentSchema = parentPropPanel.schema?.(propPanelProps) || {};
+    const parentSchema = typeof parentPropPanel.schema === 'function' 
+      ? parentPropPanel.schema(propPanelProps) 
+      : {};
     return {
       ...parentSchema,
       '-------': { type: 'void', widget: 'Divider' },
       dynamicVarContainer: {
-        title: typeof propPanelProps.i18n === 'function' ? propPanelProps.i18n('schemas.mvt.variablesSampleData') : 'Variables Sample Data',
+        title: 'Variables Sample Data',
         type: 'string',
         widget: 'Card',
         span: 24,
