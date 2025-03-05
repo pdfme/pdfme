@@ -1,5 +1,5 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, Schema, PDFRenderProps } from '@pdfme/common';
+import type { GenerateProps, Schema, PDFRenderProps, BasePdf } from '@pdfme/common';
 import {
   checkGenerateProps,
   getDynamicTemplate,
@@ -134,11 +134,11 @@ const generate = async (props: GenerateProps) => {
           y: schema.position.y - boundingBoxBottom,
         };
 
-        // Explicitly type all properties to avoid unsafe assignments
+        // Create properly typed render props
         const renderProps: PDFRenderProps<Schema> = {
           value,
           schema,
-          basePdf: basePdf as unknown,
+          basePdf,
           pdfLib,
           pdfDoc,
           page,
