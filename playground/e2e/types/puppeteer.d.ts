@@ -21,8 +21,14 @@ declare module 'puppeteer' {
     screenshot(options?: { encoding?: string }): Promise<Buffer | string>;
     close(): Promise<void>;
     url(): string;
+    reload(options?: { waitUntil?: string; timeout?: number }): Promise<any>;
   }
 
   export function launch(options?: any): Promise<Browser>;
-  export default launch;
+  
+  const puppeteer = {
+    launch
+  };
+  
+  export default puppeteer;
 }

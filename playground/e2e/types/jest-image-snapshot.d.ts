@@ -6,4 +6,12 @@ declare module 'jest-image-snapshot' {
     customDiffConfig?: { threshold?: number };
     customSnapshotIdentifier?: string;
   }
+
+  global {
+    namespace jest {
+      interface Matchers<R> {
+        toMatchImageSnapshot(options?: MatchImageSnapshotOptions): R;
+      }
+    }
+  }
 }
