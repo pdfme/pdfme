@@ -171,7 +171,9 @@ const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
       .map((p) => p.map((v) => {
         return 'fontName' in v ? v.fontName ?? '' : '';
       }))
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
+      .reduce<(string | undefined)[]>((acc, cur) => {
+        return acc.concat(cur as (string | undefined)[]);
+      }, [])
       .filter(Boolean) as string[],
   );
 
