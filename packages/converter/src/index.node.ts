@@ -1,7 +1,6 @@
 import { createCanvas } from 'canvas';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
-// @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 export const pdf2img = async (
@@ -11,11 +10,14 @@ export const pdf2img = async (
   _pdf2img(pdf, options, {
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
     createCanvas: (width, height) => createCanvas(width, height) as unknown as HTMLCanvasElement,
-    canvasToArrayBuffer: (canvas, imageType) => {
-      // @ts-ignore
-      const buffer = canvas.toBuffer(`image/${imageType}`);
-      // @ts-ignore
-      return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+    canvasToArrayBuffer: (canvas) => {
+      // Using a more specific type for the canvas from the 'canvas' package
+      const nodeCanvas = canvas as unknown as import('canvas').Canvas;
+      // Get buffer from the canvas - using the synchronous version without parameters
+      // This will use the default PNG format
+      const buffer = nodeCanvas.toBuffer();
+      // Convert to ArrayBuffer
+      return new Uint8Array(buffer).buffer;
     },
   });
 
