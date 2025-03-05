@@ -54,8 +54,9 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
 
 async function pdfToImages(pdf: Buffer): Promise<Buffer[]> {
   const arrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+  // Pass the arrayBuffer directly to pdf2img, not as an object with a data property
   const arrayBuffers = await pdf2img(
-    { data: arrayBuffer } as unknown as ArrayBuffer,
+    arrayBuffer,
     { imageType: 'png' }
   );
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
