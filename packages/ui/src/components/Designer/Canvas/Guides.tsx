@@ -17,23 +17,14 @@ const guideStyle = (
   background: '#333333',
 });
 
-// Define the interface for the Guides component
-interface GuidesInterface {
-  getGuides(): number[];
-  scroll(pos: number): void;
-  scrollGuides(pos: number): void;
-  loadGuides(guides: number[]): void;
-  resize(): void;
-}
-
 const _Guides = ({
   paperSize,
   horizontalRef,
   verticalRef,
 }: {
   paperSize: Size;
-  horizontalRef: Ref<GuidesInterface> | undefined;
-  verticalRef: Ref<GuidesInterface> | undefined;
+  horizontalRef: Ref<GuidesComponent> | undefined;
+  verticalRef: Ref<GuidesComponent> | undefined;
 }) => (
   <>
     <div
@@ -44,13 +35,13 @@ const _Guides = ({
       zoom={ZOOM}
       style={guideStyle(-RULER_HEIGHT, 0, RULER_HEIGHT, paperSize.width)}
       type="horizontal"
-      ref={horizontalRef as any}
+      ref={horizontalRef}
     />
     <GuidesComponent
       zoom={ZOOM}
       style={guideStyle(0, -RULER_HEIGHT, paperSize.height, RULER_HEIGHT)}
       type="vertical"
-      ref={verticalRef as any}
+      ref={verticalRef}
     />
   </>
 );

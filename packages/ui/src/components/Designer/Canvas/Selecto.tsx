@@ -1,42 +1,27 @@
 import React, { useEffect } from 'react';
-import SelectoComponent from 'react-selecto';
+import SelectoComponent, { OnSelect as SelectoOnSelect, OnDragStart as SelectoOnDragStart } from 'react-selecto';
 import { SELECTABLE_CLASSNAME } from '../../../constants.js';
 import { theme } from 'antd';
-
-// Define the types locally to match what's expected in Canvas/index.tsx
-interface OnDragStart {
-  inputEvent: MouseEvent;
-  stop: () => void;
-  isTrusted: boolean;
-}
-
-interface OnSelect {
-  selected: Element[];
-  added: Element[];
-  removed: Element[];
-  inputEvent: MouseEvent;
-  rect: DOMRect;
-}
 
 type Props = {
   container: HTMLElement | null;
   continueSelect: boolean;
-  onDragStart: (e: OnDragStart) => void;
-  onSelect: (e: OnSelect) => void;
+  onDragStart: (e: SelectoOnDragStart) => void;
+  onSelect: (e: SelectoOnSelect) => void;
 };
 
 const className = 'pdfme-selecto';
 
-const _Selecto = (props: Props) => {
+const Selecto = (props: Props) => {
   const { token } = theme.useToken();
   useEffect(() => {
-    const containerElement = document.querySelector('.' + className) as HTMLElement | null;
-    if (containerElement) {
+    const containerElement = document.querySelector('.' + className);
+    if (containerElement instanceof HTMLElement) {
       containerElement.style.backgroundColor = token.colorPrimary;
       containerElement.style.opacity = '0.75';
       containerElement.style.borderColor = token.colorPrimaryBorder;
     }
-  }, [props.container]);
+  }, [props.container, token.colorPrimary, token.colorPrimaryBorder]);
 
   return (
     <SelectoComponent
@@ -49,9 +34,9 @@ const _Selecto = (props: Props) => {
       container={props.container}
       continueSelect={props.continueSelect}
       onDragStart={props.onDragStart}
-      onSelect={(e: any) => props.onSelect(e as OnSelect)}
+      onSelect={props.onSelect}
     />
   );
 };
 
-export default _Selecto;
+export default Selecto;

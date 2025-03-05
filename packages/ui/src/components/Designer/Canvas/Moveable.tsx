@@ -1,64 +1,6 @@
 import React, { useEffect, forwardRef, Ref } from 'react';
-import MoveableComponent from 'react-moveable';
+import MoveableComponent, { OnDrag, OnRotate, OnRotateEnd, OnClick, OnResize } from 'react-moveable';
 import { theme } from 'antd';
-
-// Define the types locally since they're not exported properly
-interface OnDrag {
-  target: HTMLElement | SVGElement;
-  left: number;
-  top: number;
-  // Add additional properties that might be used in the original library
-  beforeDelta: any;
-  beforeDist: any;
-  beforeTranslate: any;
-  delta: any;
-  dist: any;
-  transform: any;
-  translate: any;
-}
-
-interface OnResize {
-  target: HTMLElement | SVGElement;
-  width: number;
-  height: number;
-  direction: string;
-  // Add additional properties that might be used in the original library
-  offsetWidth: number;
-  offsetHeight: number;
-  dist: any;
-  delta: any;
-  transform: any;
-  translate: any;
-}
-
-interface OnRotate {
-  target: HTMLElement | SVGElement;
-  rotate: number;
-  // Add additional properties that might be used in the original library
-  beforeDist: any;
-  beforeDelta: any;
-  beforeRotate: any;
-  dist: any;
-  delta: any;
-  transform: any;
-}
-
-interface OnRotateEnd {
-  target: HTMLElement | SVGElement;
-}
-
-interface OnClick {
-  inputEvent: MouseEvent;
-  // Add additional properties that might be used in the original library
-  inputTarget: any;
-  isTarget: boolean;
-  containsTarget: boolean;
-  isDouble: boolean;
-  datas: any;
-  targets: any[];
-  clientX: number;
-  clientY: number;
-}
 
 type Props = {
   target: HTMLElement[];
@@ -81,29 +23,28 @@ type Props = {
 
 const className = 'pdfme-moveable';
 
-const _Moveable = (props: Props, ref: Ref<any>) => {
+const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   const { token } = theme.useToken();
   useEffect(() => {
-    const containerElement = document.querySelector(`.${className}`) as HTMLElement | null;
+    const containerElement = document.querySelector(`.${className}`);
     const containerElement2 = document.querySelectorAll(
       `.${className} .moveable-line`,
-    ) as NodeListOf<HTMLElement>;
-    if (containerElement) {
+    );
+    if (containerElement instanceof HTMLElement) {
       containerElement.style.setProperty('--moveable-color', token.colorPrimary);
-      Array.from(containerElement2).map((e) =>
-        e.style.setProperty('--moveable-color', token.colorPrimary),
-      );
+      Array.from(containerElement2).forEach((e) => {
+        if (e instanceof HTMLElement) {
+          e.style.setProperty('--moveable-color', token.colorPrimary);
+        }
+      });
     }
-  }, [props.target]);
+  }, [props.target, token.colorPrimary]);
 
   return (
-    // @ts-ignore
     <MoveableComponent
-      style={{ zIndex: 1 }}
       className={className}
       rootContainer={document ? document.body : undefined}
       snappable
-      snapCenter
       draggable
       rotatable={props.rotatable}
       resizable
@@ -118,18 +59,18 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
       keepRatio={props.keepRatio}
       onRotate={props.onRotate}
       onRotateEnd={props.onRotateEnd}
-      onRotateGroup={({ events }: { events: any[] }) => {
+      onRotateGroup={({ events }: { events: OnRotate[] }) => {
         events.forEach(props.onRotate);
       }}
       onRotateGroupEnd={props.onRotateGroupEnd}
       onDrag={props.onDrag}
-      onDragGroup={({ events }: { events: any[] }) => {
+      onDragGroup={({ events }: { events: OnDrag[] }) => {
         events.forEach(props.onDrag);
       }}
       onDragEnd={props.onDragEnd}
       onDragGroupEnd={props.onDragGroupEnd}
       onResize={props.onResize}
-      onResizeGroup={({ events }: { events: any[] }) => {
+      onResizeGroup={({ events }: { events: OnResize[] }) => {
         events.forEach(props.onResize);
       }}
       onResizeEnd={props.onResizeEnd}
@@ -139,4 +80,4 @@ const _Moveable = (props: Props, ref: Ref<any>) => {
   );
 };
 
-export default forwardRef<any, Props>(_Moveable);
+export default forwardRef<MoveableComponent, Props>(Moveable);

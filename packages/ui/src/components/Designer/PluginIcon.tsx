@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
-import { Plugin } from '@pdfme/common';
+import { Plugin, Schema } from '@pdfme/common';
 import { OptionsContext } from '../../contexts.js';
 import { theme } from 'antd';
 
 interface PluginIconProps {
-  plugin: Plugin<any>;
+  plugin: Plugin<Schema>;
   label: string;
   size?: number;
   styles?: React.CSSProperties;
@@ -38,7 +38,18 @@ const PluginIcon = (props: PluginIconProps) => {
   const { plugin, label, size, styles } = props;
   const { token } = theme.useToken();
   const options = useContext(OptionsContext);
-  const icon = options.icons?.[plugin.propPanel.defaultSchema.type] ?? plugin.icon;
+  
+  // Safely access plugin properties with proper type checking
+  const defaultSchemaType = plugin.propPanel && 
+    typeof plugin.propPanel === 'object' && 
+    plugin.propPanel.defaultSchema && 
+    typeof plugin.propPanel.defaultSchema === 'object' && 
+    'type' in plugin.propPanel.defaultSchema && 
+    typeof plugin.propPanel.defaultSchema.type === 'string' 
+      ? plugin.propPanel.defaultSchema.type 
+      : '';
+  
+  const icon = options.icons?.[defaultSchemaType] ?? plugin.icon;
   const iconStyles = {
     ...styles,
     color: token.colorText,

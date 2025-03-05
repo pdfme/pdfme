@@ -19,7 +19,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     );
     const newFontFaces = fontFaces.filter((fontFace) => !document.fonts.has(fontFace));
 
-    Promise.allSettled(newFontFaces.map((f) => f.load())).then((loadedFontFaces) => {
+    void Promise.allSettled(newFontFaces.map((f) => f.load())).then((loadedFontFaces) => {
       loadedFontFaces.forEach((loadedFontFace) => {
         if (loadedFontFace.status === 'fulfilled') {
           document.fonts.add(loadedFontFace.value);

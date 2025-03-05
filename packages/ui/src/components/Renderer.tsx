@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react';
 import {
-  Dict,
   Mode,
   ZOOM,
   UIRenderProps,
@@ -29,7 +28,7 @@ type RendererProps = Omit<
 };
 
 type ReRenderCheckProps = {
-  plugin: Plugin<any>;
+  plugin?: Plugin<Schema>;
   value: string;
   mode: Mode;
   scale: number;
@@ -48,12 +47,12 @@ const useRerenderDependencies = (arg: ReRenderCheckProps) => {
   const optionStr = JSON.stringify(_options);
 
   return useMemo(() => {
-    if (plugin.uninterruptedEditMode && mode === 'designer') {
+    if (plugin?.uninterruptedEditMode && mode === 'designer') {
       return [mode];
     } else {
       return [value, mode, scale, JSON.stringify(schema), optionStr];
     }
-  }, [plugin.uninterruptedEditMode, value, mode, scale, schema, optionStr]);
+  }, [plugin?.uninterruptedEditMode, value, mode, scale, schema, optionStr, plugin]);
 };
 
 const Wrapper = ({
@@ -105,56 +104,63 @@ const Renderer = (props: RendererProps) => {
 
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
-  const i18n = useContext(I18nContext) as (key: keyof Dict | string) => string;
+  const i18n = useContext(I18nContext) as (key: string) => string;
   const { token: theme } = antdTheme.useToken();
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
-  const plugin = Object.values(pluginsRegistry || {}).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === schema.type,
-  ) as Plugin<any> | undefined;
+  // Safely extract schema type
+  const schemaType = typeof schema.type === 'string' ? schema.type : '';
+
+  // Find plugin with matching schema type using a type-safe approach
+  const plugin = Object.values(pluginsRegistry || {}).find((plugin) => {
+    const defaultSchema = plugin?.propPanel?.defaultSchema as Record<string, unknown> | undefined;
+    return defaultSchema?.type === schemaType;
+  });
+
+  const reRenderDependencies = useRerenderDependencies({
+    plugin: plugin || ({} as Plugin<Schema>),
+    value,
+    mode,
+    scale,
+    schema,
+    options,
+  });
+
+  useEffect(() => {
+    if (!plugin?.ui || !ref.current || !schema.type) return;
+    
+    ref.current.innerHTML = '';
+    const render = plugin.ui;
+    
+    void render({
+      value,
+      schema,
+      basePdf,
+      rootElement: ref.current,
+      mode,
+      onChange,
+      stopEditing,
+      tabIndex,
+      placeholder,
+      options,
+      theme,
+      i18n,
+      _cache,
+    });
+
+    return () => {
+      if (ref.current) {
+        ref.current.innerHTML = '';
+      }
+    };
+  }, [plugin?.ui, schema.type, reRenderDependencies]);
 
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
   }
-  const reRenderDependencies = useRerenderDependencies({
-    plugin,
-    value,
-    mode,
-    scale,
-    schema,
-    options: options as UIOptions,
-  });
-
-  useEffect(() => {
-    if (ref.current && schema.type) {
-      ref.current.innerHTML = '';
-      const render = plugin.ui;
-
-      void render({
-        value,
-        schema,
-        basePdf,
-        rootElement: ref.current,
-        mode,
-        onChange,
-        stopEditing,
-        tabIndex,
-        placeholder,
-        options: options as UIOptions,
-        theme,
-        i18n,
-        _cache: _cache as Map<any, any>,
-      });
-    }
-    return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
-      }
-    };
-  }, reRenderDependencies);
 
   return (
     <Wrapper {...props}>

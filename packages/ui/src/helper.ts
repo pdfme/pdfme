@@ -16,20 +16,28 @@ import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
 import { OptionsContext } from './contexts.js';
 
+// Define a type for the hotkeys function with additional properties
+type HotkeysFunction = {
+  (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void): unknown;
+  shift: boolean;
+  unbind: (keys: string) => void;
+};
+
 // Create a simple mock for hotkeys to avoid TypeScript errors
 const hotkeys = function (
   keys: string,
   callback: (e: KeyboardEvent, handler: { shortcut: string }) => void,
 ) {
-  return (hotkeysJs as any)(keys, callback);
-};
+  return hotkeysJs(keys, callback);
+} as HotkeysFunction;
 
 // Add properties to the hotkeys function
-(hotkeys as any).shift = false;
-(hotkeys as any).unbind = function (keys: string) {
+hotkeys.shift = false;
+hotkeys.unbind = function (keys: string) {
   // Do nothing if hotkeysJs doesn't have unbind
-  if (typeof (hotkeysJs as any).unbind === 'function') {
-    (hotkeysJs as any).unbind(keys);
+  const hotkeysFn = hotkeysJs as unknown as { unbind?: (keys: string) => void };
+  if (typeof hotkeysFn.unbind === 'function') {
+    hotkeysFn.unbind(keys);
   }
 };
 
@@ -40,29 +48,30 @@ export const uuid = () =>
     return v.toString(16);
   });
 
-const set = <T extends object>(obj: T, path: string | string[], value: any) => {
+
+const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
   path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
-  let src: any = obj;
+  let src: Record<string, unknown> = obj as Record<string, unknown>;
   path.forEach((key, index, array) => {
     if (index == path.length - 1) {
       src[key] = value;
     } else {
-      if (!src.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(src, key)) {
         const next = array[index + 1];
         src[key] = String(Number(next)) === next ? [] : {};
       }
-      src = src[key];
+      src = src[key] as Record<string, unknown>;
     }
   });
 };
 
-export const debounce = <T extends Function>(cb: T, wait = 20) => {
+export const debounce = <T extends (...args: unknown[]) => unknown>(cb: T, wait = 20) => {
   let h: null | ReturnType<typeof setTimeout> = null;
-  const callable = (...args: any) => {
+  const callable = (...args: Parameters<T>) => {
     if (h) clearTimeout(h);
     h = setTimeout(() => cb(...args), wait);
   };
-  return <T>(<any>callable);
+  return callable as T;
 };
 
 const shift = (number: number, precision: number, reverseShift: boolean) => {
@@ -147,22 +156,22 @@ export const initShortCuts = (arg: {
       case up:
       case shiftUp:
         e.preventDefault();
-        arg.move('up', (hotkeys as any).shift);
+        arg.move('up', hotkeys.shift);
         break;
       case down:
       case shiftDown:
         e.preventDefault();
-        arg.move('down', (hotkeys as any).shift);
+        arg.move('down', hotkeys.shift);
         break;
       case left:
       case shiftLeft:
         e.preventDefault();
-        arg.move('left', (hotkeys as any).shift);
+        arg.move('left', hotkeys.shift);
         break;
       case right:
       case shiftRight:
         e.preventDefault();
-        arg.move('right', (hotkeys as any).shift);
+        arg.move('right', hotkeys.shift);
         break;
       case rmWin:
       case rmMac:
@@ -204,7 +213,7 @@ export const initShortCuts = (arg: {
 };
 
 export const destroyShortCuts = () => {
-  (hotkeys as any).unbind(keys.join());
+  hotkeys.unbind(keys.join());
 };
 
 /**
@@ -259,10 +268,10 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
-  template.schemas.forEach((page: any[]) => {
-    page.forEach((schema: any) => {
-      schema.id = uuid();
-      schema.content = schema.content || '';
+  template.schemas.forEach((page) => {
+    page.forEach((schema) => {
+      (schema as SchemaForUI).id = uuid();
+      (schema as SchemaForUI).content = schema.content || '';
     });
   });
 
@@ -282,8 +291,8 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // @ts-expect-error
-    const pdfArrayBuffer = b64toUint8Array(b64BasePdf) as ArrayBuffer;
+    // pdf2size accepts both ArrayBuffer and Uint8Array
+    const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
 
     pageSizes = await pdf2size(pdfArrayBuffer);
   }
@@ -317,7 +326,7 @@ export const template2SchemasList = async (_template: Template) => {
 export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({
   schemas: cloneDeep(schemasList).map((page) =>
     page.map((schema) => {
-      // @ts-ignore
+      // @ts-expect-error Property 'id' is used only in UI
       delete schema.id;
       return schema;
     }),
@@ -420,14 +429,14 @@ export const getSidebarContentHeight = (sidebarHeight: number) =>
 const handlePositionSizeChange = (
   schema: SchemaForUI,
   key: string,
-  value: any,
+  value: unknown,
   basePdf: BasePdf,
   pageSize: Size,
 ) => {
   const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
   const [pt, pr, pb, pl] = padding;
   const { width: pw, height: ph } = pageSize;
-  const calcBounds = (v: any, min: number, max: number) => Math.min(Math.max(Number(v), min), max);
+  const calcBounds = (v: unknown, min: number, max: number) => Math.min(Math.max(Number(v), min), max);
   if (key === 'position.x') {
     schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
   } else if (key === 'position.y') {
@@ -442,7 +451,7 @@ const handlePositionSizeChange = (
 const handleTypeChange = (
   schema: SchemaForUI,
   key: string,
-  value: any,
+  value: unknown,
   pluginsRegistry: Plugins,
 ) => {
   if (key !== 'type') return;
@@ -453,21 +462,105 @@ const handleTypeChange = (
     }
   });
   // Apply attributes from new defaultSchema
-  const propPanel = Object.values(pluginsRegistry).find(
-    (plugin) => plugin?.propPanel.defaultSchema.type === value,
-  )?.propPanel;
-  Object.keys(propPanel?.defaultSchema || {}).forEach((key) => {
-    if (!schema.hasOwnProperty(key)) {
-      (schema as any)[key] = propPanel?.defaultSchema[key];
+  // Find the plugin with matching type
+  const pluginValue = value as string;
+  
+  // Define a type-safe approach to find the matching plugin
+  interface PluginSchema {
+    type: string;
+    [key: string]: unknown;
+  }
+  
+  interface PluginType {
+    propPanel: {
+      defaultSchema: PluginSchema;
+    };
+  }
+  
+  // Initialize plugin as undefined
+  let plugin: PluginType | undefined;
+  
+  // Safely iterate through plugins to find one with matching type
+  const pluginEntries = Object.entries(pluginsRegistry);
+  for (let i = 0; i < pluginEntries.length; i++) {
+    const [, pluginObj] = pluginEntries[i];
+    
+    // Skip invalid plugins
+    if (!pluginObj || typeof pluginObj !== 'object') continue;
+    
+    // Check if propPanel exists and is an object
+    if (!('propPanel' in pluginObj) || 
+        !pluginObj.propPanel || 
+        typeof pluginObj.propPanel !== 'object') continue;
+    
+    // Check if defaultSchema exists and is an object
+    const propPanel = pluginObj.propPanel as { defaultSchema?: unknown };
+    if (!('defaultSchema' in propPanel) || 
+        !propPanel.defaultSchema || 
+        typeof propPanel.defaultSchema !== 'object') continue;
+    
+    // Safely check if type property exists and matches
+    const defaultSchema = propPanel.defaultSchema as Record<string, unknown>;
+    if (!('type' in defaultSchema) || 
+        typeof defaultSchema.type !== 'string') continue;
+    
+    // Check if the type matches
+    const schemaType = defaultSchema.type;
+    if (schemaType === pluginValue) {
+      // Create a type-safe copy of the plugin
+      const safeSchema: PluginSchema = {
+        type: schemaType
+      };
+      
+      // Copy other properties safely
+      Object.keys(defaultSchema).forEach(key => {
+        if (key !== 'type' && Object.prototype.hasOwnProperty.call(defaultSchema, key)) {
+          safeSchema[key] = defaultSchema[key];
+        }
+      });
+      
+      // Found matching plugin with proper typing
+      plugin = {
+        propPanel: {
+          defaultSchema: safeSchema
+        }
+      };
+      break;
     }
-  });
+  }
+  
+  const propPanel = plugin?.propPanel;
+  
+  // Apply default schema properties if available
+  if (propPanel?.defaultSchema) {
+    // Create a type-safe copy of the default schema
+    const defaultSchema = propPanel.defaultSchema;
+    const schemaRecord = schema as Record<string, unknown>;
+    
+    // Use a type-safe approach to copy properties
+    for (const key of Object.keys(defaultSchema)) {
+      // Only add properties that don't already exist in the schema
+      if (!Object.prototype.hasOwnProperty.call(schema, key)) {
+        // Create a safe copy of the property
+        if (Object.prototype.hasOwnProperty.call(defaultSchema, key)) {
+          // Get the property value safely
+          const propertyValue = defaultSchema[key];
+          
+          // Only assign if the value is defined
+          if (propertyValue !== undefined) {
+            schemaRecord[key] = propertyValue;
+          }
+        }
+      }
+    }
+  }
   if (schema.readOnly) {
     schema.required = false;
   }
 };
 
 export const changeSchemas = (args: {
-  objs: { key: string; value: any; schemaId: string }[];
+  objs: { key: string; value: unknown; schemaId: string }[];
   schemas: SchemaForUI[];
   basePdf: BasePdf;
   pluginsRegistry: Plugins;
@@ -492,8 +585,8 @@ export const changeSchemas = (args: {
   commitSchemas(newSchemas);
 };
 
-export const getMaxZoom = () => {
+export const useMaxZoom = () => {
   const options = useContext(OptionsContext);
 
-  return options.maxZoom ? (options.maxZoom as number) / 100 : DEFAULT_MAX_ZOOM;
+  return options.maxZoom ? options.maxZoom / 100 : DEFAULT_MAX_ZOOM;
 };
