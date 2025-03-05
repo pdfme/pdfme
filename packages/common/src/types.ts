@@ -54,7 +54,7 @@ export interface PDFRenderProps<T extends Schema> {
   page: PDFPage;
   options: GeneratorOptions;
 
-  _cache: Map<string, unknown>;
+  _cache: Map<any, any>;
 }
 
 /**
@@ -88,7 +88,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: string) => string;
-  _cache: Map<string, unknown>;
+  _cache: Map<any, any>;
 };
 
 /**
@@ -152,7 +152,7 @@ export type Plugin<T extends Schema & { [key: string]: unknown }> = {
   uninterruptedEditMode?: boolean;
 };
 
-export type Plugins = { [key: string]: Plugin<Schema & { [key: string]: unknown }> | undefined };
+export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;
