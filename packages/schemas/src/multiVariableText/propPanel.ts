@@ -55,9 +55,11 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     const para = document.createElement('p');
     // Extract color value to avoid unsafe property access
     const colorValue = options?.theme?.token?.colorPrimary || '#168fe3';
+    const isValidColor = /^#[0-9A-F]{6}$/i.test(colorValue) || /^(rgb|hsl)a?\(\s*([+-]?\d+%?\s*,\s*){2,3}[+-]?\d+%?\s*\)$/i.test(colorValue);
+    const safeColorValue = isValidColor ? colorValue : '#168fe3';
     para.innerHTML =
       i18n('schemas.mvt.typingInstructions') +
-      ` <code style="color:${colorValue}; font-weight:bold;">{` +
+      ` <code style="color:${safeColorValue}; font-weight:bold;">{` +
       i18n('schemas.mvt.sampleField') +
       '}</code>';
     rootElement.appendChild(para);
