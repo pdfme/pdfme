@@ -1,7 +1,7 @@
 import { createCanvas } from 'canvas';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
-// @ts-ignore
+// @ts-expect-error - Legacy PDF.js import is not properly typed but required for Node.js environment
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 
 export const pdf2img = async (
@@ -12,10 +12,17 @@ export const pdf2img = async (
     getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
     createCanvas: (width, height) => createCanvas(width, height) as unknown as HTMLCanvasElement,
     canvasToArrayBuffer: (canvas, imageType) => {
-      // @ts-ignore
-      const buffer = canvas.toBuffer(`image/${imageType}`);
-      // @ts-ignore
-      return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
+      try {
+        // Using a more specific type for the canvas from the 'canvas' package
+        const nodeCanvas = canvas as unknown as import('canvas').Canvas;
+        // Get buffer from the canvas
+        const buffer = nodeCanvas.toBuffer(`image/${imageType}`);
+        // Convert to ArrayBuffer
+        return new Uint8Array(buffer).buffer;
+      } catch (error) {
+        console.error('Error converting canvas to array buffer:', error);
+        return new ArrayBuffer(0);
+      }
     },
   });
 

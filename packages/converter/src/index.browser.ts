@@ -1,11 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist';
-// @ts-expect-error
+// @ts-expect-error - PDFJSWorker import is not properly typed but required for functionality
 import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
 
-// @ts-ignore
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
+// @ts-expect-error - Setting workerSrc is required but type definitions are incomplete
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown;
 
 function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   // Split out the actual base64 string from the data URL scheme
@@ -37,9 +37,16 @@ export const pdf2img = async (
       canvas.height = height;
       return canvas;
     },
-    canvasToArrayBuffer: (canvas, imageType) =>
-      // @ts-ignore
-      dataURLToArrayBuffer(canvas.toDataURL(`image/${imageType}`)),
+    canvasToArrayBuffer: (canvas, imageType) => {
+      try {
+        // Using type assertion to handle the canvas method
+        const dataUrl = (canvas as HTMLCanvasElement).toDataURL(`image/${imageType}`);
+        return dataURLToArrayBuffer(dataUrl);
+      } catch (error) {
+        console.error('Error converting canvas to array buffer:', error);
+        return new ArrayBuffer(0);
+      }
+    },
   });
 
 export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
