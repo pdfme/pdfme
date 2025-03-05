@@ -177,18 +177,16 @@ describe('Playground E2E Tests', () => {
   it.skip('should modify template, generate PDF and compare, then input form data', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
     
-    // Add more configuration options to the PuppeteerRunnerExtension
+    // Create PuppeteerRunnerExtension with only the supported timeout option
     const extension = new PuppeteerRunnerExtension(browser, page, { 
-      timeout,
-      waitForSelector: { timeout, visible: true },
-      waitForNavigation: { timeout, waitUntil: 'networkidle2' }
+      timeout
     });
 
     // 9. Press Reset button
     await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
     
     // Add a small delay to ensure UI is ready
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // 10. Replay templateCreationRecord operations to add elements
     const templateCreationUserFlow = parse(templateCreationRecord);
@@ -196,7 +194,7 @@ describe('Playground E2E Tests', () => {
     await templateCreationRunner.run();
     
     // Add a small delay to ensure UI is ready
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // 11. Screenshot & compare
     await captureAndCompareScreenshot(page, 'modified-template-designer');
@@ -208,7 +206,7 @@ describe('Playground E2E Tests', () => {
     await page.click('#save-local');
     
     // Add a small delay to ensure save is complete
-    await page.waitForTimeout(1000);
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // 14. Move to form viewer
     await page.click('#form-viewer-nav');
@@ -218,7 +216,7 @@ describe('Playground E2E Tests', () => {
     }, { timeout });
     
     // Add a small delay to ensure form viewer is fully loaded
-    await page.waitForTimeout(2000);
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // 15. Input form data
     const formInputUserFlow = parse(formInputRecord);
@@ -229,7 +227,7 @@ describe('Playground E2E Tests', () => {
     } catch (error) {
       console.error('Error during form input:', error);
       // Take a screenshot to help debug the issue
-      const screenshot = await page.screenshot({ encoding: 'base64' });
+      await page.screenshot({ encoding: 'base64' });
       console.log('Debug screenshot taken at error point');
       throw error;
     }
