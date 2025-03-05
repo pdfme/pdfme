@@ -156,7 +156,7 @@ export const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 const CommonProps = z.object({
   template: Template,
   options: CommonOptions.optional(),
-  plugins: z.record(z.object({ ui: z.any(), pdf: z.any(), propPanel: z.any() })).optional(),
+  plugins: z.record(z.any()).optional(),
 });
 
 // -------------------generate-------------------
@@ -184,7 +184,7 @@ export const GenerateProps = CommonProps.extend({
 export const UIOptions = CommonOptions.extend({
   lang: Lang.optional(),
   labels: z.record(z.string(), z.string()).optional(),
-  theme: z.record(z.string(), z.unknown()).optional(),
+  theme: z.record(z.string(), z.any()).optional(),
   icons: z.record(z.string(), z.string()).optional(),
   requiredByDefault: z.boolean().optional(),
   maxZoom: z.number().optional(),

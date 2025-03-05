@@ -67,7 +67,7 @@ const DetailView = (props: DetailViewProps) => {
             options={options}
             theme={token}
             i18n={i18n as (key: keyof Dict | string) => string}
-            widget={widgetValue}
+            widget={widgetValue as (props: PropPanelWidgetProps) => void}
           />
         );
       });
