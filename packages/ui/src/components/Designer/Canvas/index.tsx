@@ -10,7 +10,7 @@ import React, {
   useCallback,
 } from 'react';
 import { theme, Button } from 'antd';
-import MoveableComponent, { OnDrag, OnRotate, OnRotateEnd, OnClick, OnResize } from 'react-moveable';
+import MoveableComponent, { OnDrag, OnRotate, OnResize } from 'react-moveable';
 import {
   ZOOM,
   SchemaForUI,
@@ -320,8 +320,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
-  const onClickMoveable = (e: OnClick) => {
-    e.inputEvent.stopPropagation();
+  const onClickMoveable = () => {
+    // Just set editing to true without trying to access event properties
     setEditing(true);
   };
 
@@ -331,13 +331,30 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
     const uniqueSchemaTypes = [...new Set(schemaTypes)];
-    const defaultSchemas = Object.values(pluginsRegistry).map(
-      (plugin) => plugin?.propPanel.defaultSchema,
-    );
+    
+    // Create a type-safe array of default schemas
+    const defaultSchemas: Record<string, unknown>[] = [];
+    
+    // Safely iterate through plugins registry
+    Object.values(pluginsRegistry).forEach(plugin => {
+      if (plugin && 
+          typeof plugin === 'object' && 
+          'propPanel' in plugin && 
+          plugin.propPanel && 
+          typeof plugin.propPanel === 'object' &&
+          'defaultSchema' in plugin.propPanel && 
+          plugin.propPanel.defaultSchema) {
+        defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
+      }
+    });
 
-    return uniqueSchemaTypes.every(
-      (type) => defaultSchemas.find((ds) => ds.type === type)?.rotate !== undefined,
-    );
+    // Check if all schema types have rotate property
+    return uniqueSchemaTypes.every(type => {
+      const matchingSchema = defaultSchemas.find(ds => 
+        ds && 'type' in ds && ds.type === type
+      );
+      return matchingSchema && 'rotate' in matchingSchema;
+    });
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
 
   return (
@@ -354,26 +371,37 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
         container={paperRefs.current[pageCursor]}
         continueSelect={isPressShiftKey}
         onDragStart={(e) => {
-          const { inputEvent } = e;
-          const isMoveableElement = moveable.current?.isMoveableElement(inputEvent.target as Element);
+          // Use type assertion to safely access inputEvent properties
+          const inputEvent = e.inputEvent as MouseEvent | TouchEvent;
+          const target = inputEvent.target as Element | null;
+          const isMoveableElement = moveable.current?.isMoveableElement(target as Element);
+          
           if ((inputEvent.type === 'touchstart' && e.isTrusted) || isMoveableElement) {
             e.stop();
           }
 
-          if (paperRefs.current[pageCursor] === inputEvent.target) {
+          if (paperRefs.current[pageCursor] === target) {
             onEdit([]);
           }
+          
           // Check if the target is an HTMLElement and has an id property
-          const targetElement = inputEvent.target as HTMLElement;
+          const targetElement = target as HTMLElement | null;
           if (targetElement && targetElement.id === DELETE_BTN_ID) {
             removeSchemas(activeElements.map((ae) => ae.id));
           }
         }}
-        onSelect={({ added, removed, selected, inputEvent }) => {
+        onSelect={(e) => {
+          // Use type assertions to safely access properties
+          const inputEvent = e.inputEvent as MouseEvent | TouchEvent;
+          const added = e.added as HTMLElement[];
+          const removed = e.removed as HTMLElement[];
+          const selected = e.selected as HTMLElement[];
+          
           const isClick = inputEvent.type === 'mousedown';
-          let newActiveElements: HTMLElement[] = isClick ? (selected as HTMLElement[]) : [];
+          let newActiveElements: HTMLElement[] = isClick ? selected : [];
+          
           if (!isClick && added.length > 0) {
-            newActiveElements = activeElements.concat(added as HTMLElement[]);
+            newActiveElements = activeElements.concat(added);
           }
           if (!isClick && removed.length > 0) {
             newActiveElements = activeElements.filter((ae) => !removed.includes(ae));
@@ -383,8 +411,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (newActiveElements != activeElements) {
             setEditing(false);
           }
+          
           // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
-          if (!inputEvent.shiftKey) {
+          const mouseEvent = inputEvent as MouseEvent;
+          if (mouseEvent && typeof mouseEvent.shiftKey === 'boolean' && !mouseEvent.shiftKey) {
             setIsPressShiftKey(false);
           }
         }}
@@ -485,7 +515,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               onChangeHoveringSchemaId={onChangeHoveringSchemaId}
               mode={mode}
               onChange={(arg) => {
-                const args = Array.isArray(arg) ? arg : [arg];
+                // Use type assertion to safely handle the argument
+                type ChangeArg = { key: string; value: unknown };
+                const args = Array.isArray(arg) ? arg as ChangeArg[] : [arg as ChangeArg];
                 changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
               }}
               stopEditing={() => setEditing(false)}

@@ -168,7 +168,7 @@ export const b64toUint8Array = (base64: string) => {
 const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
-      .map((p) => p.map((v) => (v as any).fontName ?? ''))
+      .map((p) => p.map((v) => (v as Schema & { fontName?: string }).fontName ?? ''))
       .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
       .filter(Boolean) as string[],
   );
@@ -212,7 +212,9 @@ export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
   } = arg;
   const allSchemaTypes = uniq(schemas.map((p) => p.map((v) => v.type)).flat());
 
-  const pluginsSchemaTypes = Object.values(plugins).map((p) => p?.propPanel.defaultSchema.type);
+  const pluginsSchemaTypes = Object.values(plugins).map((p) => 
+    p ? (p.propPanel.defaultSchema as Schema).type : undefined
+  );
 
   if (allSchemaTypes.some((s) => !pluginsSchemaTypes.includes(s))) {
     throw Error(

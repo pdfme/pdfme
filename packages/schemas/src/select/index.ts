@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { Plugin, PropPanelWidgetProps, SchemaForUI, UIRenderProps } from '@pdfme/common';
 import text from '../text/index.js';
 import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
@@ -112,7 +112,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
 };
 
 const schema: Plugin<Select> = {
-  ui: async (arg) => {
+  ui: async (arg: UIRenderProps<Select>) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 
@@ -154,7 +154,9 @@ const schema: Plugin<Select> = {
         }
       });
 
-      selectElement.innerHTML = schema.options
+      // Ensure schema.options is an array before mapping
+      const options = Array.isArray(schema.options) ? schema.options : [];
+      selectElement.innerHTML = options
         .map(
           (option) =>
             `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`,
@@ -172,8 +174,12 @@ const schema: Plugin<Select> = {
         throw Error('Oops, is text schema no longer a function?');
       }
 
+      // Safely call the parent schema function with proper type checking
+      const parentSchema = parentPropPanel.schema(propPanelProps);
+
+      // Create a type-safe return object
       return {
-        ...parentPropPanel.schema(propPanelProps),
+        ...parentSchema,
         '-------': { type: 'void', widget: 'Divider' },
 
         optionsContainer: {
@@ -185,11 +191,18 @@ const schema: Plugin<Select> = {
         },
       };
     },
-    defaultSchema: {
-      ...text.propPanel.defaultSchema,
-      type: 'select',
-      content: 'option1',
-      options: ['option1', 'option2'],
+    // Create a type-safe defaultSchema by first creating a safe copy of the text.propPanel.defaultSchema
+    get defaultSchema() {
+      // Create a safe copy of the text.propPanel.defaultSchema
+      const baseSchema = text.propPanel.defaultSchema;
+
+      // Add our properties
+      return {
+        ...baseSchema,
+        type: 'select',
+        content: 'option1',
+        options: ['option1', 'option2'],
+      };
     },
   },
   icon: selectIcon,

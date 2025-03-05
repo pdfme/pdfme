@@ -1,16 +1,31 @@
 import { b64toUint8Array } from '@pdfme/common';
-import bwipjs, { RenderOptions } from 'bwip-js';
+import bwipjs from 'bwip-js';
 import { Buffer } from 'buffer';
+
+// Define a public interface for the options to avoid using the private RenderOptions
+export interface BarcodeRenderOptions {
+  bcid: string;
+  text: string;
+  scale?: number;
+  width?: number;
+  height?: number;
+  includetext?: boolean;
+  textxalign?: 'center' | 'offleft' | 'left' | 'right' | 'offright' | 'justify';
+  backgroundcolor?: string;
+  barcolor?: string;
+  textcolor?: string;
+  [key: string]: unknown;
+}
 
 // Extend the bwipjs type to include browser-specific methods
 declare module 'bwip-js' {
   interface BwipJs {
-    toCanvas(canvas: HTMLCanvasElement, options: any): void;
+    toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
   }
   
   export default interface BwipJsModule {
-    toCanvas(canvas: HTMLCanvasElement, options: any): void;
-    toBuffer(options: any): Promise<Buffer>;
+    toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
+    toBuffer(options: BarcodeRenderOptions): Promise<Buffer>;
   }
 }
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
@@ -160,7 +175,7 @@ export const createBarCode = async (arg: {
 
   const bcid = barCodeType2Bcid(type);
   const scale = 5;
-  const bwipjsArg: RenderOptions = {
+  const bwipjsArg: BarcodeRenderOptions = {
     bcid,
     text: input,
     width,
@@ -178,12 +193,15 @@ export const createBarCode = async (arg: {
 
   if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
-    // Using any type for bwipjs to avoid type errors with toCanvas method
-    (bwipjs as any).toCanvas(canvas, bwipjsArg);
+    // Use a type assertion to safely call toCanvas
+    const bwipjsModule = bwipjs as unknown as { toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void };
+    bwipjsModule.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = Buffer.from(b64toUint8Array(dataUrl).buffer);
   } else {
-    res = await bwipjs.toBuffer(bwipjsArg);
+    // Use a type assertion to safely call toBuffer
+    const bwipjsModule = bwipjs as unknown as { toBuffer(options: BarcodeRenderOptions): Promise<Buffer> };
+    res = await bwipjsModule.toBuffer(bwipjsArg);
   }
 
   return res;

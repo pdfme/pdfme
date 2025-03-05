@@ -1,5 +1,4 @@
-import { Plugin } from '@pdfme/common';
-import { Schema } from '@pdfme/common';
+import { Plugin, Schema, UIRenderProps, PDFRenderProps } from '@pdfme/common';
 import svg from '../graphics/svg.js';
 import { isEditable } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
@@ -19,7 +18,7 @@ const getIcon = ({ value, color }: { value: string; color: string }) =>
   value === 'true' ? getCheckedIcon(color) : getUncheckedIcon(color);
 
 const schema: Plugin<Checkbox> = {
-  ui: (arg) => {
+  ui: (arg: UIRenderProps<Checkbox>) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
     container.style.width = '100%';
@@ -40,7 +39,7 @@ const schema: Plugin<Checkbox> = {
 
     rootElement.appendChild(container);
   },
-  pdf: (arg) =>
+  pdf: (arg: PDFRenderProps<Checkbox>) =>
     svg.pdf(Object.assign(arg, { value: getIcon({ value: arg.value, color: arg.schema.color }) })),
   propPanel: {
     schema: ({ i18n }) => ({

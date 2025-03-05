@@ -112,7 +112,7 @@ const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
 export const getFontKitFont = async (
   fontName: string | undefined,
   font: Font,
-  _cache: Map<string, fontkit.Font>,
+  _cache: Map<string | number, fontkit.Font>,
 ) => {
   const fntNm = fontName || getFallbackFontName(font);
   const cacheKey = getCacheKey(fntNm);
