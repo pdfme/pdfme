@@ -53,7 +53,7 @@ const generate = async (props: GenerateProps) => {
 
   const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
-  const _cache = new Map();
+  const _cache = new Map<string, unknown>();
 
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
@@ -85,9 +85,18 @@ const generate = async (props: GenerateProps) => {
       template: dynamicTemplate,
       pdfDoc,
     });
-    const schemaNames = [
-      ...new Set(dynamicTemplate.schemas.flatMap((page: Schema[]) => page.map((schema: Schema) => schema.name))),
-    ];
+    // Add proper type assertion for dynamicTemplate.schemas
+    const schemas = dynamicTemplate.schemas as Schema[][];
+    // Create a type-safe array of schema names without using Set spread which requires downlevelIteration
+    const schemaNameSet = new Set<string>();
+    schemas.forEach((page: Schema[]) => {
+      page.forEach((schema: Schema) => {
+        if (schema.name) {
+          schemaNameSet.add(schema.name);
+        }
+      });
+    });
+    const schemaNames = Array.from(schemaNameSet);
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
@@ -110,7 +119,7 @@ const generate = async (props: GenerateProps) => {
           const value = replacePlaceholders({
             content: staticSchema.content || '',
             variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-            schemas: dynamicTemplate.schemas,
+            schemas: schemas, // Use the properly typed schemas variable
           });
 
           staticSchema.position = {
@@ -118,7 +127,8 @@ const generate = async (props: GenerateProps) => {
             y: staticSchema.position.y - boundingBoxBottom,
           };
 
-          await render({
+          // Create properly typed render props for static schema
+          const staticRenderProps: PDFRenderProps<Schema> = {
             value,
             schema: staticSchema,
             basePdf,
@@ -126,14 +136,15 @@ const generate = async (props: GenerateProps) => {
             pdfDoc,
             page,
             options,
-            _cache,
-          });
+            _cache: _cache as Map<string | number, unknown>,
+          };
+          await render(staticRenderProps);
         }
       }
 
       for (let l = 0; l < schemaNames.length; l += 1) {
         const name = schemaNames[l];
-        const schemaPage = dynamicTemplate.schemas[j] || [];
+        const schemaPage = schemas[j] || [];
         const schema = schemaPage.find((s: Schema) => s.name == name);
         if (!schema) {
           continue;
@@ -147,7 +158,7 @@ const generate = async (props: GenerateProps) => {
           ? replacePlaceholders({
               content: schema.content || '',
               variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-              schemas: dynamicTemplate.schemas,
+              schemas: schemas, // Use the properly typed schemas variable
             })
           : (input[name] || '') as string;
 
@@ -165,7 +176,7 @@ const generate = async (props: GenerateProps) => {
           pdfDoc,
           page,
           options,
-          _cache,
+          _cache: _cache as Map<string | number, unknown>,
         };
         await render(renderProps);
       }

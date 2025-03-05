@@ -113,7 +113,13 @@ const addOptions = (props: PropPanelWidgetProps) => {
 
 const schema: Plugin<Select> = {
   ui: async (arg) => {
-    const { schema, value, onChange, rootElement, mode } = arg;
+    const { schema, value, onChange, rootElement, mode } = arg as { 
+      schema: SchemaForUI & Select; 
+      value: string; 
+      onChange?: (change: { key: string; value: string }) => void; 
+      rootElement: HTMLElement; 
+      mode: string 
+    };
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 
     if (mode !== 'viewer' && !(mode === 'form' && schema.readOnly)) {
@@ -154,7 +160,9 @@ const schema: Plugin<Select> = {
         }
       });
 
-      selectElement.innerHTML = schema.options
+      // Ensure schema.options is an array before mapping
+      const options = Array.isArray(schema.options) ? schema.options : [];
+      selectElement.innerHTML = options
         .map(
           (option: string) =>
             `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`,
@@ -172,8 +180,12 @@ const schema: Plugin<Select> = {
         throw Error('Oops, is text schema no longer a function?');
       }
 
+      // Safely call the parent schema function with proper type checking
+      const parentSchema = parentPropPanel.schema(propPanelProps);
+      
+      // Create a type-safe return object
       return {
-        ...parentPropPanel.schema(propPanelProps),
+        ...parentSchema,
         '-------': { type: 'void', widget: 'Divider' },
 
         optionsContainer: {
@@ -185,11 +197,20 @@ const schema: Plugin<Select> = {
         },
       };
     },
-    defaultSchema: {
-      ...text.propPanel.defaultSchema,
-      type: 'select',
-      content: 'option1',
-      options: ['option1', 'option2'],
+    // Create a type-safe defaultSchema by first creating a safe copy of the text.propPanel.defaultSchema
+    get defaultSchema() {
+      // Create a safe copy of the text.propPanel.defaultSchema
+      const baseSchema = text.propPanel.defaultSchema ? 
+        { ...text.propPanel.defaultSchema as Record<string, unknown> } : 
+        {};
+      
+      // Add our properties
+      return {
+        ...baseSchema,
+        type: 'select',
+        content: 'option1',
+        options: ['option1', 'option2'],
+      };
     },
   },
   icon: selectIcon,

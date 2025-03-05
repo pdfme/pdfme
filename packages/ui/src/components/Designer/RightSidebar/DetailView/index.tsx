@@ -45,10 +45,10 @@ const DetailView = (props: DetailViewProps) => {
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
   
-  // Define a type-safe i18n function that accepts any string key
+  // Define a type-safe i18n function that accepts string keys
   const typedI18n = (key: string): string => {
-    // Cast the key to any to avoid type constraints
-    return typeof i18n === 'function' ? i18n(key as any) : key;
+    // Use a type assertion that preserves the string type
+    return typeof i18n === 'function' ? i18n(key) : key;
   };
 
   const [widgets, setWidgets] = useState<{
