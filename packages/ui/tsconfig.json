@@ -7,14 +7,14 @@
     "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
-    "module": "NodeNext",
+    "module": "ESNext",
     "lib": [
       "ES2020",
       "DOM",
       "DOM.Iterable",
       "ESNext"
     ],
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": ["jest"],
