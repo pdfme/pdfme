@@ -27,9 +27,9 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
-  checkbox.checked = Boolean((activeSchema as any)?.dynamicFontSize);
-  checkbox.onchange = (e: any) => {
-    const val = e.target.checked
+  checkbox.checked = Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
+  checkbox.onchange = (e: Event) => {
+    const val = (e.target as HTMLInputElement).checked
       ? {
           min: DEFAULT_DYNAMIC_MIN_FONT_SIZE,
           max: DEFAULT_DYNAMIC_MAX_FONT_SIZE,
@@ -54,7 +54,7 @@ export const propPanel: PropPanel<TextSchema> = {
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
 
-    const enableDynamicFont = Boolean((activeSchema as any)?.dynamicFontSize);
+    const enableDynamicFont = Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
 
     const textSchema: Record<string, PropPanelSchema> = {
       fontName: {

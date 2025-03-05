@@ -114,7 +114,7 @@ export class Table {
     input: TableInput;
     content: ContentSettings;
     font: Font;
-    _cache: Map<any, any>;
+    _cache: Map<string, FontKitFont>;
   }) {
     const { input, content, font, _cache } = arg;
     const table = new Table(input, content);
@@ -145,7 +145,7 @@ export class Table {
   }
 }
 
-async function calculateWidths(arg: { table: Table; font: Font; _cache: Map<any, any> }) {
+async function calculateWidths(arg: { table: Table; font: Font; _cache: Map<string, FontKitFont> }) {
   const { table, font, _cache } = arg;
 
   const getFontKitFontByFontName = (fontName: string | undefined) =>

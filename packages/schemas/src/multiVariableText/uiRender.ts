@@ -23,16 +23,17 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   await parentUiRender({
     value: isEditable(mode, schema) ? text : substituteVariables(text, value),
     schema,
-    mode: mode == 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
+    mode: mode === 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
     rootElement,
-    onChange: (arg: { key: string; value: any } | { key: string; value: any }[]) => {
+    onChange: (arg: { key: string; value: string } | { key: string; value: string }[]) => {
       if (!Array.isArray(arg)) {
         const numVariables = countUniqueVariableNames(arg.value);
-        onChange &&
+        if (onChange) {
           onChange([
             { key: 'text', value: arg.value },
-            { key: 'readOnly', value: numVariables == 0 },
+            { key: 'readOnly', value: numVariables === 0 },
           ]);
+        }
       } else {
         throw new Error('onChange is not an array, the parent text plugin has changed...');
       }
@@ -40,7 +41,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     ...rest,
   });
 
-  const textBlock = rootElement.querySelector('#text-' + schema.id) as HTMLDivElement;
+  const textBlock = rootElement.querySelector('#text-' + String(schema.id)) as HTMLDivElement;
   if (!textBlock) {
     throw new Error('Text block not found. Ensure the text block has an id of "text-" + schema.id');
   }
@@ -55,7 +56,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
           if (onChange) {
             onChange([
               { key: 'text', value: text },
-              { key: 'readOnly', value: newNumVariables == 0 },
+              { key: 'readOnly', value: newNumVariables === 0 },
             ]);
           }
           numVariables = newNumVariables;
@@ -74,11 +75,11 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     rootElement.parentElement.style.outline = '';
   }
 
-  const variables: Record<string, string> = value ? JSON.parse(value) || {} : {};
+  const variables: Record<string, string> = value ? JSON.parse(value) as Record<string, string> || {} : {};
   const variableIndices = getVariableIndices(rawText);
   const substitutedText = substituteVariables(rawText, variables);
   const font = options?.font || getDefaultFont();
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache);
+  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache as Map<string, import('fontkit').Font>);
 
   const textBlock = buildStyledTextContainer(arg, fontKitFont, substitutedText);
 
@@ -96,8 +97,8 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
         const newValue = (e.target as HTMLSpanElement).textContent || '';
         if (newValue !== variables[variableIndices[i]]) {
           variables[variableIndices[i]] = newValue;
-          onChange && onChange({ key: 'content', value: JSON.stringify(variables) });
-          stopEditing && stopEditing();
+          if (onChange) onChange({ key: 'content', value: JSON.stringify(variables) });
+          if (stopEditing) stopEditing();
         }
       });
       textBlock.appendChild(span);
@@ -145,10 +146,10 @@ const countUniqueVariableNames = (content: string) => {
  */
 const keyPressShouldBeChecked = (event: KeyboardEvent) => {
   if (
-    event.key == 'ArrowUp' ||
-    event.key == 'ArrowDown' ||
-    event.key == 'ArrowLeft' ||
-    event.key == 'ArrowRight'
+    event.key === 'ArrowUp' ||
+    event.key === 'ArrowDown' ||
+    event.key === 'ArrowLeft' ||
+    event.key === 'ArrowRight'
   ) {
     return false;
   }

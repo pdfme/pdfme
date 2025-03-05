@@ -5,9 +5,9 @@ import { MultiVariableTextSchema } from './types.js';
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n, options } = props;
 
-  const mvtSchema = activeSchema as any;
+  const mvtSchema = activeSchema as unknown as MultiVariableTextSchema;
   const text = mvtSchema.text || '';
-  const variables = JSON.parse(mvtSchema.content) || {};
+  const variables = JSON.parse(mvtSchema.content || '{}') as Record<string, string>;
   const variablesChanged = updateVariablesFromText(text, variables);
   const varNames = Object.keys(variables);
 
@@ -37,10 +37,12 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
       textarea.id = 'dynamic-var-' + variableName;
       textarea.value = variables[variableName];
       textarea.addEventListener('change', (e: Event) => {
-        variables[variableName] = (e.target as HTMLTextAreaElement).value;
-        changeSchemas([
-          { key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id },
-        ]);
+        if (variableName in variables) {
+          variables[variableName] = (e.target as HTMLTextAreaElement).value;
+          changeSchemas([
+            { key: 'content', value: JSON.stringify(variables), schemaId: activeSchema.id },
+          ]);
+        }
       });
 
       const label = varRow.querySelector('label') as HTMLLabelElement;
@@ -51,9 +53,13 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
     }
   } else {
     const para = document.createElement('p');
+    // Extract color value to avoid unsafe property access
+    const colorValue = options?.theme?.token?.colorPrimary || '#168fe3';
+    const isValidColor = /^#[0-9A-F]{6}$/i.test(colorValue) || /^(rgb|hsl)a?\(\s*([+-]?\d+%?\s*,\s*){2,3}[+-]?\d+%?\s*\)$/i.test(colorValue);
+    const safeColorValue = isValidColor ? colorValue : '#168fe3';
     para.innerHTML =
       i18n('schemas.mvt.typingInstructions') +
-      ` <code style="color:${options?.theme?.token?.colorPrimary || '#168fe3'}; font-weight:bold;">{` +
+      ` <code style="color:${safeColorValue}; font-weight:bold;">{` +
       i18n('schemas.mvt.sampleField') +
       '}</code>';
     rootElement.appendChild(para);
@@ -63,13 +69,15 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
 export const propPanel: PropPanel<MultiVariableTextSchema> = {
   schema: (propPanelProps: Omit<PropPanelWidgetProps, 'rootElement'>) => {
     if (typeof parentPropPanel.schema !== 'function') {
-      throw Error('Oops, is text schema no longer a function?');
+      throw new Error('Oops, is text schema no longer a function?');
     }
+    // Safely call schema function with proper type handling
+    const parentSchema = parentPropPanel.schema?.(propPanelProps) || {};
     return {
-      ...parentPropPanel.schema(propPanelProps),
+      ...parentSchema,
       '-------': { type: 'void', widget: 'Divider' },
       dynamicVarContainer: {
-        title: propPanelProps.i18n('schemas.mvt.variablesSampleData'),
+        title: typeof propPanelProps.i18n === 'function' ? propPanelProps.i18n('schemas.mvt.variablesSampleData') : 'Variables Sample Data',
         type: 'string',
         widget: 'Card',
         span: 24,
@@ -97,7 +105,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
       },
     };
   },
-  widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
+  widgets: { ...(parentPropPanel.widgets || {}), mapDynamicVariables },
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
     readOnly: false,
@@ -110,7 +118,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
   },
 };
 
-const updateVariablesFromText = (text: string, variables: any): boolean => {
+const updateVariablesFromText = (text: string, variables: Record<string, string>): boolean => {
   const regex = /\{([^{}]+)}/g;
   const matches = text.match(regex);
   let changed = false;

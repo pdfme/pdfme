@@ -69,10 +69,10 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     input.placeholder = placeholder || '';
     input.tabIndex = tabIndex || 0;
     input.addEventListener('change', (e: Event) => {
-      onChange && onChange({ key: 'content', value: (e.target as HTMLInputElement).value });
+      if (onChange) onChange({ key: 'content', value: (e.target as HTMLInputElement).value });
     });
     input.addEventListener('blur', () => {
-      stopEditing && stopEditing();
+      if (stopEditing) stopEditing();
     });
     container.appendChild(input);
     input.setSelectionRange(value.length, value.length);
@@ -88,7 +88,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     const imgElm = await createBarcodeImageElm(schema, value);
     container.appendChild(imgElm);
   } catch (err) {
-    console.error(`[@pdfme/ui] ${err}`);
+    console.error(`[@pdfme/ui] ${String(err)}`);
     container.appendChild(createErrorElm());
   }
 };
