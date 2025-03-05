@@ -340,10 +340,14 @@ const evaluatePlaceholders = (arg: {
       const code = content.slice(startIndex + 1, endIndex - 1).trim();
 
       if (expressionCache.has(code)) {
-        const evalFunc = expressionCache.get(code)!;
+        const evalFunc = expressionCache.get(code);
         try {
-          const value = evalFunc(context);
-          resultContent += String(value);
+          if (typeof evalFunc === 'function') {
+            const value = evalFunc(context);
+            resultContent += String(value);
+          } else {
+            resultContent += content.slice(startIndex, endIndex);
+          }
         } catch {
           resultContent += content.slice(startIndex, endIndex);
         }
@@ -371,7 +375,7 @@ const evaluatePlaceholders = (arg: {
 
 export const replacePlaceholders = (arg: {
   content: string;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   schemas: SchemaPageArray;
 }): string => {
   const { content, variables, schemas } = arg;

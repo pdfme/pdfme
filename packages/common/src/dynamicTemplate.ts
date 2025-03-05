@@ -4,11 +4,11 @@ import { cloneDeep, isBlankPdf } from './helper.js';
 interface ModifyTemplateForDynamicTableArg {
   template: Template;
   input: Record<string, string>;
-  _cache: Map<any, any>;
+  _cache: Map<string, unknown>;
   options: CommonOptions;
   getDynamicHeights: (
     value: string,
-    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<any, any> },
+    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<string, unknown> },
   ) => Promise<number[]>;
 }
 
@@ -90,8 +90,8 @@ function createNode(arg: {
 function resortChildren(page: LayoutNode, orderMap: Map<string, number>): void {
   page.children = page.children
     .sort((a, b) => {
-      const orderA = orderMap.get(a.schema?.name!);
-      const orderB = orderMap.get(b.schema?.name!);
+      const orderA = orderMap.get(a.schema?.name ?? '');
+      const orderB = orderMap.get(b.schema?.name ?? '');
       if (orderA === undefined || orderB === undefined) {
         throw new Error('[@pdfme/common] order is not defined');
       }
@@ -216,10 +216,15 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
       if (!nameToSchemas.has(name)) {
         nameToSchemas.set(name, []);
       }
-      nameToSchemas.get(name)!.push(child);
+      const schemas = nameToSchemas.get(name);
+      if (schemas) {
+        schemas.push(child);
+      }
 
       const sameNameSchemas = page.children.filter((c) => c.schema?.name === name);
-      const start = nameToSchemas.get(name)!.length - sameNameSchemas.length;
+      const schemas2 = nameToSchemas.get(name);
+      const schemasLength = schemas2 ? schemas2.length : 0;
+      const start = schemasLength - sameNameSchemas.length;
 
       if (sameNameSchemas.length > 0) {
         if (!sameNameSchemas[0].schema) {
@@ -263,7 +268,7 @@ export const getDynamicTemplate = async (
     return template;
   }
 
-  const basePdf = template.basePdf as BlankPdf;
+  const basePdf = template.basePdf;
   const pages: LayoutNode[] = [];
 
   for (const schemaPage of template.schemas) {

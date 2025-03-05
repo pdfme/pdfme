@@ -168,8 +168,8 @@ export const b64toUint8Array = (base64: string) => {
 const getFontNamesInSchemas = (schemas: SchemaPageArray) =>
   uniq(
     schemas
-      .map((p) => p.map((v) => (v as any).fontName ?? ''))
-      .reduce((acc, cur) => acc.concat(cur), [] as (string | undefined)[])
+      .map((p) => p.map((v) => ('fontName' in v ? v.fontName : undefined) ?? ''))
+      .reduce((acc, cur) => acc.concat(...cur), [] as (string | undefined)[])
       .filter(Boolean) as string[],
   );
 
@@ -251,8 +251,15 @@ ${message}`);
 
   // Check plugins if template and plugins exist
   if (data && typeof data === 'object' && 'template' in data && 'plugins' in data) {
-    const { template, plugins } = data as { template: Template; plugins: Plugins };
-    if (plugins) {
+    const dataWithPlugins = data as { template: unknown; plugins: unknown };
+    if (
+      typeof dataWithPlugins.template === 'object' && 
+      dataWithPlugins.template !== null &&
+      typeof dataWithPlugins.plugins === 'object' && 
+      dataWithPlugins.plugins !== null
+    ) {
+      const template = dataWithPlugins.template as Template;
+      const plugins = dataWithPlugins.plugins as Plugins;
       checkPlugins({ plugins, template });
     }
   }
