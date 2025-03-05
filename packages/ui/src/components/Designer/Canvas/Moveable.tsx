@@ -81,20 +81,22 @@ type Props = {
 
 const className = 'pdfme-moveable';
 
-const _Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
+const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   const { token } = theme.useToken();
   useEffect(() => {
-    const containerElement = document.querySelector(`.${className}`) as HTMLElement | null;
+    const containerElement = document.querySelector(`.${className}`);
     const containerElement2 = document.querySelectorAll(
       `.${className} .moveable-line`,
-    ) as NodeListOf<HTMLElement>;
-    if (containerElement) {
+    );
+    if (containerElement instanceof HTMLElement) {
       containerElement.style.setProperty('--moveable-color', token.colorPrimary);
-      Array.from(containerElement2).map((e) =>
-        e.style.setProperty('--moveable-color', token.colorPrimary),
-      );
+      Array.from(containerElement2).forEach((e) => {
+        if (e instanceof HTMLElement) {
+          e.style.setProperty('--moveable-color', token.colorPrimary);
+        }
+      });
     }
-  }, [props.target]);
+  }, [props.target, token.colorPrimary]);
 
   return (
     // @ts-expect-error Third-party library type definitions are incomplete
@@ -139,4 +141,4 @@ const _Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   );
 };
 
-export default forwardRef<MoveableComponent, Props>(_Moveable);
+export default forwardRef<MoveableComponent, Props>(Moveable);

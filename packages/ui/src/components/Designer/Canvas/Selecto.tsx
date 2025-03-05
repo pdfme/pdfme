@@ -27,16 +27,16 @@ type Props = {
 
 const className = 'pdfme-selecto';
 
-const _Selecto = (props: Props) => {
+const Selecto = (props: Props) => {
   const { token } = theme.useToken();
   useEffect(() => {
-    const containerElement = document.querySelector('.' + className) as HTMLElement | null;
-    if (containerElement) {
+    const containerElement = document.querySelector('.' + className);
+    if (containerElement instanceof HTMLElement) {
       containerElement.style.backgroundColor = token.colorPrimary;
       containerElement.style.opacity = '0.75';
       containerElement.style.borderColor = token.colorPrimaryBorder;
     }
-  }, [props.container]);
+  }, [props.container, token.colorPrimary, token.colorPrimaryBorder]);
 
   return (
     <SelectoComponent
@@ -54,4 +54,4 @@ const _Selecto = (props: Props) => {
   );
 };
 
-export default _Selecto;
+export default Selecto;
