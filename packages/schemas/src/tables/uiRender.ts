@@ -250,7 +250,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       text: '+',
       onClick: () => {
         const newRow = Array(schema.head.length).fill('') as string[];
-        onChange && onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
+        if (onChange) onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
       },
     });
 
@@ -266,7 +266,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         text: '-',
         onClick: () => {
           const newTableBody = body.filter((_, j) => j !== i + (schema.__bodyRange?.start ?? 0));
-          onChange && onChange({ key: 'content', value: JSON.stringify(newTableBody) });
+          if (onChange) onChange({ key: 'content', value: JSON.stringify(newTableBody) });
         },
       });
       return removeRowButton;

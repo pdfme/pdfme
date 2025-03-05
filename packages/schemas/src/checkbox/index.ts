@@ -27,7 +27,7 @@ const schema: Plugin<Checkbox> = {
 
     if (isEditable(mode, schema)) {
       container.addEventListener('click', () => {
-        onChange && onChange({ key: 'content', value: value === 'true' ? 'false' : 'true' });
+        if (onChange) onChange({ key: 'content', value: value === 'true' ? 'false' : 'true' });
       });
     }
 

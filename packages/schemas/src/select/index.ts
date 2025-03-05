@@ -150,7 +150,7 @@ const schema: Plugin<Select> = {
 
       selectElement.addEventListener('change', (e) => {
         if (onChange && e.target instanceof HTMLSelectElement) {
-          onChange && onChange({ key: 'content', value: e.target.value });
+          if (onChange) onChange({ key: 'content', value: e.target.value });
         }
       });
 

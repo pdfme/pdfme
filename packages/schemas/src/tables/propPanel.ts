@@ -10,7 +10,7 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
-    // @ts-expect-error
+    // @ts-expect-error Type casting is necessary here as the activeSchema type is generic
     const tableSchema = activeSchema as TableSchema;
     const head = tableSchema.head || [];
     const showHead = tableSchema.showHead || false;
