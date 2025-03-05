@@ -1,28 +1,13 @@
 import React, { useEffect } from 'react';
-import SelectoComponent from 'react-selecto';
+import SelectoComponent, { OnSelect as SelectoOnSelect, OnDragStart as SelectoOnDragStart } from 'react-selecto';
 import { SELECTABLE_CLASSNAME } from '../../../constants.js';
 import { theme } from 'antd';
-
-// Define the types locally to match what's expected in Canvas/index.tsx
-interface OnDragStart {
-  inputEvent: MouseEvent;
-  stop: () => void;
-  isTrusted: boolean;
-}
-
-interface OnSelect {
-  selected: Element[];
-  added: Element[];
-  removed: Element[];
-  inputEvent: MouseEvent;
-  rect: DOMRect;
-}
 
 type Props = {
   container: HTMLElement | null;
   continueSelect: boolean;
-  onDragStart: (e: OnDragStart) => void;
-  onSelect: (e: OnSelect) => void;
+  onDragStart: (e: SelectoOnDragStart) => void;
+  onSelect: (e: SelectoOnSelect) => void;
 };
 
 const className = 'pdfme-selecto';
