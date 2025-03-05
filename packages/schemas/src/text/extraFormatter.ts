@@ -40,7 +40,7 @@ interface GroupButtonString {
   value: string;
 }
 
-export type GroupButton = GroupButtonBoolean | GroupButtonString;
+type GroupButton = GroupButtonBoolean | GroupButtonString;
 
 export function getExtraFormatterSchema(i18n: (key: string) => string): {
   title: string;
