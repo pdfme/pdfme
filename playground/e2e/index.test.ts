@@ -175,15 +175,26 @@ describe('Playground E2E Tests', () => {
 
   it('should modify template, generate PDF and compare, then input form data', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
-    const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
+    // Add more configuration options to the PuppeteerRunnerExtension
+    const extension = new PuppeteerRunnerExtension(browser, page, { 
+      timeout,
+      waitForSelector: { timeout, visible: true },
+      waitForNavigation: { timeout, waitUntil: 'networkidle2' }
+    });
 
     // 9. Press Reset button
     await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
+    
+    // Add a small delay to ensure UI is ready
+    await page.waitForTimeout(1000);
 
     // 10. Replay templateCreationRecord operations to add elements
     const templateCreationUserFlow = parse(templateCreationRecord);
     const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
     await templateCreationRunner.run();
+    
+    // Add a small delay to ensure UI is ready
+    await page.waitForTimeout(1000);
 
     // 11. Screenshot & compare
     await captureAndCompareScreenshot(page, 'modified-template-designer');
@@ -193,6 +204,9 @@ describe('Playground E2E Tests', () => {
 
     // 13. Save locally
     await page.click('#save-local');
+    
+    // Add a small delay to ensure save is complete
+    await page.waitForTimeout(1000);
 
     // 14. Move to form viewer
     await page.click('#form-viewer-nav');
@@ -200,11 +214,23 @@ describe('Playground E2E Tests', () => {
       const container = document.querySelector('div.flex-1.w-full');
       return container ? container.textContent?.includes('Type Something...') : false;
     }, { timeout });
+    
+    // Add a small delay to ensure form viewer is fully loaded
+    await page.waitForTimeout(2000);
 
     // 15. Input form data
     const formInputUserFlow = parse(formInputRecord);
     const formInputRunner = await createRunner(formInputUserFlow, extension);
-    await formInputRunner.run();
+    
+    try {
+      await formInputRunner.run();
+    } catch (error) {
+      console.error('Error during form input:', error);
+      // Take a screenshot to help debug the issue
+      const screenshot = await page.screenshot({ encoding: 'base64' });
+      console.log('Debug screenshot taken at error point');
+      throw error;
+    }
 
     // 16. Generate PDF & compare
     await generateAndComparePDF(page, browser, 'final-form');
