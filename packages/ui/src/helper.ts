@@ -291,8 +291,8 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // Type assertion needed for compatibility with pdf2size function
-    const pdfArrayBuffer = b64toUint8Array(b64BasePdf) as ArrayBuffer;
+    // pdf2size accepts both ArrayBuffer and Uint8Array
+    const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
 
     pageSizes = await pdf2size(pdfArrayBuffer);
   }
