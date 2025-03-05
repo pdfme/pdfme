@@ -158,7 +158,7 @@ const schema: Plugin<Select> = {
       const options = Array.isArray(schema.options) ? schema.options : [];
       selectElement.innerHTML = options
         .map(
-          (option: string) =>
+          (option) =>
             `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`,
         )
         .join('');
@@ -194,7 +194,7 @@ const schema: Plugin<Select> = {
     // Create a type-safe defaultSchema by first creating a safe copy of the text.propPanel.defaultSchema
     get defaultSchema() {
       // Create a safe copy of the text.propPanel.defaultSchema
-      const baseSchema = text.propPanel.defaultSchema as TextSchema;
+      const baseSchema = text.propPanel.defaultSchema;
 
       // Add our properties
       return {

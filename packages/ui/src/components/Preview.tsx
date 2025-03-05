@@ -20,7 +20,7 @@ import { FontContext } from '../contexts.js';
 import { template2SchemasList, getPagesScrollTopByIndex, useMaxZoom } from '../helper.js';
 import { theme } from 'antd';
 
-const _cache = new Map();
+const _cache = new Map<string | number, unknown>();
 
 const Preview = ({
   template,

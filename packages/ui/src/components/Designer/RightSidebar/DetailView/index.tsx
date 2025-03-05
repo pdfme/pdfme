@@ -47,7 +47,7 @@ const DetailView = (props: DetailViewProps) => {
   
   // Define a type-safe i18n function that accepts string keys
   const typedI18n = (key: string): string => {
-    // Use a type assertion to satisfy the union type constraint
+    // Use a type assertion to handle the union type constraint
     return typeof i18n === 'function' ? i18n(key as any) : key;
   };
 

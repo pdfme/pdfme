@@ -11,4 +11,4 @@ export const PluginsRegistry = createContext<Plugins>(builtInPlugins);
 
 export const OptionsContext = createContext<UIOptions>({});
 
-export const CacheContext = createContext<Map<unknown, unknown>>(new Map());
+export const CacheContext = createContext<Map<string | number, unknown>>(new Map());

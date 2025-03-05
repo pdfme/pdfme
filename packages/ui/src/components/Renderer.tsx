@@ -108,7 +108,7 @@ const Renderer = (props: RendererProps) => {
   const { token: theme } = antdTheme.useToken();
 
   const ref = useRef<HTMLDivElement>(null);
-  const _cache = useContext(CacheContext) as Map<string | number, unknown>;
+  const _cache = useContext(CacheContext);
   // Safely extract schema type
   const schemaType = typeof schema.type === 'string' ? schema.type : '';
 

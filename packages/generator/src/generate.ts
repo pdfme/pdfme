@@ -23,7 +23,7 @@ const safeGetDynamicHeightsForTable = (
     schema: Schema;
     basePdf: BasePdf;
     options: CommonOptions;
-    _cache: Map<string, unknown>;
+    _cache: Map<string | number, unknown>;
   }
 ): Promise<number[]> => {
   // If schema type is not table, return the height as a single-element array
