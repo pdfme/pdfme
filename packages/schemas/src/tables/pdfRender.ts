@@ -1,10 +1,18 @@
 import type { TableSchema } from './types.js';
-import type { PDFRenderProps } from '@pdfme/common';
+import type { PDFRenderProps, Schema, BasePdf, CommonOptions } from '@pdfme/common';
 import { Cell, Table, Row, Column } from './classes.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
 import cell from './cell.js';
 import { getBodyWithRange } from './helper.js';
 import { createSingleTable } from './tableHelper.js';
+
+// Define the CreateTableArgs interface locally since it's not exported from tableHelper.js
+interface CreateTableArgs {
+  schema: Schema;
+  basePdf: BasePdf;
+  options: CommonOptions;
+  _cache: Map<string | number, unknown>;
+}
 
 type Pos = { x: number; y: number };
 
@@ -108,12 +116,29 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
 }
 
 export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
-  const { value, schema } = arg;
+  const { value, schema, basePdf, options, _cache } = arg;
 
   const body = getBodyWithRange(
     typeof value !== 'string' ? JSON.stringify(value || '[]') : value,
     schema.__bodyRange,
   );
-  const table = await createSingleTable(body, arg);
+  
+  // Create a properly typed CreateTableArgs object
+  const createTableArgs: CreateTableArgs = {
+    schema,
+    basePdf,
+    options,
+    _cache: _cache
+  };
+  
+  // Ensure body is properly typed before passing to createSingleTable
+  // Ensure body is properly typed as string[][] before passing to createSingleTable
+  const typedBody: string[][] = Array.isArray(body) ? 
+    body.map(row => Array.isArray(row) ? row.map(cell => String(cell)) : []) : 
+    [];
+  const table = await createSingleTable(typedBody, createTableArgs);
+  
+  // Use the original arg directly since drawTable expects PDFRenderProps<TableSchema>
+  // which is the same type as our arg parameter
   await drawTable(arg, table);
 };
