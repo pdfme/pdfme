@@ -1,6 +1,7 @@
 import { useForm } from 'form-render';
 import React, { useRef, useContext, useState, useEffect } from 'react';
 import type {
+  Dict,
   ChangeSchemaItem,
   SchemaForUI,
   PropPanelWidgetProps,
@@ -48,7 +49,7 @@ const DetailView = (props: DetailViewProps) => {
   // Define a type-safe i18n function that accepts string keys
   const typedI18n = (key: string): string => {
     // Use a type assertion to handle the union type constraint
-    return typeof i18n === 'function' ? i18n(key as any) : key;
+    return typeof i18n === 'function' ? i18n(key as keyof Dict) : key;
   };
 
   const [widgets, setWidgets] = useState<{
