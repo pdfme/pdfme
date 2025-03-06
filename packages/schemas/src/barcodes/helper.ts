@@ -22,7 +22,7 @@ declare module 'bwip-js' {
   interface BwipJs {
     toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
   }
-  
+
   export default interface BwipJsModule {
     toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
     toBuffer(options: BarcodeRenderOptions): Promise<Buffer>;
@@ -194,13 +194,17 @@ export const createBarCode = async (arg: {
   if (typeof window !== 'undefined') {
     const canvas = document.createElement('canvas');
     // Use a type assertion to safely call toCanvas
-    const bwipjsModule = bwipjs as unknown as { toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void };
+    const bwipjsModule = bwipjs as unknown as {
+      toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
+    };
     bwipjsModule.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
     res = Buffer.from(b64toUint8Array(dataUrl).buffer);
   } else {
     // Use a type assertion to safely call toBuffer
-    const bwipjsModule = bwipjs as unknown as { toBuffer(options: BarcodeRenderOptions): Promise<Buffer> };
+    const bwipjsModule = bwipjs as unknown as {
+      toBuffer(options: BarcodeRenderOptions): Promise<Buffer>;
+    };
     res = await bwipjsModule.toBuffer(bwipjsArg);
   }
 

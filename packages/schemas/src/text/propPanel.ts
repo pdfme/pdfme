@@ -54,7 +54,9 @@ export const propPanel: PropPanel<TextSchema> = {
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
 
-    const enableDynamicFont = Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
+    const enableDynamicFont = Boolean(
+      (activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize,
+    );
 
     const textSchema: Record<string, PropPanelSchema> = {
       fontName: {

@@ -122,22 +122,22 @@ export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
     typeof value !== 'string' ? JSON.stringify(value || '[]') : value,
     schema.__bodyRange,
   );
-  
+
   // Create a properly typed CreateTableArgs object
   const createTableArgs: CreateTableArgs = {
     schema,
     basePdf,
     options,
-    _cache: _cache
+    _cache: _cache,
   };
-  
+
   // Ensure body is properly typed before passing to createSingleTable
   // Ensure body is properly typed as string[][] before passing to createSingleTable
-  const typedBody: string[][] = Array.isArray(body) ? 
-    body.map(row => Array.isArray(row) ? row.map(cell => String(cell)) : []) : 
-    [];
+  const typedBody: string[][] = Array.isArray(body)
+    ? body.map((row) => (Array.isArray(row) ? row.map((cell) => String(cell)) : []))
+    : [];
   const table = await createSingleTable(typedBody, createTableArgs);
-  
+
   // Use the original arg directly since drawTable expects PDFRenderProps<TableSchema>
   // which is the same type as our arg parameter
   await drawTable(arg, table);

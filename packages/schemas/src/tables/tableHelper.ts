@@ -279,5 +279,10 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
 
   const content = parseContent4Table(input, fallbackFontName);
 
-  return Table.create({ input, content, font, _cache: _cache as unknown as Map<string | number, FontKitFont> });
+  return Table.create({
+    input,
+    content,
+    font,
+    _cache: _cache as unknown as Map<string | number, FontKitFont>,
+  });
 }

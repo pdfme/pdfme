@@ -174,7 +174,9 @@ const imageSchema: Plugin<ImageSchema> = {
             console.error('Error reading file:', error);
           });
       });
-      input.addEventListener('blur', () => { if (stopEditing) stopEditing(); });
+      input.addEventListener('blur', () => {
+        if (stopEditing) stopEditing();
+      });
       label.appendChild(input);
     }
   },

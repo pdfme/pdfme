@@ -227,7 +227,7 @@ const TemplateEditor = ({
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);
-    
+
     // Use setTimeout to update scroll position after render
     setTimeout(() => {
       if (canvasRef.current) {

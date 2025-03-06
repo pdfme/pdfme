@@ -129,10 +129,10 @@ const Renderer = (props: RendererProps) => {
 
   useEffect(() => {
     if (!plugin?.ui || !ref.current || !schema.type) return;
-    
+
     ref.current.innerHTML = '';
     const render = plugin.ui;
-    
+
     void render({
       value,
       schema,

@@ -24,34 +24,44 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
     const tgtSize = isVertical ? 'width' : 'height';
     const isSingle = ass.length === 1;
     // Access pageSize property safely with proper type assertion
-    const root = pageSize && typeof pageSize === 'object' ? 
-      (tgtSize === 'width' ? 
-        (pageSize as unknown as { width: number }).width : 
-        (pageSize as unknown as { height: number }).height) : 0;
+    const root =
+      pageSize && typeof pageSize === 'object'
+        ? tgtSize === 'width'
+          ? (pageSize as unknown as { width: number }).width
+          : (pageSize as unknown as { height: number }).height
+        : 0;
 
     // Access position properties safely with proper type assertion
-    const min = isSingle ? 0 : Math.min(...ass.map((as) => {
-      // Safely access position property with proper type assertion
-      const position = as.position && typeof as.position === 'object' ? 
-        (as.position as unknown as { x: number; y: number }) : 
-        { x: 0, y: 0 };
-      return tgtPos === 'x' ? position.x : position.y;
-    }));
-    const max = isSingle ? root : Math.max(...ass.map((as) => {
-      // Safely access position and size properties with proper type assertion
-      const position = as.position && typeof as.position === 'object' ? 
-        (as.position as unknown as { x: number; y: number }) : 
-        { x: 0, y: 0 };
-      const posValue = tgtPos === 'x' ? position.x : position.y;
-      
-      // Safely access width/height with proper type assertion
-      const asWithSize = as as unknown as { width?: number; height?: number };
-      const sizeValue = tgtSize === 'width' ? 
-        (asWithSize.width || 0) : 
-        (asWithSize.height || 0);
-      
-      return posValue + sizeValue;
-    }));
+    const min = isSingle
+      ? 0
+      : Math.min(
+          ...ass.map((as) => {
+            // Safely access position property with proper type assertion
+            const position =
+              as.position && typeof as.position === 'object'
+                ? (as.position as unknown as { x: number; y: number })
+                : { x: 0, y: 0 };
+            return tgtPos === 'x' ? position.x : position.y;
+          }),
+        );
+    const max = isSingle
+      ? root
+      : Math.max(
+          ...ass.map((as) => {
+            // Safely access position and size properties with proper type assertion
+            const position =
+              as.position && typeof as.position === 'object'
+                ? (as.position as unknown as { x: number; y: number })
+                : { x: 0, y: 0 };
+            const posValue = tgtPos === 'x' ? position.x : position.y;
+
+            // Safely access width/height with proper type assertion
+            const asWithSize = as as unknown as { width?: number; height?: number };
+            const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
+
+            return posValue + sizeValue;
+          }),
+        );
 
     let basePos = min;
     // Define adjust function with consistent parameter usage
@@ -70,10 +80,8 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
       ass.map((as) => {
         // Safely access size property with proper type assertion
         const asWithSize = as as unknown as { width?: number; height?: number; id: string };
-        const sizeValue = tgtSize === 'width' ? 
-          (asWithSize.width || 0) : 
-          (asWithSize.height || 0);
-        
+        const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
+
         return {
           key: `position.${tgtPos}`,
           value: round(basePos - adjust(sizeValue), 2),
@@ -90,30 +98,34 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
     const isVertical = type === 'vertical';
     const tgtPos = isVertical ? 'y' : 'x';
     const tgtSize = isVertical ? 'height' : 'width';
-    
+
     // Safely access position property with proper type assertion
-    const min = Math.min(...ass.map((as) => {
-      const position = as.position && typeof as.position === 'object' ? 
-        (as.position as unknown as { x: number; y: number }) : 
-        { x: 0, y: 0 };
-      return tgtPos === 'x' ? position.x : position.y;
-    }));
-    
+    const min = Math.min(
+      ...ass.map((as) => {
+        const position =
+          as.position && typeof as.position === 'object'
+            ? (as.position as unknown as { x: number; y: number })
+            : { x: 0, y: 0 };
+        return tgtPos === 'x' ? position.x : position.y;
+      }),
+    );
+
     // Safely access position and size properties with proper type assertion
-    const max = Math.max(...ass.map((as) => {
-      const position = as.position && typeof as.position === 'object' ? 
-        (as.position as unknown as { x: number; y: number }) : 
-        { x: 0, y: 0 };
-      const posValue = tgtPos === 'x' ? position.x : position.y;
-      
-      // Safely access width/height with proper type assertion
-      const asWithSize = as as unknown as { width?: number; height?: number };
-      const sizeValue = tgtSize === 'width' ? 
-        (asWithSize.width || 0) : 
-        (asWithSize.height || 0);
-      
-      return posValue + sizeValue;
-    }));
+    const max = Math.max(
+      ...ass.map((as) => {
+        const position =
+          as.position && typeof as.position === 'object'
+            ? (as.position as unknown as { x: number; y: number })
+            : { x: 0, y: 0 };
+        const posValue = tgtPos === 'x' ? position.x : position.y;
+
+        // Safely access width/height with proper type assertion
+        const asWithSize = as as unknown as { width?: number; height?: number };
+        const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
+
+        return posValue + sizeValue;
+      }),
+    );
 
     if (ass.length < 3) return;
 
@@ -122,9 +134,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
     // Safely access size property with proper type assertion
     const sum = ass.reduce((acc, cur) => {
       const curWithSize = cur as unknown as { width?: number; height?: number };
-      const sizeValue = tgtSize === 'width' ? 
-        (curWithSize.width || 0) : 
-        (curWithSize.height || 0);
+      const sizeValue = tgtSize === 'width' ? curWithSize.width || 0 : curWithSize.height || 0;
       return acc + sizeValue;
     }, 0);
     const remain = boxSize - sum;
@@ -134,16 +144,17 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
     changeSchemas(
       ass.map((as, index) => {
         // Safely access size property of previous element with proper type assertion
-        const prevSize = index === 0 ? 0 : (() => {
-          const prevAs = ass[index - 1] as unknown as { width?: number; height?: number };
-          return tgtSize === 'width' ? 
-            (prevAs.width || 0) : 
-            (prevAs.height || 0);
-        })();
-        
+        const prevSize =
+          index === 0
+            ? 0
+            : (() => {
+                const prevAs = ass[index - 1] as unknown as { width?: number; height?: number };
+                return tgtSize === 'width' ? prevAs.width || 0 : prevAs.height || 0;
+              })();
+
         prev += index === 0 ? 0 : prevSize + unit;
         const value = round(boxPos + prev, 2);
-        
+
         // Safely access id with proper type assertion
         const asWithId = as as unknown as { id: string };
         return { key: `position.${tgtPos}`, value, schemaId: asWithId.id };

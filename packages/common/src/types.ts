@@ -152,7 +152,6 @@ export type Plugin<T = Schema> = {
   uninterruptedEditMode?: boolean;
 };
 
-
 export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;

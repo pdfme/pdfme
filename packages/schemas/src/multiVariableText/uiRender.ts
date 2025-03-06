@@ -75,11 +75,17 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     rootElement.parentElement.style.outline = '';
   }
 
-  const variables: Record<string, string> = value ? JSON.parse(value) as Record<string, string> || {} : {};
+  const variables: Record<string, string> = value
+    ? (JSON.parse(value) as Record<string, string>) || {}
+    : {};
   const variableIndices = getVariableIndices(rawText);
   const substitutedText = substituteVariables(rawText, variables);
   const font = options?.font || getDefaultFont();
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache as Map<string, import('fontkit').Font>);
+  const fontKitFont = await getFontKitFont(
+    schema.fontName,
+    font,
+    _cache as Map<string, import('fontkit').Font>,
+  );
 
   const textBlock = buildStyledTextContainer(arg, fontKitFont, substitutedText);
 

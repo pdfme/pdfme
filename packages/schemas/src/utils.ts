@@ -243,7 +243,11 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
       return String(element);
     }
 
-    const [tag, attributes = {}, children = []] = element as [unknown, Record<string, string>, unknown[]];
+    const [tag, attributes = {}, children = []] = element as [
+      unknown,
+      Record<string, string>,
+      unknown[],
+    ];
     const tagName = String(tag);
 
     // Format attributes string

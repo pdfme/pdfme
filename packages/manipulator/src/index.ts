@@ -44,7 +44,10 @@ export const split = async (
   return result;
 };
 
-export const remove = async (pdf: ArrayBuffer | Uint8Array, pages: number[]): Promise<Uint8Array> => {
+export const remove = async (
+  pdf: ArrayBuffer | Uint8Array,
+  pages: number[],
+): Promise<Uint8Array> => {
   if (!pages.length) {
     throw new Error('[@pdfme/manipulator] At least one page number is required for removal');
   }
@@ -228,7 +231,9 @@ export const organize = async (
         break;
 
       default:
-        throw new Error(`[@pdfme/manipulator] Unknown action type: ${(action as { type: string }).type}`);
+        throw new Error(
+          `[@pdfme/manipulator] Unknown action type: ${(action as { type: string }).type}`,
+        );
     }
   }
 

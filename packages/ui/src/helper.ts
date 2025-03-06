@@ -48,7 +48,6 @@ export const uuid = () =>
     return v.toString(16);
   });
 
-
 const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
   path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
   let src: Record<string, unknown> = obj as Record<string, unknown>;
@@ -436,7 +435,8 @@ const handlePositionSizeChange = (
   const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
   const [pt, pr, pb, pl] = padding;
   const { width: pw, height: ph } = pageSize;
-  const calcBounds = (v: unknown, min: number, max: number) => Math.min(Math.max(Number(v), min), max);
+  const calcBounds = (v: unknown, min: number, max: number) =>
+    Math.min(Math.max(Number(v), min), max);
   if (key === 'position.x') {
     schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
   } else if (key === 'position.y') {
@@ -464,79 +464,84 @@ const handleTypeChange = (
   // Apply attributes from new defaultSchema
   // Find the plugin with matching type
   const pluginValue = value as string;
-  
+
   // Define a type-safe approach to find the matching plugin
   interface PluginSchema {
     type: string;
     [key: string]: unknown;
   }
-  
+
   interface PluginType {
     propPanel: {
       defaultSchema: PluginSchema;
     };
   }
-  
+
   // Initialize plugin as undefined
   let plugin: PluginType | undefined;
-  
+
   // Safely iterate through plugins to find one with matching type
   const pluginEntries = Object.entries(pluginsRegistry);
   for (let i = 0; i < pluginEntries.length; i++) {
     const [, pluginObj] = pluginEntries[i];
-    
+
     // Skip invalid plugins
     if (!pluginObj || typeof pluginObj !== 'object') continue;
-    
+
     // Check if propPanel exists and is an object
-    if (!('propPanel' in pluginObj) || 
-        !pluginObj.propPanel || 
-        typeof pluginObj.propPanel !== 'object') continue;
-    
+    if (
+      !('propPanel' in pluginObj) ||
+      !pluginObj.propPanel ||
+      typeof pluginObj.propPanel !== 'object'
+    )
+      continue;
+
     // Check if defaultSchema exists and is an object
     const propPanel = pluginObj.propPanel as { defaultSchema?: unknown };
-    if (!('defaultSchema' in propPanel) || 
-        !propPanel.defaultSchema || 
-        typeof propPanel.defaultSchema !== 'object') continue;
-    
+    if (
+      !('defaultSchema' in propPanel) ||
+      !propPanel.defaultSchema ||
+      typeof propPanel.defaultSchema !== 'object'
+    )
+      continue;
+
     // Safely check if type property exists and matches
     const defaultSchema = propPanel.defaultSchema as Record<string, unknown>;
-    if (!('type' in defaultSchema) || 
-        typeof defaultSchema.type !== 'string') continue;
-    
+    if (!('type' in defaultSchema) || typeof defaultSchema.type !== 'string') continue;
+
     // Check if the type matches
     const schemaType = defaultSchema.type;
     if (schemaType === pluginValue) {
       // Create a type-safe copy of the plugin
       const safeSchema: PluginSchema = {
-        type: schemaType
+        type: schemaType,
       };
-      
+
       // Copy other properties safely
-      Object.keys(defaultSchema).forEach(key => {
+      Object.keys(defaultSchema).forEach((key) => {
         if (key !== 'type' && Object.prototype.hasOwnProperty.call(defaultSchema, key)) {
           safeSchema[key] = defaultSchema[key];
         }
       });
-      
+
       // Found matching plugin with proper typing
       plugin = {
         propPanel: {
-          defaultSchema: safeSchema
-        }
+          defaultSchema: safeSchema,
+        },
       };
       break;
     }
   }
-  
+
   const propPanel = plugin?.propPanel;
-  
+
   // Apply default schema properties if available
   if (propPanel?.defaultSchema) {
     // Create a type-safe copy of the default schema
     const defaultSchema = propPanel.defaultSchema;
     const schemaRecord = schema as Record<string, unknown>;
-    
+
     // Use a type-safe approach to copy properties
     for (const key of Object.keys(defaultSchema)) {
       // Only add properties that don't already exist in the schema
@@ -545,7 +550,7 @@ const handleTypeChange = (
         if (Object.prototype.hasOwnProperty.call(defaultSchema, key)) {
           // Get the property value safely
           const propertyValue = defaultSchema[key];
-          
+
           // Only assign if the value is defined
           if (propertyValue !== undefined) {
             schemaRecord[key] = propertyValue;

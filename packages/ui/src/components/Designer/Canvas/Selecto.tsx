@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import SelectoComponent, { OnSelect as SelectoOnSelect, OnDragStart as SelectoOnDragStart } from 'react-selecto';
+import SelectoComponent, {
+  OnSelect as SelectoOnSelect,
+  OnDragStart as SelectoOnDragStart,
+} from 'react-selecto';
 import { SELECTABLE_CLASSNAME } from '../../../constants.js';
 import { theme } from 'antd';
 

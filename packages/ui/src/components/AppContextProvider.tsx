@@ -48,12 +48,18 @@ const deepMerge = <T extends Record<string, unknown>, U extends Record<string, u
 const AppContextProvider = ({ children, lang, font, plugins, options }: Props) => {
   let theme = defaultTheme;
   if (options.theme) {
-    theme = deepMerge(theme as unknown as Record<string, unknown>, options.theme as unknown as Record<string, unknown>) as typeof theme;
+    theme = deepMerge(
+      theme as unknown as Record<string, unknown>,
+      options.theme as unknown as Record<string, unknown>,
+    ) as typeof theme;
   }
 
   let dict = getDict(lang);
   if (options.labels) {
-    dict = deepMerge(dict as unknown as Record<string, unknown>, options.labels as unknown as Record<string, unknown>) as typeof dict;
+    dict = deepMerge(
+      dict as unknown as Record<string, unknown>,
+      options.labels as unknown as Record<string, unknown>,
+    ) as typeof dict;
   }
 
   return (
