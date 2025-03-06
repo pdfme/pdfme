@@ -41,7 +41,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
-    "lint": "eslint --ext .ts src --config eslint.config.mjs --no-error-on-unmatched-pattern",
+    "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
     "test:update-snapshots": "jest --updateSnapshot",
     "prune": "ts-prune src",

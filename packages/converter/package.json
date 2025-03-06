@@ -38,13 +38,13 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
-    "lint": "eslint --ext .ts src --config eslint.config.mjs --no-error-on-unmatched-pattern",
+    "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/common": "*",
+    "@pdfme/common": "file:../common",
     "@pdfme/pdf-lib": "*",
     "pdfjs-dist": "^3.11.174"
   },
