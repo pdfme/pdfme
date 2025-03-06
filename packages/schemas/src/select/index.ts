@@ -191,18 +191,11 @@ const schema: Plugin<Select> = {
         },
       };
     },
-    // Create a type-safe defaultSchema by first creating a safe copy of the text.propPanel.defaultSchema
-    get defaultSchema() {
-      // Create a safe copy of the text.propPanel.defaultSchema
-      const baseSchema = text.propPanel.defaultSchema;
-
-      // Add our properties
-      return {
-        ...baseSchema,
-        type: 'select',
-        content: 'option1',
-        options: ['option1', 'option2'],
-      };
+    defaultSchema: {
+      ...(text.propPanel.defaultSchema as TextSchema),
+      type: 'select',
+      content: 'option1',
+      options: ['option1', 'option2'],
     },
   },
   icon: selectIcon,
