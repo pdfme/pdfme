@@ -18,6 +18,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run build
+      - run: npm run lint
       - run: npm run test
         env:
           CI: true
@@ -39,6 +40,8 @@ jobs:
         run: |
           npm install
           npm run build
+      - name: Run lint
+        run: npm run lint
       - name: Run playground tests
         run: |
           cd playground
