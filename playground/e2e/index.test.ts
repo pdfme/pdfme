@@ -101,11 +101,6 @@ describe('Playground E2E Tests', () => {
       stdio: 'pipe',
     });
 
-    // Add a delay to ensure the preview server is fully started
-    // This is especially important with React 18 which may have different initialization timing
-    console.log('Waiting for preview server to start...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -139,22 +134,7 @@ describe('Playground E2E Tests', () => {
 
     // 1. Navigate to templates list & click on Invoice template
     await page.goto(`${baseUrl}/templates`);
-    
-    // Add additional wait and retry logic for React 18 rendering
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        await page.waitForSelector('#template-img-invoice', { timeout: 10000 });
-        break;
-      } catch (e) {
-        console.log(`Retry ${4-retries}/3: Waiting for #template-img-invoice`);
-        await page.reload();
-        retries--;
-        if (retries === 0) throw e;
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-    
+    await page.waitForSelector('#template-img-invoice', { timeout });
     await page.click('#template-img-invoice');
 
     // 2. Check that "INVOICE" text is present
@@ -174,33 +154,11 @@ describe('Playground E2E Tests', () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
 
     // 5. Return to template list screen
-    try {
-      // Try to find the templates navigation link
-      await page.waitForSelector('#templates-nav', { timeout: 5000 });
-      await page.click('#templates-nav');
-    } catch (e) {
-      // If not found, navigate directly to templates page
-      console.log('Templates nav not found, navigating directly to templates page');
-      await page.goto(`${baseUrl}/templates`);
-    }
-    
-    await page.waitForNavigation({ timeout }).catch(() => console.log('Navigation timeout, continuing anyway'));
-    
+    await page.click('#templates-nav');
+    await page.reload();
+
     // 6. Select Pedigree template
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        await page.waitForSelector('#template-img-pedigree', { timeout: 10000 });
-        break;
-      } catch (e) {
-        console.log(`Retry ${4-retries}/3: Waiting for #template-img-pedigree`);
-        await page.reload();
-        retries--;
-        if (retries === 0) throw e;
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
-    
+    await page.waitForSelector('#template-img-pedigree', { timeout });
     await page.click('#template-img-pedigree');
 
     await page.waitForFunction(() => {
@@ -216,35 +174,12 @@ describe('Playground E2E Tests', () => {
   });
 
   // Skip the problematic test in CI environment
-  it.skip('should modify template, generate PDF and compare, then input form data', async () => {
+  it('should modify template, generate PDF and compare, then input form data', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
     const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
 
-    // 9. Try to find and press Reset button with retry logic
-    let resetButtonFound = false;
-    let retries = 3;
-    
-    while (retries > 0 && !resetButtonFound) {
-      try {
-        await page.waitForSelector('#reset-template', { timeout: 5000 });
-        await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
-        resetButtonFound = true;
-      } catch (e) {
-        console.log(`Retry ${4-retries}/3: Waiting for #reset-template`);
-        // Try to navigate to designer page if reset button not found
-        try {
-          await page.goto(`${baseUrl}/designer`);
-        } catch (navError) {
-          console.log('Navigation error:', navError);
-        }
-        retries--;
-        if (retries === 0) {
-          console.log('Could not find reset template button after retries, skipping test');
-          return; // Skip the rest of the test
-        }
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    }
+    // 9. Press Reset button
+    await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
 
     // 10. Replay templateCreationRecord operations to add elements
     const templateCreationUserFlow = parse(templateCreationRecord);
@@ -258,26 +193,14 @@ describe('Playground E2E Tests', () => {
     await generateAndComparePDF(page, browser, 'modified-template');
 
     // 13. Save locally
-    try {
-      await page.waitForSelector('#save-local', { timeout: 5000 });
-      await page.click('#save-local');
-    } catch (e) {
-      console.log('Could not find save-local button, continuing anyway');
-    }
+    await page.click('#save-local');
 
     // 14. Move to form viewer
-    try {
-      await page.waitForSelector('#form-viewer-nav', { timeout: 5000 });
-      await page.click('#form-viewer-nav');
-    } catch (e) {
-      console.log('Could not find form-viewer-nav, trying to navigate directly');
-      await page.goto(`${baseUrl}/form`);
-    }
-    
+    await page.click('#form-viewer-nav');
     await page.waitForFunction(() => {
       const container = document.querySelector('div.flex-1.w-full');
       return container ? container.textContent?.includes('Type Something...') : false;
-    }, { timeout }).catch(() => console.log('Wait for "Type Something..." text timed out'));
+    }, { timeout });
 
     // 15. Input form data
     const formInputUserFlow = parse(formInputRecord);
