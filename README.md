@@ -14,7 +14,7 @@
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
-  <a href="https://github.com/pdfme/pdfme/actions/workflows/nodejs.yml">
+  <a href="https://github.com/pdfme/pdfme/actions/workflows/test.yml">
     <img src="https://github.com/pdfme/pdfme/workflows/Unit%20Testing/badge.svg" alt="Unit Testing status" />
   </a>
   <a href="https://www.npmjs.com/package/@pdfme/generator">
