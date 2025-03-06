@@ -290,8 +290,11 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // pdf2size accepts both ArrayBuffer and Uint8Array
-    const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
+    // pdf2size accepts ArrayBuffer
+    const uint8Array = b64toUint8Array(b64BasePdf);
+    // Create a new ArrayBuffer copy to avoid detachment issues
+    const pdfArrayBuffer = new ArrayBuffer(uint8Array.byteLength);
+    new Uint8Array(pdfArrayBuffer).set(uint8Array);
 
     pageSizes = await pdf2size(pdfArrayBuffer);
   }
