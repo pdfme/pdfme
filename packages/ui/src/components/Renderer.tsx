@@ -52,7 +52,7 @@ const useRerenderDependencies = (arg: ReRenderCheckProps) => {
     } else {
       return [value, mode, scale, JSON.stringify(schema), optionStr];
     }
-  }, [plugin?.uninterruptedEditMode, value, mode, scale, schema, optionStr, plugin]);
+  }, [value, mode, scale, schema, optionStr, plugin]);
 };
 
 const Wrapper = ({
@@ -130,14 +130,15 @@ const Renderer = (props: RendererProps) => {
   useEffect(() => {
     if (!plugin?.ui || !ref.current || !schema.type) return;
 
-    ref.current.innerHTML = '';
+    const currentRef = ref.current;
+    currentRef.innerHTML = '';
     const render = plugin.ui;
 
     void render({
       value,
       schema,
       basePdf,
-      rootElement: ref.current,
+      rootElement: currentRef,
       mode,
       onChange,
       stopEditing,
@@ -150,11 +151,11 @@ const Renderer = (props: RendererProps) => {
     });
 
     return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
+      if (currentRef) {
+        currentRef.innerHTML = '';
       }
     };
-  }, [plugin?.ui, schema.type, reRenderDependencies]);
+  }, [plugin?.ui, schema.type, reRenderDependencies, _cache, basePdf, i18n, mode, onChange, options, placeholder, schema, stopEditing, tabIndex, theme, value]);
 
   if (!plugin || !plugin.ui) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 

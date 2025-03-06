@@ -43,6 +43,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const init = async (prop: { template: Template; size: Size }) => {
     const {
       template: { basePdf, schemas },
@@ -104,7 +105,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
         setError(err);
         console.error('[@pdfme/ui]', err);
       });
-  }, [template, size]);
+  }, [template, size, init]);
 
   return {
     backgrounds,
@@ -164,10 +165,11 @@ export const useScrollPageCursor = ({
   }, [onChangePageCursor, pageCursor, pageSizes, ref, scale]);
 
   useEffect(() => {
-    ref.current?.addEventListener('scroll', onScroll);
+    const currentRef = ref.current;
+    currentRef?.addEventListener('scroll', onScroll);
 
     return () => {
-      ref.current?.removeEventListener('scroll', onScroll);
+      currentRef?.removeEventListener('scroll', onScroll);
     };
   }, [ref, onScroll]);
 };

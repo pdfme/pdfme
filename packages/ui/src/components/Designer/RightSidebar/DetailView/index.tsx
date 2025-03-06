@@ -47,6 +47,7 @@ const DetailView = (props: DetailViewProps) => {
   const options = useContext(OptionsContext);
 
   // Define a type-safe i18n function that accepts string keys
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const typedI18n = (key: string): string => {
     // Use a type assertion to handle the union type constraint
     return typeof i18n === 'function' ? i18n(key as keyof Dict) : key;
@@ -57,6 +58,7 @@ const DetailView = (props: DetailViewProps) => {
   }>({});
 
   useEffect(() => {
+    // Using options directly in the dependency array instead of JSON.stringify
     const newWidgets: typeof widgets = {
       AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
       Divider: () => (
@@ -80,7 +82,7 @@ const DetailView = (props: DetailViewProps) => {
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+  }, [activeSchema, pluginsRegistry, options, props, token, typedI18n]);
 
   useEffect(() => {
     // Create a type-safe copy of the schema with editable property
@@ -91,7 +93,7 @@ const DetailView = (props: DetailViewProps) => {
     form.setValues(values);
   }, [activeSchema, form]);
 
-  useEffect(() => form.resetFields(), [activeSchema.id]);
+  useEffect(() => form.resetFields(), [activeSchema.id, form]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {

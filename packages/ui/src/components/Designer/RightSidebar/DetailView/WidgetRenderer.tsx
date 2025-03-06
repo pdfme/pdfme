@@ -10,17 +10,18 @@ const WidgetRenderer = (props: Props) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.innerHTML = '';
-      widget({ ...otherProps, rootElement: ref.current });
+    const currentRef = ref.current;
+    if (currentRef) {
+      currentRef.innerHTML = '';
+      widget({ ...otherProps, rootElement: currentRef });
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
+      if (currentRef) {
+        currentRef.innerHTML = '';
       }
     };
-  }, [props.activeSchema]);
+  }, [props.activeSchema, widget, otherProps]);
 
   return <div ref={ref} />;
 };

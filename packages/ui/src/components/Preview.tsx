@@ -55,6 +55,7 @@ const Preview = ({
 
   const input = inputs[unitCursor];
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const init = (template: Template) => {
     const options = { font };
     getDynamicTemplate({
@@ -85,7 +86,7 @@ const Preview = ({
     }
 
     init(template);
-  }, [template, inputs, size]);
+  }, [template, inputs, size, unitCursor, init]);
 
   useScrollPageCursor({
     ref: containerRef,
