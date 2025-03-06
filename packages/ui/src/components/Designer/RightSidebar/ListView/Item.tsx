@@ -47,111 +47,109 @@ interface Props {
 // Using TypeScript interface for prop validation instead of PropTypes
 const Item = React.memo(
   /* eslint-disable react/prop-types */
-  React.forwardRef<HTMLLIElement, Props>(
-    function Item(
-      {
-        icon,
-        value,
-        status,
-        title,
-        required,
-        readOnly,
-        style,
-        dragOverlay,
-        onClick,
-        onMouseEnter,
-        onMouseLeave,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        dragging,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        fadeIn,
-        listeners,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        sorting,
-        transition,
-        transform,
-        ...props
-      },
-      ref,
-    ) {
+  React.forwardRef<HTMLLIElement, Props>(function Item(
+    {
+      icon,
+      value,
+      status,
+      title,
+      required,
+      readOnly,
+      style,
+      dragOverlay,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      dragging,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      fadeIn,
+      listeners,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      sorting,
+      transition,
+      transform,
+      ...props
+    },
+    ref,
+  ) {
     /* eslint-enable react/prop-types */
-      const i18n = useContext(I18nContext);
+    const i18n = useContext(I18nContext);
 
-      useEffect(() => {
-        if (!dragOverlay) {
-          return;
-        }
+    useEffect(() => {
+      if (!dragOverlay) {
+        return;
+      }
 
-        document.body.style.cursor = 'grabbing';
+      document.body.style.cursor = 'grabbing';
 
-        return () => {
-          document.body.style.cursor = '';
-        };
-      }, [dragOverlay]);
+      return () => {
+        document.body.style.cursor = '';
+      };
+    }, [dragOverlay]);
 
-      const { x, y, scaleX, scaleY } = transform || { x: 0, y: 0, scaleX: 1, scaleY: 1 };
+    const { x, y, scaleX, scaleY } = transform || { x: 0, y: 0, scaleX: 1, scaleY: 1 };
 
-      return (
-        <li
+    return (
+      <li
+        style={{
+          marginTop: 10,
+          transition,
+          transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`,
+        }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        ref={ref}
+      >
+        <div
           style={{
-            marginTop: 10,
-            transition,
-            transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})`,
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            gap: '0.5rem',
+            ...style,
           }}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
-          ref={ref}
+          {...props}
+          onClick={() => onClick && onClick()}
         >
-          <div
+          <Button
+            {...listeners}
             style={{
               display: 'flex',
               alignItems: 'center',
-              cursor: 'pointer',
-              gap: '0.5rem',
-              ...style,
+              background: 'none',
+              boxShadow: 'none',
+              border: 'none',
+              paddingLeft: '0.25rem',
             }}
-            {...props}
-            onClick={() => onClick && onClick()}
+            icon={<GripVertical size={15} style={{ cursor: 'grab' }} />}
+          />
+          {icon}
+          <Text
+            style={{
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              width: '100%',
+            }}
+            title={title || ''}
           >
-            <Button
-              {...listeners}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: 'none',
-                boxShadow: 'none',
-                border: 'none',
-                paddingLeft: '0.25rem',
-              }}
-              icon={<GripVertical size={15} style={{ cursor: 'grab' }} />}
-            />
-            {icon}
-            <Text
-              style={{
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                width: '100%',
-              }}
-              title={title || ''}
-            >
-              {status === undefined ? (
-                value
-              ) : (
-                <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <CircleAlert size={15} style={{ marginRight: '0.25rem' }} />
-                  {status === 'is-warning' ? i18n('noKeyName') : value}
-                  {status === 'is-danger' ? i18n('notUniq') : ''}
-                </span>
-              )}
-            </Text>
-            {readOnly && <Lock size={15} style={{ marginRight: '0.5rem' }} />}
-            {required && <span style={{ color: 'red', marginRight: '0.5rem' }}>*</span>}
-          </div>
-        </li>
-      );
-    },
-  ),
+            {status === undefined ? (
+              value
+            ) : (
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <CircleAlert size={15} style={{ marginRight: '0.25rem' }} />
+                {status === 'is-warning' ? i18n('noKeyName') : value}
+                {status === 'is-danger' ? i18n('notUniq') : ''}
+              </span>
+            )}
+          </Text>
+          {readOnly && <Lock size={15} style={{ marginRight: '0.5rem' }} />}
+          {required && <span style={{ color: 'red', marginRight: '0.5rem' }}>*</span>}
+        </div>
+      </li>
+    );
+  }),
 );
 
 // Set display name for debugging

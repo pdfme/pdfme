@@ -212,8 +212,8 @@ export const checkPlugins = (arg: { plugins: Plugins; template: Template }) => {
   } = arg;
   const allSchemaTypes = uniq(schemas.map((p) => p.map((v) => v.type)).flat());
 
-  const pluginsSchemaTypes = Object.values(plugins).map((p) => 
-    p ? (p.propPanel.defaultSchema as Schema).type : undefined
+  const pluginsSchemaTypes = Object.values(plugins).map((p) =>
+    p ? (p.propPanel.defaultSchema as Schema).type : undefined,
   );
 
   if (allSchemaTypes.some((s) => !pluginsSchemaTypes.includes(s))) {

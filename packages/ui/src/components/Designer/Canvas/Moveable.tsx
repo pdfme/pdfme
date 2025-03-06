@@ -1,5 +1,11 @@
 import React, { useEffect, forwardRef, Ref } from 'react';
-import MoveableComponent, { OnDrag, OnRotate, OnRotateEnd, OnClick, OnResize } from 'react-moveable';
+import MoveableComponent, {
+  OnDrag,
+  OnRotate,
+  OnRotateEnd,
+  OnClick,
+  OnResize,
+} from 'react-moveable';
 import { theme } from 'antd';
 
 type Props = {
@@ -27,9 +33,7 @@ const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   const { token } = theme.useToken();
   useEffect(() => {
     const containerElement = document.querySelector(`.${className}`);
-    const containerElement2 = document.querySelectorAll(
-      `.${className} .moveable-line`,
-    );
+    const containerElement2 = document.querySelectorAll(`.${className} .moveable-line`);
     if (containerElement instanceof HTMLElement) {
       containerElement.style.setProperty('--moveable-color', token.colorPrimary);
       Array.from(containerElement2).forEach((e) => {

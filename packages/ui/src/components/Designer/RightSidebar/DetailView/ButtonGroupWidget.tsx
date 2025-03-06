@@ -35,9 +35,8 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
     ass.forEach((s: SchemaForUI) => {
       // Cast schema to Record to safely access dynamic properties
       const schemaRecord = s as Record<string, unknown>;
-      active = type === 'boolean' 
-        ? Boolean(schemaRecord[key] ?? false) 
-        : schemaRecord[key] === btn.value;
+      active =
+        type === 'boolean' ? Boolean(schemaRecord[key] ?? false) : schemaRecord[key] === btn.value;
     });
     return active;
   };

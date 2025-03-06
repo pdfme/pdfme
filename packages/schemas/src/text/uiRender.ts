@@ -69,7 +69,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return text;
   };
   const font = options?.font || getDefaultFont();
-  const fontKitFont = await getFontKitFont(schema.fontName, font, _cache as Map<string, import('fontkit').Font>);
+  const fontKitFont = await getFontKitFont(
+    schema.fontName,
+    font,
+    _cache as Map<string, import('fontkit').Font>,
+  );
   const textBlock = buildStyledTextContainer(
     arg,
     fontKitFont,

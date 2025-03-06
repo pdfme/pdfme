@@ -145,7 +145,11 @@ export class Table {
   }
 }
 
-async function calculateWidths(arg: { table: Table; font: Font; _cache: Map<string | number, FontKitFont> }) {
+async function calculateWidths(arg: {
+  table: Table;
+  font: Font;
+  _cache: Map<string | number, FontKitFont>;
+}) {
   const { table, font, _cache } = arg;
 
   const getFontKitFontByFontName = (fontName: string | undefined) =>

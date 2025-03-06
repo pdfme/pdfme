@@ -331,28 +331,28 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     );
     const schemaTypes = selectedSchemas.map((s) => s.type);
     const uniqueSchemaTypes = [...new Set(schemaTypes)];
-    
+
     // Create a type-safe array of default schemas
     const defaultSchemas: Record<string, unknown>[] = [];
-    
+
     // Safely iterate through plugins registry
-    Object.values(pluginsRegistry).forEach(plugin => {
-      if (plugin && 
-          typeof plugin === 'object' && 
-          'propPanel' in plugin && 
-          plugin.propPanel && 
-          typeof plugin.propPanel === 'object' &&
-          'defaultSchema' in plugin.propPanel && 
-          plugin.propPanel.defaultSchema) {
+    Object.values(pluginsRegistry).forEach((plugin) => {
+      if (
+        plugin &&
+        typeof plugin === 'object' &&
+        'propPanel' in plugin &&
+        plugin.propPanel &&
+        typeof plugin.propPanel === 'object' &&
+        'defaultSchema' in plugin.propPanel &&
+        plugin.propPanel.defaultSchema
+      ) {
         defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
       }
     });
 
     // Check if all schema types have rotate property
-    return uniqueSchemaTypes.every(type => {
-      const matchingSchema = defaultSchemas.find(ds => 
-        ds && 'type' in ds && ds.type === type
-      );
+    return uniqueSchemaTypes.every((type) => {
+      const matchingSchema = defaultSchemas.find((ds) => ds && 'type' in ds && ds.type === type);
       return matchingSchema && 'rotate' in matchingSchema;
     });
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
@@ -375,7 +375,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const inputEvent = e.inputEvent as MouseEvent | TouchEvent;
           const target = inputEvent.target as Element | null;
           const isMoveableElement = moveable.current?.isMoveableElement(target as Element);
-          
+
           if ((inputEvent.type === 'touchstart' && e.isTrusted) || isMoveableElement) {
             e.stop();
           }
@@ -383,7 +383,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (paperRefs.current[pageCursor] === target) {
             onEdit([]);
           }
-          
+
           // Check if the target is an HTMLElement and has an id property
           const targetElement = target as HTMLElement | null;
           if (targetElement && targetElement.id === DELETE_BTN_ID) {
@@ -396,10 +396,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const added = e.added as HTMLElement[];
           const removed = e.removed as HTMLElement[];
           const selected = e.selected as HTMLElement[];
-          
+
           const isClick = inputEvent.type === 'mousedown';
           let newActiveElements: HTMLElement[] = isClick ? selected : [];
-          
+
           if (!isClick && added.length > 0) {
             newActiveElements = activeElements.concat(added);
           }
@@ -411,7 +411,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           if (newActiveElements != activeElements) {
             setEditing(false);
           }
-          
+
           // For MacOS CMD+SHIFT+3/4 screenshots where the keydown event is never received, check mouse too
           const mouseEvent = inputEvent as MouseEvent;
           if (mouseEvent && typeof mouseEvent.shiftKey === 'boolean' && !mouseEvent.shiftKey) {
@@ -517,7 +517,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               onChange={(arg) => {
                 // Use type assertion to safely handle the argument
                 type ChangeArg = { key: string; value: unknown };
-                const args = Array.isArray(arg) ? arg as ChangeArg[] : [arg as ChangeArg];
+                const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
                 changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
               }}
               stopEditing={() => setEditing(false)}

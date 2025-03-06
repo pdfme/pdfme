@@ -8,7 +8,12 @@ interface ModifyTemplateForDynamicTableArg {
   options: CommonOptions;
   getDynamicHeights: (
     value: string,
-    args: { schema: Schema; basePdf: BasePdf; options: CommonOptions; _cache: Map<string | number, unknown> },
+    args: {
+      schema: Schema;
+      basePdf: BasePdf;
+      options: CommonOptions;
+      _cache: Map<string | number, unknown>;
+    },
   ) => Promise<number[]>;
 }
 
