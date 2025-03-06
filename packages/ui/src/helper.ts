@@ -291,10 +291,17 @@ export const template2SchemasList = async (_template: Template) => {
     }));
   } else {
     const b64BasePdf = await getB64BasePdf(basePdf);
-    // pdf2size accepts both ArrayBuffer and Uint8Array
+    // pdf2size accepts ArrayBuffer
     const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
+    
+    // Create a proper ArrayBuffer from the Uint8Array
+    const arrayBuffer = new ArrayBuffer(pdfArrayBuffer.byteLength);
+    const view = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < pdfArrayBuffer.byteLength; i++) {
+      view[i] = pdfArrayBuffer[i];
+    }
 
-    pageSizes = await pdf2size(pdfArrayBuffer);
+    pageSizes = await pdf2size(arrayBuffer);
   }
 
   const ssl = schemasForUI.length;

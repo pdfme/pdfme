@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+// No longer need ReactDOM import as we're using root.unmount() instead
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
 import { debounce } from './helper.js';
 import {
@@ -118,7 +118,10 @@ export abstract class BaseUIClass {
 
   public destroy() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.unmountComponentAtNode(this.domContainer);
+    // Use root.unmount() instead of ReactDOM.unmountComponentAtNode
+    if ((this as any).root) {
+      (this as any).root.unmount();
+    }
 
     this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;

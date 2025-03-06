@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => {
         name: '@pdfme/ui',
         fileName: (format) => `index.${format}.js`,
       },
+      rollupOptions: {
+        external: ['fast-xml-parser'],
+      },
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
