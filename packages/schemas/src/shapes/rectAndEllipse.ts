@@ -119,7 +119,7 @@ const shape: Plugin<ShapeSchema> = {
 const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   ...shape.propPanel,
   defaultSchema: {
-    ...shape.propPanel.defaultSchema as ShapeSchema,
+    ...(shape.propPanel.defaultSchema as ShapeSchema),
     type,
   },
 });

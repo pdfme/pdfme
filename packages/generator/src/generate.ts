@@ -110,7 +110,7 @@ const generate = async (props: GenerateProps) => {
             pdfDoc,
             page,
             options,
-            _cache: _cache as Map<string | number, unknown>,
+            _cache,
           };
           await render(staticRenderProps);
         }
@@ -150,7 +150,7 @@ const generate = async (props: GenerateProps) => {
           pdfDoc,
           page,
           options,
-          _cache: _cache as Map<string | number, unknown>,
+          _cache,
         };
         await render(renderProps);
       }

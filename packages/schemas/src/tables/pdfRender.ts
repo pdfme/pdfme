@@ -128,7 +128,7 @@ export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
     schema,
     basePdf,
     options,
-    _cache: _cache,
+    _cache,
   };
 
   // Ensure body is properly typed before passing to createSingleTable
