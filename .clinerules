@@ -31,7 +31,7 @@
 
 4. **Code Formatting**
    - Do not include unnecessary formatting changes in commits.
-   - Use `npm run prettier` at the root level as the project’s definitive formatting tool.
+   - Use `npm run prettier` at the root level as the project's definitive formatting tool.
 
 5. **Build and Test Requirements**
    - Pass `npm run build` and `npm run test` at the root level before merging changes.
@@ -50,3 +50,24 @@
 - Always protect sensitive files (e.g., .env, credentials).
 - Follow best practices in code organization, architecture, and testing.
 
+## Cline Memory Bank
+- Use Cline Memory Bank to track project context and progress.
+- Memory Bank consists of the following Markdown files:
+  - **projectbrief.md**: Defines project scope and purpose
+  - **productContext.md**: Problems solved, features, UX goals
+  - **activeContext.md**: Current work focus, recent changes, next steps
+  - **systemPatterns.md**: Architecture, technical decisions, design patterns
+  - **techContext.md**: Technologies used, development setup, constraints
+  - **progress.md**: Feature status, remaining work, current status
+
+## Memory Bank Update Guidelines
+- When discovering new project patterns
+- After implementing significant changes
+- When context clarification is needed
+- When "update memory bank" command is requested (review all files)
+
+## Project Intelligence
+- Critical implementation paths: Each package in packages/ has clearly defined responsibilities
+- User settings and workflows: Provides intuitive APIs for template design and generation
+- Project-specific patterns: Modularized package structure, minimal dependencies
+- Known issues: Limitations with complex PDF layouts, partial support for advanced PDF features
