@@ -152,6 +152,7 @@ export type Plugin<T = Schema> = {
   uninterruptedEditMode?: boolean;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Plugins = { [key: string]: Plugin<any> | undefined };
 
 export type Lang = z.infer<typeof Lang>;
