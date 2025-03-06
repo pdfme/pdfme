@@ -158,3 +158,65 @@ The most common use-case for this is when you're rendering a large number of PDF
 inputs might be the same and your schema could benefit from caching them. This is optional, but if you're intending for your custom schema to be used by others then you should consider it.
 
 Examples of caching are available in both [image](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/graphics/image.ts) and [barcode](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/barcodes/pdfRender.ts) schema render functions. You will need to choosing a caching key that captures the uniqueness of your generated PDF artifact (excluding attributes such as size and position, which are usually handled by pdf-lib on rendering). You will notice in the barcode schema that it requires more attributes to describe it's uniqueness compare to images which use the default `getCacheKey` function.
+
+## Community Contributions
+
+The pdfme community has created and shared various custom plugins that you might find useful in your projects. Here are some community-contributed plugins:
+
+### Lightweight QR Code Plugin
+
+A lightweight alternative QR code plugin that uses the `qrcode` npm package instead of the larger `bwip-js` package used in the built-in barcode schemas. This plugin is significantly smaller in bundle size while still providing QR code functionality.
+
+- **Gist**: [A light weight qrcode plugin for pdfme](https://gist.github.com/kyasu1/0def72d6f0826b0a9571b6e13f3c9065)
+- **Author**: [kyasu1](https://github.com/kyasu1)
+- **Features**:
+  - Smaller bundle size compared to the built-in barcode schemas
+  - Customizable background and bar colors
+  - Simple integration with pdfme
+
+To use this plugin:
+
+1. Install the required dependency:
+   ```bash
+   npm install qrcode -S
+   ```
+
+2. Add the plugin code to your project (e.g., in `./src/plugins/qrCode.ts`)
+
+3. Import and use the plugin in your generator or UI components:
+   ```ts
+   import qrCode from "./plugins/qrCode.js";
+   
+   // In your generator
+   const pdf = await generate({
+     template, 
+     inputs, 
+     options: { font },
+     plugins: {
+       // Your other plugins
+       NodeQRCode: qrCode
+     }
+   });
+   ```
+
+4. Use the schema in your template:
+   ```json
+   {
+     "type": "node-qrCode",
+     "content": "https://pdfme.com/",
+     "position": { "x": 178, "y": 20 },
+     "backgroundColor": "#ffffff",
+     "barColor": "#000000",
+     "width": 16,
+     "height": 16,
+     "rotate": 0,
+     "opacity": 1,
+     "required": false,
+     "readOnly": false,
+     "name": "qrCode"
+   }
+   ```
+
+:::tip
+If you've created a useful plugin for pdfme, please share it on [GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288) so others can benefit from your work!
+:::
