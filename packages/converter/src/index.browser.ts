@@ -1,11 +1,10 @@
 import * as pdfjsLib from 'pdfjs-dist';
 // @ts-expect-error - PDFJSWorker import is not properly typed but required for functionality
-import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
+import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
 
-// @ts-expect-error - Setting workerSrc is required but type definitions are incomplete
-pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown;
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown as string;
 
 function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   // Split out the actual base64 string from the data URL scheme

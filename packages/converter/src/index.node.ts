@@ -1,7 +1,11 @@
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+// @ts-expect-error - PDFJSWorker import is not properly typed but required for functionality
+import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.js';
 import { createCanvas } from 'canvas';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown as string;
 
 export const pdf2img = async (
   pdf: ArrayBuffer | Uint8Array,
