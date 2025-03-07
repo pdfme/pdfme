@@ -45,5 +45,6 @@ export const getPlugins = () => {
     // UPCA: barcodes.upca,
     // UPCE: barcodes.upce,
     // GS1DataMatrix: barcodes.gs1datamatrix,
+    // PDF417: barcodes.pdf417,
   };
 };

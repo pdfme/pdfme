@@ -1,33 +1,6 @@
 import { b64toUint8Array } from '@pdfme/common';
-import bwipjs from 'bwip-js';
+import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
-
-// Define a public interface for the options to avoid using the private RenderOptions
-export interface BarcodeRenderOptions {
-  bcid: string;
-  text: string;
-  scale?: number;
-  width?: number;
-  height?: number;
-  includetext?: boolean;
-  textxalign?: 'center' | 'offleft' | 'left' | 'right' | 'offright' | 'justify';
-  backgroundcolor?: string;
-  barcolor?: string;
-  textcolor?: string;
-  [key: string]: unknown;
-}
-
-// Extend the bwipjs type to include browser-specific methods
-declare module 'bwip-js' {
-  interface BwipJs {
-    toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
-  }
-
-  export default interface BwipJsModule {
-    toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
-    toBuffer(options: BarcodeRenderOptions): Promise<Buffer>;
-  }
-}
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
 import { BarcodeTypes } from './types.js';
 
@@ -52,76 +25,74 @@ const validateCheckDigit = (input: string, checkDigitPos: number) => {
 
   return passCheckDigit;
 };
-
 export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
   if (!input) return false;
 
   if (!BARCODE_TYPES.includes(type)) return false;
 
   if (type === 'qrcode') {
-    // 500文字以下
+    // Up to 500 characters
     return input.length < 500;
   }
   if (type === 'japanpost') {
-    // 郵便番号は数字(0-9)のみ。住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
+    // For Japan Post: Postal codes must be digits (0-9) only.
+    // Address display numbers can use alphanumeric characters (0-9, A-Z) and hyphen (-).
     const regexp = /^(\d{7})(\d|[A-Z]|-)+$/;
-
     return regexp.test(input);
   }
   if (type === 'ean13') {
-    // 有効文字は数値(0-9)のみ。チェックデジットを含まない12桁orチェックデジットを含む13桁。
+    // For EAN-13: Valid characters are digits (0-9) only.
+    // Either 12 digits (without check digit) or 13 digits (with check digit).
     const regexp = /^\d{12}$|^\d{13}$/;
-
     return regexp.test(input) && validateCheckDigit(input, 13);
   }
   if (type === 'ean8') {
-    // 有効文字は数値(0-9)のみ。チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    // For EAN-8: Valid characters are digits (0-9) only.
+    // Either 7 digits (without check digit) or 8 digits (with check digit).
     const regexp = /^\d{7}$|^\d{8}$/;
-
     return regexp.test(input) && validateCheckDigit(input, 8);
   }
   if (type === 'code39') {
-    // 有効文字は数字(0-9)。アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペース。
+    // For Code39: Valid characters are digits (0-9), uppercase alphabets (A-Z),
+    // symbols (-, ., $, /, +, %), and space.
     const regexp = /^(\d|[A-Z]|\-|\.|\$|\/|\+|\%|\s)+$/;
-
     return regexp.test(input);
   }
   if (type === 'code128') {
-    // 有効文字は漢字、ひらがな、カタカナ以外。
+    // For Code128: Valid characters are all except Kanji, Hiragana, and Katakana.
     // https://qiita.com/graminume/items/2ac8dd9c32277fa9da64
     return !input.match(
       /([\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]|[Ａ-Ｚａ-ｚ０-９！＂＃＄％＆＇（）＊＋，－．／：；＜＝＞？＠［＼］＾＿｀｛｜｝〜　])+/,
     );
   }
   if (type === 'nw7') {
-    // 有効文字はNW-7は数字(0-9)と記号(-.$:/+)。
-    // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
+    // For NW-7: Valid characters are digits (0-9) and symbols (-, ., $, :, /, +).
+    // The first and last characters must be one of the alphabets A-D (start/stop codes).
     const regexp = /^[A-Da-d]([0-9\-\.\$\:\/\+])+[A-Da-d]$/;
-
     return regexp.test(input);
   }
   if (type === 'itf14') {
-    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁。
+    // For ITF-14: Valid characters are digits (0-9) only.
+    // Either 13 digits (without check digit) or 14 digits (with check digit).
     const regexp = /^\d{13}$|^\d{14}$/;
-
     return regexp.test(input) && validateCheckDigit(input, 14);
   }
   if (type === 'upca') {
-    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
+    // For UPCA: Valid characters are digits (0-9) only.
+    // Either 11 digits (without check digit) or 12 digits (with check digit).
     const regexp = /^\d{11}$|^\d{12}$/;
-
     return regexp.test(input) && validateCheckDigit(input, 12);
   }
   if (type === 'upce') {
-    // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
-    // チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    // For UPCE: Valid characters are digits (0-9) only.
+    // The first digit (number system character) must be 0.
+    // Either 7 digits (without check digit) or 8 digits (with check digit).
     const regexp = /^0(\d{6}$|\d{7}$)/;
-
     return regexp.test(input) && validateCheckDigit(input, 8);
   }
   if (type === 'gs1datamatrix') {
     let ret = false;
-    // find the GTIN application identifier, regex for "(01)" and the digits after it until another "("
+    // Find the GTIN application identifier: regex for "(01)" and the digits following it until another "(".
     const regexp = /\((01)\)(\d*)(\(|$)/;
     let res = input.match(regexp);
     if (
@@ -133,8 +104,12 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
       let gtin = res[2];
       ret = validateCheckDigit(gtin, gtin.length);
     }
-
     return ret;
+  }
+  if (type === 'pdf417') {
+    // PDF417 can encode a wide range of characters,
+    // but considering performance and library limitations, the maximum number of characters is limited (up to 1000 characters here).
+    return input.length > 0 && input.length <= 1000;
   }
 
   return false;
@@ -175,7 +150,7 @@ export const createBarCode = async (arg: {
 
   const bcid = barCodeType2Bcid(type);
   const scale = 5;
-  const bwipjsArg: BarcodeRenderOptions = {
+  const bwipjsArg: RenderOptions = {
     bcid,
     text: input,
     width,
@@ -195,7 +170,7 @@ export const createBarCode = async (arg: {
     const canvas = document.createElement('canvas');
     // Use a type assertion to safely call toCanvas
     const bwipjsModule = bwipjs as unknown as {
-      toCanvas(canvas: HTMLCanvasElement, options: BarcodeRenderOptions): void;
+      toCanvas(canvas: HTMLCanvasElement, options: RenderOptions): void;
     };
     bwipjsModule.toCanvas(canvas, bwipjsArg);
     const dataUrl = canvas.toDataURL('image/png');
@@ -203,7 +178,7 @@ export const createBarCode = async (arg: {
   } else {
     // Use a type assertion to safely call toBuffer
     const bwipjsModule = bwipjs as unknown as {
-      toBuffer(options: BarcodeRenderOptions): Promise<Buffer>;
+      toBuffer(options: RenderOptions): Promise<Buffer>;
     };
     res = await bwipjsModule.toBuffer(bwipjsArg);
   }

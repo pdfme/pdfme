@@ -172,10 +172,23 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
       opacity: DEFAULT_OPACITY,
     },
   },
+  {
+    defaultSchema: {
+      name: '',
+      type: 'pdf417',
+      content: 'This is PDF417!',
+      position,
+      ...defaultColors,
+      width: 40,
+      height: 16,
+      rotate: 0,
+      opacity: DEFAULT_OPACITY,
+    },
+  },
 ];
 
 export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<BarcodeSchema> => {
-  const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix';
+  const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix' && barcodeType !== 'pdf417';
 
   const defaults = barcodeDefaults.find(({ defaultSchema }) => defaultSchema.type === barcodeType);
 

@@ -9,7 +9,7 @@ import {
 
 describe('validateBarcodeInput test', () => {
   test('qrcode', () => {
-    // 500文字以下
+    // Less than 500 characters
     const type = 'qrcode';
 
     const valid = 'https://www.google.com/';
@@ -24,7 +24,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('japanpost', () => {
     // https://barcode-place.azurewebsites.net/Barcode/zip
-    // 郵便番号は数字(0-9)のみ、住所表示番号は英数字(0-9,A-Z)とハイフン(-)が使用可能です。
+    // Postal code is numbers (0-9) only, address display numbers can use alphanumeric characters (0-9, A-Z) and hyphens (-).
     const type = 'japanpost';
 
     const valid1 = '10000131-3-2-503';
@@ -44,7 +44,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('ean13', () => {
     // https://barcode-place.azurewebsites.net/Barcode/jan
-    // 有効文字は数値(0-9)のみ。標準タイプはチェックデジットを含まない12桁orチェックデジットを含む13桁
+    // Valid characters are numbers (0-9) only. Standard type is 12 digits without check digit or 13 digits with check digit.
     const type = 'ean13';
 
     const valid1 = '111111111111';
@@ -73,7 +73,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('ean8', () => {
     // https://barcode-place.azurewebsites.net/Barcode/jan
-    // 有効文字は数値(0-9)のみ。短縮タイプはチェックデジットを含まない7桁orチェックデジットを含む8桁
+    // Valid characters are numbers (0-9) only. Short type is 7 digits without check digit or 8 digits with check digit.
     const type = 'ean8';
 
     const valid1 = '1111111';
@@ -102,7 +102,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('code39', () => {
     // https://barcode-place.azurewebsites.net/Barcode/code39
-    // CODE39は数字(0-9)、アルファベット大文字(A-Z)、記号(-.$/+%)、半角スペースに対応しています。
+    // CODE39 supports numbers (0-9), uppercase alphabets (A-Z), symbols (-.$/+%), and spaces.
     const type = 'code39';
 
     const valid1 = '12345';
@@ -122,7 +122,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('code128', () => {
     // https://www.keyence.co.jp/ss/products/autoid/codereader/basic_code128.jsp
-    // コンピュータのキーボードから打てる文字（漢字、ひらがな、カタカナ以外）可能
+    // Characters that can be typed from a computer keyboard (except kanji, hiragana, and katakana) are possible.
     const type = 'code128';
 
     const valid1 = '12345';
@@ -143,8 +143,8 @@ describe('validateBarcodeInput test', () => {
   test('nw7', () => {
     // https://barcode-place.azurewebsites.net/Barcode/nw7
     // https://en.wikipedia.org/wiki/Codabar
-    // NW-7は数字(0-9)と記号(-.$:/+)に対応しています。
-    // スタートコード／ストップコードとして、コードの始まりと終わりはアルファベット(A-D)のいずれかを使用してください。
+    // NW-7 supports numbers (0-9) and symbols (-.$:/+).
+    // For start code/stop code, use any of the alphabets (A-D) at the beginning and end of the code.
     const type = 'nw7';
 
     const valid1 = 'A12345D';
@@ -162,7 +162,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('itf14', () => {
     // https://barcode-place.azurewebsites.net/Barcode/itf
-    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない13桁orチェックデジットを含む14桁
+    // Valid characters are numbers (0-9) only. 13 digits without check digit or 14 digits with check digit.
     const type = 'itf14';
 
     const valid1 = '1111111111111';
@@ -186,7 +186,7 @@ describe('validateBarcodeInput test', () => {
   });
   test('upca', () => {
     // https://barcode-place.azurewebsites.net/Barcode/upc
-    // 有効文字は数値(0-9)のみ。 チェックデジットを含まない11桁orチェックデジットを含む12桁。
+    // Valid characters are numbers (0-9) only. 11 digits without check digit or 12 digits with check digit.
     const type = 'upca';
 
     const valid1 = '12345678901';
@@ -212,8 +212,8 @@ describe('validateBarcodeInput test', () => {
   });
   test('upce', () => {
     // https://barcode-place.azurewebsites.net/Barcode/upc
-    // 有効文字は数値(0-9)のみ。 1桁目に指定できる数字(ナンバーシステムキャラクタ)は0のみ。
-    // チェックデジットを含まない7桁orチェックデジットを含む8桁。
+    // Valid characters are numbers (0-9) only. The first digit (number system character) can only be 0.
+    // 7 digits without check digit or 8 digits with check digit.
     const type = 'upce';
 
     const valid1 = '0111111';
@@ -255,10 +255,39 @@ describe('validateBarcodeInput test', () => {
     expect(validateBarcodeInput(type, blank)).toEqual(false);
     expect(validateBarcodeInput(type, invalid_input_length)).toEqual(false);
   });
+
+  test('pdf417', () => {
+    const type = 'pdf417';
+
+    const valid1 = '12345ABCDE';
+    const valid2 = 'Test PDF417 barcode generation';
+    const valid3 = 'ひらがなカタカナ漢字も使えます';
+    const valid4 = 'Special characters: !@#$%^&*()-_=+[]{}|;:,.<>?/';
+
+    // PDF417 supports binary data and virtually any character
+    // It can encode up to 1.1 kilobytes of binary data
+
+    // Very long string that should still be valid
+    const valid5 = 'a'.repeat(1000);
+
+    // Empty string is not valid
+    const blank = '';
+
+    expect(validateBarcodeInput(type, valid1)).toEqual(true);
+    expect(validateBarcodeInput(type, valid2)).toEqual(true);
+    expect(validateBarcodeInput(type, valid3)).toEqual(true);
+    expect(validateBarcodeInput(type, valid4)).toEqual(true);
+    expect(validateBarcodeInput(type, valid5)).toEqual(true);
+    expect(validateBarcodeInput(type, blank)).toEqual(false);
+
+    // PDF417 has a capacity limit, extremely long strings should fail
+    const invalid1 = 'a'.repeat(2000);
+    expect(validateBarcodeInput(type, invalid1)).toEqual(false);
+  });
 });
 
 /**
- * 生成したQRコード（png）画像から入力データが正常に読み取れるかをテスト
+ * Test whether input data can be correctly read from the generated QR code (png) image
  */
 describe('createBarCode', () => {
   // テスト名, input, expected
@@ -281,7 +310,7 @@ describe('createBarCode', () => {
           input: t[1],
           width: 10, // mm
           height: 10, // mm
-          backgroundColor: '00000000', // 背景色を指定しないとjsQRでうまく解析できない
+          backgroundColor: '00000000', // Background color must be specified for jsQR to analyze properly
         });
         const png = PNG.sync.read(buffer);
         const pngData = new Uint8ClampedArray(png.data);
@@ -331,6 +360,7 @@ describe('barCodeType2Bcid test', () => {
     expect(barCodeType2Bcid('upca')).toEqual('upca');
     expect(barCodeType2Bcid('upce')).toEqual('upce');
     expect(barCodeType2Bcid('gs1datamatrix')).toEqual('gs1datamatrix');
+    expect(barCodeType2Bcid('pdf417')).toEqual('pdf417');
   });
 });
 
