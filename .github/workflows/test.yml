@@ -40,12 +40,11 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Run lint
-        run: npm run lint
       - name: Run playground tests
         run: |
           cd playground
           npm install
+          npm run lint
           npm run test
         env:
           CI: true

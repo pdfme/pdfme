@@ -78,7 +78,7 @@ function FormAndViewerApp() {
       localStorage.removeItem("inputs");
       localStorage.removeItem("template");
     }
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   const onChangeMode = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value as Mode;
