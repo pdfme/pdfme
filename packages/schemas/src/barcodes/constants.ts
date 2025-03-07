@@ -10,6 +10,7 @@ export const BARCODE_TYPES = [
   'upca',
   'upce',
   'gs1datamatrix',
+  'pdf417',
 ] as const;
 
 export const DEFAULT_BARCODE_BG_COLOR = '#ffffff';

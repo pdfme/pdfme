@@ -77,6 +77,7 @@ For using schemas other than the Text schema, please refer to the following docu
   - upca
   - upce
   - gs1datamatrix
+  - pdf417
 - Style-related
   - Bar Color
   - Background Color
