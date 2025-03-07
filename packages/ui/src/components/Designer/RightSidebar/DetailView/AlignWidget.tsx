@@ -1,4 +1,4 @@
-import { Button, Form } from 'antd';
+import { Space, Button, Form } from 'antd';
 import React from 'react';
 import type { PropPanelWidgetProps } from '@pdfme/common';
 import {
@@ -210,7 +210,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
 
   return (
     <Form.Item label={schema.title}>
-      <Button.Group>
+      <Space.Compact>
         {layoutBtns.map((btn) => (
           <Button
             key={btn.id}
@@ -219,7 +219,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
             {...btn}
           />
         ))}
-      </Button.Group>
+      </Space.Compact>
     </Form.Item>
   );
 };

@@ -1,4 +1,4 @@
-import { Button, Form, theme } from 'antd';
+import { Space, Button, Form, theme } from 'antd';
 import React from 'react';
 import type { PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
 interface ButtonConfig {
@@ -53,7 +53,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
 
   return (
     <Form.Item>
-      <Button.Group>
+      <Space.Compact>
         {(schema.buttons as ButtonConfig[]).map((btn: ButtonConfig, index: number) => {
           const active = isActive(btn);
           return (
@@ -70,7 +70,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
             />
           );
         })}
-      </Button.Group>
+      </Space.Compact>
     </Form.Item>
   );
 };
