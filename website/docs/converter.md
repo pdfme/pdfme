@@ -66,6 +66,8 @@ const image2 = new ArrayBuffer(...); // Second image
 const pdf = await img2pdf([image1, image2], {
   scale: 1,
   imageType: 'jpeg',
+  size: { width: 210, height: 297 },
+  margin: [10, 10, 10, 10],
 });
 ```
 
@@ -102,6 +104,8 @@ interface Pdf2SizeOptions {
 interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
+  size?: { height: number, width: number }; // in millimeters
+  margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }
 ```
 
