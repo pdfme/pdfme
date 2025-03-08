@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import { Plugin, PropPanelWidgetProps, SchemaForUI, UIRenderProps } from '@pdfme/common';
+import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
 import text from '../text/index.js';
 import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
@@ -112,7 +112,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
 };
 
 const schema: Plugin<Select> = {
-  ui: async (arg: UIRenderProps<Select>) => {
+  ui: async (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     await text.ui(Object.assign(arg, { mode: 'viewer' }));
 

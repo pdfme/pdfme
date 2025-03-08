@@ -1,4 +1,4 @@
-import type { Schema, Plugin, PDFRenderProps, UIRenderProps } from '@pdfme/common';
+import type { Schema, Plugin } from '@pdfme/common';
 import {
   rotatePoint,
   convertForPdfLayoutProps,
@@ -15,7 +15,7 @@ interface LineSchema extends Schema {
 }
 
 const lineSchema: Plugin<LineSchema> = {
-  pdf: (arg: PDFRenderProps<LineSchema>) => {
+  pdf: (arg) => {
     const { page, schema, options } = arg;
     if (schema.width === 0 || schema.height === 0 || !schema.color) return;
     const { colorType } = options;
@@ -36,7 +36,7 @@ const lineSchema: Plugin<LineSchema> = {
       opacity: opacity,
     });
   },
-  ui: (arg: UIRenderProps<LineSchema>) => {
+  ui: (arg) => {
     const { schema, rootElement } = arg;
     const div = document.createElement('div');
     div.style.backgroundColor = schema.color ?? 'transparent';

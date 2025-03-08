@@ -1,4 +1,4 @@
-import { Plugin, Schema, UIRenderProps, PDFRenderProps } from '@pdfme/common';
+import { Plugin, Schema } from '@pdfme/common';
 import { Circle, CircleDot } from 'lucide';
 import svg from '../graphics/svg.js';
 import { isEditable, createSvgStr } from '../utils.js';
@@ -28,7 +28,7 @@ const radioButtonStates = new Map<string, RadioButtonState>();
 const eventListeners = new Map<string, EventListener>();
 
 const schema: Plugin<RadioGroup> = {
-  ui: (arg: UIRenderProps<RadioGroup>) => {
+  ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');
     container.style.width = '100%';
@@ -79,7 +79,7 @@ const schema: Plugin<RadioGroup> = {
 
     rootElement.appendChild(container);
   },
-  pdf: (arg: PDFRenderProps<RadioGroup>) =>
+  pdf: (arg) =>
     svg.pdf(Object.assign(arg, { value: getIcon({ value: arg.value, color: arg.schema.color }) })),
   propPanel: {
     schema: ({ i18n }) => ({

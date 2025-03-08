@@ -1,10 +1,4 @@
-import {
-  DEFAULT_FONT_NAME,
-  Plugin,
-  PDFRenderProps,
-  UIRenderProps,
-  getFallbackFontName,
-} from '@pdfme/common';
+import { DEFAULT_FONT_NAME, Plugin, PDFRenderProps, getFallbackFontName } from '@pdfme/common';
 import { uiRender as textUiRender } from '../text/uiRender.js';
 import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import line from '../shapes/line.js';
@@ -60,7 +54,7 @@ const createLineDiv = (
 };
 
 const cellSchema: Plugin<CellSchema> = {
-  pdf: async (arg: PDFRenderProps<CellSchema>) => {
+  pdf: async (arg) => {
     const { schema } = arg;
     const { position, width, height, borderWidth, padding } = schema;
 
@@ -115,7 +109,7 @@ const cellSchema: Plugin<CellSchema> = {
       },
     });
   },
-  ui: async (arg: UIRenderProps<CellSchema>) => {
+  ui: async (arg) => {
     const { schema, rootElement } = arg;
     const { borderWidth, width, height, borderColor, backgroundColor } = schema;
     rootElement.style.backgroundColor = backgroundColor;

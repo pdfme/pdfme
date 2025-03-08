@@ -1,4 +1,4 @@
-import { Plugin, Schema, UIRenderProps, PDFRenderProps } from '@pdfme/common';
+import { Plugin, Schema } from '@pdfme/common';
 import {
   convertForPdfLayoutProps,
   isEditable,
@@ -45,7 +45,7 @@ const defaultValue = `<svg viewBox="0 0 488 600" version="1.1" xmlns="http://www
 export type SVGSchema = Schema;
 
 const svgSchema: Plugin<SVGSchema> = {
-  ui: (arg: UIRenderProps<SVGSchema>) => {
+  ui: (arg) => {
     const { rootElement, value, mode, onChange, theme, schema } = arg;
     const container = document.createElement(isEditable(mode, schema) ? 'textarea' : 'div');
     container.style.width = '100%';
@@ -93,7 +93,7 @@ const svgSchema: Plugin<SVGSchema> = {
       }
     }
   },
-  pdf: async (arg: PDFRenderProps<SVGSchema>) => {
+  pdf: async (arg) => {
     const { page, schema, value } = arg;
     if (!value || !isValidSVG(value)) return;
     const pageHeight = page.getHeight();

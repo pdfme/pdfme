@@ -1,9 +1,9 @@
 import type { ChangeEvent } from 'react';
 import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
-import type { PDFRenderProps, Schema } from '@pdfme/common';
+import type { Schema } from '@pdfme/common';
 import type * as CSS from 'csstype';
-import { UIRenderProps, px2mm } from '@pdfme/common';
+import { px2mm } from '@pdfme/common';
 import { Image } from 'lucide';
 import {
   convertForPdfLayoutProps,
@@ -23,7 +23,7 @@ const defaultValue =
 type ImageSchema = Schema;
 
 const imageSchema: Plugin<ImageSchema> = {
-  pdf: async (arg: PDFRenderProps<ImageSchema>) => {
+  pdf: async (arg) => {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value) return;
 
@@ -63,7 +63,7 @@ const imageSchema: Plugin<ImageSchema> = {
     const drawOptions = { x, y, rotate, width, height, opacity };
     page.drawImage(image, drawOptions);
   },
-  ui: (arg: UIRenderProps<ImageSchema>) => {
+  ui: (arg) => {
     const {
       value,
       rootElement,

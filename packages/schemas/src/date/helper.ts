@@ -39,14 +39,7 @@ import localeZh from 'air-datepicker/locale/zh';
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
 
-import {
-  Plugin,
-  getFallbackFontName,
-  DEFAULT_FONT_NAME,
-  PropPanelSchema,
-  UIRenderProps,
-  PDFRenderProps,
-} from '@pdfme/common';
+import { Plugin, getFallbackFontName, DEFAULT_FONT_NAME, PropPanelSchema } from '@pdfme/common';
 import text from '../text/index.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { mapVerticalAlignToFlex } from '../text/uiRender.js';
@@ -207,7 +200,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
   const defaultFormat = getFormat(type, getAirDatepickerLocale(defaultLocale));
 
   const plugin: Plugin<DateSchema> = {
-    ui: async (arg: UIRenderProps<DateSchema>) => {
+    ui: async (arg) => {
       const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
 
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
@@ -304,7 +297,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
       rootElement.appendChild(input);
       rootElement.appendChild(textElement);
     },
-    pdf: (arg: PDFRenderProps<DateSchema>) => {
+    pdf: (arg) => {
       const { schema, value, options } = arg;
       if (!value) return void 0;
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
