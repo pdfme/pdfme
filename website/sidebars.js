@@ -24,8 +24,7 @@ const sidebars = {
       label: 'Tools(New)',
       items: [
         'converter',
-        'manipulator',
-        'optimizer',
+        'manipulator'
       ],
     },
     'development-guide',
