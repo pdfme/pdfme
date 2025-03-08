@@ -118,6 +118,39 @@ describe('img2pdf tests', () => {
     const invalidImage = new ArrayBuffer(10);
     await expect(img2pdf([invalidImage])).rejects.toThrow('Failed to process image');
   });
+
+  test('handles size option', async () => {
+    const customSize = { width: 100, height: 150 }; // in millimeters
+    const pdf = await img2pdf([jpegImage], { size: customSize });
+    expect(pdf).toBeInstanceOf(ArrayBuffer);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+  
+  test('handles margin option', async () => {
+    const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
+    const pdf = await img2pdf([jpegImage], { margin: margins });
+    expect(pdf).toBeInstanceOf(ArrayBuffer);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+  
+  test('handles both size and margin options', async () => {
+    const customSize = { width: 100, height: 150 }; // in millimeters
+    const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
+    const pdf = await img2pdf([jpegImage], { 
+      size: customSize, 
+      margin: margins 
+    });
+    expect(pdf).toBeInstanceOf(ArrayBuffer);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+  
+  test('uses default margin [0,0,0,0] when margin is omitted', async () => {
+    // This test verifies the default behavior is maintained
+    const pdf1 = await img2pdf([jpegImage]);
+    const pdf2 = await img2pdf([jpegImage], { margin: [0, 0, 0, 0] as [number, number, number, number] });
+    // Both PDFs should have the same size
+    expect(pdf1.byteLength).toBe(pdf2.byteLength);
+  });
 });
 
 describe('pdf2size tests', () => {
