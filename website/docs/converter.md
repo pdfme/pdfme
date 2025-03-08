@@ -66,8 +66,14 @@ const image2 = new ArrayBuffer(...); // Second image
 const pdf = await img2pdf([image1, image2], {
   scale: 1,
   imageType: 'jpeg',
+  size: { width: 210, height: 297 }, // A4 size in millimeters (optional)
+  margin: [10, 10, 10, 10], // [top, right, bottom, left] in millimeters (optional)
 });
 ```
+
+The `size` and `margin` options were added in [https://github.com/pdfme/pdfme/pull/823](https://github.com/pdfme/pdfme/pull/823):
+- `size`: Specifies the output PDF page dimensions in millimeters. If omitted, the original image dimensions are used.
+- `margin`: Specifies the margins [top, right, bottom, left] in millimeters. If omitted, defaults to [0, 0, 0, 0].
 
 ## Error Handling
 
@@ -102,6 +108,8 @@ interface Pdf2SizeOptions {
 interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
+  size?: { height: number, width: number }; // in millimeters
+  margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }
 ```
 
