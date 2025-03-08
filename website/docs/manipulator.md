@@ -34,14 +34,16 @@ const splits = await split(pdf, [
 ]);
 ```
 
-### remove
-Removes specified pages from a PDF.
+### rotate
+Rotates specified pages in a PDF.
 
 ```ts
-import { remove } from '@pdfme/manipulator';
+import { rotate } from '@pdfme/manipulator';
 
 const pdf = new ArrayBuffer(...); // Source PDF
-const result = await remove(pdf, [1, 3]); // Remove pages 2 and 4
+const result = await rotate(pdf, 90); // Rotate all pages 90 degrees
+// Or rotate specific pages:
+const result2 = await rotate(pdf, 90, [0, 2]); // Rotate pages 1 and 3
 ```
 
 ### insert
@@ -57,16 +59,14 @@ const result = await insert(basePdf, [
 ]);
 ```
 
-### rotate
-Rotates specified pages in a PDF.
+### remove
+Removes specified pages from a PDF.
 
 ```ts
-import { rotate } from '@pdfme/manipulator';
+import { remove } from '@pdfme/manipulator';
 
 const pdf = new ArrayBuffer(...); // Source PDF
-const result = await rotate(pdf, 90); // Rotate all pages 90 degrees
-// Or rotate specific pages:
-const result2 = await rotate(pdf, 90, [0, 2]); // Rotate pages 1 and 3
+const result = await remove(pdf, [1, 3]); // Remove pages 2 and 4
 ```
 
 ### move
