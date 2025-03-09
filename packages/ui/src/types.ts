@@ -1,4 +1,4 @@
-import type { SchemaForUI, Size, ChangeSchemas } from '@pdfme/common';
+import type { SchemaForUI, Size, ChangeSchemas, Schema } from '@pdfme/common';
 
 export type SidebarProps = {
   height: number;
@@ -16,4 +16,7 @@ export type SidebarProps = {
   deselectSchema: () => void;
   sidebarOpen: boolean;
   setSidebarOpen: (sidebarOpen: boolean) => void;
+  availableFields?: Array<string | { name: string; type: string; [key: string]: unknown }>;
+  usedFieldNames?: string[];
+  addSchema?: (schema: Schema) => void;
 };

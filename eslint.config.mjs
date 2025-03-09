@@ -38,6 +38,7 @@ export default [
     rules: {
       ...typescriptPlugin.configs['recommended'].rules,
       ...typescriptPlugin.configs['recommended-requiring-type-checking'].rules,
+      "@typescript-eslint/no-unsafe-assignment": "error"
     },
   }
 ];

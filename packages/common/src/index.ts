@@ -36,6 +36,7 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
+  Field,
 } from './types.js';
 import {
   cloneDeep,
@@ -123,4 +124,5 @@ export type {
   UIRenderProps,
   Mode,
   Plugin,
+  Field,
 };

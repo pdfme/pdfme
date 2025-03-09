@@ -2,6 +2,12 @@ import { z } from 'zod';
 
 const langs = ['en', 'zh', 'ja', 'ko', 'ar', 'th', 'pl', 'it', 'de', 'es', 'fr'] as const;
 
+// Define Field type
+export const Field = z.object({
+  name: z.string(),
+  type: z.string()
+});
+
 export const Lang = z.enum(langs);
 export const Dict = z.object({
   // -----------------used in ui-----------------
@@ -33,6 +39,8 @@ export const Dict = z.object({
   addPageAfter: z.string(),
   removePage: z.string(),
   removePageConfirm: z.string(),
+  alreadyUsed: z.string(),
+  availableDynamicFields: z.string(),
   // --------------------validation-------------------
   'validation.uniqueName': z.string(),
   'validation.hexColor': z.string(),
@@ -188,6 +196,15 @@ export const UIOptions = CommonOptions.extend({
   icons: z.record(z.string(), z.string()).optional(),
   requiredByDefault: z.boolean().optional(),
   maxZoom: z.number().optional(),
+  availableDynamicFields: z.array(
+    z.union([
+      z.string(),
+      z.object({
+        name: z.string(),
+        type: z.string()
+      }).passthrough()
+    ])
+  ).optional(),
 });
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);

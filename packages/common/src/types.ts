@@ -23,6 +23,7 @@ import {
   ColorType,
   LegacySchemaPageArray,
   SchemaPageArray,
+  Field,
 } from './schema.js';
 
 export type PropPanelSchema = _PropPanelSchema;
@@ -183,3 +184,4 @@ export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
 export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
 export type SchemaPageArray = z.infer<typeof SchemaPageArray>;
 export type LegacySchemaPageArray = z.infer<typeof LegacySchemaPageArray>;
+export type Field = z.infer<typeof Field>;

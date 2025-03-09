@@ -185,7 +185,7 @@ const TemplateEditor = ({
     const s = {
       id: uuid(),
       ...defaultSchema,
-      name: newSchemaName(i18n('field')),
+      name: defaultSchema.__preserveName ? defaultSchema.name : newSchemaName(i18n('field')),
       position: {
         x: ensureMiddleValue(
           paddingLeft,
@@ -332,6 +332,8 @@ const TemplateEditor = ({
             schemas={schemasList[pageCursor] ?? []}
             changeSchemas={changeSchemas}
             onSortEnd={onSortEnd}
+            availableFields={options.availableDynamicFields || []}
+            usedFieldNames={schemasList[pageCursor]?.map(schema => schema.name) || []}
             onEdit={(id) => {
               const editingElem = document.getElementById(id);
               if (editingElem) {
@@ -342,6 +344,7 @@ const TemplateEditor = ({
             deselectSchema={onEditEnd}
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
+            addSchema={addSchema}
           />
 
           <Canvas
