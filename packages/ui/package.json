@@ -53,7 +53,7 @@
     "@pdfme/common": "file:../common",
     "@pdfme/schemas": "file:../schemas",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^12.1.2",
+    "@testing-library/react": "^16.2.0",
     "@types/jest": "^29.5.14",
     "@types/react": "^17.0.52",
     "@types/react-dom": "^17.0.18",
