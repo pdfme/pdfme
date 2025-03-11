@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "^2.0.3",
-    "@types/node": "^22.13.8",
+    "@types/node": "^22.13.10",
     "atob": "^2.1.2",
     "buffer": "^6.0.3",
     "path-browserify": "^1.0.1",
