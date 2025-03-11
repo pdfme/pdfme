@@ -184,6 +184,18 @@ exports[`Designer snapshot 1`] = `
                 <div
                   style="height: 40px; display: flex; align-items: center;"
                 >
+                  <button
+                    class="ant-btn css-dev-only-do-not-override-1v613y0 ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                    style="position: absolute; z-index: 100; display: flex; align-items: center; justify-content: center;"
+                    type="button"
+                  >
+                    <span
+                      class="ant-btn-icon"
+                    >
+                      Menu
+                    </span>
+                    
+                  </button>
                   <span
                     class="ant-typography css-dev-only-do-not-override-1v613y0"
                     style="text-align: center; width: 100%;"
