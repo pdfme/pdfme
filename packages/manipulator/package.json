@@ -50,7 +50,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@pdfme/converter": "file:../converter",
+    "@pdfme/converter": "*",
     "@types/estree": "^1.0.6"
   },
   "jest": {
