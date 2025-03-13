@@ -23,6 +23,8 @@
     "@pdfme/manipulator": "file:../packages/manipulator/dist",
     "@pdfme/schemas": "file:../packages/schemas/dist",
     "@pdfme/ui": "file:../packages/ui/dist",
+    "@sentry/react": "^9.5.0",
+    "@sentry/vite-plugin": "^3.2.2",
     "canvas": "^2.11.2",
     "esbuild": "^0.19.10",
     "lucide-react": "^0.475.0",

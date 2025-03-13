@@ -29,3 +29,6 @@ public/template-assets/**/thumbnail.png
 public/template-assets/index.json
 scripts/thumbnail-hash-map.json
 e2e-error-screenshot.png
+.env
+# Sentry Config File
+.env.sentry-build-plugin
