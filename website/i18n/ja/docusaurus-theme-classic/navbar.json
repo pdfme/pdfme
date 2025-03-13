@@ -1,0 +1,34 @@
+{
+  "title": {
+    "message": "pdfme",
+    "description": "The title in the navbar"
+  },
+  "item.label.Docs": {
+    "message": "ドキュメント",
+    "description": "Navbar item with label Docs"
+  },
+  "item.label.Examples": {
+    "message": "サンプル",
+    "description": "Navbar item with label Examples"
+  },
+  "item.label.Template Design": {
+    "message": "テンプレート設計",
+    "description": "Navbar item with label Template Design"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  },
+  "item.label.Discord": {
+    "message": "Discord",
+    "description": "Navbar item with label Discord"
+  },
+  "item.label.Try pdfme Cloud": {
+    "message": "pdfme Cloudを試す",
+    "description": "Navbar item with label Try pdfme Cloud"
+  },
+  "item.label.Contact": {
+    "message": "お問い合わせ",
+    "description": "Navbar item with label Contact"
+  }
+}

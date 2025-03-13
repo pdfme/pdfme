@@ -1,0 +1,46 @@
+{
+  "link.title.Documentation": {
+    "message": "ドキュメント",
+    "description": "The title of the footer links column with title=Documentation in the footer"
+  },
+  "link.title.More": {
+    "message": "その他",
+    "description": "The title of the footer links column with title=More in the footer"
+  },
+  "link.title.Community": {
+    "message": "コミュニティ",
+    "description": "The title of the footer links column with title=Community in the footer"
+  },
+  "link.item.label.Getting Started": {
+    "message": "はじめに",
+    "description": "The label of footer link with label=Getting Started linking to /docs/getting-started"
+  },
+  "link.item.label.Supported Features": {
+    "message": "サポートされている機能",
+    "description": "The label of footer link with label=Supported Features linking to /docs/supported-features"
+  },
+  "link.item.label.Examples": {
+    "message": "サンプル",
+    "description": "The label of footer link with label=Examples linking to /templates"
+  },
+  "link.item.label.Template Design": {
+    "message": "テンプレート設計",
+    "description": "The label of footer link with label=Template Design linking to /template-design"
+  },
+  "link.item.label.Try pdfme Cloud": {
+    "message": "pdfme Cloudを試す",
+    "description": "The label of footer link with label=Try pdfme Cloud linking to https://app.pdfme.com?utm_source=website&utm_content=footer"
+  },
+  "link.item.label.Github": {
+    "message": "Github",
+    "description": "The label of footer link with label=Github linking to https://github.com/pdfme/pdfme"
+  },
+  "link.item.label.Discord": {
+    "message": "Discord",
+    "description": "The label of footer link with label=Discord linking to https://discord.gg/xWPTJbmgNV"
+  },
+  "copyright": {
+    "message": "Copyright © 2025 pdfme",
+    "description": "The footer copyright"
+  }
+}
