@@ -28,26 +28,37 @@ export default function Home(): JSX.Element {
             </div>
             <div className="col col--6">
               <h1 className="hero__title">
-                {siteConfig.title}: <Translate id="homepage.hero.title">Free and Open source PDF generation library!</Translate>
+                {siteConfig.title}: {translate({
+                  id: "homepage.hero.title",
+                  message: "Free and Open source PDF generation library!"
+                })}
               </h1>
               <p className="hero__subtitle">
-                <Translate id="homepage.hero.subtitle">
-                  A powerful PDF generation library fully written in TypeScript, featuring a React-based UI template editor for seamless PDF creation*.
-                </Translate>
+                {translate({
+                  id: "homepage.hero.subtitle",
+                  message: "A powerful PDF generation library fully written in TypeScript, featuring a React-based UI template editor for seamless PDF creation*."
+                })}
                 <br />
-                <Translate id="homepage.hero.subtitle.part2">
-                  Open source, community-driven, and completely free for PDF generation under the MIT license!
-                </Translate>
+                {translate({
+                  id: "homepage.hero.subtitle.part2",
+                  message: "Open source, community-driven, and completely free for PDF generation under the MIT license!"
+                })}
               </p>
               <strong>
-                <Translate id="homepage.hero.note">* The PDF generation library and the UI editor can be used separately.</Translate>
+                {translate({
+                  id: "homepage.hero.note",
+                  message: "* The PDF generation library and the UI editor can be used separately."
+                })}
               </strong>
             </div>
           </div>
           <div className="row row--no-gutters" style={{ alignItems: 'center' }}>
             <div className="col col--3" style={{ marginTop: '1rem' }}>
               <Link className="button button--lg button--success " to="/docs/getting-started">
-                <Translate id="homepage.buttons.documentation">Documentation</Translate>
+                {translate({
+                  id: "homepage.buttons.documentation",
+                  message: "Documentation"
+                })}
               </Link>
             </div>
             <div className="col col--3" style={{ marginTop: '1rem' }}>
@@ -56,7 +67,10 @@ export default function Home(): JSX.Element {
                 href="https://playground.pdfme.com"
                 target={'_blank'}
               >
-                <Translate id="homepage.buttons.playground">Playground</Translate>
+                {translate({
+                  id: "homepage.buttons.playground",
+                  message: "Playground"
+                })}
               </a>
             </div>
             <div className="col col--6" />
@@ -68,16 +82,21 @@ export default function Home(): JSX.Element {
           <div className='padding-vert--lg'>
             <div className="col col--12 margin-vert--lg text--center">
               <h2 className="margin-top--lg">
-                <Translate id="homepage.main.heading">Simple. Yet a powerful PDF generation library.</Translate>
+                {translate({
+                  id: "homepage.main.heading",
+                  message: "Simple. Yet a powerful PDF generation library."
+                })}
               </h2>
               <p>
-                <Translate id="homepage.main.description.part1">
-                  pdfme provides PDF generation, forms, and a viewer centered on JSON templates.
-                </Translate>
+                {translate({
+                  id: "homepage.main.description.part1",
+                  message: "pdfme provides PDF generation, forms, and a viewer centered on JSON templates."
+                })}
                 <br />
-                <Translate id="homepage.main.description.part2">
-                  Additionally, templates can be easily created using the designer.
-                </Translate>
+                {translate({
+                  id: "homepage.main.description.part2",
+                  message: "Additionally, templates can be easily created using the designer."
+                })}
               </p>
             </div>
             <div className="row margin-vert--lg">
@@ -225,22 +244,30 @@ export default function Home(): JSX.Element {
           <div className="padding-vert--lg col col--12 margin-vert--lg text--center">
             <div>
               <h2 className='margin-top--lg'>
-                <Translate id="homepage.opensource.heading">We are Open Source❤️</Translate>
+                {translate({
+                  id: "homepage.opensource.heading",
+                  message: "We are Open Source❤️"
+                })}
               </h2>
               <p>
-                <Translate id="homepage.opensource.description.part1">
-                  pdfme is an open source project and we love contributions.
-                </Translate>
+                {translate({
+                  id: "homepage.opensource.description.part1",
+                  message: "pdfme is an open source project and we love contributions."
+                })}
                 <br />
-                <Translate id="homepage.opensource.description.part2">
-                  We are always looking for contributors to help us improve our project.
-                </Translate>
+                {translate({
+                  id: "homepage.opensource.description.part2",
+                  message: "We are always looking for contributors to help us improve our project."
+                })}
               </p>
             </div>
 
             <div className="margin-vert--lg">
               <h3 style={{ marginBottom: '20px' }}>
-                <Translate id="homepage.contributors.heading">Contributors</Translate>
+                {translate({
+                  id: "homepage.contributors.heading",
+                  message: "Contributors"
+                })}
               </h3>
               <div>
                 <a href="https://github.com/pdfme/pdfme/graphs/contributors">
@@ -251,7 +278,10 @@ export default function Home(): JSX.Element {
 
             <div className="margin-vert--lg">
               <h3>
-                <Translate id="homepage.support.heading">Support pdfme</Translate>
+                {translate({
+                  id: "homepage.support.heading",
+                  message: "Support pdfme"
+                })}
               </h3>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <a href="https://github.com/sponsors/pdfme" target="_blank" style={{ margin: '20px' }}>
