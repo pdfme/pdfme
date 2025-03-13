@@ -7,7 +7,7 @@ import App from "./App";
 
 // Initialize Sentry
 Sentry.init({
-  dsn: "https://f1c36f7b16ef87c459c35c8e5df07633@o138687.ingest.us.sentry.io/4508969425043456"
+  dsn: import.meta.env.VITE_SENTRY_DSN || ''
 });
 
 const container = document.getElementById('root')!;
