@@ -1,31 +1,31 @@
-# Getting Started
+# はじめに
 
-## Introduction
+## イントロダクション
 
-pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:
+pdfmeはPDFのデザインと生成プロセスを簡素化するために作成されました。特に以下のようなユースケースに役立ちます：
 
-- Need to create a designed PDF with short code.
-- Need to integrate PDF editor features into an application.
-- Need to create a large number of PDFs without compromising performance
+- 短いコードでデザインされたPDFを作成する必要がある場合
+- アプリケーションにPDFエディタ機能を統合する必要がある場合
+- パフォーマンスを損なうことなく大量のPDFを作成する必要がある場合
 
-## Installation
+## インストール
 
-The operating requirements should be the node environment `>=16`.  
-There are two packages in pdfme, generator and UI.
+動作要件はnode環境 `>=16` です。  
+pdfmeには、generatorとUIの2つのパッケージがあります。
 
-The package for generating PDF can be installed with the following command.
+PDFを生成するためのパッケージは、以下のコマンドでインストールできます。
 
 ```
 npm i @pdfme/generator @pdfme/common
 ```
 
-The packages for using PDF designer, forms and viewers can be installed with the following commands.
+PDFデザイナー、フォーム、ビューワーを使用するためのパッケージは、以下のコマンドでインストールできます。
 
 ```
 npm i @pdfme/ui @pdfme/common
 ```
 
-\*You must install `@pdfme/common` regardless of which package you use.
+\*どのパッケージを使用する場合でも、`@pdfme/common`をインストールする必要があります。
 
 The following type, function and classes are available in pdfme.
 
