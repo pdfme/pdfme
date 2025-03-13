@@ -93,7 +93,7 @@ const config = {
           type: 'doc',
           docId: 'getting-started',
           position: 'right',
-          label: 'Documentation',
+          label: 'Docs',
         },
         {
           to: '/templates',
@@ -118,6 +118,11 @@ const config = {
         {
           href: 'https://app.pdfme.com?utm_source=website&utm_content=navbar',
           label: 'Try pdfme Cloud',
+          position: 'right',
+        },
+        {
+          href: 'https://app.pdfme.com/contact?utm_source=website&utm_content=navbar',
+          label: 'Contact',
           position: 'right',
         }
       ],
