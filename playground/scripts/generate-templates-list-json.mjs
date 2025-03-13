@@ -6,7 +6,7 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
 
-const featuredTemplates = ['invoice', 'pedigree', 'certificate-black', 'a4-blank', 'QR-lines'];
+const featuredTemplates = ['invoice', 'quotes','pedigree', 'certificate-black', 'a4-blank', 'QR-lines'];
 
 function generateTemplatesListJson() {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
