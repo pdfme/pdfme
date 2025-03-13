@@ -44,12 +44,12 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
-    "@pdfme/common": "*",
+    "@pdfme/common": "workspace:*",
     "@pdfme/pdf-lib": "*",
     "pdfjs-dist": "^3.11.174"
   },
   "devDependencies": {
-    "@pdfme/generator": "*",
+    "@pdfme/generator": "workspace:*",
     "@types/estree": "^1.0.6",
     "canvas": "^2.11.2"
   },

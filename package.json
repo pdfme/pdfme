@@ -30,7 +30,6 @@
     "packages/ui"
   ],
   "scripts": {
-    "postinstall": "./scripts/link-workspaces.sh",
     "clean": "npm-run-all --parallel clean:*",
     "clean:common": "npm run -w packages/common clean",
     "clean:converter": "npm run -w packages/converter clean",

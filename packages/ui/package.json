@@ -38,7 +38,7 @@
   "dependencies": {
     "@dnd-kit/core": "^6.0.8",
     "@dnd-kit/sortable": "^10.0.0",
-    "@pdfme/converter": "*",
+    "@pdfme/converter": "workspace:*",
     "@scena/react-guides": "^0.28.2",
     "antd": "^5.24.3",
     "form-render": "^2.2.16",
@@ -50,8 +50,8 @@
     "react-selecto": "^1.12.0"
   },
   "devDependencies": {
-    "@pdfme/common": "*",
-    "@pdfme/schemas": "*",
+    "@pdfme/common": "workspace:*",
+    "@pdfme/schemas": "workspace:*",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^12.1.2",
     "@types/jest": "^29.5.14",
@@ -72,8 +72,8 @@
     "vite-tsconfig-paths": "^5.1.4"
   },
   "peerDependencies": {
-    "@pdfme/common": "latest",
-    "@pdfme/schemas": "latest"
+    "@pdfme/common": "workspace:*",
+    "@pdfme/schemas": "workspace:*"
   },
   "jest": {
     "testEnvironment": "jest-environment-jsdom",

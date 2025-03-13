@@ -51,7 +51,10 @@ const preVersion5Format = require('./preVersion5Format.json') as Template;
 const segmenterEnglish = require('./segmenterEnglish.json') as Template;
 const segmenterJapanese = require('./segmenterJapanese.json') as Template;
 
-export const label = {
+// Define a type for template collections
+type TemplateCollection = Record<string, Template>;
+
+export const label: TemplateCollection = {
   宛名8面,
   シンプルラベル24面,
   フレームラベル24面,
@@ -69,13 +72,13 @@ export const label = {
   connpass名札,
 };
 
-export const envelope = {
+export const envelope: TemplateCollection = {
   長形3号封筒,
   洋長3号封筒,
   角形2号封筒,
 };
 
-export const barcode = {
+export const barcode: TemplateCollection = {
   Aone31555QRコード,
   Aone31553QRコード,
   Aone72230JANコード短縮,
@@ -83,7 +86,7 @@ export const barcode = {
   barcodes,
 };
 
-export const business = {
+export const business: TemplateCollection = {
   領収書,
   領収書x4,
   表彰状,
@@ -96,7 +99,7 @@ export const business = {
 };
 
 // These tests are slower, so we allow more time for them to pass
-export const textType = {
+export const textType: TemplateCollection = {
   dynamicFontSizeHorizontal,
   dynamicFontSizeVertical,
   verticalAlignmentTop,
@@ -106,7 +109,7 @@ export const textType = {
   multiVariableText,
 };
 
-export const other = {
+export const other: TemplateCollection = {
   test,
   preVersion5Format,
   z97mmx210mm,
@@ -117,11 +120,11 @@ export const other = {
   pdfImage,
 };
 
-export const shape = {
+export const shape: TemplateCollection = {
   shapes,
 };
 
-export const segmenter = {
+export const segmenter: TemplateCollection = {
   segmenterEnglish,
   segmenterJapanese,
 };

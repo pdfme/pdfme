@@ -52,13 +52,13 @@
     "fontkit": "^2.0.2"
   },
   "devDependencies": {
-    "@pdfme/common": "*",
-    "@pdfme/converter": "*",
-    "@pdfme/schemas": "*"
+    "@pdfme/common": "workspace:*",
+    "@pdfme/converter": "workspace:*",
+    "@pdfme/schemas": "workspace:*"
   },
   "peerDependencies": {
-    "@pdfme/common": "latest",
-    "@pdfme/schemas": "latest"
+    "@pdfme/common": "workspace:*",
+    "@pdfme/schemas": "workspace:*"
   },
   "jest": {
     "resolver": "ts-jest-resolver",
