@@ -52,9 +52,9 @@
     "fontkit": "^2.0.2"
   },
   "devDependencies": {
-    "@pdfme/common": "file:../common",
-    "@pdfme/converter": "file:../converter",
-    "@pdfme/schemas": "file:../schemas"
+    "@pdfme/common": "*",
+    "@pdfme/converter": "*",
+    "@pdfme/schemas": "*"
   },
   "peerDependencies": {
     "@pdfme/common": "latest",
