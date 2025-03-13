@@ -27,7 +27,7 @@ npm i @pdfme/ui @pdfme/common
 
 \*どのパッケージを使用する場合でも、`@pdfme/common`をインストールする必要があります。
 
-The following type, function and classes are available in pdfme.
+pdfmeでは以下の型、関数、クラスが利用可能です。
 
 `@pdfme/common`
 
@@ -43,7 +43,7 @@ The following type, function and classes are available in pdfme.
 - [Form](/docs/getting-started#form)
 - [Viewer](/docs/getting-started#viewer)
 
-If your environment uses webpack, import the necessary items as shown below.
+環境がwebpackを使用している場合は、以下のように必要なアイテムをインポートします。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -55,37 +55,37 @@ import type { Template } from '@pdfme/common';
 import { Designer, Form, Viewer } from '@pdfme/ui';
 ```
 
-**All objects use `Template`, which will be briefly explained in the next section.**
+**すべてのオブジェクトは`Template`を使用しており、これについては次のセクションで簡単に説明します。**
 
-## Template
+## テンプレート
 
-The core of pdfme library are Templates.  
-Template Type can be imported by both `@pdfme/generator` or `@pdfme/ui`. Templates are used everywhere.
+pdfmeライブラリの中核はテンプレートです。  
+テンプレート型は`@pdfme/generator`または`@pdfme/ui`の両方からインポートできます。テンプレートはあらゆる場所で使用されます。
 
-A template can be divided into two parts: a fixed part and a variable part.  
-We call them basePdf and schema.
-The following image is a good illustration of a template.
+テンプレートは、固定部分と可変部分の2つに分けることができます。  
+これらをbasePdfとschemaと呼びます。
+以下の画像はテンプレートの良い例です。
 
 ![](/img/template.png)
 
-- **basePdf**: PDF data for the fixed part of the PDF to be generated.
-- **schemas**: Definition data for the variable part of the PDF to be generated.
+- **basePdf**: 生成されるPDFの固定部分のPDFデータ。
+- **schemas**: 生成されるPDFの可変部分の定義データ。
 
-The **basePdf** property accepts PDF data as a `string` (base64 encoded), an `ArrayBuffer`, or a `Uint8Array`. You can import a blank A4 PDF using `BLANK_PDF` to see how it works. Alternatively, you can define an empty PDF as shown below. When using schemas—such as tables that require page breaks—ensure you specify the PDF in the following format:
+**basePdf**プロパティは、`string`（base64エンコード）、`ArrayBuffer`、または`Uint8Array`としてPDFデータを受け入れます。`BLANK_PDF`を使用して空白のA4 PDFをインポートして動作を確認できます。または、以下のように空のPDFを定義することもできます。ページ区切りが必要なテーブルなどのスキーマを使用する場合は、以下の形式でPDFを指定してください：
 
 ```json
 basePdf: { "width": 210, "height": 297, "padding": [10, 10, 10, 10] }
 ```
 
 
-**schemas** can only utilize text by default, but you can load images and various barcodes like QR codes as plugins from the `@pdfme/schemas` package.  
-Additionally, you can create your own schemas, allowing you to render types other than the ones mentioned above.  
-Check detail about [Custom Schemas](/docs/custom-schemas).
+**schemas**はデフォルトではテキストのみ使用できますが、`@pdfme/schemas`パッケージからプラグインとして画像やQRコードなどの様々なバーコードを読み込むことができます。  
+さらに、独自のスキーマを作成することで、上記以外の種類をレンダリングすることも可能です。  
+詳細は[カスタムスキーマ](/docs/custom-schemas)をご覧ください。
 
-Let's take a look at some specific data.  
-(If you are using TypeScript, you can import the Template type.)
+具体的なデータを見てみましょう。  
+（TypeScriptを使用している場合は、Template型をインポートできます。）
 
-### Minimal Template
+### 最小限のテンプレート
 
 ```ts
 import { Template, BLANK_PDF } from '@pdfme/common';
@@ -120,23 +120,23 @@ const template: Template = {
 };
 ```
 
-You can create a template from [Template Design page](/template-design?ui=designer&template=a4-blank). Or, if you want to integrate the template creation feature into your application, check out the [Designer section](/docs/getting-started#designer).
+[テンプレートデザインページ](/template-design?ui=designer&template=a4-blank)からテンプレートを作成できます。または、テンプレート作成機能をアプリケーションに統合したい場合は、[デザイナーセクション](/docs/getting-started#designer)をご覧ください。
 
-### Using Plugins
+### プラグインの使用
 
-By default, examples often demonstrate the use of the `text` schema type. However, you can use other built-in schema types or even create your own custom schemas with the `@pdfme/schemas` package.
+デフォルトでは、例は多くの場合`text`スキーマタイプの使用を示しています。ただし、他の組み込みスキーマタイプを使用したり、`@pdfme/schemas`パッケージで独自のカスタムスキーマを作成したりすることもできます。
 
-#### Step 1: Install `@pdfme/schemas`
+#### ステップ1: `@pdfme/schemas`のインストール
 
-Install the necessary package to access additional schema types.
+追加のスキーマタイプにアクセスするために必要なパッケージをインストールします。
 
 ```bash
 npm install @pdfme/schemas
 ```
 
-#### Step 2: Use Built-in and Custom Schema Types
+#### ステップ2: 組み込みおよびカスタムスキーマタイプの使用
 
-Here’s an example of a template using both built-in and custom schema types:
+以下は、組み込みとカスタムの両方のスキーマタイプを使用したテンプレートの例です：
 
 ```ts
 import { Template, BLANK_PDF } from '@pdfme/common';
@@ -192,33 +192,33 @@ generate({ template, inputs, plugins }).then((pdf) => {
 });
 ```
 
-#### Explore Built-in Schema Types
+#### 組み込みスキーマタイプの探索
 
-To view all supported built-in schema types, refer to the [Supported Features Documentation](/docs/supported-features).
+サポートされているすべての組み込みスキーマタイプを表示するには、[サポートされている機能のドキュメント](/docs/supported-features)を参照してください。
 
-#### Creating Custom Schema Types
+#### カスタムスキーマタイプの作成
 
-If you need a schema type that isn’t built-in, you can define your own. Check out the [Custom Schemas Guide](/docs/custom-schemas#creating-your-own-schemas) for detailed instructions.
+組み込みではないスキーマタイプが必要な場合は、独自のものを定義できます。詳細な手順については、[カスタムスキーマガイド](/docs/custom-schemas#creating-your-own-schemas)をご覧ください。
 
-## Generator
+## ジェネレーター
 
-The PDF generator function, `generate`, takes 2 arguments of `template` and `inputs` for generate a PDF. It works both in Node.js and in the browser.
+PDF生成関数`generate`は、PDFを生成するために`template`と`inputs`の2つの引数を取ります。これはNode.jsとブラウザの両方で動作します。
 
-The code to generate a PDF file using the [template created above](/docs/getting-started#minimal-template) is shown below.
+[上記で作成したテンプレート](/docs/getting-started#minimal-template)を使用してPDFファイルを生成するコードを以下に示します。
 
 ```ts
 import type { Template } from '@pdfme/common';
 import { generate } from '@pdfme/generator';
 
 const template: Template = {
-  // skip...　Check the Template section.
+  // 省略...　テンプレートセクションを確認してください。
 };
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
 generate({ template, inputs }).then((pdf) => {
   console.log(pdf);
 
-  // Browser
+  // ブラウザ
   // const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   // window.open(URL.createObjectURL(blob));
 
@@ -227,23 +227,23 @@ generate({ template, inputs }).then((pdf) => {
 });
 ```
 
-You can create a PDF file like the below.
+以下のようなPDFファイルを作成できます。
 
 ![](/img/simple-pdf.png)
 
-Also, each element in the inputs array corresponds to a page in the PDF, you can create a multi-page PDF file by providing multiple elements of inputs.
+また、inputs配列の各要素はPDFのページに対応しており、複数の要素を提供することで複数ページのPDFファイルを作成できます。
 
 ## UI
 
-The UI is composed of the [Designer](/docs/getting-started#designer), [Form](/docs/getting-started#form), and [Viewer](/docs/getting-started#viewer) classes.
+UIは[デザイナー](/docs/getting-started#designer)、[フォーム](/docs/getting-started#form)、[ビューワー](/docs/getting-started#viewer)クラスで構成されています。
 
-### Designer
+### デザイナー
 
-The Designer allows you to edit the Template schemas, making it easy for anyone to create Template json objects.
+デザイナーを使用すると、テンプレートスキーマを編集でき、誰でも簡単にテンプレートJSONオブジェクトを作成できます。
 
-You can design your own template from [Template Design page](/template-design?ui=designer&template=a4-blank), or you can integrate the designer into your application.
+[テンプレートデザインページ](/template-design?ui=designer&template=a4-blank)から独自のテンプレートをデザインするか、デザイナーをアプリケーションに統合することができます。
 
-Let's integrate the designer using the template created above as the default template.
+上記で作成したテンプレートをデフォルトテンプレートとして使用し、デザイナーを統合してみましょう。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -251,18 +251,18 @@ import { Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
-  // skip...　Check the Template section.
+  // 省略...　テンプレートセクションを確認してください。
 };
 
 const designer = new Designer({ domContainer, template });
 ```
 
-The Designer class is instantiated as shown above, and the template designer is displayed in the `domContainer`.  
-You can edit the template as shown below. The operation is like Google Slides, etc., so you can use common keyboard shortcuts.
+デザイナークラスは上記のようにインスタンス化され、テンプレートデザイナーが`domContainer`に表示されます。  
+以下のようにテンプレートを編集できます。操作はGoogle Slidesなどに似ているため、一般的なキーボードショートカットを使用できます。
 
 ![](/img/designer.gif)
 
-The designer instance can be manipulated with the following methods.
+デザイナーインスタンスは以下のメソッドで操作できます。
 
 - `saveTemplate`
 - `updateTemplate`
@@ -271,13 +271,13 @@ The designer instance can be manipulated with the following methods.
 - `onSaveTemplate`
 - `destroy`
 
-### Form
+### フォーム
 
-You can use templates to create forms and PDF viewers.
+テンプレートを使用してフォームとPDFビューワーを作成できます。
 
-The Form creates a UI for the user to enter schemas based on the template.
+フォームは、ユーザーがテンプレートに基づいてスキーマを入力するためのUIを作成します。
 
-You can try out the form that uses the invoice template from [here](/template-design?ui=form-viewer&template=invoice).
+[こちら](/template-design?ui=form-viewer&template=invoice)から請求書テンプレートを使用したフォームを試すことができます。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -285,9 +285,9 @@ import { Form } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
-  // skip...
+  // 省略...
 };
-// This is initial data.
+// これは初期データです。
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
 const form = new Form({ domContainer, template, inputs });
@@ -295,9 +295,9 @@ const form = new Form({ domContainer, template, inputs });
 
 ![](/img/form.gif)
 
-The form instance has a method `getInputs` to get the user's input.
+フォームインスタンスには、ユーザーの入力を取得するための`getInputs`メソッドがあります。
 
-You can generate a PDF file based on the user's input by passing the data you get from `getInputs` as inputs to generate, as shown in the code below.
+以下のコードに示すように、`getInputs`から取得したデータを入力として渡すことで、ユーザーの入力に基づいてPDFファイルを生成できます。
 
 ```ts
 generate({ template, inputs: form.getInputs() }).then((pdf) => {
@@ -306,13 +306,13 @@ generate({ template, inputs: form.getInputs() }).then((pdf) => {
 });
 ```
 
-### Viewer
+### ビューワー
 
-Viewing a PDF file in a mobile browser is a pain, because it doesn't display well in an iframe.
+モバイルブラウザでPDFファイルを表示するのは、iframeでうまく表示されないため面倒です。
 
-The Viewer is a byproduct of the Form development process, but it allows you to show your users a preview of the PDF file you will create.
+ビューワーはフォーム開発プロセスの副産物ですが、作成するPDFファイルのプレビューをユーザーに表示することができます。
 
-Using the Viewer is basically the same as using the Form, except that user cannot edit it.
+ビューワーの使用は基本的にフォームの使用と同じですが、ユーザーが編集できない点が異なります。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -320,7 +320,7 @@ import { Viewer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
-  // skip...
+  // 省略...
 };
 const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 
@@ -329,34 +329,34 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 ![](/img/viewer.png)
 
-## Special Thanks
+## 特別な感謝
 
-- [pdf-lib](https://pdf-lib.js.org/): Used in PDF generation.
-- [fontkit](https://github.com/foliojs/fontkit): Used in font rendering.
-- [PDF.js](https://mozilla.github.io/pdf.js/): Used in PDF viewing.
-- [React](https://reactjs.org/): Used in building the UI.
-- [form-render](https://xrender.fun/form-render): Used in building the UI.
-- [antd](https://ant.design/): Used in building the UI.
-- [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): Used in Designer UI.
-- [dnd-kit](https://github.com/clauderic/dnd-kit): Used in Designer UI.
-- [Lucide](https://lucide.dev/) Used in Designer UI and Schema's icon.
+- [pdf-lib](https://pdf-lib.js.org/): PDF生成に使用。
+- [fontkit](https://github.com/foliojs/fontkit): フォントレンダリングに使用。
+- [PDF.js](https://mozilla.github.io/pdf.js/): PDF表示に使用。
+- [React](https://reactjs.org/): UI構築に使用。
+- [form-render](https://xrender.fun/form-render): UI構築に使用。
+- [antd](https://ant.design/): UI構築に使用。
+- [react-moveable](https://daybrush.com/moveable/), [react-selecto](https://github.com/daybrush/selecto), [@scena/react-guides](https://daybrush.com/guides/): デザイナーUIに使用。
+- [dnd-kit](https://github.com/clauderic/dnd-kit): デザイナーUIに使用。
+- [Lucide](https://lucide.dev/) デザイナーUIとスキーマのアイコンに使用。
 
-I definitely could not have created pdfme without these libraries. I am grateful to the developers of these libraries.
+これらのライブラリなしではpdfmeを作成することはできませんでした。これらのライブラリの開発者に感謝します。
 
-If you want to contribute to pdfme, please check the [Development Guide](/docs/development-guide) page.  
-We look forward to your contribution!
+pdfmeに貢献したい場合は、[開発ガイド](/docs/development-guide)ページをご確認ください。  
+あなたの貢献をお待ちしています！
 
-## Cloud Service Option
+## クラウドサービスオプション
 
-While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the need for setup and maintenance, we offer pdfme Cloud.
+pdfmeは強力なオープンソースライブラリですが、一部のユーザーはマネージドソリューションを好む場合があることを理解しています。セットアップやメンテナンスの必要なく、すぐに使える、スケーラブルなPDF生成サービスを探している方には、pdfme Cloudを提供しています。
 
-**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com?utm_source=website&utm_content=getting-started)**
+**[pdfme Cloudを試す - 手間のかからないPDF生成](https://app.pdfme.com?utm_source=website&utm_content=getting-started)**
 
-pdfme Cloud provides all the features of the open-source library, plus:
+pdfme Cloudはオープンソースライブラリのすべての機能に加えて、以下を提供します：
 
-- PDF generation at scale without infrastructure management
-- Hosted WYSIWYG template designer
-- Simple API integration
-- Automatic updates and maintenance
+- インフラ管理なしでスケーラブルなPDF生成
+- ホスト型WYSIWYGテンプレートデザイナー
+- シンプルなAPI統合
+- 自動更新とメンテナンス
 
-\*pdfme is and will always remain open-source. The cloud service is an optional offering for those who prefer a managed solution.
+\*pdfmeは今後もオープンソースであり続けます。クラウドサービスはマネージドソリューションを好む方向けのオプションサービスです。
