@@ -1,10 +1,10 @@
 {
   "title": {
-    "message": "Blog",
+    "message": "pdfme Blog",
     "description": "The title for the blog used in SEO"
   },
   "description": {
-    "message": "Blog",
+    "message": "pdfme Blog - Information about PDF generation",
     "description": "The description for the blog used in SEO"
   },
   "sidebar.title": {

@@ -8,7 +8,7 @@
     "description": "The label for category Customization in sidebar tutorialSidebar"
   },
   "sidebar.tutorialSidebar.category.Tools(New)": {
-    "message": "Tools(New)",
+    "message": "ツール (新機能)",
     "description": "The label for category Tools(New) in sidebar tutorialSidebar"
   }
 }
