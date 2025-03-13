@@ -1,5 +1,5 @@
 {
-  "author": "hand-dot",
+  "author": "Devin AI",
   "schemas": [
     [
       {
@@ -20,7 +20,7 @@
           "x": 120.13,
           "y": 20
         },
-        "content": "INVOICE",
+        "content": "QUOTE",
         "width": 69.87,
         "height": 22.68,
         "rotate": 0,
@@ -42,7 +42,7 @@
           "x": 20,
           "y": 57.88
         },
-        "content": "Billed to:",
+        "content": "Prepared for:",
         "width": 84.69,
         "height": 9.42,
         "rotate": 0,
@@ -56,7 +56,7 @@
         "opacity": 1,
         "readOnly": true,
         "fontName": "",
-        "name": "billedToLabel"
+        "name": "preparedForLabel"
       },
       {
         "type": "text",
@@ -82,7 +82,7 @@
           "fit": "vertical"
         },
         "fontName": "",
-        "name": "billedToInput"
+        "name": "preparedForInput"
       },
       {
         "type": "multiVariableText",
@@ -90,7 +90,7 @@
           "x": 119.87,
           "y": 67.88
         },
-        "content": "{\"InvoiceNo\":\"12345\",\"Date\":\"16 June 2025\"}",
+        "content": "{\"QuoteNo\":\"12345\",\"Date\":\"16 June 2025\",\"ValidUntil\":\"16 July 2025\"}",
         "width": 70.13,
         "height": 33.52,
         "rotate": 0,
@@ -104,13 +104,14 @@
         "opacity": 1,
         "strikethrough": false,
         "underline": false,
-        "text": "Invoice No.{InvoiceNo}\n{Date}",
+        "text": "Quote No.{QuoteNo}\n{Date}\nValid Until: {ValidUntil}",
         "variables": [
-          "InvoiceNo",
-          "Date"
+          "QuoteNo",
+          "Date",
+          "ValidUntil"
         ],
         "fontName": "",
-        "name": "info"
+        "name": "quoteInfo"
       },
       {
         "type": "table",
@@ -378,7 +379,7 @@
           "x": 20,
           "y": 191.58
         },
-        "content": "Thank you!",
+        "content": "Thank you for your interest!",
         "width": 170,
         "height": 20,
         "rotate": 0,
@@ -400,7 +401,7 @@
           "x": 20,
           "y": 232.67
         },
-        "content": "Payment Information",
+        "content": "Terms & Conditions",
         "width": 84.69,
         "height": 9.42,
         "rotate": 0,
@@ -414,11 +415,11 @@
         "opacity": 1,
         "readOnly": true,
         "fontName": "",
-        "name": "paymentInfoLabel"
+        "name": "termsLabel"
       },
       {
         "type": "text",
-        "content": "Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025",
+        "content": "This quote is valid for 30 days from the date of issue.\nPayment terms: 50% deposit required to confirm order.\nDelivery: 2-3 weeks after order confirmation.\nPrices subject to change without notice.",
         "position": {
           "x": 20,
           "y": 242.83
@@ -440,7 +441,7 @@
           "fit": "vertical"
         },
         "fontName": "",
-        "name": "paymentInfoInput"
+        "name": "termsInput"
       },
       {
         "type": "text",
@@ -517,7 +518,7 @@
       {
         "name": "footerInfo",
         "type": "text",
-        "content": "Invoice No.{info.InvoiceNo} • {total}USD due {date}",
+        "content": "Quote No.{quoteInfo.QuoteNo} • {total}USD • Valid until {quoteInfo.ValidUntil}",
         "position": {
           "x": 20,
           "y": 282
