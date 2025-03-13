@@ -13,135 +13,135 @@ pdfmeでは、以下の要素をレンダリングすることができます。
 :::
 
 
-### Text (text)
+### テキスト (text)
 
-- Style-related
-  - Font Size
-  - Letter Spacing
-  - Text Align
-  - Vertical Align
-  - Line Height
-  - Text Color
-  - Background Color
-  - Underline
-  - Strikethrough
-- Font-related
-  - TrueType fonts (TTF & TTC)
-  - OpenType fonts with PostScript or TrueType outlines (TTF, OTF, & OTC)
-  - Support for CJK (Chinese, Japanese, Korean) fonts
-  - Embedding and subsetting of fonts
-  - Support for multiple fonts and fallback fonts
-  - Dynamic Font Sizing
-    - Detailed options for Min, Max, Fit
+- スタイル関連
+  - フォントサイズ
+  - 文字間隔
+  - テキスト配置
+  - 垂直配置
+  - 行の高さ
+  - テキスト色
+  - 背景色
+  - 下線
+  - 取り消し線
+- フォント関連
+  - TrueTypeフォント（TTF＆TTC）
+  - PostScriptまたはTrueTypeアウトラインを持つOpenTypeフォント（TTF、OTF、＆OTC）
+  - CJK（中国語、日本語、韓国語）フォントのサポート
+  - フォントの埋め込みとサブセット化
+  - 複数のフォントとフォールバックフォントのサポート
+  - 動的フォントサイジング
+    - 最小、最大、フィットのための詳細オプション
 
-### Multivariable Text (multiVariableText){#multivariable-text}
+### 複数変数テキスト (multiVariableText){#multivariable-text}
 
-- As per text, but supporting 0 to n variables in a single text field
+- テキストと同様ですが、1つのテキストフィールドで0からn個の変数をサポートします
 
-### Shape
+### 図形
 
-- **Line (line)**
-  - Style-related
-    - Color
-- **Rectangle (rectangle)**
-  - Style-related
-    - Border Width
-    - Border Color
-    - Color
-- **Ellipse (ellipse)**
-  - Style-related
-    - Border Width
-    - Border Color
-    - Color
+- **線 (line)**
+  - スタイル関連
+    - 色
+- **長方形 (rectangle)**
+  - スタイル関連
+    - 枠線の幅
+    - 枠線の色
+    - 色
+- **楕円 (ellipse)**
+  - スタイル関連
+    - 枠線の幅
+    - 枠線の色
+    - 色
 
-### Graphics
+### グラフィックス
 
-- **Image (image)**
-  - Formats
+- **画像 (image)**
+  - フォーマット
     - JPEG
     - PNG
-    - PDF (embed pdf inside pdf)
+    - PDF（PDF内にPDFを埋め込み）
 - **SVG (svg)**
 
-### Barcodes
+### バーコード
 
-- Various types
-  - qrcode
-  - japanpost
-  - ean13
-  - ean8
-  - code39
-  - code128
-  - nw7
-  - itf14
-  - upca
-  - upce
-  - gs1datamatrix
-  - pdf417
-- Style-related
-  - Bar Color
-  - Background Color
-  - Text Color
-  - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
+- 様々なタイプ
+  - QRコード
+  - 日本郵便
+  - EAN13
+  - EAN8
+  - CODE39
+  - CODE128
+  - NW7
+  - ITF14
+  - UPCA
+  - UPCE
+  - GS1データマトリックス
+  - PDF417
+- スタイル関連
+  - バーの色
+  - 背景色
+  - テキスト色
+  - [テキスト表示オプション（計画中のサポート）](https://github.com/pdfme/pdfme/issues/23)
 
-### Table (table){#table}
+### テーブル (table){#table}
 
-Details: [Tables with Dynamic Data](/docs/tables)
+詳細: [動的データを持つテーブル](/docs/tables)
 
-- Style-related
-  - Table
-    - Border Width
-    - Border Color
-  - Header / Body
-    - Font Name
-    - Font Size
-    - Letter Spacing
-    - Text Align
-    - Vertical Align
-    - Line Height
-    - Text Color
-    - Border Color
-    - Background Color
-    - Border Width
-    - Padding
-  - Column
-    - Text Align
+- スタイル関連
+  - テーブル
+    - 枠線の幅
+    - 枠線の色
+  - ヘッダー / ボディ
+    - フォント名
+    - フォントサイズ
+    - 文字間隔
+    - テキスト配置
+    - 垂直配置
+    - 行の高さ
+    - テキスト色
+    - 枠線の色
+    - 背景色
+    - 枠線の幅
+    - パディング
+  - 列
+    - テキスト配置
 
-### Select (select)
+### セレクト (select)
 
-- Options
-- Style-related
-  - Font Name
-  - Font Size
-  - Letter Spacing
-  - Text Align
-  - Vertical Align
-  - Line Height
-  - Text Color
-  - Background Color
+- オプション
+- スタイル関連
+  - フォント名
+  - フォントサイズ
+  - 文字間隔
+  - テキスト配置
+  - 垂直配置
+  - 行の高さ
+  - テキスト色
+  - 背景色
 
-### Date (date) / Time (time) / DateTime (dateTime)
+### 日付 (date) / 時間 (time) / 日時 (dateTime)
 
-- Date Format
-- Style-related
-  - Font Name
-  - Font Size
-  - Letter Spacing
-  - Text Align
-  - Text Color
-  - Background Color
+- 日付フォーマット
+- スタイル関連
+  - フォント名
+  - フォントサイズ
+  - 文字間隔
+  - テキスト配置
+  - テキスト色
+  - 背景色
 
-### Radio Button (radioGroup) / Check Box (checkbox)
+### ラジオボタン (radioGroup) / チェックボックス (checkbox)
 
-- Style-related
-  - Color
+- スタイル関連
+  - 色
 
-## Planned Support
+## 計画中のサポート
 
-- [HyperLink](https://github.com/pdfme/pdfme/issues/319)
+- [ハイパーリンク](https://github.com/pdfme/pdfme/issues/319)
 
-## Custom Feature Requests
+## カスタム機能リクエスト
 
-While pdfme is an open-source project released under the MIT License, we are open to considering custom feature additions for a fee.  
-**If you are willing to pay, we can evaluate and implement your requested features.**  
-Please note that any additional functionality will always be released as open source. If this approach works for you, please [contact us](https://app.pdfme.com/contact).
+pdfmeはMITライセンスの下でリリースされているオープンソースプロジェクトですが、有料でのカスタム機能追加を検討することも可能です。  
+**お支払いいただける場合は、ご要望の機能を評価し実装することができます。**  
+なお、追加された機能はすべてオープンソースとしてリリースされます。このアプローチがご希望に合う場合は、[お問い合わせ](https://app.pdfme.com/contact)ください。
