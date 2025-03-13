@@ -1,92 +1,92 @@
-# Manipulator
+# マニピュレーター
 
-The `@pdfme/manipulator` package provides powerful utilities for manipulating PDF files. It can be used in both Node.js and browser environments.
+`@pdfme/manipulator`パッケージはPDFファイルを操作するための強力なユーティリティを提供します。Node.jsとブラウザ環境の両方で使用できます。
 
-## Installation
+## インストール
 
 ```bash
 npm install @pdfme/manipulator
 ```
 
-## Features
+## 機能
 
-### merge
-Combines multiple PDF files into a single PDF.
+### merge（結合）
+複数のPDFファイルを1つのPDFに結合します。
 
 ```ts
 import { merge } from '@pdfme/manipulator';
 
-const pdf1 = new ArrayBuffer(...); // First PDF
-const pdf2 = new ArrayBuffer(...); // Second PDF
+const pdf1 = new ArrayBuffer(...); // 1つ目のPDF
+const pdf2 = new ArrayBuffer(...); // 2つ目のPDF
 const merged = await merge([pdf1, pdf2]);
 ```
 
-### split
-Splits a PDF into multiple PDFs based on page ranges.
+### split（分割）
+PDFをページ範囲に基づいて複数のPDFに分割します。
 
 ```ts
 import { split } from '@pdfme/manipulator';
 
-const pdf = new ArrayBuffer(...); // Source PDF
+const pdf = new ArrayBuffer(...); // ソースPDF
 const splits = await split(pdf, [
-  { start: 0, end: 1 }, // Pages 1-2
-  { start: 2, end: 4 }, // Pages 3-5
+  { start: 0, end: 1 }, // 1-2ページ
+  { start: 2, end: 4 }, // 3-5ページ
 ]);
 ```
 
-### rotate
-Rotates specified pages in a PDF.
+### rotate（回転）
+PDFの指定されたページを回転させます。
 
 ```ts
 import { rotate } from '@pdfme/manipulator';
 
-const pdf = new ArrayBuffer(...); // Source PDF
-const result = await rotate(pdf, 90); // Rotate all pages 90 degrees
-// Or rotate specific pages:
-const result2 = await rotate(pdf, 90, [0, 2]); // Rotate pages 1 and 3
+const pdf = new ArrayBuffer(...); // ソースPDF
+const result = await rotate(pdf, 90); // すべてのページを90度回転
+// または特定のページを回転：
+const result2 = await rotate(pdf, 90, [0, 2]); // 1ページ目と3ページ目を回転
 ```
 
-### insert
-Inserts PDF pages at specified positions.
+### insert（挿入）
+指定された位置にPDFページを挿入します。
 
 ```ts
 import { insert } from '@pdfme/manipulator';
 
-const basePdf = new ArrayBuffer(...); // Base PDF
-const insertPdf = new ArrayBuffer(...); // PDF to insert
+const basePdf = new ArrayBuffer(...); // ベースPDF
+const insertPdf = new ArrayBuffer(...); // 挿入するPDF
 const result = await insert(basePdf, [
-  { pdf: insertPdf, position: 1 } // Insert after first page
+  { pdf: insertPdf, position: 1 } // 1ページ目の後に挿入
 ]);
 ```
 
-### remove
-Removes specified pages from a PDF.
+### remove（削除）
+PDFから指定されたページを削除します。
 
 ```ts
 import { remove } from '@pdfme/manipulator';
 
-const pdf = new ArrayBuffer(...); // Source PDF
-const result = await remove(pdf, [1, 3]); // Remove pages 2 and 4
+const pdf = new ArrayBuffer(...); // ソースPDF
+const result = await remove(pdf, [1, 3]); // 2ページ目と4ページ目を削除
 ```
 
-### move
-Moves a page from one position to another within the PDF.
+### move（移動）
+PDFの中で1つのページを別の位置に移動します。
 
 ```ts
 import { move } from '@pdfme/manipulator';
 
-const pdf = new ArrayBuffer(...); // Source PDF
-const result = await move(pdf, { from: 0, to: 2 }); // Move first page to third position
+const pdf = new ArrayBuffer(...); // ソースPDF
+const result = await move(pdf, { from: 0, to: 2 }); // 1ページ目を3番目の位置に移動
 ```
 
-### organize
-Performs multiple PDF operations in sequence.
+### organize（整理）
+複数のPDF操作を順番に実行します。
 
 ```ts
 import { organize } from '@pdfme/manipulator';
 
-const pdf = new ArrayBuffer(...); // Source PDF
-const insertPdf = new ArrayBuffer(...); // PDF to insert
+const pdf = new ArrayBuffer(...); // ソースPDF
+const insertPdf = new ArrayBuffer(...); // 挿入するPDF
 const result = await organize(pdf, [
   { type: 'remove', data: { position: 1 } },
   { type: 'insert', data: { pdf: insertPdf, position: 0 } },
@@ -94,16 +94,16 @@ const result = await organize(pdf, [
 ]);
 ```
 
-## Error Handling
+## エラー処理
 
-All functions throw descriptive errors when invalid parameters are provided:
+無効なパラメータが提供された場合、すべての関数は説明的なエラーをスローします：
 
-- Invalid page numbers: `[@pdfme/manipulator] Invalid page number`
-- Invalid rotation degrees: `[@pdfme/manipulator] Rotation degrees must be a multiple of 90`
-- Invalid positions: `[@pdfme/manipulator] Invalid position`
-- Empty inputs: `[@pdfme/manipulator] At least one PDF is required`
+- 無効なページ番号: `[@pdfme/manipulator] Invalid page number`
+- 無効な回転角度: `[@pdfme/manipulator] Rotation degrees must be a multiple of 90`
+- 無効な位置: `[@pdfme/manipulator] Invalid position`
+- 空の入力: `[@pdfme/manipulator] At least one PDF is required`
 
-## Types
+## 型定義
 
 ```ts
 type PDFInput = ArrayBuffer;
@@ -126,9 +126,9 @@ type OrganizeAction =
   | { type: 'move'; data: { from: number; to: number } };
 ```
 
-## Contact
+## お問い合わせ
 
-If you have any questions or suggestions about `@pdfme/manipulator`, please reach out via:
+`@pdfme/manipulator`に関するご質問やご提案がありましたら、以下までご連絡ください：
 
 - **Discord**: [https://discord.gg/xWPTJbmgNV](https://discord.gg/xWPTJbmgNV)
 - **GitHub Issues**: [https://github.com/pdfme/pdfme/issues](https://github.com/pdfme/pdfme/issues)

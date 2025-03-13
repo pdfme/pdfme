@@ -1,40 +1,40 @@
-# Converter
+# コンバーター
 
-`@pdfme/converter` can be used in both Node.js and in the browser.  
+`@pdfme/converter` は Node.js とブラウザの両方で使用できます。
 
-Its primary purpose is to convert PDFs into other formats (like images) or to convert various data formats (like Markdown) into PDFs.
+その主な目的は、PDFを他の形式（画像など）に変換したり、様々なデータ形式（Markdownなど）をPDFに変換することです。
 
-Although it's still under development, you can already use the following features:
+まだ開発中ですが、すでに以下の機能を使用することができます：
 
-- **Convert PDF to Images**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
-- **Retrieve Each Page's Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
-- **Convert Images to PDF**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
+- **PDFを画像に変換**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
+- **各ページの幅と高さを取得**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
+- **画像をPDFに変換**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
 
-Planned conversion features include:
-- **Markdown to PDF**: `md2pdf`
-- **PDF to Markdown**: `pdf2md`
+計画されている変換機能には以下が含まれます：
+- **MarkdownからPDF**: `md2pdf`
+- **PDFからMarkdown**: `pdf2md`
 
-## Installation
+## インストール
 
 ```bash
 npm install @pdfme/converter
 ```
 
-If you want to convert PDFs to images (`pdf2img`) in Node.js, you’ll need [node-canvas](https://github.com/Automattic/node-canvas) (^2.11.2), which requires an additional step:
+Node.jsでPDFを画像に変換する（`pdf2img`）場合は、[node-canvas](https://github.com/Automattic/node-canvas)（^2.11.2）が必要で、追加のステップが必要です：
 
 ```bash
 npm install canvas@^2.11.2
 ```
 
-## Features
+## 機能
 
 ### pdf2img
-Converts PDF pages into images (JPEG or PNG format).
+PDFページを画像（JPEGまたはPNG形式）に変換します。
 
 ```ts
 import { pdf2img } from '@pdfme/converter';
 
-const pdf = new ArrayBuffer(...); // Source PDF
+const pdf = new ArrayBuffer(...); // ソースPDF
 const images = await pdf2img(pdf, {
   imageType: 'png',
   scale: 1,
@@ -43,26 +43,26 @@ const images = await pdf2img(pdf, {
 ```
 
 ### pdf2size
-Retrieves the width and height of each page in a PDF.
+PDFの各ページの幅と高さを取得します。
 
 ```ts
 import { pdf2size } from '@pdfme/converter';
 
-const pdf = new ArrayBuffer(...); // Source PDF
+const pdf = new ArrayBuffer(...); // ソースPDF
 const sizes = await pdf2size(pdf, {
-  scale: 1, // Scale factor (default: 1)
+  scale: 1, // スケールファクター（デフォルト: 1）
 });
 // sizes: Array<{ width: number, height: number }>
 ```
 
 ### img2pdf
-Converts one or more images (JPEG or PNG) into a single PDF file.
+1つまたは複数の画像（JPEGまたはPNG）を1つのPDFファイルに変換します。
 
 ```ts
 import { img2pdf } from '@pdfme/converter';
 
-const image1 = new ArrayBuffer(...); // First image
-const image2 = new ArrayBuffer(...); // Second image
+const image1 = new ArrayBuffer(...); // 1枚目の画像
+const image2 = new ArrayBuffer(...); // 2枚目の画像
 const pdf = await img2pdf([image1, image2], {
   scale: 1,
   imageType: 'jpeg',
@@ -71,17 +71,17 @@ const pdf = await img2pdf([image1, image2], {
 });
 ```
 
-## Error Handling
+## エラー処理
 
-All functions throw descriptive errors when invalid parameters are provided:
+無効なパラメータが提供された場合、すべての関数は説明的なエラーをスローします：
 
-- Invalid PDF: `[@pdfme/converter] Invalid PDF`
-- Empty PDF: `[@pdfme/converter] The PDF file is empty`
-- Invalid page range: `[@pdfme/converter] Invalid page range`
-- Empty image array: `[@pdfme/converter] Input must be a non-empty array of image buffers`
-- Invalid image: `[@pdfme/converter] Failed to process image`
+- 無効なPDF: `[@pdfme/converter] Invalid PDF`
+- 空のPDF: `[@pdfme/converter] The PDF file is empty`
+- 無効なページ範囲: `[@pdfme/converter] Invalid page range`
+- 空の画像配列: `[@pdfme/converter] Input must be a non-empty array of image buffers`
+- 無効な画像: `[@pdfme/converter] Failed to process image`
 
-## Types
+## 型定義
 
 ```ts
 type ImageType = 'jpeg' | 'png';
@@ -104,14 +104,14 @@ interface Pdf2SizeOptions {
 interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
-  size?: { height: number, width: number }; // in millimeters
-  margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
+  size?: { height: number, width: number }; // ミリメートル単位
+  margin?: [number, number, number, number]; // ミリメートル単位 [上, 右, 下, 左]
 }
 ```
 
-## Contact
+## お問い合わせ
 
-If you have any questions or suggestions about `@pdfme/converter`, please reach out via:
+`@pdfme/converter`に関するご質問やご提案がありましたら、以下までご連絡ください：
 
 - **Discord**: [https://discord.gg/xWPTJbmgNV](https://discord.gg/xWPTJbmgNV)
 - **GitHub Issues**: [https://github.com/pdfme/pdfme/issues](https://github.com/pdfme/pdfme/issues)

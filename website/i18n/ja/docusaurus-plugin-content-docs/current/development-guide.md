@@ -1,8 +1,8 @@
-# Development Guide
+# 開発ガイド
 
-## Community Involvement and Your Role
+## コミュニティの参加とあなたの役割
 
-pdfme is proud to be an open-source project, supported and driven by our enthusiastic community. Whether you're diving into the codebase or raising your voice in our discussions, your involvement is what makes pdfme thrive.
+pdfmeは、熱心なコミュニティによってサポートされ、推進されているオープンソースプロジェクトであることを誇りに思っています。コードベースに飛び込むにしても、ディスカッションで声を上げるにしても、あなたの参加がpdfmeを発展させています。
 
 <a href="https://github.com/pdfme/pdfme/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
@@ -11,34 +11,34 @@ pdfme is proud to be an open-source project, supported and driven by our enthusi
 <br/>
 <br/>
 
-**Not a coder? No problem!** From reporting bugs and becoming a sponsor to actively participating in discussions, There are many ways you can contribute. We cherish every form of participation and would be delighted to have you be a part of our development journey.
+**プログラマーではありませんか？問題ありません！** バグの報告やスポンサーになること、ディスカッションへの積極的な参加など、貢献する方法はたくさんあります。私たちはあらゆる形の参加を大切にし、あなたが開発の旅の一部になることを喜んでいます。
 
-## Bug reports, questions and suggestions
+## バグ報告、質問、提案
 
-If you have any bugs, or suggestions for the program or documentation, please see below.
+プログラムやドキュメントに関するバグや提案がある場合は、以下をご覧ください。
 
-All bug reports and discussions are recorded in [GitHub repository](https://github.com/pdfme/pdfme).  
-It is possible that some of the problems or questions have already been solved.
+すべてのバグ報告とディスカッションは[GitHubリポジトリ](https://github.com/pdfme/pdfme)に記録されています。  
+問題や質問の一部はすでに解決されている可能性があります。
 
-- To report application bugs, please use [GitHub issue](https://github.com/pdfme/pdfme/issues)
-- For questions or suggestions, please ask them in [Discord](https://discord.gg/xWPTJbmgNV), [GitHub Discussions](https://github.com/pdfme/pdfme/discussions).
+- アプリケーションのバグを報告するには、[GitHub issue](https://github.com/pdfme/pdfme/issues)をご利用ください
+- 質問や提案については、[Discord](https://discord.gg/xWPTJbmgNV)や[GitHub Discussions](https://github.com/pdfme/pdfme/discussions)でお尋ねください。
 
-## Code Contribution
+## コード貢献
 
-Basically we accept PRs for bug fixes. However, we might decide to decline your PR if contains code that add new features.
-Please remember that pdfme is created to be small and simple as possible.
-If you have any questions or suggestions, please feel free to send them to [GitHub Discussions](https://github.com/pdfme/pdfme/discussions) and we will reply as soon as possible.
+基本的に、バグ修正のためのPRを受け付けています。ただし、新機能を追加するコードが含まれている場合、PRを辞退する可能性があります。
+pdfmeはできるだけ小さくシンプルであるように作られていることを覚えておいてください。
+質問や提案がある場合は、お気軽に[GitHub Discussions](https://github.com/pdfme/pdfme/discussions)にお送りください。できるだけ早く返信いたします。
 
-For insights on development: [How to develop pdfme](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
+開発に関する洞察：[pdfmeの開発方法](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
 
-## Need technical support?
+## 技術サポートが必要ですか？
 
-If you need technical support, please contact from [here](https://app.pdfme.com/contact?utm_source=website&utm_content=development-guide).
+技術サポートが必要な場合は、[こちら](https://app.pdfme.com/contact?utm_source=website&utm_content=development-guide)からお問い合わせください。
 
-## Become a sponsor to pdfme
+## pdfmeのスポンサーになる
 
-pdfme is an open source project that is free to use.
-However, it is not free to develop and maintain pdfme.
-If you are using pdfme in your business, please consider becoming a sponsor to pdfme.
+pdfmeは無料で使用できるオープンソースプロジェクトです。
+しかし、pdfmeの開発と維持は無料ではありません。
+ビジネスでpdfmeを使用している場合は、pdfmeのスポンサーになることをご検討ください。
 - [Github Sponsors](https://github.com/sponsors/pdfme)
 - [Open Collective](https://opencollective.com/pdfme)

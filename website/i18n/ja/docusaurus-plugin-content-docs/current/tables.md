@@ -1,16 +1,16 @@
-# Tables with Dynamic Data
+# 動的データを持つテーブル
 
-[![Preview of Dynamic Tables](/img/table.png)](https://playground.pdfme.com/)
+[![動的テーブルのプレビュー](/img/table.png)](https://playground.pdfme.com/)
 
-The table schema has been added in since [V4.5.0](https://github.com/pdfme/pdfme/releases/tag/4.5.0).  
-This schema allows you to add tables to PDFs and dynamically modify the table data.
+テーブルスキーマは[V4.5.0](https://github.com/pdfme/pdfme/releases/tag/4.5.0)から追加されました。  
+このスキーマを使用すると、PDFにテーブルを追加し、テーブルデータを動的に変更することができます。
 
-## Using the Table Schema
+## テーブルスキーマの使用方法
 
-The table schema is included in the `@pdfme/schemas` package and is exported as `table`.  
-You can add the table schema as a plugin to `@pdfme/ui` and `@pdfme/generator` using the code below.
+テーブルスキーマは`@pdfme/schemas`パッケージに含まれており、`table`としてエクスポートされています。  
+以下のコードを使用して、テーブルスキーマを`@pdfme/ui`と`@pdfme/generator`のプラグインとして追加できます。
 
-To support page breaks, ensure to set the `basePdf` property in the template to `{ width: number, height: number, padding: [number,number,number,number] }`.
+ページ区切りをサポートするには、テンプレートの`basePdf`プロパティを`{ width: number, height: number, padding: [number,number,number,number] }`に設定してください。
 
 ```javascript
 import { table } from '@pdfme/schemas';
@@ -30,7 +30,7 @@ generate({
 });
 ```
 
-Adding a table in the Designer will create a template like the following:
+デザイナーでテーブルを追加すると、以下のようなテンプレートが作成されます：
 
 ```json
 {
@@ -115,7 +115,7 @@ Adding a table in the Designer will create a template like the following:
 }
 ```
 
-You can configure the generator's input for the above template like this:
+上記のテンプレートに対するジェネレーターの入力を以下のように設定できます：
 
 ```json
 [
@@ -128,9 +128,9 @@ You can configure the generator's input for the above template like this:
 ]
 ```
 
-The input can be either a 2D array or a stringified 2D array.
+入力は2次元配列または文字列化された2次元配列のいずれかです。
 
-By changing the input data in the generator, you can dynamically modify the table's content.
+ジェネレーターの入力データを変更することで、テーブルの内容を動的に変更できます。
 
 ```json
 [
@@ -144,54 +144,54 @@ By changing the input data in the generator, you can dynamically modify the tabl
 ]
 ```
 
-![Table with 3 rows](/img/table-generated-pdf2.png)
+![3行のテーブル](/img/table-generated-pdf2.png)
 
-If the input data spans multiple pages, automatic page breaks will be inserted.
+入力データが複数ページにまたがる場合、自動的にページ区切りが挿入されます。
 
-![Table with page breaks](/img/table-generated-pdf3.png)
+![ページ区切りのあるテーブル](/img/table-generated-pdf3.png)
 
-## About Table Settings
+## テーブル設定について
 
-Using the Designer, you can easily set the number of columns and rows in a table. You can also freely configure the table's style.
+デザイナーを使用すると、テーブルの列数と行数を簡単に設定できます。また、テーブルのスタイルも自由に設定できます。
 
-### Column and Row Settings
+### 列と行の設定
 
-When you click on a selected table, it enters edit mode.
+選択したテーブルをクリックすると、編集モードになります。
 
-In this mode, you can delete columns using the "-" button on each column, and add columns using the "+" button at the bottom right of the table.
-You can also change column widths by drag and drop.
+このモードでは、各列の「-」ボタンを使用して列を削除したり、テーブルの右下にある「+」ボタンを使用して列を追加したりできます。
+また、ドラッグアンドドロップで列幅を変更することもできます。
 
-For row settings, you can add rows using the "+" button at the bottom of the table, and delete rows using the "-" button on the right side of each row.
-While the actual number of rows will vary depending on the data when creating the PDF, you can use this feature to set the number of rows when creating a non-editable table.
+行の設定については、テーブルの下部にある「+」ボタンを使用して行を追加したり、各行の右側にある「-」ボタンを使用して行を削除したりできます。
+PDFを作成する際の実際の行数はデータによって異なりますが、編集不可能なテーブルを作成する際に行数を設定するためにこの機能を使用できます。
 
-![Table Column, Row Settings](/img/table-column-row-seting.gif)
+![テーブルの列、行設定](/img/table-column-row-seting.gif)
 
-### Table Styles
+### テーブルスタイル
 
-Like other schemas, you can set styles from the property panel on the right.
-The styles are broadly categorized into four types:
+他のスキーマと同様に、右側のプロパティパネルからスタイルを設定できます。
+スタイルは大きく4つのタイプに分類されます：
 
-- Table Style
-- Head Style
-- Body Style
-- Column Style
+- テーブルスタイル
+- ヘッダースタイル
+- ボディスタイル
+- 列スタイル
 
-For each, you can set borders, fonts, background colors, padding, and more.
-The Body's Alternate Background Color is used to alternate background colors of rows.
+それぞれに対して、境界線、フォント、背景色、パディングなどを設定できます。
+ボディの代替背景色は、行の背景色を交互に変更するために使用されます。
 
-## Sample Using Table Schema
+## テーブルスキーマを使用したサンプル
 
-You can check out a sample using the table schema at [https://playground.pdfme.com/](https://playground.pdfme.com/).
+テーブルスキーマを使用したサンプルは[https://playground.pdfme.com/](https://playground.pdfme.com/)で確認できます。
 
-[![Table schema Playground](/img/table-invoice-template.png)](https://playground.pdfme.com/)
+[![テーブルスキーマのプレイグラウンド](/img/table-invoice-template.png)](https://playground.pdfme.com/)
 
-Set the Template Preset to Invoice and explore the sample using the Table schema.
+テンプレートプリセットを「Invoice」に設定して、テーブルスキーマを使用したサンプルを探索してください。
 
-The source code for this playground is available [here](https://github.com/pdfme/pdfme/tree/main/playground).
+このプレイグラウンドのソースコードは[こちら](https://github.com/pdfme/pdfme/tree/main/playground)で入手できます。
 
 :::info
 
-If you have feedback or suggestions regarding the use of the table schema, please let us know via [GitHub issues](https://github.com/pdfme/pdfme/issues) or [Discord](https://discord.gg/xWPTJbmgNV).  
-Your feedback contributes significantly to the development of pdfme.
+テーブルスキーマの使用に関するフィードバックや提案がある場合は、[GitHub issues](https://github.com/pdfme/pdfme/issues)または[Discord](https://discord.gg/xWPTJbmgNV)からお知らせください。  
+あなたのフィードバックはpdfmeの開発に大きく貢献します。
 
 :::

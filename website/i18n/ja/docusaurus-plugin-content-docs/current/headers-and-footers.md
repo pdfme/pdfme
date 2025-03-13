@@ -1,20 +1,20 @@
-# Headers and Footers
+# ヘッダーとフッター
 
-You can place elements like headers and footers that are displayed on every page and are not affected by page breaks.
+ヘッダーやフッターのような、すべてのページに表示され、ページ区切りの影響を受けない要素を配置することができます。
 
-Specifically, in cases where page breaks occur—such as with [dynamic tables](/docs/tables)—you can use this feature to place elements that are not pushed down by data.
+特に、[動的テーブル](/docs/tables)のようにページ区切りが発生する場合、この機能を使用してデータによって押し下げられない要素を配置することができます。
 
-For simplicity, we've described these as headers and footers. In reality, by adding a property called `staticSchema` to `basePdf`, you can place elements that are displayed on every page and are not affected by page breaks.
+簡単にするために、これらをヘッダーとフッターと表現しています。実際には、`basePdf`に`staticSchema`というプロパティを追加することで、すべてのページに表示され、ページ区切りの影響を受けない要素を配置することができます。
 
 :::warning
 
-This feature cannot be used when `basePdf` specifies an existing PDF. It can only be used when `basePdf` is specified with properties of the type `{ width: number, height: number, padding: [number, number, number, number] }`.
+この機能は、`basePdf`が既存のPDFを指定している場合には使用できません。`basePdf`が`{ width: number, height: number, padding: [number, number, number, number] }`型のプロパティで指定されている場合にのみ使用できます。
 
 :::
 
-## Example of a Footer
+## フッターの例
 
-Let's explain using the footer section of an invoice template as an example.
+請求書テンプレートのフッターセクションを例に説明しましょう。
 
 ```json
 {
@@ -90,14 +90,14 @@ Let's explain using the footer section of an invoice template as an example.
 }
 ```
 
-Notably, you can specify variables like `{info.InvoiceNo}` and `{totalInput}` in the `content` of each schema. These values are obtained from the data specified in `input`. In other words, within `staticSchema`, you can refer to the data specified in `input`.
+特筆すべきは、各スキーマの`content`に`{info.InvoiceNo}`や`{totalInput}`のような変数を指定できることです。これらの値は`input`で指定されたデータから取得されます。つまり、`staticSchema`内で`input`で指定されたデータを参照することができます。
 
-For information about usable variables, please refer to the Expression documentation [here](/docs/expression#variables-that-can-be-used-within-expressions).
+使用可能な変数については、[こちら](/docs/expression#variables-that-can-be-used-within-expressions)の式のドキュメントを参照してください。
 
 ![footer](/img/footer.png)
 
-## Tips/Notes
+## ヒント/注意点
 
-- By placing elements within the padding, you can display them without overlapping with elements that are pushed down when page breaks occur.
-- The `type` of the schema in `staticSchema` can specify the same types as the `schemas` in a regular template.
-- Currently, the schemas in `staticSchema` cannot be edited in the designer.
+- パディング内に要素を配置することで、ページ区切りが発生したときに押し下げられる要素と重ならずに表示することができます。
+- `staticSchema`内のスキーマの`type`は、通常のテンプレートの`schemas`と同じタイプを指定できます。
+- 現在、`staticSchema`内のスキーマはデザイナーで編集できません。

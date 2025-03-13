@@ -1,11 +1,11 @@
-# Expression
+# 式（Expression）
 
-Expressions are a feature that evaluates expressions enclosed in `{}`.   
-The simplest example is `{1+1}`, which evaluates to `2`.
+式は`{}`で囲まれた表現を評価する機能です。  
+最も単純な例は`{1+1}`で、これは`2`と評価されます。
 
-In pdfme, expressions can be used not only for simple calculations but also by utilizing user input.
+pdfmeでは、式は単純な計算だけでなく、ユーザー入力を活用することもできます。
 
-For example, consider the following template:
+例えば、以下のようなテンプレートを考えてみましょう：
 
 ```
 {
@@ -21,7 +21,7 @@ For example, consider the following template:
             {
                 "name": "field2",
                 "type": "text",
-                "content": "{field1} !", // Expression!
+                "content": "{field1} !", // 式！
                 ...
                 "readOnly": true,
             }
@@ -32,50 +32,50 @@ For example, consider the following template:
 }
 ```
 
-`field2` will have the value `Hello world !`. The expression `{field1} !` is evaluated like below:
+`field2`の値は`Hello world !`になります。式`{field1} !`は以下のように評価されます：
 
 ![expression](/img/expression.png)
 
-This means that `{field1}` is replaced with the value of `field1`, and `!` is appended to it.
+これは、`{field1}`が`field1`の値に置き換えられ、その後に`!`が追加されることを意味します。
 
-## Use Cases
+## ユースケース
 
-The following use cases can be considered:
+以下のようなユースケースが考えられます：
 
-### Displaying Date or Page Numbers in Footer and Header
+### フッターとヘッダーに日付やページ番号を表示する
 
-For example, you might want to display the creation date of the PDF in the header or display page numbers in the footer. Although headers and footers are explained in detail [here](/docs/headers-and-footers), expressions can also be used in the `staticSchema` used for headers and footers.
+例えば、PDFの作成日をヘッダーに表示したり、フッターにページ番号を表示したりすることができます。ヘッダーとフッターについては[こちら](/docs/headers-and-footers)で詳しく説明されていますが、ヘッダーとフッターに使用される`staticSchema`でも式を使用できます。
 
-### Reusing User Input for Display
+### ユーザー入力を表示用に再利用する
 
-You can reuse values entered by the user for display. For instance, if there are fields `firstName` and `lastName` entered by the user, you can concatenate and display them as `{firstName + " " + lastName}`.
+ユーザーが入力した値を表示用に再利用できます。例えば、ユーザーが入力した`firstName`と`lastName`というフィールドがある場合、それらを連結して`{firstName + " " + lastName}`として表示できます。
 
-This improves usability by eliminating the need for users to enter similar information multiple times.
+これにより、ユーザーが類似の情報を複数回入力する必要がなくなり、使いやすさが向上します。
 
-### Managing Values in One Place
+### 値を一箇所で管理する
 
-By using expressions, you can manage values in one place. For example, if there is a value `taxRate`, you can simply change `taxRate`, and it will be reflected in all places where it is used, making changes easier.
+式を使用することで、値を一箇所で管理できます。例えば、`taxRate`という値がある場合、`taxRate`を変更するだけで、それが使用されているすべての場所に反映され、変更が容易になります。
 
-## How to Use, Specifications
+## 使用方法、仕様
 
-After understanding the overview and use cases, here is an explanation of the specific usage and specifications.
+概要とユースケースを理解した後、具体的な使用方法と仕様について説明します。
 
-### How to Use Expressions
+### 式の使用方法
 
-Expressions can be used in the `schema` property when the `readOnly` property is set to `true`. From the designer, you can set `readOnly` by unchecking the `Editable` checkbox.
+式は、`readOnly`プロパティが`true`に設定されている場合に`schema`プロパティで使用できます。デザイナーから、`Editable`チェックボックスをオフにすることで`readOnly`を設定できます。
 
-As shown in the GIF below, you can start using expressions by unchecking the `Editable` checkbox.
+以下のGIFに示すように、`Editable`チェックボックスをオフにすることで式の使用を開始できます。
 
 ![Change ReadOnly](/img/expression-change-readOnly.gif)
 
-In other words, fields where expressions are used cannot be edited by the user.
+つまり、式が使用されているフィールドはユーザーが編集できません。
 
-### Limitations and Security of Expressions
+### 式の制限とセキュリティ
 
-- Only Arrow Functions are supported.
-- The `eval` function cannot be used.
-- `prototype` cannot be used.
-- Only the following global objects and their methods can be used:
+- アロー関数のみがサポートされています。
+- `eval`関数は使用できません。
+- `prototype`は使用できません。
+- 以下のグローバルオブジェクトとそのメソッドのみが使用できます：
   - Math
   - String
   - Number
@@ -92,24 +92,24 @@ In other words, fields where expressions are used cannot be edited by the user.
   - encodeURI
   - encodeURIComponent
 
-For detailed specifications, refer to [this implementation](https://github.com/pdfme/pdfme/blob/main/packages/common/src/expression.ts).
+詳細な仕様については、[この実装](https://github.com/pdfme/pdfme/blob/main/packages/common/src/expression.ts)を参照してください。
 
-### Variables That Can Be Used Within Expressions
+### 式内で使用できる変数
 
-- **User Input Values**
-  - Values entered in [Multivariable Text](/docs/supported-features#multivariable-text) or [Table](/docs/supported-features#table) that can be parsed as JSON can be used after parsing.
-- **Values of Other `readOnly` Fields**
-  - If an expression is used in the value of another `readOnly` field, the value after the expression is evaluated is used.
-- **Embedded Variables**
+- **ユーザー入力値**
+  - [複数変数テキスト](/docs/supported-features#multivariable-text)や[テーブル](/docs/supported-features#table)に入力された値で、JSONとして解析できるものは解析後に使用できます。
+- **他の`readOnly`フィールドの値**
+  - 別の`readOnly`フィールドの値に式が使用されている場合、式が評価された後の値が使用されます。
+- **組み込み変数**
   - `currentPage`
   - `totalPages`
   - `date (YYYY/MM/DD)`
   - `dateTime (YYYY/MM/DD HH:mm)`
 
-### Examples of Expressions
+### 式の例
 
-The following are examples of expressions that can be used:
+以下は使用できる式の例です：
 
-- **subtotal:** `'{orders.reduce((sum, item) => sum + parseFloat(item[1] || 0) * parseFloat(item[2] || 0), 0)}'`
-- **tax:** `'{Number(subtotalInput) * Number(tax.rate) / 100}'`
-- **total:** `'${Number(subtotal) + Number(tax)}'`
+- **小計:** `'{orders.reduce((sum, item) => sum + parseFloat(item[1] || 0) * parseFloat(item[2] || 0), 0)}'`
+- **税額:** `'{Number(subtotalInput) * Number(tax.rate) / 100}'`
+- **合計:** `'${Number(subtotal) + Number(tax)}'`

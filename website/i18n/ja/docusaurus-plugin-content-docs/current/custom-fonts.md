@@ -1,20 +1,20 @@
-# Custom Fonts
+# カスタムフォント
 
-pdfme uses the [Roboto Regular 400](https://fonts.google.com/specimen/Roboto) font by default, but you can use any font you like.
+pdfmeはデフォルトで[Roboto Regular 400](https://fonts.google.com/specimen/Roboto)フォントを使用していますが、お好きなフォントを使用することができます。
 
-To prioritize design, you can use your favorite fonts, and if you're using characters not included in the default Roboto font, such as Japanese or Chinese characters, they will be rendered as [Tofu](https://fonts.google.com/knowledge/glossary/tofu) in the PDF.
+デザインを優先する場合は、お気に入りのフォントを使用できます。また、日本語や中国語などのデフォルトのRobotoフォントに含まれていない文字を使用している場合、PDFでは[豆腐（Tofu）](https://fonts.google.com/knowledge/glossary/tofu)として表示されます。
 
-You can use this feature to solve those issues.
+この機能を使用して、これらの問題を解決することができます。
 
-## About Font type
+## フォントタイプについて
 
-You can import from `@pdfme/common` as below.
+以下のように`@pdfme/common`からインポートできます。
 
 ```ts
 import type { Font } from '@pdfme/common';
 ```
 
-The type of font is as follows.
+フォントの型は以下の通りです。
 
 ```ts
 type Font = {
@@ -25,9 +25,9 @@ type Font = {
   };
 };
 ```
-- `data`: If you register a `string` starting with `http`, it will be automatically fetched.Or set binary data directly like `Uint8Array | ArrayBuffer`
-- \*`fallback`: Setting it to true makes it the font to use if not set to a `fontName`. **Only one of the font objects must be set to true.**
-- \*`subset`: The default is true, but it can be set to false to set the font embedding to not subset. (This setting is for a bug in fontkit when embedding certain fonts with subsetting.)
+- `data`: `http`で始まる`string`を登録すると、自動的にフェッチされます。または、`Uint8Array | ArrayBuffer`のようなバイナリデータを直接設定します。
+- \*`fallback`: trueに設定すると、`fontName`が設定されていない場合に使用するフォントになります。**フォントオブジェクトのうち1つだけをtrueに設定する必要があります。**
+- \*`subset`: デフォルトはtrueですが、フォント埋め込みをサブセットにしないようにfalseに設定できます。（この設定は、特定のフォントをサブセットで埋め込む際のfontkitのバグに対応するためのものです。）
 
 ```ts
 const font: Font = {
@@ -41,13 +41,13 @@ const font: Font = {
 };
 ```
 
-## How to set font
+## フォントの設定方法
 
-Let's check out how to set font in the generator and ui packages.
+ジェネレーターとUIパッケージでフォントを設定する方法を見てみましょう。
 
-### Generator
+### ジェネレーター
 
-Set font as option in [generate](/docs/getting-started#generator) function
+[generate](/docs/getting-started#generator)関数のオプションとしてフォントを設定します。
 
 ```ts
 import { Template, BLANK_PDF, Font } from '@pdfme/common';
@@ -83,7 +83,7 @@ const template: Template = {
         height: 10,
       },
       {
-        // <- use fallback font. (serif)
+        // <- フォールバックフォントを使用（serif）
         name: 'c',
         type: 'text',
         position: { x: 20, y: 20 },
@@ -98,7 +98,7 @@ const inputs = [{ a: 'a1', b: 'b1', c: 'c1' }];
 generate({ template, inputs, options: { font } }).then((pdf) => {
   console.log(pdf);
 
-  // Browser
+  // ブラウザ
   // const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   // window.open(URL.createObjectURL(blob));
 
@@ -109,17 +109,17 @@ generate({ template, inputs, options: { font } }).then((pdf) => {
 
 ### UI
 
-There are two ways to set fonts in the UI. instance initialization and through method.  
-The sample code is for [Designer](/docs/getting-started#designer), but the same way can be used for [Form](/docs/getting-started#form) and [Viewer](/docs/getting-started#viewer).
+UIでフォントを設定する方法は2つあります。インスタンス初期化時と、メソッドを通じての設定です。  
+サンプルコードは[デザイナー](/docs/getting-started#designer)用ですが、同じ方法で[フォーム](/docs/getting-started#form)と[ビューワー](/docs/getting-started#viewer)にも使用できます。
 
-#### Setting font at instance initialization
+#### インスタンス初期化時にフォントを設定
 
 ```ts
 import { Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template = {
-  // skip...
+  // 省略...
 };
 const font = {
   serif: {
@@ -134,7 +134,7 @@ const font = {
 const designer = new Designer({ domContainer, template, options: { font } });
 ```
 
-#### Update fonts with `updateOptions`.
+#### `updateOptions`でフォントを更新
 
 ```ts
 const font = {

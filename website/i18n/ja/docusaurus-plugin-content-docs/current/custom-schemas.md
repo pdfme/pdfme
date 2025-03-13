@@ -1,24 +1,24 @@
-# Custom Schemas(Plugins)
+# カスタムスキーマ（プラグイン）
 
-By default, pdfme allows you to use a text schema. However, some users may want to utilize schemas for images or QR codes.
-These can be loaded as plugins from the `@pdfme/schemas` package.
+デフォルトでは、pdfmeはテキストスキーマを使用できます。しかし、画像やQRコードのスキーマを利用したいユーザーもいるでしょう。
+これらは`@pdfme/schemas`パッケージからプラグインとして読み込むことができます。
 
-You can also create your own schemas and load them similarly as plugins.
-This page explains how to use schemas from `@pdfme/schemas` and how to create your own.
+また、独自のスキーマを作成し、同様にプラグインとして読み込むこともできます。
+このページでは、`@pdfme/schemas`からスキーマを使用する方法と、独自のスキーマを作成する方法について説明します。
 
-## Using Schemas from @pdfme/schemas
+## @pdfme/schemasからのスキーマの使用
 
-Here, we explain how to import image and QR code schemas from `@pdfme/schemas`.
+ここでは、`@pdfme/schemas`から画像とQRコードのスキーマをインポートする方法を説明します。
 
-First, install `@pdfme/schemas`.
+まず、`@pdfme/schemas`をインストールします。
 
 ```bash
 npm install @pdfme/schemas
 ```
 
-Next, import the required schemas from `@pdfme/schemas` to `@pdfme/generator` and `@pdfme/ui`.
+次に、必要なスキーマを`@pdfme/schemas`から`@pdfme/generator`と`@pdfme/ui`にインポートします。
 
-The following code shows an example of importing QR code and image schemas from `@pdfme/generator` and `@pdfme/ui`.
+以下のコードは、`@pdfme/generator`と`@pdfme/ui`からQRコードと画像のスキーマをインポートする例を示しています。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -26,16 +26,16 @@ import { text, image, barcodes } from '@pdfme/schemas';
 import { generate } from '@pdfme/generator';
 
 const template: Template = {
-  // skip... you can use text, image, qrcode schema type in template.
+  // 省略... テンプレートでtext、image、qrcodeスキーマタイプを使用できます。
 };
 const inputs = [
-  // skip...
+  // 省略...
 ];
 
 const pdf = await generate({
   template,
   inputs,
-  // ↓ You can use plugins in Generator like this.
+  // ↓ このようにGeneratorでプラグインを使用できます。
   plugins: {
     text,
     image,
@@ -44,7 +44,7 @@ const pdf = await generate({
 });
 ```
 
-In this `@pdfme/ui` example, we're using the Designer, but you can load plugins in the Form and Viewer in the same way.
+この`@pdfme/ui`の例では、Designerを使用していますが、FormとViewerでも同じ方法でプラグインを読み込むことができます。
 
 ```ts
 import type { Template } from '@pdfme/common';
@@ -53,13 +53,13 @@ import { Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
 const template: Template = {
-  // skip... you can use text, image, qrcode schema type in template.
+  // 省略... テンプレートでtext、image、qrcodeスキーマタイプを使用できます。
 };
 
 const designer = new Designer({
   domContainer,
   template,
-  // ↓ You can use plugins in Designer like this.
+  // ↓ このようにDesignerでプラグインを使用できます。
   plugins: {
     text,
     image,
@@ -68,13 +68,13 @@ const designer = new Designer({
 });
 ```
 
-By loading image and qrcode as plugins, you can render schemas of type image and qrcode found in your template's schemas.
+imageとqrcodeをプラグインとして読み込むことで、テンプレートのスキーマに含まれるimageタイプとqrcodeタイプのスキーマをレンダリングできます。
 
 ![](/img/custom-schemas.png)
 
 :::tip
 
-Using plugins from Designer, you can override the default schema to remove text, replace it with custom schema, or rename label, rearrange the order.
+Designerからプラグインを使用することで、デフォルトのスキーマを上書きしてテキストを削除したり、カスタムスキーマに置き換えたり、ラベルの名前を変更したり、順序を並べ替えたりすることができます。
 
 ```ts
   plugins: {
@@ -86,33 +86,33 @@ Using plugins from Designer, you can override the default schema to remove text,
 ![](/img/custom-schemas-tips.png)
 :::
 
-## Creating Your Own Schemas
+## 独自のスキーマの作成
 
-Next, we will introduce the method for those who want to create their own schemas.  
-If you have created a schema or have an idea for one, please share it on [GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288).  
-We believe that since pdfme is developed as open-source, everyone should be able to share and develop schemas together.
+次に、独自のスキーマを作成したい人のための方法を紹介します。  
+スキーマを作成した場合や、アイデアがある場合は、[GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288)で共有してください。  
+pdfmeはオープンソースとして開発されているため、誰もがスキーマを共有し、一緒に開発できるべきだと考えています。
 
-### Overview of Custom Schemas / Plugins
+### カスタムスキーマ/プラグインの概要
 
-Custom schemas consist of three elements, which are collectively referred to as plugins.  
-The type definitions for plugins are defined within the [packages/common/src/types.ts](https://github.com/pdfme/pdfme/blob/main/packages/common/src/types.ts) file.
+カスタムスキーマは3つの要素で構成されており、これらを総称してプラグインと呼びます。  
+プラグインの型定義は[packages/common/src/types.ts](https://github.com/pdfme/pdfme/blob/main/packages/common/src/types.ts)ファイル内で定義されています。
 
-We will explain how the **Plugin** is structured and how it operates.
+**プラグイン**の構造と動作方法について説明します。
 
-- **pdf**: Used in `@pdfme/generator`, it includes code for rendering schemas into PDFs. The PDF rendering process is handled by [pdf-lib](https://pdf-lib.js.org/).
-- **ui**: Used in `@pdfme/ui`, it includes code for rendering schemas into the DOM. The ui has the following modes:
-  - **viewer**: Utilized in [Viewer](/docs/getting-started#viewer), [Designer](/docs/getting-started#designer) (when no field is selected). Functions as a preview by matching the rendering and appearance of the PDF.
-  - **form**: Utilized in [Form](/docs/getting-started#form). Functions as a form that users can input into.
-  - **designer**: Utilized in [Designer](/docs/getting-started#designer) (when a field is double-clicked). Basically the same as the form but serves as a WYSIWYG editor where users can input. For textarea and input elements, focusing is required.
-- **propPanel**: Used in `@pdfme/ui`'s [Designer](/docs/getting-started#designer), it allows you to add custom property editing forms to the sidebar when a field is selected. You can fill it out using [form-render](https://xrender.fun/form-render)'s JSON format (widget extensions are also possible).
+- **pdf**: `@pdfme/generator`で使用され、スキーマをPDFにレンダリングするためのコードが含まれています。PDFレンダリングプロセスは[pdf-lib](https://pdf-lib.js.org/)によって処理されます。
+- **ui**: `@pdfme/ui`で使用され、スキーマをDOMにレンダリングするためのコードが含まれています。uiには以下のモードがあります：
+  - **viewer**: [Viewer](/docs/getting-started#viewer)、[Designer](/docs/getting-started#designer)（フィールドが選択されていない場合）で使用されます。PDFのレンダリングと外観に合わせてプレビューとして機能します。
+  - **form**: [Form](/docs/getting-started#form)で使用されます。ユーザーが入力できるフォームとして機能します。
+  - **designer**: [Designer](/docs/getting-started#designer)（フィールドがダブルクリックされた場合）で使用されます。基本的にはフォームと同じですが、ユーザーが入力できるWYSIWYGエディタとして機能します。textareaやinput要素の場合、フォーカスが必要です。
+- **propPanel**: `@pdfme/ui`の[Designer](/docs/getting-started#designer)で使用され、フィールドが選択されたときにサイドバーにカスタムプロパティ編集フォームを追加できます。[form-render](https://xrender.fun/form-render)のJSON形式を使用して入力できます（ウィジェット拡張も可能）。
 
 :::note
-pdfme relies on [pdf-lib](https://pdf-lib.js.org/) and [form-render](https://xrender.fun/form-render).  
-These libraries are manipulated through plugins to achieve their functionalities within pdfme.  
-Please refer to the documentation of the above libraries as needed.
+pdfmeは[pdf-lib](https://pdf-lib.js.org/)と[form-render](https://xrender.fun/form-render)に依存しています。  
+これらのライブラリはプラグインを通じて操作され、pdfme内での機能を実現しています。  
+必要に応じて上記のライブラリのドキュメントを参照してください。
 :::
 
-The images below highlight where the pdf, ui, and propPanel of the plugin are used.
+以下の画像は、プラグインのpdf、ui、propPanelが使用される場所を示しています。
 
 - **pdf**
   ![](/img/plugin-pdf.png)
@@ -121,85 +121,85 @@ The images below highlight where the pdf, ui, and propPanel of the plugin are us
 - **ui(mode: designer), ui(mode: viewer), propPanel**
   ![](/img/plugin-designer.png)
 
-### Learning How to Create from @pdfme/schemas' Code
+### @pdfme/schemasのコードから学ぶ作成方法
 
-If you're looking to create your own schema, it is recommended to refer to the existing code within `@pdfme/schemas` while doing so.  
-The code for existing schemas can be found in the files below:
+独自のスキーマを作成する場合は、`@pdfme/schemas`内の既存のコードを参照することをお勧めします。  
+既存のスキーマのコードは以下のファイルにあります：
 
-- [packages/schemas/src/text/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/text/index.ts): The most complex schema in terms of PDF rendering. The propPanel is also customized using [form-render's Widget](https://xrender.fun/form-render/advanced-widget), demonstrating that the plugin can meet complex needs.
-- [packages/schemas/src/graphics/image.ts](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/graphics/image.ts): Simple implementation for PDF rendering, but uses an input type="file" element for image input during ui(mode: form) and ui(mode: designer) rendering. Overall, it’s a simple implementation and may serve as a good starting point.
-- [packages/schemas/src/barcodes/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/barcodes/index.ts): Cool for generating barcodes in real-time for ui preview, and shares that module with pdf. Also, supports more than 10 types of barcodes and changes the form in the propPanel according to the type of barcode. Demonstrates that the plugin can be both flexible and efficient.
+- [packages/schemas/src/text/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/text/index.ts): PDFレンダリングの観点から最も複雑なスキーマです。propPanelも[form-renderのWidget](https://xrender.fun/form-render/advanced-widget)を使用してカスタマイズされており、プラグインが複雑なニーズに対応できることを示しています。
+- [packages/schemas/src/graphics/image.ts](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/graphics/image.ts): PDFレンダリングのシンプルな実装ですが、ui(mode: form)とui(mode: designer)レンダリング中に画像入力にinput type="file"要素を使用しています。全体的にシンプルな実装であり、良い出発点になるかもしれません。
+- [packages/schemas/src/barcodes/index.ts](https://github.com/pdfme/pdfme/tree/main/packages/schemas/src/barcodes/index.ts): uiプレビュー用にバーコードをリアルタイムで生成するのに優れており、そのモジュールをpdfと共有しています。また、10種類以上のバーコードをサポートし、バーコードのタイプに応じてpropPanelのフォームを変更します。プラグインが柔軟かつ効率的であることを示しています。
 
 :::tip
 
-- If `PropPanel.defaultSchema.rotate` is not set or is undefined, the rotate handle will disappear from the Designer.
-- If rotation is not required, it's efficient to skip its implementation in PDF rendering.
+- `PropPanel.defaultSchema.rotate`が設定されていないか、undefinedの場合、Designerから回転ハンドルが消えます。
+- 回転が不要な場合は、PDFレンダリングでの実装をスキップすると効率的です。
 
 :::
 
-### Sample Scenario for Creating a Signature Plugin
+### 署名プラグイン作成のサンプルシナリオ
 
-As a sample scenario, let's try creating a plugin that allows you to input signatures in the form.  
-Specifically, it should be possible to input the signature using [signature_pad](https://github.com/szimek/signature_pad), and to render that signature as an image in both the DOM and PDF.
+サンプルシナリオとして、フォームに署名を入力できるプラグインを作成してみましょう。  
+具体的には、[signature_pad](https://github.com/szimek/signature_pad)を使用して署名を入力し、その署名をDOMとPDFの両方で画像としてレンダリングできるようにします。
 
 [![](/img/signature-schema.gif)](https://playground.pdfme.com/)
 
-- Demo: https://playground.pdfme.com/
-- Code: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)
+- デモ: https://playground.pdfme.com/
+- コード: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)
 
 
-### Caveats for writing Custom Schemas
+### カスタムスキーマ作成時の注意点
 
-#### Renderer schema caching
+#### レンダラースキーマのキャッシング
 
-pdfme supports caching of memory or cpu-intensive content so that it can be re-used within the same rendering process.
+pdfmeは、メモリやCPUを多く使用するコンテンツのキャッシングをサポートしており、同じレンダリングプロセス内で再利用できます。
 
-The most common use-case for this is when you're rendering a large number of PDFs with the same template. Often these
-inputs might be the same and your schema could benefit from caching them. This is optional, but if you're intending for your custom schema to be used by others then you should consider it.
+最も一般的なユースケースは、同じテンプレートで多数のPDFをレンダリングする場合です。多くの場合、これらの
+入力は同じである可能性があり、スキーマはキャッシングの恩恵を受けることができます。これはオプションですが、カスタムスキーマを他の人に使用してもらうことを意図している場合は検討すべきです。
 
-Examples of caching are available in both [image](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/graphics/image.ts) and [barcode](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/barcodes/pdfRender.ts) schema render functions. You will need to choosing a caching key that captures the uniqueness of your generated PDF artifact (excluding attributes such as size and position, which are usually handled by pdf-lib on rendering). You will notice in the barcode schema that it requires more attributes to describe it's uniqueness compare to images which use the default `getCacheKey` function.
+キャッシングの例は、[image](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/graphics/image.ts)と[barcode](https://github.com/pdfme/pdfme/blob/main/packages/schemas/src/barcodes/pdfRender.ts)のスキーマレンダリング関数の両方で利用できます。生成されるPDFアーティファクトの一意性を捉えるキャッシュキーを選択する必要があります（サイズや位置などの属性は除外され、通常はレンダリング時にpdf-libによって処理されます）。バーコードスキーマでは、デフォルトの`getCacheKey`関数を使用する画像と比較して、その一意性を記述するためにより多くの属性が必要であることに気付くでしょう。
 
-## Community Contributions
+## コミュニティの貢献
 
-The pdfme community has created and shared various custom plugins that you might find useful in your projects. Here are some community-contributed plugins:
+pdfmeコミュニティは、プロジェクトで役立つさまざまなカスタムプラグインを作成し共有しています。以下はコミュニティによって貢献されたプラグインの一部です：
 
-### Lightweight QR Code Plugin
+### 軽量QRコードプラグイン
 
-A lightweight alternative QR code plugin that uses the `qrcode` npm package instead of the larger `bwip-js` package used in the built-in barcode schemas. This plugin is significantly smaller in bundle size while still providing QR code functionality.
+組み込みのバーコードスキーマで使用される大きな`bwip-js`パッケージの代わりに、`qrcode` npmパッケージを使用する軽量な代替QRコードプラグインです。このプラグインはQRコード機能を提供しながらも、バンドルサイズが大幅に小さくなっています。
 
-- **Gist**: [A light weight qrcode plugin for pdfme](https://gist.github.com/kyasu1/0def72d6f0826b0a9571b6e13f3c9065)
-- **Author**: [kyasu1](https://github.com/kyasu1)
-- **Features**:
-  - Smaller bundle size compared to the built-in barcode schemas
-  - Customizable background and bar colors
-  - Simple integration with pdfme
+- **Gist**: [pdfmeのための軽量qrcodeプラグイン](https://gist.github.com/kyasu1/0def72d6f0826b0a9571b6e13f3c9065)
+- **作者**: [kyasu1](https://github.com/kyasu1)
+- **特徴**:
+  - 組み込みのバーコードスキーマと比較して小さいバンドルサイズ
+  - カスタマイズ可能な背景色とバーの色
+  - pdfmeとの簡単な統合
 
-To use this plugin:
+このプラグインを使用するには：
 
-1. Install the required dependency:
+1. 必要な依存関係をインストールします：
    ```bash
    npm install qrcode -S
    ```
 
-2. Add the plugin code to your project (e.g., in `./src/plugins/qrCode.ts`)
+2. プラグインコードをプロジェクトに追加します（例：`./src/plugins/qrCode.ts`）
 
-3. Import and use the plugin in your generator or UI components:
+3. ジェネレーターまたはUIコンポーネントでプラグインをインポートして使用します：
    ```ts
    import qrCode from "./plugins/qrCode.js";
    
-   // In your generator
+   // ジェネレーターでの使用例
    const pdf = await generate({
      template, 
      inputs, 
      options: { font },
      plugins: {
-       // Your other plugins
+       // 他のプラグイン
        NodeQRCode: qrCode
      }
    });
    ```
 
-4. Use the schema in your template:
+4. テンプレートでスキーマを使用します：
    ```json
    {
      "type": "node-qrCode",
@@ -218,5 +218,5 @@ To use this plugin:
    ```
 
 :::tip
-If you've created a useful plugin for pdfme, please share it on [GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288) so others can benefit from your work!
+pdfmeのために役立つプラグインを作成した場合は、[GitHub Discussions](https://github.com/pdfme/pdfme/discussions/288)で共有して、他の人があなたの成果を活用できるようにしてください！
 :::
