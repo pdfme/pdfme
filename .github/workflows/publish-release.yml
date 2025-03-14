@@ -63,6 +63,7 @@ jobs:
         run: |
           cd playground
           npm install
+          npm run build
           npm run test
         env:
           CI: true

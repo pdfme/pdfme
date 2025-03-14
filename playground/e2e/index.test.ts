@@ -1,7 +1,7 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
-import { execSync, ChildProcessWithoutNullStreams } from 'child_process';
+import { ChildProcessWithoutNullStreams } from 'child_process';
 import { spawn } from 'child_process';
 import type { MatchImageSnapshotOptions } from 'jest-image-snapshot';
 import templateCreationRecord from './templateCreationRecord.json';
@@ -88,13 +88,6 @@ describe('Playground E2E Tests', () => {
   let previewProcess: ChildProcessWithoutNullStreams | undefined;
 
   beforeAll(async () => {
-    if (isRunningLocal) {
-      console.log('Skip Building playground in local mode');
-    } else {
-      console.log('Building playground...');
-      execSync('npm run build', { stdio: 'inherit' });
-    }
-
     console.log('Starting preview server...');
     previewProcess = spawn('npm', ['run', 'preview'], {
       detached: true,
