@@ -3,10 +3,10 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import GitHubButton from 'react-github-btn';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Translate, { translate } from '@docusaurus/Translate';
+import { translate } from '@docusaurus/Translate';
 
 
-export default function Home(): JSX.Element {
+export default function Home() {
   const { siteConfig } = useDocusaurusContext();
 
   return (
@@ -107,10 +107,12 @@ export default function Home(): JSX.Element {
                     id: 'homepage.cards.template.header',
                     message: 'PDF Generation Template'
                   }),
-                  image: { src: '/img/template.png', alt: translate({
-                    id: 'homepage.cards.template.image.alt',
-                    message: 'Template image'
-                  }) },
+                  image: {
+                    src: '/img/template.png', alt: translate({
+                      id: 'homepage.cards.template.image.alt',
+                      message: 'Template image'
+                    })
+                  },
                   body: {
                     title: translate({
                       id: 'homepage.cards.template.body.title',
@@ -135,10 +137,12 @@ export default function Home(): JSX.Element {
                     id: 'homepage.cards.designer.header',
                     message: 'Template Designer'
                   }),
-                  image: { src: '/img/designer.png', alt: translate({
-                    id: 'homepage.cards.designer.image.alt',
-                    message: 'Designer image'
-                  }) },
+                  image: {
+                    src: '/img/designer.png', alt: translate({
+                      id: 'homepage.cards.designer.image.alt',
+                      message: 'Designer image'
+                    })
+                  },
                   body: {
                     title: translate({
                       id: 'homepage.cards.designer.body.title',
@@ -163,10 +167,12 @@ export default function Home(): JSX.Element {
                     id: 'homepage.cards.generate.header',
                     message: 'PDF Generation'
                   }),
-                  image: { src: '/img/generator.png', alt: translate({
-                    id: 'homepage.cards.generate.image.alt',
-                    message: 'Generator image'
-                  }) },
+                  image: {
+                    src: '/img/generator.png', alt: translate({
+                      id: 'homepage.cards.generate.image.alt',
+                      message: 'Generator image'
+                    })
+                  },
                   body: {
                     title: translate({
                       id: 'homepage.cards.generate.body.title',
@@ -191,10 +197,12 @@ export default function Home(): JSX.Element {
                     id: 'homepage.cards.form.header',
                     message: 'Data collection with Form'
                   }),
-                  image: { src: '/img/form.png', alt: translate({
-                    id: 'homepage.cards.form.image.alt',
-                    message: 'Form image'
-                  }) },
+                  image: {
+                    src: '/img/form.png', alt: translate({
+                      id: 'homepage.cards.form.image.alt',
+                      message: 'Form image'
+                    })
+                  },
                   body: {
                     title: translate({
                       id: 'homepage.cards.form.body.title',

@@ -4,11 +4,11 @@
     "description": "The label for version current"
   },
   "sidebar.tutorialSidebar.category.Customization": {
-    "message": "Customization",
+    "message": "カスタマイズ",
     "description": "The label for category Customization in sidebar tutorialSidebar"
   },
   "sidebar.tutorialSidebar.category.Tools(New)": {
-    "message": "ツール (新機能)",
+    "message": "ツール (New)",
     "description": "The label for category Tools(New) in sidebar tutorialSidebar"
   }
 }
