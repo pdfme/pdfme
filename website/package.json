@@ -5,6 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "start:ja": "docusaurus start --locale ja",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "GIT_USER=hand-dot USE_SSH=true docusaurus deploy",
@@ -20,7 +21,6 @@
     "@docusaurus/plugin-client-redirects": "^3.7.0",
     "@docusaurus/plugin-google-gtag": "^3.7.0",
     "@docusaurus/preset-classic": "^3.7.0",
-    "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-github-btn": "^1.2.1"

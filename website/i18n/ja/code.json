@@ -1,0 +1,146 @@
+{
+  "homepage.title": {
+    "message": "無料でオープンソースのPDF生成ライブラリ！",
+    "description": "The title of the homepage"
+  },
+  "homepage.description": {
+    "message": "TypeScriptで完全に書かれた無料でオープンソースのPDF生成ライブラリで、効率的なPDF作成のためのReactベースのUIテンプレートエディタを備えています。",
+    "description": "The description of the homepage"
+  },
+  "homepage.hero.title": {
+    "message": "無料でオープンソースのPDF生成ライブラリ！",
+    "description": "The title in the hero section"
+  },
+  "homepage.hero.subtitle": {
+    "message": "TypeScriptで完全に書かれたパワフルなPDF生成ライブラリで、シームレスなPDF作成のためのReactベースのUIテンプレートエディタを備えています*。",
+    "description": "The first part of subtitle in the hero section"
+  },
+  "homepage.hero.subtitle.part2": {
+    "message": "オープンソースでコミュニティ主導、そしてMITライセンスの下で完全に無料でPDF生成が可能です！",
+    "description": "The second part of subtitle in the hero section"
+  },
+  "homepage.hero.note": {
+    "message": "* PDF生成ライブラリとUIエディタは別々に使用できます。",
+    "description": "Note about separate usage of library and editor"
+  },
+  "homepage.buttons.documentation": {
+    "message": "ドキュメント",
+    "description": "Documentation button text"
+  },
+  "homepage.buttons.playground": {
+    "message": "プレイグラウンド",
+    "description": "Playground button text"
+  },
+  "homepage.main.heading": {
+    "message": "シンプルでありながら強力なPDF生成ライブラリ。",
+    "description": "Main section heading"
+  },
+  "homepage.main.description.part1": {
+    "message": "pdfmeはJSONテンプレートを中心としたPDF生成、フォーム、ビューアを提供します。",
+    "description": "First part of main section description"
+  },
+  "homepage.main.description.part2": {
+    "message": "さらに、デザイナーを使用して簡単にテンプレートを作成できます。",
+    "description": "Second part of main section description"
+  },
+  "homepage.cards.template.header": {
+    "message": "PDF生成テンプレート",
+    "description": "Template card header"
+  },
+  "homepage.cards.template.image.alt": {
+    "message": "テンプレート画像",
+    "description": "Template image alt text"
+  },
+  "homepage.cards.template.body.title": {
+    "message": "テンプレートはbasePdfとスキーマで構成されています",
+    "description": "Template card title"
+  },
+  "homepage.cards.template.body.description": {
+    "message": "テンプレートはpdfmeの中核です。実際、テンプレートはジェネレーター、フォーム、ビューアで使用できます。",
+    "description": "Template card description"
+  },
+  "homepage.cards.template.link.text": {
+    "message": "PDF生成テンプレートについて詳しく学ぶ",
+    "description": "Template card link text"
+  },
+  "homepage.cards.designer.header": {
+    "message": "テンプレートデザイナー",
+    "description": "Designer card header"
+  },
+  "homepage.cards.designer.image.alt": {
+    "message": "デザイナー画像",
+    "description": "Designer image alt text"
+  },
+  "homepage.cards.designer.body.title": {
+    "message": "WYSIWYGエディタで簡単にテンプレートを作成",
+    "description": "Designer card title"
+  },
+  "homepage.cards.designer.body.description": {
+    "message": "デザイナーはアプリケーションに統合できます。バニラJavaScriptで書かれているため、フレームワークに関係なく簡単に統合できます。",
+    "description": "Designer card description"
+  },
+  "homepage.cards.designer.link.text": {
+    "message": "デザイナーについて詳しく学ぶ",
+    "description": "Designer card link text"
+  },
+  "homepage.cards.generate.header": {
+    "message": "PDF生成",
+    "description": "Generate card header"
+  },
+  "homepage.cards.generate.image.alt": {
+    "message": "ジェネレーター画像",
+    "description": "Generator image alt text"
+  },
+  "homepage.cards.generate.body.title": {
+    "message": "高性能なPDF生成",
+    "description": "Generate card title"
+  },
+  "homepage.cards.generate.body.description": {
+    "message": "ほとんどのPDF生成は数十から数百ミリ秒で完了します。ジェネレーターはテンプレートと入力データを受け取るシンプルなインターフェースを提供し、非常に使いやすくなっています。",
+    "description": "Generate card description"
+  },
+  "homepage.cards.generate.link.text": {
+    "message": "PDF生成について詳しく学ぶ",
+    "description": "Generate card link text"
+  },
+  "homepage.cards.form.header": {
+    "message": "フォームによるデータ収集",
+    "description": "Form card header"
+  },
+  "homepage.cards.form.image.alt": {
+    "message": "フォーム画像",
+    "description": "Form image alt text"
+  },
+  "homepage.cards.form.body.title": {
+    "message": "テンプレートを使用してフォームを作成",
+    "description": "Form card title"
+  },
+  "homepage.cards.form.body.description": {
+    "message": "テンプレート変数を簡単に入力できるフォームを作成できます。PDFを生成する際、フォームの入力値を使用してドキュメントを作成します。",
+    "description": "Form card description"
+  },
+  "homepage.cards.form.link.text": {
+    "message": "フォームについて詳しく学ぶ",
+    "description": "Form card link text"
+  },
+  "homepage.opensource.heading": {
+    "message": "私たちはオープンソース❤️です",
+    "description": "Open source section heading"
+  },
+  "homepage.opensource.description.part1": {
+    "message": "pdfmeはオープンソースプロジェクトであり、貢献を歓迎します。",
+    "description": "First part of open source section description"
+  },
+  "homepage.opensource.description.part2": {
+    "message": "私たちは常にプロジェクトを改善するための貢献者を探しています。",
+    "description": "Second part of open source section description"
+  },
+  "homepage.contributors.heading": {
+    "message": "貢献者",
+    "description": "Contributors section heading"
+  },
+  "homepage.support.heading": {
+    "message": "pdfmeをサポートする",
+    "description": "Support section heading"
+  }
+}

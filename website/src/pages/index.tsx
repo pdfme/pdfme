@@ -3,15 +3,22 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import GitHubButton from 'react-github-btn';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import { translate } from '@docusaurus/Translate';
 
 
-export default function Home(): JSX.Element {
+export default function Home() {
   const { siteConfig } = useDocusaurusContext();
 
   return (
     <Layout
-      title="Free and Open source PDF generation library!"
-      description="Free and Open source PDF generation library fully written in TypeScript, featuring a React-based UI template editor for efficient PDF creation."
+      title={translate({
+        id: 'homepage.title',
+        message: 'Free and Open source PDF generation library!'
+      })}
+      description={translate({
+        id: 'homepage.description',
+        message: 'Free and Open source PDF generation library fully written in TypeScript, featuring a React-based UI template editor for efficient PDF creation.'
+      })}
     >
       <header className={"hero hero--primary"}>
         <div className="container">
@@ -20,21 +27,38 @@ export default function Home(): JSX.Element {
               <img src="/img/logo.svg" alt="logo" width={300} className={''} />
             </div>
             <div className="col col--6">
-              <h1 className="hero__title">{siteConfig.title}: Free and Open source PDF generation library!</h1>
+              <h1 className="hero__title">
+                {siteConfig.title}: {translate({
+                  id: "homepage.hero.title",
+                  message: "Free and Open source PDF generation library!"
+                })}
+              </h1>
               <p className="hero__subtitle">
-                A powerful PDF generation library fully written in TypeScript, featuring a React-based UI
-                template editor for seamless PDF creation*.
+                {translate({
+                  id: "homepage.hero.subtitle",
+                  message: "A powerful PDF generation library fully written in TypeScript, featuring a React-based UI template editor for seamless PDF creation*."
+                })}
                 <br />
-                Open source, community-driven, and completely free for PDF generation under the MIT
-                license!
+                {translate({
+                  id: "homepage.hero.subtitle.part2",
+                  message: "Open source, community-driven, and completely free for PDF generation under the MIT license!"
+                })}
               </p>
-              <strong>* The PDF generation library and the UI editor can be used separately.</strong>
+              <strong>
+                {translate({
+                  id: "homepage.hero.note",
+                  message: "* The PDF generation library and the UI editor can be used separately."
+                })}
+              </strong>
             </div>
           </div>
           <div className="row row--no-gutters" style={{ alignItems: 'center' }}>
             <div className="col col--3" style={{ marginTop: '1rem' }}>
               <Link className="button button--lg button--success " to="/docs/getting-started">
-                Documentation
+                {translate({
+                  id: "homepage.buttons.documentation",
+                  message: "Documentation"
+                })}
               </Link>
             </div>
             <div className="col col--3" style={{ marginTop: '1rem' }}>
@@ -43,7 +67,10 @@ export default function Home(): JSX.Element {
                 href="https://playground.pdfme.com"
                 target={'_blank'}
               >
-                Playground
+                {translate({
+                  id: "homepage.buttons.playground",
+                  message: "Playground"
+                })}
               </a>
             </div>
             <div className="col col--6" />
@@ -55,68 +82,143 @@ export default function Home(): JSX.Element {
           <div className='padding-vert--lg'>
             <div className="col col--12 margin-vert--lg text--center">
               <h2 className="margin-top--lg">
-                Simple. Yet a powerful PDF generation library.
+                {translate({
+                  id: "homepage.main.heading",
+                  message: "Simple. Yet a powerful PDF generation library."
+                })}
               </h2>
               <p>
-                pdfme provides PDF generation, forms, and a viewer centered on JSON templates.
+                {translate({
+                  id: "homepage.main.description.part1",
+                  message: "pdfme provides PDF generation, forms, and a viewer centered on JSON templates."
+                })}
                 <br />
-                Additionally, templates can be easily created using the designer.
+                {translate({
+                  id: "homepage.main.description.part2",
+                  message: "Additionally, templates can be easily created using the designer."
+                })}
               </p>
             </div>
             <div className="row margin-vert--lg">
               {[
                 {
                   id: 'template',
-                  header: 'PDF Generation Template',
-                  image: { src: '/img/template.png', alt: 'Template image' },
+                  header: translate({
+                    id: 'homepage.cards.template.header',
+                    message: 'PDF Generation Template'
+                  }),
+                  image: {
+                    src: '/img/template.png', alt: translate({
+                      id: 'homepage.cards.template.image.alt',
+                      message: 'Template image'
+                    })
+                  },
                   body: {
-                    title: 'A template is composed by a basePdf and a Schema',
-                    description:
-                      'Templates are at the core of pdfme. In fact a template can be used with the Generator, the Form, and the Viewer.',
+                    title: translate({
+                      id: 'homepage.cards.template.body.title',
+                      message: 'A template is composed by a basePdf and a Schema'
+                    }),
+                    description: translate({
+                      id: 'homepage.cards.template.body.description',
+                      message: 'Templates are at the core of pdfme. In fact a template can be used with the Generator, the Form, and the Viewer.'
+                    }),
                   },
                   link: {
                     to: '/docs/getting-started#template',
-                    text: 'Learn more about PDF Generation Templates',
+                    text: translate({
+                      id: 'homepage.cards.template.link.text',
+                      message: 'Learn more about PDF Generation Templates'
+                    }),
                   },
                 },
                 {
                   id: 'designer',
-                  header: 'Template Designer',
-                  image: { src: '/img/designer.png', alt: 'Designer image' },
+                  header: translate({
+                    id: 'homepage.cards.designer.header',
+                    message: 'Template Designer'
+                  }),
+                  image: {
+                    src: '/img/designer.png', alt: translate({
+                      id: 'homepage.cards.designer.image.alt',
+                      message: 'Designer image'
+                    })
+                  },
                   body: {
-                    title: 'Easily create templates with a WYSIWYG editor',
-                    description: 'The Designer can be integrated into your application. It is written in vanilla JavaScript, making integration effortless regardless of the framework.'
+                    title: translate({
+                      id: 'homepage.cards.designer.body.title',
+                      message: 'Easily create templates with a WYSIWYG editor'
+                    }),
+                    description: translate({
+                      id: 'homepage.cards.designer.body.description',
+                      message: 'The Designer can be integrated into your application. It is written in vanilla JavaScript, making integration effortless regardless of the framework.'
+                    })
                   },
                   link: {
                     to: '/docs/getting-started#designer',
-                    text: 'Learn more about the Designer',
+                    text: translate({
+                      id: 'homepage.cards.designer.link.text',
+                      message: 'Learn more about the Designer'
+                    }),
                   },
                 },
                 {
                   id: 'generate',
-                  header: 'PDF Generation',
-                  image: { src: '/img/generator.png', alt: 'Generator image' },
+                  header: translate({
+                    id: 'homepage.cards.generate.header',
+                    message: 'PDF Generation'
+                  }),
+                  image: {
+                    src: '/img/generator.png', alt: translate({
+                      id: 'homepage.cards.generate.image.alt',
+                      message: 'Generator image'
+                    })
+                  },
                   body: {
-                    title: 'High-performance PDF generation',
-                    description:
-                      'Most PDF generations complete within tens to hundreds of milliseconds. The Generator provides a simple interface that accepts a template and input data, making it very easy to use.',
+                    title: translate({
+                      id: 'homepage.cards.generate.body.title',
+                      message: 'High-performance PDF generation'
+                    }),
+                    description: translate({
+                      id: 'homepage.cards.generate.body.description',
+                      message: 'Most PDF generations complete within tens to hundreds of milliseconds. The Generator provides a simple interface that accepts a template and input data, making it very easy to use.'
+                    }),
                   },
                   link: {
                     to: '/docs/getting-started#generator',
-                    text: 'Learn more about PDF Generation',
+                    text: translate({
+                      id: 'homepage.cards.generate.link.text',
+                      message: 'Learn more about PDF Generation'
+                    }),
                   },
                 },
                 {
                   id: 'form',
-                  header: 'Data collection with Form',
-                  image: { src: '/img/form.png', alt: 'Form image' },
+                  header: translate({
+                    id: 'homepage.cards.form.header',
+                    message: 'Data collection with Form'
+                  }),
+                  image: {
+                    src: '/img/form.png', alt: translate({
+                      id: 'homepage.cards.form.image.alt',
+                      message: 'Form image'
+                    })
+                  },
                   body: {
-                    title: 'Create forms using templates',
-                    description: 'You can create forms that allow for easy input of template variables. When generating a PDF, the form’s input values are used to create the document.'
+                    title: translate({
+                      id: 'homepage.cards.form.body.title',
+                      message: 'Create forms using templates'
+                    }),
+                    description: translate({
+                      id: 'homepage.cards.form.body.description',
+                      message: 'You can create forms that allow for easy input of template variables. When generating a PDF, the form\'s input values are used to create the document.'
+                    })
                   },
                   link: {
                     to: '/docs/getting-started#form',
-                    text: 'Learn more about Form',
+                    text: translate({
+                      id: 'homepage.cards.form.link.text',
+                      message: 'Learn more about Form'
+                    }),
                   },
                 },
               ]
@@ -150,17 +252,31 @@ export default function Home(): JSX.Element {
           <div className="padding-vert--lg col col--12 margin-vert--lg text--center">
             <div>
               <h2 className='margin-top--lg'>
-                We are Open Source❤️
+                {translate({
+                  id: "homepage.opensource.heading",
+                  message: "We are Open Source❤️"
+                })}
               </h2>
               <p>
-                pdfme is an open source project and we love contributions.
+                {translate({
+                  id: "homepage.opensource.description.part1",
+                  message: "pdfme is an open source project and we love contributions."
+                })}
                 <br />
-                We are always looking for contributors to help us improve our project.
+                {translate({
+                  id: "homepage.opensource.description.part2",
+                  message: "We are always looking for contributors to help us improve our project."
+                })}
               </p>
             </div>
 
             <div className="margin-vert--lg">
-              <h3 style={{ marginBottom: '20px' }}>Contributors</h3>
+              <h3 style={{ marginBottom: '20px' }}>
+                {translate({
+                  id: "homepage.contributors.heading",
+                  message: "Contributors"
+                })}
+              </h3>
               <div>
                 <a href="https://github.com/pdfme/pdfme/graphs/contributors">
                   <img src="https://contrib.rocks/image?repo=pdfme/pdfme" />
@@ -169,7 +285,12 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className="margin-vert--lg">
-              <h3>Support pdfme</h3>
+              <h3>
+                {translate({
+                  id: "homepage.support.heading",
+                  message: "Support pdfme"
+                })}
+              </h3>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <a href="https://github.com/sponsors/pdfme" target="_blank" style={{ margin: '20px' }}>
                   <img alt="GitHub Sponsors" src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86" width={190} />

@@ -13,6 +13,20 @@ const config = {
   projectName: 'pdfme',
   deploymentBranch: 'website',
   trailingSlash: false,
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ja'],
+    localeConfigs: {
+      en: {
+        label: 'English',
+        direction: 'ltr',
+      },
+      ja: {
+        label: '日本語',
+        direction: 'ltr',
+      },
+    },
+  },
   presets: [
     [
       'classic',
@@ -123,6 +137,10 @@ const config = {
         {
           href: 'https://app.pdfme.com/contact?utm_source=website&utm_content=navbar',
           label: 'Contact',
+          position: 'right',
+        },
+        {
+          type: 'localeDropdown',
           position: 'right',
         }
       ],
