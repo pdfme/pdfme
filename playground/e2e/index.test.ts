@@ -6,7 +6,6 @@ import { spawn } from 'child_process';
 import type { MatchImageSnapshotOptions } from 'jest-image-snapshot';
 import templateCreationRecord from './templateCreationRecord.json';
 import formInputRecord from './formInputRecord.json';
-import 'isomorphic-fetch';
 
 const baseUrl = 'http://localhost:4173';
 const timeout = 40000; // Increased timeout to avoid test failures
@@ -100,36 +99,6 @@ describe('Playground E2E Tests', () => {
     previewProcess = spawn('npm', ['run', 'preview'], {
       detached: true,
       stdio: 'pipe',
-    });
-    
-    // Wait for preview server to be ready
-    console.log('Waiting for preview server to be ready...');
-    await new Promise((resolve) => {
-      const maxRetries = 30;
-      let retries = 0;
-      const checkServer = async () => {
-        try {
-          const response = await fetch(`${baseUrl}/`);
-          if (response.ok) {
-            console.log('Preview server is ready!');
-            resolve(true);
-            return;
-          }
-        } catch (e) {
-          // Server not ready yet
-        }
-        
-        retries++;
-        if (retries >= maxRetries) {
-          console.log(`Server not ready after ${maxRetries} attempts, continuing anyway...`);
-          resolve(false);
-          return;
-        }
-        
-        setTimeout(checkServer, 1000);
-      };
-      
-      checkServer();
     });
 
     browser = await puppeteer.launch({

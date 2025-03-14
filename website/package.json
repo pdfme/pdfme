@@ -5,6 +5,7 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "start:ja": "docusaurus start --locale ja",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "GIT_USER=hand-dot USE_SSH=true docusaurus deploy",
