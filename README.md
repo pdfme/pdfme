@@ -100,5 +100,5 @@ We look forward to your contributions!
 
 ---
 
-This project is tested with BrowserStack.
+pdfme is supported by [Devin AI](https://app.devin.ai/invite/KyOTXVPrlFl2TjcT) and [Greptile](https://app.greptile.com/signup?ref=MzgyNzgtMjQ1MTU=).
 
