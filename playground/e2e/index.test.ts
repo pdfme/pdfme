@@ -12,6 +12,7 @@ const timeout = 40000; // Increased timeout to avoid test failures
 jest.setTimeout(timeout * 5);
 
 const isRunningLocal = process.env.LOCAL === 'true';
+const isCI = process.env.CI === 'true';
 
 const snapShotOpt: MatchImageSnapshotOptions = {
   failureThreshold: 1,
@@ -88,15 +89,35 @@ describe('Playground E2E Tests', () => {
   let previewProcess: ChildProcessWithoutNullStreams | undefined;
 
   beforeAll(async () => {
-    // Always start the preview server for tests
+    // Start the preview server for tests
     console.log('Starting preview server for tests...');
     previewProcess = spawn('npm', ['run', 'preview'], {
-      detached: true,
+      detached: false, // Not detached in CI to ensure process terminates with test
       stdio: 'pipe',
     });
     
-    // Wait for preview server to start
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    // Wait for preview server to start and be ready
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
+    // Try to connect to the server to verify it's running
+    let serverReady = false;
+    for (let i = 0; i < 3; i++) {
+      try {
+        const response = await fetch(baseUrl);
+        if (response.ok) {
+          console.log('Preview server is ready');
+          serverReady = true;
+          break;
+        }
+      } catch (error) {
+        console.log(`Attempt ${i+1}: Preview server not ready yet, waiting...`);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+    }
+
+    if (!serverReady) {
+      console.log('Warning: Could not verify preview server is running');
+    }
 
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
