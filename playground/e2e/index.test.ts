@@ -88,16 +88,15 @@ describe('Playground E2E Tests', () => {
   let previewProcess: ChildProcessWithoutNullStreams | undefined;
 
   beforeAll(async () => {
-    // Only start preview server if not in CI environment
-    if (!process.env.CI) {
-      console.log('Starting preview server locally...');
-      previewProcess = spawn('npm', ['run', 'preview'], {
-        detached: true,
-        stdio: 'pipe',
-      });
-    } else {
-      console.log('Using existing preview server in CI environment...');
-    }
+    // Always start the preview server for tests
+    console.log('Starting preview server for tests...');
+    previewProcess = spawn('npm', ['run', 'preview'], {
+      detached: true,
+      stdio: 'pipe',
+    });
+    
+    // Wait for preview server to start
+    await new Promise(resolve => setTimeout(resolve, 5000));
 
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
@@ -122,9 +121,13 @@ describe('Playground E2E Tests', () => {
     if (browser && !isRunningLocal) {
       await browser.close();
     }
-    // Only kill the preview process if we started it (not in CI)
-    if (!process.env.CI && previewProcess && previewProcess.pid) {
-      process.kill(-previewProcess.pid);
+    // Always clean up the preview process
+    if (previewProcess && previewProcess.pid) {
+      try {
+        process.kill(-previewProcess.pid);
+      } catch (error) {
+        console.log('Error killing preview process:', error);
+      }
     }
   });
 
