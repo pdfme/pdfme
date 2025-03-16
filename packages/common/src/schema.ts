@@ -125,7 +125,7 @@ export const BlankPdf = z.object({
   staticSchema: z.array(Schema).optional(),
 });
 
-const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
+export const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]);
 
 export const BasePdf = z.union([CustomPdf, BlankPdf]);
 

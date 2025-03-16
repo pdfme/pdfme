@@ -427,7 +427,7 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="moveable-control-box    pdfme-moveable rCS1bhdyl6"
+              class="moveable-control-box    pdfme-moveable-3 rCS1bhdyl6"
               data-able-clickable="true"
               data-able-draggable="true"
               data-able-origin="true"
