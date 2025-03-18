@@ -49,6 +49,9 @@
     "lint": "npm run lint --workspaces",
     "prettier": "npm run prettier --workspaces"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.16.7",
     "@humanwhocodes/config-array": "^0.13.0",
