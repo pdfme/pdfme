@@ -46,7 +46,7 @@
     "hotkeys-js": "^3.8.7",
     "lucide-react": "^0.482.0",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "react-dom": "^19.0.0",
     "react-moveable": "^0.56.0",
     "react-refresh": "^0.16.0",
     "react-selecto": "^1.12.0"
