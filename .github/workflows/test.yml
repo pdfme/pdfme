@@ -54,6 +54,8 @@ jobs:
           npm install
           npm run lint
           npm run build
+          npm run preview & 
+          sleep 5
           npm run test
         env:
           CI: true
