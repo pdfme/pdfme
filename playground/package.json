@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npm run generate-template-assets && vite",
     "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
-    "lint": "eslint . --ext ts,tsx",
+    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b playground",
