@@ -2,6 +2,7 @@
   "name": "playground",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "npm run generate-template-assets && vite",
     "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
@@ -11,9 +12,9 @@
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --updateSnapshot",
-    "test:local": "LOCAL=true node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "jest",
+    "test:update-snapshots": "jest --updateSnapshot",
+    "test:local": "LOCAL=true jest"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -76,6 +77,9 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@pdfme/converter$": "<rootDir>/../packages/converter/dist/cjs/src/index.node.js"
+    }
   }
 }
