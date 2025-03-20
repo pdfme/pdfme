@@ -30,7 +30,13 @@ const pdf2img = async (
   options: Pdf2ImgOptions = {},
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) =>
+      pdfjsLib.getDocument({
+        data: pdf,
+        cMapUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+        verbosity: 0,
+      }).promise,
     createCanvas: (width, height) => {
       const canvas = document.createElement('canvas');
       canvas.width = width;
@@ -46,7 +52,13 @@ const pdf2img = async (
 
 const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) =>
+      pdfjsLib.getDocument({
+        data: pdf,
+        cMapUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+        verbosity: 0,
+      }).promise,
   });
 
 export { img2pdf, pdf2img, pdf2size };

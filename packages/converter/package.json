@@ -22,13 +22,13 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
+  "main": "dist/cjs/src/index.node.js",
+  "module": "dist/esm/src/index.browser.js",
   "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
       "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js",
+      "node": "./dist/esm/src/index.node.js",
       "default": "./dist/esm/src/index.browser.js",
       "types": "./dist/types/src/index.node.d.ts"
     }
