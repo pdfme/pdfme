@@ -1,6 +1,6 @@
 import { PDFDocument, RotationTypes } from '@pdfme/pdf-lib';
 
-export const merge = async (pdfs: (ArrayBuffer | Uint8Array)[]): Promise<Uint8Array> => {
+const merge = async (pdfs: (ArrayBuffer | Uint8Array)[]): Promise<Uint8Array> => {
   if (!pdfs.length) {
     throw new Error('[@pdfme/manipulator] At least one PDF is required for merging');
   }
@@ -14,7 +14,7 @@ export const merge = async (pdfs: (ArrayBuffer | Uint8Array)[]): Promise<Uint8Ar
   return mergedPdf.save();
 };
 
-export const split = async (
+const split = async (
   pdf: ArrayBuffer | Uint8Array,
   ranges: { start?: number; end?: number }[],
 ): Promise<Uint8Array[]> => {
@@ -44,10 +44,7 @@ export const split = async (
   return result;
 };
 
-export const remove = async (
-  pdf: ArrayBuffer | Uint8Array,
-  pages: number[],
-): Promise<Uint8Array> => {
+const remove = async (pdf: ArrayBuffer | Uint8Array, pages: number[]): Promise<Uint8Array> => {
   if (!pages.length) {
     throw new Error('[@pdfme/manipulator] At least one page number is required for removal');
   }
@@ -65,7 +62,7 @@ export const remove = async (
   return pdfDoc.save();
 };
 
-export const insert = async (
+const insert = async (
   basePdf: ArrayBuffer | Uint8Array,
   inserts: { pdf: ArrayBuffer | Uint8Array; position: number }[],
 ): Promise<Uint8Array> => {
@@ -116,7 +113,7 @@ export const insert = async (
   return pdfDoc.save();
 };
 
-export const rotate = async (
+const rotate = async (
   pdf: ArrayBuffer | Uint8Array,
   degrees: 0 | 90 | 180 | 270 | 360,
   pageNumbers?: number[],
@@ -159,7 +156,7 @@ export const rotate = async (
   return pdfDoc.save();
 };
 
-export const move = async (
+const move = async (
   pdf: ArrayBuffer | Uint8Array,
   operation: { from: number; to: number },
 ): Promise<Uint8Array> => {
@@ -186,7 +183,7 @@ export const move = async (
   return pdfDoc.save();
 };
 
-export const organize = async (
+const organize = async (
   pdf: ArrayBuffer | Uint8Array,
   actions: Array<
     | { type: 'remove'; data: { position: number } }
@@ -239,3 +236,5 @@ export const organize = async (
 
   return currentPdf.save();
 };
+
+export { merge, split, remove, insert, rotate, move, organize };
