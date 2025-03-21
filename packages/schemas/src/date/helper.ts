@@ -55,13 +55,6 @@ import { DateSchema } from './types.js';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter.js';
 import { isEditable } from '../utils.js';
 
-interface AirDatepickerInstance {
-  selectedDates: Date[];
-  hide: () => void;
-  destroy: () => void;
-  show: () => void;
-}
-
 type PickerType = 'date' | 'time' | 'dateTime';
 
 interface Locale {
@@ -275,7 +268,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: adButtons,
-        onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
+        onSelect: ({ datepicker }: { datepicker: AirDatepicker }) => {
           if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
             datepicker.hide();

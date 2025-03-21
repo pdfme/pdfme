@@ -4,6 +4,7 @@
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "type": "module",
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -61,17 +62,17 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!(air-datepicker)/)"
-    ],
+    "transformIgnorePatterns": [],
     "moduleFileExtensions": [
       "js",
       "ts"

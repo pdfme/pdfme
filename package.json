@@ -4,6 +4,7 @@
   "private": true,
   "author": "hand-dot",
   "license": "MIT",
+  "type": "module",
   "keywords": [
     "pdf",
     "pdf-generation",

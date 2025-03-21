@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import PDFJSWorker from 'pdfjs-dist/build/pdf.worker.entry.js';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
+import { img2pdf } from './img2pdf.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown as string;
 
@@ -24,12 +25,18 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   return arrayBuffer;
 }
 
-export const pdf2img = async (
+const pdf2img = async (
   pdf: ArrayBuffer | Uint8Array,
   options: Pdf2ImgOptions = {},
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) =>
+      pdfjsLib.getDocument({
+        data: pdf,
+        cMapUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+        verbosity: 0,
+      }).promise,
     createCanvas: (width, height) => {
       const canvas = document.createElement('canvas');
       canvas.width = width;
@@ -43,9 +50,15 @@ export const pdf2img = async (
     },
   });
 
-export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
+const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) =>
+      pdfjsLib.getDocument({
+        data: pdf,
+        cMapUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/cmaps/`,
+        cMapPacked: true,
+        verbosity: 0,
+      }).promise,
   });
 
-export { img2pdf } from './img2pdf.js';
+export { img2pdf, pdf2img, pdf2size };
