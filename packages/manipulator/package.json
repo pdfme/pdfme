@@ -77,7 +77,7 @@
       ]
     },
     "moduleNameMapper": {
-      "^@pdfme/converter$": "<rootDir>/../converter/dist/cjs/src/index.node.js"
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts"
     }
   }
 }

@@ -69,7 +69,7 @@
     ],
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^@pdfme/converter$": "<rootDir>/../converter/dist/cjs/src/index.node.js",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
     "transformIgnorePatterns": [],
