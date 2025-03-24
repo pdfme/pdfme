@@ -79,6 +79,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/estree": "^1.0.6"
+    "@types/estree": "^1.0.7"
   }
 }
