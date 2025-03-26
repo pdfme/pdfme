@@ -9,6 +9,7 @@ interface ShapeSchema extends Schema {
   borderWidth: number;
   borderColor: string;
   color: string;
+  radius?: number;
 }
 
 const shape: Plugin<ShapeSchema> = {
@@ -20,6 +21,8 @@ const shape: Plugin<ShapeSchema> = {
     div.style.boxSizing = 'border-box';
     if (schema.type === 'ellipse') {
       div.style.borderRadius = '50%';
+    } else if (schema.radius && schema.radius > 0) {
+      div.style.borderRadius = `${schema.radius}mm`;
     }
     div.style.borderWidth = `${schema.borderWidth ?? 0}mm`;
     div.style.borderStyle = schema.borderWidth && schema.borderColor ? 'solid' : 'none';
@@ -57,6 +60,8 @@ const shape: Plugin<ShapeSchema> = {
         ...drawOptions,
       });
     } else if (schema.type === 'rectangle') {
+      const radius = schema.radius ?? 0;
+      
       page.drawRectangle({
         x:
           position.x +
@@ -68,6 +73,7 @@ const shape: Plugin<ShapeSchema> = {
           Math.tan(toRadians(rotate)) * Math.PI ** 2,
         width: width - borderWidth,
         height: height - borderWidth,
+        ...(radius ? { radius: mm2pt(radius) } : {}),
         ...drawOptions,
       });
     }
@@ -78,8 +84,8 @@ const shape: Plugin<ShapeSchema> = {
         title: i18n('schemas.borderWidth'),
         type: 'number',
         widget: 'inputNumber',
-        props: { min: 0 },
-        step: 1,
+        props: { min: 0, step: 1 },
+        span: 12,
       },
       borderColor: {
         title: i18n('schemas.borderColor'),
@@ -89,6 +95,7 @@ const shape: Plugin<ShapeSchema> = {
           disabledAlpha: true,
         },
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
+        span: 12,
       },
       color: {
         title: i18n('schemas.color'),
@@ -98,6 +105,13 @@ const shape: Plugin<ShapeSchema> = {
           disabledAlpha: true,
         },
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
+      },
+      radius: {
+        title: i18n('schemas.radius'),
+        type: 'number',
+        widget: 'inputNumber',
+        props: { min: 0, step: 1 },
+        span: 12,
       },
     }),
     defaultSchema: {
@@ -112,6 +126,7 @@ const shape: Plugin<ShapeSchema> = {
       borderColor: '#000000',
       color: '',
       readOnly: true,
+      radius: 0,
     },
   },
 };
