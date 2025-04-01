@@ -65,7 +65,7 @@
   "devDependencies": {
     "@pdfme/common": "*",
     "@types/bwip-js": "^3.2.1",
-    "@types/fontkit": "^2.0.4",
+    "@types/fontkit": "^2.0.8",
     "@types/pngjs": "^6.0.2",
     "jsqr": "^1.4.0",
     "pngjs": "^7.0.0"
