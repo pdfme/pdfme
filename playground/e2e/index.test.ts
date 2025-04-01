@@ -7,6 +7,28 @@ import type { MatchImageSnapshotOptions } from 'jest-image-snapshot';
 import templateCreationRecord from './templateCreationRecord.json';
 import formInputRecord from './formInputRecord.json';
 
+async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 1000): Promise<boolean> {
+  console.log(`Waiting for server to be ready at ${url}`);
+  
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch(url);
+      if (response.status === 200) {
+        console.log(`Server is ready after ${i + 1} attempts!`);
+        return true;
+      }
+      console.log(`Server returned status ${response.status}, still waiting...`);
+    } catch (error) {
+      console.log(`Server not ready yet (attempt ${i + 1}/${maxRetries}): ${error.message}`);
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, retryInterval));
+  }
+  
+  console.error(`Server failed to become ready after ${maxRetries} attempts`);
+  return false;
+}
+
 const baseUrl = 'http://localhost:4173';
 const timeout = 40000; // Increased timeout to avoid test failures
 jest.setTimeout(timeout * 5);
@@ -93,6 +115,19 @@ describe('Playground E2E Tests', () => {
       detached: true,
       stdio: 'pipe',
     });
+    
+    previewProcess.stdout.on('data', (data) => {
+      console.log(`Preview server output: ${data.toString().trim()}`);
+    });
+    
+    previewProcess.stderr.on('data', (data) => {
+      console.error(`Preview server error: ${data.toString().trim()}`);
+    });
+    
+    const serverReady = await waitForServerReady(baseUrl);
+    if (!serverReady) {
+      throw new Error('Failed to start preview server in time');
+    }
 
     browser = await puppeteer.launch({
       headless: !isRunningLocal,
