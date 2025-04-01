@@ -19,7 +19,8 @@ async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 
       }
       console.log(`Server returned status ${response.status}, still waiting...`);
     } catch (error) {
-      console.log(`Server not ready yet (attempt ${i + 1}/${maxRetries}): ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`Server not ready yet (attempt ${i + 1}/${maxRetries}): ${errorMessage}`);
     }
     
     await new Promise(resolve => setTimeout(resolve, retryInterval));
