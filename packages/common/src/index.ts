@@ -4,6 +4,8 @@ import {
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,
   BLANK_PDF,
+  BLANK_A4_PDF,
+  CUSTOM_A4_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
 } from './constants.js';
@@ -69,6 +71,8 @@ export {
   PT_TO_MM_RATIO,
   PT_TO_PX_RATIO,
   BLANK_PDF,
+  BLANK_A4_PDF,
+  CUSTOM_A4_PDF,
   ZOOM,
   DEFAULT_FONT_NAME,
   cloneDeep,
