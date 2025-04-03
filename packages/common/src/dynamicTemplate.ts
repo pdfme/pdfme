@@ -195,6 +195,11 @@ function breakIntoPages(arg: {
 
     if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
+    if (targetPageIndex > 0 && schema.type === 'table' && schema.showHead === true && schema.repeatHead === true) {
+      const estimatedHeaderHeight = 30; // Approximate height in mm for a typical header row
+      newY += estimatedHeaderHeight;
+    }
+
     const clonedElement = createNode({ schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
   }
@@ -245,11 +250,6 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
 
         // Currently, this is used to determine whether to display the header when a table is split.
         schema.__isSplit = start > 0;
-        
-        if (schema.__isSplit && schema.type === 'table' && schema.repeatHead === true && schema.showHead === true) {
-          const estimatedHeaderHeight = 30; // Approximate height in mm for a typical header row
-          position.y += estimatedHeaderHeight;
-        }
 
         const newSchema = Object.assign({}, schema, { position, height });
         const index = newTemplate.schemas[pageIndex].findIndex((s) => s.name === name);
