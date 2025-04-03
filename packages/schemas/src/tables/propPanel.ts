@@ -14,6 +14,7 @@ export const propPanel: PropPanel<TableSchema> = {
     const tableSchema = activeSchema as TableSchema;
     const head = tableSchema.head || [];
     const showHead = tableSchema.showHead || false;
+    const repeatHead = tableSchema.repeatHead !== false;
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
@@ -23,6 +24,13 @@ export const propPanel: PropPanel<TableSchema> = {
         type: 'boolean',
         widget: 'checkbox',
         span: 24,
+      },
+      repeatHead: {
+        title: i18n('schemas.table.repeatHead') || 'Repeat Header',
+        type: 'boolean',
+        widget: 'checkbox',
+        span: 24,
+        hidden: !showHead,
       },
       '-------': { type: 'void', widget: 'Divider' },
       tableStyles: {
@@ -84,6 +92,7 @@ export const propPanel: PropPanel<TableSchema> = {
       ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
     ]),
     showHead: true,
+    repeatHead: true,
     head: ['Name', 'City', 'Description'],
     headWidthPercentages: [30, 30, 40],
     tableStyles: {

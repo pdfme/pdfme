@@ -33,6 +33,7 @@ interface UserOptions {
   tableWidth: number;
   margin: Spacing;
   showHead: boolean;
+  repeatHead?: boolean;
   tableLineWidth?: number;
   tableLineColor?: string;
   head?: string[][];
@@ -193,6 +194,7 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     head: [schema.head],
     body,
     showHead: schema.showHead,
+    repeatHead: schema.showHead ? schema.repeatHead !== false : false,
     startY: schema.position.y,
     tableWidth: schema.width,
     tableLineColor: schema.tableStyles.borderColor,
@@ -241,6 +243,7 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
     margin: options.margin,
     tableWidth: options.tableWidth,
     showHead: options.showHead,
+    repeatHead: options.repeatHead ?? true,
     tableLineWidth: options.tableLineWidth ?? 0,
     tableLineColor: options.tableLineColor ?? '',
   };
@@ -269,7 +272,7 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : !schema.__isSplit;
+  schema.showHead = schema.showHead === false ? false : !schema.__isSplit || (schema.repeatHead !== false && schema.__isSplit);
 
   const input = parseInput(schema, body);
 
