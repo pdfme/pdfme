@@ -14,7 +14,7 @@ export const propPanel: PropPanel<TableSchema> = {
     const tableSchema = activeSchema as TableSchema;
     const head = tableSchema.head || [];
     const showHead = tableSchema.showHead || false;
-    const repeatHead = tableSchema.repeatHead !== false;
+
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
