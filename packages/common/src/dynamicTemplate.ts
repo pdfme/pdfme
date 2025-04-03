@@ -245,6 +245,11 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
 
         // Currently, this is used to determine whether to display the header when a table is split.
         schema.__isSplit = start > 0;
+        
+        if (schema.__isSplit && schema.type === 'table' && schema.repeatHead === true && schema.showHead === true) {
+          const estimatedHeaderHeight = 30; // Approximate height in mm for a typical header row
+          position.y += estimatedHeaderHeight;
+        }
 
         const newSchema = Object.assign({}, schema, { position, height });
         const index = newTemplate.schemas[pageIndex].findIndex((s) => s.name === name);
