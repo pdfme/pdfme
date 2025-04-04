@@ -196,8 +196,10 @@ function breakIntoPages(arg: {
     if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
     if (targetPageIndex > 0 && schema.type === 'table' && schema.showHead === true && schema.repeatHead === true) {
-      const estimatedHeaderHeight = 30; // Approximate height in mm for a typical header row
-      newY += estimatedHeaderHeight;
+      const headFontSize = Number(schema.headFontSize || schema.fontSize || 12);
+      const headCellPadding = (schema.headCellPadding || schema.cellPadding || [2, 2, 2, 2]) as number[];
+      const headerHeight = headFontSize * 0.35 + headCellPadding[0] + headCellPadding[2];
+      newY += headerHeight;
     }
 
     const clonedElement = createNode({ schema, position: { x, y: newY }, width, height });
