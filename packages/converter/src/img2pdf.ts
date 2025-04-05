@@ -9,6 +9,30 @@ interface Img2PdfOptions {
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }
 
+function detectImageType(buffer: ArrayBuffer): 'jpeg' | 'png' | 'unknown' {
+  const bytes = new Uint8Array(buffer);
+
+  if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xD8) {
+    return 'jpeg';
+  }
+
+  if (
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4E &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0D &&
+    bytes[5] === 0x0A &&
+    bytes[6] === 0x1A &&
+    bytes[7] === 0x0A
+  ) {
+    return 'png';
+  }
+
+  return 'unknown';
+}
+
 export async function img2pdf(
   imgs: ArrayBuffer[],
   options: Img2PdfOptions = {},
@@ -23,9 +47,21 @@ export async function img2pdf(
     const doc = await PDFDocument.create();
     for (const img of imgs) {
       try {
-        const image = await doc.embedJpg(img).catch(async () => {
-          return await doc.embedPng(img);
-        });
+        let image;
+        const type = detectImageType(img);
+
+        if (type === 'jpeg') {
+          image = await doc.embedJpg(img);
+        } else if (type === 'png') {
+          image = await doc.embedPng(img);
+        } else {
+          try {
+            image = await doc.embedJpg(img);
+          } catch {
+            image = await doc.embedPng(img);
+          }
+        }
+
         const page = doc.addPage();
         const { width: imgWidth, height: imgHeight } = image.scale(scale);
         
