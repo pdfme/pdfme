@@ -116,7 +116,12 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
 }
 
 export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
-  const { value, schema, basePdf, options, _cache } = arg;
+  const { value, basePdf, options, _cache } = arg;
+  const schema = { ...arg.schema };
+  
+  if (schema.repeatHead === undefined) {
+    schema.repeatHead = true;
+  }
 
   const body = getBodyWithRange(
     typeof value !== 'string' ? JSON.stringify(value || '[]') : value,

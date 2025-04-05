@@ -78,6 +78,7 @@ export const Dict = z.object({
   'schemas.table.alternateBackgroundColor': z.string(),
   'schemas.table.tableStyle': z.string(),
   'schemas.table.showHead': z.string(),
+  'schemas.table.repeatHead': z.string(),
   'schemas.table.headStyle': z.string(),
   'schemas.table.bodyStyle': z.string(),
   'schemas.table.columnStyle': z.string(),
