@@ -1,5 +1,9 @@
 # Getting Started
 
+:::tip Interactive Documentation
+You can interactively ask questions about pdfme's documentation and source code using [DeepWiki](https://deepwiki.com/pdfme/pdfme). This is helpful when you have questions about code usage or functionality.
+:::
+
 ## Introduction
 
 pdfme was created to simplify the design and generation process of a PDF. It is especially useful for the following use cases:

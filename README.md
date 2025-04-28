@@ -46,7 +46,9 @@ For a detailed list of supported features, please refer to the [Supported Featur
 
 ## Documentation
 
-For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide.
+For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide. 
+
+Need interactive help? Use [DeepWiki](https://deepwiki.com/pdfme/pdfme) to ask questions about pdfme's documentation and source code directly.
 
 ## Examples Using pdfme
 
@@ -101,4 +103,3 @@ We look forward to your contributions!
 ---
 
 pdfme is supported by [Devin AI](https://app.devin.ai/invite/KyOTXVPrlFl2TjcT) and [Greptile](https://app.greptile.com/signup?ref=MzgyNzgtMjQ1MTU=).
-
