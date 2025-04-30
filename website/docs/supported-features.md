@@ -48,6 +48,7 @@ For using schemas other than the Text schema, please refer to the following docu
     - Border Width
     - Border Color
     - Color
+    - Radius
 - **Ellipse (ellipse)**
   - Style-related
     - Border Width
