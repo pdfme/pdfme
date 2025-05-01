@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/esm",
+    "declaration": true,
+    "declarationDir": "dist/types",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"]
+}

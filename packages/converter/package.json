@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/converter",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -21,32 +22,32 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
+  "main": "dist/esm/src/index.browser.js",
+  "module": "dist/esm/src/index.browser.js",
   "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
       "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js",
+      "node": "./dist/esm/src/index.node.js",
       "default": "./dist/esm/src/index.browser.js",
       "types": "./dist/types/src/index.node.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm build:node",
     "build:esm": "tsc -p tsconfig.esm.json",
+    "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^5.2.133"
   },
   "devDependencies": {
     "@pdfme/generator": "*",
@@ -66,13 +67,19 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },
+    "moduleNameMapper": {
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/generator$": "<rootDir>/../generator/src/index.ts"
+    },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "extensionsToTreatAsEsm": [".ts"]
   },
   "publishConfig": {
     "access": "public"
