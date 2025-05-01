@@ -1,5 +1,6 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
+// @ts-ignore
 import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
 
 describe('pdf2img tests', () => {

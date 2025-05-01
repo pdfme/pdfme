@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/generator",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -21,29 +22,23 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
+  "main": "dist/esm/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
+      "import": "./dist/esm/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs",
+    "test:update-snapshots": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -63,9 +58,11 @@
   "jest": {
     "resolver": "ts-jest-resolver",
     "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
+      "<rootDir>/jest.setup.mjs"
     ],
     "moduleNameMapper": {
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
@@ -80,14 +77,16 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ],
       "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
     },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "extensionsToTreatAsEsm": [".ts"]
   },
   "publishConfig": {
     "access": "public"

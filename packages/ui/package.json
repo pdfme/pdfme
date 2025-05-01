@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/ui",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -31,7 +32,7 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts,.tsx src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
@@ -85,17 +86,19 @@
       "jest-canvas-mock"
     ],
     "setupFilesAfterEnv": [
-      "./__tests__/test-helpers.js"
+      "./__tests__/test-helpers.mjs"
     ],
     "moduleNameMapper": {
-      "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
+      "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.mjs",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
       "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^antd/es/": "antd/lib/",
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
+      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.mjs"
     },
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
@@ -107,7 +110,8 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.json",
+          "useESM": true
         }
       ]
     },
@@ -115,6 +119,7 @@
       "**/*.test.ts",
       "**/*.test.tsx"
     ],
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "transformIgnorePatterns": [
       "/node_modules/(?!lucide-react)"
     ]

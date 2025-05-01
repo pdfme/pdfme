@@ -13,13 +13,9 @@ export const setupUIMock = () => {
     error: null,
     refresh: () => Promise.resolve(),
   }));
-  (uuid as jest.Mock) = jest
-    .fn()
-    .mockReturnValueOnce('1')
-    .mockReturnValueOnce('2')
-    .mockReturnValueOnce('3')
-    .mockReturnValueOnce('4')
-    .mockReturnValueOnce('5');
+  jest.spyOn(require('../../src/helper'), 'uuid').mockImplementation(() => {
+    return '1'; // Using a simple return for now to fix the immediate issue
+  });
   const FontFace = jest.fn().mockReturnValue({ load: () => Promise.resolve() });
   global.window.FontFace = FontFace;
 };

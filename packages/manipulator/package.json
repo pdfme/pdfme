@@ -1,6 +1,7 @@
 {
   "name": "@pdfme/manipulator",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
@@ -21,25 +22,23 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
+  "main": "dist/esm/src/index.js",
   "module": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs",
+    "test:update-snapshots": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.mjs --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -60,7 +59,7 @@
       "**/__tests__/**/*.test.ts"
     ],
     "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
+      "<rootDir>/jest.setup.mjs"
     ],
     "extensionsToTreatAsEsm": [
       ".ts"
@@ -75,7 +74,9 @@
       ]
     },
     "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
+      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts"
     }
   }
 }
