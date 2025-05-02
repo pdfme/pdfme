@@ -507,7 +507,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           }
 
           const onChange =
-            schemasList[pageCursor].filter((s) => s.id === schema.id).length > 0
+            schemasList[pageCursor].some((s) => s.id === schema.id)
               ? (arg) => {
                   // Use type assertion to safely handle the argument
                   type ChangeArg = { key: string; value: unknown };
