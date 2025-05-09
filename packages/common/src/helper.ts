@@ -30,8 +30,8 @@ import {
 
 export const cloneDeep = typeof structuredClone !== 'undefined' 
   ? structuredClone 
-  : (obj: any) => {
-      return JSON.parse(JSON.stringify(obj));
+  : <T>(obj: T): T => {
+      return JSON.parse(JSON.stringify(obj)) as T;
     };
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));

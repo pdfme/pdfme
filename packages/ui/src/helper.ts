@@ -290,7 +290,7 @@ export const template2SchemasList = async (_template: Template) => {
       height: basePdf.height,
     }));
   } else {
-    const b64BasePdf = await getB64BasePdf(basePdf as string | ArrayBuffer | Uint8Array);
+    const b64BasePdf = await getB64BasePdf(basePdf);
     // pdf2size accepts both ArrayBuffer and Uint8Array
     const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
 

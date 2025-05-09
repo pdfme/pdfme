@@ -65,7 +65,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
       );
       _pageSizes = (schemas as Schema[][]).map(() => ({ width, height }));
     } else {
-      const _basePdf = await getB64BasePdf(basePdf as string | ArrayBuffer | Uint8Array);
+      const _basePdf = await getB64BasePdf(basePdf);
 
       const uint8Array = b64toUint8Array(_basePdf);
       // Create a new ArrayBuffer copy to avoid detachment issues
