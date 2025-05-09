@@ -1,5 +1,5 @@
-import { replacePlaceholders } from '../dist/esm/src/expression.js';
-import type { SchemaPageArray } from '../dist/esm/src/types.js';
+import { replacePlaceholders } from '../src/expression.js';
+import type { SchemaPageArray } from '../src/types.js';
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {
