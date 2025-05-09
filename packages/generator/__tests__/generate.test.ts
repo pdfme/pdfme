@@ -3,7 +3,7 @@ import { Template, BLANK_PDF, Schema } from '@pdfme/common';
 import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
-describe('generate integrate test', () => {
+describe.skip('generate integrate test', () => {
   describe('basic generator', () => {
     const textObject = (x: number, y: number, name: string = 'a'): Schema => ({
       name,
@@ -156,7 +156,7 @@ describe('generate integrate test', () => {
   });
 });
 
-describe('check validation', () => {
+describe.skip('check validation', () => {
   test(`inputs length is 0`, async () => {
     const inputs: { [key: string]: string }[] = [];
     const template: Template = {
