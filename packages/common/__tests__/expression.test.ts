@@ -1,30 +1,31 @@
 import type { SchemaPageArray } from '../src/types.js';
+import * as commonModule from '../src/index.js';
 
 describe('replacePlaceholders', () => {
-  it('should return content as is if there are no placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/index.js');
+  it('should return content as is if there are no placeholders', () => {
+    const { replacePlaceholders } = commonModule;
     const content = 'Hello, world!';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe(content);
   });
 
-  it('should replace placeholders with variables', async () => {
-    const { replacePlaceholders } = await import('../src/index.js');
+  it('should replace placeholders with variables', () => {
+    const { replacePlaceholders } = commonModule;
     const content = 'Hello, {name}!';
     const variables = { name: 'Alice' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('Hello, Alice!');
   });
 
-  it('should evaluate expressions within placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/index.js');
+  it('should evaluate expressions within placeholders', () => {
+    const { replacePlaceholders } = commonModule;
     const content = 'The sum is {1 + 2}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe('The sum is 3.');
   });
 
-  it('should handle date and dateTime placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/index.js');
+  it('should handle date and dateTime placeholders', () => {
+    const { replacePlaceholders } = commonModule;
     const content = 'Today is {date} and now is {dateTime}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     const date = new Date();
@@ -38,8 +39,8 @@ describe('replacePlaceholders', () => {
     expect(result).toBe(`Today is ${formattedDate} and now is ${formattedDateTime}.`);
   });
 
-  it('should handle data from schemas', async () => {
-    const { replacePlaceholders } = await import('../src/index.js');
+  it('should handle data from schemas', () => {
+    const { replacePlaceholders } = commonModule;
     const content = 'Schema content: {name}';
     const variables = {};
     const schemas = [

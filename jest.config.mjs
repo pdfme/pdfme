@@ -34,5 +34,10 @@ export default {
     '/dist/',
     '/playground/e2e/'
   ],
-  resolver: undefined
+  resolver: undefined,
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    }
+  }
 };
