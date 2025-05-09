@@ -37,8 +37,8 @@
     "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -56,13 +56,14 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
+    "preset": "ts-jest/presets/default-esm",
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
+      "^.+\\\\.(css|less|scss)$": "identity-obj-proxy",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!(air-datepicker)/)"
@@ -71,11 +72,13 @@
       "js",
       "ts"
     ],
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "transform": {
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ],
       "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"

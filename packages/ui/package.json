@@ -31,7 +31,7 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts,.tsx src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
@@ -80,6 +80,7 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "jest-environment-jsdom",
     "setupFiles": [
       "jest-canvas-mock"
@@ -95,9 +96,10 @@
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
+      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
-    "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -107,7 +109,8 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.json",
+          "useESM": true
         }
       ]
     },

@@ -35,8 +35,8 @@
     "build": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --updateSnapshot",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },

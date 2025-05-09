@@ -36,7 +36,7 @@
     "build": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -54,7 +54,8 @@
     "canvas": "^2.11.0"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
+    "preset": "ts-jest/presets/default-esm",
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -63,9 +64,13 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "testMatch": [
       "**/*.test.ts"
