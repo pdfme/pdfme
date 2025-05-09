@@ -27,5 +27,10 @@ export default {
   ],
   transformIgnorePatterns: [
     '/node_modules/(?!(air-datepicker)/)'
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/playground/e2e/'
   ]
 };
