@@ -19,7 +19,7 @@ import {
   checkUIProps,
   checkTemplate,
   checkGenerateProps
-} from '../dist/esm/src/helper.js';
+} from '../src/helper.js';
 
 describe('helper', () => {
   it('should export functions', () => {
