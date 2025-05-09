@@ -22,14 +22,14 @@
     "url": "https://github.com/pdfme/pdfme/issues"
   },
   "type": "module",
-  "main": "./dist/esm/src/index.browser.js",
-  "module": "./dist/esm/src/index.browser.js",
+  "main": "./dist/esm/index.browser.js",
+  "module": "./dist/esm/index.browser.js",
   "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/esm/src/index.node.js",
-      "import": "./dist/esm/src/index.browser.js",
+      "browser": "./dist/esm/index.browser.js",
+      "node": "./dist/esm/index.node.js",
+      "import": "./dist/esm/index.browser.js",
       "types": "./src/index.d.ts"
     }
   },
@@ -45,7 +45,7 @@
   "dependencies": {
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^5.2.133"
   },
   "devDependencies": {
     "@pdfme/generator": "*",
