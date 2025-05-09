@@ -1,27 +1,30 @@
-import { replacePlaceholders } from '../src/expression.js';
 import type { SchemaPageArray } from '../src/types.js';
 
 describe('replacePlaceholders', () => {
-  it('should return content as is if there are no placeholders', () => {
+  it('should return content as is if there are no placeholders', async () => {
+    const { replacePlaceholders } = await import('../src/expression.js');
     const content = 'Hello, world!';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe(content);
   });
 
-  it('should replace placeholders with variables', () => {
+  it('should replace placeholders with variables', async () => {
+    const { replacePlaceholders } = await import('../src/expression.js');
     const content = 'Hello, {name}!';
     const variables = { name: 'Alice' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('Hello, Alice!');
   });
 
-  it('should evaluate expressions within placeholders', () => {
+  it('should evaluate expressions within placeholders', async () => {
+    const { replacePlaceholders } = await import('../src/expression.js');
     const content = 'The sum is {1 + 2}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe('The sum is 3.');
   });
 
-  it('should handle date and dateTime placeholders', () => {
+  it('should handle date and dateTime placeholders', async () => {
+    const { replacePlaceholders } = await import('../src/expression.js');
     const content = 'Today is {date} and now is {dateTime}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     const date = new Date();
@@ -35,7 +38,8 @@ describe('replacePlaceholders', () => {
     expect(result).toBe(`Today is ${formattedDate} and now is ${formattedDateTime}.`);
   });
 
-  it('should handle data from schemas', () => {
+  it('should handle data from schemas', async () => {
+    const { replacePlaceholders } = await import('../src/expression.js');
     const content = 'Schema content: {name}';
     const variables = {};
     const schemas = [
