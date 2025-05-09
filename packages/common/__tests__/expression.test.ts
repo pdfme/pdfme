@@ -1,7 +1,5 @@
-import * as expressionModule from '../src/expression.js';
+import { replacePlaceholders } from '../src/index.js';
 import type { SchemaPageArray } from '../src/types.js';
-
-const { replacePlaceholders } = expressionModule;
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {

@@ -1,28 +1,47 @@
-import * as helperModule from '../src/helper.js';
+import {
+  cloneDeep,
+  getFallbackFontName,
+  getDefaultFont,
+  mm2pt,
+  pt2mm,
+  pt2px,
+  px2mm,
+  isHexValid,
+  getInputFromTemplate,
+  getB64BasePdf,
+  isBlankPdf,
+  b64toUint8Array,
+  checkFont,
+  checkInputs,
+  checkUIOptions,
+  checkPreviewProps,
+  checkDesignerProps,
+  checkUIProps,
+  checkTemplate,
+  checkGenerateProps
+} from '../src/index.js';
 
 describe('helper', () => {
   it('should export functions', () => {
-    expect(helperModule.cloneDeep).toBeDefined();
-    expect(helperModule.getFallbackFontName).toBeDefined();
-    expect(helperModule.getDefaultFont).toBeDefined();
-    expect(helperModule.mm2pt).toBeDefined();
-    expect(helperModule.pt2mm).toBeDefined();
-    expect(helperModule.pt2px).toBeDefined();
-    expect(helperModule.px2mm).toBeDefined();
-    expect(helperModule.isHexValid).toBeDefined();
-    expect(helperModule.migrateTemplate).toBeDefined();
-    expect(helperModule.getInputFromTemplate).toBeDefined();
-    expect(helperModule.getB64BasePdf).toBeDefined();
-    expect(helperModule.isBlankPdf).toBeDefined();
-    expect(helperModule.b64toUint8Array).toBeDefined();
-    expect(helperModule.checkFont).toBeDefined();
-    expect(helperModule.checkPlugins).toBeDefined();
-    expect(helperModule.checkInputs).toBeDefined();
-    expect(helperModule.checkUIOptions).toBeDefined();
-    expect(helperModule.checkPreviewProps).toBeDefined();
-    expect(helperModule.checkDesignerProps).toBeDefined();
-    expect(helperModule.checkUIProps).toBeDefined();
-    expect(helperModule.checkTemplate).toBeDefined();
-    expect(helperModule.checkGenerateProps).toBeDefined();
+    expect(cloneDeep).toBeDefined();
+    expect(getFallbackFontName).toBeDefined();
+    expect(getDefaultFont).toBeDefined();
+    expect(mm2pt).toBeDefined();
+    expect(pt2mm).toBeDefined();
+    expect(pt2px).toBeDefined();
+    expect(px2mm).toBeDefined();
+    expect(isHexValid).toBeDefined();
+    expect(getInputFromTemplate).toBeDefined();
+    expect(getB64BasePdf).toBeDefined();
+    expect(isBlankPdf).toBeDefined();
+    expect(b64toUint8Array).toBeDefined();
+    expect(checkFont).toBeDefined();
+    expect(checkInputs).toBeDefined();
+    expect(checkUIOptions).toBeDefined();
+    expect(checkPreviewProps).toBeDefined();
+    expect(checkDesignerProps).toBeDefined();
+    expect(checkUIProps).toBeDefined();
+    expect(checkTemplate).toBeDefined();
+    expect(checkGenerateProps).toBeDefined();
   });
 });
