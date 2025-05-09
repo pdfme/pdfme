@@ -11,6 +11,7 @@ import {
   Size,
   isBlankPdf,
   Plugins,
+  Schema,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
@@ -267,8 +268,8 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
 };
 
 const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
-  template.schemas.forEach((page) => {
-    page.forEach((schema) => {
+  (template.schemas as Schema[][]).forEach((page: Schema[]) => {
+    page.forEach((schema: Schema) => {
       (schema as SchemaForUI).id = uuid();
       (schema as SchemaForUI).content = schema.content || '';
     });
@@ -284,12 +285,12 @@ export const template2SchemasList = async (_template: Template) => {
 
   let pageSizes: Size[] = [];
   if (isBlankPdf(basePdf)) {
-    pageSizes = schemas.map(() => ({
+    pageSizes = (schemas as Schema[][]).map(() => ({
       width: basePdf.width,
       height: basePdf.height,
     }));
   } else {
-    const b64BasePdf = await getB64BasePdf(basePdf);
+    const b64BasePdf = await getB64BasePdf(basePdf as string | ArrayBuffer | Uint8Array);
     // pdf2size accepts both ArrayBuffer and Uint8Array
     const pdfArrayBuffer = b64toUint8Array(b64BasePdf);
 

@@ -27,8 +27,12 @@
   "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
+      "browser": "./dist/esm/src/index.browser.js",
+      "node": "./dist/esm/src/index.node.js",
       "import": "./dist/esm/src/index.browser.js",
-      "types": "./dist/types/src/index.node.d.ts"
+      "require": "./dist/esm/src/index.node.js",
+      "default": "./dist/esm/src/index.browser.js",
+      "types": "./src/index.d.ts"
     }
   },
   "scripts": {

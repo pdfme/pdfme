@@ -324,7 +324,7 @@ describe.skip('PDF manipulator E2E Tests with real PDF files', () => {
   //
   // merge
   //
-  test('merge: merge a.pdf, b.pdf, c.pdf in order', async () => {
+  test.skip('merge: merge a.pdf, b.pdf, c.pdf in order', async () => {
     const mergedBuffer = await merge([aPdf, bPdf, cPdf]);
 
     const images = await pdfToImages(mergedBuffer);
@@ -338,7 +338,7 @@ describe.skip('PDF manipulator E2E Tests with real PDF files', () => {
   //
   // split
   //
-  test('split: split 5p.pdf into pages 1-2 and 3-5', async () => {
+  test.skip('split: split 5p.pdf into pages 1-2 and 3-5', async () => {
     const [split12, split35] = await split(fiveP, [
       { start: 0, end: 1 }, // pages 1-2
       { start: 2, end: 4 }, // pages 3-5
@@ -363,7 +363,7 @@ describe.skip('PDF manipulator E2E Tests with real PDF files', () => {
   //
   // remove
   //
-  test('remove: remove the 1st page of 5p.pdf', async () => {
+  test.skip('remove: remove the 1st page of 5p.pdf', async () => {
     const removed = await remove(fiveP, [0]);
 
     const images = await pdfToImages(removed);
@@ -374,7 +374,7 @@ describe.skip('PDF manipulator E2E Tests with real PDF files', () => {
     }
   });
 
-  test('remove: remove the 1st and 3rd pages of 5p.pdf', async () => {
+  test.skip('remove: remove the 1st and 3rd pages of 5p.pdf', async () => {
     // Note: This assumes removing all at once, not one by one with index shifting
     const removed = await remove(fiveP, [0, 2]);
 

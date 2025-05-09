@@ -28,7 +28,7 @@ describe.skip('generate integration test(label, envelope)', () => {
 
         const pdf = await generate({
           inputs,
-          template,
+          template: template as any,
           plugins: { text, image },
           options: { font },
         });

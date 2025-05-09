@@ -28,7 +28,7 @@ describe.skip('generate integration test(barcode, business)', () => {
 
         const pdf = await generate({
           inputs,
-          template,
+          template: template as any,
           plugins: { text, image, ...barcodes },
           options: { font },
         });

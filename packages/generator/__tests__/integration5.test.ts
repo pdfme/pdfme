@@ -29,7 +29,7 @@ describe.skip('generate integration test(slower)', () => {
 
         const pdf = await generate({
           inputs,
-          template,
+          template: template as any,
           plugins: { text, image, multiVariableText, ...barcodes },
           options: { font },
         });

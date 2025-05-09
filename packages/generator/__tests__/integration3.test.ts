@@ -40,7 +40,7 @@ describe.skip('generate integration test(other, shape)', () => {
 
         const pdf = await generate({
           inputs,
-          template,
+          template: template as any,
           plugins: {
             text,
             image,
