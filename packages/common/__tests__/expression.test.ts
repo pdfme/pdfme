@@ -2,14 +2,14 @@ import type { SchemaPageArray } from '../src/types.js';
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/expression.js');
+    const { replacePlaceholders } = await import('../src/index.js');
     const content = 'Hello, world!';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe(content);
   });
 
   it('should replace placeholders with variables', async () => {
-    const { replacePlaceholders } = await import('../src/expression.js');
+    const { replacePlaceholders } = await import('../src/index.js');
     const content = 'Hello, {name}!';
     const variables = { name: 'Alice' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
@@ -17,14 +17,14 @@ describe('replacePlaceholders', () => {
   });
 
   it('should evaluate expressions within placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/expression.js');
+    const { replacePlaceholders } = await import('../src/index.js');
     const content = 'The sum is {1 + 2}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe('The sum is 3.');
   });
 
   it('should handle date and dateTime placeholders', async () => {
-    const { replacePlaceholders } = await import('../src/expression.js');
+    const { replacePlaceholders } = await import('../src/index.js');
     const content = 'Today is {date} and now is {dateTime}.';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     const date = new Date();
@@ -39,7 +39,7 @@ describe('replacePlaceholders', () => {
   });
 
   it('should handle data from schemas', async () => {
-    const { replacePlaceholders } = await import('../src/expression.js');
+    const { replacePlaceholders } = await import('../src/index.js');
     const content = 'Schema content: {name}';
     const variables = {};
     const schemas = [

@@ -1,6 +1,6 @@
 describe('helper', () => {
   it('should export functions', async () => {
-    const helperModule = await import('../src/helper.js');
+    const helperModule = await import('../src/index.js');
     
     expect(helperModule.cloneDeep).toBeDefined();
     expect(helperModule.getFallbackFontName).toBeDefined();
