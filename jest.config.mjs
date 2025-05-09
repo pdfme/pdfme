@@ -13,6 +13,7 @@ export default {
         }
       },
     ],
+    '^.+\\.js$': '<rootDir>/jest-transformer/esm-transformer.js'
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
@@ -21,9 +22,7 @@ export default {
   },
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
-    '<rootDir>/packages/ui/__tests__/test-helpers.js',
-    '<rootDir>/packages/generator/jest.setup.js',
-    '<rootDir>/packages/manipulator/jest.setup.js'
+    '<rootDir>/packages/common/jest.setup.js'
   ],
   transformIgnorePatterns: [
     '/node_modules/(?!(air-datepicker)/)'
