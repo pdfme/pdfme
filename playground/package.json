@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run generate-template-assets && vite",
+    "dev": "vite",
+    "prebuild": "npm run generate-template-assets",
     "build": "vite build && npm run copy-vercel-config",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
     "preview": "vite preview",
@@ -12,9 +13,9 @@
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"import('fs').then(fs => fs.copyFileSync('vercel.json', 'dist/vercel.json'))\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs",
-    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs --updateSnapshot",
-    "test:local": "LOCAL=true node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs"
+    "test": "jest --config=jest.config.mjs",
+    "test:update-snapshots": "jest --config=jest.config.mjs --updateSnapshot",
+    "test:local": "LOCAL=true jest --config=jest.config.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -26,7 +27,7 @@
     "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^9.5.0",
     "@sentry/vite-plugin": "^3.2.2",
-    "canvas": "^2.11.2",
+    "canvas": "^3.1.0",
     "esbuild": "^0.19.10",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",

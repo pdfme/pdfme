@@ -38,7 +38,7 @@
     "build": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test": "jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -50,14 +50,17 @@
   "devDependencies": {
     "@pdfme/generator": "*",
     "@types/estree": "^1.0.6",
-    "canvas": "^2.11.2"
+    "canvas": "^3.1.0"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.0"
+    "canvas": "^3.1.0"
   },
   "jest": {
     "preset": "ts-jest/presets/default-esm",
-    "extensionsToTreatAsEsm": [".ts", ".tsx"],
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts"
