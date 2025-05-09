@@ -6,12 +6,26 @@ export default {
       'ts-jest',
       {
         useESM: true,
+        tsconfig: {
+          jsx: 'react',
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true
+        }
       },
     ],
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
     '^@pdfme/(.*)$': '<rootDir>/packages/$1/src',
+    '\\.(css|less|scss)$': 'identity-obj-proxy'
   },
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    '<rootDir>/packages/ui/__tests__/test-helpers.js',
+    '<rootDir>/packages/generator/jest.setup.js',
+    '<rootDir>/packages/manipulator/jest.setup.js'
+  ],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(air-datepicker)/)'
+  ]
 };
