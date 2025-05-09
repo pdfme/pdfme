@@ -1,4 +1,8 @@
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
+import * as nodeModule from '../src/index.node.js';
+
+const nodePdf2Img = nodeModule.pdf2img;
+const nodePdf2Size = nodeModule.pdf2size;
+const img2pdf = nodeModule.img2pdf;
 
 const generate = async (props) => {
   // Create a simple PDF buffer for testing
