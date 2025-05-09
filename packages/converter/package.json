@@ -23,14 +23,11 @@
   },
   "type": "module",
   "main": "dist/esm/src/index.browser.js",
+  "module": "dist/esm/src/index.browser.js",
   "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "browser": "./dist/esm/src/index.browser.js",
-        "node": "./dist/esm/src/index.node.js",
-        "default": "./dist/esm/src/index.browser.js"
-      },
+      "import": "./dist/esm/src/index.browser.js",
       "types": "./dist/types/src/index.node.d.ts"
     }
   },
