@@ -38,7 +38,6 @@
     "dev": "tsc -p tsconfig.esm.json -w",
     "build": "tsc -p tsconfig.esm.json",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "echo 'Skipping node build for ESM-only'",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",

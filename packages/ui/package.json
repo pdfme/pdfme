@@ -27,10 +27,10 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/src/index.d.ts",
       "import": "./dist/index.es.js",
       "require": "./dist/index.es.js",
-      "default": "./dist/index.es.js",
-      "types": "./dist/types/src/index.d.ts"
+      "default": "./dist/index.es.js"
     }
   },
   "scripts": {
