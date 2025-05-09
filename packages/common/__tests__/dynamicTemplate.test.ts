@@ -1,7 +1,7 @@
-import * as commonModule from '../src/index.js';
+import { getDynamicTemplate } from '../src/dynamicTemplate.js';
 
 describe('dynamicTemplate', () => {
   it('should export functions', () => {
-    expect(commonModule.getDynamicTemplate).toBeDefined();
+    expect(getDynamicTemplate).toBeDefined();
   });
 });
