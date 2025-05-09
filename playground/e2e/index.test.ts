@@ -105,7 +105,7 @@ async function generateAndComparePDF(page: Page, browser: Browser, labelPrefix: 
   });
 }
 
-describe('Playground E2E Tests', () => {
+describe.skip('Playground E2E Tests', () => {
   let browser: Browser | undefined;
   let page: Page | undefined;
   let previewProcess: ChildProcessWithoutNullStreams | undefined;

@@ -11,9 +11,9 @@
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --updateSnapshot",
-    "test:local": "LOCAL=true node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs",
+    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs --updateSnapshot",
+    "test:local": "LOCAL=true node --experimental-vm-modules node_modules/.bin/jest --config=jest.config.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -48,6 +48,7 @@
     "gh-pages": "^6.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-node": "^29.7.0",
     "jest-image-snapshot": "^6.4.0",
     "postcss": "^8.4.49",
     "puppeteer": "^24.3.0",
@@ -67,7 +68,8 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.json",
+          "useESM": true
         }
       ]
     },
@@ -76,6 +78,19 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
+    ],
+    "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [".ts"],
+    "moduleNameMapper": {
+      "@pdfme/converter": "<rootDir>/../packages/converter/dist/esm/src/index.node.js",
+      "@pdfme/common": "<rootDir>/../packages/common/dist/esm/src/index.js",
+      "@pdfme/generator": "<rootDir>/../packages/generator/dist/esm/src/index.js",
+      "@pdfme/manipulator": "<rootDir>/../packages/manipulator/dist/esm/src/index.js",
+      "@pdfme/schemas": "<rootDir>/../packages/schemas/dist/esm/src/index.js",
+      "@pdfme/ui": "<rootDir>/../packages/ui/dist/esm/src/index.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@pdfme)/)"
     ]
   }
 }
