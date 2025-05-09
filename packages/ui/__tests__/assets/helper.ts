@@ -1,5 +1,5 @@
 import * as hooks from '../../src/hooks.js';
-import { uuid } from '../../src/helper.js';
+import * as helper from '../../src/helper.js';
 import { BLANK_PDF, Template } from '@pdfme/common';
 
 export const setupUIMock = () => {
@@ -13,13 +13,14 @@ export const setupUIMock = () => {
     error: null,
     refresh: () => Promise.resolve(),
   }));
-  (uuid as jest.Mock) = jest
-    .fn()
+  
+  jest.spyOn(helper, 'uuid')
     .mockReturnValueOnce('1')
     .mockReturnValueOnce('2')
     .mockReturnValueOnce('3')
     .mockReturnValueOnce('4')
     .mockReturnValueOnce('5');
+    
   const FontFace = jest.fn().mockReturnValue({ load: () => Promise.resolve() });
   global.window.FontFace = FontFace;
 };
