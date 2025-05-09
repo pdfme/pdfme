@@ -1,29 +1,29 @@
 import type { SchemaPageArray } from '../src/types.js';
-import { replacePlaceholders } from '../src/index.js';
+import * as common from '../src/index.js';
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {
     const content = 'Hello, world!';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    const result = common.replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe(content);
   });
 
   it('should replace placeholders with variables', () => {
     const content = 'Hello, {name}!';
     const variables = { name: 'Alice' };
-    const result = replacePlaceholders({ content, variables, schemas: [] });
+    const result = common.replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('Hello, Alice!');
   });
 
   it('should evaluate expressions within placeholders', () => {
     const content = 'The sum is {1 + 2}.';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    const result = common.replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe('The sum is 3.');
   });
 
   it('should handle date and dateTime placeholders', () => {
     const content = 'Today is {date} and now is {dateTime}.';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    const result = common.replacePlaceholders({ content, variables: {}, schemas: [] });
     const date = new Date();
     const padZero = (num: number) => String(num).padStart(2, '0');
     const formattedDate = `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(
@@ -48,7 +48,7 @@ describe('replacePlaceholders', () => {
         },
       ],
     ] as SchemaPageArray;
-    const result = replacePlaceholders({ content, variables, schemas });
+    const result = common.replacePlaceholders({ content, variables, schemas });
     expect(result).toBe('Schema content: SchemaName');
   });
 });
