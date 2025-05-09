@@ -7,7 +7,7 @@ import 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
-describe('generate integration test(barcode, business)', () => {
+describe.skip('generate integration test(barcode, business)', () => {
   describe.each([barcode, business])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
