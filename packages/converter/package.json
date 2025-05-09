@@ -22,16 +22,14 @@
     "url": "https://github.com/pdfme/pdfme/issues"
   },
   "type": "module",
-  "main": "dist/esm/src/index.browser.js",
-  "module": "dist/esm/src/index.browser.js",
-  "types": "dist/types/src/index.node.d.ts",
+  "main": "./dist/esm/src/index.browser.js",
+  "module": "./dist/esm/src/index.browser.js",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
       "browser": "./dist/esm/src/index.browser.js",
       "node": "./dist/esm/src/index.node.js",
       "import": "./dist/esm/src/index.browser.js",
-      "require": "./dist/esm/src/index.node.js",
-      "default": "./dist/esm/src/index.browser.js",
       "types": "./src/index.d.ts"
     }
   },
