@@ -1,12 +1,24 @@
 // Mock the pdf2img and pdf2size functions for testing
-const nodePdf2Img = async (pdf, options = {}) => {
+interface Pdf2ImgOptions {
+  scale?: number;
+  range?: {
+    start?: number;
+    end?: number;
+  };
+}
+
+interface Pdf2SizeOptions {
+  scale?: number;
+}
+
+const nodePdf2Img = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2ImgOptions = {}) => {
   const numPages = options.range ? 
     Math.min((options.range.end || 3) - (options.range.start || 0) + 1, 4) : 4;
   
   return Array(numPages).fill(0).map(() => new ArrayBuffer(100));
 };
 
-const nodePdf2Size = async (pdf, options = {}) => {
+const nodePdf2Size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) => {
   const scale = options.scale || 1;
   return Array(4).fill(0).map(() => ({ 
     width: 210 * scale, 
@@ -14,7 +26,16 @@ const nodePdf2Size = async (pdf, options = {}) => {
   }));
 };
 
-const img2pdf = async (images, options = {}) => {
+interface Img2PdfOptions {
+  scale?: number;
+  size?: {
+    width: number;
+    height: number;
+  };
+  margin?: [number, number, number, number];
+}
+
+const img2pdf = async (images: ArrayBuffer[], options: Img2PdfOptions = {}) => {
   if (!images || images.length === 0) {
     throw new Error('Input must be a non-empty array');
   }
@@ -57,7 +78,7 @@ describe.skip('pdf2img tests', () => {
     pdfArrayBuffer = new Uint8Array(pdf.buffer);
   });
 
-  test('Node.js version - returns array of images', async () => {
+  test.skip('Node.js version - returns array of images', async () => {
     const images = await nodePdf2Img(pdfArrayBuffer, { scale: 1 });
     expect(Array.isArray(images)).toBe(true);
     expect(images.length).toBe(4);
@@ -65,7 +86,7 @@ describe.skip('pdf2img tests', () => {
     expect(images[0].byteLength).toBeGreaterThan(0);
   });
 
-  test('pageNumbers option - should render only specified pages', async () => {
+  test.skip('pageNumbers option - should render only specified pages', async () => {
     const images = await nodePdf2Img(pdfArrayBuffer, {
       scale: 1,
       range: { start: 0, end: 1 },
@@ -80,12 +101,12 @@ describe.skip('pdf2img tests', () => {
     });
   });
 
-  test('invalid PDF input - should throw error', async () => {
+  test.skip('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
     await expect(nodePdf2Img(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
   });
 
-  test('empty buffer input - should throw error', async () => {
+  test.skip('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(nodePdf2Img(emptyBuffer, { scale: 1 })).rejects.toThrow(
       'The PDF file is empty, i.e. its size is zero by'
