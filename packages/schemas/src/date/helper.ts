@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 
 import AirDatepicker from 'air-datepicker';
-import type { AirDatepickerLocale, AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
+import type { AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
 
 
 import * as dateFns from 'date-fns/locale';
@@ -118,7 +118,7 @@ const strDateToDate = (strDate: string, type: PickerType): Date => {
   return new Date(strDate);
 };
 
-const getFormat = (type: PickerType, locale: Locale): string => {
+const getFormat = (type: PickerType): string => {
   switch (type) {
     case 'date': {
       return 'yyyy-MM-dd';
@@ -166,7 +166,7 @@ const getFmtContent = (date: Date | null, type: PickerType) => {
 
 export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) => {
   const defaultLocale = 'en';
-  const defaultFormat = getFormat(type, getAirDatepickerLocale(defaultLocale));
+  const defaultFormat = getFormat(type);
 
   const plugin: Plugin<DateSchema> = {
     ui: async (arg) => {
@@ -295,7 +295,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         ) {
           changeSchemas([
             { schemaId: activeSchema.id, key: 'locale', value: options.lang },
-            { schemaId: activeSchema.id, key: 'format', value: getFormat(type, locale) },
+            { schemaId: activeSchema.id, key: 'format', value: getFormat(type) },
           ]);
         }
 
@@ -324,8 +324,8 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           format: {
             title: i18n('schemas.date.format'),
             type: 'string',
-            default: getFormat(type, locale),
-            placeholder: getFormat(type, locale),
+            default: getFormat(type),
+            placeholder: getFormat(type),
             rules: [
               {
                 validator: validateDateTimeFormat,

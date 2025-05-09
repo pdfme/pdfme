@@ -10,7 +10,6 @@ import {
   ChangeSchemas,
   isBlankPdf,
   Schema,
-  BasePdf,
 } from '@pdfme/common';
 import { pdf2img, pdf2size } from '@pdfme/converter';
 
