@@ -33,8 +33,7 @@
   "scripts": {
     "dev": "node set-version.js && tsc -p tsconfig.esm.json -w",
     "prebuild": "node set-version.js",
-    "build": "npm-run-all --parallel build:esm",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",

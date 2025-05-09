@@ -42,7 +42,7 @@
     "clean:generator": "npm run -w packages/generator clean",
     "clean:manipulator": "npm run -w packages/manipulator clean",
     "clean:ui": "npm run -w packages/ui clean",
-    "build": "npm run clean && npm run build:common && npm run build:converter && npm run build:schemas && npm-run-all --parallel build:generator build:ui build:manipulator",
+    "build": "npm-run-all clean build:common build:converter build:schemas --parallel build:generator build:ui build:manipulator",
     "build:common": "npm run -w packages/common build",
     "build:converter": "npm run -w packages/converter build",
     "build:schemas": "npm run -w packages/schemas build",
