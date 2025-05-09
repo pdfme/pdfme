@@ -51,7 +51,7 @@
     "prettier": "npm run prettier --workspaces"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.7",
+    "@babel/core": "^7.27.1",
     "@humanwhocodes/config-array": "^0.13.0",
     "@types/jest": "^29.5.14",
     "@types/jest-image-snapshot": "^6.4.0",
