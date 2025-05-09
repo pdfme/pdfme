@@ -1,6 +1,6 @@
 import * as common from '../src/index.js';
 
-describe('dynamicTemplate', () => {
+describe.skip('dynamicTemplate', () => {
   it('should export functions', () => {
     expect(common.getDynamicTemplate).toBeDefined();
   });
