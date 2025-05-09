@@ -11,7 +11,8 @@ export default {
     ],
   },
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^@pdfme/(.*)$': '<rootDir>/../$1/src'
   },
   testEnvironment: 'node',
   testMatch: [
@@ -19,5 +20,8 @@ export default {
   ],
   setupFilesAfterEnv: [
     '<rootDir>/jest.setup.js'
+  ],
+  transformIgnorePatterns: [
+    '/node_modules/(?!(air-datepicker)/)'
   ]
 };
