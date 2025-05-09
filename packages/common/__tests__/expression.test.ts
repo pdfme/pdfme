@@ -1,11 +1,5 @@
-import type { SchemaPageArray } from '../src/types.js';
-
-let replacePlaceholders: any;
-
-beforeAll(async () => {
-  const module = await import('../src/expression.js');
-  replacePlaceholders = module.replacePlaceholders;
-});
+import type { SchemaPageArray } from '../dist/esm/src/types.js';
+import { replacePlaceholders } from '../dist/esm/src/expression.js';
 
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {

@@ -1,9 +1,4 @@
-let getDynamicTemplate: any;
-
-beforeAll(async () => {
-  const module = await import('../src/dynamicTemplate.js');
-  getDynamicTemplate = module.getDynamicTemplate;
-});
+import { getDynamicTemplate } from '../dist/esm/src/dynamicTemplate.js';
 
 describe('dynamicTemplate', () => {
   it('should export functions', () => {
