@@ -1,9 +1,10 @@
 export default {
-  process(sourceText, sourcePath) {
+  process(sourceText) {
     return {
       code: sourceText
         .replace(/export default/g, 'module.exports =')
-        .replace(/export /g, '')
+        .replace(/export (const|let|var|function) /g, '$1 ')
+        .replace(/export type /g, 'type ')
         .replace(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g, 'const $1 = require("$2")')
         .replace(/import\s+\{\s*([^}]+)\s*\}\s+from\s+['"]([^'"]+)['"]/g, (_, imports, path) => {
           const importStatements = imports
