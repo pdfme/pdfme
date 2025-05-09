@@ -9,6 +9,14 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Common package
   - package-ecosystem: "npm"
@@ -18,6 +26,14 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Converter package
   - package-ecosystem: "npm"
@@ -27,6 +43,14 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Generator package
   - package-ecosystem: "npm"
@@ -36,6 +60,14 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Manipulator package
   - package-ecosystem: "npm"
@@ -45,6 +77,14 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Schemas package
   - package-ecosystem: "npm"
@@ -54,6 +94,20 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # UI package
   - package-ecosystem: "npm"
@@ -63,6 +117,20 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Playground
   - package-ecosystem: "npm"
@@ -72,6 +140,20 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Website
   - package-ecosystem: "npm"
@@ -81,3 +163,11 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
