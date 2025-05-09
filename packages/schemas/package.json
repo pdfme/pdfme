@@ -21,36 +21,27 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
+  "type": "module",
+  "main": "dist/esm/src/index.js",
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
+      "import": "./dist/esm/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     },
     "./utils": {
-      "import": {
-        "node": "./dist/node/src/utils.js",
-        "default": "./dist/esm/src/utils.js"
-      },
-      "require": "./dist/cjs/src/utils.js",
+      "import": "./dist/esm/src/utils.js",
       "types": "./dist/types/src/utils.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "tsc -p tsconfig.esm.json",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "build:node": "echo 'Skipping node build for ESM-only'",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -74,7 +65,8 @@
     "@pdfme/common": "latest"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
+    "preset": "ts-jest/presets/default-esm",
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -83,9 +75,13 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
+          "useESM": true,
           "tsconfig": "tsconfig.esm.json"
         }
       ]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "testMatch": [
       "**/*.test.ts"

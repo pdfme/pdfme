@@ -1,5 +1,5 @@
 import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf } from '@pdfme/common';
-import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas } from '../src/helper';
+import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas } from '../src/helper.js';
 import { text, image } from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({

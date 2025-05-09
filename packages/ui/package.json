@@ -21,8 +21,8 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.umd.js",
-  "module": "dist/index.es.js",
+  "type": "module",
+  "main": "dist/index.es.js",
   "types": "dist/types/src/index.d.ts",
   "scripts": {
     "dev": "npm-run-all --parallel devBuild:watch devBuildType:watch",

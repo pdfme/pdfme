@@ -1,5 +1,6 @@
-import jsQR, { QRCode } from 'jsqr';
+import jsQR from 'jsqr';
 import { PNG } from 'pngjs';
+type QRCode = any; // Define QRCode type for compatibility
 import {
   validateBarcodeInput,
   createBarCode,

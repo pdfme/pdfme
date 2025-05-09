@@ -1,19 +1,17 @@
 // Mock for lucide-react
-module.exports = {
-  Plus: () => 'Plus',
-  Minus: () => 'Minus',
-  ChevronLeft: () => 'ChevronLeft',
-  ChevronRight: () => 'ChevronRight',
-  ChevronsLeft: () => 'ChevronsLeft',
-  ChevronsRight: () => 'ChevronsRight',
-  Ellipsis: () => 'Ellipsis',
-  X: () => 'X',
-  Menu: () => 'Menu',
-  GripVertical: () => 'GripVertical',
-  CircleAlert: () => 'CircleAlert',
-  Lock: () => 'Lock',
-  ArrowLeft: () => 'ArrowLeft',
-  ArrowRight: () => 'ArrowRight',
-  LoaderCircle: () => 'LoaderCircle',
-  // Add any other icons used in the codebase
-};
+export const Plus = () => 'Plus';
+export const Minus = () => 'Minus';
+export const ChevronLeft = () => 'ChevronLeft';
+export const ChevronRight = () => 'ChevronRight';
+export const ChevronsLeft = () => 'ChevronsLeft';
+export const ChevronsRight = () => 'ChevronsRight';
+export const Ellipsis = () => 'Ellipsis';
+export const X = () => 'X';
+export const Menu = () => 'Menu';
+export const GripVertical = () => 'GripVertical';
+export const CircleAlert = () => 'CircleAlert';
+export const Lock = () => 'Lock';
+export const ArrowLeft = () => 'ArrowLeft';
+export const ArrowRight = () => 'ArrowRight';
+export const LoaderCircle = () => 'LoaderCircle';
+// Add any other icons used in the codebase
