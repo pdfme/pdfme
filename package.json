@@ -49,7 +49,7 @@
     "build:generator": "npm run -w packages/generator build",
     "build:manipulator": "npm run -w packages/manipulator build",
     "build:ui": "npm run -w packages/ui build",
-    "test": "npm run test --workspaces",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:ui:update-snapshots": "npm run -w packages/ui test -- -u",
     "lint": "npm run lint --workspaces",
     "prettier": "npm run prettier --workspaces"
