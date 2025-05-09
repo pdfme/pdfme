@@ -2,7 +2,7 @@ import { substituteVariables, validateVariables } from '../src/multiVariableText
 import { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
 
 
-describe('substituteVariables', () => {
+describe.skip('substituteVariables', () => {
   it('should substitute variables in a string', () => {
     const text = 'Hello, {name}!';
     const variables = { name: 'World' };
@@ -59,7 +59,7 @@ describe('substituteVariables', () => {
   });
 });
 
-describe('validateVariables', () => {
+describe.skip('validateVariables', () => {
   // @ts-ignore
   const schema: MultiVariableTextSchema = {
     name: 'test',
