@@ -1,4 +1,4 @@
-import { getDynamicTemplate } from '../src/index.js';
+import { getDynamicTemplate } from '../src/dynamicTemplate.js';
 
 describe('dynamicTemplate', () => {
   it('should export functions', () => {

@@ -19,7 +19,7 @@ import {
   checkUIProps,
   checkTemplate,
   checkGenerateProps
-} from '../src/index.js';
+} from '../src/helper.js';
 
 describe('helper', () => {
   it('should export functions', () => {

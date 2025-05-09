@@ -1,4 +1,4 @@
-import { replacePlaceholders } from '../src/index.js';
+import { replacePlaceholders } from '../src/expression.js';
 import type { SchemaPageArray } from '../src/types.js';
 
 describe('replacePlaceholders', () => {
