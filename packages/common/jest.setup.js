@@ -6,4 +6,6 @@ if (typeof globalThis.structuredClone !== 'function') {
   globalThis.structuredClone = (obj) => JSON.parse(JSON.stringify(obj));
 }
 
+global.exports = {};
+
 export default {};

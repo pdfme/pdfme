@@ -1,6 +1,8 @@
 import { replacePlaceholders } from '../src/expression.js';
 import { SchemaPageArray } from '../src/index.js';
 
+const globalThis = global;
+
 describe('replacePlaceholders', () => {
   it('should return content as is if there are no placeholders', () => {
     const content = 'Hello, world!';
