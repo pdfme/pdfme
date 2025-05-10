@@ -1,9 +1,16 @@
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+// @ts-expect-error - PDFJSWorker import is not properly typed but required for functionality
+import * as PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.mjs';
 import { createCanvas } from 'canvas';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
 
-const CMAP_URL = "../../node_modules/pdfjs-dist/cmaps/";
+console.log('🍨PDFJSWorker',PDFJSWorker)
+
+// TODO workerを設定する
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker as unknown as string;
+
+  const CMAP_URL = "../../node_modules/pdfjs-dist/cmaps/";
 // Where the standard fonts are located.
 const STANDARD_FONT_DATA_URL =
   "../../node_modules/pdfjs-dist/standard_fonts/";
