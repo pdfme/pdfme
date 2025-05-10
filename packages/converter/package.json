@@ -21,22 +21,21 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.node.d.ts",
+  "type": "module",
+  "main": "./dist/esm/index.browser.js",
+  "module": "./dist/esm/index.browser.js",
+  "types": "./src/index.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js",
-      "default": "./dist/esm/src/index.browser.js",
-      "types": "./dist/types/src/index.node.d.ts"
+      "browser": "./dist/esm/index.browser.js",
+      "node": "./dist/esm/index.node.js",
+      "import": "./dist/esm/index.browser.js",
+      "types": "./src/index.d.ts"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -46,18 +45,22 @@
   "dependencies": {
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^5.2.133"
   },
   "devDependencies": {
     "@pdfme/generator": "*",
     "@types/estree": "^1.0.6",
-    "canvas": "^2.11.2"
+    "canvas": "^3.1.0"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.0"
+    "canvas": "^3.1.0"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
+    "preset": "ts-jest/presets/default-esm",
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -66,9 +69,13 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
+    },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "testMatch": [
       "**/*.test.ts"

@@ -9,6 +9,7 @@ import {
   SchemaForUI,
   ChangeSchemas,
   isBlankPdf,
+  Schema,
 } from '@pdfme/common';
 import { pdf2img, pdf2size } from '@pdfme/converter';
 
@@ -58,11 +59,11 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
       const { width, height } = basePdf;
       paperWidth = width * ZOOM;
       paperHeight = height * ZOOM;
-      _backgrounds = schemas.map(
+      _backgrounds = (schemas as Schema[][]).map(
         () =>
           'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=',
       );
-      _pageSizes = schemas.map(() => ({ width, height }));
+      _pageSizes = (schemas as Schema[][]).map(() => ({ width, height }));
     } else {
       const _basePdf = await getB64BasePdf(basePdf);
 
@@ -73,7 +74,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
 
       const [_pages, imgBuffers] = await Promise.all([
         pdf2size(pdfArrayBuffer),
-        pdf2img(pdfArrayBuffer.slice(), { scale: maxZoom }),
+        pdf2img(pdfArrayBuffer.slice(0), { scale: maxZoom }),
       ]);
       _pageSizes = _pages;
       paperWidth = _pageSizes[0].width * ZOOM;

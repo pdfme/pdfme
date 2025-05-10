@@ -21,9 +21,18 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.umd.js",
+  "type": "module",
+  "main": "dist/index.es.js",
   "module": "dist/index.es.js",
   "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.es.js",
+      "default": "./dist/index.es.js"
+    }
+  },
   "scripts": {
     "dev": "npm-run-all --parallel devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.es.js --format=esm --watch",
@@ -31,7 +40,7 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts,.tsx src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
@@ -66,6 +75,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "is-path-inside": "^4.0.0",
+    "jest": "^29.7.0",
     "jest-canvas-mock": "^2.3.1",
     "jest-environment-jsdom": "^29.7.0",
     "postcss": "^8.5.3",
@@ -80,6 +90,7 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "jest-environment-jsdom",
     "setupFiles": [
       "jest-canvas-mock"
@@ -95,9 +106,13 @@
       "^form-render/es/": "form-render/lib/",
       "^rc-picker/es/": "rc-picker/lib/",
       "^lodash-es$": "lodash",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
+      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js",
+      "^(\\.{1,2}/.*)\\.js$": "$1"
     },
-    "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [
+      ".ts",
+      ".tsx"
+    ],
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -107,7 +122,8 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.json",
+          "useESM": true
         }
       ]
     },

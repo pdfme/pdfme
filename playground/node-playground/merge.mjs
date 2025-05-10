@@ -1,6 +1,10 @@
-const { merge } = require('@pdfme/manipulator');
-const fs = require('fs');
-const path = require('path');
+import { merge } from '@pdfme/manipulator';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const aPdf = fs.readFileSync(path.join(__dirname, 'a.pdf'));
 const bPdf = fs.readFileSync(path.join(__dirname, 'b.pdf'));

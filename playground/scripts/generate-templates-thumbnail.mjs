@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import pLimit from 'p-limit';
-import { generate } from '@pdfme/generator/cjs/src/index.js';
-import { pdf2img } from '@pdfme/converter/cjs/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '@pdfme/common/cjs/src/index.js';
+import { generate } from '@pdfme/generator';
+import { pdf2img } from '@pdfme/converter';
+import { getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import {
   multiVariableText,
   text,
@@ -21,7 +21,7 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '@pdfme/schemas/cjs/src/index.js';
+} from '@pdfme/schemas';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
