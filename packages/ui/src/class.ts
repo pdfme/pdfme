@@ -23,6 +23,8 @@ import { builtInPlugins } from '@pdfme/schemas';
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;
 
+  protected _isDestroyed!: boolean = false;
+
   protected template!: Template;
 
   protected size!: Size;
@@ -36,7 +38,7 @@ export abstract class BaseUIClass {
   private options: UIOptions = {};
 
   private readonly setSize = debounce(() => {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!this.domContainer && !this._isDestroyed) throw Error(DESTROYED_ERR_MSG);
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
@@ -94,6 +96,10 @@ export abstract class BaseUIClass {
     return this.template;
   }
 
+  public isDestroyed() {
+    return this._isDestroyed;
+  }
+
   public updateTemplate(template: Template) {
     checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
@@ -122,6 +128,7 @@ export abstract class BaseUIClass {
 
     this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;
+    this._isDestroyed = true;
   }
 
   protected abstract render(): void;
