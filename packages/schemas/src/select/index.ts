@@ -203,7 +203,7 @@ const schema: Plugin<Select> = {
       };
     },
     defaultSchema: {
-      ...(parentPropPanel.defaultSchema as TextSchema),
+      ...parentPropPanel.defaultSchema,
       ...additionalDefaultSchema,
     },
     defaultSchemaFn: (props: DefaultSchemaProps) => {

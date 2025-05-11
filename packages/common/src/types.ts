@@ -126,15 +126,13 @@ export type DefaultSchemaProps = {
   options: UIOptions;
 };
 
-
-
 /**
  * Used for customizing the property panel.
  * @template T - Type of the extended Schema object.
  * @property {Record<string, PropPanelSchema> | ((propPanelProps: Omit<PropPanelProps, 'rootElement'>) => Record<string, PropPanelSchema>)} schema - A function returning a form-render schema object or the schema object itself. When a function, it takes properties passed from the designer as arguments.
  * @property {Record<string, (props: PropPanelWidgetProps) => void>} [widgets] - An object of functions returning form-render widgets. The functions take, as arguments, both form-render's WidgetProps and properties passed from the designer.
  * @property {T} defaultSchema - The default schema set when adding the schema.
- * @property {(props: DefaultSchemaProps) => T)} defaultSchemaFn - An optional function to generate the base schema dynamically using run-time args
+ * @property {(props: DefaultSchemaProps) => T} defaultSchemaFn - An optional function to generate the base schema dynamically using run-time args
  */
 export interface PropPanel<T extends Schema> {
   schema:
