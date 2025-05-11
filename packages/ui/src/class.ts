@@ -23,7 +23,7 @@ import { builtInPlugins } from '@pdfme/schemas';
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;
 
-  protected _isDestroyed!: boolean = false;
+  protected _isDestroyed: boolean = false;
 
   protected template!: Template;
 
