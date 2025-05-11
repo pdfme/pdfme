@@ -5,7 +5,7 @@ import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import Renderer from '../Renderer.js';
 import { LEFT_SIDEBAR_WIDTH } from '../../constants.js';
-import { PluginsRegistry } from '../../contexts.js';
+import { OptionsContext, PluginsRegistry } from '../../contexts.js';
 import PluginIcon from './PluginIcon.js';
 
 const Draggable = (props: {
@@ -16,7 +16,9 @@ const Draggable = (props: {
 }) => {
   const { scale, basePdf, plugin } = props;
   const { token } = theme.useToken();
-  const defaultSchema = plugin.propPanel.defaultSchema;
+  const options = useContext(OptionsContext);
+  const propPanel = plugin.propPanel;
+  const defaultSchema = (typeof propPanel.defaultSchemaFn === 'function') ? propPanel.defaultSchemaFn({options}) : propPanel.defaultSchema;
   const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
   const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
   const style = { transform: CSS.Translate.toString(transform) };

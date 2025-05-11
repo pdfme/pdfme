@@ -1,6 +1,11 @@
 import type * as CSS from 'csstype';
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
-import { Plugin, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import {
+  DefaultSchemaProps,
+  Plugin,
+  PropPanelWidgetProps,
+  SchemaForUI,
+} from '@pdfme/common';
 import text from '../text/index.js';
 import { TextSchema } from '../text/types.js';
 import { ChevronDown } from 'lucide';
@@ -11,6 +16,12 @@ const selectIcon = createSvgStr(ChevronDown);
 interface Select extends TextSchema {
   options: string[];
 }
+
+const additionalDefaultSchema = {
+  type: 'select',
+  content: 'option1',
+  options: ['option1', 'option2'],
+};
 
 const addOptions = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -192,10 +203,17 @@ const schema: Plugin<Select> = {
       };
     },
     defaultSchema: {
-      ...(text.propPanel.defaultSchema as TextSchema),
-      type: 'select',
-      content: 'option1',
-      options: ['option1', 'option2'],
+      ...(parentPropPanel.defaultSchema as TextSchema),
+      ...additionalDefaultSchema,
+    },
+    defaultSchemaFn: (props: DefaultSchemaProps) => {
+      if (!parentPropPanel.defaultSchemaFn) {
+        throw new Error('defaultSchemaFn is not defined in parent prop panel');
+      }
+      return {
+        ...parentPropPanel.defaultSchemaFn(props),
+        ...additionalDefaultSchema,
+      };
     },
   },
   icon: selectIcon,

@@ -4,6 +4,7 @@ import {
   PropPanelWidgetProps,
   PropPanelSchema,
   getFallbackFontName,
+  DefaultSchemaProps,
 } from '@pdfme/common';
 import type { TextSchema } from './types.js';
 import {
@@ -21,6 +22,41 @@ import {
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
+
+export const baseDefaultTextSchema: TextSchema = {
+  name: '',
+  type: 'text',
+  content: 'Type Something...',
+  position: { x: 0, y: 0 },
+  width: 45,
+  height: 10,
+  // If the value of "rotate" is set to undefined or not set at all, rotation will be disabled in the UI.
+  // Check this document: https://pdfme.com//docs/custom-schemas#learning-how-to-create-from-pdfmeschemas-code
+  rotate: 0,
+  alignment: DEFAULT_ALIGNMENT,
+  verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
+  fontSize: DEFAULT_FONT_SIZE,
+  lineHeight: DEFAULT_LINE_HEIGHT,
+  characterSpacing: DEFAULT_CHARACTER_SPACING,
+  dynamicFontSize: undefined,
+  fontColor: DEFAULT_FONT_COLOR,
+  fontName: undefined,
+  backgroundColor: '',
+  opacity: DEFAULT_OPACITY,
+  strikethrough: false,
+  underline: false,
+};
+
+const defaultSchemaFn = (props: DefaultSchemaProps) => {
+  const {options} = props;
+  const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
+  const fontName = getFallbackFontName(font);
+
+  return {
+    ...baseDefaultTextSchema,
+    fontName
+  };
+};
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -158,27 +194,6 @@ export const propPanel: PropPanel<TextSchema> = {
     return textSchema;
   },
   widgets: { UseDynamicFontSize },
-  defaultSchema: {
-    name: '',
-    type: 'text',
-    content: 'Type Something...',
-    position: { x: 0, y: 0 },
-    width: 45,
-    height: 10,
-    // If the value of "rotate" is set to undefined or not set at all, rotation will be disabled in the UI.
-    // Check this document: https://pdfme.com//docs/custom-schemas#learning-how-to-create-from-pdfmeschemas-code
-    rotate: 0,
-    alignment: DEFAULT_ALIGNMENT,
-    verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
-    fontSize: DEFAULT_FONT_SIZE,
-    lineHeight: DEFAULT_LINE_HEIGHT,
-    characterSpacing: DEFAULT_CHARACTER_SPACING,
-    dynamicFontSize: undefined,
-    fontColor: DEFAULT_FONT_COLOR,
-    fontName: undefined,
-    backgroundColor: '',
-    opacity: DEFAULT_OPACITY,
-    strikethrough: false,
-    underline: false,
-  },
+  defaultSchema: baseDefaultTextSchema,
+  defaultSchemaFn: defaultSchemaFn,
 };
