@@ -23,6 +23,7 @@ export type CellSchema = Schema & CellStyle;
 
 export interface TableSchema extends Schema {
   showHead: boolean;
+  repeatHead: boolean;
   head: string[];
   headWidthPercentages: number[];
 
@@ -70,6 +71,7 @@ export interface Settings {
   startY: number;
   margin: Spacing;
   tableWidth: number;
+  repeatHead: boolean;
   showHead: boolean;
   tableLineWidth: number;
   tableLineColor: string;

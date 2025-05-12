@@ -33,6 +33,7 @@ interface UserOptions {
   tableWidth: number;
   margin: Spacing;
   showHead: boolean;
+  repeatHead: boolean;
   tableLineWidth?: number;
   tableLineColor?: string;
   head?: string[][];
@@ -193,6 +194,7 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     head: [schema.head],
     body,
     showHead: schema.showHead,
+    repeatHead: schema.repeatHead,
     startY: schema.position.y,
     tableWidth: schema.width,
     tableLineColor: schema.tableStyles.borderColor,
@@ -243,6 +245,7 @@ function parseInput(schema: TableSchema, body: string[][]): TableInput {
     showHead: options.showHead,
     tableLineWidth: options.tableLineWidth ?? 0,
     tableLineColor: options.tableLineColor ?? '',
+    repeatHead: options.repeatHead ?? false,
   };
 
   const content = parseContent4Input(options);
@@ -269,7 +272,14 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : !schema.__isSplit;
+  
+  const copyOfShowHead = schema.showHead;
+  schema.showHead = copyOfShowHead === false ? false : !schema.__isSplit;
+
+  // this will make sure the head is shown when the table is split and repeatHead is true
+  if (schema.repeatHead && schema.__isSplit && copyOfShowHead !== false) {
+    schema.showHead = true;
+  }
 
   const input = parseInput(schema, body);
 
