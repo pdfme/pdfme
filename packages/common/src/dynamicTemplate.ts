@@ -204,6 +204,19 @@ function breakIntoPages(arg: {
   return pages;
 }
 
+// this function is used to get the header height of a table schema
+// when the table is split across multiple pages
+// and the header is repeated on each page
+function getTableHeaderHeight(schema: any): number {
+  const headStyles = schema?.headStyles;
+  const lineHeight = headStyles?.lineHeight || 1;
+  const paddingTop = headStyles.padding?.top || 0;
+  const paddingBottom = headStyles.padding?.bottom || 0;
+  const fontSize = headStyles?.fontSize || 0;
+  const headerHeight = fontSize + paddingTop - lineHeight - paddingBottom;
+  return headerHeight;
+}
+
 function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
   const newTemplate: Template = {
     schemas: Array.from({ length: pages.length }, () => [] as Schema[]),
@@ -256,6 +269,30 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
       }
     });
   });
+
+  let headerHeight = 0;
+  const updatedSchemas = newTemplate.schemas.flat();
+  for (let i = 0; i < updatedSchemas.length; i++) {
+    const currentSchema = updatedSchemas[i];
+ 
+    if (
+      currentSchema.type === 'table' &&
+      currentSchema.__isSplit &&
+      currentSchema.showHead &&
+      currentSchema.repeatHead
+    ) {
+      headerHeight = getTableHeaderHeight(currentSchema);
+      for (let j = i + 1; j < updatedSchemas.length; j++) {
+        const subsequentSchema = updatedSchemas[j];
+ 
+        // Adjust the y-position by adding the header height
+        subsequentSchema.position = {
+          ...subsequentSchema.position,
+          y: subsequentSchema.position.y + headerHeight,
+        };
+      }
+    }
+  }
 
   return newTemplate;
 }
