@@ -194,7 +194,7 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     head: [schema.head],
     body,
     showHead: schema.showHead,
-    repeatHead: schema.repeatHead,
+    repeatHead: schema.repeatHead ?? false,
     startY: schema.position.y,
     tableWidth: schema.width,
     tableLineColor: schema.tableStyles.borderColor,

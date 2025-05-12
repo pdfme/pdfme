@@ -23,7 +23,7 @@ export type CellSchema = Schema & CellStyle;
 
 export interface TableSchema extends Schema {
   showHead: boolean;
-  repeatHead: boolean;
+  repeatHead?: boolean;
   head: string[];
   headWidthPercentages: number[];
 
