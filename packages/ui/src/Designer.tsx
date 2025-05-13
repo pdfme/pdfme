@@ -22,8 +22,8 @@ class Designer extends BaseUIClass {
 
   constructor(props: DesignerProps) {
     super(props);
-    this.initialState = props.initialState;
     checkDesignerProps(props);
+    this.initialState = props.initialState;
   }
 
   public saveTemplate() {

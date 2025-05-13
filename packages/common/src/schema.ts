@@ -206,4 +206,6 @@ export const DesignerInitialStateSchema = z.object({
   sidebarOpen: z.boolean().optional(),
 });
 
-export const DesignerProps = UIProps.extend({}).strict();
+export const DesignerProps = UIProps.extend({
+  initialState: DesignerInitialStateSchema.optional(),
+}).strict();
