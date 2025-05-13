@@ -21,23 +21,25 @@ const Draggable = (props: {
   const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
   const style = { transform: CSS.Translate.toString(transform) };
 
+  const renderedSchema = React.useMemo(() => (
+    <div style={{ transform: `scale(${scale})` }}>
+      <Renderer
+        schema={{ ...defaultSchema, id: defaultSchema.type }}
+        basePdf={basePdf}
+        value={defaultSchema.content || ''}
+        onChangeHoveringSchemaId={() => {
+          void 0;
+        }}
+        mode={'viewer'}
+        outline={`1px solid ${token.colorPrimary}`}
+        scale={scale}
+      />
+    </div>
+  ), [defaultSchema, basePdf, scale, token.colorPrimary]);
+
   return (
     <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {isDragging && (
-        <div style={{ transform: `scale(${scale})` }}>
-          <Renderer
-            schema={{ ...defaultSchema, id: defaultSchema.type }}
-            basePdf={basePdf}
-            value={defaultSchema.content || ''}
-            onChangeHoveringSchemaId={() => {
-              void 0;
-            }}
-            mode={'viewer'}
-            outline={`1px solid ${token.colorPrimary}`}
-            scale={scale}
-          />
-        </div>
-      )}
+      {isDragging && renderedSchema}
       <div style={{ visibility: isDragging ? 'hidden' : 'visible' }}>{props.children}</div>
     </div>
   );
