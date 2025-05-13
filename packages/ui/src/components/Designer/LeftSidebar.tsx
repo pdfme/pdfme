@@ -18,7 +18,7 @@ const Draggable = (props: {
   const { token } = theme.useToken();
   const options = useContext(OptionsContext);
   const propPanel = plugin.propPanel;
-  const defaultSchema = (typeof propPanel.defaultSchemaFn === 'function') ? propPanel.defaultSchemaFn({options}) : propPanel.defaultSchema;
+  const defaultSchema = (typeof propPanel.defaultSchema === 'function') ? propPanel.defaultSchema({options}) : propPanel.defaultSchema;
   const draggable = useDraggable({ id: defaultSchema.type, data: defaultSchema });
   const { listeners, setNodeRef, attributes, transform, isDragging } = draggable;
   const style = { transform: CSS.Translate.toString(transform) };

@@ -187,15 +187,19 @@ const DetailView = (props: DetailViewProps) => {
   const emptySchema: Record<string, unknown> = {};
 
   // Safely access the default schema with proper null checking
-  const defaultSchema: Record<string, unknown> = activePlugin?.propPanel?.defaultSchema
+  const originalDefaultSchema: Record<string, unknown> = typeof activePlugin?.propPanel?.defaultSchema == 'function'
+    ? activePlugin.propPanel.defaultSchema()
+    : activePlugin?.propPanel?.defaultSchema;
+
+  const defaultSchema: Record<string, unknown> = originalDefaultSchema
     ? // Create a safe copy of the schema
       (() => {
         const result: Record<string, unknown> = {};
 
         // Only copy properties that exist on the object
-        for (const key in activePlugin.propPanel.defaultSchema) {
-          if (Object.prototype.hasOwnProperty.call(activePlugin.propPanel.defaultSchema, key)) {
-            result[key] = (activePlugin.propPanel.defaultSchema as Record<string, unknown>)[key];
+        for (const key in originalDefaultSchema) {
+          if (Object.prototype.hasOwnProperty.call(originalDefaultSchema, key)) {
+            result[key] = (originalDefaultSchema as Record<string, unknown>)[key];
           }
         }
 

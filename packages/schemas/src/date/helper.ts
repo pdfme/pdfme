@@ -39,7 +39,7 @@ import localeZh from 'air-datepicker/locale/zh';
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
 
-import { Plugin, getFallbackFontName, DEFAULT_FONT_NAME, PropPanelSchema } from '@pdfme/common';
+import { Plugin, getFallbackFontName, DEFAULT_FONT_NAME, PropPanelSchema, DefaultSchemaProps } from '@pdfme/common';
 import text from '../text/index.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { mapVerticalAlignToFlex } from '../text/uiRender.js';
@@ -431,24 +431,32 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
 
         return dateSchema;
       },
-      defaultSchema: {
-        name: '',
-        format: defaultFormat,
-        type,
-        content: getFmtContent(new Date(), type),
-        position: { x: 0, y: 0 },
-        width: 50,
-        height: 10,
-        rotate: 0,
-        alignment: DEFAULT_ALIGNMENT,
-        fontSize: DEFAULT_FONT_SIZE,
-        characterSpacing: DEFAULT_CHARACTER_SPACING,
-        fontColor: DEFAULT_FONT_COLOR,
-        fontName: undefined,
-        backgroundColor: '',
-        locale: undefined,
-        opacity: DEFAULT_OPACITY,
-      } as DateSchema,
+      defaultSchema: (props?: DefaultSchemaProps) => {
+        let fontName = undefined;
+        if (props) {
+          const { options } = props;
+          const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
+          fontName = getFallbackFontName(font);
+        }
+        return {
+          name: '',
+          format: defaultFormat,
+          type,
+          content: getFmtContent(new Date(), type),
+          position: { x: 0, y: 0 },
+          width: 50,
+          height: 10,
+          rotate: 0,
+          alignment: DEFAULT_ALIGNMENT,
+          fontSize: DEFAULT_FONT_SIZE,
+          characterSpacing: DEFAULT_CHARACTER_SPACING,
+          fontColor: DEFAULT_FONT_COLOR,
+          fontName,
+          backgroundColor: '',
+          locale: undefined,
+          opacity: DEFAULT_OPACITY,
+        } as DateSchema;
+      },
     },
     icon,
   };

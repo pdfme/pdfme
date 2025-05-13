@@ -39,9 +39,11 @@ const PluginIcon = (props: PluginIconProps) => {
   const { token } = theme.useToken();
   const options = useContext(OptionsContext);
 
-  const schemaType = plugin.propPanel.defaultSchema?.type ?? '';
+  const defaultSchemaType = typeof plugin.propPanel?.defaultSchema === 'function'
+    ? plugin.propPanel.defaultSchema().type
+    : plugin.propPanel.defaultSchema.type;
 
-  const icon = options.icons?.[schemaType] ?? plugin.icon;
+  const icon = options.icons?.[defaultSchemaType] ?? plugin.icon;
   const iconStyles = {
     ...styles,
     color: token.colorText,

@@ -336,8 +336,11 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const defaultSchemas: Record<string, unknown>[] = [];
 
     pluginsRegistry.entries().forEach(([, plugin]) => {
-      if (plugin.propPanel.defaultSchema) {
-        defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
+      const defaultSchema = typeof plugin?.propPanel?.defaultSchema == 'function'
+        ? plugin.propPanel.defaultSchema()
+        : plugin?.propPanel?.defaultSchema;
+      if (defaultSchema) {
+        defaultSchemas.push(defaultSchema as Record<string, unknown>);
       }
     });
 

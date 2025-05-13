@@ -466,7 +466,10 @@ const handleTypeChange = (
 
   // Apply default schema properties if available
   if (plugin?.propPanel.defaultSchema) {
-    const defaultSchema = plugin.propPanel.defaultSchema;
+    const defaultSchema = typeof plugin.propPanel.defaultSchema == 'function'
+      ? plugin.propPanel.defaultSchema()
+      : plugin.propPanel.defaultSchema;
+
     const schemaRecord = schema as Record<string, unknown>;
 
     // Use a type-safe approach to copy properties

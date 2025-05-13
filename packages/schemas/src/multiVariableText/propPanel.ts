@@ -6,25 +6,6 @@ import {
 } from '@pdfme/common';
 import { MultiVariableTextSchema } from './types.js';
 
-const mvtAdditionalDefaultSchema = {
-  readOnly: false,
-  type: 'multiVariableText',
-  text: 'Add text here using {} for variables ',
-  width: 50,
-  height: 15,
-  content: '{}',
-  variables: [],
-}
-
-const defaultSchemaFn = function(props: DefaultSchemaProps) {
-  if (!parentPropPanel.defaultSchemaFn) {
-    throw new Error('defaultSchemaFn is not defined in parent prop panel');
-  }
-  return {
-    ...parentPropPanel.defaultSchemaFn(props),
-    ...mvtAdditionalDefaultSchema,
-  };
-};
 
 const mapDynamicVariables = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n, options } = props;
@@ -138,11 +119,22 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
     };
   },
   widgets: { ...(parentPropPanel.widgets || {}), mapDynamicVariables },
-  defaultSchema: {
-    ...parentPropPanel.defaultSchema,
-    ...mvtAdditionalDefaultSchema,
+  defaultSchema: (props?: DefaultSchemaProps)=> {
+    const parentDefaultSchema = typeof parentPropPanel.defaultSchema === 'function'
+      ? parentPropPanel.defaultSchema(props)
+      : parentPropPanel.defaultSchema;
+
+    return {
+      ...parentDefaultSchema,
+      readOnly: false,
+      type: 'multiVariableText',
+      text: 'Add text here using {} for variables ',
+      width: 50,
+      height: 15,
+      content: '{}',
+      variables: [],
+    };
   },
-  defaultSchemaFn
 };
 
 const updateVariablesFromText = (text: string, variables: Record<string, string>): boolean => {

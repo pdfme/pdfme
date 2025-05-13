@@ -17,12 +17,6 @@ interface Select extends TextSchema {
   options: string[];
 }
 
-const additionalDefaultSchema = {
-  type: 'select',
-  content: 'option1',
-  options: ['option1', 'option2'],
-};
-
 const addOptions = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
 
@@ -202,17 +196,16 @@ const schema: Plugin<Select> = {
         },
       };
     },
-    defaultSchema: {
-      ...parentPropPanel.defaultSchema,
-      ...additionalDefaultSchema,
-    },
-    defaultSchemaFn: (props: DefaultSchemaProps) => {
-      if (!parentPropPanel.defaultSchemaFn) {
-        throw new Error('defaultSchemaFn is not defined in parent prop panel');
-      }
+    defaultSchema: (props?: DefaultSchemaProps) => {
+      const parentDefaultSchema = typeof parentPropPanel.defaultSchema === 'function'
+        ? parentPropPanel.defaultSchema(props)
+        : parentPropPanel.defaultSchema;
+
       return {
-        ...parentPropPanel.defaultSchemaFn(props),
-        ...additionalDefaultSchema,
+        ...parentDefaultSchema,
+        type: 'select',
+        content: 'option1',
+        options: ['option1', 'option2'],
       };
     },
   },
