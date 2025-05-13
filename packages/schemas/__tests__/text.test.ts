@@ -10,6 +10,7 @@ import {
   getSplittedLines,
   filterStartJP,
   filterEndJP,
+  widthOfTextAtSize,
 } from '../src/text/helper.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
@@ -51,9 +52,10 @@ describe('getSplitPosition test with mocked font width calculations', () => {
 
   let widthOfTextAtSizeSpy: jest.SpyInstance<number, [string]>;
 
-  beforeAll(() => {
-    // @ts-ignore
-    widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper'), 'widthOfTextAtSize');
+  beforeAll(async () => {
+    const helperModule = await import('../src/text/helper.js');
+    // @ts-ignore - Type mismatch is expected as we're simplifying the mock
+    widthOfTextAtSizeSpy = jest.spyOn(helperModule, 'widthOfTextAtSize');
     widthOfTextAtSizeSpy.mockImplementation((text) => {
       return text.length;
     });

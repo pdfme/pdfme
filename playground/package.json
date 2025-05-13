@@ -2,30 +2,32 @@
   "name": "playground",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "npm run generate-template-assets && vite",
-    "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
+    "dev": "vite",
+    "prebuild": "npm run generate-template-assets",
+    "build": "vite build && npm run copy-vercel-config",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b playground",
-    "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
+    "copy-vercel-config": "node -e \"import('fs').then(fs => fs.copyFileSync('vercel.json', 'dist/vercel.json'))\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:update-snapshots": "node --experimental-vm-modules node_modules/.bin/jest --updateSnapshot",
-    "test:local": "LOCAL=true node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "jest --config=jest.config.mjs",
+    "test:update-snapshots": "jest --config=jest.config.mjs --updateSnapshot",
+    "test:local": "LOCAL=true jest --config=jest.config.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
-    "@pdfme/common": "file:../packages/common/dist",
-    "@pdfme/converter": "file:../packages/converter/dist",
-    "@pdfme/generator": "file:../packages/generator/dist",
-    "@pdfme/manipulator": "file:../packages/manipulator/dist",
-    "@pdfme/schemas": "file:../packages/schemas/dist",
-    "@pdfme/ui": "file:../packages/ui/dist",
+    "@pdfme/common": "file:../packages/common",
+    "@pdfme/converter": "file:../packages/converter",
+    "@pdfme/generator": "file:../packages/generator",
+    "@pdfme/manipulator": "file:../packages/manipulator",
+    "@pdfme/schemas": "file:../packages/schemas",
+    "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^9.5.0",
     "@sentry/vite-plugin": "^3.2.2",
-    "canvas": "^2.11.2",
+    "canvas": "^3.1.0",
     "esbuild": "^0.19.10",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
@@ -56,26 +58,5 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
-  },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ]
   }
 }

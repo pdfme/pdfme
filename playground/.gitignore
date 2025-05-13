@@ -25,6 +25,7 @@ dist-ssr
 
 node-playground/test-generate.pdf
 node-playground/test-merge.pdf
+node-playground/output-page-1.png
 public/template-assets/**/thumbnail.png
 public/template-assets/index.json
 scripts/thumbnail-hash-map.json
