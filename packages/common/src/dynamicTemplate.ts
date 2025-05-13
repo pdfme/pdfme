@@ -1,5 +1,5 @@
 import { Font } from 'fontkit';
-import { getFontKitFont, heightOfFontAtSize } from './helper';
+import { getFontKitFont, heightOfFontAtSize, pt2mm } from './helper';
 import { Schema, Template, BasePdf, BlankPdf, CommonOptions } from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
 
@@ -215,20 +215,48 @@ async function getTableHeaderHeight(
   __cache: Map<string | number, unknown>,
 ): Promise<number> {
   const headStyles = schema?.headStyles;
+  if (!headStyles) return 0;
+
   const paddingTop = headStyles.padding?.top || 0;
   const paddingBottom = headStyles.padding?.bottom || 0;
-  if (!options.font) {
-    return headStyles.fontSize + Math.max(paddingBottom, paddingTop);
-  }
-  const fontKitFont = await getFontKitFont(
-    schema.fontName,
-    options.font,
-    __cache as Map<string | number, Font>,
-  );
+  const borderTopWidth = headStyles.borderWidth?.top || 0;
+  const borderBottomWidth = headStyles.borderWidth?.bottom || 0;
+  const fontSize = headStyles.fontSize || 0;
+  const lineHeight = headStyles.lineHeight || 1;
 
-  const heightOfFont = heightOfFontAtSize(fontKitFont, headStyles?.fontSize || 0);
-  const padding = Math.min(paddingBottom, paddingTop);
-  return heightOfFont <= padding ? heightOfFont + padding : heightOfFont;
+  // Calculate font height in mm
+  let fontHeightPt = fontSize;
+  if (options.font) {
+    const fontKitFont = await getFontKitFont(
+      schema.fontName || headStyles.fontName,
+      options.font,
+      __cache as Map<string | number, Font>,
+    );
+    fontHeightPt = heightOfFontAtSize(fontKitFont, fontSize);
+  }
+
+  const fontHeightMm = pt2mm(fontHeightPt);
+
+  // Get the maximum number of lines in any header cell
+  let maxLineCount = 1;
+  if (schema.head && Array.isArray(schema.head)) {
+    for (const headerText of schema.head) {
+      if (typeof headerText === 'string') {
+        const splitRegex = /\r\n|\r|\n/g;
+        const lines = headerText.split(splitRegex);
+        maxLineCount = Math.max(maxLineCount, lines.length);
+      }
+    }
+  }
+
+  const lineHeightMm = fontHeightMm * lineHeight;
+  const textHeightMm = lineHeightMm * maxLineCount;
+
+  // Calculate total cell height: text height + padding + borders
+  let totalHeightMm =
+    textHeightMm + paddingTop + paddingBottom + borderTopWidth + borderBottomWidth;
+
+  return totalHeightMm;
 }
 
 async function createNewTemplate(
