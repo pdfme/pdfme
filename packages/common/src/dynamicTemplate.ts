@@ -227,8 +227,8 @@ async function getTableHeaderHeight(
   );
 
   const heightOfFont = heightOfFontAtSize(fontKitFont, headStyles?.fontSize || 0);
-  const padding = Math.max(paddingBottom, paddingTop);
-  return heightOfFont + padding;
+  const padding = Math.min(paddingBottom, paddingTop);
+  return heightOfFont <= padding ? heightOfFont + padding : heightOfFont;
 }
 
 async function createNewTemplate(
