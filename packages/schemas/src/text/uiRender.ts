@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
-import { UIRenderProps, getDefaultFont } from '@pdfme/common';
+import { UIRenderProps, getDefaultFont, getFontKitFont } from '@pdfme/common';
 import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -16,7 +16,6 @@ import {
 } from './constants.js';
 import {
   calculateDynamicFontSize,
-  getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
 } from './helper.js';

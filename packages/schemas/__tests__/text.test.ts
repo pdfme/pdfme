@@ -1,12 +1,11 @@
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import type { Font as FontKitFont } from 'fontkit';
-import { Font, getDefaultFont } from '@pdfme/common';
+import { Font, getDefaultFont, getFontKitFont } from '@pdfme/common';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
   getFontDescentInPt,
-  getFontKitFont,
   getSplittedLines,
   filterStartJP,
   filterEndJP,

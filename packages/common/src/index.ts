@@ -61,6 +61,8 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  getFontKitFont,
+  heightOfFontAtSize
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
@@ -97,6 +99,8 @@ export {
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
+  heightOfFontAtSize,
+  getFontKitFont
 };
 
 export type {
