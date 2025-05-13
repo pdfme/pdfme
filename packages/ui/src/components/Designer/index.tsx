@@ -7,6 +7,7 @@ import {
   SchemaForUI,
   ChangeSchemas,
   DesignerProps,
+  DesignerInitialState,
   Size,
   isBlankPdf,
   px2mm,
@@ -42,7 +43,14 @@ const scaleDragPosAdjustment = (adjustment: number, scale: number): number => {
   return 0;
 };
 
+export const designerDefaultInitialState: Required<DesignerInitialState> = {
+  pageCursor: 0,
+  zoomLevel: 1,
+  sidebarOpen: true,
+};
+
 const TemplateEditor = ({
+  initialState: maybeInitialState,
   template,
   size,
   onSaveTemplate,
@@ -66,12 +74,18 @@ const TemplateEditor = ({
   const options = useContext(OptionsContext);
   const maxZoom = useMaxZoom();
 
+  const initialState = {
+    ...designerDefaultInitialState,
+    ...(maybeInitialState && maybeInitialState),
+  };
+
+  const [pageCursor, setPageCursor] = useState(initialState.pageCursor);
+  const [zoomLevel, setZoomLevel] = useState(initialState.zoomLevel);
+  const [sidebarOpen, setSidebarOpen] = useState(initialState.sidebarOpen);
+
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
-  const [pageCursor, setPageCursor] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
   const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({

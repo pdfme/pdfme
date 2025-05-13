@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {
   cloneDeep,
   Template,
+  DesignerInitialState,
   DesignerProps,
   checkDesignerProps,
   checkTemplate,
@@ -14,12 +15,14 @@ import DesignerComponent from './components/Designer/index.js';
 import AppContextProvider from './components/AppContextProvider.js';
 
 class Designer extends BaseUIClass {
+  private initialState?: DesignerInitialState;
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
   private pageCursor: number = 0;
 
   constructor(props: DesignerProps) {
     super(props);
+    this.initialState = props.initialState;
     checkDesignerProps(props);
   }
 
@@ -62,6 +65,7 @@ class Designer extends BaseUIClass {
         options={this.getOptions()}
       >
         <DesignerComponent
+          initialState={this.initialState}
           template={this.template}
           onSaveTemplate={(template) => {
             this.template = template;

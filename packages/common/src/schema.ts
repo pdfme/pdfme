@@ -200,4 +200,10 @@ export const UIProps = CommonProps.extend({
 
 export const PreviewProps = UIProps.extend({ inputs: Inputs }).strict();
 
+export const DesignerInitialStateSchema = z.object({
+  pageCursor: z.number().optional(),
+  zoomLevel: z.number().optional(),
+  sidebarOpen: z.boolean().optional(),
+});
+
 export const DesignerProps = UIProps.extend({}).strict();
