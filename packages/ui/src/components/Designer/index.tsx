@@ -76,7 +76,7 @@ const TemplateEditor = ({
 
   const initialState = {
     ...designerDefaultInitialState,
-    ...(maybeInitialState && maybeInitialState),
+    ...(maybeInitialState ?? {}),
   };
 
   const [pageCursor, setPageCursor] = useState(initialState.pageCursor);
