@@ -36,7 +36,9 @@ export abstract class BaseUIClass {
   private options: UIOptions = {};
 
   private readonly setSize = debounce(() => {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!this.domContainer) {
+      return;
+    }
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
