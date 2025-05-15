@@ -5,10 +5,10 @@ import {
   GeneratorOptions,
   Template,
   PDFRenderProps,
-  Plugin,
   getB64BasePdf,
   isBlankPdf,
   mm2pt,
+  pluginRegistry,
   BasePdf,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
@@ -80,11 +80,9 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
   // @ts-expect-error registerFontkit method is not in type definitions but exists at runtime
   pdfDoc.registerFontkit(fontkit);
 
-  const pluginValues = (
-    Object.values(userPlugins).length > 0
-      ? Object.values(userPlugins)
-      : Object.values(builtInPlugins)
-  ) as Plugin<Schema>[];
+  const plugins = pluginRegistry(
+    Object.values(userPlugins).length > 0 ? userPlugins : builtInPlugins,
+  );
 
   const schemaTypes = Array.from(
     new Set(
@@ -102,23 +100,9 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
       >,
       type: string,
     ) => {
-      const render = pluginValues.find((pv) => {
-        // Safely check if propPanel and defaultSchema exist and have a type property
-        return (
-          pv &&
-          typeof pv === 'object' &&
-          'propPanel' in pv &&
-          pv.propPanel &&
-          typeof pv.propPanel === 'object' &&
-          'defaultSchema' in pv.propPanel &&
-          pv.propPanel.defaultSchema &&
-          typeof pv.propPanel.defaultSchema === 'object' &&
-          'type' in pv.propPanel.defaultSchema &&
-          pv.propPanel.defaultSchema.type === type
-        );
-      });
+      const plugin = plugins.findByType(type);
 
-      if (!render) {
+      if (!plugin || !plugin.pdf) {
         throw new Error(`[@pdfme/generator] Renderer for type ${type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
       }
@@ -126,7 +110,7 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
       // Use type assertion to handle the pdf function with schema type
       return {
         ...acc,
-        [type]: render.pdf as (
+        [type]: plugin.pdf as (
           arg: PDFRenderProps<Schema & { [key: string]: unknown }>,
         ) => Promise<void> | void,
       };

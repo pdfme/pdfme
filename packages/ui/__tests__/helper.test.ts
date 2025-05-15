@@ -1,4 +1,4 @@
-import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf } from '@pdfme/common';
+import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf, pluginRegistry } from '@pdfme/common';
 import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
@@ -153,7 +153,7 @@ describe('changeSchemas test', () => {
   const schemas: SchemaForUI[] = [schemaA, schemaB];
   const basePdf1: BasePdf = BLANK_PDF;
   const basePdf2: BasePdf = { width: 210, height: 297, padding: [10, 10, 10, 10] };
-  const pluginsRegistry = { text, image };
+  const pluginsRegistry = pluginRegistry({ text, image });
   const pageSize = { width: 210, height: 297 };
 
   test('changeSchemas - change content with objs length = 1', () => {

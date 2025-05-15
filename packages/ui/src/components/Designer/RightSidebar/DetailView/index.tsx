@@ -64,8 +64,8 @@ const DetailView = (props: DetailViewProps) => {
       ),
       ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
     };
-    for (const plugin of Object.values(pluginsRegistry)) {
-      const widgets = plugin?.propPanel.widgets || {};
+    for (const plugin of pluginsRegistry.values()) {
+      const widgets = plugin.propPanel.widgets || {};
       Object.entries(widgets).forEach(([widgetKey, widgetValue]) => {
         newWidgets[widgetKey] = (p) => (
           <WidgetRenderer
@@ -171,64 +171,18 @@ const DetailView = (props: DetailViewProps) => {
     }
   }, 100);
 
-  // Find the active plugin with proper type safety
-  const activePlugin = Object.values(pluginsRegistry).find((plugin) => {
-    if (!plugin || typeof plugin !== 'object') return false;
-    if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
-    if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object')
-      return false;
-
-    const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
-    return (
-      'type' in defaultSchema &&
-      typeof defaultSchema.type === 'string' &&
-      defaultSchema.type === activeSchema.type
-    );
-  });
-
-  // Safely access the propPanel schema
-  const activePropPanelSchema = activePlugin?.propPanel?.schema;
-  if (!activePropPanelSchema) {
-    console.error(`[@pdfme/ui] No propPanel.schema for ${activeSchema.type}.
-Check this document: https://pdfme.com/docs/custom-schemas`);
+  const activePlugin = pluginsRegistry.findByType(activeSchema.type);
+  if (!activePlugin) {
+    throw Error(`[@pdfme/ui] Failed to find plugin used for ${activeSchema.type}`);
   }
 
-  // Create type-safe options for the type dropdown
-  // Create a type-safe options array for the dropdown
+  const activePropPanelSchema = activePlugin.propPanel.schema;
   const typeOptions: Array<{ label: string; value: string | undefined }> = [];
 
-  // Safely populate the options array
-  Object.entries(pluginsRegistry).forEach(([label, value]) => {
-    // Skip invalid plugins
-    if (!value || typeof value !== 'object') {
-      typeOptions.push({ label, value: undefined });
-      return;
-    }
-
-    if (!('propPanel' in value) || !value.propPanel || typeof value.propPanel !== 'object') {
-      typeOptions.push({ label, value: undefined });
-      return;
-    }
-
-    if (
-      !('defaultSchema' in value.propPanel) ||
-      !value.propPanel.defaultSchema ||
-      typeof value.propPanel.defaultSchema !== 'object'
-    ) {
-      typeOptions.push({ label, value: undefined });
-      return;
-    }
-
-    // Safely extract the type
-    const defaultSchema = value.propPanel.defaultSchema as Record<string, unknown>;
-    let schemaType: string | undefined = undefined;
-
-    if ('type' in defaultSchema && typeof defaultSchema.type === 'string') {
-      schemaType = defaultSchema.type;
-    }
-
-    typeOptions.push({ label, value: schemaType });
+  pluginsRegistry.entries().forEach(([label, plugin]) => {
+    typeOptions.push({ label, value: plugin.propPanel.defaultSchema?.type ?? undefined });
   });
+
   // Create a safe empty schema as fallback
   const emptySchema: Record<string, unknown> = {};
 
@@ -236,15 +190,6 @@ Check this document: https://pdfme.com/docs/custom-schemas`);
   const defaultSchema: Record<string, unknown> = activePlugin?.propPanel?.defaultSchema
     ? // Create a safe copy of the schema
       (() => {
-        // First check if the defaultSchema is an object
-        if (
-          typeof activePlugin.propPanel.defaultSchema !== 'object' ||
-          activePlugin.propPanel.defaultSchema === null
-        ) {
-          return emptySchema;
-        }
-
-        // Create a safe copy
         const result: Record<string, unknown> = {};
 
         // Only copy properties that exist on the object
