@@ -112,7 +112,7 @@ const Renderer = (props: RendererProps) => {
   const plugin = pluginsRegistry.findByType(schema.type as string);
 
   const reRenderDependencies = useRerenderDependencies({
-    plugin: plugin || ({} as Plugin<Schema>),
+    plugin: plugin || undefined,
     value,
     mode,
     scale,
