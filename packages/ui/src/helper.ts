@@ -462,7 +462,7 @@ const handleTypeChange = (
     }
   });
 
-  const plugin = pluginsRegistry.findByType(value as string)
+  const plugin = pluginsRegistry.findByType(value as string);
 
   // Apply default schema properties if available
   if (plugin?.propPanel.defaultSchema) {

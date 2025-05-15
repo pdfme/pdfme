@@ -65,7 +65,7 @@ import {
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
-import { pluginRegistry } from './pluginRegistry';
+import { pluginRegistry } from './pluginRegistry.js';
 
 export {
   PDFME_VERSION,
