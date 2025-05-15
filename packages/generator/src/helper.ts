@@ -103,7 +103,7 @@ export const preprocessing = async (arg: { template: Template; userPlugins: Plug
       const plugin = plugins.findByType(type);
 
       if (!plugin || !plugin.pdf) {
-        throw new Error(`[@pdfme/generator] Renderer for type ${type} not found.
+        throw new Error(`[@pdfme/generator] Plugin or renderer for type ${type} not found.
 Check this document: https://pdfme.com/docs/custom-schemas`);
       }
 

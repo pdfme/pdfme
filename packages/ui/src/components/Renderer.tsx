@@ -109,7 +109,7 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
-  const plugin = pluginsRegistry.findByType(schema.type as string);
+  const plugin = pluginsRegistry.findByType(schema.type);
 
   const reRenderDependencies = useRerenderDependencies({
     plugin: plugin || ({} as Plugin<Schema>),
