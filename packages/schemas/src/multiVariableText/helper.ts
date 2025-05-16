@@ -16,8 +16,8 @@ export const substituteVariables = (
       variables = typeof variablesIn === 'string'
         ? (JSON.parse(variablesIn || '{}') as Record<string, string>)
         : variablesIn;
-    } catch (error) {
-      throw new SyntaxError(`[@pdfme/schemas] MVT: invalid JSON string '${variablesIn}'`);
+    } catch {
+      throw new SyntaxError(`[@pdfme/schemas] MVT: invalid JSON string '${variablesIn as string}'`);
     }
 
     Object.keys(variables).forEach((variableName) => {
