@@ -28,7 +28,7 @@ type RendererProps = Omit<
 };
 
 type ReRenderCheckProps = {
-  plugin?: Plugin<Schema>;
+  plugin: Plugin<Schema>;
   value: string;
   mode: Mode;
   scale: number;
@@ -47,12 +47,12 @@ const useRerenderDependencies = (arg: ReRenderCheckProps) => {
   const optionStr = JSON.stringify(_options);
 
   return useMemo(() => {
-    if (plugin?.uninterruptedEditMode && mode === 'designer') {
+    if (plugin.uninterruptedEditMode && mode === 'designer') {
       return [mode];
     } else {
       return [value, mode, scale, JSON.stringify(schema), optionStr];
     }
-  }, [plugin?.uninterruptedEditMode, value, mode, scale, schema, optionStr, plugin]);
+  }, [plugin.uninterruptedEditMode, value, mode, scale, schema, optionStr, plugin]);
 };
 
 const Wrapper = ({
@@ -111,8 +111,14 @@ const Renderer = (props: RendererProps) => {
   const _cache = useContext(CacheContext);
   const plugin = pluginsRegistry.findByType(schema.type);
 
+  if (!plugin || !plugin.ui) {
+    console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
+Check this document: https://pdfme.com/docs/custom-schemas`);
+    return <></>;
+  }
+
   const reRenderDependencies = useRerenderDependencies({
-    plugin: plugin || undefined,
+    plugin,
     value,
     mode,
     scale,
@@ -121,7 +127,7 @@ const Renderer = (props: RendererProps) => {
   });
 
   useEffect(() => {
-    if (!plugin?.ui || !ref.current || !schema.type) return;
+    if (!ref.current) return;
 
     ref.current.innerHTML = '';
     const render = plugin.ui;
@@ -147,13 +153,7 @@ const Renderer = (props: RendererProps) => {
         ref.current.innerHTML = '';
       }
     };
-  }, [plugin?.ui, schema.type, reRenderDependencies]);
-
-  if (!plugin || !plugin.ui) {
-    console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
-Check this document: https://pdfme.com/docs/custom-schemas`);
-    return <></>;
-  }
+  }, reRenderDependencies);
 
   return (
     <Wrapper {...props}>
