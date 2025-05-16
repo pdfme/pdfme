@@ -27,12 +27,8 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     rootElement,
     onChange: (arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => {
       if (!Array.isArray(arg)) {
-        const numVariables = countUniqueVariableNames(arg.value as string);
         if (onChange) {
-          onChange([
-            { key: 'text', value: arg.value },
-            { key: 'readOnly', value: numVariables === 0 },
-          ]);
+          onChange({ key: 'text', value: arg.value });
         }
       } else {
         throw new Error('onChange is not an array, the parent text plugin has changed...');
@@ -54,10 +50,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
         if (numVariables !== newNumVariables) {
           // If variables were modified during this keypress, we trigger a change
           if (onChange) {
-            onChange([
-              { key: 'text', value: text },
-              { key: 'readOnly', value: newNumVariables === 0 },
-            ]);
+            onChange({ key: 'text', value: text });
           }
           numVariables = newNumVariables;
         }
