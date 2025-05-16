@@ -86,7 +86,7 @@ const LeftSidebar = ({
         overflow: isDragging ? 'visible' : 'auto',
       }}
     >
-      {Object.entries(pluginsRegistry).map(([label, plugin]) => {
+      {pluginsRegistry.entries().map(([label, plugin]) => {
         if (!plugin?.propPanel.defaultSchema) return null;
 
         return (

@@ -109,17 +109,10 @@ const Renderer = (props: RendererProps) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const _cache = useContext(CacheContext);
-  // Safely extract schema type
-  const schemaType = typeof schema.type === 'string' ? schema.type : '';
-
-  // Find plugin with matching schema type using a type-safe approach
-  const plugin = Object.values(pluginsRegistry || {}).find((plugin) => {
-    const defaultSchema = plugin?.propPanel?.defaultSchema as Record<string, unknown> | undefined;
-    return defaultSchema?.type === schemaType;
-  });
+  const plugin = pluginsRegistry.findByType(schema.type);
 
   const reRenderDependencies = useRerenderDependencies({
-    plugin: plugin || ({} as Plugin<Schema>),
+    plugin: plugin || undefined,
     value,
     mode,
     scale,
