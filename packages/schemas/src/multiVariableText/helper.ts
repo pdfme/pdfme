@@ -11,10 +11,14 @@ export const substituteVariables = (
   let substitutedText = text;
 
   if (variablesIn) {
-    const variables: Record<string, string> =
-      typeof variablesIn === 'string'
+    let variables: Record<string, string>;
+    try {
+      variables = typeof variablesIn === 'string'
         ? (JSON.parse(variablesIn || '{}') as Record<string, string>)
         : variablesIn;
+    } catch {
+      throw new SyntaxError(`[@pdfme/schemas] MVT: invalid JSON string '${variablesIn as string}'`);
+    }
 
     Object.keys(variables).forEach((variableName) => {
       // handle special characters in variable name

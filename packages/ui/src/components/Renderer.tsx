@@ -52,7 +52,7 @@ const useRerenderDependencies = (arg: ReRenderCheckProps) => {
     } else {
       return [value, mode, scale, JSON.stringify(schema), optionStr];
     }
-  }, [plugin?.uninterruptedEditMode, value, mode, scale, schema, optionStr, plugin]);
+  }, [value, mode, scale, schema, optionStr, plugin]);
 };
 
 const Wrapper = ({
@@ -112,7 +112,7 @@ const Renderer = (props: RendererProps) => {
   const plugin = pluginsRegistry.findByType(schema.type);
 
   const reRenderDependencies = useRerenderDependencies({
-    plugin: plugin || undefined,
+    plugin,
     value,
     mode,
     scale,
@@ -147,9 +147,9 @@ const Renderer = (props: RendererProps) => {
         ref.current.innerHTML = '';
       }
     };
-  }, [plugin?.ui, schema.type, reRenderDependencies]);
+  }, reRenderDependencies);
 
-  if (!plugin || !plugin.ui) {
+  if (!plugin) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 
 Check this document: https://pdfme.com/docs/custom-schemas`);
     return <></>;
