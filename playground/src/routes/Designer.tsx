@@ -69,8 +69,9 @@ function DesignerApp() {
       });
       designer.current.onSaveTemplate(onSaveTemplate);
 
-    } catch {
+    } catch (error) {
       localStorage.removeItem("template");
+      console.error(error);
     }
   }, [searchParams, setSearchParams]);
 

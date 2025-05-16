@@ -12,7 +12,7 @@ import {
 } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { SELECTABLE_CLASSNAME } from '../../src/constants';
-import { getDefaultFont } from '@pdfme/common';
+import { getDefaultFont, pluginRegistry } from '@pdfme/common';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
 import { text, image } from "@pdfme/schemas"
 
@@ -25,7 +25,7 @@ test('Designer snapshot', async () => {
     const { container: c } = render(
       <I18nContext.Provider value={i18n}>
         <FontContext.Provider value={getDefaultFont()}>
-          <PluginsRegistry.Provider value={plugins}>
+          <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
             <Designer
               template={getSampleTemplate()}
               onSaveTemplate={console.log}

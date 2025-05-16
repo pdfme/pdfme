@@ -335,17 +335,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     // Create a type-safe array of default schemas
     const defaultSchemas: Record<string, unknown>[] = [];
 
-    // Safely iterate through plugins registry
-    Object.values(pluginsRegistry).forEach((plugin) => {
-      if (
-        plugin &&
-        typeof plugin === 'object' &&
-        'propPanel' in plugin &&
-        plugin.propPanel &&
-        typeof plugin.propPanel === 'object' &&
-        'defaultSchema' in plugin.propPanel &&
-        plugin.propPanel.defaultSchema
-      ) {
+    pluginsRegistry.entries().forEach(([, plugin]) => {
+      if (plugin.propPanel.defaultSchema) {
         defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
       }
     });

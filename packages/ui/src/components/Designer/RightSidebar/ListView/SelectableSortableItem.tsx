@@ -42,26 +42,7 @@ const SelectableSortableItem = ({
     onClick: (event: React.MouseEvent) => onSelect(schema.id, event.shiftKey),
   };
 
-  // Safely extract schema type
-  const schemaType = typeof schema.type === 'string' ? schema.type : '';
-
-  // Find matching plugin with type-safe approach
-  const pluginEntry = Object.entries(pluginsRegistry).find(([, plugin]) => {
-    if (!plugin || typeof plugin !== 'object') return false;
-    if (!plugin.propPanel || typeof plugin.propPanel !== 'object') return false;
-    if (!plugin.propPanel.defaultSchema || typeof plugin.propPanel.defaultSchema !== 'object')
-      return false;
-
-    // Use Record<string, unknown> to safely access properties
-    const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
-    return (
-      'type' in defaultSchema &&
-      typeof defaultSchema.type === 'string' &&
-      defaultSchema.type === schemaType
-    );
-  });
-
-  const [pluginLabel, thisPlugin] = pluginEntry || ['', undefined];
+  const [pluginLabel, thisPlugin] = pluginsRegistry.findWithLabelByType(schema.type);
 
   let status: undefined | 'is-warning' | 'is-danger';
   if (!schema.name) {

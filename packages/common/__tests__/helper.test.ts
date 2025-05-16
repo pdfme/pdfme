@@ -4,6 +4,7 @@ import {
   mm2pt,
   pt2mm,
   pt2px,
+  checkGenerateProps,
   checkFont,
   checkPlugins,
   isHexValid,
@@ -95,6 +96,162 @@ describe('isHexValid test', () => {
     expect(isHexValid('#ffffff00000')).toEqual(false);
     expect(isHexValid('#ffffff000000')).toEqual(false);
     expect(isHexValid('#pdfme123')).toEqual(false);
+  });
+});
+
+// NOTE: We only test the generator check function because the others
+// have a schema that checks for HTMLElement, which isn't available in the test environment
+describe('checkGenerateProps', () => {
+  test('accepts valid generator schema', () => {
+    const validProps = {
+      inputs: [{a: 'a', b: 'b'}],
+      template: {
+        basePdf: 'data:application/pdf;base64,abc123',
+        schemas: [
+          [
+            {
+              name: 'field1',
+              type: 'text',
+              position: { x: 0, y: 0 },
+              width: 100,
+              height: 100,
+              content: 'Test'
+            }
+          ]
+        ]
+      },
+      options: {
+        font: getSampleFont()
+      },
+      plugins: {
+        text: {
+          pdf: async () => {},
+          ui: async () => {},
+          propPanel: {
+            schema: {},
+            defaultSchema: {
+              type: 'text',
+              name: 'myText',
+              content: '',
+              position: { x: 0, y: 0 },
+              width: 100,
+              height: 100
+            }
+          }
+        }
+      }
+    };
+
+    expect(() => checkGenerateProps(validProps)).not.toThrow();
+  });
+
+  test('throws for invalid template structure', () => {
+    const invalidProps = {
+      template: {
+        schemas: 'not-an-array' // Invalid type
+      }
+    };
+
+    expect(() => checkGenerateProps(invalidProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: template.schemas\n" +
+      "ERROR MESSAGE: Expected array, received string\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: template.basePdf\n" +
+      "ERROR MESSAGE: Invalid input\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: inputs\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------");
+  });
+
+  test('throws for missing required template field and empty inputs', () => {
+    const missingSchemaProps = {
+      inputs: [],
+      template: {
+        basePdf: 'data:application/pdf;base64,abc123',
+        // schemas is missing
+      }
+    };
+
+    expect(() => checkGenerateProps(missingSchemaProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: template.schemas\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: inputs\n" +
+      "ERROR MESSAGE: Array must contain at least 1 element(s)\n" +
+      "--------------------------");
+  });
+
+  test('throws for invalid plugin definitions', () => {
+    const invalidPluginProps = {
+      inputs: [{a: 'a'}],
+      template: {
+        basePdf: 'data:application/pdf;base64,abc123',
+        schemas: [[]]
+      },
+      plugins: {
+        invalid: {
+          // missing pdf
+          // missing ui
+          propPanel: {
+            schema: {},
+            defaultSchema: {
+              // missing type
+              name: 'myText',
+              content: '',
+              position: { x: 0, y: 0 },
+              width: 100,
+              height: 100
+            }
+          }
+        },
+        missingPanel: {
+          pdf: async () => {},
+          ui: async () => {},
+          // missing propPanel
+        },
+        missingDefaultSchema: {
+          pdf: async () => {},
+          ui: async () => {},
+          propPanel: {}
+        }
+      }
+    };
+
+    expect(() => checkGenerateProps(invalidPluginProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: plugins.invalid.ui\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: plugins.invalid.pdf\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: plugins.invalid.propPanel.defaultSchema.type\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: plugins.missingPanel.propPanel\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------\n" +
+      "ERROR POSITION: plugins.missingDefaultSchema.propPanel.defaultSchema\n" +
+      "ERROR MESSAGE: Required\n" +
+      "--------------------------");
+  });
+
+  test('calls checkFont when font option is provided', () => {
+    const propsWithFont = {
+      inputs: [{a: 'a'}],
+      template: {
+        basePdf: 'data:application/pdf;base64,abc123',
+        schemas: [[]]
+      },
+      options: {
+        font: { Roboto: { data: new Uint8Array(), fallback: true } }
+      }
+    };
+
+    checkGenerateProps(propsWithFont);
   });
 });
 

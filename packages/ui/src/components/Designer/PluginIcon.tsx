@@ -39,18 +39,9 @@ const PluginIcon = (props: PluginIconProps) => {
   const { token } = theme.useToken();
   const options = useContext(OptionsContext);
 
-  // Safely access plugin properties with proper type checking
-  const defaultSchemaType =
-    plugin.propPanel &&
-    typeof plugin.propPanel === 'object' &&
-    plugin.propPanel.defaultSchema &&
-    typeof plugin.propPanel.defaultSchema === 'object' &&
-    'type' in plugin.propPanel.defaultSchema &&
-    typeof plugin.propPanel.defaultSchema.type === 'string'
-      ? plugin.propPanel.defaultSchema.type
-      : '';
+  const schemaType = plugin.propPanel.defaultSchema?.type ?? '';
 
-  const icon = options.icons?.[defaultSchemaType] ?? plugin.icon;
+  const icon = options.icons?.[schemaType] ?? plugin.icon;
   const iconStyles = {
     ...styles,
     color: token.colorText,
