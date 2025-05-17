@@ -9,6 +9,7 @@ import {
   getFallbackFontName,
   getDefaultFont,
   DEFAULT_FONT_NAME,
+  heightOfFontAtSize,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
@@ -71,19 +72,6 @@ export const getFontDescentInPt = (fontKitFont: FontKitFont, fontSize: number) =
   return (descent / unitsPerEm) * fontSize;
 };
 
-export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) => {
-  const { ascent, descent, bbox, unitsPerEm } = fontKitFont;
-
-  const scale = 1000 / unitsPerEm;
-  const yTop = (ascent || bbox.maxY) * scale;
-  const yBottom = (descent || bbox.minY) * scale;
-
-  let height = yTop - yBottom;
-  height -= Math.abs(descent * scale) || 0;
-
-  return (height / 1000) * fontSize;
-};
-
 const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
   return (textContent.length - 1) * textCharacterSpacing;
 };
@@ -100,45 +88,6 @@ export const widthOfTextAtSize = (
     glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
     (fontSize / 1000);
   return standardWidth + calculateCharacterSpacing(text, characterSpacing);
-};
-
-const getFallbackFont = (font: Font) => {
-  const fallbackFontName = getFallbackFontName(font);
-  return font[fallbackFontName];
-};
-
-const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
-
-export const getFontKitFont = async (
-  fontName: string | undefined,
-  font: Font,
-  _cache: Map<string | number, fontkit.Font>,
-) => {
-  const fntNm = fontName || getFallbackFontName(font);
-  const cacheKey = getCacheKey(fntNm);
-  if (_cache.has(cacheKey)) {
-    return _cache.get(cacheKey) as fontkit.Font;
-  }
-
-  const currentFont = font[fntNm] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
-  let fontData = currentFont.data;
-  if (typeof fontData === 'string') {
-    fontData = fontData.startsWith('http')
-      ? await fetch(fontData).then((res) => res.arrayBuffer())
-      : b64toUint8Array(fontData);
-  }
-
-  // Convert fontData to Buffer if it's not already a Buffer
-  let fontDataBuffer: Buffer;
-  if (fontData instanceof Buffer) {
-    fontDataBuffer = fontData;
-  } else {
-    fontDataBuffer = Buffer.from(fontData as ArrayBufferLike);
-  }
-  const fontKitFont = fontkit.create(fontDataBuffer) as fontkit.Font;
-  _cache.set(cacheKey, fontKitFont);
-
-  return fontKitFont;
 };
 
 const isTextExceedingBoxWidth = (text: string, calcValues: FontWidthCalcValues) => {
