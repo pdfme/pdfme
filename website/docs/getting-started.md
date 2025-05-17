@@ -254,11 +254,19 @@ import type { Template } from '@pdfme/common';
 import { Designer } from '@pdfme/ui';
 
 const domContainer = document.getElementById('container');
+
+// configure some or all of the initial UI state (optional, defaults shown below)
+const initialState = {
+  pageCursor: 0,
+  zoomLevel: 1,
+  sidebarOpen: true
+};
+
 const template: Template = {
   // skip...　Check the Template section.
 };
 
-const designer = new Designer({ domContainer, template });
+const designer = new Designer({ domContainer, initialState, template });
 ```
 
 The Designer class is instantiated as shown above, and the template designer is displayed in the `domContainer`.  

@@ -39,6 +39,7 @@ import type {
   UIOptions,
   UIProps,
   PreviewProps,
+  DesignerInitialState,
   DesignerProps,
 } from './types.js';
 import {
@@ -123,6 +124,7 @@ export type {
   UIOptions,
   UIProps,
   PreviewProps,
+  DesignerInitialState,
   DesignerProps,
   ChangeSchemaItem,
   ChangeSchemas,

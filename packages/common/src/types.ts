@@ -20,6 +20,7 @@ import {
   UIOptions,
   UIProps,
   PreviewProps,
+  DesignerInitialStateSchema,
   DesignerProps,
   ColorType,
   LegacySchemaPageArray,
@@ -191,6 +192,7 @@ export type GenerateProps = z.infer<typeof GenerateProps> & { plugins?: Plugins 
 export type UIOptions = z.infer<typeof UIOptions> & { theme?: ThemeConfig };
 export type UIProps = z.infer<typeof UIProps> & { plugins?: Plugins };
 export type PreviewProps = z.infer<typeof PreviewProps> & { plugins?: Plugins };
+export type DesignerInitialState = z.infer<typeof DesignerInitialStateSchema>;
 export type DesignerProps = z.infer<typeof DesignerProps> & { plugins?: Plugins };
 export type SchemaPageArray = z.infer<typeof SchemaPageArray>;
 export type LegacySchemaPageArray = z.infer<typeof LegacySchemaPageArray>;
