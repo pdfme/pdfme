@@ -516,3 +516,15 @@ export const useMaxZoom = () => {
 
   return options.maxZoom ? options.maxZoom / 100 : DEFAULT_MAX_ZOOM;
 };
+
+export const setFontNameRecursively = (obj: Record<string, unknown>, fontName: string): void => {
+  if (!obj || typeof obj !== 'object') return;
+
+  for (const key in obj) {
+    if (key === 'fontName' && obj[key] === undefined) {
+      obj[key] = fontName;
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      setFontNameRecursively(obj[key] as Record<string, unknown>, fontName);
+    }
+  }
+};

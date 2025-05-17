@@ -1,5 +1,5 @@
 import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf, pluginRegistry } from '@pdfme/common';
-import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas } from '../src/helper';
+import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas, setFontNameRecursively } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({
@@ -519,5 +519,67 @@ describe('changeSchemas test', () => {
         height: 100,
       },
     ]);
+  });
+});
+
+describe('setFontNameRecursively', () => {
+  it('sets fontName in object with undefined fontName property', () => {
+    const obj = { fontName: undefined, content: 'test' };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Arial');
+  });
+
+  it('does not modify existing fontName values', () => {
+    const obj = { fontName: 'Helvetica', content: 'test' };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Helvetica');
+  });
+
+  it('recursively sets fontName in nested objects', () => {
+    const obj = {
+      outer: {
+        fontName: undefined,
+        inner: {
+          fontName: undefined,
+          content: 'test'
+        }
+      }
+    };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.outer.fontName).toEqual('Arial');
+    expect(obj.outer.inner.fontName).toEqual('Arial');
+  });
+
+  it('handles arrays of objects', () => {
+    const obj = {
+      items: [
+        { fontName: undefined, content: 'item1' },
+        { fontName: undefined, content: 'item2' }
+      ]
+    };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.items[0].fontName).toEqual('Arial');
+    expect(obj.items[1].fontName).toEqual('Arial');
+  });
+
+  it('ignores null values', () => {
+    const obj = { fontName: undefined, nullProp: null };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Arial');
+    expect(obj.nullProp).toBeNull();
+  });
+
+  it('handles empty objects', () => {
+    const obj = {};
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj).toEqual({});
+  });
+
+  it('returns early for null input', () => {
+    expect(() => setFontNameRecursively(null as any, 'Arial')).not.toThrow();
+  });
+
+  it('returns early for undefined input', () => {
+    expect(() => setFontNameRecursively(undefined as any, 'Arial')).not.toThrow();
   });
 });
