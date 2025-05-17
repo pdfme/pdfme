@@ -535,19 +535,24 @@ describe('setFontNameRecursively', () => {
     expect(obj.fontName).toEqual('Helvetica');
   });
 
-  it('recursively sets fontName in nested objects', () => {
+  it('recursively sets fontName in nested objects and preserves other properties', () => {
     const obj = {
       outer: {
         fontName: undefined,
+        otherProp: 'unchanged',
         inner: {
           fontName: undefined,
-          content: 'test'
+          content: 'test',
+          style: { color: 'red' }
         }
       }
     };
     setFontNameRecursively(obj, 'Arial');
     expect(obj.outer.fontName).toEqual('Arial');
+    expect(obj.outer.otherProp).toEqual('unchanged');
     expect(obj.outer.inner.fontName).toEqual('Arial');
+    expect(obj.outer.inner.content).toEqual('test');
+    expect(obj.outer.inner.style.color).toEqual('red');
   });
 
   it('handles arrays of objects', () => {
@@ -575,11 +580,8 @@ describe('setFontNameRecursively', () => {
     expect(obj).toEqual({});
   });
 
-  it('returns early for null input', () => {
+  it('returns early for null input or undefined input', () => {
     expect(() => setFontNameRecursively(null as any, 'Arial')).not.toThrow();
-  });
-
-  it('returns early for undefined input', () => {
     expect(() => setFontNameRecursively(undefined as any, 'Arial')).not.toThrow();
   });
 });

@@ -10,7 +10,7 @@ import {
   SchemaForUI,
   Size,
   isBlankPdf,
-  PluginRegistry
+  PluginRegistry,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
@@ -517,14 +517,19 @@ export const useMaxZoom = () => {
   return options.maxZoom ? options.maxZoom / 100 : DEFAULT_MAX_ZOOM;
 };
 
-export const setFontNameRecursively = (obj: Record<string, unknown>, fontName: string): void => {
-  if (!obj || typeof obj !== 'object') return;
+export const setFontNameRecursively = (
+  obj: Record<string, unknown>,
+  fontName: string,
+  seen = new WeakSet(),
+): void => {
+  if (!obj || typeof obj !== 'object' || seen.has(obj)) return;
+  seen.add(obj);
 
   for (const key in obj) {
-    if (key === 'fontName' && obj[key] === undefined) {
+    if (key === 'fontName' && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] === undefined) {
       obj[key] = fontName;
     } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-      setFontNameRecursively(obj[key] as Record<string, unknown>, fontName);
+      setFontNameRecursively(obj[key] as Record<string, unknown>, fontName, seen);
     }
   }
 };
