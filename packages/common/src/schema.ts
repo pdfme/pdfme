@@ -202,7 +202,6 @@ export const UIOptions = CommonOptions.extend({
   icons: z.record(z.string(), z.string()).optional(),
   requiredByDefault: z.boolean().optional(),
   maxZoom: z.number().optional(),
-  pageCursor: z.number().optional(),
   sidebarOpen: z.boolean().optional(),
   zoomLevel: z.number().optional(),
 });

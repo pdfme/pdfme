@@ -16,15 +16,11 @@ import AppContextProvider from './components/AppContextProvider.js';
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
-  private pageCursor = 0;
+  private pageCursor: number = 0;
 
   constructor(props: DesignerProps) {
     super(props);
     checkDesignerProps(props);
-
-    if (typeof props.options?.pageCursor === 'number') {
-      this.pageCursor = props.options.pageCursor;
-    }
   }
 
   public saveTemplate() {

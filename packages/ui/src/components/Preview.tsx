@@ -41,7 +41,7 @@ const Preview = ({
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
   const [unitCursor, setUnitCursor] = useState(0);
-  const [pageCursor, setPageCursor] = useState(options.pageCursor ?? 0);
+  const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(options.zoomLevel ?? 1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
@@ -83,9 +83,6 @@ const Preview = ({
   // Update component state only when _options_ changes
   // Ignore exhaustive useEffect dependency warnings here
   useEffect(() => {
-    if (typeof options.pageCursor === 'number' && options.pageCursor !== pageCursor) {
-      setPageCursor(options.pageCursor);
-    }
     if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
       setZoomLevel(options.zoomLevel);
     }

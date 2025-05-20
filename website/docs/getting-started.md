@@ -260,7 +260,6 @@ const template: Template = {
 
 // configure some or all of the UI state (optional, defaults shown below)
  const options = {
-   pageCursor: 0,
    zoomLevel: 1,
    sidebarOpen: true
  };

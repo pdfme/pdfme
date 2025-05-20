@@ -88,7 +88,6 @@ const designer = new Designer({
   template,
   options: {
     zoomLevel: 1.5,
-    pageCursor: 0,
     sidebarOpen: false,  // (Designer only)
   }
 });

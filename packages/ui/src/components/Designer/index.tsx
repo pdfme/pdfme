@@ -69,7 +69,7 @@ const TemplateEditor = ({
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
-  const [pageCursor, setPageCursor] = useState(options.pageCursor ?? 0);
+  const [pageCursor, setPageCursor] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(options.zoomLevel ?? 1);
   const [sidebarOpen, setSidebarOpen] = useState(options.sidebarOpen ?? true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
@@ -94,10 +94,6 @@ const TemplateEditor = ({
   // Update component state only when _options_ changes
   // Ignore exhaustive useEffect dependency warnings here
   useEffect(() => {
-    if (typeof options.pageCursor === 'number' && options.pageCursor !== pageCursor) {
-      setPageCursor(options.pageCursor);
-      onPageCursorChange(options.pageCursor);
-    }
     if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
       setZoomLevel(options.zoomLevel);
     }
