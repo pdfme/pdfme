@@ -76,3 +76,26 @@ new Designer({
   },
 });
 ```
+
+## UI Options
+
+You can control aspects of the UI state by passing options:
+
+```javascript
+// Initialize with specific states (also works for Form and Viewer):
+const designer = new Designer({
+  domContainer,
+  template,
+  options: {
+    zoomLevel: 1.5,
+    pageCursor: 0,
+    sidebarOpen: false,  // (Designer only)
+  }
+});
+
+// Update states after initialization:
+designer.updateOptions({
+  zoomLevel: 2,
+  sidebarOpen: true
+});
+```

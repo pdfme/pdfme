@@ -258,7 +258,14 @@ const template: Template = {
   // skip...　Check the Template section.
 };
 
-const designer = new Designer({ domContainer, template });
+// configure some or all of the UI state (optional, defaults shown below)
+ const options = {
+   pageCursor: 0,
+   zoomLevel: 1,
+   sidebarOpen: true
+ };
+
+const designer = new Designer({ domContainer, template, options });
 ```
 
 The Designer class is instantiated as shown above, and the template designer is displayed in the `domContainer`.  
