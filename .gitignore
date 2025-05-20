@@ -7,6 +7,6 @@
 dist
 coverage/
 
-**/repomix-output.txt
+**/repomix-output.{txt,xml}
 
 **/__diff_output__/**

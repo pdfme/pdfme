@@ -16,7 +16,7 @@ import CtlBar from './CtlBar.js';
 import Paper from './Paper.js';
 import Renderer from './Renderer.js';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
-import { FontContext } from '../contexts.js';
+import { FontContext, OptionsContext } from '../contexts.js';
 import { template2SchemasList, getPagesScrollTopByIndex, useMaxZoom } from '../helper.js';
 import { theme } from 'antd';
 
@@ -34,6 +34,7 @@ const Preview = ({
   const { token } = theme.useToken();
 
   const font = useContext(FontContext);
+  const options = useContext(OptionsContext);
   const maxZoom = useMaxZoom();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,7 @@ const Preview = ({
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(options.zoomLevel ?? 1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
   const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
@@ -78,6 +79,15 @@ const Preview = ({
       })
       .catch((err) => console.error(`[@pdfme/ui] `, err));
   };
+
+  // Update component state only when _options_ changes
+  // Ignore exhaustive useEffect dependency warnings here
+  useEffect(() => {
+    if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
+      setZoomLevel(options.zoomLevel);
+    }
+    // eslint-disable-next-line
+  }, [options]);
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
