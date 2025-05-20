@@ -25,11 +25,11 @@ const StaticSchema = (props: {
           key={schema.name}
           schema={{ ...schema, id: uuid() }}
           basePdf={basePdf}
-          value={replacePlaceholders({
+          value={schema.readOnly ? replacePlaceholders({
             content: schema.content || '',
             variables: { ...input, totalPages, currentPage },
             schemas,
-          })}
+          }) : schema.content || ''}
           onChangeHoveringSchemaId={() => {
             void 0;
           }}
