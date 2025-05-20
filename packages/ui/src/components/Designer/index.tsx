@@ -101,7 +101,7 @@ const TemplateEditor = ({
       setSidebarOpen(options.sidebarOpen);
     }
     // eslint-disable-next-line
-  }, [options, onPageCursorChange]);
+  }, [options]);
 
   useScrollPageCursor({
     ref: canvasRef,
