@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "target": "ES2020",
+    "target": "ES2022",
     "jsx": "react",
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -9,7 +9,7 @@
     "declarationDir": "dist/types",
     "module": "ESNext",
     "lib": [
-      "ES2020",
+      "ES2022",
       "DOM",
       "DOM.Iterable",
       "ESNext"

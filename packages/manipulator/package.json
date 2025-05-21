@@ -1,9 +1,13 @@
 {
   "name": "@pdfme/manipulator",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -26,15 +30,14 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/src/index.d.ts",
       "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "default": "./dist/esm/src/index.js"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
@@ -56,26 +59,28 @@
   "jest": {
     "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "node",
-    "testMatch": [
-      "**/__tests__/**/*.test.ts"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "./tsconfig.json",
           "useESM": true
         }
       ]
     },
     "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
-    }
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/pdf-lib$": "@pdfme/pdf-lib",
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils",
+      "^@pdfme/(.*)$": "<rootDir>/../$1/src"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@pdfme|lucide-react)/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.js"
+    ]
   }
 }

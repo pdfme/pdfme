@@ -1,9 +1,13 @@
 {
   "name": "@pdfme/generator",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -26,18 +30,14 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/esm/src/index.js",
+      "default": "./dist/esm/src/index.js"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm build:node",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
@@ -61,32 +61,30 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "moduleNameMapper": {
-      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!(air-datepicker)/)"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
+    "preset": "ts-jest/presets/default-esm",
+    "testEnvironment": "node",
     "transform": {
-      "^.+\\.ts?$": [
+      "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "useESM": true
         }
-      ],
-      "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
+      ]
     },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/pdf-lib$": "@pdfme/pdf-lib",
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils",
+      "^@pdfme/(.*)$": "<rootDir>/../$1/src"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@pdfme|lucide-react)/"
+    ],
     "testMatch": [
-      "**/*.test.ts"
+      "**/__tests__/**/*.test.ts"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.js"
     ]
   },
   "publishConfig": {

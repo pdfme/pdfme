@@ -1,9 +1,13 @@
 {
   "name": "@pdfme/common",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -26,19 +30,15 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/esm/src/index.js",
+      "default": "./dist/esm/src/index.js"
     }
   },
   "scripts": {
     "dev": "node set-version.js && tsc -p tsconfig.esm.json -w",
     "prebuild": "node set-version.js",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm build:node",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
@@ -58,16 +58,19 @@
     "form-render": "^2.2.20"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
       "js",
       "ts"
     ],
+    "extensionsToTreatAsEsm": [".ts"],
     "transform": {
-      "^.+\\.ts?$": [
+      "^.+\\.ts$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },

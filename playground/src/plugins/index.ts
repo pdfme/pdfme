@@ -15,7 +15,7 @@ import {
   checkbox,
   radioGroup,
 } from '@pdfme/schemas';
-import { signature } from './signature';
+import { signature } from './signature.js';
 
 export const getPlugins = () => {
   return {

@@ -1,40 +1,73 @@
 import type * as CSS from 'csstype';
-
-import AirDatepicker from 'air-datepicker';
-import type { AirDatepickerLocale, AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
-import localeAr from 'air-datepicker/locale/ar';
-import localeBg from 'air-datepicker/locale/bg';
-import localeCa from 'air-datepicker/locale/ca';
-import localeCs from 'air-datepicker/locale/cs';
-import localeDa from 'air-datepicker/locale/da';
-import localeDe from 'air-datepicker/locale/de';
-import localeEl from 'air-datepicker/locale/el';
-import localeEn from 'air-datepicker/locale/en';
-import localeEs from 'air-datepicker/locale/es';
-import localeEu from 'air-datepicker/locale/eu';
-import localeFi from 'air-datepicker/locale/fi';
-import localeFr from 'air-datepicker/locale/fr';
-import localeHr from 'air-datepicker/locale/hr';
-import localeHu from 'air-datepicker/locale/hu';
-import localeId from 'air-datepicker/locale/id';
-import localeIt from 'air-datepicker/locale/it';
-import localeJa from 'air-datepicker/locale/ja';
-import localeKo from 'air-datepicker/locale/ko';
-import localeNb from 'air-datepicker/locale/nb';
-import localeNl from 'air-datepicker/locale/nl';
-import localeTh from 'air-datepicker/locale/th';
-import localePl from 'air-datepicker/locale/pl';
-import localePtBR from 'air-datepicker/locale/pt-BR';
-import localePt from 'air-datepicker/locale/pt';
-import localeRo from 'air-datepicker/locale/ro';
-import localeRu from 'air-datepicker/locale/ru';
-import localeSi from 'air-datepicker/locale/si';
-import localeSk from 'air-datepicker/locale/sk';
-import localeSl from 'air-datepicker/locale/sl';
-import localeSv from 'air-datepicker/locale/sv';
-import localeTr from 'air-datepicker/locale/tr';
-import localeUk from 'air-datepicker/locale/uk';
-import localeZh from 'air-datepicker/locale/zh';
+// FIXME: air-datepickerの対応
+// import AirDatepicker from 'air-datepicker';
+// import type { AirDatepickerLocale, AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
+// // @ts-ignore
+// import localeAr from 'air-datepicker/locale/ar';
+// // @ts-ignore
+// import localeBg from 'air-datepicker/locale/bg';
+// // @ts-ignore
+// import localeCa from 'air-datepicker/locale/ca';
+// // @ts-ignore
+// import localeCs from 'air-datepicker/locale/cs';
+// // @ts-ignore
+// import localeDa from 'air-datepicker/locale/da';
+// // @ts-ignore
+// import localeDe from 'air-datepicker/locale/de';
+// // @ts-ignore
+// import localeEl from 'air-datepicker/locale/el';
+// // @ts-ignore
+// import localeEn from 'air-datepicker/locale/en';
+// // @ts-ignore
+// import localeEs from 'air-datepicker/locale/es';
+// // @ts-ignore
+// import localeEu from 'air-datepicker/locale/eu';
+// // @ts-ignore
+// import localeFi from 'air-datepicker/locale/fi';
+// // @ts-ignore
+// import localeFr from 'air-datepicker/locale/fr';
+// // @ts-ignore
+// import localeHr from 'air-datepicker/locale/hr';
+// // @ts-ignore
+// import localeHu from 'air-datepicker/locale/hu';
+// // @ts-ignore
+// import localeId from 'air-datepicker/locale/id';
+// // @ts-ignore
+// import localeIt from 'air-datepicker/locale/it';
+// // @ts-ignore
+// import localeJa from 'air-datepicker/locale/ja';
+// // @ts-ignore
+// import localeKo from 'air-datepicker/locale/ko';
+// // @ts-ignore
+// import localeNb from 'air-datepicker/locale/nb';
+// // @ts-ignore
+// import localeNl from 'air-datepicker/locale/nl';
+// // @ts-ignore
+// import localeTh from 'air-datepicker/locale/th';
+// // @ts-ignore
+// import localePl from 'air-datepicker/locale/pl';
+// // @ts-ignore
+// import localePtBR from 'air-datepicker/locale/pt-BR';
+// // @ts-ignore
+// import localePt from 'air-datepicker/locale/pt';
+// // @ts-ignore
+// import localeRo from 'air-datepicker/locale/ro';
+// // @ts-ignore
+// import localeRu from 'air-datepicker/locale/ru';
+// // @ts-ignore
+// import localeSi from 'air-datepicker/locale/si';
+// // @ts-ignore
+// import localeSk from 'air-datepicker/locale/sk';
+// // @ts-ignore
+// import localeSl from 'air-datepicker/locale/sl';
+// // @ts-ignore
+// import localeSv from 'air-datepicker/locale/sv';
+// // @ts-ignore
+// import localeTr from 'air-datepicker/locale/tr';
+// // @ts-ignore
+// import localeUk from 'air-datepicker/locale/uk';
+// // @ts-ignore
+// import localeZh from 'air-datepicker/locale/zh';
 
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
@@ -66,50 +99,54 @@ type PickerType = 'date' | 'time' | 'dateTime';
 
 interface Locale {
   label: string;
-  adLocale: AirDatepickerLocale;
+  // adLocale: AirDatepickerLocale;
   formatLocale: dateFns.Locale;
 }
 
 const LOCALE_MAP: Record<string, Locale> = {
-  ar: { label: 'Arabic', adLocale: localeAr, formatLocale: dateFns.ar },
-  bg: { label: 'Bulgarian', adLocale: localeBg, formatLocale: dateFns.bg },
-  ca: { label: 'Catalan', adLocale: localeCa, formatLocale: dateFns.ca },
-  cs: { label: 'Czech', adLocale: localeCs, formatLocale: dateFns.cs },
-  da: { label: 'Danish', adLocale: localeDa, formatLocale: dateFns.da },
-  de: { label: 'German', adLocale: localeDe, formatLocale: dateFns.de },
-  el: { label: 'Greek', adLocale: localeEl, formatLocale: dateFns.el },
-  en: { label: 'English', adLocale: localeEn, formatLocale: dateFns.enUS },
-  es: { label: 'Spanish', adLocale: localeEs, formatLocale: dateFns.es },
-  eu: { label: 'Basque', adLocale: localeEu, formatLocale: dateFns.eu },
-  fi: { label: 'Finnish', adLocale: localeFi, formatLocale: dateFns.fi },
-  fr: { label: 'French', adLocale: localeFr, formatLocale: dateFns.fr },
-  hr: { label: 'Croatian', adLocale: localeHr, formatLocale: dateFns.hr },
-  hu: { label: 'Hungarian', adLocale: localeHu, formatLocale: dateFns.hu },
-  id: { label: 'Indonesian', adLocale: localeId, formatLocale: dateFns.id },
-  it: { label: 'Italian', adLocale: localeIt, formatLocale: dateFns.it },
-  ja: { label: 'Japanese', adLocale: localeJa, formatLocale: dateFns.ja },
-  ko: { label: 'Korean', adLocale: localeKo, formatLocale: dateFns.ko },
-  nb: { label: 'Norwegian Bokmål', adLocale: localeNb, formatLocale: dateFns.nb },
-  nl: { label: 'Dutch', adLocale: localeNl, formatLocale: dateFns.nl },
-  pl: { label: 'Polish', adLocale: localePl, formatLocale: dateFns.pl },
-  'pt-Br': { label: 'Portuguese', adLocale: localePtBR, formatLocale: dateFns.ptBR },
-  pt: { label: 'Portuguese', adLocale: localePt, formatLocale: dateFns.pt },
-  ro: { label: 'Romanian', adLocale: localeRo, formatLocale: dateFns.ro },
-  ru: { label: 'Russian', adLocale: localeRu, formatLocale: dateFns.ru },
-  si: { label: 'Sinhala', adLocale: localeSi, formatLocale: dateFns.enUS },
-  sk: { label: 'Slovak', adLocale: localeSk, formatLocale: dateFns.sk },
-  sl: { label: 'Slovenian', adLocale: localeSl, formatLocale: dateFns.sl },
-  sv: { label: 'Swedish', adLocale: localeSv, formatLocale: dateFns.sv },
-  th: { label: 'Thai', adLocale: localeTh, formatLocale: dateFns.th },
-  tr: { label: 'Turkish', adLocale: localeTr, formatLocale: dateFns.tr },
-  uk: { label: 'Ukrainian', adLocale: localeUk, formatLocale: dateFns.uk },
-  zh: { label: 'Chinese', adLocale: localeZh, formatLocale: dateFns.zhCN },
+  // ar: { label: 'Arabic', adLocale: localeAr, formatLocale: dateFns.ar },
+  // bg: { label: 'Bulgarian', adLocale: localeBg, formatLocale: dateFns.bg },
+  // ca: { label: 'Catalan', adLocale: localeCa, formatLocale: dateFns.ca },
+  // cs: { label: 'Czech', adLocale: localeCs, formatLocale: dateFns.cs },
+  // da: { label: 'Danish', adLocale: localeDa, formatLocale: dateFns.da },
+  // de: { label: 'German', adLocale: localeDe, formatLocale: dateFns.de },
+  // el: { label: 'Greek', adLocale: localeEl, formatLocale: dateFns.el },
+  // en: { label: 'English', adLocale: localeEn, formatLocale: dateFns.enUS },
+  // es: { label: 'Spanish', adLocale: localeEs, formatLocale: dateFns.es },
+  // eu: { label: 'Basque', adLocale: localeEu, formatLocale: dateFns.eu },
+  // fi: { label: 'Finnish', adLocale: localeFi, formatLocale: dateFns.fi },
+  // fr: { label: 'French', adLocale: localeFr, formatLocale: dateFns.fr },
+  // hr: { label: 'Croatian', adLocale: localeHr, formatLocale: dateFns.hr },
+  // hu: { label: 'Hungarian', adLocale: localeHu, formatLocale: dateFns.hu },
+  // id: { label: 'Indonesian', adLocale: localeId, formatLocale: dateFns.id },
+  // it: { label: 'Italian', adLocale: localeIt, formatLocale: dateFns.it },
+  // ja: { label: 'Japanese', adLocale: localeJa, formatLocale: dateFns.ja },
+  // ko: { label: 'Korean', adLocale: localeKo, formatLocale: dateFns.ko },
+  // nb: { label: 'Norwegian Bokmål', adLocale: localeNb, formatLocale: dateFns.nb },
+  // nl: { label: 'Dutch', adLocale: localeNl, formatLocale: dateFns.nl },
+  // pl: { label: 'Polish', adLocale: localePl, formatLocale: dateFns.pl },
+  // 'pt-Br': { label: 'Portuguese', adLocale: localePtBR, formatLocale: dateFns.ptBR },
+  // pt: { label: 'Portuguese', adLocale: localePt, formatLocale: dateFns.pt },
+  // ro: { label: 'Romanian', adLocale: localeRo, formatLocale: dateFns.ro },
+  // ru: { label: 'Russian', adLocale: localeRu, formatLocale: dateFns.ru },
+  // si: { label: 'Sinhala', adLocale: localeSi, formatLocale: dateFns.enUS },
+  // sk: { label: 'Slovak', adLocale: localeSk, formatLocale: dateFns.sk },
+  // sl: { label: 'Slovenian', adLocale: localeSl, formatLocale: dateFns.sl },
+  // sv: { label: 'Swedish', adLocale: localeSv, formatLocale: dateFns.sv },
+  // th: { label: 'Thai', adLocale: localeTh, formatLocale: dateFns.th },
+  // tr: { label: 'Turkish', adLocale: localeTr, formatLocale: dateFns.tr },
+  // uk: { label: 'Ukrainian', adLocale: localeUk, formatLocale: dateFns.uk },
+  // zh: { label: 'Chinese', adLocale: localeZh, formatLocale: dateFns.zhCN },
 };
 
 const getAirDatepickerLocale = (locale: string) => {
   const data = LOCALE_MAP[locale];
   if (!data) {
-    throw new Error(`Unsupported locale: ${locale}`);
+    // throw new Error(`Unsupported locale: ${locale}`);
+    return {
+      label: '',
+      formatLocale: {},
+    } as Locale;
   }
   return data;
 };
@@ -152,17 +189,18 @@ const strDateToDate = (strDate: string, type: PickerType): Date => {
 };
 
 const getFormat = (type: PickerType, locale: Locale): string => {
-  switch (type) {
-    case 'date': {
-      return locale.adLocale.dateFormat;
-    }
-    case 'time': {
-      return 'HH:mm';
-    }
-    case 'dateTime': {
-      return `${locale.adLocale.dateFormat} ${locale.adLocale.timeFormat}`;
-    }
-  }
+  // switch (type) {
+  //   case 'date': {
+  //     return locale.adLocale.dateFormat;
+  //   }
+  //   case 'time': {
+  //     return 'HH:mm';
+  //   }
+  //   case 'dateTime': {
+  //     return `${locale.adLocale.dateFormat} ${locale.adLocale.timeFormat}`;
+  //   }
+  // }
+  return '';
 };
 
 const getFmtValue = (
@@ -241,56 +279,56 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         }
       };
 
-      const adButtons: AirDatepickerButton[] = [
-        {
-          content: i18n('cancel'),
-          onClick: (datepicker) => {
-            datepicker.hide();
-          },
-        },
-        {
-          content: i18n('clear'),
-          onClick: (datepicker) => {
-            datepicker.hide();
-            commitChange(null);
-          },
-        },
-      ];
-      if (type !== 'date') {
-        adButtons.push({
-          content: i18n('set'),
-          onClick: (datepicker) => {
-            datepicker.hide();
-            const date = datepicker.selectedDates.length ? datepicker.selectedDates[0] : null;
-            commitChange(date);
-          },
-        });
-      }
-      const airDatepicker = new AirDatepicker(input, {
-        locale: locale.adLocale,
-        selectedDates: [strDateToDate(value, type)],
-        dateFormat: (date: AirDatepickerDate) =>
-          format(date, schema.format, { locale: locale.formatLocale }),
-        timepicker: type !== 'date',
-        onlyTimepicker: type === 'time',
-        isMobile: window.innerWidth < 768,
-        buttons: adButtons,
-        onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
-          if (type === 'date') {
-            commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
-            datepicker.hide();
-          }
-        },
-      });
+      // const adButtons: AirDatepickerButton[] = [
+      //   {
+      //     content: i18n('cancel'),
+      //     onClick: (datepicker) => {
+      //       datepicker.hide();
+      //     },
+      //   },
+      //   {
+      //     content: i18n('clear'),
+      //     onClick: (datepicker) => {
+      //       datepicker.hide();
+      //       commitChange(null);
+      //     },
+      //   },
+      // ];
+      // if (type !== 'date') {
+      //   adButtons.push({
+      //     content: i18n('set'),
+      //     onClick: (datepicker) => {
+      //       datepicker.hide();
+      //       const date = datepicker.selectedDates.length ? datepicker.selectedDates[0] : null;
+      //       commitChange(date);
+      //     },
+      //   });
+      // }
+      // const airDatepicker = new AirDatepicker(input, {
+      //   locale: locale.adLocale,
+      //   selectedDates: [strDateToDate(value, type)],
+      //   dateFormat: (date: AirDatepickerDate) =>
+      //     format(date, schema.format, { locale: locale.formatLocale }),
+      //   timepicker: type !== 'date',
+      //   onlyTimepicker: type === 'time',
+      //   isMobile: window.innerWidth < 768,
+      //   buttons: adButtons,
+      //   onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
+      //     if (type === 'date') {
+      //       commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
+      //       datepicker.hide();
+      //     }
+      //   },
+      // });
 
       rootElement.addEventListener('beforeRemove', () => {
         if (isEditable(mode, schema)) {
-          airDatepicker.destroy();
+          // airDatepicker.destroy();
         }
       });
       textElement.addEventListener('click', () => {
         if (isEditable(mode, schema)) {
-          airDatepicker.show();
+          // airDatepicker.show();
         }
       });
 

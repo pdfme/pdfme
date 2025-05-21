@@ -70,6 +70,9 @@
     "ts-jest-resolver": "^2.0.1",
     "ts-loader": "^9.2.5",
     "ts-prune": "^0.10.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "upng-js": "^2.1.0"
   }
 }

@@ -1,9 +1,13 @@
 {
   "name": "@pdfme/converter",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -26,16 +30,15 @@
   "types": "dist/types/src/index.node.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/src/index.node.d.ts",
       "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js",
-      "default": "./dist/esm/src/index.browser.js",
-      "types": "./dist/types/src/index.node.d.ts"
+      "node": "./dist/esm/src/index.node.js",
+      "default": "./dist/esm/src/index.browser.js"
     }
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build": "npm-run-all --parallel build:esm",
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
@@ -57,21 +60,27 @@
     "canvas": "^2.11.0"
   },
   "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
+    "preset": "ts-jest/presets/default-esm",
+    "testEnvironment": "node",
     "transform": {
-      "^.+\\.ts?$": [
+      "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "useESM": true
         }
       ]
     },
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/pdf-lib$": "@pdfme/pdf-lib",
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils",
+      "^@pdfme/(.*)$": "<rootDir>/../$1/src"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@pdfme|lucide-react)/"
+    ],
     "testMatch": [
-      "**/*.test.ts"
+      "**/__tests__/**/*.test.ts"
     ]
   },
   "publishConfig": {

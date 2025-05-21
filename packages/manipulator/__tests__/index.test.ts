@@ -1,3 +1,4 @@
+import '../../common/__tests__/test-helpers.js';
 import fs from 'fs';
 import path from 'path';
 import { PDFDocument } from '@pdfme/pdf-lib';

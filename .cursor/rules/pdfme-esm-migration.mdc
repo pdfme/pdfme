@@ -1,0 +1,47 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# pdfme ESM/Node20/Jest/ビルド統一ルール
+
+## 概要
+- pdfmeは全パッケージESMオンリー配信・Node.js v20以降サポート
+- テストはJest（ESM対応）で統一
+- importは相対パス含め必ず拡張子（.js）を明記
+- 各パッケージのビルド・型定義はESM/Node20仕様に準拠
+
+## パッケージ構成
+- packages/common
+- packages/schemas
+- packages/generator
+- packages/converter
+- packages/manipulator
+- packages/ui
+
+## importルール
+- 相対importは必ず拡張子（.js）を付与する
+  - 例: `import { X } from './foo.js'`
+- 内部パッケージ参照は `@pdfme/xxx` でpackage.jsonのexportsに従う
+
+## TypeScript/ビルド
+- tsconfigは `module: "ESNext"`, `moduleResolution: "bundler"` などESM/Node20向け
+- 型エラー回避のため、外部依存の型定義がない場合は `// @ts-ignore` で一時的に無視可
+- ビルドは `npm run build --workspace=packages/xxx` で各パッケージ単位
+
+## Jestテスト
+- Jestは `ts-jest/presets/default-esm` をpresetに指定
+- setupFilesAfterEnvでカスタムマッチャーやグローバルpolyfillを登録
+- moduleNameMapperで内部パッケージや外部依存をsrc参照にマッピング
+- transformIgnorePatternsはnode_modulesのみ
+
+## 依存パッケージの注意
+- jsQR, air-datepicker等はCJS/UMD型定義のためimport方法に注意
+  - jsQR: `const jsQR = require('jsqr');` で回避
+  - air-datepickerロケール: `// @ts-ignore` でimport
+
+## ドキュメント・CI/CD
+- READMEやAPIドキュメントにはESM/Node20必須を明記
+- CIはNode.js v20で動作確認
+
+## 参考: [plan.md](mdc:plan.md)

@@ -1,9 +1,13 @@
 {
   "name": "@pdfme/ui",
   "version": "0.0.0",
+  "type": "module",
   "sideEffects": false,
   "author": "hand-dot",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "keywords": [
     "pdf",
     "pdf-generation",
@@ -21,9 +25,16 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.umd.js",
+  "main": "dist/index.es.js",
   "module": "dist/index.es.js",
   "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/src/index.d.ts",
+      "import": "./dist/index.es.js",
+      "default": "./dist/index.es.js"
+    }
+  },
   "scripts": {
     "dev": "npm-run-all --parallel devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.es.js --format=esm --watch",
@@ -80,43 +91,37 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
-    "testEnvironment": "jest-environment-jsdom",
-    "setupFiles": [
-      "jest-canvas-mock"
-    ],
-    "setupFilesAfterEnv": [
-      "./__tests__/test-helpers.js"
-    ],
-    "moduleNameMapper": {
-      "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
-      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
-      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^antd/es/": "antd/lib/",
-      "^form-render/es/": "form-render/lib/",
-      "^rc-picker/es/": "rc-picker/lib/",
-      "^lodash-es$": "lodash",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
-    },
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "tsx"
-    ],
+    "preset": "ts-jest/presets/default-esm",
+    "testEnvironment": "jsdom",
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "useESM": true
         }
       ]
     },
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
+      "^@pdfme/generator$": "<rootDir>/../generator/src/index.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.ts",
+      "^@pdfme/manipulator$": "<rootDir>/../manipulator/src/index.ts",
+      "^@pdfme/pdf-lib$": "@pdfme/pdf-lib",
+      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils",
+      "^@pdfme/(.*)$": "<rootDir>/../$1/src",
+      "^.+\\.(css|less|scss)$": "identity-obj-proxy"
+    },
     "transformIgnorePatterns": [
-      "/node_modules/(?!lucide-react)"
+      "/node_modules/(?!@pdfme|lucide-react)/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts",
+      "**/__tests__/**/*.test.tsx"
+    ],
+    "setupFilesAfterEnv": [
+      "../common/__tests__/test-helpers.js"
     ]
   },
   "publishConfig": {

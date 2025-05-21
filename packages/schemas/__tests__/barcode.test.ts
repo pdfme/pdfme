@@ -1,4 +1,5 @@
-import jsQR, { QRCode } from 'jsqr';
+const jsQR = require('jsqr');
+import type { QRCode } from 'jsqr';
 import { PNG } from 'pngjs';
 import {
   validateBarcodeInput,

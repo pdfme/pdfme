@@ -15,6 +15,7 @@ import { SELECTABLE_CLASSNAME } from '../../src/constants';
 import { getDefaultFont } from '@pdfme/common';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
 import { text, image } from "@pdfme/schemas"
+import '../../../common/__tests__/test-helpers.js';
 
 const plugins = { text, image, }
 

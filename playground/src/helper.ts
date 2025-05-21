@@ -1,7 +1,8 @@
 import { Template, Font, checkTemplate, getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate } from '@pdfme/generator';
-import { getPlugins } from './plugins';
+import { getPlugins } from './plugins/index.js';
+import { BlankPdf, CustomPdf } from '@pdfme/common';
 
 export function fromKebabCase(str: string): string {
   return str
