@@ -1,0 +1,43 @@
+{
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "rules": {
+    "only-arrow-functions": true,
+    "arrow-return-shorthand": [true, "multiline"],
+    "curly": [true, "ignore-same-line"],
+    "import-blacklist": [true, "lodash"],
+    "max-line-length": false,
+    "member-access": [true, "no-public"],
+    "no-console": false,
+    "no-empty-interface": false,
+    "prefer-for-of": false,
+    "object-literal-sort-keys": false,
+    "interface-name": false,
+    "no-bitwise": false,
+    "quotemark": [true, "single"],
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "ban": [
+      true,
+      ["Object", "values"],
+      ["Object", "entries"],
+      {
+        "name": ["*", "toHaveLength"],
+        "message": "expect(...).toHaveLength(...) can stall when the assertion fails"
+      }
+    ],
+    "trailing-comma": [
+      true,
+      {
+        "esSpecCompliant": true,
+        "multiline": { "functions": "ignore" }
+      }
+    ],
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-pascal-case",
+        "allow-leading-underscore"
+      ]
+    }
+  }
+}

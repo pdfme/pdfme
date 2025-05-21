@@ -27,7 +27,8 @@
     "packages/schemas",
     "packages/generator",
     "packages/manipulator",
-    "packages/ui"
+    "packages/ui",
+    "packages/pdf-lib"
   ],
   "scripts": {
     "postinstall": "./scripts/link-workspaces.sh",

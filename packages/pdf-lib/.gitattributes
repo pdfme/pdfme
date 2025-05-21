@@ -1,0 +1,16 @@
+* text eol=lf
+
+tests/**/*.encoded binary eol=lf
+tests/**/*.decoded binary eol=lf
+
+*.otf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.eot binary
+assets/**/* binary
+*.jar binary 
+*.bat binary

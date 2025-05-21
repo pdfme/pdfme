@@ -53,7 +53,6 @@
 - [x] @pdfme/manipulator
 - [x] @pdfme/ui
 
-
 ### 残作業
 - [ ] テストが失敗する
   - [ ] converter

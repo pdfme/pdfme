@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "es2019",
+    "module": "commonjs",
+    "allowJs": false,
+    "checkJs": false,
+    "declaration": true,
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "outDir": "./build",
+    "rootDir": "./src",
+    "composite": false,
+    "incremental": true,
+    "tsBuildInfoFile": "./tsBuildInfo.json",
+    "removeComments": false,
+    "importHelpers": true,
+    "downlevelIteration": false,
+    "isolatedModules": false,
+    "newLine": "LF",
+    /* Strict Type-Checking Options */
+    "strict": true,
+    /* Additional Checks */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    /* Module Resolution Options */
+    "baseUrl": "./src",
+    "paths": {
+      "src/*": ["./*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    ".circleci",
+    ".github",
+    ".vscode",
+    "apps",
+    "assets",
+    "cjs",
+    "docs",
+    "node_modules",
+    "scratchpad",
+    "tests"
+  ]
+}
