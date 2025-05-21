@@ -2,6 +2,7 @@
   "name": "playground",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "npm run generate-template-assets && vite",
     "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",

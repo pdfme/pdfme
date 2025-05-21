@@ -54,9 +54,9 @@
 - [x] @pdfme/ui
 
 ### 残作業
-- [ ] テストが失敗する
-  - [ ] converter
-  - [ ] ui
+- [x] テストが失敗する
+  - [x] converter
+  - [x] ui
 - [x] playgroundでビルド確認 npm run dev でエラーになる。もはやpdf-lib自体をpdfmeの中に入れた方が今後のためにも楽かも
   - node_modules/@pdf-lib/upng/UPNG.js の末尾に export default UPNG; を追記する
   - node_modules/@pdfme/pdf-lib/es/utils/png.js を import _UPNG from '@pdf-lib/upng'; const UPNG = _UPNG.default; にする
@@ -115,3 +115,24 @@
 1. パフォーマンスモニタリング
 2. ユーザーフィードバックの収集
 3. 必要に応じた最適化の実施
+
+# 進捗・現状まとめ（2024-05-21）
+
+## 現状
+- `test` コマンド：通る（テストは全てパス）
+- `build` コマンド：通る
+- `playground` ディレクトリで `npm run dev` を実行するとエラーが発生する
+  - エラー内容：`pdfjsLib.GlobalWorkerOptions` が undefined になる、または `pdfjsLib.getDocument` が undefined になる等
+
+## 検証フェーズまでの進捗
+- 依存パッケージのインストール・importパス修正済み
+- `pdfjs-dist` のESM/Node対応に伴うimport方法の修正済み
+- テスト・ビルドは正常に完了する状態まで到達
+- playgroundでの動作検証フェーズでエラーが発生しており、ここから先の対応が必要
+
+---
+
+今後のTODO（例）
+- playgroundでの `npm run dev` エラーの根本解決
+- `pdfjs-dist` のNode/ESM/ブラウザ環境ごとのimportやworker設定の整理
+- 必要に応じてテスト用モックや環境分岐の導入

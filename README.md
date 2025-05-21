@@ -29,6 +29,34 @@
   TypeScript-based PDF generator and React-based UI. Open source, developed by the community, and completely free to use under the MIT license!
 </p>
 
+## Requirements
+
+- **Node.js v20 or later is required.**
+- pdfme is distributed as ESM-only. CommonJS is not supported.
+
+## Installation
+
+Install the core generator package (and others as needed):
+
+```bash
+npm install @pdfme/generator
+```
+
+## Usage Example
+
+Here is a minimal example using ESM syntax:
+
+```js
+// example.mjs or in a project with "type": "module" in package.json
+import { generate } from '@pdfme/generator';
+
+const template = { /* ... your template JSON ... */ };
+const inputs = [ /* ... your data ... */ ];
+
+const pdfBuffer = await generate({ template, inputs });
+// Save or use pdfBuffer as needed
+```
+
 ## Features
 
 | Fast PDF Generator | Easy PDF Template Design | Simple JSON Template |
@@ -47,6 +75,8 @@ For a detailed list of supported features, please refer to the [Supported Featur
 ## Documentation
 
 For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide. 
+
+**Migrating from v3 to v4? See the [Migration Guide](./MIGRATION_GUIDE.md).**
 
 Need interactive help? Use [DeepWiki](https://deepwiki.com/pdfme/pdfme) to ask questions about pdfme's documentation and source code directly.
 
