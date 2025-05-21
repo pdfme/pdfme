@@ -1,5 +1,5 @@
-import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf } from '@pdfme/common';
-import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas } from '../src/helper';
+import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf, pluginRegistry } from '@pdfme/common';
+import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas, setFontNameRecursively } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({
@@ -153,7 +153,7 @@ describe('changeSchemas test', () => {
   const schemas: SchemaForUI[] = [schemaA, schemaB];
   const basePdf1: BasePdf = BLANK_PDF;
   const basePdf2: BasePdf = { width: 210, height: 297, padding: [10, 10, 10, 10] };
-  const pluginsRegistry = { text, image };
+  const pluginsRegistry = pluginRegistry({ text, image });
   const pageSize = { width: 210, height: 297 };
 
   test('changeSchemas - change content with objs length = 1', () => {
@@ -519,5 +519,69 @@ describe('changeSchemas test', () => {
         height: 100,
       },
     ]);
+  });
+});
+
+describe('setFontNameRecursively', () => {
+  it('sets fontName in object with undefined fontName property', () => {
+    const obj = { fontName: undefined, content: 'test' };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Arial');
+  });
+
+  it('does not modify existing fontName values', () => {
+    const obj = { fontName: 'Helvetica', content: 'test' };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Helvetica');
+  });
+
+  it('recursively sets fontName in nested objects and preserves other properties', () => {
+    const obj = {
+      outer: {
+        fontName: undefined,
+        otherProp: 'unchanged',
+        inner: {
+          fontName: undefined,
+          content: 'test',
+          style: { color: 'red' }
+        }
+      }
+    };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.outer.fontName).toEqual('Arial');
+    expect(obj.outer.otherProp).toEqual('unchanged');
+    expect(obj.outer.inner.fontName).toEqual('Arial');
+    expect(obj.outer.inner.content).toEqual('test');
+    expect(obj.outer.inner.style.color).toEqual('red');
+  });
+
+  it('handles arrays of objects', () => {
+    const obj = {
+      items: [
+        { fontName: undefined, content: 'item1' },
+        { fontName: undefined, content: 'item2' }
+      ]
+    };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.items[0].fontName).toEqual('Arial');
+    expect(obj.items[1].fontName).toEqual('Arial');
+  });
+
+  it('ignores null values', () => {
+    const obj = { fontName: undefined, nullProp: null };
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj.fontName).toEqual('Arial');
+    expect(obj.nullProp).toBeNull();
+  });
+
+  it('handles empty objects', () => {
+    const obj = {};
+    setFontNameRecursively(obj, 'Arial');
+    expect(obj).toEqual({});
+  });
+
+  it('returns early for null input or undefined input', () => {
+    expect(() => setFontNameRecursively(null as any, 'Arial')).not.toThrow();
+    expect(() => setFontNameRecursively(undefined as any, 'Arial')).not.toThrow();
   });
 });

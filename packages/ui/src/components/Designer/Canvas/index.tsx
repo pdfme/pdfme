@@ -335,17 +335,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     // Create a type-safe array of default schemas
     const defaultSchemas: Record<string, unknown>[] = [];
 
-    // Safely iterate through plugins registry
-    Object.values(pluginsRegistry).forEach((plugin) => {
-      if (
-        plugin &&
-        typeof plugin === 'object' &&
-        'propPanel' in plugin &&
-        plugin.propPanel &&
-        typeof plugin.propPanel === 'object' &&
-        'defaultSchema' in plugin.propPanel &&
-        plugin.propPanel.defaultSchema
-      ) {
+    pluginsRegistry.entries().forEach(([, plugin]) => {
+      if (plugin.propPanel.defaultSchema) {
         defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
       }
     });
@@ -514,18 +505,23 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               value={value}
               onChangeHoveringSchemaId={onChangeHoveringSchemaId}
               mode={mode}
-              onChange={(arg) => {
-                // Use type assertion to safely handle the argument
-                type ChangeArg = { key: string; value: unknown };
-                const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
-                changeSchemas(args.map(({ key, value }) => ({ key, value, schemaId: schema.id })));
-              }}
+              onChange={
+                (schemasList[pageCursor] || []).some((s) => s.id === schema.id)
+                  ? (arg) => {
+                    // Use type assertion to safely handle the argument
+                    type ChangeArg = { key: string; value: unknown };
+                    const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
+                    changeSchemas(
+                      args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
+                    );
+                  }
+                  : undefined
+              }
               stopEditing={() => setEditing(false)}
-              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
-                schema.readOnly && hoveringSchemaId !== schema.id
+              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id
                   ? 'transparent'
                   : token.colorPrimary
-              }`}
+                }`}
               scale={scale}
             />
           );

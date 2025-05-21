@@ -22,6 +22,7 @@ pdfmeは、熱心なコミュニティによってサポートされ、推進さ
 
 - アプリケーションのバグを報告するには、[GitHub issue](https://github.com/pdfme/pdfme/issues)をご利用ください
 - 質問や提案については、[Discord](https://discord.gg/xWPTJbmgNV)や[GitHub Discussions](https://github.com/pdfme/pdfme/discussions)でお尋ねください。
+- pdfmeのドキュメントやソースコードについてインタラクティブに質問するには、[DeepWiki](https://deepwiki.com/pdfme/pdfme)をご利用いただけます。
 
 ## コード貢献
 

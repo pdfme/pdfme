@@ -154,7 +154,16 @@ export type Plugin<T = Schema> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Plugins = { [key: string]: Plugin<any> | undefined };
+export type Plugins = { [key: string]: Plugin<any> };
+
+export interface PluginRegistry {
+  plugins: { [key: string]: Plugin };
+  exists(): boolean;
+  values(): Plugin[];
+  entries(): [string, Plugin][];
+  findByType(type: string): Plugin | undefined;
+  findWithLabelByType(type: string): [string, Plugin|undefined];
+}
 
 export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;

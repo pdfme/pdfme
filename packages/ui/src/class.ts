@@ -7,9 +7,9 @@ import {
   Size,
   Lang,
   Font,
-  Plugins,
   UIProps,
   UIOptions,
+  PluginRegistry,
   PreviewProps,
   getDefaultFont,
   checkUIProps,
@@ -17,6 +17,7 @@ import {
   checkInputs,
   checkUIOptions,
   checkPreviewProps,
+  pluginRegistry,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas';
 
@@ -31,12 +32,14 @@ export abstract class BaseUIClass {
 
   private font: Font = getDefaultFont();
 
-  private pluginsRegistry: Plugins = builtInPlugins;
+  private pluginsRegistry: PluginRegistry = pluginRegistry(builtInPlugins);
 
   private options: UIOptions = {};
 
   private readonly setSize = debounce(() => {
-    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!this.domContainer) {
+      return;
+    }
     this.size = {
       height: this.domContainer.clientHeight || window.innerHeight,
       width: this.domContainer.clientWidth || window.innerWidth,
@@ -68,7 +71,7 @@ export abstract class BaseUIClass {
     }
 
     if (Object.values(plugins).length > 0) {
-      this.pluginsRegistry = plugins;
+      this.pluginsRegistry = pluginRegistry(plugins);
     }
   }
 

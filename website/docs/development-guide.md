@@ -22,6 +22,7 @@ It is possible that some of the problems or questions have already been solved.
 
 - To report application bugs, please use [GitHub issue](https://github.com/pdfme/pdfme/issues)
 - For questions or suggestions, please ask them in [Discord](https://discord.gg/xWPTJbmgNV), [GitHub Discussions](https://github.com/pdfme/pdfme/discussions).
+- For interactive questions about pdfme's documentation and source code, you can use [DeepWiki](https://deepwiki.com/pdfme/pdfme).
 
 ## Code Contribution
 

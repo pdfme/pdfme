@@ -6,9 +6,6 @@ import { DESTROYED_ERR_MSG } from './constants.js';
 import Preview from './components/Preview.js';
 import AppContextProvider from './components/AppContextProvider.js';
 
-/**
- * @deprecated This component will be removed in a future version. Consider using an alternative solution.
- */
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
     super(props);

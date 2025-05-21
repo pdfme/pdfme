@@ -14,8 +14,8 @@
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
-  <a href="https://github.com/pdfme/pdfme/actions/workflows/publish-commit.yml">
-    <img src="https://github.com/pdfme/pdfme/workflows/Unit%20Testing/badge.svg" alt="Unit Testing status" />
+  <a href="https://deepwiki.com/pdfme/pdfme">
+    <img src="https://img.shields.io/badge/DeepWiki-pdfme%2Fpdfme-blue.svg" alt="DeepWiki" />
   </a>
   <a href="https://www.npmjs.com/package/@pdfme/generator">
     <img src="https://img.shields.io/npm/v/@pdfme/generator.svg" alt="Current npm package version." />
@@ -46,7 +46,9 @@ For a detailed list of supported features, please refer to the [Supported Featur
 
 ## Documentation
 
-For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide.
+For complete documentation on pdfme, please refer to the [Getting Started](https://pdfme.com/docs/getting-started) guide. 
+
+Need interactive help? Use [DeepWiki](https://deepwiki.com/pdfme/pdfme) to ask questions about pdfme's documentation and source code directly.
 
 ## Examples Using pdfme
 
@@ -101,4 +103,3 @@ We look forward to your contributions!
 ---
 
 pdfme is supported by [Devin AI](https://app.devin.ai/invite/KyOTXVPrlFl2TjcT) and [Greptile](https://app.greptile.com/signup?ref=MzgyNzgtMjQ1MTU=).
-

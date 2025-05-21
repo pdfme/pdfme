@@ -4,80 +4,170 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
+      interval: "monthly"
+    open-pull-requests-limit: 20
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Common package
   - package-ecosystem: "npm"
     directory: "/packages/common"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Converter package
   - package-ecosystem: "npm"
     directory: "/packages/converter"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Generator package
   - package-ecosystem: "npm"
     directory: "/packages/generator"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Manipulator package
   - package-ecosystem: "npm"
     directory: "/packages/manipulator"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Schemas package
   - package-ecosystem: "npm"
     directory: "/packages/schemas"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # UI package
   - package-ecosystem: "npm"
     directory: "/packages/ui"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Playground
   - package-ecosystem: "npm"
     directory: "/playground"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      lucide-packages:
+        patterns:
+          - "lucide*"
+        update-types:
+          - "minor"
+          - "patch"
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
   
   # Website
   - package-ecosystem: "npm"
     directory: "/website"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     labels:
       - "dependencies"
       - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"

@@ -34,6 +34,7 @@ import type {
   CommonOptions,
   GeneratorOptions,
   Plugins,
+  PluginRegistry,
   GenerateProps,
   UIOptions,
   UIProps,
@@ -64,6 +65,7 @@ import {
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
+import { pluginRegistry } from './pluginRegistry.js';
 
 export {
   PDFME_VERSION,
@@ -97,6 +99,7 @@ export {
   checkPreviewProps,
   checkDesignerProps,
   checkGenerateProps,
+  pluginRegistry,
 };
 
 export type {
@@ -113,7 +116,9 @@ export type {
   Template,
   CommonOptions,
   GeneratorOptions,
+  Plugin,
   Plugins,
+  PluginRegistry,
   GenerateProps,
   UIOptions,
   UIProps,
@@ -128,5 +133,4 @@ export type {
   PDFRenderProps,
   UIRenderProps,
   Mode,
-  Plugin,
 };

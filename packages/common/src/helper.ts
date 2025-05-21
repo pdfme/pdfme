@@ -235,15 +235,15 @@ const checkProps = <T>(data: unknown, zodSchema: z.ZodType<T>) => {
 ERROR MESSAGE: ${issue.message}
 --------------------------`,
       );
-
-      const message = messages.join('\n');
       throw Error(`[@pdfme/common] Invalid argument:
 --------------------------
-${message}`);
+${messages.join('\n')}`);
+    } else {
+      throw Error(`[@pdfme/common] Unexpected parsing error: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
-  // Check fon if template and options exist
+  // Check fonts if template and options exist
   if (data && typeof data === 'object' && 'template' in data && 'options' in data) {
     const { template, options } = data as { template: Template; options: { font?: Font } };
     if (options && options.font) {
