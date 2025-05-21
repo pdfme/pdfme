@@ -57,7 +57,7 @@
 - [ ] テストが失敗する
   - [ ] converter
   - [ ] ui
-- [ ] playgroundでビルド確認 npm run dev でエラーになる。もはやpdf-lib自体をpdfmeの中に入れた方が今後のためにも楽かも
+- [x] playgroundでビルド確認 npm run dev でエラーになる。もはやpdf-lib自体をpdfmeの中に入れた方が今後のためにも楽かも
   - node_modules/@pdf-lib/upng/UPNG.js の末尾に export default UPNG; を追記する
   - node_modules/@pdfme/pdf-lib/es/utils/png.js を import _UPNG from '@pdf-lib/upng'; const UPNG = _UPNG.default; にする
 

@@ -1,5 +1,4 @@
-// FIXME upngでエラーになる
-import _UPNG from '@pdf-lib/upng';
+import UPNG from './upng';
 
 const getImageType = (ctype: number) => {
   if (ctype === 0) return PngType.Greyscale;
@@ -49,7 +48,9 @@ export class PNG {
   readonly bitsPerComponent: number;
 
   private constructor(pngData: Uint8Array) {
+    // @ts-ignore
     const upng = UPNG.decode(pngData);
+    // @ts-ignore
     const frames = UPNG.toRGBA8(upng);
 
     if (frames.length > 1) throw new Error(`Animated PNGs are not supported`);
