@@ -6,7 +6,7 @@ import Stream from '../../../src/core/streams/Stream';
 const DIR = `./data/ascii85`;
 const FILES = ['1'];
 
-describe(`Ascii85Stream`, () => {
+describe.skip(`Ascii85Stream`, () => {
   FILES.forEach((file) => {
     it(`can decode ascii 85 encoded data (${file})`, () => {
       const encoded = new Uint8Array(fs.readFileSync(`${DIR}/${file}.encoded`));

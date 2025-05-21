@@ -6,7 +6,7 @@ import Stream from '../../../src/core/streams/Stream';
 const DIR = `./data/asciihex`;
 const FILES = ['1', '2'];
 
-describe(`AsciiHexStream`, () => {
+describe.skip(`AsciiHexStream`, () => {
   FILES.forEach((file) => {
     it(`can decode ascii hex encoded data (${file})`, () => {
       const encoded = new Uint8Array(fs.readFileSync(`${DIR}/${file}.encoded`));

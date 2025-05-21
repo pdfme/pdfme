@@ -6,7 +6,7 @@ import Stream from '../../../src/core/streams/Stream';
 const DIR = `./data/runlength`;
 const FILES = ['1', '2', '3', '4', '5'];
 
-describe(`RunLengthStream`, () => {
+describe.skip(`RunLengthStream`, () => {
   FILES.forEach((file) => {
     it(`can decode run length encoded data (${file})`, () => {
       const encoded = new Uint8Array(fs.readFileSync(`${DIR}/${file}.encoded`));

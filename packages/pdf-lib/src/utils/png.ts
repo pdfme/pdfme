@@ -1,4 +1,5 @@
-import UPNG from '@pdf-lib/upng';
+// FIXME upngでエラーになる
+import _UPNG from '@pdf-lib/upng';
 
 const getImageType = (ctype: number) => {
   if (ctype === 0) return PngType.Greyscale;

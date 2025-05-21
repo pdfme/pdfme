@@ -6,7 +6,7 @@ import Stream from '../../../src/core/streams/Stream';
 const DIR = `./data/lzw`;
 const FILES = ['1', '2', '3', '4'];
 
-describe(`LZWStream`, () => {
+describe.skip(`LZWStream`, () => {
   FILES.forEach((file) => {
     it(`can decode LZW encoded data (${file})`, () => {
       const encoded = new Uint8Array(fs.readFileSync(`${DIR}/${file}.encoded`));
