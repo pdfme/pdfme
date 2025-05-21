@@ -206,7 +206,127 @@ exports[`Designer snapshot 1`] = `
                   >
                     <ul
                       style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
-                    />
+                    >
+                      <li
+                        style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
+                      >
+                        <div
+                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
+                        >
+                          <button
+                            class="ant-btn css-dev-only-do-not-override-vrrzze ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                            style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                            type="button"
+                          >
+                            <span
+                              class="ant-btn-icon"
+                            >
+                              GripVertical
+                            </span>
+                            
+                          </button>
+                          <div
+                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                            title="text"
+                          >
+                            <svg
+                              fill="none"
+                              height="20"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                              width="20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"
+                              />
+                              <path
+                                d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"
+                              />
+                              <path
+                                d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"
+                              />
+                              <path
+                                d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"
+                              />
+                              <path
+                                d="M9 6v12"
+                              />
+                            </svg>
+                          </div>
+                          <span
+                            class="ant-typography css-dev-only-do-not-override-vrrzze"
+                            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                            title="Edit"
+                          >
+                            field1
+                          </span>
+                        </div>
+                      </li>
+                      <li
+                        style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
+                      >
+                        <div
+                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
+                        >
+                          <button
+                            class="ant-btn css-dev-only-do-not-override-vrrzze ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                            style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                            type="button"
+                          >
+                            <span
+                              class="ant-btn-icon"
+                            >
+                              GripVertical
+                            </span>
+                            
+                          </button>
+                          <div
+                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                            title="image"
+                          >
+                            <svg
+                              fill="none"
+                              height="20"
+                              stroke="currentColor"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              viewBox="0 0 24 24"
+                              width="20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <rect
+                                height="18"
+                                rx="2"
+                                ry="2"
+                                width="18"
+                                x="3"
+                                y="3"
+                              />
+                              <circle
+                                cx="9"
+                                cy="9"
+                                r="2"
+                              />
+                              <path
+                                d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                              />
+                            </svg>
+                          </div>
+                          <span
+                            class="ant-typography css-dev-only-do-not-override-vrrzze"
+                            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                            title="Edit"
+                          >
+                            field2
+                          </span>
+                        </div>
+                      </li>
+                    </ul>
                   </div>
                   <div
                     id="DndDescribedBy-1"
@@ -411,6 +531,59 @@ exports[`Designer snapshot 1`] = `
                 data-rotation="-1"
                 style="transform: translateY(-50%) translate(0px, 0.5px) rotate(4.71238898038469rad) scaleY(1); width: 1px; --moveable-color: #1677ff;"
               />
+            </div>
+            <div>
+              <div
+                class="selectable"
+                id="1"
+                style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
+                title="field1"
+              >
+                <div
+                  style="height: 100%; width: 100%;"
+                >
+                  <div
+                    style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
+                  >
+                    <div
+                      id="text-1"
+                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
+                    >
+                      <span
+                        style="letter-spacing:inherit;"
+                      >
+                        b
+                      </span>
+                      <span
+                        style="letter-spacing:0;"
+                      >
+                        b
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div
+                class="selectable"
+                id="2"
+                style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
+                title="field2"
+              >
+                <div
+                  style="height: 100%; width: 100%;"
+                >
+                  <div
+                    style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center;"
+                  >
+                    <img
+                      src="aaaaaaaaaaaa"
+                      style="height: 100%; width: 100%; border-radius: 0; object-fit: contain;"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
