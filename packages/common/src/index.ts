@@ -102,7 +102,7 @@ export {
   checkDesignerProps,
   checkGenerateProps,
   heightOfFontAtSize,
-  getFontKitFont
+  getFontKitFont,
   pluginRegistry,
 };
 
