@@ -1,3 +1,5 @@
+import { Font } from 'fontkit';
+import { getFontKitFont, heightOfFontAtSize, pt2mm } from './helper';
 import { Schema, Template, BasePdf, BlankPdf, CommonOptions } from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
 
@@ -204,7 +206,65 @@ function breakIntoPages(arg: {
   return pages;
 }
 
-function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
+// this function is used to get the header height of a table schema
+// when the table is split across multiple pages
+// and the header is repeated on each page
+async function getTableHeaderHeight(
+  schema: any,
+  options: CommonOptions,
+  __cache: Map<string | number, unknown>,
+): Promise<number> {
+  const headStyles = schema?.headStyles;
+  if (!headStyles) return 0;
+
+  const paddingTop = headStyles.padding?.top || 0;
+  const paddingBottom = headStyles.padding?.bottom || 0;
+  const borderTopWidth = headStyles.borderWidth?.top || 0;
+  const borderBottomWidth = headStyles.borderWidth?.bottom || 0;
+  const fontSize = headStyles.fontSize || 0;
+  const lineHeight = headStyles.lineHeight || 1;
+
+  // Calculate font height in mm
+  let fontHeightPt = fontSize;
+  if (options.font) {
+    const fontKitFont = await getFontKitFont(
+      schema.fontName || headStyles.fontName,
+      options.font,
+      __cache as Map<string | number, Font>,
+    );
+    fontHeightPt = heightOfFontAtSize(fontKitFont, fontSize);
+  }
+
+  const fontHeightMm = pt2mm(fontHeightPt);
+
+  // Get the maximum number of lines in any header cell
+  let maxLineCount = 1;
+  if (schema.head && Array.isArray(schema.head)) {
+    for (const headerText of schema.head) {
+      if (typeof headerText === 'string') {
+        const splitRegex = /\r\n|\r|\n/g;
+        const lines = headerText.split(splitRegex);
+        maxLineCount = Math.max(maxLineCount, lines.length);
+      }
+    }
+  }
+
+  const lineHeightMm = fontHeightMm * lineHeight;
+  const textHeightMm = lineHeightMm * maxLineCount;
+
+  // Calculate total cell height: text height + padding + borders
+  let totalHeightMm =
+    textHeightMm + paddingTop + paddingBottom + borderTopWidth + borderBottomWidth;
+
+  return totalHeightMm;
+}
+
+async function createNewTemplate(
+  pages: LayoutNode[],
+  basePdf: BlankPdf,
+  options: CommonOptions,
+  __cache: Map<string | number, unknown>,
+): Promise<Template> {
   const newTemplate: Template = {
     schemas: Array.from({ length: pages.length }, () => [] as Schema[]),
     basePdf: basePdf,
@@ -257,6 +317,30 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
     });
   });
 
+  let headerHeight = 0;
+  const updatedSchemas = newTemplate.schemas.flat();
+  for (let i = 0; i < updatedSchemas.length; i++) {
+    const currentSchema = updatedSchemas[i];
+
+    if (
+      currentSchema.type === 'table' &&
+      currentSchema.__isSplit &&
+      currentSchema.showHead &&
+      currentSchema.repeatHead
+    ) {
+      headerHeight = await getTableHeaderHeight(currentSchema, options, __cache);
+      for (let j = i + 1; j < updatedSchemas.length; j++) {
+        const subsequentSchema = updatedSchemas[j];
+
+        // Adjust the y-position by adding the header height
+        subsequentSchema.position = {
+          ...subsequentSchema.position,
+          y: subsequentSchema.position.y + headerHeight,
+        };
+      }
+    }
+  }
+
   return newTemplate;
 }
 
@@ -278,5 +362,5 @@ export const getDynamicTemplate = async (
     pages.push(...brokenPages);
   }
 
-  return createNewTemplate(pages, template.basePdf);
+  return createNewTemplate(pages, template.basePdf, arg.options, arg._cache);
 };

@@ -8,6 +8,8 @@ import {
   getDefaultFont,
   getFallbackFontName,
   mm2pt,
+  getFontKitFont,
+  heightOfFontAtSize,
 } from '@pdfme/common';
 import {
   VERTICAL_ALIGN_TOP,
@@ -22,9 +24,7 @@ import {
 } from './constants.js';
 import {
   calculateDynamicFontSize,
-  heightOfFontAtSize,
   getFontDescentInPt,
-  getFontKitFont,
   widthOfTextAtSize,
   splitTextToSize,
 } from './helper.js';
