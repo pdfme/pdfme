@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext, useCallback } from 'react';
+import React, { useRef, useState, useContext, useCallback, useEffect } from 'react';
 import {
   cloneDeep,
   ZOOM,
@@ -70,8 +70,8 @@ const TemplateEditor = ({
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [zoomLevel, setZoomLevel] = useState(options.zoomLevel ?? 1);
+  const [sidebarOpen, setSidebarOpen] = useState(options.sidebarOpen ?? true);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
   const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
@@ -90,6 +90,18 @@ const TemplateEditor = ({
     setActiveElements([]);
     setHoveringSchemaId(null);
   };
+
+  // Update component state only when _options_ changes
+  // Ignore exhaustive useEffect dependency warnings here
+  useEffect(() => {
+    if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
+      setZoomLevel(options.zoomLevel);
+    }
+    if (typeof options.sidebarOpen === 'boolean' && options.sidebarOpen !== sidebarOpen) {
+      setSidebarOpen(options.sidebarOpen);
+    }
+    // eslint-disable-next-line
+  }, [options]);
 
   useScrollPageCursor({
     ref: canvasRef,

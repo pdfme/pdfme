@@ -275,6 +275,18 @@ const designer = new Designer({ domContainer, template });
 - `onSaveTemplate`
 - `destroy`
 
+UIの状態は `options` で制御できます（省略時は下記のデフォルト値です）。
+
+```js
+// UIの状態を一部またはすべて設定（省略時のデフォルト値を例示）
+const options = {
+  zoomLevel: 1,
+  sidebarOpen: true
+};
+
+const designer = new Designer({ domContainer, template, options });
+```
+
 ### フォーム
 
 テンプレートを使用してフォームとPDFビューワーを作成できます。
