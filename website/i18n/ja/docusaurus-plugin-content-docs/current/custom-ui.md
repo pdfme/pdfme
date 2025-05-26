@@ -76,3 +76,25 @@ new Designer({
   },
 });
 ```
+
+## UIオプション
+
+UIの状態をオプションで制御できます。
+
+```javascript
+// 特定の状態で初期化（FormやViewerでも同様に使えます）:
+const designer = new Designer({
+  domContainer,
+  template,
+  options: {
+    zoomLevel: 1.5,
+    sidebarOpen: false,  // （Designerのみ）
+  }
+});
+
+// 初期化後に状態を更新:
+designer.updateOptions({
+  zoomLevel: 2,
+  sidebarOpen: true
+});
+```
