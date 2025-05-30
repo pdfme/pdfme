@@ -153,6 +153,84 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      borderWidth: {
+        title: i18n('schemas.borderWidth') || 'Border Width',
+        type: 'object',
+        widget: 'card',
+        column: 4,
+        properties: {
+          top: {
+            title: i18n('schemas.top') || 'Top',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          right: {
+            title: i18n('schemas.right') || 'Right',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          bottom: {
+            title: i18n('schemas.bottom') || 'Bottom',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          left: {
+            title: i18n('schemas.left') || 'Left',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+        },
+      },
+      borderColor: {
+        title: i18n('schemas.borderColor') || 'Border Color',
+        type: 'string',
+        widget: 'color',
+        props: {
+          disabledAlpha: true,
+        },
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: i18n('validation.hexColor'),
+          },
+        ],
+      },
+      padding: {
+        title: i18n('schemas.padding') || 'Padding',
+        type: 'object',
+        widget: 'card',
+        column: 4,
+        properties: {
+          top: {
+            title: i18n('schemas.top') || 'Top',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          right: {
+            title: i18n('schemas.right') || 'Right',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          bottom: {
+            title: i18n('schemas.bottom') || 'Bottom',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+          left: {
+            title: i18n('schemas.left') || 'Left',
+            type: 'number',
+            widget: 'inputNumber',
+            props: { min: 0, step: 0.1, precision: 1 },
+          },
+        },
+      },
     };
 
     return textSchema;
@@ -180,5 +258,8 @@ export const propPanel: PropPanel<TextSchema> = {
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,
+    borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+    borderColor: '#000000',
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
   },
 };
