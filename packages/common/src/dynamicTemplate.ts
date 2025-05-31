@@ -238,13 +238,14 @@ function breakIntoPages(arg: {
       newY = calculateNewY(y, targetPageIndex);
     }
     
-    if (schema && schema.type === 'table' && 'repeatHead' in schema && (schema as {repeatHead?: boolean}).repeatHead === true && 'showHead' in schema && (schema as {showHead?: boolean}).showHead !== false) {
+    if (schema && schema.type === 'table' && 'repeatHead' in schema && schema.repeatHead === true && 'showHead' in schema && schema.showHead !== false) {
       const tableName = schema.name;
       
       if (!tablesWithRepeatHead.has(tableName)) {
+        const headerHeight = 20;
         tablesWithRepeatHead.set(tableName, {
           firstPage: targetPageIndex,
-          headerHeight: height
+          headerHeight: headerHeight
         });
         tableRowsOnPages.set(tableName, new Map());
       }
@@ -279,17 +280,16 @@ function breakIntoPages(arg: {
 
     if (!schema) throw new Error('[@pdfme/common] schema is undefined');
     
-    // Apply header adjustment for elements that come after tables with repeatHead on subsequent pages
     let headerAdjustment = 0;
+    const appliedAdjustments = new Set<string>();
     for (const [tableName, tableInfo] of tablesWithRepeatHead.entries()) {
       const tablePageMap = tableRowsOnPages.get(tableName)!;
       const firstRowOnThisPage = tablePageMap.get(targetPageIndex);
       
-      // If this page has the table and it's not the first page of the table
       if (firstRowOnThisPage !== undefined && targetPageIndex > tableInfo.firstPage) {
-        // If this element comes after the table's first row on this page
-        if (i > firstRowOnThisPage) {
+        if (i > firstRowOnThisPage && !appliedAdjustments.has(tableName)) {
           headerAdjustment += tableInfo.headerHeight;
+          appliedAdjustments.add(tableName);
         }
       }
     }
