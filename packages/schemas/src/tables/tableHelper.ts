@@ -269,7 +269,10 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : !schema.__isSplit;
+  // Show header if showHead is true and either:
+  // 1. It's not a split table (first page)
+  // 2. It's a split table but repeatHead is true
+  schema.showHead = schema.showHead === false ? false : (!schema.__isSplit || schema.repeatHead === true);
 
   const input = parseInput(schema, body);
 
