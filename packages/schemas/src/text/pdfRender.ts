@@ -1,4 +1,4 @@
-import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
+import { PDFFont, PDFDocument, PDFPage, Rotation } from '@pdfme/pdf-lib';
 import type { Font as FontKitFont } from 'fontkit';
 import type { TextSchema, Spacing } from './types.js';
 import {
@@ -62,66 +62,93 @@ const embedAndGetFontObj = async (arg: {
 };
 
 const renderBorder = (
-  page: any,
+  page: PDFPage,
   x: number,
   y: number,
   width: number,
   height: number,
   borderWidth: Spacing,
   borderColor: string,
-  rotate: any,
+  rotate: Rotation,
   opacity: number,
-  colorType?: ColorType
+  pageHeight: number,
+  schema: { position: { x: number; y: number } },
+  colorType?: ColorType,
 ) => {
   const color = hex2PrintingColor(borderColor, colorType);
-  
+
+  const borderWidthPt = {
+    top: mm2pt(borderWidth.top),
+    right: mm2pt(borderWidth.right),
+    bottom: mm2pt(borderWidth.bottom),
+    left: mm2pt(borderWidth.left),
+  };
+
+  // Calculate pivot point for rotation (center of the element)
+  const pivotPoint = {
+    x: x + width / 2,
+    y: pageHeight - mm2pt(schema.position.y) - height / 2,
+  };
+
   // Top border
   if (borderWidth.top > 0) {
-    page.drawRectangle({
-      x,
-      y: y + height - mm2pt(borderWidth.top),
-      width,
-      height: mm2pt(borderWidth.top),
-      rotate,
+    const startPoint = { x, y: y + height };
+    const endPoint = { x: x + width, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.top,
       color,
       opacity,
     });
   }
-  
+
   // Right border
   if (borderWidth.right > 0) {
-    page.drawRectangle({
-      x: x + width - mm2pt(borderWidth.right),
-      y,
-      width: mm2pt(borderWidth.right),
-      height,
-      rotate,
+    const startPoint = { x: x + width, y };
+    const endPoint = { x: x + width, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.right,
       color,
       opacity,
     });
   }
-  
+
   // Bottom border
   if (borderWidth.bottom > 0) {
-    page.drawRectangle({
-      x,
-      y,
-      width,
-      height: mm2pt(borderWidth.bottom),
-      rotate,
+    const startPoint = { x, y };
+    const endPoint = { x: x + width, y };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.bottom,
       color,
       opacity,
     });
   }
-  
+
   // Left border
   if (borderWidth.left > 0) {
-    page.drawRectangle({
-      x,
-      y,
-      width: mm2pt(borderWidth.left),
-      height,
-      rotate,
+    const startPoint = { x, y };
+    const endPoint = { x, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.left,
       color,
       opacity,
     });
@@ -184,7 +211,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     rotate,
     position: { x, y },
     opacity,
-  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: true });
 
   // Get border and padding values
   const borderWidth = schema.borderWidth || { top: 0, right: 0, bottom: 0, left: 0 };
@@ -195,20 +222,44 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 
+  // For border positioning, we need the original unrotated coordinates
+  const {
+    position: { x: borderX, y: borderY },
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+
   // Render borders if defined
   if (schema.borderWidth && schema.borderColor) {
-    renderBorder(page, x, y, width, height, borderWidth, schema.borderColor, rotate, opacity || 1, colorType);
+    renderBorder(
+      page,
+      borderX,
+      borderY,
+      width,
+      height,
+      borderWidth,
+      schema.borderColor,
+      rotate,
+      opacity || 1,
+      pageHeight,
+      schema,
+      colorType,
+    );
   }
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
+  // For text positioning, we need the original unrotated coordinates
+  const {
+    position: { x: originalX },
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+
   // Calculate text area dimensions accounting for borders and padding
-  const textAreaWidth = width - mm2pt(borderWidth.left + borderWidth.right + padding.left + padding.right);
-  const textAreaHeight = height - mm2pt(borderWidth.top + borderWidth.bottom + padding.top + padding.bottom);
-  const textAreaX = x + mm2pt(borderWidth.left + padding.left);
-  const textAreaY = y + mm2pt(borderWidth.bottom + padding.bottom);
+  const textAreaWidth =
+    width - mm2pt(borderWidth.left + borderWidth.right + padding.left + padding.right);
+  const textAreaHeight =
+    height - mm2pt(borderWidth.top + borderWidth.bottom + padding.top + padding.bottom);
+  const textAreaX = originalX + mm2pt(borderWidth.left + padding.left);
 
   const lines = splitTextToSize({
     value,
@@ -229,11 +280,15 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       yOffset = textAreaHeight - otherLinesHeight + descent - halfLineHeightAdjustment;
     } else if (verticalAlignment === VERTICAL_ALIGN_MIDDLE) {
       yOffset =
-        (textAreaHeight - otherLinesHeight - firstLineTextHeight + descent) / 2 + firstLineTextHeight;
+        (textAreaHeight - otherLinesHeight - firstLineTextHeight + descent) / 2 +
+        firstLineTextHeight;
     }
   }
 
-  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+  const pivotPoint = {
+    x: originalX + width / 2,
+    y: pageHeight - mm2pt(schema.position.y) - height / 2,
+  };
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
@@ -255,7 +310,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       xLine += textAreaWidth - textWidth;
     }
 
-    let yLine = pageHeight - mm2pt(schema.position.y) - mm2pt(borderWidth.top + padding.top) - yOffset - rowYOffset;
+    let yLine =
+      pageHeight -
+      mm2pt(schema.position.y) -
+      mm2pt(borderWidth.top + padding.top) -
+      yOffset -
+      rowYOffset;
 
     // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
