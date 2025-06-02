@@ -1,5 +1,5 @@
 import type * as CSS from 'csstype';
-import { cmyk, degrees, degreesToRadians, rgb, Color } from '@pdfme/pdf-lib';
+import { cmyk, degrees, degreesToRadians, rgb, Color, PDFPage, Rotation } from '@pdfme/pdf-lib';
 import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
 import { IconNode } from 'lucide';
 import { getDynamicHeightsForTable as _getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
@@ -278,4 +278,156 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
 
   // Return the complete SVG string
   return `<svg ${svgAttrString}>${elementsString}</svg>`;
+};
+
+// Common border and spacing types
+export interface BoxDimensions {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+// Common border rendering for PDF
+export const renderBorder = (
+  page: PDFPage,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  borderWidth: BoxDimensions,
+  borderColor: string,
+  rotate: Rotation,
+  opacity: number,
+  pageHeight: number,
+  schema: { position: { x: number; y: number } },
+  colorType?: ColorType,
+) => {
+  const color = hex2PrintingColor(borderColor, colorType);
+
+  const borderWidthPt = {
+    top: mm2pt(borderWidth.top),
+    right: mm2pt(borderWidth.right),
+    bottom: mm2pt(borderWidth.bottom),
+    left: mm2pt(borderWidth.left),
+  };
+
+  // Calculate pivot point for rotation (center of the element)
+  const pivotPoint = {
+    x: x + width / 2,
+    y: pageHeight - mm2pt(schema.position.y) - height / 2,
+  };
+
+  // Top border
+  if (borderWidth.top > 0) {
+    const startPoint = { x, y: y + height };
+    const endPoint = { x: x + width, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.top,
+      color,
+      opacity,
+    });
+  }
+
+  // Right border
+  if (borderWidth.right > 0) {
+    const startPoint = { x: x + width, y };
+    const endPoint = { x: x + width, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.right,
+      color,
+      opacity,
+    });
+  }
+
+  // Bottom border
+  if (borderWidth.bottom > 0) {
+    const startPoint = { x, y };
+    const endPoint = { x: x + width, y };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.bottom,
+      color,
+      opacity,
+    });
+  }
+
+  // Left border
+  if (borderWidth.left > 0) {
+    const startPoint = { x, y };
+    const endPoint = { x, y: y + height };
+    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
+    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
+
+    page.drawLine({
+      start: rotatedStart,
+      end: rotatedEnd,
+      thickness: borderWidthPt.left,
+      color,
+      opacity,
+    });
+  }
+};
+
+// Common box dimension prop panel schema
+export const getBoxDimensionProp = (step = 1, i18n?: (key: string) => string) => {
+  const getCommonProp = () => ({
+    type: 'number',
+    widget: 'inputNumber',
+    props: { min: 0, step, precision: step < 1 ? 1 : 0 },
+  });
+  return {
+    top: {
+      title: i18n?.('schemas.top') || 'Top',
+      ...getCommonProp(),
+    },
+    right: {
+      title: i18n?.('schemas.right') || 'Right',
+      ...getCommonProp(),
+    },
+    bottom: {
+      title: i18n?.('schemas.bottom') || 'Bottom',
+      ...getCommonProp(),
+    },
+    left: {
+      title: i18n?.('schemas.left') || 'Left',
+      ...getCommonProp(),
+    },
+  };
+};
+
+// Common border UI creation for line elements
+export const createBorderLineDiv = (
+  width: string,
+  height: string,
+  top: string | null,
+  right: string | null,
+  bottom: string | null,
+  left: string | null,
+  borderColor: string,
+) => {
+  const div = document.createElement('div');
+  div.style.width = width;
+  div.style.height = height;
+  div.style.position = 'absolute';
+  if (top !== null) div.style.top = top;
+  if (right !== null) div.style.right = right;
+  if (bottom !== null) div.style.bottom = bottom;
+  if (left !== null) div.style.left = left;
+  div.style.backgroundColor = borderColor;
+  return div;
 };

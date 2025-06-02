@@ -21,6 +21,7 @@ import {
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
+import { getBoxDimensionProp } from '../utils.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -158,32 +159,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'object',
         widget: 'card',
         column: 4,
-        properties: {
-          top: {
-            title: i18n('schemas.top') || 'Top',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          right: {
-            title: i18n('schemas.right') || 'Right',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          bottom: {
-            title: i18n('schemas.bottom') || 'Bottom',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          left: {
-            title: i18n('schemas.left') || 'Left',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-        },
+        properties: getBoxDimensionProp(0.1, i18n),
       },
       borderColor: {
         title: i18n('schemas.borderColor') || 'Border Color',
@@ -204,32 +180,7 @@ export const propPanel: PropPanel<TextSchema> = {
         type: 'object',
         widget: 'card',
         column: 4,
-        properties: {
-          top: {
-            title: i18n('schemas.top') || 'Top',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          right: {
-            title: i18n('schemas.right') || 'Right',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          bottom: {
-            title: i18n('schemas.bottom') || 'Bottom',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-          left: {
-            title: i18n('schemas.left') || 'Left',
-            type: 'number',
-            widget: 'inputNumber',
-            props: { min: 0, step: 0.1, precision: 1 },
-          },
-        },
+        properties: getBoxDimensionProp(0.1, i18n),
       },
     };
 

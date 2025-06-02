@@ -1,6 +1,6 @@
-import { PDFFont, PDFDocument, PDFPage, Rotation } from '@pdfme/pdf-lib';
+import { PDFFont, PDFDocument } from '@pdfme/pdf-lib';
 import type { Font as FontKitFont } from 'fontkit';
-import type { TextSchema, Spacing } from './types.js';
+import type { TextSchema } from './types.js';
 import {
   PDFRenderProps,
   ColorType,
@@ -28,7 +28,12 @@ import {
   widthOfTextAtSize,
   splitTextToSize,
 } from './helper.js';
-import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
+import {
+  convertForPdfLayoutProps,
+  renderBorder,
+  rotatePoint,
+  hex2PrintingColor,
+} from '../utils.js';
 
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;
@@ -59,100 +64,6 @@ const embedAndGetFontObj = async (arg: {
 
   _cache.set(pdfDoc, fontObj);
   return fontObj;
-};
-
-const renderBorder = (
-  page: PDFPage,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  borderWidth: Spacing,
-  borderColor: string,
-  rotate: Rotation,
-  opacity: number,
-  pageHeight: number,
-  schema: { position: { x: number; y: number } },
-  colorType?: ColorType,
-) => {
-  const color = hex2PrintingColor(borderColor, colorType);
-
-  const borderWidthPt = {
-    top: mm2pt(borderWidth.top),
-    right: mm2pt(borderWidth.right),
-    bottom: mm2pt(borderWidth.bottom),
-    left: mm2pt(borderWidth.left),
-  };
-
-  // Calculate pivot point for rotation (center of the element)
-  const pivotPoint = {
-    x: x + width / 2,
-    y: pageHeight - mm2pt(schema.position.y) - height / 2,
-  };
-
-  // Top border
-  if (borderWidth.top > 0) {
-    const startPoint = { x, y: y + height };
-    const endPoint = { x: x + width, y: y + height };
-    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
-    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
-
-    page.drawLine({
-      start: rotatedStart,
-      end: rotatedEnd,
-      thickness: borderWidthPt.top,
-      color,
-      opacity,
-    });
-  }
-
-  // Right border
-  if (borderWidth.right > 0) {
-    const startPoint = { x: x + width, y };
-    const endPoint = { x: x + width, y: y + height };
-    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
-    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
-
-    page.drawLine({
-      start: rotatedStart,
-      end: rotatedEnd,
-      thickness: borderWidthPt.right,
-      color,
-      opacity,
-    });
-  }
-
-  // Bottom border
-  if (borderWidth.bottom > 0) {
-    const startPoint = { x, y };
-    const endPoint = { x: x + width, y };
-    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
-    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
-
-    page.drawLine({
-      start: rotatedStart,
-      end: rotatedEnd,
-      thickness: borderWidthPt.bottom,
-      color,
-      opacity,
-    });
-  }
-
-  // Left border
-  if (borderWidth.left > 0) {
-    const startPoint = { x, y };
-    const endPoint = { x, y: y + height };
-    const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
-    const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
-
-    page.drawLine({
-      start: rotatedStart,
-      end: rotatedEnd,
-      thickness: borderWidthPt.left,
-      color,
-      opacity,
-    });
-  }
 };
 
 const getFontProp = ({

@@ -543,7 +543,7 @@ exports[`Designer snapshot 1`] = `
                   style="height: 100%; width: 100%;"
                 >
                   <div
-                    style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
+                    style="padding: 0mm 0mm 0mm 0mm; resize: none; background-color: transparent; border-top-width: 0mm; border-right-width: 0mm; border-bottom-width: 0mm; border-left-width: 0mm; border-color: transparent; border-style: solid; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; box-sizing: border-box; cursor: default;"
                   >
                     <div
                       id="text-1"
