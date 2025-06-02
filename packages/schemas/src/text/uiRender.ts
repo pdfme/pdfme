@@ -191,16 +191,29 @@ export const buildStyledTextContainer = (
 
   const container = document.createElement('div');
 
+  // Get border and padding values
+  const borderWidth = schema.borderWidth || { top: 0, right: 0, bottom: 0, left: 0 };
+  const padding = schema.padding || { top: 0, right: 0, bottom: 0, left: 0 };
+
   const containerStyle: CSS.Properties = {
-    padding: 0,
+    padding: `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`,
     resize: 'none',
     backgroundColor: getBackgroundColor(value, schema),
-    border: 'none',
+    border: schema.borderWidth && schema.borderColor 
+      ? `${borderWidth.top}mm solid ${schema.borderColor}` 
+      : 'none',
+    borderTopWidth: `${borderWidth.top}mm`,
+    borderRightWidth: `${borderWidth.right}mm`,
+    borderBottomWidth: `${borderWidth.bottom}mm`,
+    borderLeftWidth: `${borderWidth.left}mm`,
+    borderColor: schema.borderColor || 'transparent',
+    borderStyle: 'solid',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
     width: '100%',
     height: '100%',
+    boxSizing: 'border-box',
     cursor: isEditable(mode, schema) ? 'text' : 'default',
   };
   Object.assign(container.style, containerStyle);

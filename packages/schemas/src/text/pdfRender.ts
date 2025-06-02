@@ -28,7 +28,12 @@ import {
   widthOfTextAtSize,
   splitTextToSize,
 } from './helper.js';
-import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
+import {
+  convertForPdfLayoutProps,
+  renderBorder,
+  rotatePoint,
+  hex2PrintingColor,
+} from '../utils.js';
 
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;
@@ -117,23 +122,62 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     rotate,
     position: { x, y },
     opacity,
-  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: true });
+
+  // Get border and padding values
+  const borderWidth = schema.borderWidth || { top: 0, right: 0, bottom: 0, left: 0 };
+  const padding = schema.padding || { top: 0, right: 0, bottom: 0, left: 0 };
 
   if (schema.backgroundColor) {
     const color = hex2PrintingColor(schema.backgroundColor, colorType);
     page.drawRectangle({ x, y, width, height, rotate, color });
   }
 
+  // For border positioning, we need the original unrotated coordinates
+  const {
+    position: { x: borderX, y: borderY },
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+
+  // Render borders if defined
+  if (schema.borderWidth && schema.borderColor) {
+    renderBorder(
+      page,
+      borderX,
+      borderY,
+      width,
+      height,
+      borderWidth,
+      schema.borderColor,
+      rotate,
+      opacity || 1,
+      pageHeight,
+      schema,
+      colorType,
+    );
+  }
+
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
+
+  // For text positioning, we need the original unrotated coordinates
+  const {
+    position: { x: originalX },
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+
+  // Calculate text area dimensions accounting for borders and padding
+  const textAreaWidth =
+    width - mm2pt(borderWidth.left + borderWidth.right + padding.left + padding.right);
+  const textAreaHeight =
+    height - mm2pt(borderWidth.top + borderWidth.bottom + padding.top + padding.bottom);
+  const textAreaX = originalX + mm2pt(borderWidth.left + padding.left);
 
   const lines = splitTextToSize({
     value,
     characterSpacing,
     fontSize,
     fontKitFont,
-    boxWidthInPt: width,
+    boxWidthInPt: textAreaWidth,
   });
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down
@@ -144,14 +188,18 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     const otherLinesHeight = lineHeight * fontSize * (lines.length - 1);
 
     if (verticalAlignment === VERTICAL_ALIGN_BOTTOM) {
-      yOffset = height - otherLinesHeight + descent - halfLineHeightAdjustment;
+      yOffset = textAreaHeight - otherLinesHeight + descent - halfLineHeightAdjustment;
     } else if (verticalAlignment === VERTICAL_ALIGN_MIDDLE) {
       yOffset =
-        (height - otherLinesHeight - firstLineTextHeight + descent) / 2 + firstLineTextHeight;
+        (textAreaHeight - otherLinesHeight - firstLineTextHeight + descent) / 2 +
+        firstLineTextHeight;
     }
   }
 
-  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+  const pivotPoint = {
+    x: originalX + width / 2,
+    y: pageHeight - mm2pt(schema.position.y) - height / 2,
+  };
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
@@ -166,14 +214,19 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       line = '\r\n';
     }
 
-    let xLine = x;
+    let xLine = textAreaX;
     if (alignment === 'center') {
-      xLine += (width - textWidth) / 2;
+      xLine += (textAreaWidth - textWidth) / 2;
     } else if (alignment === 'right') {
-      xLine += width - textWidth;
+      xLine += textAreaWidth - textWidth;
     }
 
-    let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
+    let yLine =
+      pageHeight -
+      mm2pt(schema.position.y) -
+      mm2pt(borderWidth.top + padding.top) -
+      yOffset -
+      rowYOffset;
 
     // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
@@ -214,7 +267,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       // if alignment is `justify` but the end of line is not newline, then adjust the spacing
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
-      spacing += (width - textWidth) / len;
+      spacing += (textAreaWidth - textWidth) / len;
     }
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 

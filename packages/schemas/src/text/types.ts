@@ -5,6 +5,8 @@ export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
 export type VERTICAL_ALIGNMENT = 'top' | 'middle' | 'bottom';
 export type DYNAMIC_FONT_SIZE_FIT = 'horizontal' | 'vertical';
 
+export type Spacing = { top: number; right: number; bottom: number; left: number };
+
 export type FontWidthCalcValues = {
   font: FontKitFont;
   fontSize: number;
@@ -27,4 +29,7 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
+  borderWidth?: Spacing;
+  borderColor?: string;
+  padding?: Spacing;
 }

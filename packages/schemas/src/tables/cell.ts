@@ -94,10 +94,13 @@ const cellSchema: Plugin<CellSchema> = {
       renderLine(arg, schema, { x: position.x, y: position.y }, borderWidth.left, height),
     ]);
     // TEXT
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { borderWidth: _bw, padding: _pd, borderColor: _bc, ...textSchema } = schema;
     await textPdfRender({
       ...arg,
       schema: {
-        ...schema,
+        ...textSchema,
         type: 'text',
         backgroundColor: '',
         position: {
@@ -115,9 +118,11 @@ const cellSchema: Plugin<CellSchema> = {
     rootElement.style.backgroundColor = backgroundColor;
 
     const textDiv = createTextDiv(schema);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { borderWidth: _bw, padding: _pd, borderColor: _bc, ...textSchema } = schema;
     await textUiRender({
       ...arg,
-      schema: { ...schema, backgroundColor: '' },
+      schema: { ...textSchema, backgroundColor: '' },
       rootElement: textDiv,
     });
     rootElement.appendChild(textDiv);
