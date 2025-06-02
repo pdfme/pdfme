@@ -341,7 +341,9 @@ describe('Table Schema with repeatHead Tests', () => {
           expect(tableSchema.__bodyRange).toBeDefined();
           expect(typeof tableSchema.__bodyRange?.start).toBe('number');
           expect(typeof tableSchema.__bodyRange?.end).toBe('number');
-          expect(tableSchema.__bodyRange?.start).toBeLessThanOrEqual(tableSchema.__bodyRange?.end);
+          if (tableSchema.__bodyRange?.start !== undefined && tableSchema.__bodyRange?.end !== undefined) {
+            expect(tableSchema.__bodyRange.start).toBeLessThanOrEqual(tableSchema.__bodyRange.end);
+          }
         }
       }
     });
@@ -446,7 +448,7 @@ describe('Table Schema with repeatHead Tests', () => {
       
       // Verify staticSchema is preserved in the template
       expect(result.basePdf).toHaveProperty('staticSchema');
-      if ('staticSchema' in result.basePdf && result.basePdf.staticSchema) {
+      if (typeof result.basePdf === 'object' && result.basePdf !== null && 'staticSchema' in result.basePdf && result.basePdf.staticSchema) {
         expect(result.basePdf.staticSchema).toHaveLength(1);
         expect(result.basePdf.staticSchema[0].name).toBe('pageNumber');
       }

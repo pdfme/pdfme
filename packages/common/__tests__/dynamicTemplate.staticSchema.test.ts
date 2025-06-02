@@ -287,7 +287,7 @@ describe('StaticSchema Collision Detection Tests', () => {
 
       // StaticSchema should be preserved in the result
       expect(result.basePdf).toHaveProperty('staticSchema');
-      if ('staticSchema' in result.basePdf && result.basePdf.staticSchema) {
+      if (typeof result.basePdf === 'object' && result.basePdf !== null && 'staticSchema' in result.basePdf && result.basePdf.staticSchema) {
         expect(result.basePdf.staticSchema).toHaveLength(3);
         expect(result.basePdf.staticSchema.map(s => s.name)).toEqual(['header', 'footer1', 'footer2']);
       }
