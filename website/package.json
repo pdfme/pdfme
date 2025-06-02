@@ -18,7 +18,7 @@
   "dependencies": {
     "@docusaurus/core": "^3.7.0",
     "@docusaurus/module-type-aliases": "^3.7.0",
-    "@docusaurus/plugin-client-redirects": "^3.7.0",
+    "@docusaurus/plugin-client-redirects": "^3.8.0",
     "@docusaurus/plugin-google-gtag": "^3.7.0",
     "@docusaurus/preset-classic": "^3.8.0",
     "react": "^19.1.0",
