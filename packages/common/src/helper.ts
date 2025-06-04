@@ -70,7 +70,7 @@ export const px2mm = (px: number): number => {
   return parseFloat(String(px)) * ratio;
 };
 
-const blob2Base64Pdf = (blob: Blob) => {
+export const blob2Base64Pdf = (blob: Blob) => {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
