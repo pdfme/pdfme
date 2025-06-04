@@ -242,10 +242,9 @@ function breakIntoPages(arg: {
       const tableName = schema.name;
       
       if (!tablesWithRepeatHead.has(tableName)) {
-        const headerHeight = 20;
         tablesWithRepeatHead.set(tableName, {
           firstPage: targetPageIndex,
-          headerHeight: headerHeight
+          headerHeight: height
         });
         tableRowsOnPages.set(tableName, new Map());
       }
