@@ -165,37 +165,6 @@ function breakIntoPages(arg: {
   const [paddingTop, , paddingBottom] = basePdf.padding;
   const yAdjustments: { page: number; value: number }[] = [];
 
-  // Calculate reserved space by staticSchema elements at the bottom of the page
-  const getReservedBottomSpace = () => {
-    if (!('staticSchema' in basePdf) || !basePdf.staticSchema) {
-      return 0;
-    }
-    
-    let minStaticY = basePdf.height;
-    for (const staticSchema of basePdf.staticSchema) {
-      const staticY = staticSchema.position.y;
-      if (staticY < minStaticY) {
-        minStaticY = staticY;
-      }
-    }
-    
-    // Reserve space from minStaticY to bottom of page, excluding bottom padding
-    // This ensures content doesn't overlap with staticSchema elements
-    const reservedSpace = basePdf.height - minStaticY;
-    
-    return reservedSpace;
-  };
-
-  const reservedBottomSpace = getReservedBottomSpace();
-  
-  // Get maximum Y position before staticSchema starts (if any)
-  const getMaxContentY = () => {
-    if (reservedBottomSpace > 0) {
-      return basePdf.height - reservedBottomSpace;
-    }
-    return basePdf.height - paddingBottom;
-  };
-
   const getPageHeight = (pageIndex: number) =>
     basePdf.height - paddingBottom - (pageIndex > 0 ? paddingTop : 0);
 
@@ -212,51 +181,6 @@ function breakIntoPages(arg: {
   };
 
   const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
-  
-  // Track tables with repeatHead to identify which elements need layout adjustments
-  const tablesWithRepeatHead = new Map<string, { firstPage: number; headerHeight: number }>();
-  const tableRowsOnPages = new Map<string, Map<number, number>>(); // table name -> (page -> first row index)
-  
-  // First pass: identify tables and their pages
-  for (let i = 0; i < children.length; i++) {
-    const { schema, position, height } = children[i];
-    const { y } = position;
-
-    let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
-    let newY = calculateNewY(y, targetPageIndex);
-
-    // Check for normal page overflow first
-    if (newY + height > getPageHeight(targetPageIndex)) {
-      targetPageIndex++;
-      newY = calculateNewY(y, targetPageIndex);
-    }
-    
-    // Additional check for staticSchema collision
-    const maxContentY = getMaxContentY();
-    if (reservedBottomSpace > 0 && newY + height > maxContentY) {
-      targetPageIndex++;
-      newY = calculateNewY(y, targetPageIndex);
-    }
-    
-    if (schema && schema.type === 'table' && 'repeatHead' in schema && schema.repeatHead === true && 'showHead' in schema && schema.showHead !== false) {
-      const tableName = schema.name;
-      
-      if (!tablesWithRepeatHead.has(tableName)) {
-        tablesWithRepeatHead.set(tableName, {
-          firstPage: targetPageIndex,
-          headerHeight: height
-        });
-        tableRowsOnPages.set(tableName, new Map());
-      }
-      
-      const tablePageMap = tableRowsOnPages.get(tableName)!;
-      if (!tablePageMap.has(targetPageIndex)) {
-        tablePageMap.set(targetPageIndex, i);
-      }
-    }
-  }
-  
-  // Second pass: place elements with header adjustments for subsequent pages
   for (let i = 0; i < children.length; i++) {
     const { schema, position, height, width } = children[i];
     const { y, x } = position;
@@ -264,45 +188,12 @@ function breakIntoPages(arg: {
     let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
     let newY = calculateNewY(y, targetPageIndex);
 
-    // Check for normal page overflow first
-    if (newY + height > getPageHeight(targetPageIndex)) {
-      targetPageIndex++;
-      newY = calculateNewY(y, targetPageIndex);
-    }
-    
-    // Additional check for staticSchema collision
-    const maxContentY = getMaxContentY();
-    if (reservedBottomSpace > 0 && newY + height > maxContentY) {
+    if (newY + height > basePdf.height - paddingBottom) {
       targetPageIndex++;
       newY = calculateNewY(y, targetPageIndex);
     }
 
     if (!schema) throw new Error('[@pdfme/common] schema is undefined');
-    
-    let headerAdjustment = 0;
-    const appliedAdjustments = new Set<string>();
-    for (const [tableName, tableInfo] of tablesWithRepeatHead.entries()) {
-      const tablePageMap = tableRowsOnPages.get(tableName)!;
-      const firstRowOnThisPage = tablePageMap.get(targetPageIndex);
-      
-      if (firstRowOnThisPage !== undefined && targetPageIndex > tableInfo.firstPage) {
-        if (i > firstRowOnThisPage && !appliedAdjustments.has(tableName)) {
-          headerAdjustment += tableInfo.headerHeight;
-          appliedAdjustments.add(tableName);
-        }
-      }
-    }
-    
-    newY += headerAdjustment;
-    
-    // Mark table as split if it's not on its first page
-    if (schema.type === 'table') {
-      const tableName = schema.name;
-      const tableInfo = tablesWithRepeatHead.get(tableName);
-      if (tableInfo && targetPageIndex > tableInfo.firstPage) {
-        schema.__isSplit = true;
-      }
-    }
 
     const clonedElement = createNode({ schema, position: { x, y: newY }, width, height });
     pages[targetPageIndex].insertChild(clonedElement);
