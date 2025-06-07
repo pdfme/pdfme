@@ -207,6 +207,10 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(bodyWidthRange, arg);
+  if(table.allRows().length === 0) {
+    rootElement.innerHTML = '';
+    return;
+  }
   const showHead = table.settings.showHead;
 
   rootElement.innerHTML = '';

@@ -19,25 +19,28 @@ export const getDynamicHeightsForTable = async (
   const table = await createSingleTable(body, args);
 
   const heights = schema.showHead
-    ? table.allRows().map((row) => row.height)
+    ? table.allRows().map((row) => row.getMaxCellHeight(table.columns))
     : [0].concat(table.body.map((row) => row.height));
 
   if (!isBlankPdf(args.basePdf) || !schema.repeatHead || !schema.showHead) {
     return heights;
   }
 
-  const paddingTop = args.basePdf.padding[0];
-  const paddingBottom = args.basePdf.padding[2];
-  const pageHeight = args.basePdf.height - paddingTop - paddingBottom;
+  const [paddingTop, , paddingBottom] = args.basePdf.padding;
+
+  const pageHeight = args.basePdf.height - paddingBottom;
   const headerHeight = table.getHeadHeight();
   let currentY = schema.position.y;
   const adjustedHeights: number[] = [];
 
+  let pageBreak = false;
+
   for (let i = 0; i < heights.length; i++) {
     const rowHeight = heights[i];
 
-    if (currentY + rowHeight > pageHeight + headerHeight && currentY > paddingTop) {
+    if (currentY + rowHeight > pageHeight - (pageBreak ? paddingTop : 0)) {
       adjustedHeights.push(headerHeight);
+      pageBreak = true;
       currentY = paddingTop + headerHeight;
     }
 
