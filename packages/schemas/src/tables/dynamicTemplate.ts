@@ -30,7 +30,11 @@ export const getDynamicHeightsForTable = async (
 
   const pageHeight = args.basePdf.height - paddingBottom;
   const headerHeight = table.getHeadHeight();
-  let currentY = schema.position.y;
+  
+  // Get adjusted Y position from cache if available (set by createOnePage)
+  const adjustedY = args._cache.get(`adjustedY_${schema.name}`) as number | undefined;
+  let currentY = adjustedY ?? schema.position.y;
+  
   const adjustedHeights: number[] = [];
 
   let pageBreak = false;
@@ -39,7 +43,7 @@ export const getDynamicHeightsForTable = async (
     const rowHeight = heights[i];
 
     if (currentY + rowHeight > pageHeight - (pageBreak ? paddingTop : 0)) {
-      adjustedHeights.push(headerHeight);
+      adjustedHeights.push(headerHeight); 
       pageBreak = true;
       currentY = paddingTop + headerHeight;
     }

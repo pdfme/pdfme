@@ -124,6 +124,17 @@ async function createOnePage(
   for (const schema of sortedSchemaEntries) {
     const { position, width } = schema;
 
+    // Calculate adjusted Y position based on previous schema height changes
+    let adjustedY = schema.position.y;
+    for (const [diffY, diff] of diffMap.entries()) {
+      if (diffY <= schema.position.y) {
+        adjustedY += diff;
+      }
+    }
+
+    // Store adjusted Y position in cache for getDynamicHeights
+    _cache.set(`adjustedY_${schema.name}`, adjustedY);
+
     const opt = { schema, basePdf, options, _cache };
     const value = (schema.readOnly ? schema.content : input?.[schema.name]) || '';
     const heights = await getDynamicHeights(value, opt);
@@ -275,8 +286,19 @@ export const getDynamicTemplate = async (
     const orderMap = new Map(schemaPage.map((schema, index) => [schema.name, index]));
     const longPage = await createOnePage({ basePdf, schemaPage, orderMap, ...arg });
     const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.longPage = longPage;
+      // @ts-ignore
+      window.brokenPages = brokenPages;
+    }
     pages.push(...brokenPages);
   }
+  const newTemplate = createNewTemplate(pages, basePdf);
+  if (typeof window !== 'undefined') {
+    // @ts-ignore
+    window.newTemplate = newTemplate;
+  }
 
-  return createNewTemplate(pages, template.basePdf);
+  return newTemplate;
 };

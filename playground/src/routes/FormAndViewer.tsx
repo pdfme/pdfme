@@ -15,6 +15,7 @@ import {
 import { getPlugins } from '../plugins';
 import { NavItem, NavBar } from "../components/NavBar";
 import ExternalButton from "../components/ExternalButton";
+import DebugLayoutView from "../components/DebugLayoutView";
 
 type Mode = "form" | "viewer";
 
@@ -27,6 +28,8 @@ function FormAndViewerApp() {
   const [mode, setMode] = useState<Mode>(
     (localStorage.getItem("mode") as Mode) ?? "form"
   );
+
+  const [showDebug, setShowDebug] = useState(false);
 
   const buildUi = useCallback(async (mode: Mode) => {
     if (!uiRef.current) return;
@@ -243,13 +246,49 @@ function FormAndViewerApp() {
         href: "https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME",
         title: "Feedback this template"
       })
+    },
+    {
+      label: "",
+      content: (
+        <button
+          className="px-2 py-1 border rounded hover:bg-gray-100"
+          onClick={() => {
+            // @ts-ignore
+            const longPage = window.longPage
+            // @ts-ignore
+            const brokenPages = window.brokenPages
+            // @ts-ignore
+            const newTemplate = window.newTemplate
+
+            if (!longPage || !brokenPages || !newTemplate) {
+              toast.error("Debug data not available. Generate a PDF first.");
+              return;
+            }
+
+            setShowDebug(true);
+          }}
+        >
+          Debug Layout
+        </button>
+      ),
     }
   ];
 
   return (
     <>
       <NavBar items={navItems} />
-      <div ref={uiRef} className="flex-1 w-full" />
+      <div ref={uiRef} className="flex-1 w-full" style={{ display: showDebug ? 'none' : 'block' }} />
+      {showDebug && (
+        <DebugLayoutView
+          // @ts-ignore
+          longPage={window.longPage}
+          // @ts-ignore
+          brokenPages={window.brokenPages}
+          // @ts-ignore
+          newTemplate={window.newTemplate}
+          onClose={() => setShowDebug(false)}
+        />
+      )}
     </>
   );
 }
