@@ -19,7 +19,14 @@ import type {
 } from './types.js';
 import { Cell, Column, Row, Table } from './classes.js';
 
-type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
+type StyleProp =
+  | 'styles'
+  | 'headStyles'
+  | 'bodyStyles'
+  | 'alternateRowStyles'
+  | 'columnStyles'
+  | 'cellStyles'
+  | 'rowStyles';
 
 interface CreateTableArgs {
   schema: Schema;
@@ -37,7 +44,9 @@ interface UserOptions {
   tableLineColor?: string;
   head?: string[][];
   body?: string[][];
-
+  rowStyles: {
+    [key: number]: Partial<Styles> & { cells?: { [colIndex: number]: Partial<Styles> } };
+  };
   styles?: Partial<Styles>;
   bodyStyles?: Partial<Styles>;
   headStyles?: Partial<Styles>;
@@ -121,13 +130,19 @@ function cellStyles(
   } else if (sectionName === 'body') {
     sectionStyles = styles.bodyStyles;
   }
+
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
 
   const colStyles = styles.columnStyles[column.index] || styles.columnStyles[column.index] || {};
 
   const rowStyles =
-    sectionName === 'body' && rowIndex % 2 === 0
-      ? Object.assign({}, styles.alternateRowStyles)
+    sectionName === 'body'
+      ? Object.assign(
+          {},
+          rowIndex % 2 === 0 ? styles.alternateRowStyles : {},
+          styles.rowStyles?.[rowIndex] || {},
+          styles.cellStyles?.[rowIndex]?.[column.index] || {},
+        )
       : {};
 
   const defaultStyle = {
@@ -165,30 +180,34 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
   };
 }
 
-function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
-  const columnStylesWidth = schema.headWidthPercentages.reduce(
+function mapColumnStyles(schema: TableSchema): Record<number, Partial<Styles>> {
+  const { headWidthPercentages, columnStyles } = schema;
+  const columnStylesWidth = headWidthPercentages.reduce(
     (acc, cur, i) => ({ ...acc, [i]: { cellWidth: schema.width * (cur / 100) } }),
     {} as Record<number, Partial<Styles>>,
   );
+  return (Object.keys(columnStyles) as (keyof Styles)[]).reduce((acc, key) => {
+    const values = columnStyles[key];
+    if (!values) return acc;
 
-  const columnStylesAlignment = Object.entries(schema.columnStyles.alignment || {}).reduce(
-    (acc, [key, value]) => ({ ...acc, [key]: { alignment: value } }),
-    {} as Record<number, Partial<Styles>>,
-  );
+    Object.entries(values).forEach(([colIndexStr, value]) => {
+      const colIndex = Number(colIndexStr);
+      const current = acc[colIndex] || {};
 
-  const allKeys = new Set([
-    ...Object.keys(columnStylesWidth).map(Number),
-    ...Object.keys(columnStylesAlignment).map(Number),
-  ]);
-  const columnStyles = Array.from(allKeys).reduce(
-    (acc, key) => {
-      const widthStyle = columnStylesWidth[key] || {};
-      const alignmentStyle = columnStylesAlignment[key] || {};
-      return { ...acc, [key]: { ...widthStyle, ...alignmentStyle } };
-    },
-    {} as Record<number, Partial<Styles>>,
-  );
+      acc = {
+        ...acc,
+        [colIndex]: {
+          ...current,
+          [key]: value as Styles[typeof key],
+        },
+      };
+    });
 
+    return acc;
+  }, columnStylesWidth);
+}
+
+function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   return {
     head: [schema.head],
     body,
@@ -198,9 +217,10 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     tableLineColor: schema.tableStyles.borderColor,
     tableLineWidth: schema.tableStyles.borderWidth,
     headStyles: mapCellStyle(schema.headStyles),
+    rowStyles: schema.rowStyles || {},
     bodyStyles: mapCellStyle(schema.bodyStyles),
     alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
-    columnStyles,
+    columnStyles: mapColumnStyles(schema),
     margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
   };
 }
@@ -210,19 +230,48 @@ function parseStyles(cInput: UserOptions) {
     styles: {},
     headStyles: {},
     bodyStyles: {},
+    rowStyles: {},
     alternateRowStyles: {},
     columnStyles: {},
+    cellStyles: {},
   };
+
   for (const prop of Object.keys(styleOptions) as StyleProp[]) {
     if (prop === 'columnStyles') {
       const current = cInput[prop];
       styleOptions.columnStyles = Object.assign({}, current);
+    } else if (prop === 'cellStyles' || prop === 'rowStyles') {
+      const current = cInput.rowStyles || {};
+
+      const { rowStyles, cellStyles } = Object.entries(current).reduce(
+        (acc, [rowIndex, rowStyle]) => {
+          const index = Number(rowIndex);
+          const { cells, ...rest } = rowStyle;
+
+          if (prop === 'cellStyles' && cells) {
+            acc.cellStyles[index] = cells;
+          }
+
+          if (prop === 'rowStyles') {
+            acc.rowStyles[index] = rest;
+          }
+
+          return acc;
+        },
+        {
+          rowStyles: {} as { [rowIndex: number]: Partial<Styles> },
+          cellStyles: {} as { [rowIndex: number]: { [colIndex: number]: Partial<Styles> } },
+        },
+      );
+
+      styleOptions[prop] = prop === 'cellStyles' ? cellStyles : rowStyles;
     } else {
       const allOptions = [cInput];
       const styles = allOptions.map((opts) => opts[prop] || {});
       styleOptions[prop] = Object.assign({}, styles[0], styles[1], styles[2]);
     }
   }
+
   return styleOptions;
 }
 
