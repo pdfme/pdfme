@@ -35,7 +35,6 @@ export interface TableSchema extends Schema {
   rowStyles?: {
     [rowIndex: number]: Partial<Styles> & { cells?: { [colIndex: number]: Partial<Styles> } };
   };
-
   columnStyles: Partial<{ [K in keyof Styles]: Record<number, Styles[K]> }>;
 }
 
@@ -83,7 +82,7 @@ export interface StylesProps {
   bodyStyles: Partial<Styles>;
   alternateRowStyles: Partial<Styles>;
   rowStyles: {
-    [key: number]: Partial<Styles>;
+    [rowIndex: number]: Partial<Styles>;
   };
   cellStyles: { [rowIndex: number]: { [colIndex: number]: Partial<Styles> } };
   columnStyles: { [key: string]: Partial<Styles> };
