@@ -207,6 +207,29 @@ function mapColumnStyles(schema: TableSchema): Record<number, Partial<Styles>> {
   }, columnStylesWidth);
 }
 
+function adjustRowStyles(
+  rowStyles:
+    | { [rowIndex: number]: Partial<Styles> & { cells?: { [colIndex: number]: Partial<Styles> } } }
+    | undefined,
+  __bodyRange: { start: number; end?: number },
+):
+  | { [rowIndex: number]: Partial<Styles> & { cells?: { [colIndex: number]: Partial<Styles> } } }
+  | undefined {
+  if (!rowStyles || __bodyRange.start === 0) return rowStyles;
+
+  const adjusted: typeof rowStyles = {};
+
+  for (const key in rowStyles) {
+    const originalIndex = Number(key);
+    const adjustedIndex = originalIndex - __bodyRange.start;
+    if (adjustedIndex >= 0) {
+      adjusted[adjustedIndex] = rowStyles[originalIndex];
+    }
+  }
+
+  return adjusted;
+}
+
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
   return {
     head: [schema.head],
@@ -217,7 +240,8 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     tableLineColor: schema.tableStyles.borderColor,
     tableLineWidth: schema.tableStyles.borderWidth,
     headStyles: mapCellStyle(schema.headStyles),
-    rowStyles: schema.rowStyles || {},
+    rowStyles:
+      adjustRowStyles(schema.rowStyles, schema.__bodyRange || { start: 0, end: undefined }) || {},
     bodyStyles: mapCellStyle(schema.bodyStyles),
     alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
     columnStyles: mapColumnStyles(schema),
