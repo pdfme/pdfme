@@ -21,6 +21,7 @@ import {
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
+import { getBoxDimensionProp } from '../utils.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
@@ -153,6 +154,34 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      borderWidth: {
+        title: i18n('schemas.borderWidth') || 'Border Width',
+        type: 'object',
+        widget: 'card',
+        column: 4,
+        properties: getBoxDimensionProp(0.1, i18n),
+      },
+      borderColor: {
+        title: i18n('schemas.borderColor') || 'Border Color',
+        type: 'string',
+        widget: 'color',
+        props: {
+          disabledAlpha: true,
+        },
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: i18n('validation.hexColor'),
+          },
+        ],
+      },
+      padding: {
+        title: i18n('schemas.padding') || 'Padding',
+        type: 'object',
+        widget: 'card',
+        column: 4,
+        properties: getBoxDimensionProp(0.1, i18n),
+      },
     };
 
     return textSchema;
@@ -180,5 +209,8 @@ export const propPanel: PropPanel<TextSchema> = {
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,
+    borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+    borderColor: '#000000',
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
   },
 };

@@ -1,9 +1,9 @@
 import type { UIRenderProps, Mode } from '@pdfme/common';
-import type { TableSchema, CellStyle, Styles } from './types.js';
+import type { TableSchema, Styles, CellStyle } from './types.js';
 import { px2mm } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
-import cell from './cell.js';
+import { uiRender as textUiRender } from '../text/uiRender.js';
 import { Row } from './classes.js';
 
 const buttonSize = 30;
@@ -35,9 +35,7 @@ function createButton(options: {
 
 type RowType = InstanceType<typeof Row>;
 
-const cellUiRender = cell.ui;
-
-const convertToCellStyle = (styles: Styles): CellStyle => ({
+const convertStylesToCellStyle = (styles: Styles): CellStyle => ({
   fontName: styles.fontName,
   alignment: styles.alignment,
   verticalAlignment: styles.verticalAlignment,
@@ -45,7 +43,6 @@ const convertToCellStyle = (styles: Styles): CellStyle => ({
   lineHeight: styles.lineHeight,
   characterSpacing: styles.characterSpacing,
   backgroundColor: styles.backgroundColor,
-  // ---
   fontColor: styles.textColor,
   borderColor: styles.lineColor,
   borderWidth: styles.lineWidth,
@@ -72,45 +69,6 @@ const calcResizedHeadWidthPercentages = (arg: {
   return headWidthPercentages;
 };
 
-const setBorder = (
-  div: HTMLDivElement,
-  borderPosition: 'Top' | 'Left' | 'Right' | 'Bottom',
-  arg: UIRenderProps<TableSchema>,
-) => {
-  div.style[`border${borderPosition}`] = `${String(arg.schema.tableStyles.borderWidth)}mm solid ${
-    arg.schema.tableStyles.borderColor
-  }`;
-};
-
-const drawBorder = (
-  div: HTMLDivElement,
-  row: RowType,
-  colIndex: number,
-  rowIndex: number,
-  rowsLength: number,
-  arg: UIRenderProps<TableSchema>,
-) => {
-  const isFirstColumn = colIndex === 0;
-  const isLastColumn = colIndex === Object.values(row.cells).length - 1;
-  const isLastRow = rowIndex === rowsLength - 1;
-
-  if (row.section === 'head') {
-    setBorder(div, 'Top', arg);
-    if (isFirstColumn) setBorder(div, 'Left', arg);
-    if (isLastColumn) setBorder(div, 'Right', arg);
-    if ((JSON.parse(arg.value || '[]') as string[][]).length === 0) {
-      setBorder(div, 'Bottom', arg);
-    }
-  } else if (row.section === 'body') {
-    if (!arg.schema.showHead && rowIndex === 0) {
-      setBorder(div, 'Top', arg);
-    }
-    if (isFirstColumn) setBorder(div, 'Left', arg);
-    if (isLastColumn) setBorder(div, 'Right', arg);
-    if (isLastRow) setBorder(div, 'Bottom', arg);
-  }
-};
-
 const renderRowUi = (args: {
   rows: RowType[];
   arg: UIRenderProps<TableSchema>;
@@ -134,8 +92,6 @@ const renderRowUi = (args: {
       div.style.height = `${cell.height}mm`;
       div.style.boxSizing = 'border-box';
 
-      drawBorder(div, row, colIndex, rowIndex, rows.length, arg);
-
       div.style.cursor =
         arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
 
@@ -153,7 +109,9 @@ const renderRowUi = (args: {
         mode = isEditing ? 'designer' : 'form';
       }
 
-      void cellUiRender({
+      const cellStyle = convertStylesToCellStyle(cell.styles);
+
+      void textUiRender({
         ...arg,
         stopEditing: () => {
           if (arg.mode === 'form') {
@@ -161,7 +119,7 @@ const renderRowUi = (args: {
           }
         },
         mode,
-        onChange: (v) => {
+        onChange: (v: { key: string; value: unknown } | { key: string; value: unknown }[]) => {
           if (!arg.onChange) return;
           const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
           if (section === 'body') {
@@ -174,17 +132,17 @@ const renderRowUi = (args: {
             arg.onChange({ key: 'head', value: newHead });
           }
         },
-        value: cell.raw,
+        value: cell.raw || ' ',
         placeholder: '',
         rootElement: div,
         schema: {
           name: '',
-          type: 'cell',
-          content: cell.raw,
+          type: 'text',
+          content: cell.raw || ' ',
           position: { x: colOffsetX, y: rowOffsetY },
           width: cell.width,
           height: cell.height,
-          ...convertToCellStyle(cell.styles),
+          ...cellStyle,
         },
       });
       colOffsetX += cell.width;
@@ -422,6 +380,25 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       });
       rootElement.appendChild(dragHandle);
     });
+  }
+
+  const borderWidth = schema.tableStyles.borderWidth;
+  const borderColor = schema.tableStyles.borderColor;
+  const tableWidth = table.getWidth();
+  const tableTotalHeight = table.getHeight();
+
+  if (borderWidth > 0 && borderColor) {
+    const tableBorder = document.createElement('div');
+    tableBorder.style.position = 'absolute';
+    tableBorder.style.top = '0';
+    tableBorder.style.left = '0';
+    tableBorder.style.width = `${tableWidth}mm`;
+    tableBorder.style.height = `${tableTotalHeight}mm`;
+    tableBorder.style.border = `${borderWidth}mm solid ${borderColor}`;
+    tableBorder.style.boxSizing = 'border-box';
+    tableBorder.style.pointerEvents = 'none';
+    tableBorder.style.zIndex = '1';
+    rootElement.appendChild(tableBorder);
   }
 
   if (mode === 'viewer') {
