@@ -320,8 +320,9 @@ export const renderBorder = (
 
   // Top border
   if (borderWidth.top > 0) {
-    const startPoint = { x, y: y + height };
-    const endPoint = { x: x + width, y: y + height };
+    const offset = borderWidthPt.top / 2;
+    const startPoint = { x, y: y + height - offset };
+    const endPoint = { x: x + width, y: y + height - offset };
     const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
     const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
 
@@ -336,8 +337,9 @@ export const renderBorder = (
 
   // Right border
   if (borderWidth.right > 0) {
-    const startPoint = { x: x + width, y };
-    const endPoint = { x: x + width, y: y + height };
+    const offset = borderWidthPt.right / 2;
+    const startPoint = { x: x + width - offset, y };
+    const endPoint = { x: x + width - offset, y: y + height };
     const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
     const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
 
@@ -352,8 +354,9 @@ export const renderBorder = (
 
   // Bottom border
   if (borderWidth.bottom > 0) {
-    const startPoint = { x, y };
-    const endPoint = { x: x + width, y };
+    const offset = borderWidthPt.bottom / 2;
+    const startPoint = { x, y: y + offset };
+    const endPoint = { x: x + width, y: y + offset };
     const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
     const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
 
@@ -368,8 +371,9 @@ export const renderBorder = (
 
   // Left border
   if (borderWidth.left > 0) {
-    const startPoint = { x, y };
-    const endPoint = { x, y: y + height };
+    const offset = borderWidthPt.left / 2;
+    const startPoint = { x: x + offset, y };
+    const endPoint = { x: x + offset, y: y + height };
     const rotatedStart = rotatePoint(startPoint, pivotPoint, rotate.angle);
     const rotatedEnd = rotatePoint(endPoint, pivotPoint, rotate.angle);
 

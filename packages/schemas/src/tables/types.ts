@@ -1,23 +1,9 @@
-import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types.js';
+import type { ALIGNMENT, Spacing, BaseTextStyle } from '../text/types.js';
 import type { Schema } from '@pdfme/common';
 
-export type Spacing = { top: number; right: number; bottom: number; left: number };
-type BorderInsets = Spacing;
-type BoxDimensions = Spacing;
+export type { Spacing } from '../text/types.js';
 
-export interface CellStyle {
-  fontName?: string;
-  alignment: ALIGNMENT;
-  verticalAlignment: VERTICAL_ALIGNMENT;
-  fontSize: number;
-  lineHeight: number;
-  characterSpacing: number;
-  fontColor: string;
-  backgroundColor: string;
-  borderColor: string;
-  borderWidth: BoxDimensions;
-  padding: BoxDimensions;
-}
+export type CellStyle = BaseTextStyle;
 
 export type CellSchema = Schema & CellStyle;
 
@@ -48,7 +34,7 @@ export interface Styles {
   fontSize: number;
   cellPadding: Spacing;
   lineColor: string;
-  lineWidth: BorderInsets;
+  lineWidth: Spacing;
   cellWidth: number;
   minCellHeight: number;
   minCellWidth: number;

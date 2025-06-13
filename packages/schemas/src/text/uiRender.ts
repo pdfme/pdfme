@@ -199,9 +199,10 @@ export const buildStyledTextContainer = (
     padding: `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`,
     resize: 'none',
     backgroundColor: getBackgroundColor(value, schema),
-    border: schema.borderWidth && schema.borderColor 
-      ? `${borderWidth.top}mm solid ${schema.borderColor}` 
-      : 'none',
+    border:
+      schema.borderWidth && schema.borderColor
+        ? `${borderWidth.top}mm solid ${schema.borderColor}`
+        : 'none',
     borderTopWidth: `${borderWidth.top}mm`,
     borderRightWidth: `${borderWidth.right}mm`,
     borderBottomWidth: `${borderWidth.bottom}mm`,

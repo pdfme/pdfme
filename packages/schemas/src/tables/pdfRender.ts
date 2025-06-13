@@ -1,10 +1,11 @@
-import type { TableSchema } from './types.js';
+import type { TableSchema, Styles } from './types.js';
 import type { PDFRenderProps, Schema, BasePdf, CommonOptions } from '@pdfme/common';
 import { Cell, Table, Row, Column } from './classes.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
-import cell from './cell.js';
+import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import { getBodyWithRange } from './helper.js';
 import { createSingleTable } from './tableHelper.js';
+import type { CellStyle } from './types.js';
 
 // Define the CreateTableArgs interface locally since it's not exported from tableHelper.js
 interface CreateTableArgs {
@@ -17,29 +18,34 @@ interface CreateTableArgs {
 type Pos = { x: number; y: number };
 
 const rectanglePdfRender = rectangle.pdf;
-const cellPdfRender = cell.pdf;
+
+const convertStylesToCellStyle = (styles: Styles): CellStyle => ({
+  fontName: styles.fontName,
+  alignment: styles.alignment,
+  verticalAlignment: styles.verticalAlignment,
+  fontSize: styles.fontSize,
+  lineHeight: styles.lineHeight,
+  characterSpacing: styles.characterSpacing,
+  backgroundColor: styles.backgroundColor,
+  fontColor: styles.textColor,
+  borderColor: styles.lineColor,
+  borderWidth: styles.lineWidth,
+  padding: styles.cellPadding,
+});
 
 async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
-  await cellPdfRender({
+  const cellStyle = convertStylesToCellStyle(cell.styles);
+
+  await textPdfRender({
     ...arg,
-    value: cell.raw,
+    value: cell.raw || ' ',
     schema: {
       name: '',
-      type: 'cell',
+      type: 'text',
       position: { x: cell.x, y: cell.y },
       width: cell.width,
       height: cell.height,
-      fontName: cell.styles.fontName,
-      alignment: cell.styles.alignment,
-      verticalAlignment: cell.styles.verticalAlignment,
-      fontSize: cell.styles.fontSize,
-      lineHeight: cell.styles.lineHeight,
-      characterSpacing: cell.styles.characterSpacing,
-      backgroundColor: cell.styles.backgroundColor,
-      fontColor: cell.styles.textColor,
-      borderColor: cell.styles.lineColor,
-      borderWidth: cell.styles.lineWidth,
-      padding: cell.styles.cellPadding,
+      ...cellStyle,
     },
   });
 }
