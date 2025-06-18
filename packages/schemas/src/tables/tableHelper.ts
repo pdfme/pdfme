@@ -148,7 +148,7 @@ function cellStyles(
   return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
 }
 
-function mapCellStyle(style: CellStyle): Partial<Styles> {
+function convertCellStyleToStyles(style: CellStyle): Partial<Styles> {
   return {
     fontName: style.fontName,
     alignment: style.alignment,
@@ -157,7 +157,6 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
     lineHeight: style.lineHeight,
     characterSpacing: style.characterSpacing,
     backgroundColor: style.backgroundColor,
-    // ---
     textColor: style.fontColor,
     lineColor: style.borderColor,
     lineWidth: style.borderWidth,
@@ -197,8 +196,8 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     tableWidth: schema.width,
     tableLineColor: schema.tableStyles.borderColor,
     tableLineWidth: schema.tableStyles.borderWidth,
-    headStyles: mapCellStyle(schema.headStyles),
-    bodyStyles: mapCellStyle(schema.bodyStyles),
+    headStyles: convertCellStyleToStyles(schema.headStyles),
+    bodyStyles: convertCellStyleToStyles(schema.bodyStyles),
     alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
     columnStyles,
     margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },

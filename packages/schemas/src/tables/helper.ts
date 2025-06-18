@@ -12,6 +12,7 @@ import {
   VERTICAL_ALIGN_BOTTOM,
 } from '../text/constants.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { getBoxDimensionProp } from '../utils.js';
 
 export const getDefaultCellStyles = () => ({
   fontName: undefined,
@@ -26,21 +27,6 @@ export const getDefaultCellStyles = () => ({
   borderWidth: { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 },
   padding: { top: 5, bottom: 5, left: 5, right: 5 },
 });
-
-const getBoxDimensionProp = (step = 1) => {
-  const getCommonProp = () => ({
-    type: 'number',
-    widget: 'inputNumber',
-    props: { min: 0, step },
-    span: 6,
-  });
-  return {
-    top: { title: 'Top', ...getCommonProp() },
-    right: { title: 'Right', ...getCommonProp() },
-    bottom: { title: 'Bottom', ...getCommonProp() },
-    left: { title: 'Left', ...getCommonProp() },
-  };
-};
 
 export const getCellPropPanelSchema = (arg: {
   i18n: (key: string) => string;

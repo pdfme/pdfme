@@ -246,10 +246,22 @@ export const calculateDynamicFontSize = ({
     width: boxWidth,
     height: boxHeight,
     lineHeight = DEFAULT_LINE_HEIGHT,
+    borderWidth,
+    padding,
   } = textSchema;
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
+
+  const borderWidthValues = borderWidth || { top: 0, right: 0, bottom: 0, left: 0 };
+  const paddingValues = padding || { top: 0, right: 0, bottom: 0, left: 0 };
+
+  const actualTextWidth =
+    boxWidth -
+    (borderWidthValues.left + borderWidthValues.right + paddingValues.left + paddingValues.right);
+  const actualTextHeight =
+    boxHeight -
+    (borderWidthValues.top + borderWidthValues.bottom + paddingValues.top + paddingValues.bottom);
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const paragraphs = value.split('\n');
@@ -266,7 +278,7 @@ export const calculateDynamicFontSize = ({
     let totalWidthInMm = 0;
     let totalHeightInMm = 0;
 
-    const boxWidthInPt = mm2pt(boxWidth);
+    const boxWidthInPt = mm2pt(actualTextWidth);
     const firstLineTextHeight = heightOfFontAtSize(fontKitFont, size);
     const firstLineHeightInMm = pt2mm(firstLineTextHeight * lineHeight);
     const otherRowHeightInMm = pt2mm(size * lineHeight);
@@ -314,16 +326,16 @@ export const calculateDynamicFontSize = ({
       return false;
     }
     if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
-      return totalWidthInMm < boxWidth;
+      return totalWidthInMm < actualTextWidth;
     }
-    return totalHeightInMm < boxHeight;
+    return totalHeightInMm < actualTextHeight;
   };
 
   const shouldFontShrinkToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
     if (dynamicFontSize <= dynamicFontSizeSetting.min || dynamicFontSize <= 0) {
       return false;
     }
-    return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
+    return totalWidthInMm > actualTextWidth || totalHeightInMm > actualTextHeight;
   };
 
   let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
@@ -334,7 +346,7 @@ export const calculateDynamicFontSize = ({
     const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
       calculateConstraints(dynamicFontSize);
 
-    if (newHeight < boxHeight) {
+    if (newHeight < actualTextHeight) {
       totalWidthInMm = newWidth;
       totalHeightInMm = newHeight;
     } else {
@@ -547,4 +559,74 @@ export const filterEndJP = (lines: string[]): string[] => {
   } else {
     return filtered;
   }
+};
+
+/**
+ * Common interface for text processing configuration
+ */
+export interface TextProcessingConfig {
+  value: string;
+  schema: TextSchema;
+  fontKitFont: FontKitFont;
+  startingFontSize?: number;
+}
+
+/**
+ * Common interface for text area calculations
+ */
+export interface TextAreaDimensions {
+  actualTextWidth: number;
+  actualTextHeight: number;
+  textAreaWidthInPt: number;
+}
+
+/**
+ * Calculate actual text area dimensions considering borders and padding
+ */
+export const calculateTextAreaDimensions = (schema: TextSchema): TextAreaDimensions => {
+  const borderWidth = schema.borderWidth || { top: 0, right: 0, bottom: 0, left: 0 };
+  const padding = schema.padding || { top: 0, right: 0, bottom: 0, left: 0 };
+
+  const actualTextWidth =
+    schema.width - (borderWidth.left + borderWidth.right + padding.left + padding.right);
+  const actualTextHeight =
+    schema.height - (borderWidth.top + borderWidth.bottom + padding.top + padding.bottom);
+  const textAreaWidthInPt = mm2pt(actualTextWidth);
+
+  return { actualTextWidth, actualTextHeight, textAreaWidthInPt };
+};
+
+/**
+ * Process text value by removing trailing newlines for consistent processing
+ */
+export const processTextValue = (value: string): string => {
+  return value.endsWith('\n') ? value.slice(0, -1) : value;
+};
+
+/**
+ * Calculate font size and split text consistently across UI and PDF rendering
+ */
+export const calculateFontSizeAndSplitText = (config: TextProcessingConfig) => {
+  const { value, schema, fontKitFont, startingFontSize } = config;
+  const processedValue = processTextValue(value);
+  const { textAreaWidthInPt } = calculateTextAreaDimensions(schema);
+
+  const fontSize = schema.dynamicFontSize
+    ? calculateDynamicFontSize({
+        textSchema: schema,
+        fontKitFont,
+        value: processedValue,
+        startingFontSize,
+      })
+    : (schema.fontSize ?? DEFAULT_FONT_SIZE);
+
+  const lines = splitTextToSize({
+    value: processedValue,
+    characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+    fontSize,
+    fontKitFont,
+    boxWidthInPt: textAreaWidthInPt,
+  });
+
+  return { fontSize, lines, processedValue };
 };
