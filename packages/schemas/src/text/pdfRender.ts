@@ -27,6 +27,7 @@ import {
   getFontKitFont,
   widthOfTextAtSize,
   splitTextToSize,
+  processTextValue,
 } from './helper.js';
 import {
   convertForPdfLayoutProps,
@@ -77,8 +78,10 @@ const getFontProp = ({
   colorType?: ColorType;
   schema: TextSchema;
 }) => {
+  const processedValue = processTextValue(value);
+
   const fontSize = schema.dynamicFontSize
-    ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
+    ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value: processedValue })
     : (schema.fontSize ?? DEFAULT_FONT_SIZE);
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
 
@@ -172,8 +175,9 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     height - mm2pt(borderWidth.top + borderWidth.bottom + padding.top + padding.bottom);
   const textAreaX = originalX + mm2pt(borderWidth.left + padding.left);
 
+  const processedValue = processTextValue(value);
   const lines = splitTextToSize({
-    value,
+    value: processedValue,
     characterSpacing,
     fontSize,
     fontKitFont,

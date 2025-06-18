@@ -19,6 +19,7 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
+  calculateFontSizeAndSplitText,
 } from './helper.js';
 import { isEditable } from '../utils.js';
 
@@ -83,22 +84,35 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const processedText = replaceUnsupportedChars(value, fontKitFont);
 
   if (!isEditable(mode, schema)) {
-    // Read-only mode
-    textBlock.innerHTML = processedText
-      .split('')
-      .map(
-        (l, i) =>
-          `<span style="letter-spacing:${
-            String(value).length === i + 1 ? 0 : 'inherit'
-          };">${l}</span>`,
+    // Read-only mode - use same text splitting as PDF rendering
+    const { lines } = calculateFontSizeAndSplitText({
+      value: processedText,
+      schema,
+      fontKitFont,
+    });
+
+    textBlock.innerHTML = lines
+      .map((line) =>
+        line
+          .replace('\n', '')
+          .split('')
+          .map(
+            (l, i) =>
+              `<span style="letter-spacing:${
+                i === line.replace('\n', '').length - 1 ? 0 : 'inherit'
+              };">${l}</span>`,
+          )
+          .join(''),
       )
-      .join('');
+      .join('<br>');
     return;
   }
 
   makeElementPlainTextContentEditable(textBlock);
   textBlock.tabIndex = tabIndex || 0;
+
   textBlock.innerText = mode === 'designer' ? value : processedText;
+
   textBlock.addEventListener('blur', (e: Event) => {
     if (onChange) onChange({ key: 'content', value: getText(e.target as HTMLDivElement) });
     if (stopEditing) stopEditing();
@@ -169,19 +183,22 @@ export const buildStyledTextContainer = (
   let dynamicFontSize: undefined | number = undefined;
 
   if (schema.dynamicFontSize && value) {
-    dynamicFontSize = calculateDynamicFontSize({
-      textSchema: schema,
-      fontKitFont,
+    const { fontSize } = calculateFontSizeAndSplitText({
       value,
-      startingFontSize: dynamicFontSize,
+      schema,
+      fontKitFont,
     });
+    dynamicFontSize = fontSize;
   }
+
+  // Update font size in textBlockStyle to match calculated dynamic font size
+  const finalFontSize = dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE;
 
   // Depending on vertical alignment, we need to move the top or bottom of the font to keep
   // it within it's defined box and align it with the generated pdf.
   const { topAdj, bottomAdj } = getBrowserVerticalFontAdjustments(
     fontKitFont,
-    dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE,
+    finalFontSize,
     schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
     schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT,
   );
@@ -230,7 +247,7 @@ export const buildStyledTextContainer = (
     // Font formatting styles
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
-    fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
+    fontSize: `${finalFontSize}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
