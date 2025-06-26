@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, ReactNode, useRef, useMemo } from 'react';
+import React, { useEffect, useContext, ReactNode, useRef } from 'react';
 import {
   Mode,
   ZOOM,
@@ -27,33 +27,6 @@ type RendererProps = Omit<
   selectable?: boolean;
 };
 
-type ReRenderCheckProps = {
-  plugin?: Plugin<Schema>;
-  value: string;
-  mode: Mode;
-  scale: number;
-  schema: SchemaForUI;
-  options: UIOptions;
-};
-
-const useRerenderDependencies = (arg: ReRenderCheckProps) => {
-  const { plugin, value, mode, scale, schema, options } = arg;
-  const _options = cloneDeep(options);
-  if (_options.font) {
-    Object.values(_options.font).forEach((fontObj) => {
-      (fontObj as { data: string }).data = '...';
-    });
-  }
-  const optionStr = JSON.stringify(_options);
-
-  return useMemo(() => {
-    if (plugin?.uninterruptedEditMode && mode === 'designer') {
-      return [mode];
-    } else {
-      return [value, mode, scale, JSON.stringify(schema), optionStr];
-    }
-  }, [value, mode, scale, schema, optionStr, plugin]);
-};
 
 const Wrapper = ({
   children,
