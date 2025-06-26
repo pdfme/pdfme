@@ -735,10 +735,17 @@ const parseHTMLNode = (
       clipSpaces,
     );
   } else {
-    if (node.tagName === 'polygon') {
-      node.tagName = 'path';
-      node.attributes.d = `M${node.attributes.points}Z`;
-      delete node.attributes.points;
+    if (node.tagName === 'polygon' && node.attributes && typeof node.attributes.points === 'string') {
+      const points = node.attributes.points;
+      if (points.length < 1000 && /^[\d\s,.-]+$/.test(points)) {
+        node.tagName = 'path';
+        if (typeof node.attributes === 'object' && node.attributes !== null) {
+          node.attributes.d = `M${points}Z`;
+          if (Object.prototype.hasOwnProperty.call(node.attributes, 'points')) {
+            delete node.attributes.points;
+          }
+        }
+      }
     }
     const attributes = parseAttributes(node, inherited, matrix);
     const svgAttributes = {
@@ -747,7 +754,11 @@ const parseHTMLNode = (
       matrix: attributes.matrix,
       clipSpaces
     };
-    Object.assign(node, { svgAttributes });
+    
+    if (node && typeof node === 'object' && node !== null) {
+      const safeNode = node as any;
+      safeNode.svgAttributes = svgAttributes;
+    }
     return [node as SVGElement];
   }
 };
@@ -758,18 +769,33 @@ const parseSvgNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
+  if (!node || !node.attributes || typeof node.setAttribute !== 'function') {
+    return [];
+  }
+  
   // if the width/height aren't set, the svg will have the same dimension as the current drawing space
-  node.attributes.width ??
+  if (!node.attributes.width && inherited.viewBox && typeof inherited.viewBox.width === 'number') {
     node.setAttribute('width', inherited.viewBox.width + '');
-  node.attributes.height ??
+  }
+  if (!node.attributes.height && inherited.viewBox && typeof inherited.viewBox.height === 'number') {
     node.setAttribute('height', inherited.viewBox.height + '');
+  }
+  
   const attributes = parseAttributes(node, inherited, matrix);
   const result: SVGElement[] = [];
-  const viewBox = node.attributes.viewBox
-    ? parseViewBox(node.attributes.viewBox)!
-    : node.attributes.width && node.attributes.height
-      ? parseViewBox(`0 0 ${node.attributes.width} ${node.attributes.height}`)!
-      : inherited.viewBox;
+  
+  let viewBox = inherited.viewBox;
+  if (node.attributes.viewBox && typeof node.attributes.viewBox === 'string') {
+    const parsedViewBox = parseViewBox(node.attributes.viewBox);
+    if (parsedViewBox) {
+      viewBox = parsedViewBox;
+    }
+  } else if (node.attributes.width && node.attributes.height) {
+    const parsedViewBox = parseViewBox(`0 0 ${node.attributes.width} ${node.attributes.height}`);
+    if (parsedViewBox) {
+      viewBox = parsedViewBox;
+    }
+  }
   const x = parseFloat(node.attributes.x) || 0
   const y = parseFloat(node.attributes.y) || 0
 
@@ -816,15 +842,21 @@ const parseSvgNode = (
   // newMatrix = combineTransformation(newMatrix, 'translate', [-baseClipSpace.xMin, -baseClipSpace.yMin])
   newMatrix = combineTransformation(contentTransform, 'translate', [-viewBox.x, -viewBox.y])
 
-  node.childNodes.forEach((child) => {
-    const parsedNodes = parseHTMLNode(
-      child,
-      { ...attributes.inherited, viewBox },
-      newMatrix,
-      [...clipSpaces, baseClipSpace],
-    )
-    result.push(...parsedNodes);
-  });
+  if (node.childNodes && Array.isArray(node.childNodes)) {
+    node.childNodes.forEach((child) => {
+      if (child && typeof child === 'object') {
+        const parsedNodes = parseHTMLNode(
+          child,
+          { ...attributes.inherited, viewBox },
+          newMatrix,
+          [...clipSpaces, baseClipSpace],
+        );
+        if (Array.isArray(parsedNodes)) {
+          result.push(...parsedNodes);
+        }
+      }
+    });
+  }
   return result;
 };
 
@@ -834,13 +866,24 @@ const parseGroupNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
+  if (!node || !node.childNodes) {
+    return [];
+  }
+  
   const attributes = parseAttributes(node, inherited, matrix);
   const result: SVGElement[] = [];
-  node.childNodes.forEach((child) => {
-    result.push(
-      ...parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces),
-    );
-  });
+  
+  if (Array.isArray(node.childNodes)) {
+    node.childNodes.forEach((child) => {
+      if (child && typeof child === 'object') {
+        const parsedNodes = parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces);
+        if (Array.isArray(parsedNodes)) {
+          result.push(...parsedNodes);
+        }
+      }
+    });
+  }
+  
   return result;
 };
 
