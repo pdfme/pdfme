@@ -54,28 +54,29 @@
     "@types/estree": "^1.0.6"
   },
   "jest": {
-    "preset": "ts-jest/presets/default-esm",
+    "resolver": "ts-jest-resolver",
     "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "transform": {
+      "^.+\\.ts?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.esm.json"
+        }
+      ]
+    },
     "testMatch": [
       "**/__tests__/**/*.test.ts"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
-    ],
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "./tsconfig.json",
-          "useESM": true
-        }
-      ]
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
-    }
+    ]
   }
 }
