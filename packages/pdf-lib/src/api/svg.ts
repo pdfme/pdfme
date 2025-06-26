@@ -6,6 +6,7 @@ import {
   NodeType,
 } from 'node-html-better-parser';
 import { Color, colorString } from './colors';
+import sanitizeHtml from 'sanitize-html';
 import {
   Degrees,
   degreesToRadians,
@@ -923,27 +924,18 @@ const parseViewBox = (viewBox?: string): Box | undefined => {
 const sanitizeSvgContent = (svg: string): string => {
   if (!svg || typeof svg !== 'string') return '';
   
-  let sanitizedSvg = svg;
-  let previousSvg;
-  do {
-    previousSvg = sanitizedSvg;
-    sanitizedSvg = sanitizedSvg
-      .replace(/<script[^>]*>.*?<\/script>/gis, '')
-      .replace(/<style[^>]*>.*?<\/style>/gis, '')
-      .replace(/javascript:/gi, '')
-      .replace(/data:/gi, '')
-      .replace(/vbscript:/gi, '')
-      .replace(/on\w+\s*=/gi, '')
-      .replace(/href\s*=/gi, '')
-      .replace(/xlink:href\s*=/gi, '')
-      .replace(/xmlns\s*=/gi, '')
-      .replace(/<\s*\/?\s*[^>]*>/g, (match) => {
-        const allowedTags = /^<\s*\/?\s*(svg|g|text|line|path|image|rect|ellipse|circle|polygon)\b/i;
-        return allowedTags.test(match) ? match : '';
-      });
-  } while (sanitizedSvg !== previousSvg);
+  const allowedTags = [
+    'svg', 'g', 'text', 'line', 'path', 'image', 'rect',
+    'ellipse', 'circle', 'polygon',
+  ];
+  const allowedAttributes = {
+    '*': ['x', 'y', 'width', 'height', 'fill', 'stroke', 'transform'],
+  };
   
-  return sanitizedSvg;
+  return sanitizeHtml(svg, {
+    allowedTags,
+    allowedAttributes,
+  });
 };
 
 const parse = (
