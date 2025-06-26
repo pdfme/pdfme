@@ -67,6 +67,10 @@
     ],
     "moduleNameMapper": {
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
     "transformIgnorePatterns": [

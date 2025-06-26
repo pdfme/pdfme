@@ -75,6 +75,10 @@
   },
   "jest": {
     "resolver": "ts-jest-resolver",
+    "moduleNameMapper": {
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts"
+    },
     "moduleFileExtensions": [
       "js",
       "ts"
