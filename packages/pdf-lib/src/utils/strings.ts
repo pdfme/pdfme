@@ -177,9 +177,21 @@ export const parseDate = (dateStr: string): Date | undefined => {
 };
 
 export const findLastMatch = (value: string, regex: RegExp) => {
+  const MAX_STRING_LENGTH = 10000;
+  if (value.length > MAX_STRING_LENGTH) {
+    return { match: undefined, pos: 0 };
+  }
+
   let position = 0;
   let lastMatch: RegExpMatchArray | undefined;
+  let iterations = 0;
+  const MAX_ITERATIONS = 1000;
+
   while (position < value.length) {
+    if (++iterations > MAX_ITERATIONS) {
+      return { match: lastMatch, pos: position };
+    }
+
     const match = value.substring(position).match(regex);
     if (!match) return { match: lastMatch, pos: position };
     lastMatch = match;

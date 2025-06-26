@@ -112,8 +112,7 @@ export const normalizeAppearance = <T extends Object>(
 // Examples:
 //   `/Helv 12 Tf` -> ['/Helv 12 Tf', 'Helv', '12']
 //   `/HeBo 8.00 Tf` -> ['/HeBo 8 Tf', 'HeBo', '8.00']
-const tfRegex =
-  /\/([^\0\t\n\f\r\ ]+)[\0\t\n\f\r\ ]+(\d*\.\d+|\d+)[\0\t\n\f\r\ ]+Tf/;
+const tfRegex = /\/([^\s]+)\s+(\d+(?:\.\d+)?)\s+Tf/;
 
 const getDefaultFontSize = (field: {
   getDefaultAppearance(): string | undefined;
@@ -128,8 +127,7 @@ const getDefaultFontSize = (field: {
 //   `0.3 g` -> ['0.3', 'g']
 //   `0.3 1 .3 rg` -> ['0.3', '1', '.3', 'rg']
 //   `0.3 1 .3 0 k` -> ['0.3', '1', '.3', '0', 'k']
-const colorRegex =
-  /(\d*\.\d+|\d+)[\0\t\n\f\r\ ]*(\d*\.\d+|\d+)?[\0\t\n\f\r\ ]*(\d*\.\d+|\d+)?[\0\t\n\f\r\ ]*(\d*\.\d+|\d+)?[\0\t\n\f\r\ ]+(g|rg|k)/;
+const colorRegex = /(\d+(?:\.\d+)?)\s*(\d+(?:\.\d+)?)?\s*(\d+(?:\.\d+)?)?\s*(\d+(?:\.\d+)?)?\s+(g|rg|k)/;
 
 const getDefaultColor = (field: {
   getDefaultAppearance(): string | undefined;
