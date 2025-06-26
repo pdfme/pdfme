@@ -118,7 +118,7 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; width: 1155px; margin-left: 45px;"
     >
       <div
-        style="position: absolute; bottom: 6%; width: 755px;"
+        style="position: absolute; top: auto; bottom: 6%; width: 755px;"
       >
         <div
           style="display: flex; align-items: center; justify-content: space-evenly; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
@@ -177,7 +177,7 @@ exports[`Designer snapshot 1`] = `
             
           </button>
           <div
-            style="width: 400px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
+            style="width: 400px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: "Open Sans", sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
           >
             <div>
               <div>
@@ -370,13 +370,13 @@ exports[`Designer snapshot 1`] = `
       >
         <div
           class="selecto-selection rCS179bs95 pdfme-selecto"
-          style="background-color: rgb(22, 119, 255); opacity: 0.75; border-color: #91caff;"
+          style="background-color: rgb(22, 119, 255); opacity: 0.75; border-color: rgb(145, 202, 255);"
         />
         <div
           style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
         >
           <div
-            style="font-family: 'Roboto'; top: 30px; left: 30px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+            style="font-family: "Roboto"; top: 30px; left: 30px; position: relative; background-image: url("data:image/png;base64,a..."); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
           >
             <div
               class="ruler-container"
