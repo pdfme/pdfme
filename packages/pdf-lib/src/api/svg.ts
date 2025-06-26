@@ -873,16 +873,42 @@ const parse = (
   size: Size,
   matrix: TransformationMatrix
 ): SVGElement[] => {
-  const htmlElement = parseHtml(svg).firstChild as HTMLElement;
-  if (width) htmlElement.setAttribute('width', width + '');
-  if (height) htmlElement.setAttribute('height', height + '');
-  if (fontSize) htmlElement.setAttribute('font-size', fontSize + '');
-  // TODO: what should be the default viewBox?
+  if (!svg || typeof svg !== 'string' || svg.length > 100000) {
+    return [];
+  }
+  
+  const sanitizedSvg = svg.replace(/<script[^>]*>.*?<\/script>/gis, '')
+                          .replace(/javascript:/gi, '')
+                          .replace(/on\w+\s*=/gi, '');
+  
+  const parsed = parseHtml(sanitizedSvg);
+  if (!parsed || !parsed.firstChild) {
+    return [];
+  }
+  
+  const htmlElement = parsed.firstChild as HTMLElement;
+  if (!htmlElement || typeof htmlElement.setAttribute !== 'function') {
+    return [];
+  }
+  
+  if (width && typeof width === 'number' && isFinite(width)) {
+    htmlElement.setAttribute('width', width + '');
+  }
+  if (height && typeof height === 'number' && isFinite(height)) {
+    htmlElement.setAttribute('height', height + '');
+  }
+  if (fontSize && typeof fontSize === 'number' && isFinite(fontSize)) {
+    htmlElement.setAttribute('font-size', fontSize + '');
+  }
+  
+  const viewBoxAttr = htmlElement.attributes?.viewBox;
+  const safeViewBox = typeof viewBoxAttr === 'string' && viewBoxAttr.length < 100 ? viewBoxAttr : '0 0 1 1';
+  
   return parseHTMLNode(
     htmlElement,
     {
       ...size,
-      viewBox: parseViewBox(htmlElement.attributes.viewBox || '0 0 1 1')!,
+      viewBox: parseViewBox(safeViewBox) || { x: 0, y: 0, width: 1, height: 1 },
     },
     matrix,
     []
@@ -894,9 +920,18 @@ export const drawSvg = async (
   svg: string,
   options: PDFPageDrawSVGElementOptions,
 ) => {
-  if (!svg) return;
+  if (!svg || typeof svg !== 'string' || svg.length > 100000) return;
+  
+  const sanitizedSvg = svg.replace(/<script[^>]*>.*?<\/script>/gis, '')
+                          .replace(/javascript:/gi, '')
+                          .replace(/on\w+\s*=/gi, '');
+  
   const size = page.getSize();
-  const firstChild = parseHtml(svg).firstChild as HTMLElement;
+  const parsed = parseHtml(sanitizedSvg);
+  if (!parsed || !parsed.firstChild) return;
+  
+  const firstChild = parsed.firstChild as HTMLElement;
+  if (!firstChild || !firstChild.attributes) return;
 
   const attributes = firstChild.attributes;
   const style = parseStyles(attributes.style);
@@ -909,64 +944,53 @@ export const drawSvg = async (
   const height =
     options.height !== undefined ? options.height : parseFloat(heightRaw);
 
-  // it's important to add the viewBox to allow svg resizing through the options
-  if (!attributes.viewBox) {
+  if (!attributes.viewBox && typeof firstChild.setAttribute === 'function') {
+    const safeWidth = isFinite(width) ? width : (widthRaw || 100);
+    const safeHeight = isFinite(height) ? height : (heightRaw || 100);
     firstChild.setAttribute(
       'viewBox',
-      `0 0 ${widthRaw || width} ${heightRaw || height}`,
+      `0 0 ${safeWidth} ${safeHeight}`,
     );
   }
 
   if (options.width || options.height) {
-    if (width !== undefined) style.width = width + (isNaN(width) ? '' : 'px');
-    if (height !== undefined) {
+    if (width !== undefined && isFinite(width)) {
+      style.width = width + (isNaN(width) ? '' : 'px');
+    }
+    if (height !== undefined && isFinite(height)) {
       style.height = height + (isNaN(height) ? '' : 'px');
     }
-    firstChild.setAttribute(
-      'style',
-      Object.entries(style)
-        .map(([key, val]) => `${key}:${val};`)
-        .join(''),
-    );
+    
+    const safeStyleEntries = Object.entries(style)
+      .filter(([key, val]) => typeof key === 'string' && typeof val === 'string')
+      .filter(([key, val]) => key.length < 50 && val.length < 100)
+      .slice(0, 20);
+    
+    if (typeof firstChild.setAttribute === 'function') {
+      firstChild.setAttribute(
+        'style',
+        safeStyleEntries
+          .map(([key, val]) => `${key}:${val};`)
+          .join(''),
+      );
+    }
   }
 
   const baseTransformation: TransformationMatrix = [1, 0, 0, 1, options.x ||  0, options.y || 0]
 
   const runners = runnersToPage(page, options);
-  const elements = parse(firstChild.outerHTML, options, size, baseTransformation);
+  const elements = parse(firstChild.outerHTML || '', options, size, baseTransformation);
+
+  const allowedTagNames = new Set(['text', 'line', 'path', 'image', 'rect', 'ellipse', 'circle']);
 
   await elements.reduce(async (prev, elt) => {
     await prev;
-    // uncomment these lines to draw the clipSpaces
-    // elt.svgAttributes.clipSpaces.forEach(space => {
-    //   page.drawLine({
-    //     start: space.topLeft,
-    //     end: space.topRight,
-    //     color: parseColor('#000000')?.rgb,
-    //     thickness: 1
-    //   })
-
-    //   page.drawLine({
-    //     start: space.topRight,
-    //     end: space.bottomRight,
-    //     color: parseColor('#000000')?.rgb,
-    //     thickness: 1
-    //   })
-
-    //   page.drawLine({
-    //     start: space.bottomRight,
-    //     end: space.bottomLeft,
-    //     color: parseColor('#000000')?.rgb,
-    //     thickness: 1
-    //   })
-
-    //   page.drawLine({
-    //     start: space.bottomLeft,
-    //     end: space.topLeft,
-    //     color: parseColor('#000000')?.rgb,
-    //     thickness: 1
-    //   })
-    // })
-    return runners[elt.tagName]?.(elt);
+    if (elt && elt.tagName && typeof elt.tagName === 'string' && allowedTagNames.has(elt.tagName)) {
+      const runner = runners[elt.tagName];
+      if (typeof runner === 'function') {
+        return runner(elt);
+      }
+    }
+    return Promise.resolve();
   }, Promise.resolve());
 };
