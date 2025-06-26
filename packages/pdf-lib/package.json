@@ -79,7 +79,8 @@
       ]
     },
     "testMatch": [
-      "**/*.test.ts"
+      "**/*.test.ts",
+      "**/*.spec.ts"
     ]
   },
   "publishConfig": {
