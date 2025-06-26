@@ -171,3 +171,20 @@ updates:
         update-types:
           - "minor"
           - "patch"
+  
+  # PDF-lib package
+  - package-ecosystem: "npm"
+    directory: "/packages/pdf-lib"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "npm"
+    groups:
+      eslint-packages:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint*"
+        update-types:
+          - "minor"
+          - "patch"
