@@ -1,14 +1,10 @@
 import React, { useEffect, useContext, ReactNode, useRef } from 'react';
 import {
-  Mode,
   ZOOM,
   UIRenderProps,
   SchemaForUI,
   BasePdf,
   Schema,
-  Plugin,
-  UIOptions,
-  cloneDeep,
 } from '@pdfme/common';
 import { theme as antdTheme } from 'antd';
 import { SELECTABLE_CLASSNAME } from '../constants.js';

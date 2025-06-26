@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
 import {
   Template,
   SchemaForUI,
@@ -56,7 +56,7 @@ const Preview = ({
 
   const input = inputs[unitCursor];
 
-  const init = (template: Template) => {
+  const init = useCallback((template: Template) => {
     const options = { font };
     getDynamicTemplate({
       template,
@@ -78,7 +78,7 @@ const Preview = ({
         await refresh(dynamicTemplate);
       })
       .catch((err) => console.error(`[@pdfme/ui] `, err));
-  };
+  }, [font, input, refresh]);
 
   // Update component state only when _options_ changes
   // Ignore exhaustive useEffect dependency warnings here
@@ -95,7 +95,7 @@ const Preview = ({
     }
 
     init(template);
-  }, [template, inputs, size, unitCursor, font, input, refresh]);
+  }, [template, inputs, size, unitCursor, init]);
 
   useScrollPageCursor({
     ref: containerRef,
