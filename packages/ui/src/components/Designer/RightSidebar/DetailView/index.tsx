@@ -1,5 +1,5 @@
 import { useForm } from 'form-render';
-import React, { useRef, useContext, useState, useEffect } from 'react';
+import React, { useRef, useContext, useState, useEffect, useCallback } from 'react';
 import type {
   Dict,
   ChangeSchemaItem,
@@ -47,10 +47,10 @@ const DetailView = (props: DetailViewProps) => {
   const options = useContext(OptionsContext);
 
   // Define a type-safe i18n function that accepts string keys
-  const typedI18n = (key: string): string => {
+  const typedI18n = useCallback((key: string): string => {
     // Use a type assertion to handle the union type constraint
     return typeof i18n === 'function' ? i18n(key as keyof Dict) : key;
-  };
+  }, [i18n]);
 
   const [widgets, setWidgets] = useState<{
     [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
@@ -80,7 +80,7 @@ const DetailView = (props: DetailViewProps) => {
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+  }, [activeSchema, pluginsRegistry, options, props, token, typedI18n]);
 
   useEffect(() => {
     // Create a type-safe copy of the schema with editable property
@@ -91,7 +91,7 @@ const DetailView = (props: DetailViewProps) => {
     form.setValues(values);
   }, [activeSchema, form]);
 
-  useEffect(() => form.resetFields(), [activeSchema.id]);
+  useEffect(() => form.resetFields(), [activeSchema.id, form]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {

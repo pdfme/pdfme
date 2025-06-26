@@ -89,6 +89,9 @@
     ],
     "moduleNameMapper": {
       "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
       "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^antd/es/": "antd/lib/",

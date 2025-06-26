@@ -111,26 +111,19 @@ const Renderer = (props: RendererProps) => {
   const _cache = useContext(CacheContext);
   const plugin = pluginsRegistry.findByType(schema.type);
 
-  const reRenderDependencies = useRerenderDependencies({
-    plugin,
-    value,
-    mode,
-    scale,
-    schema,
-    options,
-  });
 
   useEffect(() => {
     if (!plugin?.ui || !ref.current || !schema.type) return;
 
-    ref.current.innerHTML = '';
+    const currentRef = ref.current;
+    currentRef.innerHTML = '';
     const render = plugin.ui;
 
     void render({
       value,
       schema,
       basePdf,
-      rootElement: ref.current,
+      rootElement: currentRef,
       mode,
       onChange,
       stopEditing,
@@ -143,11 +136,11 @@ const Renderer = (props: RendererProps) => {
     });
 
     return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
+      if (currentRef) {
+        currentRef.innerHTML = '';
       }
     };
-  }, reRenderDependencies);
+  }, [value, mode, scale, schema, options, plugin, basePdf, onChange, stopEditing, tabIndex, placeholder, theme, i18n, _cache]);
 
   if (!plugin) {
     console.error(`[@pdfme/ui] Renderer for type ${schema.type} not found. 

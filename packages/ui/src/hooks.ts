@@ -43,7 +43,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
 
-  const init = async (prop: { template: Template; size: Size }) => {
+  const init = useCallback(async (prop: { template: Template; size: Size }) => {
     const {
       template: { basePdf, schemas },
       size,
@@ -91,7 +91,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
       pageSizes: _pageSizes,
       scale: _scale,
     };
-  };
+  }, [maxZoom]);
 
   useEffect(() => {
     init({ template, size })
@@ -104,7 +104,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
         setError(err);
         console.error('[@pdfme/ui]', err);
       });
-  }, [template, size]);
+  }, [template, size, init]);
 
   return {
     backgrounds,
@@ -164,10 +164,11 @@ export const useScrollPageCursor = ({
   }, [onChangePageCursor, pageCursor, pageSizes, ref, scale]);
 
   useEffect(() => {
-    ref.current?.addEventListener('scroll', onScroll);
+    const currentRef = ref.current;
+    currentRef?.addEventListener('scroll', onScroll);
 
     return () => {
-      ref.current?.removeEventListener('scroll', onScroll);
+      currentRef?.removeEventListener('scroll', onScroll);
     };
   }, [ref, onScroll]);
 };
