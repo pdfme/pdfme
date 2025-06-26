@@ -718,9 +718,16 @@ const parseHTMLNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
+  if (!node || typeof node !== 'object') return [];
   if (node.nodeType === NodeType.COMMENT_NODE) return [];
   else if (node.nodeType === NodeType.TEXT_NODE) return [];
-  else if (node.tagName === 'g') {
+  
+  const allowedTags = new Set(['g', 'svg', 'text', 'line', 'path', 'image', 'rect', 'ellipse', 'circle', 'polygon']);
+  if (!node.tagName || typeof node.tagName !== 'string' || !allowedTags.has(node.tagName)) {
+    return [];
+  }
+  
+  if (node.tagName === 'g') {
     return parseGroupNode(
       node as HTMLElement & { tagName: 'g' },
       inherited,
@@ -735,19 +742,18 @@ const parseHTMLNode = (
       clipSpaces,
     );
   } else {
-    if (node.tagName === 'polygon' && node.attributes && typeof node.attributes.points === 'string') {
-      const points = node.attributes.points;
-      if (points.length < 1000 && /^[\d\s,.-]+$/.test(points)) {
-        node.tagName = 'path';
-        if (typeof node.attributes === 'object' && node.attributes !== null) {
-          node.attributes.d = `M${points}Z`;
-          if (Object.prototype.hasOwnProperty.call(node.attributes, 'points')) {
-            delete node.attributes.points;
-          }
+    if (node.tagName === 'polygon' && (node as HTMLElement).attributes && typeof (node as HTMLElement).attributes.points === 'string') {
+      const htmlNode = node as HTMLElement;
+      const points = htmlNode.attributes.points;
+      if (points.length < 500 && /^[\d\s,.-]+$/.test(points)) {
+        htmlNode.tagName = 'path';
+        if (htmlNode.setAttribute && typeof htmlNode.setAttribute === 'function') {
+          htmlNode.setAttribute('d', `M${points}Z`);
+          htmlNode.removeAttribute && htmlNode.removeAttribute('points');
         }
       }
     }
-    const attributes = parseAttributes(node, inherited, matrix);
+    const attributes = parseAttributes(node as HTMLElement, inherited, matrix);
     const svgAttributes = {
       ...attributes.inherited,
       ...attributes.svgAttributes,
@@ -755,11 +761,15 @@ const parseHTMLNode = (
       clipSpaces
     };
     
-    if (node && typeof node === 'object' && node !== null) {
-      const safeNode = node as any;
-      safeNode.svgAttributes = svgAttributes;
-    }
-    return [node as SVGElement];
+    const result = node as SVGElement;
+    Object.defineProperty(result, 'svgAttributes', {
+      value: svgAttributes,
+      writable: false,
+      enumerable: false,
+      configurable: false
+    });
+    
+    return [result];
   }
 };
 
@@ -910,21 +920,47 @@ const parseViewBox = (viewBox?: string): Box | undefined => {
   };
 };
 
+const sanitizeSvgContent = (svg: string): string => {
+  if (!svg || typeof svg !== 'string') return '';
+  
+  return svg
+    .replace(/<script[^>]*>.*?<\/script>/gis, '')
+    .replace(/<style[^>]*>.*?<\/style>/gis, '')
+    .replace(/javascript:/gi, '')
+    .replace(/data:/gi, '')
+    .replace(/vbscript:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    .replace(/href\s*=/gi, '')
+    .replace(/xlink:href\s*=/gi, '')
+    .replace(/xmlns\s*=/gi, '')
+    .replace(/<\s*\/?\s*[^>]*>/g, (match) => {
+      const allowedTags = /^<\s*\/?\s*(svg|g|text|line|path|image|rect|ellipse|circle|polygon)\b/i;
+      return allowedTags.test(match) ? match : '';
+    });
+};
+
 const parse = (
   svg: string,
   { width, height, fontSize }: PDFPageDrawSVGElementOptions,
   size: Size,
   matrix: TransformationMatrix
 ): SVGElement[] => {
-  if (!svg || typeof svg !== 'string' || svg.length > 100000) {
+  if (!svg || typeof svg !== 'string' || svg.length > 50000) {
     return [];
   }
   
-  const sanitizedSvg = svg.replace(/<script[^>]*>.*?<\/script>/gis, '')
-                          .replace(/javascript:/gi, '')
-                          .replace(/on\w+\s*=/gi, '');
+  const sanitizedSvg = sanitizeSvgContent(svg);
+  if (!sanitizedSvg || sanitizedSvg.length === 0) {
+    return [];
+  }
   
-  const parsed = parseHtml(sanitizedSvg);
+  let parsed;
+  try {
+    parsed = parseHtml(sanitizedSvg);
+  } catch (error) {
+    return [];
+  }
+  
   if (!parsed || !parsed.firstChild) {
     return [];
   }
@@ -934,18 +970,18 @@ const parse = (
     return [];
   }
   
-  if (width && typeof width === 'number' && isFinite(width)) {
-    htmlElement.setAttribute('width', width + '');
+  if (width && typeof width === 'number' && isFinite(width) && width > 0 && width < 10000) {
+    htmlElement.setAttribute('width', String(Math.floor(width)));
   }
-  if (height && typeof height === 'number' && isFinite(height)) {
-    htmlElement.setAttribute('height', height + '');
+  if (height && typeof height === 'number' && isFinite(height) && height > 0 && height < 10000) {
+    htmlElement.setAttribute('height', String(Math.floor(height)));
   }
-  if (fontSize && typeof fontSize === 'number' && isFinite(fontSize)) {
-    htmlElement.setAttribute('font-size', fontSize + '');
+  if (fontSize && typeof fontSize === 'number' && isFinite(fontSize) && fontSize > 0 && fontSize < 1000) {
+    htmlElement.setAttribute('font-size', String(Math.floor(fontSize)));
   }
   
   const viewBoxAttr = htmlElement.attributes?.viewBox;
-  const safeViewBox = typeof viewBoxAttr === 'string' && viewBoxAttr.length < 100 ? viewBoxAttr : '0 0 1 1';
+  const safeViewBox = typeof viewBoxAttr === 'string' && viewBoxAttr.length < 50 && /^[\d\s.-]+$/.test(viewBoxAttr) ? viewBoxAttr : '0 0 1 1';
   
   return parseHTMLNode(
     htmlElement,
@@ -963,14 +999,23 @@ export const drawSvg = async (
   svg: string,
   options: PDFPageDrawSVGElementOptions,
 ) => {
-  if (!svg || typeof svg !== 'string' || svg.length > 100000) return;
+  if (!svg || typeof svg !== 'string' || svg.length > 50000) return;
+  if (!page || typeof page.getSize !== 'function') return;
+  if (!options || typeof options !== 'object') return;
   
-  const sanitizedSvg = svg.replace(/<script[^>]*>.*?<\/script>/gis, '')
-                          .replace(/javascript:/gi, '')
-                          .replace(/on\w+\s*=/gi, '');
+  const sanitizedSvg = sanitizeSvgContent(svg);
+  if (!sanitizedSvg || sanitizedSvg.length === 0) return;
   
   const size = page.getSize();
-  const parsed = parseHtml(sanitizedSvg);
+  if (!size || typeof size.width !== 'number' || typeof size.height !== 'number') return;
+  
+  let parsed;
+  try {
+    parsed = parseHtml(sanitizedSvg);
+  } catch (error) {
+    return;
+  }
+  
   if (!parsed || !parsed.firstChild) return;
   
   const firstChild = parsed.firstChild as HTMLElement;
@@ -982,14 +1027,16 @@ export const drawSvg = async (
   const widthRaw = styleOrAttribute(attributes, style, 'width', '');
   const heightRaw = styleOrAttribute(attributes, style, 'height', '');
 
-  const width =
-    options.width !== undefined ? options.width : parseFloat(widthRaw);
-  const height =
-    options.height !== undefined ? options.height : parseFloat(heightRaw);
+  const width = options.width !== undefined && typeof options.width === 'number' && isFinite(options.width) 
+    ? Math.max(0, Math.min(10000, options.width)) 
+    : parseFloat(widthRaw);
+  const height = options.height !== undefined && typeof options.height === 'number' && isFinite(options.height)
+    ? Math.max(0, Math.min(10000, options.height))
+    : parseFloat(heightRaw);
 
   if (!attributes.viewBox && typeof firstChild.setAttribute === 'function') {
-    const safeWidth = isFinite(width) ? width : (widthRaw || 100);
-    const safeHeight = isFinite(height) ? height : (heightRaw || 100);
+    const safeWidth = isFinite(width) && width > 0 ? Math.floor(width) : 100;
+    const safeHeight = isFinite(height) && height > 0 ? Math.floor(height) : 100;
     firstChild.setAttribute(
       'viewBox',
       `0 0 ${safeWidth} ${safeHeight}`,
@@ -997,17 +1044,18 @@ export const drawSvg = async (
   }
 
   if (options.width || options.height) {
-    if (width !== undefined && isFinite(width)) {
-      style.width = width + (isNaN(width) ? '' : 'px');
+    if (width !== undefined && isFinite(width) && width > 0) {
+      style.width = Math.floor(width) + 'px';
     }
-    if (height !== undefined && isFinite(height)) {
-      style.height = height + (isNaN(height) ? '' : 'px');
+    if (height !== undefined && isFinite(height) && height > 0) {
+      style.height = Math.floor(height) + 'px';
     }
     
+    const allowedStyleKeys = new Set(['width', 'height', 'fill', 'stroke', 'stroke-width', 'opacity']);
     const safeStyleEntries = Object.entries(style)
       .filter(([key, val]) => typeof key === 'string' && typeof val === 'string')
-      .filter(([key, val]) => key.length < 50 && val.length < 100)
-      .slice(0, 20);
+      .filter(([key, val]) => allowedStyleKeys.has(key) && key.length < 20 && val.length < 50)
+      .slice(0, 10);
     
     if (typeof firstChild.setAttribute === 'function') {
       firstChild.setAttribute(
@@ -1019,21 +1067,25 @@ export const drawSvg = async (
     }
   }
 
-  const baseTransformation: TransformationMatrix = [1, 0, 0, 1, options.x ||  0, options.y || 0]
+  const safeX = typeof options.x === 'number' && isFinite(options.x) ? Math.max(-10000, Math.min(10000, options.x)) : 0;
+  const safeY = typeof options.y === 'number' && isFinite(options.y) ? Math.max(-10000, Math.min(10000, options.y)) : 0;
+  const baseTransformation: TransformationMatrix = [1, 0, 0, 1, safeX, safeY];
 
   const runners = runnersToPage(page, options);
   const elements = parse(firstChild.outerHTML || '', options, size, baseTransformation);
 
   const allowedTagNames = new Set(['text', 'line', 'path', 'image', 'rect', 'ellipse', 'circle']);
 
-  await elements.reduce(async (prev, elt) => {
-    await prev;
+  for (const elt of elements) {
     if (elt && elt.tagName && typeof elt.tagName === 'string' && allowedTagNames.has(elt.tagName)) {
       const runner = runners[elt.tagName];
       if (typeof runner === 'function') {
-        return runner(elt);
+        try {
+          await runner(elt);
+        } catch (error) {
+          continue;
+        }
       }
     }
-    return Promise.resolve();
-  }, Promise.resolve());
+  }
 };
