@@ -78,6 +78,9 @@
         }
       ]
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(color)/)"
+    ],
     "testMatch": [
       "**/*.test.ts",
       "**/*.spec.ts"
