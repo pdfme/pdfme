@@ -193,21 +193,31 @@ const anchor = element.svgAttributes.textAnchor;
     function getBestFont(
       style: InheritedAttributes,
       fonts: { [fontName: string]: PDFFont },
-    ) {
+    ): PDFFont | undefined {
       const family = style.fontFamily;
-      if (!family) return undefined;
+      if (!family || typeof family !== 'string') return undefined;
+      const sanitizedFamily = family.replace(/[^a-zA-Z0-9\-_\s]/g, '');
+      if (!sanitizedFamily) return undefined;
+      
       const isBold =
         style.fontWeight === 'bold' || Number(style.fontWeight) >= 700;
       const isItalic = style.fontStyle === 'italic';
-      const getFont = (bold: boolean, italic: boolean, family: string) =>
-        fonts[family + (bold ? '_bold' : '') + (italic ? '_italic' : '')];
-      return (
-        getFont(isBold, isItalic, family) ||
-        getFont(isBold, false, family) ||
-        getFont(false, isItalic, family) ||
-        getFont(false, false, family) ||
-        Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(family))
+      const getFont = (bold: boolean, italic: boolean, family: string): PDFFont | undefined => {
+        const fontKey = family + (bold ? '_bold' : '') + (italic ? '_italic' : '');
+        return Object.prototype.hasOwnProperty.call(fonts, fontKey) ? fonts[fontKey] : undefined;
+      };
+      
+      const foundFont = (
+        getFont(isBold, isItalic, sanitizedFamily) ||
+        getFont(isBold, false, sanitizedFamily) ||
+        getFont(false, isItalic, sanitizedFamily) ||
+        getFont(false, false, sanitizedFamily)
       );
+      
+      if (foundFont) return foundFont;
+      
+      const matchingFontKey = Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(sanitizedFamily));
+      return matchingFontKey ? fonts[matchingFontKey] : undefined;
     }
 
     const font =
@@ -279,8 +289,19 @@ const textWidth = (font || page.getFont()[0]).widthOfTextAtSize(
   },
   async image(element) {
     const { src } = element.svgAttributes;
-    if (!src) return;
-    const isPng = src.match(/\.png(\?|$)|^data:image\/png;base64/gim);
+    if (!src || typeof src !== 'string') return;
+    
+    if (src.includes('..') || src.includes('file://') || src.includes('javascript:')) {
+      return;
+    }
+    
+    const isDataUrl = src.startsWith('data:image/');
+    const isHttpUrl = src.startsWith('http://') || src.startsWith('https://');
+    if (!isDataUrl && !isHttpUrl) {
+      return;
+    }
+    
+    const isPng = src.match(/\.png(\?|$)|^data:image\/png;base64/i);
     const img = isPng
       ? await page.doc.embedPng(src)
       : await page.doc.embedJpg(src);
@@ -352,12 +373,19 @@ const styleOrAttribute = (
 };
 
 const parseStyles = (style: string): SVGStyle => {
+  if (!style || typeof style !== 'string' || style.length > 10000) {
+    return {};
+  }
   const cssRegex = /([^:\s]+)*\s*:\s*([^;]+)/g;
   const css: SVGStyle = {};
   let match = cssRegex.exec(style);
-  while (match != null) {
-    css[match[1]] = match[2];
+  let matchCount = 0;
+  while (match != null && matchCount < 100) {
+    if (match[1] && match[2]) {
+      css[match[1]] = match[2];
+    }
     match = cssRegex.exec(style);
+    matchCount++;
   }
   return css;
 };
@@ -495,17 +523,24 @@ const parseAttributes = (
   }
   let newMatrix = matrix
   // Apply the transformations
-  if (transformList) {
+  if (transformList && typeof transformList === 'string' && transformList.length < 1000) {
     const regexTransform = /(\w+)\((.+?)\)/g;
     let parsed = regexTransform.exec(transformList);
-    while (parsed !== null) {
+    let transformCount = 0;
+    while (parsed !== null && transformCount < 20) {
       const [, name, rawArgs] = parsed;
-      const args = (rawArgs || '')
-        .split(/\s*,\s*|\s+/)
-        .filter((value) => value.length > 0)
-        .map((value) => parseFloat(value));
-      newMatrix = combineTransformation(newMatrix, name as TransformationName, args)
+      if (name && rawArgs) {
+        const args = (rawArgs || '')
+          .split(/\s*,\s*|\s+/)
+          .filter((value) => value.length > 0 && value.length < 50)
+          .map((value) => parseFloat(value))
+          .filter((value) => !isNaN(value) && isFinite(value));
+        if (args.length > 0 && args.length <= 6) {
+          newMatrix = combineTransformation(newMatrix, name as TransformationName, args);
+        }
+      }
       parsed = regexTransform.exec(transformList);
+      transformCount++;
     }
   }
 
