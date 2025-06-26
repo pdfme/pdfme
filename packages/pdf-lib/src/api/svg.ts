@@ -6,7 +6,6 @@ import {
   NodeType,
 } from 'node-html-better-parser';
 import { Color, colorString } from './colors';
-import sanitizeHtml from 'sanitize-html';
 import {
   Degrees,
   degreesToRadians,
@@ -194,31 +193,21 @@ const anchor = element.svgAttributes.textAnchor;
     function getBestFont(
       style: InheritedAttributes,
       fonts: { [fontName: string]: PDFFont },
-    ): PDFFont | undefined {
+    ) {
       const family = style.fontFamily;
-      if (!family || typeof family !== 'string') return undefined;
-      const sanitizedFamily = family.replace(/[^a-zA-Z0-9\-_\s]/g, '');
-      if (!sanitizedFamily) return undefined;
-      
+      if (!family) return undefined;
       const isBold =
         style.fontWeight === 'bold' || Number(style.fontWeight) >= 700;
       const isItalic = style.fontStyle === 'italic';
-      const getFont = (bold: boolean, italic: boolean, family: string): PDFFont | undefined => {
-        const fontKey = family + (bold ? '_bold' : '') + (italic ? '_italic' : '');
-        return Object.prototype.hasOwnProperty.call(fonts, fontKey) ? fonts[fontKey] : undefined;
-      };
-      
-      const foundFont = (
-        getFont(isBold, isItalic, sanitizedFamily) ||
-        getFont(isBold, false, sanitizedFamily) ||
-        getFont(false, isItalic, sanitizedFamily) ||
-        getFont(false, false, sanitizedFamily)
+      const getFont = (bold: boolean, italic: boolean, family: string) =>
+        fonts[family + (bold ? '_bold' : '') + (italic ? '_italic' : '')];
+      return (
+        getFont(isBold, isItalic, family) ||
+        getFont(isBold, false, family) ||
+        getFont(false, isItalic, family) ||
+        getFont(false, false, family) ||
+        Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(family))
       );
-      
-      if (foundFont) return foundFont;
-      
-      const matchingFontKey = Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(sanitizedFamily));
-      return matchingFontKey ? fonts[matchingFontKey] : undefined;
     }
 
     const font =
@@ -290,19 +279,8 @@ const textWidth = (font || page.getFont()[0]).widthOfTextAtSize(
   },
   async image(element) {
     const { src } = element.svgAttributes;
-    if (!src || typeof src !== 'string') return;
-    
-    if (src.includes('..') || src.includes('file://') || src.includes('javascript:')) {
-      return;
-    }
-    
-    const isDataUrl = src.startsWith('data:image/');
-    const isHttpUrl = src.startsWith('http://') || src.startsWith('https://');
-    if (!isDataUrl && !isHttpUrl) {
-      return;
-    }
-    
-    const isPng = src.match(/\.png(\?|$)|^data:image\/png;base64/i);
+    if (!src) return;
+    const isPng = src.match(/\.png(\?|$)|^data:image\/png;base64/gim);
     const img = isPng
       ? await page.doc.embedPng(src)
       : await page.doc.embedJpg(src);
@@ -374,19 +352,12 @@ const styleOrAttribute = (
 };
 
 const parseStyles = (style: string): SVGStyle => {
-  if (!style || typeof style !== 'string' || style.length > 10000) {
-    return {};
-  }
-  const cssRegex = /([^:\s]+)*\s*:\s*([^;]+)/g;
+  const cssRegex = /([^:\s]+)\s*:\s*([^;]+)/g;
   const css: SVGStyle = {};
   let match = cssRegex.exec(style);
-  let matchCount = 0;
-  while (match != null && matchCount < 100) {
-    if (match[1] && match[2]) {
-      css[match[1]] = match[2];
-    }
+  while (match != null) {
+    css[match[1]] = match[2];
     match = cssRegex.exec(style);
-    matchCount++;
   }
   return css;
 };
@@ -524,24 +495,17 @@ const parseAttributes = (
   }
   let newMatrix = matrix
   // Apply the transformations
-  if (transformList && typeof transformList === 'string' && transformList.length < 1000) {
+  if (transformList) {
     const regexTransform = /(\w+)\((.+?)\)/g;
     let parsed = regexTransform.exec(transformList);
-    let transformCount = 0;
-    while (parsed !== null && transformCount < 20) {
+    while (parsed !== null) {
       const [, name, rawArgs] = parsed;
-      if (name && rawArgs) {
-        const args = (rawArgs || '')
-          .split(/\s*,\s*|\s+/)
-          .filter((value) => value.length > 0 && value.length < 50)
-          .map((value) => parseFloat(value))
-          .filter((value) => !isNaN(value) && isFinite(value));
-        if (args.length > 0 && args.length <= 6) {
-          newMatrix = combineTransformation(newMatrix, name as TransformationName, args);
-        }
-      }
+      const args = (rawArgs || '')
+        .split(/\s*,\s*|\s+/)
+        .filter((value) => value.length > 0)
+        .map((value) => parseFloat(value));
+      newMatrix = combineTransformation(newMatrix, name as TransformationName, args)
       parsed = regexTransform.exec(transformList);
-      transformCount++;
     }
   }
 
@@ -719,16 +683,9 @@ const parseHTMLNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
-  if (!node || typeof node !== 'object') return [];
   if (node.nodeType === NodeType.COMMENT_NODE) return [];
   else if (node.nodeType === NodeType.TEXT_NODE) return [];
-  
-  const allowedTags = new Set(['g', 'svg', 'text', 'line', 'path', 'image', 'rect', 'ellipse', 'circle', 'polygon']);
-  if (!node.tagName || typeof node.tagName !== 'string' || !allowedTags.has(node.tagName)) {
-    return [];
-  }
-  
-  if (node.tagName === 'g') {
+  else if (node.tagName === 'g') {
     return parseGroupNode(
       node as HTMLElement & { tagName: 'g' },
       inherited,
@@ -743,34 +700,20 @@ const parseHTMLNode = (
       clipSpaces,
     );
   } else {
-    if (node.tagName === 'polygon' && (node as HTMLElement).attributes && typeof (node as HTMLElement).attributes.points === 'string') {
-      const htmlNode = node as HTMLElement;
-      const points = htmlNode.attributes.points;
-      if (points.length < 500 && /^[\d\s,.-]+$/.test(points)) {
-        htmlNode.tagName = 'path';
-        if (htmlNode.setAttribute && typeof htmlNode.setAttribute === 'function') {
-          htmlNode.setAttribute('d', `M${points}Z`);
-          htmlNode.removeAttribute && htmlNode.removeAttribute('points');
-        }
-      }
+    if (node.tagName === 'polygon') {
+      node.tagName = 'path';
+      node.attributes.d = `M${node.attributes.points}Z`;
+      delete node.attributes.points;
     }
-    const attributes = parseAttributes(node as HTMLElement, inherited, matrix);
+    const attributes = parseAttributes(node, inherited, matrix);
     const svgAttributes = {
       ...attributes.inherited,
       ...attributes.svgAttributes,
       matrix: attributes.matrix,
       clipSpaces
     };
-    
-    const result = node as SVGElement;
-    Object.defineProperty(result, 'svgAttributes', {
-      value: svgAttributes,
-      writable: false,
-      enumerable: false,
-      configurable: false
-    });
-    
-    return [result];
+    Object.assign(node, { svgAttributes });
+    return [node as SVGElement];
   }
 };
 
@@ -780,33 +723,18 @@ const parseSvgNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
-  if (!node || !node.attributes || typeof node.setAttribute !== 'function') {
-    return [];
-  }
-  
   // if the width/height aren't set, the svg will have the same dimension as the current drawing space
-  if (!node.attributes.width && inherited.viewBox && typeof inherited.viewBox.width === 'number') {
+  node.attributes.width ??
     node.setAttribute('width', inherited.viewBox.width + '');
-  }
-  if (!node.attributes.height && inherited.viewBox && typeof inherited.viewBox.height === 'number') {
+  node.attributes.height ??
     node.setAttribute('height', inherited.viewBox.height + '');
-  }
-  
   const attributes = parseAttributes(node, inherited, matrix);
   const result: SVGElement[] = [];
-  
-  let viewBox = inherited.viewBox;
-  if (node.attributes.viewBox && typeof node.attributes.viewBox === 'string') {
-    const parsedViewBox = parseViewBox(node.attributes.viewBox);
-    if (parsedViewBox) {
-      viewBox = parsedViewBox;
-    }
-  } else if (node.attributes.width && node.attributes.height) {
-    const parsedViewBox = parseViewBox(`0 0 ${node.attributes.width} ${node.attributes.height}`);
-    if (parsedViewBox) {
-      viewBox = parsedViewBox;
-    }
-  }
+  const viewBox = node.attributes.viewBox
+    ? parseViewBox(node.attributes.viewBox)!
+    : node.attributes.width && node.attributes.height
+      ? parseViewBox(`0 0 ${node.attributes.width} ${node.attributes.height}`)!
+      : inherited.viewBox;
   const x = parseFloat(node.attributes.x) || 0
   const y = parseFloat(node.attributes.y) || 0
 
@@ -853,21 +781,15 @@ const parseSvgNode = (
   // newMatrix = combineTransformation(newMatrix, 'translate', [-baseClipSpace.xMin, -baseClipSpace.yMin])
   newMatrix = combineTransformation(contentTransform, 'translate', [-viewBox.x, -viewBox.y])
 
-  if (node.childNodes && Array.isArray(node.childNodes)) {
-    node.childNodes.forEach((child) => {
-      if (child && typeof child === 'object') {
-        const parsedNodes = parseHTMLNode(
-          child,
-          { ...attributes.inherited, viewBox },
-          newMatrix,
-          [...clipSpaces, baseClipSpace],
-        );
-        if (Array.isArray(parsedNodes)) {
-          result.push(...parsedNodes);
-        }
-      }
-    });
-  }
+  node.childNodes.forEach((child) => {
+    const parsedNodes = parseHTMLNode(
+      child,
+      { ...attributes.inherited, viewBox },
+      newMatrix,
+      [...clipSpaces, baseClipSpace],
+    )
+    result.push(...parsedNodes);
+  });
   return result;
 };
 
@@ -877,24 +799,13 @@ const parseGroupNode = (
   matrix: TransformationMatrix,
   clipSpaces: Space[],
 ): SVGElement[] => {
-  if (!node || !node.childNodes) {
-    return [];
-  }
-  
   const attributes = parseAttributes(node, inherited, matrix);
   const result: SVGElement[] = [];
-  
-  if (Array.isArray(node.childNodes)) {
-    node.childNodes.forEach((child) => {
-      if (child && typeof child === 'object') {
-        const parsedNodes = parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces);
-        if (Array.isArray(parsedNodes)) {
-          result.push(...parsedNodes);
-        }
-      }
-    });
-  }
-  
+  node.childNodes.forEach((child) => {
+    result.push(
+      ...parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces),
+    );
+  });
   return result;
 };
 
@@ -921,72 +832,22 @@ const parseViewBox = (viewBox?: string): Box | undefined => {
   };
 };
 
-const sanitizeSvgContent = (svg: string): string => {
-  if (!svg || typeof svg !== 'string') return '';
-  
-  const allowedTags = [
-    'svg', 'g', 'text', 'line', 'path', 'image', 'rect',
-    'ellipse', 'circle', 'polygon',
-  ];
-  const allowedAttributes = {
-    '*': ['x', 'y', 'width', 'height', 'fill', 'stroke', 'transform'],
-  };
-  
-  return sanitizeHtml(svg, {
-    allowedTags,
-    allowedAttributes,
-  });
-};
-
 const parse = (
   svg: string,
   { width, height, fontSize }: PDFPageDrawSVGElementOptions,
   size: Size,
   matrix: TransformationMatrix
 ): SVGElement[] => {
-  if (!svg || typeof svg !== 'string' || svg.length > 50000) {
-    return [];
-  }
-  
-  const sanitizedSvg = sanitizeSvgContent(svg);
-  if (!sanitizedSvg || sanitizedSvg.length === 0) {
-    return [];
-  }
-  
-  let parsed;
-  try {
-    parsed = parseHtml(sanitizedSvg);
-  } catch (error) {
-    return [];
-  }
-  
-  if (!parsed || !parsed.firstChild) {
-    return [];
-  }
-  
-  const htmlElement = parsed.firstChild as HTMLElement;
-  if (!htmlElement || typeof htmlElement.setAttribute !== 'function') {
-    return [];
-  }
-  
-  if (width && typeof width === 'number' && isFinite(width) && width > 0 && width < 10000) {
-    htmlElement.setAttribute('width', String(Math.floor(width)));
-  }
-  if (height && typeof height === 'number' && isFinite(height) && height > 0 && height < 10000) {
-    htmlElement.setAttribute('height', String(Math.floor(height)));
-  }
-  if (fontSize && typeof fontSize === 'number' && isFinite(fontSize) && fontSize > 0 && fontSize < 1000) {
-    htmlElement.setAttribute('font-size', String(Math.floor(fontSize)));
-  }
-  
-  const viewBoxAttr = htmlElement.attributes?.viewBox;
-  const safeViewBox = typeof viewBoxAttr === 'string' && viewBoxAttr.length < 50 && /^[\d\s.-]+$/.test(viewBoxAttr) ? viewBoxAttr : '0 0 1 1';
-  
+  const htmlElement = parseHtml(svg).firstChild as HTMLElement;
+  if (width) htmlElement.setAttribute('width', width + '');
+  if (height) htmlElement.setAttribute('height', height + '');
+  if (fontSize) htmlElement.setAttribute('font-size', fontSize + '');
+  // TODO: what should be the default viewBox?
   return parseHTMLNode(
     htmlElement,
     {
       ...size,
-      viewBox: parseViewBox(safeViewBox) || { x: 0, y: 0, width: 1, height: 1 },
+      viewBox: parseViewBox(htmlElement.attributes.viewBox || '0 0 1 1')!,
     },
     matrix,
     []
@@ -998,27 +859,9 @@ export const drawSvg = async (
   svg: string,
   options: PDFPageDrawSVGElementOptions,
 ) => {
-  if (!svg || typeof svg !== 'string' || svg.length > 50000) return;
-  if (!page || typeof page.getSize !== 'function') return;
-  if (!options || typeof options !== 'object') return;
-  
-  const sanitizedSvg = sanitizeSvgContent(svg);
-  if (!sanitizedSvg || sanitizedSvg.length === 0) return;
-  
+  if (!svg) return;
   const size = page.getSize();
-  if (!size || typeof size.width !== 'number' || typeof size.height !== 'number') return;
-  
-  let parsed;
-  try {
-    parsed = parseHtml(sanitizedSvg);
-  } catch (error) {
-    return;
-  }
-  
-  if (!parsed || !parsed.firstChild) return;
-  
-  const firstChild = parsed.firstChild as HTMLElement;
-  if (!firstChild || !firstChild.attributes) return;
+  const firstChild = parseHtml(svg).firstChild as HTMLElement;
 
   const attributes = firstChild.attributes;
   const style = parseStyles(attributes.style);
@@ -1026,65 +869,69 @@ export const drawSvg = async (
   const widthRaw = styleOrAttribute(attributes, style, 'width', '');
   const heightRaw = styleOrAttribute(attributes, style, 'height', '');
 
-  const width = options.width !== undefined && typeof options.width === 'number' && isFinite(options.width) 
-    ? Math.max(0, Math.min(10000, options.width)) 
-    : parseFloat(widthRaw);
-  const height = options.height !== undefined && typeof options.height === 'number' && isFinite(options.height)
-    ? Math.max(0, Math.min(10000, options.height))
-    : parseFloat(heightRaw);
+  const width =
+    options.width !== undefined ? options.width : parseFloat(widthRaw);
+  const height =
+    options.height !== undefined ? options.height : parseFloat(heightRaw);
 
-  if (!attributes.viewBox && typeof firstChild.setAttribute === 'function') {
-    const safeWidth = isFinite(width) && width > 0 ? Math.floor(width) : 100;
-    const safeHeight = isFinite(height) && height > 0 ? Math.floor(height) : 100;
+  // it's important to add the viewBox to allow svg resizing through the options
+  if (!attributes.viewBox) {
     firstChild.setAttribute(
       'viewBox',
-      `0 0 ${safeWidth} ${safeHeight}`,
+      `0 0 ${widthRaw || width} ${heightRaw || height}`,
     );
   }
 
   if (options.width || options.height) {
-    if (width !== undefined && isFinite(width) && width > 0) {
-      style.width = Math.floor(width) + 'px';
+    if (width !== undefined) style.width = width + (isNaN(width) ? '' : 'px');
+    if (height !== undefined) {
+      style.height = height + (isNaN(height) ? '' : 'px');
     }
-    if (height !== undefined && isFinite(height) && height > 0) {
-      style.height = Math.floor(height) + 'px';
-    }
-    
-    const allowedStyleKeys = new Set(['width', 'height', 'fill', 'stroke', 'stroke-width', 'opacity']);
-    const safeStyleEntries = Object.entries(style)
-      .filter(([key, val]) => typeof key === 'string' && typeof val === 'string')
-      .filter(([key, val]) => allowedStyleKeys.has(key) && key.length < 20 && val.length < 50)
-      .slice(0, 10);
-    
-    if (typeof firstChild.setAttribute === 'function') {
-      firstChild.setAttribute(
-        'style',
-        safeStyleEntries
-          .map(([key, val]) => `${key}:${val};`)
-          .join(''),
-      );
-    }
+    firstChild.setAttribute(
+      'style',
+      Object.entries(style)
+        .map(([key, val]) => `${key}:${val};`)
+        .join(''),
+    );
   }
 
-  const safeX = typeof options.x === 'number' && isFinite(options.x) ? Math.max(-10000, Math.min(10000, options.x)) : 0;
-  const safeY = typeof options.y === 'number' && isFinite(options.y) ? Math.max(-10000, Math.min(10000, options.y)) : 0;
-  const baseTransformation: TransformationMatrix = [1, 0, 0, 1, safeX, safeY];
+  const baseTransformation: TransformationMatrix = [1, 0, 0, 1, options.x ||  0, options.y || 0]
 
   const runners = runnersToPage(page, options);
-  const elements = parse(firstChild.outerHTML || '', options, size, baseTransformation);
+  const elements = parse(firstChild.outerHTML, options, size, baseTransformation);
 
-  const allowedTagNames = new Set(['text', 'line', 'path', 'image', 'rect', 'ellipse', 'circle']);
+  await elements.reduce(async (prev, elt) => {
+    await prev;
+    // uncomment these lines to draw the clipSpaces
+    // elt.svgAttributes.clipSpaces.forEach(space => {
+    //   page.drawLine({
+    //     start: space.topLeft,
+    //     end: space.topRight,
+    //     color: parseColor('#000000')?.rgb,
+    //     thickness: 1
+    //   })
 
-  for (const elt of elements) {
-    if (elt && elt.tagName && typeof elt.tagName === 'string' && allowedTagNames.has(elt.tagName)) {
-      const runner = runners[elt.tagName];
-      if (typeof runner === 'function') {
-        try {
-          await runner(elt);
-        } catch (error) {
-          continue;
-        }
-      }
-    }
-  }
+    //   page.drawLine({
+    //     start: space.topRight,
+    //     end: space.bottomRight,
+    //     color: parseColor('#000000')?.rgb,
+    //     thickness: 1
+    //   })
+
+    //   page.drawLine({
+    //     start: space.bottomRight,
+    //     end: space.bottomLeft,
+    //     color: parseColor('#000000')?.rgb,
+    //     thickness: 1
+    //   })
+
+    //   page.drawLine({
+    //     start: space.bottomLeft,
+    //     end: space.topLeft,
+    //     color: parseColor('#000000')?.rgb,
+    //     thickness: 1
+    //   })
+    // })
+    return runners[elt.tagName]?.(elt);
+  }, Promise.resolve());
 };
