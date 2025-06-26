@@ -49,9 +49,9 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
-    "acorn": "^8.14.0",
+    "acorn": "^8.15.0",
     "buffer": "^6.0.3",
-    "zod": "^3.25.46"
+    "zod": "^3.25.67"
   },
   "peerDependencies": {
     "antd": "^5.11.2",
