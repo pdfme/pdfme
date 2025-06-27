@@ -19,28 +19,44 @@ import {
   rotate,
 } from './maths';
 
+// Common pattern for filtering intersections by inclusion
+const filterByInclusion = (
+  results: Coordinates[],
+  shape: Segment | Arc,
+): Coordinates[] => {
+  return results.filter((P) => shape.includes(new Point(P)));
+};
+
+// Common pattern for handling shape conversions
+const handleShapeConversion = <T extends GraphicElement>(
+  shape: Segment | Arc,
+  B: GraphicElement,
+  intersectionFn: (converted: T, B: GraphicElement) => Coordinates[],
+): Coordinates[] => {
+  if (shape instanceof Segment) {
+    return filterByInclusion(intersectionFn(shape.getLine() as T, B), shape);
+  } else if (shape instanceof Arc) {
+    return filterByInclusion(intersectionFn(shape.getCircle() as T, B), shape);
+  }
+  return [];
+};
+
 export function intersections(
   A: GraphicElement,
   B: GraphicElement,
 ): Coordinates[] {
   if (A instanceof Point || B instanceof Point) return [];
-  else if (A instanceof Text || B instanceof Text) return [];
-  else if (A instanceof Image || B instanceof Image) return [];
   // TODO: calculate the coords of the intersection: https://www.emathzone.com/tutorials/geometry/intersection-of-line-and-ellipse.html
   else if (A instanceof Line) return intersectionsLine(A, B);
   else if (A instanceof Segment) {
-    return intersectionsLine(A.getLine(), B).filter((P) =>
-      A.includes(new Point(P)),
-    );
+    return handleShapeConversion(A, B, intersectionsLine);
   } else if (A instanceof Circle) return intersectionsCircle(A, B);
   else if (A instanceof Arc) {
-    return intersectionsCircle(A.getCircle(), B).filter((P) =>
-      A.includes(new Point(P)),
-    );
+    return handleShapeConversion(A, B, intersectionsCircle);
   } else if (A instanceof Plot) return intersectionsPlot(A, B);
   else if (A instanceof Rectangle) return intersectionsRectangle(A, B);
   else if (A instanceof Ellipse) return intersectionsEllipse(A, B);
-  return A;
+  return [];
 }
 
 export function intersection(
@@ -52,33 +68,27 @@ export function intersection(
 
 function intersectionsLine(
   A: Line,
-  B: Exclude<GraphicElement, Text | Point>,
+  B: GraphicElement,
 ): Coordinates[] {
   if (B instanceof Line) return intersectionLine(A, B);
   else if (B instanceof Segment) {
-    return intersectionLine(A, B.getLine()).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionLine(A, B.getLine()), B);
   } else if (B instanceof Circle) return intersectionCircleLine(B, A);
   else if (B instanceof Arc) {
-    return intersectionsCircle(B.getCircle(), A).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionsCircle(B.getCircle(), A), B);
   } else if (B instanceof Plot) return intersectionsPlot(B, A);
   else if (B instanceof Rectangle) return intersectionsRectangle(B, A);
   else if (B instanceof Ellipse) return intersectionsEllipse(B, A);
-  return B;
+  return [];
 }
 
 function intersectionsEllipse(
   A: Ellipse,
-  B: Exclude<GraphicElement, Text | Point>,
+  B: GraphicElement,
 ): Coordinates[] {
   if (B instanceof Line) return intersectionsLineAndEllipse(A, B);
   else if (B instanceof Segment) {
-    return intersectionsEllipse(A, B.getLine()).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionsEllipse(A, B.getLine()), B);
   }
   // TODO:
   // else if (B instanceof Circle) return intersectionEllipseCircle(B, A)
@@ -87,12 +97,10 @@ function intersectionsEllipse(
   // else if (B instanceof Ellipse) return intersectionEllipseEllipse(B, A)
   else if (B instanceof Ellipse) return [];
   else if (B instanceof Arc) {
-    return intersectionsEllipse(A, B.getCircle()).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionsEllipse(A, B.getCircle()), B);
   } else if (B instanceof Plot) return intersectionsPlot(B, A);
   else if (B instanceof Rectangle) return intersectionsRectangle(B, A);
-  return B;
+  return [];
 }
 
 function intersectionsLineAndEllipse(A: Ellipse, B: Line): Coordinates[] {
@@ -253,22 +261,18 @@ export function intersectionCircle(A: Circle, B: Circle): Coordinates[] {
 
 function intersectionsCircle(
   A: Circle,
-  B: Exclude<GraphicElement, Text | Point>,
+  B: GraphicElement,
 ): Coordinates[] {
   if (B instanceof Circle) return intersectionCircle(A, B);
   else if (B instanceof Line) return intersectionCircleLine(A, B);
   else if (B instanceof Segment) {
-    return intersectionCircleLine(A, B.getLine()).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionCircleLine(A, B.getLine()), B);
   } else if (B instanceof Arc) {
-    return intersectionCircle(A, B.getCircle()).filter((P) =>
-      B.includes(new Point(P)),
-    );
+    return filterByInclusion(intersectionCircle(A, B.getCircle()), B);
   } else if (B instanceof Plot) return intersectionsPlot(B, A);
   else if (B instanceof Rectangle) return intersectionsRectangle(B, A);
   else if (B instanceof Ellipse) return intersectionsEllipse(B, A);
-  return B;
+  return [];
 }
 
 export function getIntersections(elements: GraphicElement[]) {

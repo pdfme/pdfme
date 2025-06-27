@@ -700,7 +700,8 @@ export const drawTextLines = (
   return operators;
 };
 
-export const drawTextField = (options: {
+// Common helper for text field operations
+const createTextFieldBase = (options: {
   x: number | PDFNumber;
   y: number | PDFNumber;
   width: number | PDFNumber;
@@ -708,11 +709,12 @@ export const drawTextField = (options: {
   borderWidth: number | PDFNumber;
   color: Color | undefined;
   borderColor: Color | undefined;
-  textLines: { encoded: PDFHexString; x: number; y: number }[];
+  textLines: { encoded: PDFHexString; x: number; y: number; height?: number }[];
   textColor: Color;
   font: string | PDFName;
   fontSize: number | PDFNumber;
   padding: number | PDFNumber;
+  additionalOperators?: PDFOperator[];
 }) => {
   const x = asNumber(options.x);
   const y = asNumber(options.y);
@@ -769,10 +771,28 @@ export const drawTextField = (options: {
   return [
     pushGraphicsState(),
     ...background,
+    ...(options.additionalOperators || []),
     ...clippingArea,
     ...markedContent,
     popGraphicsState(),
   ];
+};
+
+export const drawTextField = (options: {
+  x: number | PDFNumber;
+  y: number | PDFNumber;
+  width: number | PDFNumber;
+  height: number | PDFNumber;
+  borderWidth: number | PDFNumber;
+  color: Color | undefined;
+  borderColor: Color | undefined;
+  textLines: { encoded: PDFHexString; x: number; y: number }[];
+  textColor: Color;
+  font: string | PDFName;
+  fontSize: number | PDFNumber;
+  padding: number | PDFNumber;
+}) => {
+  return createTextFieldBase(options);
 };
 
 export const drawOptionList = (options: {
@@ -792,41 +812,10 @@ export const drawOptionList = (options: {
   selectedColor: Color;
   padding: number | PDFNumber;
 }) => {
-  const x = asNumber(options.x);
-  const y = asNumber(options.y);
   const width = asNumber(options.width);
-  const height = asNumber(options.height);
-  const lineHeight = asNumber(options.lineHeight);
   const borderWidth = asNumber(options.borderWidth);
   const padding = asNumber(options.padding);
-
-  const clipX = x + borderWidth / 2 + padding;
-  const clipY = y + borderWidth / 2 + padding;
-  const clipWidth = width - (borderWidth / 2 + padding) * 2;
-  const clipHeight = height - (borderWidth / 2 + padding) * 2;
-
-  const clippingArea = [
-    moveTo(clipX, clipY),
-    lineTo(clipX, clipY + clipHeight),
-    lineTo(clipX + clipWidth, clipY + clipHeight),
-    lineTo(clipX + clipWidth, clipY),
-    closePath(),
-    clip(),
-    endPath(),
-  ];
-
-  const background = drawRectangle({
-    x,
-    y,
-    width,
-    height,
-    borderWidth: options.borderWidth,
-    color: options.color,
-    borderColor: options.borderColor,
-    rotate: degrees(0),
-    xSkew: degrees(0),
-    ySkew: degrees(0),
-  });
+  const lineHeight = asNumber(options.lineHeight);
 
   const highlights: PDFOperator[] = [];
   for (let idx = 0, len = options.selectedLines.length; idx < len; idx++) {
@@ -847,29 +836,8 @@ export const drawOptionList = (options: {
     );
   }
 
-  const lines = drawTextLines(options.textLines, {
-    color: options.textColor,
-    font: options.font,
-    size: options.fontSize,
-    rotate: degrees(0),
-    xSkew: degrees(0),
-    ySkew: degrees(0),
+  return createTextFieldBase({
+    ...options,
+    additionalOperators: highlights,
   });
-
-  const markedContent = [
-    beginMarkedContent('Tx'),
-    pushGraphicsState(),
-    ...lines,
-    popGraphicsState(),
-    endMarkedContent(),
-  ];
-
-  return [
-    pushGraphicsState(),
-    ...background,
-    ...highlights,
-    ...clippingArea,
-    ...markedContent,
-    popGraphicsState(),
-  ];
 };

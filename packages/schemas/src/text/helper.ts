@@ -12,6 +12,7 @@ import {
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
+import { findOptimalSize } from '../common/sizeOptimizer.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -326,30 +327,20 @@ export const calculateDynamicFontSize = ({
     return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
   };
 
-  let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
-
-  // Attempt to increase the font size up to desired fit
-  while (shouldFontGrowToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
-    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
-      calculateConstraints(dynamicFontSize);
-
-    if (newHeight < boxHeight) {
-      totalWidthInMm = newWidth;
-      totalHeightInMm = newHeight;
-    } else {
-      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-      break;
-    }
-  }
-
-  // Attempt to decrease the font size down to desired fit
-  while (shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
-  }
-
-  return dynamicFontSize;
+  return findOptimalSize({
+    initialSize: dynamicFontSize,
+    min: dynamicFontSizeSetting.min,
+    max: dynamicFontSizeSetting.max,
+    step: FONT_SIZE_ADJUSTMENT,
+    shouldGrow: (size) => {
+      const { totalWidthInMm, totalHeightInMm } = calculateConstraints(size);
+      return shouldFontGrowToFit(totalWidthInMm, totalHeightInMm) && totalHeightInMm < boxHeight;
+    },
+    shouldShrink: (size) => {
+      const { totalWidthInMm, totalHeightInMm } = calculateConstraints(size);
+      return shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm);
+    },
+  });
 };
 
 export const splitTextToSize = (arg: {
@@ -457,80 +448,42 @@ function containsJapanese(text: string): boolean {
 //
 // https://www.morisawa.co.jp/blogs/MVP/8760
 //
-// 行頭禁則
-export const filterStartJP = (lines: string[]): string[] => {
-  const filtered: string[] = [];
-  let charToAppend: string | null = null;
-
-  lines
-    .slice()
-    .reverse()
-    .forEach((line) => {
-      if (line.trim().length === 0) {
-        filtered.push('');
-      } else {
-        const charAtStart: string = line.charAt(0);
-        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
-          if (line.trim().length === 1) {
-            filtered.push(line);
-            charToAppend = null;
-          } else {
-            if (charToAppend) {
-              filtered.push(line.slice(1) + charToAppend);
-            } else {
-              filtered.push(line.slice(1));
-            }
-            charToAppend = charAtStart;
-          }
-        } else {
-          if (charToAppend) {
-            filtered.push(line + charToAppend);
-            charToAppend = null;
-          } else {
-            filtered.push(line);
-          }
-        }
-      }
-    });
-
-  if (charToAppend) {
-    // Handle the case where filtered might be empty
-    const firstItem = filtered.length > 0 ? filtered[0] : '';
-    // Ensure we're concatenating strings
-    const combinedItem = String(charToAppend) + String(firstItem);
-    return [combinedItem, ...filtered.slice(1)].reverse();
-  } else {
-    return filtered.reverse();
+// Common logic for Japanese line-breaking rules
+const filterJapaneseLine = (
+  lines: string[],
+  options: {
+    forbiddenChars: string[];
+    isStart: boolean;
+    getChar: (line: string) => string;
+    trimLine: (line: string) => string;
+    combineChar: (char: string, line: string) => string;
   }
-};
-
-// 行末禁則
-export const filterEndJP = (lines: string[]): string[] => {
+): string[] => {
   const filtered: string[] = [];
-  let charToPrepend: string | null = null;
+  let pendingChar: string | null = null;
+  const processLines = options.isStart ? lines.slice().reverse() : lines;
 
-  lines.forEach((line) => {
+  processLines.forEach((line) => {
     if (line.trim().length === 0) {
       filtered.push('');
     } else {
-      const chartAtEnd = line.slice(-1);
-
-      if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
+      const targetChar = options.getChar(line);
+      if (options.forbiddenChars.includes(targetChar)) {
         if (line.trim().length === 1) {
           filtered.push(line);
-          charToPrepend = null;
+          pendingChar = null;
         } else {
-          if (charToPrepend) {
-            filtered.push(charToPrepend + line.slice(0, -1));
+          if (pendingChar) {
+            filtered.push(options.combineChar(pendingChar, options.trimLine(line)));
           } else {
-            filtered.push(line.slice(0, -1));
+            filtered.push(options.trimLine(line));
           }
-          charToPrepend = chartAtEnd;
+          pendingChar = targetChar;
         }
       } else {
-        if (charToPrepend) {
-          filtered.push(charToPrepend + line);
-          charToPrepend = null;
+        if (pendingChar) {
+          filtered.push(options.combineChar(pendingChar, line));
+          pendingChar = null;
         } else {
           filtered.push(line);
         }
@@ -538,13 +491,39 @@ export const filterEndJP = (lines: string[]): string[] => {
     }
   });
 
-  if (charToPrepend) {
-    // Handle the case where filtered might be empty
-    const lastItem = filtered.length > 0 ? filtered[filtered.length - 1] : '';
-    // Ensure we're concatenating strings
-    const combinedItem = String(lastItem) + String(charToPrepend);
-    return [...filtered.slice(0, -1), combinedItem];
+  if (pendingChar) {
+    if (options.isStart) {
+      const firstItem = filtered.length > 0 ? filtered[0] : '';
+      const combinedItem = String(pendingChar) + String(firstItem);
+      return [combinedItem, ...filtered.slice(1)].reverse();
+    } else {
+      const lastItem = filtered.length > 0 ? filtered[filtered.length - 1] : '';
+      const combinedItem = String(lastItem) + String(pendingChar);
+      return [...filtered.slice(0, -1), combinedItem];
+    }
   } else {
-    return filtered;
+    return options.isStart ? filtered.reverse() : filtered;
   }
+};
+
+// 行頭禁則
+export const filterStartJP = (lines: string[]): string[] => {
+  return filterJapaneseLine(lines, {
+    forbiddenChars: LINE_START_FORBIDDEN_CHARS,
+    isStart: true,
+    getChar: (line) => line.charAt(0),
+    trimLine: (line) => line.slice(1),
+    combineChar: (char, line) => line + char,
+  });
+};
+
+// 行末禁則
+export const filterEndJP = (lines: string[]): string[] => {
+  return filterJapaneseLine(lines, {
+    forbiddenChars: LINE_END_FORBIDDEN_CHARS,
+    isStart: false,
+    getChar: (line) => line.slice(-1),
+    trimLine: (line) => line.slice(0, -1),
+    combineChar: (char, line) => char + line,
+  });
 };

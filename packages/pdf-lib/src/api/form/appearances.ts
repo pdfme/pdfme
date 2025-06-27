@@ -163,12 +163,71 @@ const updateDefaultAppearance = (
   field.setDefaultAppearance(da);
 };
 
-export const defaultCheckBoxAppearanceProvider: AppearanceProviderFor<
-  PDFCheckBox
-> = (checkBox, widget) => {
-  // The `/DA` entry can be at the widget or field level - so we handle both
+// Common helper for preparing text field widget appearance
+const prepareTextFieldWidgetAppearance = <T extends { acroField: any }>(
+  field: T,
+  widget: PDFWidgetAnnotation,
+) => {
   const widgetColor = getDefaultColor(widget);
-  const fieldColor = getDefaultColor(checkBox.acroField);
+  const fieldColor = getDefaultColor(field.acroField);
+  const widgetFontSize = getDefaultFontSize(widget);
+  const fieldFontSize = getDefaultFontSize(field.acroField);
+
+  const rectangle = widget.getRectangle();
+  const ap = widget.getAppearanceCharacteristics();
+  const bs = widget.getBorderStyle();
+
+  const borderWidth = bs?.getWidth() ?? 0;
+  const rotation = reduceRotation(ap?.getRotation());
+  const { width, height } = adjustDimsForRotation(rectangle, rotation);
+  const rotate = rotateInPlace({ ...rectangle, rotation });
+
+  const black = rgb(0, 0, 0);
+  const borderColor = componentsToColor(ap?.getBorderColor());
+  const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
+  const downBackgroundColor = componentsToColor(ap?.getBackgroundColor(), 0.8);
+
+  const textColor = widgetColor ?? fieldColor ?? black;
+
+  return {
+    widgetColor,
+    fieldColor,
+    widgetFontSize,
+    fieldFontSize,
+    width,
+    height,
+    borderWidth,
+    borderColor,
+    textColor,
+    rotate,
+    normalBackgroundColor,
+    downBackgroundColor,
+    black,
+  };
+};
+
+// Common helper to update text field appearance
+const updateTextFieldAppearance = <T extends { acroField: any }>(
+  field: T,
+  widget: PDFWidgetAnnotation,
+  appearance: ReturnType<typeof prepareTextFieldWidgetAppearance>,
+  font: PDFFont,
+  fontSize: number,
+) => {
+  if (appearance.widgetColor || appearance.widgetFontSize !== undefined) {
+    updateDefaultAppearance(widget, appearance.textColor, font, fontSize);
+  } else {
+    updateDefaultAppearance(field.acroField, appearance.textColor, font, fontSize);
+  }
+};
+
+// Common helper for preparing widget appearance settings
+const prepareToggleWidgetAppearance = <T extends { acroField: any }>(
+  field: T,
+  widget: PDFWidgetAnnotation,
+) => {
+  const widgetColor = getDefaultColor(widget);
+  const fieldColor = getDefaultColor(field.acroField);
 
   const rectangle = widget.getRectangle();
   const ap = widget.getAppearanceCharacteristics();
@@ -185,227 +244,151 @@ export const defaultCheckBoxAppearanceProvider: AppearanceProviderFor<
   const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
   const downBackgroundColor = componentsToColor(ap?.getBackgroundColor(), 0.8);
 
-  // Update color
   const textColor = widgetColor ?? fieldColor ?? black;
   if (widgetColor) {
     updateDefaultAppearance(widget, textColor);
   } else {
-    updateDefaultAppearance(checkBox.acroField, textColor);
+    updateDefaultAppearance(field.acroField, textColor);
   }
 
-  const options = {
-    x: 0 + borderWidth / 2,
-    y: 0 + borderWidth / 2,
-    width: width - borderWidth,
-    height: height - borderWidth,
-    thickness: 1.5,
+  return {
+    width,
+    height,
     borderWidth,
     borderColor,
-    markColor: textColor,
+    textColor,
+    rotate,
+    normalBackgroundColor,
+    downBackgroundColor,
   };
+};
 
+// Common helper for creating toggle appearance states
+const createToggleAppearanceStates = <T extends Record<string, any>>(
+  rotate: PDFOperator[],
+  drawFunction: (options: T & { color: Color | undefined; filled: boolean }) => PDFOperator[],
+  options: T,
+  normalBackgroundColor: Color | undefined,
+  downBackgroundColor: Color | undefined,
+) => {
   return {
     normal: {
-      on: [
-        ...rotate,
-        ...drawCheckBox({
-          ...options,
-          color: normalBackgroundColor,
-          filled: true,
-        }),
-      ],
-      off: [
-        ...rotate,
-        ...drawCheckBox({
-          ...options,
-          color: normalBackgroundColor,
-          filled: false,
-        }),
-      ],
+      on: [...rotate, ...drawFunction({ ...options, color: normalBackgroundColor, filled: true } as T & { color: Color | undefined; filled: boolean })],
+      off: [...rotate, ...drawFunction({ ...options, color: normalBackgroundColor, filled: false } as T & { color: Color | undefined; filled: boolean })],
     },
     down: {
-      on: [
-        ...rotate,
-        ...drawCheckBox({
-          ...options,
-          color: downBackgroundColor,
-          filled: true,
-        }),
-      ],
-      off: [
-        ...rotate,
-        ...drawCheckBox({
-          ...options,
-          color: downBackgroundColor,
-          filled: false,
-        }),
-      ],
+      on: [...rotate, ...drawFunction({ ...options, color: downBackgroundColor, filled: true } as T & { color: Color | undefined; filled: boolean })],
+      off: [...rotate, ...drawFunction({ ...options, color: downBackgroundColor, filled: false } as T & { color: Color | undefined; filled: boolean })],
     },
   };
+};
+
+export const defaultCheckBoxAppearanceProvider: AppearanceProviderFor<
+  PDFCheckBox
+> = (checkBox, widget) => {
+  const appearance = prepareToggleWidgetAppearance(checkBox, widget);
+  
+  const options = {
+    x: 0 + appearance.borderWidth / 2,
+    y: 0 + appearance.borderWidth / 2,
+    width: appearance.width - appearance.borderWidth,
+    height: appearance.height - appearance.borderWidth,
+    thickness: 1.5,
+    borderWidth: appearance.borderWidth,
+    borderColor: appearance.borderColor,
+    markColor: appearance.textColor,
+  };
+
+  return createToggleAppearanceStates(
+    appearance.rotate,
+    drawCheckBox,
+    options,
+    appearance.normalBackgroundColor,
+    appearance.downBackgroundColor,
+  );
 };
 
 export const defaultRadioGroupAppearanceProvider: AppearanceProviderFor<
   PDFRadioGroup
 > = (radioGroup, widget) => {
-  // The `/DA` entry can be at the widget or field level - so we handle both
-  const widgetColor = getDefaultColor(widget);
-  const fieldColor = getDefaultColor(radioGroup.acroField);
-
-  const rectangle = widget.getRectangle();
-  const ap = widget.getAppearanceCharacteristics();
-  const bs = widget.getBorderStyle();
-
-  const borderWidth = bs?.getWidth() ?? 0;
-  const rotation = reduceRotation(ap?.getRotation());
-  const { width, height } = adjustDimsForRotation(rectangle, rotation);
-
-  const rotate = rotateInPlace({ ...rectangle, rotation });
-
-  const black = rgb(0, 0, 0);
-  const borderColor = componentsToColor(ap?.getBorderColor()) ?? black;
-  const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
-  const downBackgroundColor = componentsToColor(ap?.getBackgroundColor(), 0.8);
-
-  // Update color
-  const textColor = widgetColor ?? fieldColor ?? black;
-  if (widgetColor) {
-    updateDefaultAppearance(widget, textColor);
-  } else {
-    updateDefaultAppearance(radioGroup.acroField, textColor);
-  }
-
+  const appearance = prepareToggleWidgetAppearance(radioGroup, widget);
+  
   const options = {
-    x: width / 2,
-    y: height / 2,
-    width: width - borderWidth,
-    height: height - borderWidth,
-    borderWidth,
-    borderColor,
-    dotColor: textColor,
+    x: appearance.width / 2,
+    y: appearance.height / 2,
+    width: appearance.width - appearance.borderWidth,
+    height: appearance.height - appearance.borderWidth,
+    borderWidth: appearance.borderWidth,
+    borderColor: appearance.borderColor,
+    dotColor: appearance.textColor,
   };
 
-  return {
-    normal: {
-      on: [
-        ...rotate,
-        ...drawRadioButton({
-          ...options,
-          color: normalBackgroundColor,
-          filled: true,
-        }),
-      ],
-      off: [
-        ...rotate,
-        ...drawRadioButton({
-          ...options,
-          color: normalBackgroundColor,
-          filled: false,
-        }),
-      ],
-    },
-    down: {
-      on: [
-        ...rotate,
-        ...drawRadioButton({
-          ...options,
-          color: downBackgroundColor,
-          filled: true,
-        }),
-      ],
-      off: [
-        ...rotate,
-        ...drawRadioButton({
-          ...options,
-          color: downBackgroundColor,
-          filled: false,
-        }),
-      ],
-    },
-  };
+  return createToggleAppearanceStates(
+    appearance.rotate,
+    drawRadioButton,
+    options,
+    appearance.normalBackgroundColor,
+    appearance.downBackgroundColor,
+  );
 };
 
 export const defaultButtonAppearanceProvider: AppearanceProviderFor<
   PDFButton
 > = (button, widget, font) => {
-  // The `/DA` entry can be at the widget or field level - so we handle both
-  const widgetColor = getDefaultColor(widget);
-  const fieldColor = getDefaultColor(button.acroField);
-  const widgetFontSize = getDefaultFontSize(widget);
-  const fieldFontSize = getDefaultFontSize(button.acroField);
-
-  const rectangle = widget.getRectangle();
+  const appearance = prepareTextFieldWidgetAppearance(button, widget);
   const ap = widget.getAppearanceCharacteristics();
-  const bs = widget.getBorderStyle();
   const captions = ap?.getCaptions();
   const normalText = captions?.normal ?? '';
   const downText = captions?.down ?? normalText ?? '';
 
-  const borderWidth = bs?.getWidth() ?? 0;
-  const rotation = reduceRotation(ap?.getRotation());
-  const { width, height } = adjustDimsForRotation(rectangle, rotation);
-
-  const rotate = rotateInPlace({ ...rectangle, rotation });
-
-  const black = rgb(0, 0, 0);
-
-  const borderColor = componentsToColor(ap?.getBorderColor());
-  const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
-  const downBackgroundColor = componentsToColor(ap?.getBackgroundColor(), 0.8);
-
   const bounds = {
-    x: borderWidth,
-    y: borderWidth,
-    width: width - borderWidth * 2,
-    height: height - borderWidth * 2,
+    x: appearance.borderWidth,
+    y: appearance.borderWidth,
+    width: appearance.width - appearance.borderWidth * 2,
+    height: appearance.height - appearance.borderWidth * 2,
   };
   const normalLayout = layoutSinglelineText(normalText, {
     alignment: TextAlignment.Center,
-    fontSize: widgetFontSize ?? fieldFontSize,
+    fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
     font,
     bounds,
   });
   const downLayout = layoutSinglelineText(downText, {
     alignment: TextAlignment.Center,
-    fontSize: widgetFontSize ?? fieldFontSize,
+    fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
     font,
     bounds,
   });
 
-  // Update font size and color
   const fontSize = Math.min(normalLayout.fontSize, downLayout.fontSize);
-  const textColor = widgetColor ?? fieldColor ?? black;
-  if (widgetColor || widgetFontSize !== undefined) {
-    updateDefaultAppearance(widget, textColor, font, fontSize);
-  } else {
-    updateDefaultAppearance(button.acroField, textColor, font, fontSize);
-  }
+  updateTextFieldAppearance(button, widget, appearance, font, fontSize);
 
   const options = {
-    x: 0 + borderWidth / 2,
-    y: 0 + borderWidth / 2,
-    width: width - borderWidth,
-    height: height - borderWidth,
-    borderWidth,
-    borderColor,
-    textColor,
+    x: 0 + appearance.borderWidth / 2,
+    y: 0 + appearance.borderWidth / 2,
+    width: appearance.width - appearance.borderWidth,
+    height: appearance.height - appearance.borderWidth,
+    borderWidth: appearance.borderWidth,
+    borderColor: appearance.borderColor,
+    textColor: appearance.textColor,
     font: font.name,
     fontSize,
   };
 
   return {
     normal: [
-      ...rotate,
+      ...appearance.rotate,
       ...drawButton({
         ...options,
-        color: normalBackgroundColor,
+        color: appearance.normalBackgroundColor,
         textLines: [normalLayout.line],
       }),
     ],
     down: [
-      ...rotate,
+      ...appearance.rotate,
       ...drawButton({
         ...options,
-        color: downBackgroundColor,
+        color: appearance.downBackgroundColor,
         textLines: [downLayout.line],
       }),
     ],
@@ -415,42 +398,23 @@ export const defaultButtonAppearanceProvider: AppearanceProviderFor<
 export const defaultTextFieldAppearanceProvider: AppearanceProviderFor<
   PDFTextField
 > = (textField, widget, font) => {
-  // The `/DA` entry can be at the widget or field level - so we handle both
-  const widgetColor = getDefaultColor(widget);
-  const fieldColor = getDefaultColor(textField.acroField);
-  const widgetFontSize = getDefaultFontSize(widget);
-  const fieldFontSize = getDefaultFontSize(textField.acroField);
-
-  const rectangle = widget.getRectangle();
-  const ap = widget.getAppearanceCharacteristics();
-  const bs = widget.getBorderStyle();
+  const appearance = prepareTextFieldWidgetAppearance(textField, widget);
   const text = textField.getText() ?? '';
-
-  const borderWidth = bs?.getWidth() ?? 0;
-  const rotation = reduceRotation(ap?.getRotation());
-  const { width, height } = adjustDimsForRotation(rectangle, rotation);
-
-  const rotate = rotateInPlace({ ...rectangle, rotation });
-
-  const black = rgb(0, 0, 0);
-
-  const borderColor = componentsToColor(ap?.getBorderColor());
-  const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
 
   let textLines: TextPosition[];
   let fontSize: number;
 
   const padding = textField.isCombed() ? 0 : 1;
   const bounds = {
-    x: borderWidth + padding,
-    y: borderWidth + padding,
-    width: width - (borderWidth + padding) * 2,
-    height: height - (borderWidth + padding) * 2,
+    x: appearance.borderWidth + padding,
+    y: appearance.borderWidth + padding,
+    width: appearance.width - (appearance.borderWidth + padding) * 2,
+    height: appearance.height - (appearance.borderWidth + padding) * 2,
   };
   if (textField.isMultiline()) {
     const layout = layoutMultilineText(text, {
       alignment: textField.getAlignment(),
-      fontSize: widgetFontSize ?? fieldFontSize,
+      fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
       font,
       bounds,
     });
@@ -458,7 +422,7 @@ export const defaultTextFieldAppearanceProvider: AppearanceProviderFor<
     fontSize = layout.fontSize;
   } else if (textField.isCombed()) {
     const layout = layoutCombedText(text, {
-      fontSize: widgetFontSize ?? fieldFontSize,
+      fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
       font,
       bounds,
       cellCount: textField.getMaxLength() ?? 0,
@@ -468,7 +432,7 @@ export const defaultTextFieldAppearanceProvider: AppearanceProviderFor<
   } else {
     const layout = layoutSinglelineText(text, {
       alignment: textField.getAlignment(),
-      fontSize: widgetFontSize ?? fieldFontSize,
+      fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
       font,
       bounds,
     });
@@ -476,95 +440,64 @@ export const defaultTextFieldAppearanceProvider: AppearanceProviderFor<
     fontSize = layout.fontSize;
   }
 
-  // Update font size and color
-  const textColor = widgetColor ?? fieldColor ?? black;
-  if (widgetColor || widgetFontSize !== undefined) {
-    updateDefaultAppearance(widget, textColor, font, fontSize);
-  } else {
-    updateDefaultAppearance(textField.acroField, textColor, font, fontSize);
-  }
+  updateTextFieldAppearance(textField, widget, appearance, font, fontSize);
 
   const options = {
-    x: 0 + borderWidth / 2,
-    y: 0 + borderWidth / 2,
-    width: width - borderWidth,
-    height: height - borderWidth,
-    borderWidth: borderWidth ?? 0,
-    borderColor,
-    textColor,
+    x: 0 + appearance.borderWidth / 2,
+    y: 0 + appearance.borderWidth / 2,
+    width: appearance.width - appearance.borderWidth,
+    height: appearance.height - appearance.borderWidth,
+    borderWidth: appearance.borderWidth ?? 0,
+    borderColor: appearance.borderColor,
+    textColor: appearance.textColor,
     font: font.name,
     fontSize,
-    color: normalBackgroundColor,
+    color: appearance.normalBackgroundColor,
     textLines,
     padding,
   };
 
-  return [...rotate, ...drawTextField(options)];
+  return [...appearance.rotate, ...drawTextField(options)];
 };
 
 export const defaultDropdownAppearanceProvider: AppearanceProviderFor<
   PDFDropdown
 > = (dropdown, widget, font) => {
-  // The `/DA` entry can be at the widget or field level - so we handle both
-  const widgetColor = getDefaultColor(widget);
-  const fieldColor = getDefaultColor(dropdown.acroField);
-  const widgetFontSize = getDefaultFontSize(widget);
-  const fieldFontSize = getDefaultFontSize(dropdown.acroField);
-
-  const rectangle = widget.getRectangle();
-  const ap = widget.getAppearanceCharacteristics();
-  const bs = widget.getBorderStyle();
+  const appearance = prepareTextFieldWidgetAppearance(dropdown, widget);
   const text = dropdown.getSelected()[0] ?? '';
-
-  const borderWidth = bs?.getWidth() ?? 0;
-  const rotation = reduceRotation(ap?.getRotation());
-  const { width, height } = adjustDimsForRotation(rectangle, rotation);
-
-  const rotate = rotateInPlace({ ...rectangle, rotation });
-
-  const black = rgb(0, 0, 0);
-
-  const borderColor = componentsToColor(ap?.getBorderColor());
-  const normalBackgroundColor = componentsToColor(ap?.getBackgroundColor());
 
   const padding = 1;
   const bounds = {
-    x: borderWidth + padding,
-    y: borderWidth + padding,
-    width: width - (borderWidth + padding) * 2,
-    height: height - (borderWidth + padding) * 2,
+    x: appearance.borderWidth + padding,
+    y: appearance.borderWidth + padding,
+    width: appearance.width - (appearance.borderWidth + padding) * 2,
+    height: appearance.height - (appearance.borderWidth + padding) * 2,
   };
   const { line, fontSize } = layoutSinglelineText(text, {
     alignment: TextAlignment.Left,
-    fontSize: widgetFontSize ?? fieldFontSize,
+    fontSize: appearance.widgetFontSize ?? appearance.fieldFontSize,
     font,
     bounds,
   });
 
-  // Update font size and color
-  const textColor = widgetColor ?? fieldColor ?? black;
-  if (widgetColor || widgetFontSize !== undefined) {
-    updateDefaultAppearance(widget, textColor, font, fontSize);
-  } else {
-    updateDefaultAppearance(dropdown.acroField, textColor, font, fontSize);
-  }
+  updateTextFieldAppearance(dropdown, widget, appearance, font, fontSize);
 
   const options = {
-    x: 0 + borderWidth / 2,
-    y: 0 + borderWidth / 2,
-    width: width - borderWidth,
-    height: height - borderWidth,
-    borderWidth: borderWidth ?? 0,
-    borderColor,
-    textColor,
+    x: 0 + appearance.borderWidth / 2,
+    y: 0 + appearance.borderWidth / 2,
+    width: appearance.width - appearance.borderWidth,
+    height: appearance.height - appearance.borderWidth,
+    borderWidth: appearance.borderWidth ?? 0,
+    borderColor: appearance.borderColor,
+    textColor: appearance.textColor,
     font: font.name,
     fontSize,
-    color: normalBackgroundColor,
+    color: appearance.normalBackgroundColor,
     textLines: [line],
     padding,
   };
 
-  return [...rotate, ...drawTextField(options)];
+  return [...appearance.rotate, ...drawTextField(options)];
 };
 
 export const defaultOptionListAppearanceProvider: AppearanceProviderFor<
