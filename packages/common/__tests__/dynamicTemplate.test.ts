@@ -3,12 +3,12 @@ import * as path from 'path';
 import { getDynamicTemplate } from '../src/dynamicTemplate.js';
 import { Template, Schema, Font } from '../src/index.js';
 
-const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
-const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
+const sansData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSans-Regular.ttf`));
+const serifData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSerif-Regular.ttf`));
 
 const getSampleFont = (): Font => ({
-  SauceHanSansJP: { fallback: true, data: sansData },
-  SauceHanSerifJP: { data: serifData },
+  NotoSans: { fallback: true, data: sansData },
+  NotoSerif: { data: serifData },
 });
 
 describe('getDynamicTemplate', () => {
