@@ -28,7 +28,7 @@ const filterByInclusion = (
 };
 
 // Common pattern for handling shape conversions
-const handleShapeConversion = <T extends GraphicElement>(
+const handleShapeConversion = <T extends Line | Circle>(
   shape: Segment | Arc,
   B: GraphicElement,
   intersectionFn: (converted: T, B: GraphicElement) => Coordinates[],

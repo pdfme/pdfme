@@ -3,7 +3,7 @@
  */
 
 // Conversion constants
-export const MM_TO_PT_RATIO = 2.83465;
+export const MM_TO_PT_RATIO = 2.8346;
 export const MM_TO_PX_RATIO = 3.77953;
 export const PT_TO_PX_RATIO = 1.33333;
 

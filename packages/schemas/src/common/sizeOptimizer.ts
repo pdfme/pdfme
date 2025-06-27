@@ -20,7 +20,7 @@ export function findOptimalSize(options: SizeOptimizationOptions): number {
 
   // Growing phase
   if (shouldGrow) {
-    while (size < max && shouldGrow(size)) {
+    while (size < max) {
       const nextSize = size + step;
       if (nextSize > max || !shouldGrow(nextSize)) {
         break;

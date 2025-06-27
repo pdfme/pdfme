@@ -334,7 +334,7 @@ export const calculateDynamicFontSize = ({
     step: FONT_SIZE_ADJUSTMENT,
     shouldGrow: (size) => {
       const { totalWidthInMm, totalHeightInMm } = calculateConstraints(size);
-      return shouldFontGrowToFit(totalWidthInMm, totalHeightInMm) && totalHeightInMm < boxHeight;
+      return shouldFontGrowToFit(totalWidthInMm, totalHeightInMm);
     },
     shouldShrink: (size) => {
       const { totalWidthInMm, totalHeightInMm } = calculateConstraints(size);
