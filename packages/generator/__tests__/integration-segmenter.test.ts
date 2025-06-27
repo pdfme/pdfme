@@ -18,8 +18,6 @@ describe('generate integration test(segmenter)', () => {
         const inputs = getInputFromTemplate(template);
 
         const font = getFont();
-        font.SauceHanSansJP.fallback = false;
-        font.SauceHanSerifJP.fallback = false;
         font['NotoSerifJP-Regular'].fallback = false;
         font.NotoSerifJP.fallback = false;
         font.NotoSansJP.fallback = false;
