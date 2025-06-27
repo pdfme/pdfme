@@ -1,26 +1,14 @@
 import generate from '../src/generate.js';
-import { other, shape } from './assets/templates/index.js';
+import { textType } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, image, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
+import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
 import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
-const signature = {
-  pdf: image.pdf,
-  ui: () => {},
-  propPanel: {
-    ...image.propPanel,
-    defaultSchema: {
-      ...image.propPanel.defaultSchema,
-      type: 'signature',
-    },
-  },
-};
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
-const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
-
-describe('generate integration test(other, shape)', () => {
-  describe.each([other, shape])('%s', (templateData) => {
+describe('generate integration test(textType)', () => {
+  describe.each([textType])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
@@ -41,16 +29,7 @@ describe('generate integration test(other, shape)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: {
-            text,
-            image,
-            svg,
-            line,
-            rectangle,
-            ellipse,
-            signature,
-            qrcode: barcodes.qrcode,
-          },
+          plugins: { text, image, multiVariableText, ...barcodes },
           options: { font },
         });
 

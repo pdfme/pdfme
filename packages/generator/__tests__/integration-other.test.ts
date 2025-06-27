@@ -1,15 +1,26 @@
 import generate from '../src/generate.js';
-import { textType } from './assets/templates/index.js';
+import { other } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
+import { text, image, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
 import { getFont, pdfToImages } from './utils.js';
 import 'jest-image-snapshot';
 
-const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
+const signature = {
+  pdf: image.pdf,
+  ui: () => {},
+  propPanel: {
+    ...image.propPanel,
+    defaultSchema: {
+      ...image.propPanel.defaultSchema,
+      type: 'signature',
+    },
+  },
+};
 
-jest.setTimeout(30000);
-describe('generate integration test(slower)', () => {
-  describe.each([textType])('%s', (templateData) => {
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
+
+describe('generate integration test(other)', () => {
+  describe.each([other])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
       const [key, template] = entries[l];
@@ -30,7 +41,16 @@ describe('generate integration test(slower)', () => {
         const pdf = await generate({
           inputs,
           template,
-          plugins: { text, image, multiVariableText, ...barcodes },
+          plugins: {
+            text,
+            image,
+            svg,
+            line,
+            rectangle,
+            ellipse,
+            signature,
+            ...barcodes,
+          },
           options: { font },
         });
 
@@ -40,7 +60,7 @@ describe('generate integration test(slower)', () => {
           expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
         } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
           console.warn(
-            `Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`
+            `Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`,
           );
         }
 

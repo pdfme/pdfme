@@ -7,8 +7,7 @@ import 'jest-image-snapshot';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
-jest.setTimeout(30000);
-describe('generate integration test(slower)', () => {
+describe('generate integration test(segmenter)', () => {
   describe.each([segmenter])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
