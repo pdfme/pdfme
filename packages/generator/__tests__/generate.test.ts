@@ -101,7 +101,7 @@ describe('generate integrate test', () => {
 
   describe('use fontSubset template', () => {
     test(`sample`, async () => {
-      const inputs = [{ field1: 'SauceHanSansJP', field2: 'SauceHanSerifJP' }];
+      const inputs = [{ field1: 'NotoSansJP', field2: 'NotoSerifJP' }];
       const template: Template = {
         basePdf: BLANK_PDF,
         schemas: [
@@ -113,7 +113,7 @@ describe('generate integrate test', () => {
               position: { x: 30, y: 30 },
               width: 100,
               height: 20,
-              fontName: 'SauceHanSansJP',
+              fontName: 'NotoSansJP',
             },
             {
               name: 'field2',
@@ -122,25 +122,24 @@ describe('generate integrate test', () => {
               position: { x: 60, y: 60 },
               width: 100,
               height: 20,
-              fontName: 'SauceHanSerifJP',
+              fontName: 'NotoSerifJP',
             },
           ],
         ],
       };
-      jest.setTimeout(30000);
-      const { SauceHanSansJP, SauceHanSerifJP } = getFont();
+      const font = getFont();
       const pdf = await generate({
         inputs,
         template,
         options: {
           font: {
-            SauceHanSansJP: {
-              data: SauceHanSansJP.data,
+            NotoSansJP: {
+              ...font.NotoSansJP,
               fallback: true,
               subset: false,
             },
-            SauceHanSerifJP: {
-              data: SauceHanSerifJP.data,
+            NotoSerifJP: {
+              ...font.NotoSerifJP,
               subset: false,
             },
           },
@@ -204,8 +203,6 @@ ERROR MESSAGE: Array must contain at least 1 element(s)
     };
     const font = getFont();
     font.Roboto.fallback = false;
-    font.SauceHanSansJP.fallback = false;
-    font.SauceHanSerifJP.fallback = false;
     try {
       await generate({ inputs, template, options: { font } });
       fail();
@@ -234,9 +231,9 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       ],
     };
     const font = getFont();
-    font.Roboto.fallback = false;
-    font.SauceHanSansJP.fallback = true;
-    font.SauceHanSerifJP.fallback = true;
+    // Set multiple fonts to have fallback = true to test the error
+    font.Roboto.fallback = true;
+    font.NotoSansJP = { ...font.NotoSansJP, fallback: true };
     try {
       await generate({ inputs, template, options: { font } });
       fail();
@@ -257,7 +254,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
             name: 'a',
             type: 'text',
             content: '',
-            fontName: 'SauceHanSansJP2',
+            fontName: 'DUMMY_FONT',
             position: { x: 0, y: 0 },
             width: 100,
             height: 100,
@@ -278,7 +275,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
       fail();
     } catch (e: any) {
       expect(e.message).toEqual(
-        `[@pdfme/common] SauceHanSansJP2 of template.schemas is not found in font.
+        `[@pdfme/common] DUMMY_FONT of template.schemas is not found in font.
 Check this document: https://pdfme.com/docs/custom-fonts`
       );
     }

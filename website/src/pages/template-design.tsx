@@ -11,6 +11,7 @@ const TemplateDesign = () => {
 
   const [template, setTemplate] = useState('');
   const [ui, setUi] = useState('');
+  const iframeRef = React.useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
@@ -31,9 +32,43 @@ const TemplateDesign = () => {
 
   }, []);
 
+  useEffect(() => {
+    const handleIframeLoad = () => {
+      // Auto-focus iframe content when loaded
+      setTimeout(() => {
+        if (iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.focus();
+          // Try to click inside iframe to ensure focus
+          const iframeDoc = iframeRef.current.contentDocument;
+          if (iframeDoc) {
+            const clickEvent = new MouseEvent('click', {
+              view: iframeRef.current.contentWindow,
+              bubbles: true,
+              cancelable: true,
+              clientX: 10,
+              clientY: 10
+            });
+            iframeDoc.body?.dispatchEvent(clickEvent);
+          }
+        }
+      }, 500);
+    };
+
+    if (iframeRef.current) {
+      iframeRef.current.addEventListener('load', handleIframeLoad);
+    }
+
+    return () => {
+      if (iframeRef.current) {
+        iframeRef.current.removeEventListener('load', handleIframeLoad);
+      }
+    };
+  }, []);
+
   return (
     <Layout title="Template Design" description='Design your PDF template with the playground editor.'>
       <iframe
+        ref={iframeRef}
         src={`${playgroundUrl}/${ui}?template=${template}`}
         style={{ width: '100%', height: `calc(100vh - ${headerHeight}px)` }}
         allow="clipboard-write"

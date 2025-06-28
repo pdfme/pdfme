@@ -1,0 +1,89 @@
+{
+  "name": "@pdfme/pdf-lib",
+  "version": "0.0.0",
+  "sideEffects": false,
+  "author": "hand-dot",
+  "license": "MIT",
+  "keywords": [
+    "pdf-lib",
+    "pdf",
+    "document",
+    "create",
+    "modify",
+    "creation",
+    "modification",
+    "edit",
+    "editing",
+    "typescript",
+    "javascript",
+    "library"
+  ],
+  "description": "Create and modify PDF files with JavaScript",
+  "homepage": "https://pdfme.com",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:pdfme/pdfme.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pdfme/pdfme/issues"
+  },
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
+  "types": "dist/types/src/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "node": "./dist/node/src/index.js",
+        "default": "./dist/esm/src/index.js"
+      },
+      "require": "./dist/cjs/src/index.js",
+      "types": "./dist/types/src/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -p tsconfig.esm.json -w",
+    "build": "npm-run-all --parallel build:cjs build:esm build:node",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:node": "tsc -p tsconfig.node.json",
+    "clean": "rimraf dist",
+    "lint": "eslint --ext .ts src --config eslint.config.mjs",
+    "test": "jest",
+    "prune": "ts-prune src",
+    "prettier": "prettier --write 'src/**/*.ts'"
+  },
+  "dependencies": {
+    "@pdf-lib/standard-fonts": "^1.0.0",
+    "@pdf-lib/upng": "^1.0.1",
+    "color": "^4.2.3",
+    "node-html-better-parser": "^1.5.1",
+    "pako": "^2.1.0"
+  },
+  "devDependencies": {
+    "@pdf-lib/fontkit": "^1.1.0",
+    "@types/color": "^4.2.0",
+    "@types/pako": "^2.0.3"
+  },
+  "jest": {
+    "resolver": "ts-jest-resolver",
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "transform": {
+      "^.+\\.ts?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.esm.json"
+        }
+      ]
+    },
+    "testMatch": [
+      "**/*.test.ts",
+      "**/*.spec.ts"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
