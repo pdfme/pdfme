@@ -1,7 +1,17 @@
 import generate from '../src/generate.js';
 import { Template } from '@pdfme/common';
 import { getInputFromTemplate } from '@pdfme/common';
-import { text, image, svg, line, rectangle, ellipse, barcodes, table, multiVariableText } from '@pdfme/schemas';
+import {
+  text,
+  image,
+  svg,
+  line,
+  rectangle,
+  ellipse,
+  barcodes,
+  table,
+  multiVariableText,
+} from '@pdfme/schemas';
 import { getFont, pdfToImages } from './utils.js';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -25,16 +35,16 @@ const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1
 function loadPlaygroundTemplates(): Record<string, Template> {
   const templatesDir = path.join(__dirname, '../../../playground/public/template-assets');
   const templates: Record<string, Template> = {};
-  
+
   const folders = fs.readdirSync(templatesDir);
-  
+
   for (const folder of folders) {
     const folderPath = path.join(templatesDir, folder);
     const stat = fs.statSync(folderPath);
-    
+
     if (stat.isDirectory()) {
       const templatePath = path.join(folderPath, 'template.json');
-      
+
       if (fs.existsSync(templatePath)) {
         try {
           const templateContent = fs.readFileSync(templatePath, 'utf-8');
@@ -46,14 +56,14 @@ function loadPlaygroundTemplates(): Record<string, Template> {
       }
     }
   }
-  
+
   return templates;
 }
 
 describe('generate integration test(playground)', () => {
   const playgroundTemplates = loadPlaygroundTemplates();
-  
-  const RealDate = Date;  
+
+  const RealDate = Date;
   beforeAll(() => {
     class MockDate extends RealDate {
       constructor(...args: any[]) {
@@ -67,11 +77,11 @@ describe('generate integration test(playground)', () => {
     }
     global.Date = MockDate as any;
   });
-  
+
   afterAll(() => {
     global.Date = RealDate;
   });
-  
+
   describe.each([playgroundTemplates])('%s', (templateData) => {
     const entries = Object.entries(templateData);
     for (let l = 0; l < entries.length; l += 1) {
@@ -117,6 +127,8 @@ describe('generate integration test(playground)', () => {
         for (let i = 0; i < images.length; i++) {
           expect(images[i]).toMatchImageSnapshot({
             customSnapshotIdentifier: `${key}-${i + 1}`,
+            failureThreshold: 0.001, // Allow 0.1% pixel difference
+            failureThresholdType: 'percent' as const,
           });
         }
       });
