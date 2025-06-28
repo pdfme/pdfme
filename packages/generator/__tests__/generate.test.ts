@@ -127,7 +127,6 @@ describe('generate integrate test', () => {
           ],
         ],
       };
-      jest.setTimeout(30000);
       const font = getFont();
       const pdf = await generate({
         inputs,

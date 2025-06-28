@@ -51,8 +51,26 @@ function loadPlaygroundTemplates(): Record<string, Template> {
 }
 
 describe('generate integration test(playground)', () => {
-  jest.setTimeout(30000);
   const playgroundTemplates = loadPlaygroundTemplates();
+  
+  const RealDate = Date;  
+  beforeAll(() => {
+    class MockDate extends RealDate {
+      constructor(...args: any[]) {
+        if (args.length === 0) {
+          super('2024-01-01T00:00:00.000Z');
+        } else {
+          // @ts-expect-error Allow passing arguments to Date constructor
+          super(...args);
+        }
+      }
+    }
+    global.Date = MockDate as any;
+  });
+  
+  afterAll(() => {
+    global.Date = RealDate;
+  });
   
   describe.each([playgroundTemplates])('%s', (templateData) => {
     const entries = Object.entries(templateData);
