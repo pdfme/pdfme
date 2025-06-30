@@ -74,19 +74,18 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<MultiVariableTextSchema> = {
-  schema: (propPanelProps: Omit<PropPanelWidgetProps, 'rootElement'>) => {
-    const { i18n } = propPanelProps;
+  schema: ({ i18n, ...propPanelProps }: Omit<PropPanelWidgetProps, 'rootElement'>) => {
     if (typeof parentPropPanel.schema !== 'function') {
       throw new Error('Oops, is text schema no longer a function?');
     }
     // Safely call schema function with proper type handling
-    const parentSchema =
-      typeof parentPropPanel.schema === 'function' ? parentPropPanel.schema(propPanelProps) : {};
+    const parentSchema: Record<string, unknown> =
+      typeof parentPropPanel.schema === 'function' ? (parentPropPanel.schema({ i18n, ...propPanelProps } as Omit<PropPanelWidgetProps, 'rootElement'>) as Record<string, unknown>) : {} as Record<string, unknown>;
     return {
       ...parentSchema,
       '-------': { type: 'void', widget: 'Divider' },
       dynamicVarContainer: {
-        title: i18n('schemas.mvt.variablesSampleData'),
+        title: (i18n as (key: string) => string)('schemas.mvt.variablesSampleData'),
         type: 'string',
         widget: 'Card',
         span: 24,
