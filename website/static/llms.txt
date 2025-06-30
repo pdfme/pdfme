@@ -1,0 +1,38 @@
+# pdfme Open Source Library
+> A lightweight, performant JavaScript/TypeScript library for PDF generation and manipulation, designed for developers who need complete control over PDF creation in web and Node.js applications.
+
+pdfme is built with a focus on performance, minimal dependencies, and ease of use. It supports complex layouts, custom fonts, images, and templates while maintaining a small bundle size. Perfect for generating invoices, reports, certificates, and any document that requires precise control over layout and styling.
+
+## Installation & Setup
+- [Getting Started](https://pdfme.com/docs/getting-started): Installation and basic setup guide
+- [Development Guide](https://pdfme.com/docs/development-guide): Contributing and local development
+- [Playground Examples](https://playground.pdfme.com/): Interactive code examples and demos
+
+## Documentation
+- [Supported Features](https://pdfme.com/docs/supported-features): Complete feature overview
+- [Custom Schemas](https://pdfme.com/docs/custom-schemas): Creating custom field types
+- [Custom Fonts](https://pdfme.com/docs/custom-fonts): Font integration and management
+- [Custom UI](https://pdfme.com/docs/custom-ui): UI customization options
+
+## Core Concepts
+- [Tables](https://pdfme.com/docs/tables): Dynamic table generation
+- [Headers and Footers](https://pdfme.com/docs/headers-and-footers): Page layout management
+- [Expression](https://pdfme.com/docs/expression): Dynamic content and calculations
+- [Template Contribution](https://pdfme.com/docs/template-contribution-guide): Template sharing guidelines
+
+## Community & Development
+- [GitHub Repository](https://github.com/pdfme/pdfme): Source code and issue tracking
+- [Discord Community](https://discord.gg/xWPTJbmgNV): Get help and share ideas
+- [DeepWiki Help](https://deepwiki.com/pdfme/pdfme): AI-powered documentation assistant
+- [Changelog](https://github.com/pdfme/pdfme/releases): Version history and updates
+
+## Package Ecosystem
+- [Generator Package](https://www.npmjs.com/package/@pdfme/generator): PDF generation from templates
+- [UI Package](https://www.npmjs.com/package/@pdfme/ui): Designer, Form, and Viewer components
+- [Schemas Package](https://www.npmjs.com/package/@pdfme/schemas): Built-in field types and schemas
+- [Manipulator Package](https://www.npmjs.com/package/@pdfme/manipulator): PDF manipulation utilities
+
+## Optional
+- [Converter Package](https://www.npmjs.com/package/@pdfme/converter): PDF conversion utilities
+- [Common Package](https://www.npmjs.com/package/@pdfme/common): Shared utilities and types
+- [Cloud Service](https://app.pdfme.com): Commercial hosted solution
