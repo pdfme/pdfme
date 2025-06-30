@@ -74,32 +74,73 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<MultiVariableTextSchema> = {
-  schema: ({ i18n, ...propPanelProps }: Omit<PropPanelWidgetProps, 'rootElement'>) => {
-    if (typeof parentPropPanel.schema !== 'function') {
-      throw new Error('Oops, is text schema no longer a function?');
-    }
-    // Safely call schema function with proper type handling
-    const parentSchema: Record<string, unknown> =
-      typeof parentPropPanel.schema === 'function' ? (parentPropPanel.schema({ i18n, ...propPanelProps } as Omit<PropPanelWidgetProps, 'rootElement'>) as Record<string, unknown>) : {} as Record<string, unknown>;
+  schema: ({ i18n }: Omit<PropPanelWidgetProps, 'rootElement'>) => {
+    const typedI18n = i18n as (key: string) => string;
+    const textSchemaProperties = {
+      fontName: {
+        title: typedI18n('schemas.text.fontName'),
+        type: 'string' as const,
+        widget: 'select' as const,
+        span: 12,
+      },
+      fontSize: {
+        title: typedI18n('schemas.text.size'),
+        type: 'number' as const,
+        widget: 'inputNumber' as const,
+        span: 6,
+        props: { min: 0 },
+      },
+      characterSpacing: {
+        title: typedI18n('schemas.text.spacing'),
+        type: 'number' as const,
+        widget: 'inputNumber' as const,
+        span: 6,
+        props: { min: 0 },
+      },
+      lineHeight: {
+        title: typedI18n('schemas.text.lineHeight'),
+        type: 'number' as const,
+        widget: 'inputNumber' as const,
+        props: { step: 0.1, min: 0 },
+        span: 8,
+      },
+      fontColor: {
+        title: typedI18n('schemas.textColor'),
+        type: 'string' as const,
+        widget: 'color' as const,
+        props: {
+          disabledAlpha: true,
+        },
+      },
+      backgroundColor: {
+        title: typedI18n('schemas.bgColor'),
+        type: 'string' as const,
+        widget: 'color' as const,
+        props: {
+          disabledAlpha: true,
+        },
+      },
+    };
+    
     return {
-      ...parentSchema,
-      '-------': { type: 'void', widget: 'Divider' },
+      ...textSchemaProperties,
+      '-------': { type: 'void' as const, widget: 'Divider' as const },
       dynamicVarContainer: {
-        title: (i18n as (key: string) => string)('schemas.mvt.variablesSampleData'),
-        type: 'string',
-        widget: 'Card',
+        title: typedI18n('schemas.mvt.variablesSampleData'),
+        type: 'string' as const,
+        widget: 'Card' as const,
         span: 24,
         properties: {
           dynamicVariables: {
-            type: 'object',
-            widget: 'mapDynamicVariables',
+            type: 'object' as const,
+            widget: 'mapDynamicVariables' as const,
             bind: false,
             span: 24,
           },
           placeholderDynamicVar: {
             title: 'Placeholder Dynamic Variable',
-            type: 'string',
-            format: 'textarea',
+            type: 'string' as const,
+            format: 'textarea' as const,
             props: {
               id: 'placeholder-dynamic-var',
               autoSize: {
