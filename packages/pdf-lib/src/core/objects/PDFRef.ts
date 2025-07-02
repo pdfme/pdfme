@@ -22,11 +22,7 @@ class PDFRef extends PDFObject {
   readonly generationNumber: number;
   readonly tag: string;
 
-  private constructor(
-    enforcer: any,
-    objectNumber: number,
-    generationNumber: number,
-  ) {
+  private constructor(enforcer: any, objectNumber: number, generationNumber: number) {
     if (enforcer !== ENFORCER) throw new PrivateConstructorError('PDFRef');
     super();
     this.objectNumber = objectNumber;

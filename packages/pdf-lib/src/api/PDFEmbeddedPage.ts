@@ -37,11 +37,7 @@ export default class PDFEmbeddedPage implements Embeddable {
   private alreadyEmbedded = false;
   private readonly embedder: PDFPageEmbedder;
 
-  private constructor(
-    ref: PDFRef,
-    doc: PDFDocument,
-    embedder: PDFPageEmbedder,
-  ) {
+  private constructor(ref: PDFRef, doc: PDFDocument, embedder: PDFPageEmbedder) {
     assertIs(ref, 'ref', [[PDFRef, 'PDFRef']]);
     assertIs(doc, 'doc', [[PDFDocument, 'PDFDocument']]);
     assertIs(embedder, 'embedder', [[PDFPageEmbedder, 'PDFPageEmbedder']]);

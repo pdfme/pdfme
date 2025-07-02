@@ -49,12 +49,7 @@ export const rgb = (red: number, green: number, blue: number): RGB => {
   return { type: ColorTypes.RGB, red, green, blue };
 };
 
-export const cmyk = (
-  cyan: number,
-  magenta: number,
-  yellow: number,
-  key: number,
-): CMYK => {
+export const cmyk = (cyan: number, magenta: number, yellow: number, key: number): CMYK => {
   assertRange(cyan, 'cyan', 0, 1);
   assertRange(magenta, 'magenta', 0, 1);
   assertRange(yellow, 'yellow', 0, 1);

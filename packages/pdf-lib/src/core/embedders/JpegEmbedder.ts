@@ -61,13 +61,7 @@ class JpegEmbedder {
 
     const colorSpace = channelName;
 
-    return new JpegEmbedder(
-      imageData,
-      bitsPerComponent,
-      width,
-      height,
-      colorSpace,
-    );
+    return new JpegEmbedder(imageData, bitsPerComponent, width, height, colorSpace);
   }
 
   readonly bitsPerComponent: number;
@@ -109,10 +103,7 @@ class JpegEmbedder {
       //
       // Applying a swap here as a hedge that most bytes passing
       // through this method will benefit from it.
-      Decode:
-        this.colorSpace === ColorSpace.DeviceCMYK
-          ? [1, 0, 1, 0, 1, 0, 1, 0]
-          : undefined,
+      Decode: this.colorSpace === ColorSpace.DeviceCMYK ? [1, 0, 1, 0, 1, 0, 1, 0] : undefined,
     });
 
     if (ref) {

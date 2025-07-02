@@ -72,8 +72,7 @@ class PDFWriter {
       buffer[offset++] = CharCodes.Newline;
       buffer[offset++] = CharCodes.Newline;
 
-      const n =
-        object instanceof PDFObjectStream ? object.getObjectsCount() : 1;
+      const n = object instanceof PDFObjectStream ? object.getObjectsCount() : 1;
       if (this.shouldWaitForTick(n)) await waitForTick();
     }
 
@@ -93,10 +92,7 @@ class PDFWriter {
     return buffer;
   }
 
-  protected computeIndirectObjectSize([ref, object]: [
-    PDFRef,
-    PDFObject,
-  ]): number {
+  protected computeIndirectObjectSize([ref, object]: [PDFRef, PDFObject]): number {
     const refSize = ref.sizeInBytes() + 3; // 'R' -> 'obj\n'
     const objectSize = object.sizeInBytes() + 9; // '\nendobj\n\n'
     return refSize + objectSize;

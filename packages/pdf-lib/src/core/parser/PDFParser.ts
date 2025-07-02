@@ -32,14 +32,7 @@ class PDFParser extends PDFObjectParser {
     throwOnInvalidObject?: boolean,
     capNumbers?: boolean,
     cryptoFactory?: CipherTransformFactory,
-  ) =>
-    new PDFParser(
-      pdfBytes,
-      objectsPerTick,
-      throwOnInvalidObject,
-      capNumbers,
-      cryptoFactory,
-    );
+  ) => new PDFParser(pdfBytes, objectsPerTick, throwOnInvalidObject, capNumbers, cryptoFactory);
 
   private readonly objectsPerTick: number;
   private readonly throwOnInvalidObject: boolean;
@@ -53,15 +46,10 @@ class PDFParser extends PDFObjectParser {
     capNumbers = false,
     cryptoFactory?: CipherTransformFactory,
   ) {
-    super(
-      ByteStream.of(pdfBytes),
-      PDFContext.create(),
-      capNumbers,
-      cryptoFactory,
-    );
+    super(ByteStream.of(pdfBytes), PDFContext.create(), capNumbers, cryptoFactory);
     this.objectsPerTick = objectsPerTick;
     this.throwOnInvalidObject = throwOnInvalidObject;
-    this.context.isDecrypted = !!cryptoFactory?.encryptionKey
+    this.context.isDecrypted = !!cryptoFactory?.encryptionKey;
   }
 
   async parseDocument(): Promise<PDFContext> {
@@ -94,8 +82,7 @@ class PDFParser extends PDFObjectParser {
 
   private maybeRecoverRoot(): void {
     const isValidCatalog = (obj?: PDFObject) =>
-      obj instanceof PDFDict &&
-      obj.lookup(PDFName.of('Type')) === PDFName.of('Catalog');
+      obj instanceof PDFDict && obj.lookup(PDFName.of('Type')) === PDFName.of('Catalog');
 
     const catalog = this.context.lookup(this.context.trailerInfo.Root);
 
@@ -175,10 +162,7 @@ class PDFParser extends PDFObjectParser {
       object instanceof PDFRawStream &&
       object.dict.lookup(PDFName.of('Type')) === PDFName.of('ObjStm')
     ) {
-      await PDFObjectStreamParser.forStream(
-        object,
-        this.shouldWaitForTick,
-      ).parseIntoContext();
+      await PDFObjectStreamParser.forStream(object, this.shouldWaitForTick).parseIntoContext();
     } else if (
       object instanceof PDFRawStream &&
       object.dict.lookup(PDFName.of('Type')) === PDFName.of('XRef')

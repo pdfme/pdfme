@@ -7,18 +7,9 @@ import {
 } from './appearances';
 import { rgb } from '../colors';
 import { degrees } from '../rotations';
-import PDFField, {
-  FieldAppearanceOptions,
-  assertFieldAppearanceOptions,
-} from './PDFField';
+import PDFField, { FieldAppearanceOptions, assertFieldAppearanceOptions } from './PDFField';
 
-import {
-  PDFName,
-  PDFRef,
-  PDFDict,
-  PDFAcroCheckBox,
-  PDFWidgetAnnotation,
-} from '../../core';
+import { PDFName, PDFRef, PDFDict, PDFAcroCheckBox, PDFWidgetAnnotation } from '../../core';
 import { assertIs, assertOrUndefined } from '../../utils';
 
 /**
@@ -48,16 +39,10 @@ export default class PDFCheckBox extends PDFField {
   /** The low-level PDFAcroCheckBox wrapped by this check box. */
   readonly acroField: PDFAcroCheckBox;
 
-  private constructor(
-    acroCheckBox: PDFAcroCheckBox,
-    ref: PDFRef,
-    doc: PDFDocument,
-  ) {
+  private constructor(acroCheckBox: PDFAcroCheckBox, ref: PDFRef, doc: PDFDocument) {
     super(acroCheckBox, ref, doc);
 
-    assertIs(acroCheckBox, 'acroCheckBox', [
-      [PDFAcroCheckBox, 'PDFAcroCheckBox'],
-    ]);
+    assertIs(acroCheckBox, 'acroCheckBox', [[PDFAcroCheckBox, 'PDFAcroCheckBox']]);
 
     this.acroField = acroCheckBox;
   }

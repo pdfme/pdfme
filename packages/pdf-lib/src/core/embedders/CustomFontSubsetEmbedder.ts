@@ -1,10 +1,4 @@
-import {
-  Font,
-  Fontkit,
-  Glyph,
-  Subset,
-  TypeFeatures,
-} from '../../types/fontkit';
+import { Font, Fontkit, Glyph, Subset, TypeFeatures } from '../../types/fontkit';
 
 import CustomFontEmbedder from './CustomFontEmbedder';
 import PDFHexString from '../objects/PDFHexString';
@@ -23,12 +17,7 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
     fontFeatures?: TypeFeatures,
   ) {
     const font = await fontkit.create(fontData);
-    return new CustomFontSubsetEmbedder(
-      font,
-      fontData,
-      customFontName,
-      fontFeatures,
-    );
+    return new CustomFontSubsetEmbedder(font, fontData, customFontName, fontFeatures);
   }
 
   private readonly subset: Subset;

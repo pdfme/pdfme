@@ -9,8 +9,7 @@ import PDFAnnotation from './PDFAnnotation';
 import AppearanceCharacteristics from './AppearanceCharacteristics';
 
 class PDFWidgetAnnotation extends PDFAnnotation {
-  static fromDict = (dict: PDFDict): PDFWidgetAnnotation =>
-    new PDFWidgetAnnotation(dict);
+  static fromDict = (dict: PDFDict): PDFWidgetAnnotation => new PDFWidgetAnnotation(dict);
 
   static create = (context: PDFContext, parent: PDFRef) => {
     const dict = context.obj({

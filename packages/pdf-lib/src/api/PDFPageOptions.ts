@@ -2,11 +2,11 @@ import { Color } from './colors';
 import PDFFont from './PDFFont';
 import { Rotation } from './rotations';
 import { FillRule, LineCapStyle } from './operators';
-import type { Space, TransformationMatrix } from '../types'
+import type { Space, TransformationMatrix } from '../types';
 
 interface SvgOptions {
-  matrix?: TransformationMatrix
-  clipSpaces?: Space[]
+  matrix?: TransformationMatrix;
+  clipSpaces?: Space[];
 }
 
 export enum BlendMode {
@@ -80,7 +80,7 @@ export interface PDFPageDrawSVGOptions extends SvgOptions {
   borderDashPhase?: number;
   borderLineCap?: LineCapStyle;
   blendMode?: BlendMode;
-  fillRule?: FillRule
+  fillRule?: FillRule;
 }
 
 export interface PDFPageDrawLineOptions extends SvgOptions {

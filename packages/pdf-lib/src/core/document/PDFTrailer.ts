@@ -2,8 +2,7 @@ import CharCodes from '../syntax/CharCodes';
 import { copyStringIntoBuffer } from '../../utils';
 
 class PDFTrailer {
-  static forLastCrossRefSectionOffset = (offset: number) =>
-    new PDFTrailer(offset);
+  static forLastCrossRefSectionOffset = (offset: number) => new PDFTrailer(offset);
 
   private readonly lastXRefOffset: string;
 

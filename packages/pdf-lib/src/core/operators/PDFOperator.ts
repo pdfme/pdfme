@@ -9,17 +9,10 @@ import PDFContext from '../PDFContext';
 import CharCodes from '../syntax/CharCodes';
 import { copyStringIntoBuffer } from '../../utils';
 
-export type PDFOperatorArg =
-  | string
-  | PDFName
-  | PDFArray
-  | PDFNumber
-  | PDFString
-  | PDFHexString;
+export type PDFOperatorArg = string | PDFName | PDFArray | PDFNumber | PDFString | PDFHexString;
 
 class PDFOperator {
-  static of = (name: PDFOperatorNames, args?: PDFOperatorArg[]) =>
-    new PDFOperator(name, args);
+  static of = (name: PDFOperatorNames, args?: PDFOperatorArg[]) => new PDFOperator(name, args);
 
   private readonly name: PDFOperatorNames;
   private readonly args: PDFOperatorArg[];

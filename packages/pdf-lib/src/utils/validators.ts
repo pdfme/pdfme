@@ -15,11 +15,7 @@ const formatValue = (value: any) => {
   else return value;
 };
 
-export const createValueErrorMsg = (
-  value: any,
-  valueName: string,
-  values: Primitive[],
-) => {
+export const createValueErrorMsg = (value: any, valueName: string, values: Primitive[]) => {
   const allowedValues = new Array(values.length);
 
   for (let idx = 0, len = values.length; idx < len; idx++) {
@@ -117,11 +113,7 @@ export const isType = (value: any, type: TypeDescriptor) => {
   return value instanceof (type as [Function, string])[0];
 };
 
-export const createTypeErrorMsg = (
-  value: any,
-  valueName: string,
-  types: TypeDescriptor[],
-) => {
+export const createTypeErrorMsg = (value: any, valueName: string, types: TypeDescriptor[]) => {
   const allowedTypes = new Array(types.length);
 
   for (let idx = 0, len = types.length; idx < len; idx++) {
@@ -145,41 +137,24 @@ export const createTypeErrorMsg = (
   return `${backtick(valueName)} must be of type ${joinedTypes}, but was actually of type ${backtick(getType(value))}`;
 };
 
-export const assertIs = (
-  value: any,
-  valueName: string,
-  types: TypeDescriptor[],
-) => {
+export const assertIs = (value: any, valueName: string, types: TypeDescriptor[]) => {
   for (let idx = 0, len = types.length; idx < len; idx++) {
     if (isType(value, types[idx])) return;
   }
   throw new TypeError(createTypeErrorMsg(value, valueName, types));
 };
 
-export const assertOrUndefined = (
-  value: any,
-  valueName: string,
-  types: TypeDescriptor[],
-) => {
+export const assertOrUndefined = (value: any, valueName: string, types: TypeDescriptor[]) => {
   assertIs(value, valueName, types.concat('undefined'));
 };
 
-export const assertEachIs = (
-  values: any[],
-  valueName: string,
-  types: TypeDescriptor[],
-) => {
+export const assertEachIs = (values: any[], valueName: string, types: TypeDescriptor[]) => {
   for (let idx = 0, len = values.length; idx < len; idx++) {
     assertIs(values[idx], valueName, types);
   }
 };
 
-export const assertRange = (
-  value: any,
-  valueName: string,
-  min: number,
-  max: number,
-) => {
+export const assertRange = (value: any, valueName: string, min: number, max: number) => {
   assertIs(value, valueName, ['number']);
   assertIs(min, 'min', ['number']);
   assertIs(max, 'max', ['number']);
@@ -190,21 +165,12 @@ export const assertRange = (
   }
 };
 
-export const assertRangeOrUndefined = (
-  value: any,
-  valueName: string,
-  min: number,
-  max: number,
-) => {
+export const assertRangeOrUndefined = (value: any, valueName: string, min: number, max: number) => {
   assertIs(value, valueName, ['number', 'undefined']);
   if (typeof value === 'number') assertRange(value, valueName, min, max);
 };
 
-export const assertMultiple = (
-  value: any,
-  valueName: string,
-  multiplier: number,
-) => {
+export const assertMultiple = (value: any, valueName: string, multiplier: number) => {
   assertIs(value, valueName, ['number']);
   if (value % multiplier !== 0) {
     // prettier-ignore
@@ -214,9 +180,7 @@ export const assertMultiple = (
 
 export const assertInteger = (value: any, valueName: string) => {
   if (!Number.isInteger(value)) {
-    throw new Error(
-      `${backtick(valueName)} must be an integer, but was actually ${value}`,
-    );
+    throw new Error(`${backtick(valueName)} must be an integer, but was actually ${value}`);
   }
 };
 

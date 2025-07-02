@@ -16,8 +16,7 @@ export interface Entry {
 }
 
 class PDFXRefStreamParser {
-  static forStream = (rawStream: PDFRawStream) =>
-    new PDFXRefStreamParser(rawStream);
+  static forStream = (rawStream: PDFRawStream) => new PDFXRefStreamParser(rawStream);
 
   private alreadyParsed: boolean;
 

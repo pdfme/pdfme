@@ -526,7 +526,11 @@ export const setFontNameRecursively = (
   seen.add(obj);
 
   for (const key in obj) {
-    if (key === 'fontName' && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] === undefined) {
+    if (
+      key === 'fontName' &&
+      Object.prototype.hasOwnProperty.call(obj, key) &&
+      obj[key] === undefined
+    ) {
       obj[key] = fontName;
     } else if (typeof obj[key] === 'object' && obj[key] !== null) {
       setFontNameRecursively(obj[key] as Record<string, unknown>, fontName, seen);

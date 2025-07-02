@@ -188,7 +188,8 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
 ];
 
 export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<BarcodeSchema> => {
-  const barcodeHasText = barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix' && barcodeType !== 'pdf417';
+  const barcodeHasText =
+    barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix' && barcodeType !== 'pdf417';
 
   const defaults = barcodeDefaults.find(({ defaultSchema }) => defaultSchema.type === barcodeType);
 

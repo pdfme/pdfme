@@ -39,7 +39,7 @@ import { Rotation, degrees, toRadians } from './rotations';
 import { svgPathToOperators } from './svgPath';
 import { PDFHexString, PDFName, PDFNumber, PDFOperator } from '../core';
 import { asNumber } from './objects';
-import type { Space, TransformationMatrix } from '../types'
+import type { Space, TransformationMatrix } from '../types';
 
 export interface DrawTextOptions {
   color: Color;
@@ -55,27 +55,18 @@ export interface DrawTextOptions {
   clipSpaces?: Space[];
 }
 
-const clipSpace = ({ 
-  topLeft,
-  topRight,
-  bottomRight,
-  bottomLeft
-}: Space) => 
-  [
-    moveTo(topLeft.x, topLeft.y),
-    lineTo(topRight.x, topRight.y),
-    lineTo(bottomRight.x, bottomRight.y),
-    lineTo(bottomLeft.x, bottomLeft.y),
-    closePath(),
-    clip(),
-    endPath(),
-  ]
-const clipSpaces = (spaces: Space[]) => spaces.flatMap(clipSpace)
+const clipSpace = ({ topLeft, topRight, bottomRight, bottomLeft }: Space) => [
+  moveTo(topLeft.x, topLeft.y),
+  lineTo(topRight.x, topRight.y),
+  lineTo(bottomRight.x, bottomRight.y),
+  lineTo(bottomLeft.x, bottomLeft.y),
+  closePath(),
+  clip(),
+  endPath(),
+];
+const clipSpaces = (spaces: Space[]) => spaces.flatMap(clipSpace);
 
-export const drawText = (
-  line: PDFHexString,
-  options: DrawTextOptions,
-): PDFOperator[] =>
+export const drawText = (line: PDFHexString, options: DrawTextOptions): PDFOperator[] =>
   [
     pushGraphicsState(),
     options.graphicsState && setGraphicsState(options.graphicsState),
@@ -228,7 +219,7 @@ export const drawRectangle = (options: {
   radius?: number | PDFNumber;
 }) => {
   let ops = [];
-  
+
   if (!options.radius || asNumber(options.radius) <= 0) {
     ops = [
       moveTo(0, 0),
@@ -252,7 +243,14 @@ export const drawRectangle = (options: {
       lineTo(width - radius, 0),
       appendBezierCurve(width - radius + offset, 0, width, radius - offset, width, radius),
       lineTo(width, height - radius),
-      appendBezierCurve(width, height - radius + offset, width - radius + offset, height, width - radius, height),
+      appendBezierCurve(
+        width,
+        height - radius + offset,
+        width - radius + offset,
+        height,
+        width - radius,
+        height,
+      ),
       lineTo(radius, height),
       appendBezierCurve(radius - offset, height, 0, height - radius + offset, 0, height - radius),
       closePath(),
@@ -283,7 +281,7 @@ export const drawRectangle = (options: {
 
     popGraphicsState(),
   ].filter(Boolean) as PDFOperator[];
-}
+};
 
 const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0);
 

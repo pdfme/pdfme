@@ -9,7 +9,9 @@ import AppContextProvider from './components/AppContextProvider.js';
 class Viewer extends PreviewUI {
   constructor(props: PreviewProps) {
     super(props);
-    console.warn('[@pdfme/ui] Viewer component is deprecated and will be removed in a future version.');
+    console.warn(
+      '[@pdfme/ui] Viewer component is deprecated and will be removed in a future version.',
+    );
   }
 
   protected render() {

@@ -239,7 +239,9 @@ ERROR MESSAGE: ${issue.message}
 --------------------------
 ${messages.join('\n')}`);
     } else {
-      throw Error(`[@pdfme/common] Unexpected parsing error: ${e instanceof Error ? e.message : String(e)}`);
+      throw Error(
+        `[@pdfme/common] Unexpected parsing error: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 

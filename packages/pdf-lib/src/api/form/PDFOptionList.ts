@@ -1,10 +1,7 @@
 import PDFDocument from '../PDFDocument';
 import PDFPage from '../PDFPage';
 import PDFFont from '../PDFFont';
-import PDFField, {
-  FieldAppearanceOptions,
-  assertFieldAppearanceOptions,
-} from './PDFField';
+import PDFField, { FieldAppearanceOptions, assertFieldAppearanceOptions } from './PDFField';
 import {
   AppearanceProviderFor,
   normalizeAppearance,
@@ -22,12 +19,7 @@ import {
   AcroChoiceFlags,
   PDFWidgetAnnotation,
 } from '../../core';
-import {
-  assertIs,
-  assertIsSubset,
-  assertOrUndefined,
-  assertPositive,
-} from '../../utils';
+import { assertIs, assertIsSubset, assertOrUndefined, assertPositive } from '../../utils';
 
 /**
  * Represents an option list field of a [[PDFForm]].
@@ -59,11 +51,7 @@ export default class PDFOptionList extends PDFField {
   /** The low-level PDFAcroListBox wrapped by this option list. */
   readonly acroField: PDFAcroListBox;
 
-  private constructor(
-    acroListBox: PDFAcroListBox,
-    ref: PDFRef,
-    doc: PDFDocument,
-  ) {
+  private constructor(acroListBox: PDFAcroListBox, ref: PDFRef, doc: PDFDocument) {
     super(acroListBox, ref, doc);
 
     assertIs(acroListBox, 'acroListBox', [[PDFAcroListBox, 'PDFAcroListBox']]);
@@ -498,8 +486,7 @@ export default class PDFOptionList extends PDFField {
     const widgets = this.acroField.getWidgets();
     for (let idx = 0, len = widgets.length; idx < len; idx++) {
       const widget = widgets[idx];
-      const hasAppearances =
-        widget.getAppearances()?.normal instanceof PDFStream;
+      const hasAppearances = widget.getAppearances()?.normal instanceof PDFStream;
       if (!hasAppearances) return true;
     }
 
@@ -537,10 +524,7 @@ export default class PDFOptionList extends PDFField {
    * @param provider Optionally, the appearance provider to be used for
    *                 generating the contents of the appearance streams.
    */
-  updateAppearances(
-    font: PDFFont,
-    provider?: AppearanceProviderFor<PDFOptionList>,
-  ) {
+  updateAppearances(font: PDFFont, provider?: AppearanceProviderFor<PDFOptionList>) {
     assertIs(font, 'font', [[PDFFont, 'PDFFont']]);
     assertOrUndefined(provider, 'provider', [Function]);
 

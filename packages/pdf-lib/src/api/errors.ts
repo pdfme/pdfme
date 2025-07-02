@@ -30,8 +30,7 @@ export class ForeignPageError extends Error {
 // TODO: Include link to documentation with example
 export class RemovePageFromEmptyDocumentError extends Error {
   constructor() {
-    const msg =
-      'PDFDocument has no pages so `PDFDocument.removePage` cannot be called';
+    const msg = 'PDFDocument has no pages so `PDFDocument.removePage` cannot be called';
     super(msg);
   }
 }

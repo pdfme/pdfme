@@ -5,8 +5,7 @@ import PDFContext from '../PDFContext';
 import PDFAcroField from './PDFAcroField';
 
 class PDFAcroNonTerminal extends PDFAcroField {
-  static fromDict = (dict: PDFDict, ref: PDFRef) =>
-    new PDFAcroNonTerminal(dict, ref);
+  static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroNonTerminal(dict, ref);
 
   static create = (context: PDFContext) => {
     const dict = context.obj({});

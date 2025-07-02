@@ -30,11 +30,7 @@ export default class PDFJavaScript implements Embeddable {
   private alreadyEmbedded = false;
   private readonly embedder: JavaScriptEmbedder;
 
-  private constructor(
-    ref: PDFRef,
-    doc: PDFDocument,
-    embedder: JavaScriptEmbedder,
-  ) {
+  private constructor(ref: PDFRef, doc: PDFDocument, embedder: JavaScriptEmbedder) {
     this.ref = ref;
     this.doc = doc;
     this.embedder = embedder;
@@ -53,10 +49,7 @@ export default class PDFJavaScript implements Embeddable {
     if (!this.alreadyEmbedded) {
       const { catalog, context } = this.doc;
 
-      const ref = await this.embedder.embedIntoContext(
-        this.doc.context,
-        this.ref,
-      );
+      const ref = await this.embedder.embedIntoContext(this.doc.context, this.ref);
 
       if (!catalog.has(PDFName.of('Names'))) {
         catalog.set(PDFName.of('Names'), context.obj({}));
