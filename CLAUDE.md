@@ -129,4 +129,4 @@ Implementation: `packages/common/src/expression.ts`
 - `packages/generator/src/generate.ts`: Main PDF generation logic
 - `packages/ui/src/components/Designer/index.tsx`: Designer implementation
 - `packages/schemas/src/text/index.ts`: Example of a complete plugin
-- `playground/src/templateItems.ts`: Template examples
+- `playground/public/template-assets/`: Template examples and definitions
