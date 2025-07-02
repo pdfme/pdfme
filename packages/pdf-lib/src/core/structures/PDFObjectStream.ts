@@ -10,21 +10,14 @@ import { copyStringIntoBuffer, last } from '../../utils';
 export type IndirectObject = [PDFRef, PDFObject];
 
 class PDFObjectStream extends PDFFlateStream {
-  static withContextAndObjects = (
-    context: PDFContext,
-    objects: IndirectObject[],
-    encode = true,
-  ) => new PDFObjectStream(context, objects, encode);
+  static withContextAndObjects = (context: PDFContext, objects: IndirectObject[], encode = true) =>
+    new PDFObjectStream(context, objects, encode);
 
   private readonly objects: IndirectObject[];
   private readonly offsets: [number, number][];
   private readonly offsetsString: string;
 
-  private constructor(
-    context: PDFContext,
-    objects: IndirectObject[],
-    encode = true,
-  ) {
+  private constructor(context: PDFContext, objects: IndirectObject[], encode = true) {
     super(context.obj({}), encode);
 
     this.objects = objects;
@@ -70,10 +63,7 @@ class PDFObjectStream extends PDFFlateStream {
 
   getUnencodedContentsSize(): number {
     return (
-      this.offsetsString.length +
-      last(this.offsets)[1] +
-      last(this.objects)[1].sizeInBytes() +
-      1
+      this.offsetsString.length + last(this.offsets)[1] + last(this.objects)[1].sizeInBytes() + 1
     );
   }
 

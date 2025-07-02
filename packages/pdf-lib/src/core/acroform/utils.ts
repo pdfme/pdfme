@@ -19,9 +19,7 @@ import PDFAcroComboBox from './PDFAcroComboBox';
 import PDFAcroListBox from './PDFAcroListBox';
 import { AcroButtonFlags, AcroChoiceFlags } from './flags';
 
-export const createPDFAcroFields = (
-  kidDicts?: PDFArray,
-): [PDFAcroField, PDFRef][] => {
+export const createPDFAcroFields = (kidDicts?: PDFArray): [PDFAcroField, PDFRef][] => {
   if (!kidDicts) return [];
 
   const kids: [PDFAcroField, PDFRef][] = [];
@@ -37,10 +35,7 @@ export const createPDFAcroFields = (
   return kids;
 };
 
-export const createPDFAcroField = (
-  dict: PDFDict,
-  ref: PDFRef,
-): PDFAcroField => {
+export const createPDFAcroField = (dict: PDFDict, ref: PDFRef): PDFAcroField => {
   const isNonTerminal = isNonTerminalAcroField(dict);
   if (isNonTerminal) return PDFAcroNonTerminal.fromDict(dict, ref);
   return createPDFAcroTerminal(dict, ref);
@@ -117,8 +112,7 @@ const createPDFAcroChoice = (dict: PDFDict, ref: PDFRef): PDFAcroChoice => {
   }
 };
 
-const flagIsSet = (flags: number, flag: number): boolean =>
-  (flags & flag) !== 0;
+const flagIsSet = (flags: number, flag: number): boolean => (flags & flag) !== 0;
 
 const getInheritableAttribute = (startNode: PDFDict, name: PDFName) => {
   let attribute: PDFObject | undefined;

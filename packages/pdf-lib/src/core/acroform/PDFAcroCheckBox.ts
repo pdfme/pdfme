@@ -6,8 +6,7 @@ import PDFAcroButton from './PDFAcroButton';
 import { InvalidAcroFieldValueError } from '../errors';
 
 class PDFAcroCheckBox extends PDFAcroButton {
-  static fromDict = (dict: PDFDict, ref: PDFRef) =>
-    new PDFAcroCheckBox(dict, ref);
+  static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroCheckBox(dict, ref);
 
   static create = (context: PDFContext) => {
     const dict = context.obj({

@@ -53,10 +53,7 @@ export const reduceRotation = (degreeAngle = 0) => {
   return 0; // `degreeAngle` is not a multiple of 90
 };
 
-export const adjustDimsForRotation = (
-  dims: { width: number; height: number },
-  degreeAngle = 0,
-) => {
+export const adjustDimsForRotation = (dims: { width: number; height: number }, degreeAngle = 0) => {
   const rotation = reduceRotation(degreeAngle);
   return rotation === 90 || rotation === 270
     ? { width: dims.height, height: dims.width }

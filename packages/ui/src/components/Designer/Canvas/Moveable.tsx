@@ -6,7 +6,7 @@ import MoveableComponent, {
   OnClick,
   OnResize,
 } from 'react-moveable';
-import { uuid } from '../../../helper.js'
+import { uuid } from '../../../helper.js';
 import { theme } from 'antd';
 
 type Props = {

@@ -131,9 +131,7 @@ class FlateStream extends DecodeStream {
       throw new Error(`Invalid header in flate stream: ${cmf}, ${flg}`);
     }
     if ((cmf & 0x0f) !== 0x08) {
-      throw new Error(
-        `Unknown compression method in flate stream: ${cmf}, ${flg}`,
-      );
+      throw new Error(`Unknown compression method in flate stream: ${cmf}, ${flg}`);
     }
     if (((cmf << 8) + flg) % 31 !== 0) {
       throw new Error(`Bad FCHECK in flate stream: ${cmf}, ${flg}`);
@@ -259,12 +257,8 @@ class FlateStream extends DecodeStream {
         }
       }
 
-      litCodeTable = this.generateHuffmanTable(
-        codeLengths.subarray(0, numLitCodes),
-      );
-      distCodeTable = this.generateHuffmanTable(
-        codeLengths.subarray(numLitCodes, codes),
-      );
+      litCodeTable = this.generateHuffmanTable(codeLengths.subarray(0, numLitCodes));
+      distCodeTable = this.generateHuffmanTable(codeLengths.subarray(numLitCodes, codes));
     } else {
       throw new Error('Unknown block type in flate stream');
     }
@@ -376,11 +370,7 @@ class FlateStream extends DecodeStream {
     // build the table
     const size = 1 << maxLen;
     const codes = new Int32Array(size);
-    for (
-      let len = 1, code = 0, skip = 2;
-      len <= maxLen;
-      ++len, code <<= 1, skip <<= 1
-    ) {
+    for (let len = 1, code = 0, skip = 2; len <= maxLen; ++len, code <<= 1, skip <<= 1) {
       for (let val = 0; val < n; ++val) {
         if (lengths[val] === len) {
           // bit-reverse the code

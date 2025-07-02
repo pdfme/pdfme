@@ -47,10 +47,7 @@ export default class PDFEmbeddedFile implements Embeddable {
    */
   async embed(): Promise<void> {
     if (!this.alreadyEmbedded) {
-      const ref = await this.embedder.embedIntoContext(
-        this.doc.context,
-        this.ref,
-      );
+      const ref = await this.embedder.embedIntoContext(this.doc.context, this.ref);
 
       if (!this.doc.catalog.has(PDFName.of('Names'))) {
         this.doc.catalog.set(PDFName.of('Names'), this.doc.context.obj({}));

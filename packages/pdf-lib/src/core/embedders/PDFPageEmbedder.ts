@@ -1,7 +1,4 @@
-import {
-  MissingPageContentsEmbeddingError,
-  UnrecognizedStreamTypeError,
-} from '../errors';
+import { MissingPageContentsEmbeddingError, UnrecognizedStreamTypeError } from '../errors';
 import PDFArray from '../objects/PDFArray';
 import PDFNumber from '../objects/PDFNumber';
 import PDFRawStream from '../objects/PDFRawStream';
@@ -40,22 +37,24 @@ export interface PageBoundingBox {
 const fullPageBoundingBox = (page: PDFPageLeaf) => {
   const mediaBox = page.MediaBox();
 
-  const width =
-    mediaBox.lookup(2, PDFNumber).asNumber() -
-    mediaBox.lookup(0, PDFNumber).asNumber();
+  const width = mediaBox.lookup(2, PDFNumber).asNumber() - mediaBox.lookup(0, PDFNumber).asNumber();
 
   const height =
-    mediaBox.lookup(3, PDFNumber).asNumber() -
-    mediaBox.lookup(1, PDFNumber).asNumber();
+    mediaBox.lookup(3, PDFNumber).asNumber() - mediaBox.lookup(1, PDFNumber).asNumber();
 
   return { left: 0, bottom: 0, right: width, top: height };
 };
 
 // Returns the identity matrix, modified to position the content of the given
 // bounding box at (0, 0).
-const boundingBoxAdjustedMatrix = (
-  bb: PageBoundingBox,
-): TransformationMatrix => [1, 0, 0, 1, -bb.left, -bb.bottom];
+const boundingBoxAdjustedMatrix = (bb: PageBoundingBox): TransformationMatrix => [
+  1,
+  0,
+  0,
+  1,
+  -bb.left,
+  -bb.bottom,
+];
 
 class PDFPageEmbedder {
   static async for(
@@ -85,8 +84,7 @@ class PDFPageEmbedder {
     this.width = bb.right - bb.left;
     this.height = bb.top - bb.bottom;
     this.boundingBox = bb;
-    this.transformationMatrix =
-      transformationMatrix ?? boundingBoxAdjustedMatrix(bb);
+    this.transformationMatrix = transformationMatrix ?? boundingBoxAdjustedMatrix(bb);
   }
 
   async embedIntoContext(context: PDFContext, ref?: PDFRef): Promise<PDFRef> {

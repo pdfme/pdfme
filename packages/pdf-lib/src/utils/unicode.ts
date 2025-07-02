@@ -200,10 +200,7 @@ export const utf8Encode = (input: string, byteOrderMark = true): Uint8Array => {
  *   - [3] https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/length#Description
  *
  */
-export const utf16Encode = (
-  input: string,
-  byteOrderMark = true,
-): Uint16Array => {
+export const utf16Encode = (input: string, byteOrderMark = true): Uint16Array => {
   const encoded = [];
 
   if (byteOrderMark) encoded.push(0xfeff);
@@ -238,8 +235,7 @@ export const utf16Encode = (
  *
  * Reference: https://en.wikipedia.org/wiki/UTF-16#Description
  */
-export const isWithinBMP = (codePoint: number) =>
-  codePoint >= 0 && codePoint <= 0xffff;
+export const isWithinBMP = (codePoint: number) => codePoint >= 0 && codePoint <= 0xffff;
 
 /**
  * Returns `true` if the given `codePoint` is valid and must be represented
@@ -248,8 +244,7 @@ export const isWithinBMP = (codePoint: number) =>
  *
  * Reference: https://en.wikipedia.org/wiki/UTF-16#Description
  */
-export const hasSurrogates = (codePoint: number) =>
-  codePoint >= 0x010000 && codePoint <= 0x10ffff;
+export const hasSurrogates = (codePoint: number) => codePoint >= 0x010000 && codePoint <= 0x10ffff;
 
 // From Unicode 3.0 spec, section 3.7:
 //   http://unicode.org/versions/Unicode3.0.0/ch03.pdf
@@ -258,8 +253,7 @@ export const highSurrogate = (codePoint: number) =>
 
 // From Unicode 3.0 spec, section 3.7:
 //   http://unicode.org/versions/Unicode3.0.0/ch03.pdf
-export const lowSurrogate = (codePoint: number) =>
-  ((codePoint - 0x10000) % 0x400) + 0xdc00;
+export const lowSurrogate = (codePoint: number) => ((codePoint - 0x10000) % 0x400) + 0xdc00;
 
 enum ByteOrder {
   BigEndian = 'BigEndian',
@@ -280,10 +274,7 @@ const REPLACEMENT = '�'.codePointAt(0)!;
  *                      at the start of the encoding. (default `true`)
  * @returns The decoded string.
  */
-export const utf16Decode = (
-  input: Uint8Array,
-  byteOrderMark = true,
-): string => {
+export const utf16Decode = (input: Uint8Array, byteOrderMark = true): string => {
   // Need at least 2 bytes of data in UTF-16 encodings
   if (input.length <= 1) return String.fromCodePoint(REPLACEMENT);
 
@@ -332,8 +323,7 @@ export const utf16Decode = (
  *
  * Reference: https://en.wikipedia.org/wiki/UTF-16#Description
  */
-const isHighSurrogate = (codePoint: number) =>
-  codePoint >= 0xd800 && codePoint <= 0xdbff;
+const isHighSurrogate = (codePoint: number) => codePoint >= 0xd800 && codePoint <= 0xdbff;
 
 /**
  * Returns `true` if the given `codePoint` is a low surrogate.
@@ -341,8 +331,7 @@ const isHighSurrogate = (codePoint: number) =>
  *
  * Reference: https://en.wikipedia.org/wiki/UTF-16#Description
  */
-const isLowSurrogate = (codePoint: number) =>
-  codePoint >= 0xdc00 && codePoint <= 0xdfff;
+const isLowSurrogate = (codePoint: number) => codePoint >= 0xdc00 && codePoint <= 0xdfff;
 
 /**
  * Decodes the given utf-16 values first and second using the specified
@@ -376,11 +365,9 @@ const readBOM = (bytes: Uint8Array): ByteOrder => (
   : ByteOrder.BigEndian
 );
 
-const hasUtf16BigEndianBOM = (bytes: Uint8Array) =>
-  bytes[0] === 0xfe && bytes[1] === 0xff;
+const hasUtf16BigEndianBOM = (bytes: Uint8Array) => bytes[0] === 0xfe && bytes[1] === 0xff;
 
-const hasUtf16LittleEndianBOM = (bytes: Uint8Array) =>
-  bytes[0] === 0xff && bytes[1] === 0xfe;
+const hasUtf16LittleEndianBOM = (bytes: Uint8Array) => bytes[0] === 0xff && bytes[1] === 0xfe;
 
 export const hasUtf16BOM = (bytes: Uint8Array) =>
   hasUtf16BigEndianBOM(bytes) || hasUtf16LittleEndianBOM(bytes);

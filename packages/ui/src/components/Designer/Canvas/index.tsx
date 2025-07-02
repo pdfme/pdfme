@@ -508,20 +508,21 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               onChange={
                 (schemasList[pageCursor] || []).some((s) => s.id === schema.id)
                   ? (arg) => {
-                    // Use type assertion to safely handle the argument
-                    type ChangeArg = { key: string; value: unknown };
-                    const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
-                    changeSchemas(
-                      args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
-                    );
-                  }
+                      // Use type assertion to safely handle the argument
+                      type ChangeArg = { key: string; value: unknown };
+                      const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
+                      changeSchemas(
+                        args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
+                      );
+                    }
                   : undefined
               }
               stopEditing={() => setEditing(false)}
-              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${schema.readOnly && hoveringSchemaId !== schema.id
+              outline={`1px ${hoveringSchemaId === schema.id ? 'solid' : 'dashed'} ${
+                schema.readOnly && hoveringSchemaId !== schema.id
                   ? 'transparent'
                   : token.colorPrimary
-                }`}
+              }`}
               scale={scale}
             />
           );

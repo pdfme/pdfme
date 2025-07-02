@@ -23,10 +23,8 @@ export const pluginRegistry = (plugins: Plugins): PluginRegistry => {
       return ['', undefined];
     },
     findByType(type: string): Plugin | undefined {
-      const [, plugin] = this.findWithLabelByType(type)
+      const [, plugin] = this.findWithLabelByType(type);
       return plugin;
-    }
-  }
+    },
+  };
 };
-
-

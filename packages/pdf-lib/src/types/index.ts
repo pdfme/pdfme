@@ -18,21 +18,13 @@ export type Coordinates = {
   y: number;
 };
 
-export type GraphicElement =
-  | Arc
-  | Circle
-  | Ellipse
-  | Line
-  | Plot
-  | Point
-  | Rectangle
-  | Segment;
+export type GraphicElement = Arc | Circle | Ellipse | Line | Plot | Point | Rectangle | Segment;
 
 export type Space = {
-  topLeft: Coordinates
-  topRight: Coordinates
-  bottomRight: Coordinates
-  bottomLeft: Coordinates
- };
+  topLeft: Coordinates;
+  topRight: Coordinates;
+  bottomRight: Coordinates;
+  bottomLeft: Coordinates;
+};
 
 export type LinkElement = Rectangle | Ellipse;

@@ -64,9 +64,7 @@ export default class Line extends GraphElement {
   includes(P: Point) {
     const { x, y } = P.toCoords();
     const vect = this.dirVect();
-    return isEqual(vect.x, 0)
-      ? isEqual(this.origin().toCoords().x, x)
-      : isEqual(this.y(x), y);
+    return isEqual(vect.x, 0) ? isEqual(this.origin().toCoords().x, x) : isEqual(this.y(x), y);
   }
 
   /** This is used to standarsize type Segment | HalfLine | Line */

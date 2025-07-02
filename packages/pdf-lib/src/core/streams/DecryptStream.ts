@@ -3,10 +3,7 @@ import { StreamType } from './Stream';
 
 const chunkSize = 512;
 
-type DecryptFnType = (
-  arg1: Uint8Array | Uint8ClampedArray,
-  arg2: boolean,
-) => Uint8Array;
+type DecryptFnType = (arg1: Uint8Array | Uint8ClampedArray, arg2: boolean) => Uint8Array;
 
 class DecryptStream extends DecodeStream {
   private stream: StreamType;
@@ -14,11 +11,7 @@ class DecryptStream extends DecodeStream {
   private nextChunk: Uint8Array | Uint8ClampedArray | null;
   private decrypt: DecryptFnType;
 
-  constructor(
-    stream: StreamType,
-    decrypt: DecryptFnType,
-    maybeLength?: number,
-  ) {
+  constructor(stream: StreamType, decrypt: DecryptFnType, maybeLength?: number) {
     super(maybeLength);
 
     this.stream = stream;

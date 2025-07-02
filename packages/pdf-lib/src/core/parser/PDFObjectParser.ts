@@ -32,17 +32,11 @@ import { CipherTransformFactory } from '../crypto';
 
 // TODO: Throw error if eof is reached before finishing object parse...
 class PDFObjectParser extends BaseParser {
-  static forBytes = (
-    bytes: Uint8Array,
-    context: PDFContext,
-    capNumbers?: boolean,
-  ) => new PDFObjectParser(ByteStream.of(bytes), context, capNumbers);
+  static forBytes = (bytes: Uint8Array, context: PDFContext, capNumbers?: boolean) =>
+    new PDFObjectParser(ByteStream.of(bytes), context, capNumbers);
 
-  static forByteStream = (
-    byteStream: ByteStream,
-    context: PDFContext,
-    capNumbers = false,
-  ) => new PDFObjectParser(byteStream, context, capNumbers);
+  static forByteStream = (byteStream: ByteStream, context: PDFContext, capNumbers = false) =>
+    new PDFObjectParser(byteStream, context, capNumbers);
 
   protected readonly context: PDFContext;
   private readonly cryptoFactory?: CipherTransformFactory;
@@ -68,10 +62,7 @@ class PDFObjectParser extends BaseParser {
 
     const byte = this.bytes.peek();
 
-    if (
-      byte === CharCodes.LessThan &&
-      this.bytes.peekAhead(1) === CharCodes.LessThan
-    ) {
+    if (byte === CharCodes.LessThan && this.bytes.peekAhead(1) === CharCodes.LessThan) {
       return this.parseDictOrStream(ref);
     }
     if (byte === CharCodes.LessThan) return this.parseHexString(ref);

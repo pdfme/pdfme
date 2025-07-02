@@ -18,13 +18,7 @@ class PDFStreamWriter extends PDFWriter {
     objectsPerTick: number,
     encodeStreams = true,
     objectsPerStream = 50,
-  ) =>
-    new PDFStreamWriter(
-      context,
-      objectsPerTick,
-      encodeStreams,
-      objectsPerStream,
-    );
+  ) => new PDFStreamWriter(context, objectsPerTick, encodeStreams, objectsPerStream);
 
   private readonly encodeStreams: boolean;
   private readonly objectsPerStream: number;
@@ -48,10 +42,7 @@ class PDFStreamWriter extends PDFWriter {
 
     let size = header.sizeInBytes() + 2;
 
-    const xrefStream = PDFCrossRefStream.create(
-      this.createTrailerDict(),
-      this.encodeStreams,
-    );
+    const xrefStream = PDFCrossRefStream.create(this.createTrailerDict(), this.encodeStreams);
 
     const uncompressedObjects: [PDFRef, PDFObject][] = [];
     const compressedObjects: [PDFRef, PDFObject][][] = [];

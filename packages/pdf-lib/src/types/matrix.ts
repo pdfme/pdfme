@@ -17,13 +17,6 @@
  *   * Skew shall be specified by `[1 tan(a) tan(b) 1 0 0]`, which skews the
  *     x-axis by an angle `a` and the y axis by an angle `b`.
  */
-export type TransformationMatrix = [
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-];
+export type TransformationMatrix = [number, number, number, number, number, number];
 
 export const identityMatrix: TransformationMatrix = [1, 0, 0, 1, 0, 0];

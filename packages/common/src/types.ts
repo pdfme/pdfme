@@ -162,7 +162,7 @@ export interface PluginRegistry {
   values(): Plugin[];
   entries(): [string, Plugin][];
   findByType(type: string): Plugin | undefined;
-  findWithLabelByType(type: string): [string, Plugin|undefined];
+  findWithLabelByType(type: string): [string, Plugin | undefined];
 }
 
 export type Lang = z.infer<typeof Lang>;

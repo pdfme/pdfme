@@ -43,18 +43,10 @@ class PDFCrossRefSection {
   toString(): string {
     let section = `xref\n`;
 
-    for (
-      let rangeIdx = 0, rangeLen = this.subsections.length;
-      rangeIdx < rangeLen;
-      rangeIdx++
-    ) {
+    for (let rangeIdx = 0, rangeLen = this.subsections.length; rangeIdx < rangeLen; rangeIdx++) {
       const range = this.subsections[rangeIdx];
       section += `${range[0].ref.objectNumber} ${range.length}\n`;
-      for (
-        let entryIdx = 0, entryLen = range.length;
-        entryIdx < entryLen;
-        entryIdx++
-      ) {
+      for (let entryIdx = 0, entryLen = range.length; entryIdx < entryLen; entryIdx++) {
         const entry = range[entryIdx];
         section += padStart(String(entry.offset), 10, '0');
         section += ' ';
@@ -121,11 +113,7 @@ class PDFCrossRefSection {
     return offset - initialOffset;
   }
 
-  private copyEntriesIntoBuffer(
-    entries: Entry[],
-    buffer: Uint8Array,
-    offset: number,
-  ): number {
+  private copyEntriesIntoBuffer(entries: Entry[], buffer: Uint8Array, offset: number): number {
     const length = entries.length;
 
     for (let idx = 0; idx < length; idx++) {

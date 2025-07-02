@@ -5,8 +5,7 @@ import PDFRef from '../objects/PDFRef';
 import { AcroButtonFlags } from './flags';
 
 class PDFAcroPushButton extends PDFAcroButton {
-  static fromDict = (dict: PDFDict, ref: PDFRef) =>
-    new PDFAcroPushButton(dict, ref);
+  static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroPushButton(dict, ref);
 
   static create = (context: PDFContext) => {
     const dict = context.obj({

@@ -61,7 +61,7 @@ const shape: Plugin<ShapeSchema> = {
       });
     } else if (schema.type === 'rectangle') {
       const radius = schema.radius ?? 0;
-      
+
       page.drawRectangle({
         x:
           position.x +

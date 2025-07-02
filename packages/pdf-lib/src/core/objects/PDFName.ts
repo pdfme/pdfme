@@ -2,20 +2,13 @@ import { PrivateConstructorError } from '../errors';
 import PDFObject from './PDFObject';
 import CharCodes from '../syntax/CharCodes';
 import { IsIrregular } from '../syntax/Irregular';
-import {
-  charFromHexCode,
-  copyStringIntoBuffer,
-  toCharCode,
-  toHexString,
-} from '../../utils';
+import { charFromHexCode, copyStringIntoBuffer, toCharCode, toHexString } from '../../utils';
 
 const decodeName = (name: string) =>
   name.replace(/#([\dABCDEF]{2})/g, (_, hex) => charFromHexCode(hex));
 
 const isRegularChar = (charCode: number) =>
-  charCode >= CharCodes.ExclamationPoint &&
-  charCode <= CharCodes.Tilde &&
-  !IsIrregular[charCode];
+  charCode >= CharCodes.ExclamationPoint && charCode <= CharCodes.Tilde && !IsIrregular[charCode];
 
 const ENFORCER = {};
 const pool = new Map<string, PDFName>();

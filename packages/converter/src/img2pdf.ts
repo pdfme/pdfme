@@ -5,14 +5,14 @@ import type { ImageType } from './types.js';
 interface Img2PdfOptions {
   scale?: number;
   imageType?: ImageType;
-  size?: { height: number, width: number }; // in millimeters
+  size?: { height: number; width: number }; // in millimeters
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }
 
 function detectImageType(buffer: ArrayBuffer): 'jpeg' | 'png' | 'unknown' {
   const bytes = new Uint8Array(buffer);
 
-  if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xD8) {
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xd8) {
     return 'jpeg';
   }
 
@@ -20,12 +20,12 @@ function detectImageType(buffer: ArrayBuffer): 'jpeg' | 'png' | 'unknown' {
     bytes.length >= 8 &&
     bytes[0] === 0x89 &&
     bytes[1] === 0x50 &&
-    bytes[2] === 0x4E &&
+    bytes[2] === 0x4e &&
     bytes[3] === 0x47 &&
-    bytes[4] === 0x0D &&
-    bytes[5] === 0x0A &&
-    bytes[6] === 0x1A &&
-    bytes[7] === 0x0A
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a
   ) {
     return 'png';
   }
@@ -64,30 +64,30 @@ export async function img2pdf(
 
         const page = doc.addPage();
         const { width: imgWidth, height: imgHeight } = image.scale(scale);
-        
+
         // Set page size based on size option or image dimensions
         const pageWidth = size ? mm2pt(size.width) : imgWidth;
         const pageHeight = size ? mm2pt(size.height) : imgHeight;
         page.setSize(pageWidth, pageHeight);
-        
+
         // Convert margins from mm to points
         const [topMargin, rightMargin, bottomMargin, leftMargin] = margin.map(mm2pt);
-        
+
         // Calculate available space for the image after applying margins
         const availableWidth = pageWidth - leftMargin - rightMargin;
         const availableHeight = pageHeight - topMargin - bottomMargin;
-        
+
         // Calculate scaling to fit image within available space while maintaining aspect ratio
         const widthRatio = availableWidth / imgWidth;
         const heightRatio = availableHeight / imgHeight;
         const ratio = Math.min(widthRatio, heightRatio, 1); // Don't upscale images
-        
+
         // Calculate final image dimensions and position
         const finalWidth = imgWidth * ratio;
         const finalHeight = imgHeight * ratio;
         const x = leftMargin + (availableWidth - finalWidth) / 2; // Center horizontally
         const y = bottomMargin + (availableHeight - finalHeight) / 2; // Center vertically
-        
+
         page.drawImage(image, {
           x,
           y,

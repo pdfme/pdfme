@@ -90,11 +90,13 @@ const generate = async (props: GenerateProps) => {
           if (!render) {
             continue;
           }
-          const value = staticSchema.readOnly ? replacePlaceholders({
-            content: staticSchema.content || '',
-            variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-            schemas: schemas, // Use the properly typed schemas variable
-          }) : staticSchema.content || '';
+          const value = staticSchema.readOnly
+            ? replacePlaceholders({
+                content: staticSchema.content || '',
+                variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
+                schemas: schemas, // Use the properly typed schemas variable
+              })
+            : staticSchema.content || '';
 
           staticSchema.position = {
             x: staticSchema.position.x + boundingBoxLeft,

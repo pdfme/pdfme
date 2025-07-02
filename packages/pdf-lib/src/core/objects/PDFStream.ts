@@ -19,10 +19,7 @@ class PDFStream extends PDFObject {
   }
 
   getContentsString(): string {
-    throw new MethodNotImplementedError(
-      this.constructor.name,
-      'getContentsString',
-    );
+    throw new MethodNotImplementedError(this.constructor.name, 'getContentsString');
   }
 
   getContents(): Uint8Array {
@@ -30,10 +27,7 @@ class PDFStream extends PDFObject {
   }
 
   getContentsSize(): number {
-    throw new MethodNotImplementedError(
-      this.constructor.name,
-      'getContentsSize',
-    );
+    throw new MethodNotImplementedError(this.constructor.name, 'getContentsSize');
   }
 
   updateDict(): void {

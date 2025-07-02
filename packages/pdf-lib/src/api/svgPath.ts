@@ -3,13 +3,7 @@
 // MIT LICENSE
 // Updated for pdf-lib & TypeScript by Jeremy Messenger
 
-import {
-  appendBezierCurve,
-  appendQuadraticCurve,
-  closePath,
-  lineTo,
-  moveTo,
-} from './operators';
+import { appendBezierCurve, appendQuadraticCurve, closePath, lineTo, moveTo } from './operators';
 import { PDFOperator } from '../core';
 
 let cx: number = 0;
@@ -184,14 +178,7 @@ const runners: CmdToOperatorsMap = {
   },
 
   c(a) {
-    const cmd = appendBezierCurve(
-      a[0] + cx,
-      a[1] + cy,
-      a[2] + cx,
-      a[3] + cy,
-      a[4] + cx,
-      a[5] + cy,
-    );
+    const cmd = appendBezierCurve(a[0] + cx, a[1] + cy, a[2] + cx, a[3] + cy, a[4] + cx, a[5] + cy);
     px = cx + a[2];
     py = cy + a[3];
     cx += a[4];
@@ -205,14 +192,7 @@ const runners: CmdToOperatorsMap = {
       py = cy;
     }
 
-    const cmd = appendBezierCurve(
-      cx - (px - cx),
-      cy - (py - cy),
-      a[0],
-      a[1],
-      a[2],
-      a[3],
-    );
+    const cmd = appendBezierCurve(cx - (px - cx), cy - (py - cy), a[0], a[1], a[2], a[3]);
     px = a[0];
     py = a[1];
     cx = a[2];
@@ -250,12 +230,7 @@ const runners: CmdToOperatorsMap = {
   },
 
   q(a) {
-    const cmd = appendQuadraticCurve(
-      a[0] + cx,
-      a[1] + cy,
-      a[2] + cx,
-      a[3] + cy,
-    );
+    const cmd = appendQuadraticCurve(a[0] + cx, a[1] + cy, a[2] + cx, a[3] + cy);
     px = cx + a[0];
     py = cy + a[1];
     cx += a[2];
@@ -463,9 +438,7 @@ const segmentToBezier = (
   const a11 = cosTh * ry;
 
   const thHalf = 0.5 * (th1 - th0);
-  const t =
-    ((8 / 3) * Math.sin(thHalf * 0.5) * Math.sin(thHalf * 0.5)) /
-    Math.sin(thHalf);
+  const t = ((8 / 3) * Math.sin(thHalf * 0.5) * Math.sin(thHalf * 0.5)) / Math.sin(thHalf);
   const x1 = cx1 + Math.cos(th0) - t * Math.sin(th0);
   const y1 = cy1 + Math.sin(th0) + t * Math.cos(th0);
   const x3 = cx1 + Math.cos(th1);

@@ -102,11 +102,7 @@ class PDFCrossRefStream extends PDFFlateStream {
     const byteWidths = this.maxByteWidthsCache.access();
     let value = '';
 
-    for (
-      let entryIdx = 0, entriesLen = entryTuples.length;
-      entryIdx < entriesLen;
-      entryIdx++
-    ) {
+    for (let entryIdx = 0, entriesLen = entryTuples.length; entryIdx < entriesLen; entryIdx++) {
       const [first, second, third] = entryTuples[entryIdx];
 
       const firstBytes = reverseArray(bytesFor(first));
@@ -133,11 +129,7 @@ class PDFCrossRefStream extends PDFFlateStream {
     const buffer = new Uint8Array(this.getUnencodedContentsSize());
 
     let offset = 0;
-    for (
-      let entryIdx = 0, entriesLen = entryTuples.length;
-      entryIdx < entriesLen;
-      entryIdx++
-    ) {
+    for (let entryIdx = 0, entriesLen = entryTuples.length; entryIdx < entriesLen; entryIdx++) {
       const [first, second, third] = entryTuples[entryIdx];
 
       const firstBytes = reverseArray(bytesFor(first));

@@ -6,12 +6,7 @@ import PDFHexString from '../objects/PDFHexString';
 import PDFRef from '../objects/PDFRef';
 import PDFString from '../objects/PDFString';
 import PDFContext from '../PDFContext';
-import {
-  byAscendingId,
-  Cache,
-  sortedUniq,
-  toHexStringOfMinLength,
-} from '../../utils';
+import { byAscendingId, Cache, sortedUniq, toHexStringOfMinLength } from '../../utils';
 
 /**
  * A note of thanks to the developers of https://github.com/foliojs/pdfkit, as
@@ -81,10 +76,7 @@ class CustomFontEmbedder {
     return totalWidth * scale;
   }
 
-  heightOfFontAtSize(
-    size: number,
-    options: { descender?: boolean } = {},
-  ): number {
+  heightOfFontAtSize(size: number, options: { descender?: boolean } = {}): number {
     const { descender = true } = options;
 
     const { ascent, descent, bbox } = this.font;
@@ -105,15 +97,11 @@ class CustomFontEmbedder {
   }
 
   embedIntoContext(context: PDFContext, ref?: PDFRef): Promise<PDFRef> {
-    this.baseFontName =
-      this.customName || context.addRandomSuffix(this.fontName);
+    this.baseFontName = this.customName || context.addRandomSuffix(this.fontName);
     return this.embedFontDict(context, ref);
   }
 
-  protected async embedFontDict(
-    context: PDFContext,
-    ref?: PDFRef,
-  ): Promise<PDFRef> {
+  protected async embedFontDict(context: PDFContext, ref?: PDFRef): Promise<PDFRef> {
     const cidFontDictRef = await this.embedCIDFontDict(context);
     const unicodeCMapRef = this.embedUnicodeCmap(context);
 

@@ -57,18 +57,12 @@ class PDFArray extends PDFObject {
   lookupMaybe(index: number, type: typeof PDFArray): PDFArray | undefined;
   lookupMaybe(index: number, type: typeof PDFBool): PDFBool | undefined;
   lookupMaybe(index: number, type: typeof PDFDict): PDFDict | undefined;
-  lookupMaybe(
-    index: number,
-    type: typeof PDFHexString,
-  ): PDFHexString | undefined;
+  lookupMaybe(index: number, type: typeof PDFHexString): PDFHexString | undefined;
   lookupMaybe(index: number, type: typeof PDFName): PDFName | undefined;
   lookupMaybe(index: number, type: typeof PDFNull): typeof PDFNull | undefined;
   lookupMaybe(index: number, type: typeof PDFNumber): PDFNumber | undefined;
   lookupMaybe(index: number, type: typeof PDFStream): PDFStream | undefined;
-  lookupMaybe(
-    index: number,
-    type: typeof PDFRawStream,
-  ): PDFRawStream | undefined;
+  lookupMaybe(index: number, type: typeof PDFRawStream): PDFRawStream | undefined;
   lookupMaybe(index: number, type: typeof PDFRef): PDFRef | undefined;
   lookupMaybe(index: number, type: typeof PDFString): PDFString | undefined;
   lookupMaybe(
