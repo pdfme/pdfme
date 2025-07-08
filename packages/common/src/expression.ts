@@ -42,6 +42,7 @@ const safeObject = {
   keys: Object.keys,
   values: Object.values,
   entries: Object.entries,
+  fromEntries: Object.fromEntries,
   assign: Object.assign,
   create: Object.create,
   freeze: Object.freeze,
