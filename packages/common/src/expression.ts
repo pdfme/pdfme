@@ -37,13 +37,29 @@ const formatDate = (date: Date): string =>
 const formatDateTime = (date: Date): string =>
   `${formatDate(date)} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
 
+// Create a safe copy of Object with dangerous methods excluded
+const safeObject = {
+  keys: Object.keys,
+  values: Object.values,
+  entries: Object.entries,
+  assign: Object.assign,
+  create: Object.create,
+  freeze: Object.freeze,
+  seal: Object.seal,
+  is: Object.is,
+  hasOwnProperty: Object.hasOwnProperty,
+  // The following dangerous methods are intentionally excluded:
+  // getOwnPropertyDescriptor, getPrototypeOf, setPrototypeOf,
+  // defineProperty, defineProperties, getOwnPropertyNames, getOwnPropertySymbols
+};
+
 const allowedGlobals: Record<string, unknown> = {
   Math,
   String,
   Number,
   Boolean,
   Array,
-  Object,
+  Object: safeObject,
   Date,
   JSON,
   isNaN,

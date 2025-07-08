@@ -370,3 +370,106 @@ describe('replacePlaceholders - Comparison Operators Tests', () => {
     expect(result).toBe('ArbitraryCode: {1 < (() => { return "Hacked" })()}');
   });
 });
+
+describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
+  it('should prevent XSS via Object.getOwnPropertyDescriptor and Object.getPrototypeOf (CVE payload 1)', () => {
+    const content = '{ ((f, g) => f(g(Object), "constructor").value)(Object.getOwnPropertyDescriptor, Object.getPrototypeOf)("alert(location)")() }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // The dangerous expression should not be evaluated and should return as-is
+    expect(result).toBe(content);
+  });
+
+  it('should prevent XSS via object property assignment (CVE payload 2)', () => {
+    const content = '{ { f: Object.getOwnPropertyDescriptor }.f({ g: Object.getPrototypeOf }.g(Object), "constructor").value("alert(location)")() }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // The dangerous expression should not be evaluated and should return as-is
+    expect(result).toBe(content);
+  });
+
+  it('should prevent direct access to Object.getOwnPropertyDescriptor', () => {
+    const content = '{ Object.getOwnPropertyDescriptor(Object, "constructor") }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent direct access to Object.getPrototypeOf', () => {
+    const content = '{ Object.getPrototypeOf(Object) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to Object.setPrototypeOf', () => {
+    const content = '{ Object.setPrototypeOf({}, null) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to Object.defineProperty', () => {
+    const content = '{ Object.defineProperty({}, "prop", { value: 42 }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to Object.defineProperties', () => {
+    const content = '{ Object.defineProperties({}, { prop: { value: 42 } }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to Object.getOwnPropertyNames', () => {
+    const content = '{ Object.getOwnPropertyNames(Object) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to Object.getOwnPropertySymbols', () => {
+    const content = '{ Object.getOwnPropertySymbols(Object) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Direct access to dangerous method should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should allow safe Object methods like Object.keys', () => {
+    const content = '{ Object.keys({ a: 1, b: 2 }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('a,b');
+  });
+
+  it('should allow safe Object methods like Object.values', () => {
+    const content = '{ Object.values({ a: 1, b: 2 }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('1,2');
+  });
+
+  it('should allow safe Object methods like Object.entries', () => {
+    const content = '{ Object.entries({ a: 1 })[0] }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('a,1');
+  });
+
+  it('should allow safe Object methods like Object.assign', () => {
+    const content = '{ Object.assign({}, { a: 1 }, { b: 2 }).a }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('1');
+  });
+
+  it('should prevent complex XSS attempts via nested function calls', () => {
+    const content = '{ [].map.call("abc", Object.getOwnPropertyDescriptor) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Complex attempts to access dangerous functions should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent Function constructor access via constructor property', () => {
+    const content = '{ "".constructor.constructor("alert(1)")() }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Attempts to access Function constructor should be blocked
+    expect(result).toBe(content);
+  });
+});
