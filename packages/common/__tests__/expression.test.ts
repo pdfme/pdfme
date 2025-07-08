@@ -435,28 +435,26 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
     expect(result).toBe(content);
   });
 
-  it('should allow safe Object methods like Object.keys', () => {
-    const content = '{ Object.keys({ a: 1, b: 2 }) }';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('a,b');
-  });
+  it('should allow safe Object methods', () => {
+    // Test Object.keys
+    const keysContent = '{ Object.keys({ a: 1, b: 2 }) }';
+    const keysResult = replacePlaceholders({ content: keysContent, variables: {}, schemas: [] });
+    expect(keysResult).toBe('a,b');
 
-  it('should allow safe Object methods like Object.values', () => {
-    const content = '{ Object.values({ a: 1, b: 2 }) }';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('1,2');
-  });
+    // Test Object.values
+    const valuesContent = '{ Object.values({ a: 1, b: 2 }) }';
+    const valuesResult = replacePlaceholders({ content: valuesContent, variables: {}, schemas: [] });
+    expect(valuesResult).toBe('1,2');
 
-  it('should allow safe Object methods like Object.entries', () => {
-    const content = '{ Object.entries({ a: 1 })[0] }';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('a,1');
-  });
+    // Test Object.entries
+    const entriesContent = '{ Object.entries({ a: 1 })[0] }';
+    const entriesResult = replacePlaceholders({ content: entriesContent, variables: {}, schemas: [] });
+    expect(entriesResult).toBe('a,1');
 
-  it('should allow safe Object methods like Object.assign', () => {
-    const content = '{ Object.assign({}, { a: 1 }, { b: 2 }).a }';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('1');
+    // Test Object.assign
+    const assignContent = '{ Object.assign({}, { a: 1 }, { b: 2 }).a }';
+    const assignResult = replacePlaceholders({ content: assignContent, variables: {}, schemas: [] });
+    expect(assignResult).toBe('1');
   });
 
   it('should prevent complex XSS attempts via nested function calls', () => {
