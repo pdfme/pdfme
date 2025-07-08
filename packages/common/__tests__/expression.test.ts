@@ -451,10 +451,10 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
     const entriesResult = replacePlaceholders({ content: entriesContent, variables: {}, schemas: [] });
     expect(entriesResult).toBe('a,1');
 
-    // Test Object.assign
+    // Test safe Object.assign
     const assignContent = '{ Object.assign({}, { a: 1 }, { b: 2 }).a }';
     const assignResult = replacePlaceholders({ content: assignContent, variables: {}, schemas: [] });
-    expect(assignResult).toBe('1');
+    expect(assignResult).toBe('1'); // Safe assign should work
   });
 
   it('should prevent complex XSS attempts via nested function calls', () => {
@@ -468,6 +468,81 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
     const content = '{ "".constructor.constructor("alert(1)")() }';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     // Attempts to access Function constructor should be blocked
+    expect(result).toBe(content);
+  });
+
+  it('should prevent prototype pollution via Object.assign and __lookupGetter__', () => {
+    const content = '{ { assign: Object.assign }.assign({ f: {}.__lookupGetter__("__proto__") }.f(), { polluted: "yes" }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // The dangerous expression should not be evaluated due to __lookupGetter__ being blocked
+    expect(result).toBe(content);
+    // Verify that prototype is not polluted
+    expect(({} as any).polluted).toBeUndefined();
+  });
+
+  it('should prevent access to __lookupGetter__', () => {
+    const content = '{ {}.__lookupGetter__("__proto__") }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to __lookupSetter__', () => {
+    const content = '{ {}.__lookupSetter__("__proto__") }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to __defineGetter__', () => {
+    const content = '{ {}.__defineGetter__("test", () => "hacked") }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe(content);
+  });
+
+  it('should prevent access to __defineSetter__', () => {
+    const content = '{ {}.__defineSetter__("test", () => {}) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe(content);
+  });
+
+  it('should allow safe Object.assign but prevent prototype pollution', () => {
+    const content = '{ Object.assign({}, { a: 1 }) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Safe assign should work
+    expect(result).toBe('[object Object]');
+  });
+
+  it('should prevent prototype pollution via Object.assign', () => {
+    const pollutionContent = '{ Object.assign({}, { "__proto__": { polluted: "yes" } }) }';
+    const result = replacePlaceholders({ content: pollutionContent, variables: {}, schemas: [] });
+    // Should execute but not pollute prototype
+    expect(result).toBe('[object Object]');
+    expect(({} as any).polluted).toBeUndefined();
+    
+    // Test with constructor
+    const constructorContent = '{ Object.assign({}, { "constructor": { polluted: "yes" } }) }';
+    const result2 = replacePlaceholders({ content: constructorContent, variables: {}, schemas: [] });
+    expect(result2).toBe('[object Object]');
+    expect(({} as any).constructor.polluted).toBeUndefined();
+  });
+
+  it('should no longer allow Object.create due to security concerns', () => {
+    const content = '{ Object.create(null) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Object.create is now blocked
+    expect(result).toBe(content);
+  });
+
+  it('should no longer allow Object.freeze due to security concerns', () => {
+    const content = '{ Object.freeze({}) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Object.freeze is now blocked
+    expect(result).toBe(content);
+  });
+
+  it('should no longer allow Object.seal due to security concerns', () => {
+    const content = '{ Object.seal({}) }';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    // Object.seal is now blocked
     expect(result).toBe(content);
   });
 });
