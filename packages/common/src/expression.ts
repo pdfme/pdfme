@@ -37,13 +37,57 @@ const formatDate = (date: Date): string =>
 const formatDateTime = (date: Date): string =>
   `${formatDate(date)} ${padZero(date.getHours())}:${padZero(date.getMinutes())}`;
 
+// Safe assign function that prevents prototype pollution
+const safeAssign = (
+  target: Record<string, unknown>,
+  ...sources: Array<Record<string, unknown> | null | undefined>
+): Record<string, unknown> => {
+  if (target == null) {
+    throw new TypeError('Cannot convert undefined or null to object');
+  }
+  
+  const to = { ...target };
+  
+  for (const source of sources) {
+    if (source != null) {
+      for (const key in source) {
+        // Skip prototype pollution keys
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+          continue;
+        }
+        // Only copy own properties
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          to[key] = source[key];
+        }
+      }
+    }
+  }
+  
+  return to;
+};
+
+// Create a safe copy of Object with dangerous methods excluded
+const safeObject = {
+  keys: Object.keys,
+  values: Object.values,
+  entries: Object.entries,
+  fromEntries: Object.fromEntries,
+  is: Object.is,
+  hasOwnProperty: Object.hasOwnProperty,
+  assign: safeAssign, // Safe version of Object.assign
+  // The following methods are excluded due to security concerns:
+  // - Side effects: create, freeze, seal (can still be used for attacks)
+  // - Prototype access: getOwnPropertyDescriptor, getPrototypeOf, setPrototypeOf,
+  //   defineProperty, defineProperties, getOwnPropertyNames, getOwnPropertySymbols
+};
+
 const allowedGlobals: Record<string, unknown> = {
   Math,
   String,
   Number,
   Boolean,
   Array,
-  Object,
+  Object: safeObject,
   Date,
   JSON,
   isNaN,
@@ -88,6 +132,10 @@ const validateAST = (node: AcornNode): void => {
         const propName = (memberNode.property as Identifier).name;
         if (['constructor', '__proto__', 'prototype'].includes(propName)) {
           throw new Error('Access to prohibited property');
+        }
+        // Block prototype pollution methods
+        if (['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(propName)) {
+          throw new Error(`Access to prohibited method: ${propName}`);
         }
         const prohibitedMethods = ['toLocaleString', 'valueOf'];
         if (typeof propName === 'string' && prohibitedMethods.includes(propName)) {
@@ -233,6 +281,10 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
       if (typeof prop === 'string' || typeof prop === 'number') {
         if (typeof prop === 'string' && ['constructor', '__proto__', 'prototype'].includes(prop)) {
           throw new Error('Access to prohibited property');
+        }
+        // Block prototype pollution methods
+        if (typeof prop === 'string' && ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(prop)) {
+          throw new Error(`Access to prohibited method: ${prop}`);
         }
         return obj[prop];
       } else {
