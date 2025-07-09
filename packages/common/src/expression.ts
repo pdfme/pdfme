@@ -46,7 +46,7 @@ const safeAssign = (
     throw new TypeError('Cannot convert undefined or null to object');
   }
   
-  const to = Object(target) as Record<string, unknown>;
+  const to = { ...target };
   
   for (const source of sources) {
     if (source != null) {
