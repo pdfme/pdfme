@@ -1,6 +1,6 @@
 import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
-import { px2mm } from '@pdfme/common';
+import { px2mm, ZOOM } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
@@ -203,7 +203,7 @@ const resetEditingPosition = () => {
 };
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
-  const { rootElement, onChange, schema, value, mode } = arg;
+  const { rootElement, onChange, schema, value, mode, scale} = arg;
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(bodyWidthRange, arg);
@@ -383,22 +383,23 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         dragHandle.removeEventListener('mouseover', setColor);
         dragHandle.removeEventListener('mouseout', resetColor);
 
+        const startClientX = e.clientX;
+        const startLeft = Number(handle.style.left.replace('mm', ''));
+
         let move = 0;
         const mouseMove = (e: MouseEvent) => {
-          // TODO There is an issue where newLeft gets displaced with drag & drop
-          let moveX = e.movementX;
-          const currentLeft = Number(handle.style.left.replace('mm', ''));
-          let newLeft = currentLeft + moveX;
+          const deltaX = e.clientX - startClientX;
+          const moveX = deltaX / ZOOM / scale;
+          let newLeft = startLeft + moveX;
+
           if (newLeft < prevColumnLeft) {
             newLeft = prevColumnLeft;
-            moveX = newLeft - currentLeft;
           }
           if (newLeft >= nextColumnRight) {
             newLeft = nextColumnRight;
-            moveX = newLeft - currentLeft;
           }
           handle.style.left = `${newLeft}mm`;
-          move += moveX;
+          move = newLeft - startLeft;
         };
         rootElement.addEventListener('mousemove', mouseMove);
 
