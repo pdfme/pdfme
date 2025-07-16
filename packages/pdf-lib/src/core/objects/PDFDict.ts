@@ -1,15 +1,15 @@
-import PDFArray from './PDFArray';
-import PDFBool from './PDFBool';
-import PDFHexString from './PDFHexString';
-import PDFName from './PDFName';
-import PDFNull from './PDFNull';
-import PDFNumber from './PDFNumber';
-import PDFObject from './PDFObject';
-import PDFRef from './PDFRef';
-import PDFStream from './PDFStream';
-import PDFString from './PDFString';
-import PDFContext from '../PDFContext';
-import CharCodes from '../syntax/CharCodes';
+import PDFArray from './PDFArray.js';
+import PDFBool from './PDFBool.js';
+import PDFHexString from './PDFHexString.js';
+import PDFName from './PDFName.js';
+import PDFNull from './PDFNull.js';
+import PDFNumber from './PDFNumber.js';
+import PDFObject from './PDFObject.js';
+import PDFRef from './PDFRef.js';
+import PDFStream from './PDFStream.js';
+import PDFString from './PDFString.js';
+import PDFContext from '../PDFContext.js';
+import CharCodes from '../syntax/CharCodes.js';
 
 export type DictMap = Map<PDFName, PDFObject>;
 

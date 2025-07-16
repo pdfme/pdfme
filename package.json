@@ -32,7 +32,7 @@
   ],
   "scripts": {
     "postinstall": "./scripts/link-workspaces.sh",
-    "clean": "npm-run-all --parallel clean:*",
+    "clean": "npm run clean:common && npm run clean:pdf-lib && npm run clean:converter && npm run clean:schemas && npm run clean:generator && npm run clean:manipulator && npm run clean:ui",
     "clean:common": "npm run -w packages/common clean",
     "clean:pdf-lib": "npm run -w packages/pdf-lib clean",
     "clean:converter": "npm run -w packages/converter clean",
@@ -40,7 +40,7 @@
     "clean:generator": "npm run -w packages/generator clean",
     "clean:manipulator": "npm run -w packages/manipulator clean",
     "clean:ui": "npm run -w packages/ui clean",
-    "build": "npm run clean && npm run build:pdf-lib && npm run build:common && npm run build:converter && npm run build:schemas && npm-run-all --parallel build:generator build:ui build:manipulator",
+    "build": "npm run clean && npm run build:pdf-lib && npm run build:common && npm run build:converter && npm run build:schemas && npm run build:generator && npm run build:ui && npm run build:manipulator",
     "build:common": "npm run -w packages/common build",
     "build:pdf-lib": "npm run -w packages/pdf-lib build",
     "build:converter": "npm run -w packages/converter build",
@@ -54,25 +54,21 @@
     "prettier": "npm run prettier --workspaces"
   },
   "devDependencies": {
-    "@babel/core": "^7.27.7",
     "@humanwhocodes/config-array": "^0.13.0",
     "@types/jest": "^29.5.14",
     "@types/jest-image-snapshot": "^6.4.0",
     "@types/node": "^24.0.8",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.32.0",
-    "babel-loader": "^10.0.0",
     "eslint": "^9.30.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
     "jest": "^29.7.0",
     "jest-image-snapshot": "^6.5.1",
-    "npm-run-all": "^4.1.5",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
     "ts-jest": "^29.3.4",
     "ts-jest-resolver": "^2.0.1",
-    "ts-loader": "^9.2.5",
     "ts-prune": "^0.10.3",
     "typescript": "^5.8.3"
   }

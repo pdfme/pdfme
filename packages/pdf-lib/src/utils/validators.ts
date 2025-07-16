@@ -1,6 +1,6 @@
 /* tslint:disable:ban-types */
 
-import { values as objectValues } from './objects';
+import { values as objectValues } from './objects.js';
 
 export const backtick = (val: any) => `\`${val}\``;
 export const singleQuote = (val: any) => `'${val}'`;

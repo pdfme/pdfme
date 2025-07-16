@@ -6,7 +6,8 @@
     "moduleResolution": "node",
     "allowJs": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react"
   },
   "include": ["src/**/*", "__tests__/**/*"]
 }

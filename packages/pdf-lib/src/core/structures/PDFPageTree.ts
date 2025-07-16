@@ -1,11 +1,11 @@
-import PDFArray from '../objects/PDFArray';
-import PDFDict, { DictMap } from '../objects/PDFDict';
-import PDFName from '../objects/PDFName';
-import PDFNumber from '../objects/PDFNumber';
-import PDFRef from '../objects/PDFRef';
-import PDFContext from '../PDFContext';
-import PDFPageLeaf from './PDFPageLeaf';
-import { InvalidTargetIndexError, CorruptPageTreeError } from '../errors';
+import PDFArray from '../objects/PDFArray.js';
+import PDFDict, { DictMap } from '../objects/PDFDict.js';
+import PDFName from '../objects/PDFName.js';
+import PDFNumber from '../objects/PDFNumber.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFContext from '../PDFContext.js';
+import PDFPageLeaf from './PDFPageLeaf.js';
+import { InvalidTargetIndexError, CorruptPageTreeError } from '../errors.js';
 
 export type TreeNode = PDFPageTree | PDFPageLeaf;
 

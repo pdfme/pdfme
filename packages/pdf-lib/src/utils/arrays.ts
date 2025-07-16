@@ -1,5 +1,5 @@
-import { decodeFromBase64DataUri } from './base64';
-import { charFromCode } from './strings';
+import { decodeFromBase64DataUri } from './base64.js';
+import { charFromCode } from './strings.js';
 
 export const last = <T>(array: T[]): T => array[array.length - 1];
 

@@ -21,33 +21,22 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./utils": {
-      "import": {
-        "node": "./dist/node/src/utils.js",
-        "default": "./dist/esm/src/utils.js"
-      },
-      "require": "./dist/cjs/src/utils.js",
-      "types": "./dist/types/src/utils.d.ts"
+      "import": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
     }
   },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "dev": "tsc -w",
+    "build": "tsc",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -74,7 +63,14 @@
     "@pdfme/common": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts"],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts"
+    },
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -83,13 +79,15 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "publishConfig": {
     "access": "public"

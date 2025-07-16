@@ -1,6 +1,15 @@
 {
-  "extends": "./tsconfig.esm",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "rootDir": "./src",
     "outDir": "./dist",
-  }
+    "declaration": true,
+    "declarationDir": "./dist",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"]
 }

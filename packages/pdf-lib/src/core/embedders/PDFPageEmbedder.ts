@@ -1,16 +1,16 @@
-import { MissingPageContentsEmbeddingError, UnrecognizedStreamTypeError } from '../errors';
-import PDFArray from '../objects/PDFArray';
-import PDFNumber from '../objects/PDFNumber';
-import PDFRawStream from '../objects/PDFRawStream';
-import PDFRef from '../objects/PDFRef';
-import PDFStream from '../objects/PDFStream';
-import PDFContext from '../PDFContext';
-import { decodePDFRawStream } from '../streams/decode';
-import PDFContentStream from '../structures/PDFContentStream';
-import PDFPageLeaf from '../structures/PDFPageLeaf';
-import CharCodes from '../syntax/CharCodes';
-import { TransformationMatrix } from '../../types/matrix';
-import { mergeIntoTypedArray } from '../../utils';
+import { MissingPageContentsEmbeddingError, UnrecognizedStreamTypeError } from '../errors.js';
+import PDFArray from '../objects/PDFArray.js';
+import PDFNumber from '../objects/PDFNumber.js';
+import PDFRawStream from '../objects/PDFRawStream.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFStream from '../objects/PDFStream.js';
+import PDFContext from '../PDFContext.js';
+import { decodePDFRawStream } from '../streams/decode.js';
+import PDFContentStream from '../structures/PDFContentStream.js';
+import PDFPageLeaf from '../structures/PDFPageLeaf.js';
+import CharCodes from '../syntax/CharCodes.js';
+import { TransformationMatrix } from '../../types/matrix.js';
+import { mergeIntoTypedArray } from '../../utils/index.js';
 
 /**
  * Represents a page bounding box.

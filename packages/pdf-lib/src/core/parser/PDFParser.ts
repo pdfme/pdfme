@@ -1,29 +1,29 @@
-import PDFCrossRefSection from '../document/PDFCrossRefSection';
-import PDFHeader from '../document/PDFHeader';
-import PDFTrailer from '../document/PDFTrailer';
+import PDFCrossRefSection from '../document/PDFCrossRefSection.js';
+import PDFHeader from '../document/PDFHeader.js';
+import PDFTrailer from '../document/PDFTrailer.js';
 import {
   MissingKeywordError,
   MissingPDFHeaderError,
   PDFInvalidObjectParsingError,
   ReparseError,
   StalledParserError,
-} from '../errors';
-import PDFDict from '../objects/PDFDict';
-import PDFInvalidObject from '../objects/PDFInvalidObject';
-import PDFName from '../objects/PDFName';
-import PDFObject from '../objects/PDFObject';
-import PDFRawStream from '../objects/PDFRawStream';
-import PDFRef from '../objects/PDFRef';
-import ByteStream from './ByteStream';
-import PDFObjectParser from './PDFObjectParser';
-import PDFObjectStreamParser from './PDFObjectStreamParser';
-import PDFXRefStreamParser from './PDFXRefStreamParser';
-import PDFContext from '../PDFContext';
-import CharCodes from '../syntax/CharCodes';
-import { Keywords } from '../syntax/Keywords';
-import { IsDigit } from '../syntax/Numeric';
-import { waitForTick } from '../../utils';
-import { CipherTransformFactory } from '../crypto';
+} from '../errors.js';
+import PDFDict from '../objects/PDFDict.js';
+import PDFInvalidObject from '../objects/PDFInvalidObject.js';
+import PDFName from '../objects/PDFName.js';
+import PDFObject from '../objects/PDFObject.js';
+import PDFRawStream from '../objects/PDFRawStream.js';
+import PDFRef from '../objects/PDFRef.js';
+import ByteStream from './ByteStream.js';
+import PDFObjectParser from './PDFObjectParser.js';
+import PDFObjectStreamParser from './PDFObjectStreamParser.js';
+import PDFXRefStreamParser from './PDFXRefStreamParser.js';
+import PDFContext from '../PDFContext.js';
+import CharCodes from '../syntax/CharCodes.js';
+import { Keywords } from '../syntax/Keywords.js';
+import { IsDigit } from '../syntax/Numeric.js';
+import { waitForTick } from '../../utils/index.js';
+import { CipherTransformFactory } from '../crypto.js';
 
 class PDFParser extends PDFObjectParser {
   static forBytesWithOptions = (

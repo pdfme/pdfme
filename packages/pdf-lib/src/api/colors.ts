@@ -5,8 +5,8 @@ import {
   setStrokingCmykColor,
   setStrokingGrayscaleColor,
   setStrokingRgbColor,
-} from './operators';
-import { assertRange, assertIs, error } from '../utils';
+} from './operators.js';
+import { assertRange, assertIs, error } from '../utils/index.js';
 import ColorParser from 'color';
 
 export enum ColorTypes {

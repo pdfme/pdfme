@@ -7,6 +7,7 @@
     "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
+    "rootDir": "./src",
     "module": "ESNext",
     "lib": [
       "ES2020",
@@ -37,9 +38,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "__tests__/**/*.ts",
-    "__tests__/**/*.tsx"
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",

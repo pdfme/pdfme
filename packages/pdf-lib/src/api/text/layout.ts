@@ -1,9 +1,9 @@
-import PDFFont from '../PDFFont';
-import { CombedTextLayoutError } from '../errors';
-import { TextAlignment } from './alignment';
+import PDFFont from '../PDFFont.js';
+import { CombedTextLayoutError } from '../errors.js';
+import { TextAlignment } from './alignment.js';
 
-import { PDFHexString } from '../../core';
-import { cleanText, lineSplit, mergeLines, charAtIndex, charSplit } from '../../utils';
+import { PDFHexString } from '../../core/index.js';
+import { cleanText, lineSplit, mergeLines, charAtIndex, charSplit } from '../../utils/index.js';
 
 export interface TextPosition {
   text: string;

@@ -21,25 +21,18 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "dev": "tsc -w",
+    "build": "tsc",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -61,12 +54,19 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts"],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
     ],
     "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
     "transformIgnorePatterns": [
@@ -80,14 +80,16 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ],
       "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
     },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "publishConfig": {
     "access": "public"

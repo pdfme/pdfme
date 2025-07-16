@@ -1,18 +1,18 @@
-import PDFDocument from '../PDFDocument';
-import PDFPage from '../PDFPage';
-import PDFFont from '../PDFFont';
-import PDFImage from '../PDFImage';
-import PDFField, { FieldAppearanceOptions, assertFieldAppearanceOptions } from './PDFField';
+import PDFDocument from '../PDFDocument.js';
+import PDFPage from '../PDFPage.js';
+import PDFFont from '../PDFFont.js';
+import PDFImage from '../PDFImage.js';
+import PDFField, { FieldAppearanceOptions, assertFieldAppearanceOptions } from './PDFField.js';
 import {
   AppearanceProviderFor,
   normalizeAppearance,
   defaultTextFieldAppearanceProvider,
-} from './appearances';
-import { rgb } from '../colors';
-import { degrees } from '../rotations';
-import { RichTextFieldReadError, ExceededMaxLengthError, InvalidMaxLengthError } from '../errors';
-import { ImageAlignment } from '../image/alignment';
-import { TextAlignment } from '../text/alignment';
+} from './appearances.js';
+import { rgb } from '../colors.js';
+import { degrees } from '../rotations.js';
+import { RichTextFieldReadError, ExceededMaxLengthError, InvalidMaxLengthError } from '../errors.js';
+import { ImageAlignment } from '../image/alignment.js';
+import { TextAlignment } from '../text/alignment.js';
 
 import {
   PDFHexString,
@@ -21,14 +21,14 @@ import {
   PDFAcroText,
   AcroTextFlags,
   PDFWidgetAnnotation,
-} from '../../core';
+} from '../../core/index.js';
 import {
   assertIs,
   assertIsOneOf,
   assertOrUndefined,
   assertPositive,
   assertRangeOrUndefined,
-} from '../../utils';
+} from '../../utils/index.js';
 
 /**
  * Represents a text field of a [[PDFForm]].

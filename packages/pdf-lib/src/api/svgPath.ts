@@ -3,8 +3,8 @@
 // MIT LICENSE
 // Updated for pdf-lib & TypeScript by Jeremy Messenger
 
-import { appendBezierCurve, appendQuadraticCurve, closePath, lineTo, moveTo } from './operators';
-import { PDFOperator } from '../core';
+import { appendBezierCurve, appendQuadraticCurve, closePath, lineTo, moveTo } from './operators.js';
+import { PDFOperator } from '../core/index.js';
 
 let cx: number = 0;
 let cy: number = 0;

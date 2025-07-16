@@ -1,4 +1,4 @@
-import { toHexString } from './strings';
+import { toHexString } from './strings.js';
 
 /**
  * Encodes a string to UTF-8.

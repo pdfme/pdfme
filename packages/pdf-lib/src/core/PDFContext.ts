@@ -1,24 +1,24 @@
 import pako from 'pako';
 
-import PDFHeader from './document/PDFHeader';
-import { UnexpectedObjectTypeError } from './errors';
-import PDFArray from './objects/PDFArray';
-import PDFBool from './objects/PDFBool';
-import PDFDict from './objects/PDFDict';
-import PDFHexString from './objects/PDFHexString';
-import PDFName from './objects/PDFName';
-import PDFNull from './objects/PDFNull';
-import PDFNumber from './objects/PDFNumber';
-import PDFObject from './objects/PDFObject';
-import PDFRawStream from './objects/PDFRawStream';
-import PDFRef from './objects/PDFRef';
-import PDFStream from './objects/PDFStream';
-import PDFString from './objects/PDFString';
-import PDFOperator from './operators/PDFOperator';
-import Ops from './operators/PDFOperatorNames';
-import PDFContentStream from './structures/PDFContentStream';
-import { typedArrayFor } from '../utils';
-import { SimpleRNG } from '../utils/rng';
+import PDFHeader from './document/PDFHeader.js';
+import { UnexpectedObjectTypeError } from './errors.js';
+import PDFArray from './objects/PDFArray.js';
+import PDFBool from './objects/PDFBool.js';
+import PDFDict from './objects/PDFDict.js';
+import PDFHexString from './objects/PDFHexString.js';
+import PDFName from './objects/PDFName.js';
+import PDFNull from './objects/PDFNull.js';
+import PDFNumber from './objects/PDFNumber.js';
+import PDFObject from './objects/PDFObject.js';
+import PDFRawStream from './objects/PDFRawStream.js';
+import PDFRef from './objects/PDFRef.js';
+import PDFStream from './objects/PDFStream.js';
+import PDFString from './objects/PDFString.js';
+import PDFOperator from './operators/PDFOperator.js';
+import Ops from './operators/PDFOperatorNames.js';
+import PDFContentStream from './structures/PDFContentStream.js';
+import { typedArrayFor } from '../utils/index.js';
+import { SimpleRNG } from '../utils/rng.js';
 
 type LookupKey = PDFRef | PDFObject | undefined;
 

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { arrayAsString, isArrayEqual } from '../utils/arrays';
-import { stringAsByteArray } from '../utils/strings';
+import { arrayAsString, isArrayEqual } from '../utils/arrays.js';
+import { stringAsByteArray } from '../utils/strings.js';
 import PDFBool from './objects/PDFBool.js';
 import PDFDict from './objects/PDFDict.js';
 import PDFName from './objects/PDFName.js';

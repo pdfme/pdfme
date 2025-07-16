@@ -1,18 +1,13 @@
 {
-  "extends": "./tsconfig.esm",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@pdfme/common": [
-        "packages/common/dist/esm/src"
-      ],
-      "@pdfme/schemas": [
-        "packages/schemas/dist/esm/src"
-      ],
-      "@pdfme/schemas/utils": [
-        "packages/schemas/dist/esm/src/utils"
-      ]
-    }
+    "declaration": true,
+    "declarationDir": "./dist",
+    "skipLibCheck": true
   },
+  "include": ["src/**/*"]
 }

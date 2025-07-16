@@ -58,7 +58,12 @@
     "vite": "^4.4.5"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts"],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -67,6 +72,7 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
+          "useESM": true,
           "tsconfig": "tsconfig.json"
         }
       ]
@@ -76,6 +82,9 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@pdfme)/)"
     ]
   }
 }

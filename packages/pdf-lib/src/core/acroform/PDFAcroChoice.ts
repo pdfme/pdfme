@@ -1,10 +1,10 @@
-import PDFAcroTerminal from './PDFAcroTerminal';
-import PDFHexString from '../objects/PDFHexString';
-import PDFString from '../objects/PDFString';
-import PDFArray from '../objects/PDFArray';
-import PDFName from '../objects/PDFName';
-import { AcroChoiceFlags } from './flags';
-import { InvalidAcroFieldValueError, MultiSelectValueError } from '../errors';
+import PDFAcroTerminal from './PDFAcroTerminal.js';
+import PDFHexString from '../objects/PDFHexString.js';
+import PDFString from '../objects/PDFString.js';
+import PDFArray from '../objects/PDFArray.js';
+import PDFName from '../objects/PDFName.js';
+import { AcroChoiceFlags } from './flags.js';
+import { InvalidAcroFieldValueError, MultiSelectValueError } from '../errors.js';
 
 class PDFAcroChoice extends PDFAcroTerminal {
   setValues(values: (PDFString | PDFHexString)[]) {

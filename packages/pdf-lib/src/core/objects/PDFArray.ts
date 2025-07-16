@@ -1,17 +1,17 @@
-import PDFBool from './PDFBool';
-import PDFDict from './PDFDict';
-import PDFHexString from './PDFHexString';
-import PDFName from './PDFName';
-import PDFNull from './PDFNull';
-import PDFNumber from './PDFNumber';
-import PDFObject from './PDFObject';
-import PDFRef from './PDFRef';
-import PDFStream from './PDFStream';
-import PDFString from './PDFString';
-import PDFContext from '../PDFContext';
-import CharCodes from '../syntax/CharCodes';
-import { PDFArrayIsNotRectangleError } from '../errors';
-import PDFRawStream from './PDFRawStream';
+import PDFBool from './PDFBool.js';
+import PDFDict from './PDFDict.js';
+import PDFHexString from './PDFHexString.js';
+import PDFName from './PDFName.js';
+import PDFNull from './PDFNull.js';
+import PDFNumber from './PDFNumber.js';
+import PDFObject from './PDFObject.js';
+import PDFRef from './PDFRef.js';
+import PDFStream from './PDFStream.js';
+import PDFString from './PDFString.js';
+import PDFContext from '../PDFContext.js';
+import CharCodes from '../syntax/CharCodes.js';
+import { PDFArrayIsNotRectangleError } from '../errors.js';
+import PDFRawStream from './PDFRawStream.js';
 
 class PDFArray extends PDFObject {
   static withContext = (context: PDFContext) => new PDFArray(context);

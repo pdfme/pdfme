@@ -1,4 +1,6 @@
 import UPNG from '@pdf-lib/upng';
+// @ts-ignore - UPNG has a double default export issue
+const UPNGLib = (UPNG as any).default || UPNG;
 
 const getImageType = (ctype: number) => {
   if (ctype === 0) return PngType.Greyscale;
@@ -48,8 +50,8 @@ export class PNG {
   readonly bitsPerComponent: number;
 
   private constructor(pngData: Uint8Array) {
-    const upng = UPNG.decode(pngData.buffer as ArrayBuffer);
-    const frames = UPNG.toRGBA8(upng);
+    const upng = UPNGLib.decode(pngData.buffer as ArrayBuffer);
+    const frames = UPNGLib.toRGBA8(upng);
 
     if (frames.length > 1) throw new Error(`Animated PNGs are not supported`);
 
