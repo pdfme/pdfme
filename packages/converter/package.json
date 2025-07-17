@@ -21,22 +21,20 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.node.d.ts",
+  "type": "module",
+  "module": "dist/index.browser.js",
+  "types": "dist/index.node.d.ts",
   "exports": {
     ".": {
-      "browser": "./dist/esm/src/index.browser.js",
-      "node": "./dist/cjs/src/index.node.js",
-      "default": "./dist/esm/src/index.browser.js",
-      "types": "./dist/types/src/index.node.d.ts"
+      "browser": "./dist/index.browser.js",
+      "node": "./dist/index.node.js",
+      "default": "./dist/index.browser.js",
+      "types": "./dist/index.node.d.ts"
     }
   },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "dev": "tsc -w",
+    "build": "tsc",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -57,7 +55,16 @@
     "canvas": "^2.11.0"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts"],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/generator$": "<rootDir>/../generator/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts"
+    },
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -66,13 +73,15 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "publishConfig": {
     "access": "public"

@@ -1,8 +1,8 @@
-import PDFDict from '../objects/PDFDict';
-import PDFRef from '../objects/PDFRef';
-import PDFName from '../objects/PDFName';
-import PDFContext from '../PDFContext';
-import PDFAcroField from './PDFAcroField';
+import PDFDict from '../objects/PDFDict.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFName from '../objects/PDFName.js';
+import PDFContext from '../PDFContext.js';
+import PDFAcroField from './PDFAcroField.js';
 
 class PDFAcroNonTerminal extends PDFAcroField {
   static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroNonTerminal(dict, ref);

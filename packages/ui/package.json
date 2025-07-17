@@ -21,12 +21,18 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/index.umd.js",
-  "module": "dist/index.es.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "scripts": {
-    "dev": "npm-run-all --parallel devBuild:watch devBuildType:watch",
-    "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.es.js --format=esm --watch",
+    "dev": "npm run devBuild:watch & npm run devBuildType:watch",
+    "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
     "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
     "build": "vite build && tsc --emitDeclarationOnly",
     "clean": "rimraf dist",
@@ -80,7 +86,9 @@
     "@pdfme/schemas": "latest"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "testEnvironment": "jest-environment-jsdom",
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "setupFiles": [
       "jest-canvas-mock"
     ],
@@ -88,7 +96,11 @@
       "./__tests__/test-helpers.js"
     ],
     "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
       "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/schemas$": "<rootDir>/../schemas/src/index.ts",
       "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
       "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
       "^antd/es/": "antd/lib/",
@@ -107,7 +119,8 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },

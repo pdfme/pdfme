@@ -1,4 +1,4 @@
-import { Size } from '../../types';
+import { Size } from '../../types/index.js';
 import {
   angle,
   distance,
@@ -8,11 +8,11 @@ import {
   times,
   unitVector,
   vector,
-} from '../maths';
+} from '../maths.js';
 
-import GraphElement from './GraphElement';
-import Point from './Point';
-import Segment from './Segment';
+import GraphElement from './GraphElement.js';
+import Point from './Point.js';
+import Segment from './Segment.js';
 
 export default class Ellipse extends GraphElement {
   A: Point;

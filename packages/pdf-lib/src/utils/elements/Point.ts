@@ -1,7 +1,7 @@
-import type { Coordinates } from '../../types';
+import type { Coordinates } from '../../types/index.js';
 
-import { isEqual, plus } from '../maths';
-import GraphElement from './GraphElement';
+import { isEqual, plus } from '../maths.js';
+import GraphElement from './GraphElement.js';
 
 export default class Point extends GraphElement {
   static type = 'PointFixed';

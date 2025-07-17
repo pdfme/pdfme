@@ -21,21 +21,18 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "npm-run-all --parallel build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "dev": "tsc -w",
+    "build": "tsc",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -69,13 +66,25 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "./tsconfig.json",
+          "tsconfig": "tsconfig.esm.json",
           "useESM": true
         }
       ]
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@pdfme/)"
+    ],
     "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
+      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts",
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@pdfme/common$": "<rootDir>/../common/src/index.ts",
+      "^@pdfme/pdf-lib$": "<rootDir>/../pdf-lib/src/index.ts",
+      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
+      "^@pdfme/converter/(.*)$": "<rootDir>/../converter/src/$1",
+      "^@pdfme/pdf-lib/(.*)\\.js$": "<rootDir>/../pdf-lib/src/$1.ts",
+      "(.*)/pdf2img\\.js$": "$1/pdf2img.ts",
+      "(.*)/pdf2size\\.js$": "$1/pdf2size.ts",
+      "(.*)/img2pdf\\.js$": "$1/img2pdf.ts"
     }
   }
 }

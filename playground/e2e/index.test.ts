@@ -1,3 +1,4 @@
+import { jest, describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';

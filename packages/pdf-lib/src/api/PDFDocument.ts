@@ -1,17 +1,17 @@
-import Embeddable from './Embeddable';
+import Embeddable from './Embeddable.js';
 import {
   EncryptedPDFError,
   FontkitNotRegisteredError,
   ForeignPageError,
   RemovePageFromEmptyDocumentError,
-} from './errors';
-import PDFEmbeddedPage from './PDFEmbeddedPage';
-import PDFFont from './PDFFont';
-import PDFImage from './PDFImage';
-import PDFPage from './PDFPage';
-import PDFForm from './form/PDFForm';
-import { PageSizes } from './sizes';
-import { StandardFonts } from './StandardFonts';
+} from './errors.js';
+import PDFEmbeddedPage from './PDFEmbeddedPage.js';
+import PDFFont from './PDFFont.js';
+import PDFImage from './PDFImage.js';
+import PDFPage from './PDFPage.js';
+import PDFForm from './form/PDFForm.js';
+import { PageSizes } from './sizes.js';
+import { StandardFonts } from './StandardFonts.js';
 import {
   CustomFontEmbedder,
   CustomFontSubsetEmbedder,
@@ -35,7 +35,7 @@ import {
   PngEmbedder,
   StandardFontEmbedder,
   UnexpectedObjectTypeError,
-} from '../core';
+} from '../core/index.js';
 import {
   ParseSpeeds,
   AttachmentOptions,
@@ -45,11 +45,11 @@ import {
   CreateOptions,
   EmbedFontOptions,
   SetTitleOptions,
-} from './PDFDocumentOptions';
-import PDFObject from '../core/objects/PDFObject';
-import PDFRef from '../core/objects/PDFRef';
-import { Fontkit } from '../types/fontkit';
-import { TransformationMatrix } from '../types/matrix';
+} from './PDFDocumentOptions.js';
+import PDFObject from '../core/objects/PDFObject.js';
+import PDFRef from '../core/objects/PDFRef.js';
+import { Fontkit } from '../types/fontkit.js';
+import { TransformationMatrix } from '../types/matrix.js';
 import {
   assertIs,
   assertIsOneOfOrUndefined,
@@ -62,12 +62,12 @@ import {
   pluckIndices,
   range,
   toUint8Array,
-} from '../utils';
-import FileEmbedder, { AFRelationship } from '../core/embedders/FileEmbedder';
-import PDFEmbeddedFile from './PDFEmbeddedFile';
-import PDFJavaScript from './PDFJavaScript';
-import JavaScriptEmbedder from '../core/embedders/JavaScriptEmbedder';
-import { CipherTransformFactory } from '../core/crypto';
+} from '../utils/index.js';
+import FileEmbedder, { AFRelationship } from '../core/embedders/FileEmbedder.js';
+import PDFEmbeddedFile from './PDFEmbeddedFile.js';
+import PDFJavaScript from './PDFJavaScript.js';
+import JavaScriptEmbedder from '../core/embedders/JavaScriptEmbedder.js';
+import { CipherTransformFactory } from '../core/crypto.js';
 
 /**
  * Represents a PDF document.

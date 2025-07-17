@@ -10,8 +10,8 @@ export default defineConfig(({ mode }) => {
     build: {
       lib: {
         entry: 'src/index.ts',
-        name: '@pdfme/ui',
-        fileName: (format) => `index.${format}.js`,
+        formats: ['es'],
+        fileName: () => 'index.js',
       },
     },
     optimizeDeps: {

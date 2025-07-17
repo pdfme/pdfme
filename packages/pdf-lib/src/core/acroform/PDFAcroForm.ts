@@ -1,11 +1,11 @@
-import PDFContext from '../PDFContext';
-import PDFDict from '../objects/PDFDict';
-import PDFArray from '../objects/PDFArray';
-import PDFName from '../objects/PDFName';
-import PDFRef from '../objects/PDFRef';
-import PDFAcroField from './PDFAcroField';
-import PDFAcroNonTerminal from './PDFAcroNonTerminal';
-import { createPDFAcroField, createPDFAcroFields } from './utils';
+import PDFContext from '../PDFContext.js';
+import PDFDict from '../objects/PDFDict.js';
+import PDFArray from '../objects/PDFArray.js';
+import PDFName from '../objects/PDFName.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFAcroField from './PDFAcroField.js';
+import PDFAcroNonTerminal from './PDFAcroNonTerminal.js';
+import { createPDFAcroField, createPDFAcroFields } from './utils.js';
 
 class PDFAcroForm {
   readonly dict: PDFDict;

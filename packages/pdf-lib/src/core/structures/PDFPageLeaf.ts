@@ -1,12 +1,12 @@
-import PDFArray from '../objects/PDFArray';
-import PDFDict, { DictMap } from '../objects/PDFDict';
-import PDFName from '../objects/PDFName';
-import PDFNumber from '../objects/PDFNumber';
-import PDFObject from '../objects/PDFObject';
-import PDFRef from '../objects/PDFRef';
-import PDFStream from '../objects/PDFStream';
-import PDFContext from '../PDFContext';
-import PDFPageTree from './PDFPageTree';
+import PDFArray from '../objects/PDFArray.js';
+import PDFDict, { DictMap } from '../objects/PDFDict.js';
+import PDFName from '../objects/PDFName.js';
+import PDFNumber from '../objects/PDFNumber.js';
+import PDFObject from '../objects/PDFObject.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFStream from '../objects/PDFStream.js';
+import PDFContext from '../PDFContext.js';
+import PDFPageTree from './PDFPageTree.js';
 
 class PDFPageLeaf extends PDFDict {
   static readonly InheritableEntries = ['Resources', 'MediaBox', 'CropBox', 'Rotate'];

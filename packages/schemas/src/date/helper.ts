@@ -2,39 +2,72 @@ import type * as CSS from 'csstype';
 
 import AirDatepicker from 'air-datepicker';
 import type { AirDatepickerLocale, AirDatepickerButton, AirDatepickerDate } from 'air-datepicker';
-import localeAr from 'air-datepicker/locale/ar';
-import localeBg from 'air-datepicker/locale/bg';
-import localeCa from 'air-datepicker/locale/ca';
-import localeCs from 'air-datepicker/locale/cs';
-import localeDa from 'air-datepicker/locale/da';
-import localeDe from 'air-datepicker/locale/de';
-import localeEl from 'air-datepicker/locale/el';
-import localeEn from 'air-datepicker/locale/en';
-import localeEs from 'air-datepicker/locale/es';
-import localeEu from 'air-datepicker/locale/eu';
-import localeFi from 'air-datepicker/locale/fi';
-import localeFr from 'air-datepicker/locale/fr';
-import localeHr from 'air-datepicker/locale/hr';
-import localeHu from 'air-datepicker/locale/hu';
-import localeId from 'air-datepicker/locale/id';
-import localeIt from 'air-datepicker/locale/it';
-import localeJa from 'air-datepicker/locale/ja';
-import localeKo from 'air-datepicker/locale/ko';
-import localeNb from 'air-datepicker/locale/nb';
-import localeNl from 'air-datepicker/locale/nl';
-import localeTh from 'air-datepicker/locale/th';
-import localePl from 'air-datepicker/locale/pl';
-import localePtBR from 'air-datepicker/locale/pt-BR';
-import localePt from 'air-datepicker/locale/pt';
-import localeRo from 'air-datepicker/locale/ro';
-import localeRu from 'air-datepicker/locale/ru';
-import localeSi from 'air-datepicker/locale/si';
-import localeSk from 'air-datepicker/locale/sk';
-import localeSl from 'air-datepicker/locale/sl';
-import localeSv from 'air-datepicker/locale/sv';
-import localeTr from 'air-datepicker/locale/tr';
-import localeUk from 'air-datepicker/locale/uk';
-import localeZh from 'air-datepicker/locale/zh';
+// @ts-expect-error - ESM compatibility
+import localeAr from 'air-datepicker/locale/ar.js';
+// @ts-expect-error - ESM compatibility
+import localeBg from 'air-datepicker/locale/bg.js';
+// @ts-expect-error - ESM compatibility
+import localeCa from 'air-datepicker/locale/ca.js';
+// @ts-expect-error - ESM compatibility
+import localeCs from 'air-datepicker/locale/cs.js';
+// @ts-expect-error - ESM compatibility
+import localeDa from 'air-datepicker/locale/da.js';
+// @ts-expect-error - ESM compatibility
+import localeDe from 'air-datepicker/locale/de.js';
+// @ts-expect-error - ESM compatibility
+import localeEl from 'air-datepicker/locale/el.js';
+// @ts-expect-error - ESM compatibility
+import localeEn from 'air-datepicker/locale/en.js';
+// @ts-expect-error - ESM compatibility
+import localeEs from 'air-datepicker/locale/es.js';
+// @ts-expect-error - ESM compatibility
+import localeEu from 'air-datepicker/locale/eu.js';
+// @ts-expect-error - ESM compatibility
+import localeFi from 'air-datepicker/locale/fi.js';
+// @ts-expect-error - ESM compatibility
+import localeFr from 'air-datepicker/locale/fr.js';
+// @ts-expect-error - ESM compatibility
+import localeHr from 'air-datepicker/locale/hr.js';
+// @ts-expect-error - ESM compatibility
+import localeHu from 'air-datepicker/locale/hu.js';
+// @ts-expect-error - ESM compatibility
+import localeId from 'air-datepicker/locale/id.js';
+// @ts-expect-error - ESM compatibility
+import localeIt from 'air-datepicker/locale/it.js';
+// @ts-expect-error - ESM compatibility
+import localeJa from 'air-datepicker/locale/ja.js';
+// @ts-expect-error - ESM compatibility
+import localeKo from 'air-datepicker/locale/ko.js';
+// @ts-expect-error - ESM compatibility
+import localeNb from 'air-datepicker/locale/nb.js';
+// @ts-expect-error - ESM compatibility
+import localeNl from 'air-datepicker/locale/nl.js';
+// @ts-expect-error - ESM compatibility
+import localeTh from 'air-datepicker/locale/th.js';
+// @ts-expect-error - ESM compatibility
+import localePl from 'air-datepicker/locale/pl.js';
+// @ts-expect-error - ESM compatibility
+import localePtBR from 'air-datepicker/locale/pt-BR.js';
+// @ts-expect-error - ESM compatibility
+import localePt from 'air-datepicker/locale/pt.js';
+// @ts-expect-error - ESM compatibility
+import localeRo from 'air-datepicker/locale/ro.js';
+// @ts-expect-error - ESM compatibility
+import localeRu from 'air-datepicker/locale/ru.js';
+// @ts-expect-error - ESM compatibility
+import localeSi from 'air-datepicker/locale/si.js';
+// @ts-expect-error - ESM compatibility
+import localeSk from 'air-datepicker/locale/sk.js';
+// @ts-expect-error - ESM compatibility
+import localeSl from 'air-datepicker/locale/sl.js';
+// @ts-expect-error - ESM compatibility
+import localeSv from 'air-datepicker/locale/sv.js';
+// @ts-expect-error - ESM compatibility
+import localeTr from 'air-datepicker/locale/tr.js';
+// @ts-expect-error - ESM compatibility
+import localeUk from 'air-datepicker/locale/uk.js';
+// @ts-expect-error - ESM compatibility
+import localeZh from 'air-datepicker/locale/zh.js';
 
 import * as dateFns from 'date-fns/locale';
 import { format } from 'date-fns';
@@ -71,39 +104,39 @@ interface Locale {
 }
 
 const LOCALE_MAP: Record<string, Locale> = {
-  ar: { label: 'Arabic', adLocale: localeAr, formatLocale: dateFns.ar },
-  bg: { label: 'Bulgarian', adLocale: localeBg, formatLocale: dateFns.bg },
-  ca: { label: 'Catalan', adLocale: localeCa, formatLocale: dateFns.ca },
-  cs: { label: 'Czech', adLocale: localeCs, formatLocale: dateFns.cs },
-  da: { label: 'Danish', adLocale: localeDa, formatLocale: dateFns.da },
-  de: { label: 'German', adLocale: localeDe, formatLocale: dateFns.de },
-  el: { label: 'Greek', adLocale: localeEl, formatLocale: dateFns.el },
-  en: { label: 'English', adLocale: localeEn, formatLocale: dateFns.enUS },
-  es: { label: 'Spanish', adLocale: localeEs, formatLocale: dateFns.es },
-  eu: { label: 'Basque', adLocale: localeEu, formatLocale: dateFns.eu },
-  fi: { label: 'Finnish', adLocale: localeFi, formatLocale: dateFns.fi },
-  fr: { label: 'French', adLocale: localeFr, formatLocale: dateFns.fr },
-  hr: { label: 'Croatian', adLocale: localeHr, formatLocale: dateFns.hr },
-  hu: { label: 'Hungarian', adLocale: localeHu, formatLocale: dateFns.hu },
-  id: { label: 'Indonesian', adLocale: localeId, formatLocale: dateFns.id },
-  it: { label: 'Italian', adLocale: localeIt, formatLocale: dateFns.it },
-  ja: { label: 'Japanese', adLocale: localeJa, formatLocale: dateFns.ja },
-  ko: { label: 'Korean', adLocale: localeKo, formatLocale: dateFns.ko },
-  nb: { label: 'Norwegian Bokmål', adLocale: localeNb, formatLocale: dateFns.nb },
-  nl: { label: 'Dutch', adLocale: localeNl, formatLocale: dateFns.nl },
-  pl: { label: 'Polish', adLocale: localePl, formatLocale: dateFns.pl },
-  'pt-Br': { label: 'Portuguese', adLocale: localePtBR, formatLocale: dateFns.ptBR },
-  pt: { label: 'Portuguese', adLocale: localePt, formatLocale: dateFns.pt },
-  ro: { label: 'Romanian', adLocale: localeRo, formatLocale: dateFns.ro },
-  ru: { label: 'Russian', adLocale: localeRu, formatLocale: dateFns.ru },
-  si: { label: 'Sinhala', adLocale: localeSi, formatLocale: dateFns.enUS },
-  sk: { label: 'Slovak', adLocale: localeSk, formatLocale: dateFns.sk },
-  sl: { label: 'Slovenian', adLocale: localeSl, formatLocale: dateFns.sl },
-  sv: { label: 'Swedish', adLocale: localeSv, formatLocale: dateFns.sv },
-  th: { label: 'Thai', adLocale: localeTh, formatLocale: dateFns.th },
-  tr: { label: 'Turkish', adLocale: localeTr, formatLocale: dateFns.tr },
-  uk: { label: 'Ukrainian', adLocale: localeUk, formatLocale: dateFns.uk },
-  zh: { label: 'Chinese', adLocale: localeZh, formatLocale: dateFns.zhCN },
+  ar: { label: 'Arabic', adLocale: localeAr as AirDatepickerLocale, formatLocale: dateFns.ar },
+  bg: { label: 'Bulgarian', adLocale: localeBg as AirDatepickerLocale, formatLocale: dateFns.bg },
+  ca: { label: 'Catalan', adLocale: localeCa as AirDatepickerLocale, formatLocale: dateFns.ca },
+  cs: { label: 'Czech', adLocale: localeCs as AirDatepickerLocale, formatLocale: dateFns.cs },
+  da: { label: 'Danish', adLocale: localeDa as AirDatepickerLocale, formatLocale: dateFns.da },
+  de: { label: 'German', adLocale: localeDe as AirDatepickerLocale, formatLocale: dateFns.de },
+  el: { label: 'Greek', adLocale: localeEl as AirDatepickerLocale, formatLocale: dateFns.el },
+  en: { label: 'English', adLocale: localeEn as AirDatepickerLocale, formatLocale: dateFns.enUS },
+  es: { label: 'Spanish', adLocale: localeEs as AirDatepickerLocale, formatLocale: dateFns.es },
+  eu: { label: 'Basque', adLocale: localeEu as AirDatepickerLocale, formatLocale: dateFns.eu },
+  fi: { label: 'Finnish', adLocale: localeFi as AirDatepickerLocale, formatLocale: dateFns.fi },
+  fr: { label: 'French', adLocale: localeFr as AirDatepickerLocale, formatLocale: dateFns.fr },
+  hr: { label: 'Croatian', adLocale: localeHr as AirDatepickerLocale, formatLocale: dateFns.hr },
+  hu: { label: 'Hungarian', adLocale: localeHu as AirDatepickerLocale, formatLocale: dateFns.hu },
+  id: { label: 'Indonesian', adLocale: localeId as AirDatepickerLocale, formatLocale: dateFns.id },
+  it: { label: 'Italian', adLocale: localeIt as AirDatepickerLocale, formatLocale: dateFns.it },
+  ja: { label: 'Japanese', adLocale: localeJa as AirDatepickerLocale, formatLocale: dateFns.ja },
+  ko: { label: 'Korean', adLocale: localeKo as AirDatepickerLocale, formatLocale: dateFns.ko },
+  nb: { label: 'Norwegian Bokmål', adLocale: localeNb as AirDatepickerLocale, formatLocale: dateFns.nb },
+  nl: { label: 'Dutch', adLocale: localeNl as AirDatepickerLocale, formatLocale: dateFns.nl },
+  pl: { label: 'Polish', adLocale: localePl as AirDatepickerLocale, formatLocale: dateFns.pl },
+  'pt-Br': { label: 'Portuguese', adLocale: localePtBR as AirDatepickerLocale, formatLocale: dateFns.ptBR },
+  pt: { label: 'Portuguese', adLocale: localePt as AirDatepickerLocale, formatLocale: dateFns.pt },
+  ro: { label: 'Romanian', adLocale: localeRo as AirDatepickerLocale, formatLocale: dateFns.ro },
+  ru: { label: 'Russian', adLocale: localeRu as AirDatepickerLocale, formatLocale: dateFns.ru },
+  si: { label: 'Sinhala', adLocale: localeSi as AirDatepickerLocale, formatLocale: dateFns.enUS },
+  sk: { label: 'Slovak', adLocale: localeSk as AirDatepickerLocale, formatLocale: dateFns.sk },
+  sl: { label: 'Slovenian', adLocale: localeSl as AirDatepickerLocale, formatLocale: dateFns.sl },
+  sv: { label: 'Swedish', adLocale: localeSv as AirDatepickerLocale, formatLocale: dateFns.sv },
+  th: { label: 'Thai', adLocale: localeTh as AirDatepickerLocale, formatLocale: dateFns.th },
+  tr: { label: 'Turkish', adLocale: localeTr as AirDatepickerLocale, formatLocale: dateFns.tr },
+  uk: { label: 'Ukrainian', adLocale: localeUk as AirDatepickerLocale, formatLocale: dateFns.uk },
+  zh: { label: 'Chinese', adLocale: localeZh as AirDatepickerLocale, formatLocale: dateFns.zhCN },
 };
 
 const getAirDatepickerLocale = (locale: string) => {

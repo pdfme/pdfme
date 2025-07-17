@@ -1,13 +1,13 @@
-import PDFDict from '../objects/PDFDict';
-import PDFString from '../objects/PDFString';
-import PDFHexString from '../objects/PDFHexString';
-import PDFName from '../objects/PDFName';
-import PDFObject from '../objects/PDFObject';
-import PDFNumber from '../objects/PDFNumber';
-import PDFArray from '../objects/PDFArray';
-import PDFRef from '../objects/PDFRef';
-import { findLastMatch } from '../../utils';
-import { MissingDAEntryError, MissingTfOperatorError } from '../errors';
+import PDFDict from '../objects/PDFDict.js';
+import PDFString from '../objects/PDFString.js';
+import PDFHexString from '../objects/PDFHexString.js';
+import PDFName from '../objects/PDFName.js';
+import PDFObject from '../objects/PDFObject.js';
+import PDFNumber from '../objects/PDFNumber.js';
+import PDFArray from '../objects/PDFArray.js';
+import PDFRef from '../objects/PDFRef.js';
+import { findLastMatch } from '../../utils/index.js';
+import { MissingDAEntryError, MissingTfOperatorError } from '../errors.js';
 
 // Examples:
 //   `/Helv 12 Tf` -> ['Helv', '12']

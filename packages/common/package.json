@@ -21,26 +21,19 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     }
   },
   "scripts": {
-    "dev": "node set-version.js && tsc -p tsconfig.esm.json -w",
+    "dev": "node set-version.js && tsc -w",
     "prebuild": "node set-version.js",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "build": "tsc",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "jest",
@@ -58,7 +51,12 @@
     "form-render": "^2.2.20"
   },
   "jest": {
+    "preset": "ts-jest/presets/default-esm",
     "resolver": "ts-jest-resolver",
+    "extensionsToTreatAsEsm": [".ts"],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
     "moduleFileExtensions": [
       "js",
       "ts"
@@ -67,13 +65,15 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
         }
       ]
     },
     "testMatch": [
       "**/*.test.ts"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "publishConfig": {
     "access": "public"

@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.base",
-  "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "outDir": "./dist/cjs",
-    "skipLibCheck": true
-  }
-}

@@ -1,8 +1,8 @@
-import { PrivateConstructorError } from '../errors';
-import PDFObject from './PDFObject';
-import CharCodes from '../syntax/CharCodes';
-import { IsIrregular } from '../syntax/Irregular';
-import { charFromHexCode, copyStringIntoBuffer, toCharCode, toHexString } from '../../utils';
+import { PrivateConstructorError } from '../errors.js';
+import PDFObject from './PDFObject.js';
+import CharCodes from '../syntax/CharCodes.js';
+import { IsIrregular } from '../syntax/Irregular.js';
+import { charFromHexCode, copyStringIntoBuffer, toCharCode, toHexString } from '../../utils/index.js';
 
 const decodeName = (name: string) =>
   name.replace(/#([\dABCDEF]{2})/g, (_, hex) => charFromHexCode(hex));
