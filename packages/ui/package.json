@@ -40,7 +40,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@pdfme/converter": "*",
     "@scena/react-guides": "^0.28.2",
-    "antd": "^5.26.3",
+    "antd": "^5.26.7",
     "form-render": "^2.5.3",
     "globrex": "^0.1.2",
     "hotkeys-js": "^3.13.14",
