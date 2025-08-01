@@ -57,7 +57,7 @@
   "dependencies": {
     "@pdfme/pdf-lib": "*",
     "air-datepicker": "^3.6.0",
-    "bwip-js": "^4.6.0",
+    "bwip-js": "^4.7.0",
     "date-fns": "^4.1.0",
     "fontkit": "^2.0.2",
     "lucide": "^0.525.0"
