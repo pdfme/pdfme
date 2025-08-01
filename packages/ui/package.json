@@ -54,7 +54,7 @@
   "devDependencies": {
     "@pdfme/common": "*",
     "@pdfme/schemas": "*",
-    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^12.1.2",
     "@types/jest": "^30.0.0",
     "@types/react": "^17.0.52",
