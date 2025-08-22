@@ -2,7 +2,7 @@ import { b64toUint8Array } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
-import { BarcodeTypes } from './types.js';
+import type { BarcodeSchema, BarcodeTypes } from './types.js';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {
@@ -77,6 +77,12 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
     const regexp = /^\d{13}$|^\d{14}$/;
     return regexp.test(input) && validateCheckDigit(input, 14);
   }
+  if (type === 'itf') {
+    // General Interleaved 2 of 5 (ITF): digits only, even number of digits.
+    // Allow any even length supported by the symbology.
+    const regexp = /^\d+$/;
+    return regexp.test(input) && input.length % 2 === 0;
+  }
   if (type === 'upca') {
     // For UPCA: Valid characters are digits (0-9) only.
     // Either 11 digits (without check digit) or 12 digits (with check digit).
@@ -119,7 +125,7 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
  * The bwip.js lib has a different name for nw7 type barcodes
  */
 export const barCodeType2Bcid = (type: BarcodeTypes) =>
-  type === 'nw7' ? 'rationalizedCodabar' : type;
+  type === 'nw7' ? 'rationalizedCodabar' : type === 'itf' ? 'interleaved2of5' : type;
 
 /**
  *  Strip hash from the beginning of HTML hex color codes for the bwip.js lib
@@ -127,7 +133,7 @@ export const barCodeType2Bcid = (type: BarcodeTypes) =>
 export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
   color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
-export const createBarCode = async (arg: {
+type BuildOptsArg = {
   type: BarcodeTypes;
   input: string;
   width: number;
@@ -136,7 +142,9 @@ export const createBarCode = async (arg: {
   barColor?: string;
   textColor?: string;
   includetext?: boolean;
-}): Promise<Buffer> => {
+} & Partial<BarcodeSchema>;
+
+const buildBwipOptions = (arg: BuildOptsArg): RenderOptions => {
   const {
     type,
     input,
@@ -146,16 +154,39 @@ export const createBarCode = async (arg: {
     barColor,
     textColor,
     includetext = DEFAULT_BARCODE_INCLUDETEXT,
+    scale,
+    scaleX,
+    scaleY,
+    padding,
+    paddingtop,
+    paddingleft,
+    paddingright,
+    paddingbottom,
+    inkspread,
+    showBorder,
+    borderwidth,
+    bordercolor,
+    alttext,
+    textxalign,
+    textsize,
+    textyalign,
+    textyoffset,
+    eclevel,
+    version,
+    mask,
+    qzone,
+    columns,
+    rows,
+    compact,
   } = arg;
 
   const bcid = barCodeType2Bcid(type);
-  const scale = 5;
   const bwipjsArg: RenderOptions = {
     bcid,
     text: input,
     width,
     height,
-    scale,
+    scale: scale ?? 5,
     includetext,
     textxalign: 'center',
   };
@@ -163,6 +194,67 @@ export const createBarCode = async (arg: {
   if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
   if (textColor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textColor);
+
+  if (typeof scaleX === 'number') (bwipjsArg as unknown as { scaleX: number }).scaleX = scaleX;
+  if (typeof scaleY === 'number') (bwipjsArg as unknown as { scaleY: number }).scaleY = scaleY;
+
+  if (typeof padding === 'number') (bwipjsArg as unknown as { padding: number }).padding = padding;
+  if (typeof paddingtop === 'number')
+    (bwipjsArg as unknown as { paddingtop: number }).paddingtop = paddingtop;
+  if (typeof paddingleft === 'number')
+    (bwipjsArg as unknown as { paddingleft: number }).paddingleft = paddingleft;
+  if (typeof paddingright === 'number')
+    (bwipjsArg as unknown as { paddingright: number }).paddingright = paddingright;
+  if (typeof paddingbottom === 'number')
+    (bwipjsArg as unknown as { paddingbottom: number }).paddingbottom = paddingbottom;
+  if (typeof inkspread === 'number')
+    (bwipjsArg as unknown as { inkspread: number }).inkspread = inkspread;
+  // Border: only set when explicitly configured by schema
+  if (showBorder === false) (bwipjsArg as unknown as { borderwidth: number }).borderwidth = 0;
+  if (typeof borderwidth === 'number')
+    (bwipjsArg as unknown as { borderwidth: number }).borderwidth = borderwidth;
+  if (bordercolor)
+    (bwipjsArg as unknown as { bordercolor: string }).bordercolor = mapHexColorForBwipJsLib(
+      bordercolor,
+    );
+
+  if (includetext) {
+    if (alttext) (bwipjsArg as unknown as { alttext: string }).alttext = alttext;
+    if (textxalign)
+      (bwipjsArg as unknown as { textxalign: 'left' | 'center' | 'right' }).textxalign = textxalign;
+    if (textyalign)
+      (bwipjsArg as unknown as { textyalign: 'above' | 'below' }).textyalign = textyalign;
+    if (typeof textsize === 'number')
+      (bwipjsArg as unknown as { textsize: number }).textsize = textsize;
+    if (typeof textyoffset === 'number')
+      (bwipjsArg as unknown as { textyoffset: number }).textyoffset = textyoffset;
+  }
+
+  if (type === 'qrcode') {
+    if (eclevel)
+      (bwipjsArg as unknown as { eclevel: 'L' | 'M' | 'Q' | 'H' }).eclevel = eclevel;
+    if (typeof version === 'number') (bwipjsArg as unknown as { version: number }).version = version;
+    if (typeof mask === 'number') (bwipjsArg as unknown as { mask: number }).mask = mask;
+    if (typeof qzone === 'number') (bwipjsArg as unknown as { qzone: number }).qzone = qzone;
+  }
+
+  if (type === 'pdf417') {
+    if (typeof columns === 'number')
+      (bwipjsArg as unknown as { columns: number }).columns = columns;
+    if (typeof rows === 'number') (bwipjsArg as unknown as { rows: number }).rows = rows;
+    if (typeof compact === 'boolean')
+      (bwipjsArg as unknown as { compact: boolean }).compact = compact;
+    if (typeof eclevel === 'number')
+      (bwipjsArg as unknown as { eclevel: number }).eclevel = eclevel as unknown as number;
+  }
+
+  return bwipjsArg;
+};
+
+export const createBarCode = async (
+  arg: BuildOptsArg,
+): Promise<Buffer> => {
+  const bwipjsArg = buildBwipOptions(arg);
 
   let res: Buffer;
 
@@ -184,4 +276,17 @@ export const createBarCode = async (arg: {
   }
 
   return res;
+};
+
+export const createBarCodeSvg = async (
+  arg: BuildOptsArg,
+): Promise<string> => {
+  const opts = buildBwipOptions(arg) as RenderOptions;
+  const bwipjsModule = bwipjs as unknown as { toSVG?: (options: RenderOptions) => Promise<string> | string };
+  if (typeof bwipjsModule.toSVG === 'function') {
+    const svg = await bwipjsModule.toSVG(opts);
+    return typeof svg === 'string' ? svg : String(svg);
+  }
+  // Fallback when toSVG is unavailable (e.g., certain browser builds)
+  return '';
 };
