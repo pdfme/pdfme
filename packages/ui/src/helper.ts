@@ -49,7 +49,7 @@ export const uuid = () =>
   });
 
 const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
-  path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
+  path = Array.isArray(path) ? path : path.replace(/\[/g, '.').replace(/\]/g, '').split('.');
   let src: Record<string, unknown> = obj as Record<string, unknown>;
   path.forEach((key, index, array) => {
     if (index == path.length - 1) {
