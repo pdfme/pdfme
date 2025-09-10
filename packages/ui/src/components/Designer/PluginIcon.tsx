@@ -37,7 +37,17 @@ const SVGIcon = ({ svgString, size, styles, label }: {
     const allElements = svgElement.querySelectorAll('*');
     allElements.forEach(element => {
       Array.from(element.attributes).forEach(attr => {
-        if (attr.name.startsWith('on') || attr.name === 'href' && attr.value.startsWith('javascript:')) {
+        const attrValue = attr.value.trim().toLowerCase();
+        if (
+          attr.name.startsWith('on') ||
+          (
+            attr.name === 'href' && (
+              attrValue.startsWith('javascript:') ||
+              attrValue.startsWith('data:') ||
+              attrValue.startsWith('vbscript:')
+            )
+          )
+        ) {
           element.removeAttribute(attr.name);
         }
       });
