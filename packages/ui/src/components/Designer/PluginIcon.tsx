@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Plugin, Schema } from '@pdfme/common';
 import { OptionsContext } from '../../contexts.js';
 import { theme } from 'antd';
@@ -10,27 +10,52 @@ interface PluginIconProps {
   styles?: React.CSSProperties;
 }
 
-const getWithModifiedSize = (
-  htmlString: string,
-  label: string,
-  size: number,
-  styles?: React.CSSProperties,
-) => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, 'text/html');
-
-  const modifyNode = (node: HTMLElement) => {
-    if (node.tagName === 'SVG' || node.tagName === 'svg') {
-      node.setAttribute('width', size.toString());
-      node.setAttribute('height', size.toString());
+const SVGIcon = ({ svgString, size, styles, label }: { 
+  svgString: string; 
+  size?: number; 
+  styles?: React.CSSProperties; 
+  label: string;
+}) => {
+  const processedSVG = useMemo(() => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, 'image/svg+xml');
+    
+    const svgElement = doc.querySelector('svg');
+    if (!svgElement) {
+      return null;
     }
-    Array.from(node.children).forEach((child) => modifyNode(child as HTMLElement));
-  };
 
-  Array.from(doc.body.children).forEach((child) => modifyNode(child as HTMLElement));
+    if (size) {
+      svgElement.setAttribute('width', size.toString());
+      svgElement.setAttribute('height', size.toString());
+    }
+
+    // Sanitize SVG by removing script tags and event handlers
+    const scripts = svgElement.querySelectorAll('script');
+    scripts.forEach(script => script.remove());
+    
+    const allElements = svgElement.querySelectorAll('*');
+    allElements.forEach(element => {
+      Array.from(element.attributes).forEach(attr => {
+        if (attr.name.startsWith('on') || attr.name === 'href' && attr.value.startsWith('javascript:')) {
+          element.removeAttribute(attr.name);
+        }
+      });
+    });
+
+    return svgElement.outerHTML;
+  }, [svgString, size]);
+
+  if (!processedSVG) {
+    return null;
+  }
 
   return (
-    <div style={styles} title={label} dangerouslySetInnerHTML={{ __html: doc.body.innerHTML }} />
+    <div 
+      style={styles} 
+      title={label}
+      dangerouslySetInnerHTML={{ __html: processedSVG }}
+    />
   );
 };
 
@@ -50,10 +75,7 @@ const PluginIcon = (props: PluginIconProps) => {
   };
 
   if (icon) {
-    if (size) {
-      return getWithModifiedSize(icon, label, size, iconStyles);
-    }
-    return <div style={iconStyles} title={label} dangerouslySetInnerHTML={{ __html: icon }} />;
+    return <SVGIcon svgString={icon} size={size} styles={iconStyles} label={label} />;
   }
 
   return (
