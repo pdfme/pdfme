@@ -139,6 +139,7 @@ const Renderer = (props: RendererProps) => {
       options,
       theme,
       i18n,
+      scale,
       _cache,
     });
 

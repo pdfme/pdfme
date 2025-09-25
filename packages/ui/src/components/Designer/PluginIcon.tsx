@@ -1,7 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Plugin, Schema } from '@pdfme/common';
 import { OptionsContext } from '../../contexts.js';
 import { theme } from 'antd';
+import DOMPurify from 'dompurify';
 
 interface PluginIconProps {
   plugin: Plugin<Schema>;
@@ -10,27 +11,50 @@ interface PluginIconProps {
   styles?: React.CSSProperties;
 }
 
-const getWithModifiedSize = (
-  htmlString: string,
-  label: string,
-  size: number,
-  styles?: React.CSSProperties,
-) => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, 'text/html');
+const SVGIcon = ({ svgString, size, styles, label }: { 
+  svgString: string; 
+  size?: number; 
+  styles?: React.CSSProperties; 
+  label: string;
+}) => {
+  const processedSVG = useMemo(() => {
+    // First sanitize the SVG string using DOMPurify with SVG profile
+    const sanitizedSVG = DOMPurify.sanitize(svgString, {
+      USE_PROFILES: { svg: true, svgFilters: true },
+      ALLOWED_TAGS: ['svg', 'path', 'circle', 'rect', 'line', 'polygon', 'polyline', 'ellipse', 'g', 'defs', 'title', 'desc', 'metadata'],
+      ALLOWED_ATTR: ['class', 'id', 'fill', 'stroke', 'stroke-width', 'viewBox', 'width', 'height', 'd', 'cx', 'cy', 'r', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'points', 'rx', 'ry', 'transform'],
+      FORBID_TAGS: ['script', 'foreignObject', 'use', 'embed', 'iframe', 'object', 'link', 'style'],
+      FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'href', 'xlink:href', 'src', 'action', 'formaction'],
+      KEEP_CONTENT: false
+    });
 
-  const modifyNode = (node: HTMLElement) => {
-    if (node.tagName === 'SVG' || node.tagName === 'svg') {
-      node.setAttribute('width', size.toString());
-      node.setAttribute('height', size.toString());
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(sanitizedSVG, 'image/svg+xml');
+    
+    const svgElement = doc.querySelector('svg');
+    if (!svgElement) {
+      return null;
     }
-    Array.from(node.children).forEach((child) => modifyNode(child as HTMLElement));
-  };
 
-  Array.from(doc.body.children).forEach((child) => modifyNode(child as HTMLElement));
+    // Apply size attributes if specified
+    if (size) {
+      svgElement.setAttribute('width', size.toString());
+      svgElement.setAttribute('height', size.toString());
+    }
+
+    return svgElement.outerHTML;
+  }, [svgString, size]);
+
+  if (!processedSVG) {
+    return null;
+  }
 
   return (
-    <div style={styles} title={label} dangerouslySetInnerHTML={{ __html: doc.body.innerHTML }} />
+    <div 
+      style={styles} 
+      title={label}
+      dangerouslySetInnerHTML={{ __html: processedSVG }}
+    />
   );
 };
 
@@ -50,10 +74,7 @@ const PluginIcon = (props: PluginIconProps) => {
   };
 
   if (icon) {
-    if (size) {
-      return getWithModifiedSize(icon, label, size, iconStyles);
-    }
-    return <div style={iconStyles} title={label} dangerouslySetInnerHTML={{ __html: icon }} />;
+    return <SVGIcon svgString={icon} size={size} styles={iconStyles} label={label} />;
   }
 
   return (
