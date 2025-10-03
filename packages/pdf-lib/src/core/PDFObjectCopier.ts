@@ -29,8 +29,7 @@ import PDFPageLeaf from './structures/PDFPageLeaf';
  * supported, but is equivalent to cloning it.
  */
 class PDFObjectCopier {
-  static for = (src: PDFContext, dest: PDFContext) =>
-    new PDFObjectCopier(src, dest);
+  static for = (src: PDFContext, dest: PDFContext) => new PDFObjectCopier(src, dest);
 
   private readonly src: PDFContext;
   private readonly dest: PDFContext;

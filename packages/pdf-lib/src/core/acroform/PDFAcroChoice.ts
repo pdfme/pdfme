@@ -49,9 +49,7 @@ class PDFAcroChoice extends PDFAcroTerminal {
       const options = this.getOptions();
       for (let idx = 0, len = values.length; idx < len; idx++) {
         const val = values[idx].decodeText();
-        indices[idx] = options.findIndex(
-          (o) => val === (o.display || o.value).decodeText(),
-        );
+        indices[idx] = options.findIndex((o) => val === (o.display || o.value).decodeText());
       }
       this.dict.set(PDFName.of('I'), this.dict.context.obj(indices.sort()));
     } else {
@@ -81,12 +79,7 @@ class PDFAcroChoice extends PDFAcroTerminal {
   }
 
   Opt(): PDFArray | PDFString | PDFHexString | undefined {
-    return this.dict.lookupMaybe(
-      PDFName.of('Opt'),
-      PDFString,
-      PDFHexString,
-      PDFArray,
-    );
+    return this.dict.lookupMaybe(PDFName.of('Opt'), PDFString, PDFHexString, PDFArray);
   }
 
   setOptions(

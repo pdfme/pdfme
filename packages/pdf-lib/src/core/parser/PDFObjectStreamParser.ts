@@ -8,10 +8,8 @@ import PDFObjectParser from './PDFObjectParser';
 import { waitForTick } from '../../utils';
 
 class PDFObjectStreamParser extends PDFObjectParser {
-  static forStream = (
-    rawStream: PDFRawStream,
-    shouldWaitForTick?: () => boolean,
-  ) => new PDFObjectStreamParser(rawStream, shouldWaitForTick);
+  static forStream = (rawStream: PDFRawStream, shouldWaitForTick?: () => boolean) =>
+    new PDFObjectStreamParser(rawStream, shouldWaitForTick);
 
   private alreadyParsed: boolean;
   private readonly shouldWaitForTick: () => boolean;

@@ -49,7 +49,7 @@ export const uuid = () =>
   });
 
 const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
-  path = Array.isArray(path) ? path : path.replace('[', '.').replace(']', '').split('.');
+  path = Array.isArray(path) ? path : path.replace(/\[/g, '.').replace(/\]/g, '').split('.');
   let src: Record<string, unknown> = obj as Record<string, unknown>;
   path.forEach((key, index, array) => {
     if (index == path.length - 1) {
@@ -526,7 +526,11 @@ export const setFontNameRecursively = (
   seen.add(obj);
 
   for (const key in obj) {
-    if (key === 'fontName' && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] === undefined) {
+    if (
+      key === 'fontName' &&
+      Object.prototype.hasOwnProperty.call(obj, key) &&
+      obj[key] === undefined
+    ) {
       obj[key] = fontName;
     } else if (typeof obj[key] === 'object' && obj[key] !== null) {
       setFontNameRecursively(obj[key] as Record<string, unknown>, fontName, seen);

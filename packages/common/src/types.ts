@@ -74,6 +74,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
  * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
+ * @property {number} scale - The scale of the UI.
  * @property {Map<string | number, unknown>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
  */
 export type UIRenderProps<T extends Schema> = {
@@ -89,6 +90,7 @@ export type UIRenderProps<T extends Schema> = {
   options: UIOptions;
   theme: GlobalToken;
   i18n: (key: string) => string;
+  scale: number;
   _cache: Map<string | number, unknown>;
 };
 
@@ -162,7 +164,7 @@ export interface PluginRegistry {
   values(): Plugin[];
   entries(): [string, Plugin][];
   findByType(type: string): Plugin | undefined;
-  findWithLabelByType(type: string): [string, Plugin|undefined];
+  findWithLabelByType(type: string): [string, Plugin | undefined];
 }
 
 export type Lang = z.infer<typeof Lang>;

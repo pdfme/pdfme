@@ -5,8 +5,7 @@ import PDFRef from '../objects/PDFRef';
 import { AcroChoiceFlags } from './flags';
 
 class PDFAcroComboBox extends PDFAcroChoice {
-  static fromDict = (dict: PDFDict, ref: PDFRef) =>
-    new PDFAcroComboBox(dict, ref);
+  static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroComboBox(dict, ref);
 
   static create = (context: PDFContext) => {
     const dict = context.obj({

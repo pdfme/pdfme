@@ -37,12 +37,7 @@ export default class Arc extends GraphElement {
   }
 
   sweep() {
-    this.lastSweep = angleABC(
-      this.origin(),
-      this.center(),
-      this.destination(),
-      this.lastSweep,
-    );
+    this.lastSweep = angleABC(this.origin(), this.center(), this.destination(), this.lastSweep);
     return this.lastSweep;
   }
 
@@ -58,8 +53,7 @@ export default class Arc extends GraphElement {
     const eO = element.origin();
     return (
       this.getCircle().isEqual(element.getCircle()) &&
-      ((dest.isEqual(eDest) && o.isEqual(eO)) ||
-        (dest.isEqual(eO) && o.isEqual(eDest)))
+      ((dest.isEqual(eDest) && o.isEqual(eO)) || (dest.isEqual(eO) && o.isEqual(eDest)))
     );
   }
 
@@ -74,9 +68,7 @@ export default class Arc extends GraphElement {
 
   middle() {
     const halfSweep = this.sweep() / 2;
-    const mid = this.center().plus(
-      rotate(vector(this.center(), this.origin()), halfSweep),
-    );
+    const mid = this.center().plus(rotate(vector(this.center(), this.origin()), halfSweep));
     return mid;
   }
 
@@ -84,8 +76,7 @@ export default class Arc extends GraphElement {
     // As angles are returned between -π and π, we need the middle of the arc
     return (
       this.getCircle().includes(P) &&
-      Math.abs(angleABC(this.middle(), this.center(), P)) <=
-        Math.abs(this.sweep() / 2)
+      Math.abs(angleABC(this.middle(), this.center(), P)) <= Math.abs(this.sweep() / 2)
     );
   }
 
@@ -97,8 +88,7 @@ export default class Arc extends GraphElement {
       const destination = this.destination().toCoords();
       // Returns the closest between origin and destination
       const coords =
-        distanceCoords(H.toCoords(), origin) <
-        distanceCoords(H.toCoords(), destination)
+        distanceCoords(H.toCoords(), origin) < distanceCoords(H.toCoords(), destination)
           ? origin
           : destination;
       return new Point(coords);

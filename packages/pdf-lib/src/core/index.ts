@@ -14,16 +14,10 @@ export { default as PDFCrossRefSection } from './document/PDFCrossRefSection';
 export { default as StandardFontEmbedder } from './embedders/StandardFontEmbedder';
 export { default as CustomFontEmbedder } from './embedders/CustomFontEmbedder';
 export { default as CustomFontSubsetEmbedder } from './embedders/CustomFontSubsetEmbedder';
-export {
-  default as FileEmbedder,
-  AFRelationship,
-} from './embedders/FileEmbedder';
+export { default as FileEmbedder, AFRelationship } from './embedders/FileEmbedder';
 export { default as JpegEmbedder } from './embedders/JpegEmbedder';
 export { default as PngEmbedder } from './embedders/PngEmbedder';
-export {
-  default as PDFPageEmbedder,
-  type PageBoundingBox,
-} from './embedders/PDFPageEmbedder';
+export { default as PDFPageEmbedder, type PageBoundingBox } from './embedders/PDFPageEmbedder';
 
 export {
   default as ViewerPreferences,

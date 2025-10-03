@@ -19,8 +19,7 @@ class PDFPageTree extends PDFDict {
     return new PDFPageTree(dict, context);
   };
 
-  static fromMapWithContext = (map: DictMap, context: PDFContext) =>
-    new PDFPageTree(map, context);
+  static fromMapWithContext = (map: DictMap, context: PDFContext) => new PDFPageTree(map, context);
 
   Parent(): PDFPageTree | undefined {
     return this.lookup(PDFName.of('Parent')) as PDFPageTree | undefined;
@@ -75,9 +74,7 @@ class PDFPageTree extends PDFDict {
       if (kid instanceof PDFPageTree) {
         if (kid.Count().asNumber() > leafsRemainingUntilTarget) {
           // Dig in
-          return (
-            kid.insertLeafNode(leafRef, leafsRemainingUntilTarget) || kidRef
-          );
+          return kid.insertLeafNode(leafRef, leafsRemainingUntilTarget) || kidRef;
         } else {
           // Move on
           leafsRemainingUntilTarget -= kid.Count().asNumber();

@@ -33,10 +33,7 @@ class PDFFlateStream extends PDFStream {
   }
 
   getUnencodedContents(): Uint8Array {
-    throw new MethodNotImplementedError(
-      this.constructor.name,
-      'getUnencodedContents',
-    );
+    throw new MethodNotImplementedError(this.constructor.name, 'getUnencodedContents');
   }
 }
 

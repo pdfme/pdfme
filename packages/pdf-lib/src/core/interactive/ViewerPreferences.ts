@@ -4,12 +4,7 @@ import PDFDict from '../objects/PDFDict';
 import PDFName from '../objects/PDFName';
 import PDFNumber from '../objects/PDFNumber';
 import PDFContext from '../PDFContext';
-import {
-  assertEachIs,
-  assertInteger,
-  assertIsOneOf,
-  assertRange,
-} from '../../utils';
+import { assertEachIs, assertInteger, assertIsOneOf, assertRange } from '../../utils';
 
 const asEnum = <T extends string | number, U extends { [key: string]: T }>(
   rawValue: T | undefined,
@@ -83,11 +78,7 @@ type BoolViewerPrefKey =
   | 'CenterWindow'
   | 'DisplayDocTitle'
   | 'PickTrayByPDFSize';
-type NameViewerPrefKey =
-  | 'NonFullScreenPageMode'
-  | 'Direction'
-  | 'PrintScaling'
-  | 'Duplex';
+type NameViewerPrefKey = 'NonFullScreenPageMode' | 'Direction' | 'PrintScaling' | 'Duplex';
 
 interface PageRange {
   start: number;
@@ -99,8 +90,7 @@ class ViewerPreferences {
   readonly dict: PDFDict;
 
   /** @ignore */
-  static fromDict = (dict: PDFDict): ViewerPreferences =>
-    new ViewerPreferences(dict);
+  static fromDict = (dict: PDFDict): ViewerPreferences => new ViewerPreferences(dict);
 
   /** @ignore */
   static create = (context: PDFContext) => {
@@ -429,11 +419,7 @@ class ViewerPreferences {
    *                              exiting full screen mode.
    */
   setNonFullScreenPageMode(nonFullScreenPageMode: NonFullScreenPageMode) {
-    assertIsOneOf(
-      nonFullScreenPageMode,
-      'nonFullScreenPageMode',
-      NonFullScreenPageMode,
-    );
+    assertIsOneOf(nonFullScreenPageMode, 'nonFullScreenPageMode', NonFullScreenPageMode);
     const mode = PDFName.of(nonFullScreenPageMode);
     this.dict.set(PDFName.of('NonFullScreenPageMode'), mode);
   }

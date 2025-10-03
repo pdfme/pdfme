@@ -13,7 +13,6 @@ export const BLANK_A4_PDF: BlankPdf = {
   padding: [10, 10, 10, 10],
 };
 
-
 /**
  * Base64 encoded PDF with custom A4 size.
  * PDF content: A4 page withouth any content.
@@ -24,7 +23,7 @@ export const CUSTOM_A4_PDF: CustomPdf =
 /**
  * @deprecated BLANK_PDF will be removed in a future version. Use BLANK_A4_PDF or CUSTOM_A4_PDF instead.
  */
-  export const BLANK_PDF = CUSTOM_A4_PDF;
+export const BLANK_PDF = CUSTOM_A4_PDF;
 
 export const DEFAULT_FONT_NAME = 'Roboto';
 export const DEFAULT_FONT_VALUE =

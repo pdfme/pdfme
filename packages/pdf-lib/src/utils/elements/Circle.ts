@@ -1,12 +1,4 @@
-import {
-  distance,
-  distanceCoords,
-  isEqual,
-  minus,
-  plus,
-  times,
-  unitVector,
-} from '../maths';
+import { distance, distanceCoords, isEqual, minus, plus, times, unitVector } from '../maths';
 
 import GraphElement from './GraphElement';
 import Point from './Point';

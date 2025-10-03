@@ -9,12 +9,7 @@ import { IndexOutOfBoundsError } from '../errors';
 
 class PDFAcroButton extends PDFAcroTerminal {
   Opt(): PDFString | PDFHexString | PDFArray | undefined {
-    return this.dict.lookupMaybe(
-      PDFName.of('Opt'),
-      PDFString,
-      PDFHexString,
-      PDFArray,
-    );
+    return this.dict.lookupMaybe(PDFName.of('Opt'), PDFString, PDFHexString, PDFArray);
   }
 
   setOpt(opt: PDFObject[]) {
@@ -67,8 +62,7 @@ class PDFAcroButton extends PDFAcroTerminal {
     for (let idx = 0, len = widgets.length; idx < len; idx++) {
       const widget = widgets[idx];
       const exportVal =
-        exportValues[idx] ??
-        PDFHexString.fromText(widget.getOnValue()?.decodeText() ?? '');
+        exportValues[idx] ?? PDFHexString.fromText(widget.getOnValue()?.decodeText() ?? '');
       Opt.push(exportVal);
     }
 
@@ -99,11 +93,7 @@ class PDFAcroButton extends PDFAcroTerminal {
     return existingIdx ?? Opt.size() - 1;
   }
 
-  addWidgetWithOpt(
-    widget: PDFRef,
-    opt: PDFHexString | PDFString,
-    useExistingOptIdx: boolean,
-  ) {
+  addWidgetWithOpt(widget: PDFRef, opt: PDFHexString | PDFString, useExistingOptIdx: boolean) {
     const optIdx = this.addOpt(opt, useExistingOptIdx);
     const apStateValue = PDFName.of(String(optIdx));
     this.addWidget(widget);
