@@ -23,7 +23,11 @@ export const DEFAULT_DYNAMIC_MIN_FONT_SIZE = 4;
 export const DEFAULT_DYNAMIC_MAX_FONT_SIZE = 72;
 export const FONT_SIZE_ADJUSTMENT = 0.25;
 
-export const LINE_START_FORBIDDEN_CHARS = [
+// 日本語禁則処理
+//
+// https://www.morisawa.co.jp/blogs/MVP/8760
+//
+export const LINE_START_FORBIDDEN_CHARS_JA = [
   // 句読点
   '、',
   '。',
@@ -84,7 +88,7 @@ export const LINE_START_FORBIDDEN_CHARS = [
   'ョ',
 ];
 
-export const LINE_END_FORBIDDEN_CHARS = [
+export const LINE_END_FORBIDDEN_CHARS_JA = [
   // 始め括弧類
   '「',
   '『',
@@ -101,4 +105,34 @@ export const LINE_END_FORBIDDEN_CHARS = [
   '“',
   '｟',
   '«',
+];
+
+// Define characters that should not end a line in German
+export const LINE_END_FORBIDDEN_CHARS_DE = [
+  '-', // Avoid ending with a dash (hyphen)
+  '–', // En dash
+  '—', // Em dash
+  '(', // Opening parenthesis
+  '[', // Opening square bracket
+  '{', // Opening curly bracket
+  '„', // German opening quote
+  '"', // Double quote (optional)
+  "'", // Single quote (optional)
+];
+
+// Define forbidden line start characters for German
+export const LINE_START_FORBIDDEN_CHARS_DE = [
+  '.',
+  ',',
+  '!',
+  '?',
+  ':',
+  ';',
+  ')',
+  ']',
+  '}',
+  '“',
+  '”',
+  '"',
+  "'", // Add or remove as needed
 ];
