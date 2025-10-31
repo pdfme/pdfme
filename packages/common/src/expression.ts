@@ -29,9 +29,24 @@ const createCacheKey = (data: Record<string, unknown>): string => {
       // For objects/arrays, use constructor name and JSON length
       valueRep = `${value.constructor.name}:${JSON.stringify(value).length}`;
     } else {
-      // For primitives, include actual length and a sample
-      const str = String(value);
-      valueRep = `${str.length}:${str.substring(0, 10)}`;
+      // For primitives (string, number, boolean, etc), include actual length and a sample
+      // Handle all primitive types explicitly to satisfy no-base-to-string rule
+      let strValue: string;
+      if (typeof value === 'string') {
+        strValue = value;
+      } else if (typeof value === 'number') {
+        strValue = String(value);
+      } else if (typeof value === 'boolean') {
+        strValue = String(value);
+      } else if (typeof value === 'bigint') {
+        strValue = String(value);
+      } else if (typeof value === 'symbol') {
+        strValue = value.toString();
+      } else {
+        // Fallback for function or unknown types - should rarely hit this
+        strValue = valueType;
+      }
+      valueRep = `${strValue.length}:${strValue.substring(0, 10)}`;
     }
     
     // Use escaped separator to avoid collision issues
