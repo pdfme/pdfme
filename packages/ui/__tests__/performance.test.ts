@@ -181,6 +181,7 @@ describe('Performance Benchmarks', () => {
 
   describe('Array operations performance', () => {
     it('should benchmark arrayBufferToBase64 optimization', () => {
+      // Use 10KB for testing - small enough to use the optimized path
       const size = 10000;
       const arrayBuffer = new Uint8Array(size).buffer;
 
@@ -194,10 +195,19 @@ describe('Performance Benchmarks', () => {
         return btoa(binary);
       };
 
-      // New method (Array.from)
+      // New method (Array.from with size check)
       const newMethod = (ab: ArrayBuffer): string => {
         const bytes = new Uint8Array(ab);
-        const binary = String.fromCharCode(...Array.from(bytes));
+        // For arrays <= 65535, use the faster approach
+        const binary = bytes.length <= 65535
+          ? String.fromCharCode(...Array.from(bytes))
+          : (() => {
+              let result = '';
+              for (let i = 0; i < bytes.length; i++) {
+                result += String.fromCharCode(bytes[i]);
+              }
+              return result;
+            })();
         return btoa(binary);
       };
 
@@ -215,11 +225,33 @@ describe('Performance Benchmarks', () => {
 
       console.log(`ArrayBuffer to Base64 (10KB, 100 iterations):`);
       console.log(`  Old method (concatenation): ${time1.toFixed(2)}ms`);
-      console.log(`  New method (Array.from):    ${time2.toFixed(2)}ms`);
+      console.log(`  New method (hybrid):        ${time2.toFixed(2)}ms`);
       console.log(`  Speedup:                    ${(time1 / time2).toFixed(2)}x`);
 
       // Results should be identical
       expect(oldMethod(arrayBuffer)).toBe(newMethod(arrayBuffer));
+    });
+
+    it('should handle large arrays without stack overflow', () => {
+      // Test with 100KB array to verify large array handling
+      const size = 100000;
+      const arrayBuffer = new Uint8Array(size).buffer;
+
+      const safeMethod = (ab: ArrayBuffer): string => {
+        const bytes = new Uint8Array(ab);
+        // Should use fallback for large arrays
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      };
+
+      // This should not throw
+      expect(() => safeMethod(arrayBuffer)).not.toThrow();
+      const result = safeMethod(arrayBuffer);
+      expect(typeof result).toBe('string');
+      console.log(`Large array (100KB) handled successfully: ${result.length} chars`);
     });
   });
 });

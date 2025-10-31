@@ -248,10 +248,22 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
   // Detect the MIME type
   const mimeType = detectMimeType(arrayBuffer);
 
-  // Convert ArrayBuffer to raw Base64 efficiently using Array.from
+  // Convert ArrayBuffer to raw Base64
   const bytes = new Uint8Array(arrayBuffer);
-  // Using Array.from with map is more efficient than string concatenation
-  const binary = String.fromCharCode(...Array.from(bytes));
+  
+  // For large arrays (>65535 bytes), use chunked approach to avoid call stack limits
+  // The spread operator has a limit on the number of arguments it can handle
+  let binary: string;
+  if (bytes.length > 65535) {
+    binary = '';
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+  } else {
+    // For smaller arrays, use the faster Array.from approach
+    binary = String.fromCharCode(...Array.from(bytes));
+  }
+  
   const base64String = btoa(binary);
 
   // Optionally prepend a data: URL if a known MIME type is found;
@@ -539,6 +551,10 @@ export const setFontNameRecursively = (
 /**
  * Efficiently compare two arrays of schemas by checking length and key properties
  * instead of full JSON.stringify comparison. This is significantly faster for large arrays.
+ * 
+ * Note: This function checks the most commonly changed properties that affect layout
+ * and visual appearance (position, size, type, id, name). For a full deep equality check,
+ * use JSON.stringify comparison, but be aware of the performance impact.
  */
 export const areSchemaArraysEqual = (
   arr1: SchemaForUI[] | undefined,
@@ -553,6 +569,7 @@ export const areSchemaArraysEqual = (
     const s1 = arr1[i];
     const s2 = arr2[i];
     
+    // Check structural properties that affect layout
     if (
       s1.id !== s2.id ||
       s1.name !== s2.name ||
@@ -560,7 +577,9 @@ export const areSchemaArraysEqual = (
       s1.position.x !== s2.position.x ||
       s1.position.y !== s2.position.y ||
       s1.width !== s2.width ||
-      s1.height !== s2.height
+      s1.height !== s2.height ||
+      s1.rotate !== s2.rotate ||
+      s1.opacity !== s2.opacity
     ) {
       return false;
     }

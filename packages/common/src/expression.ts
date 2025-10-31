@@ -7,7 +7,11 @@ const parseDataCache = new Map<string, Record<string, unknown>>();
 
 /**
  * Generate a lightweight hash for cache key instead of full JSON.stringify
- * This is significantly faster for large objects
+ * This is significantly faster for large objects.
+ * 
+ * Note: This creates a structural hash based on keys, types, and value characteristics.
+ * It's designed for cache differentiation, not cryptographic security.
+ * Collisions are possible but rare for typical usage patterns.
  */
 const createCacheKey = (data: Record<string, unknown>): string => {
   const keys = Object.keys(data).sort();
@@ -15,11 +19,26 @@ const createCacheKey = (data: Record<string, unknown>): string => {
   
   for (const key of keys) {
     const value = data[key];
-    // Include key and value type/length info for cache differentiation
-    parts.push(`${key}:${typeof value}:${String(value).length}`);
+    const valueType = typeof value;
+    
+    // Create a more robust representation to avoid collisions
+    let valueRep: string;
+    if (value === null || value === undefined) {
+      valueRep = String(value);
+    } else if (valueType === 'object') {
+      // For objects/arrays, use constructor name and JSON length
+      valueRep = `${value.constructor.name}:${JSON.stringify(value).length}`;
+    } else {
+      // For primitives, include actual length and a sample
+      const str = String(value);
+      valueRep = `${str.length}:${str.substring(0, 10)}`;
+    }
+    
+    // Use escaped separator to avoid collision issues
+    parts.push(`${key}\x00${valueType}\x00${valueRep}`);
   }
   
-  return parts.join('|');
+  return parts.join('\x01');
 };
 
 const parseData = (data: Record<string, unknown>): Record<string, unknown> => {
