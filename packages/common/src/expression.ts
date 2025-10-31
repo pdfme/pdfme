@@ -5,8 +5,26 @@ import type { SchemaPageArray } from './types.js';
 const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
 const parseDataCache = new Map<string, Record<string, unknown>>();
 
+/**
+ * Generate a lightweight hash for cache key instead of full JSON.stringify
+ * This is significantly faster for large objects
+ */
+const createCacheKey = (data: Record<string, unknown>): string => {
+  const keys = Object.keys(data).sort();
+  const parts: string[] = [];
+  
+  for (const key of keys) {
+    const value = data[key];
+    // Include key and value type/length info for cache differentiation
+    parts.push(`${key}:${typeof value}:${String(value).length}`);
+  }
+  
+  return parts.join('|');
+};
+
 const parseData = (data: Record<string, unknown>): Record<string, unknown> => {
-  const key = JSON.stringify(data);
+  // Use lightweight cache key instead of full JSON.stringify
+  const key = createCacheKey(data);
   if (parseDataCache.has(key)) {
     return parseDataCache.get(key)!;
   }

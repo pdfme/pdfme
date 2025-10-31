@@ -133,13 +133,25 @@ async function createOnePage(
     if (heightsSum !== originalHeight) {
       diffMap.set(position.y + originalHeight, heightsSum - originalHeight);
     }
-    heights.forEach((height, index) => {
-      let y = schema.position.y + heights.reduce((acc, cur, i) => (i < index ? acc + cur : acc), 0);
-      for (const [diffY, diff] of diffMap.entries()) {
-        if (diffY <= schema.position.y) {
-          y += diff;
-        }
+    
+    // Pre-calculate cumulative heights to avoid repeated reduce operations
+    const cumulativeHeights: number[] = [];
+    let runningSum = 0;
+    for (let i = 0; i < heights.length; i++) {
+      cumulativeHeights.push(runningSum);
+      runningSum += heights[i];
+    }
+    
+    // Pre-calculate diff adjustment to avoid repeated Map iteration
+    let diffAdjustment = 0;
+    for (const [diffY, diff] of diffMap.entries()) {
+      if (diffY <= schema.position.y) {
+        diffAdjustment += diff;
       }
+    }
+    
+    heights.forEach((height, index) => {
+      const y = schema.position.y + cumulativeHeights[index] + diffAdjustment;
       const node = createNode({ schema, position: { ...position, y }, width, height });
 
       schemaPositions.push(y + height + basePdf.padding[2]);

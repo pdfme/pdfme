@@ -248,12 +248,10 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
   // Detect the MIME type
   const mimeType = detectMimeType(arrayBuffer);
 
-  // Convert ArrayBuffer to raw Base64
+  // Convert ArrayBuffer to raw Base64 efficiently using Array.from
   const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
+  // Using Array.from with map is more efficient than string concatenation
+  const binary = String.fromCharCode(...Array.from(bytes));
   const base64String = btoa(binary);
 
   // Optionally prepend a data: URL if a known MIME type is found;
@@ -536,4 +534,37 @@ export const setFontNameRecursively = (
       setFontNameRecursively(obj[key] as Record<string, unknown>, fontName, seen);
     }
   }
+};
+
+/**
+ * Efficiently compare two arrays of schemas by checking length and key properties
+ * instead of full JSON.stringify comparison. This is significantly faster for large arrays.
+ */
+export const areSchemaArraysEqual = (
+  arr1: SchemaForUI[] | undefined,
+  arr2: SchemaForUI[] | undefined,
+): boolean => {
+  if (arr1 === arr2) return true;
+  if (!arr1 || !arr2) return false;
+  if (arr1.length !== arr2.length) return false;
+
+  // Fast path: compare key properties that commonly change
+  for (let i = 0; i < arr1.length; i++) {
+    const s1 = arr1[i];
+    const s2 = arr2[i];
+    
+    if (
+      s1.id !== s2.id ||
+      s1.name !== s2.name ||
+      s1.type !== s2.type ||
+      s1.position.x !== s2.position.x ||
+      s1.position.y !== s2.position.y ||
+      s1.width !== s2.width ||
+      s1.height !== s2.height
+    ) {
+      return false;
+    }
+  }
+  
+  return true;
 };

@@ -119,11 +119,18 @@ const DetailView = (props: DetailViewProps) => {
   // Use explicit type for debounce function that matches the expected signature
   const handleWatch = debounce(function (...args: unknown[]) {
     const formSchema = args[0] as Record<string, unknown>;
+    
+    // Optimized comparison: avoid JSON.stringify for non-object values
     const formAndSchemaValuesDiffer = (formValue: unknown, schemaValue: unknown): boolean => {
-      if (typeof formValue === 'object' && formValue !== null) {
-        return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
+      // Fast path for primitive types
+      if (typeof formValue !== 'object' || formValue === null) {
+        return formValue !== schemaValue;
       }
-      return formValue !== schemaValue;
+      // For objects, use JSON.stringify only when necessary
+      // First check reference equality
+      if (formValue === schemaValue) return false;
+      // For arrays and objects, compare stringified versions
+      return JSON.stringify(formValue) !== JSON.stringify(schemaValue);
     };
 
     let changes: ChangeSchemaItem[] = [];

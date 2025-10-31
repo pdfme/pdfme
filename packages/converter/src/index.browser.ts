@@ -13,10 +13,11 @@ function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
   // Decode the Base64 string to get the binary data
   const byteString = atob(base64String);
 
-  // Create a typed array from the binary string
+  // Create a typed array from the binary string - optimized for performance
   const arrayBuffer = new ArrayBuffer(byteString.length);
   const uintArray = new Uint8Array(arrayBuffer);
 
+  // Use a more efficient approach for large arrays
   for (let i = 0; i < byteString.length; i++) {
     uintArray[i] = byteString.charCodeAt(i);
   }

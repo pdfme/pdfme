@@ -24,7 +24,7 @@ import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
-import { uuid, round, flatten } from '../../../helper.js';
+import { uuid, round, flatten, areSchemaArraysEqual } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
 import Selecto from './Selecto.js';
@@ -159,10 +159,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       return;
     }
 
-    const prevSchemaKeys = JSON.stringify(prevSchemas[pageCursor] || {});
-    const schemaKeys = JSON.stringify(schemasList[pageCursor] || {});
-
-    if (prevSchemaKeys === schemaKeys) {
+    // Use efficient shallow comparison instead of JSON.stringify
+    const currentSchemaPage = schemasList[pageCursor];
+    
+    if (areSchemaArraysEqual(prevSchemas, currentSchemaPage)) {
       moveable.current?.updateRect();
     }
   }, [pageCursor, schemasList, prevSchemas]);
