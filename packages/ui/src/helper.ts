@@ -308,13 +308,11 @@ export const template2SchemasList = async (_template: Template) => {
       const { width, height } = pageSizes[i];
       const xEdge = value.position.x + value.width;
       const yEdge = value.position.y + value.height;
-      if (width < xEdge) {
-        const diff = xEdge - width;
-        value.position.x += diff;
+      if (xEdge > width) {
+        value.position.x = Math.max(0, width - value.width);
       }
-      if (height < yEdge) {
-        const diff = yEdge - height;
-        value.position.y += diff;
+      if (yEdge > height) {
+        value.position.y = Math.max(0, height - value.height);
       }
     });
 
