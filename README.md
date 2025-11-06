@@ -23,6 +23,9 @@
   <a href="https://npmcharts.com/compare/@pdfme/common?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/common.svg" alt="Downloads per month on npm." />
   </a>
+  <a href="https://flatt.tech/oss/gmo/trampoline" target="_blank">
+    <img src="https://flatt.tech/assets/images/badges/gmo-oss.svg" height="20px"/>
+  </a>
 </p>
 
 <p align="center">
