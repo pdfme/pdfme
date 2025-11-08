@@ -29,7 +29,7 @@ export const pdf2img = async (
   options: Pdf2ImgOptions = {},
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) => pdfjsLib.getDocument({ data: pdf, isEvalSupported: false }).promise,
     createCanvas: (width, height) => {
       const canvas = document.createElement('canvas');
       canvas.width = width;
@@ -45,7 +45,7 @@ export const pdf2img = async (
 
 export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
-    getDocument: (pdf) => pdfjsLib.getDocument(pdf).promise,
+    getDocument: (pdf) => pdfjsLib.getDocument({ data: pdf, isEvalSupported: false }).promise,
   });
 
 export { img2pdf } from './img2pdf.js';
