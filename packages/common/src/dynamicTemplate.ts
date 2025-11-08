@@ -180,12 +180,28 @@ function breakIntoPages(arg: {
     return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
   };
 
+  const calculateTargetPageIndex = (y: number) => {
+    let accumulatedHeight = 0;
+    let pageIndex = 0;
+
+    while (true) {
+      const currentPageHeight = getPageHeight(pageIndex);
+
+      if (y <= accumulatedHeight + currentPageHeight) {
+        return pageIndex;
+      }
+
+      accumulatedHeight += currentPageHeight;
+      pageIndex++;
+    }
+  };
+
   const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
   for (let i = 0; i < children.length; i++) {
     const { schema, position, height, width } = children[i];
     const { y, x } = position;
 
-    let targetPageIndex = Math.floor(y / getPageHeight(pages.length - 1));
+    let targetPageIndex = calculateTargetPageIndex(y);
     let newY = calculateNewY(y, targetPageIndex);
 
     if (newY + height > basePdf.height - paddingBottom) {
