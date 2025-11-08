@@ -180,7 +180,7 @@ describe('check validation', () => {
       expect(e.message).toEqual(`[@pdfme/common] Invalid argument:
 --------------------------
 ERROR POSITION: inputs
-ERROR MESSAGE: Array must contain at least 1 element(s)
+ERROR MESSAGE: Too small: expected array to have >=1 items
 --------------------------`);
     }
   });
