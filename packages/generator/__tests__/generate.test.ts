@@ -157,7 +157,7 @@ describe('generate integrate test', () => {
 
 describe('check validation', () => {
   test(`inputs length is 0`, async () => {
-    const inputs: { [key: string]: string }[] = [];
+    const cd: { [key: string]: string }[] = [];
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [
