@@ -33,7 +33,7 @@ class PDFWriter {
     this.objectsPerTick = objectsPerTick;
   }
 
-  async serializeToBuffer(): Promise<Uint8Array> {
+  async serializeToBuffer(): Promise<Uint8Array<ArrayBuffer>> {
     const { size, header, indirectObjects, xref, trailerDict, trailer } =
       await this.computeBufferSize();
 
