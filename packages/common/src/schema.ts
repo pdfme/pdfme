@@ -117,7 +117,9 @@ const SchemaForUIAdditionalInfo = z.object({ id: z.string() });
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
-const Uint8ArraySchema: z.ZodSchema<Uint8Array> = z.any().refine((v) => v instanceof Uint8Array);
+const Uint8ArraySchema: z.ZodSchema<Uint8Array<ArrayBuffer>> = z
+  .any()
+  .refine((v) => v instanceof Uint8Array && v.buffer instanceof ArrayBuffer);
 
 export const BlankPdf = z.object({
   width: z.number(),

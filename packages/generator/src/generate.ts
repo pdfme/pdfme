@@ -17,7 +17,7 @@ import {
   validateRequiredFields,
 } from './helper.js';
 
-const generate = async (props: GenerateProps) => {
+const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> => {
   checkGenerateProps(props);
   const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
   const template = cloneDeep(_template);

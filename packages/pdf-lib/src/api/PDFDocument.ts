@@ -1261,7 +1261,7 @@ export default class PDFDocument {
    * @param options The options to be used when saving the document.
    * @returns Resolves with the bytes of the serialized document.
    */
-  async save(options: SaveOptions = {}): Promise<Uint8Array> {
+  async save(options: SaveOptions = {}): Promise<Uint8Array<ArrayBuffer>> {
     const {
       useObjectStreams = true,
       addDefaultPage = true,
