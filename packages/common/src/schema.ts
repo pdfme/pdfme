@@ -131,7 +131,7 @@ export const CustomPdf = z.union([z.string(), ArrayBufferSchema, Uint8ArraySchem
 export const BasePdf = z.union([CustomPdf, BlankPdf]);
 
 // Legacy keyed structure for BC - we convert to SchemaPageArray on import
-export const LegacySchemaPageArray = z.array(z.record(Schema));
+export const LegacySchemaPageArray = z.array(z.record(z.string(), Schema));
 export const SchemaPageArray = z.array(z.array(Schema));
 
 export const Template = z
@@ -142,9 +142,10 @@ export const Template = z
   })
   .passthrough();
 
-export const Inputs = z.array(z.record(z.any())).min(1);
+export const Inputs = z.array(z.record(z.string(), z.any())).min(1);
 
 export const Font = z.record(
+  z.string(),
   z.object({
     data: z.union([z.string(), ArrayBufferSchema, Uint8ArraySchema]),
     fallback: z.boolean().optional(),
@@ -154,11 +155,11 @@ export const Font = z.record(
 
 export const Plugin = z
   .object({
-    ui: z.function().args(z.any()).returns(z.any()),
-    pdf: z.function().args(z.any()).returns(z.any()),
+    ui: z.any(),
+    pdf: z.any(),
     propPanel: z.object({
       schema: z.unknown(),
-      widgets: z.record(z.any()).optional(),
+      widgets: z.record(z.string(), z.any()).optional(),
       defaultSchema: Schema,
     }),
     icon: z.string().optional(),
@@ -170,7 +171,7 @@ export const CommonOptions = z.object({ font: Font.optional() }).passthrough();
 const CommonProps = z.object({
   template: Template,
   options: CommonOptions.optional(),
-  plugins: z.record(Plugin).optional(),
+  plugins: z.record(z.string(), Plugin).optional(),
 });
 
 // -------------------generate-------------------

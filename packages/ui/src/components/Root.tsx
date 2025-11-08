@@ -13,7 +13,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
     if (!document || !document.fonts) return;
     const fontFaces = Object.entries(font).map(
       ([key, { data }]) =>
-        new FontFace(key, typeof data === 'string' ? `url(${data})` : data, {
+        new FontFace(key, typeof data === 'string' ? `url(${data})` : (data as BufferSource), {
           display: 'swap',
         }),
     );
