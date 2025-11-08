@@ -155,13 +155,13 @@ describe('checkGenerateProps', () => {
     expect(() => checkGenerateProps(invalidProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
       "--------------------------\n" +
       "ERROR POSITION: template.schemas\n" +
-      "ERROR MESSAGE: Expected array, received string\n" +
+      "ERROR MESSAGE: Invalid input: expected array, received string\n" +
       "--------------------------\n" +
       "ERROR POSITION: template.basePdf\n" +
       "ERROR MESSAGE: Invalid input\n" +
       "--------------------------\n" +
       "ERROR POSITION: inputs\n" +
-      "ERROR MESSAGE: Required\n" +
+      "ERROR MESSAGE: Invalid input: expected array, received undefined\n" +
       "--------------------------");
   });
 
@@ -177,10 +177,10 @@ describe('checkGenerateProps', () => {
     expect(() => checkGenerateProps(missingSchemaProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
       "--------------------------\n" +
       "ERROR POSITION: template.schemas\n" +
-      "ERROR MESSAGE: Required\n" +
+      "ERROR MESSAGE: Invalid input: expected array, received undefined\n" +
       "--------------------------\n" +
       "ERROR POSITION: inputs\n" +
-      "ERROR MESSAGE: Array must contain at least 1 element(s)\n" +
+      "ERROR MESSAGE: Too small: expected array to have >=1 items\n" +
       "--------------------------");
   });
 
@@ -222,20 +222,14 @@ describe('checkGenerateProps', () => {
 
     expect(() => checkGenerateProps(invalidPluginProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
       "--------------------------\n" +
-      "ERROR POSITION: plugins.invalid.ui\n" +
-      "ERROR MESSAGE: Required\n" +
-      "--------------------------\n" +
-      "ERROR POSITION: plugins.invalid.pdf\n" +
-      "ERROR MESSAGE: Required\n" +
-      "--------------------------\n" +
       "ERROR POSITION: plugins.invalid.propPanel.defaultSchema.type\n" +
-      "ERROR MESSAGE: Required\n" +
+      "ERROR MESSAGE: Invalid input: expected string, received undefined\n" +
       "--------------------------\n" +
       "ERROR POSITION: plugins.missingPanel.propPanel\n" +
-      "ERROR MESSAGE: Required\n" +
+      "ERROR MESSAGE: Invalid input: expected object, received undefined\n" +
       "--------------------------\n" +
       "ERROR POSITION: plugins.missingDefaultSchema.propPanel.defaultSchema\n" +
-      "ERROR MESSAGE: Required\n" +
+      "ERROR MESSAGE: Invalid input: expected object, received undefined\n" +
       "--------------------------");
   });
 
