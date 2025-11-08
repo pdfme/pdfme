@@ -126,22 +126,24 @@ describe('getDynamicTemplate', () => {
       );
 
       verifyBasicStructure(dynamicTemplate);
-      expect(dynamicTemplate.schemas.length).toBe(5);
+      expect(dynamicTemplate.schemas.length).toBe(4);
 
       // Verify 'a' elements
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 3; i++) {
         expect(dynamicTemplate.schemas[i][0]).toBeDefined();
         expect(dynamicTemplate.schemas[i][0].position.y).toEqual(i === 0 ? aPositionY : padding);
-        expect(dynamicTemplate.schemas[i][0].height).toEqual(i === 3 ? 100 : 50);
+        expect(dynamicTemplate.schemas[i][0].height).toEqual(i === 2 ? 100 : 50);
         expect(dynamicTemplate.schemas[i][0].name).toEqual('a');
-        expect(dynamicTemplate.schemas[i][1]).toBeUndefined();
+        if (i === 3) {
+          expect(dynamicTemplate.schemas[i][1]).toBeDefined();
+        }
       }
 
       // Verify 'b' element
-      expect(dynamicTemplate.schemas[4][0]).toBeDefined();
-      expect(dynamicTemplate.schemas[4][0].name).toEqual('b');
-      expect(dynamicTemplate.schemas[4][0].position.y).toEqual(padding);
-      expect(dynamicTemplate.schemas[4][0].height).toEqual(10);
+      expect(dynamicTemplate.schemas[3][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[3][1].name).toEqual('b');
+      expect(dynamicTemplate.schemas[3][1].position.y).toEqual(70);
+      expect(dynamicTemplate.schemas[3][1].height).toEqual(10);
     });
 
     test('should handle both a and b on next page', async () => {
