@@ -268,13 +268,52 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
       }
       const airDatepicker = new AirDatepicker(input, {
         locale: locale.adLocale,
-        selectedDates: [strDateToDate(value, type)],
+        selectedDates: value.trim() ? [strDateToDate(value, type)] : [],
         dateFormat: (date: AirDatepickerDate) =>
           format(date, schema.format, { locale: locale.formatLocale }),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
         buttons: adButtons,
+        position({ $datepicker, $target, $pointer, done }) {
+          $datepicker.style.position = 'fixed';
+          const offset = 5; 
+          const scrollY = window.scrollY;
+          const scrollX = window.scrollX;
+
+          const targetRect = $target.getBoundingClientRect();
+          const dpHeight = $datepicker.offsetHeight;
+          const dpWidth = $datepicker.offsetWidth;
+
+          const spaceBelow = window.innerHeight - targetRect.bottom;
+          const spaceAbove = targetRect.top;
+
+          const showAbove = spaceBelow < dpHeight + offset && spaceAbove > dpHeight;
+
+          let top = showAbove
+              ? targetRect.top + scrollY - dpHeight - offset
+              : targetRect.bottom + scrollY + offset;
+
+          let left = targetRect.left + scrollX;
+
+          if (left + dpWidth > window.innerWidth) {
+              left = window.innerWidth - dpWidth - 10;
+          }
+
+          $datepicker.style.position = 'absolute';
+          $datepicker.style.top = `${top}px`;
+          $datepicker.style.left = `${left}px`;
+          if ($pointer) {
+              $pointer.style.display = 'block';
+              $pointer.style.position = 'absolute';
+              $pointer.style.left = '10px'; 
+              $pointer.style.top = showAbove ? 'calc(100% - 5px)' : '-5px';
+              $pointer.style.transform = showAbove ? 'rotate(135deg)' : 'rotate(-45deg)';
+          }
+          return function completeHide() {
+              done();
+          };
+      },
         onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
           if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);
