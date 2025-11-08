@@ -7,7 +7,7 @@ import {
   setStrokingRgbColor,
 } from './operators';
 import { assertRange, assertIs, error } from '../utils';
-import ColorParser from 'color';
+import tinycolor from 'tinycolor2';
 
 export enum ColorTypes {
   Grayscale = 'Grayscale',
@@ -59,10 +59,11 @@ export const cmyk = (cyan: number, magenta: number, yellow: number, key: number)
 
 export const colorString = (color: string): { rgb: Color; alpha?: number } => {
   assertIs(color, 'color', ['string']);
-  const colorDescription = ColorParser(color).unitObject();
+  const colorObj = tinycolor(color);
+  const rgbObj = colorObj.toRgb();
   return {
-    rgb: rgb(colorDescription.r, colorDescription.g, colorDescription.b),
-    alpha: colorDescription.alpha,
+    rgb: rgb(rgbObj.r / 255, rgbObj.g / 255, rgbObj.b / 255),
+    alpha: rgbObj.a,
   };
 };
 
