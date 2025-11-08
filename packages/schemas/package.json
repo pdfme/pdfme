@@ -83,10 +83,21 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
+        }
+      ],
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "useESM": true
         }
       ]
     },
+    "extensionsToTreatAsEsm": [".ts"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(color|color-string|color-convert|color-name)/)"
+    ],
     "testMatch": [
       "**/*.test.ts"
     ]

@@ -109,16 +109,24 @@
       "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.json"
+          "tsconfig": "tsconfig.json",
+          "useESM": true
+        }
+      ],
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "useESM": true
         }
       ]
     },
+    "extensionsToTreatAsEsm": [".ts", ".tsx"],
     "testMatch": [
       "**/*.test.ts",
       "**/*.test.tsx"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!lucide-react)"
+      "/node_modules/(?!lucide-react|color|color-string|color-convert|color-name)"
     ]
   },
   "publishConfig": {

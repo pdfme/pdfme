@@ -70,7 +70,7 @@
       "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
     },
     "transformIgnorePatterns": [
-      "/node_modules/(?!(air-datepicker)/)"
+      "/node_modules/(?!(air-datepicker|color|color-string|color-convert|color-name)/)"
     ],
     "moduleFileExtensions": [
       "js",
@@ -80,11 +80,19 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
+        }
+      ],
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "useESM": true
         }
       ],
       "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
     },
+    "extensionsToTreatAsEsm": [".ts"],
     "testMatch": [
       "**/*.test.ts"
     ]

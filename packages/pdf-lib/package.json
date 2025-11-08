@@ -55,7 +55,7 @@
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",
     "@pdf-lib/upng": "^1.0.1",
-    "color": "^4.2.3",
+    "color": "^5.0.2",
     "node-html-better-parser": "^1.5.8",
     "pako": "^2.1.0"
   },
@@ -74,10 +74,21 @@
       "^.+\\.ts?$": [
         "ts-jest",
         {
-          "tsconfig": "tsconfig.esm.json"
+          "tsconfig": "tsconfig.esm.json",
+          "useESM": true
+        }
+      ],
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "useESM": true
         }
       ]
     },
+    "extensionsToTreatAsEsm": [".ts"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(color|color-string|color-convert|color-name)/)"
+    ],
     "testMatch": [
       "**/*.test.ts",
       "**/*.spec.ts"

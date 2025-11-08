@@ -72,8 +72,17 @@
           "tsconfig": "./tsconfig.json",
           "useESM": true
         }
+      ],
+      "^.+\\.js$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
       ]
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(color|color-string|color-convert|color-name)/)"
+    ],
     "moduleNameMapper": {
       "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
     }
