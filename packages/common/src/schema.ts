@@ -37,6 +37,7 @@ export const Dict = z.object({
   'validation.uniqueName': z.string(),
   'validation.hexColor': z.string(),
   'validation.dateTimeFormat': z.string(),
+  'validation.outOfBounds': z.string(),
 
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),

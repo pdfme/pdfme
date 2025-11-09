@@ -339,6 +339,7 @@ const TemplateEditor = ({
             height={canvasRef.current ? canvasRef.current.clientHeight : 0}
             size={size}
             pageSize={pageSizes[pageCursor] ?? []}
+            basePdf={template.basePdf}
             activeElements={activeElements}
             schemasList={schemasList}
             schemas={schemasList[pageCursor] ?? []}

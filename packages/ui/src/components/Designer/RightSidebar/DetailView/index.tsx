@@ -8,6 +8,7 @@ import type {
   PropPanelSchema,
   Schema,
 } from '@pdfme/common';
+import { isBlankPdf } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
@@ -29,6 +30,7 @@ type DetailViewProps = Pick<
   | 'schemas'
   | 'schemasList'
   | 'pageSize'
+  | 'basePdf'
   | 'changeSchemas'
   | 'activeElements'
   | 'deselectSchema'
@@ -39,7 +41,8 @@ type DetailViewProps = Pick<
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, schemasList, changeSchemas, deselectSchema, activeSchema } = props;
+  const { size, schemasList, changeSchemas, deselectSchema, activeSchema, pageSize, basePdf } =
+    props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
@@ -115,6 +118,37 @@ const DetailView = (props: DetailViewProps) => {
   // Use proper type for validator function parameter
   const validateUniqueSchemaName = (_: unknown, value: string): boolean =>
     uniqueSchemaName.current(value);
+
+  // Calculate padding values once
+  const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(basePdf)
+    ? basePdf.padding
+    : [0, 0, 0, 0];
+
+  // Cross-field validation: only checks when both fields are individually valid
+  const validatePosition = (_: unknown, value: number, fieldName: string): boolean => {
+    const formValues = form.getValues() as Record<string, unknown>;
+    const position = formValues.position as { x: number; y: number } | undefined;
+    const width = formValues.width as number | undefined;
+    const height = formValues.height as number | undefined;
+
+    if (!position || width === undefined || height === undefined) return true;
+
+    if (fieldName === 'x') {
+      if (value < paddingLeft || value > pageSize.width - paddingRight) return true;
+      if (width > 0 && value + width > pageSize.width - paddingRight) return false;
+    } else if (fieldName === 'y') {
+      if (value < paddingTop || value > pageSize.height - paddingBottom) return true;
+      if (height > 0 && value + height > pageSize.height - paddingBottom) return false;
+    } else if (fieldName === 'width') {
+      if (position.x < paddingLeft || position.x > pageSize.width - paddingRight) return true;
+      if (value > 0 && position.x + value > pageSize.width - paddingRight) return false;
+    } else if (fieldName === 'height') {
+      if (position.y < paddingTop || position.y > pageSize.height - paddingBottom) return true;
+      if (value > 0 && position.y + value > pageSize.height - paddingBottom) return false;
+    }
+
+    return true;
+  };
 
   // Use explicit type for debounce function that matches the expected signature
   const handleWatch = debounce(function (...args: unknown[]) {
@@ -203,6 +237,10 @@ const DetailView = (props: DetailViewProps) => {
       })()
     : emptySchema;
 
+  // Calculate max values considering padding
+  const maxWidth = pageSize.width - paddingLeft - paddingRight;
+  const maxHeight = pageSize.height - paddingTop - paddingBottom;
+
   // Create a type-safe schema object
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
@@ -247,8 +285,36 @@ const DetailView = (props: DetailViewProps) => {
         type: 'object',
         widget: 'card',
         properties: {
-          x: { title: 'X', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
-          y: { title: 'Y', type: 'number', widget: 'inputNumber', required: true, span: 8, min: 0 },
+          x: {
+            title: 'X',
+            type: 'number',
+            widget: 'inputNumber',
+            required: true,
+            span: 8,
+            min: paddingLeft,
+            max: pageSize.width - paddingRight,
+            rules: [
+              {
+                validator: (_: unknown, value: number) => validatePosition(_, value, 'x'),
+                message: typedI18n('validation.outOfBounds'),
+              },
+            ],
+          },
+          y: {
+            title: 'Y',
+            type: 'number',
+            widget: 'inputNumber',
+            required: true,
+            span: 8,
+            min: paddingTop,
+            max: pageSize.height - paddingBottom,
+            rules: [
+              {
+                validator: (_: unknown, value: number) => validatePosition(_, value, 'y'),
+                message: typedI18n('validation.outOfBounds'),
+              },
+            ],
+          },
         },
       },
       width: {
@@ -257,7 +323,13 @@ const DetailView = (props: DetailViewProps) => {
         widget: 'inputNumber',
         required: true,
         span: 6,
-        props: { min: 0 },
+        props: { min: 0, max: maxWidth },
+        rules: [
+          {
+            validator: (_: unknown, value: number) => validatePosition(_, value, 'width'),
+            message: typedI18n('validation.outOfBounds'),
+          },
+        ],
       },
       height: {
         title: typedI18n('height'),
@@ -265,7 +337,13 @@ const DetailView = (props: DetailViewProps) => {
         widget: 'inputNumber',
         required: true,
         span: 6,
-        props: { min: 0 },
+        props: { min: 0, max: maxHeight },
+        rules: [
+          {
+            validator: (_: unknown, value: number) => validatePosition(_, value, 'height'),
+            message: typedI18n('validation.outOfBounds'),
+          },
+        ],
       },
       rotate: {
         title: typedI18n('rotate'),
