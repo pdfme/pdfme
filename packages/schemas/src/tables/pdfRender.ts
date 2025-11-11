@@ -124,12 +124,7 @@ export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
   );
 
   // Create a properly typed CreateTableArgs object
-  const createTableArgs: CreateTableArgs = {
-    schema,
-    basePdf,
-    options,
-    _cache,
-  };
+  const createTableArgs: CreateTableArgs = { schema, basePdf, options, _cache };
 
   // Ensure body is properly typed before passing to createSingleTable
   // Ensure body is properly typed as string[][] before passing to createSingleTable
@@ -137,6 +132,11 @@ export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
     ? body.map((row) => (Array.isArray(row) ? row.map((cell) => String(cell)) : []))
     : [];
   const table = await createSingleTable(typedBody, createTableArgs);
+
+  if (table.allRows().length === 0) {
+    // If there are no rows, we can skip rendering
+    return;
+  }
 
   // Use the original arg directly since drawTable expects PDFRenderProps<TableSchema>
   // which is the same type as our arg parameter
