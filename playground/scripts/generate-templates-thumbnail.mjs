@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import pLimit from 'p-limit';
 import { generate } from '@pdfme/generator/cjs/src/index.js';
@@ -23,7 +24,8 @@ import {
   radioGroup,
 } from '@pdfme/schemas/cjs/src/index.js';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const plugins = {
   multiVariableText,
@@ -45,7 +47,7 @@ const plugins = {
   checkbox,
   radioGroup,
   signature: {
-    ui: async () => { },
+    ui: async () => {},
     pdf: image.pdf,
     propPanel: {
       schema: {},
@@ -74,7 +76,7 @@ const font = {
   NotoSansJP: {
     fallback: false,
     data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
-  }
+  },
 };
 
 const limit = pLimit(4);
@@ -82,7 +84,6 @@ const limit = pLimit(4);
 function calcHash(content) {
   return crypto.createHash('md5').update(content, 'utf8').digest('hex');
 }
-
 
 async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
   try {
