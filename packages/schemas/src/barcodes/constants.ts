@@ -6,6 +6,7 @@ export const BARCODE_TYPES = [
   'code39',
   'code128',
   'nw7',
+  'itf',
   'itf14',
   'upca',
   'upce',

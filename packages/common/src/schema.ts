@@ -55,6 +55,21 @@ export const Dict = z.object({
   'schemas.middle': z.string(),
   'schemas.bottom': z.string(),
   'schemas.padding': z.string(),
+  'schemas.scale': z.string(),
+  'schemas.showBorder': z.string(),
+  'schemas.outputFormat': z.string(),
+  'schemas.altText': z.string(),
+  'schemas.textYOffset': z.string(),
+
+  'schemas.qr.eclevel': z.string(),
+  'schemas.qr.version': z.string(),
+  'schemas.qr.mask': z.string(),
+  'schemas.qr.qzone': z.string(),
+
+  'schemas.pdf417.columns': z.string(),
+  'schemas.pdf417.rows': z.string(),
+  'schemas.pdf417.compact': z.string(),
+  'schemas.pdf417.eclevel': z.string(),
 
   'schemas.text.fontName': z.string(),
   'schemas.text.size': z.string(),
