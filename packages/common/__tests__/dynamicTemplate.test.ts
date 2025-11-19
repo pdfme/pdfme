@@ -69,7 +69,7 @@ describe('getDynamicTemplate', () => {
     test('should handle no page break', async () => {
       const increaseHeights = [10, 10, 10, 10, 10];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -77,7 +77,7 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
       expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1].position.y).toEqual(
-        increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY
+        increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY,
       );
       expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
     });
@@ -87,7 +87,7 @@ describe('getDynamicTemplate', () => {
     test('should handle page break with a on page 1 and b on page 2', async () => {
       const increaseHeights = [20, 20, 20, 20];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -103,7 +103,7 @@ describe('getDynamicTemplate', () => {
     test('should handle page break with a on page 1 and 2, b on page 2', async () => {
       const increaseHeights = [20, 20, 20, 20, 20];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -114,7 +114,7 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
       expect(dynamicTemplate.schemas[1][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[1][1].position.y).toEqual(
-        increaseHeights.slice(3).reduce((a, b) => a + b, 0) - height + padding
+        increaseHeights.slice(3).reduce((a, b) => a + b, 0) - height + padding,
       );
       expect(dynamicTemplate.schemas[1][1].name).toEqual('b');
     });
@@ -122,34 +122,53 @@ describe('getDynamicTemplate', () => {
     test('should handle multiple page breaks', async () => {
       const increaseHeights = [50, 50, 50, 50, 50];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
-      expect(dynamicTemplate.schemas.length).toBe(4);
+      expect(dynamicTemplate.schemas.length).toBe(5);
 
-      // Verify 'a' elements
-      for (let i = 0; i < 3; i++) {
-        expect(dynamicTemplate.schemas[i][0]).toBeDefined();
-        expect(dynamicTemplate.schemas[i][0].position.y).toEqual(i === 0 ? aPositionY : padding);
-        expect(dynamicTemplate.schemas[i][0].height).toEqual(i === 2 ? 100 : 50);
-        expect(dynamicTemplate.schemas[i][0].name).toEqual('a');
-        if (i === 3) {
-          expect(dynamicTemplate.schemas[i][1]).toBeDefined();
-        }
-      }
+      // Verify 'a' elements across pages
+      // Page 0: 'a' first segment (50px)
+      expect(dynamicTemplate.schemas[0][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][0].position.y).toEqual(aPositionY);
+      expect(dynamicTemplate.schemas[0][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
 
-      // Verify 'b' element
-      expect(dynamicTemplate.schemas[3][1]).toBeDefined();
-      expect(dynamicTemplate.schemas[3][1].name).toEqual('b');
-      expect(dynamicTemplate.schemas[3][1].position.y).toEqual(70);
-      expect(dynamicTemplate.schemas[3][1].height).toEqual(10);
+      // Page 1: 'a' second segment (50px)
+      expect(dynamicTemplate.schemas[1][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[1][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[1][0].name).toEqual('a');
+
+      // Page 2: 'a' third segment (50px)
+      expect(dynamicTemplate.schemas[2][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[2][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[2][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[2][0].name).toEqual('a');
+
+      // Page 3: 'a' fourth segment (50px)
+      expect(dynamicTemplate.schemas[3][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[3][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[3][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[3][0].name).toEqual('a');
+
+      // Page 4: 'a' fifth segment (50px) and 'b' element (10px)
+      expect(dynamicTemplate.schemas[4][0]).toBeDefined();
+      expect(dynamicTemplate.schemas[4][0].position.y).toEqual(padding);
+      expect(dynamicTemplate.schemas[4][0].height).toEqual(50);
+      expect(dynamicTemplate.schemas[4][0].name).toEqual('a');
+
+      expect(dynamicTemplate.schemas[4][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[4][1].position.y).toEqual(70);
+      expect(dynamicTemplate.schemas[4][1].height).toEqual(10);
+      expect(dynamicTemplate.schemas[4][1].name).toEqual('b');
     });
 
     test('should handle both a and b on next page', async () => {
       const increaseHeights = [80, 10, 10];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -168,7 +187,7 @@ describe('getDynamicTemplate', () => {
 
       expect(dynamicTemplate.schemas[1][1]).toBeDefined();
       expect(dynamicTemplate.schemas[1][1].position.y).toBeGreaterThanOrEqual(
-        dynamicTemplate.schemas[1][0].position.y + dynamicTemplate.schemas[1][0].height
+        dynamicTemplate.schemas[1][0].position.y + dynamicTemplate.schemas[1][0].height,
       );
     });
   });
@@ -178,7 +197,7 @@ describe('getDynamicTemplate', () => {
       const increaseHeights = [10, 10, 10, 10, 10];
       const bHeight = 30;
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights, bHeight)
+        createGetDynamicTemplateArg(increaseHeights, bHeight),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -202,7 +221,7 @@ describe('getDynamicTemplate', () => {
     test('should handle empty increase heights', async () => {
       const increaseHeights: number[] = [];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
@@ -215,11 +234,65 @@ describe('getDynamicTemplate', () => {
     test('should handle very large increase heights', async () => {
       const increaseHeights = [1000, 1000];
       const dynamicTemplate = await getDynamicTemplate(
-        createGetDynamicTemplateArg(increaseHeights)
+        createGetDynamicTemplateArg(increaseHeights),
       );
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBeGreaterThan(1);
+    });
+  });
+
+  describe('Long page flow (cross-template-page)', () => {
+    test('should flow table and text across template pages without extra blank pages', async () => {
+      const templateWithTwoPages: Template = {
+        schemas: [
+          [
+            {
+              name: 'table',
+              content: 'table',
+              type: 'table',
+              position: { x: 10, y: 60 },
+              width: 80,
+              height: 10,
+            },
+          ],
+          [
+            {
+              name: 'text',
+              content: 'text',
+              type: 'text',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: templateWithTwoPages,
+        input: { table: 'table', text: 'text' },
+        options: { font: getSampleFont() },
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.type === 'table') {
+            return [10, 10, 10, 10];
+          }
+          return [args.schema.height];
+        },
+      });
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+      expect(dynamicTemplate.schemas[0].some((s) => s.name === 'table')).toBe(true);
+      expect(dynamicTemplate.schemas[1].some((s) => s.name === 'table')).toBe(true);
+      expect(dynamicTemplate.schemas[1].some((s) => s.name === 'text')).toBe(true);
+      const tableOnPage2 = dynamicTemplate.schemas[1].find((s) => s.name === 'table');
+      const textOnPage2 = dynamicTemplate.schemas[1].find((s) => s.name === 'text');
+      expect(tableOnPage2).toBeDefined();
+      expect(textOnPage2).toBeDefined();
+      expect(textOnPage2!.position.y).toBeGreaterThan(tableOnPage2!.position.y);
     });
   });
 });

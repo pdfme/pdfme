@@ -177,6 +177,7 @@ function breakIntoPages(arg: {
         yAdjustments.push({ page: pageIndex, value: (newY - paddingTop) * -1 });
       }
     }
+
     return newY + (yAdjustments.find((adj) => adj.page === pageIndex)?.value || 0);
   };
 
@@ -197,17 +198,35 @@ function breakIntoPages(arg: {
   };
 
   const children = longPage.children.sort((a, b) => a.position.y - b.position.y);
+
+  let currentPageIndex = 0;
+
   for (let i = 0; i < children.length; i++) {
     const { schema, position, height, width } = children[i];
     const { y, x } = position;
 
     let targetPageIndex = calculateTargetPageIndex(y);
+
+    if (targetPageIndex < currentPageIndex) {
+      targetPageIndex = currentPageIndex;
+    }
+
     let newY = calculateNewY(y, targetPageIndex);
 
-    if (newY + height > basePdf.height - paddingBottom) {
+    while (newY + height > basePdf.height - paddingBottom) {
+      const currentPageContentHeight = getPageHeight(targetPageIndex + 1);
+
+      if (height > currentPageContentHeight) {
+        targetPageIndex++;
+        newY = calculateNewY(y, targetPageIndex);
+        break;
+      }
+
       targetPageIndex++;
       newY = calculateNewY(y, targetPageIndex);
     }
+
+    currentPageIndex = targetPageIndex;
 
     if (!schema) throw new Error('[@pdfme/common] schema is undefined');
 
@@ -276,23 +295,55 @@ function createNewTemplate(pages: LayoutNode[], basePdf: BlankPdf): Template {
   return newTemplate;
 }
 
+function flattenSchemasWithOffset(
+  templateSchemas: Schema[][],
+  basePdf: BlankPdf,
+): { flatSchemas: Schema[]; orderMap: Map<string, number> } {
+  const flatSchemas: Schema[] = [];
+  const orderMap = new Map<string, number>();
+  let globalOrder = 0;
+  const [paddingTop, , paddingBottom] = basePdf.padding;
+  const getPageHeight = (pageIndex: number) =>
+    basePdf.height - paddingBottom - (pageIndex > 0 ? paddingTop : 0);
+
+  let yOffset = 0;
+  templateSchemas.forEach((schemaPage, pageIndex) => {
+    if (pageIndex > 0) yOffset += getPageHeight(pageIndex - 1);
+
+    schemaPage.forEach((schema) => {
+      const clonedSchema = cloneDeep(schema);
+      clonedSchema.position = { ...clonedSchema.position, y: clonedSchema.position.y + yOffset };
+      flatSchemas.push(clonedSchema);
+
+      if (!orderMap.has(schema.name)) {
+        orderMap.set(schema.name, globalOrder++);
+      }
+    });
+  });
+
+  return { flatSchemas, orderMap };
+}
+
 export const getDynamicTemplate = async (
   arg: ModifyTemplateForDynamicTableArg,
 ): Promise<Template> => {
-  const { template } = arg;
-  if (!isBlankPdf(template.basePdf)) {
+  const { template, ...rest } = arg;
+  const basePdf = template.basePdf;
+
+  if (!isBlankPdf(basePdf)) {
     return template;
   }
 
-  const basePdf = template.basePdf;
-  const pages: LayoutNode[] = [];
+  const { flatSchemas, orderMap } = flattenSchemasWithOffset(template.schemas, basePdf);
 
-  for (const schemaPage of template.schemas) {
-    const orderMap = new Map(schemaPage.map((schema, index) => [schema.name, index]));
-    const longPage = await createOnePage({ basePdf, schemaPage, orderMap, ...arg });
-    const brokenPages = breakIntoPages({ longPage, basePdf, orderMap });
-    pages.push(...brokenPages);
-  }
+  const longPage = await createOnePage({
+    basePdf,
+    schemaPage: flatSchemas,
+    orderMap,
+    ...rest,
+  });
 
-  return createNewTemplate(pages, template.basePdf);
+  const pages = breakIntoPages({ longPage, basePdf, orderMap });
+
+  return createNewTemplate(pages, basePdf);
 };

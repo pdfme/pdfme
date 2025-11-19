@@ -22,7 +22,13 @@ export const propPanel: PropPanel<TableSchema> = {
         title: i18n('schemas.table.showHead'),
         type: 'boolean',
         widget: 'checkbox',
-        span: 24,
+        span: 12,
+      },
+      headerRepeat: {
+        title: i18n('schemas.table.headerRepeat'),
+        type: 'boolean',
+        widget: 'checkbox',
+        span: 12,
       },
       '-------': { type: 'void', widget: 'Divider' },
       tableStyles: {
@@ -84,6 +90,7 @@ export const propPanel: PropPanel<TableSchema> = {
       ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
     ]),
     showHead: true,
+    headerRepeat: false,
     head: ['Name', 'City', 'Description'],
     headWidthPercentages: [30, 30, 40],
     tableStyles: {

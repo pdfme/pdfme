@@ -269,7 +269,7 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : !schema.__isSplit;
+  schema.showHead = schema.showHead === false ? false : (!schema.__isSplit || schema.headerRepeat === true);
 
   const input = parseInput(schema, body);
 
