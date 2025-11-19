@@ -9,6 +9,7 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import { Minus } from 'lucide';
 
 const DEFAULT_LINE_COLOR = '#000000';
+const HIT_POINT_HEIGHT = 16;
 
 interface LineSchema extends Schema {
   color: string;
@@ -38,11 +39,30 @@ const lineSchema: Plugin<LineSchema> = {
   },
   ui: (arg) => {
     const { schema, rootElement } = arg;
+    Object.assign(rootElement.style, { position: 'relative', overflow: 'visible' });
+
+    const baseStyles = {
+      position: 'absolute',
+      top: '50%',
+      left: '0',
+      transform: 'translateY(-50%)',
+      width: '100%',
+    } as const;
+
+    const hitArea = document.createElement('div');
+    Object.assign(hitArea.style, baseStyles, {
+      height: `${HIT_POINT_HEIGHT}px`,
+      backgroundColor: 'transparent',
+    });
+
     const div = document.createElement('div');
-    div.style.backgroundColor = schema.color ?? 'transparent';
-    div.style.width = '100%';
-    div.style.height = '100%';
-    rootElement.appendChild(div);
+    Object.assign(div.style, baseStyles, {
+      height: '100%',
+      backgroundColor: schema.color ?? 'transparent',
+      pointerEvents: 'none',
+    });
+
+    rootElement.append(hitArea, div);
   },
   propPanel: {
     schema: ({ i18n }) => ({
