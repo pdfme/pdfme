@@ -5,6 +5,8 @@ export type Spacing = { top: number; right: number; bottom: number; left: number
 type BorderInsets = Spacing;
 type BoxDimensions = Spacing;
 
+export type ColumnType = 'text' | 'qrcode' | 'code128';
+
 export interface CellStyle {
   fontName?: string;
   alignment: ALIGNMENT;
@@ -19,7 +21,7 @@ export interface CellStyle {
   padding: BoxDimensions;
 }
 
-export type CellSchema = Schema & CellStyle;
+export type CellSchema = Schema & CellStyle & { columnType?: ColumnType };
 
 export interface TableSchema extends Schema {
   showHead: boolean;
@@ -35,6 +37,7 @@ export interface TableSchema extends Schema {
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
+    columnType?: { [colIndex: number]: ColumnType };
   };
 }
 
@@ -53,6 +56,7 @@ export interface Styles {
   cellWidth: number;
   minCellHeight: number;
   minCellWidth: number;
+  columnType?: ColumnType;
 }
 
 export interface TableInput {

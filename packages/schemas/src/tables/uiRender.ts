@@ -185,6 +185,8 @@ const renderRowUi = (args: {
           width: cell.width,
           height: cell.height,
           ...convertToCellStyle(cell.styles),
+          // Head section should always be text, body can use columnType
+          columnType: section === 'head' ? 'text' : cell.styles.columnType,
         },
       });
       colOffsetX += cell.width;
@@ -203,7 +205,7 @@ const resetEditingPosition = () => {
 };
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
-  const { rootElement, onChange, schema, value, mode, scale} = arg;
+  const { rootElement, onChange, schema, value, mode, scale } = arg;
   const body = getBody(value);
   const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
   const table = await createSingleTable(bodyWidthRange, arg);
