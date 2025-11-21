@@ -24,8 +24,8 @@ export const propPanel: PropPanel<TableSchema> = {
         widget: 'checkbox',
         span: 12,
       },
-      headerRepeat: {
-        title: i18n('schemas.table.headerRepeat'),
+      repeatHead: {
+        title: i18n('schemas.table.repeatHead'),
         type: 'boolean',
         widget: 'checkbox',
         span: 12,
@@ -90,7 +90,7 @@ export const propPanel: PropPanel<TableSchema> = {
       ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
     ]),
     showHead: true,
-    headerRepeat: false,
+    repeatHead: false,
     head: ['Name', 'City', 'Description'],
     headWidthPercentages: [30, 30, 40],
     tableStyles: {

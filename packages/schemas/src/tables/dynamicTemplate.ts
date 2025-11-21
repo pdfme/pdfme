@@ -23,7 +23,7 @@ export const getDynamicHeightsForTable = async (
     : [0].concat(table.body.map((row) => row.height));
 
   const headerHeight = schema.showHead ? table.getHeadHeight() : 0;
-  const shouldRepeatHeader = schema.headerRepeat && isBlankPdf(args.basePdf) && headerHeight > 0;
+  const shouldRepeatHeader = schema.repeatHead && isBlankPdf(args.basePdf) && headerHeight > 0;
 
   if (!shouldRepeatHeader) {
     return baseHeights;
