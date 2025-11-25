@@ -119,9 +119,17 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     opacity,
   } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
 
+  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+
   if (schema.backgroundColor) {
     const color = hex2PrintingColor(schema.backgroundColor, colorType);
-    page.drawRectangle({ x, y, width, height, rotate, color });
+    if (rotate.angle !== 0) {
+      // Apply the same rotation logic as text rendering to match UI behavior
+      const rotatedPoint = rotatePoint({ x, y }, pivotPoint, rotate.angle);
+      page.drawRectangle({ x: rotatedPoint.x, y: rotatedPoint.y, width, height, rotate, color });
+    } else {
+      page.drawRectangle({ x, y, width, height, rotate, color });
+    }
   }
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
@@ -151,7 +159,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
   }
 
-  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
   const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
   lines.forEach((line, rowIndex) => {
