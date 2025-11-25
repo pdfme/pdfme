@@ -423,9 +423,10 @@ const DetailView = (props: DetailViewProps) => {
   }
 
   return (
-    <div>
+    <div id="pdfme-designer-detail-view">
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <Button
+          id="pdfme-designer-back-button"
           style={{
             position: 'absolute',
             zIndex: 100,

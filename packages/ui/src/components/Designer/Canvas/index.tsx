@@ -24,7 +24,7 @@ import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
-import { uuid, round, flatten } from '../../../helper.js';
+import { round, flatten } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
 import Selecto from './Selecto.js';
@@ -36,7 +36,7 @@ import StaticSchema from '../../StaticSchema.js';
 
 const mm2px = (mm: number) => mm * 3.7795275591;
 
-const DELETE_BTN_ID = uuid();
+const DELETE_BTN_ID = 'pdfme-designer-delete-button';
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
@@ -51,7 +51,7 @@ const DeleteButton = ({ activeElements: aes }: { activeElements: HTMLElement[] }
 
   return (
     <Button
-      id={DELETE_BTN_ID}
+      id="pdfme-designer-delete-button"
       style={{
         position: 'absolute',
         zIndex: 1,
@@ -350,6 +350,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   return (
     <div
+      id="pdfme-designer-canvas"
       style={{
         position: 'relative',
         overflow: 'auto',

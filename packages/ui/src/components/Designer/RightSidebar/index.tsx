@@ -21,6 +21,7 @@ const Sidebar = (props: SidebarProps) => {
 
   return (
     <div
+      id="pdfme-designer-right-sidebar"
       style={{
         position: 'absolute',
         right: 0,
@@ -31,6 +32,7 @@ const Sidebar = (props: SidebarProps) => {
     >
       <div>
         <Button
+          id="pdfme-designer-sidebar-toggle"
           style={{
             position: 'absolute',
             display: 'flex',

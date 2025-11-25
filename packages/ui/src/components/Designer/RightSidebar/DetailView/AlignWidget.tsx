@@ -213,6 +213,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
       <Space.Compact>
         {layoutBtns.map((btn) => (
           <Button
+            id={`pdfme-designer-align-${btn.id}`}
             key={btn.id}
             style={{ padding: 7 }}
             disabled={activeElements.length <= 2 && ['vertical', 'horizontal'].includes(btn.id)}

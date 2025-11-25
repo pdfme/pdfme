@@ -60,7 +60,7 @@ const ListView = (
   };
 
   return (
-    <div>
+    <div id="pdfme-designer-list-view">
       <div style={{ height: headHeight, display: 'flex', alignItems: 'center' }}>
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('fieldsList')}
@@ -99,16 +99,16 @@ const ListView = (
         >
           {isBulkUpdateFieldNamesMode ? (
             <>
-              <Button size="small" type="text" onClick={commitBulk}>
+              <Button id="pdfme-designer-bulk-commit" size="small" type="text" onClick={commitBulk}>
                 <u> {i18n('commitBulkUpdateFieldName')}</u>
               </Button>
               <span style={{ margin: '0 1rem' }}>/</span>
-              <Button size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
+              <Button id="pdfme-designer-bulk-cancel" size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
                 <u> {i18n('cancel')}</u>
               </Button>
             </>
           ) : (
-            <Button size="small" type="text" onClick={startBulk}>
+            <Button id="pdfme-designer-bulk-update" size="small" type="text" onClick={startBulk}>
               <u> {i18n('bulkUpdateFieldName')}</u>
             </Button>
           )}

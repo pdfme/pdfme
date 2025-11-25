@@ -83,6 +83,7 @@ const LeftSidebar = ({
 
   return (
     <div
+      id="pdfme-designer-left-sidebar"
       style={{
         left: 0,
         right: 0,
@@ -98,9 +99,12 @@ const LeftSidebar = ({
       {pluginsRegistry.entries().map(([label, plugin]) => {
         if (!plugin?.propPanel.defaultSchema) return null;
 
+        const pluginType = plugin.propPanel.defaultSchema.type;
+
         return (
           <Draggable key={label} scale={scale} basePdf={basePdf} plugin={plugin}>
             <Button
+              id={`pdfme-designer-plugin-${pluginType}`}
               onMouseDown={() => setIsDragging(true)}
               style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}
             >

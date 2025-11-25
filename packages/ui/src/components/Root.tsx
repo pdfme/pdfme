@@ -29,7 +29,7 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   }, [font]);
 
   return (
-    <div ref={ref} style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}>
+    <div id="pdfme-designer-root" ref={ref} style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}>
       <div style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
     </div>
   );

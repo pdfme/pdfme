@@ -29,6 +29,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button
+        id="pdfme-designer-zoom-out"
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
@@ -38,6 +39,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         {Math.round(zoomLevel * 100)}%
       </Text>
       <Button
+        id="pdfme-designer-zoom-in"
         type="text"
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
@@ -57,13 +59,14 @@ type PagerProps = {
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Button type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
+      <Button id="pdfme-designer-page-prev" type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
         <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
       </Text>
       <Button
+        id="pdfme-designer-page-next"
         type="text"
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
@@ -80,7 +83,7 @@ type ContextMenuProps = {
 };
 const ContextMenu = ({ items, style }: ContextMenuProps) => (
   <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
-    <Button type="text">
+    <Button id="pdfme-designer-context-menu" type="text">
       <Ellipsis size={16} color={style.textStyle.color} />
     </Button>
   </Dropdown>
@@ -139,6 +142,7 @@ const CtlBar = (props: CtlBarProps) => {
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
       <div
+        id="pdfme-designer-control-bar"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -155,14 +159,18 @@ const CtlBar = (props: CtlBarProps) => {
         }}
       >
         {pageNum > 1 && (
-          <Pager
-            style={{ textStyle }}
-            pageCursor={pageCursor}
-            pageNum={pageNum}
-            setPageCursor={setPageCursor}
-          />
+          <div id="pdfme-designer-pager">
+            <Pager
+              style={{ textStyle }}
+              pageCursor={pageCursor}
+              pageNum={pageNum}
+              setPageCursor={setPageCursor}
+            />
+          </div>
         )}
-        <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+        <div id="pdfme-designer-zoom">
+          <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+        </div>
         {contextMenuItems.length > 0 && (
           <ContextMenu items={contextMenuItems} style={{ textStyle }} />
         )}
