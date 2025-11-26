@@ -1,6 +1,7 @@
 import { Space, Button, Form } from 'antd';
 import React from 'react';
 import type { PropPanelWidgetProps } from '@pdfme/common';
+import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import {
   AlignStartVertical,
   AlignStartHorizontal,
@@ -213,7 +214,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
       <Space.Compact>
         {layoutBtns.map((btn) => (
           <Button
-            id={`pdfme-designer-align-${btn.id}`}
+            className={DESIGNER_CLASSNAME + 'align-' + btn.id}
             key={btn.id}
             style={{ padding: 7 }}
             disabled={activeElements.length <= 2 && ['vertical', 'horizontal'].includes(btn.id)}

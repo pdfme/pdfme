@@ -13,6 +13,7 @@ import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
 import { getSidebarContentHeight, debounce } from '../../../../helper.js';
+import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
 import WidgetRenderer from './WidgetRenderer.js';
@@ -423,10 +424,10 @@ const DetailView = (props: DetailViewProps) => {
   }
 
   return (
-    <div id="pdfme-designer-detail-view">
+    <div className={DESIGNER_CLASSNAME + 'detail-view'}>
       <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
         <Button
-          id="pdfme-designer-back-button"
+          className={DESIGNER_CLASSNAME + 'back-button'}
           style={{
             position: 'absolute',
             zIndex: 100,

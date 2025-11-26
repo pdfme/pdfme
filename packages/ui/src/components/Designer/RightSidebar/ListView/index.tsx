@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import type { SidebarProps } from '../../../../types.js';
-import { RIGHT_SIDEBAR_WIDTH } from '../../../../constants.js';
+import { RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { I18nContext } from '../../../../contexts.js';
 import { getSidebarContentHeight } from '../../../../helper.js';
 import { theme, Input, Typography, Divider, Button } from 'antd';
@@ -60,7 +60,7 @@ const ListView = (
   };
 
   return (
-    <div id="pdfme-designer-list-view">
+    <div className={DESIGNER_CLASSNAME + 'list-view'}>
       <div style={{ height: headHeight, display: 'flex', alignItems: 'center' }}>
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {i18n('fieldsList')}
@@ -99,16 +99,16 @@ const ListView = (
         >
           {isBulkUpdateFieldNamesMode ? (
             <>
-              <Button id="pdfme-designer-bulk-commit" size="small" type="text" onClick={commitBulk}>
+              <Button className={DESIGNER_CLASSNAME + 'bulk-commit'} size="small" type="text" onClick={commitBulk}>
                 <u> {i18n('commitBulkUpdateFieldName')}</u>
               </Button>
               <span style={{ margin: '0 1rem' }}>/</span>
-              <Button id="pdfme-designer-bulk-cancel" size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
+              <Button className={DESIGNER_CLASSNAME + 'bulk-cancel'} size="small" type="text" onClick={() => setIsBulkUpdateFieldNamesMode(false)}>
                 <u> {i18n('cancel')}</u>
               </Button>
             </>
           ) : (
-            <Button id="pdfme-designer-bulk-update" size="small" type="text" onClick={startBulk}>
+            <Button className={DESIGNER_CLASSNAME + 'bulk-update'} size="small" type="text" onClick={startBulk}>
               <u> {i18n('bulkUpdateFieldName')}</u>
             </Button>
           )}

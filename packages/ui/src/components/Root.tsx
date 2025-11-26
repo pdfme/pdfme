@@ -1,7 +1,7 @@
 import React, { useContext, forwardRef, ReactNode, Ref, useEffect } from 'react';
 import { Size } from '@pdfme/common';
 import { FontContext } from '../contexts.js';
-import { BACKGROUND_COLOR } from '../constants.js';
+import { BACKGROUND_COLOR, DESIGNER_CLASSNAME } from '../constants.js';
 import Spinner from './Spinner.js';
 
 type Props = { size: Size; scale: number; children: ReactNode };
@@ -29,8 +29,8 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   }, [font]);
 
   return (
-    <div id="pdfme-designer-root" ref={ref} style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}>
-      <div style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
+    <div className={DESIGNER_CLASSNAME + 'root'} ref={ref} style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}>
+      <div className={DESIGNER_CLASSNAME + 'background'} style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
     </div>
   );
 };
