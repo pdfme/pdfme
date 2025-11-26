@@ -1,12 +1,21 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
 
-const featuredTemplates = ['invoice', 'quotes','pedigree', 'certificate-black', 'a4-blank', 'QR-lines'];
+const featuredTemplates = [
+  'invoice',
+  'quotes',
+  'pedigree',
+  'certificate-black',
+  'a4-blank',
+  'QR-lines',
+];
 
 function generateTemplatesListJson() {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
@@ -23,7 +32,7 @@ function generateTemplatesListJson() {
       const templateJson = JSON.parse(fs.readFileSync(templateJsonPath, 'utf8'));
       return {
         name: item.name,
-        author: templateJson.author || 'pdfme'
+        author: templateJson.author || 'pdfme',
       };
     })
     .sort((a, b) => {
@@ -40,7 +49,7 @@ function generateTemplatesListJson() {
     });
 
   fs.writeFileSync(indexFilePath, JSON.stringify(result, null, 2));
-  console.log(`Generated index.json with templates: ${result.map(t => t.name).join(', ')}`);
+  console.log(`Generated index.json with templates: ${result.map((t) => t.name).join(', ')}`);
 }
 
 generateTemplatesListJson();
