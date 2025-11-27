@@ -2,12 +2,15 @@
 
 exports[`Designer snapshot 1`] = `
 <div
+  class="pdfme-designer-root"
   style="position: relative; background: rgb(74, 74, 74); width: 1200px; height: 1200px;"
 >
   <div
+    class="pdfme-designer-background"
     style="margin: 0px auto; width: 1200px; height: 1200px;"
   >
     <div
+      class="pdfme-designer-left-sidebar"
       style="left: 0px; right: 0px; position: absolute; z-index: 1; height: 0px; width: 45px; background: rgb(245, 245, 245); text-align: center; overflow: auto;"
     >
       <div
@@ -21,7 +24,7 @@ exports[`Designer snapshot 1`] = `
           style="visibility: visible;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined"
+            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-text"
             style="width: 35px; height: 35px; margin-top: 0.25rem; padding: 0.25rem;"
             type="button"
           >
@@ -72,7 +75,7 @@ exports[`Designer snapshot 1`] = `
           style="visibility: visible;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined"
+            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-image"
             style="width: 35px; height: 35px; margin-top: 0.25rem; padding: 0.25rem;"
             type="button"
           >
@@ -121,51 +124,57 @@ exports[`Designer snapshot 1`] = `
         style="position: absolute; bottom: 6%; width: 755px;"
       >
         <div
+          class="pdfme-ui-control-bar"
           style="display: flex; align-items: center; justify-content: space-evenly; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
         >
           <div
-            style="display: flex; align-items: center;"
+            class="pdfme-ui-zoom"
           >
-            <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
-              type="button"
+            <div
+              style="display: flex; align-items: center;"
             >
-              <span
-                class="ant-btn-icon"
+              <button
+                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
+                type="button"
               >
-                Minus
-              </span>
-              
-            </button>
-            <span
-              class="ant-typography css-dev-only-do-not-override-11mmrso"
-              style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
-            >
-              <strong>
-                100
-                %
-              </strong>
-            </span>
-            <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only"
-              type="button"
-            >
+                <span
+                  class="ant-btn-icon"
+                >
+                  Minus
+                </span>
+                
+              </button>
               <span
-                class="ant-btn-icon"
+                class="ant-typography css-dev-only-do-not-override-11mmrso"
+                style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
               >
-                Plus
+                <strong>
+                  100
+                  %
+                </strong>
               </span>
-              
-            </button>
+              <button
+                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
+                type="button"
+              >
+                <span
+                  class="ant-btn-icon"
+                >
+                  Plus
+                </span>
+                
+              </button>
+            </div>
           </div>
         </div>
       </div>
       <div
+        class="pdfme-designer-right-sidebar"
         style="position: absolute; right: 0px; z-index: 1; height: 100%; width: 400px;"
       >
         <div>
           <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only pdfme-designer-sidebar-toggle"
             style="position: absolute; display: flex; align-items: center; justify-content: center; top: 1rem; right: 1rem; z-index: 100;"
             type="button"
           >
@@ -180,7 +189,9 @@ exports[`Designer snapshot 1`] = `
             style="width: 400px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
           >
             <div>
-              <div>
+              <div
+                class="pdfme-designer-list-view"
+              >
                 <div
                   style="height: 40px; display: flex; align-items: center;"
                 >
@@ -349,7 +360,7 @@ exports[`Designer snapshot 1`] = `
                     style="padding-top: 0.5rem; display: flex; align-items: center; justify-content: flex-end;"
                   >
                     <button
-                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm"
+                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm pdfme-designer-bulk-update"
                       type="button"
                     >
                       <u>
@@ -366,6 +377,7 @@ exports[`Designer snapshot 1`] = `
         </div>
       </div>
       <div
+        class="pdfme-designer-canvas"
         style="position: relative; overflow: auto; margin-right: 400px; width: 755px; height: 1200px;"
       >
         <div
