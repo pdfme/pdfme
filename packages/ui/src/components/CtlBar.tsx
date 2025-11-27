@@ -8,7 +8,7 @@ import type { MenuProps } from 'antd';
 import { theme, Typography, Button, Dropdown } from 'antd';
 import { I18nContext } from '../contexts.js';
 import { useMaxZoom } from '../helper.js';
-import { DESIGNER_CLASSNAME } from '../constants.js';
+import { UI_CLASSNAME } from '../constants.js';
 
 const { Text } = Typography;
 
@@ -30,7 +30,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <Button
-        className={DESIGNER_CLASSNAME + 'zoom-out'}
+        className={UI_CLASSNAME + 'zoom-out'}
         type="text"
         disabled={minZoom >= nextZoomOut}
         onClick={() => setZoomLevel(nextZoomOut)}
@@ -40,7 +40,7 @@ const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
         {Math.round(zoomLevel * 100)}%
       </Text>
       <Button
-        className={DESIGNER_CLASSNAME + 'zoom-in'}
+        className={UI_CLASSNAME + 'zoom-in'}
         type="text"
         disabled={maxZoom < nextZoomIn}
         onClick={() => setZoomLevel(nextZoomIn)}
@@ -60,14 +60,14 @@ type PagerProps = {
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Button className={DESIGNER_CLASSNAME + 'page-prev'} type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
+      <Button className={UI_CLASSNAME + 'page-prev'} type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
         <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>
         {pageCursor + 1}/{pageNum}
       </Text>
       <Button
-        className={DESIGNER_CLASSNAME + 'page-next'}
+        className={UI_CLASSNAME + 'page-next'}
         type="text"
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
@@ -84,7 +84,7 @@ type ContextMenuProps = {
 };
 const ContextMenu = ({ items, style }: ContextMenuProps) => (
   <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
-    <Button className={DESIGNER_CLASSNAME + 'context-menu'} type="text">
+    <Button className={UI_CLASSNAME + 'context-menu'} type="text">
       <Ellipsis size={16} color={style.textStyle.color} />
     </Button>
   </Dropdown>
@@ -143,7 +143,7 @@ const CtlBar = (props: CtlBarProps) => {
   return (
     <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
       <div
-        className={DESIGNER_CLASSNAME + 'control-bar'}
+        className={UI_CLASSNAME + 'control-bar'}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -160,7 +160,7 @@ const CtlBar = (props: CtlBarProps) => {
         }}
       >
         {pageNum > 1 && (
-          <div className={DESIGNER_CLASSNAME + 'pager'}>
+          <div className={UI_CLASSNAME + 'pager'}>
             <Pager
               style={{ textStyle }}
               pageCursor={pageCursor}
@@ -169,7 +169,7 @@ const CtlBar = (props: CtlBarProps) => {
             />
           </div>
         )}
-        <div className={DESIGNER_CLASSNAME + 'zoom'}>
+        <div className={UI_CLASSNAME + 'zoom'}>
           <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
         </div>
         {contextMenuItems.length > 0 && (

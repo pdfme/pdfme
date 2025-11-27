@@ -17,3 +17,5 @@ export const BACKGROUND_COLOR = 'rgb(74, 74, 74)';
 export const DEFAULT_MAX_ZOOM = 2;
 
 export const DESIGNER_CLASSNAME = 'pdfme-designer-';
+
+export const UI_CLASSNAME = 'pdfme-ui-';
