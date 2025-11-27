@@ -30,44 +30,40 @@ const Sidebar = (props: SidebarProps) => {
         width: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
       }}
     >
-      <div>
-        <Button
-          className={DESIGNER_CLASSNAME + 'sidebar-toggle'}
-          style={{
-            position: 'absolute',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 100,
-          }}
-          icon={sidebarOpen ? <ArrowRight {...iconProps} /> : <ArrowLeft {...iconProps} />}
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        />
-        <div
-          style={{
-            width: RIGHT_SIDEBAR_WIDTH,
-            height: '100%',
-            display: sidebarOpen ? 'block' : 'none',
-            top: 0,
-            right: 0,
-            position: 'absolute',
-            padding: '0.7rem 1rem',
-            overflowY: 'auto',
-            fontFamily: "'Open Sans', sans-serif",
-            boxSizing: 'border-box',
-            background: token.colorBgLayout,
-          }}
-        >
-          <div>
-            {getActiveSchemas().length === 0 ? (
-              <ListView {...props} />
-            ) : (
-              <DetailView {...props} activeSchema={getLastActiveSchema()} />
-            )}
-          </div>
-        </div>
+      <Button
+        className={DESIGNER_CLASSNAME + 'sidebar-toggle'}
+        style={{
+          position: 'absolute',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          top: '14px',
+          right: '16px',
+          paddingTop: '2px',
+          zIndex: 100,
+        }}
+        icon={sidebarOpen ? <ArrowRight {...iconProps} /> : <ArrowLeft {...iconProps} />}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      />
+      <div
+        style={{
+          width: RIGHT_SIDEBAR_WIDTH,
+          height: '100%',
+          display: sidebarOpen ? 'flex' : 'none',
+          top: 0,
+          right: 0,
+          position: 'absolute',
+          fontFamily: "'Open Sans', sans-serif",
+          boxSizing: 'border-box',
+          background: token.colorBgLayout,
+          borderLeft: `1px solid ${token.colorSplit}`,
+        }}
+      >
+        {getActiveSchemas().length === 0 ? (
+          <ListView {...props} />
+        ) : (
+          <DetailView {...props} activeSchema={getLastActiveSchema()} />
+        )}
       </div>
     </div>
   );

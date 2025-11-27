@@ -135,29 +135,27 @@ const SelectableSortableContainer = (
       }}
     >
       <>
-        <div style={{ height: '100%', overflowY: 'auto' }}>
-          <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
-              {schemas.map((schema) => (
-                <SelectableSortableItem
-                  key={schema.id}
-                  style={{
-                    border: `1px solid ${
-                      schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
-                    }`,
-                  }}
-                  schema={schema}
-                  schemas={schemas}
-                  isSelected={isItemSelected(schema.id) || activeId === schema.id}
-                  onEdit={onEdit}
-                  onSelect={onSelectionChanged}
-                  onMouseEnter={() => onChangeHoveringSchemaId(schema.id)}
-                  onMouseLeave={() => onChangeHoveringSchemaId(null)}
-                />
-              ))}
-            </ul>
-          </SortableContext>
-        </div>
+        <SortableContext items={schemas} strategy={verticalListSortingStrategy}>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', borderRadius: 5 }}>
+            {schemas.map((schema) => (
+              <SelectableSortableItem
+                key={schema.id}
+                style={{
+                  border: `1px solid ${
+                    schema.id === hoveringSchemaId ? token.colorPrimary : 'transparent'
+                  }`,
+                }}
+                schema={schema}
+                schemas={schemas}
+                isSelected={isItemSelected(schema.id) || activeId === schema.id}
+                onEdit={onEdit}
+                onSelect={onSelectionChanged}
+                onMouseEnter={() => onChangeHoveringSchemaId(schema.id)}
+                onMouseLeave={() => onChangeHoveringSchemaId(null)}
+              />
+            ))}
+          </ul>
+        </SortableContext>
         {createPortal(
           <DragOverlay adjustScale>
             {activeId

@@ -172,206 +172,203 @@ exports[`Designer snapshot 1`] = `
         class="pdfme-designer-right-sidebar"
         style="position: absolute; right: 0px; z-index: 1; height: 100%; width: 400px;"
       >
-        <div>
-          <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only pdfme-designer-sidebar-toggle"
-            style="position: absolute; display: flex; align-items: center; justify-content: center; top: 1rem; right: 1rem; z-index: 100;"
-            type="button"
+        <button
+          class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only pdfme-designer-sidebar-toggle"
+          style="position: absolute; display: flex; align-items: center; justify-content: center; top: 14px; right: 16px; padding-top: 2px; z-index: 100;"
+          type="button"
+        >
+          <span
+            class="ant-btn-icon"
           >
-            <span
-              class="ant-btn-icon"
-            >
-              ArrowRight
-            </span>
-            
-          </button>
+            ArrowRight
+          </span>
+          
+        </button>
+        <div
+          style="width: 400px; height: 100%; display: flex; top: 0px; right: 0px; position: absolute; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245); border-left: 1px solid rgba(5,5,5,0.06);"
+        >
           <div
-            style="width: 400px; height: 100%; display: block; top: 0px; right: 0px; position: absolute; padding: 0.7rem 1rem; overflow-y: auto; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245);"
+            class="pdfme-designer-list-view"
+            style="height: 100%; display: flex; flex: 1; flex-direction: column;"
           >
-            <div>
+            <div
+              style="position: relative; min-height: 60px; display: flex; flex-shrink: 0; flex-direction: column; justify-content: center; padding: 8px 16px 0px;"
+            >
               <div
-                class="pdfme-designer-list-view"
+                style="min-height: 40px; display: flex; align-items: center; justify-content: center;"
               >
-                <div
-                  style="height: 40px; display: flex; align-items: center;"
+                <span
+                  class="ant-typography css-dev-only-do-not-override-11mmrso"
+                  style="text-align: center; width: 100%;"
                 >
-                  <span
-                    class="ant-typography css-dev-only-do-not-override-11mmrso"
-                    style="text-align: center; width: 100%;"
-                  >
-                    <strong>
-                      Field List
-                    </strong>
-                  </span>
-                </div>
-                <div
-                  class="ant-divider css-dev-only-do-not-override-11mmrso ant-divider-horizontal"
-                  role="separator"
-                  style="margin-top: 8px; margin-bottom: 8px;"
-                />
-                <div
-                  style="height: 1085px;"
+                  <strong>
+                    Field List
+                  </strong>
+                </span>
+              </div>
+              <div
+                class="ant-divider css-dev-only-do-not-override-11mmrso ant-divider-horizontal"
+                role="separator"
+                style="margin-top: 8px; margin-bottom: 0px;"
+              />
+            </div>
+            <div
+              style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
+            >
+              <ul
+                style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
+              >
+                <li
+                  style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
                 >
                   <div
-                    style="height: 100%; overflow-y: auto;"
+                    style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                   >
-                    <ul
-                      style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
+                    <button
+                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                      type="button"
                     >
-                      <li
-                        style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
+                      <span
+                        class="ant-btn-icon"
                       >
-                        <div
-                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
-                        >
-                          <button
-                            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                            style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
-                            type="button"
-                          >
-                            <span
-                              class="ant-btn-icon"
-                            >
-                              GripVertical
-                            </span>
-                            
-                          </button>
-                          <div
-                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
-                            title="text"
-                          >
-                            <svg
-                              fill="none"
-                              height="20"
-                              stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              viewBox="0 0 24 24"
-                              width="20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"
-                              />
-                              <path
-                                d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"
-                              />
-                              <path
-                                d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"
-                              />
-                              <path
-                                d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"
-                              />
-                              <path
-                                d="M9 6v12"
-                              />
-                            </svg>
-                          </div>
-                          <span
-                            class="ant-typography css-dev-only-do-not-override-11mmrso"
-                            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
-                            title="Edit"
-                          >
-                            field1
-                          </span>
-                        </div>
-                      </li>
-                      <li
-                        style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
+                        GripVertical
+                      </span>
+                      
+                    </button>
+                    <div
+                      style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                      title="text"
+                    >
+                      <svg
+                        fill="none"
+                        height="20"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <div
-                          style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
-                        >
-                          <button
-                            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                            style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
-                            type="button"
-                          >
-                            <span
-                              class="ant-btn-icon"
-                            >
-                              GripVertical
-                            </span>
-                            
-                          </button>
-                          <div
-                            style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
-                            title="image"
-                          >
-                            <svg
-                              fill="none"
-                              height="20"
-                              stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              viewBox="0 0 24 24"
-                              width="20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <rect
-                                height="18"
-                                rx="2"
-                                ry="2"
-                                width="18"
-                                x="3"
-                                y="3"
-                              />
-                              <circle
-                                cx="9"
-                                cy="9"
-                                r="2"
-                              />
-                              <path
-                                d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
-                              />
-                            </svg>
-                          </div>
-                          <span
-                            class="ant-typography css-dev-only-do-not-override-11mmrso"
-                            style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
-                            title="Edit"
-                          >
-                            field2
-                          </span>
-                        </div>
-                      </li>
-                    </ul>
+                        <path
+                          d="M12 20h-1a2 2 0 0 1-2-2 2 2 0 0 1-2 2H6"
+                        />
+                        <path
+                          d="M13 8h7a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-7"
+                        />
+                        <path
+                          d="M5 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h1"
+                        />
+                        <path
+                          d="M6 4h1a2 2 0 0 1 2 2 2 2 0 0 1 2-2h1"
+                        />
+                        <path
+                          d="M9 6v12"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="ant-typography css-dev-only-do-not-override-11mmrso"
+                      style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                      title="Edit"
+                    >
+                      field1
+                    </span>
                   </div>
+                </li>
+                <li
+                  style="margin-top: 10px; transform: translate(0px, 0px) scale(1, 1);"
+                >
                   <div
-                    id="DndDescribedBy-1"
-                    style="display: none;"
+                    style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                   >
-                    
+                    <button
+                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                      type="button"
+                    >
+                      <span
+                        class="ant-btn-icon"
+                      >
+                        GripVertical
+                      </span>
+                      
+                    </button>
+                    <div
+                      style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
+                      title="image"
+                    >
+                      <svg
+                        fill="none"
+                        height="20"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        viewBox="0 0 24 24"
+                        width="20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <rect
+                          height="18"
+                          rx="2"
+                          ry="2"
+                          width="18"
+                          x="3"
+                          y="3"
+                        />
+                        <circle
+                          cx="9"
+                          cy="9"
+                          r="2"
+                        />
+                        <path
+                          d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      class="ant-typography css-dev-only-do-not-override-11mmrso"
+                      style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
+                      title="Edit"
+                    >
+                      field2
+                    </span>
+                  </div>
+                </li>
+              </ul>
+              <div
+                id="DndDescribedBy-1"
+                style="display: none;"
+              >
+                
     To pick up a draggable item, press the space bar.
     While dragging, use the arrow keys to move the item.
     Press space again to drop the item in its new position, or press escape to cancel.
   
-                  </div>
-                  <div
-                    aria-atomic="true"
-                    aria-live="assertive"
-                    id="DndLiveRegion-0"
-                    role="status"
-                    style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
-                  />
-                  <div
-                    style="padding-top: 0.5rem; display: flex; align-items: center; justify-content: flex-end;"
-                  >
-                    <button
-                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm pdfme-designer-bulk-update"
-                      type="button"
-                    >
-                      <u>
-                         
-                        Bulk update field names
-                      </u>
-                      
-                    </button>
-                  </div>
-                </div>
               </div>
+              <div
+                aria-atomic="true"
+                aria-live="assertive"
+                id="DndLiveRegion-0"
+                role="status"
+                style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
+              />
+            </div>
+            <div
+              style="display: flex; flex-shrink: 0; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px;"
+            >
+              <button
+                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm pdfme-designer-bulk-update"
+                type="button"
+              >
+                <u>
+                   
+                  Bulk update field names
+                </u>
+                
+              </button>
             </div>
           </div>
         </div>
