@@ -4,7 +4,7 @@ import { theme, Button } from 'antd';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import Renderer from '../Renderer.js';
-import { LEFT_SIDEBAR_WIDTH } from '../../constants.js';
+import { LEFT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../constants.js';
 import { setFontNameRecursively } from '../../helper';
 import { OptionsContext, PluginsRegistry } from '../../contexts.js';
 import PluginIcon from './PluginIcon.js';
@@ -83,6 +83,7 @@ const LeftSidebar = ({
 
   return (
     <div
+      className={DESIGNER_CLASSNAME + 'left-sidebar'}
       style={{
         left: 0,
         right: 0,
@@ -98,9 +99,12 @@ const LeftSidebar = ({
       {pluginsRegistry.entries().map(([label, plugin]) => {
         if (!plugin?.propPanel.defaultSchema) return null;
 
+        const pluginType = plugin.propPanel.defaultSchema.type;
+
         return (
           <Draggable key={label} scale={scale} basePdf={basePdf} plugin={plugin}>
             <Button
+              className={DESIGNER_CLASSNAME + 'plugin-' + pluginType}
               onMouseDown={() => setIsDragging(true)}
               style={{ width: 35, height: 35, marginTop: '0.25rem', padding: '0.25rem' }}
             >

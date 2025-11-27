@@ -1,7 +1,7 @@
 import React from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types.js';
-import { RIGHT_SIDEBAR_WIDTH } from '../../../constants.js';
+import { RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import ListView from './ListView/index.js';
 import DetailView from './DetailView/index.js';
@@ -21,6 +21,7 @@ const Sidebar = (props: SidebarProps) => {
 
   return (
     <div
+      className={DESIGNER_CLASSNAME + 'right-sidebar'}
       style={{
         position: 'absolute',
         right: 0,
@@ -31,6 +32,7 @@ const Sidebar = (props: SidebarProps) => {
     >
       <div>
         <Button
+          className={DESIGNER_CLASSNAME + 'sidebar-toggle'}
           style={{
             position: 'absolute',
             display: 'flex',
