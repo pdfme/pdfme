@@ -76,9 +76,9 @@ pdfme Cloud provides all the features of the open-source library, plus:
 
 Support this project by becoming a sponsor. Your logo will appear here with a link to your website.
 
-| [![ProgressLab](https://avatars.githubusercontent.com/u/103434180?s=120&v=4)](https://github.com/ProgressLabIT) | [<img src="https://github.com/user-attachments/assets/e5b1bbbe-bcc2-41bd-9d04-fcd886e62105" alt="photoquest_logo" width="150">](https://photoquest.wedding/) | [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/pdfme) |
-| :---: | :---: | :---: |
-| [ProgressLab](https://github.com/ProgressLabIT) | [PhotoQuest](https://photoquest.wedding/) | [New Sponsor](https://github.com/sponsors/pdfme) |
+| [![ProgressLab](https://avatars.githubusercontent.com/u/103434180?s=120&v=4)](https://github.com/ProgressLabIT) | [<img src="https://github.com/user-attachments/assets/e5b1bbbe-bcc2-41bd-9d04-fcd886e62105" alt="photoquest_logo" width="150">](https://photoquest.wedding/) | [<img src="https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/famly.jpg" alt="Famly" width="150">](https://famly.co) | [![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/pdfme) |
+| :---: | :---: | :---: | :---: |
+| [ProgressLab](https://github.com/ProgressLabIT) | [PhotoQuest](https://photoquest.wedding/) | [Famly](https://famly.co) | [New Sponsor](https://github.com/sponsors/pdfme) |
 
 ## Contributors
 
