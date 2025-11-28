@@ -14,6 +14,7 @@
         "rotate": 0,
         "opacity": 1,
         "fontSize": 36,
+        "lineHeight": 1,
         "fontColor": "#14b351",
         "fontName": "",
         "name": "name"
@@ -44,6 +45,7 @@
         "opacity": 1,
         "fontSize": 12,
         "fontName": "",
+        "lineHeight": 1,
         "name": "age"
       },
       {
@@ -59,6 +61,7 @@
         "opacity": 1,
         "fontSize": 12,
         "fontName": "",
+        "lineHeight": 1,
         "name": "sex"
       },
       {
@@ -89,6 +92,7 @@
         "opacity": 1,
         "fontSize": 12,
         "fontName": "",
+        "lineHeight": 1,
         "name": "breed"
       },
       {

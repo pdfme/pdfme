@@ -101,7 +101,7 @@
       {
         "name": "totalAmountLabel",
         "type": "text",
-        "position": { "x": 12, "y": 71 },
+        "position": { "x": 12, "y": 70.5 },
         "width": 26,
         "height": 6,
         "content": "ご請求金額",
@@ -195,7 +195,7 @@
       {
         "name": "senderRegistrationNumber",
         "type": "text",
-        "position": { "x": 143, "y": 47 },
+        "position": { "x": 143, "y": 46.8 },
         "width": 43,
         "height": 5.03,
         "content": "T-1234567890123",
@@ -287,7 +287,7 @@
       {
         "name": "taxSubtotalsLabel",
         "type": "text",
-        "position": { "x": 12, "y": 128 },
+        "position": { "x": 12, "y": 127.6 },
         "width": 86,
         "height": 5,
         "content": "税率ごとの内訳",
@@ -363,7 +363,7 @@
       {
         "name": "subtotal",
         "type": "text",
-        "position": { "x": 164.72, "y": 132 },
+        "position": { "x": 164.72, "y": 131.5 },
         "width": 31.5,
         "height": 6.5,
         "content": "39,000",
@@ -389,7 +389,7 @@
       {
         "name": "taxValue",
         "type": "text",
-        "position": { "x": 164.72, "y": 138.89 },
+        "position": { "x": 164.72, "y": 138.49 },
         "width": 31.5,
         "height": 6.61,
         "content": "3,820",
@@ -415,7 +415,7 @@
       {
         "name": "totalValue",
         "type": "text",
-        "position": { "x": 164.72, "y": 146 },
+        "position": { "x": 164.72, "y": 145.5 },
         "width": 31.5,
         "height": 6.5,
         "content": "42,820",
@@ -469,8 +469,7 @@
         "showHead": true,
         "head": ["品番・品名", "数量", "単価", "金額"],
         "headWidthPercentages": [
-          53.23273305655902, 14.951609424704792, 14.364048094031382,
-          17.451609424704806
+          53.23273305655902, 14.951609424704792, 14.364048094031382, 17.451609424704806
         ],
         "tableStyles": { "borderWidth": 0.2, "borderColor": "#969696" },
         "headStyles": {
