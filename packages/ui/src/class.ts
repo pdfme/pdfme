@@ -40,10 +40,19 @@ export abstract class BaseUIClass {
     if (!this.domContainer) {
       return;
     }
+
+    const rect = this.domContainer.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const visibleWidth = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
+    const visibleHeight = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+
     this.size = {
-      height: this.domContainer.clientHeight || window.innerHeight,
-      width: this.domContainer.clientWidth || window.innerWidth,
+      height: visibleHeight,
+      width: visibleWidth,
     };
+
     this.render();
   }, 100);
 
