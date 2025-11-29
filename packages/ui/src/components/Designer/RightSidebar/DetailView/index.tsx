@@ -1,5 +1,5 @@
 import { useForm } from 'form-render';
-import React, { useRef, useContext, useState, useEffect } from 'react';
+import React, { useRef, useContext, useState, useEffect, useCallback } from 'react';
 import type {
   Dict,
   ChangeSchemaItem,
@@ -12,13 +12,14 @@ import { isBlankPdf } from '@pdfme/common';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
-import { getSidebarContentHeight, debounce } from '../../../../helper.js';
+import { debounce } from '../../../../helper.js';
 import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
 import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
 import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
+import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '../layout.js';
 
 // Import FormRender as a default import
 import FormRenderComponent from 'form-render';
@@ -42,8 +43,7 @@ type DetailViewProps = Pick<
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { size, schemasList, changeSchemas, deselectSchema, activeSchema, pageSize, basePdf } =
-    props;
+  const { schemasList, changeSchemas, deselectSchema, activeSchema, pageSize, basePdf } = props;
   const form = useForm();
 
   const i18n = useContext(I18nContext);
@@ -51,10 +51,13 @@ const DetailView = (props: DetailViewProps) => {
   const options = useContext(OptionsContext);
 
   // Define a type-safe i18n function that accepts string keys
-  const typedI18n = (key: string): string => {
-    // Use a type assertion to handle the union type constraint
-    return typeof i18n === 'function' ? i18n(key as keyof Dict) : key;
-  };
+  const typedI18n = useCallback(
+    (key: string): string => {
+      // Use a type assertion to handle the union type constraint
+      return typeof i18n === 'function' ? i18n(key as keyof Dict) : key;
+    },
+    [i18n],
+  );
 
   const [widgets, setWidgets] = useState<{
     [key: string]: (props: PropPanelWidgetProps) => React.JSX.Element;
@@ -84,7 +87,7 @@ const DetailView = (props: DetailViewProps) => {
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+  }, [activeSchema, options, pluginsRegistry, props, token, typedI18n]);
 
   useEffect(() => {
     // Create a type-safe copy of the schema with editable property
@@ -95,7 +98,7 @@ const DetailView = (props: DetailViewProps) => {
     form.setValues(values);
   }, [activeSchema, form]);
 
-  useEffect(() => form.resetFields(), [activeSchema.id]);
+  useEffect(() => form.resetFields(), [activeSchema.id, form]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {
@@ -424,16 +427,20 @@ const DetailView = (props: DetailViewProps) => {
   }
 
   return (
-    <div className={DESIGNER_CLASSNAME + 'detail-view'}>
-      <div style={{ height: 40, display: 'flex', alignItems: 'center' }}>
+    <SidebarFrame className={DESIGNER_CLASSNAME + 'detail-view'}>
+      <SidebarHeader>
         <Button
           className={DESIGNER_CLASSNAME + 'back-button'}
           style={{
             position: 'absolute',
+            left: SIDEBAR_H_PADDING_PX,
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            transform: 'translateY(-50%)',
+            top: '50%',
+            paddingTop: '3px',
           }}
           onClick={deselectSchema}
           icon={<Menu strokeWidth={1.5} size={20} />}
@@ -441,15 +448,8 @@ const DetailView = (props: DetailViewProps) => {
         <Text strong style={{ textAlign: 'center', width: '100%' }}>
           {typedI18n('editField')}
         </Text>
-      </div>
-      <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
-      <div
-        style={{
-          height: getSidebarContentHeight(size.height),
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
-      >
+      </SidebarHeader>
+      <SidebarBody>
         <FormRenderComponent
           form={form}
           schema={propPanelSchema}
@@ -457,8 +457,8 @@ const DetailView = (props: DetailViewProps) => {
           watch={{ '#': handleWatch }}
           locale="en-US"
         />
-      </div>
-    </div>
+      </SidebarBody>
+    </SidebarFrame>
   );
 };
 

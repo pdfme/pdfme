@@ -420,9 +420,6 @@ export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
 };
 
-export const getSidebarContentHeight = (sidebarHeight: number) =>
-  sidebarHeight - RULER_HEIGHT - RULER_HEIGHT / 2 - 30;
-
 const handlePositionSizeChange = (
   schema: SchemaForUI,
   key: string,
