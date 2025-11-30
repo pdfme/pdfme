@@ -1,0 +1,23 @@
+[package]
+name = "pdfme-python"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pdfme"
+crate-type = ["cdylib"]
+
+[dependencies]
+# PDF生成
+lopdf = "0.32"
+printpdf = "0.7"
+
+# Python bindings
+pyo3 = { version = "0.20", features = ["extension-module"] }
+
+# シリアライゼーション
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# エラーハンドリング
+thiserror = "1.0"
