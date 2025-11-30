@@ -3,13 +3,15 @@ name = "pdfme-core"
 version = "0.1.0"
 edition = "2021"
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # PDF生成
 lopdf = "0.32"
-printpdf = "0.7"
 
 # シリアライゼーション
 serde = { version = "1.0", features = ["derive"] }
