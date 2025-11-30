@@ -30,11 +30,31 @@ export class Cell {
   }
 
   getContentHeight() {
-    const lineCount = Array.isArray(this.text) ? this.text.length : 1;
-    const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
     const vPadding = this.padding('top') + this.padding('bottom');
-    const height = lineCount * lineHeight + vPadding;
-    return Math.max(height, this.styles.minCellHeight);
+
+    // QR Code minimum size (same as in cell.ts)
+    const QR_MIN_SIZE = 26;
+
+    // Check if this cell should render as a barcode
+    const columnType = this.section === 'head' ? 'text' : this.styles.columnType;
+
+    if (columnType === 'qrcode') {
+      // QR code needs minimum 26mm height
+      const height = QR_MIN_SIZE + vPadding;
+      return Math.max(height, this.styles.minCellHeight);
+    } else if (columnType === 'code128') {
+      // Barcode needs reasonable height for readability
+      // Typical barcode height is around 15-20mm
+      const barcodeHeight = 15;
+      const height = barcodeHeight + vPadding;
+      return Math.max(height, this.styles.minCellHeight);
+    } else {
+      // Text content
+      const lineCount = Array.isArray(this.text) ? this.text.length : 1;
+      const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
+      const height = lineCount * lineHeight + vPadding;
+      return Math.max(height, this.styles.minCellHeight);
+    }
   }
 
   padding(name: 'top' | 'bottom' | 'left' | 'right') {

@@ -74,6 +74,19 @@ export const getCellPropPanelSchema = (arg: {
       props: { min: 0 },
       span: 6,
     },
+    columnType: {
+      title: i18n('schemas.table.columnType'),
+      type: 'string',
+      widget: 'select',
+      props: {
+        options: [
+          { label: 'Text', value: 'text' },
+          { label: 'QR Code', value: 'qrcode' },
+          { label: 'Barcode (Code128)', value: 'code128' },
+        ],
+      },
+      span: 8,
+    },
     alignment: {
       title: i18n('schemas.text.textAlign'),
       type: 'string',
@@ -190,6 +203,30 @@ export const getColumnStylesPropPanelSchema = ({
                 { label: i18n('schemas.left'), value: ALIGN_LEFT },
                 { label: i18n('schemas.center'), value: ALIGN_CENTER },
                 { label: i18n('schemas.right'), value: ALIGN_RIGHT },
+              ],
+            },
+          },
+        }),
+      {},
+    ),
+  },
+  columnType: {
+    type: 'object',
+    widget: 'lineTitle',
+    title: i18n('schemas.table.columnType'),
+    column: 3,
+    properties: head.reduce(
+      (acc, cur, i) =>
+        Object.assign(acc, {
+          [i]: {
+            title: cur || 'Column ' + String(i + 1),
+            type: 'string',
+            widget: 'select',
+            props: {
+              options: [
+                { label: 'Text', value: 'text' },
+                { label: 'QR Code', value: 'qrcode' },
+                { label: 'Barcode (Code128)', value: 'code128' },
               ],
             },
           },
