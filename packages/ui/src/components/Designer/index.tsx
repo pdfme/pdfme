@@ -54,7 +54,7 @@ const TemplateEditor = ({
   onChangeTemplate: (t: Template) => void;
 } & {
   onChangeTemplate: (t: Template) => void;
-  onPageCursorChange: (newPageCursor: number) => void;
+  onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
@@ -110,7 +110,7 @@ const TemplateEditor = ({
     pageCursor,
     onChangePageCursor: (p) => {
       setPageCursor(p);
-      onPageCursorChange(p);
+      onPageCursorChange(p, schemasList.length);
       onEditEnd();
     },
   });
@@ -239,6 +239,9 @@ const TemplateEditor = ({
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);
+    
+    // Notify page change with updated total pages
+    onPageCursorChange(newPageCursor, sl.length);
 
     // Use setTimeout to update scroll position after render
     setTimeout(() => {
@@ -326,6 +329,7 @@ const TemplateEditor = ({
               // Update scroll position and state
               canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
               setPageCursor(p);
+              onPageCursorChange(p, schemasList.length);
               onEditEnd();
             }}
             zoomLevel={zoomLevel}

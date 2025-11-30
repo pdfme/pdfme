@@ -16,6 +16,7 @@ import AppContextProvider from './components/AppContextProvider.js';
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
+  private onPageChangeCallback?: (pageInfo: { currentPage: number; totalPages: number }) => void;
   private pageCursor: number = 0;
 
   constructor(props: DesignerProps) {
@@ -48,8 +49,17 @@ class Designer extends BaseUIClass {
     this.onChangeTemplateCallback = cb;
   }
 
+  public onPageChange(cb: (pageInfo: { currentPage: number; totalPages: number }) => void) {
+    this.onPageChangeCallback = cb;
+  }
+
   public getPageCursor() {
     return this.pageCursor;
+  }
+
+  public getTotalPages() {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    return this.template.schemas.length;
   }
 
   protected render() {
@@ -77,8 +87,14 @@ class Designer extends BaseUIClass {
               this.onChangeTemplateCallback(template);
             }
           }}
-          onPageCursorChange={(newPageCursor: number) => {
+          onPageCursorChange={(newPageCursor: number, totalPages: number) => {
             this.pageCursor = newPageCursor;
+            if (this.onPageChangeCallback) {
+              this.onPageChangeCallback({
+                currentPage: newPageCursor,
+                totalPages: totalPages,
+              });
+            }
           }}
           size={this.size}
         />
