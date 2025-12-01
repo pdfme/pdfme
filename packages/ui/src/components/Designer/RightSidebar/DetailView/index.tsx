@@ -87,7 +87,9 @@ const DetailView = (props: DetailViewProps) => {
       });
     }
     setWidgets(newWidgets);
-  }, [activeSchema, options, pluginsRegistry, props, token, typedI18n]);
+  }, [activeSchema, pluginsRegistry, JSON.stringify(options)]);
+
+  useEffect(() => form.resetFields(), [activeSchema.id]);
 
   useEffect(() => {
     // Create a type-safe copy of the schema with editable property
@@ -96,9 +98,7 @@ const DetailView = (props: DetailViewProps) => {
     const readOnly = typeof values.readOnly === 'boolean' ? values.readOnly : false;
     values.editable = !readOnly;
     form.setValues(values);
-  }, [activeSchema, form]);
-
-  useEffect(() => form.resetFields(), [activeSchema.id, form]);
+  }, [activeSchema]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {
