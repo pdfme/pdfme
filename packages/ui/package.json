@@ -45,7 +45,7 @@
     "form-render": "^2.5.5",
     "globrex": "^0.1.2",
     "hotkeys-js": "^3.13.15",
-    "lucide-react": "^0.552.0",
+    "lucide-react": "^0.555.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-moveable": "^0.56.0",
