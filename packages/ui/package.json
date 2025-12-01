@@ -46,7 +46,7 @@
     "globrex": "^0.1.2",
     "hotkeys-js": "^3.13.15",
     "lucide-react": "^0.552.0",
-    "react": "^16.14.0",
+    "react": "^19.2.0",
     "react-dom": "^16.14.0",
     "react-moveable": "^0.56.0",
     "react-refresh": "^0.17.0",
