@@ -27,8 +27,10 @@ const Preview = ({
   inputs,
   size,
   onChangeInput,
+  onPageChange,
 }: Omit<PreviewProps, 'domContainer'> & {
   onChangeInput?: (args: { index: number; value: string; name: string }) => void;
+  onPageChange?: (pageInfo: { currentPage: number; totalPages: number }) => void;
   size: Size;
 }) => {
   const { token } = theme.useToken();
@@ -102,7 +104,12 @@ const Preview = ({
     pageSizes,
     scale,
     pageCursor,
-    onChangePageCursor: setPageCursor,
+    onChangePageCursor: (p) => {
+      setPageCursor(p);
+      if (onPageChange) {
+        onPageChange({ currentPage: p, totalPages: schemasList.length });
+      }
+    },
   });
 
   const handleChangeInput = ({ name, value }: { name: string; value: string }) =>
@@ -146,6 +153,9 @@ const Preview = ({
           if (!containerRef.current) return;
           containerRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
           setPageCursor(p);
+          if (onPageChange) {
+            onPageChange({ currentPage: p, totalPages: schemasList.length });
+          }
         }}
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
