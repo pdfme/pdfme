@@ -176,15 +176,22 @@ function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
     {} as Record<number, Partial<Styles>>,
   );
 
+  const columnStylesType = Object.entries(schema.columnStyles.columnType || {}).reduce(
+    (acc, [key, value]) => ({ ...acc, [key]: { columnType: value } }),
+    {} as Record<number, Partial<Styles>>,
+  );
+
   const allKeys = new Set([
     ...Object.keys(columnStylesWidth).map(Number),
     ...Object.keys(columnStylesAlignment).map(Number),
+    ...Object.keys(columnStylesType).map(Number),
   ]);
   const columnStyles = Array.from(allKeys).reduce(
     (acc, key) => {
       const widthStyle = columnStylesWidth[key] || {};
       const alignmentStyle = columnStylesAlignment[key] || {};
-      return { ...acc, [key]: { ...widthStyle, ...alignmentStyle } };
+      const typeStyle = columnStylesType[key] || {};
+      return { ...acc, [key]: { ...widthStyle, ...alignmentStyle, ...typeStyle } };
     },
     {} as Record<number, Partial<Styles>>,
   );
@@ -269,7 +276,8 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : (!schema.__isSplit || schema.repeatHead === true);
+  schema.showHead =
+    schema.showHead === false ? false : !schema.__isSplit || schema.repeatHead === true;
 
   const input = parseInput(schema, body);
 

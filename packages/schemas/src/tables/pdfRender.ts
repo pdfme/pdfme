@@ -40,6 +40,8 @@ async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
       borderColor: cell.styles.lineColor,
       borderWidth: cell.styles.lineWidth,
       padding: cell.styles.cellPadding,
+      // Head section should always be text, body can use columnType
+      columnType: cell.section === 'head' ? 'text' : cell.styles.columnType,
     },
   });
 }
