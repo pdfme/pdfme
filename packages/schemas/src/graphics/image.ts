@@ -28,7 +28,7 @@ const imageSchema: Plugin<ImageSchema> = {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value) return;
 
-    const isPng = value.startsWith('data: image/png;');
+    const isPng = value.startsWith('data:image/png;');
     /**
      * pdf-lib's embedJpg does not interpret EXIF Orientation, so the direction is reflected in advance.
      * @see https://github.com/Hopding/pdf-lib/issues/1284
