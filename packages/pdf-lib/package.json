@@ -55,7 +55,7 @@
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",
     "@pdf-lib/upng": "^1.0.1",
-    "color": "^4.2.3",
+    "color": "^5.0.3",
     "node-html-better-parser": "^1.5.8",
     "pako": "^2.1.0"
   },
