@@ -8,6 +8,8 @@ import Preview from './components/Preview.js';
 
 class Form extends PreviewUI {
   private onChangeInputCallback?: (arg: { index: number; value: string; name: string }) => void;
+  private onPageChangeCallback?: (pageInfo: { currentPage: number; totalPages: number }) => void;
+  private pageCursor: number = 0;
 
   constructor(props: PreviewProps) {
     super(props);
@@ -15,6 +17,19 @@ class Form extends PreviewUI {
 
   public onChangeInput(cb: (arg: { index: number; value: string; name: string }) => void) {
     this.onChangeInputCallback = cb;
+  }
+
+  public onPageChange(cb: (pageInfo: { currentPage: number; totalPages: number }) => void) {
+    this.onPageChangeCallback = cb;
+  }
+
+  public getPageCursor() {
+    return this.pageCursor;
+  }
+
+  public getTotalPages() {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    return this.template.schemas.length;
   }
 
   public setInputs(inputs: { [key: string]: string }[]): void {
@@ -69,6 +84,12 @@ class Form extends PreviewUI {
                 this.inputs[index][name] = value;
                 this.render();
               }
+            }
+          }}
+          onPageChange={(pageInfo) => {
+            this.pageCursor = pageInfo.currentPage;
+            if (this.onPageChangeCallback) {
+              this.onPageChangeCallback(pageInfo);
             }
           }}
         />
