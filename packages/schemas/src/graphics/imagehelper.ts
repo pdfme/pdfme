@@ -153,4 +153,20 @@ const imageSize = (imgBuffer: Buffer): { height: number; width: number } => {
     '[@pdfme/schemas/images] Unsupported file type: ' + (type === undefined ? 'undefined' : type),
   );
 };
+
+export function dataUrlToBuffer(dataUrl: string): ArrayBuffer {
+  const base64Data = dataUrl.split(',')[1];
+  if (!base64Data) {
+    throw new Error('[@pdfme/schemas] Invalid data URL format');
+  }
+
+  const binaryString = atob(base64Data);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes.buffer;
+}
+
 // ----------------------------

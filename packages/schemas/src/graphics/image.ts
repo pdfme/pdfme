@@ -14,6 +14,7 @@ import {
 } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
 import { getImageDimension } from './imagehelper.js';
+import { normalizeImageOrientation } from './orientation.js';
 
 const getCacheKey = (schema: Schema, input: string) => `${schema.type}${input}`;
 const fullSize = { width: '100%', height: '100%' };
@@ -27,16 +28,22 @@ const imageSchema: Plugin<ImageSchema> = {
     const { value, schema, pdfDoc, page, _cache } = arg;
     if (!value) return;
 
-    const inputImageCacheKey = getCacheKey(schema, value);
+    const isPng = value.startsWith('data: image/png;');
+    /**
+     * pdf-lib's embedJpg does not interpret EXIF Orientation, so the direction is reflected in advance.
+     * @see https://github.com/Hopding/pdf-lib/issues/1284
+     */
+    const dataUrl = isPng ? value : await normalizeImageOrientation(value);
+
+    const inputImageCacheKey = getCacheKey(schema, dataUrl);
     let image = _cache.get(inputImageCacheKey) as PDFImage;
     if (!image) {
-      const isPng = value.startsWith('data:image/png;');
-      image = await (isPng ? pdfDoc.embedPng(value) : pdfDoc.embedJpg(value));
+      image = await (isPng ? pdfDoc.embedPng(dataUrl) : pdfDoc.embedJpg(dataUrl));
       _cache.set(inputImageCacheKey, image);
     }
 
     const _schema = { ...schema, position: { ...schema.position } };
-    const dimension = getImageDimension(value);
+    const dimension = getImageDimension(dataUrl);
     const imageWidth = px2mm(dimension.width);
     const imageHeight = px2mm(dimension.height);
     const boxWidth = _schema.width;
