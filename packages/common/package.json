@@ -37,7 +37,7 @@
   "scripts": {
     "dev": "node set-version.js && tsc -p tsconfig.esm.json -w",
     "prebuild": "node set-version.js",
-    "build": "npm-run-all --parallel build:cjs build:esm build:node",
+    "build": "run-p build:cjs build:esm build:node",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",
