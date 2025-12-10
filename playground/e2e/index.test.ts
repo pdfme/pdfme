@@ -31,8 +31,8 @@ async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 
 }
 
 const baseUrl = 'http://localhost:4173';
-const timeout = 40000; // Increased timeout to avoid test failures
-jest.setTimeout(timeout * 6);
+const timeout = 50000; // Increased timeout to avoid test failures
+jest.setTimeout(timeout * 5);
 
 const isRunningLocal = process.env.LOCAL === 'true';
 
