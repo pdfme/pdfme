@@ -50,8 +50,8 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
   await page.click('#generate-pdf');
 
   const newTarget = await browser.waitForTarget(
-    (target) => target.url().startsWith('blob:'),
-    { timeout }
+    (target) => target.url().startsWith('blob:') && target.type() === 'page',
+    { timeout },
   );
   const newPage = await newTarget?.page();
   if (!newPage) {
