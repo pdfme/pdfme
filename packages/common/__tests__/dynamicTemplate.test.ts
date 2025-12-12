@@ -96,7 +96,9 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
       expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
-      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      // b maintains its relative offset from a's end position
+      // a ends at y=90 (page content), b was 20 units below a, so b is at y=10 in page coords + padding = 20
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding + padding);
       expect(dynamicTemplate.schemas[1][1]).toBeUndefined();
     });
 
@@ -226,9 +228,12 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
+      // Both schemas are placed; 'a' with height 0, 'b' follows
       expect(dynamicTemplate.schemas[0][0]).toBeDefined();
-      expect(dynamicTemplate.schemas[0][0].name).toEqual('b');
-      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[0][0].height).toEqual(0);
+      expect(dynamicTemplate.schemas[0][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
     });
 
     test('should handle very large increase heights', async () => {

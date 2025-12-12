@@ -58,11 +58,12 @@ const Preview = ({
 
   const input = inputs[unitCursor];
 
-  const init = (template: Template) => {
+  const init = (template: Template, inputOverride?: Record<string, string>) => {
+    const currentInput = inputOverride ?? input;
     const options = { font };
     getDynamicTemplate({
       template,
-      input,
+      input: currentInput,
       options,
       _cache,
       getDynamicHeights: (value, args) => {
@@ -117,6 +118,8 @@ const Preview = ({
 
   const handleOnChangeRenderer = (args: { key: string; value: unknown }[], schema: SchemaForUI) => {
     let isNeedInit = false;
+    let newInputValue: string | undefined;
+
     args.forEach(({ key: _key, value }) => {
       if (_key === 'content') {
         const newValue = value as string;
@@ -124,7 +127,10 @@ const Preview = ({
         if (newValue === oldValue) return;
         handleChangeInput({ name: schema.name, value: newValue });
         // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
-        if (schema.type === 'table') isNeedInit = true;
+        if (schema.type === 'table') {
+          isNeedInit = true;
+          newInputValue = newValue;
+        }
       } else {
         const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI;
         if (!targetSchema) return;
@@ -133,8 +139,10 @@ const Preview = ({
         targetSchema[_key] = value as string;
       }
     });
-    if (isNeedInit) {
-      init(template);
+    if (isNeedInit && newInputValue !== undefined) {
+      // Pass the updated input directly to recalculate with new value
+      const updatedInput = { ...input, [schema.name]: newInputValue };
+      init(template, updatedInput);
     }
     setSchemasList([...schemasList]);
   };
