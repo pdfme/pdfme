@@ -1,26 +1,49 @@
-# .github/workflows/publish-commit.yml
-name: Publish Commit
+# .github/workflows/publish.yml
+name: Publish
 
 on:
   push:
     branches:
       - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for OIDC authentication
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Increment version and append git hash
-        run: ./scripts/increment-version.sh
+      - name: Update npm (11.5.1+ required for OIDC)
+        run: npm install -g npm@latest
+
+      - name: Determine version and tag
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            # Release build
+            VERSION=${GITHUB_REF#refs/tags/}
+            if [[ $VERSION == *"-alpha"* ]] || [[ $VERSION == *"-beta"* ]] || [[ $VERSION == *"-rc"* ]]; then
+              NPM_TAG="next"
+            else
+              NPM_TAG="latest"
+            fi
+          else
+            # Dev build (main branch push)
+            ./scripts/increment-version.sh
+            NPM_TAG="dev"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "NPM_TAG=$NPM_TAG" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm ci
@@ -37,9 +60,7 @@ jobs:
           CI: true
 
       - name: Publish to NPM
-        run: npm publish --workspaces --access public --tag dev
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --workspaces --access public --tag $NPM_TAG
 
   playground-test:
     runs-on: ubuntu-latest
@@ -48,7 +69,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
