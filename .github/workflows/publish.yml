@@ -37,13 +37,14 @@ jobs:
             else
               NPM_TAG="latest"
             fi
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "NPM_TAG=$NPM_TAG" >> $GITHUB_ENV
           else
             # Dev build (main branch push)
+            # increment-version.sh sets VERSION in GITHUB_ENV
             ./scripts/increment-version.sh
-            NPM_TAG="dev"
+            echo "NPM_TAG=dev" >> $GITHUB_ENV
           fi
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "NPM_TAG=$NPM_TAG" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm ci
