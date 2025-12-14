@@ -1,0 +1,48 @@
+name: Dependabot Auto-merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot metadata
+        id: dependabot-metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check update type
+        id: check-update
+        run: |
+          echo "Update type: ${{ steps.dependabot-metadata.outputs.update-type }}"
+          if [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-minor" ]] || \
+             [[ "${{ steps.dependabot-metadata.outputs.update-type }}" == "version-update:semver-patch" ]]; then
+            echo "should-merge=true" >> $GITHUB_OUTPUT
+            echo "Auto-merge approved for ${{ steps.dependabot-metadata.outputs.update-type }}"
+          else
+            echo "should-merge=false" >> $GITHUB_OUTPUT
+            echo "Skipping auto-merge for ${{ steps.dependabot-metadata.outputs.update-type }}"
+          fi
+
+      - name: Enable auto-merge
+        if: steps.check-update.outputs.should-merge == 'true'
+        run: |
+          gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Comment on PR
+        if: steps.check-update.outputs.should-merge == 'true'
+        run: |
+          gh pr comment "${{ github.event.pull_request.html_url }}" \
+            --body "Auto-merge enabled for this ${{ steps.dependabot-metadata.outputs.update-type }} update. Will merge automatically once CI checks pass."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
