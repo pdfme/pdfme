@@ -14,6 +14,7 @@ import {
   select,
   checkbox,
   radioGroup,
+  styledQrCode,
 } from '@pdfme/schemas';
 import { signature } from './signature';
 
@@ -29,6 +30,7 @@ export const getPlugins = () => {
     SVG: svg,
     Signature: signature,
     QR: barcodes.qrcode,
+    'Styled QR Code': styledQrCode,
     DateTime: dateTime,
     Date: date,
     Time: time,

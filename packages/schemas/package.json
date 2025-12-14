@@ -60,18 +60,29 @@
     "bwip-js": "^4.7.0",
     "date-fns": "^4.1.0",
     "fontkit": "^2.0.2",
-    "lucide": "^0.552.0"
+    "lucide": "^0.552.0",
+    "qr-code-styling": "^1.9.2"
   },
   "devDependencies": {
     "@pdfme/common": "*",
     "@types/bwip-js": "^3.2.1",
     "@types/fontkit": "^2.0.8",
     "@types/pngjs": "^6.0.2",
+    "canvas": "^2.11.2",
+    "jsdom": "^20.0.0",
     "jsqr": "^1.4.0",
     "pngjs": "^7.0.0"
   },
   "peerDependencies": {
     "@pdfme/common": "latest"
+  },
+  "peerDependenciesMeta": {
+    "canvas": {
+      "optional": true
+    },
+    "jsdom": {
+      "optional": true
+    }
   },
   "jest": {
     "resolver": "ts-jest-resolver",
