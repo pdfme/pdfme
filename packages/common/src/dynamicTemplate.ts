@@ -24,6 +24,7 @@ interface LayoutItem {
   schema: Schema;
   baseY: number;
   height: number;
+  dynamicHeights: number[];
 }
 
 /** Calculate the content height of a page (drawable area excluding padding) */
@@ -35,34 +36,25 @@ const getSchemaValue = (schema: Schema, input: Record<string, string>): string =
   (schema.readOnly ? schema.content : input?.[schema.name]) || '';
 
 /**
- * Flatten all schemas into a continuous coordinate system.
- * Treats multi-page templates as a single long coordinate space.
+ * Normalize schemas within a single page into layout items.
+ * Returns items sorted by Y coordinate with their order preserved.
  */
-function normalizeSchemas(
-  templateSchemas: Schema[][],
-  basePdf: BlankPdf,
+function normalizePageSchemas(
+  pageSchemas: Schema[],
+  paddingTop: number,
 ): { items: LayoutItem[]; orderMap: Map<string, number> } {
   const items: LayoutItem[] = [];
   const orderMap = new Map<string, number>();
-  const contentHeight = getContentHeight(basePdf);
-  const paddingTop = basePdf.padding[0];
-  let globalOrder = 0;
 
-  templateSchemas.forEach((pageSchemas, pageIndex) => {
-    const pageYOffset = pageIndex * contentHeight;
-
-    pageSchemas.forEach((schema) => {
-      const localY = schema.position.y - paddingTop;
-      items.push({
-        schema: cloneDeep(schema),
-        baseY: pageYOffset + localY,
-        height: schema.height,
-      });
-
-      if (!orderMap.has(schema.name)) {
-        orderMap.set(schema.name, globalOrder++);
-      }
+  pageSchemas.forEach((schema, index) => {
+    const localY = schema.position.y - paddingTop;
+    items.push({
+      schema: cloneDeep(schema),
+      baseY: localY,
+      height: schema.height,
+      dynamicHeights: [schema.height], // Will be updated later
     });
+    orderMap.set(schema.name, index);
   });
 
   // Sort by Y coordinate (preserve original order for same position)
@@ -202,73 +194,25 @@ function removeTrailingEmptyPages(pages: Schema[][]): void {
 }
 
 /**
- * Process a template containing tables with dynamic heights
- * and generate a new template with proper page breaks.
+ * Process a single template page that has dynamic content.
+ * Uses the same layout algorithm as the original implementation,
+ * but scoped to a single page's schemas.
  */
-export const getDynamicTemplate = async (
-  arg: ModifyTemplateForDynamicTableArg,
-): Promise<Template> => {
-  const { template, input, options, _cache, getDynamicHeights } = arg;
-  const basePdf = template.basePdf;
-
-  if (!isBlankPdf(basePdf)) {
-    return template;
-  }
-
-  // 1. Flatten schemas and establish ordering
-  const { items, orderMap } = normalizeSchemas(template.schemas, basePdf);
-
-  // 2. Calculate all dynamic heights in parallel with concurrency limit
-  // Limits parallel execution to prevent memory issues with large templates
-  const PARALLEL_LIMIT = 10;
-  const dynamicHeightsList: number[][] = [];
-
-  for (let i = 0; i < items.length; i += PARALLEL_LIMIT) {
-    const chunk = items.slice(i, i + PARALLEL_LIMIT);
-    const chunkResults = await Promise.all(
-      chunk.map((item) => {
-        const value = getSchemaValue(item.schema, input);
-        return getDynamicHeights(value, {
-          schema: item.schema,
-          basePdf,
-          options,
-          _cache,
-        }).then((heights) => (heights.length === 0 ? [0] : heights));
-      }),
-    );
-    dynamicHeightsList.push(...chunkResults);
-  }
-
-  // 3. Check if any heights changed (using pre-calculated results)
-  let hasChange = false;
-  for (let i = 0; i < items.length; i++) {
-    const totalHeight = dynamicHeightsList[i].reduce((a, b) => a + b, 0);
-    if (Math.abs(totalHeight - items[i].height) > EPSILON) {
-      hasChange = true;
-      break;
-    }
-  }
-
-  // Return original template if no height changes
-  if (!hasChange) {
-    return template;
-  }
-
-  // 4. Layout calculation (pure numeric computation, no async)
-  const contentHeight = getContentHeight(basePdf);
-  const paddingTop = basePdf.padding[0];
+function processDynamicPage(
+  items: LayoutItem[],
+  orderMap: Map<string, number>,
+  contentHeight: number,
+  paddingTop: number,
+): Schema[][] {
   const pages: Schema[][] = [];
   let totalYOffset = 0;
 
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i];
-    const dynamicHeights = dynamicHeightsList[i];
-
+  for (const item of items) {
     const currentGlobalStartY = item.baseY + totalYOffset;
 
     const actualGlobalEndY = placeRowsOnPages(
       item.schema,
-      dynamicHeights,
+      item.dynamicHeights,
       currentGlobalStartY,
       contentHeight,
       paddingTop,
@@ -283,5 +227,106 @@ export const getDynamicTemplate = async (
   sortPagesByOrder(pages, orderMap);
   removeTrailingEmptyPages(pages);
 
-  return { basePdf, schemas: pages };
+  return pages;
+}
+
+/**
+ * Process a template containing tables with dynamic heights
+ * and generate a new template with proper page breaks.
+ *
+ * Processing is done page-by-page:
+ * - Pages with height changes are processed with full layout calculations
+ * - Pages without height changes are copied as-is (no offset propagation between pages)
+ *
+ * This reduces computation cost by:
+ * 1. Limiting layout calculations to pages that need them
+ * 2. Avoiding cross-page offset propagation for static pages
+ */
+export const getDynamicTemplate = async (
+  arg: ModifyTemplateForDynamicTableArg,
+): Promise<Template> => {
+  const { template, input, options, _cache, getDynamicHeights } = arg;
+  const basePdf = template.basePdf;
+
+  if (!isBlankPdf(basePdf)) {
+    return template;
+  }
+
+  const contentHeight = getContentHeight(basePdf);
+  const paddingTop = basePdf.padding[0];
+  const resultPages: Schema[][] = [];
+  const PARALLEL_LIMIT = 10;
+
+  // Process each template page independently
+  for (let pageIndex = 0; pageIndex < template.schemas.length; pageIndex++) {
+    const pageSchemas = template.schemas[pageIndex];
+
+    // Normalize this page's schemas
+    const { items, orderMap } = normalizePageSchemas(pageSchemas, paddingTop);
+
+    // Calculate dynamic heights for this page's schemas with concurrency limit
+    for (let i = 0; i < items.length; i += PARALLEL_LIMIT) {
+      const chunk = items.slice(i, i + PARALLEL_LIMIT);
+      const chunkResults = await Promise.all(
+        chunk.map((item) => {
+          const value = getSchemaValue(item.schema, input);
+          return getDynamicHeights(value, {
+            schema: item.schema,
+            basePdf,
+            options,
+            _cache,
+          }).then((heights) => (heights.length === 0 ? [0] : heights));
+        }),
+      );
+      // Update items with calculated heights
+      for (let j = 0; j < chunkResults.length; j++) {
+        items[i + j].dynamicHeights = chunkResults[j];
+      }
+    }
+
+    // Check if this page has any height changes
+    let pageHasChange = false;
+    for (const item of items) {
+      const totalHeight = item.dynamicHeights.reduce((a, b) => a + b, 0);
+      if (Math.abs(totalHeight - item.height) > EPSILON) {
+        pageHasChange = true;
+        break;
+      }
+    }
+
+    if (pageHasChange) {
+      const processedPages = processDynamicPage(items, orderMap, contentHeight, paddingTop);
+      resultPages.push(...processedPages);
+    } else {
+      resultPages.push(items.map((item) => item.schema));
+    }
+  }
+
+  removeTrailingEmptyPages(resultPages);
+
+  // Check if anything changed - return original template if not
+  if (resultPages.length === template.schemas.length) {
+    let unchanged = true;
+    for (let i = 0; i < resultPages.length && unchanged; i++) {
+      if (resultPages[i].length !== template.schemas[i].length) {
+        unchanged = false;
+        break;
+      }
+      for (let j = 0; j < resultPages[i].length && unchanged; j++) {
+        const orig = template.schemas[i][j];
+        const result = resultPages[i][j];
+        if (
+          Math.abs(orig.height - result.height) > EPSILON ||
+          Math.abs(orig.position.y - result.position.y) > EPSILON
+        ) {
+          unchanged = false;
+        }
+      }
+    }
+    if (unchanged) {
+      return template;
+    }
+  }
+
+  return { basePdf, schemas: resultPages };
 };
