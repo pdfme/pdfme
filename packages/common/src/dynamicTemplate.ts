@@ -284,22 +284,9 @@ export const getDynamicTemplate = async (
       }
     }
 
-    // Check if this page has any height changes
-    let pageHasChange = false;
-    for (const item of items) {
-      const totalHeight = item.dynamicHeights.reduce((a, b) => a + b, 0);
-      if (Math.abs(totalHeight - item.height) > EPSILON) {
-        pageHasChange = true;
-        break;
-      }
-    }
-
-    if (pageHasChange) {
-      const processedPages = processDynamicPage(items, orderMap, contentHeight, paddingTop);
-      resultPages.push(...processedPages);
-    } else {
-      resultPages.push(items.map((item) => item.schema));
-    }
+    // Process all pages independently (no cross-page offset propagation)
+    const processedPages = processDynamicPage(items, orderMap, contentHeight, paddingTop);
+    resultPages.push(...processedPages);
   }
 
   removeTrailingEmptyPages(resultPages);
