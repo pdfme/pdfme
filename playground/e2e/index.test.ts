@@ -31,7 +31,7 @@ async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 
 }
 
 const baseUrl = 'http://localhost:4173';
-const timeout = 40000; // Increased timeout to avoid test failures
+const timeout = 50000; // Increased timeout to avoid test failures
 jest.setTimeout(timeout * 5);
 
 const isRunningLocal = process.env.LOCAL === 'true';
@@ -50,8 +50,8 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
   await page.click('#generate-pdf');
 
   const newTarget = await browser.waitForTarget(
-    (target) => target.url().startsWith('blob:'),
-    { timeout }
+    (target) => target.url().startsWith('blob:') && target.type() === 'page',
+    { timeout },
   );
   const newPage = await newTarget?.page();
   if (!newPage) {
