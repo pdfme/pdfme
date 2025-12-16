@@ -96,7 +96,9 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
       expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
       expect(dynamicTemplate.schemas[1][0].name).toEqual('b');
-      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding);
+      // b maintains its relative offset from a's end position
+      // a ends at y=90 (page content), b was 20 units below a, so b is at y=10 in page coords + padding = 20
+      expect(dynamicTemplate.schemas[1][0].position.y).toEqual(padding + padding);
       expect(dynamicTemplate.schemas[1][1]).toBeUndefined();
     });
 
@@ -226,9 +228,12 @@ describe('getDynamicTemplate', () => {
 
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBe(1);
+      // Both schemas are placed; 'a' with height 0, 'b' follows
       expect(dynamicTemplate.schemas[0][0]).toBeDefined();
-      expect(dynamicTemplate.schemas[0][0].name).toEqual('b');
-      expect(dynamicTemplate.schemas[0][1]).toBeUndefined();
+      expect(dynamicTemplate.schemas[0][0].name).toEqual('a');
+      expect(dynamicTemplate.schemas[0][0].height).toEqual(0);
+      expect(dynamicTemplate.schemas[0][1]).toBeDefined();
+      expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
     });
 
     test('should handle very large increase heights', async () => {
@@ -243,7 +248,10 @@ describe('getDynamicTemplate', () => {
   });
 
   describe('Long page flow (cross-template-page)', () => {
-    test('should flow table and text across template pages without extra blank pages', async () => {
+    test('should process pages independently - static pages are added as-is without offset propagation', async () => {
+      // New behavior: pages without dynamic content are added as-is,
+      // without being affected by previous page's table expansion.
+      // This reduces computation cost by skipping layout calculations for static pages.
       const templateWithTwoPages: Template = {
         schemas: [
           [
@@ -277,22 +285,82 @@ describe('getDynamicTemplate', () => {
         _cache: new Map(),
         getDynamicHeights: async (value: string, args: { schema: Schema }) => {
           if (args.schema.type === 'table') {
-            return [10, 10, 10, 10];
+            return [10, 10, 10, 10]; // 40 total height, will cause page break
           }
           return [args.schema.height];
         },
       });
 
       verifyBasicStructure(dynamicTemplate);
-      expect(dynamicTemplate.schemas.length).toBe(2);
+      // Page 1: table starts at y=60, with 40 height, will split across pages
+      // Page 2: table continuation
+      // Page 3: text from template page 2 (added as-is, no offset propagation)
+      expect(dynamicTemplate.schemas.length).toBe(3);
+
+      // First page has table
       expect(dynamicTemplate.schemas[0].some((s) => s.name === 'table')).toBe(true);
+      // Second page has table continuation
       expect(dynamicTemplate.schemas[1].some((s) => s.name === 'table')).toBe(true);
-      expect(dynamicTemplate.schemas[1].some((s) => s.name === 'text')).toBe(true);
-      const tableOnPage2 = dynamicTemplate.schemas[1].find((s) => s.name === 'table');
-      const textOnPage2 = dynamicTemplate.schemas[1].find((s) => s.name === 'text');
-      expect(tableOnPage2).toBeDefined();
-      expect(textOnPage2).toBeDefined();
-      expect(textOnPage2!.position.y).toBeGreaterThan(tableOnPage2!.position.y);
+      // Third page has text (from template page 2, added as-is)
+      expect(dynamicTemplate.schemas[2].some((s) => s.name === 'text')).toBe(true);
+
+      // Text position should be unchanged from template (y=10)
+      const textOnPage3 = dynamicTemplate.schemas[2].find((s) => s.name === 'text');
+      expect(textOnPage3).toBeDefined();
+      expect(textOnPage3!.position.y).toBe(10);
+    });
+
+    test('should keep static page schemas together with dynamic page when both on same template page', async () => {
+      // When table and text are on the SAME template page, they should be processed together
+      const templateWithOnePage: Template = {
+        schemas: [
+          [
+            {
+              name: 'table',
+              content: 'table',
+              type: 'table',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'text',
+              content: 'text',
+              type: 'text',
+              position: { x: 10, y: 30 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: templateWithOnePage,
+        input: { table: 'table', text: 'text' },
+        options: { font: getSampleFont() },
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.type === 'table') {
+            return [10, 10, 10, 10]; // 40 total height
+          }
+          return [args.schema.height];
+        },
+      });
+
+      verifyBasicStructure(dynamicTemplate);
+      // Table expands from 10 to 40, pushing text down by 30
+      // Both should still fit on one page (table ends at 50, text at 70)
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      expect(dynamicTemplate.schemas[0].some((s) => s.name === 'table')).toBe(true);
+      expect(dynamicTemplate.schemas[0].some((s) => s.name === 'text')).toBe(true);
+
+      const table = dynamicTemplate.schemas[0].find((s) => s.name === 'table');
+      const text = dynamicTemplate.schemas[0].find((s) => s.name === 'text');
+      expect(table!.height).toBe(40);
+      // Text should be pushed down: original y=30 + (40-10) offset = 60
+      expect(text!.position.y).toBe(60);
     });
   });
 });
