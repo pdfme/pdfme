@@ -111,6 +111,7 @@ export const Schema = z
     readOnly: z.boolean().optional(),
     required: z.boolean().optional(),
     __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
+    __lineRange: z.object({ start: z.number(), end: z.number() }).optional(),
     __isSplit: z.boolean().optional(),
   })
   .passthrough();

@@ -29,6 +29,7 @@ import {
   splitTextToSize,
 } from './helper.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
+import { parseRichText, renderRichTextBlocks } from './richText/index.js';
 
 const embedAndGetFontObj = async (arg: {
   pdfDoc: PDFDocument;
@@ -103,7 +104,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   ]);
   const fontProp = getFontProp({ value, fontKitFont, schema, colorType });
 
-  const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
+  const { fontSize: baseFontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
   const fontName = (
     schema.fontName ? schema.fontName : getFallbackFontName(font)
@@ -122,21 +123,121 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
 
   if (schema.backgroundColor) {
-    const color = hex2PrintingColor(schema.backgroundColor, colorType);
+    const bgColor = hex2PrintingColor(schema.backgroundColor, colorType);
     if (rotate.angle !== 0) {
-      // Apply the same rotation logic as text rendering to match UI behavior
       const rotatedPoint = rotatePoint({ x, y }, pivotPoint, rotate.angle);
-      page.drawRectangle({ x: rotatedPoint.x, y: rotatedPoint.y, width, height, rotate, color });
+      page.drawRectangle({ x: rotatedPoint.x, y: rotatedPoint.y, width, height, rotate, color: bgColor });
     } else {
-      page.drawRectangle({ x, y, width, height, rotate, color });
+      page.drawRectangle({ x, y, width, height, rotate, color: bgColor });
     }
   }
+
+  // schema.richText がtrueの場合のみリッチテキストモードを有効にする
+  if (!schema.richText) {
+    // 通常テキストの場合は従来のレンダリング
+    renderPlainText({
+      value,
+      schema,
+      page,
+      pdfLib,
+      fontKitFont,
+      pdfFontValue,
+      baseFontSize,
+      color,
+      alignment,
+      verticalAlignment,
+      lineHeight,
+      characterSpacing,
+      x,
+      y,
+      width,
+      height,
+      pageHeight,
+      rotate,
+      pivotPoint,
+      opacity,
+    });
+    return;
+  }
+
+  // リッチテキストの場合はブロック単位でレンダリング
+  const blocks = parseRichText(value);
+  renderRichTextBlocks({
+    blocks,
+    schema,
+    page,
+    pdfLib,
+    fontKitFont,
+    pdfFontValue,
+    baseFontSize,
+    color,
+    alignment,
+    verticalAlignment,
+    lineHeight,
+    characterSpacing,
+    x,
+    width,
+    pageHeight,
+    schemaPositionY: mm2pt(schema.position.y),
+    rotate,
+    pivotPoint,
+    opacity,
+  });
+};
+
+/**
+ * 通常テキストのレンダリング（従来のロジック）
+ */
+const renderPlainText = (params: {
+  value: string;
+  schema: TextSchema;
+  page: PDFRenderProps<TextSchema>['page'];
+  pdfLib: PDFRenderProps<TextSchema>['pdfLib'];
+  fontKitFont: FontKitFont;
+  pdfFontValue: PDFFont;
+  baseFontSize: number;
+  color: ReturnType<typeof hex2PrintingColor>;
+  alignment: string;
+  verticalAlignment: string;
+  lineHeight: number;
+  characterSpacing: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  pageHeight: number;
+  rotate: ReturnType<typeof convertForPdfLayoutProps>['rotate'];
+  pivotPoint: { x: number; y: number };
+  opacity: number | undefined;
+}) => {
+  const {
+    value,
+    schema,
+    page,
+    pdfLib,
+    fontKitFont,
+    pdfFontValue,
+    baseFontSize: fontSize,
+    color,
+    alignment,
+    verticalAlignment,
+    lineHeight,
+    characterSpacing,
+    x,
+    y,
+    width,
+    height,
+    pageHeight,
+    rotate,
+    pivotPoint,
+    opacity,
+  } = params;
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
-  const lines = splitTextToSize({
+  let lines = splitTextToSize({
     value,
     characterSpacing,
     fontSize,
@@ -144,7 +245,11 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     boxWidthInPt: width,
   });
 
-  // Text lines are rendered from the bottom upwards, we need to adjust the position down
+  const lineRange = schema.__lineRange;
+  if (lineRange) {
+    lines = lines.slice(lineRange.start, lineRange.end + 1);
+  }
+
   let yOffset = 0;
   if (verticalAlignment === VERTICAL_ALIGN_TOP) {
     yOffset = firstLineTextHeight + halfLineHeightAdjustment;
@@ -163,15 +268,14 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   lines.forEach((line, rowIndex) => {
     const trimmed = line.replace('\n', '');
-    const textWidth = widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing);
     const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
-    // Adobe Acrobat Reader shows an error if `drawText` is called with an empty text
     if (line === '') {
-      // return; // this also works
-      line = '\r\n';
+      return;
     }
+
+    const textWidth = widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing);
 
     let xLine = x;
     if (alignment === 'center') {
@@ -182,7 +286,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
 
-    // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
       const _x = xLine + textWidth + 1;
       const _y = yLine + textHeight / 3;
@@ -195,7 +298,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       });
     }
 
-    // draw underline
     if (schema.underline && textWidth > 0) {
       const _x = xLine + textWidth + 1;
       const _y = yLine - textHeight / 12;
@@ -209,8 +311,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
 
     if (rotate.angle !== 0) {
-      // As we draw each line individually from different points, we must translate each lines position
-      // relative to the UI rotation pivot point. see comments in convertForPdfLayoutProps() for more info.
       const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
       xLine = rotatedPoint.x;
       yLine = rotatedPoint.y;
@@ -218,7 +318,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
     let spacing = characterSpacing;
     if (alignment === 'justify' && line.slice(-1) !== '\n') {
-      // if alignment is `justify` but the end of line is not newline, then adjust the spacing
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
       spacing += (width - textWidth) / len;
