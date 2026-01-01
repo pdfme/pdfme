@@ -232,8 +232,19 @@ export const renderRichTextBlocks = (params: RenderRichTextParams) => {
   } = params;
 
   let currentY = pageHeight - schemaPositionY;
-  const firstLineTextHeight = heightOfFontAtSize(fontKitFont, baseFontSize);
-  const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * baseFontSize) / 2;
+
+  // Determine the actual font size for the first block (headings use different size)
+  let firstBlockFontSize = baseFontSize;
+  if (blocks.length > 0 && blocks[0].type === 'heading') {
+    const level = blocks[0].level ?? 1;
+    const sizeMultiplier = HEADING_SIZE_MULTIPLIERS[level];
+    firstBlockFontSize = baseFontSize * sizeMultiplier;
+  } else if (blocks.length > 0 && blocks[0].type === 'code') {
+    firstBlockFontSize = baseFontSize * CODE_FONT_SIZE_RATIO;
+  }
+
+  const firstLineTextHeight = heightOfFontAtSize(fontKitFont, firstBlockFontSize);
+  const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * firstBlockFontSize) / 2;
 
   if (verticalAlignment === 'top') {
     currentY -= firstLineTextHeight + halfLineHeightAdjustment;
@@ -569,7 +580,6 @@ const countParagraphLines = (
   const rawText = block.rawText;
   const segments = block.lines[0]?.segments ?? [];
   const plainText = segments.map((s) => s.content).join('');
-  // splitSegmentsIntoLinesと同じロジックで行数をカウント
   const segmentsByLine = splitSegmentsIntoLines(
     rawText ?? plainText,
     fontKitFont,
