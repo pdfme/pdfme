@@ -11,6 +11,45 @@ export type FontWidthCalcValues = {
   characterSpacing: number;
   boxWidthInPt: number;
 };
+
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
+export interface TextSegment {
+  content: string;
+  bold?: boolean;
+  italic?: boolean;
+  code?: boolean;
+  color?: string;
+  backgroundColor?: string;
+}
+
+export interface TextLine {
+  segments: TextSegment[];
+  heightInMm: number;
+}
+
+export interface ListItem {
+  level: number;
+  ordered: boolean;
+  orderNumber?: number;
+  segments: TextSegment[];
+}
+
+export interface TableData {
+  headers: string[];
+  rows: string[][];
+}
+
+export interface TextBlock {
+  type: 'paragraph' | 'heading' | 'code' | 'blockquote' | 'table' | 'list';
+  level?: HeadingLevel;
+  language?: string;
+  lines: TextLine[];
+  rawText?: string;
+  tableData?: TableData;
+  listItems?: ListItem[];
+}
+
 export interface TextSchema extends Schema {
   fontName?: string;
   alignment: ALIGNMENT;
@@ -27,4 +66,7 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
+  richText?: boolean;
+  __lineRange?: { start: number; end: number };
+  __isSplit?: boolean;
 }

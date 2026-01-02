@@ -152,14 +152,24 @@ function placeRowsOnPages(
       position: { ...schema.position, y: currentYInPage + paddingTop },
     };
 
-    // Set bodyRange for splittable elements
-    // dynamicHeights[0] = header row, dynamicHeights[1] = body[0]
-    // So subtract 1 to convert to body index
+    // Set range for splittable elements based on schema type
     if (isSplittable) {
-      newSchema.__bodyRange = {
-        start: startRowIndex === 0 ? 0 : startRowIndex - 1,
-        end: currentRowIndex - 1,
-      };
+      const isTableLike = schema.type === 'table' || schema.type === 'multiVariableText';
+
+      if (isTableLike) {
+        // For tables: dynamicHeights[0] = header row, dynamicHeights[1] = body[0]
+        // So subtract 1 to convert to body index
+        newSchema.__bodyRange = {
+          start: startRowIndex === 0 ? 0 : startRowIndex - 1,
+          end: currentRowIndex - 1,
+        };
+      } else {
+        // For text-based schemas (text, cell, etc.): line indices directly
+        newSchema.__lineRange = {
+          start: startRowIndex,
+          end: currentRowIndex - 1,
+        };
+      }
       newSchema.__isSplit = startRowIndex > 0;
     }
 

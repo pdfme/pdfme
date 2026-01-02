@@ -48,6 +48,26 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
+const UseRichText = (props: PropPanelWidgetProps) => {
+  const { rootElement, changeSchemas, activeSchema, i18n } = props;
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = Boolean((activeSchema as { richText?: unknown })?.richText);
+  checkbox.onchange = (e: Event) => {
+    const val = (e.target as HTMLInputElement).checked ? true : undefined;
+    changeSchemas([{ key: 'richText', value: val, schemaId: activeSchema.id }]);
+  };
+  const label = document.createElement('label');
+  const span = document.createElement('span');
+  span.innerText = i18n('schemas.text.richText') || 'Rich Text (Markdown)';
+  span.style.cssText = 'margin-left: 0.5rem';
+  label.style.cssText = 'display: flex; width: 100%;';
+  label.appendChild(checkbox);
+  label.appendChild(span);
+  rootElement.appendChild(label);
+};
+
 export const propPanel: PropPanel<TextSchema> = {
   schema: ({ options, activeSchema, i18n }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
@@ -91,7 +111,12 @@ export const propPanel: PropPanel<TextSchema> = {
         props: { step: 0.1, min: 0 },
         span: 8,
       },
-      useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
+      useDynamicFontSize: {
+        type: 'boolean',
+        widget: 'UseDynamicFontSize',
+        bind: false,
+        span: 8,
+      },
       dynamicFontSize: {
         type: 'object',
         widget: 'card',
@@ -153,11 +178,17 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      useRichText: {
+        type: 'boolean',
+        widget: 'UseRichText',
+        bind: false,
+        span: 8,
+      },
     };
 
     return textSchema;
   },
-  widgets: { UseDynamicFontSize },
+  widgets: { UseDynamicFontSize, UseRichText },
   defaultSchema: {
     name: '',
     type: 'text',
@@ -174,6 +205,7 @@ export const propPanel: PropPanel<TextSchema> = {
     lineHeight: DEFAULT_LINE_HEIGHT,
     characterSpacing: DEFAULT_CHARACTER_SPACING,
     dynamicFontSize: undefined,
+    richText: undefined,
     fontColor: DEFAULT_FONT_COLOR,
     fontName: undefined,
     backgroundColor: '',
