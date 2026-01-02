@@ -69,7 +69,7 @@
     "jest-image-snapshot": "^6.5.1",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
+    "rimraf": "^6.1.2",
     "ts-jest": "^29.4.4",
     "ts-jest-resolver": "^2.0.1",
     "ts-loader": "^9.5.4",
