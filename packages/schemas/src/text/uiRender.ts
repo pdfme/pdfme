@@ -81,7 +81,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   );
 
   const processedText = replaceUnsupportedChars(value, fontKitFont);
-  const resolvedFontName = fontKitFont.postscriptName || schema.familyName;
+  const resolvedFontName = fontKitFont.postscriptName || schema.fontName;
   if (!isEditable(mode, schema)) {
     // Read-only mode
     textBlock.innerHTML = processedText
