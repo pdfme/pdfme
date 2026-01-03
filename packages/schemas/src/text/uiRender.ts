@@ -81,16 +81,16 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   );
 
   const processedText = replaceUnsupportedChars(value, fontKitFont);
-
+  const resolvedFontName = fontKitFont.postscriptName || schema.familyName;
   if (!isEditable(mode, schema)) {
     // Read-only mode
     textBlock.innerHTML = processedText
       .split('')
       .map(
         (l, i) =>
-          `<span style="letter-spacing:${
-            String(value).length === i + 1 ? 0 : 'inherit'
-          };">${l}</span>`,
+          `<span style="
+        font-family:${resolvedFontName};
+        letter-spacing:${String(value).length === i + 1 ? 0 : 'inherit'};">${l}</span>`,
       )
       .join('');
     return;
@@ -214,7 +214,11 @@ export const buildStyledTextContainer = (
 
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
-    fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
+    fontFamily: fontKitFont?.postscriptName
+      ? `'${fontKitFont.postscriptName}'`
+      : schema.fontName
+        ? `'${schema.fontName}'`
+        : 'inherit',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
