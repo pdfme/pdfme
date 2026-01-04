@@ -11,7 +11,10 @@ import {
   filterStartJP,
   filterEndJP,
 } from '../src/text/helper.js';
-import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
+import {
+  LINE_START_FORBIDDEN_CHARS_JA,
+  LINE_END_FORBIDDEN_CHARS_JA,
+} from '../src/text/constants.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 
@@ -249,7 +252,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 18;
-    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value, startingFontSize });
 
     expect(result).toBe(19.25);
   });
@@ -259,7 +262,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 36;
-    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value, startingFontSize });
 
     expect(result).toBe(11.25);
   });
@@ -277,9 +280,8 @@ describe('calculateDynamicFontSize with Default font', () => {
 describe('calculateDynamicFontSize with Custom font', () => {
   let fontKitFont: FontKitFont;
   beforeAll(async () => {
-    fontKitFont = await getFontKitFont('SauceHanSansJP',  getSampleFont(), new Map());
+    fontKitFont = await getFontKitFont('SauceHanSansJP', getSampleFont(), new Map());
   });
-
 
   it('should return smaller font size when dynamicFontSizeSetting is provided with horizontal fit', async () => {
     const textSchema = getTextSchema();
@@ -330,7 +332,7 @@ describe('calculateDynamicFontSize with Custom font', () => {
 describe('getFontDescentInPt test', () => {
   test('it gets a descent size relative to the font size', () => {
     expect(getFontDescentInPt({ descent: -400, unitsPerEm: 1000 } as FontKitFont, 12)).toBe(
-      -4.800000000000001
+      -4.800000000000001,
     );
     expect(getFontDescentInPt({ descent: 54, unitsPerEm: 1000 } as FontKitFont, 20)).toBe(1.08);
     expect(getFontDescentInPt({ descent: -512, unitsPerEm: 2048 } as FontKitFont, 54)).toBe(-13.5);
@@ -415,8 +417,11 @@ describe('filterStartJP', () => {
   });
 
   test('すべての禁則文字を正しく処理する', () => {
-    const input = LINE_START_FORBIDDEN_CHARS.map((char: string) => ['この', char + '文字']).flat();
-    const expected = LINE_START_FORBIDDEN_CHARS.map((char: string) => [
+    const input = LINE_START_FORBIDDEN_CHARS_JA.map((char: string) => [
+      'この',
+      char + '文字',
+    ]).flat();
+    const expected = LINE_START_FORBIDDEN_CHARS_JA.map((char: string) => [
       'この' + char,
       '文字',
     ]).flat();
@@ -460,8 +465,11 @@ describe('filterEndJP', () => {
   });
 
   test('すべての禁則文字を正しく処理する', () => {
-    const input = LINE_END_FORBIDDEN_CHARS.map((char: string) => ['これは' + char, '文章']).flat();
-    const expected = LINE_END_FORBIDDEN_CHARS.map((char: string) => [
+    const input = LINE_END_FORBIDDEN_CHARS_JA.map((char: string) => [
+      'これは' + char,
+      '文章',
+    ]).flat();
+    const expected = LINE_END_FORBIDDEN_CHARS_JA.map((char: string) => [
       'これは',
       char + '文章',
     ]).flat();
