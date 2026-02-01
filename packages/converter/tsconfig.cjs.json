@@ -6,5 +6,6 @@
     "declaration": true,
     "declarationDir": "dist/types",
     "skipLibCheck": true
-  }
+  },
+  "exclude": ["src/**/*.browser.ts"]
 }
