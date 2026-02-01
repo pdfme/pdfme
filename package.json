@@ -57,7 +57,7 @@
     "@babel/core": "^7.28.4",
     "@humanwhocodes/config-array": "^0.13.0",
     "@types/jest": "^29.5.14",
-    "@types/jest-image-snapshot": "^6.4.0",
+    "@types/jest-image-snapshot": "^6.4.1",
     "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.32.0",
