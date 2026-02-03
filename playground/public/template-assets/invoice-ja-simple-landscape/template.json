@@ -105,7 +105,7 @@
       {
         "name": "totalAmountLabel",
         "type": "text",
-        "position": { "x": 12, "y": 61 },
+        "position": { "x": 12, "y": 60.5 },
         "width": 26,
         "height": 6,
         "content": "ご請求金額",
@@ -208,7 +208,7 @@
       {
         "name": "senderRegistrationNumber",
         "type": "text",
-        "position": { "x": 230.83, "y": 38 },
+        "position": { "x": 230.83, "y": 37.25 },
         "width": 43,
         "height": 5.03,
         "content": "T-1234567890123",
@@ -222,7 +222,7 @@
       {
         "name": "senderPostalCodeLabel",
         "type": "text",
-        "position": { "x": 213.83, "y": 44 },
+        "position": { "x": 213.83, "y": 43.5 },
         "width": 8,
         "height": 5,
         "content": "〒 ",
@@ -501,8 +501,7 @@
         "showHead": true,
         "head": ["品番・品名", "数量", "単位", "単価", "金額", "備考"],
         "headWidthPercentages": [
-          29.943412344314446, 8.410280301396446, 8.079777052892652,
-          9.816530301396453, 18.75, 25
+          29.943412344314446, 8.410280301396446, 8.079777052892652, 9.816530301396453, 18.75, 25
         ],
         "tableStyles": { "borderWidth": 0.2, "borderColor": "#969696" },
         "headStyles": {
