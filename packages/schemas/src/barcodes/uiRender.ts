@@ -1,10 +1,10 @@
-import type * as CSS from 'csstype';
-import { UIRenderProps } from '@pdfme/common';
+import type { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types.js';
-import { validateBarcodeInput, createBarCode } from './helper.js';
+import { validateBarcodeInput, createBarCode, createBarCodeSvg } from './helper.js';
 import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 
-const fullSize = { width: '100%', height: '100%' };
+type CSSProperties = Record<string, string | number>;
+const fullSize: CSSProperties = { width: '100%', height: '100%' };
 
 const blobToDataURL = (blob: Blob): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -16,8 +16,35 @@ const blobToDataURL = (blob: Blob): Promise<string> =>
 
 const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
   const imageBuf = await createBarCode({
-    ...schema,
+    type: schema.type,
     input: value,
+    width: (schema as unknown as { width: number }).width,
+    height: (schema as unknown as { height: number }).height,
+    backgroundColor: schema.backgroundColor,
+    barColor: schema.barColor,
+    textColor: schema.textColor,
+    includetext: schema.includetext,
+    alttext: schema.alttext,
+    textxalign: schema.textxalign,
+    textsize: schema.textsize,
+    textyoffset: schema.textyoffset,
+    scale: schema.scale,
+    scaleX: schema.scaleX,
+    scaleY: schema.scaleY,
+    padding: schema.padding,
+    paddingtop: schema.paddingtop,
+    paddingleft: schema.paddingleft,
+    paddingright: schema.paddingright,
+    paddingbottom: schema.paddingbottom,
+    inkspread: schema.inkspread,
+    showBorder: schema.showBorder,
+    eclevel: schema.eclevel,
+    version: schema.version,
+    mask: schema.mask,
+    qzone: schema.qzone,
+    columns: schema.columns,
+    rows: schema.rows,
+    compact: schema.compact,
   });
   const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
   const barcodeDataURL = await blobToDataURL(barcodeData);
@@ -28,9 +55,54 @@ const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
   const barcodeDataURL = await createBarcodeImage(schema, value);
   const img = document.createElement('img');
   img.src = barcodeDataURL;
-  const imgStyle: CSS.Properties = { ...fullSize, borderRadius: 0 };
+  const imgStyle: CSSProperties = { ...fullSize, borderRadius: 0 };
   Object.assign(img.style, imgStyle);
   return img;
+};
+
+const createBarcodeSvgElm = async (schema: BarcodeSchema, value: string) => {
+  const svgStr = await createBarCodeSvg({
+    type: schema.type,
+    input: value,
+    width: (schema as unknown as { width: number }).width,
+    height: (schema as unknown as { height: number }).height,
+    backgroundColor: schema.backgroundColor,
+    barColor: schema.barColor,
+    textColor: schema.textColor,
+    includetext: schema.includetext,
+    alttext: schema.alttext,
+    textxalign: schema.textxalign,
+    textyalign: schema.textyalign,
+    textsize: schema.textsize,
+    textyoffset: schema.textyoffset,
+    scale: schema.scale,
+    scaleX: schema.scaleX,
+    scaleY: schema.scaleY,
+    padding: schema.padding,
+    paddingtop: schema.paddingtop,
+    paddingleft: schema.paddingleft,
+    paddingright: schema.paddingright,
+    paddingbottom: schema.paddingbottom,
+    inkspread: schema.inkspread,
+    showBorder: schema.showBorder,
+    eclevel: schema.eclevel,
+    version: schema.version,
+    mask: schema.mask,
+    qzone: schema.qzone,
+    columns: schema.columns,
+    rows: schema.rows,
+    compact: schema.compact,
+  });
+  const container = document.createElement('div');
+  container.innerHTML = svgStr;
+  const svgEl = container.firstChild as SVGElement | null;
+  if (svgEl && svgEl instanceof SVGElement) {
+    svgEl.setAttribute('width', '100%');
+    svgEl.setAttribute('height', '100%');
+    return svgEl;
+  }
+  // Fallback to image element if parsing failed
+  return createBarcodeImageElm(schema, value);
 };
 
 export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
@@ -38,7 +110,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     arg;
 
   const container = document.createElement('div');
-  const containerStyle: CSS.Properties = {
+  const containerStyle: CSSProperties = {
     ...fullSize,
     display: 'flex',
     alignItems: 'center',
@@ -50,7 +122,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   const editable = isEditable(mode, schema);
   if (editable) {
     const input = document.createElement('input');
-    const inputStyle: CSS.Properties = {
+    const inputStyle: CSSProperties = {
       width: '100%',
       position: 'absolute',
       textAlign: 'center',
@@ -85,8 +157,18 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
   try {
     if (!validateBarcodeInput(schema.type, value))
       throw new Error('[@pdfme/schemas/barcodes] Invalid barcode input');
-    const imgElm = await createBarcodeImageElm(schema, value);
-    container.appendChild(imgElm);
+    if ((schema as { format?: string }).format === 'svg') {
+      try {
+        const svgElm = await createBarcodeSvgElm(schema, value);
+        container.appendChild(svgElm);
+      } catch {
+        const imgElm = await createBarcodeImageElm(schema, value);
+        container.appendChild(imgElm);
+      }
+    } else {
+      const imgElm = await createBarcodeImageElm(schema, value);
+      container.appendChild(imgElm);
+    }
   } catch (err) {
     console.error(`[@pdfme/ui] ${String(err)}`);
     container.appendChild(createErrorElm());

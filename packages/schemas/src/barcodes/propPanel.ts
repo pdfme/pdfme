@@ -133,6 +133,20 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   {
     defaultSchema: {
       name: '',
+      type: 'itf',
+      content: '01234567890123456789012345678901234567890123',
+      position,
+      ...defaultColors,
+      ...defaultTextColors,
+      ...defaultIncludetext,
+      ...default40x20,
+      rotate: 0,
+      opacity: DEFAULT_OPACITY,
+    },
+  },
+  {
+    defaultSchema: {
+      name: '',
       type: 'upca',
       content: '416000336108',
       position,
@@ -240,6 +254,140 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
               title: i18n('schemas.barcodes.includetext'),
               type: 'boolean',
               widget: 'switch',
+            },
+            alttext: {
+              title: i18n('schemas.altText'),
+              type: 'string',
+              widget: 'input',
+            },
+            textxalign: {
+              title: i18n('schemas.text.textAlign'),
+              type: 'string',
+              widget: 'select',
+              props: {
+                options: [
+                  { label: i18n('schemas.left'), value: 'left' },
+                  { label: i18n('schemas.center'), value: 'center' },
+                  { label: i18n('schemas.right'), value: 'right' },
+                ],
+              },
+            },
+            textyalign: {
+              title: i18n('schemas.vertical'),
+              type: 'string',
+              widget: 'select',
+              props: {
+                options: [
+                  { label: i18n('schemas.bottom'), value: 'below' },
+                  { label: i18n('schemas.top'), value: 'above' },
+                ],
+              },
+            },
+            textsize: {
+              title: i18n('schemas.text.size'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 1 },
+            },
+            textyoffset: {
+              title: i18n('schemas.textYOffset'),
+              type: 'number',
+              widget: 'inputNumber',
+            },
+          }
+        : {}),
+      // General rendering controls
+      scale: {
+        title: i18n('schemas.scale'),
+        type: 'number',
+        widget: 'inputNumber',
+        props: { min: 1 },
+        placeholder: 'Default 5',
+      },
+      padding: {
+        title: i18n('schemas.padding'),
+        type: 'number',
+        widget: 'inputNumber',
+        props: { min: 0 },
+      },
+      // Border controls removed for now due to inconsistent behavior across symbologies
+      format: {
+        title: i18n('schemas.outputFormat'),
+        type: 'string',
+        widget: 'select',
+        props: {
+          options: [
+            { label: 'PNG', value: 'png' },
+            { label: 'SVG', value: 'svg' },
+          ],
+        },
+      },
+      ...(barcodeType === 'qrcode'
+        ? {
+            eclevel: {
+              title: i18n('schemas.qr.eclevel'),
+              type: 'string',
+              widget: 'select',
+              props: {
+                options: [
+                  { label: 'L (7%)', value: 'L' },
+                  { label: 'M (15%)', value: 'M' },
+                  { label: 'Q (25%)', value: 'Q' },
+                  { label: 'H (30%)', value: 'H' },
+                ],
+              },
+              default: 'M',
+            },
+            version: {
+              title: i18n('schemas.qr.version'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 1, max: 40 },
+              placeholder: 'Auto',
+            },
+            mask: {
+              title: i18n('schemas.qr.mask'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 0, max: 7 },
+              placeholder: 'Auto',
+            },
+            qzone: {
+              title: i18n('schemas.qr.qzone'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 0 },
+              default: 4,
+            },
+          }
+        : {}),
+      ...(barcodeType === 'pdf417'
+        ? {
+            columns: {
+              title: i18n('schemas.pdf417.columns'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 1 },
+              default: 5,
+            },
+            rows: {
+              title: i18n('schemas.pdf417.rows'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 1 },
+            },
+            compact: {
+              title: i18n('schemas.pdf417.compact'),
+              type: 'boolean',
+              widget: 'switch',
+              default: false,
+            },
+            eclevel: {
+              title: i18n('schemas.pdf417.eclevel'),
+              type: 'number',
+              widget: 'inputNumber',
+              props: { min: 0, max: 8 },
+              default: 2,
             },
           }
         : {}),
