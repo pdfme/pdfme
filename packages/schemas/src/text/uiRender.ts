@@ -1,6 +1,6 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
-import { UIRenderProps, getDefaultFont } from '@pdfme/common';
+import { UIRenderProps, getDefaultFont, mm2pt } from '@pdfme/common';
 import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -19,8 +19,41 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
+  splitTextToSize,
 } from './helper.js';
 import { isEditable } from '../utils.js';
+import { richTextToHtml } from './richText/index.js';
+
+/**
+ * __lineRangeがある場合、指定された行範囲のテキストのみを返す
+ */
+const applyLineRange = (
+  value: string,
+  schema: TextSchema,
+  fontKitFont: FontKitFont,
+): string => {
+  const lineRange = schema.__lineRange;
+  if (!lineRange) {
+    return value;
+  }
+
+  const fontSize = schema.fontSize ?? DEFAULT_FONT_SIZE;
+  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const boxWidthInPt = mm2pt(schema.width);
+
+  // テキストを行に分割
+  const lines = splitTextToSize({
+    value,
+    characterSpacing,
+    fontSize,
+    fontKitFont,
+    boxWidthInPt,
+  });
+
+  // 指定された行範囲のみを取得
+  const selectedLines = lines.slice(lineRange.start, lineRange.end + 1);
+  return selectedLines.join('\n');
+};
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -74,25 +107,40 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
+
+  // __lineRangeがある場合、指定された行範囲のテキストのみを表示
+  const displayValue = applyLineRange(value, schema, fontKitFont);
+
   const textBlock = buildStyledTextContainer(
     arg,
     fontKitFont,
-    usePlaceholder ? placeholder : value,
+    usePlaceholder ? placeholder : displayValue,
   );
 
-  const processedText = replaceUnsupportedChars(value, fontKitFont);
+  const processedText = replaceUnsupportedChars(displayValue, fontKitFont);
 
+  // viewerモードかつschema.richText がtrueの場合のみリッチテキストレンダリング
+  if (mode === 'viewer') {
+    if (schema.richText) {
+      textBlock.innerHTML = richTextToHtml(processedText, schema);
+    } else {
+      textBlock.innerHTML = processedText
+        .split('')
+        .map(
+          (l, i) =>
+            `<span style="letter-spacing:${
+              String(value).length === i + 1 ? 0 : 'inherit'
+            };">${l}</span>`,
+        )
+        .join('');
+    }
+    return;
+  }
+
+  // designer/formモードは生テキスト表示
   if (!isEditable(mode, schema)) {
-    // Read-only mode
-    textBlock.innerHTML = processedText
-      .split('')
-      .map(
-        (l, i) =>
-          `<span style="letter-spacing:${
-            String(value).length === i + 1 ? 0 : 'inherit'
-          };">${l}</span>`,
-      )
-      .join('');
+    // form(readOnly=true)の場合: 生テキストで表示のみ
+    textBlock.innerText = processedText;
     return;
   }
 
@@ -202,6 +250,7 @@ export const buildStyledTextContainer = (
     width: '100%',
     height: '100%',
     cursor: isEditable(mode, schema) ? 'text' : 'default',
+    overflow: mode === 'viewer' ? 'hidden' : 'auto',
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
