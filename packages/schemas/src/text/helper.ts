@@ -24,6 +24,7 @@ import {
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
 } from './constants.js';
+import { stripRichText } from './richText/index.js';
 
 export const getBrowserVerticalFontAdjustments = (
   fontKitFont: FontKitFont,
@@ -252,7 +253,9 @@ export const calculateDynamicFontSize = ({
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const paragraphs = value.split('\n');
+  // Strip markdown syntax for width calculation in rich text mode
+  const plainValue = textSchema.richText ? stripRichText(value) : value;
+  const paragraphs = plainValue.split('\n');
 
   let dynamicFontSize = fontSize;
   if (dynamicFontSize < dynamicFontSizeSetting.min) {

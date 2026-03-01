@@ -11,6 +11,7 @@ import {
   filterStartJP,
   filterEndJP,
 } from '../src/text/helper.js';
+import { getDynamicHeightsForText } from '../src/text/dynamicTemplate.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
@@ -472,5 +473,114 @@ describe('filterEndJP', () => {
     const input = ['これは「', '文章「', 'です「'];
     const expected = ['これは', '「文章', '「です「'];
     expect(filterEndJP(input)).toEqual(expected);
+  });
+});
+
+describe('getDynamicHeightsForText', () => {
+  const font = getDefaultFont();
+  const basePdf: { width: number; height: number; padding: [number, number, number, number] } = {
+    width: 210,
+    height: 297,
+    padding: [0, 0, 0, 0],
+  };
+  const options = { font };
+
+  const getTextSchemaWithRichText = (): TextSchema => ({
+    name: 'test',
+    type: 'text',
+    content: 'test',
+    position: { x: 10, y: 10 },
+    width: 50,
+    height: 20,
+    alignment: 'left',
+    verticalAlignment: 'top',
+    fontColor: '#000000',
+    backgroundColor: '#ffffff',
+    lineHeight: 1,
+    characterSpacing: 0,
+    fontSize: 12,
+    richText: true,
+  });
+
+  it('should return fixed height when richText is not enabled', async () => {
+    const schema: TextSchema = {
+      ...getTextSchemaWithRichText(),
+      richText: undefined,
+    };
+    const result = await getDynamicHeightsForText('test', {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    expect(result).toEqual([20]); // schema.height
+  });
+
+  it('should return fixed height for empty text', async () => {
+    const schema = getTextSchemaWithRichText();
+    const result = await getDynamicHeightsForText('', {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    // Empty text returns schema.height
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe(20);
+  });
+
+  it('should return array of line heights for rich text with heading', async () => {
+    const schema = getTextSchemaWithRichText();
+    const value = '# Heading\nParagraph text';
+    const result = await getDynamicHeightsForText(value, {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    // Rich text should produce multiple heights (heading + spacing + paragraph + spacing)
+    expect(result.length).toBeGreaterThan(1);
+    result.forEach((height) => expect(height).toBeGreaterThan(0));
+  });
+
+  it('should return array of line heights for rich text with list', async () => {
+    const schema = getTextSchemaWithRichText();
+    const value = '- Item 1\n- Item 2\n- Item 3';
+    const result = await getDynamicHeightsForText(value, {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    // List should produce heights for each item plus spacing
+    expect(result.length).toBeGreaterThan(1);
+    result.forEach((height) => expect(height).toBeGreaterThan(0));
+  });
+
+  it('should handle plain text in rich text mode', async () => {
+    const schema = getTextSchemaWithRichText();
+    const value = 'Just plain text';
+    const result = await getDynamicHeightsForText(value, {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    // Plain text in rich text mode produces line heights (paragraph + spacing)
+    expect(result.length).toBeGreaterThanOrEqual(1);
+    result.forEach((height) => expect(height).toBeGreaterThan(0));
+  });
+
+  it('should handle text with explicit newlines in rich text mode', async () => {
+    const schema = getTextSchemaWithRichText();
+    const value = 'Line 1\n\nLine 2\n\nLine 3';
+    const result = await getDynamicHeightsForText(value, {
+      schema,
+      basePdf,
+      options,
+      _cache: new Map(),
+    });
+    // Multiple paragraphs separated by blank lines
+    expect(result.length).toBeGreaterThanOrEqual(1);
   });
 });

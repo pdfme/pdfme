@@ -37,3 +37,13 @@ export {
 
 // Export utility functions
 export { getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
+export { getDynamicHeightsForText } from './text/dynamicTemplate.js';
+
+// Export types from text schema
+export type {
+  TextSchema,
+  TextSegment,
+  TextLine,
+  TextBlock,
+  HeadingLevel,
+} from './text/index.js';
