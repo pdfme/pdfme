@@ -21,8 +21,10 @@ import {
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
   VERTICAL_ALIGN_TOP,
-  LINE_END_FORBIDDEN_CHARS,
-  LINE_START_FORBIDDEN_CHARS,
+  LINE_END_FORBIDDEN_CHARS_JA,
+  LINE_START_FORBIDDEN_CHARS_JA,
+  LINE_END_FORBIDDEN_CHARS_DE,
+  LINE_START_FORBIDDEN_CHARS_DE,
 } from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
@@ -434,7 +436,7 @@ const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValu
   if (lines.some(containsJapanese)) {
     return adjustEndOfLine(filterEndJP(filterStartJP(lines)));
   } else {
-    return adjustEndOfLine(lines);
+    return adjustEndOfLine(filterEndDE(filterStartDE(lines)));
   }
 };
 
@@ -452,13 +454,8 @@ const adjustEndOfLine = (lines: string[]): string[] => {
 function containsJapanese(text: string): boolean {
   return /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u.test(text);
 }
-//
-// 日本語禁則処理
-//
-// https://www.morisawa.co.jp/blogs/MVP/8760
-//
-// 行頭禁則
-export const filterStartJP = (lines: string[]): string[] => {
+
+const filterStartForbiddenChars = (lines: string[], forbiddenChars: string[]): string[] => {
   const filtered: string[] = [];
   let charToAppend: string | null = null;
 
@@ -470,7 +467,7 @@ export const filterStartJP = (lines: string[]): string[] => {
         filtered.push('');
       } else {
         const charAtStart: string = line.charAt(0);
-        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
+        if (forbiddenChars.includes(charAtStart)) {
           if (line.trim().length === 1) {
             filtered.push(line);
             charToAppend = null;
@@ -504,8 +501,7 @@ export const filterStartJP = (lines: string[]): string[] => {
   }
 };
 
-// 行末禁則
-export const filterEndJP = (lines: string[]): string[] => {
+const filterEndForbiddenChars = (lines: string[], forbiddenChars: string[]): string[] => {
   const filtered: string[] = [];
   let charToPrepend: string | null = null;
 
@@ -515,7 +511,7 @@ export const filterEndJP = (lines: string[]): string[] => {
     } else {
       const chartAtEnd = line.slice(-1);
 
-      if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
+      if (forbiddenChars.includes(chartAtEnd)) {
         if (line.trim().length === 1) {
           filtered.push(line);
           charToPrepend = null;
@@ -547,4 +543,24 @@ export const filterEndJP = (lines: string[]): string[] => {
   } else {
     return filtered;
   }
+};
+
+// 行頭禁則
+export const filterStartJP = (lines: string[]): string[] => {
+  return filterStartForbiddenChars(lines, LINE_START_FORBIDDEN_CHARS_JA);
+};
+
+// 行末禁則
+export const filterEndJP = (lines: string[]): string[] => {
+  return filterEndForbiddenChars(lines, LINE_END_FORBIDDEN_CHARS_JA);
+};
+
+// Similar to filterEndJP, but for German
+export const filterEndDE = (lines: string[]): string[] => {
+  return filterEndForbiddenChars(lines, LINE_END_FORBIDDEN_CHARS_DE);
+};
+
+// German line start prohibition (similar to filterStartJP)
+export const filterStartDE = (lines: string[]): string[] => {
+  return filterStartForbiddenChars(lines, LINE_START_FORBIDDEN_CHARS_DE);
 };
