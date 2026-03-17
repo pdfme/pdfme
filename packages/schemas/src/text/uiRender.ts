@@ -86,12 +86,16 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     // Read-only mode
     textBlock.innerHTML = processedText
       .split('')
-      .map(
-        (l, i) =>
-          `<span style="letter-spacing:${
-            String(value).length === i + 1 ? 0 : 'inherit'
-          };">${l}</span>`,
-      )
+      .map((l, i) => {
+        const escaped = l
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+        return `<span style="letter-spacing:${
+          String(value).length === i + 1 ? 0 : 'inherit'
+        };">${escaped}</span>`;
+      })
       .join('');
     return;
   }

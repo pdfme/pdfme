@@ -156,12 +156,13 @@ const schema: Plugin<Select> = {
 
       // Ensure schema.options is an array before mapping
       const options = Array.isArray(schema.options) ? schema.options : [];
-      selectElement.innerHTML = options
-        .map(
-          (option) =>
-            `<option value="${option}" ${option === value ? 'selected' : ''}>${option}</option>`,
-        )
-        .join('');
+      options.forEach((option) => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        if (option === value) optionElement.selected = true;
+        selectElement.appendChild(optionElement);
+      });
       rootElement.appendChild(selectElement);
     }
   },
