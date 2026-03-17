@@ -6,6 +6,7 @@ import {
   createErrorElm,
   createSvgStr,
 } from '../utils.js';
+import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
 
 const isValidSVG = (svgString: string): boolean => {
@@ -58,13 +59,15 @@ const svgSchema: Plugin<SVGSchema> = {
       textarea.style.backgroundColor = addAlphaToHex(theme.colorPrimaryBg, 30);
 
       if (isValidSVG(value)) {
-        const svgElement = new DOMParser().parseFromString(value, 'text/xml').childNodes[0];
+        const sanitizedValue = sanitizeSVG(value);
+        const svgElement = new DOMParser().parseFromString(sanitizedValue, 'image/svg+xml')
+          .childNodes[0];
         if (svgElement instanceof SVGElement) {
           svgElement.setAttribute('width', '100%');
           svgElement.setAttribute('height', '100%');
           svgElement.style.position = 'absolute';
+          rootElement.appendChild(svgElement);
         }
-        rootElement.appendChild(svgElement);
       } else if (value) {
         const errorElm = createErrorElm();
         errorElm.style.position = 'absolute';
@@ -84,7 +87,7 @@ const svgSchema: Plugin<SVGSchema> = {
         rootElement.appendChild(createErrorElm());
         return;
       }
-      container.innerHTML = value;
+      container.innerHTML = sanitizeSVG(value);
       const svgElement = container.childNodes[0];
       if (svgElement instanceof SVGElement) {
         svgElement.setAttribute('width', '100%');
