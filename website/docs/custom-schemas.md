@@ -145,7 +145,7 @@ Specifically, it should be possible to input the signature using [signature_pad]
 [![](/img/signature-schema.gif)](https://playground.pdfme.com/)
 
 - Demo: https://playground.pdfme.com/
-- Code: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)
+- Code: [playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme/blob/main/playground/src/plugins/signature.ts)
 
 
 ### Caveats for writing Custom Schemas

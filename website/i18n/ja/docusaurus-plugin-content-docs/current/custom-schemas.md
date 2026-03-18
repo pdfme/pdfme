@@ -145,7 +145,7 @@ pdfmeは[pdf-lib](https://pdf-lib.js.org/)と[form-render](https://xrender.fun/f
 [![](/img/signature-schema.gif)](https://playground.pdfme.com/)
 
 - デモ: https://playground.pdfme.com/
-- コード: [pdfme-playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme-playground/blob/main/src/plugins/signature.ts)
+- コード: [playground/src/plugins/signature.ts](https://github.com/pdfme/pdfme/blob/main/playground/src/plugins/signature.ts)
 
 
 ### カスタムスキーマ作成時の注意点
