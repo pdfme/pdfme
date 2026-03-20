@@ -23,20 +23,23 @@ const isExternal = (id: string) =>
   builtinModuleSet.has(id) ||
   packageDependencies.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
 
-export default defineConfig({
-  build: {
-    lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.browser.ts'),
-        'index.node': resolve(__dirname, 'src/index.node.ts'),
+export default defineConfig(() => {
+  return {
+    base: './',
+    build: {
+      lib: {
+        entry: {
+          index: resolve(__dirname, 'src/index.browser.ts'),
+          'index.node': resolve(__dirname, 'src/index.node.ts'),
+        },
+        fileName: (_, entryName) => `${entryName}.js`,
+        formats: ['es'],
       },
-      fileName: (_, entryName) => `${entryName}.js`,
-      formats: ['es'],
+      minify: false,
+      outDir: 'dist',
+      rollupOptions: { external: isExternal },
+      sourcemap: true,
+      target: 'es2020',
     },
-    minify: false,
-    outDir: 'dist',
-    rollupOptions: { external: isExternal },
-    sourcemap: true,
-    target: 'es2020',
-  },
+  };
 });

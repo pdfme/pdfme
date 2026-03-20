@@ -46,6 +46,9 @@ Latest committed checkpoint:
 - `ui` の react-hooks lint 対応で発生した `Preview` 回帰を解消
 - playground thumbnail script の remote font 依存を撤去
 - playground の asset generation script が package root export + local fonts で通ることを確認
+- `pdfjs-dist` v5 browser worker の `hashOriginal.toHex` 回帰を local worker wrapper で吸収
+- `playground` の E2E test runner を Jest から Vitest へ移行
+- `@pdfme/converter` の一時的な CJS 後退を撤回し、ESM-only 方針へ復帰
 
 まだ未着手:
 
@@ -55,12 +58,15 @@ Latest committed checkpoint:
 現在の残課題:
 
 - playground 側の exports 変更追従確認
-- playground 側 test/lint 方針の整理
+- playground Vitest E2E の安定化継続
+  - preview port drift による誤接続は修正済み
+  - 最新差分の再検証は次ターンへ持ち越し
+- playground 側の legacy test dependency / lockfile 整理
 
 次に進める順序:
 
 1. playground 側の exports 追従確認を広げる
-2. playground 側 test/lint 方針の整理に入る
+2. playground 側の legacy test dependency / lockfile 整理に入る
 3. CLI (`Phase 2`) の前提整理に着手する
 
 ## Completed Work

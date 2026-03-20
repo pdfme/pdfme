@@ -10,6 +10,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => {
   return {
+    base: './',
     define: { 'process.env.NODE_ENV': JSON.stringify(mode) },
     plugins: [react(), tsconfigPaths({ root: '.' }), cssInjectedByJsPlugin()],
     resolve: {
@@ -41,6 +42,9 @@ export default defineConfig(({ mode }) => {
     optimizeDeps: {
       include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
       exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter'],
+    },
+    worker: {
+      format: 'es',
     },
   };
 });

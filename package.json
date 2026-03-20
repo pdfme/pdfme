@@ -55,6 +55,7 @@
     "test:generator": "npm run -w packages/generator test",
     "test:manipulator": "npm run -w packages/manipulator test",
     "test:manipulator:update-snapshots": "npm run -w packages/manipulator test:update-snapshots",
+    "test:playground": "npm run test --prefix playground",
     "test:pdf-lib": "npm run -w packages/pdf-lib test",
     "test:schemas": "npm run -w packages/schemas test",
     "test:ui": "npm run -w packages/ui test",

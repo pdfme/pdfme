@@ -13,6 +13,8 @@ const workspaceTests: Record<
     include: string[];
     setupFiles?: string[];
     testTimeout?: number;
+    hookTimeout?: number;
+    fileParallelism?: boolean;
     environment?: 'jsdom';
   }
 > = {
@@ -54,6 +56,14 @@ const workspaceTests: Record<
     testTimeout: 30000,
     environment: 'jsdom',
   },
+  playground: {
+    name: 'playground',
+    include: ['e2e/**/*.test.ts'],
+    setupFiles: [path.resolve(repoRoot, 'playground/vitest.setup.ts')],
+    testTimeout: 200000,
+    hookTimeout: 200000,
+    fileParallelism: false,
+  },
 };
 
 const selectedWorkspace = workspaceTests[workspacePath];
@@ -70,6 +80,8 @@ const testConfig = {
   include: selectedWorkspace?.include ?? [],
   setupFiles: selectedWorkspace?.setupFiles,
   testTimeout: selectedWorkspace?.testTimeout,
+  hookTimeout: selectedWorkspace?.hookTimeout,
+  fileParallelism: selectedWorkspace?.fileParallelism,
   ...(selectedWorkspace?.environment ? { environment: selectedWorkspace.environment } : {}),
 };
 

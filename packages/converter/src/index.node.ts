@@ -9,8 +9,8 @@ const clonePdfData = (pdf: ArrayBuffer | Uint8Array) =>
 export const pdf2img = async (
   pdf: ArrayBuffer | Uint8Array,
   options: Pdf2ImgOptions = {},
-): Promise<ArrayBuffer[]> =>
-  _pdf2img(pdf, options, {
+): Promise<ArrayBuffer[]> => {
+  return _pdf2img(pdf, options, {
     getDocument: (pdf) =>
       pdfjsLib.getDocument({
         data: clonePdfData(pdf),
@@ -26,14 +26,16 @@ export const pdf2img = async (
       return arrayBuffer;
     },
   });
+};
 
-export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
-  _pdf2size(pdf, options, {
+export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) => {
+  return _pdf2size(pdf, options, {
     getDocument: (pdf) =>
       pdfjsLib.getDocument({
         data: clonePdfData(pdf),
         isEvalSupported: false,
       }).promise,
   });
+};
 
 export { img2pdf } from './img2pdf.js';

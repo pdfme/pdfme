@@ -1,11 +1,12 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
-import { ChildProcessWithoutNullStreams } from 'child_process';
-import { spawn } from 'child_process';
-import type { MatchImageSnapshotOptions } from 'jest-image-snapshot';
+import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
+import type { MatchImageOptions } from 'vitest-image-snapshot';
 import templateCreationRecord from './templateCreationRecord.json';
 import formInputRecord from './formInputRecord.json';
+
+const previewUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+/;
 
 async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 1000): Promise<boolean> {
   console.log(`Waiting for server to be ready at ${url}`);
@@ -30,17 +31,65 @@ async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 
   return false;
 }
 
-const baseUrl = 'http://localhost:4173';
-const timeout = 40000; // Increased timeout to avoid test failures
-jest.setTimeout(timeout * 5);
+async function waitForPreviewUrl(
+  previewProcess: ChildProcessWithoutNullStreams,
+  timeoutMs = 20000,
+): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error(`Timed out waiting for preview URL after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+      previewProcess.stdout.off('data', onStdout);
+      previewProcess.stderr.off('data', onStderr);
+      previewProcess.off('exit', onExit);
+      previewProcess.off('error', onError);
+    };
+
+    const handleChunk = (kind: 'output' | 'error', data: Buffer | string) => {
+      const text = data.toString();
+      const message = text.trim();
+      if (message) {
+        const log = kind === 'output' ? console.log : console.error;
+        log(`Preview server ${kind}: ${message}`);
+      }
+
+      const matchedUrl = text.match(previewUrlPattern)?.[0];
+      if (matchedUrl) {
+        cleanup();
+        resolve(matchedUrl);
+      }
+    };
+
+    const onStdout = (data: Buffer | string) => handleChunk('output', data);
+    const onStderr = (data: Buffer | string) => handleChunk('error', data);
+    const onExit = (code: number | null, signal: NodeJS.Signals | null) => {
+      cleanup();
+      reject(new Error(`Preview server exited before becoming ready (code=${code}, signal=${signal})`));
+    };
+    const onError = (error: Error) => {
+      cleanup();
+      reject(error);
+    };
+
+    previewProcess.stdout.on('data', onStdout);
+    previewProcess.stderr.on('data', onStderr);
+    previewProcess.on('exit', onExit);
+    previewProcess.on('error', onError);
+  });
+}
+
+let baseUrl = 'http://127.0.0.1:4173';
+const timeout = 40000;
 
 const isRunningLocal = process.env.LOCAL === 'true';
 
-const snapShotOpt: MatchImageSnapshotOptions = {
-  failureThreshold: 1,
-  failureThresholdType: 'percent',
-  blur: 1,
-  customDiffConfig: { threshold: 0.2 },
+const snapshotOptions: MatchImageOptions = {
+  allowedPixelRatio: 0.01,
+  threshold: 0.2,
 };
 
 const viewport = { width: 1366, height: 768 };
@@ -76,33 +125,28 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
 }
 
 async function pdfToImages(pdf: Buffer): Promise<Buffer[]> {
-  const arrayBuffer = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
-  // Pass the arrayBuffer directly to pdf2img, not as an object with a data property
-  const arrayBuffers = await pdf2img(
-    arrayBuffer,
-    { imageType: 'png' }
-  );
-  return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
+  const pdfBytes = new Uint8Array(pdf.buffer, pdf.byteOffset, pdf.byteLength);
+  const arrayBuffers = await pdf2img(pdfBytes, { imageType: 'png' });
+  return arrayBuffers.map((buf: ArrayBuffer) => Buffer.from(new Uint8Array(buf)));
 }
 
 async function captureAndCompareScreenshot(page: Page, label?: string) {
-  const screenshot = await page.screenshot({ encoding: 'base64' });
-  expect(screenshot).toMatchImageSnapshot({
-    ...snapShotOpt,
-    customSnapshotIdentifier: label ? `${label}` : undefined,
-  });
+  const screenshot = await page.screenshot({ type: 'png' });
+  await expect(Buffer.from(screenshot)).toMatchImage(
+    label ? { ...snapshotOptions, name: label } : snapshotOptions,
+  );
 }
 
 async function generateAndComparePDF(page: Page, browser: Browser, labelPrefix: string) {
   const pdfBuffer = await generatePdf(page, browser);
   const pdfImages = await pdfToImages(pdfBuffer);
 
-  pdfImages.forEach((imageBuffer, idx) => {
-    expect(imageBuffer).toMatchImageSnapshot({
-      ...snapShotOpt,
-      customSnapshotIdentifier: `${labelPrefix}-pdf-page-${idx}`,
+  for (const [idx, imageBuffer] of pdfImages.entries()) {
+    await expect(imageBuffer).toMatchImage({
+      ...snapshotOptions,
+      name: `${labelPrefix}-pdf-page-${idx}`,
     });
-  });
+  }
 }
 
 describe('Playground E2E Tests', () => {
@@ -112,19 +156,12 @@ describe('Playground E2E Tests', () => {
 
   beforeAll(async () => {
     console.log('Starting preview server...');
-    previewProcess = spawn('npm', ['run', 'preview'], {
+    previewProcess = spawn('npm', ['run', 'preview', '--', '--host', '127.0.0.1'], {
       detached: true,
       stdio: 'pipe',
     });
-    
-    previewProcess.stdout.on('data', (data) => {
-      console.log(`Preview server output: ${data.toString().trim()}`);
-    });
-    
-    previewProcess.stderr.on('data', (data) => {
-      console.error(`Preview server error: ${data.toString().trim()}`);
-    });
-    
+
+    baseUrl = await waitForPreviewUrl(previewProcess);
     const serverReady = await waitForServerReady(baseUrl);
     if (!serverReady) {
       throw new Error('Failed to start preview server in time');
