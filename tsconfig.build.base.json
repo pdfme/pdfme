@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "ESNext"],
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"],
+    "sourceMap": true
+  }
+}

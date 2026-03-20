@@ -1,9 +1,10 @@
 {
-  "extends": "../../tsconfig.base",
+  "extends": "../../tsconfig.build.base",
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "node",
     "outDir": "./dist/esm",
+    "rootDir": ".",
     "declaration": true,
     "declarationDir": "dist/types",
     "skipLibCheck": true

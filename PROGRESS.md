@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `19e6bfb6` `Migrate converter and schemas tests to Vitest`
+- `f60a10c0` `Migrate ui tests to Vitest`
 
 ## Current Status
 
@@ -20,14 +20,20 @@ Latest committed checkpoint:
   - internal package path の source 解決
   - build tsconfig の `src` 限定化
 - `Phase 1` の一部である root の Vitest / Oxlint 基盤
-- `common` / `manipulator` / `converter` / `schemas` / `generator` / `pdf-lib` の Jest -> Vitest 移行
+- 全 package (`common` / `manipulator` / `converter` / `schemas` / `generator` / `pdf-lib` / `ui`) の Jest -> Vitest 移行
 
 まだ未着手:
 
-- `Phase 1` の残りである `ui` の Jest -> Vitest 移行
 - type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
+
+現在の未コミット作業:
+
+- build 用 tsconfig を typecheck 用 path alias から分離する修正
+- build 出力を package export と一致する `dist/*/src/*` に戻す修正
+- clean `tsc -b` で露出した latent type error の整理
+- `generator` integration test で継続している `pdf2img failed: Image or Canvas expected` の調査
 
 ## Completed Work
 
@@ -235,6 +241,45 @@ Latest committed checkpoint:
 
 - `pdf-lib` は runner 依存が薄く、少数の mock API 置換だけで移行できたため
 - `ui` より先に進めるほうが安全だったため
+
+### 13. `ui` の Jest -> Vitest 移行
+
+実施内容:
+
+- `packages/ui/package.json` の `test` を Vitest 実行へ変更
+- `packages/ui/package.json` から inline Jest config を削除
+- ルート `vitest.config.ts` に `ui` workspace と `jsdom` environment を追加
+- `packages/ui/vitest.setup.ts` を追加して `jest-dom` / `jest-canvas-mock` / cleanup を集約
+- `packages/ui/__mocks__/converter.ts` / `form-render.ts` / `lucide-react.ts` を追加
+- `Designer.test.tsx` / `Preview.test.tsx` の snapshot を Vitest 向けに安定化
+- `PluginIcon.test.tsx` / `helper.test.ts` / `assets/helper.ts` の Jest API を `vi` ベースへ置換
+- `packages/ui/__tests__/test-helpers.js` を削除
+- ルート `package.json` に `test:ui` / `test:ui:update-snapshots` を追加
+
+理由:
+
+- `ui` は jsdom と mock 解決が必要で、最後の移行対象として個別調整が多かったため
+- snapshot の DOM id が非決定的だったため、Vitest でも安定する正規化が必要だったため
+
+### 14. 進行中: build 用 tsconfig の分離
+
+実施内容:
+
+- `tsconfig.build.base.json` を追加
+- 各 package の build 用 `tsconfig.cjs.json` / `tsconfig.esm.json` / `tsconfig.node.json` を
+  `tsconfig.build.base.json` 継承へ切り替え
+- 各 build 用 tsconfig に `rootDir: "."` を追加し、出力を `dist/*/src/*` に揃えるよう修正
+
+確認済み:
+
+- `npm run build`
+- `cd playground/node-playground && node generate.js`
+- `cd playground/node-playground && node merge.js`
+
+補足:
+
+- これにより `@pdfme/common` などの Node import は再び package export 経由で解決できる状態に戻った
+- 一方で clean `npm run typecheck` では既存の latent type error が多数露出しており、未解消
 
 ## Verification Completed
 
