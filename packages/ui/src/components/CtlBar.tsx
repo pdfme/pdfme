@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 // Import icons from lucide-react
-// Note: In tests, these will be mocked by the mock file in __mocks__/lucide-react.js
+// Note: In tests, these are replaced via the Vitest lucide-react mock.
 import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 
 import type { MenuProps } from 'antd';

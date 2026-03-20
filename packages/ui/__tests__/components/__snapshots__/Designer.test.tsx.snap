@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Designer snapshot 1`] = `
 <div
@@ -14,7 +14,7 @@ exports[`Designer snapshot 1`] = `
       style="left: 0px; right: 0px; position: absolute; z-index: 1; height: 0px; width: 45px; background: rgb(245, 245, 245); text-align: center; overflow: auto;"
     >
       <div
-        aria-describedby="DndDescribedBy-0"
+        aria-describedby="5"
         aria-disabled="false"
         aria-roledescription="draggable"
         role="button"
@@ -65,7 +65,7 @@ exports[`Designer snapshot 1`] = `
         </div>
       </div>
       <div
-        aria-describedby="DndDescribedBy-0"
+        aria-describedby="5"
         aria-disabled="false"
         aria-roledescription="draggable"
         role="button"
@@ -213,7 +213,7 @@ exports[`Designer snapshot 1`] = `
               />
             </div>
             <div
-              style="flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
+              style="flex: 1 1 0%; min-height: 0px; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
             >
               <ul
                 style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
@@ -226,7 +226,7 @@ exports[`Designer snapshot 1`] = `
                   >
                     <button
                       class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; border: medium; padding-left: 0.25rem;"
                       type="button"
                     >
                       <span
@@ -285,7 +285,7 @@ exports[`Designer snapshot 1`] = `
                   >
                     <button
                       class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; border: medium; padding-left: 0.25rem;"
                       type="button"
                     >
                       <span
@@ -339,7 +339,7 @@ exports[`Designer snapshot 1`] = `
                 </li>
               </ul>
               <div
-                id="DndDescribedBy-1"
+                id="1"
                 style="display: none;"
               >
                 
@@ -351,9 +351,9 @@ exports[`Designer snapshot 1`] = `
               <div
                 aria-atomic="true"
                 aria-live="assertive"
-                id="DndLiveRegion-0"
+                id="2"
                 role="status"
-                style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
+                style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px); clip-path: inset(100%); white-space: nowrap;"
               />
             </div>
             <div
@@ -436,7 +436,7 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="moveable-control-box    pdfme-moveable-3 rCS1bhdyl6"
+              class="moveable-control-box    pdfme-moveable-1 rCS1bhdyl6"
               data-able-clickable="true"
               data-able-draggable="true"
               data-able-origin="true"
@@ -544,7 +544,7 @@ exports[`Designer snapshot 1`] = `
             <div>
               <div
                 class="selectable"
-                id="1"
+                id="3"
                 style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
                 title="field1"
               >
@@ -552,11 +552,11 @@ exports[`Designer snapshot 1`] = `
                   style="height: 100%; width: 100%;"
                 >
                   <div
-                    style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
+                    style="padding: 0px; resize: none; background-color: transparent; border: medium; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
                   >
                     <div
-                      id="text-1"
-                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
+                      id="text-3"
+                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; border: medium; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
                     >
                       <span
                         style="letter-spacing:inherit;"
@@ -576,7 +576,7 @@ exports[`Designer snapshot 1`] = `
             <div>
               <div
                 class="selectable"
-                id="2"
+                id="4"
                 style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
                 title="field2"
               >
@@ -584,11 +584,11 @@ exports[`Designer snapshot 1`] = `
                   style="height: 100%; width: 100%;"
                 >
                   <div
-                    style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center;"
+                    style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center center;"
                   >
                     <img
                       src="aaaaaaaaaaaa"
-                      style="height: 100%; width: 100%; border-radius: 0; object-fit: contain;"
+                      style="height: 100%; width: 100%; border-radius: 0px; object-fit: contain;"
                     />
                   </div>
                 </div>
@@ -599,7 +599,7 @@ exports[`Designer snapshot 1`] = `
       </div>
     </div>
     <div
-      id="DndDescribedBy-0"
+      id="5"
       style="display: none;"
     >
       
@@ -611,9 +611,9 @@ exports[`Designer snapshot 1`] = `
     <div
       aria-atomic="true"
       aria-live="assertive"
-      id="DndLiveRegion-1"
+      id="6"
       role="status"
-      style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
+      style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px); clip-path: inset(100%); white-space: nowrap;"
     />
   </div>
 </div>

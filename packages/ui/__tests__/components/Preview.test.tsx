@@ -1,18 +1,15 @@
-/**
- * @jest-environment jsdom
- */
 import React from 'react';
 import { render, act, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import Preview from '../../src/components/Preview';
 import { I18nContext, FontContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { SELECTABLE_CLASSNAME } from '../../src/constants';
 import { getDefaultFont, pluginRegistry } from '@pdfme/common';
+import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
-import { text, image } from "@pdfme/schemas"
+import { text, image } from '@pdfme/schemas';
 
-const plugins = pluginRegistry({ text, image, })
+const plugins = pluginRegistry({ text, image });
 
 
 test('Preview(as Viewer) snapshot', async () => {
@@ -36,7 +33,7 @@ test('Preview(as Viewer) snapshot', async () => {
   });
 
   await waitFor(() => Boolean(container?.getElementsByClassName(SELECTABLE_CLASSNAME)));
-  expect(container.firstChild).toMatchSnapshot();
+  expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });
 
 test('Preview(as Form) snapshot', async () => {
@@ -61,5 +58,5 @@ test('Preview(as Form) snapshot', async () => {
   });
 
   await waitFor(() => Boolean(container?.getElementsByClassName(SELECTABLE_CLASSNAME)));
-  expect(container.firstChild).toMatchSnapshot();
+  expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });

@@ -158,7 +158,7 @@ describe('changeSchemas test', () => {
 
   test('changeSchemas - change content with objs length = 1', () => {
     const objs = [{ key: 'content', value: 'a!', schemaId: schemaA.id }];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -195,7 +195,7 @@ describe('changeSchemas test', () => {
       { key: 'content', value: 'a!', schemaId: schemaA.id },
       { key: 'content', value: 'b!', schemaId: schemaB.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -229,7 +229,7 @@ describe('changeSchemas test', () => {
 
   test('changeSchemas - change width with objs length = 1', () => {
     const objs = [{ key: 'width', value: 150, schemaId: schemaA.id }];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -266,7 +266,7 @@ describe('changeSchemas test', () => {
       { key: 'width', value: 150, schemaId: schemaA.id },
       { key: 'height', value: 75, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -300,7 +300,7 @@ describe('changeSchemas test', () => {
 
   test('changeSchemas - change type with objs length = 1', () => {
     const objs = [{ key: 'type', value: 'image', schemaId: schemaA.id }];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -340,7 +340,7 @@ describe('changeSchemas test', () => {
       { key: 'position.x', value: 5, schemaId: schemaA.id },
       { key: 'position.y', value: 5, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -377,7 +377,7 @@ describe('changeSchemas test', () => {
       { key: 'position.x', value: 5, schemaId: schemaA.id },
       { key: 'position.y', value: 5, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -414,7 +414,7 @@ describe('changeSchemas test', () => {
       { key: 'position.x', value: 10, schemaId: schemaA.id },
       { key: 'position.y', value: 10, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -451,7 +451,7 @@ describe('changeSchemas test', () => {
       { key: 'width', value: 110, schemaId: schemaA.id },
       { key: 'height', value: 110, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,
@@ -489,7 +489,7 @@ describe('changeSchemas test', () => {
       { key: 'width', value: 110, schemaId: schemaA.id },
       { key: 'height', value: 110, schemaId: schemaA.id },
     ];
-    const mockCallback = jest.fn();
+    const mockCallback = vi.fn();
 
     changeSchemas({
       schemas,

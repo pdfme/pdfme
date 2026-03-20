@@ -13,6 +13,7 @@ const workspaceTests: Record<
     include: string[];
     setupFiles?: string[];
     testTimeout?: number;
+    environment?: 'jsdom';
   }
 > = {
   'packages/common': {
@@ -46,9 +47,31 @@ const workspaceTests: Record<
     include: ['__tests__/**/*.test.ts', '__tests__/**/*.spec.ts'],
     testTimeout: 30000,
   },
+  'packages/ui': {
+    name: 'ui',
+    include: ['__tests__/**/*.test.ts', '__tests__/**/*.test.tsx'],
+    setupFiles: [path.resolve(repoRoot, 'packages/ui/vitest.setup.ts')],
+    testTimeout: 30000,
+    environment: 'jsdom',
+  },
 };
 
 const selectedWorkspace = workspaceTests[workspacePath];
+const converterReplacement =
+  workspacePath === 'packages/ui'
+    ? path.resolve(repoRoot, 'packages/ui/__mocks__/converter.ts')
+    : path.resolve(repoRoot, 'packages/converter/src/index.node.ts');
+const testConfig = {
+  name: selectedWorkspace?.name ?? 'root',
+  root: workspaceRoot,
+  globals: true,
+  pool: 'forks' as const,
+  passWithNoTests: !selectedWorkspace,
+  include: selectedWorkspace?.include ?? [],
+  setupFiles: selectedWorkspace?.setupFiles,
+  testTimeout: selectedWorkspace?.testTimeout,
+  ...(selectedWorkspace?.environment ? { environment: selectedWorkspace.environment } : {}),
+};
 
 export default defineConfig({
   resolve: {
@@ -63,7 +86,7 @@ export default defineConfig({
       },
       {
         find: '@pdfme/converter',
-        replacement: path.resolve(repoRoot, 'packages/converter/src/index.node.ts'),
+        replacement: converterReplacement,
       },
       {
         find: '@pdfme/generator',
@@ -81,16 +104,31 @@ export default defineConfig({
         find: '@pdfme/schemas',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/index.ts'),
       },
+      {
+        find: /^antd\/es\//,
+        replacement: 'antd/lib/',
+      },
+      {
+        find: /^form-render$/,
+        replacement: path.resolve(repoRoot, 'packages/ui/__mocks__/form-render.ts'),
+      },
+      {
+        find: /^form-render\/es\//,
+        replacement: 'form-render/lib/',
+      },
+      {
+        find: /^rc-picker\/es\//,
+        replacement: 'rc-picker/lib/',
+      },
+      {
+        find: /^lodash-es$/,
+        replacement: 'lodash',
+      },
+      {
+        find: /^lucide-react$/,
+        replacement: path.resolve(repoRoot, 'packages/ui/__mocks__/lucide-react.ts'),
+      },
     ],
   },
-  test: {
-    name: selectedWorkspace?.name ?? 'root',
-    root: workspaceRoot,
-    globals: true,
-    pool: 'forks',
-    passWithNoTests: !selectedWorkspace,
-    include: selectedWorkspace?.include ?? [],
-    setupFiles: selectedWorkspace?.setupFiles,
-    testTimeout: selectedWorkspace?.testTimeout,
-  },
+  test: testConfig,
 });

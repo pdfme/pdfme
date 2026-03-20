@@ -31,7 +31,7 @@
     "build": "vite build && tsc -b tsconfig.typecheck.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts,.tsx src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "vitest run --config ../../vitest.config.ts",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.{ts,tsx}'"
   },
@@ -80,46 +80,6 @@
   "peerDependencies": {
     "@pdfme/common": "latest",
     "@pdfme/schemas": "latest"
-  },
-  "jest": {
-    "testEnvironment": "jest-environment-jsdom",
-    "setupFiles": [
-      "jest-canvas-mock"
-    ],
-    "setupFilesAfterEnv": [
-      "./__tests__/test-helpers.js"
-    ],
-    "moduleNameMapper": {
-      "\\.(png|css)$": "<rootDir>/__mocks__/assetsTransformer.js",
-      "^@pdfme/converter$": "<rootDir>/../converter/src/index.node.ts",
-      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^antd/es/": "antd/lib/",
-      "^form-render/es/": "form-render/lib/",
-      "^rc-picker/es/": "rc-picker/lib/",
-      "^lodash-es$": "lodash",
-      "\\^lucide-react$": "<rootDir>/__mocks__/lucide-react.js"
-    },
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts",
-      "tsx"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ],
-    "transformIgnorePatterns": [
-      "/node_modules/(?!lucide-react)"
-    ]
   },
   "publishConfig": {
     "access": "public"

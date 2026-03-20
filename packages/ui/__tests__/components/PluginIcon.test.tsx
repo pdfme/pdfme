@@ -1,34 +1,30 @@
-/**
- * @jest-environment jsdom
- */
 import React from 'react';
 import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import PluginIcon from '../../src/components/Designer/PluginIcon';
 import { Plugin, Schema } from '@pdfme/common';
 import { OptionsContext } from '../../src/contexts';
 
 // Mock Ant Design theme
-jest.mock('antd', () => ({
+vi.mock('antd', () => ({
   theme: {
-    useToken: () => ({ token: { colorText: '#000' } })
-  }
+    useToken: () => ({ token: { colorText: '#000' } }),
+  },
 }));
 
 const mockPlugin: Plugin<Schema> = {
   propPanel: {
     schema: {},
-    defaultSchema: { 
+    defaultSchema: {
       type: 'text',
       name: 'test',
       width: 50,
       height: 20,
-      position: { x: 0, y: 0 }
-    }
+      position: { x: 0, y: 0 },
+    },
   },
   icon: '<svg><path d="M10 10h10v10h-10z"/></svg>',
   ui: () => {},
-  pdf: () => Promise.resolve()
+  pdf: () => Promise.resolve(),
 };
 
 const renderPluginIcon = (
@@ -38,8 +34,8 @@ const renderPluginIcon = (
 ) => {
   return render(
     <OptionsContext.Provider value={options}>
-      <PluginIcon 
-        plugin={plugin} 
+      <PluginIcon
+        plugin={plugin}
         label="Test Plugin" 
         size={24}
         {...props}
@@ -51,7 +47,7 @@ const renderPluginIcon = (
 describe('PluginIcon Security Tests', () => {
   beforeEach(() => {
     // Clear any previous DOM purify configurations
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test('renders safe SVG icon correctly', () => {
@@ -175,9 +171,9 @@ describe('PluginIcon Security Tests', () => {
   });
 
   test('falls back to text label when no icon provided', () => {
-    const pluginWithoutIcon = { 
-      ...mockPlugin, 
-      icon: undefined 
+    const pluginWithoutIcon = {
+      ...mockPlugin,
+      icon: undefined,
     };
     
     const { container } = renderPluginIcon(pluginWithoutIcon);

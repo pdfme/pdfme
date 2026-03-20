@@ -57,6 +57,7 @@
     "test:manipulator:update-snapshots": "npm run -w packages/manipulator test:update-snapshots",
     "test:pdf-lib": "npm run -w packages/pdf-lib test",
     "test:schemas": "npm run -w packages/schemas test",
+    "test:ui": "npm run -w packages/ui test",
     "test:ui:update-snapshots": "npm run -w packages/ui test -- -u",
     "lint": "npm run lint --workspaces",
     "lint:typecheck": "eslint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/schemas/src --ext .ts,.tsx --config eslint.typecheck.config.mjs",
