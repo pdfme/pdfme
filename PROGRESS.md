@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `400fe64d` `Migrate converter schemas and generator builds to Vite`
+- `193e82b8` `Clean up pdf-lib lint and localize playground fonts`
 
 ## Current Status
 
@@ -43,6 +43,7 @@ Latest committed checkpoint:
 - `lint:typecheck` の warning を 0 に整理
 - `lint:oxlint` の warning を 74 -> 0 に整理
 - `pdf-lib` / `ui` の package-local lint を error なしへ整理
+- `ui` の react-hooks lint 対応で発生した `Preview` 回帰を解消
 - playground thumbnail script の remote font 依存を撤去
 - playground の asset generation script が package root export + local fonts で通ることを確認
 
@@ -54,13 +55,13 @@ Latest committed checkpoint:
 現在の残課題:
 
 - playground 側の exports 変更追従確認
-- `ui` package-local lint の react-hooks warning 整理
+- playground 側 test/lint 方針の整理
 
 次に進める順序:
 
-1. `ui` package-local lint の react-hooks warning を段階的に整理する
-2. playground 側の exports 追従確認を広げる
-3. playground 側 test/lint 方針の整理に入る
+1. playground 側の exports 追従確認を広げる
+2. playground 側 test/lint 方針の整理に入る
+3. CLI (`Phase 2`) の前提整理に着手する
 
 ## Completed Work
 

@@ -99,7 +99,7 @@ const TemplateEditor = ({
     if (typeof options.sidebarOpen === 'boolean' && options.sidebarOpen !== sidebarOpen) {
       setSidebarOpen(options.sidebarOpen);
     }
-  }, [options]);
+  }, [options, sidebarOpen, zoomLevel]);
 
   useScrollPageCursor({
     ref: canvasRef,

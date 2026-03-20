@@ -59,10 +59,10 @@ const Item = React.memo(
       onClick,
       onMouseEnter,
       onMouseLeave,
-      dragging: _dragging,
-      fadeIn: _fadeIn,
+      dragging,
+      fadeIn,
       listeners,
-      sorting: _sorting,
+      sorting,
       transition,
       transform,
       ...props
@@ -70,6 +70,9 @@ const Item = React.memo(
     ref,
   ) {
     const i18n = useContext(I18nContext);
+    void dragging;
+    void fadeIn;
+    void sorting;
 
     useEffect(() => {
       if (!dragOverlay) {

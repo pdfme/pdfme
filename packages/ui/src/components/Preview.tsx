@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useContext } from 'react';
+import React, { useRef, useState, useEffect, useContext, useCallback } from 'react';
 import {
   Template,
   SchemaForUI,
@@ -57,10 +57,36 @@ const Preview = ({
   const isForm = Boolean(onChangeInput);
 
   const input = inputs[unitCursor];
+  const latestFontRef = useRef(font);
+  const latestInputRef = useRef(input);
+  const latestRefreshRef = useRef(refresh);
+  const isMountedRef = useRef(true);
+  const initRequestIdRef = useRef(0);
 
-  const init = (template: Template, inputOverride?: Record<string, string>) => {
-    const currentInput = inputOverride ?? input;
-    const options = { font };
+  useEffect(() => {
+    latestFontRef.current = font;
+  }, [font]);
+
+  useEffect(() => {
+    latestInputRef.current = input;
+  }, [input]);
+
+  useEffect(() => {
+    latestRefreshRef.current = refresh;
+  }, [refresh]);
+
+  useEffect(
+    () => () => {
+      isMountedRef.current = false;
+    },
+    [],
+  );
+
+  const init = useCallback((template: Template, inputOverride?: Record<string, string>) => {
+    const requestId = ++initRequestIdRef.current;
+    const currentInput = inputOverride ?? latestInputRef.current;
+    const options = { font: latestFontRef.current };
+    const currentRefresh = latestRefreshRef.current;
     getDynamicTemplate({
       template,
       input: currentInput,
@@ -77,26 +103,29 @@ const Preview = ({
     })
       .then(async (dynamicTemplate) => {
         const sl = await template2SchemasList(dynamicTemplate);
+        if (!isMountedRef.current || requestId !== initRequestIdRef.current) {
+          return;
+        }
         setSchemasList(sl);
-        await refresh(dynamicTemplate);
+        await currentRefresh(dynamicTemplate);
       })
       .catch((err) => console.error(`[@pdfme/ui] `, err));
-  };
+  }, []);
 
   // Update component state only when _options_ changes
   useEffect(() => {
     if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
       setZoomLevel(options.zoomLevel);
     }
-  }, [options]);
+  }, [options, zoomLevel]);
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
       setUnitCursor(inputs.length - 1);
+      return;
     }
-
     init(template);
-  }, [template, inputs, size]);
+  }, [init, inputs, size, template, unitCursor]);
 
   useScrollPageCursor({
     ref: containerRef,

@@ -42,8 +42,10 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   const [pageSizes, setPageSizes] = useState<Size[]>([]);
   const [scale, setScale] = useState(0);
   const [error, setError] = useState<Error | null>(null);
+  const isMountedRef = useRef(true);
+  const requestIdRef = useRef(0);
 
-  const init = async (prop: { template: Template; size: Size }) => {
+  const init = useCallback(async (prop: { template: Template; size: Size }) => {
     const {
       template: { basePdf, schemas },
       size,
@@ -91,32 +93,56 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
       pageSizes: _pageSizes,
       scale: _scale,
     };
-  };
+  }, [maxZoom]);
 
-  useEffect(() => {
-    init({ template, size })
-      .then(({ pageSizes, scale, backgrounds }) => {
+  useEffect(
+    () => () => {
+      isMountedRef.current = false;
+    },
+    [],
+  );
+
+  const runInit = useCallback(
+    async (prop: { template: Template; size: Size }) => {
+      const requestId = ++requestIdRef.current;
+
+      try {
+        const { pageSizes, scale, backgrounds } = await init(prop);
+        if (!isMountedRef.current || requestId !== requestIdRef.current) {
+          return;
+        }
+
         setPageSizes(pageSizes);
         setScale(scale);
         setBackgrounds(backgrounds);
-      })
-      .catch((err: Error) => {
-        setError(err);
-        console.error('[@pdfme/ui]', err);
-      });
-  }, [template, size]);
+        setError(null);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        if (isMountedRef.current && requestId === requestIdRef.current) {
+          setError(error);
+          console.error('[@pdfme/ui]', error);
+        }
+        throw error;
+      }
+    },
+    [init],
+  );
+
+  useEffect(() => {
+    void runInit({ template, size });
+  }, [runInit, template, size]);
+
+  const refresh = useCallback(
+    (template: Template) => runInit({ template, size }),
+    [runInit, size],
+  );
 
   return {
     backgrounds,
     pageSizes,
     scale: scale * zoomLevel,
     error,
-    refresh: (template: Template) =>
-      init({ template, size }).then(({ pageSizes, scale, backgrounds }) => {
-        setPageSizes(pageSizes);
-        setScale(scale);
-        setBackgrounds(backgrounds);
-      }),
+    refresh,
   };
 };
 
@@ -164,10 +190,11 @@ export const useScrollPageCursor = ({
   }, [onChangePageCursor, pageCursor, pageSizes, ref, scale]);
 
   useEffect(() => {
-    ref.current?.addEventListener('scroll', onScroll);
+    const node = ref.current;
+    node?.addEventListener('scroll', onScroll);
 
     return () => {
-      ref.current?.removeEventListener('scroll', onScroll);
+      node?.removeEventListener('scroll', onScroll);
     };
   }, [ref, onScroll]);
 };

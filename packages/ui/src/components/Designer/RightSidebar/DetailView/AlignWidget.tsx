@@ -66,7 +66,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
 
     let basePos = min;
     // Define adjust function with consistent parameter usage
-    let adjust = (): number => 0;
+    let adjust: (size: number) => number = () => 0;
 
     if (['center', 'middle'].includes(type)) {
       basePos = (min + max) / 2;
