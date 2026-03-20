@@ -44,6 +44,7 @@
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.97",
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
     "pdfjs-dist": "^5.5.207"

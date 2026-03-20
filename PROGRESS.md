@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `fe08c521` `Fix browser worker entry and refresh generator snapshots`
+- `c756700c` `Expand type-aware lint and fix pdf-lib Node ESM exports`
 
 ## Current Status
 
@@ -29,6 +29,7 @@ Latest committed checkpoint:
 - `pdfjs-dist` / `canvas` 更新後の root build 再通過
 - type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
 - `@pdfme/pdf-lib` の Node ESM named import 修正
+- `fe08c521` で誤って更新した blank snapshot の撤回と、renderer 修正後の再基準化
 
 まだ未着手:
 
@@ -308,14 +309,13 @@ Latest committed checkpoint:
 - clean build 後は declaration 解決がより厳密になり、`interface extends` では base `Schema` の union 的な shape と衝突していたため
 - typecheck 基盤導入後に顕在化した既存の型不整合を、挙動変更なしで解消する必要があったため
 
-### 16. `packages/converter` の `pdfjs-dist` / `canvas` 更新と Node 描画修正
+### 16. `packages/converter` の `pdfjs-dist` / `canvas` 更新
 
 実施内容:
 
 - `packages/converter/package.json` の `pdfjs-dist` を `^5.5.207` に更新
 - `packages/converter/package.json` の `canvas` を `^3.2.1` に更新
 - `packages/converter/src/index.node.ts` を `pdfjs-dist/legacy/build/pdf.mjs` ベースへ更新
-- Node 側 `getDocument()` に `CanvasFactory` を渡すよう変更
 - `pdfjs-dist` に渡す PDF data を copy して buffer detach の影響を避けるよう変更
 - `packages/converter/src/pdf2img.ts` の render parameters に `canvas` を明示的に渡すよう変更
 
@@ -324,18 +324,16 @@ Latest committed checkpoint:
 - `pdfjs-dist` v5 系では Node 側の canvas 解決と `CanvasFactory` の扱いが v3 系から変わっており、既存実装では `Image or Canvas expected` が再現したため
 - `canvas` を最新版 3.x 系へ揃え、`pdfjs-dist` 側の想定と一致する構成へ寄せる必要があったため
 
-### 17. browser worker entry 修正と generator snapshot 再基準化
+### 17. browser worker entry 修正
 
 実施内容:
 
 - `packages/converter/src/index.browser.ts` を `pdfjs-dist/webpack.mjs` ベースへ切り替え
 - `packages/converter/src/pdfjs-dist-webpack.d.ts` を追加して module declaration を補完
-- `packages/generator/__tests__/__image_snapshots__/*.png` を新レンダラ基準へ更新
 
 理由:
 
 - `pdfjs-dist` v5 では `pdf.worker.entry.js` が存在せず、`ui` build が browser worker import 解決エラーで落ちていたため
-- Node 側不具合解消後に generator の落ち方が runtime error から画像差分へ変わったため、renderer 変更を受け入れる snapshot 更新が必要だったため
 
 ### 18. `pdf-lib` / `ui` への type-aware lint / oxlint 拡張
 
@@ -364,6 +362,23 @@ Latest committed checkpoint:
 - 既存の `dist/node/src/index.js` は CommonJS 出力のため、Node ESM から package root を named import すると `Named export not found` で失敗していたため
 - `dist/esm` をそのまま Node ESM に向けると extensionless directory import で壊れるため、CJS 上に薄い `.mjs` wrapper を置く方が安全だったため
 
+### 20. Node renderer blank regression の解消と generator snapshot の再基準化
+
+実施内容:
+
+- `packages/converter/package.json` に `@napi-rs/canvas` を direct dependency として追加
+- `packages/converter/src/index.node.ts` の render target を `canvas` から `@napi-rs/canvas` へ切り替え
+- Node 側 `getDocument()` への custom `CanvasFactory` 注入をやめ、`pdfjs-dist` v5 のデフォルト Node 経路に寄せた
+- `canvasToArrayBuffer` を `png` / `jpeg` ごとに明示 encode し、plain `ArrayBuffer` を返すよう修正
+- `packages/converter/__tests__/index.test.ts` に「rendered image is not blank」を追加し、空入力 fixture も非空データへ修正
+- `packages/generator/__tests__/__image_snapshots__/*.png` を、blank ではない corrected renderer 出力で再更新
+
+理由:
+
+- `canvas@3` を render target にした Node `pdf2img` は `pdfjs-dist` v5 下で白紙 PNG を返し、text / basePdf が描画されない regression を起こしていたため
+- 同じ PDF を `@napi-rs/canvas` で描画すると内容が復元し、bbox と非白画素数も旧 snapshot に近いことを確認できたため
+- `fe08c521` の snapshot 更新はこの regression を隠していたため、いったん撤回し、renderer 修正後にのみ再基準化する必要があったため
+
 ## Verification Completed
 
 実行済み:
@@ -374,6 +389,7 @@ Latest committed checkpoint:
 - `cd playground/node-playground && node merge.js`
 - `cd playground && node --check scripts/generate-templates-thumbnail.mjs`
 - `cd packages/common && node set-version.cjs`
+- `npm install --package-lock-only --workspace packages/converter @napi-rs/canvas@^0.1.97`
 - `npm run typecheck`
 - `npm run clean`
 - `npm run typecheck`
@@ -411,8 +427,9 @@ Latest committed checkpoint:
 - `pdf-lib` の test は Vitest で通る
 - root の `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` スコープで通る
 - generator の test 実行は local font asset 化により network 非依存になった
-- `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` でも unit test が通る
-- `generator` は `pdf2img failed: Image or Canvas expected` では落ちなくなり、snapshot 更新後に test が再度通る
+- `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` 更新後でも、Node renderer を `@napi-rs/canvas` に寄せた状態で unit test が通る
+- `generator` は `pdf2img failed: Image or Canvas expected` では落ちなくなり、blank snapshot を撤回したうえで corrected renderer 出力へ再基準化して test が再度通る
+- `segmenterEnglish` / `multiVariableText` / `address-label-10` は bbox と非白画素数が旧 snapshot と近く、text / basePdf 描画が復元している
 - `ui` build は `pdfjs-dist/webpack.mjs` への切り替え後に通る
 - root build も `pdfjs-dist` / `canvas` 更新後の状態で再度通る
 - `@pdfme/pdf-lib` は Node ESM から package root の named import が通る
@@ -471,6 +488,7 @@ Latest committed checkpoint:
 - `packages/converter/package.json`
 - `packages/converter/src/index.browser.ts`
 - `packages/converter/src/index.node.ts`
+- `packages/converter/__tests__/index.test.ts`
 - `packages/converter/src/pdf2img.ts`
 - `packages/converter/src/pdfjs-dist-webpack.d.ts`
 - `packages/generator/package.json`
@@ -483,6 +501,7 @@ Latest committed checkpoint:
 - `packages/generator/__tests__/integration-playground.test.ts`
 - `packages/generator/__tests__/integration-segmenter.test.ts`
 - `packages/generator/__tests__/integration-textType.test.ts`
+- `packages/generator/__tests__/__image_snapshots__/*.png`
 - `packages/generator/__tests__/utils.ts`
 - `packages/generator/src/generate.ts`
 - `packages/generator/src/helper.ts`
@@ -606,9 +625,10 @@ Latest committed checkpoint:
 - `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
 - `lint:typecheck` は `PLAN.md` 準拠の最小ルールで全 package に適用済みだが、unused eslint-disable などの warning は残っている
 - `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
-- `pdfjs-dist` / `canvas` 更新により generator の image snapshot は既に再基準化済みであり、今後の差分確認は旧 baseline 前提で見ないこと
+- `pdfjs-dist` v5 の Node rasterize は `canvas` render target に戻すと白紙回帰するため、`packages/converter/src/index.node.ts` の `@napi-rs/canvas` 依存を安易に外さないこと
+- generator の image snapshot は corrected renderer 出力へ再基準化済みであり、`fe08c521` の blank baseline を前提に見ないこと
 
 ## Notes For Next Turn
 
 - 次回はこの `PROGRESS.md` を読み、package build の Vite 化から進める
-- 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと
+- まず `packages/converter` の Node renderer は `@napi-rs/canvas` 前提で固定されていることを踏まえ、Phase 1 残件へ戻る
