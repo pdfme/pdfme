@@ -2,7 +2,7 @@ import generate from '../src/generate.js';
 import { segmenter } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
-import { getFont, pdfToImages } from './utils.js';
+import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
@@ -42,7 +42,7 @@ describe('generate integration test(segmenter)', () => {
 
         const images = await pdfToImages(pdf);
         for (let i = 0; i < images.length; i++) {
-          await expect(images[i]).toMatchImage(`${key}-${i + 1}`);
+          await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
         }
       });
     }

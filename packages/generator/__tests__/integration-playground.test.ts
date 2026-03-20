@@ -15,7 +15,7 @@ import {
   table,
   multiVariableText,
 } from '@pdfme/schemas';
-import { getFont, pdfToImages } from './utils.js';
+import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -127,10 +127,7 @@ describe('generate integration test(playground)', () => {
 
         const images = await pdfToImages(pdf);
         for (let i = 0; i < images.length; i++) {
-          await expect(images[i]).toMatchImage({
-            name: `${key}-${i + 1}`,
-            allowedPixelRatio: 0.001,
-          });
+          await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
         }
       });
     }

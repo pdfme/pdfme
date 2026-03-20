@@ -27,6 +27,8 @@ const PinyonScriptRegularData = readFileSync(
   path.join(__dirname, `/assets/fonts/PinyonScript-Regular.ttf`),
 );
 
+const IMAGE_SNAPSHOT_ALLOWED_PIXEL_RATIO = 0.001;
+
 export const getFont = (): Font => ({
   ...getDefaultFont(),
   'NotoSerifJP-Regular': { data: NotoSerifJPRegularData },
@@ -45,3 +47,8 @@ export const pdfToImages = async (pdf: ArrayBuffer | Uint8Array): Promise<Buffer
   const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
+
+export const getImageSnapshotOptions = (name: string) => ({
+  name,
+  allowedPixelRatio: IMAGE_SNAPSHOT_ALLOWED_PIXEL_RATIO,
+});
