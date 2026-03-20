@@ -69,7 +69,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "is-path-inside": "^4.0.0",
     "jest-canvas-mock": "^2.3.1",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.5.8",
     "process": "^0.11.10",
     "rollup": "^4.59.0",
