@@ -113,7 +113,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
       },
     };
   },
-  widgets: { ...(parentPropPanel.widgets || {}), mapDynamicVariables },
+  widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
     readOnly: false,

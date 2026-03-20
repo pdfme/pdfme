@@ -27,25 +27,20 @@
   "bugs": {
     "url": "https://github.com/pdfme/pdfme/issues"
   },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/index.mjs",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "run-p build:cjs build:esm build:node && node write-node-esm-wrapper.cjs",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "dev": "vite build --watch",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "vitest run --config ../../vitest.config.ts",

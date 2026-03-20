@@ -59,13 +59,10 @@ const Item = React.memo(
       onClick,
       onMouseEnter,
       onMouseLeave,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      dragging,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      fadeIn,
+      dragging: _dragging,
+      fadeIn: _fadeIn,
       listeners,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      sorting,
+      sorting: _sorting,
       transition,
       transform,
       ...props

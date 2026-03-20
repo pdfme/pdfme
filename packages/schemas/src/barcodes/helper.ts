@@ -55,7 +55,7 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
   if (type === 'code39') {
     // For Code39: Valid characters are digits (0-9), uppercase alphabets (A-Z),
     // symbols (-, ., $, /, +, %), and space.
-    const regexp = /^(\d|[A-Z]|\-|\.|\$|\/|\+|\%|\s)+$/;
+    const regexp = /^(\d|[A-Z]|[-.$/+%]|\s)+$/;
     return regexp.test(input);
   }
   if (type === 'code128') {
@@ -68,7 +68,7 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
   if (type === 'nw7') {
     // For NW-7: Valid characters are digits (0-9) and symbols (-, ., $, :, /, +).
     // The first and last characters must be one of the alphabets A-D (start/stop codes).
-    const regexp = /^[A-Da-d]([0-9\-\.\$\:\/\+])+[A-Da-d]$/;
+    const regexp = /^[A-Da-d]([0-9.$:/+-])+[A-Da-d]$/;
     return regexp.test(input);
   }
   if (type === 'itf14') {

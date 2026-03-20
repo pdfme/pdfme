@@ -301,7 +301,7 @@ export const template2SchemasList = async (_template: Template) => {
 
   return (
     ssl < psl
-      ? schemasForUI.concat(new Array(psl - ssl).fill(cloneDeep([])))
+      ? schemasForUI.concat(Array.from({ length: psl - ssl }, () => cloneDeep([])))
       : schemasForUI.slice(0, pageSizes.length)
   ).map((schema, i) => {
     Object.values(schema).forEach((value) => {

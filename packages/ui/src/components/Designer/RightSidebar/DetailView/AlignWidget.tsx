@@ -66,8 +66,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
 
     let basePos = min;
     // Define adjust function with consistent parameter usage
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let adjust = (_size: number): number => 0;
+    let adjust = (): number => 0;
 
     if (['center', 'middle'].includes(type)) {
       basePos = (min + max) / 2;

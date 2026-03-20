@@ -14,7 +14,7 @@ export default [
     files: ['src/**/*.ts'],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.esm.json'],
+        project: ['./tsconfig.json'],
         tsconfigRootDir: __dirname,
       },
     },

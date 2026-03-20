@@ -155,7 +155,6 @@ export type Plugin<T = Schema> = {
   uninterruptedEditMode?: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Plugins = { [key: string]: Plugin<any> };
 
 export interface PluginRegistry {

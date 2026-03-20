@@ -1428,7 +1428,6 @@ class CipherTransform {
   }
 }
 
-// eslint-disable-next-line no-shadow
 class CipherTransformFactory {
   encryptMetadata: boolean;
   encryptionKey: Uint8Array;
@@ -1510,7 +1509,7 @@ class CipherTransformFactory {
       if (revision === 6) {
         try {
           password = unescape(encodeURIComponent(password));
-        } catch (ex) {
+        } catch {
           console.warn('CipherTransformFactory: ' + 'Unable to convert UTF8 encoded password.');
         }
       }

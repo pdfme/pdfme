@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `2dec270b` `Migrate common and manipulator builds to Vite`
+- `400fe64d` `Migrate converter schemas and generator builds to Vite`
 
 ## Current Status
 
@@ -37,6 +37,12 @@ Latest committed checkpoint:
 - `converter` / `schemas` / `generator` の build を Vite library mode + declaration emit に移行
 - `converter` / `schemas` / `generator` の package exports を `dist/*` 直下の ESM 出力へ整理
 - `schemas` の `air-datepicker/locale/*` を Node ESM でも壊れない形で bundle 側へ吸収
+- `pdf-lib` / `ui` の build を Vite library mode + declaration emit に移行
+- `pdf-lib` / `ui` の package exports を `dist/index.js` / `dist/index.d.ts` 前提へ整理
+- 全 package の build Vite 化を完了
+- `lint:typecheck` の warning を 0 に整理
+- `lint:oxlint` の warning を 74 -> 48 まで削減
+- `pdf-lib` / `ui` の package-local lint を error なしへ整理
 
 まだ未着手:
 
@@ -45,16 +51,15 @@ Latest committed checkpoint:
 
 現在の残課題:
 
-- package build の Vite 化と exports 再設計
-  - 残り: `pdf-lib` / `ui`
-- lint warning の整理
+- `pdf-lib` 中心の oxlint warning 整理
 - playground 側の exports 変更追従確認
+- `ui` package-local lint の react-hooks warning 整理
 
 次に進める順序:
 
-1. `pdf-lib` / `ui` の build 置換方針を整理し、package build の Vite 化を完了させる
-2. lint warning を段階的に整理する
-3. playground 側の exports 追従確認を行う
+1. `pdf-lib` 中心に残っている oxlint warning を段階的に整理する
+2. playground 側の exports 追従確認を行う
+3. `ui` package-local lint の react-hooks warning を段階的に整理する
 
 ## Completed Work
 
@@ -435,6 +440,47 @@ Latest committed checkpoint:
 - `schemas` は `air-datepicker/locale/*` の bare subpath import が Node ESM import を壊していたため、build 側で吸収する必要があったため
 - `generator` は single entry で、`converter` / `schemas` の public export が安定した後に続けて移行しやすかったため
 
+### 23. `pdf-lib` / `ui` build の Vite 化と exports 再設計
+
+実施内容:
+
+- `packages/pdf-lib/package.json` を `type: "module"` 化し、root export を `./dist/index.js` / `./dist/index.d.ts` ベースへ整理
+- `packages/pdf-lib` に `tsconfig.build.json` / `vite.config.mts` を追加
+- `packages/pdf-lib` の build を `vite build && tsc -p tsconfig.build.json` に変更
+- `packages/pdf-lib` の旧 `tsconfig.cjs.json` / `tsconfig.esm.json` / `tsconfig.node.json` と `write-node-esm-wrapper.cjs` を削除
+- `packages/pdf-lib/eslint.config.mjs` の project 参照を `tsconfig.json` に切り替え
+- `packages/ui/package.json` を `type: "module"` 化し、root export を `./dist/index.js` / `./dist/index.d.ts` ベースへ整理
+- `packages/ui` に `tsconfig.build.json` を追加
+- `packages/ui` の build / dev watch を `vite build --watch` + `tsc -p tsconfig.build.json` ベースへ変更
+- `packages/ui/tsconfig.json` を editor / lint 用の `noEmit` 構成へ整理
+- `packages/ui/tsconfig.typecheck.json` の出力先を `dist/typecheck` へ移し、build 用 declaration 出力と分離
+- `packages/ui/vite.config.mts` を ESM single-entry 出力 (`dist/index.js`) 前提に変更
+
+理由:
+
+- `PLAN.md` の `Phase 1` にある package build の Vite 化を全 package で完了させるため
+- `pdf-lib` は intermediate な CJS / wrapper 付き export を維持するより、他 package と同じ dist root の ESM export へ揃える方が単純で保守しやすいため
+- `ui` はすでに Vite build を使っていたが、出力名と declaration 配置だけが旧構成のまま残っていたため、package metadata と一致させる必要があったため
+- `ui` の typecheck 出力と build 出力が同じ `dist/types` を共有しており、clean build 後の状態が分かりにくかったため
+
+### 24. lint warning 整理の初回ラウンド
+
+実施内容:
+
+- `packages/common/src/types.ts`、`packages/pdf-lib/src/core/crypto.ts`、`packages/ui/src/components/**` などの不要な `eslint-disable` を削除
+- root `lint:typecheck` を warning 0 に整理
+- `packages/ui/eslint.config.mjs` で `react/prop-types` を無効化し、TypeScript 前提の package-local lint を error なしに修正
+- `packages/schemas/src/tables/tableHelper.ts` の重複式を修正
+- `packages/converter/src/pdf2size.ts`、`packages/ui/src/helper.ts`、`packages/schemas/src/**` の `new Array(...)` / regex / spread fallback など、非 `pdf-lib` の低リスク warning を整理
+- `packages/pdf-lib/src/**` の `Object` 型境界、`catch (e)`、一部 regex / 条件式を warning の出ない形へ整理
+- `lint:oxlint` を 74 warning から 48 warning まで削減
+
+理由:
+
+- build/export 移行後に次の安全なタスクは lint warning の圧縮で、不要 suppression の撤去は挙動を変えずに進めやすいため
+- `tableHelper` の重複式は単なる style warning ではなく、実質的に無意味な条件式だったため先に直す価値があったため
+- `ui` の package-local lint は `react/prop-types` が TypeScript 構成と噛み合っておらず、設定で止まっていたため先に exit 0 へ戻す必要があったため
+
 ## Verification Completed
 
 実行済み:
@@ -458,11 +504,14 @@ Latest committed checkpoint:
 - `npm run test --workspace packages/converter`
 - `npm run test --workspace packages/schemas`
 - `npm run test --workspace packages/pdf-lib`
+- `npm run test --workspace packages/ui`
 - `npm run test --workspace packages/generator`
 - `npm run test:update-snapshots --workspace packages/generator`
 - `npm run test:update-snapshots --workspace packages/manipulator`
 - `npm run -w packages/ui build`
 - `npm run -w packages/pdf-lib build`
+- `npm run lint --workspace packages/pdf-lib`
+- `npm run lint --workspace packages/ui`
 - `npm run -w packages/common build`
 - `npm run -w packages/manipulator build`
 - `npm run -w packages/converter build`
@@ -484,13 +533,15 @@ Latest committed checkpoint:
 - clean 後の `tsc -b` も通る
 - ルート build が通る
 - `ui` package は build と typecheck の分離後も単体 build が通る
+- `ui` package の test は Vitest で通る
 - `common` の test は Vitest で通る
 - `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
 - `common` / `manipulator` は Vite build 後も package root の ESM import が通る
 - `converter` の test は Vitest で通る
 - `schemas` の test は Vitest で通る
 - `pdf-lib` の test は Vitest で通る
-- root の `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` スコープで通る
+- root の `lint:typecheck` は `pdf-lib` / `ui` を含む全 package の `src` スコープで error なしで通る
+- root の `lint:oxlint` は warning のみで exit 0 を維持している
 - `converter` / `schemas` / `generator` は root build 後も package root の Node ESM import が通る
 - generator の test 実行は local font asset 化により network 非依存になった
 - `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` 更新後でも、Node renderer を `@napi-rs/canvas` に寄せた状態で unit test が通る
@@ -499,6 +550,8 @@ Latest committed checkpoint:
 - `ui` build は `pdfjs-dist/webpack.mjs` への切り替え後に通る
 - root build も `pdfjs-dist` / `canvas` 更新後の状態で再度通る
 - `@pdfme/pdf-lib` は Node ESM から package root の named import が通る
+- `pdf-lib` / `ui` の build は dist root (`dist/index.js` / `dist/index.d.ts`) 前提へ揃った
+- `pdf-lib` / `ui` の package-local lint は error なしで実行できる
 
 ## Files Changed So Far
 
@@ -545,10 +598,10 @@ Latest committed checkpoint:
 - `packages/manipulator/tsconfig.build.json`
 - `packages/manipulator/tsconfig.json`
 - `packages/manipulator/vite.config.mts`
-- `packages/pdf-lib/tsconfig.cjs.json`
-- `packages/pdf-lib/tsconfig.esm.json`
+- `packages/pdf-lib/eslint.config.mjs`
+- `packages/pdf-lib/tsconfig.build.json`
 - `packages/pdf-lib/tsconfig.json`
-- `packages/pdf-lib/tsconfig.node.json`
+- `packages/pdf-lib/vite.config.mts`
 - `packages/schemas/tsconfig.cjs.json`
 - `packages/schemas/tsconfig.esm.json`
 - `packages/schemas/tsconfig.build.json`
@@ -556,17 +609,21 @@ Latest committed checkpoint:
 - `packages/schemas/tsconfig.node.json`
 - `packages/schemas/vite.config.mts`
 - `packages/ui/package.json`
+- `packages/ui/eslint.config.mjs`
+- `packages/ui/tsconfig.build.json`
 - `packages/ui/tsconfig.json`
 - `packages/ui/tsconfig.typecheck.json`
 - `packages/ui/vite.config.mts`
 - `packages/common/__tests__/dynamicTemplate.test.ts`
 - `packages/common/__tests__/helper.test.ts`
+- `packages/common/src/types.ts`
 - `packages/converter/package.json`
 - `packages/converter/src/index.ts`
 - `packages/converter/src/index.browser.ts`
 - `packages/converter/src/index.node.ts`
 - `packages/converter/__tests__/index.test.ts`
 - `packages/converter/src/pdf2img.ts`
+- `packages/converter/src/pdf2size.ts`
 - `packages/converter/src/pdfjs-dist-webpack.d.ts`
 - `packages/generator/package.json`
 - `packages/generator/vitest.setup.ts`
@@ -594,21 +651,36 @@ Latest committed checkpoint:
 - `packages/manipulator/__tests__/e2e/__image_snapshots__/*.png`
 - `packages/manipulator/vitest.setup.ts`
 - `packages/pdf-lib/package.json`
-- `packages/pdf-lib/write-node-esm-wrapper.cjs`
 - `packages/pdf-lib/__tests__/api/PDFDocument.spec.ts`
 - `packages/pdf-lib/__tests__/api/form/PDFForm.spec.ts`
 - `packages/pdf-lib/__tests__/core/parser/PDFObjectParser.spec.ts`
 - `packages/pdf-lib/__tests__/core/parser/PDFParser.spec.ts`
+- `packages/pdf-lib/src/api/form/appearances.ts`
+- `packages/pdf-lib/src/api/svg.ts`
+- `packages/pdf-lib/src/core/parser/PDFParser.ts`
+- `packages/pdf-lib/src/core/streams/decode.ts`
 - `packages/pdf-lib/src/core/embedders/CustomFontEmbedder.ts`
 - `packages/pdf-lib/src/core/embedders/CustomFontSubsetEmbedder.ts`
+- `packages/pdf-lib/src/utils/base64.ts`
+- `packages/pdf-lib/src/utils/strings.ts`
 - `packages/schemas/package.json`
 - `packages/schemas/__tests__/text.test.ts`
+- `packages/schemas/src/barcodes/helper.ts`
 - `packages/schemas/src/date/helper.ts`
+- `packages/schemas/src/multiVariableText/propPanel.ts`
+- `packages/schemas/src/tables/tableHelper.ts`
 - `packages/schemas/src/barcodes/types.ts`
 - `packages/schemas/src/multiVariableText/types.ts`
 - `packages/schemas/src/tables/types.ts`
+- `packages/schemas/src/text/helper.ts`
 - `packages/schemas/src/text/types.ts`
+- `packages/schemas/src/utils.ts`
+- `packages/ui/src/helper.ts`
+- `packages/ui/src/components/Designer/RightSidebar/DetailView/AlignWidget.tsx`
+- `packages/ui/src/components/Designer/RightSidebar/DetailView/index.tsx`
 - `packages/ui/src/components/Designer/RightSidebar/ListView/Item.tsx`
+- `packages/ui/src/components/Designer/index.tsx`
+- `packages/ui/src/components/Preview.tsx`
 - `.gitignore`
 - `eslint.config.mjs`
 
@@ -617,6 +689,10 @@ Latest committed checkpoint:
 - `packages/common/set-version.js`
 - `packages/manipulator/jest.setup.js`
 - `packages/generator/jest.setup.js`
+- `packages/pdf-lib/tsconfig.cjs.json`
+- `packages/pdf-lib/tsconfig.esm.json`
+- `packages/pdf-lib/tsconfig.node.json`
+- `packages/pdf-lib/write-node-esm-wrapper.cjs`
 
 参考:
 
@@ -654,16 +730,15 @@ Latest committed checkpoint:
 
 ### Priority 3: package build の Vite 化
 
-進行中:
+完了:
 
-- 完了: `common` / `manipulator` / `converter` / `schemas` / `generator`
-- 残り: `pdf-lib` / `ui`
-
-未実施:
-
-- 残 package への `vite.config.ts` 追加
-- 残 package の `package.json` exports 再設計
-- `pdf-lib` / `ui` の build 置換方針整理
+- `common`
+- `converter`
+- `generator`
+- `manipulator`
+- `pdf-lib`
+- `schemas`
+- `ui`
 
 ### Priority 4: playground の残件
 
@@ -677,7 +752,8 @@ Latest committed checkpoint:
 
 - 内部 import 廃止は完了
 - package root 参照化は完了
-- ただし `Phase 1` で package exports を大きく変える場合は再確認が必要
+- `node-playground/generate.js` は最新 exports 構成でも通過済み
+- ただし `scripts/generate-templates-list-json.mjs` など未確認の周辺 script は残っている
 
 ### Priority 5: CLI / Skills
 
@@ -696,9 +772,9 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `PLAN.md` の `Phase 1` 残件として `pdf-lib` / `ui` の build 置換方針を固める
-2. package build の Vite 化を完了させる
-3. その後に lint warning と playground 追従確認を消化する
+1. `lint:typecheck` の unused `eslint-disable` warning を先に整理する
+2. `lint:oxlint` で残っている 48 warning を、`pdf-lib` 由来とそれ以外に分けて段階的に潰す
+3. playground 周辺 script の exports 追従確認を進める
 
 ## Known Risks
 
@@ -706,7 +782,8 @@ Latest committed checkpoint:
 - `converter` は browser/node entry と `pdfjs-dist` 更新が絡むため、単独で切り出して進めたほうが安全
 - `playground` は package exports の変更に追従確認が必要
 - `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
-- `lint:typecheck` は `PLAN.md` 準拠の最小ルールで全 package に適用済みだが、unused eslint-disable などの warning は残っている
+- `lint:typecheck` は `PLAN.md` 準拠の最小ルールで全 package に適用済みで、現在は warning 0
+- `lint:typecheck` 自体は warning 0 まで整理済みだが、`oxlint` にはまだ 48 warning 残っており、主に `pdf-lib` の legacy 実装に集中している
 - `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
 - `pdfjs-dist` v5 の Node rasterize は `canvas` render target に戻すと白紙回帰するため、`packages/converter/src/index.node.ts` の `@napi-rs/canvas` 依存を安易に外さないこと
 - generator の image snapshot は corrected renderer 出力へ再基準化済みであり、`fe08c521` の blank baseline を前提に見ないこと
@@ -717,5 +794,5 @@ Latest committed checkpoint:
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、package build の Vite 化から進める
-- まず `pdf-lib` / `ui` の build をどう Vite 化するか、既存 build の責務差分を確認してから着手する
+- 次回はこの `PROGRESS.md` を読み、lint warning の整理から進める
+- `Phase 1` の package build Vite 化は完了済みなので、以降は `pdf-lib` 中心の oxlint warning 整理と playground 周辺確認が主対象

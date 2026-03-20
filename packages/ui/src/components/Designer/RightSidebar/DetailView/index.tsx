@@ -114,10 +114,7 @@ const DetailView = (props: DetailViewProps) => {
   }, [schemasList, activeSchema]);
 
   // Reference to a function that validates schema name uniqueness
-  const uniqueSchemaName = useRef(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_unused: string): boolean => true,
-  );
+  const uniqueSchemaName = useRef((_: string): boolean => true);
 
   // Use proper type for validator function parameter
   const validateUniqueSchemaName = (_: unknown, value: string): boolean =>

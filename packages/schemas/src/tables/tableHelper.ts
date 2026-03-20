@@ -123,7 +123,7 @@ function cellStyles(
   }
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
 
-  const colStyles = styles.columnStyles[column.index] || styles.columnStyles[column.index] || {};
+  const colStyles = styles.columnStyles[column.index] || {};
 
   const rowStyles =
     sectionName === 'body' && rowIndex % 2 === 0

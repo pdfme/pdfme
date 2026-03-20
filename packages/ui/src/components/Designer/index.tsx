@@ -92,7 +92,6 @@ const TemplateEditor = ({
   };
 
   // Update component state only when _options_ changes
-  // Ignore exhaustive useEffect dependency warnings here
   useEffect(() => {
     if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
       setZoomLevel(options.zoomLevel);
@@ -100,7 +99,6 @@ const TemplateEditor = ({
     if (typeof options.sidebarOpen === 'boolean' && options.sidebarOpen !== sidebarOpen) {
       setSidebarOpen(options.sidebarOpen);
     }
-    // eslint-disable-next-line
   }, [options]);
 
   useScrollPageCursor({

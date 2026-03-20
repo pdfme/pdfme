@@ -29,10 +29,14 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       lib: {
-        entry: 'src/index.ts',
-        name: '@pdfme/ui',
-        fileName: (format) => `index.${format}.js`,
+        entry: resolve(__dirname, 'src/index.ts'),
+        fileName: 'index',
+        formats: ['es'],
       },
+      minify: false,
+      outDir: 'dist',
+      sourcemap: true,
+      target: 'es2020',
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],

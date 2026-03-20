@@ -20,7 +20,7 @@ export async function pdf2size(
   const pdfDoc = await getDocument(pdf);
 
   const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
+    Array.from({ length: pdfDoc.numPages }, async (_, i) => {
       return await pdfDoc.getPage(i + 1).then((page) => {
         const { height, width } = page.getViewport({ scale, rotation: 0 });
 

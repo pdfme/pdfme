@@ -84,12 +84,10 @@ const Preview = ({
   };
 
   // Update component state only when _options_ changes
-  // Ignore exhaustive useEffect dependency warnings here
   useEffect(() => {
     if (typeof options.zoomLevel === 'number' && options.zoomLevel !== zoomLevel) {
       setZoomLevel(options.zoomLevel);
     }
-    // eslint-disable-next-line
   }, [options]);
 
   useEffect(() => {
