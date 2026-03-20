@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `5f70376d` `Fix Node pdf renderer and refresh snapshots`
+- `2dec270b` `Migrate common and manipulator builds to Vite`
 
 ## Current Status
 
@@ -34,6 +34,9 @@ Latest committed checkpoint:
 - `common` / `manipulator` の package exports を `dist/index.js` / `dist/index.d.ts` 前提へ整理
 - `manipulator` e2e image snapshot を pixelmatch v6 の AA 差分に合わせて再基準化
 - `pdf-lib` clean 時に stray `src/**/*.d.ts` を確実に掃除するよう修正
+- `converter` / `schemas` / `generator` の build を Vite library mode + declaration emit に移行
+- `converter` / `schemas` / `generator` の package exports を `dist/*` 直下の ESM 出力へ整理
+- `schemas` の `air-datepicker/locale/*` を Node ESM でも壊れない形で bundle 側へ吸収
 
 まだ未着手:
 
@@ -43,13 +46,13 @@ Latest committed checkpoint:
 現在の残課題:
 
 - package build の Vite 化と exports 再設計
-  - 残り: `converter` / `schemas` / `generator` / `pdf-lib` / `ui`
+  - 残り: `pdf-lib` / `ui`
 - lint warning の整理
 - playground 側の exports 変更追従確認
 
 次に進める順序:
 
-1. `converter` -> `schemas` -> `generator` の順で package build の Vite 化と exports 再設計を進める
+1. `pdf-lib` / `ui` の build 置換方針を整理し、package build の Vite 化を完了させる
 2. lint warning を段階的に整理する
 3. playground 側の exports 追従確認を行う
 
@@ -407,6 +410,31 @@ Latest committed checkpoint:
 - `vitest-image-snapshot` が内部で使う `pixelmatch@6` により、既存 manipulator snapshot と微小な AA 差分が出るため
 - `pdf-lib/src/*.d.ts` の残骸が `lint:typecheck` / `lint:oxlint` を不安定にしていたため
 
+### 22. `converter` / `schemas` / `generator` build の Vite 化と exports 再設計
+
+実施内容:
+
+- `packages/converter` に `src/index.ts` / `tsconfig.build.json` / `vite.config.mts` を追加
+- `packages/converter` の build を Vite multi-entry (`index` / `index.node`) + declaration emit に変更
+- `packages/converter/package.json` を `type: "module"` 化し、`browser` / `node` 条件付き export を `dist/index.js` / `dist/index.node.js` ベースへ整理
+- `tsconfig.base.json` の `@pdfme/converter` path を `packages/converter/src/index.ts` に変更
+- `packages/ui/vite.config.mts` の `@pdfme/converter` alias を `../converter/src/index.ts` に変更
+- `packages/schemas` に `tsconfig.build.json` / `vite.config.mts` を追加
+- `packages/schemas` の build を Vite multi-entry (`index` / `utils`) + declaration emit に変更
+- `packages/schemas/package.json` を `type: "module"` 化し、root export と `./utils` export を `dist/index.js` / `dist/utils.js` ベースへ整理
+- `packages/schemas/vite.config.mts` で `air-datepicker/locale/*` を external から外し、Node ESM でも壊れないようにした
+- `packages/generator` に `tsconfig.build.json` / `vite.config.mts` を追加
+- `packages/generator` の build を Vite library mode + declaration emit に変更
+- `packages/generator/package.json` を `type: "module"` 化し、root export を `dist/index.js` / `dist/index.d.ts` ベースへ整理
+
+理由:
+
+- `PLAN.md` の `Phase 1` にある package build の Vite 化を、依存関係の浅い順に継続するため
+- `converter` は browser/node dual entry を持つため、`common` / `manipulator` の次に整理する価値が高かったため
+- `schemas` は public subpath が `.` と `./utils` に限られており、Vite multi-entry へ素直に移行できるため
+- `schemas` は `air-datepicker/locale/*` の bare subpath import が Node ESM import を壊していたため、build 側で吸収する必要があったため
+- `generator` は single entry で、`converter` / `schemas` の public export が安定した後に続けて移行しやすかったため
+
 ## Verification Completed
 
 実行済み:
@@ -437,8 +465,12 @@ Latest committed checkpoint:
 - `npm run -w packages/pdf-lib build`
 - `npm run -w packages/common build`
 - `npm run -w packages/manipulator build`
+- `npm run -w packages/converter build`
+- `npm run -w packages/schemas build`
+- `npm run -w packages/generator build`
 - `node --input-type=module -e "import { PDFDocument } from '@pdfme/pdf-lib'; console.log(typeof PDFDocument);"`
 - `node --input-type=module -e "import { BLANK_PDF } from '@pdfme/common'; import { merge } from '@pdfme/manipulator'; console.log(typeof BLANK_PDF, typeof merge);"`
+- `node --input-type=module -e "import { pdf2img } from '@pdfme/converter'; import { text } from '@pdfme/schemas'; import { getDynamicHeightsForTable } from '@pdfme/schemas/utils'; import { generate } from '@pdfme/generator'; console.log(typeof pdf2img, typeof text, typeof getDynamicHeightsForTable, typeof generate);"`
 
 確認できたこと:
 
@@ -459,6 +491,7 @@ Latest committed checkpoint:
 - `schemas` の test は Vitest で通る
 - `pdf-lib` の test は Vitest で通る
 - root の `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` スコープで通る
+- `converter` / `schemas` / `generator` は root build 後も package root の Node ESM import が通る
 - generator の test 実行は local font asset 化により network 非依存になった
 - `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` 更新後でも、Node renderer を `@napi-rs/canvas` に寄せた状態で unit test が通る
 - `generator` は `pdf2img failed: Image or Canvas expected` では落ちなくなり、blank snapshot を撤回したうえで corrected renderer 出力へ再基準化して test が再度通る
@@ -498,11 +531,15 @@ Latest committed checkpoint:
 - `packages/common/vite.config.mts`
 - `packages/converter/tsconfig.cjs.json`
 - `packages/converter/tsconfig.esm.json`
+- `packages/converter/tsconfig.build.json`
 - `packages/converter/tsconfig.json`
+- `packages/converter/vite.config.mts`
 - `packages/generator/tsconfig.cjs.json`
 - `packages/generator/tsconfig.esm.json`
+- `packages/generator/tsconfig.build.json`
 - `packages/generator/tsconfig.json`
 - `packages/generator/tsconfig.node.json`
+- `packages/generator/vite.config.mts`
 - `packages/manipulator/tsconfig.cjs.json`
 - `packages/manipulator/tsconfig.esm.json`
 - `packages/manipulator/tsconfig.build.json`
@@ -514,8 +551,10 @@ Latest committed checkpoint:
 - `packages/pdf-lib/tsconfig.node.json`
 - `packages/schemas/tsconfig.cjs.json`
 - `packages/schemas/tsconfig.esm.json`
+- `packages/schemas/tsconfig.build.json`
 - `packages/schemas/tsconfig.json`
 - `packages/schemas/tsconfig.node.json`
+- `packages/schemas/vite.config.mts`
 - `packages/ui/package.json`
 - `packages/ui/tsconfig.json`
 - `packages/ui/tsconfig.typecheck.json`
@@ -523,6 +562,7 @@ Latest committed checkpoint:
 - `packages/common/__tests__/dynamicTemplate.test.ts`
 - `packages/common/__tests__/helper.test.ts`
 - `packages/converter/package.json`
+- `packages/converter/src/index.ts`
 - `packages/converter/src/index.browser.ts`
 - `packages/converter/src/index.node.ts`
 - `packages/converter/__tests__/index.test.ts`
@@ -563,6 +603,7 @@ Latest committed checkpoint:
 - `packages/pdf-lib/src/core/embedders/CustomFontSubsetEmbedder.ts`
 - `packages/schemas/package.json`
 - `packages/schemas/__tests__/text.test.ts`
+- `packages/schemas/src/date/helper.ts`
 - `packages/schemas/src/barcodes/types.ts`
 - `packages/schemas/src/multiVariableText/types.ts`
 - `packages/schemas/src/tables/types.ts`
@@ -615,15 +656,13 @@ Latest committed checkpoint:
 
 進行中:
 
-- 完了: `common` / `manipulator`
-- 次候補: `converter` / `schemas` / `generator`
+- 完了: `common` / `manipulator` / `converter` / `schemas` / `generator`
+- 残り: `pdf-lib` / `ui`
 
 未実施:
 
 - 残 package への `vite.config.ts` 追加
 - 残 package の `package.json` exports 再設計
-- `converter` の browser/node dual entry 整理
-- `schemas` の multi-entry 対応
 - `pdf-lib` / `ui` の build 置換方針整理
 
 ### Priority 4: playground の残件
@@ -657,8 +696,8 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `PLAN.md` の `Phase 1` 残件として `converter` build の Vite 化へ進む
-2. 続けて `schemas` と `generator` の build / exports を揃える
+1. `PLAN.md` の `Phase 1` 残件として `pdf-lib` / `ui` の build 置換方針を固める
+2. package build の Vite 化を完了させる
 3. その後に lint warning と playground 追従確認を消化する
 
 ## Known Risks
@@ -673,8 +712,10 @@ Latest committed checkpoint:
 - generator の image snapshot は corrected renderer 出力へ再基準化済みであり、`fe08c521` の blank baseline を前提に見ないこと
 - manipulator の e2e snapshot は Vite build 移行後の renderer 出力へ再基準化済みで、差分は文字エッジの AA 変化が主因だった
 - `pdf-lib` の clean が効かない状態に戻ると stray `src/**/*.d.ts` が lint を壊すため、`packages/pdf-lib/package.json` の clean script を維持すること
+- `schemas` の Node ESM import は `air-datepicker/locale/*` を Vite bundle 側へ取り込む前提で成立しているため、`packages/schemas/vite.config.mts` の external 判定を安易に戻さないこと
+- `converter` / `schemas` / `generator` の単体 build は、workspace dependency の dist が無い clean 状態では root build order に依存すること
 
 ## Notes For Next Turn
 
 - 次回はこの `PROGRESS.md` を読み、package build の Vite 化から進める
-- まず `packages/converter` の Node renderer は `@napi-rs/canvas` 前提で固定されていることを踏まえ、`converter` build の Vite 化へ進む
+- まず `pdf-lib` / `ui` の build をどう Vite 化するか、既存 build の責務差分を確認してから着手する

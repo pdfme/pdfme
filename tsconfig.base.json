@@ -13,7 +13,7 @@
     "baseUrl": ".",
     "paths": {
       "@pdfme/common": ["packages/common/src/index.ts"],
-      "@pdfme/converter": ["packages/converter/src/index.browser.ts"],
+      "@pdfme/converter": ["packages/converter/src/index.ts"],
       "@pdfme/generator": ["packages/generator/src/index.ts"],
       "@pdfme/manipulator": ["packages/manipulator/src/index.ts"],
       "@pdfme/pdf-lib": ["packages/pdf-lib/src/index.ts"],

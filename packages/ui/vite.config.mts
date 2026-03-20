@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
         { find: /^@pdfme\/common$/, replacement: resolve(__dirname, '../common/src/index.ts') },
         {
           find: /^@pdfme\/converter$/,
-          replacement: resolve(__dirname, '../converter/src/index.browser.ts'),
+          replacement: resolve(__dirname, '../converter/src/index.ts'),
         },
         { find: /^@pdfme\/pdf-lib$/, replacement: resolve(__dirname, '../pdf-lib/src/index.ts') },
         { find: /^@pdfme\/schemas$/, replacement: resolve(__dirname, '../schemas/src/index.ts') },
