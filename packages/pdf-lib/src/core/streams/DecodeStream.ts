@@ -168,6 +168,9 @@ class DecodeStream implements StreamType {
     }
     if (size > MAX_DECODED_SIZE) {
       size = MAX_DECODED_SIZE;
+      if (size < requested) {
+        throw new DecompressionBombError(requested, MAX_DECODED_SIZE);
+      }
     }
     const buffer2 = new Uint8Array(size);
     buffer2.set(buffer);
