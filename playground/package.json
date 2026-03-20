@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "npm run generate-template-assets && vite",
-    "build": "npm run generate-template-assets && node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build && npm run copy-vercel-config",
+    "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
     "preview": "vite preview",
     "predeploy": "npm run build",
@@ -12,9 +12,9 @@
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
     "test:exports": "node scripts/verify-package-exports.mjs",
-    "test": "npm run test:exports && node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts",
-    "test:update-snapshots": "npm run test:exports && node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts -u",
-    "test:local": "npm run test:exports && LOCAL=true node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts"
+    "test": "npm run test:exports && vitest run --config ../vitest.config.ts",
+    "test:update-snapshots": "npm run test:exports && vitest run --config ../vitest.config.ts -u",
+    "test:local": "npm run test:exports && LOCAL=true vitest run --config ../vitest.config.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -25,9 +25,6 @@
     "@pdfme/schemas": "file:../packages/schemas",
     "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^9.5.0",
-    "@sentry/vite-plugin": "^3.2.2",
-    "canvas": "^2.11.2",
-    "esbuild": "^0.19.10",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -41,16 +38,20 @@
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-react": "^4.0.3",
+    "@sentry/vite-plugin": "^5.1.1",
+    "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "gh-pages": "^6.0.0",
+    "p-limit": "^7.3.0",
     "postcss": "^8.4.49",
     "puppeteer": "^24.3.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0",
+    "vitest-image-snapshot": "^0.6.47"
   }
 }

@@ -49,12 +49,7 @@
     "pdfjs-dist": "^5.5.207"
   },
   "devDependencies": {
-    "@pdfme/generator": "*",
-    "@types/estree": "^1.0.6",
-    "canvas": "^3.2.1"
-  },
-  "optionalDependencies": {
-    "canvas": "^3.2.1"
+    "@pdfme/generator": "*"
   },
   "publishConfig": {
     "access": "public"
