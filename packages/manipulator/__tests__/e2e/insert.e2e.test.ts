@@ -1,6 +1,5 @@
 import { insert } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: insert', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -11,9 +10,7 @@ describe('E2E: insert', () => {
 
     const images = await pdfToImages(inserted);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `insert-5p-a-at-0-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`insert-5p-a-at-0-result-page${i + 1}`);
     }
   });
 
@@ -26,9 +23,7 @@ describe('E2E: insert', () => {
 
     const images = await pdfToImages(inserted);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `insert-5p-a-at-0-and-2-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`insert-5p-a-at-0-and-2-result-page${i + 1}`);
     }
   });
 });

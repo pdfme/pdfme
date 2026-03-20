@@ -1,6 +1,5 @@
 import { organize } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: organize (single operations)', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -12,9 +11,7 @@ describe('E2E: organize (single operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-remove-only-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-remove-only-result-page${i + 1}`);
     }
   });
 
@@ -23,9 +20,7 @@ describe('E2E: organize (single operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-insert-only-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-insert-only-result-page${i + 1}`);
     }
   });
 
@@ -34,9 +29,7 @@ describe('E2E: organize (single operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-replace-only-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-replace-only-result-page${i + 1}`);
     }
   });
 
@@ -48,9 +41,7 @@ describe('E2E: organize (single operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-rotate-only-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-rotate-only-result-page${i + 1}`);
     }
   });
 
@@ -68,9 +59,7 @@ describe('E2E: organize (single operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-multiple-ops-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-multiple-ops-result-page${i + 1}`);
     }
   });
 });

@@ -1,5 +1,6 @@
-import { readFileSync } from 'fs';
-import * as path from 'path';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   mm2pt,
   pt2mm,
@@ -20,6 +21,7 @@ import {
   getB64BasePdf,
 } from '../src/index.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSans-Regular.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/NotoSerif-Regular.ttf`));
 

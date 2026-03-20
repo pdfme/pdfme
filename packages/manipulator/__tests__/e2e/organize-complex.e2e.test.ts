@@ -1,6 +1,5 @@
 import { organize } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: organize (complex operations)', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -20,9 +19,7 @@ describe('E2E: organize (complex operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-composite-1-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-composite-1-result-page${i + 1}`);
     }
   });
 
@@ -39,9 +36,7 @@ describe('E2E: organize (complex operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-composite-2-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-composite-2-result-page${i + 1}`);
     }
   });
 
@@ -60,9 +55,7 @@ describe('E2E: organize (complex operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-composite-3-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-composite-3-result-page${i + 1}`);
     }
   });
 
@@ -80,9 +73,7 @@ describe('E2E: organize (complex operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-composite-4-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-composite-4-result-page${i + 1}`);
     }
   });
 
@@ -101,9 +92,7 @@ describe('E2E: organize (complex operations)', () => {
 
     const images = await pdfToImages(result);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `organize-composite-5-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`organize-composite-5-result-page${i + 1}`);
     }
   });
 });

@@ -41,8 +41,8 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:update-snapshots": "vitest run --config ../../vitest.config.ts -u",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -55,30 +55,5 @@
   "devDependencies": {
     "@pdfme/converter": "*",
     "@types/estree": "^1.0.6"
-  },
-  "jest": {
-    "preset": "ts-jest/presets/default-esm",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/__tests__/**/*.test.ts"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "./tsconfig.json",
-          "useESM": true
-        }
-      ]
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
-    }
   }
 }

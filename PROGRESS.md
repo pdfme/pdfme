@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `0d0f89f1` `Prepare ESM migration groundwork`
+- `58a8c712` `Add TypeScript project references`
 
 ## Current Status
 
@@ -19,11 +19,13 @@ Latest committed checkpoint:
   - package references
   - internal package path の source 解決
   - build tsconfig の `src` 限定化
+- `Phase 1` の一部である root の Vitest / Oxlint 基盤
+- `common` / `manipulator` の Jest -> Vitest 移行
 
 まだ未着手:
 
-- `Phase 1` の本体である Vite / Vitest / Oxlint への全面移行
-- Jest 依存の package ごとの移行
+- `Phase 1` の残りである package ごとの Jest -> Vitest 移行
+- type-aware lint / oxlint の適用範囲拡大
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
 
@@ -130,6 +132,53 @@ Latest committed checkpoint:
 - 既存 build が `__tests__` を `dist` に吐いていたため、その副作用を止めるため
 - `ui` は build 設定と typecheck 設定の責務を分けないと declaration build と references が衝突するため
 
+### 8. Phase 1: root の Vitest / Oxlint 基盤
+
+実施内容:
+
+- ルート `package.json` に以下を追加
+- `vitest`
+- `vitest-image-snapshot`
+- `vite`
+- `oxlint`
+- ルート `vitest.config.ts` を追加
+- ルート `eslint.typecheck.config.mjs` を追加
+- ルート scripts を追加
+- `test:common`
+- `test:manipulator`
+- `test:manipulator:update-snapshots`
+- `lint:typecheck`
+- `lint:oxlint`
+- `.gitignore` に以下を追加
+- `**/__image_actual__/**`
+- `**/__image_diffs__/**`
+- `**/__image_diff_report__/**`
+
+補足:
+
+- `lint:typecheck` と `lint:oxlint` は現時点では `common` / `manipulator` にスコープ
+- repo 全体へ広げるのは残 package 移行後に行う
+- `vitest.config.ts` は workspace の `cwd` を見て `common` / `manipulator` の設定を切り替える構成
+
+### 9. `common` / `manipulator` の Jest -> Vitest 移行
+
+実施内容:
+
+- `packages/common/package.json` の `test` を Vitest 実行へ変更
+- `packages/manipulator/package.json` の `test` / `test:update-snapshots` を Vitest 実行へ変更
+- `common` / `manipulator` の `package.json` から inline Jest config を削除
+- `packages/manipulator/jest.setup.js` を削除
+- `packages/manipulator/vitest.setup.ts` を追加して `vitest-image-snapshot` を登録
+- `manipulator` の e2e snapshot test を `toMatchImage` ベースへ置換
+- `common` / `manipulator` の test code で `__dirname` を `import.meta.url` ベースへ置換
+- ルート `eslint.config.mjs` に `vi` global を追加
+
+理由:
+
+- `common` は Jest 固有 API 依存が少なく、最初の移行対象として安全だったため
+- `manipulator` は image snapshot があるが、`vitest-image-snapshot` で移行可能だったため
+- `__dirname` は Vitest の ESM 実行では使えないため、先に除去が必要だったため
+
 ## Verification Completed
 
 実行済み:
@@ -143,6 +192,10 @@ Latest committed checkpoint:
 - `npm run typecheck`
 - `npm run -w packages/ui build`
 - `npm run build`
+- `npm run test --workspace packages/common`
+- `npm run test --workspace packages/manipulator`
+- `npm run lint:typecheck`
+- `npm run lint:oxlint`
 
 確認できたこと:
 
@@ -155,6 +208,9 @@ Latest committed checkpoint:
 - `tsc -b` ベースの root typecheck が通る
 - ルート build が通る
 - `ui` package は build と typecheck の分離後も単体 build が通る
+- `common` の test は Vitest で通る
+- `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
+- root の `lint:typecheck` / `lint:oxlint` は `common` / `manipulator` スコープで通る
 
 ## Files Changed So Far
 
@@ -168,6 +224,7 @@ Latest committed checkpoint:
 - `playground/node-playground/generate.js`
 - `playground/node-playground/merge.js`
 - `playground/scripts/generate-templates-thumbnail.mjs`
+- `package-lock.json`
 - `website/sidebars.js`
 - `website/docs/development-guide.md`
 - `website/docs/migration-v6.md`
@@ -176,6 +233,8 @@ Latest committed checkpoint:
 - `package.json`
 - `tsconfig.base.json`
 - `tsconfig.json`
+- `vitest.config.ts`
+- `eslint.typecheck.config.mjs`
 - `packages/common/tsconfig.cjs.json`
 - `packages/common/tsconfig.esm.json`
 - `packages/common/tsconfig.json`
@@ -202,11 +261,25 @@ Latest committed checkpoint:
 - `packages/ui/tsconfig.json`
 - `packages/ui/tsconfig.typecheck.json`
 - `packages/ui/vite.config.mts`
+- `packages/common/__tests__/dynamicTemplate.test.ts`
+- `packages/common/__tests__/helper.test.ts`
+- `packages/manipulator/__tests__/test-helpers.ts`
+- `packages/manipulator/__tests__/e2e/insert.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/merge.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/move.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/organize-complex.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/organize-single.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/remove.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/rotate.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/split.e2e.test.ts`
+- `packages/manipulator/vitest.setup.ts`
 - `.gitignore`
+- `eslint.config.mjs`
 
 削除:
 
 - `packages/common/set-version.js`
+- `packages/manipulator/jest.setup.js`
 
 参考:
 
@@ -217,7 +290,7 @@ Latest committed checkpoint:
 
 ### Priority 1: ルートレベルの新基盤導入
 
-未実施:
+完了:
 
 - ルート `package.json` の scripts 再編
 - `vitest.config.ts` 追加
@@ -226,18 +299,22 @@ Latest committed checkpoint:
 
 補足:
 
-- この段階では `package-lock.json` の更新が発生する
-- `vitest` / `oxlint` はまだ install していない
+- `package-lock.json` 更新済み
+- `lint:typecheck` / `lint:oxlint` は現状 `common` / `manipulator` スコープ
+- full repo への拡張は残 package 移行後に行う
 
 ### Priority 2: package ごとの Jest -> Vitest 移行
 
-未実施:
+完了:
 
 - `common`
+- `manipulator`
+
+未実施:
+
 - `converter`
 - `schemas`
 - `generator`
-- `manipulator`
 - `ui`
 - `pdf-lib`
 
@@ -245,12 +322,10 @@ Latest committed checkpoint:
 
 - `ui`
 - `generator`
-- `manipulator`
 - `pdf-lib`
 
 理由:
 
-- image snapshot
 - jsdom
 - `__mocks__`
 - `jest.*` API
@@ -297,11 +372,10 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `vite` / `vitest` / `oxlint` を root に追加
-2. `vitest.config.ts` と `eslint.typecheck.config.mjs` を追加
-3. `common` と `manipulator` から Jest -> Vitest を移行
-4. その後に `converter` / `schemas` / `generator` を進める
-5. `ui` と `pdf-lib` は最後に回す
+1. `converter` と `schemas` を Jest -> Vitest 移行
+2. `generator` を続けて移行
+3. `lint:typecheck` / `lint:oxlint` の対象を段階的に広げる
+4. `ui` と `pdf-lib` は最後に回す
 
 ## Known Risks
 
@@ -310,8 +384,10 @@ Latest committed checkpoint:
 - `converter` は browser/node entry と `pdfjs-dist` 更新が絡むため、単独で切り出して進めたほうが安全
 - `playground` は package exports の変更に追従確認が必要
 - `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
+- `lint:typecheck` を full repo に広げると既存 package 由来の大量エラーが出るため、package migration とセットで広げること
+- `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、`Priority 1` から順に進める
+- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `converter` から順に進める
 - 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと

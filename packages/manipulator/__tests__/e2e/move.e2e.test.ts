@@ -1,6 +1,5 @@
 import { move } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: move', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -10,9 +9,7 @@ describe('E2E: move', () => {
 
     const images = await pdfToImages(moved);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `move-5p-page0-to-2-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`move-5p-page0-to-2-result-page${i + 1}`);
     }
   });
 });

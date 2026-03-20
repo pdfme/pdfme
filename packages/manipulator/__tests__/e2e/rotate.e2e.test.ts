@@ -1,6 +1,5 @@
 import { rotate } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: rotate', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -10,9 +9,7 @@ describe('E2E: rotate', () => {
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `rotate-5p-90deg-all-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`rotate-5p-90deg-all-result-page${i + 1}`);
     }
   });
 
@@ -22,9 +19,7 @@ describe('E2E: rotate', () => {
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `rotate-5p-180deg-page1-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`rotate-5p-180deg-page1-result-page${i + 1}`);
     }
   });
 
@@ -34,9 +29,7 @@ describe('E2E: rotate', () => {
 
     const images = await pdfToImages(rotated);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `rotate-5p-270deg-pages1-3-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`rotate-5p-270deg-pages1-3-result-page${i + 1}`);
     }
   });
 });
