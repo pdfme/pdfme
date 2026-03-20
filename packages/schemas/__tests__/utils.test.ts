@@ -28,7 +28,7 @@ describe('hex2RgbColor', () => {
 
   it('should throw an error if hex is invalid', () => {
     const hex = '#fffee';
-    expect(() => hex2RgbColor(hex)).toThrowError('Invalid hex color value #ff');
+    expect(() => hex2RgbColor(hex)).toThrow('Invalid hex color value #ff');
   });
 });
 
