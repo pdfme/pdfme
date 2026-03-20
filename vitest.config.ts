@@ -24,6 +24,12 @@ const workspaceTests: Record<
     include: ['__tests__/**/*.test.ts'],
     testTimeout: 30000,
   },
+  'packages/generator': {
+    name: 'generator',
+    include: ['__tests__/**/*.test.ts'],
+    setupFiles: [path.resolve(repoRoot, 'packages/generator/vitest.setup.ts')],
+    testTimeout: 60000,
+  },
   'packages/manipulator': {
     name: 'manipulator',
     include: ['__tests__/**/*.test.ts'],
@@ -33,6 +39,11 @@ const workspaceTests: Record<
   'packages/schemas': {
     name: 'schemas',
     include: ['__tests__/**/*.test.ts'],
+    testTimeout: 30000,
+  },
+  'packages/pdf-lib': {
+    name: 'pdf-lib',
+    include: ['__tests__/**/*.test.ts', '__tests__/**/*.spec.ts'],
     testTimeout: 30000,
   },
 };

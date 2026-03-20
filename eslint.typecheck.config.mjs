@@ -10,6 +10,7 @@ export default [
     files: [
       'packages/common/src/**/*.{ts,tsx}',
       'packages/converter/src/**/*.{ts,tsx}',
+      'packages/generator/src/**/*.{ts,tsx}',
       'packages/manipulator/src/**/*.{ts,tsx}',
       'packages/schemas/src/**/*.{ts,tsx}',
     ],

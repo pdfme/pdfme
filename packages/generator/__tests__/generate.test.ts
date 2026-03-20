@@ -1,7 +1,6 @@
 import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema } from '@pdfme/common';
 import { getFont, pdfToImages } from './utils.js';
-import 'jest-image-snapshot';
 
 describe('generate integrate test', () => {
   describe('basic generator', () => {
@@ -62,9 +61,7 @@ describe('generate integrate test', () => {
         const pdf = await generate({ inputs, template });
         const images = await pdfToImages(pdf);
         for (let i = 0; i < images.length; i++) {
-          expect(images[i]).toMatchImageSnapshot({
-            customSnapshotIdentifier: `${testName}-${i + 1}`,
-          });
+          await expect(images[i]).toMatchImage(`${testName}-${i + 1}`);
         }
       });
     }
@@ -92,9 +89,7 @@ describe('generate integrate test', () => {
       const pdf = await generate({ inputs, template });
       const images = await pdfToImages(pdf);
       for (let i = 0; i < images.length; i++) {
-        expect(images[i]).toMatchImageSnapshot({
-          customSnapshotIdentifier: `fontColor-${i + 1}`,
-        });
+        await expect(images[i]).toMatchImage(`fontColor-${i + 1}`);
       }
     });
   });
@@ -147,9 +142,7 @@ describe('generate integrate test', () => {
       });
       const images = await pdfToImages(pdf);
       for (let i = 0; i < images.length; i++) {
-        expect(images[i]).toMatchImageSnapshot({
-          customSnapshotIdentifier: `fontSubset-${i + 1}`,
-        });
+        await expect(images[i]).toMatchImage(`fontSubset-${i + 1}`);
       }
     }, 10000);
   });

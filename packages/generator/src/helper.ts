@@ -60,7 +60,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
 };
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, unknown>[]) => {
-  (template.schemas as Schema[][]).forEach((schemaPage: Schema[]) =>
+  template.schemas.forEach((schemaPage: Schema[]) =>
     schemaPage.forEach((schema: Schema) => {
       if (schema.required && !schema.readOnly && !inputs.some((input) => input[schema.name])) {
         throw new Error(

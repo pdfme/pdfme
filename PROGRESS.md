@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `45082df0` `Add Vitest foundation for common and manipulator`
+- `19e6bfb6` `Migrate converter and schemas tests to Vitest`
 
 ## Current Status
 
@@ -20,12 +20,12 @@ Latest committed checkpoint:
   - internal package path の source 解決
   - build tsconfig の `src` 限定化
 - `Phase 1` の一部である root の Vitest / Oxlint 基盤
-- `common` / `manipulator` / `converter` / `schemas` の Jest -> Vitest 移行
+- `common` / `manipulator` / `converter` / `schemas` / `generator` / `pdf-lib` の Jest -> Vitest 移行
 
 まだ未着手:
 
-- `Phase 1` の残りである package ごとの Jest -> Vitest 移行
-- type-aware lint / oxlint の適用範囲拡大
+- `Phase 1` の残りである `ui` の Jest -> Vitest 移行
+- type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
 
@@ -198,6 +198,44 @@ Latest committed checkpoint:
 - `schemas` は `text.test.ts` に ESM 非互換な `jest.spyOn(require(...))` があり、そこだけテストロジックを Vitest 向けに組み替える必要があったため
 - `lint:typecheck` / `lint:oxlint` を migration 済み package に合わせて広げることで、段階的に root 基盤を有効化できるため
 
+### 11. `generator` の Jest -> Vitest 移行
+
+実施内容:
+
+- `packages/generator/package.json` の `test` / `test:update-snapshots` を Vitest 実行へ変更
+- `packages/generator/package.json` から inline Jest config を削除
+- `packages/generator/jest.setup.js` を削除
+- `packages/generator/vitest.setup.ts` を追加して `vitest-image-snapshot` を登録
+- ルート `vitest.config.ts` に `generator` を追加
+- ルート `package.json` に `test:generator` を追加
+- `packages/generator/__tests__/utils.ts` と `integration-playground.test.ts` の `__dirname` を `import.meta.url` ベースへ置換
+- `packages/generator/__tests__/assets/templates/index.ts` に `createRequire(import.meta.url)` を追加
+- generator の image snapshot test を `toMatchImage` ベースへ置換
+- `PinyonScript-Regular.ttf` を `packages/generator/__tests__/assets/fonts/` に追加し、test font を remote fetch ではなく local asset に変更
+- `lint:typecheck` / `lint:oxlint` の対象を `generator` まで拡張
+- `packages/generator/src/generate.ts` / `packages/generator/src/helper.ts` の不要な型 assertion を削除
+
+理由:
+
+- generator は image snapshot と test asset の `require()` があるため、Vitest 用 setup と ESM 対応が必要だったため
+- playground snapshot test が remote font fetch に依存しており、この環境では安定実行できないため local asset 化が必要だったため
+- lint 対象拡張で出た型 assertion 2 件は既存挙動を変えずに解消できたため
+
+### 12. `pdf-lib` の Jest -> Vitest 移行
+
+実施内容:
+
+- `packages/pdf-lib/package.json` の `test` を Vitest 実行へ変更
+- `packages/pdf-lib/package.json` から inline Jest config を削除
+- ルート `vitest.config.ts` に `pdf-lib` を追加
+- ルート `package.json` に `test:pdf-lib` を追加
+- `packages/pdf-lib/__tests__` の `jest.fn` / `jest.clearAllMocks` を `vi.fn` / `vi.clearAllMocks` へ置換
+
+理由:
+
+- `pdf-lib` は runner 依存が薄く、少数の mock API 置換だけで移行できたため
+- `ui` より先に進めるほうが安全だったため
+
 ## Verification Completed
 
 実行済み:
@@ -217,6 +255,8 @@ Latest committed checkpoint:
 - `npm run lint:oxlint`
 - `npm run test --workspace packages/converter`
 - `npm run test --workspace packages/schemas`
+- `npm run test --workspace packages/generator`
+- `npm run test --workspace packages/pdf-lib`
 
 確認できたこと:
 
@@ -233,7 +273,10 @@ Latest committed checkpoint:
 - `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
 - `converter` の test は Vitest で通る
 - `schemas` の test は Vitest で通る
-- root の `lint:typecheck` / `lint:oxlint` は `common` / `converter` / `manipulator` / `schemas` スコープで通る
+- `generator` の test は Vitest で通る
+- `pdf-lib` の test は Vitest で通る
+- root の `lint:typecheck` / `lint:oxlint` は `common` / `converter` / `generator` / `manipulator` / `schemas` スコープで通る
+- generator の test 実行は local font asset 化により network 非依存になった
 
 ## Files Changed So Far
 
@@ -287,6 +330,18 @@ Latest committed checkpoint:
 - `packages/common/__tests__/dynamicTemplate.test.ts`
 - `packages/common/__tests__/helper.test.ts`
 - `packages/converter/package.json`
+- `packages/generator/package.json`
+- `packages/generator/vitest.setup.ts`
+- `packages/generator/__tests__/assets/fonts/PinyonScript-Regular.ttf`
+- `packages/generator/__tests__/assets/templates/index.ts`
+- `packages/generator/__tests__/generate.test.ts`
+- `packages/generator/__tests__/integration-other.test.ts`
+- `packages/generator/__tests__/integration-playground.test.ts`
+- `packages/generator/__tests__/integration-segmenter.test.ts`
+- `packages/generator/__tests__/integration-textType.test.ts`
+- `packages/generator/__tests__/utils.ts`
+- `packages/generator/src/generate.ts`
+- `packages/generator/src/helper.ts`
 - `packages/manipulator/__tests__/test-helpers.ts`
 - `packages/manipulator/__tests__/e2e/insert.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/merge.e2e.test.ts`
@@ -297,6 +352,11 @@ Latest committed checkpoint:
 - `packages/manipulator/__tests__/e2e/rotate.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/split.e2e.test.ts`
 - `packages/manipulator/vitest.setup.ts`
+- `packages/pdf-lib/package.json`
+- `packages/pdf-lib/__tests__/api/PDFDocument.spec.ts`
+- `packages/pdf-lib/__tests__/api/form/PDFForm.spec.ts`
+- `packages/pdf-lib/__tests__/core/parser/PDFObjectParser.spec.ts`
+- `packages/pdf-lib/__tests__/core/parser/PDFParser.spec.ts`
 - `packages/schemas/package.json`
 - `packages/schemas/__tests__/text.test.ts`
 - `.gitignore`
@@ -306,6 +366,7 @@ Latest committed checkpoint:
 
 - `packages/common/set-version.js`
 - `packages/manipulator/jest.setup.js`
+- `packages/generator/jest.setup.js`
 
 参考:
 
@@ -326,7 +387,7 @@ Latest committed checkpoint:
 補足:
 
 - `package-lock.json` 更新済み
-- `lint:typecheck` / `lint:oxlint` は現状 `common` / `converter` / `manipulator` / `schemas` スコープ
+- `lint:typecheck` / `lint:oxlint` は現状 `common` / `converter` / `generator` / `manipulator` / `schemas` スコープ
 - full repo への拡張は残 package 移行後に行う
 
 ### Priority 2: package ごとの Jest -> Vitest 移行
@@ -335,20 +396,18 @@ Latest committed checkpoint:
 
 - `common`
 - `converter`
+- `generator`
 - `manipulator`
+- `pdf-lib`
 - `schemas`
 
 未実施:
 
-- `generator`
 - `ui`
-- `pdf-lib`
 
 特に重い package:
 
 - `ui`
-- `generator`
-- `pdf-lib`
 
 理由:
 
@@ -398,9 +457,8 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `generator` を Jest -> Vitest 移行
-2. `lint:typecheck` / `lint:oxlint` の対象を `generator` まで広げる
-3. `ui` と `pdf-lib` は最後に回す
+1. `ui` を Jest -> Vitest 移行
+2. 必要なら `lint:typecheck` / `lint:oxlint` の対象を最終調整する
 
 ## Known Risks
 
@@ -414,5 +472,5 @@ Latest committed checkpoint:
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `generator` から順に進める
+- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `ui` から進める
 - 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと

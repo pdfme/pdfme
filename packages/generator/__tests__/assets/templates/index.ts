@@ -1,4 +1,7 @@
+import { createRequire } from 'node:module';
 import { Template } from '@pdfme/common';
+
+const require = createRequire(import.meta.url);
 
 const z97mmx210mm = require('./z97mmx210mm.json') as Template;
 const barcodes = require('./barcodes.json') as Template;

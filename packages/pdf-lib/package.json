@@ -48,7 +48,7 @@
     "build:node": "tsc -p tsconfig.node.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
+    "test": "vitest run --config ../../vitest.config.ts",
     "prune": "ts-prune src",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
@@ -63,25 +63,6 @@
     "@pdf-lib/fontkit": "^1.1.0",
     "@types/color": "^4.2.0",
     "@types/pako": "^2.0.4"
-  },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.esm.json"
-        }
-      ]
-    },
-    "testMatch": [
-      "**/*.test.ts",
-      "**/*.spec.ts"
-    ]
   },
   "publishConfig": {
     "access": "public"

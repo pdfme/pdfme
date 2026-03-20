@@ -47,14 +47,14 @@ describe(`PDFDocument`, () => {
         'Trying to parse invalid object:',
         'Invalid object ref:',
       ];
-      console.warn = jest.fn((...args) => {
+      console.warn = vi.fn((...args) => {
         const isIgnored = ignoredWarnings.find((iw) => args[0].includes(iw));
         if (!isIgnored) origConsoleWarn(...args);
       });
     });
 
     beforeEach(() => {
-      jest.clearAllMocks();
+      vi.clearAllMocks();
     });
 
     afterAll(() => {

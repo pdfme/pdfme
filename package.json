@@ -52,13 +52,15 @@
     "test": "npm run test --workspaces",
     "test:common": "npm run -w packages/common test",
     "test:converter": "npm run -w packages/converter test",
+    "test:generator": "npm run -w packages/generator test",
     "test:manipulator": "npm run -w packages/manipulator test",
     "test:manipulator:update-snapshots": "npm run -w packages/manipulator test:update-snapshots",
+    "test:pdf-lib": "npm run -w packages/pdf-lib test",
     "test:schemas": "npm run -w packages/schemas test",
     "test:ui:update-snapshots": "npm run -w packages/ui test -- -u",
     "lint": "npm run lint --workspaces",
-    "lint:typecheck": "eslint packages/common/src packages/converter/src packages/manipulator/src packages/schemas/src --ext .ts,.tsx --config eslint.typecheck.config.mjs",
-    "lint:oxlint": "oxlint packages/common/src packages/converter/src packages/manipulator/src packages/schemas/src",
+    "lint:typecheck": "eslint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/schemas/src --ext .ts,.tsx --config eslint.typecheck.config.mjs",
+    "lint:oxlint": "oxlint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/schemas/src",
     "prettier": "npm run prettier --workspaces"
   },
   "devDependencies": {

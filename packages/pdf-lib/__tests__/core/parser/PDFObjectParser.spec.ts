@@ -44,14 +44,14 @@ describe(`PDFObjectParser`, () => {
     const ignoredWarnings = [
       'Parsed number that is too large for some PDF readers:',
     ];
-    console.warn = jest.fn((...args) => {
+    console.warn = vi.fn((...args) => {
       const isIgnored = ignoredWarnings.find((iw) => args[0].includes(iw));
       if (!isIgnored) origConsoleWarn(...args);
     });
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterAll(() => {
