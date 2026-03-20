@@ -121,7 +121,7 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; width: 1155px; margin-left: 45px;"
     >
       <div
-        style="position: absolute; bottom: 6%; width: 755px;"
+        style="position: absolute; top: auto; bottom: 6%; width: 755px;"
       >
         <div
           class="pdfme-ui-control-bar"
@@ -185,11 +185,11 @@ exports[`Designer snapshot 1`] = `
           
         </button>
         <div
-          style="width: 400px; height: 100%; display: flex; top: 0px; right: 0px; position: absolute; font-family: 'Open Sans', sans-serif; box-sizing: border-box; background: rgb(245, 245, 245); border-left: 1px solid rgba(5,5,5,0.06);"
+          style="width: 400px; height: 100%; display: flex; top: 0px; right: 0px; position: absolute; font-family: "Open Sans", sans-serif; box-sizing: border-box; background: rgb(245, 245, 245); border-left: 1px solid rgba(5, 5, 5, 0.06);"
         >
           <div
             class="pdfme-designer-list-view"
-            style="height: 100%; display: flex; flex: 1; flex-direction: column;"
+            style="height: 100%; display: flex; flex: 1 1 0%; flex-direction: column;"
           >
             <div
               style="position: relative; min-height: 60px; display: flex; flex-shrink: 0; flex-direction: column; justify-content: center; padding: 8px 16px 0px;"
@@ -213,7 +213,7 @@ exports[`Designer snapshot 1`] = `
               />
             </div>
             <div
-              style="flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
+              style="flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
             >
               <ul
                 style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
@@ -379,13 +379,13 @@ exports[`Designer snapshot 1`] = `
       >
         <div
           class="selecto-selection rCS179bs95 pdfme-selecto"
-          style="background-color: rgb(22, 119, 255); opacity: 0.75; border-color: #91caff;"
+          style="background-color: rgb(22, 119, 255); opacity: 0.75; border-color: rgb(145, 202, 255);"
         />
         <div
           style="transform: scale(1); transform-origin: top left; height: 1px; width: 1px;"
         >
           <div
-            style="font-family: 'Roboto'; top: 30px; left: 30px; position: relative; background-image: url(data:image/png;base64,a...); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
+            style="font-family: "Roboto"; top: 30px; left: 30px; position: relative; background-image: url("data:image/png;base64,a..."); background-size: 793.700787411px 1122.5196850527px; width: 793.700787411px; height: 1122.5196850527px;"
           >
             <div
               class="ruler-container"
