@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `58a8c712` `Add TypeScript project references`
+- `45082df0` `Add Vitest foundation for common and manipulator`
 
 ## Current Status
 
@@ -20,7 +20,7 @@ Latest committed checkpoint:
   - internal package path の source 解決
   - build tsconfig の `src` 限定化
 - `Phase 1` の一部である root の Vitest / Oxlint 基盤
-- `common` / `manipulator` の Jest -> Vitest 移行
+- `common` / `manipulator` / `converter` / `schemas` の Jest -> Vitest 移行
 
 まだ未着手:
 
@@ -179,6 +179,25 @@ Latest committed checkpoint:
 - `manipulator` は image snapshot があるが、`vitest-image-snapshot` で移行可能だったため
 - `__dirname` は Vitest の ESM 実行では使えないため、先に除去が必要だったため
 
+### 10. `converter` / `schemas` の Jest -> Vitest 移行
+
+実施内容:
+
+- `packages/converter/package.json` の `test` を Vitest 実行へ変更
+- `packages/schemas/package.json` の `test` を Vitest 実行へ変更
+- `converter` / `schemas` の `package.json` から inline Jest config を削除
+- ルート `vitest.config.ts` に `converter` / `schemas` を追加
+- ルート `package.json` に `test:converter` / `test:schemas` を追加
+- ルート `lint:typecheck` / `lint:oxlint` の対象を `converter` / `schemas` まで拡張
+- `packages/schemas/__tests__/text.test.ts` の `__dirname` を `import.meta.url` ベースへ置換
+- `packages/schemas/__tests__/text.test.ts` の Jest spy をやめ、幅 1 の mocked font に置換
+
+理由:
+
+- `converter` は Jest 固有 API 依存がなく、設定差し替え中心で移行可能だったため
+- `schemas` は `text.test.ts` に ESM 非互換な `jest.spyOn(require(...))` があり、そこだけテストロジックを Vitest 向けに組み替える必要があったため
+- `lint:typecheck` / `lint:oxlint` を migration 済み package に合わせて広げることで、段階的に root 基盤を有効化できるため
+
 ## Verification Completed
 
 実行済み:
@@ -196,6 +215,8 @@ Latest committed checkpoint:
 - `npm run test --workspace packages/manipulator`
 - `npm run lint:typecheck`
 - `npm run lint:oxlint`
+- `npm run test --workspace packages/converter`
+- `npm run test --workspace packages/schemas`
 
 確認できたこと:
 
@@ -210,7 +231,9 @@ Latest committed checkpoint:
 - `ui` package は build と typecheck の分離後も単体 build が通る
 - `common` の test は Vitest で通る
 - `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
-- root の `lint:typecheck` / `lint:oxlint` は `common` / `manipulator` スコープで通る
+- `converter` の test は Vitest で通る
+- `schemas` の test は Vitest で通る
+- root の `lint:typecheck` / `lint:oxlint` は `common` / `converter` / `manipulator` / `schemas` スコープで通る
 
 ## Files Changed So Far
 
@@ -263,6 +286,7 @@ Latest committed checkpoint:
 - `packages/ui/vite.config.mts`
 - `packages/common/__tests__/dynamicTemplate.test.ts`
 - `packages/common/__tests__/helper.test.ts`
+- `packages/converter/package.json`
 - `packages/manipulator/__tests__/test-helpers.ts`
 - `packages/manipulator/__tests__/e2e/insert.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/merge.e2e.test.ts`
@@ -273,6 +297,8 @@ Latest committed checkpoint:
 - `packages/manipulator/__tests__/e2e/rotate.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/split.e2e.test.ts`
 - `packages/manipulator/vitest.setup.ts`
+- `packages/schemas/package.json`
+- `packages/schemas/__tests__/text.test.ts`
 - `.gitignore`
 - `eslint.config.mjs`
 
@@ -300,7 +326,7 @@ Latest committed checkpoint:
 補足:
 
 - `package-lock.json` 更新済み
-- `lint:typecheck` / `lint:oxlint` は現状 `common` / `manipulator` スコープ
+- `lint:typecheck` / `lint:oxlint` は現状 `common` / `converter` / `manipulator` / `schemas` スコープ
 - full repo への拡張は残 package 移行後に行う
 
 ### Priority 2: package ごとの Jest -> Vitest 移行
@@ -308,12 +334,12 @@ Latest committed checkpoint:
 完了:
 
 - `common`
+- `converter`
 - `manipulator`
+- `schemas`
 
 未実施:
 
-- `converter`
-- `schemas`
 - `generator`
 - `ui`
 - `pdf-lib`
@@ -372,10 +398,9 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `converter` と `schemas` を Jest -> Vitest 移行
-2. `generator` を続けて移行
-3. `lint:typecheck` / `lint:oxlint` の対象を段階的に広げる
-4. `ui` と `pdf-lib` は最後に回す
+1. `generator` を Jest -> Vitest 移行
+2. `lint:typecheck` / `lint:oxlint` の対象を `generator` まで広げる
+3. `ui` と `pdf-lib` は最後に回す
 
 ## Known Risks
 
@@ -389,5 +414,5 @@ Latest committed checkpoint:
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `converter` から順に進める
+- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `generator` から順に進める
 - 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと

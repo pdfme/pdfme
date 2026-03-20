@@ -19,10 +19,20 @@ const workspaceTests: Record<
     name: 'common',
     include: ['__tests__/**/*.test.ts'],
   },
+  'packages/converter': {
+    name: 'converter',
+    include: ['__tests__/**/*.test.ts'],
+    testTimeout: 30000,
+  },
   'packages/manipulator': {
     name: 'manipulator',
     include: ['__tests__/**/*.test.ts'],
     setupFiles: [path.resolve(repoRoot, 'packages/manipulator/vitest.setup.ts')],
+    testTimeout: 30000,
+  },
+  'packages/schemas': {
+    name: 'schemas',
+    include: ['__tests__/**/*.test.ts'],
     testTimeout: 30000,
   },
 };

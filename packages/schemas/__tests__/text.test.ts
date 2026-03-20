@@ -1,5 +1,6 @@
-import { readFileSync } from 'fs';
-import * as path from 'path';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Font as FontKitFont } from 'fontkit';
 import { Font, getDefaultFont } from '@pdfme/common';
 import {
@@ -15,6 +16,7 @@ import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/tex
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
 
@@ -44,30 +46,20 @@ const getTextSchema = () => {
 
 describe('getSplitPosition test with mocked font width calculations', () => {
   /**
-   * To simplify these tests we mock the widthOfTextAtSize function to return
-   * the length of the text in number of characters.
+   * To simplify these tests we use a mocked font where each glyph has width 1.
    * Therefore, setting the boxWidthInPt to 5 should result in a split after 5 characters.
    */
-
-  let widthOfTextAtSizeSpy: jest.SpyInstance<number, [string]>;
-
-  beforeAll(() => {
-    // @ts-ignore
-    widthOfTextAtSizeSpy = jest.spyOn(require('../src/text/helper'), 'widthOfTextAtSize');
-    widthOfTextAtSizeSpy.mockImplementation((text) => {
-      return text.length;
-    });
-  });
-
-  afterAll(() => {
-    widthOfTextAtSizeSpy.mockRestore();
-  });
-
-  const mockedFont: FontKitFont = {} as FontKitFont;
+  const mockedAdvanceWidth = 1000 / 12;
+  const mockedFont = {
+    unitsPerEm: 1000,
+    layout: (text: string) => ({
+      glyphs: Array.from(text, () => ({ advanceWidth: mockedAdvanceWidth })),
+    }),
+  } as unknown as FontKitFont;
   const mockCalcValues: FontWidthCalcValues = {
     font: mockedFont,
     fontSize: 12,
-    characterSpacing: 1,
+    characterSpacing: 0,
     boxWidthInPt: 5,
   };
 
@@ -277,7 +269,7 @@ describe('calculateDynamicFontSize with Default font', () => {
 describe('calculateDynamicFontSize with Custom font', () => {
   let fontKitFont: FontKitFont;
   beforeAll(async () => {
-    fontKitFont = await getFontKitFont('SauceHanSansJP',  getSampleFont(), new Map());
+    fontKitFont = await getFontKitFont('SauceHanSansJP', getSampleFont(), new Map());
   });
 
 
