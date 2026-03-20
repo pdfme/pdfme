@@ -1,48 +1,27 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,
-    "target": "ES2020",
     "jsx": "react",
-    "esModuleInterop": true,
-    "isolatedModules": true,
     "declaration": true,
     "declarationDir": "dist/types",
     "module": "ESNext",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
     "moduleResolution": "bundler",
+    "noImplicitAny": true,
+    "target": "ES2020",
+    "esModuleInterop": true,
+    "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": ["jest"],
-    "typeRoots": [
-      "../node_modules/@types",
-      "./node_modules/@types",
-      "../../node_modules/@types"
-    ],
+    "typeRoots": ["../node_modules/@types", "./node_modules/@types", "../../node_modules/@types"],
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@pdfme/common": [
-        "packages/common/dist/esm/src"
-      ],
-      "@pdfme/schemas": [
-        "packages/schemas/dist/esm/src"
-      ]
+      "@pdfme/common": ["../common/dist/esm/src"],
+      "@pdfme/schemas": ["../schemas/dist/esm/src"],
+      "@pdfme/schemas/utils": ["../schemas/dist/esm/src/utils"]
     },
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "__tests__/**/*.ts",
-    "__tests__/**/*.tsx"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -27,8 +27,8 @@
   "scripts": {
     "dev": "run-p devBuild:watch devBuildType:watch",
     "devBuild:watch": "esbuild src/index.ts --bundle --outfile=dist/index.es.js --format=esm --watch",
-    "devBuildType:watch": "tsc --emitDeclarationOnly --watch",
-    "build": "vite build && tsc --emitDeclarationOnly",
+    "devBuildType:watch": "tsc -b tsconfig.typecheck.json --watch",
+    "build": "vite build && tsc -b tsconfig.typecheck.json",
     "clean": "rimraf dist",
     "lint": "eslint --ext .ts,.tsx src --config eslint.config.mjs",
     "test": "jest",

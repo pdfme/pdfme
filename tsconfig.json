@@ -1,0 +1,12 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/pdf-lib" },
+    { "path": "packages/common" },
+    { "path": "packages/converter" },
+    { "path": "packages/schemas" },
+    { "path": "packages/generator" },
+    { "path": "packages/manipulator" },
+    { "path": "packages/ui/tsconfig.typecheck.json" }
+  ]
+}

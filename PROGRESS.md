@@ -2,14 +2,27 @@
 
 Last updated: 2026-03-20 JST
 
+Latest committed checkpoint:
+
+- `0d0f89f1` `Prepare ESM migration groundwork`
+
 ## Current Status
 
 `PLAN.md` のうち、まず安全に着手できる `Phase 0` と playground 周辺のブロッカー解消を実装済み。
 
+今回までで完了:
+
+- `Phase 0` の互換性方針と migration guide の整備
+- playground の public export 化と Node playground の ESM 化
+- `Phase 1` の前提となる TypeScript typecheck 基盤
+  - ルート `tsconfig.json`
+  - package references
+  - internal package path の source 解決
+  - build tsconfig の `src` 限定化
+
 まだ未着手:
 
 - `Phase 1` の本体である Vite / Vitest / Oxlint への全面移行
-- ルート `tsconfig.json` + project references + `composite` 化
 - Jest 依存の package ごとの移行
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
@@ -95,6 +108,28 @@ Last updated: 2026-03-20 JST
 - `playground/node-playground/merge.js` を public export 経由で動かすと、
   既存の export 条件では browser/esm 側へ寄って `@pdfme/pdf-lib` の named export 解決に失敗していたため
 
+### 7. Phase 1: TypeScript typecheck 基盤
+
+実施内容:
+
+- ルート `tsconfig.json` を追加して solution style references を定義
+- ルート `package.json` に `typecheck` script を追加
+- `tsconfig.base.json` に internal package 用の `baseUrl` / `paths` を追加
+- `tsconfig.base.json` から `jest` 型を削除
+- 各 package の `tsconfig.json` を typecheck 用 `composite` project に変更
+- `common` / `converter` / `schemas` / `generator` / `manipulator` / `pdf-lib` は
+  `dist/typecheck` へ declaration-only 出力する構成に変更
+- `ui` は build 用 `tsconfig.json` と typecheck 用 `tsconfig.typecheck.json` を分離
+- 各 build 用 `tsconfig.*.json` を `src` 限定に変更し、`__tests__` が build 出力へ混ざらないよう修正
+- `packages/ui/vite.config.mts` に internal package alias を追加して clean build 後でも source 解決できるように修正
+- `.gitignore` に `*.tsbuildinfo` を追加
+
+理由:
+
+- clean checkout で package 間型解決が壊れない状態を先に作るため
+- 既存 build が `__tests__` を `dist` に吐いていたため、その副作用を止めるため
+- `ui` は build 設定と typecheck 設定の責務を分けないと declaration build と references が衝突するため
+
 ## Verification Completed
 
 実行済み:
@@ -105,6 +140,9 @@ Last updated: 2026-03-20 JST
 - `cd playground/node-playground && node merge.js`
 - `cd playground && node --check scripts/generate-templates-thumbnail.mjs`
 - `cd packages/common && node set-version.cjs`
+- `npm run typecheck`
+- `npm run -w packages/ui build`
+- `npm run build`
 
 確認できたこと:
 
@@ -114,6 +152,9 @@ Last updated: 2026-03-20 JST
 - `merge.js` も `manipulator` の export 修正後に動作する
 - `generate-templates-thumbnail.mjs` は syntax check を通る
 - `set-version.cjs` は期待どおり `src/version.ts` を更新できる
+- `tsc -b` ベースの root typecheck が通る
+- ルート build が通る
+- `ui` package は build と typecheck の分離後も単体 build が通る
 
 ## Files Changed So Far
 
@@ -132,6 +173,36 @@ Last updated: 2026-03-20 JST
 - `website/docs/migration-v6.md`
 - `website/i18n/ja/docusaurus-plugin-content-docs/current/development-guide.md`
 - `website/i18n/ja/docusaurus-plugin-content-docs/current/migration-v6.md`
+- `package.json`
+- `tsconfig.base.json`
+- `tsconfig.json`
+- `packages/common/tsconfig.cjs.json`
+- `packages/common/tsconfig.esm.json`
+- `packages/common/tsconfig.json`
+- `packages/common/tsconfig.node.json`
+- `packages/converter/tsconfig.cjs.json`
+- `packages/converter/tsconfig.esm.json`
+- `packages/converter/tsconfig.json`
+- `packages/generator/tsconfig.cjs.json`
+- `packages/generator/tsconfig.esm.json`
+- `packages/generator/tsconfig.json`
+- `packages/generator/tsconfig.node.json`
+- `packages/manipulator/tsconfig.cjs.json`
+- `packages/manipulator/tsconfig.esm.json`
+- `packages/manipulator/tsconfig.json`
+- `packages/pdf-lib/tsconfig.cjs.json`
+- `packages/pdf-lib/tsconfig.esm.json`
+- `packages/pdf-lib/tsconfig.json`
+- `packages/pdf-lib/tsconfig.node.json`
+- `packages/schemas/tsconfig.cjs.json`
+- `packages/schemas/tsconfig.esm.json`
+- `packages/schemas/tsconfig.json`
+- `packages/schemas/tsconfig.node.json`
+- `packages/ui/package.json`
+- `packages/ui/tsconfig.json`
+- `packages/ui/tsconfig.typecheck.json`
+- `packages/ui/vite.config.mts`
+- `.gitignore`
 
 削除:
 
@@ -144,26 +215,11 @@ Last updated: 2026-03-20 JST
 
 ## Remaining Work
 
-### Priority 1: Phase 1 の設計を実装可能な単位へ落とす
-
-次に着手すべき内容:
-
-1. ルート `tsconfig.json` を追加
-2. 各 package の `tsconfig.json` を `composite` + `references` ベースへ整理
-3. `tsconfig.base.json` から `jest` 型を外す
-4. package 間の型解決が clean checkout で成立する形へ揃える
-
-注意:
-
-- ここを固める前に `vitest` や `vite` の build scripts へ大きく切り替えると破綻しやすい
-- 特に `generator` / `ui` の path 解決が現状のボトルネック
-
-### Priority 2: ルートレベルの新基盤導入
+### Priority 1: ルートレベルの新基盤導入
 
 未実施:
 
 - ルート `package.json` の scripts 再編
-- `typecheck` 追加
 - `vitest.config.ts` 追加
 - `eslint.typecheck.config.mjs` 追加
 - `vite` / `vitest` / `oxlint` 依存追加
@@ -173,7 +229,7 @@ Last updated: 2026-03-20 JST
 - この段階では `package-lock.json` の更新が発生する
 - `vitest` / `oxlint` はまだ install していない
 
-### Priority 3: package ごとの Jest -> Vitest 移行
+### Priority 2: package ごとの Jest -> Vitest 移行
 
 未実施:
 
@@ -201,7 +257,7 @@ Last updated: 2026-03-20 JST
 - CommonJS mock file
 - alias / mapper
 
-### Priority 4: package build の Vite 化
+### Priority 3: package build の Vite 化
 
 未実施:
 
@@ -210,7 +266,7 @@ Last updated: 2026-03-20 JST
 - `converter` の browser/node dual entry 整理
 - `schemas` の multi-entry 対応
 
-### Priority 5: playground の残件
+### Priority 4: playground の残件
 
 未実施:
 
@@ -224,7 +280,7 @@ Last updated: 2026-03-20 JST
 - package root 参照化は完了
 - ただし `Phase 1` で package exports を大きく変える場合は再確認が必要
 
-### Priority 6: CLI / Skills
+### Priority 5: CLI / Skills
 
 未着手:
 
@@ -241,11 +297,11 @@ Last updated: 2026-03-20 JST
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. ルート `tsconfig.json` を追加
-2. 各 package を `composite` + `references` に寄せる
-3. `tsconfig.base.json` の `jest` 型依存を外す
-4. clean build 前提で `tsc -b` が通る状態を作る
-5. その後に `vitest` / `oxlint` / `vite` へ進む
+1. `vite` / `vitest` / `oxlint` を root に追加
+2. `vitest.config.ts` と `eslint.typecheck.config.mjs` を追加
+3. `common` と `manipulator` から Jest -> Vitest を移行
+4. その後に `converter` / `schemas` / `generator` を進める
+5. `ui` と `pdf-lib` は最後に回す
 
 ## Known Risks
 
@@ -253,6 +309,7 @@ Last updated: 2026-03-20 JST
 - `pdf-lib` と `ui` の test migration は別途まとまった工数が必要
 - `converter` は browser/node entry と `pdfjs-dist` 更新が絡むため、単独で切り出して進めたほうが安全
 - `playground` は package exports の変更に追従確認が必要
+- `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
 
 ## Notes For Next Turn
 

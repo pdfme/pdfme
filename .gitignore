@@ -6,6 +6,7 @@
 .cache
 dist
 coverage/
+*.tsbuildinfo
 
 **/repomix-output.{txt,xml}
 

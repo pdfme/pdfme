@@ -5,5 +5,6 @@
     "moduleResolution": "node",
     "outDir": "./dist/cjs",
     "skipLibCheck": true
-  }
+  },
+  "include": ["src/**/*.ts"]
 }

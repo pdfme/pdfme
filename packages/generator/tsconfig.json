@@ -1,18 +1,16 @@
 {
-  "extends": "./tsconfig.esm",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@pdfme/common": [
-        "packages/common/dist/esm/src"
-      ],
-      "@pdfme/schemas": [
-        "packages/schemas/dist/esm/src"
-      ],
-      "@pdfme/schemas/utils": [
-        "packages/schemas/dist/esm/src/utils"
-      ]
-    }
+    "composite": true,
+    "declaration": true,
+    "declarationDir": "./dist/typecheck",
+    "emitDeclarationOnly": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/typecheck",
+    "tsBuildInfoFile": "./dist/typecheck/tsconfig.tsbuildinfo",
+    "skipLibCheck": true
   },
+  "include": ["src/**/*.ts"],
+  "references": [{ "path": "../common" }, { "path": "../pdf-lib" }, { "path": "../schemas" }]
 }
