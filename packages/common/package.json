@@ -57,6 +57,14 @@
     "antd": "^5.11.2",
     "form-render": "^2.2.20"
   },
+  "peerDependenciesMeta": {
+    "antd": {
+      "optional": true
+    },
+    "form-render": {
+      "optional": true
+    }
+  },
   "jest": {
     "resolver": "ts-jest-resolver",
     "moduleFileExtensions": [
