@@ -62,6 +62,7 @@ import {
   isHexValid,
   getInputFromTemplate,
   isBlankPdf,
+  isUrlSafeToFetch,
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
@@ -100,6 +101,7 @@ export {
   checkDesignerProps,
   checkGenerateProps,
   pluginRegistry,
+  isUrlSafeToFetch,
 };
 
 export type {

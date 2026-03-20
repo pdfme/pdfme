@@ -61,14 +61,14 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
       /^(rgb|hsl)a?\(\s*([+-]?\d+%?\s*,\s*){2,3}[+-]?\d+%?\s*\)$/i.test(colorValue);
     const safeColorValue = isValidColor ? colorValue : '#168fe3';
 
-    // Use safe string concatenation for innerHTML
     const typingInstructions = i18n('schemas.mvt.typingInstructions');
     const sampleField = i18n('schemas.mvt.sampleField');
-    para.innerHTML =
-      typingInstructions +
-      ` <code style="color:${safeColorValue}; font-weight:bold;">{` +
-      sampleField +
-      '}</code>';
+    para.appendChild(document.createTextNode(typingInstructions + ' '));
+    const codeEl = document.createElement('code');
+    codeEl.style.color = safeColorValue;
+    codeEl.style.fontWeight = 'bold';
+    codeEl.textContent = `{${sampleField}}`;
+    para.appendChild(codeEl);
     rootElement.appendChild(para);
   }
 };
