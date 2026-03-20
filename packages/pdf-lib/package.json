@@ -33,7 +33,7 @@
   "exports": {
     ".": {
       "import": {
-        "node": "./dist/node/src/index.js",
+        "node": "./dist/node/index.mjs",
         "default": "./dist/esm/src/index.js"
       },
       "require": "./dist/cjs/src/index.js",
@@ -42,7 +42,7 @@
   },
   "scripts": {
     "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "run-p build:cjs build:esm build:node",
+    "build": "run-p build:cjs build:esm build:node && node write-node-esm-wrapper.cjs",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",

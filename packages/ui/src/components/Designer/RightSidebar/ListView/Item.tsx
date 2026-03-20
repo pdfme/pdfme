@@ -46,7 +46,6 @@ interface Props {
 // Using React.memo and forwardRef for optimized rendering
 // Using TypeScript interface for prop validation instead of PropTypes
 const Item = React.memo(
-  /* eslint-disable react/prop-types */
   React.forwardRef<HTMLLIElement, Props>(function Item(
     {
       icon,
@@ -73,7 +72,6 @@ const Item = React.memo(
     },
     ref,
   ) {
-    /* eslint-enable react/prop-types */
     const i18n = useContext(I18nContext);
 
     useEffect(() => {

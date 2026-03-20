@@ -20,7 +20,7 @@ class CustomFontEmbedder {
     customName?: string,
     fontFeatures?: TypeFeatures,
   ) {
-    const font = await fontkit.create(fontData);
+    const font = fontkit.create(fontData);
     return new CustomFontEmbedder(font, fontData, customName, fontFeatures);
   }
 

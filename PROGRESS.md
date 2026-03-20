@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `ef0e60c8` `Fix clean typecheck and upgrade converter renderer`
+- `fe08c521` `Fix browser worker entry and refresh generator snapshots`
 
 ## Current Status
 
@@ -27,24 +27,25 @@ Latest committed checkpoint:
 - `generator` image snapshot の再基準化
 - `pdfjs-dist` v5 系に合わせた browser worker entry の修正
 - `pdfjs-dist` / `canvas` 更新後の root build 再通過
+- type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
+- `@pdfme/pdf-lib` の Node ESM named import 修正
 
 まだ未着手:
 
-- type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
 
 現在の残課題:
 
-- type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
-- `@pdfme/pdf-lib` の Node ESM import 条件の整理
 - package build の Vite 化と exports 再設計
+- lint warning の整理
+- playground 側の exports 変更追従確認
 
 次に進める順序:
 
-1. `pdf-lib` / `ui` まで `lint:typecheck` / `lint:oxlint` の対象を広げる
-2. `@pdfme/pdf-lib` の Node ESM import 条件を整理する
-3. package build の Vite 化と exports 再設計に入る
+1. package build の Vite 化と exports 再設計に入る
+2. lint warning を段階的に整理する
+3. playground 側の exports 追従確認を行う
 
 ## Completed Work
 
@@ -336,6 +337,33 @@ Latest committed checkpoint:
 - `pdfjs-dist` v5 では `pdf.worker.entry.js` が存在せず、`ui` build が browser worker import 解決エラーで落ちていたため
 - Node 側不具合解消後に generator の落ち方が runtime error から画像差分へ変わったため、renderer 変更を受け入れる snapshot 更新が必要だったため
 
+### 18. `pdf-lib` / `ui` への type-aware lint / oxlint 拡張
+
+実施内容:
+
+- root `package.json` の `lint:typecheck` / `lint:oxlint` に `packages/pdf-lib/src` と `packages/ui/src` を追加
+- `eslint.typecheck.config.mjs` を `PLAN.md` 準拠の型認識ルール専用構成へ整理
+- `@typescript-eslint/await-thenable` に反していた `pdf-lib` の不要な `await` を削除
+- `packages/ui/src/components/Designer/RightSidebar/ListView/Item.tsx` の古い `react/prop-types` disable を削除
+
+理由:
+
+- `PLAN.md` の方針では type-aware lint は `no-floating-promises` / `no-misused-promises` / `await-thenable` のみを ESLint で担う想定で、`recommended-requiring-type-checking` 全量を当てる想定ではなかったため
+- その方針に戻すことで、既存 package の大規模な unrelated lint error を出さずに `pdf-lib` / `ui` まで適用対象を広げられるため
+
+### 19. `@pdfme/pdf-lib` の Node ESM named import 修正
+
+実施内容:
+
+- `packages/pdf-lib/package.json` の `exports.import.node` を `./dist/node/index.mjs` へ変更
+- `packages/pdf-lib/write-node-esm-wrapper.cjs` を追加し、build 後に CJS export を再公開する ESM wrapper を自動生成
+- `node --input-type=module -e "import { PDFDocument } from '@pdfme/pdf-lib'"` が通ることを確認
+
+理由:
+
+- 既存の `dist/node/src/index.js` は CommonJS 出力のため、Node ESM から package root を named import すると `Named export not found` で失敗していたため
+- `dist/esm` をそのまま Node ESM に向けると extensionless directory import で壊れるため、CJS 上に薄い `.mjs` wrapper を置く方が安全だったため
+
 ## Verification Completed
 
 実行済み:
@@ -361,6 +389,8 @@ Latest committed checkpoint:
 - `npm run test --workspace packages/generator`
 - `npm run test:update-snapshots --workspace packages/generator`
 - `npm run -w packages/ui build`
+- `npm run -w packages/pdf-lib build`
+- `node --input-type=module -e "import { PDFDocument } from '@pdfme/pdf-lib'; console.log(typeof PDFDocument);"`
 
 確認できたこと:
 
@@ -379,12 +409,13 @@ Latest committed checkpoint:
 - `converter` の test は Vitest で通る
 - `schemas` の test は Vitest で通る
 - `pdf-lib` の test は Vitest で通る
-- root の `lint:typecheck` / `lint:oxlint` は `common` / `converter` / `generator` / `manipulator` / `schemas` スコープで通る
+- root の `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` スコープで通る
 - generator の test 実行は local font asset 化により network 非依存になった
 - `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` でも unit test が通る
 - `generator` は `pdf2img failed: Image or Canvas expected` では落ちなくなり、snapshot 更新後に test が再度通る
 - `ui` build は `pdfjs-dist/webpack.mjs` への切り替え後に通る
 - root build も `pdfjs-dist` / `canvas` 更新後の状態で再度通る
+- `@pdfme/pdf-lib` は Node ESM から package root の named import が通る
 
 ## Files Changed So Far
 
@@ -466,16 +497,20 @@ Latest committed checkpoint:
 - `packages/manipulator/__tests__/e2e/split.e2e.test.ts`
 - `packages/manipulator/vitest.setup.ts`
 - `packages/pdf-lib/package.json`
+- `packages/pdf-lib/write-node-esm-wrapper.cjs`
 - `packages/pdf-lib/__tests__/api/PDFDocument.spec.ts`
 - `packages/pdf-lib/__tests__/api/form/PDFForm.spec.ts`
 - `packages/pdf-lib/__tests__/core/parser/PDFObjectParser.spec.ts`
 - `packages/pdf-lib/__tests__/core/parser/PDFParser.spec.ts`
+- `packages/pdf-lib/src/core/embedders/CustomFontEmbedder.ts`
+- `packages/pdf-lib/src/core/embedders/CustomFontSubsetEmbedder.ts`
 - `packages/schemas/package.json`
 - `packages/schemas/__tests__/text.test.ts`
 - `packages/schemas/src/barcodes/types.ts`
 - `packages/schemas/src/multiVariableText/types.ts`
 - `packages/schemas/src/tables/types.ts`
 - `packages/schemas/src/text/types.ts`
+- `packages/ui/src/components/Designer/RightSidebar/ListView/Item.tsx`
 - `.gitignore`
 - `eslint.config.mjs`
 
@@ -504,8 +539,8 @@ Latest committed checkpoint:
 補足:
 
 - `package-lock.json` 更新済み
-- `lint:typecheck` / `lint:oxlint` は現状 `common` / `converter` / `generator` / `manipulator` / `schemas` スコープ
-- full repo への拡張は残 package 移行後に行う
+- `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` に適用済み
+- warning は残るが、error は解消済み
 
 ### Priority 2: package ごとの Jest -> Vitest 移行
 
@@ -559,9 +594,9 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `pdf-lib` / `ui` を `lint:typecheck` / `lint:oxlint` の対象へ追加する
-2. `@pdfme/pdf-lib` の Node ESM import 条件を整理する
-3. `PLAN.md` の `Phase 1` 残件として package build の Vite 化へ進む
+1. `PLAN.md` の `Phase 1` 残件として package build の Vite 化へ進む
+2. package `exports` を Vite 出力前提で整理する
+3. lint warning と playground 追従確認を消化する
 
 ## Known Risks
 
@@ -569,11 +604,11 @@ Latest committed checkpoint:
 - `converter` は browser/node entry と `pdfjs-dist` 更新が絡むため、単独で切り出して進めたほうが安全
 - `playground` は package exports の変更に追従確認が必要
 - `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
-- `lint:typecheck` を full repo に広げると既存 package 由来の大量エラーが出るため、package migration とセットで広げること
+- `lint:typecheck` は `PLAN.md` 準拠の最小ルールで全 package に適用済みだが、unused eslint-disable などの warning は残っている
 - `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
 - `pdfjs-dist` / `canvas` 更新により generator の image snapshot は既に再基準化済みであり、今後の差分確認は旧 baseline 前提で見ないこと
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、`pdf-lib` / `ui` の lint 対象拡張から進める
+- 次回はこの `PROGRESS.md` を読み、package build の Vite 化から進める
 - 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと

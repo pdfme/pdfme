@@ -60,8 +60,8 @@
     "test:ui": "npm run -w packages/ui test",
     "test:ui:update-snapshots": "npm run -w packages/ui test -- -u",
     "lint": "npm run lint --workspaces",
-    "lint:typecheck": "eslint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/schemas/src --ext .ts,.tsx --config eslint.typecheck.config.mjs",
-    "lint:oxlint": "oxlint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/schemas/src",
+    "lint:typecheck": "eslint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --ext .ts,.tsx --config eslint.typecheck.config.mjs",
+    "lint:oxlint": "oxlint packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src",
     "prettier": "npm run prettier --workspaces"
   },
   "devDependencies": {

@@ -16,7 +16,7 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
     customFontName?: string,
     fontFeatures?: TypeFeatures,
   ) {
-    const font = await fontkit.create(fontData);
+    const font = fontkit.create(fontData);
     return new CustomFontSubsetEmbedder(font, fontData, customFontName, fontFeatures);
   }
 
