@@ -5,7 +5,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
-    "types": ["jest"],
     "typeRoots": ["../node_modules/@types", "./node_modules/@types", "../../node_modules/@types"],
     "skipLibCheck": true
   },

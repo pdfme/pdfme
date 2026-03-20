@@ -1,13 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["node", "vitest/globals"],
-    "baseUrl": ".",
-    "paths": {
-      "@pdfme/common": ["../packages/common/src/index.ts"],
-      "@pdfme/converter": ["../packages/converter/src/index.node.ts"],
-      "@pdfme/pdf-lib": ["../packages/pdf-lib/src/index.ts"]
-    }
+    "types": ["node", "vitest/globals"]
   },
   "include": ["e2e", "vitest.setup.ts"]
 }

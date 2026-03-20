@@ -33,7 +33,6 @@ export default [
         window: 'readonly',
         document: 'readonly',
         process: 'readonly',
-        jest: 'readonly',
         vi: 'readonly',
         describe: 'readonly',
         test: 'readonly',

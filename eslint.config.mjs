@@ -21,7 +21,6 @@ export default [
         // Node globals
         process: 'readonly',
         // Test runner globals
-        jest: 'readonly',
         vi: 'readonly',
         describe: 'readonly',
         test: 'readonly',

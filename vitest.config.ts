@@ -67,27 +67,14 @@ const workspaceTests: Record<
 };
 
 const selectedWorkspace = workspaceTests[workspacePath];
+const usePublishedPdfmeExports = workspacePath === 'playground';
 const converterReplacement =
   workspacePath === 'packages/ui'
     ? path.resolve(repoRoot, 'packages/ui/__mocks__/converter.ts')
     : path.resolve(repoRoot, 'packages/converter/src/index.node.ts');
-const testConfig = {
-  name: selectedWorkspace?.name ?? 'root',
-  root: workspaceRoot,
-  globals: true,
-  pool: 'forks' as const,
-  passWithNoTests: !selectedWorkspace,
-  include: selectedWorkspace?.include ?? [],
-  setupFiles: selectedWorkspace?.setupFiles,
-  testTimeout: selectedWorkspace?.testTimeout,
-  hookTimeout: selectedWorkspace?.hookTimeout,
-  fileParallelism: selectedWorkspace?.fileParallelism,
-  ...(selectedWorkspace?.environment ? { environment: selectedWorkspace.environment } : {}),
-};
-
-export default defineConfig({
-  resolve: {
-    alias: [
+const pdfmeAliases = usePublishedPdfmeExports
+  ? []
+  : [
       {
         find: '@pdfme/schemas/utils',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/utils.ts'),
@@ -116,6 +103,25 @@ export default defineConfig({
         find: '@pdfme/schemas',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/index.ts'),
       },
+    ];
+const testConfig = {
+  name: selectedWorkspace?.name ?? 'root',
+  root: workspaceRoot,
+  globals: true,
+  pool: 'forks' as const,
+  passWithNoTests: !selectedWorkspace,
+  include: selectedWorkspace?.include ?? [],
+  setupFiles: selectedWorkspace?.setupFiles,
+  testTimeout: selectedWorkspace?.testTimeout,
+  hookTimeout: selectedWorkspace?.hookTimeout,
+  fileParallelism: selectedWorkspace?.fileParallelism,
+  ...(selectedWorkspace?.environment ? { environment: selectedWorkspace.environment } : {}),
+};
+
+export default defineConfig({
+  resolve: {
+    alias: [
+      ...pdfmeAliases,
       {
         find: /^antd\/es\//,
         replacement: 'antd/lib/',

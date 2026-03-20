@@ -49,6 +49,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint (Oxlint)
+        run: npm run lint:oxlint
+
+      - name: Lint (Type-Aware)
+        run: npm run lint:typecheck
+
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Set NPM version
         run: npm version --no-git-tag-version $VERSION --workspaces
 
@@ -79,11 +88,14 @@ jobs:
           npm ci
           npm run build
 
-      - name: Run playground tests
+      - name: Install playground dependencies
         run: |
-          cd playground
-          npm install
-          npm run build
-          npm run test
+          npm ci --prefix playground
+
+      - name: Run playground checks
+        run: |
+          npm run lint:playground
+          npm run build:playground
+          npm run test:playground
         env:
           CI: true

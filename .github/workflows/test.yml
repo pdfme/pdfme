@@ -9,14 +9,17 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
+      - run: npm ci
+      - run: npm run lint:oxlint
+      - run: npm run lint:typecheck
+      - run: npm run typecheck
       - run: npm run build
       - run: npm run lint
       - run: npm run test
@@ -29,23 +32,24 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install dependencies and build project
+      - name: Install workspace dependencies and build packages
         run: |
-          npm install
+          npm ci
           npm run build
-      - name: Run playground tests
+      - name: Install playground dependencies
         run: |
-          cd playground
-          npm install
-          npm run lint
-          npm run build
-          npm run test
+          npm ci --prefix playground
+      - name: Run playground checks
+        run: |
+          npm run lint:playground
+          npm run build:playground
+          npm run test:playground
         env:
           CI: true

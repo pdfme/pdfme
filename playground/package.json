@@ -11,9 +11,10 @@
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
     "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
-    "test": "node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts",
-    "test:update-snapshots": "node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts -u",
-    "test:local": "LOCAL=true node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts"
+    "test:exports": "node scripts/verify-package-exports.mjs",
+    "test": "npm run test:exports && node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts",
+    "test:update-snapshots": "npm run test:exports && node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts -u",
+    "test:local": "npm run test:exports && LOCAL=true node ../node_modules/vitest/vitest.mjs run --config ../vitest.config.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -46,14 +47,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "gh-pages": "^6.0.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "jest-image-snapshot": "^6.4.0",
     "postcss": "^8.4.49",
     "puppeteer": "^24.3.0",
     "tailwindcss": "^3.4.17",
-    "ts-jest": "^29.2.6",
-    "ts-node": "^10.9.1",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"
   }

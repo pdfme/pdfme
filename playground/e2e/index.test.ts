@@ -82,6 +82,24 @@ async function waitForPreviewUrl(
   });
 }
 
+function stopPreviewProcess(previewProcess: ChildProcessWithoutNullStreams | undefined) {
+  if (!previewProcess?.pid) {
+    return;
+  }
+
+  if (previewProcess.exitCode !== null || previewProcess.signalCode !== null) {
+    return;
+  }
+
+  try {
+    process.kill(-previewProcess.pid);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ESRCH') {
+      throw error;
+    }
+  }
+}
+
 let baseUrl = 'http://127.0.0.1:4173';
 const timeout = 40000;
 
@@ -190,9 +208,7 @@ describe('Playground E2E Tests', () => {
     if (browser && !isRunningLocal) {
       await browser.close();
     }
-    if (previewProcess && previewProcess.pid) {
-      process.kill(-previewProcess.pid);
-    }
+    stopPreviewProcess(previewProcess);
   });
 
   it('should select Invoice template and compare PDF snapshot', async () => {

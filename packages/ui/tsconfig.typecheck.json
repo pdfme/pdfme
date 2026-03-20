@@ -10,7 +10,6 @@
     "moduleResolution": "bundler",
     "outDir": "dist/typecheck",
     "tsBuildInfoFile": "dist/typecheck/tsconfig.tsbuildinfo",
-    "types": ["jest"],
     "typeRoots": ["../node_modules/@types", "./node_modules/@types", "../../node_modules/@types"],
     "skipLibCheck": true
   },

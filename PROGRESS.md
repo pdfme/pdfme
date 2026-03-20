@@ -8,7 +8,7 @@ Latest committed checkpoint:
 
 ## Current Status
 
-`PLAN.md` のうち、まず安全に着手できる `Phase 0` と playground 周辺のブロッカー解消を実装済み。
+`PLAN.md` のうち、`Phase 0` と `Phase 1` を完了。次の主作業は `Phase 2` (`@pdfme/cli`)。
 
 今回までで完了:
 
@@ -49,6 +49,14 @@ Latest committed checkpoint:
 - `pdfjs-dist` v5 browser worker の `hashOriginal.toHex` 回帰を local worker wrapper で吸収
 - `playground` の E2E test runner を Jest から Vitest へ移行
 - `@pdfme/converter` の一時的な CJS 後退を撤回し、ESM-only 方針へ復帰
+- `playground` の Vitest / TS 側 source alias を外し、`@pdfme/*` を package exports 経由で解決するよう整理
+- `playground` に package exports smoke check を追加し、E2E 実行前に必ず走るようにした
+- `playground` の direct devDependencies から legacy Jest / `ts-jest` / `ts-node` を撤去し、lockfile を整理
+- root / `ui` 側の legacy Jest devDependencies・`jest` globals・`types: ["jest"]` を撤去
+- `ui` の Vitest setup を local canvas mock ベースへ整理し、`jest-canvas-mock` / `jest-environment-jsdom` / `@ungap/structured-clone` 依存を撤去
+- package-local ESLint の project 解決を `tsconfig.json` ベースへ統一し、不要になった `tsconfig.cjs.json` / `tsconfig.esm.json` / `tsconfig.node.json` を削除
+- CI workflow を `npm ci` と root scripts ベースへ整理し、`lint:oxlint` / `lint:typecheck` / `typecheck` を明示実行するよう更新
+- root の `npm run build` / `npm run test` と playground の `npm run build` / `npm run test` が通ることを確認
 
 まだ未着手:
 
@@ -57,17 +65,13 @@ Latest committed checkpoint:
 
 現在の残課題:
 
-- playground 側の exports 変更追従確認
-- playground Vitest E2E の安定化継続
-  - preview port drift による誤接続は修正済み
-  - 最新差分の再検証は次ターンへ持ち越し
-- playground 側の legacy test dependency / lockfile 整理
+- CLI (`Phase 2`) 未着手
+- Claude Code Skills (`Phase 3`) 未着手
 
 次に進める順序:
 
-1. playground 側の exports 追従確認を広げる
-2. playground 側の legacy test dependency / lockfile 整理に入る
-3. CLI (`Phase 2`) の前提整理に着手する
+1. CLI (`Phase 2`) の前提整理に着手する
+2. Claude Code Skills (`Phase 3`) の設計に入る
 
 ## Completed Work
 
