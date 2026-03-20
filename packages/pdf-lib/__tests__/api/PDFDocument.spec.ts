@@ -489,7 +489,7 @@ describe(`PDFDocument`, () => {
         pdfDoc.setTitle('Unit Test');
       };
 
-      await expect(noErrorFunc()).resolves.not.toThrowError();
+      await expect(noErrorFunc()).resolves.not.toThrow();
     });
   });
 
@@ -524,7 +524,7 @@ describe(`PDFDocument`, () => {
         expect(pdfBytes3.byteLength).not.toEqual(pdfBytes2.byteLength);
       };
 
-      await expect(noErrorFunc()).resolves.not.toThrowError();
+      await expect(noErrorFunc()).resolves.not.toThrow();
     });
   });
 
