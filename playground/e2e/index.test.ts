@@ -232,6 +232,8 @@ describe('Playground E2E Tests', () => {
       return container ? container.textContent?.includes('Pet Name') : false;
     }, { timeout });
 
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     // 7. Screenshot & compare
     await captureAndCompareScreenshot(page, 'pedigree-designer');
 

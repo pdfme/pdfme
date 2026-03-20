@@ -7,6 +7,23 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const pdfjsWorkerCompatBanner = [
+  'const pdfmeUint8ArrayPrototype = Uint8Array.prototype;',
+  'if (!pdfmeUint8ArrayPrototype.toHex) {',
+  "  Object.defineProperty(Uint8Array.prototype, 'toHex', {",
+  '    configurable: true,',
+  '    value() {',
+  "      let result = '';",
+  '      for (let i = 0; i < this.length; i += 1) {',
+  '        const hex = this[i].toString(16);',
+  '        result += hex.length === 1 ? `0${hex}` : hex;',
+  '      }',
+  '      return result;',
+  '    },',
+  '    writable: true,',
+  '  });',
+  '}',
+].join('\n');
 
 export default defineConfig(({ mode }) => {
   return {
@@ -45,6 +62,11 @@ export default defineConfig(({ mode }) => {
     },
     worker: {
       format: 'es',
+      rollupOptions: {
+        output: {
+          banner: pdfjsWorkerCompatBanner,
+        },
+      },
     },
   };
 });

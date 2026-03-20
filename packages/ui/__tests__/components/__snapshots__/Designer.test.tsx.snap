@@ -213,7 +213,7 @@ exports[`Designer snapshot 1`] = `
               />
             </div>
             <div
-              style="flex: 1 1 0%; min-height: 0px; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
+              style="flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 8px 16px;"
             >
               <ul
                 style="margin: 0px; padding: 0px; list-style: none; border-radius: 5px;"
@@ -226,7 +226,7 @@ exports[`Designer snapshot 1`] = `
                   >
                     <button
                       class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                      style="display: flex; align-items: center; background: none; box-shadow: none; border: medium; padding-left: 0.25rem;"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                       type="button"
                     >
                       <span
@@ -285,7 +285,7 @@ exports[`Designer snapshot 1`] = `
                   >
                     <button
                       class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
-                      style="display: flex; align-items: center; background: none; box-shadow: none; border: medium; padding-left: 0.25rem;"
+                      style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                       type="button"
                     >
                       <span
@@ -353,7 +353,7 @@ exports[`Designer snapshot 1`] = `
                 aria-live="assertive"
                 id="2"
                 role="status"
-                style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px); clip-path: inset(100%); white-space: nowrap;"
+                style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
               />
             </div>
             <div
@@ -552,11 +552,11 @@ exports[`Designer snapshot 1`] = `
                   style="height: 100%; width: 100%;"
                 >
                   <div
-                    style="padding: 0px; resize: none; background-color: transparent; border: medium; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
+                    style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
                   >
                     <div
                       id="text-3"
-                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; border: medium; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
+                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
                     >
                       <span
                         style="letter-spacing:inherit;"
@@ -584,11 +584,11 @@ exports[`Designer snapshot 1`] = `
                   style="height: 100%; width: 100%;"
                 >
                   <div
-                    style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center center;"
+                    style="width: 100%; height: 100%; background-image: none; background-size: contain; background-repeat: no-repeat; background-position: center;"
                   >
                     <img
                       src="aaaaaaaaaaaa"
-                      style="height: 100%; width: 100%; border-radius: 0px; object-fit: contain;"
+                      style="height: 100%; width: 100%; border-radius: 0; object-fit: contain;"
                     />
                   </div>
                 </div>
@@ -613,7 +613,7 @@ exports[`Designer snapshot 1`] = `
       aria-live="assertive"
       id="6"
       role="status"
-      style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip: rect(0px); clip-path: inset(100%); white-space: nowrap;"
+      style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
     />
   </div>
 </div>

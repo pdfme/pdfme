@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "npm run generate-template-assets && vite",
-    "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
+    "build": "npm run generate-template-assets && node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build && npm run copy-vercel-config",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
     "preview": "vite preview",
     "predeploy": "npm run build",
