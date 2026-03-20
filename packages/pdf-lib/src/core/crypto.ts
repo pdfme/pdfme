@@ -15,6 +15,25 @@
 
 import { arrayAsString, isArrayEqual } from '../utils/arrays';
 import { stringAsByteArray } from '../utils/strings';
+
+/**
+ * Try to load Node.js native crypto module for AES-256 decryption.
+ * The pure JS AES-256 implementation in AESBaseCipher._decrypt produces
+ * garbled output for V=5/R=5 encrypted PDFs. Node.js crypto (OpenSSL-backed)
+ * handles it correctly. In browser environments this will be null and the
+ * JS fallback is used.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _nodeCrypto: any = null;
+try {
+  _nodeCrypto =
+    typeof globalThis.process !== 'undefined' &&
+    typeof globalThis.process.versions?.node !== 'undefined'
+      ? require('node:crypto')
+      : null;
+} catch {
+  // Not in a Node.js environment — use JS fallback
+}
 import PDFBool from './objects/PDFBool.js';
 import PDFDict from './objects/PDFDict.js';
 import PDFName from './objects/PDFName.js';
@@ -1144,11 +1163,14 @@ class AES128Cipher extends AESBaseCipher {
 }
 
 class AES256Cipher extends AESBaseCipher {
+  _rawCipherKey: Uint8Array;
+
   constructor(key: Uint8Array) {
     super();
 
     this._cyclesOfRepetition = 14;
     this._keySize = 224; // bits
+    this._rawCipherKey = new Uint8Array(key);
 
     this._key = this._expandKey(key);
   }
@@ -1201,6 +1223,25 @@ class AES256Cipher extends AESBaseCipher {
       }
     }
     return result;
+  }
+
+  /**
+   * Override AES-256 block decryption to use Node.js native crypto when available.
+   * The pure JS implementation in AESBaseCipher._decrypt produces garbled output
+   * for AES-256 (14 rounds / V=5/R=5 encrypted PDFs).
+   * See: https://github.com/pdfme/pdfme/issues/1348
+   */
+  _decrypt(input: Uint8Array, key: Uint8Array) {
+    if (_nodeCrypto) {
+      const decipher = _nodeCrypto.createDecipheriv(
+        'aes-256-ecb',
+        this._rawCipherKey,
+        null,
+      );
+      decipher.setAutoPadding(false);
+      return new Uint8Array(decipher.update(input));
+    }
+    return super._decrypt(input, key);
   }
 }
 
