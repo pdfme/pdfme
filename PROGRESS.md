@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `c756700c` `Expand type-aware lint and fix pdf-lib Node ESM exports`
+- `5f70376d` `Fix Node pdf renderer and refresh snapshots`
 
 ## Current Status
 
@@ -30,6 +30,10 @@ Latest committed checkpoint:
 - type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
 - `@pdfme/pdf-lib` の Node ESM named import 修正
 - `fe08c521` で誤って更新した blank snapshot の撤回と、renderer 修正後の再基準化
+- `common` / `manipulator` の build を Vite library mode + declaration emit に移行
+- `common` / `manipulator` の package exports を `dist/index.js` / `dist/index.d.ts` 前提へ整理
+- `manipulator` e2e image snapshot を pixelmatch v6 の AA 差分に合わせて再基準化
+- `pdf-lib` clean 時に stray `src/**/*.d.ts` を確実に掃除するよう修正
 
 まだ未着手:
 
@@ -39,12 +43,13 @@ Latest committed checkpoint:
 現在の残課題:
 
 - package build の Vite 化と exports 再設計
+  - 残り: `converter` / `schemas` / `generator` / `pdf-lib` / `ui`
 - lint warning の整理
 - playground 側の exports 変更追従確認
 
 次に進める順序:
 
-1. package build の Vite 化と exports 再設計に入る
+1. `converter` -> `schemas` -> `generator` の順で package build の Vite 化と exports 再設計を進める
 2. lint warning を段階的に整理する
 3. playground 側の exports 追従確認を行う
 
@@ -379,6 +384,29 @@ Latest committed checkpoint:
 - 同じ PDF を `@napi-rs/canvas` で描画すると内容が復元し、bbox と非白画素数も旧 snapshot に近いことを確認できたため
 - `fe08c521` の snapshot 更新はこの regression を隠していたため、いったん撤回し、renderer 修正後にのみ再基準化する必要があったため
 
+### 21. `common` / `manipulator` build の Vite 化と exports 再設計
+
+実施内容:
+
+- `packages/common/package.json` を `type: "module"` に変更
+- `packages/common` に `vite.config.mts` と `tsconfig.build.json` を追加
+- `packages/common` の build を `vite build && tsc -p tsconfig.build.json` に変更
+- `packages/common` の export を `./dist/index.js` / `./dist/index.d.ts` に整理
+- `packages/manipulator/package.json` を `type: "module"` に変更
+- `packages/manipulator` に `vite.config.mts` と `tsconfig.build.json` を追加
+- `packages/manipulator` の build を `vite build && tsc -p tsconfig.build.json` に変更
+- `packages/manipulator` の export を `./dist/index.js` / `./dist/index.d.ts` に整理
+- `packages/ui/tsconfig.json` の `@pdfme/common` path を `../common/dist` へ更新
+- `packages/manipulator/__tests__/e2e/__image_snapshots__/*.png` を Vite build 移行後の renderer 出力で再更新
+- `packages/pdf-lib/package.json` の `clean` を `rimraf --glob dist "src/**/*.d.ts"` に変更
+
+理由:
+
+- `PLAN.md` の `Phase 1` にある build の Vite library mode 化を安全な package から進めるため
+- `common` / `manipulator` は multi-entry や browser/node dual entry がなく、最初の移行対象として安全だったため
+- `vitest-image-snapshot` が内部で使う `pixelmatch@6` により、既存 manipulator snapshot と微小な AA 差分が出るため
+- `pdf-lib/src/*.d.ts` の残骸が `lint:typecheck` / `lint:oxlint` を不安定にしていたため
+
 ## Verification Completed
 
 実行済み:
@@ -404,9 +432,13 @@ Latest committed checkpoint:
 - `npm run test --workspace packages/pdf-lib`
 - `npm run test --workspace packages/generator`
 - `npm run test:update-snapshots --workspace packages/generator`
+- `npm run test:update-snapshots --workspace packages/manipulator`
 - `npm run -w packages/ui build`
 - `npm run -w packages/pdf-lib build`
+- `npm run -w packages/common build`
+- `npm run -w packages/manipulator build`
 - `node --input-type=module -e "import { PDFDocument } from '@pdfme/pdf-lib'; console.log(typeof PDFDocument);"`
+- `node --input-type=module -e "import { BLANK_PDF } from '@pdfme/common'; import { merge } from '@pdfme/manipulator'; console.log(typeof BLANK_PDF, typeof merge);"`
 
 確認できたこと:
 
@@ -422,6 +454,7 @@ Latest committed checkpoint:
 - `ui` package は build と typecheck の分離後も単体 build が通る
 - `common` の test は Vitest で通る
 - `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
+- `common` / `manipulator` は Vite build 後も package root の ESM import が通る
 - `converter` の test は Vitest で通る
 - `schemas` の test は Vitest で通る
 - `pdf-lib` の test は Vitest で通る
@@ -459,8 +492,10 @@ Latest committed checkpoint:
 - `eslint.typecheck.config.mjs`
 - `packages/common/tsconfig.cjs.json`
 - `packages/common/tsconfig.esm.json`
+- `packages/common/tsconfig.build.json`
 - `packages/common/tsconfig.json`
 - `packages/common/tsconfig.node.json`
+- `packages/common/vite.config.mts`
 - `packages/converter/tsconfig.cjs.json`
 - `packages/converter/tsconfig.esm.json`
 - `packages/converter/tsconfig.json`
@@ -470,7 +505,9 @@ Latest committed checkpoint:
 - `packages/generator/tsconfig.node.json`
 - `packages/manipulator/tsconfig.cjs.json`
 - `packages/manipulator/tsconfig.esm.json`
+- `packages/manipulator/tsconfig.build.json`
 - `packages/manipulator/tsconfig.json`
+- `packages/manipulator/vite.config.mts`
 - `packages/pdf-lib/tsconfig.cjs.json`
 - `packages/pdf-lib/tsconfig.esm.json`
 - `packages/pdf-lib/tsconfig.json`
@@ -514,6 +551,7 @@ Latest committed checkpoint:
 - `packages/manipulator/__tests__/e2e/remove.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/rotate.e2e.test.ts`
 - `packages/manipulator/__tests__/e2e/split.e2e.test.ts`
+- `packages/manipulator/__tests__/e2e/__image_snapshots__/*.png`
 - `packages/manipulator/vitest.setup.ts`
 - `packages/pdf-lib/package.json`
 - `packages/pdf-lib/write-node-esm-wrapper.cjs`
@@ -575,12 +613,18 @@ Latest committed checkpoint:
 
 ### Priority 3: package build の Vite 化
 
+進行中:
+
+- 完了: `common` / `manipulator`
+- 次候補: `converter` / `schemas` / `generator`
+
 未実施:
 
-- 各 package の `vite.config.ts` 追加
-- `package.json` の exports 再設計
+- 残 package への `vite.config.ts` 追加
+- 残 package の `package.json` exports 再設計
 - `converter` の browser/node dual entry 整理
 - `schemas` の multi-entry 対応
+- `pdf-lib` / `ui` の build 置換方針整理
 
 ### Priority 4: playground の残件
 
@@ -613,9 +657,9 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `PLAN.md` の `Phase 1` 残件として package build の Vite 化へ進む
-2. package `exports` を Vite 出力前提で整理する
-3. lint warning と playground 追従確認を消化する
+1. `PLAN.md` の `Phase 1` 残件として `converter` build の Vite 化へ進む
+2. 続けて `schemas` と `generator` の build / exports を揃える
+3. その後に lint warning と playground 追従確認を消化する
 
 ## Known Risks
 
@@ -627,8 +671,10 @@ Latest committed checkpoint:
 - `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
 - `pdfjs-dist` v5 の Node rasterize は `canvas` render target に戻すと白紙回帰するため、`packages/converter/src/index.node.ts` の `@napi-rs/canvas` 依存を安易に外さないこと
 - generator の image snapshot は corrected renderer 出力へ再基準化済みであり、`fe08c521` の blank baseline を前提に見ないこと
+- manipulator の e2e snapshot は Vite build 移行後の renderer 出力へ再基準化済みで、差分は文字エッジの AA 変化が主因だった
+- `pdf-lib` の clean が効かない状態に戻ると stray `src/**/*.d.ts` が lint を壊すため、`packages/pdf-lib/package.json` の clean script を維持すること
 
 ## Notes For Next Turn
 
 - 次回はこの `PROGRESS.md` を読み、package build の Vite 化から進める
-- まず `packages/converter` の Node renderer は `@napi-rs/canvas` 前提で固定されていることを踏まえ、Phase 1 残件へ戻る
+- まず `packages/converter` の Node renderer は `@napi-rs/canvas` 前提で固定されていることを踏まえ、`converter` build の Vite 化へ進む

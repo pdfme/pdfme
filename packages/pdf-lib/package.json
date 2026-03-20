@@ -46,7 +46,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
     "build:node": "tsc -p tsconfig.node.json",
-    "clean": "rimraf dist",
+    "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
     "lint": "eslint --ext .ts src --config eslint.config.mjs",
     "test": "vitest run --config ../../vitest.config.ts",
     "prune": "ts-prune src",

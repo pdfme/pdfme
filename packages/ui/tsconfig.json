@@ -16,7 +16,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@pdfme/common": ["../common/dist/esm/src"],
+      "@pdfme/common": ["../common/dist"],
       "@pdfme/schemas": ["../schemas/dist/esm/src"],
       "@pdfme/schemas/utils": ["../schemas/dist/esm/src/utils"]
     },
