@@ -41,8 +41,10 @@ Latest committed checkpoint:
 - `pdf-lib` / `ui` の package exports を `dist/index.js` / `dist/index.d.ts` 前提へ整理
 - 全 package の build Vite 化を完了
 - `lint:typecheck` の warning を 0 に整理
-- `lint:oxlint` の warning を 74 -> 48 まで削減
+- `lint:oxlint` の warning を 74 -> 0 に整理
 - `pdf-lib` / `ui` の package-local lint を error なしへ整理
+- playground thumbnail script の remote font 依存を撤去
+- playground の asset generation script が package root export + local fonts で通ることを確認
 
 まだ未着手:
 
@@ -51,15 +53,14 @@ Latest committed checkpoint:
 
 現在の残課題:
 
-- `pdf-lib` 中心の oxlint warning 整理
 - playground 側の exports 変更追従確認
 - `ui` package-local lint の react-hooks warning 整理
 
 次に進める順序:
 
-1. `pdf-lib` 中心に残っている oxlint warning を段階的に整理する
-2. playground 側の exports 追従確認を行う
-3. `ui` package-local lint の react-hooks warning を段階的に整理する
+1. `ui` package-local lint の react-hooks warning を段階的に整理する
+2. playground 側の exports 追従確認を広げる
+3. playground 側 test/lint 方針の整理に入る
 
 ## Completed Work
 
@@ -481,6 +482,25 @@ Latest committed checkpoint:
 - `tableHelper` の重複式は単なる style warning ではなく、実質的に無意味な条件式だったため先に直す価値があったため
 - `ui` の package-local lint は `react/prop-types` が TypeScript 構成と噛み合っておらず、設定で止まっていたため先に exit 0 へ戻す必要があったため
 
+### 25. `pdf-lib` oxlint warning 完了と playground script の network 依存撤去
+
+実施内容:
+
+- `packages/pdf-lib/src/**` の `new Array(...)` を `Array(...)` へ整理
+- `packages/pdf-lib/src/api/PDFPage.ts` の `!!` を `Boolean(...)` に変更
+- `packages/pdf-lib/src/core/syntax/CharCodes.ts` と `packages/pdf-lib/src/core/embedders/FileEmbedder.ts` の duplicate enum value を alias 参照へ変更
+- `packages/pdf-lib/src/core/acroform/PDFAcroField.ts` の control regex は挙動維持のため `oxlint` comment で意図を明示
+- root `lint:oxlint` を warning 0 に整理
+- `playground/scripts/generate-templates-thumbnail.mjs` を `packages/generator/__tests__/assets/fonts/*.ttf` のローカル読込へ変更
+- `playground/scripts/generate-templates-list-json.mjs` の built-in import を `node:` prefix に整理
+- `playground/scripts/generate-templates-list-json.mjs` と `generate-templates-thumbnail.mjs` の実行を確認
+
+理由:
+
+- 残っていた `oxlint` warning の大半は `pdf-lib` の古い `new Array(...)` 記法に集中しており、挙動を変えずにまとめて削減できたため
+- duplicate enum value は public 値を変えずに alias 参照へ直すのが安全だったため
+- playground thumbnail script は Google Fonts 依存のままだと network 制約下で安定確認できないため、repo 内の既存 font asset を再利用する方が安全だったため
+
 ## Verification Completed
 
 実行済み:
@@ -512,6 +532,8 @@ Latest committed checkpoint:
 - `npm run -w packages/pdf-lib build`
 - `npm run lint --workspace packages/pdf-lib`
 - `npm run lint --workspace packages/ui`
+- `node playground/scripts/generate-templates-list-json.mjs`
+- `node playground/scripts/generate-templates-thumbnail.mjs`
 - `npm run -w packages/common build`
 - `npm run -w packages/manipulator build`
 - `npm run -w packages/converter build`
@@ -552,6 +574,8 @@ Latest committed checkpoint:
 - `@pdfme/pdf-lib` は Node ESM から package root の named import が通る
 - `pdf-lib` / `ui` の build は dist root (`dist/index.js` / `dist/index.d.ts`) 前提へ揃った
 - `pdf-lib` / `ui` の package-local lint は error なしで実行できる
+- `root lint:oxlint` は warning 0
+- `playground` の template list / thumbnail script は package root export と local font asset 前提で通る
 
 ## Files Changed So Far
 
@@ -661,6 +685,20 @@ Latest committed checkpoint:
 - `packages/pdf-lib/src/core/streams/decode.ts`
 - `packages/pdf-lib/src/core/embedders/CustomFontEmbedder.ts`
 - `packages/pdf-lib/src/core/embedders/CustomFontSubsetEmbedder.ts`
+- `packages/pdf-lib/src/core/embedders/FileEmbedder.ts`
+- `packages/pdf-lib/src/core/syntax/CharCodes.ts`
+- `packages/pdf-lib/src/core/acroform/PDFAcroField.ts`
+- `packages/pdf-lib/src/core/acroform/PDFAcroChoice.ts`
+- `packages/pdf-lib/src/core/acroform/PDFAcroForm.ts`
+- `packages/pdf-lib/src/core/acroform/PDFAcroTerminal.ts`
+- `packages/pdf-lib/src/core/operators/PDFOperator.ts`
+- `packages/pdf-lib/src/core/structures/PDFContentStream.ts`
+- `packages/pdf-lib/src/core/structures/PDFCrossRefStream.ts`
+- `packages/pdf-lib/src/core/structures/PDFObjectStream.ts`
+- `packages/pdf-lib/src/utils/arrays.ts`
+- `packages/pdf-lib/src/utils/numbers.ts`
+- `packages/pdf-lib/src/utils/pdfDocEncoding.ts`
+- `packages/pdf-lib/src/utils/validators.ts`
 - `packages/pdf-lib/src/utils/base64.ts`
 - `packages/pdf-lib/src/utils/strings.ts`
 - `packages/schemas/package.json`
@@ -681,6 +719,8 @@ Latest committed checkpoint:
 - `packages/ui/src/components/Designer/RightSidebar/ListView/Item.tsx`
 - `packages/ui/src/components/Designer/index.tsx`
 - `packages/ui/src/components/Preview.tsx`
+- `playground/scripts/generate-templates-list-json.mjs`
+- `playground/scripts/generate-templates-thumbnail.mjs`
 - `.gitignore`
 - `eslint.config.mjs`
 
@@ -714,7 +754,7 @@ Latest committed checkpoint:
 
 - `package-lock.json` 更新済み
 - `lint:typecheck` / `lint:oxlint` は `pdf-lib` / `ui` を含む全 package の `src` に適用済み
-- warning は残るが、error は解消済み
+- 現在は `lint:typecheck` / `lint:oxlint` ともに warning 0
 
 ### Priority 2: package ごとの Jest -> Vitest 移行
 

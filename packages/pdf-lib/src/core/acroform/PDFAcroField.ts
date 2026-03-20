@@ -13,7 +13,8 @@ import { MissingDAEntryError, MissingTfOperatorError } from '../errors';
 //   `/Helv 12 Tf` -> ['Helv', '12']
 //   `/HeBo 8.00 Tf` -> ['HeBo', '8.00']
 //   `/HeBo Tf` -> ['HeBo', undefined]
-const tfRegex = /\/([^\0\t\n\f\r\ ]+)[\0\t\n\f\r\ ]*(\d*\.\d+|\d+)?[\0\t\n\f\r\ ]+Tf/;
+// oxlint-disable-next-line no-control-regex -- Default appearance strings can contain NUL delimiters.
+const tfRegex = /\/([^\u0000\t\n\f\r ]+)[\u0000\t\n\f\r ]*(\d*\.\d+|\d+)?[\u0000\t\n\f\r ]+Tf/;
 
 class PDFAcroField {
   readonly dict: PDFDict;

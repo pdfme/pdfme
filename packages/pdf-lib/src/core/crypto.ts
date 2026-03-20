@@ -548,7 +548,7 @@ const calculateSHA512 = (function calculateSHA512Closure() {
     padded[i++] = (length >> 5) & 0xff;
     padded[i++] = (length << 3) & 0xff;
 
-    const w = new Array(80);
+    const w = Array<any>(80);
     for (i = 0; i < 80; i++) {
       w[i] = new Word64(0, 0);
     }

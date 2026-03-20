@@ -203,10 +203,10 @@ export default class PDFPage {
     const trimBox = this.getTrimBox();
     const artBox = this.getArtBox();
 
-    const hasCropBox = this.node.CropBox()!!;
-    const hasBleedBox = this.node.BleedBox()!!;
-    const hasTrimBox = this.node.TrimBox()!!;
-    const hasArtBox = this.node.ArtBox()!!;
+    const hasCropBox = Boolean(this.node.CropBox());
+    const hasBleedBox = Boolean(this.node.BleedBox());
+    const hasTrimBox = Boolean(this.node.TrimBox());
+    const hasArtBox = Boolean(this.node.ArtBox());
 
     if (hasCropBox && rectanglesAreEqual(cropBox, mediaBox)) {
       this.setCropBox(mediaBox.x, mediaBox.y, width, height);
@@ -988,7 +988,7 @@ export default class PDFPage {
         ? lineSplit(cleanText(text))
         : breakTextIntoLines(text, wordBreaks, options.maxWidth, textWidth);
 
-    const encodedLines = new Array(lines.length) as PDFHexString[];
+    const encodedLines = Array<PDFHexString>(lines.length);
     for (let idx = 0, len = lines.length; idx < len; idx++) {
       encodedLines[idx] = newFont.encodeText(lines[idx]);
     }

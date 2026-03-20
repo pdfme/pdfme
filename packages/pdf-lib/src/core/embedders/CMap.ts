@@ -8,7 +8,7 @@ type BfChar = [string, string];
 
 /** `glyphs` should be an array of unique glyphs */
 export const createCmap = (glyphs: Glyph[], glyphId: (g?: Glyph) => number) => {
-  const bfChars: BfChar[] = new Array(glyphs.length);
+  const bfChars: BfChar[] = Array(glyphs.length);
   for (let idx = 0, len = glyphs.length; idx < len; idx++) {
     const glyph = glyphs[idx];
     const id = cmapHexFormat(cmapHexString(glyphId(glyph)));

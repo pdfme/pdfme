@@ -45,7 +45,7 @@ class PDFAcroChoice extends PDFAcroTerminal {
 
   updateSelectedIndices(values: (PDFString | PDFHexString)[]) {
     if (values.length > 1) {
-      const indices = new Array<number>(values.length);
+      const indices = Array<number>(values.length);
       const options = this.getOptions();
       for (let idx = 0, len = values.length; idx < len; idx++) {
         const val = values[idx].decodeText();
@@ -88,7 +88,7 @@ class PDFAcroChoice extends PDFAcroTerminal {
       display?: PDFString | PDFHexString;
     }[],
   ) {
-    const newOpt = new Array<PDFArray>(options.length);
+    const newOpt = Array<PDFArray>(options.length);
     for (let idx = 0, len = options.length; idx < len; idx++) {
       const { value, display } = options[idx];
       newOpt[idx] = this.dict.context.obj([value, display || value]);

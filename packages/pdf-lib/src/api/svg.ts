@@ -528,9 +528,6 @@ const parseAttributes = (
     svgAttributes.d = attributes.d;
   }
 
-  if (fontSizeRaw && newInherited.fontSize) {
-    newInherited.fontSize = newInherited.fontSize;
-  }
   if (newInherited.fontFamily) {
     // Handle complex fontFamily like `"Linux Libertine O", serif`
     const inner = newInherited.fontFamily.match(/^"(.*?)"|^'(.*?)'/);
