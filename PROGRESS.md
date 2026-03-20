@@ -4,7 +4,7 @@ Last updated: 2026-03-20 JST
 
 Latest committed checkpoint:
 
-- `f60a10c0` `Migrate ui tests to Vitest`
+- `982a3a0f` `Separate build tsconfig from typecheck aliases`
 
 ## Current Status
 
@@ -21,6 +21,9 @@ Latest committed checkpoint:
   - build tsconfig の `src` 限定化
 - `Phase 1` の一部である root の Vitest / Oxlint 基盤
 - 全 package (`common` / `manipulator` / `converter` / `schemas` / `generator` / `pdf-lib` / `ui`) の Jest -> Vitest 移行
+- clean `npm run typecheck` で露出していた latent type error の解消
+- `packages/converter` の `pdfjs-dist` / `canvas` 最新系への更新
+- `pdfjs-dist` v5 系で再発していた Node 側 `pdf2img` 実行不整合の解消
 
 まだ未着手:
 
@@ -28,12 +31,18 @@ Latest committed checkpoint:
 - CLI (`Phase 2`)
 - Claude Code Skills (`Phase 3`)
 
-現在の未コミット作業:
+現在の残課題:
 
-- build 用 tsconfig を typecheck 用 path alias から分離する修正
-- build 出力を package export と一致する `dist/*/src/*` に戻す修正
-- clean `tsc -b` で露出した latent type error の整理
-- `generator` integration test で継続している `pdf2img failed: Image or Canvas expected` の調査
+- `generator` image snapshot を新しい `pdfjs-dist` / `canvas` レンダラ基準へ更新する
+- snapshot 更新後に `generator` / `converter` / root build を再検証する
+- type-aware lint / oxlint の `pdf-lib` / `ui` への適用拡大
+- `@pdfme/pdf-lib` の Node ESM import 条件の整理
+
+次に進める順序:
+
+1. `generator` の image snapshot を更新する
+2. `generator` / `converter` / root build を再検証する
+3. `pdf-lib` / `ui` まで lint 対象を広げる
 
 ## Completed Work
 
@@ -261,7 +270,7 @@ Latest committed checkpoint:
 - `ui` は jsdom と mock 解決が必要で、最後の移行対象として個別調整が多かったため
 - snapshot の DOM id が非決定的だったため、Vitest でも安定する正規化が必要だったため
 
-### 14. 進行中: build 用 tsconfig の分離
+### 14. build 用 tsconfig の分離
 
 実施内容:
 
@@ -279,7 +288,38 @@ Latest committed checkpoint:
 補足:
 
 - これにより `@pdfme/common` などの Node import は再び package export 経由で解決できる状態に戻った
-- 一方で clean `npm run typecheck` では既存の latent type error が多数露出しており、未解消
+- `npm run build`、`playground/node-playground/generate.js`、`playground/node-playground/merge.js` は通過済み
+- 後続対応として clean `npm run typecheck` で露出していた latent type error も解消済み
+
+### 15. clean `npm run typecheck` の latent type error 解消
+
+実施内容:
+
+- `packages/schemas/src/text/types.ts` の `TextSchema` を `Schema & { ... }` へ変更
+- `packages/schemas/src/barcodes/types.ts` の `BarcodeSchema` を `Schema & { ... }` へ変更
+- `packages/schemas/src/tables/types.ts` の `TableSchema` を `Schema & { ... }` へ変更
+- `packages/schemas/src/multiVariableText/types.ts` の `MultiVariableTextSchema` を intersection type に変更
+
+理由:
+
+- clean build 後は declaration 解決がより厳密になり、`interface extends` では base `Schema` の union 的な shape と衝突していたため
+- typecheck 基盤導入後に顕在化した既存の型不整合を、挙動変更なしで解消する必要があったため
+
+### 16. `packages/converter` の `pdfjs-dist` / `canvas` 更新と Node 描画修正
+
+実施内容:
+
+- `packages/converter/package.json` の `pdfjs-dist` を `^5.5.207` に更新
+- `packages/converter/package.json` の `canvas` を `^3.2.1` に更新
+- `packages/converter/src/index.node.ts` を `pdfjs-dist/legacy/build/pdf.mjs` ベースへ更新
+- Node 側 `getDocument()` に `CanvasFactory` を渡すよう変更
+- `pdfjs-dist` に渡す PDF data を copy して buffer detach の影響を避けるよう変更
+- `packages/converter/src/pdf2img.ts` の render parameters に `canvas` を明示的に渡すよう変更
+
+理由:
+
+- `pdfjs-dist` v5 系では Node 側の canvas 解決と `CanvasFactory` の扱いが v3 系から変わっており、既存実装では `Image or Canvas expected` が再現したため
+- `canvas` を最新版 3.x 系へ揃え、`pdfjs-dist` 側の想定と一致する構成へ寄せる必要があったため
 
 ## Verification Completed
 
@@ -292,6 +332,8 @@ Latest committed checkpoint:
 - `cd playground && node --check scripts/generate-templates-thumbnail.mjs`
 - `cd packages/common && node set-version.cjs`
 - `npm run typecheck`
+- `npm run clean`
+- `npm run typecheck`
 - `npm run -w packages/ui build`
 - `npm run build`
 - `npm run test --workspace packages/common`
@@ -300,8 +342,8 @@ Latest committed checkpoint:
 - `npm run lint:oxlint`
 - `npm run test --workspace packages/converter`
 - `npm run test --workspace packages/schemas`
-- `npm run test --workspace packages/generator`
 - `npm run test --workspace packages/pdf-lib`
+- `npm run test --workspace packages/generator`
 
 確認できたこと:
 
@@ -312,16 +354,18 @@ Latest committed checkpoint:
 - `generate-templates-thumbnail.mjs` は syntax check を通る
 - `set-version.cjs` は期待どおり `src/version.ts` を更新できる
 - `tsc -b` ベースの root typecheck が通る
+- clean 後の `tsc -b` も通る
 - ルート build が通る
 - `ui` package は build と typecheck の分離後も単体 build が通る
 - `common` の test は Vitest で通る
 - `manipulator` の unit / e2e test は Vitest と `vitest-image-snapshot` で通る
 - `converter` の test は Vitest で通る
 - `schemas` の test は Vitest で通る
-- `generator` の test は Vitest で通る
 - `pdf-lib` の test は Vitest で通る
 - root の `lint:typecheck` / `lint:oxlint` は `common` / `converter` / `generator` / `manipulator` / `schemas` スコープで通る
 - generator の test 実行は local font asset 化により network 非依存になった
+- `packages/converter` は `pdfjs-dist@5.5.207` / `canvas@3.2.1` でも unit test が通る
+- `generator` は `pdf2img failed: Image or Canvas expected` では落ちなくなり、残る失敗は image snapshot 差分のみ
 
 ## Files Changed So Far
 
@@ -375,6 +419,8 @@ Latest committed checkpoint:
 - `packages/common/__tests__/dynamicTemplate.test.ts`
 - `packages/common/__tests__/helper.test.ts`
 - `packages/converter/package.json`
+- `packages/converter/src/index.node.ts`
+- `packages/converter/src/pdf2img.ts`
 - `packages/generator/package.json`
 - `packages/generator/vitest.setup.ts`
 - `packages/generator/__tests__/assets/fonts/PinyonScript-Regular.ttf`
@@ -404,6 +450,10 @@ Latest committed checkpoint:
 - `packages/pdf-lib/__tests__/core/parser/PDFParser.spec.ts`
 - `packages/schemas/package.json`
 - `packages/schemas/__tests__/text.test.ts`
+- `packages/schemas/src/barcodes/types.ts`
+- `packages/schemas/src/multiVariableText/types.ts`
+- `packages/schemas/src/tables/types.ts`
+- `packages/schemas/src/text/types.ts`
 - `.gitignore`
 - `eslint.config.mjs`
 
@@ -445,22 +495,7 @@ Latest committed checkpoint:
 - `manipulator`
 - `pdf-lib`
 - `schemas`
-
-未実施:
-
 - `ui`
-
-特に重い package:
-
-- `ui`
-
-理由:
-
-- jsdom
-- `__mocks__`
-- `jest.*` API
-- CommonJS mock file
-- alias / mapper
 
 ### Priority 3: package build の Vite 化
 
@@ -502,20 +537,21 @@ Latest committed checkpoint:
 
 次のターンでは `PROGRESS.md` を起点にして、以下の順で進めるのが安全。
 
-1. `ui` を Jest -> Vitest 移行
-2. 必要なら `lint:typecheck` / `lint:oxlint` の対象を最終調整する
+1. `npm run test --workspace packages/generator -- -u` で image snapshot を新基準に更新する
+2. `npm run test --workspace packages/generator` と `npm run build` を再実行して安定性を確認する
+3. その後で `lint:typecheck` / `lint:oxlint` の対象拡張に進む
 
 ## Known Risks
 
 - `PLAN.md` の Phase 1 は現状のまま一気に切り替えると変更範囲が広すぎる
-- `pdf-lib` と `ui` の test migration は別途まとまった工数が必要
 - `converter` は browser/node entry と `pdfjs-dist` 更新が絡むため、単独で切り出して進めたほうが安全
 - `playground` は package exports の変更に追従確認が必要
 - `ui` の build は source alias と typecheck config 分離の上で成立しているため、次の移行ではこの構成を壊さないこと
 - `lint:typecheck` を full repo に広げると既存 package 由来の大量エラーが出るため、package migration とセットで広げること
 - `manipulator` の snapshot runner は `vitest-image-snapshot` へ切り替わったため、今後 snapshot 更新時は生成される補助ディレクトリが変わること
+- `pdfjs-dist` / `canvas` 更新により generator の image snapshot は広範囲に差分が出るため、今回の再基準化は renderer 変更を受け入れる判断になること
 
 ## Notes For Next Turn
 
-- 次回はこの `PROGRESS.md` を読み、`Priority 2` の `ui` から進める
+- 次回はこの `PROGRESS.md` を読み、まず generator の image snapshot 更新から進める
 - 既存の未コミット差分として `PLAN.md` と `REVIEW.md` があるため、触らないこと

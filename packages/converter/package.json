@@ -46,15 +46,15 @@
   "dependencies": {
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^3.11.174"
+    "pdfjs-dist": "^5.5.207"
   },
   "devDependencies": {
     "@pdfme/generator": "*",
     "@types/estree": "^1.0.6",
-    "canvas": "^2.11.2"
+    "canvas": "^3.2.1"
   },
   "optionalDependencies": {
-    "canvas": "^2.11.0"
+    "canvas": "^3.2.1"
   },
   "publishConfig": {
     "access": "public"

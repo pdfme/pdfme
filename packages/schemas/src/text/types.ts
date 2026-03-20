@@ -11,7 +11,7 @@ export type FontWidthCalcValues = {
   characterSpacing: number;
   boxWidthInPt: number;
 };
-export interface TextSchema extends Schema {
+export type TextSchema = Schema & {
   fontName?: string;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
@@ -27,4 +27,4 @@ export interface TextSchema extends Schema {
   };
   fontColor: string;
   backgroundColor: string;
-}
+};

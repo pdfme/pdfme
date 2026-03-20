@@ -52,7 +52,13 @@ export async function pdf2img(
         throw new Error('Failed to get canvas context');
       }
 
-      await page.render({ canvasContext: context, viewport }).promise;
+      await page
+        .render({
+          canvas: canvas as unknown as HTMLCanvasElement,
+          canvasContext: context,
+          viewport,
+        })
+        .promise;
       const arrayBuffer = canvasToArrayBuffer(canvas, imageType);
       results.push(arrayBuffer);
     }
