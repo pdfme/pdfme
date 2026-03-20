@@ -197,6 +197,13 @@ export class UnbalancedParenthesisError extends PDFParsingError {
   }
 }
 
+export class DecompressionBombError extends Error {
+  constructor(requested: number, maxSize: number) {
+    const msg = `Decompression bomb detected: requested buffer size ${requested} exceeds maximum allowed size ${maxSize}`;
+    super(msg);
+  }
+}
+
 export class StalledParserError extends PDFParsingError {
   constructor(pos: Position) {
     const msg = `Parser stalled`;

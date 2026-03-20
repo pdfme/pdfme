@@ -9,6 +9,7 @@ import {
   getFallbackFontName,
   getDefaultFont,
   DEFAULT_FONT_NAME,
+  isUrlSafeToFetch,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
@@ -123,9 +124,14 @@ export const getFontKitFont = async (
   const currentFont = font[fntNm] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
   let fontData = currentFont.data;
   if (typeof fontData === 'string') {
-    fontData = fontData.startsWith('http')
-      ? await fetch(fontData).then((res) => res.arrayBuffer())
-      : b64toUint8Array(fontData);
+    if (fontData.startsWith('http')) {
+      if (!isUrlSafeToFetch(fontData)) {
+        throw Error('[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.');
+      }
+      fontData = await fetch(fontData).then((res) => res.arrayBuffer());
+    } else {
+      fontData = b64toUint8Array(fontData);
+    }
   }
 
   // Convert fontData to Buffer if it's not already a Buffer

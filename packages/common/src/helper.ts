@@ -127,6 +127,44 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   return [input];
 };
 
+export const isUrlSafeToFetch = (urlString: string): boolean => {
+  let parsed: URL;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    return false;
+  }
+
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    return false;
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+
+  if (
+    hostname === 'localhost' ||
+    hostname === '0.0.0.0' ||
+    hostname === '[::1]' ||
+    hostname === '::1'
+  ) {
+    return false;
+  }
+
+  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4Match) {
+    const a = Number(ipv4Match[1]);
+    const b = Number(ipv4Match[2]);
+    if (a === 0) return false;
+    if (a === 10) return false;
+    if (a === 127) return false;
+    if (a === 169 && b === 254) return false;
+    if (a === 172 && b >= 16 && b <= 31) return false;
+    if (a === 192 && b === 168) return false;
+  }
+
+  return true;
+};
+
 export const getB64BasePdf = async (
   customPdf: ArrayBuffer | Uint8Array | string,
 ): Promise<string> => {
@@ -135,6 +173,11 @@ export const getB64BasePdf = async (
     !customPdf.startsWith('data:application/pdf;') &&
     typeof window !== 'undefined'
   ) {
+    if (!isUrlSafeToFetch(customPdf)) {
+      throw Error(
+        '[@pdfme/common] Invalid or unsafe URL for basePdf. Only http: and https: URLs pointing to public hosts are allowed.',
+      );
+    }
     const response = await fetch(customPdf);
     const blob = await response.blob();
     return blob2Base64Pdf(blob);

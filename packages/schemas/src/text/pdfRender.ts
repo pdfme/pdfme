@@ -8,6 +8,7 @@ import {
   getDefaultFont,
   getFallbackFontName,
   mm2pt,
+  isUrlSafeToFetch,
 } from '@pdfme/common';
 import {
   VERTICAL_ALIGN_TOP,
@@ -44,6 +45,9 @@ const embedAndGetFontObj = async (arg: {
     Object.values(font).map(async (v) => {
       let fontData = v.data;
       if (typeof fontData === 'string' && fontData.startsWith('http')) {
+        if (!isUrlSafeToFetch(fontData)) {
+          throw Error('[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.');
+        }
         fontData = await fetch(fontData).then((res) => res.arrayBuffer());
       }
       return pdfDoc.embedFont(fontData, {

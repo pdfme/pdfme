@@ -1,4 +1,4 @@
-import { MethodNotImplementedError } from '../errors';
+import { MethodNotImplementedError, DecompressionBombError } from '../errors';
 import Stream, { StreamType } from './Stream';
 
 /*
@@ -14,6 +14,12 @@ import Stream, { StreamType } from './Stream';
 // having special cases that would be required if we used |null| for an empty
 // buffer.
 const emptyBuffer = new Uint8Array(0);
+
+/**
+ * Maximum allowed decoded buffer size (100 MB).
+ * Prevents decompression bomb attacks from consuming unbounded memory.
+ */
+const MAX_DECODED_SIZE = 100 * 1024 * 1024;
 
 /**
  * Super class for the decoding streams
@@ -36,6 +42,9 @@ class DecodeStream implements StreamType {
       // Compute the first power of two that is as big as maybeMinBufferLength.
       while (this.minBufferLength < maybeMinBufferLength) {
         this.minBufferLength *= 2;
+      }
+      if (this.minBufferLength > MAX_DECODED_SIZE) {
+        this.minBufferLength = MAX_DECODED_SIZE;
       }
     }
   }
@@ -150,9 +159,15 @@ class DecodeStream implements StreamType {
     if (requested <= buffer.byteLength) {
       return buffer;
     }
+    if (requested > MAX_DECODED_SIZE) {
+      throw new DecompressionBombError(requested, MAX_DECODED_SIZE);
+    }
     let size = this.minBufferLength;
     while (size < requested) {
       size *= 2;
+    }
+    if (size > MAX_DECODED_SIZE) {
+      size = MAX_DECODED_SIZE;
     }
     const buffer2 = new Uint8Array(size);
     buffer2.set(buffer);
