@@ -35,8 +35,8 @@
     }
   },
   "scripts": {
-    "dev": "node set-version.js && tsc -p tsconfig.esm.json -w",
-    "prebuild": "node set-version.js",
+    "dev": "node set-version.cjs && tsc -p tsconfig.esm.json -w",
+    "prebuild": "node set-version.cjs",
     "build": "run-p build:cjs build:esm build:node",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",

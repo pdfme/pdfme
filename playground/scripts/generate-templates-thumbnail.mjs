@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
-import { generate } from '@pdfme/generator/cjs/src/index.js';
-import { pdf2img } from '@pdfme/converter/cjs/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '@pdfme/common/cjs/src/index.js';
+import { getDefaultFont, getInputFromTemplate } from '@pdfme/common';
+import { pdf2img } from '@pdfme/converter';
+import { generate } from '@pdfme/generator';
 import {
   multiVariableText,
   text,
@@ -22,7 +22,7 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '@pdfme/schemas/cjs/src/index.js';
+} from '@pdfme/schemas';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

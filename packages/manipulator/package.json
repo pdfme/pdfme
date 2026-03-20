@@ -26,7 +26,10 @@
   "types": "dist/types/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
+      "import": {
+        "node": "./dist/cjs/src/index.js",
+        "default": "./dist/esm/src/index.js"
+      },
       "require": "./dist/cjs/src/index.js",
       "types": "./dist/types/src/index.d.ts"
     }

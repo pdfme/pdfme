@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+const { execSync } = require('node:child_process');
 
 const updateVersion = (version) => {
   const filePath = path.join(__dirname, 'src/version.ts');
@@ -23,7 +23,9 @@ const updateVersion = (version) => {
 };
 
 try {
-  const gitTag = execSync('git describe --tags $(git rev-list --tags --max-count=1)', { encoding: 'utf8' }).trim();
+  const gitTag = execSync('git describe --tags $(git rev-list --tags --max-count=1)', {
+    encoding: 'utf8',
+  }).trim();
   updateVersion(gitTag);
 } catch (error) {
   console.error('Error replacing PDFME_VERSION:', error);
