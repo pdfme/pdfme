@@ -47,7 +47,9 @@ function normalizePageSchemas(
   const orderMap = new Map<string, number>();
 
   pageSchemas.forEach((schema, index) => {
-    const localY = schema.position.y - paddingTop;
+    // Guard against negative Y position when schema.y < paddingTop
+    // Prevents "Cannot read properties of undefined (reading 'push')" error
+    const localY = Math.max(0, schema.position.y - paddingTop);
     items.push({
       schema: cloneDeep(schema),
       baseY: localY,
