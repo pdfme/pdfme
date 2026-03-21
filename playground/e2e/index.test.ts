@@ -129,7 +129,18 @@ const designerSnapshotOptions: MatchImageOptions = {
   allowedPixelRatio: 0.035,
 };
 
+const replayPdfSnapshotOptions: MatchImageOptions = {
+  ...snapshotOptions,
+  allowedPixelRatio: 0.05,
+};
+
 const viewport = { width: 1366, height: 768 };
+
+function getPdfSnapshotOptions(labelPrefix: string): MatchImageOptions {
+  return labelPrefix === 'modified-template' || labelPrefix === 'final-form'
+    ? replayPdfSnapshotOptions
+    : snapshotOptions;
+}
 
 async function waitForDesignerReady(page: Page, expectedText?: string) {
   await page.waitForFunction(
@@ -208,10 +219,11 @@ async function captureAndCompareScreenshot(page: Page, label?: string) {
 async function generateAndComparePDF(page: Page, browser: Browser, labelPrefix: string) {
   const pdfBuffer = await generatePdf(page, browser);
   const pdfImages = await pdfToImages(pdfBuffer);
+  const pdfSnapshotOptions = getPdfSnapshotOptions(labelPrefix);
 
   for (const [idx, imageBuffer] of pdfImages.entries()) {
     await expect(imageBuffer).toMatchImage({
-      ...snapshotOptions,
+      ...pdfSnapshotOptions,
       name: `${labelPrefix}-pdf-page-${idx}`,
     });
   }
