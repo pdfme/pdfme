@@ -2,11 +2,12 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
 import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 import type { MatchImageOptions } from 'vitest-image-snapshot';
 import templateCreationRecord from './templateCreationRecord.json';
 import formInputRecord from './formInputRecord.json';
 
-const previewUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+/;
+const previewUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+\/?/;
 
 async function waitForServerReady(
   url: string,
@@ -40,6 +41,8 @@ async function waitForPreviewUrl(
   timeoutMs = 20000,
 ): Promise<string> {
   return await new Promise((resolve, reject) => {
+    let outputBuffer = '';
+
     const timeoutId = setTimeout(() => {
       cleanup();
       reject(new Error(`Timed out waiting for preview URL after ${timeoutMs}ms`));
@@ -54,17 +57,22 @@ async function waitForPreviewUrl(
     };
 
     const handleChunk = (kind: 'output' | 'error', data: Buffer | string) => {
-      const text = data.toString();
+      const text = stripVTControlCharacters(data.toString());
       const message = text.trim();
       if (message) {
         const log = kind === 'output' ? console.log : console.error;
         log(`Preview server ${kind}: ${message}`);
       }
 
-      const matchedUrl = text.match(previewUrlPattern)?.[0];
+      outputBuffer += text;
+      if (outputBuffer.length > 2048) {
+        outputBuffer = outputBuffer.slice(-2048);
+      }
+
+      const matchedUrl = outputBuffer.match(previewUrlPattern)?.[0];
       if (matchedUrl) {
         cleanup();
-        resolve(matchedUrl);
+        resolve(matchedUrl.replace(/\/$/, ''));
       }
     };
 
