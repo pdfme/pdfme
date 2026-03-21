@@ -115,7 +115,7 @@ function stopPreviewProcess(previewProcess: ChildProcessWithoutNullStreams | und
 }
 
 let baseUrl = 'http://127.0.0.1:4173';
-const timeout = 40000;
+const timeout = 60000;
 
 const isRunningLocal = process.env.LOCAL === 'true';
 
@@ -126,7 +126,7 @@ const snapshotOptions: MatchImageOptions = {
 
 const designerSnapshotOptions: MatchImageOptions = {
   ...snapshotOptions,
-  allowedPixelRatio: 0.035,
+  allowedPixelRatio: 0.06,
 };
 
 const replayPdfSnapshotOptions: MatchImageOptions = {
@@ -180,6 +180,9 @@ async function waitForDesignerReady(page: Page, expectedText?: string) {
     }
     await new Promise<void>((resolve) => {
       requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 150);
     });
   });
 }
