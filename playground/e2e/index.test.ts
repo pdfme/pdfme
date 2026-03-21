@@ -129,7 +129,7 @@ const designerSnapshotOptions: MatchImageOptions = {
   allowedPixelRatio: 0.035,
 };
 
-const modifiedTemplatePdfSnapshotOptions: MatchImageOptions = {
+const replayPdfSnapshotOptions: MatchImageOptions = {
   ...snapshotOptions,
   allowedPixelRatio: 0.05,
 };
@@ -137,7 +137,9 @@ const modifiedTemplatePdfSnapshotOptions: MatchImageOptions = {
 const viewport = { width: 1366, height: 768 };
 
 function getPdfSnapshotOptions(labelPrefix: string): MatchImageOptions {
-  return labelPrefix === 'modified-template' ? modifiedTemplatePdfSnapshotOptions : snapshotOptions;
+  return labelPrefix === 'modified-template' || labelPrefix === 'final-form'
+    ? replayPdfSnapshotOptions
+    : snapshotOptions;
 }
 
 async function waitForDesignerReady(page: Page, expectedText?: string) {
