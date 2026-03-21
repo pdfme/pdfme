@@ -331,7 +331,7 @@ describe('Playground E2E Tests', () => {
     await page.waitForSelector('#template-img-pedigree', { timeout });
     await page.click('#template-img-pedigree');
 
-    await waitForDesignerReady(page, 'Pet Name');
+    await waitForDesignerReady(page);
 
     // 7. Screenshot & compare
     await captureAndCompareScreenshot(page, 'pedigree-designer');
