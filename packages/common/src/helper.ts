@@ -35,7 +35,10 @@ const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 export const getFallbackFontName = (font: Font) => {
   const initial = '';
   const fallbackFontName = Object.entries(font).reduce((acc, cur) => {
-    const [fontName, fontValue] = cur as [string, { data: string | ArrayBuffer | Uint8Array; fallback?: boolean; subset?: boolean }];
+    const [fontName, fontValue] = cur as [
+      string,
+      { data: string | ArrayBuffer | Uint8Array; fallback?: boolean; subset?: boolean },
+    ];
 
     return !acc && fontValue.fallback ? fontName : acc;
   }, initial);
@@ -236,7 +239,10 @@ export const checkFont = (arg: { font: Font; template: Template }) => {
     template: { schemas },
   } = arg;
   const fontValues = Object.values(font);
-  const fallbackFontNum = fontValues.reduce((acc, cur) => (cur.fallback ? acc + 1 : acc), 0 as number);
+  const fallbackFontNum = fontValues.reduce(
+    (acc, cur) => (cur.fallback ? acc + 1 : acc),
+    0 as number,
+  );
   if (fallbackFontNum === 0) {
     throw Error(
       `[@pdfme/common] fallback flag is not found in font. true fallback flag must be only one.

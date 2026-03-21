@@ -237,7 +237,7 @@ const TemplateEditor = ({
     onChangeTemplate(newTemplate);
     await updateTemplate(newTemplate);
     void refresh(newTemplate);
-    
+
     // Notify page change with updated total pages
     onPageCursorChange(newPageCursor, sl.length);
 

@@ -1,0 +1,14 @@
+{
+  "ignorePattern": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/package-lock.json",
+    "**/__image_actual__/**",
+    "**/__image_diffs__/**",
+    "**/__image_diff_report__/**",
+    "website/**"
+  ],
+  "singleQuote": true,
+  "printWidth": 100,
+  "sortPackageJson": true
+}

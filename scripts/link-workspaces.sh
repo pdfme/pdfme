@@ -2,16 +2,16 @@ cd packages
 
 for dir in $(ls -d */); do
     cd "$dir"
-    npm link
+    npm_config_ignore_scripts=true npm link
     cd ..
 done
 
 for dir in generator ui; do
     cd "$dir"
-    npm link @pdfme/common
-    npm link @pdfme/schemas
+    npm_config_ignore_scripts=true npm link @pdfme/common
+    npm_config_ignore_scripts=true npm link @pdfme/schemas
     if [ "$dir" = "ui" ]; then
-        npm link @pdfme/converter
+        npm_config_ignore_scripts=true npm link @pdfme/converter
     fi
     cd ..
 done

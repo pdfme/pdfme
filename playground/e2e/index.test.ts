@@ -8,9 +8,13 @@ import formInputRecord from './formInputRecord.json';
 
 const previewUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+/;
 
-async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 1000): Promise<boolean> {
+async function waitForServerReady(
+  url: string,
+  maxRetries = 30,
+  retryInterval = 1000,
+): Promise<boolean> {
   console.log(`Waiting for server to be ready at ${url}`);
-  
+
   for (let i = 0; i < maxRetries; i++) {
     try {
       const response = await fetch(url);
@@ -23,10 +27,10 @@ async function waitForServerReady(url: string, maxRetries = 30, retryInterval = 
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.log(`Server not ready yet (attempt ${i + 1}/${maxRetries}): ${errorMessage}`);
     }
-    
-    await new Promise(resolve => setTimeout(resolve, retryInterval));
+
+    await new Promise((resolve) => setTimeout(resolve, retryInterval));
   }
-  
+
   console.error(`Server failed to become ready after ${maxRetries} attempts`);
   return false;
 }
@@ -68,7 +72,9 @@ async function waitForPreviewUrl(
     const onStderr = (data: Buffer | string) => handleChunk('error', data);
     const onExit = (code: number | null, signal: NodeJS.Signals | null) => {
       cleanup();
-      reject(new Error(`Preview server exited before becoming ready (code=${code}, signal=${signal})`));
+      reject(
+        new Error(`Preview server exited before becoming ready (code=${code}, signal=${signal})`),
+      );
     };
     const onError = (error: Error) => {
       cleanup();
@@ -116,10 +122,9 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
   await page.waitForSelector('#generate-pdf', { timeout });
   await page.click('#generate-pdf');
 
-  const newTarget = await browser.waitForTarget(
-    (target) => target.url().startsWith('blob:'),
-    { timeout }
-  );
+  const newTarget = await browser.waitForTarget((target) => target.url().startsWith('blob:'), {
+    timeout,
+  });
   const newPage = await newTarget?.page();
   if (!newPage) {
     throw new Error('[generatePdf]: New page not found');
@@ -220,10 +225,13 @@ describe('Playground E2E Tests', () => {
     await page.click('#template-img-invoice');
 
     // 2. Check that "INVOICE" text is present
-    await page.waitForFunction(() => {
-      const container = document.querySelector('div.flex-1.w-full');
-      return container ? container.textContent?.includes('INVOICE') : false;
-    }, { timeout });
+    await page.waitForFunction(
+      () => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('INVOICE') : false;
+      },
+      { timeout },
+    );
 
     // 3. Screenshot & compare
     await captureAndCompareScreenshot(page, 'invoice-designer');
@@ -243,12 +251,15 @@ describe('Playground E2E Tests', () => {
     await page.waitForSelector('#template-img-pedigree', { timeout });
     await page.click('#template-img-pedigree');
 
-    await page.waitForFunction(() => {
-      const container = document.querySelector('div.flex-1.w-full');
-      return container ? container.textContent?.includes('Pet Name') : false;
-    }, { timeout });
+    await page.waitForFunction(
+      () => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('Pet Name') : false;
+      },
+      { timeout },
+    );
 
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // 7. Screenshot & compare
     await captureAndCompareScreenshot(page, 'pedigree-designer');
@@ -281,10 +292,13 @@ describe('Playground E2E Tests', () => {
 
     // 14. Move to form viewer
     await page.click('#form-viewer-nav');
-    await page.waitForFunction(() => {
-      const container = document.querySelector('div.flex-1.w-full');
-      return container ? container.textContent?.includes('Type Something...') : false;
-    }, { timeout });
+    await page.waitForFunction(
+      () => {
+        const container = document.querySelector('div.flex-1.w-full');
+        return container ? container.textContent?.includes('Type Something...') : false;
+      },
+      { timeout },
+    );
 
     // 15. Input form data
     const formInputUserFlow = parse(formInputRecord);

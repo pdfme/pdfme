@@ -29,8 +29,14 @@ const Root = ({ size, scale, children }: Props, ref: Ref<HTMLDivElement>) => {
   }, [font]);
 
   return (
-    <div className={DESIGNER_CLASSNAME + 'root'} ref={ref} style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}>
-      <div className={DESIGNER_CLASSNAME + 'background'} style={{ margin: '0 auto', ...size }}>{scale === 0 ? <Spinner /> : children}</div>
+    <div
+      className={DESIGNER_CLASSNAME + 'root'}
+      ref={ref}
+      style={{ position: 'relative', background: BACKGROUND_COLOR, ...size }}
+    >
+      <div className={DESIGNER_CLASSNAME + 'background'} style={{ margin: '0 auto', ...size }}>
+        {scale === 0 ? <Spinner /> : children}
+      </div>
     </div>
   );
 };

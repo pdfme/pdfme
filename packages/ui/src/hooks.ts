@@ -45,55 +45,58 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   const isMountedRef = useRef(true);
   const requestIdRef = useRef(0);
 
-  const init = useCallback(async (prop: { template: Template; size: Size }) => {
-    const {
-      template: { basePdf, schemas },
-      size,
-    } = prop;
+  const init = useCallback(
+    async (prop: { template: Template; size: Size }) => {
+      const {
+        template: { basePdf, schemas },
+        size,
+      } = prop;
 
-    let paperWidth: number;
-    let paperHeight: number;
-    let _backgrounds: string[];
-    let _pageSizes: { width: number; height: number }[];
+      let paperWidth: number;
+      let paperHeight: number;
+      let _backgrounds: string[];
+      let _pageSizes: { width: number; height: number }[];
 
-    if (isBlankPdf(basePdf)) {
-      const { width, height } = basePdf;
-      paperWidth = width * ZOOM;
-      paperHeight = height * ZOOM;
-      _backgrounds = schemas.map(
-        () =>
-          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=',
+      if (isBlankPdf(basePdf)) {
+        const { width, height } = basePdf;
+        paperWidth = width * ZOOM;
+        paperHeight = height * ZOOM;
+        _backgrounds = schemas.map(
+          () =>
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=',
+        );
+        _pageSizes = schemas.map(() => ({ width, height }));
+      } else {
+        const _basePdf = await getB64BasePdf(basePdf);
+
+        const uint8Array = b64toUint8Array(_basePdf);
+        // Create a new ArrayBuffer copy to avoid detachment issues
+        const pdfArrayBuffer = new ArrayBuffer(uint8Array.byteLength);
+        new Uint8Array(pdfArrayBuffer).set(uint8Array);
+
+        const [_pages, imgBuffers] = await Promise.all([
+          pdf2size(pdfArrayBuffer),
+          pdf2img(pdfArrayBuffer.slice(), { scale: maxZoom }),
+        ]);
+        _pageSizes = _pages;
+        paperWidth = _pageSizes[0].width * ZOOM;
+        paperHeight = _pageSizes[0].height * ZOOM;
+        _backgrounds = imgBuffers.map(arrayBufferToBase64);
+      }
+
+      const _scale = Math.min(
+        getScale(size.width, paperWidth),
+        getScale(size.height - RULER_HEIGHT, paperHeight),
       );
-      _pageSizes = schemas.map(() => ({ width, height }));
-    } else {
-      const _basePdf = await getB64BasePdf(basePdf);
 
-      const uint8Array = b64toUint8Array(_basePdf);
-      // Create a new ArrayBuffer copy to avoid detachment issues
-      const pdfArrayBuffer = new ArrayBuffer(uint8Array.byteLength);
-      new Uint8Array(pdfArrayBuffer).set(uint8Array);
-
-      const [_pages, imgBuffers] = await Promise.all([
-        pdf2size(pdfArrayBuffer),
-        pdf2img(pdfArrayBuffer.slice(), { scale: maxZoom }),
-      ]);
-      _pageSizes = _pages;
-      paperWidth = _pageSizes[0].width * ZOOM;
-      paperHeight = _pageSizes[0].height * ZOOM;
-      _backgrounds = imgBuffers.map(arrayBufferToBase64);
-    }
-
-    const _scale = Math.min(
-      getScale(size.width, paperWidth),
-      getScale(size.height - RULER_HEIGHT, paperHeight),
-    );
-
-    return {
-      backgrounds: _backgrounds,
-      pageSizes: _pageSizes,
-      scale: _scale,
-    };
-  }, [maxZoom]);
+      return {
+        backgrounds: _backgrounds,
+        pageSizes: _pageSizes,
+        scale: _scale,
+      };
+    },
+    [maxZoom],
+  );
 
   useEffect(
     () => () => {
@@ -132,10 +135,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
     void runInit({ template, size });
   }, [runInit, template, size]);
 
-  const refresh = useCallback(
-    (template: Template) => runInit({ template, size }),
-    [runInit, size],
-  );
+  const refresh = useCallback((template: Template) => runInit({ template, size }), [runInit, size]);
 
   return {
     backgrounds,

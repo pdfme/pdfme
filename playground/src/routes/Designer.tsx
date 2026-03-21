@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from "@pdfme/common";
-import { Designer } from "@pdfme/ui";
+import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
+import { Designer } from '@pdfme/ui';
 import {
   getFontsData,
   getTemplateById,
@@ -12,10 +12,10 @@ import {
   generatePDF,
   downloadJsonFile,
   translations,
-} from "../helper";
+} from '../helper';
 import { getPlugins } from '../plugins';
-import { NavBar, NavItem } from "../components/NavBar";
-import ExternalButton from "../components/ExternalButton";
+import { NavBar, NavItem } from '../components/NavBar';
+import ExternalButton from '../components/ExternalButton';
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -29,17 +29,17 @@ function DesignerApp() {
     if (!designerRef.current) return;
     try {
       let template: Template = getBlankTemplate();
-      const templateIdFromQuery = searchParams.get("template");
-      searchParams.delete("template");
+      const templateIdFromQuery = searchParams.get('template');
+      searchParams.delete('template');
       setSearchParams(searchParams, { replace: true });
-      const templateFromLocal = localStorage.getItem("template");
+      const templateFromLocal = localStorage.getItem('template');
 
       if (templateIdFromQuery) {
         const templateJson = await getTemplateById(templateIdFromQuery);
         checkTemplate(templateJson);
         template = templateJson;
         if (!templateFromLocal) {
-          localStorage.setItem("template", JSON.stringify(templateJson));
+          localStorage.setItem('template', JSON.stringify(templateJson));
         }
       } else if (templateFromLocal) {
         const templateJson = JSON.parse(templateFromLocal) as Template;
@@ -54,10 +54,10 @@ function DesignerApp() {
           font: getFontsData(),
           lang: 'en',
           labels: {
-            'signature.clear': "🗑️",
+            'signature.clear': '🗑️',
           },
           theme: {
-            token: { colorPrimary: "#25c2a0" },
+            token: { colorPrimary: '#25c2a0' },
           },
           icons: {
             multiVariableText:
@@ -68,16 +68,15 @@ function DesignerApp() {
         plugins: getPlugins(),
       });
       designer.current.onSaveTemplate(onSaveTemplate);
-
     } catch (error) {
-      localStorage.removeItem("template");
+      localStorage.removeItem('template');
       console.error(error);
     }
   }, [searchParams, setSearchParams]);
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      readFile(e.target.files[0], "dataURL").then(async (basePdf) => {
+      readFile(e.target.files[0], 'dataURL').then(async (basePdf) => {
         if (designer.current) {
           const newTemplate = cloneDeep(designer.current.getTemplate());
           newTemplate.basePdf = basePdf;
@@ -89,7 +88,7 @@ function DesignerApp() {
 
   const onDownloadTemplate = () => {
     if (designer.current) {
-      downloadJsonFile(designer.current.getTemplate(), "template");
+      downloadJsonFile(designer.current.getTemplate(), 'template');
       toast.success(
         <div>
           <p>Can you share the template you created? ❤️</p>
@@ -101,23 +100,20 @@ function DesignerApp() {
           >
             See: Template Contribution Guide
           </a>
-        </div>
+        </div>,
       );
     }
   };
 
   const onSaveTemplate = (template?: Template) => {
     if (designer.current) {
-      localStorage.setItem(
-        "template",
-        JSON.stringify(template || designer.current.getTemplate())
-      );
-      toast.success("Saved on local storage");
+      localStorage.setItem('template', JSON.stringify(template || designer.current.getTemplate()));
+      toast.success('Saved on local storage');
     }
   };
 
   const onResetTemplate = () => {
-    localStorage.removeItem("template");
+    localStorage.removeItem('template');
     if (designer.current) {
       designer.current.updateTemplate(getBlankTemplate());
     }
@@ -129,17 +125,19 @@ function DesignerApp() {
     if (!editingStaticSchemas) {
       const currentTemplate = cloneDeep(designer.current.getTemplate());
       if (!isBlankPdf(currentTemplate.basePdf)) {
-        toast.error(<div>
-          <p>The current template cannot edit the static schema.</p>
-          <a
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://pdfme.com/docs/headers-and-footers"
-          >
-            See: Headers and Footers
-          </a>
-        </div>);
+        toast.error(
+          <div>
+            <p>The current template cannot edit the static schema.</p>
+            <a
+              className="text-blue-500 underline"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://pdfme.com/docs/headers-and-footers"
+            >
+              See: Headers and Footers
+            </a>
+          </div>,
+        );
         return;
       }
 
@@ -154,13 +152,12 @@ function DesignerApp() {
       });
 
       setEditingStaticSchemas(true);
-
     } else {
       const editedTemplate = designer.current.getTemplate();
       if (!originalTemplate) return;
       const merged = cloneDeep(originalTemplate);
       if (!isBlankPdf(merged.basePdf)) {
-        toast.error("Invalid basePdf format");
+        toast.error('Invalid basePdf format');
         return;
       }
 
@@ -183,12 +180,13 @@ function DesignerApp() {
 
   const navItems: NavItem[] = [
     {
-      label: "Lang",
+      label: 'Lang',
       content: (
         <select
           disabled={editingStaticSchemas}
-          className={`w-full border rounded px-2 py-1 ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`w-full border rounded px-2 py-1 ${
+            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           onChange={(e) => {
             designer.current?.updateOptions({ lang: e.target.value as Lang });
           }}
@@ -202,51 +200,54 @@ function DesignerApp() {
       ),
     },
     {
-      label: "Change BasePDF",
+      label: 'Change BasePDF',
       content: (
         <input
           disabled={editingStaticSchemas}
           type="file"
           accept="application/pdf"
-          className={`w-full text-sm border rounded ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`w-full text-sm border rounded ${
+            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           onChange={onChangeBasePDF}
         />
       ),
     },
     {
-      label: "Load Template",
+      label: 'Load Template',
       content: (
         <input
           disabled={editingStaticSchemas}
           type="file"
           accept="application/json"
-          className={`w-full text-sm border rounded ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`w-full text-sm border rounded ${
+            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
           onChange={(e) => handleLoadTemplate(e, designer.current)}
         />
       ),
     },
     {
-      label: "Edit static schema",
+      label: 'Edit static schema',
       content: (
         <button
           className={`px-2 py-1 border rounded hover:bg-gray-100 w-full disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={toggleEditingStaticSchemas}
         >
-          {editingStaticSchemas ? "End editing" : "Start editing"}
+          {editingStaticSchemas ? 'End editing' : 'Start editing'}
         </button>
       ),
     },
     {
-      label: "",
+      label: '',
       content: (
         <div className="flex gap-2">
           <button
             id="save-local"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${
+              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={() => onSaveTemplate()}
           >
             Save Local
@@ -254,8 +255,9 @@ function DesignerApp() {
           <button
             id="reset-template"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${
+              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={onResetTemplate}
           >
             Reset
@@ -264,13 +266,14 @@ function DesignerApp() {
       ),
     },
     {
-      label: "",
+      label: '',
       content: (
         <div className="flex gap-2">
           <button
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${
+              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={onDownloadTemplate}
           >
             DL Template
@@ -278,8 +281,9 @@ function DesignerApp() {
           <button
             id="generate-pdf"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${editingStaticSchemas ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${
+              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             onClick={async () => {
               const startTimer = performance.now();
               await generatePDF(designer.current);
@@ -293,10 +297,10 @@ function DesignerApp() {
       ),
     },
     {
-      label: "",
+      label: '',
       content: React.createElement(ExternalButton, {
-        href: "https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME",
-        title: "Feedback this template"
+        href: 'https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME',
+        title: 'Feedback this template',
       }),
     },
   ];

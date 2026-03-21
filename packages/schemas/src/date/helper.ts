@@ -277,7 +277,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         buttons: adButtons,
         position({ $datepicker, $target, $pointer, done }) {
           $datepicker.style.position = 'fixed';
-          const offset = 5; 
+          const offset = 5;
           const scrollY = window.scrollY;
           const scrollX = window.scrollX;
 
@@ -291,29 +291,29 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           const showAbove = spaceBelow < dpHeight + offset && spaceAbove > dpHeight;
 
           let top = showAbove
-              ? targetRect.top + scrollY - dpHeight - offset
-              : targetRect.bottom + scrollY + offset;
+            ? targetRect.top + scrollY - dpHeight - offset
+            : targetRect.bottom + scrollY + offset;
 
           let left = targetRect.left + scrollX;
 
           if (left + dpWidth > window.innerWidth) {
-              left = window.innerWidth - dpWidth - 10;
+            left = window.innerWidth - dpWidth - 10;
           }
 
           $datepicker.style.position = 'absolute';
           $datepicker.style.top = `${top}px`;
           $datepicker.style.left = `${left}px`;
           if ($pointer) {
-              $pointer.style.display = 'block';
-              $pointer.style.position = 'absolute';
-              $pointer.style.left = '10px'; 
-              $pointer.style.top = showAbove ? 'calc(100% - 5px)' : '-5px';
-              $pointer.style.transform = showAbove ? 'rotate(135deg)' : 'rotate(-45deg)';
+            $pointer.style.display = 'block';
+            $pointer.style.position = 'absolute';
+            $pointer.style.left = '10px';
+            $pointer.style.top = showAbove ? 'calc(100% - 5px)' : '-5px';
+            $pointer.style.transform = showAbove ? 'rotate(135deg)' : 'rotate(-45deg)';
           }
           return function completeHide() {
-              done();
+            done();
           };
-      },
+        },
         onSelect: ({ datepicker }: { datepicker: AirDatepickerInstance }) => {
           if (type === 'date') {
             commitChange(datepicker.selectedDates.length ? datepicker.selectedDates[0] : null);

@@ -60,7 +60,12 @@ type PagerProps = {
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Button className={UI_CLASSNAME + 'page-prev'} type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
+      <Button
+        className={UI_CLASSNAME + 'page-prev'}
+        type="text"
+        disabled={pageCursor <= 0}
+        onClick={() => setPageCursor(pageCursor - 1)}
+      >
         <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>

@@ -3,10 +3,22 @@ import { NavLink } from 'react-router-dom';
 import { PDFME_VERSION } from '@pdfme/common';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 
-const externalIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4 ml-1">
-  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-</svg>
-
+const externalIcon = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-4 ml-1"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+    />
+  </svg>
+);
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -51,7 +63,7 @@ function HelpModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
                     onClick={() =>
                       window.open(
                         'https://app.pdfme.com/contact?utm_source=playground&utm_content=need-help',
-                        '_blank'
+                        '_blank',
                       )
                     }
                     className="flex justify-center items-center w-full rounded-md bg-blue-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
@@ -106,15 +118,13 @@ export default function Navigation() {
       isActive
         ? 'border-green-500 text-green-600'
         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-      'whitespace-nowrap border-b-2 px-1 py-2 text-sm font-medium'
+      'whitespace-nowrap border-b-2 px-1 py-2 text-sm font-medium',
     );
 
   return (
     <div className="border-b border-gray-200 my-1 overflow-x-auto">
       <nav aria-label="Tabs" className="-mb-px flex items-center space-x-3 px-4">
-        <span className="text-xs text-gray-500 select-none">
-          Version: {PDFME_VERSION}
-        </span>
+        <span className="text-xs text-gray-500 select-none">Version: {PDFME_VERSION}</span>
 
         {navLinks.map((item) => (
           <NavLink id={item.id} key={item.to} to={item.to} end className={linkClass}>

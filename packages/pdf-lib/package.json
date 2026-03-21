@@ -1,33 +1,33 @@
 {
   "name": "@pdfme/pdf-lib",
   "version": "0.0.0",
-  "sideEffects": false,
-  "author": "hand-dot",
-  "license": "MIT",
+  "description": "Create and modify PDF files with JavaScript",
   "keywords": [
-    "pdf-lib",
-    "pdf",
-    "document",
     "create",
-    "modify",
     "creation",
-    "modification",
+    "document",
     "edit",
     "editing",
-    "typescript",
     "javascript",
-    "library"
+    "library",
+    "modification",
+    "modify",
+    "pdf",
+    "pdf-lib",
+    "typescript"
   ],
-  "description": "Create and modify PDF files with JavaScript",
   "homepage": "https://pdfme.com",
+  "bugs": {
+    "url": "https://github.com/pdfme/pdfme/issues"
+  },
+  "license": "MIT",
+  "author": "hand-dot",
   "repository": {
     "type": "git",
     "url": "git@github.com:pdfme/pdfme.git"
   },
-  "bugs": {
-    "url": "https://github.com/pdfme/pdfme/issues"
-  },
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -38,14 +38,18 @@
       "default": "./dist/index.js"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build && tsc -p tsconfig.build.json",
     "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
-    "lint": "eslint --ext .ts src --config eslint.config.mjs",
+    "lint": "vp lint -c ../../.oxlintrc.json src",
+    "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
     "test": "vitest run --config ../../vitest.config.ts",
     "prune": "ts-prune src",
-    "prettier": "prettier --write 'src/**/*.ts'"
+    "prettier": "npm run fmt"
   },
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",
@@ -58,8 +62,5 @@
     "@pdf-lib/fontkit": "^1.1.0",
     "@types/color": "^4.2.0",
     "@types/pako": "^2.0.4"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

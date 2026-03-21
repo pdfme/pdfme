@@ -1,6 +1,6 @@
 # PROGRESS
 
-Last updated: 2026-03-20 JST
+Last updated: 2026-03-21 JST
 
 Latest committed checkpoint:
 
@@ -57,6 +57,9 @@ Latest committed checkpoint:
 - package-local ESLint の project 解決を `tsconfig.json` ベースへ統一し、不要になった `tsconfig.cjs.json` / `tsconfig.esm.json` / `tsconfig.node.json` を削除
 - CI workflow を `npm ci` と root scripts ベースへ整理し、`lint:oxlint` / `lint:typecheck` / `typecheck` を明示実行するよう更新
 - root の `npm run build` / `npm run test` と playground の `npm run build` / `npm run test` が通ることを確認
+- root / package / playground の task 実行を `vite-plus` (`vp`) ベースへ整理
+- `lint` / `fmt` を `vp lint` / `vp fmt` ベースへ寄せ、shared config を `.oxlintrc.json` / `.oxfmtrc.json` に移行
+- legacy ESLint / Prettier config と不要 devDependencies を撤去し、lint/format の front door を `vp native` に統一
 
 まだ未着手:
 

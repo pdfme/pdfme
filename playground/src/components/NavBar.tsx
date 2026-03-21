@@ -1,4 +1,4 @@
-import { Disclosure } from "@headlessui/react";
+import { Disclosure } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
 
 export type NavItem = {
@@ -19,9 +19,10 @@ export function NavBar({ items }: NavBarProps) {
             <div className="relative flex h-16 items-center justify-between">
               <div className="flex flex-1 items-center justify-start sm:items-stretch sm:justify-start">
                 <div className="hidden sm:block">
-                  <div className={"grid gap-4 text-sm items-end justify-items-center"}
+                  <div
+                    className={'grid gap-4 text-sm items-end justify-items-center'}
                     style={{
-                      gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`
+                      gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
                     }}
                   >
                     {items.map(({ label, content }, index) => (
@@ -47,7 +48,7 @@ export function NavBar({ items }: NavBarProps) {
             </div>
           </div>
 
-          <Disclosure.Panel className="sm:hidden border-t bg-white z-10 w-full absolute" >
+          <Disclosure.Panel className="sm:hidden border-t bg-white z-10 w-full absolute">
             <div className="px-2 pt-2 pb-3 space-y-2 text-sm shadow-md rounded-md bg-white">
               {items.map(({ label, content }) => (
                 <div key={label} className="flex flex-col border-b border-gray-200 py-2">

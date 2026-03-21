@@ -1,12 +1,13 @@
 {
   "name": "playground",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "dev": "npm run generate-template-assets && vite",
-    "build": "npm run generate-template-assets && vite build && npm run copy-vercel-config",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext ts,tsx",
-    "preview": "vite preview",
+    "dev": "npm run generate-template-assets && vp dev",
+    "build": "npm run generate-template-assets && vp build && npm run copy-vercel-config",
+    "lint": "vp lint -c .oxlintrc.json src e2e vite.config.ts vitest.setup.ts",
+    "fmt": "vp fmt -c ../.oxfmtrc.json src e2e vite.config.ts vitest.setup.ts postcss.config.js tailwind.config.js --write",
+    "preview": "vp preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
@@ -14,7 +15,8 @@
     "test:exports": "node scripts/verify-package-exports.mjs",
     "test": "npm run test:exports && vitest run --config ../vitest.config.ts",
     "test:update-snapshots": "npm run test:exports && vitest run --config ../vitest.config.ts -u",
-    "test:local": "npm run test:exports && LOCAL=true vitest run --config ../vitest.config.ts"
+    "test:local": "npm run test:exports && LOCAL=true vitest run --config ../vitest.config.ts",
+    "prettier": "npm run fmt"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
@@ -34,16 +36,11 @@
   },
   "devDependencies": {
     "@puppeteer/replay": "^3.1.1",
+    "@sentry/vite-plugin": "^5.1.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@sentry/vite-plugin": "^5.1.1",
     "@vitejs/plugin-react": "^6.0.1",
     "autoprefixer": "^10.4.20",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
     "gh-pages": "^6.0.0",
     "p-limit": "^7.3.0",
     "postcss": "^8.4.49",
@@ -51,6 +48,7 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.0.2",
     "vite": "^8.0.1",
+    "vite-plus": "^0.1.13",
     "vitest": "^4.1.0",
     "vitest-image-snapshot": "^0.6.47"
   }

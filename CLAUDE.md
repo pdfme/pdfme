@@ -30,9 +30,9 @@ PDFme is an open-source TypeScript-based PDF generation and manipulation library
 
 ### Required Development Tools
 - **TypeScript**: For type checking and compilation
-- **ESLint**: Code linting (configured in `eslint.config.mjs`)
-- **Prettier**: Code formatting
-- **Jest**: Testing framework with image snapshot support
+- **Vite+ (`vp`)**: Unified task runner used for install/run/lint/fmt
+- **Oxlint/Oxfmt**: Native linting and formatting through `vp`
+- **Vitest**: Testing framework with image snapshot support
 
 ### OS-Specific Considerations
 - **Windows**: Use Git Bash or WSL for shell commands
@@ -68,8 +68,8 @@ cd packages/[package-name] && npm run test
 
 ### Code Quality
 ```bash
-npm run lint      # Run ESLint
-npm run prettier  # Format code
+npm run lint  # Run vp native lint
+npm run fmt   # Format code with vp native fmt
 ```
 
 ### Building Individual Packages
@@ -171,8 +171,8 @@ Implementation: `packages/common/src/expression.ts`
 
 ### Code Standards
 - **TypeScript**: All new code must be written in TypeScript
-- **ESLint**: Follow existing ESLint configuration
-- **Prettier**: Format code using `npm run prettier`
+- **Lint**: Follow the shared `vp lint` / `.oxlintrc.json` setup
+- **Format**: Format code using `npm run fmt`
 - **Type Safety**: Ensure proper type definitions and avoid `any` types
 
 ### Commit Message Standards
