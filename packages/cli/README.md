@@ -51,6 +51,13 @@ npm install -D @pdfme/cli
 npx @pdfme/cli generate --help
 ```
 
+monorepo でローカルに試す場合は、build 後にエントリポイントを直接実行できる:
+
+```bash
+npm run build -w packages/cli
+node packages/cli/dist/index.js --help
+```
+
 **要件**: Node.js 20 以上
 
 ---
