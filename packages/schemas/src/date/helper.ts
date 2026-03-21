@@ -70,43 +70,53 @@ interface Locale {
   formatLocale: dateFns.Locale;
 }
 
-const LOCALE_MAP: Record<string, Locale> = {
-  ar: { label: 'Arabic', adLocale: localeAr, formatLocale: dateFns.ar },
-  bg: { label: 'Bulgarian', adLocale: localeBg, formatLocale: dateFns.bg },
-  ca: { label: 'Catalan', adLocale: localeCa, formatLocale: dateFns.ca },
-  cs: { label: 'Czech', adLocale: localeCs, formatLocale: dateFns.cs },
-  da: { label: 'Danish', adLocale: localeDa, formatLocale: dateFns.da },
-  de: { label: 'German', adLocale: localeDe, formatLocale: dateFns.de },
-  el: { label: 'Greek', adLocale: localeEl, formatLocale: dateFns.el },
-  en: { label: 'English', adLocale: localeEn, formatLocale: dateFns.enUS },
-  es: { label: 'Spanish', adLocale: localeEs, formatLocale: dateFns.es },
-  eu: { label: 'Basque', adLocale: localeEu, formatLocale: dateFns.eu },
-  fi: { label: 'Finnish', adLocale: localeFi, formatLocale: dateFns.fi },
-  fr: { label: 'French', adLocale: localeFr, formatLocale: dateFns.fr },
-  hr: { label: 'Croatian', adLocale: localeHr, formatLocale: dateFns.hr },
-  hu: { label: 'Hungarian', adLocale: localeHu, formatLocale: dateFns.hu },
-  id: { label: 'Indonesian', adLocale: localeId, formatLocale: dateFns.id },
-  it: { label: 'Italian', adLocale: localeIt, formatLocale: dateFns.it },
-  ja: { label: 'Japanese', adLocale: localeJa, formatLocale: dateFns.ja },
-  ko: { label: 'Korean', adLocale: localeKo, formatLocale: dateFns.ko },
-  nb: { label: 'Norwegian Bokmål', adLocale: localeNb, formatLocale: dateFns.nb },
-  nl: { label: 'Dutch', adLocale: localeNl, formatLocale: dateFns.nl },
-  pl: { label: 'Polish', adLocale: localePl, formatLocale: dateFns.pl },
-  'pt-Br': { label: 'Portuguese', adLocale: localePtBR, formatLocale: dateFns.ptBR },
-  pt: { label: 'Portuguese', adLocale: localePt, formatLocale: dateFns.pt },
-  ro: { label: 'Romanian', adLocale: localeRo, formatLocale: dateFns.ro },
-  ru: { label: 'Russian', adLocale: localeRu, formatLocale: dateFns.ru },
-  si: { label: 'Sinhala', adLocale: localeSi, formatLocale: dateFns.enUS },
-  sk: { label: 'Slovak', adLocale: localeSk, formatLocale: dateFns.sk },
-  sl: { label: 'Slovenian', adLocale: localeSl, formatLocale: dateFns.sl },
-  sv: { label: 'Swedish', adLocale: localeSv, formatLocale: dateFns.sv },
-  th: { label: 'Thai', adLocale: localeTh, formatLocale: dateFns.th },
-  tr: { label: 'Turkish', adLocale: localeTr, formatLocale: dateFns.tr },
-  uk: { label: 'Ukrainian', adLocale: localeUk, formatLocale: dateFns.uk },
-  zh: { label: 'Chinese', adLocale: localeZh, formatLocale: dateFns.zhCN },
+const normalizeAdLocale = (
+  locale: AirDatepickerLocale | { default: AirDatepickerLocale },
+): AirDatepickerLocale => {
+  return 'default' in locale ? locale.default : locale;
 };
 
-const getAirDatepickerLocale = (locale: string) => {
+const LOCALE_MAP: Record<string, Locale> = {
+  ar: { label: 'Arabic', adLocale: normalizeAdLocale(localeAr), formatLocale: dateFns.ar },
+  bg: { label: 'Bulgarian', adLocale: normalizeAdLocale(localeBg), formatLocale: dateFns.bg },
+  ca: { label: 'Catalan', adLocale: normalizeAdLocale(localeCa), formatLocale: dateFns.ca },
+  cs: { label: 'Czech', adLocale: normalizeAdLocale(localeCs), formatLocale: dateFns.cs },
+  da: { label: 'Danish', adLocale: normalizeAdLocale(localeDa), formatLocale: dateFns.da },
+  de: { label: 'German', adLocale: normalizeAdLocale(localeDe), formatLocale: dateFns.de },
+  el: { label: 'Greek', adLocale: normalizeAdLocale(localeEl), formatLocale: dateFns.el },
+  en: { label: 'English', adLocale: normalizeAdLocale(localeEn), formatLocale: dateFns.enUS },
+  es: { label: 'Spanish', adLocale: normalizeAdLocale(localeEs), formatLocale: dateFns.es },
+  eu: { label: 'Basque', adLocale: normalizeAdLocale(localeEu), formatLocale: dateFns.eu },
+  fi: { label: 'Finnish', adLocale: normalizeAdLocale(localeFi), formatLocale: dateFns.fi },
+  fr: { label: 'French', adLocale: normalizeAdLocale(localeFr), formatLocale: dateFns.fr },
+  hr: { label: 'Croatian', adLocale: normalizeAdLocale(localeHr), formatLocale: dateFns.hr },
+  hu: { label: 'Hungarian', adLocale: normalizeAdLocale(localeHu), formatLocale: dateFns.hu },
+  id: { label: 'Indonesian', adLocale: normalizeAdLocale(localeId), formatLocale: dateFns.id },
+  it: { label: 'Italian', adLocale: normalizeAdLocale(localeIt), formatLocale: dateFns.it },
+  ja: { label: 'Japanese', adLocale: normalizeAdLocale(localeJa), formatLocale: dateFns.ja },
+  ko: { label: 'Korean', adLocale: normalizeAdLocale(localeKo), formatLocale: dateFns.ko },
+  nb: { label: 'Norwegian Bokmål', adLocale: normalizeAdLocale(localeNb), formatLocale: dateFns.nb },
+  nl: { label: 'Dutch', adLocale: normalizeAdLocale(localeNl), formatLocale: dateFns.nl },
+  pl: { label: 'Polish', adLocale: normalizeAdLocale(localePl), formatLocale: dateFns.pl },
+  'pt-Br': {
+    label: 'Portuguese',
+    adLocale: normalizeAdLocale(localePtBR),
+    formatLocale: dateFns.ptBR,
+  },
+  pt: { label: 'Portuguese', adLocale: normalizeAdLocale(localePt), formatLocale: dateFns.pt },
+  ro: { label: 'Romanian', adLocale: normalizeAdLocale(localeRo), formatLocale: dateFns.ro },
+  ru: { label: 'Russian', adLocale: normalizeAdLocale(localeRu), formatLocale: dateFns.ru },
+  si: { label: 'Sinhala', adLocale: normalizeAdLocale(localeSi), formatLocale: dateFns.enUS },
+  sk: { label: 'Slovak', adLocale: normalizeAdLocale(localeSk), formatLocale: dateFns.sk },
+  sl: { label: 'Slovenian', adLocale: normalizeAdLocale(localeSl), formatLocale: dateFns.sl },
+  sv: { label: 'Swedish', adLocale: normalizeAdLocale(localeSv), formatLocale: dateFns.sv },
+  th: { label: 'Thai', adLocale: normalizeAdLocale(localeTh), formatLocale: dateFns.th },
+  tr: { label: 'Turkish', adLocale: normalizeAdLocale(localeTr), formatLocale: dateFns.tr },
+  uk: { label: 'Ukrainian', adLocale: normalizeAdLocale(localeUk), formatLocale: dateFns.uk },
+  zh: { label: 'Chinese', adLocale: normalizeAdLocale(localeZh), formatLocale: dateFns.zhCN },
+};
+
+export const getAirDatepickerLocale = (locale: string) => {
   const data = LOCALE_MAP[locale];
   if (!data) {
     throw new Error(`Unsupported locale: ${locale}`);
@@ -151,7 +161,7 @@ const strDateToDate = (strDate: string, type: PickerType): Date => {
   return new Date(strDate);
 };
 
-const getFormat = (type: PickerType, locale: Locale): string => {
+export const getFormat = (type: PickerType, locale: Locale): string => {
   switch (type) {
     case 'date': {
       return locale.adLocale.dateFormat;
@@ -165,14 +175,49 @@ const getFormat = (type: PickerType, locale: Locale): string => {
   }
 };
 
-const getFmtValue = (
+export const isValidDateFormat = (
+  formatString: string | undefined,
+  locale: Locale,
+): formatString is string => {
+  if (typeof formatString !== 'string') {
+    return false;
+  }
+
+  const normalizedFormat = formatString.trim();
+  if (!normalizedFormat || normalizedFormat === 'undefined') {
+    return false;
+  }
+
+  try {
+    format(new Date(0), normalizedFormat, {
+      locale: locale.formatLocale,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const getSafeFormat = (
+  type: PickerType,
+  schema: Pick<DateSchema, 'format'>,
+  locale: Locale,
+): string => {
+  return isValidDateFormat(schema.format, locale)
+    ? schema.format.trim()
+    : getFormat(type, locale);
+};
+
+export const getFmtValue = (
   value: string,
   type: PickerType,
   schema: DateSchema,
   locale: Locale,
 ): string => {
+  const formatString = getSafeFormat(type, schema, locale);
+
   return value
-    ? format(strDateToDate(value, type), schema.format, {
+    ? format(strDateToDate(value, type), formatString, {
         locale: locale.formatLocale,
       })
     : '';
@@ -204,6 +249,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
       const { schema, value, onChange, rootElement, mode, options, i18n } = arg;
 
       const locale = getAirDatepickerLocale(schema.locale || options.lang || defaultLocale);
+      const formatString = getSafeFormat(type, schema, locale);
 
       const textElement = document.createElement('div');
       const textElementStyle: CSS.Properties = {
@@ -270,7 +316,7 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         locale: locale.adLocale,
         selectedDates: value.trim() ? [strDateToDate(value, type)] : [],
         dateFormat: (date: AirDatepickerDate) =>
-          format(date, schema.format, { locale: locale.formatLocale }),
+          format(date, formatString, { locale: locale.formatLocale }),
         timepicker: type !== 'date',
         onlyTimepicker: type === 'time',
         isMobile: window.innerWidth < 768,
@@ -355,19 +401,27 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
         const fontNames = Object.keys(font);
         const fallbackFontName = getFallbackFontName(font);
+        const activeDateSchema = activeSchema as { locale?: string; format?: string };
 
         const locale = getAirDatepickerLocale(
-          (activeSchema as { locale?: string }).locale || options.lang || defaultLocale,
+          activeDateSchema.locale || options.lang || defaultLocale,
         );
+        const defaultFormat = getFormat(type, locale);
+        const safeFormat = getSafeFormat(
+          type,
+          activeDateSchema as Pick<DateSchema, 'format'>,
+          locale,
+        );
+        const schemaChanges = [];
 
-        if (
-          (activeSchema as { locale?: string }).locale === undefined &&
-          (activeSchema as { locale?: string }).locale !== options.lang
-        ) {
-          changeSchemas([
-            { schemaId: activeSchema.id, key: 'locale', value: options.lang },
-            { schemaId: activeSchema.id, key: 'format', value: getFormat(type, locale) },
-          ]);
+        if (activeDateSchema.locale === undefined && activeDateSchema.locale !== options.lang) {
+          schemaChanges.push({ schemaId: activeSchema.id, key: 'locale', value: options.lang });
+        }
+        if (activeDateSchema.format !== safeFormat) {
+          schemaChanges.push({ schemaId: activeSchema.id, key: 'format', value: safeFormat });
+        }
+        if (schemaChanges.length > 0) {
+          changeSchemas(schemaChanges);
         }
 
         const formatter = getExtraFormatterSchema(i18n);
@@ -375,16 +429,8 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           (button) => button.key === Formatter.ALIGNMENT,
         );
 
-        const validateDateTimeFormat = (_rule: unknown, formatString: string): boolean => {
-          try {
-            format('Thu Jan 01 1970 00:00:00 GMT+0000', formatString, {
-              locale: locale.formatLocale,
-            });
-            return true;
-          } catch {
-            return false;
-          }
-        };
+        const validateDateTimeFormat = (_rule: unknown, formatString: string): boolean =>
+          isValidDateFormat(formatString, locale);
 
         const localeOptions = Object.keys(LOCALE_MAP).map((lc) => ({
           label: `${lc} (${LOCALE_MAP[lc].label})`,
@@ -395,8 +441,8 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
           format: {
             title: i18n('schemas.date.format'),
             type: 'string',
-            default: getFormat(type, locale),
-            placeholder: getFormat(type, locale),
+            default: safeFormat,
+            placeholder: defaultFormat,
             rules: [
               {
                 validator: validateDateTimeFormat,
