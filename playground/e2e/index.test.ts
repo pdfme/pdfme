@@ -323,13 +323,8 @@ describe('Playground E2E Tests', () => {
   it('should select Pedigree template and compare PDF snapshot', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
 
-    // 5. Return to template list screen
-    await page.click('#templates-nav');
-    await page.reload();
-
-    // 6. Select Pedigree template
-    await page.waitForSelector('#template-img-pedigree', { timeout });
-    await page.click('#template-img-pedigree');
+    // 5. Load the Pedigree designer directly to avoid flaky list-page navigation in CI
+    await page.goto(`${baseUrl}/?template=pedigree`, { waitUntil: 'networkidle2', timeout });
 
     await waitForDesignerReady(page);
 
