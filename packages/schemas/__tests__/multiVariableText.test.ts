@@ -74,7 +74,7 @@ describe('validateVariables', () => {
 
   it('should throw an error for missing required variables', () => {
     const value = JSON.stringify({ var1: 'value1' });
-    expect(() => validateVariables(value, schema)).toThrowError(
+    expect(() => validateVariables(value, schema)).toThrow(
       '[@pdfme/generator] variable var2 is missing for field test'
     );
   });
@@ -92,7 +92,7 @@ describe('validateVariables', () => {
 
   it('should throw an error for invalid JSON input', () => {
     const value = '{ var1: value1 var2: value2 }'; // Invalid JSON
-    expect(() => validateVariables(value, schema)).toThrowError(SyntaxError);
+    expect(() => validateVariables(value, schema)).toThrow(SyntaxError);
   });
 
   it('should return true for a string with no variables', () => {
