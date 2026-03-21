@@ -42,9 +42,7 @@
     "clean": "rimraf dist",
     "lint": "vp lint -c ../../.oxlintrc.json src",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
-    "test": "vitest run --config ../../vitest.config.ts",
-    "prune": "ts-prune src",
-    "prettier": "npm run fmt"
+    "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",

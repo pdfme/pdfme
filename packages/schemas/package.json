@@ -46,9 +46,7 @@
     "clean": "rimraf dist",
     "lint": "vp lint -c ../../.oxlintrc.json src",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
-    "test": "vitest run --config ../../vitest.config.ts",
-    "prune": "ts-prune src",
-    "prettier": "npm run fmt"
+    "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
@@ -62,7 +60,6 @@
   "devDependencies": {
     "@pdfme/common": "*",
     "@types/bwip-js": "^3.2.1",
-    "@types/dompurify": "^3.2.0",
     "@types/fontkit": "^2.0.9",
     "@types/pngjs": "^6.0.2",
     "csstype": "^3.2.3",

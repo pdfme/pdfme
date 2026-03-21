@@ -42,9 +42,7 @@
     "lint": "vp lint -c ../../.oxlintrc.json src",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
     "test": "vitest run --config ../../vitest.config.ts",
-    "test:update-snapshots": "vitest run --config ../../vitest.config.ts -u",
-    "prune": "ts-prune src",
-    "prettier": "npm run fmt"
+    "test:update-snapshots": "vitest run --config ../../vitest.config.ts -u"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*"

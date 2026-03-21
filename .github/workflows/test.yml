@@ -17,8 +17,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npm run lint:oxlint
-      - run: npm run lint:typecheck
       - run: npm run typecheck
       - run: npm run build
       - run: npm run lint
@@ -48,8 +46,8 @@ jobs:
           npm ci --prefix playground
       - name: Run playground checks
         run: |
-          npm run lint:playground
-          npm run build:playground
-          npm run test:playground
+          npm --prefix playground run lint
+          npm --prefix playground run build
+          npm --prefix playground run test
         env:
           CI: true

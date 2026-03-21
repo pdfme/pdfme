@@ -47,9 +47,7 @@
     "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
     "lint": "vp lint -c ../../.oxlintrc.json src",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
-    "test": "vitest run --config ../../vitest.config.ts",
-    "prune": "ts-prune src",
-    "prettier": "npm run fmt"
+    "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",

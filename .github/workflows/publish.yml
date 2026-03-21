@@ -49,12 +49,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint (Oxlint)
-        run: npm run lint:oxlint
-
-      - name: Lint (Type-Aware)
-        run: npm run lint:typecheck
-
       - name: Typecheck
         run: npm run typecheck
 
@@ -94,8 +88,8 @@ jobs:
 
       - name: Run playground checks
         run: |
-          npm run lint:playground
-          npm run build:playground
-          npm run test:playground
+          npm --prefix playground run lint
+          npm --prefix playground run build
+          npm --prefix playground run test
         env:
           CI: true
