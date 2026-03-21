@@ -41,7 +41,7 @@
     "fmt:meta": "vp fmt -c .oxfmtrc.json package.json packages/cli/package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --write",
     "ci": "npm run check && npm run build && npm --prefix playground run build",
     "typecheck": "node packages/common/set-version.cjs && tsc -b",
-    "test": "node scripts/run-workspace-tests.mjs",
+    "test": "vp run --filter '@pdfme/*' test",
     "lint": "vp run --filter '@pdfme/*' lint && npm --prefix playground run lint",
     "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
   },
