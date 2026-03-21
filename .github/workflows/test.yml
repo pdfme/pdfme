@@ -2,41 +2,43 @@ name: Testing
 
 on: [pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pdfme-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playground/package-lock.json
       - run: npm ci
       - run: npm run typecheck
+      - run: ./node_modules/.bin/vp run --filter '@pdfme/*' lint
       - run: npm run build
-      - run: npm run lint
       - run: npm run test
         env:
           CI: true
 
   playground-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playground/package-lock.json
       - name: Install workspace dependencies and build packages
         run: |
           npm ci
