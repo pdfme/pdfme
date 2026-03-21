@@ -12,6 +12,8 @@ const trackedSpecifiers = [
   '@pdfme/generator',
   '@pdfme/manipulator',
   '@pdfme/schemas',
+  '@pdfme/schemas/builtins',
+  '@pdfme/schemas/tables',
   '@pdfme/schemas/utils',
   '@pdfme/ui',
 ];

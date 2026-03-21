@@ -8,7 +8,6 @@ This document tracks the breaking changes planned for the next major release and
 | --------------------------------- | -------------------------------------------------------------- | -------------------------------------- |
 | `ESM-only` packages               | Anyone using `require('@pdfme/...')`                           | Move to `import` / `export` syntax     |
 | `Node 20+` minimum runtime        | Node 16 / 18 users                                             | Upgrade to Node 20 LTS or newer        |
-| `React 18+` for UI packages       | `@pdfme/ui` consumers on React 16 / 17                         | Upgrade `react` and `react-dom` to 18+ |
 | Internal `dist/*` imports removed | Anyone importing `@pdfme/*/dist/...` or `@pdfme/*/cjs/src/...` | Import only from package root exports  |
 
 ## Support Policy
@@ -17,7 +16,6 @@ This document tracks the breaking changes planned for the next major release and
 | ---------------- | ---------- |
 | Runtime          | Node 20+   |
 | Browser target   | `es2020`   |
-| UI peer baseline | React 18+  |
 | Module format    | `ESM-only` |
 
 ## Migrations
@@ -63,14 +61,6 @@ After:
 ```ts
 import { generate } from '@pdfme/generator';
 import { pdf2img } from '@pdfme/converter';
-```
-
-### React 18+
-
-Update UI consumers to React 18 or newer:
-
-```bash
-npm install react@^18 react-dom@^18
 ```
 
 ### Node 20+

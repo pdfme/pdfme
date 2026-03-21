@@ -29,6 +29,8 @@ The packages for using PDF designer, forms and viewers can be installed with the
 npm i @pdfme/ui @pdfme/common
 ```
 
+`@pdfme/ui` ships as a standalone bundle, so you do not need to install `react` or `react-dom` separately just to use Designer, Form, or Viewer.
+
 \*You must install `@pdfme/common` regardless of which package you use.
 
 The following type, function and classes are available in pdfme.

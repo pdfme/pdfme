@@ -11,7 +11,7 @@ import {
   pluginRegistry,
   BasePdf,
 } from '@pdfme/common';
-import { builtInPlugins } from '@pdfme/schemas';
+import { builtInPlugins } from '@pdfme/schemas/builtins';
 import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types.js';

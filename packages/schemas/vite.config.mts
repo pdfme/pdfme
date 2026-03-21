@@ -34,7 +34,9 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        builtins: resolve(__dirname, 'src/builtins.ts'),
         index: resolve(__dirname, 'src/index.ts'),
+        tables: resolve(__dirname, 'src/tables.ts'),
         utils: resolve(__dirname, 'src/utils.ts'),
       },
       fileName: (_, entryName) => `${entryName}.js`,

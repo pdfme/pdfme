@@ -8,7 +8,7 @@ import {
   pt2mm,
   cloneDeep,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
 import {
   insertPage,
   preprocessing,

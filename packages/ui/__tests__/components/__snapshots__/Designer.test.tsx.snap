@@ -60,7 +60,6 @@ exports[`Designer snapshot 1`] = `
                 />
               </svg>
             </div>
-            
           </button>
         </div>
       </div>
@@ -112,7 +111,6 @@ exports[`Designer snapshot 1`] = `
                 />
               </svg>
             </div>
-            
           </button>
         </div>
       </div>
@@ -142,7 +140,6 @@ exports[`Designer snapshot 1`] = `
                 >
                   Minus
                 </span>
-                
               </button>
               <span
                 class="ant-typography css-dev-only-do-not-override-11mmrso"
@@ -162,7 +159,6 @@ exports[`Designer snapshot 1`] = `
                 >
                   Plus
                 </span>
-                
               </button>
             </div>
           </div>
@@ -182,7 +178,6 @@ exports[`Designer snapshot 1`] = `
           >
             ArrowRight
           </span>
-          
         </button>
         <div
           style="width: 400px; height: 100%; display: flex; top: 0px; right: 0px; position: absolute; font-family: "Open Sans", sans-serif; box-sizing: border-box; background: rgb(245, 245, 245); border-left: 1px solid rgba(5, 5, 5, 0.06);"
@@ -234,7 +229,6 @@ exports[`Designer snapshot 1`] = `
                       >
                         GripVertical
                       </span>
-                      
                     </button>
                     <div
                       style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
@@ -293,7 +287,6 @@ exports[`Designer snapshot 1`] = `
                       >
                         GripVertical
                       </span>
-                      
                     </button>
                     <div
                       style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
@@ -364,10 +357,8 @@ exports[`Designer snapshot 1`] = `
                 type="button"
               >
                 <u>
-                   
                   Bulk update field names
                 </u>
-                
               </button>
             </div>
           </div>

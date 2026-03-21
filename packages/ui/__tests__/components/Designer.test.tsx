@@ -35,6 +35,6 @@ test('Designer snapshot', async () => {
     container = c;
   });
 
-  await waitFor(() => Boolean(container?.getElementsByClassName(SELECTABLE_CLASSNAME)));
+  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
   expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });

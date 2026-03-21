@@ -1,4 +1,12 @@
 export const normalizeElementIdsForSnapshot = (container: HTMLElement) => {
+  container.querySelectorAll<HTMLElement>('*').forEach((element) => {
+    element.childNodes.forEach((childNode) => {
+      if (childNode.nodeType === Node.TEXT_NODE && !childNode.textContent?.trim()) {
+        childNode.remove();
+      }
+    });
+  });
+
   const idMap = new Map<string, string>();
   let nextId = 1;
 

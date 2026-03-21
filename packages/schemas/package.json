@@ -31,6 +31,16 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./builtins": {
+      "types": "./dist/builtins.d.ts",
+      "import": "./dist/builtins.js",
+      "default": "./dist/builtins.js"
+    },
+    "./tables": {
+      "types": "./dist/tables.d.ts",
+      "import": "./dist/tables.js",
+      "default": "./dist/tables.js"
+    },
     "./utils": {
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.js",

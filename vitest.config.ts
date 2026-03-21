@@ -76,6 +76,14 @@ const pdfmeAliases = usePublishedPdfmeExports
   ? []
   : [
       {
+        find: '@pdfme/schemas/builtins',
+        replacement: path.resolve(repoRoot, 'packages/schemas/src/builtins.ts'),
+      },
+      {
+        find: '@pdfme/schemas/tables',
+        replacement: path.resolve(repoRoot, 'packages/schemas/src/tables.ts'),
+      },
+      {
         find: '@pdfme/schemas/utils',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/utils.ts'),
       },

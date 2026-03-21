@@ -7,7 +7,7 @@ import {
   getDynamicTemplate,
   replacePlaceholders,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas/utils';
+import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
 import StaticSchema from './StaticSchema.js';

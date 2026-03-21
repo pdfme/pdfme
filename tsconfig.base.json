@@ -18,6 +18,8 @@
       "@pdfme/manipulator": ["packages/manipulator/src/index.ts"],
       "@pdfme/pdf-lib": ["packages/pdf-lib/src/index.ts"],
       "@pdfme/schemas": ["packages/schemas/src/index.ts"],
+      "@pdfme/schemas/builtins": ["packages/schemas/src/builtins.ts"],
+      "@pdfme/schemas/tables": ["packages/schemas/src/tables.ts"],
       "@pdfme/schemas/utils": ["packages/schemas/src/utils.ts"],
       "@pdfme/ui": ["packages/ui/src/index.ts"]
     },
