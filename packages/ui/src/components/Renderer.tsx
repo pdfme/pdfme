@@ -158,29 +158,39 @@ const Renderer = (props: RendererProps) => {
     const renderArgs = renderArgsRef.current;
     if (!renderArgs.plugin?.ui || !element || !schema.type) return;
 
+    let cancelled = false;
     element.innerHTML = '';
+    element.dataset.pdfmeRenderReady = 'false';
     const render = renderArgs.plugin.ui;
 
-    void render({
-      value: renderArgs.value,
-      schema: renderArgs.schema,
-      basePdf: renderArgs.basePdf,
-      rootElement: element,
-      mode: renderArgs.mode,
-      onChange: renderArgs.onChange,
-      stopEditing: renderArgs.stopEditing,
-      tabIndex: renderArgs.tabIndex,
-      placeholder: renderArgs.placeholder,
-      options: renderArgs.options,
-      theme: renderArgs.theme,
-      i18n: renderArgs.i18n,
-      scale: renderArgs.scale,
-      _cache: renderArgs._cache,
+    void Promise.resolve(
+      render({
+        value: renderArgs.value,
+        schema: renderArgs.schema,
+        basePdf: renderArgs.basePdf,
+        rootElement: element,
+        mode: renderArgs.mode,
+        onChange: renderArgs.onChange,
+        stopEditing: renderArgs.stopEditing,
+        tabIndex: renderArgs.tabIndex,
+        placeholder: renderArgs.placeholder,
+        options: renderArgs.options,
+        theme: renderArgs.theme,
+        i18n: renderArgs.i18n,
+        scale: renderArgs.scale,
+        _cache: renderArgs._cache,
+      }),
+    ).finally(() => {
+      if (!cancelled) {
+        element.dataset.pdfmeRenderReady = 'true';
+      }
     });
 
     return () => {
+      cancelled = true;
       if (element) {
         element.innerHTML = '';
+        delete element.dataset.pdfmeRenderReady;
       }
     };
   }, [renderKey, schema.type]);

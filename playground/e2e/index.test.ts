@@ -153,8 +153,19 @@ async function waitForDesignerReady(page: Page, expectedText?: string) {
       const canvas = document.querySelector('.pdfme-designer-canvas');
       const spinner = document.querySelector('.pdfme-designer-root svg.lucide-loader-circle');
       const paper = document.querySelector('.pdfme-designer-canvas [style*="background-image"]');
+      const renderRoots = Array.from(
+        document.querySelectorAll('.pdfme-designer-canvas .selectable[title] > div'),
+      );
+      const renderersReady =
+        renderRoots.length > 0 &&
+        renderRoots.every((element) => {
+          const content = element as HTMLElement;
+          return (
+            content.childElementCount > 0 || (content.textContent?.trim().length ?? 0) > 0
+          );
+        });
       const fontsLoaded = !document.fonts || document.fonts.status === 'loaded';
-      return hasExpectedText && !!canvas && !spinner && !!paper && fontsLoaded;
+      return hasExpectedText && !!canvas && !spinner && !!paper && fontsLoaded && renderersReady;
     },
     { timeout },
     expectedText,
@@ -296,14 +307,7 @@ describe('Playground E2E Tests', () => {
     await page.waitForSelector('#template-img-invoice', { timeout });
     await page.click('#template-img-invoice');
 
-    // 2. Check that "INVOICE" text is present
-    await page.waitForFunction(
-      () => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('INVOICE') : false;
-      },
-      { timeout },
-    );
+    // 2. Wait for the designer canvas and schema renderers to settle
     await waitForDesignerReady(page, 'INVOICE');
 
     // 3. Screenshot & compare
@@ -324,13 +328,6 @@ describe('Playground E2E Tests', () => {
     await page.waitForSelector('#template-img-pedigree', { timeout });
     await page.click('#template-img-pedigree');
 
-    await page.waitForFunction(
-      () => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('Pet Name') : false;
-      },
-      { timeout },
-    );
     await waitForDesignerReady(page, 'Pet Name');
 
     // 7. Screenshot & compare

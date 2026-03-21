@@ -34,7 +34,7 @@
   "scripts": {
     "postinstall": "./scripts/link-workspaces.sh",
     "clean": "vp run --filter '@pdfme/*' clean",
-    "build": "npm run clean && npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && (npm run build -w packages/generator & npm run build -w packages/ui & npm run build -w packages/manipulator & npm run build -w packages/cli & wait)",
+    "build": "npm run clean && npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && (npm run build -w packages/generator & npm run build -w packages/ui & npm run build -w packages/manipulator & wait) && npm run build -w packages/cli",
     "check": "npm run fmt:check && npm run lint && npm run typecheck && npm run test && npm --prefix playground run test",
     "fmt": "vp run --filter '@pdfme/*' fmt && npm --prefix playground run fmt && npm run fmt:meta",
     "fmt:check": "vp fmt -c .oxfmtrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src playground/src playground/e2e playground/vite.config.ts playground/vitest.setup.ts playground/postcss.config.js playground/tailwind.config.js package.json packages/cli/package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --check",

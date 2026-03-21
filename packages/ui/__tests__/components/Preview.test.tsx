@@ -32,7 +32,12 @@ test('Preview(as Viewer) snapshot', async () => {
     container = c;
   });
 
-  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+  await waitFor(() => {
+    const selectableElements = container.getElementsByClassName(SELECTABLE_CLASSNAME);
+    const renderedElements = container.querySelectorAll('[data-pdfme-render-ready="true"]');
+    expect(selectableElements.length).toBeGreaterThan(0);
+    expect(renderedElements.length).toBe(selectableElements.length);
+  });
   expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });
 
@@ -57,6 +62,11 @@ test('Preview(as Form) snapshot', async () => {
     container = c;
   });
 
-  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+  await waitFor(() => {
+    const selectableElements = container.getElementsByClassName(SELECTABLE_CLASSNAME);
+    const renderedElements = container.querySelectorAll('[data-pdfme-render-ready="true"]');
+    expect(selectableElements.length).toBeGreaterThan(0);
+    expect(renderedElements.length).toBe(selectableElements.length);
+  });
   expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });
