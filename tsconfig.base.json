@@ -21,7 +21,8 @@
       "@pdfme/schemas/builtins": ["packages/schemas/src/builtins.ts"],
       "@pdfme/schemas/tables": ["packages/schemas/src/tables.ts"],
       "@pdfme/schemas/utils": ["packages/schemas/src/utils.ts"],
-      "@pdfme/ui": ["packages/ui/src/index.ts"]
+      "@pdfme/ui": ["packages/ui/src/index.ts"],
+      "@pdfme/cli": ["packages/cli/src/index.ts"]
     },
     "types": ["node"],
     "typeRoots": ["node_modules/@types"],

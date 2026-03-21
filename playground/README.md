@@ -22,10 +22,10 @@ https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md
 
 ## How to Add Templates to the List
 
-The `playground/public/templates` directory contains sample templates, which are used at [https://pdfme.com/templates](https://pdfme.com/templates) and [https://playground.pdfme.com/templates](https://playground.pdfme.com/templates).
+The `playground/public/template-assets` directory contains sample templates, which are used at [https://pdfme.com/templates](https://pdfme.com/templates) and [https://playground.pdfme.com/templates](https://playground.pdfme.com/templates).
 
 Follow these steps to add a sample template:
-1. Create a directory with a **kebab-case** name inside `playground/public/templates`.
+1. Create a directory with a **kebab-case** name inside `playground/public/template-assets`.
    - This template name will be converted from kebab-case and displayed in the template selection screen.
 2. Place a `template.json` file inside the directory you created.
    - You can create this template using [https://pdfme.com/template-design](https://pdfme.com/template-design) or [https://playground.pdfme.com](https://playground.pdfme.com).

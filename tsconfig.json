@@ -7,6 +7,7 @@
     { "path": "packages/schemas" },
     { "path": "packages/generator" },
     { "path": "packages/manipulator" },
-    { "path": "packages/ui/tsconfig.typecheck.json" }
+    { "path": "packages/ui/tsconfig.typecheck.json" },
+    { "path": "packages/cli" }
   ]
 }

@@ -1,0 +1,62 @@
+{
+  "name": "@pdfme/cli",
+  "version": "0.0.0",
+  "description": "CLI tool for pdfme - generate PDFs, convert images, validate templates",
+  "keywords": [
+    "pdf",
+    "pdf-generation",
+    "cli",
+    "typescript"
+  ],
+  "homepage": "https://pdfme.com",
+  "bugs": {
+    "url": "https://github.com/pdfme/pdfme/issues"
+  },
+  "license": "MIT",
+  "author": "hand-dot",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:pdfme/pdfme.git"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "bin": {
+    "pdfme": "dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "npm run clean && vite build && tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "lint": "vp lint -c ../../.oxlintrc.json src",
+    "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
+    "pretest": "npm run build",
+    "test": "vitest run --config ../../vitest.config.ts"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.97",
+    "@pdfme/common": "*",
+    "@pdfme/converter": "*",
+    "@pdfme/generator": "*",
+    "@pdfme/schemas": "*",
+    "citty": "^0.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

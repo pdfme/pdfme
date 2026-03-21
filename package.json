@@ -28,21 +28,22 @@
     "packages/schemas",
     "packages/generator",
     "packages/manipulator",
-    "packages/ui"
+    "packages/ui",
+    "packages/cli"
   ],
   "scripts": {
     "postinstall": "./scripts/link-workspaces.sh",
     "clean": "vp run --filter '@pdfme/*' clean",
-    "build": "npm run clean && npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && (npm run build -w packages/generator & npm run build -w packages/ui & npm run build -w packages/manipulator & wait)",
+    "build": "npm run clean && npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && (npm run build -w packages/generator & npm run build -w packages/ui & npm run build -w packages/manipulator & npm run build -w packages/cli & wait)",
     "check": "npm run fmt:check && npm run lint && npm run typecheck && npm run test && npm --prefix playground run test",
     "fmt": "vp run --filter '@pdfme/*' fmt && npm --prefix playground run fmt && npm run fmt:meta",
-    "fmt:check": "vp fmt -c .oxfmtrc.json packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src playground/src playground/e2e playground/vite.config.ts playground/vitest.setup.ts playground/postcss.config.js playground/tailwind.config.js package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --check",
-    "fmt:meta": "vp fmt -c .oxfmtrc.json package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --write",
+    "fmt:check": "vp fmt -c .oxfmtrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src playground/src playground/e2e playground/vite.config.ts playground/vitest.setup.ts playground/postcss.config.js playground/tailwind.config.js package.json packages/cli/package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --check",
+    "fmt:meta": "vp fmt -c .oxfmtrc.json package.json packages/cli/package.json packages/common/package.json packages/converter/package.json packages/generator/package.json packages/manipulator/package.json packages/pdf-lib/package.json packages/schemas/package.json packages/ui/package.json playground/package.json .oxlintrc.json .oxfmtrc.json playground/.oxlintrc.json vite.config.mts --write",
     "ci": "npm run check && npm run build && npm --prefix playground run build",
     "typecheck": "node packages/common/set-version.cjs && tsc -b",
     "test": "node scripts/run-workspace-tests.mjs",
     "lint": "vp run --filter '@pdfme/*' lint && npm --prefix playground run lint",
-    "lint:fix": "vp lint -c .oxlintrc.json packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
+    "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",

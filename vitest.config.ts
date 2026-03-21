@@ -49,6 +49,11 @@ const workspaceTests: Record<
     include: ['__tests__/**/*.test.ts', '__tests__/**/*.spec.ts'],
     testTimeout: 30000,
   },
+  'packages/cli': {
+    name: 'cli',
+    include: ['__tests__/**/*.test.ts'],
+    testTimeout: 60000,
+  },
   'packages/ui': {
     name: 'ui',
     include: ['__tests__/**/*.test.ts', '__tests__/**/*.test.tsx'],
