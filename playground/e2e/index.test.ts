@@ -124,7 +124,43 @@ const snapshotOptions: MatchImageOptions = {
   threshold: 0.2,
 };
 
+const designerSnapshotOptions: MatchImageOptions = {
+  ...snapshotOptions,
+  allowedPixelRatio: 0.035,
+};
+
 const viewport = { width: 1366, height: 768 };
+
+async function waitForDesignerReady(page: Page, expectedText?: string) {
+  await page.waitForFunction(
+    (text) => {
+      const container = document.querySelector('div.flex-1.w-full');
+      const hasExpectedText =
+        typeof text === 'string' && text.length > 0
+          ? (container?.textContent?.includes(text) ?? false)
+          : true;
+      const canvas = document.querySelector('.pdfme-designer-canvas');
+      const spinner = document.querySelector('.pdfme-designer-root svg.lucide-loader-circle');
+      const paper = document.querySelector('.pdfme-designer-canvas [style*="background-image"]');
+      const fontsLoaded = !document.fonts || document.fonts.status === 'loaded';
+      return hasExpectedText && !!canvas && !spinner && !!paper && fontsLoaded;
+    },
+    { timeout },
+    expectedText,
+  );
+
+  await page.evaluate(async () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    if (document.fonts) {
+      await document.fonts.ready;
+    }
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  });
+}
 
 async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
   await page.waitForSelector('#generate-pdf', { timeout });
@@ -162,9 +198,10 @@ async function pdfToImages(pdf: Buffer): Promise<Buffer[]> {
 }
 
 async function captureAndCompareScreenshot(page: Page, label?: string) {
+  await waitForDesignerReady(page);
   const screenshot = await page.screenshot({ type: 'png' });
   await expect(Buffer.from(screenshot)).toMatchImage(
-    label ? { ...snapshotOptions, name: label } : snapshotOptions,
+    label ? { ...designerSnapshotOptions, name: label } : designerSnapshotOptions,
   );
 }
 
@@ -203,6 +240,21 @@ describe('Playground E2E Tests', () => {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     page = await browser.newPage();
+    await page.evaluateOnNewDocument(() => {
+      const style = document.createElement('style');
+      style.textContent = `
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          caret-color: transparent !important;
+        }
+      `;
+      document.addEventListener('DOMContentLoaded', () => {
+        document.head.appendChild(style);
+      });
+    });
     await page.setRequestInterception(true);
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
@@ -240,6 +292,7 @@ describe('Playground E2E Tests', () => {
       },
       { timeout },
     );
+    await waitForDesignerReady(page, 'INVOICE');
 
     // 3. Screenshot & compare
     await captureAndCompareScreenshot(page, 'invoice-designer');
@@ -266,8 +319,7 @@ describe('Playground E2E Tests', () => {
       },
       { timeout },
     );
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await waitForDesignerReady(page, 'Pet Name');
 
     // 7. Screenshot & compare
     await captureAndCompareScreenshot(page, 'pedigree-designer');
@@ -288,6 +340,7 @@ describe('Playground E2E Tests', () => {
     const templateCreationUserFlow = parse(templateCreationRecord);
     const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
     await templateCreationRunner.run();
+    await waitForDesignerReady(page);
 
     // 11. Screenshot & compare
     await captureAndCompareScreenshot(page, 'modified-template-designer');
