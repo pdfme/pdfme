@@ -123,7 +123,7 @@ function cellStyles(
   }
   const otherStyles = Object.assign({}, styles.styles, sectionStyles);
 
-  const colStyles = styles.columnStyles[column.index] || styles.columnStyles[column.index] || {};
+  const colStyles = styles.columnStyles[column.index] || {};
 
   const rowStyles =
     sectionName === 'body' && rowIndex % 2 === 0
@@ -269,7 +269,8 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
-  schema.showHead = schema.showHead === false ? false : (!schema.__isSplit || schema.repeatHead === true);
+  schema.showHead =
+    schema.showHead === false ? false : !schema.__isSplit || schema.repeatHead === true;
 
   const input = parseInput(schema, body);
 

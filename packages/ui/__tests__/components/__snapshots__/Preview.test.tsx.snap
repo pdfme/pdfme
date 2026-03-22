@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Preview(as Form) snapshot 1`] = `
 <div
@@ -31,7 +31,6 @@ exports[`Preview(as Form) snapshot 1`] = `
               >
                 Minus
               </span>
-              
             </button>
             <span
               class="ant-typography css-dev-only-do-not-override-11mmrso"
@@ -51,7 +50,6 @@ exports[`Preview(as Form) snapshot 1`] = `
               >
                 Plus
               </span>
-              
             </button>
           </div>
         </div>
@@ -152,7 +150,6 @@ exports[`Preview(as Viewer) snapshot 1`] = `
               >
                 Minus
               </span>
-              
             </button>
             <span
               class="ant-typography css-dev-only-do-not-override-11mmrso"
@@ -172,7 +169,6 @@ exports[`Preview(as Viewer) snapshot 1`] = `
               >
                 Plus
               </span>
-              
             </button>
           </div>
         </div>

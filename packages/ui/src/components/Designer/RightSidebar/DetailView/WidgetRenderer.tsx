@@ -6,21 +6,22 @@ type Props = PropPanelWidgetProps & {
 };
 
 const WidgetRenderer = (props: Props) => {
-  const { widget, ...otherProps } = props;
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.innerHTML = '';
-      widget({ ...otherProps, rootElement: ref.current });
+    const element = ref.current;
+    if (element) {
+      const { widget, ...otherProps } = props;
+      element.innerHTML = '';
+      widget({ ...otherProps, rootElement: element });
     }
 
     return () => {
-      if (ref.current) {
-        ref.current.innerHTML = '';
+      if (element) {
+        element.innerHTML = '';
       }
     };
-  }, [props.activeSchema]);
+  }, [props]);
 
   return <div ref={ref} />;
 };

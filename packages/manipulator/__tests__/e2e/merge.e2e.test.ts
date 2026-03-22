@@ -1,6 +1,5 @@
 import { merge } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: merge', () => {
   const aPdf = loadTestPDF('a.pdf');
@@ -12,9 +11,7 @@ describe('E2E: merge', () => {
 
     const images = await pdfToImages(mergedBuffer);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `merge-abc-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`merge-abc-page${i + 1}`);
     }
   });
 });

@@ -3,6 +3,7 @@ import { Size, pt2mm } from '@pdfme/common';
 
 interface Environment {
   getDocument: (pdf: ArrayBuffer | Uint8Array) => Promise<PDFDocumentProxy>;
+  destroyDocument?: (pdfDoc: PDFDocumentProxy) => Promise<void>;
 }
 
 export interface Pdf2SizeOptions {
@@ -15,19 +16,20 @@ export async function pdf2size(
   env: Environment,
 ): Promise<Size[]> {
   const { scale = 1 } = options;
-  const { getDocument } = env;
-
+  const { getDocument, destroyDocument } = env;
   const pdfDoc = await getDocument(pdf);
 
-  const promises = Promise.all(
-    new Array(pdfDoc.numPages).fill('').map(async (_, i) => {
-      return await pdfDoc.getPage(i + 1).then((page) => {
-        const { height, width } = page.getViewport({ scale, rotation: 0 });
+  try {
+    return await Promise.all(
+      Array.from({ length: pdfDoc.numPages }, async (_, i) => {
+        return await pdfDoc.getPage(i + 1).then((page) => {
+          const { height, width } = page.getViewport({ scale, rotation: 0 });
 
-        return { height: pt2mm(height), width: pt2mm(width) };
-      });
-    }),
-  );
-
-  return promises;
+          return { height: pt2mm(height), width: pt2mm(width) };
+        });
+      }),
+    );
+  } finally {
+    await destroyDocument?.(pdfDoc);
+  }
 }

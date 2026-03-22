@@ -7,7 +7,15 @@ const mapDynamicVariables = (props: PropPanelWidgetProps) => {
 
   const mvtSchema = activeSchema as unknown as MultiVariableTextSchema;
   const text = mvtSchema.text || '';
-  const variables = JSON.parse(mvtSchema.content || '{}') as Record<string, string>;
+  let variables: Record<string, string> = {};
+  try {
+    const parsed = JSON.parse(mvtSchema.content || '{}');
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      variables = parsed as Record<string, string>;
+    }
+  } catch {
+    // content is not valid JSON (e.g. a plain string value) — start fresh
+  }
   const variablesChanged = updateVariablesFromText(text, variables);
   const varNames = Object.keys(variables);
 
@@ -113,7 +121,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
       },
     };
   },
-  widgets: { ...(parentPropPanel.widgets || {}), mapDynamicVariables },
+  widgets: { ...parentPropPanel.widgets, mapDynamicVariables },
   defaultSchema: {
     ...parentPropPanel.defaultSchema,
     readOnly: false,

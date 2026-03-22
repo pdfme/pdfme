@@ -743,7 +743,7 @@ export default class PDFDocument {
     await srcDoc.flush();
     const copier = PDFObjectCopier.for(srcDoc.context, this.context);
     const srcPages = srcDoc.getPages();
-    const copiedPages: PDFPage[] = new Array(indices.length);
+    const copiedPages: PDFPage[] = Array(indices.length);
     for (let idx = 0, len = indices.length; idx < len; idx++) {
       const srcPage = srcPages[indices[idx]];
       const copiedPage = copier.copy(srcPage.node);
@@ -1210,7 +1210,7 @@ export default class PDFDocument {
         ? (p: PDFPageLeaf) => p
         : PDFObjectCopier.for(context, this.context).copy;
 
-    const embeddedPages = new Array<PDFEmbeddedPage>(pages.length);
+    const embeddedPages = Array<PDFEmbeddedPage>(pages.length);
     for (let idx = 0, len = pages.length; idx < len; idx++) {
       const page = maybeCopyPage(pages[idx].node);
       const box = boundingBoxes[idx];

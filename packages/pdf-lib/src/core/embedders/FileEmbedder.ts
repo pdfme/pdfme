@@ -14,7 +14,7 @@ export enum AFRelationship {
   Alternative = 'Alternative',
   Supplement = 'Supplement',
   EncryptedPayload = 'EncryptedPayload',
-  FormData = 'EncryptedPayload',
+  FormData = EncryptedPayload,
   Schema = 'Schema',
   Unspecified = 'Unspecified',
 }

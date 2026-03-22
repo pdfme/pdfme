@@ -16,7 +16,7 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
     customFontName?: string,
     fontFeatures?: TypeFeatures,
   ) {
-    const font = await fontkit.create(fontData);
+    const font = fontkit.create(fontData);
     return new CustomFontSubsetEmbedder(font, fontData, customFontName, fontFeatures);
   }
 
@@ -40,7 +40,7 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
 
   encodeText(text: string): PDFHexString {
     const { glyphs } = this.font.layout(text, this.fontFeatures);
-    const hexCodes = new Array(glyphs.length);
+    const hexCodes = Array(glyphs.length);
 
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       const glyph = glyphs[idx];

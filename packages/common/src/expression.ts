@@ -45,9 +45,9 @@ const safeAssign = (
   if (target == null) {
     throw new TypeError('Cannot convert undefined or null to object');
   }
-  
+
   const to = { ...target };
-  
+
   for (const source of sources) {
     if (source != null) {
       for (const key in source) {
@@ -62,7 +62,7 @@ const safeAssign = (
       }
     }
   }
-  
+
   return to;
 };
 
@@ -134,7 +134,11 @@ const validateAST = (node: AcornNode): void => {
           throw new Error('Access to prohibited property');
         }
         // Block prototype pollution methods
-        if (['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(propName)) {
+        if (
+          ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(
+            propName,
+          )
+        ) {
           throw new Error(`Access to prohibited method: ${propName}`);
         }
         const prohibitedMethods = ['toLocaleString', 'valueOf'];
@@ -283,7 +287,12 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
           throw new Error('Access to prohibited property');
         }
         // Block prototype pollution methods
-        if (typeof prop === 'string' && ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(prop)) {
+        if (
+          typeof prop === 'string' &&
+          ['__defineGetter__', '__defineSetter__', '__lookupGetter__', '__lookupSetter__'].includes(
+            prop,
+          )
+        ) {
           throw new Error(`Access to prohibited method: ${prop}`);
         }
         return obj[prop];

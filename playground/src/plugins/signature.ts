@@ -30,7 +30,11 @@ export const signature: Plugin<Signature> = {
 
     const signaturePad = new SignaturePad(canvas);
     try {
-      value ? signaturePad.fromDataURL(value, { ratio: resetScale }) : signaturePad.clear();
+      if (value) {
+        void signaturePad.fromDataURL(value, { ratio: resetScale });
+      } else {
+        signaturePad.clear();
+      }
     } catch (e) {
       console.error(e);
     }
@@ -44,12 +48,16 @@ export const signature: Plugin<Signature> = {
       clearButton.style.zIndex = '1';
       clearButton.textContent = i18n('signature.clear') || 'x';
       clearButton.addEventListener('click', () => {
-        onChange && onChange({ key: 'content', value: '' });
+        if (onChange) {
+          onChange({ key: 'content', value: '' });
+        }
       });
       rootElement.appendChild(clearButton);
       signaturePad.addEventListener('endStroke', () => {
         const data = signaturePad.toDataURL('image/png');
-        onChange && data && onChange({ key: 'content', value: data });
+        if (onChange && data) {
+          onChange({ key: 'content', value: data });
+        }
       });
     }
     rootElement.appendChild(canvas);

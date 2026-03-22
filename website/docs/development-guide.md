@@ -32,6 +32,12 @@ If you have any questions or suggestions, please feel free to send them to [GitH
 
 For insights on development: [How to develop pdfme](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
 
+## Upcoming Breaking Changes
+
+The next major packaging update is expected to include `ESM-only`, `Node 20+`, `React 18+` for UI packages, and removal of internal `dist/*` imports.
+
+Before changing build, test, or example code, review the [Migration Guide](/docs/migration-v6).
+
 ## Need technical support?
 
 If you need technical support, please contact from [here](https://app.pdfme.com/contact?utm_source=website&utm_content=development-guide).
@@ -41,5 +47,6 @@ If you need technical support, please contact from [here](https://app.pdfme.com/
 pdfme is an open source project that is free to use.
 However, it is not free to develop and maintain pdfme.
 If you are using pdfme in your business, please consider becoming a sponsor to pdfme.
+
 - [Github Sponsors](https://github.com/sponsors/pdfme)
 - [Open Collective](https://opencollective.com/pdfme)

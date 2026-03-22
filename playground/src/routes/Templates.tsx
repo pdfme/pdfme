@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClipboardCopy } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fromKebabCase } from "../helper";
-import ExternalButton from "../components/ExternalButton";
+import { fromKebabCase } from '../helper';
+import ExternalButton from '../components/ExternalButton';
 
 declare global {
   interface Window {
@@ -22,31 +22,31 @@ type TemplateData = {
 type UIType = 'designer' | 'form-viewer';
 
 // Constants
-const DEVIN_AI_AUTHOR = "Devin AI";
-const DEVIN_INVITE_URL = "https://app.devin.ai/invite/KyOTXVPrlFl2TjcT";
+const DEVIN_AI_AUTHOR = 'Devin AI';
+const DEVIN_INVITE_URL = 'https://app.devin.ai/invite/KyOTXVPrlFl2TjcT';
 
-const CopyButton = ({ ui, name }: { ui: UIType, name: string }) => {
+const CopyButton = ({ ui, name }: { ui: UIType; name: string }) => {
   const handleCopy = async () => {
     const shareableUrl = `https://pdfme.com/template-design?ui=${ui}&template=${name}`;
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareableUrl);
       } else {
-        const textArea = document.createElement("textarea");
+        const textArea = document.createElement('textarea');
         textArea.value = shareableUrl;
-        textArea.style.position = "fixed";
+        textArea.style.position = 'fixed';
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
-        if (!document.execCommand("copy")) {
-          throw new Error("Fallback: Copying text command was unsuccessful");
+        if (!document.execCommand('copy')) {
+          throw new Error('Fallback: Copying text command was unsuccessful');
         }
         document.body.removeChild(textArea);
       }
       toast.info(`Copied shareable link to clipboard - "${fromKebabCase(name)}"`);
     } catch (error) {
-      toast.error("Failed to copy shareable link");
-      console.error("Copy failed:", error);
+      toast.error('Failed to copy shareable link');
+      console.error('Copy failed:', error);
     }
   };
 
@@ -75,7 +75,8 @@ const ContributionCard = () => (
           Contribute Your Template ❤️
         </a>
         <p className="mt-2 text-sm text-green-800 flex items-center gap-2 font-medium">
-          Share the templates you've created! Contributing your templates is extremely beneficial for other users.
+          Share the templates you've created! Contributing your templates is extremely beneficial
+          for other users.
         </p>
       </div>
       <div className="mt-6">
@@ -91,7 +92,6 @@ const ContributionCard = () => (
     </div>
   </div>
 );
-
 
 // Author link component to avoid duplication
 const AuthorLink = ({ author }: { author: string }) => {
@@ -139,7 +139,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
         Promise.all(
           Array.from(authors).map((author) => {
             if (author === DEVIN_AI_AUTHOR) {
-              avatarUrlMap[author] = "/imgs/devin.svg";
+              avatarUrlMap[author] = '/imgs/devin.svg';
               return Promise.resolve();
             } else {
               return fetch(`https://api.github.com/users/${author}`)
@@ -148,7 +148,7 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                   avatarUrlMap[author] = ghData.avatar_url;
                 });
             }
-          })
+          }),
         ).then(() => {
           setAvatarUrlMap(avatarUrlMap);
         });
@@ -157,10 +157,10 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
   // Load ethical ads
   useEffect(() => {
-    if (window.ethicalads && typeof window.ethicalads.load === "function") {
+    if (window.ethicalads && typeof window.ethicalads.load === 'function') {
       window.ethicalads.load();
     } else {
-      console.warn("EthicalAds script is not loaded yet.");
+      console.warn('EthicalAds script is not loaded yet.');
     }
   }, [templates]);
 
@@ -184,16 +184,13 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
           </p>
           <div className="mt-4 ml-auto">
             {React.createElement(ExternalButton, {
-              href: "https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title=TEMPLATE_NAME",
-              title: "Request a Template"
+              href: 'https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title=TEMPLATE_NAME',
+              title: 'Request a Template',
             })}
           </div>
         </div>
         <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-          {templates.map(({
-            name,
-            author
-          }, index) => (
+          {templates.map(({ name, author }, index) => (
             <React.Fragment key={name}>
               {index === 3 && (
                 <div
@@ -214,11 +211,9 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
                     />
                   </div>
                   <div className="relative mt-4">
-                    <h3 className="text-md font-bold text-green-600">
-                      {fromKebabCase(name)}
-                    </h3>
+                    <h3 className="text-md font-bold text-green-600">{fromKebabCase(name)}</h3>
                     <p className="mt-1 text-sm text-gray-600 flex items-center gap-2">
-                      by{" "}
+                      by{' '}
                       {avatarUrlMap[author] && (
                         <img
                           src={avatarUrlMap[author]}

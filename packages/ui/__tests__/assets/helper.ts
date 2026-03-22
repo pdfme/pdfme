@@ -1,11 +1,11 @@
 import * as hooks from '../../src/hooks';
-import { uuid } from '../../src/helper';
+import * as helper from '../../src/helper';
 import { BLANK_PDF, Template } from '@pdfme/common';
 
 export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
   const pageSizes = [{ height: 297, width: 210 }];
-  const mock = jest.spyOn(hooks, 'useUIPreProcessor');
+  const mock = vi.spyOn(hooks, 'useUIPreProcessor');
   mock.mockImplementation(() => ({
     backgrounds,
     pageSizes,
@@ -13,14 +13,14 @@ export const setupUIMock = () => {
     error: null,
     refresh: () => Promise.resolve(),
   }));
-  (uuid as jest.Mock) = jest
-    .fn()
+  vi
+    .spyOn(helper, 'uuid')
     .mockReturnValueOnce('1')
     .mockReturnValueOnce('2')
     .mockReturnValueOnce('3')
     .mockReturnValueOnce('4')
     .mockReturnValueOnce('5');
-  const FontFace = jest.fn().mockReturnValue({ load: () => Promise.resolve() });
+  const FontFace = vi.fn().mockReturnValue({ load: () => Promise.resolve() });
   global.window.FontFace = FontFace;
 };
 

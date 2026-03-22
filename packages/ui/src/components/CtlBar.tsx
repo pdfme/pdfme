@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 // Import icons from lucide-react
-// Note: In tests, these will be mocked by the mock file in __mocks__/lucide-react.js
+// Note: In tests, these are replaced via the Vitest lucide-react mock.
 import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
 
 import type { MenuProps } from 'antd';
@@ -60,7 +60,12 @@ type PagerProps = {
 const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Button className={UI_CLASSNAME + 'page-prev'} type="text" disabled={pageCursor <= 0} onClick={() => setPageCursor(pageCursor - 1)}>
+      <Button
+        className={UI_CLASSNAME + 'page-prev'}
+        type="text"
+        disabled={pageCursor <= 0}
+        onClick={() => setPageCursor(pageCursor - 1)}
+      >
         <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
       <Text strong style={style.textStyle}>

@@ -1,5 +1,5 @@
-const useForm = jest.fn();
-const FormRender = jest.fn();
+const useForm = () => ({});
+const FormRender = () => null;
 
 module.exports = {
   useForm,

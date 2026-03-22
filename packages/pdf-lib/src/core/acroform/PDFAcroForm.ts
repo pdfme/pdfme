@@ -30,7 +30,7 @@ class PDFAcroForm {
   getFields(): [PDFAcroField, PDFRef][] {
     const { Fields } = this.normalizedEntries();
 
-    const fields = new Array(Fields.size());
+    const fields = Array(Fields.size());
     for (let idx = 0, len = Fields.size(); idx < len; idx++) {
       const ref = Fields.get(idx) as PDFRef;
       const dict = Fields.lookup(idx, PDFDict);

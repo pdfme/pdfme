@@ -229,7 +229,7 @@ export const createSvgStr = (icon: IconNode, attrs?: Record<string, string>): st
     'stroke-width': '2',
     'stroke-linecap': 'round',
     'stroke-linejoin': 'round',
-    ...(attrs || {}),
+    ...attrs,
   };
 
   // Format SVG attributes string

@@ -81,7 +81,7 @@ export default class PDFRadioGroup extends PDFField {
   getOptions(): string[] {
     const exportValues = this.acroField.getExportValues();
     if (exportValues) {
-      const exportOptions = new Array<string>(exportValues.length);
+      const exportOptions = Array<string>(exportValues.length);
       for (let idx = 0, len = exportValues.length; idx < len; idx++) {
         exportOptions[idx] = exportValues[idx].decodeText();
       }
@@ -89,7 +89,7 @@ export default class PDFRadioGroup extends PDFField {
     }
 
     const onValues = this.acroField.getOnValues();
-    const onOptions = new Array<string>(onValues.length);
+    const onOptions = Array<string>(onValues.length);
     for (let idx = 0, len = onOptions.length; idx < len; idx++) {
       onOptions[idx] = onValues[idx].decodeText();
     }

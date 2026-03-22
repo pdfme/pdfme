@@ -133,7 +133,7 @@ class PDFParser extends PDFObjectParser {
     try {
       this.parseIndirectObjectHeader();
       return true;
-    } catch (e) {
+    } catch {
       this.bytes.moveTo(initialOffset);
       return false;
     }
@@ -217,7 +217,7 @@ class PDFParser extends PDFObjectParser {
 
       try {
         await this.parseIndirectObject();
-      } catch (e) {
+      } catch {
         // TODO: Add tracing/logging mechanism to track when this happens!
         this.bytes.moveTo(initialOffset);
         this.tryToParseInvalidIndirectObject();
@@ -353,7 +353,7 @@ class PDFParser extends PDFObjectParser {
       const initialOffset = this.bytes.offset();
       this.parseIndirectObjectHeader();
       this.bytes.moveTo(initialOffset);
-    } catch (e) {
+    } catch {
       this.bytes.next();
       this.skipWhitespaceAndComments();
     }

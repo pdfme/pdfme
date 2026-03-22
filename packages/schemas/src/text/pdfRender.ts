@@ -46,7 +46,9 @@ const embedAndGetFontObj = async (arg: {
       let fontData = v.data;
       if (typeof fontData === 'string' && fontData.startsWith('http')) {
         if (!isUrlSafeToFetch(fontData)) {
-          throw Error('[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.');
+          throw Error(
+            '[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.',
+          );
         }
         fontData = await fetch(fontData).then((res) => res.arrayBuffer());
       }

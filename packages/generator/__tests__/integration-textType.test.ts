@@ -2,8 +2,7 @@ import generate from '../src/generate.js';
 import { textType } from './assets/templates/index.js';
 import { getInputFromTemplate } from '@pdfme/common';
 import { text, multiVariableText, image, barcodes } from '@pdfme/schemas';
-import { getFont, pdfToImages } from './utils.js';
-import 'jest-image-snapshot';
+import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
@@ -43,9 +42,7 @@ describe('generate integration test(textType)', () => {
 
         const images = await pdfToImages(pdf);
         for (let i = 0; i < images.length; i++) {
-          expect(images[i]).toMatchImageSnapshot({
-            customSnapshotIdentifier: `${key}-${i + 1}`,
-          });
+          await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
         }
       });
     }

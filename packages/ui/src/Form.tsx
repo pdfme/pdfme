@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { PreviewProps } from '@pdfme/common';
 import { PreviewUI } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
@@ -63,7 +62,7 @@ class Form extends PreviewUI {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.render(
+    this.mount(
       <AppContextProvider
         lang={this.getLang()}
         font={this.getFont()}
@@ -94,7 +93,6 @@ class Form extends PreviewUI {
           }}
         />
       </AppContextProvider>,
-      this.domContainer,
     );
   }
 }

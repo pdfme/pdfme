@@ -13,7 +13,7 @@ enum CharCodes {
   RightParen = 41,
   Plus = 43,
   Minus = 45,
-  Dash = 45,
+  Dash = Minus,
   Period = 46,
   ForwardSlash = 47,
   Zero = 48,

@@ -8,6 +8,10 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
@@ -23,6 +27,10 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playground/package-lock.json
 
       - name: Update npm (11.5.1+ required for OIDC)
         run: npm install -g npm@latest
@@ -49,6 +57,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Set NPM version
         run: npm version --no-git-tag-version $VERSION --workspaces
 
@@ -67,23 +78,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playground/package-lock.json
 
       - name: Install dependencies and build project
         run: |
           npm ci
           npm run build
 
-      - name: Run playground tests
+      - name: Install playground dependencies
         run: |
-          cd playground
-          npm install
-          npm run build
-          npm run test
+          npm ci --prefix playground
+
+      - name: Run playground checks
+        run: |
+          npm --prefix playground run lint
+          npm --prefix playground run build
+          npm --prefix playground run test
         env:
           CI: true

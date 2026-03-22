@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react",
+    "declaration": true,
+    "declarationDir": "dist/typecheck",
+    "emitDeclarationOnly": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "dist/typecheck",
+    "tsBuildInfoFile": "dist/typecheck/tsconfig.tsbuildinfo",
+    "typeRoots": ["../node_modules/@types", "./node_modules/@types", "../../node_modules/@types"],
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules", "dist"],
+  "references": [{ "path": "../common" }, { "path": "../converter" }, { "path": "../schemas" }]
+}

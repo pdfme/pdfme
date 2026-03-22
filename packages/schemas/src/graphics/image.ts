@@ -1,4 +1,3 @@
-import type { ChangeEvent } from 'react';
 import type { PDFImage } from '@pdfme/pdf-lib';
 import type { Plugin } from '@pdfme/common';
 import type { Schema } from '@pdfme/common';
@@ -165,8 +164,9 @@ const imageSchema: Plugin<ImageSchema> = {
       input.type = 'file';
       input.accept = 'image/jpeg, image/png';
       input.addEventListener('change', (event: Event) => {
-        const changeEvent = event as unknown as ChangeEvent<HTMLInputElement>;
-        readFile(changeEvent.target.files)
+        const target = event.target;
+        const files = target instanceof HTMLInputElement ? target.files : null;
+        readFile(files)
           .then((result) => {
             if (onChange) onChange({ key: 'content', value: result as string });
           })

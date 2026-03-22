@@ -1,5 +1,6 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
 
 describe('pdf2img tests', () => {
@@ -23,7 +24,12 @@ describe('pdf2img tests', () => {
         basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
         pdfmeVersion: '5.2.16',
       },
-      inputs: [{}, {}, {}, {}],
+      inputs: [
+        { field1: 'hello-1' },
+        { field1: 'hello-2' },
+        { field1: 'hello-3' },
+        { field1: 'hello-4' },
+      ],
     });
     pdfArrayBuffer = new Uint8Array(pdf.buffer);
   });
@@ -34,6 +40,30 @@ describe('pdf2img tests', () => {
     expect(images.length).toBe(4);
     expect(images[0]).toBeInstanceOf(ArrayBuffer);
     expect(images[0].byteLength).toBeGreaterThan(0);
+  });
+
+  test('Node.js version - rendered image is not blank', async () => {
+    const images = await nodePdf2Img(pdfArrayBuffer, { scale: 1, imageType: 'png' });
+    const image = await loadImage(Buffer.from(new Uint8Array(images[0])));
+    const canvas = createCanvas(image.width, image.height);
+    const context = canvas.getContext('2d');
+
+    context.drawImage(image, 0, 0);
+    const { data } = context.getImageData(0, 0, image.width, image.height);
+    let nonWhitePixels = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const a = data[i + 3];
+
+      if (!(a === 0 || (r === 255 && g === 255 && b === 255))) {
+        nonWhitePixels += 1;
+      }
+    }
+
+    expect(nonWhitePixels).toBeGreaterThan(0);
   });
 
   test('pageNumbers option - should render only specified pages', async () => {
@@ -86,7 +116,7 @@ describe('img2pdf tests', () => {
         basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
         pdfmeVersion: '5.2.16',
       },
-      inputs: [{}],
+      inputs: [{ field1: 'hello-1' }],
     });
     const images = await nodePdf2Img(new Uint8Array(pdf.buffer), { scale: 1 });
     jpegImage = images[0];

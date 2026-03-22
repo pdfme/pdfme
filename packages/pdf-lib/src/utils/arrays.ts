@@ -120,7 +120,7 @@ export const sum = (array: number[] | Uint8Array): number => {
 };
 
 export const range = (start: number, end: number): number[] => {
-  const arr = new Array(end - start);
+  const arr = Array<number>(end - start);
   for (let idx = 0, len = arr.length; idx < len; idx++) {
     arr[idx] = start + idx;
   }
@@ -128,7 +128,7 @@ export const range = (start: number, end: number): number[] => {
 };
 
 export const pluckIndices = <T>(arr: T[], indices: number[]) => {
-  const plucked = new Array<T>(indices.length);
+  const plucked = Array<T>(indices.length);
   for (let idx = 0, len = indices.length; idx < len; idx++) {
     plucked[idx] = arr[indices[idx]];
   }

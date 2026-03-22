@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationDir": "./dist/typecheck",
+    "emitDeclarationOnly": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/typecheck",
+    "tsBuildInfoFile": "./dist/typecheck/tsconfig.tsbuildinfo",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    { "path": "../common" },
+    { "path": "../converter" },
+    { "path": "../generator" },
+    { "path": "../schemas" }
+  ]
+}

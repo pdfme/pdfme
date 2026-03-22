@@ -1,4 +1,34 @@
-import UPNG from '@pdf-lib/upng';
+import UPNGModule from '@pdf-lib/upng';
+
+type DecodedPng = {
+  ctype: number;
+  width: number;
+  height: number;
+};
+
+type UPNGApi = {
+  decode: (input: ArrayBuffer) => DecodedPng;
+  toRGBA8: (decoded: DecodedPng) => ArrayBuffer[];
+};
+
+const isUPNGApi = (value: unknown): value is UPNGApi =>
+  !!value &&
+  typeof value === 'object' &&
+  typeof (value as UPNGApi).decode === 'function' &&
+  typeof (value as UPNGApi).toRGBA8 === 'function';
+
+const resolveUPNG = (value: unknown): UPNGApi => {
+  let current: unknown = value;
+
+  while (current && typeof current === 'object') {
+    if (isUPNGApi(current)) return current;
+    current = (current as { default?: unknown }).default;
+  }
+
+  throw new TypeError('Failed to resolve @pdf-lib/upng exports');
+};
+
+const UPNG = resolveUPNG(UPNGModule);
 
 const getImageType = (ctype: number) => {
   if (ctype === 0) return PngType.Greyscale;

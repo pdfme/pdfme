@@ -1,51 +1,48 @@
 {
   "name": "@pdfme/generator",
   "version": "0.0.0",
-  "sideEffects": false,
-  "author": "hand-dot",
-  "license": "MIT",
+  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
   "keywords": [
     "pdf",
-    "pdf-generation",
     "pdf-designer",
+    "pdf-generation",
     "pdf-viewer",
-    "typescript",
-    "react"
+    "react",
+    "typescript"
   ],
-  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
   "homepage": "https://pdfme.com",
+  "bugs": {
+    "url": "https://github.com/pdfme/pdfme/issues"
+  },
+  "license": "MIT",
+  "author": "hand-dot",
   "repository": {
     "type": "git",
     "url": "git@github.com:pdfme/pdfme.git"
   },
-  "bugs": {
-    "url": "https://github.com/pdfme/pdfme/issues"
-  },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "node": "./dist/node/src/index.js",
-        "default": "./dist/esm/src/index.js"
-      },
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "run-p build:cjs build:esm build:node",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build:node": "tsc -p tsconfig.node.json",
+    "dev": "vite build --watch",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "clean": "rimraf dist",
-    "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
-    "prune": "ts-prune src",
-    "prettier": "prettier --write 'src/**/*.ts'"
+    "lint": "vp lint -c ../../.oxlintrc.json src",
+    "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:update-snapshots": "vitest run --config ../../vitest.config.ts -u"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
@@ -59,37 +56,5 @@
   "peerDependencies": {
     "@pdfme/common": "latest",
     "@pdfme/schemas": "latest"
-  },
-  "jest": {
-    "resolver": "ts-jest-resolver",
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "moduleNameMapper": {
-      "^@pdfme/schemas/utils$": "<rootDir>/../schemas/src/utils.ts",
-      "^.+\\\\.(css|less|scss)$": "identity-obj-proxy"
-    },
-    "transformIgnorePatterns": [
-      "/node_modules/(?!(air-datepicker)/)"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "ts"
-    ],
-    "transform": {
-      "^.+\\.ts?$": [
-        "ts-jest",
-        {
-          "tsconfig": "tsconfig.esm.json"
-        }
-      ],
-      "^.+\\.css$": "<rootDir>/__tests__/cssTransform.cjs"
-    },
-    "testMatch": [
-      "**/*.test.ts"
-    ]
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

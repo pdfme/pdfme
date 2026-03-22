@@ -6,22 +6,26 @@
     "module": "ESNext",
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable",
-      "ESNext"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "types": [
-      "node",
-      "jest",
-    ],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "baseUrl": ".",
+    "paths": {
+      "@pdfme/common": ["packages/common/src/index.ts"],
+      "@pdfme/converter": ["packages/converter/src/index.ts"],
+      "@pdfme/generator": ["packages/generator/src/index.ts"],
+      "@pdfme/manipulator": ["packages/manipulator/src/index.ts"],
+      "@pdfme/pdf-lib": ["packages/pdf-lib/src/index.ts"],
+      "@pdfme/schemas": ["packages/schemas/src/index.ts"],
+      "@pdfme/schemas/builtins": ["packages/schemas/src/builtins.ts"],
+      "@pdfme/schemas/tables": ["packages/schemas/src/tables.ts"],
+      "@pdfme/schemas/utils": ["packages/schemas/src/utils.ts"],
+      "@pdfme/ui": ["packages/ui/src/index.ts"],
+      "@pdfme/cli": ["packages/cli/src/index.ts"]
+    },
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"],
     "sourceMap": true
-  },
+  }
 }

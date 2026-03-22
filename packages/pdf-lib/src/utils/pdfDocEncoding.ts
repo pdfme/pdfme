@@ -61,7 +61,7 @@ pdfDocEncodingToUnicode[0xad] = toCharCode('\uFFFD'); // REPLACEMENT CHARACTER (
  *              encoded with PDFDocEncoding.
  */
 export const pdfDocEncodingDecode = (bytes: Uint8Array): string => {
-  const codePoints = new Array(bytes.length);
+  const codePoints = Array<number>(bytes.length);
   for (let idx = 0, len = bytes.length; idx < len; idx++) {
     codePoints[idx] = pdfDocEncodingToUnicode[bytes[idx]];
   }

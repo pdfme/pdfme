@@ -126,7 +126,9 @@ export const getFontKitFont = async (
   if (typeof fontData === 'string') {
     if (fontData.startsWith('http')) {
       if (!isUrlSafeToFetch(fontData)) {
-        throw Error('[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.');
+        throw Error(
+          '[@pdfme/schemas] Invalid or unsafe URL for font data. Only http: and https: URLs pointing to public hosts are allowed.',
+        );
       }
       fontData = await fetch(fontData).then((res) => res.arrayBuffer());
     } else {
@@ -373,7 +375,7 @@ export const splitTextToSize = (arg: {
     boxWidthInPt,
   };
   let lines: string[] = [];
-  value.split(/\r\n|\r|\n|\f|\u000B/g).forEach((line: string) => {
+  value.split(/\r\n|\r|\n|\f|\v/g).forEach((line: string) => {
     lines = lines.concat(getSplittedLinesBySegmenter(line, fontWidthCalcValues));
   });
   return lines;

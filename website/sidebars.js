@@ -12,22 +12,16 @@ const sidebars = {
       type: 'category',
       collapsed: false,
       label: 'Customization',
-      items: [
-        'custom-fonts',
-        'custom-ui',
-        'custom-schemas',
-      ],
+      items: ['custom-fonts', 'custom-ui', 'custom-schemas'],
     },
     {
       type: 'category',
       collapsed: true,
       label: 'Tools(New)',
-      items: [
-        'converter',
-        'manipulator'
-      ],
+      items: ['converter', 'manipulator'],
     },
     'development-guide',
+    'migration-v6',
     'template-contribution-guide',
   ],
 };

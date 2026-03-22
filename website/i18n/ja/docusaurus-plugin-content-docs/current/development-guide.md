@@ -32,6 +32,12 @@ pdfmeはできるだけ小さくシンプルであるように作られている
 
 開発に関する洞察：[pdfmeの開発方法](https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md)
 
+## 今後の破壊的変更
+
+次のメジャーアップデートでは、`ESM-only`、`Node 20+`、UIパッケージでの `React 18+`、および内部 `dist/*` import の廃止が入る想定です。
+
+ビルド、テスト、サンプルコードを変更する前に、[Migration Guide](/docs/migration-v6) を確認してください。
+
 ## 技術サポートが必要ですか？
 
 技術サポートが必要な場合は、[こちら](https://app.pdfme.com/contact?utm_source=website&utm_content=development-guide)からお問い合わせください。
@@ -41,5 +47,6 @@ pdfmeはできるだけ小さくシンプルであるように作られている
 pdfmeは無料で使用できるオープンソースプロジェクトです。
 しかし、pdfmeの開発と維持は無料ではありません。
 ビジネスでpdfmeを使用している場合は、pdfmeのスポンサーになることをご検討ください。
+
 - [Github Sponsors](https://github.com/sponsors/pdfme)
 - [Open Collective](https://opencollective.com/pdfme)

@@ -1,6 +1,5 @@
 import { remove } from '../../src/index';
 import { pdfToImages, loadTestPDF } from '../test-helpers';
-import 'jest-image-snapshot';
 
 describe('E2E: remove', () => {
   const fiveP = loadTestPDF('5p.pdf');
@@ -10,9 +9,7 @@ describe('E2E: remove', () => {
 
     const images = await pdfToImages(removed);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `remove-5p-page1-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`remove-5p-page1-result-page${i + 1}`);
     }
   });
 
@@ -22,9 +19,7 @@ describe('E2E: remove', () => {
 
     const images = await pdfToImages(removed);
     for (let i = 0; i < images.length; i++) {
-      expect(images[i]).toMatchImageSnapshot({
-        customSnapshotIdentifier: `remove-5p-pages1-3-result-page${i + 1}`,
-      });
+      await expect(images[i]).toMatchImage(`remove-5p-pages1-3-result-page${i + 1}`);
     }
   });
 });

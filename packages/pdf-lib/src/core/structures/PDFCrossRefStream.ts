@@ -194,7 +194,7 @@ class PDFCrossRefStream extends PDFFlateStream {
   };
 
   private computeEntryTuples = (): EntryTuple[] => {
-    const entryTuples: EntryTuple[] = new Array(this.entries.length);
+    const entryTuples: EntryTuple[] = Array(this.entries.length);
 
     for (let idx = 0, len = this.entries.length; idx < len; idx++) {
       const entry = this.entries[idx];

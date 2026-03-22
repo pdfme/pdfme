@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`Designer snapshot 1`] = `
 <div
@@ -14,7 +14,7 @@ exports[`Designer snapshot 1`] = `
       style="left: 0px; right: 0px; position: absolute; z-index: 1; height: 0px; width: 45px; background: rgb(245, 245, 245); text-align: center; overflow: auto;"
     >
       <div
-        aria-describedby="DndDescribedBy-0"
+        aria-describedby="5"
         aria-disabled="false"
         aria-roledescription="draggable"
         role="button"
@@ -60,12 +60,11 @@ exports[`Designer snapshot 1`] = `
                 />
               </svg>
             </div>
-            
           </button>
         </div>
       </div>
       <div
-        aria-describedby="DndDescribedBy-0"
+        aria-describedby="5"
         aria-disabled="false"
         aria-roledescription="draggable"
         role="button"
@@ -112,7 +111,6 @@ exports[`Designer snapshot 1`] = `
                 />
               </svg>
             </div>
-            
           </button>
         </div>
       </div>
@@ -142,7 +140,6 @@ exports[`Designer snapshot 1`] = `
                 >
                   Minus
                 </span>
-                
               </button>
               <span
                 class="ant-typography css-dev-only-do-not-override-11mmrso"
@@ -162,7 +159,6 @@ exports[`Designer snapshot 1`] = `
                 >
                   Plus
                 </span>
-                
               </button>
             </div>
           </div>
@@ -182,7 +178,6 @@ exports[`Designer snapshot 1`] = `
           >
             ArrowRight
           </span>
-          
         </button>
         <div
           style="width: 400px; height: 100%; display: flex; top: 0px; right: 0px; position: absolute; font-family: "Open Sans", sans-serif; box-sizing: border-box; background: rgb(245, 245, 245); border-left: 1px solid rgba(5, 5, 5, 0.06);"
@@ -234,7 +229,6 @@ exports[`Designer snapshot 1`] = `
                       >
                         GripVertical
                       </span>
-                      
                     </button>
                     <div
                       style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
@@ -293,7 +287,6 @@ exports[`Designer snapshot 1`] = `
                       >
                         GripVertical
                       </span>
-                      
                     </button>
                     <div
                       style="color: rgba(0, 0, 0, 0.88); display: flex; justify-content: center;"
@@ -339,7 +332,7 @@ exports[`Designer snapshot 1`] = `
                 </li>
               </ul>
               <div
-                id="DndDescribedBy-1"
+                id="1"
                 style="display: none;"
               >
                 
@@ -351,7 +344,7 @@ exports[`Designer snapshot 1`] = `
               <div
                 aria-atomic="true"
                 aria-live="assertive"
-                id="DndLiveRegion-0"
+                id="2"
                 role="status"
                 style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
               />
@@ -364,10 +357,8 @@ exports[`Designer snapshot 1`] = `
                 type="button"
               >
                 <u>
-                   
                   Bulk update field names
                 </u>
-                
               </button>
             </div>
           </div>
@@ -436,7 +427,7 @@ exports[`Designer snapshot 1`] = `
               </div>
             </div>
             <div
-              class="moveable-control-box    pdfme-moveable-3 rCS1bhdyl6"
+              class="moveable-control-box    pdfme-moveable-1 rCS1bhdyl6"
               data-able-clickable="true"
               data-able-draggable="true"
               data-able-origin="true"
@@ -544,7 +535,7 @@ exports[`Designer snapshot 1`] = `
             <div>
               <div
                 class="selectable"
-                id="1"
+                id="3"
                 style="position: absolute; cursor: pointer; height: 56.692913386499995px; width: 377.95275591px; top: 75.590551182px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
                 title="field1"
               >
@@ -555,7 +546,7 @@ exports[`Designer snapshot 1`] = `
                     style="padding: 0px; resize: none; background-color: transparent; display: flex; flex-direction: column; justify-content: flex-start; width: 100%; height: 100%; cursor: default;"
                   >
                     <div
-                      id="text-1"
+                      id="text-3"
                       style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent;"
                     >
                       <span
@@ -576,7 +567,7 @@ exports[`Designer snapshot 1`] = `
             <div>
               <div
                 class="selectable"
-                id="2"
+                id="4"
                 style="position: absolute; cursor: pointer; height: 151.181102364px; width: 377.95275591px; top: 132.2834645685px; left: 75.590551182px; transform: rotate(0deg); opacity: 1; outline: 1px dashed #1677ff;"
                 title="field2"
               >
@@ -599,7 +590,7 @@ exports[`Designer snapshot 1`] = `
       </div>
     </div>
     <div
-      id="DndDescribedBy-0"
+      id="5"
       style="display: none;"
     >
       
@@ -611,7 +602,7 @@ exports[`Designer snapshot 1`] = `
     <div
       aria-atomic="true"
       aria-live="assertive"
-      id="DndLiveRegion-1"
+      id="6"
       role="status"
       style="position: fixed; top: 0px; left: 0px; width: 1px; height: 1px; margin: -1px; border: 0px; padding: 0px; overflow: hidden; clip-path: inset(100%); white-space: nowrap;"
     />

@@ -20,11 +20,7 @@
 npm install @pdfme/converter
 ```
 
-Node.jsでPDFを画像に変換する（`pdf2img`）場合は、[node-canvas](https://github.com/Automattic/node-canvas)（^2.11.2）が必要で、追加のステップが必要です：
-
-```bash
-npm install canvas@^2.11.2
-```
+Node.js で `pdf2img` を使うために追加の install は不要です。`@pdfme/converter` には必要な Node 向け canvas 実装として `@napi-rs/canvas` がすでに含まれています。
 
 ## 機能
 

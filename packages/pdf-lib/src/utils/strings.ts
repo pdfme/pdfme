@@ -41,15 +41,15 @@ export const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, 
 export const cleanText = (text: string) =>
   text.replace(/\t|\u0085|\u2028|\u2029/g, '    ').replace(/[\b\v]/g, '');
 
-export const escapedNewlineChars = ['\\n', '\\f', '\\r', '\\u000B'];
+export const escapedNewlineChars = ['\\n', '\\f', '\\r', '\\v'];
 
-export const newlineChars = ['\n', '\f', '\r', '\u000B'];
+export const newlineChars = ['\n', '\f', '\r', '\v'];
 
-export const isNewlineChar = (text: string) => /^[\n\f\r\u000B]$/.test(text);
+export const isNewlineChar = (text: string) => /^[\n\f\r\v]$/.test(text);
 
-export const lineSplit = (text: string) => text.split(/[\n\f\r\u000B]/);
+export const lineSplit = (text: string) => text.split(/[\n\f\r\v]/);
 
-export const mergeLines = (text: string) => text.replace(/[\n\f\r\u000B]/g, ' ');
+export const mergeLines = (text: string) => text.replace(/[\n\f\r\v]/g, ' ');
 
 // JavaScript's String.charAt() method doesn work on strings containing UTF-16
 // characters (with high and low surrogate pairs), such as 💩 (poo emoji). This

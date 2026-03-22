@@ -16,7 +16,7 @@ const formatValue = (value: any) => {
 };
 
 export const createValueErrorMsg = (value: any, valueName: string, values: Primitive[]) => {
-  const allowedValues = new Array(values.length);
+  const allowedValues = Array(values.length);
 
   for (let idx = 0, len = values.length; idx < len; idx++) {
     const v = values[idx];
@@ -114,7 +114,7 @@ export const isType = (value: any, type: TypeDescriptor) => {
 };
 
 export const createTypeErrorMsg = (value: any, valueName: string, types: TypeDescriptor[]) => {
-  const allowedTypes = new Array(types.length);
+  const allowedTypes = Array(types.length);
 
   for (let idx = 0, len = types.length; idx < len; idx++) {
     const type = types[idx];

@@ -1,7 +1,10 @@
-import { readFileSync } from 'fs';
-import * as path from 'path';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Font, getDefaultFont } from '@pdfme/common';
 import { pdf2img } from '@pdfme/converter';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const NotoSerifJPRegularData = readFileSync(
   // path.join(__dirname, `/assets/fonts/NotoSerifJP-Regular.otf`)
@@ -20,6 +23,11 @@ const GreatVibesRegularData = readFileSync(
 const JuliusSansOneRegularData = readFileSync(
   path.join(__dirname, `/assets/fonts/JuliusSansOne-Regular.ttf`),
 );
+const PinyonScriptRegularData = readFileSync(
+  path.join(__dirname, `/assets/fonts/PinyonScript-Regular.ttf`),
+);
+
+const IMAGE_SNAPSHOT_ALLOWED_PIXEL_RATIO = 0.001;
 
 export const getFont = (): Font => ({
   ...getDefaultFont(),
@@ -32,10 +40,15 @@ export const getFont = (): Font => ({
   NotoSansJP: { data: NotoSansJPRegularData },
   'PinyonScript-Regular': {
     fallback: false,
-    data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
+    data: PinyonScriptRegularData,
   },
 });
 export const pdfToImages = async (pdf: ArrayBuffer | Uint8Array): Promise<Buffer[]> => {
   const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
+
+export const getImageSnapshotOptions = (name: string) => ({
+  name,
+  allowedPixelRatio: IMAGE_SNAPSHOT_ALLOWED_PIXEL_RATIO,
+});

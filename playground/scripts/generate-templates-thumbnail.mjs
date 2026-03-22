@@ -1,11 +1,11 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
-import { generate } from '@pdfme/generator/cjs/src/index.js';
-import { pdf2img } from '@pdfme/converter/cjs/src/index.node.js';
-import { getInputFromTemplate, getDefaultFont } from '@pdfme/common/cjs/src/index.js';
+import { getDefaultFont, getInputFromTemplate } from '@pdfme/common';
+import { pdf2img } from '@pdfme/converter';
+import { generate } from '@pdfme/generator';
 import {
   multiVariableText,
   text,
@@ -22,10 +22,13 @@ import {
   select,
   checkbox,
   radioGroup,
-} from '@pdfme/schemas/cjs/src/index.js';
+} from '@pdfme/schemas';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const fontDir = path.resolve(__dirname, '../../packages/generator/__tests__/assets/fonts');
+
+const readFont = (fileName) => fs.readFileSync(path.join(fontDir, fileName));
 
 const plugins = {
   multiVariableText,
@@ -67,15 +70,15 @@ const font = {
   ...getDefaultFont(),
   'PinyonScript-Regular': {
     fallback: false,
-    data: 'https://fonts.gstatic.com/s/pinyonscript/v22/6xKpdSJbL9-e9LuoeQiDRQR8aOLQO4bhiDY.ttf',
+    data: readFont('PinyonScript-Regular.ttf'),
   },
   NotoSerifJP: {
     fallback: false,
-    data: 'https://fonts.gstatic.com/s/notoserifjp/v30/xn71YHs72GKoTvER4Gn3b5eMRtWGkp6o7MjQ2bwxOubAILO5wBCU.ttf',
+    data: readFont('NotoSerifJP-Regular.ttf'),
   },
   NotoSansJP: {
     fallback: false,
-    data: 'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEj75vY0rw-oME.ttf',
+    data: readFont('NotoSansJP-Regular.ttf'),
   },
 };
 

@@ -528,9 +528,6 @@ const parseAttributes = (
     svgAttributes.d = attributes.d;
   }
 
-  if (fontSizeRaw && newInherited.fontSize) {
-    newInherited.fontSize = newInherited.fontSize;
-  }
   if (newInherited.fontFamily) {
     // Handle complex fontFamily like `"Linux Libertine O", serif`
     const inner = newInherited.fontFamily.match(/^"(.*?)"|^'(.*?)'/);
@@ -688,8 +685,12 @@ const parseSvgNode = (
   clipSpaces: Space[],
 ): SVGElement[] => {
   // if the width/height aren't set, the svg will have the same dimension as the current drawing space
-  node.attributes.width ?? node.setAttribute('width', inherited.viewBox.width + '');
-  node.attributes.height ?? node.setAttribute('height', inherited.viewBox.height + '');
+  if (!node.attributes.width) {
+    node.setAttribute('width', inherited.viewBox.width + '');
+  }
+  if (!node.attributes.height) {
+    node.setAttribute('height', inherited.viewBox.height + '');
+  }
   const attributes = parseAttributes(node, inherited, matrix);
   const result: SVGElement[] = [];
   const viewBox = node.attributes.viewBox

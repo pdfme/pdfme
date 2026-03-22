@@ -1,6 +1,15 @@
 {
-  "extends": "./tsconfig.esm",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist"
-  }
+    "composite": true,
+    "declaration": true,
+    "declarationDir": "./dist/typecheck",
+    "emitDeclarationOnly": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/typecheck",
+    "tsBuildInfoFile": "./dist/typecheck/tsconfig.tsbuildinfo",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts"]
 }

@@ -1,4 +1,6 @@
-import ReactDOM from 'react-dom';
+import { ReactNode } from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot, Root } from 'react-dom/client';
 import { DESTROYED_ERR_MSG, DEFAULT_LANG } from './constants.js';
 import { debounce } from './helper.js';
 import {
@@ -19,7 +21,7 @@ import {
   checkPreviewProps,
   pluginRegistry,
 } from '@pdfme/common';
-import { builtInPlugins } from '@pdfme/schemas';
+import { builtInPlugins } from '@pdfme/schemas/builtins';
 
 export abstract class BaseUIClass {
   protected domContainer!: HTMLElement | null;
@@ -27,6 +29,8 @@ export abstract class BaseUIClass {
   protected template!: Template;
 
   protected size!: Size;
+
+  private reactRoot: Root | null = null;
 
   private lang: Lang = DEFAULT_LANG;
 
@@ -65,11 +69,12 @@ export abstract class BaseUIClass {
     this.domContainer = domContainer;
     this.template = cloneDeep(template);
     this.options = options;
+    const container = this.domContainer;
     this.size = {
-      height: this.domContainer.clientHeight || window.innerHeight,
-      width: this.domContainer.clientWidth || window.innerWidth,
+      height: container.clientHeight || window.innerHeight,
+      width: container.clientWidth || window.innerWidth,
     };
-    this.resizeObserver.observe(this.domContainer);
+    this.resizeObserver.observe(container);
 
     const { lang, font } = options;
     if (lang) {
@@ -130,10 +135,19 @@ export abstract class BaseUIClass {
 
   public destroy() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    ReactDOM.unmountComponentAtNode(this.domContainer);
+    this.reactRoot?.unmount();
+    this.reactRoot = null;
 
     this.resizeObserver.unobserve(this.domContainer);
     this.domContainer = null;
+  }
+
+  protected mount(node: ReactNode) {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    this.reactRoot ??= createRoot(this.domContainer);
+    flushSync(() => {
+      this.reactRoot!.render(node);
+    });
   }
 
   protected abstract render(): void;

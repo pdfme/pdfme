@@ -1,6 +1,6 @@
 import type { TextSchema } from '../text/types.js';
 
-export interface MultiVariableTextSchema extends TextSchema {
+export type MultiVariableTextSchema = TextSchema & {
   text: string;
   variables: string[];
-}
+};

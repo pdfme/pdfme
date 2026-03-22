@@ -548,7 +548,7 @@ const calculateSHA512 = (function calculateSHA512Closure() {
     padded[i++] = (length >> 5) & 0xff;
     padded[i++] = (length << 3) & 0xff;
 
-    const w = new Array(80);
+    const w = Array<any>(80);
     for (i = 0; i < 80; i++) {
       w[i] = new Word64(0, 0);
     }
@@ -1428,7 +1428,6 @@ class CipherTransform {
   }
 }
 
-// eslint-disable-next-line no-shadow
 class CipherTransformFactory {
   encryptMetadata: boolean;
   encryptionKey: Uint8Array;
@@ -1510,7 +1509,7 @@ class CipherTransformFactory {
       if (revision === 6) {
         try {
           password = unescape(encodeURIComponent(password));
-        } catch (ex) {
+        } catch {
           console.warn('CipherTransformFactory: ' + 'Unable to convert UTF8 encoded password.');
         }
       }

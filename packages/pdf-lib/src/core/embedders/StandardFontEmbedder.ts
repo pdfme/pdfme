@@ -43,7 +43,7 @@ class StandardFontEmbedder {
    */
   encodeText(text: string): PDFHexString {
     const glyphs = this.encodeTextAsGlyphs(text);
-    const hexCodes = new Array(glyphs.length);
+    const hexCodes = Array(glyphs.length);
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       hexCodes[idx] = toHexString(glyphs[idx].code);
     }
@@ -109,7 +109,7 @@ class StandardFontEmbedder {
 
   private encodeTextAsGlyphs(text: string): Glyph[] {
     const codePoints = Array.from(text);
-    const glyphs: Glyph[] = new Array(codePoints.length);
+    const glyphs: Glyph[] = Array(codePoints.length);
     for (let idx = 0, len = codePoints.length; idx < len; idx++) {
       const codePoint = toCodePoint(codePoints[idx])!;
       glyphs[idx] = this.encoding.encodeUnicodeCodePoint(codePoint);

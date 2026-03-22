@@ -8,7 +8,7 @@ import {
   pt2mm,
   cloneDeep,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas';
+import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
 import {
   insertPage,
   preprocessing,
@@ -59,8 +59,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
       pdfDoc,
     });
 
-    // Add proper type assertion for dynamicTemplate.schemas
-    const schemas = dynamicTemplate.schemas as Schema[][];
+    const schemas = dynamicTemplate.schemas;
     // Create a type-safe array of schema names without using Set spread which requires downlevelIteration
     const schemaNameSet = new Set<string>();
     schemas.forEach((page: Schema[]) => {

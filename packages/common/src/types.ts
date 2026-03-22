@@ -147,16 +147,15 @@ export interface PropPanel<T extends Schema> {
  * @property {string} [icon] Icon SVG for the plugin.
  * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
  */
-export type Plugin<T = Schema> = {
-  pdf: (arg: PDFRenderProps<T & Schema>) => Promise<void> | void;
-  ui: (arg: UIRenderProps<T & Schema>) => Promise<void> | void;
+export interface Plugin<T extends Schema = Schema> {
+  pdf(arg: PDFRenderProps<T & Schema>): Promise<void> | void;
+  ui(arg: UIRenderProps<T & Schema>): Promise<void> | void;
   propPanel: PropPanel<T & Schema>;
   icon?: string;
   uninterruptedEditMode?: boolean;
-};
+}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Plugins = { [key: string]: Plugin<any> };
+export type Plugins = { [key: string]: Plugin };
 
 export interface PluginRegistry {
   plugins: { [key: string]: Plugin };

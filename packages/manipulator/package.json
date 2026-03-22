@@ -1,81 +1,53 @@
 {
   "name": "@pdfme/manipulator",
   "version": "0.0.0",
-  "sideEffects": false,
-  "author": "hand-dot",
-  "license": "MIT",
+  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
   "keywords": [
     "pdf",
-    "pdf-generation",
     "pdf-designer",
+    "pdf-generation",
     "pdf-viewer",
-    "typescript",
-    "react"
+    "react",
+    "typescript"
   ],
-  "description": "TypeScript base PDF generator and React base UI. Open source, developed by the community, and completely free to use under the MIT license!",
   "homepage": "https://pdfme.com",
+  "bugs": {
+    "url": "https://github.com/pdfme/pdfme/issues"
+  },
+  "license": "MIT",
+  "author": "hand-dot",
   "repository": {
     "type": "git",
     "url": "git@github.com:pdfme/pdfme.git"
   },
-  "bugs": {
-    "url": "https://github.com/pdfme/pdfme/issues"
-  },
-  "main": "dist/cjs/src/index.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/types/src/index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/esm/src/index.js",
-      "require": "./dist/cjs/src/index.js",
-      "types": "./dist/types/src/index.d.ts"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     }
-  },
-  "scripts": {
-    "dev": "tsc -p tsconfig.esm.json -w",
-    "build": "run-p build:cjs build:esm",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "clean": "rimraf dist",
-    "lint": "eslint --ext .ts src --config eslint.config.mjs",
-    "test": "jest",
-    "test:update-snapshots": "jest --updateSnapshot",
-    "prune": "ts-prune src",
-    "prettier": "prettier --write 'src/**/*.ts'"
-  },
-  "dependencies": {
-    "@pdfme/pdf-lib": "*"
   },
   "publishConfig": {
     "access": "public"
   },
-  "devDependencies": {
-    "@pdfme/converter": "*",
-    "@types/estree": "^1.0.6"
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "clean": "rimraf dist",
+    "lint": "vp lint -c ../../.oxlintrc.json src",
+    "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:update-snapshots": "vitest run --config ../../vitest.config.ts -u"
   },
-  "jest": {
-    "preset": "ts-jest/presets/default-esm",
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/__tests__/**/*.test.ts"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/jest.setup.js"
-    ],
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
-    "transform": {
-      "^.+\\.tsx?$": [
-        "ts-jest",
-        {
-          "tsconfig": "./tsconfig.json",
-          "useESM": true
-        }
-      ]
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/(?:src|__tests__)/.*)\\.js$": "$1.ts"
-    }
+  "dependencies": {
+    "@pdfme/pdf-lib": "*"
+  },
+  "devDependencies": {
+    "@pdfme/converter": "*"
   }
 }

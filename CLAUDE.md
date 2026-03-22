@@ -30,9 +30,9 @@ PDFme is an open-source TypeScript-based PDF generation and manipulation library
 
 ### Required Development Tools
 - **TypeScript**: For type checking and compilation
-- **ESLint**: Code linting (configured in `eslint.config.mjs`)
-- **Prettier**: Code formatting
-- **Jest**: Testing framework with image snapshot support
+- **Vite+ (`vp`)**: Unified task runner used for install/run/lint/fmt
+- **Oxlint/Oxfmt**: Native linting and formatting through `vp`
+- **Vitest**: Testing framework with image snapshot support
 
 ### OS-Specific Considerations
 - **Windows**: Use Git Bash or WSL for shell commands
@@ -61,23 +61,23 @@ To work on packages with live reloading:
 ### Testing
 ```bash
 npm run test                      # Run all tests
-npm run test:ui:update-snapshots  # Update UI snapshot tests
+npm run test -w packages/ui -- -u # Update UI snapshot tests
 # Run tests in specific package:
 cd packages/[package-name] && npm run test
 ```
 
 ### Code Quality
 ```bash
-npm run lint      # Run ESLint
-npm run prettier  # Format code
+npm run lint  # Run vp native lint
+npm run fmt   # Format code with vp native fmt
 ```
 
 ### Building Individual Packages
 ```bash
-npm run build:common      # Build @pdfme/common
-npm run build:schemas     # Build @pdfme/schemas
-npm run build:generator   # Build @pdfme/generator
-npm run build:ui          # Build @pdfme/ui
+npm run build -w packages/common    # Build @pdfme/common
+npm run build -w packages/schemas   # Build @pdfme/schemas
+npm run build -w packages/generator # Build @pdfme/generator
+npm run build -w packages/ui        # Build @pdfme/ui
 ```
 
 ## Architecture and Code Structure
@@ -167,12 +167,12 @@ Implementation: `packages/common/src/expression.ts`
 3. **Testing Requirements**: 
    - Run `npm run test` and ensure all tests pass
    - Run `npm run lint` and fix any linting issues
-   - Update snapshots if UI changes are intentional: `npm run test:ui:update-snapshots`
+   - Update snapshots if UI changes are intentional: `npm run test -w packages/ui -- -u`
 
 ### Code Standards
 - **TypeScript**: All new code must be written in TypeScript
-- **ESLint**: Follow existing ESLint configuration
-- **Prettier**: Format code using `npm run prettier`
+- **Lint**: Follow the shared `vp lint` / `.oxlintrc.json` setup
+- **Format**: Format code using `npm run fmt`
 - **Type Safety**: Ensure proper type definitions and avoid `any` types
 
 ### Commit Message Standards
@@ -252,10 +252,10 @@ npm install --legacy-peer-deps
 #### Import Resolution Problems
 ```bash
 # Rebuild packages in correct order
-npm run build:common
-npm run build:schemas
-npm run build:generator
-npm run build:ui
+npm run build -w packages/common
+npm run build -w packages/schemas
+npm run build -w packages/generator
+npm run build -w packages/ui
 ```
 
 ### Environment Issues
@@ -381,7 +381,7 @@ npm run test
 cd playground && npm run test
 
 # Update UI snapshots after intentional changes
-npm run test:ui:update-snapshots
+npm run test -w packages/ui -- -u
 ```
 
 ### Debugging with Playground
