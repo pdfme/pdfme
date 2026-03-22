@@ -68,9 +68,17 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     rootElement.parentElement.style.outline = '';
   }
 
-  const variables: Record<string, string> = value
-    ? (JSON.parse(value) as Record<string, string>) || {}
-    : {};
+  let variables: Record<string, string> = {};
+  if (value) {
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        variables = parsed as Record<string, string>;
+      }
+    } catch {
+      // value is not valid JSON — use empty variables
+    }
+  }
   const variableIndices = getVariableIndices(rawText);
   const substitutedText = substituteVariables(rawText, variables);
   const font = options?.font || getDefaultFont();
