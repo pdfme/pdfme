@@ -1,32 +1,34 @@
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { pdf2img as _pdf2img, Pdf2ImgOptions } from './pdf2img.js';
 import { pdf2size as _pdf2size, Pdf2SizeOptions } from './pdf2size.js';
-
-let workerPort: Worker | null = null;
+import workerSrc from './pdfjs-worker.js?worker&url';
 
 const clonePdfData = (pdf: ArrayBuffer | Uint8Array) =>
   pdf instanceof Uint8Array ? new Uint8Array(pdf) : new Uint8Array(pdf);
 
-const getWorkerPort = () => {
-  if (typeof Worker === 'undefined') {
-    return null;
+const loadingTaskMap = new WeakMap<object, { destroy: () => Promise<void> }>();
+
+const getDocument = async (pdf: ArrayBuffer | Uint8Array) => {
+  if (
+    typeof Worker !== 'undefined' &&
+    pdfjsLib.GlobalWorkerOptions.workerSrc !== workerSrc
+  ) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
   }
 
-  workerPort ??= new Worker(new URL('./pdfjs-worker.ts', import.meta.url), { type: 'module' });
-  return workerPort;
-};
-
-const getDocument = (pdf: ArrayBuffer | Uint8Array) => {
-  const port = getWorkerPort();
-
-  if (port && pdfjsLib.GlobalWorkerOptions.workerPort !== port) {
-    pdfjsLib.GlobalWorkerOptions.workerPort = port;
-  }
-
-  return pdfjsLib.getDocument({
+  const loadingTask = pdfjsLib.getDocument({
     data: clonePdfData(pdf),
     isEvalSupported: false,
-  }).promise;
+  });
+  const document = await loadingTask.promise;
+  loadingTaskMap.set(document, { destroy: () => loadingTask.destroy() });
+  return document;
+};
+
+const destroyDocument = async (document: object) => {
+  const loadingTask = loadingTaskMap.get(document);
+  loadingTaskMap.delete(document);
+  await loadingTask?.destroy();
 };
 
 function dataURLToArrayBuffer(dataURL: string): ArrayBuffer {
@@ -53,6 +55,7 @@ export const pdf2img = async (
 ): Promise<ArrayBuffer[]> =>
   _pdf2img(pdf, options, {
     getDocument,
+    destroyDocument,
     createCanvas: (width, height) => {
       const canvas = document.createElement('canvas');
       canvas.width = width;
@@ -69,6 +72,7 @@ export const pdf2img = async (
 export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeOptions = {}) =>
   _pdf2size(pdf, options, {
     getDocument,
+    destroyDocument,
   });
 
 export { img2pdf } from './img2pdf.js';

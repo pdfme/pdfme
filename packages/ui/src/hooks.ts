@@ -68,16 +68,16 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
         _pageSizes = schemas.map(() => ({ width, height }));
       } else {
         const _basePdf = await getB64BasePdf(basePdf);
-
         const uint8Array = b64toUint8Array(_basePdf);
-        // Create a new ArrayBuffer copy to avoid detachment issues
-        const pdfArrayBuffer = new ArrayBuffer(uint8Array.byteLength);
-        new Uint8Array(pdfArrayBuffer).set(uint8Array);
+        const createPdfArrayBuffer = () => {
+          const buffer = new ArrayBuffer(uint8Array.byteLength);
+          new Uint8Array(buffer).set(uint8Array);
+          return buffer;
+        };
 
-        const [_pages, imgBuffers] = await Promise.all([
-          pdf2size(pdfArrayBuffer),
-          pdf2img(pdfArrayBuffer.slice(), { scale: maxZoom }),
-        ]);
+        // Run sequentially with isolated buffers to avoid pdf.js worker races and buffer detachment.
+        const _pages = await pdf2size(createPdfArrayBuffer());
+        const imgBuffers = await pdf2img(createPdfArrayBuffer(), { scale: maxZoom });
         _pageSizes = _pages;
         paperWidth = _pageSizes[0].width * ZOOM;
         paperHeight = _pageSizes[0].height * ZOOM;

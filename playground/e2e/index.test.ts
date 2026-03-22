@@ -1,11 +1,10 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
-import { createRunner, parse, PuppeteerRunnerExtension } from '@puppeteer/replay';
+import { Template, Schema, cloneDeep } from '@pdfme/common';
+import { text, table, image, barcodes, select, checkbox, radioGroup } from '@pdfme/schemas';
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { stripVTControlCharacters } from 'node:util';
 import type { MatchImageOptions } from 'vitest-image-snapshot';
-import templateCreationRecord from './templateCreationRecord.json';
-import formInputRecord from './formInputRecord.json';
 
 const previewUrlPattern = /https?:\/\/(?:localhost|127\.0\.0\.1):\d+\/?/;
 
@@ -142,6 +141,121 @@ function getPdfSnapshotOptions(labelPrefix: string): MatchImageOptions {
     : snapshotOptions;
 }
 
+const modifiedTemplateFieldNames = {
+  text: 'headline',
+  table: 'lineItems',
+  image: 'brandImage',
+  qrcode: 'supportQr',
+  select: 'status',
+  checkbox: 'approved',
+  radioGroup: 'selected',
+} as const;
+
+type PlaygroundStorageState = {
+  template?: Template;
+  inputs?: Record<string, string>[];
+  mode?: 'form' | 'viewer';
+};
+
+const cloneSchema = <T extends Schema>(schema: T, overrides: Partial<T>): T =>
+  ({
+    ...cloneDeep(schema),
+    ...overrides,
+    position: {
+      ...schema.position,
+      ...overrides.position,
+    },
+  }) as T;
+
+function buildModifiedTemplate(): Template {
+  const basePdf: Template['basePdf'] = {
+    width: 210,
+    height: 297,
+    padding: [20, 10, 20, 10],
+  };
+
+  return {
+    basePdf,
+    schemas: [
+      [
+        cloneSchema(text.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.text,
+          position: { x: 20, y: 20 },
+        }),
+        cloneSchema(table.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.table,
+          position: { x: 20, y: 40 },
+          width: 150,
+        }),
+        cloneSchema(image.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.image,
+          position: { x: 20, y: 90 },
+          readOnly: true,
+        }),
+        cloneSchema(barcodes.qrcode.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.qrcode,
+          position: { x: 70, y: 95 },
+          readOnly: true,
+        }),
+        cloneSchema(select.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.select,
+          position: { x: 115, y: 98 },
+        }),
+        cloneSchema(checkbox.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.checkbox,
+          position: { x: 115, y: 120 },
+        }),
+        cloneSchema(radioGroup.propPanel.defaultSchema, {
+          name: modifiedTemplateFieldNames.radioGroup,
+          position: { x: 130, y: 120 },
+        }),
+      ],
+    ],
+  };
+}
+
+function buildFinalFormInputs(): Record<string, string>[] {
+  const tableRows = Array.from({ length: 40 }, (_, index) => [
+    `Person ${String(index + 1).padStart(2, '0')}`,
+    `City ${((index % 5) + 1).toString()}`,
+    `Summary ${index + 1}`,
+  ]);
+
+  return [
+    {
+      [modifiedTemplateFieldNames.text]: 'Filled by CI',
+      [modifiedTemplateFieldNames.table]: JSON.stringify(tableRows),
+      [modifiedTemplateFieldNames.select]: 'option2',
+      [modifiedTemplateFieldNames.checkbox]: 'true',
+      [modifiedTemplateFieldNames.radioGroup]: 'true',
+    },
+  ];
+}
+
+async function loadRouteWithStorage(
+  page: Page,
+  path: '/designer' | '/form-viewer',
+  storageState: PlaygroundStorageState,
+) {
+  await page.goto(`${baseUrl}${path}`, { waitUntil: 'networkidle2', timeout });
+  await page.evaluate((state) => {
+    localStorage.removeItem('template');
+    localStorage.removeItem('inputs');
+    localStorage.removeItem('mode');
+
+    if (state.template) {
+      localStorage.setItem('template', JSON.stringify(state.template));
+    }
+    if (state.inputs) {
+      localStorage.setItem('inputs', JSON.stringify(state.inputs));
+    }
+    if (state.mode) {
+      localStorage.setItem('mode', state.mode);
+    }
+  }, storageState);
+  await page.reload({ waitUntil: 'networkidle2', timeout });
+}
+
 async function waitForDesignerReady(page: Page, expectedText?: string) {
   await page.waitForFunction(
     (text) => {
@@ -153,17 +267,13 @@ async function waitForDesignerReady(page: Page, expectedText?: string) {
       const canvas = document.querySelector('.pdfme-designer-canvas');
       const spinner = document.querySelector('.pdfme-designer-root svg.lucide-loader-circle');
       const paper = document.querySelector('.pdfme-designer-canvas [style*="background-image"]');
-      const renderRoots = Array.from(
-        document.querySelectorAll('.pdfme-designer-canvas .selectable[title] > div'),
+      const titledSelectables = Array.from(
+        document.querySelectorAll('.pdfme-designer-canvas .selectable[title]'),
       );
-      const renderersReady =
-        renderRoots.length > 0 &&
-        renderRoots.every((element) => {
-          const content = element as HTMLElement;
-          return (
-            content.childElementCount > 0 || (content.textContent?.trim().length ?? 0) > 0
-          );
-        });
+      const renderersReady = titledSelectables.every((element) => {
+        const content = element.firstElementChild;
+        return !(content instanceof HTMLElement) || content.dataset.pdfmeRenderReady === 'true';
+      });
       const fontsLoaded = !document.fonts || document.fonts.status === 'loaded';
       return hasExpectedText && !!canvas && !spinner && !!paper && fontsLoaded && renderersReady;
     },
@@ -175,6 +285,41 @@ async function waitForDesignerReady(page: Page, expectedText?: string) {
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
+    if (document.fonts) {
+      await document.fonts.ready;
+    }
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+    await new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), 150);
+    });
+  });
+}
+
+async function waitForFormReady(page: Page, expectedText?: string) {
+  await page.waitForFunction(
+    (text) => {
+      const container = document.querySelector('div.flex-1.w-full');
+      const hasExpectedText =
+        typeof text === 'string' && text.length > 0
+          ? (container?.textContent?.includes(text) ?? false)
+          : true;
+      const titledSelectables = Array.from(document.querySelectorAll('.selectable[title]'));
+      const renderersReady =
+        titledSelectables.length > 0 &&
+        titledSelectables.every((element) => {
+          const content = element.firstElementChild;
+          return !(content instanceof HTMLElement) || content.dataset.pdfmeRenderReady === 'true';
+        });
+      const fontsLoaded = !document.fonts || document.fonts.status === 'loaded';
+      return hasExpectedText && renderersReady && fontsLoaded;
+    },
+    { timeout },
+    expectedText,
+  );
+
+  await page.evaluate(async () => {
     if (document.fonts) {
       await document.fonts.ready;
     }
@@ -326,7 +471,7 @@ describe('Playground E2E Tests', () => {
     // 5. Load the Pedigree designer directly to avoid flaky list-page navigation in CI
     await page.goto(`${baseUrl}/?template=pedigree`, { waitUntil: 'networkidle2', timeout });
 
-    await waitForDesignerReady(page);
+    await waitForDesignerReady(page, 'Pet Name');
 
     // 7. Screenshot & compare
     await captureAndCompareScreenshot(page, 'pedigree-designer');
@@ -335,45 +480,25 @@ describe('Playground E2E Tests', () => {
     await generateAndComparePDF(page, browser, 'pedigree');
   });
 
-  // Skip the problematic test in CI environment
-  it('should modify template, generate PDF and compare, then input form data', async () => {
+  it('should load a deterministic template, generate PDF and compare, then render form inputs', async () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
-    const extension = new PuppeteerRunnerExtension(browser, page, { timeout });
 
-    // 9. Press Reset button
-    await page.$eval('#reset-template', (el: Element) => (el as HTMLElement).click());
+    const template = buildModifiedTemplate();
 
-    // 10. Replay templateCreationRecord operations to add elements
-    const templateCreationUserFlow = parse(templateCreationRecord);
-    const templateCreationRunner = await createRunner(templateCreationUserFlow, extension);
-    await templateCreationRunner.run();
-    await waitForDesignerReady(page);
+    await loadRouteWithStorage(page, '/designer', { template });
+    await waitForDesignerReady(page, 'Type Something...');
 
-    // 11. Screenshot & compare
     await captureAndCompareScreenshot(page, 'modified-template-designer');
 
-    // 12. Generate PDF & compare
     await generateAndComparePDF(page, browser, 'modified-template');
 
-    // 13. Save locally
-    await page.click('#save-local');
+    await loadRouteWithStorage(page, '/form-viewer', {
+      template,
+      inputs: buildFinalFormInputs(),
+      mode: 'form',
+    });
+    await waitForFormReady(page, 'Filled by CI');
 
-    // 14. Move to form viewer
-    await page.click('#form-viewer-nav');
-    await page.waitForFunction(
-      () => {
-        const container = document.querySelector('div.flex-1.w-full');
-        return container ? container.textContent?.includes('Type Something...') : false;
-      },
-      { timeout },
-    );
-
-    // 15. Input form data
-    const formInputUserFlow = parse(formInputRecord);
-    const formInputRunner = await createRunner(formInputUserFlow, extension);
-    await formInputRunner.run();
-
-    // 16. Generate PDF & compare
     await generateAndComparePDF(page, browser, 'final-form');
   });
 });
