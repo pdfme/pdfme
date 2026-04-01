@@ -72,7 +72,7 @@
     "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.5.8",
     "process": "^0.11.10",
-    "rollup": "^4.59.0",
+    "rollup": "^4.60.1",
     "vite": "^7.3.1",
     "vite-plugin-css-injected-by-js": "^4.0.1",
     "vite-tsconfig-paths": "^6.1.1"
