@@ -33,9 +33,10 @@ export interface TableSchema extends Schema {
   };
   headStyles: CellStyle;
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
-  columnStyles: {
-    alignment?: { [colIndex: number]: ALIGNMENT };
+  rowStyles?: {
+    [rowIndex: number]: Partial<Styles> & { cells?: { [colIndex: number]: Partial<Styles> } };
   };
+  columnStyles: Partial<{ [K in keyof Styles]: Record<number, Styles[K]> }>;
 }
 
 export interface Styles {
@@ -81,6 +82,10 @@ export interface StylesProps {
   headStyles: Partial<Styles>;
   bodyStyles: Partial<Styles>;
   alternateRowStyles: Partial<Styles>;
+  rowStyles: {
+    [rowIndex: number]: Partial<Styles>;
+  };
+  cellStyles: { [rowIndex: number]: { [colIndex: number]: Partial<Styles> } };
   columnStyles: { [key: string]: Partial<Styles> };
 }
 
