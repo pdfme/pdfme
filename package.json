@@ -59,7 +59,7 @@
     "@types/jest": "^30.0.0",
     "@types/jest-image-snapshot": "^6.4.1",
     "@types/node": "^25.3.3",
-    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.32.0",
     "babel-loader": "^10.1.1",
     "eslint": "^9.39.4",
