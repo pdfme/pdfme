@@ -42,6 +42,7 @@ export const getPlugins = () => {
     Code128: barcodes.code128,
     // NW7: barcodes.nw7,
     // ITF14: barcodes.itf14,
+    ITF: barcodes.itf,
     // UPCA: barcodes.upca,
     // UPCE: barcodes.upce,
     // GS1DataMatrix: barcodes.gs1datamatrix,
