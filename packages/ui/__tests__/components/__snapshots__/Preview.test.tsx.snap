@@ -23,7 +23,7 @@ exports[`Preview(as Form) snapshot 1`] = `
             style="display: flex; align-items: center;"
           >
             <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
+              class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
               type="button"
             >
               <span
@@ -33,7 +33,7 @@ exports[`Preview(as Form) snapshot 1`] = `
               </span>
             </button>
             <span
-              class="ant-typography css-dev-only-do-not-override-11mmrso"
+              class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
               style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
             >
               <strong>
@@ -42,7 +42,7 @@ exports[`Preview(as Form) snapshot 1`] = `
               </strong>
             </span>
             <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
+              class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
               type="button"
             >
               <span
@@ -142,7 +142,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
             style="display: flex; align-items: center;"
           >
             <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
+              class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
               type="button"
             >
               <span
@@ -152,7 +152,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
               </span>
             </button>
             <span
-              class="ant-typography css-dev-only-do-not-override-11mmrso"
+              class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
               style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
             >
               <strong>
@@ -161,7 +161,7 @@ exports[`Preview(as Viewer) snapshot 1`] = `
               </strong>
             </span>
             <button
-              class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
+              class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
               type="button"
             >
               <span

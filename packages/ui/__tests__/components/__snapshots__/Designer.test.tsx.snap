@@ -24,7 +24,7 @@ exports[`Designer snapshot 1`] = `
           style="visibility: visible;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-text"
+            class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-text"
             style="width: 35px; height: 35px; margin-top: 0.25rem; padding: 0.25rem;"
             type="button"
           >
@@ -74,7 +74,7 @@ exports[`Designer snapshot 1`] = `
           style="visibility: visible;"
         >
           <button
-            class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-image"
+            class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined pdfme-designer-plugin-image"
             style="width: 35px; height: 35px; margin-top: 0.25rem; padding: 0.25rem;"
             type="button"
           >
@@ -132,7 +132,7 @@ exports[`Designer snapshot 1`] = `
               style="display: flex; align-items: center;"
             >
               <button
-                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
+                class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
                 type="button"
               >
                 <span
@@ -142,7 +142,7 @@ exports[`Designer snapshot 1`] = `
                 </span>
               </button>
               <span
-                class="ant-typography css-dev-only-do-not-override-11mmrso"
+                class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
                 style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
               >
                 <strong>
@@ -151,7 +151,7 @@ exports[`Designer snapshot 1`] = `
                 </strong>
               </span>
               <button
-                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
+                class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
                 type="button"
               >
                 <span
@@ -169,7 +169,7 @@ exports[`Designer snapshot 1`] = `
         style="position: absolute; right: 0px; z-index: 1; height: 100%; width: 400px;"
       >
         <button
-          class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only pdfme-designer-sidebar-toggle"
+          class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only pdfme-designer-sidebar-toggle"
           style="position: absolute; display: flex; align-items: center; justify-content: center; top: 14px; right: 16px; padding-top: 2px; z-index: 100;"
           type="button"
         >
@@ -193,7 +193,7 @@ exports[`Designer snapshot 1`] = `
                 style="min-height: 40px; display: flex; align-items: center; justify-content: center;"
               >
                 <span
-                  class="ant-typography css-dev-only-do-not-override-11mmrso"
+                  class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
                   style="text-align: center; width: 100%;"
                 >
                   <strong>
@@ -202,7 +202,7 @@ exports[`Designer snapshot 1`] = `
                 </span>
               </div>
               <div
-                class="ant-divider css-dev-only-do-not-override-11mmrso ant-divider-horizontal"
+                class="ant-divider css-dev-only-do-not-override-ch9ese css-var-root ant-divider-horizontal ant-divider-rail"
                 role="separator"
                 style="margin-top: 8px; margin-bottom: 0px;"
               />
@@ -220,7 +220,7 @@ exports[`Designer snapshot 1`] = `
                     style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                   >
                     <button
-                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                      class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
                       style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                       type="button"
                     >
@@ -263,7 +263,7 @@ exports[`Designer snapshot 1`] = `
                       </svg>
                     </div>
                     <span
-                      class="ant-typography css-dev-only-do-not-override-11mmrso"
+                      class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
                       style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                       title="Edit"
                     >
@@ -278,7 +278,7 @@ exports[`Designer snapshot 1`] = `
                     style="display: flex; align-items: center; cursor: pointer; gap: 0.5rem; border: 1px solid transparent;"
                   >
                     <button
-                      class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
+                      class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-default ant-btn-color-default ant-btn-variant-outlined ant-btn-icon-only"
                       style="display: flex; align-items: center; background: none; box-shadow: none; padding-left: 0.25rem;"
                       type="button"
                     >
@@ -322,7 +322,7 @@ exports[`Designer snapshot 1`] = `
                       </svg>
                     </div>
                     <span
-                      class="ant-typography css-dev-only-do-not-override-11mmrso"
+                      class="ant-typography css-dev-only-do-not-override-ch9ese css-var-root"
                       style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: 100%;"
                       title="Edit"
                     >
@@ -353,7 +353,7 @@ exports[`Designer snapshot 1`] = `
               style="display: flex; flex-shrink: 0; align-items: center; justify-content: flex-end; gap: 8px; padding: 16px;"
             >
               <button
-                class="ant-btn css-dev-only-do-not-override-11mmrso ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm pdfme-designer-bulk-update"
+                class="ant-btn css-dev-only-do-not-override-ch9ese css-var-root ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-sm pdfme-designer-bulk-update"
                 type="button"
               >
                 <u>
