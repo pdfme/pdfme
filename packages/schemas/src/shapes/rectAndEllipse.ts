@@ -139,13 +139,13 @@ const getPropPanelSchema = (type: 'rectangle' | 'ellipse') => ({
   },
 });
 
-export const rectangle = {
+export const rectangle: Plugin<ShapeSchema> = {
   ...shape,
   propPanel: getPropPanelSchema('rectangle'),
   icon: createSvgStr(Square),
 };
 
-export const ellipse = {
+export const ellipse: Plugin<ShapeSchema> = {
   ...shape,
   propPanel: getPropPanelSchema('ellipse'),
   icon: createSvgStr(Circle),

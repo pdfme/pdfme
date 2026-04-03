@@ -8,6 +8,7 @@
     "useDefineForClassFields": true,
     "lib": ["ES2020", "DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "baseUrl": ".",

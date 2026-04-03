@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
-import type { ThemeConfig, GlobalToken } from 'antd';
+import type { ThemeConfig } from 'antd';
 import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
   Lang,
@@ -33,6 +33,12 @@ export type ChangeSchemaItem = {
   schemaId: string;
 };
 export type ChangeSchemas = (objs: ChangeSchemaItem[]) => void;
+
+export type UITheme = {
+  colorPrimary: string;
+  colorPrimaryBg: string;
+  colorWhite: string;
+};
 
 /**
  * Properties used for PDF rendering.
@@ -72,7 +78,7 @@ export interface PDFRenderProps<T extends Schema> {
  * @property {(arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => void} [onChange] - Used to change the value and schema properties. Only applicable when the mode is 'form' or 'designer'.
  * @property {HTMLDivElement} rootElement - The root HTMLDivElement for the UI.
  * @property {UIOptions} options - Options object passed from the Viewer, Form, or Designer.
- * @property {ThemeConfig} theme - An object that merges the 'theme' passed as an options with the default theme.
+ * @property {UITheme} theme - A merged token object used for UI rendering.
  * @property {(key: keyof Dict | string) => string} i18n - An object merged based on the options 'lang' and 'labels'.
  * @property {number} scale - The scale of the UI.
  * @property {Map<string | number, unknown>} _cache - Cache shared only during the execution of the render function (useful for caching images, etc. if needed).
@@ -88,7 +94,7 @@ export type UIRenderProps<T extends Schema> = {
   onChange?: (arg: { key: string; value: unknown } | { key: string; value: unknown }[]) => void;
   rootElement: HTMLDivElement;
   options: UIOptions;
-  theme: GlobalToken;
+  theme: UITheme;
   i18n: (key: string) => string;
   scale: number;
   _cache: Map<string | number, unknown>;
@@ -104,7 +110,7 @@ export type UIRenderProps<T extends Schema> = {
  * @property {SchemaForUI[]} schemas - Array of schemas for UI rendering.
  * @property {Size} pageSize - The size of the page being edited.
  * @property {UIOptions} options - UI options for the property panel.
- * @property {GlobalToken} theme - The theme configuration used in the UI.
+ * @property {UITheme} theme - The theme token used in the UI.
  * @property {(key: keyof Dict | string) => string} i18n - Internationalization dictionary for UI labels and texts.
  */
 type PropPanelProps = {
@@ -114,7 +120,7 @@ type PropPanelProps = {
   changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
   options: UIOptions;
-  theme: GlobalToken;
+  theme: UITheme;
   i18n: (key: string) => string;
 };
 
