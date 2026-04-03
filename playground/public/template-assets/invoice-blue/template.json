@@ -5,7 +5,7 @@
         "type": "text",
         "position": {
           "x": 164.14,
-          "y": 20.36
+          "y": 19.76
         },
         "width": 43.38,
         "height": 6.11,
@@ -16,11 +16,11 @@
         "type": "text",
         "position": {
           "x": 96.82,
-          "y": 52.47
+          "y": 51.57
         },
         "width": 43.38,
         "height": 6.38,
-        "fontSize": 13,
+        "fontSize": 14,
         "content": "123456789"
       },
       "BilledTo": {
@@ -387,7 +387,7 @@
         "type": "text",
         "position": {
           "x": 150.29,
-          "y": 199.57
+          "y": 199.07
         },
         "width": 37.8,
         "height": 9.26,

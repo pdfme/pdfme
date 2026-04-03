@@ -5,7 +5,7 @@
         "type": "text",
         "position": {
           "x": 32.97,
-          "y": 22.57
+          "y": 22.27
         },
         "width": 43.38,
         "height": 6.38,
@@ -16,7 +16,7 @@
         "type": "text",
         "position": {
           "x": 32.97,
-          "y": 29.07
+          "y": 28.47
         },
         "width": 43.38,
         "height": 6.11,
@@ -220,7 +220,7 @@
         "type": "text",
         "position": {
           "x": 142.8,
-          "y": 200.98
+          "y": 200.08
         },
         "width": 44.41,
         "height": 6,
@@ -232,7 +232,7 @@
         "type": "text",
         "position": {
           "x": 125.92,
-          "y": 208.09
+          "y": 207.39
         },
         "width": 10.54,
         "height": 5.99,
@@ -244,7 +244,7 @@
         "type": "text",
         "position": {
           "x": 142.8,
-          "y": 208.08
+          "y": 207.1
         },
         "width": 44.41,
         "height": 6,
@@ -256,9 +256,9 @@
         "type": "text",
         "position": {
           "x": 142.8,
-          "y": 217.08
+          "y": 216.38
         },
-        "width": 44.41,
+        "width": 44.31,
         "height": 6,
         "fontSize": 16,
         "alignment": "center",

@@ -10,6 +10,7 @@
         "width": 43.38,
         "height": 6.38,
         "fontSize": 14,
+        "lineHeight": 1,
         "content": "123456789"
       },
       "Date": {
@@ -21,6 +22,7 @@
         "width": 43.38,
         "height": 6.11,
         "fontSize": 14,
+        "lineHeight": 1,
         "content": "02/02/2020"
       },
       "InvoiceToName": {
@@ -32,6 +34,7 @@
         "width": 90.21,
         "height": 9.56,
         "fontSize": 24,
+        "lineHeight": 1,
         "content": "pdfme studio"
       },
       "InvoiceToInfo": {
@@ -43,6 +46,7 @@
         "width": 90.21,
         "height": 19.08,
         "fontSize": 12,
+        "lineHeight": 1,
         "content": "+123-456-7890\nhello@pdfme.com"
       },
       "PaymentMethod": {
@@ -54,6 +58,7 @@
         "width": 68.77,
         "height": 19.08,
         "fontSize": 12,
+        "lineHeight": 1,
         "content": "Salford&Co.\nAccount No: 123-456-7890"
       },
       "Description1": {
@@ -65,6 +70,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -77,6 +83,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -89,6 +96,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -101,6 +109,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -113,6 +122,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -125,6 +135,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -137,6 +148,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -149,6 +161,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -161,6 +174,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -173,6 +187,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -185,6 +200,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -197,6 +213,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -209,6 +226,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -221,6 +239,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -233,6 +252,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -245,6 +265,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -257,6 +278,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -269,6 +291,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -281,6 +304,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -293,6 +317,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -305,6 +330,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -317,6 +343,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -329,6 +356,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -341,6 +369,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -353,6 +382,7 @@
         "width": 90.46,
         "height": 11.93,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "Your Service Description"
       },
@@ -365,6 +395,7 @@
         "width": 19.29,
         "height": 11.92,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "1"
       },
@@ -377,6 +408,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
@@ -389,6 +421,7 @@
         "width": 27.48,
         "height": 11.91,
         "fontSize": 14,
+        "lineHeight": 1,
         "alignment": "center",
         "content": "$100"
       },
