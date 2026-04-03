@@ -65,7 +65,7 @@
     "date-fns": "^4.1.0",
     "dompurify": "^3.3.3",
     "fontkit": "^2.0.2",
-    "lucide": "^0.577.0",
+    "lucide": "^1.7.0",
     "signature_pad": "^4.2.0"
   },
   "devDependencies": {
