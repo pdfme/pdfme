@@ -53,7 +53,7 @@
     "dompurify": "^3.3.3",
     "form-render": "^2.5.5",
     "hotkeys-js": "^4.0.2",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.7.0",
     "rc-field-form": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
