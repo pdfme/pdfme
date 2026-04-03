@@ -1,4 +1,5 @@
 import { useForm } from 'form-render';
+import type { Schema as FormRenderSchema } from 'form-render';
 import React, { useRef, useContext, useEffect, useCallback, useMemo } from 'react';
 import type {
   Dict,
@@ -450,7 +451,7 @@ const DetailView = (props: DetailViewProps) => {
       <SidebarBody>
         <FormRenderComponent
           form={form}
-          schema={propPanelSchema}
+          schema={propPanelSchema as unknown as FormRenderSchema}
           widgets={widgets}
           watch={{ '#': handleWatch }}
           locale="en-US"

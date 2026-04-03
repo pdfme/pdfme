@@ -11,6 +11,7 @@ interface ButtonConfig {
 const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
   const { activeElements, changeSchemas, schemas, schema } = props;
   const { token } = theme.useToken();
+  const buttons = Array.isArray(schema?.buttons) ? (schema.buttons as ButtonConfig[]) : [];
 
   const apply = (btn: ButtonConfig) => {
     const key = btn.key;
@@ -54,7 +55,7 @@ const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
   return (
     <Form.Item>
       <Space.Compact>
-        {(schema.buttons as ButtonConfig[]).map((btn: ButtonConfig, index: number) => {
+        {buttons.map((btn: ButtonConfig, index: number) => {
           const active = isActive(btn);
           return (
             <Button

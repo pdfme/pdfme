@@ -1,7 +1,5 @@
 import { z } from 'zod';
 import type { PDFPage, PDFDocument } from '@pdfme/pdf-lib';
-import type { ThemeConfig } from 'antd';
-import type { WidgetProps as _PropPanelWidgetProps, Schema as _PropPanelSchema } from 'form-render';
 import {
   Lang,
   Dict,
@@ -26,7 +24,48 @@ import {
   SchemaPageArray,
 } from './schema.js';
 
-export type PropPanelSchema = _PropPanelSchema;
+export interface UIOptionsThemeToken {
+  colorPrimary?: string;
+  colorPrimaryBg?: string;
+  colorWhite?: string;
+  [key: string]: unknown;
+}
+
+export interface UIOptionsTheme {
+  token?: UIOptionsThemeToken;
+  components?: Record<string, Record<string, unknown>>;
+  [key: string]: unknown;
+}
+
+export interface PropPanelRule {
+  validator?: (...args: any[]) => unknown;
+  message?: string;
+  pattern?: RegExp | string;
+  [key: string]: unknown;
+}
+
+export interface PropPanelSchema {
+  title?: string;
+  type?: string;
+  widget?: string;
+  default?: unknown;
+  placeholder?: string;
+  format?: string;
+  required?: boolean;
+  hidden?: boolean | string;
+  disabled?: boolean;
+  bind?: string | false | string[];
+  span?: number;
+  column?: number;
+  min?: number;
+  max?: number;
+  props?: Record<string, unknown>;
+  rules?: PropPanelRule[];
+  properties?: Record<string, PropPanelSchema>;
+  items?: PropPanelSchema | PropPanelSchema[];
+  [key: string]: unknown;
+}
+
 export type ChangeSchemaItem = {
   key: string;
   value: unknown;
@@ -124,7 +163,15 @@ type PropPanelProps = {
   i18n: (key: string) => string;
 };
 
-export type PropPanelWidgetProps = _PropPanelWidgetProps & PropPanelProps;
+type PropPanelWidgetRuntimeProps = {
+  schema?: PropPanelSchema;
+  value?: unknown;
+  onChange?: (...args: any[]) => unknown;
+  error?: unknown;
+  [key: string]: unknown;
+};
+
+export type PropPanelWidgetProps = PropPanelWidgetRuntimeProps & PropPanelProps;
 
 /**
  * Used for customizing the property panel.
@@ -195,7 +242,7 @@ export type Template = z.infer<typeof Template>;
 export type CommonOptions = z.infer<typeof CommonOptions>;
 export type GeneratorOptions = z.infer<typeof GeneratorOptions>;
 export type GenerateProps = Omit<z.infer<typeof GenerateProps>, 'plugins'> & { plugins?: Plugins };
-export type UIOptions = z.infer<typeof UIOptions> & { theme?: ThemeConfig };
+export type UIOptions = z.infer<typeof UIOptions> & { theme?: UIOptionsTheme };
 export type UIProps = Omit<z.infer<typeof UIProps>, 'plugins'> & { plugins?: Plugins };
 export type PreviewProps = Omit<z.infer<typeof PreviewProps>, 'plugins'> & { plugins?: Plugins };
 export type DesignerProps = Omit<z.infer<typeof DesignerProps>, 'plugins'> & { plugins?: Plugins };

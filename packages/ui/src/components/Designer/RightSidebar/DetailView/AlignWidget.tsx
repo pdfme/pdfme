@@ -209,7 +209,7 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
   ];
 
   return (
-    <Form.Item label={schema.title}>
+    <Form.Item label={schema?.title}>
       <Space.Compact>
         {layoutBtns.map((btn) => (
           <Button

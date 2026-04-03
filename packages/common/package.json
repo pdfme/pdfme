@@ -55,9 +55,5 @@
   },
   "devDependencies": {
     "@types/estree": "^1.0.6"
-  },
-  "peerDependencies": {
-    "antd": "^5.11.2 || ^6.0.0",
-    "form-render": "^2.2.20"
   }
 }
