@@ -1,5 +1,5 @@
 import { Schema, mm2pt, pt2mm } from '@pdfme/common';
-import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, createSvgStr } from '../src/utils.js';
+import { convertForPdfLayoutProps, rotatePoint, hex2RgbColor, hex2PrintingColor, createSvgStr } from '../src/utils.js';
 import { SquareCheck, IconNode } from 'lucide';
 
 describe('hex2RgbColor', () => {
@@ -30,6 +30,40 @@ describe('hex2RgbColor', () => {
     const hex = '#fffee';
     expect(() => hex2RgbColor(hex)).toThrow('Invalid hex color value #ff');
   });
+});
+
+describe('hex2PrintingColor (CMYK)', () => {
+  // hex2CmykColor is not directly exported — test via hex2PrintingColor with 'cmyk'.
+  // Regression guard for the bug where individual RGB channel === 0 incorrectly
+  // zeroed the corresponding CMYK output. The division-by-zero guard should be
+  // k === 1, not per-channel.
+
+  const cmykExpect = (hex: string, c: number, m: number, y: number, k: number) => {
+    const result = hex2PrintingColor(hex, 'cmyk') as {
+      type: string; cyan: number; magenta: number; yellow: number; key: number;
+    };
+    expect(result.type).toBe('CMYK');
+    expect(result.cyan).toBeCloseTo(c, 5);
+    expect(result.magenta).toBeCloseTo(m, 5);
+    expect(result.yellow).toBeCloseTo(y, 5);
+    expect(result.key).toBeCloseTo(k, 5);
+  };
+
+  it('pure black → K=1', () => cmykExpect('#000000', 0, 0, 0, 1));
+  it('pure white → all zeros', () => cmykExpect('#ffffff', 0, 0, 0, 0));
+
+  // These three used to be incorrectly converted to (0,0,0,0) because the
+  // division-by-zero guard checked individual RGB channels.
+  it('pure red → Y=1, M=1 (regression guard)', () => cmykExpect('#ff0000', 0, 1, 1, 0));
+  it('pure green → C=1, Y=1 (regression guard)', () => cmykExpect('#00ff00', 1, 0, 1, 0));
+  it('pure blue → C=1, M=1 (regression guard)', () => cmykExpect('#0000ff', 1, 1, 0, 0));
+  it('pure yellow → Y=1 (regression guard)', () => cmykExpect('#ffff00', 0, 0, 1, 0));
+  it('pure magenta → M=1 (regression guard)', () => cmykExpect('#ff00ff', 0, 1, 0, 0));
+  it('pure cyan → C=1 (regression guard)', () => cmykExpect('#00ffff', 1, 0, 0, 0));
+  it('orange (ff8000) → M=0.498, Y=1 (regression guard)', () =>
+    cmykExpect('#ff8000', 0, 0.498039, 1, 0));
+
+  it('mid-gray → K=0.5', () => cmykExpect('#808080', 0, 0, 0, 0.498039));
 });
 
 describe('rotatePoint', () => {
