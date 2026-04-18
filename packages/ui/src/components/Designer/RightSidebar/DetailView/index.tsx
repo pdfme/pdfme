@@ -268,7 +268,15 @@ const DetailView = (props: DetailViewProps) => {
             message: typedI18n('validation.uniqueName'),
           },
         ],
-        props: { autoComplete: 'off' },
+        props: {
+          autoComplete: 'off',
+          onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+            const newName = e.target.value;
+            if (newName && newName !== activeSchema.name && uniqueSchemaName.current(newName)) {
+              changeSchemas([{ key: 'name', value: newName, schemaId: activeSchema.id }]);
+            }
+          },
+        },
       },
       editable: {
         title: typedI18n('editable'),
