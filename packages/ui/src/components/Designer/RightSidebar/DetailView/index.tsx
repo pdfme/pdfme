@@ -165,7 +165,7 @@ const DetailView = (props: DetailViewProps) => {
 
     let changes: ChangeSchemaItem[] = [];
     for (const key in formSchema) {
-      if (['id', 'content'].includes(key)) continue;
+      if (['id', 'content', 'name'].includes(key)) continue;
 
       let value = formSchema[key];
       if (formAndSchemaValuesDiffer(value, (activeSchema as Record<string, unknown>)[key])) {
