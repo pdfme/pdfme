@@ -284,11 +284,16 @@ function DesignerApp() {
             className={`px-2 py-1 border rounded hover:bg-gray-100 w-full ${
               editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            onClick={async () => {
+            onClick={async (e) => {
+              const output = e.altKey ? 'form' : 'pdf';
               const startTimer = performance.now();
-              await generatePDF(designer.current);
+              await generatePDF(designer.current, output);
               const endTimer = performance.now();
-              toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`);
+              toast.info(
+                `Generated ${output === 'form' ? 'Form' : 'PDF'} in ${Math.round(
+                  endTimer - startTimer,
+                )}ms ⚡️`,
+              );
             }}
           >
             Generate PDF

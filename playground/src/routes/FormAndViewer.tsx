@@ -219,11 +219,16 @@ function FormAndViewerApp() {
         <button
           id="generate-pdf"
           className="px-2 py-1 border rounded hover:bg-gray-100"
-          onClick={async () => {
+          onClick={async (e) => {
+            const output = e.altKey ? 'form' : 'pdf';
             const startTimer = performance.now();
-            await generatePDF(ui.current);
+            await generatePDF(ui.current, output);
             const endTimer = performance.now();
-            toast.info(`Generated PDF in ${Math.round(endTimer - startTimer)}ms ⚡️`);
+            toast.info(
+              `Generated ${output === 'form' ? 'Form' : 'PDF'} in ${Math.round(
+                endTimer - startTimer,
+              )}ms ⚡️`,
+            );
           }}
         >
           Generate PDF

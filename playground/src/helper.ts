@@ -1,6 +1,6 @@
 import { Template, Font, checkTemplate, getInputFromTemplate, getDefaultFont } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
-import { generate } from '@pdfme/generator';
+import { generate, generateForm } from '@pdfme/generator';
 import { getPlugins } from './plugins';
 
 export function fromKebabCase(str: string): string {
@@ -100,7 +100,10 @@ export const translations: { label: string; value: string }[] = [
   { value: 'es', label: 'Spanish' },
 ];
 
-export const generatePDF = async (currentRef: Designer | Form | Viewer | null) => {
+export const generatePDF = async (
+  currentRef: Designer | Form | Viewer | null,
+  output: 'pdf' | 'form' = 'pdf',
+) => {
   if (!currentRef) return;
   const template = currentRef.getTemplate();
   const options = currentRef.getOptions();
@@ -111,7 +114,7 @@ export const generatePDF = async (currentRef: Designer | Form | Viewer | null) =
   const font = getFontsData();
 
   try {
-    const pdf = await generate({
+    const pdf = await (output === 'form' ? generateForm : generate)({
       template,
       inputs,
       options: {
