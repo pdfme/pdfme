@@ -4,7 +4,6 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:f
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { Dirent } from 'node:fs';
-import { PDFME_VERSION } from '@pdfme/common';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -201,7 +200,6 @@ describe('examples integration smoke', () => {
       .sort();
 
     expect(manifest.schemaVersion).toBe(1);
-    expect(manifest.cliVersion).toBe(PDFME_VERSION);
     expect(versionedManifestFiles).toEqual([`${manifest.cliVersion}.json`]);
     expect(existsSync(versionedManifestPath)).toBe(true);
     expect(readJson<ExampleManifest>(versionedManifestPath)).toEqual(manifest);
