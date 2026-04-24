@@ -10,12 +10,9 @@ describe('image plugin memory-safety', () => {
     const page = pdfDoc.addPage();
     const _cache = new Map<string | number, unknown>();
 
-    // A valid 1×1 transparent PNG encoded in base64, padded to ~1 MB with
-    // additional whitespace (which we then mutate into a valid-but-large
-    // payload further below). We only need embedPng to succeed so the
-    // render path reaches the cache; the cache key is formed regardless.
-    //
-    // Use a minimal but valid base64 PNG so embedPng doesn't throw.
+    // A minimal but valid 1×1 PNG data URL is sufficient: we only need
+    // embedPng to succeed so the render path reaches the cache; the
+    // cache key is derived from `value` regardless of image size.
     const minimalPng =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1J' +
       'REFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=';
@@ -49,8 +46,8 @@ describe('image plugin memory-safety', () => {
     // input. Before the fix, the key was `${schema.type}${value}` and its
     // byte length matched the input byte length. A tight bound of 100
     // chars catches any regression back to that behaviour — the current
-    // fingerprint format (`type:len:first16:last16`) stays well under 60
-    // even for huge inputs.
+    // fingerprint format (`${type}:${len}:${fnv1a-hex}`) stays well under
+    // 40 even for huge inputs.
     expect(keys[0].length).toBeLessThan(100);
     // Schema type must still be part of the key so different plugins
     // can't collide on the same shared cache Map.
@@ -70,9 +67,9 @@ describe('image plugin memory-safety', () => {
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1J' +
       'REFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=';
     // Same size/header/trailer shape as pngA but different middle bytes —
-    // the fingerprint must still distinguish them (length is identical so
-    // first16+last16 carries the signal; we'll also rely on the raw bytes
-    // of the minimal PNG differing via embedPng's output).
+    // the fingerprint must still distinguish them. Because the key is a
+    // hash over every byte, any differing byte flips the hash with
+    // overwhelming probability.
     const pngB =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAD8S7TTAAAAAXNSR0IArs4c6QAAAA1J' +
       'REFUGFdj+P///38ACfsD/QVDRcoAAAAASUVORK5CYII=';

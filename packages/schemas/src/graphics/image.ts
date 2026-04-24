@@ -20,20 +20,23 @@ import { getImageDimension } from './imagehelper.js';
  * strings in the cache Map forever — every unique image input created a
  * permanent Map key whose byte length matched the image itself.
  *
- * The fingerprint samples three regions — first 16 chars, middle 16
- * chars, last 16 chars — plus the total byte length and the schema
- * type. Sampling only the first and last regions was not sufficient:
- * base64 PNGs of the same pixel size share identical `data:image/png;
- * base64,iVBORw0KGgo...` headers and identical `...ElFTkSuQmCC` IEND
- * trailers, so two distinct images could collide. The middle region is
- * pixel data and differs between distinct images with overwhelming
- * probability. Keys stay under ~80 chars regardless of input size.
+ * The fingerprint is an FNV-1a 32-bit hash over the full input, combined
+ * with the schema type and input byte length. An earlier revision sampled
+ * three 16-char regions (first + middle + last) instead of hashing, but
+ * the first-16 slice is a constant data-URI prefix for any image of the
+ * same MIME type (`data:image/png;b…` / `data:image/jpeg…`), contributing
+ * no entropy. Hashing every byte removes that weakness at the same O(n)
+ * cost, without retaining any slice of the input as a Map key. Keys stay
+ * well under ~40 chars regardless of input size.
  */
 const getCacheKey = (schema: Schema, input: string) => {
-  const len = input.length;
-  const mid = len >>> 1;
-  const midSlice = input.slice(Math.max(0, mid - 8), mid + 8);
-  return `${schema.type}:${len}:${input.slice(0, 16)}:${midSlice}:${input.slice(-16)}`;
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  const hex = (hash >>> 0).toString(16).padStart(8, '0');
+  return `${schema.type}:${input.length}:${hex}`;
 };
 const fullSize = { width: '100%', height: '100%' };
 const defaultValue =
