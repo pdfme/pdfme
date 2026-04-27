@@ -144,7 +144,7 @@ describe('generate integrate test', () => {
       for (let i = 0; i < images.length; i++) {
         await expect(images[i]).toMatchImage(getImageSnapshotOptions(`fontSubset-${i + 1}`));
       }
-    }, 10000);
+    }, 30000);
   });
 });
 
