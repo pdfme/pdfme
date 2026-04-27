@@ -23,7 +23,7 @@
     "@pdfme/generator": "file:../packages/generator",
     "@pdfme/schemas": "file:../packages/schemas",
     "@pdfme/ui": "file:../packages/ui",
-    "@sentry/react": "^9.47.1",
+    "@sentry/react": "^10.50.0",
     "lucide-react": "^0.475.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
