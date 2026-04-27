@@ -47,7 +47,10 @@ const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
   const { schemasList, changeSchemas, deselectSchema, activeSchema, pageSize, basePdf } = props;
-  const form = useForm();
+  const formInstance = useForm();
+  // form-render returns a new wrapper each render; keep one so schema updates do not reset focused fields.
+  const formRef = useRef(formInstance);
+  const form = formRef.current;
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -165,7 +168,7 @@ const DetailView = (props: DetailViewProps) => {
 
     let changes: ChangeSchemaItem[] = [];
     for (const key in formSchema) {
-      if (['id', 'content', 'name'].includes(key)) continue;
+      if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
       if (formAndSchemaValuesDiffer(value, (activeSchema as Record<string, unknown>)[key])) {
@@ -268,15 +271,7 @@ const DetailView = (props: DetailViewProps) => {
             message: typedI18n('validation.uniqueName'),
           },
         ],
-        props: {
-          autoComplete: 'off',
-          onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
-            const newName = e.target.value;
-            if (newName && newName !== activeSchema.name && uniqueSchemaName.current(newName)) {
-              changeSchemas([{ key: 'name', value: newName, schemaId: activeSchema.id }]);
-            }
-          },
-        },
+        props: { autoComplete: 'off' },
       },
       editable: {
         title: typedI18n('editable'),
