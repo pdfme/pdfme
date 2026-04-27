@@ -546,3 +546,104 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
     expect(result).toBe(content);
   });
 });
+
+describe('replacePlaceholders memory safety', () => {
+  // Regression guard: before the fix, `parseData` memoized results in a
+  // module-level `parseDataCache` keyed by `JSON.stringify(data)` that was
+  // never evicted. Every unique inputs state added a permanent Map key
+  // whose byte length matched the input byte length, so any consumer
+  // passing varying large string values (image base64 in schema content,
+  // embedded fonts, large text) leaked memory for the app's lifetime.
+  //
+  // This test stress-tests the API with many unique large inputs and
+  // asserts that no multi-hundred-KB strings are retained afterwards. It
+  // uses `v8.writeHeapSnapshot` to capture ground truth from V8 instead
+  // of relying on `process.memoryUsage()` (which is too coarse and noisy
+  // to catch a cache that grows by tens of MB per burst).
+  //
+  // The test is deterministic in direction: pre-fix, retained "big
+  // string" bytes is O(inputs × inputSize) ≈ 15 MB, far above the
+  // threshold. Post-fix, retained is effectively zero (the strings are
+  // temporaries freed when the call returns).
+  it('does not retain call inputs in a module-level cache', () => {
+    const schemas: SchemaPageArray = [
+      [
+        {
+          name: 'blob',
+          type: 'text',
+          content: '',
+          position: { x: 0, y: 0 },
+          width: 100,
+          height: 10,
+        },
+      ],
+    ] as unknown as SchemaPageArray;
+
+    // 30 unique payloads × ~500 KB each. If the fix regresses, at least
+    // 15 MB of string data will be pinned as parseDataCache keys. The
+    // content MUST contain a placeholder (`{blob}`) — otherwise
+    // replacePlaceholders short-circuits and parseData is never called.
+    const PAYLOAD_COUNT = 30;
+    const PAYLOAD_SIZE = 500_000;
+    for (let i = 0; i < PAYLOAD_COUNT; i++) {
+      replacePlaceholders({
+        content: 'value: {blob}',
+        variables: { blob: `${i}-${'x'.repeat(PAYLOAD_SIZE)}` },
+        schemas,
+      });
+    }
+
+    // Force full GC if `--expose-gc` is available. If not, V8 will still
+    // have collected most transients by the time writeHeapSnapshot runs,
+    // and the threshold is generous enough that transient tails don't
+    // matter. On CI where --expose-gc is absent the test can still
+    // distinguish +15 MB (leak) from <1 MB (fixed).
+    const gc = (globalThis as { gc?: () => void }).gc;
+    if (gc) gc();
+
+    // v8.writeHeapSnapshot is available in all Node versions the pdfme
+    // monorepo supports. The snapshot JSON can be tens of MB; we parse it
+    // once and discard.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const v8: typeof import('v8') = require('v8');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs: typeof import('fs') = require('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const os: typeof import('os') = require('os');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const path: typeof import('path') = require('path');
+
+    const snapPath = path.join(
+      os.tmpdir(),
+      `pdfme-expression-memtest-${process.pid}-${Date.now()}.heapsnapshot`,
+    );
+    v8.writeHeapSnapshot(snapPath);
+    const rawSnap = fs.readFileSync(snapPath, 'utf8');
+    fs.unlinkSync(snapPath);
+    const snap = JSON.parse(rawSnap) as {
+      nodes: number[];
+      snapshot: { meta: { node_fields: string[]; node_types: string[][] } };
+    };
+    const fieldCount = snap.snapshot.meta.node_fields.length;
+    const typeFieldIdx = snap.snapshot.meta.node_fields.indexOf('type');
+    const selfSizeIdx = snap.snapshot.meta.node_fields.indexOf('self_size');
+    const typeNames = snap.snapshot.meta.node_types[typeFieldIdx];
+
+    // Sum self_size of all 'string' nodes whose size exceeds 200 KB. A
+    // healthy post-fix run has ~0 such nodes (strings are freed after
+    // each call). A leaking pre-fix run has at least PAYLOAD_COUNT
+    // nodes totalling >= PAYLOAD_COUNT * PAYLOAD_SIZE bytes.
+    const MIN_STRING_BYTES = 200_000;
+    let retainedLargeStringBytes = 0;
+    for (let i = 0; i < snap.nodes.length; i += fieldCount) {
+      if (typeNames[snap.nodes[i + typeFieldIdx]] !== 'string') continue;
+      const size = snap.nodes[i + selfSizeIdx];
+      if (size >= MIN_STRING_BYTES) retainedLargeStringBytes += size;
+    }
+
+    // Generous threshold: healthy is ~0, leak is ~15 MB. 2 MB cleanly
+    // separates the two without being sensitive to unrelated large
+    // strings (e.g. inline source maps in test fixtures).
+    expect(retainedLargeStringBytes).toBeLessThan(2_000_000);
+  }, 60_000);
+});
