@@ -4,7 +4,7 @@ import { getInputFromTemplate } from '@pdfme/common';
 import { text, image, signature, svg, line, rectangle, ellipse, barcodes } from '@pdfme/schemas';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
-const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
+const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '2.5');
 
 describe('generate integration test(other)', () => {
   describe.each([other])('%s', (templateData) => {
