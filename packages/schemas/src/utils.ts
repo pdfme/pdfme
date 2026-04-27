@@ -136,9 +136,9 @@ const hex2CmykColor = (hexString: string | undefined) => {
 
     // Calculate the CMYK values
     const k = 1 - Math.max(r, g, b);
-    const c = r === 0 ? 0 : (1 - r - k) / (1 - k);
-    const m = g === 0 ? 0 : (1 - g - k) / (1 - k);
-    const y = b === 0 ? 0 : (1 - b - k) / (1 - k);
+    const c = k === 1 ? 0 : (1 - r - k) / (1 - k);
+    const m = k === 1 ? 0 : (1 - g - k) / (1 - k);
+    const y = k === 1 ? 0 : (1 - b - k) / (1 - k);
 
     return cmyk(c, m, y, k);
   }
