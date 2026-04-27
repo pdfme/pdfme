@@ -46,16 +46,16 @@
     "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
   },
   "devDependencies": {
-    "@types/node": "^25.3.3",
+    "@types/node": "^25.6.0",
     "jsdom": "^26.1.0",
     "lodash": "^4.18.1",
     "lodash-es": "^4.18.1",
     "rimraf": "^6.1.3",
-    "typescript": "^6.0.2",
-    "vite": "^8.0.3",
-    "vite-plus": "^0.1.13",
-    "vitest": "^4.1.0",
-    "vitest-image-snapshot": "^0.6.47"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10",
+    "vite-plus": "^0.1.19",
+    "vitest": "^4.1.5",
+    "vitest-image-snapshot": "^0.6.50"
   },
   "packageManager": "npm@11.12.1"
 }

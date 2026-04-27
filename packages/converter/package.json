@@ -49,10 +49,10 @@
     "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.97",
+    "@napi-rs/canvas": "^0.1.99",
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^5.5.207"
+    "pdfjs-dist": "^5.6.205"
   },
   "devDependencies": {
     "@pdfme/generator": "*"

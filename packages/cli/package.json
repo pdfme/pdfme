@@ -48,12 +48,12 @@
     "test": "npm run build && vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.97",
+    "@napi-rs/canvas": "^0.1.99",
     "@pdfme/common": "*",
     "@pdfme/converter": "*",
     "@pdfme/generator": "*",
     "@pdfme/schemas": "*",
-    "citty": "^0.2.1"
+    "citty": "^0.2.2"
   },
   "engines": {
     "node": ">=20"
