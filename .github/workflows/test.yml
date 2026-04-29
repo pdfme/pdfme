@@ -46,6 +46,8 @@ jobs:
       - name: Install playground dependencies
         run: |
           npm ci --prefix playground
+      - name: Install Puppeteer Chrome
+        run: npm --prefix playground exec -- puppeteer browsers install chrome
       - name: Run playground checks
         run: |
           npm --prefix playground run lint
