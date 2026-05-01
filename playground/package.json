@@ -41,7 +41,7 @@
     "autoprefixer": "^10.5.0",
     "gh-pages": "^6.0.0",
     "p-limit": "^7.3.0",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.12",
     "puppeteer": "^24.42.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
