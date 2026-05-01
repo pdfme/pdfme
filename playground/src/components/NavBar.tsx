@@ -50,8 +50,11 @@ export function NavBar({ items }: NavBarProps) {
 
           <Disclosure.Panel className="sm:hidden border-t bg-white z-10 w-full absolute">
             <div className="px-2 pt-2 pb-3 space-y-2 text-sm shadow-md rounded-md bg-white">
-              {items.map(({ label, content }) => (
-                <div key={label} className="flex flex-col border-b border-gray-200 py-2">
+              {items.map(({ label, content }, index) => (
+                <div
+                  key={label || String(index)}
+                  className="flex flex-col border-b border-gray-200 py-2"
+                >
                   <span className="block mb-1">{label}</span>
                   {content}
                 </div>

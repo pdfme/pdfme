@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Code2 } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
 import { Designer } from '@pdfme/ui';
 import {
@@ -16,6 +17,7 @@ import {
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
 import ExternalButton from '../components/ExternalButton';
+import TemplateJsonDialog from '../components/TemplateJsonDialog';
 
 function DesignerApp() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -24,6 +26,8 @@ function DesignerApp() {
 
   const [editingStaticSchemas, setEditingStaticSchemas] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
+  const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
+  const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
 
   const buildDesigner = useCallback(async () => {
     if (!designerRef.current) return;
@@ -117,6 +121,19 @@ function DesignerApp() {
     if (designer.current) {
       designer.current.updateTemplate(getBlankTemplate());
     }
+  };
+
+  const onOpenTemplateJson = () => {
+    if (!designer.current) return;
+    setTemplateJsonSource(cloneDeep(designer.current.getTemplate()));
+    setJsonDialogOpen(true);
+  };
+
+  const onCommitTemplateJson = (template: Template) => {
+    if (!designer.current) return;
+
+    designer.current.updateTemplate(template);
+    toast.success('Template JSON committed');
   };
 
   const toggleEditingStaticSchemas = () => {
@@ -239,6 +256,22 @@ function DesignerApp() {
       ),
     },
     {
+      label: 'Template JSON',
+      content: (
+        <button
+          type="button"
+          disabled={editingStaticSchemas}
+          className={`inline-flex items-center justify-center gap-1 px-2 py-1 border rounded hover:bg-gray-100 w-full ${
+            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          onClick={onOpenTemplateJson}
+        >
+          <Code2 className="size-4" />
+          Edit JSON
+        </button>
+      ),
+    },
+    {
       label: '',
       content: (
         <div className="flex gap-2">
@@ -314,6 +347,15 @@ function DesignerApp() {
     <>
       <NavBar items={navItems} />
       <div ref={designerRef} className="flex-1 w-full" />
+      <TemplateJsonDialog
+        isOpen={jsonDialogOpen}
+        template={templateJsonSource}
+        onClose={() => {
+          setJsonDialogOpen(false);
+          setTemplateJsonSource(null);
+        }}
+        onCommit={onCommitTemplateJson}
+      />
     </>
   );
 }
