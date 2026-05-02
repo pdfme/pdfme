@@ -15,7 +15,6 @@ const getDocument = async (pdf: ArrayBuffer | Uint8Array) => {
 
   const loadingTask = pdfjsLib.getDocument({
     data: clonePdfData(pdf),
-    isEvalSupported: false,
   });
   const document = await loadingTask.promise;
   loadingTaskMap.set(document, { destroy: () => loadingTask.destroy() });
