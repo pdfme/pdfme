@@ -1,0 +1,60 @@
+{
+  "schemas": [
+    [
+      {
+        "name": "message",
+        "type": "multiVariableText",
+        "content": "{\"name\":\"Alice **literal**\",\"role\":\"Designer\",\"status\":\"draft\",\"code\":\"PDF `42`\"}",
+        "position": {
+          "x": 20,
+          "y": 30
+        },
+        "width": 170,
+        "height": 70,
+        "rotate": 0,
+        "readOnly": false,
+        "required": false,
+        "text": "Hello **{name}**\nRole: *{role}*\nBold italic: ***{role}***\nStatus: ~~{status}~~ and `{code}`",
+        "variables": ["name", "role", "status", "code"],
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontName": "NotoSansJP",
+        "fontSize": 14,
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "textFormat": "inline-markdown",
+        "fontVariantFallback": "synthetic",
+        "fontColor": "#000000",
+        "backgroundColor": ""
+      },
+      {
+        "name": "plainText",
+        "type": "text",
+        "content": "Text schema: **bold** | *italic* | ***bold italic*** | ~~strike~~ | `code`",
+        "position": {
+          "x": 20,
+          "y": 120
+        },
+        "width": 170,
+        "height": 25,
+        "rotate": 0,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontName": "NotoSansJP",
+        "fontSize": 13,
+        "lineHeight": 1.2,
+        "characterSpacing": 0,
+        "textFormat": "inline-markdown",
+        "fontVariantFallback": "synthetic",
+        "fontColor": "#000000",
+        "backgroundColor": ""
+      }
+    ]
+  ],
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [20, 10, 20, 10]
+  }
+}

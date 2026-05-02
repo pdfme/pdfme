@@ -18,6 +18,13 @@ import {
   DEFAULT_DYNAMIC_FIT,
   DEFAULT_DYNAMIC_MIN_FONT_SIZE,
   DEFAULT_DYNAMIC_MAX_FONT_SIZE,
+  DEFAULT_TEXT_FORMAT,
+  TEXT_FORMAT_INLINE_MARKDOWN,
+  TEXT_FORMAT_PLAIN,
+  DEFAULT_FONT_VARIANT_FALLBACK,
+  FONT_VARIANT_FALLBACK_ERROR,
+  FONT_VARIANT_FALLBACK_PLAIN,
+  FONT_VARIANT_FALLBACK_SYNTHETIC,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
@@ -48,6 +55,29 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
+const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
+  const { rootElement, changeSchemas, activeSchema, i18n } = props;
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked =
+    (activeSchema as { textFormat?: unknown })?.textFormat === TEXT_FORMAT_INLINE_MARKDOWN;
+  checkbox.onchange = (e: Event) => {
+    const value = (e.target as HTMLInputElement).checked
+      ? TEXT_FORMAT_INLINE_MARKDOWN
+      : TEXT_FORMAT_PLAIN;
+    changeSchemas([{ key: 'textFormat', value, schemaId: activeSchema.id }]);
+  };
+  const label = document.createElement('label');
+  const span = document.createElement('span');
+  span.innerText = i18n('schemas.text.inlineMarkdown') || '';
+  span.style.cssText = 'margin-left: 0.5rem';
+  label.style.cssText = 'display: flex; width: 100%;';
+  label.appendChild(checkbox);
+  label.appendChild(span);
+  rootElement.appendChild(label);
+};
+
 export const propPanel: PropPanel<TextSchema> = {
   schema: ({ options, activeSchema, i18n }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
@@ -57,6 +87,20 @@ export const propPanel: PropPanel<TextSchema> = {
     const enableDynamicFont = Boolean(
       (activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize,
     );
+    const activeTextSchema = activeSchema as unknown as TextSchema;
+    const hideTextFormat = activeTextSchema.type === 'text' && activeTextSchema.readOnly !== true;
+    const enableInlineMarkdown =
+      activeTextSchema.textFormat === TEXT_FORMAT_INLINE_MARKDOWN && !hideTextFormat;
+    const baseFontName =
+      activeTextSchema.fontName && font[activeTextSchema.fontName]
+        ? activeTextSchema.fontName
+        : fallbackFontName;
+    const optionalFontNames = [
+      { label: baseFontName, value: '' },
+      ...fontNames
+        .filter((name) => name !== baseFontName)
+        .map((name) => ({ label: name, value: name })),
+    ];
 
     const textSchema: Record<string, PropPanelSchema> = {
       fontName: {
@@ -153,11 +197,66 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      useInlineMarkdown: {
+        type: 'boolean',
+        widget: 'UseInlineMarkdown',
+        bind: false,
+        hidden: hideTextFormat,
+        span: enableInlineMarkdown ? 12 : 24,
+      },
+      fontVariantFallback: {
+        title: i18n('schemas.text.variantFallback'),
+        type: 'string',
+        widget: 'select',
+        default: DEFAULT_FONT_VARIANT_FALLBACK,
+        hidden: !enableInlineMarkdown,
+        props: {
+          options: [
+            { label: i18n('schemas.text.synthetic'), value: FONT_VARIANT_FALLBACK_SYNTHETIC },
+            { label: i18n('schemas.text.plain'), value: FONT_VARIANT_FALLBACK_PLAIN },
+            { label: i18n('schemas.text.error'), value: FONT_VARIANT_FALLBACK_ERROR },
+          ],
+        },
+        span: 12,
+      },
+      fontVariants: {
+        title: i18n('schemas.text.markdownFonts'),
+        type: 'object',
+        widget: 'card',
+        column: 2,
+        hidden: !enableInlineMarkdown,
+        properties: {
+          bold: {
+            title: i18n('schemas.text.boldFont'),
+            type: 'string',
+            widget: 'select',
+            props: { options: optionalFontNames },
+          },
+          italic: {
+            title: i18n('schemas.text.italicFont'),
+            type: 'string',
+            widget: 'select',
+            props: { options: optionalFontNames },
+          },
+          boldItalic: {
+            title: i18n('schemas.text.boldItalicFont'),
+            type: 'string',
+            widget: 'select',
+            props: { options: optionalFontNames },
+          },
+          code: {
+            title: i18n('schemas.text.codeFont'),
+            type: 'string',
+            widget: 'select',
+            props: { options: optionalFontNames },
+          },
+        },
+      },
     };
 
     return textSchema;
   },
-  widgets: { UseDynamicFontSize },
+  widgets: { UseDynamicFontSize, UseInlineMarkdown },
   defaultSchema: {
     name: '',
     type: 'text',
@@ -171,6 +270,8 @@ export const propPanel: PropPanel<TextSchema> = {
     alignment: DEFAULT_ALIGNMENT,
     verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
     fontSize: DEFAULT_FONT_SIZE,
+    textFormat: DEFAULT_TEXT_FORMAT,
+    fontVariantFallback: DEFAULT_FONT_VARIANT_FALLBACK,
     lineHeight: DEFAULT_LINE_HEIGHT,
     characterSpacing: DEFAULT_CHARACTER_SPACING,
     dynamicFontSize: undefined,

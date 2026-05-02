@@ -90,11 +90,12 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
     // Safely call schema function with proper type handling
     const parentSchema =
       typeof parentPropPanel.schema === 'function' ? parentPropPanel.schema(propPanelProps) : {};
+    const i18n = (propPanelProps as PropPanelWidgetProps).i18n;
     return {
       ...parentSchema,
       '-------': { type: 'void', widget: 'Divider' },
       dynamicVarContainer: {
-        title: 'Variables Sample Data',
+        title: i18n('schemas.mvt.variablesSampleData'),
         type: 'string',
         widget: 'Card',
         span: 24,
@@ -106,7 +107,7 @@ export const propPanel: PropPanel<MultiVariableTextSchema> = {
             span: 24,
           },
           placeholderDynamicVar: {
-            title: 'Placeholder Dynamic Variable',
+            title: i18n('schemas.mvt.placeholderDynamicVariable'),
             type: 'string',
             format: 'textarea',
             props: {

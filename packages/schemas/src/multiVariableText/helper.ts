@@ -1,8 +1,10 @@
 import { MultiVariableTextSchema } from './types.js';
+import { escapeInlineMarkdown } from '../text/inlineMarkdown.js';
 
 export const substituteVariables = (
   text: string,
   variablesIn: string | Record<string, string>,
+  valueMapper: (value: string, variableName: string) => string = (value) => value,
 ): string => {
   if (!text) {
     return '';
@@ -25,7 +27,10 @@ export const substituteVariables = (
       // handle special characters in variable name
       const variableForRegex = variableName.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
       const regex = new RegExp('\\{' + variableForRegex + '\\}', 'g');
-      substitutedText = substitutedText.replace(regex, variables[variableName]);
+      substitutedText = substitutedText.replace(
+        regex,
+        valueMapper(variables[variableName], variableName),
+      );
     });
   }
 
@@ -34,6 +39,11 @@ export const substituteVariables = (
 
   return substitutedText;
 };
+
+export const substituteVariablesAsInlineMarkdownLiterals = (
+  text: string,
+  variablesIn: string | Record<string, string>,
+): string => substituteVariables(text, variablesIn, escapeInlineMarkdown);
 
 export const validateVariables = (value: string, schema: MultiVariableTextSchema): boolean => {
   if (schema.variables.length === 0) {

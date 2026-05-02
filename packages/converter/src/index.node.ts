@@ -16,7 +16,6 @@ export const pdf2img = async (
     getDocument: (pdf) =>
       pdfjsLib.getDocument({
         data: clonePdfData(pdf),
-        isEvalSupported: false,
         wasmUrl: pdfJsWasmUrl,
       }).promise,
     createCanvas: (width, height) => createCanvas(width, height) as unknown as HTMLCanvasElement,
@@ -36,7 +35,6 @@ export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeO
     getDocument: (pdf) =>
       pdfjsLib.getDocument({
         data: clonePdfData(pdf),
-        isEvalSupported: false,
         wasmUrl: pdfJsWasmUrl,
       }).promise,
   });

@@ -13,6 +13,8 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
   PLACEHOLDER_FONT_COLOR,
+  CODE_BACKGROUND_COLOR,
+  SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -20,6 +22,12 @@ import {
   getBrowserVerticalFontAdjustments,
   isFirefox,
 } from './helper.js';
+import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
+import {
+  calculateDynamicRichTextFontSize,
+  isInlineMarkdownTextSchema,
+  resolveRichTextRuns,
+} from './richText.js';
 import { isEditable } from '../utils.js';
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
@@ -42,8 +50,7 @@ const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string
         return segment;
       }
 
-      return segment
-        .split('')
+      return Array.from(segment)
         .map((char) => {
           if (/\s/.test(char) || char.charCodeAt(0) < 32) {
             return char;
@@ -74,15 +81,38 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
+  const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+  const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
+  const dynamicRichTextFontSize =
+    enableInlineMarkdown && schema.dynamicFontSize
+      ? await calculateDynamicRichTextFontSize({
+          value: usePlaceholder ? (placeholder as string) : value,
+          schema,
+          font,
+          _cache,
+        })
+      : undefined;
   const textBlock = buildStyledTextContainer(
     arg,
     fontKitFont,
-    usePlaceholder ? placeholder : value,
+    usePlaceholder ? placeholder : displayValue,
+    dynamicRichTextFontSize,
   );
 
   const processedText = replaceUnsupportedChars(value, fontKitFont);
 
   if (!isEditable(mode, schema)) {
+    if (enableInlineMarkdown) {
+      await renderInlineMarkdownReadOnly({
+        textBlock,
+        value,
+        schema,
+        font,
+        _cache,
+      });
+      return;
+    }
+
     // Read-only mode
     textBlock.innerHTML = processedText
       .split('')
@@ -119,7 +149,9 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           dynamicFontSize = calculateDynamicFontSize({
             textSchema: schema,
             fontKitFont,
-            value: getText(textBlock),
+            value: isInlineMarkdownTextSchema(schema)
+              ? stripInlineMarkdown(getText(textBlock))
+              : getText(textBlock),
             startingFontSize: dynamicFontSize,
           });
           textBlock.style.fontSize = `${dynamicFontSize}pt`;
@@ -163,16 +195,65 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   }
 };
 
+const renderInlineMarkdownReadOnly = async (arg: {
+  textBlock: HTMLDivElement;
+  value: string;
+  schema: TextSchema;
+  font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
+  _cache: Map<string | number, unknown>;
+}) => {
+  const { textBlock, value, schema, font, _cache } = arg;
+  const runs = await resolveRichTextRuns({
+    runs: parseInlineMarkdown(value),
+    schema,
+    font,
+    _cache,
+  });
+
+  textBlock.innerHTML = '';
+  runs.forEach((run) => {
+    const span = document.createElement('span');
+    const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
+
+    span.textContent = processedText;
+    if (run.fontName) {
+      span.style.fontFamily = `'${run.fontName}'`;
+    }
+    if (run.syntheticBold) {
+      span.style.fontWeight = '800';
+      span.style.textShadow = SYNTHETIC_BOLD_CSS_TEXT_SHADOW;
+    }
+    if (run.syntheticItalic) {
+      span.style.fontStyle = 'italic';
+    }
+    if (run.strikethrough) {
+      span.style.textDecoration = 'line-through';
+    }
+    if (run.code) {
+      span.style.backgroundColor = CODE_BACKGROUND_COLOR;
+      span.style.borderRadius = '2px';
+      span.style.padding = '0 0.15em';
+      if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
+        span.style.fontFamily = run.fontName
+          ? `'${run.fontName}', monospace`
+          : 'monospace';
+      }
+    }
+    textBlock.appendChild(span);
+  });
+};
+
 export const buildStyledTextContainer = (
   arg: UIRenderProps<TextSchema>,
   fontKitFont: FontKitFont,
   value: string,
+  resolvedDynamicFontSize?: number,
 ) => {
   const { schema, rootElement, mode } = arg;
 
-  let dynamicFontSize: undefined | number = undefined;
+  let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 
-  if (schema.dynamicFontSize && value) {
+  if (dynamicFontSize === undefined && schema.dynamicFontSize && value) {
     dynamicFontSize = calculateDynamicFontSize({
       textSchema: schema,
       fontKitFont,
