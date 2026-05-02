@@ -30,7 +30,7 @@ import {
   splitTextToSize,
 } from './helper.js';
 import { stripInlineMarkdown } from './inlineMarkdown.js';
-import { isInlineMarkdownTextSchema } from './richText.js';
+import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './richText.js';
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 
@@ -70,15 +70,19 @@ const getFontProp = ({
   fontKitFont,
   schema,
   colorType,
+  fontSize: resolvedFontSize,
 }: {
   value: string;
   fontKitFont: FontKitFont;
   colorType?: ColorType;
   schema: TextSchema;
+  fontSize?: number;
 }) => {
-  const fontSize = schema.dynamicFontSize
-    ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
-    : (schema.fontSize ?? DEFAULT_FONT_SIZE);
+  const fontSize =
+    resolvedFontSize ??
+    (schema.dynamicFontSize
+      ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
+      : (schema.fontSize ?? DEFAULT_FONT_SIZE));
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
 
   return {
@@ -105,8 +109,19 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }),
     getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>),
   ]);
-  const displayValue = isInlineMarkdownTextSchema(schema) ? stripInlineMarkdown(value) : value;
-  const fontProp = getFontProp({ value: displayValue, fontKitFont, schema, colorType });
+  const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+  const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
+  const dynamicRichTextFontSize =
+    enableInlineMarkdown && schema.dynamicFontSize
+      ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
+      : undefined;
+  const fontProp = getFontProp({
+    value: displayValue,
+    fontKitFont,
+    schema,
+    colorType,
+    fontSize: dynamicRichTextFontSize,
+  });
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
@@ -137,7 +152,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
   }
 
-  if (isInlineMarkdownTextSchema(schema)) {
+  if (enableInlineMarkdown) {
     await renderInlineMarkdownText({
       value,
       schema,

@@ -1,13 +1,22 @@
-import type { Font } from '@pdfme/common';
-import { getFallbackFontName } from '@pdfme/common';
+import { getFallbackFontName, mm2pt, pt2mm, type Font } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import {
+  DEFAULT_CHARACTER_SPACING,
+  DEFAULT_DYNAMIC_FIT,
+  DEFAULT_FONT_SIZE,
+  DEFAULT_LINE_HEIGHT,
   DEFAULT_FONT_VARIANT_FALLBACK,
+  DYNAMIC_FIT_HORIZONTAL,
+  DYNAMIC_FIT_VERTICAL,
+  FONT_SIZE_ADJUSTMENT,
   FONT_VARIANT_FALLBACK_ERROR,
   FONT_VARIANT_FALLBACK_PLAIN,
+  SYNTHETIC_BOLD_OFFSET_RATIO,
+  SYNTHETIC_BOLD_PDF_EXTRA_DRAWS,
   TEXT_FORMAT_INLINE_MARKDOWN,
 } from './constants.js';
-import { getFontKitFont, widthOfTextAtSize } from './helper.js';
+import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
+import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
 
 export type ResolvedRichTextRun = RichTextRun & {
@@ -31,6 +40,11 @@ type FontVariantResolution = {
   fontName: string;
   syntheticBold: boolean;
   syntheticItalic: boolean;
+};
+
+type RichTextRunPiece = {
+  run: ResolvedRichTextRun;
+  text: string;
 };
 
 const getBaseFontName = (schema: TextSchema, font: Font) =>
@@ -139,7 +153,12 @@ const measureRunText = (
   text: string,
   fontSize: number,
   characterSpacing: number,
-) => widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing);
+) => {
+  const syntheticBoldWidth = run.syntheticBold
+    ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS
+    : 0;
+  return widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing) + syntheticBoldWidth;
+};
 
 const createLine = (): RichTextLine => ({ runs: [], width: 0, hardBreak: false });
 
@@ -155,6 +174,83 @@ const pushRunToLine = (
   if (line.runs.length > 0) line.width += characterSpacing;
   line.runs.push({ ...run, text, width });
   line.width += width;
+};
+
+const measurePiecesWidth = (
+  pieces: RichTextRunPiece[],
+  fontSize: number,
+  characterSpacing: number,
+) => {
+  let width = 0;
+  let hasText = false;
+  pieces.forEach((piece) => {
+    if (!piece.text) return;
+    if (hasText) width += characterSpacing;
+    width += measureRunText(piece.run, piece.text, fontSize, characterSpacing);
+    hasText = true;
+  });
+  return width;
+};
+
+const sliceRunPieces = (
+  pieces: RichTextRunPiece[],
+  startIndex: number,
+  endIndex: number,
+): RichTextRunPiece[] => {
+  const result: RichTextRunPiece[] = [];
+  let offset = 0;
+
+  pieces.forEach((piece) => {
+    const pieceStart = offset;
+    const pieceEnd = pieceStart + piece.text.length;
+    const sliceStart = Math.max(startIndex, pieceStart);
+    const sliceEnd = Math.min(endIndex, pieceEnd);
+
+    if (sliceStart < sliceEnd) {
+      result.push({
+        run: piece.run,
+        text: piece.text.slice(sliceStart - pieceStart, sliceEnd - pieceStart),
+      });
+    }
+
+    offset = pieceEnd;
+  });
+
+  return result;
+};
+
+const segmentRunPiecesByWord = (
+  runs: ResolvedRichTextRun[],
+  onSegment: (pieces: RichTextRunPiece[]) => void,
+  onHardBreak: () => void,
+) => {
+  const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+  let paragraphPieces: RichTextRunPiece[] = [];
+
+  const flushParagraph = () => {
+    if (paragraphPieces.length === 0) return;
+
+    const paragraphText = paragraphPieces.map((piece) => piece.text).join('');
+    Array.from(wordSegmenter.segment(paragraphText), ({ segment, index }) => {
+      const pieces = sliceRunPieces(paragraphPieces, index, index + segment.length);
+      if (pieces.length > 0) onSegment(pieces);
+    });
+    paragraphPieces = [];
+  };
+
+  runs.forEach((run) => {
+    run.text.split(/(\r\n|\r|\n)/).forEach((part) => {
+      if (part === '\r\n' || part === '\r' || part === '\n') {
+        flushParagraph();
+        onHardBreak();
+        return;
+      }
+
+      if (part) paragraphPieces.push({ run, text: part });
+    });
+  });
+
+  flushParagraph();
 };
 
 const splitIntoGraphemes = (value: string) => {
@@ -184,7 +280,13 @@ export const layoutRichTextLines = (arg: {
     currentLine = createLine();
   };
 
-  const pushText = (run: ResolvedRichTextRun, text: string) => {
+  const pushPiecesToLine = (pieces: RichTextRunPiece[]) => {
+    pieces.forEach((piece) => {
+      pushRunToLine(currentLine, piece.run, piece.text, fontSize, characterSpacing);
+    });
+  };
+
+  const pushOversizedText = (run: ResolvedRichTextRun, text: string) => {
     let remainingText = text;
 
     while (remainingText.length > 0) {
@@ -213,7 +315,10 @@ export const layoutRichTextLines = (arg: {
         const candidate = fittingText + grapheme;
         const candidateWidth = measureRunText(run, candidate, fontSize, characterSpacing);
         const maxWidth = currentLine.runs.length === 0 ? boxWidthInPt : remainingWidth;
-        if (candidateWidth > maxWidth && fittingText) break;
+        if (candidateWidth > maxWidth) {
+          if (fittingText) break;
+          if (currentLine.runs.length > 0) break;
+        }
         fittingText = candidate;
         fittingLength += grapheme.length;
         if (candidateWidth > maxWidth) break;
@@ -230,24 +335,174 @@ export const layoutRichTextLines = (arg: {
     }
   };
 
-  const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+  const pushSegment = (pieces: RichTextRunPiece[]) => {
+    const segmentWidth = measurePiecesWidth(pieces, fontSize, characterSpacing);
+    const pendingSpacing = currentLine.runs.length > 0 ? characterSpacing : 0;
+    const remainingWidth = Math.max(boxWidthInPt - currentLine.width - pendingSpacing, 0);
 
-  runs.forEach((run) => {
-    run.text.split(/(\r\n|\r|\n)/).forEach((part) => {
-      if (part === '\r\n' || part === '\r' || part === '\n') {
-        pushCurrentLine(true);
+    if (
+      segmentWidth <= remainingWidth ||
+      (currentLine.runs.length === 0 && segmentWidth <= boxWidthInPt)
+    ) {
+      pushPiecesToLine(pieces);
+      return;
+    }
+
+    if (currentLine.runs.length > 0) {
+      pushCurrentLine(false);
+      if (segmentWidth <= boxWidthInPt) {
+        pushPiecesToLine(pieces);
         return;
       }
+    }
 
-      Array.from(wordSegmenter.segment(part), ({ segment }) => segment).forEach((segment) => {
-        pushText(run, segment);
-      });
-    });
-  });
+    pieces.forEach((piece) => pushOversizedText(piece.run, piece.text));
+  };
+
+  segmentRunPiecesByWord(runs, pushSegment, () => pushCurrentLine(true));
 
   if (currentLine.runs.length > 0 || lines.length === 0) {
     pushCurrentLine(false);
   }
 
   return lines;
+};
+
+const measureParagraphWidths = (
+  runs: ResolvedRichTextRun[],
+  fontSize: number,
+  characterSpacing: number,
+) => {
+  const widths: number[] = [];
+  let paragraphPieces: RichTextRunPiece[] = [];
+
+  const pushWidth = () => {
+    widths.push(measurePiecesWidth(paragraphPieces, fontSize, characterSpacing));
+    paragraphPieces = [];
+  };
+
+  runs.forEach((run) => {
+    run.text.split(/(\r\n|\r|\n)/).forEach((part) => {
+      if (part === '\r\n' || part === '\r' || part === '\n') {
+        pushWidth();
+        return;
+      }
+
+      if (part) paragraphPieces.push({ run, text: part });
+    });
+  });
+
+  pushWidth();
+  return widths;
+};
+
+const getLineHeightAtSize = (line: RichTextLine, fontSize: number) => {
+  if (line.runs.length === 0) return fontSize;
+  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)));
+};
+
+export const calculateDynamicRichTextFontSize = async (arg: {
+  value: string;
+  schema: TextSchema;
+  font: Font;
+  _cache: Map<string | number, unknown>;
+  startingFontSize?: number | undefined;
+}) => {
+  const { value, schema, font, _cache, startingFontSize } = arg;
+  const {
+    fontSize: schemaFontSize,
+    dynamicFontSize: dynamicFontSizeSetting,
+    characterSpacing: schemaCharacterSpacing,
+    width: boxWidth,
+    height: boxHeight,
+    lineHeight = DEFAULT_LINE_HEIGHT,
+  } = schema;
+  const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
+  if (!dynamicFontSizeSetting) return fontSize;
+  if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
+
+  const richTextRuns = parseInlineMarkdown(value);
+  const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
+  const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const dynamicFontFit = dynamicFontSizeSetting.fit ?? DEFAULT_DYNAMIC_FIT;
+  const boxWidthInPt = mm2pt(boxWidth);
+
+  let dynamicFontSize = fontSize;
+  if (dynamicFontSize < dynamicFontSizeSetting.min) {
+    dynamicFontSize = dynamicFontSizeSetting.min;
+  } else if (dynamicFontSize > dynamicFontSizeSetting.max) {
+    dynamicFontSize = dynamicFontSizeSetting.max;
+  }
+
+  const calculateConstraints = (size: number) => {
+    let totalWidthInMm = 0;
+    let totalHeightInMm = 0;
+
+    const lines = layoutRichTextLines({
+      runs: resolvedRuns,
+      fontSize: size,
+      characterSpacing,
+      boxWidthInPt,
+    });
+
+    lines.forEach((line, lineIndex) => {
+      if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
+        totalWidthInMm = Math.max(totalWidthInMm, pt2mm(line.width));
+      }
+
+      if (lineIndex === 0) {
+        totalHeightInMm += pt2mm(getLineHeightAtSize(line, size) * lineHeight);
+      } else {
+        totalHeightInMm += pt2mm(size * lineHeight);
+      }
+    });
+
+    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
+      measureParagraphWidths(resolvedRuns, size, characterSpacing).forEach((paragraphWidth) => {
+        totalWidthInMm = Math.max(totalWidthInMm, pt2mm(paragraphWidth));
+      });
+    }
+
+    return { totalWidthInMm, totalHeightInMm };
+  };
+
+  const shouldFontGrowToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
+    if (dynamicFontSize >= dynamicFontSizeSetting.max) {
+      return false;
+    }
+    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
+      return totalWidthInMm < boxWidth;
+    }
+    return totalHeightInMm < boxHeight;
+  };
+
+  const shouldFontShrinkToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
+    if (dynamicFontSize <= dynamicFontSizeSetting.min || dynamicFontSize <= 0) {
+      return false;
+    }
+    return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
+  };
+
+  let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
+
+  while (shouldFontGrowToFit(totalWidthInMm, totalHeightInMm)) {
+    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
+    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
+      calculateConstraints(dynamicFontSize);
+
+    if (newHeight < boxHeight) {
+      totalWidthInMm = newWidth;
+      totalHeightInMm = newHeight;
+    } else {
+      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
+      break;
+    }
+  }
+
+  while (shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm)) {
+    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
+    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
+  }
+
+  return dynamicFontSize;
 };

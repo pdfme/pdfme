@@ -25,8 +25,12 @@ import { hex2PrintingColor, rotatePoint } from '../utils.js';
 
 type TextColor = ReturnType<typeof hex2PrintingColor>;
 
+const getSyntheticBoldWidth = (run: RichTextLineRun, fontSize: number) =>
+  run.syntheticBold ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS : 0;
+
 const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: number) =>
-  widthOfTextAtSize(run.text, run.fontKitFont, fontSize, characterSpacing);
+  widthOfTextAtSize(run.text, run.fontKitFont, fontSize, characterSpacing) +
+  getSyntheticBoldWidth(run, fontSize);
 
 const getPdfFont = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
   const pdfFont = pdfFontObj[run.fontName];
@@ -98,7 +102,7 @@ const drawRun = (arg: {
     const yLine = y + textHeight / 3;
     page.drawLine({
       start: rotatePoint({ x, y: yLine }, pivotPoint, rotate.angle),
-      end: rotatePoint({ x: x + runWidth + 1, y: yLine }, pivotPoint, rotate.angle),
+      end: rotatePoint({ x: x + runWidth, y: yLine }, pivotPoint, rotate.angle),
       thickness: (1 / 12) * fontSize,
       color,
       opacity,
@@ -109,7 +113,7 @@ const drawRun = (arg: {
     const yLine = y - textHeight / 12;
     page.drawLine({
       start: rotatePoint({ x, y: yLine }, pivotPoint, rotate.angle),
-      end: rotatePoint({ x: x + runWidth + 1, y: yLine }, pivotPoint, rotate.angle),
+      end: rotatePoint({ x: x + runWidth, y: yLine }, pivotPoint, rotate.angle),
       thickness: (1 / 12) * fontSize,
       color,
       opacity,

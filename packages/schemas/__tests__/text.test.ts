@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Font as FontKitFont } from 'fontkit';
-import { Font, getDefaultFont } from '@pdfme/common';
+import { Font, getDefaultFont, mm2pt } from '@pdfme/common';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
@@ -11,13 +11,21 @@ import {
   getSplittedLines,
   filterStartJP,
   filterEndJP,
+  widthOfTextAtSize,
 } from '../src/text/helper.js';
 import {
   escapeInlineMarkdown,
   parseInlineMarkdown,
   stripInlineMarkdown,
 } from '../src/text/inlineMarkdown.js';
-import { isInlineMarkdownTextSchema, resolveFontVariant } from '../src/text/richText.js';
+import {
+  calculateDynamicRichTextFontSize,
+  getRichTextLineText,
+  isInlineMarkdownTextSchema,
+  layoutRichTextLines,
+  resolveFontVariant,
+  type ResolvedRichTextRun,
+} from '../src/text/richText.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
@@ -25,6 +33,21 @@ import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
+
+const createMockFont = (
+  advanceWidth: number,
+  hasGlyphForCodePoint = (_codePoint: number) => true,
+) =>
+  ({
+    unitsPerEm: 1000,
+    ascent: 800,
+    descent: -200,
+    bbox: { maxY: 800, minY: -200 },
+    layout: (text: string) => ({
+      glyphs: Array.from(text, () => ({ advanceWidth })),
+    }),
+    hasGlyphForCodePoint,
+  }) as unknown as FontKitFont;
 
 const getSampleFont = (): Font => ({
   SauceHanSansJP: { fallback: true, data: sansData },
@@ -185,6 +208,90 @@ describe('isInlineMarkdownTextSchema', () => {
         readOnly: false,
       }),
     ).toBe(true);
+  });
+});
+
+describe('layoutRichTextLines', () => {
+  const fontKitFont = createMockFont(1000 / 12);
+
+  const createRun = (
+    text: string,
+    options: Partial<ResolvedRichTextRun> = {},
+  ): ResolvedRichTextRun => ({
+    text,
+    fontName: 'Base',
+    fontKitFont,
+    syntheticBold: false,
+    syntheticItalic: false,
+    ...options,
+  });
+
+  it('keeps a word together when style changes inside the word', () => {
+    const lines = layoutRichTextLines({
+      runs: [createRun('x he'), createRun('llo', { bold: true })],
+      fontSize: 12,
+      characterSpacing: 0,
+      boxWidthInPt: 6,
+    });
+
+    expect(lines.map(getRichTextLineText)).toEqual(['x ', 'hello']);
+    expect(lines[1].runs.map((run) => run.text)).toEqual(['he', 'llo']);
+  });
+
+  it('wraps before splitting an oversized token at the end of a line', () => {
+    const lines = layoutRichTextLines({
+      runs: [createRun('abc '), createRun('123456', { code: true })],
+      fontSize: 12,
+      characterSpacing: 0,
+      boxWidthInPt: 4,
+    });
+
+    expect(lines.map(getRichTextLineText)).toEqual(['abc ', '1234', '56']);
+  });
+});
+
+describe('calculateDynamicRichTextFontSize', () => {
+  it('measures inline markdown text with resolved variant fonts', async () => {
+    const baseFont = createMockFont(500);
+    const boldFont = createMockFont(1000);
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+      Bold: { data: new Uint8Array() },
+    } as Font;
+    const cache = new Map<string | number, FontKitFont>([
+      ['getFontKitFont-Base', baseFont],
+      ['getFontKitFont-Bold', boldFont],
+    ]);
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      width: 10,
+      height: 20,
+      characterSpacing: 0,
+      fontSize: 20,
+      textFormat: 'inline-markdown',
+      readOnly: true,
+      fontVariants: { bold: 'Bold' },
+      dynamicFontSize: { min: 4, max: 20, fit: 'horizontal' },
+    };
+
+    const fontSize = await calculateDynamicRichTextFontSize({
+      value: '**abcdef**',
+      schema,
+      font,
+      _cache: cache,
+    });
+
+    expect(widthOfTextAtSize('abcdef', boldFont, fontSize, 0)).toBeLessThanOrEqual(
+      mm2pt(schema.width),
+    );
+    expect(fontSize).toBeLessThan(
+      calculateDynamicFontSize({
+        textSchema: schema,
+        fontKitFont: baseFont,
+        value: 'abcdef',
+      }),
+    );
   });
 });
 
