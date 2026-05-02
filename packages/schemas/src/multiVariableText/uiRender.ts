@@ -7,8 +7,11 @@ import {
 } from '../text/uiRender.js';
 import { isEditable } from '../utils.js';
 import { getFontKitFont } from '../text/helper.js';
-import { substituteVariables } from './helper.js';
-import { countUniqueVariableNames, getVariableIndices } from './variables.js';
+import { CODE_BACKGROUND_COLOR, SYNTHETIC_BOLD_CSS_TEXT_SHADOW } from '../text/constants.js';
+import { parseInlineMarkdown } from '../text/inlineMarkdown.js';
+import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText.js';
+import { substituteVariables, substituteVariablesAsInlineMarkdownLiterals } from './helper.js';
+import { countUniqueVariableNames, visitVariables } from './variables.js';
 
 export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const { value, schema, rootElement, mode, onChange, ...rest } = arg;
@@ -21,8 +24,12 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     return;
   }
 
+  const renderValue = isInlineMarkdownTextSchema(schema)
+    ? substituteVariablesAsInlineMarkdownLiterals(text, value)
+    : substituteVariables(text, value);
+
   await parentUiRender({
-    value: isEditable(mode, schema) ? text : substituteVariables(text, value),
+    value: isEditable(mode, schema) ? text : renderValue,
     schema,
     mode: mode === 'form' ? 'viewer' : mode, // if no variables for form it's just a viewer
     rootElement,
@@ -80,7 +87,6 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       // value is not valid JSON — use empty variables
     }
   }
-  const variableIndices = getVariableIndices(rawText);
   const substitutedText = substituteVariables(rawText, variables);
   const font = options?.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(
@@ -89,7 +95,32 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     _cache as Map<string, import('fontkit').Font>,
   );
 
-  const textBlock = buildStyledTextContainer(arg, fontKitFont, substitutedText);
+  const textBlock = buildStyledTextContainer(
+    arg,
+    fontKitFont,
+    isInlineMarkdownTextSchema(schema)
+      ? getInlineMarkdownFormDisplayText(rawText, variables)
+      : substitutedText,
+  );
+
+  if (isInlineMarkdownTextSchema(schema)) {
+    renderInlineMarkdownVariableSpans({
+      rawText,
+      variables,
+      textBlock,
+      schema,
+      font,
+      theme,
+      onChange,
+      stopEditing,
+    });
+    return;
+  }
+
+  const variableIndices = new Map<number, string>();
+  visitVariables(rawText, ({ name, startIndex }) => {
+    variableIndices.set(startIndex, name);
+  });
 
   // Construct content-editable spans for each variable within the string
   let inVarString = false;
@@ -123,6 +154,141 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       textBlock.appendChild(span);
     }
   }
+};
+
+const getInlineMarkdownFormDisplayText = (
+  rawText: string,
+  variables: Record<string, string>,
+): string =>
+  parseInlineMarkdown(rawText)
+    .map((run) => substituteVariables(run.text, variables))
+    .join('');
+
+const applyInlineMarkdownStyle = (arg: {
+  element: HTMLElement;
+  run: ReturnType<typeof parseInlineMarkdown>[number];
+  schema: MultiVariableTextSchema;
+  font: NonNullable<UIRenderProps<MultiVariableTextSchema>['options']['font']>;
+}) => {
+  const { element, run, schema, font } = arg;
+  const resolvedFont = resolveFontVariant(run, schema, font);
+
+  if (resolvedFont.fontName) {
+    element.style.fontFamily = `'${resolvedFont.fontName}'`;
+  }
+  if (resolvedFont.syntheticBold) {
+    element.style.fontWeight = '800';
+    element.style.textShadow = SYNTHETIC_BOLD_CSS_TEXT_SHADOW;
+  }
+  if (resolvedFont.syntheticItalic) {
+    element.style.fontStyle = 'italic';
+  }
+  if (run.strikethrough) {
+    element.style.textDecoration = 'line-through';
+  }
+  if (run.code) {
+    element.style.backgroundColor = CODE_BACKGROUND_COLOR;
+    element.style.borderRadius = '2px';
+    element.style.padding = '0 0.15em';
+    if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
+      element.style.fontFamily = resolvedFont.fontName
+        ? `'${resolvedFont.fontName}', monospace`
+        : 'monospace';
+    }
+  }
+};
+
+const appendTextSpan = (arg: {
+  textBlock: HTMLDivElement;
+  text: string;
+  run: ReturnType<typeof parseInlineMarkdown>[number];
+  schema: MultiVariableTextSchema;
+  font: NonNullable<UIRenderProps<MultiVariableTextSchema>['options']['font']>;
+}) => {
+  const { textBlock, text, run, schema, font } = arg;
+  if (!text) return;
+
+  const span = document.createElement('span');
+  span.textContent = text;
+  applyInlineMarkdownStyle({ element: span, run, schema, font });
+  textBlock.appendChild(span);
+};
+
+const appendVariableSpan = (arg: {
+  textBlock: HTMLDivElement;
+  variableName: string;
+  variables: Record<string, string>;
+  run: ReturnType<typeof parseInlineMarkdown>[number];
+  schema: MultiVariableTextSchema;
+  font: NonNullable<UIRenderProps<MultiVariableTextSchema>['options']['font']>;
+  theme: UIRenderProps<MultiVariableTextSchema>['theme'];
+  onChange: UIRenderProps<MultiVariableTextSchema>['onChange'];
+  stopEditing: UIRenderProps<MultiVariableTextSchema>['stopEditing'];
+}) => {
+  const { textBlock, variableName, variables, run, schema, font, theme, onChange, stopEditing } =
+    arg;
+  const span = document.createElement('span');
+  span.style.outline = `${theme.colorPrimary} dashed 1px`;
+  applyInlineMarkdownStyle({ element: span, run, schema, font });
+  makeElementPlainTextContentEditable(span);
+  span.textContent = variables[variableName] ?? '';
+  span.addEventListener('blur', (e: Event) => {
+    const newValue = (e.target as HTMLSpanElement).textContent || '';
+    if (newValue !== variables[variableName]) {
+      variables[variableName] = newValue;
+      if (onChange) onChange({ key: 'content', value: JSON.stringify(variables) });
+      if (stopEditing) stopEditing();
+    }
+  });
+  textBlock.appendChild(span);
+};
+
+const renderInlineMarkdownVariableSpans = (arg: {
+  rawText: string;
+  variables: Record<string, string>;
+  textBlock: HTMLDivElement;
+  schema: MultiVariableTextSchema;
+  font: NonNullable<UIRenderProps<MultiVariableTextSchema>['options']['font']>;
+  theme: UIRenderProps<MultiVariableTextSchema>['theme'];
+  onChange: UIRenderProps<MultiVariableTextSchema>['onChange'];
+  stopEditing: UIRenderProps<MultiVariableTextSchema>['stopEditing'];
+}) => {
+  const { rawText, variables, textBlock, schema, font, theme, onChange, stopEditing } = arg;
+  textBlock.innerHTML = '';
+
+  parseInlineMarkdown(rawText).forEach((run) => {
+    let lastIndex = 0;
+
+    visitVariables(run.text, ({ name, startIndex, endIndex }) => {
+      appendTextSpan({
+        textBlock,
+        text: run.text.slice(lastIndex, startIndex),
+        run,
+        schema,
+        font,
+      });
+      appendVariableSpan({
+        textBlock,
+        variableName: name,
+        variables,
+        run,
+        schema,
+        font,
+        theme,
+        onChange,
+        stopEditing,
+      });
+      lastIndex = endIndex + 1;
+    });
+
+    appendTextSpan({
+      textBlock,
+      text: run.text.slice(lastIndex),
+      run,
+      schema,
+      font,
+    });
+  });
 };
 
 /**

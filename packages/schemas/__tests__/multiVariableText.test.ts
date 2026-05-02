@@ -1,4 +1,9 @@
-import { substituteVariables, validateVariables } from '../src/multiVariableText/helper.js';
+import {
+  substituteVariables,
+  substituteVariablesAsInlineMarkdownLiterals,
+  validateVariables,
+} from '../src/multiVariableText/helper.js';
+import { parseInlineMarkdown, stripInlineMarkdown } from '../src/text/inlineMarkdown.js';
 import { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
 import {
   countUniqueVariableNames,
@@ -60,6 +65,19 @@ describe('substituteVariables', () => {
     const text = 'Hello, {name}!';
     const variables = 'invalid json';
     expect(() => substituteVariables(text, variables)).toThrow(SyntaxError);
+  });
+
+  it('should keep inline markdown variables as literal text while preserving template styling', () => {
+    const text = '**{name}** uses `{code}`';
+    const variables = { name: 'A **bold** user', code: 'PDF `42`' };
+    const result = substituteVariablesAsInlineMarkdownLiterals(text, variables);
+
+    expect(stripInlineMarkdown(result)).toBe('A **bold** user uses PDF `42`');
+    expect(parseInlineMarkdown(result)).toEqual([
+      { text: 'A **bold** user', bold: true },
+      { text: ' uses ' },
+      { text: 'PDF `42`', code: true },
+    ]);
   });
 });
 

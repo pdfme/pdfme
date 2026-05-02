@@ -12,6 +12,12 @@ import {
   filterStartJP,
   filterEndJP,
 } from '../src/text/helper.js';
+import {
+  escapeInlineMarkdown,
+  parseInlineMarkdown,
+  stripInlineMarkdown,
+} from '../src/text/inlineMarkdown.js';
+import { isInlineMarkdownTextSchema, resolveFontVariant } from '../src/text/richText.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
@@ -43,6 +49,144 @@ const getTextSchema = () => {
   };
   return textSchema;
 };
+
+describe('parseInlineMarkdown', () => {
+  it('parses supported inline markdown styles', () => {
+    const result = parseInlineMarkdown(
+      'Hello **bold** and *italic* and ***both*** and ~~gone~~ and `code`',
+    );
+
+    expect(result).toEqual([
+      { text: 'Hello ' },
+      { text: 'bold', bold: true },
+      { text: ' and ' },
+      { text: 'italic', italic: true },
+      { text: ' and ' },
+      { text: 'both', bold: true, italic: true },
+      { text: ' and ' },
+      { text: 'gone', strikethrough: true },
+      { text: ' and ' },
+      { text: 'code', code: true },
+    ]);
+  });
+
+  it('keeps escaped and unmatched delimiters as text', () => {
+    expect(parseInlineMarkdown('\\*\\*literal\\*\\* and **unclosed')).toEqual([
+      { text: '**literal** and **unclosed' },
+    ]);
+  });
+
+  it('strips inline markdown markers', () => {
+    expect(stripInlineMarkdown('Hello **bold** and `code`')).toBe('Hello bold and code');
+  });
+
+  it('escapes markdown markers for literal content', () => {
+    const escaped = escapeInlineMarkdown('**literal** and `code` with \\');
+
+    expect(escaped).toBe('\\*\\*literal\\*\\* and \\`code\\` with \\\\');
+    expect(parseInlineMarkdown(`**${escaped}**`)).toEqual([
+      { text: '**literal** and `code` with \\', bold: true },
+    ]);
+  });
+});
+
+describe('resolveFontVariant', () => {
+  const font = {
+    Base: { data: new Uint8Array(), fallback: true },
+    Bold: { data: new Uint8Array() },
+    Italic: { data: new Uint8Array() },
+    BoldItalic: { data: new Uint8Array() },
+    Mono: { data: new Uint8Array() },
+  } as unknown as Font;
+
+  it('uses loaded variant fonts when they are available', () => {
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      fontVariants: { bold: 'Bold', italic: 'Italic', boldItalic: 'BoldItalic', code: 'Mono' },
+    };
+
+    expect(resolveFontVariant({ text: 'x', bold: true }, schema, font)).toEqual({
+      fontName: 'Bold',
+      syntheticBold: false,
+      syntheticItalic: false,
+    });
+    expect(resolveFontVariant({ text: 'x', bold: true, italic: true }, schema, font)).toEqual({
+      fontName: 'BoldItalic',
+      syntheticBold: false,
+      syntheticItalic: false,
+    });
+    expect(resolveFontVariant({ text: 'x', code: true }, schema, font)).toEqual({
+      fontName: 'Mono',
+      syntheticBold: false,
+      syntheticItalic: false,
+    });
+  });
+
+  it('falls back to synthetic styling when variant fonts are missing', () => {
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      fontVariants: { bold: 'MissingBold', italic: 'Italic' },
+    };
+
+    expect(resolveFontVariant({ text: 'x', bold: true }, schema, font)).toEqual({
+      fontName: 'Base',
+      syntheticBold: true,
+      syntheticItalic: false,
+    });
+    expect(resolveFontVariant({ text: 'x', bold: true, italic: true }, schema, font)).toEqual({
+      fontName: 'Italic',
+      syntheticBold: true,
+      syntheticItalic: false,
+    });
+  });
+
+  it('can disable synthetic fallback or throw on missing variants', () => {
+    const plainSchema = { ...getTextSchema(), fontName: 'Base', fontVariantFallback: 'plain' };
+    expect(resolveFontVariant({ text: 'x', bold: true }, plainSchema, font)).toEqual({
+      fontName: 'Base',
+      syntheticBold: false,
+      syntheticItalic: false,
+    });
+
+    const errorSchema = { ...getTextSchema(), fontName: 'Base', fontVariantFallback: 'error' };
+    expect(() => resolveFontVariant({ text: 'x', italic: true }, errorSchema, font)).toThrow(
+      'Missing font variant',
+    );
+  });
+});
+
+describe('isInlineMarkdownTextSchema', () => {
+  it('enables inline markdown for read-only text schemas only', () => {
+    expect(
+      isInlineMarkdownTextSchema({
+        ...getTextSchema(),
+        textFormat: 'inline-markdown',
+        readOnly: true,
+      }),
+    ).toBe(true);
+
+    expect(
+      isInlineMarkdownTextSchema({
+        ...getTextSchema(),
+        textFormat: 'inline-markdown',
+        readOnly: false,
+      }),
+    ).toBe(false);
+  });
+
+  it('keeps inline markdown available for multiVariableText schemas', () => {
+    expect(
+      isInlineMarkdownTextSchema({
+        ...getTextSchema(),
+        type: 'multiVariableText',
+        textFormat: 'inline-markdown',
+        readOnly: false,
+      }),
+    ).toBe(true);
+  });
+});
 
 describe('getSplitPosition test with mocked font width calculations', () => {
   /**

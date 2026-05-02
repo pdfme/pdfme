@@ -29,6 +29,9 @@ import {
   widthOfTextAtSize,
   splitTextToSize,
 } from './helper.js';
+import { stripInlineMarkdown } from './inlineMarkdown.js';
+import { isInlineMarkdownTextSchema } from './richText.js';
+import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 
 const embedAndGetFontObj = async (arg: {
@@ -102,7 +105,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }),
     getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>),
   ]);
-  const fontProp = getFontProp({ value, fontKitFont, schema, colorType });
+  const displayValue = isInlineMarkdownTextSchema(schema) ? stripInlineMarkdown(value) : value;
+  const fontProp = getFontProp({ value: displayValue, fontKitFont, schema, colorType });
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
@@ -131,6 +135,34 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     } else {
       page.drawRectangle({ x, y, width, height, rotate, color });
     }
+  }
+
+  if (isInlineMarkdownTextSchema(schema)) {
+    await renderInlineMarkdownText({
+      value,
+      schema,
+      font,
+      pdfFontObj,
+      fontKitFont,
+      page,
+      pdfLib,
+      _cache,
+      colorType,
+      fontSize,
+      color,
+      alignment,
+      verticalAlignment,
+      lineHeight,
+      characterSpacing,
+      x,
+      width,
+      height,
+      pageHeight,
+      pivotPoint,
+      rotate,
+      opacity,
+    });
+    return;
   }
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
