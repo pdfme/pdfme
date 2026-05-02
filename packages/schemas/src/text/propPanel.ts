@@ -55,6 +55,29 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
+const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
+  const { rootElement, changeSchemas, activeSchema, i18n } = props;
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked =
+    (activeSchema as { textFormat?: unknown })?.textFormat === TEXT_FORMAT_INLINE_MARKDOWN;
+  checkbox.onchange = (e: Event) => {
+    const value = (e.target as HTMLInputElement).checked
+      ? TEXT_FORMAT_INLINE_MARKDOWN
+      : TEXT_FORMAT_PLAIN;
+    changeSchemas([{ key: 'textFormat', value, schemaId: activeSchema.id }]);
+  };
+  const label = document.createElement('label');
+  const span = document.createElement('span');
+  span.innerText = i18n('schemas.text.inlineMarkdown') || '';
+  span.style.cssText = 'margin-left: 0.5rem';
+  label.style.cssText = 'display: flex; width: 100%;';
+  label.appendChild(checkbox);
+  label.appendChild(span);
+  rootElement.appendChild(label);
+};
+
 export const propPanel: PropPanel<TextSchema> = {
   schema: ({ options, activeSchema, i18n }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
@@ -174,19 +197,12 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
-      textFormat: {
-        title: i18n('schemas.text.textFormat'),
-        type: 'string',
-        widget: 'select',
-        default: DEFAULT_TEXT_FORMAT,
+      useInlineMarkdown: {
+        type: 'boolean',
+        widget: 'UseInlineMarkdown',
+        bind: false,
         hidden: hideTextFormat,
-        props: {
-          options: [
-            { label: i18n('schemas.text.plain'), value: TEXT_FORMAT_PLAIN },
-            { label: i18n('schemas.text.inlineMarkdown'), value: TEXT_FORMAT_INLINE_MARKDOWN },
-          ],
-        },
-        span: 12,
+        span: 24,
       },
       fontVariants: {
         title: i18n('schemas.text.markdownFonts'),
@@ -240,7 +256,7 @@ export const propPanel: PropPanel<TextSchema> = {
 
     return textSchema;
   },
-  widgets: { UseDynamicFontSize },
+  widgets: { UseDynamicFontSize, UseInlineMarkdown },
   defaultSchema: {
     name: '',
     type: 'text',

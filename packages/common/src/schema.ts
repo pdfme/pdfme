@@ -67,7 +67,6 @@ export const Dict = z.object({
   'schemas.text.fit': z.string(),
   'schemas.text.dynamicFontSize': z.string(),
   'schemas.text.format': z.string(),
-  'schemas.text.textFormat': z.string(),
   'schemas.text.plain': z.string(),
   'schemas.text.inlineMarkdown': z.string(),
   'schemas.text.markdownFonts': z.string(),
