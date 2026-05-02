@@ -137,7 +137,7 @@ function FormAndViewerApp() {
       label: 'Lang',
       content: (
         <select
-          className="w-full border rounded px-2 py-1"
+          className="w-full border rounded px-2 py-1 border-gray-300"
           onChange={(e) => {
             ui.current?.updateOptions({ lang: e.target.value as Lang });
           }}
@@ -183,7 +183,7 @@ function FormAndViewerApp() {
           type="file"
           accept="application/json"
           onChange={(e) => handleLoadTemplate(e, ui.current)}
-          className="w-full text-sm border rounded"
+          className="w-full text-sm border rounded border-gray-300"
         />
       ),
     },
@@ -191,10 +191,10 @@ function FormAndViewerApp() {
       label: '',
       content: (
         <div className="flex gap-2">
-          <button className="px-2 py-1 border rounded hover:bg-gray-100" onClick={onGetInputs}>
+          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onGetInputs}>
             Get Inputs
           </button>
-          <button className="px-2 py-1 border rounded hover:bg-gray-100" onClick={onSetInputs}>
+          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onSetInputs}>
             Set Inputs
           </button>
         </div>
@@ -204,10 +204,10 @@ function FormAndViewerApp() {
       label: '',
       content: (
         <div className="flex gap-2">
-          <button className="px-2 py-1 border rounded hover:bg-gray-100" onClick={onSaveInputs}>
+          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onSaveInputs}>
             Save Inputs
           </button>
-          <button className="px-2 py-1 border rounded hover:bg-gray-100" onClick={onResetInputs}>
+          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onResetInputs}>
             Reset Inputs
           </button>
         </div>
@@ -218,7 +218,7 @@ function FormAndViewerApp() {
       content: (
         <button
           id="generate-pdf"
-          className="px-2 py-1 border rounded hover:bg-gray-100"
+          className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
           onClick={async (e) => {
             const output = e.altKey ? 'form' : 'pdf';
             const startTimer = performance.now();
