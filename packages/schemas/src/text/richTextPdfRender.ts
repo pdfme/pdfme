@@ -28,9 +28,16 @@ type TextColor = ReturnType<typeof hex2PrintingColor>;
 const getSyntheticBoldWidth = (run: RichTextLineRun, fontSize: number) =>
   run.syntheticBold ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS : 0;
 
+const getSyntheticItalicWidth = (run: RichTextLineRun, fontSize: number) =>
+  run.syntheticItalic
+    ? heightOfFontAtSize(run.fontKitFont, fontSize) *
+      Math.tan((SYNTHETIC_ITALIC_SKEW_DEGREES * Math.PI) / 180)
+    : 0;
+
 const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: number) =>
   widthOfTextAtSize(run.text, run.fontKitFont, fontSize, characterSpacing) +
-  getSyntheticBoldWidth(run, fontSize);
+  getSyntheticBoldWidth(run, fontSize) +
+  getSyntheticItalicWidth(run, fontSize);
 
 const getPdfFont = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
   const pdfFont = pdfFontObj[run.fontName];
@@ -145,7 +152,7 @@ const drawRun = (arg: {
       lineHeight: lineHeight * fontSize,
       font: pdfFont,
       opacity,
-      ...(run.syntheticItalic ? { xSkew: pdfLib.degrees(SYNTHETIC_ITALIC_SKEW_DEGREES) } : {}),
+      ...(run.syntheticItalic ? { ySkew: pdfLib.degrees(SYNTHETIC_ITALIC_SKEW_DEGREES) } : {}),
     });
   };
 

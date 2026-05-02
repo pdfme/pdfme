@@ -13,6 +13,7 @@ import {
   FONT_VARIANT_FALLBACK_PLAIN,
   SYNTHETIC_BOLD_OFFSET_RATIO,
   SYNTHETIC_BOLD_PDF_EXTRA_DRAWS,
+  SYNTHETIC_ITALIC_SKEW_DEGREES,
   TEXT_FORMAT_INLINE_MARKDOWN,
 } from './constants.js';
 import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
@@ -160,7 +161,15 @@ const measureRunText = (
   const syntheticBoldWidth = run.syntheticBold
     ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS
     : 0;
-  return widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing) + syntheticBoldWidth;
+  const syntheticItalicWidth = run.syntheticItalic
+    ? heightOfFontAtSize(run.fontKitFont, fontSize) *
+      Math.tan((SYNTHETIC_ITALIC_SKEW_DEGREES * Math.PI) / 180)
+    : 0;
+  return (
+    widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing) +
+    syntheticBoldWidth +
+    syntheticItalicWidth
+  );
 };
 
 const createLine = (): RichTextLine => ({ runs: [], width: 0, hardBreak: false });
