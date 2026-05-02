@@ -202,7 +202,22 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'UseInlineMarkdown',
         bind: false,
         hidden: hideTextFormat,
-        span: 24,
+        span: enableInlineMarkdown ? 12 : 24,
+      },
+      fontVariantFallback: {
+        title: i18n('schemas.text.variantFallback'),
+        type: 'string',
+        widget: 'select',
+        default: DEFAULT_FONT_VARIANT_FALLBACK,
+        hidden: !enableInlineMarkdown,
+        props: {
+          options: [
+            { label: i18n('schemas.text.synthetic'), value: FONT_VARIANT_FALLBACK_SYNTHETIC },
+            { label: i18n('schemas.text.plain'), value: FONT_VARIANT_FALLBACK_PLAIN },
+            { label: i18n('schemas.text.error'), value: FONT_VARIANT_FALLBACK_ERROR },
+          ],
+        },
+        span: 12,
       },
       fontVariants: {
         title: i18n('schemas.text.markdownFonts'),
@@ -236,21 +251,6 @@ export const propPanel: PropPanel<TextSchema> = {
             props: { options: optionalFontNames },
           },
         },
-      },
-      fontVariantFallback: {
-        title: i18n('schemas.text.variantFallback'),
-        type: 'string',
-        widget: 'select',
-        default: DEFAULT_FONT_VARIANT_FALLBACK,
-        hidden: !enableInlineMarkdown,
-        props: {
-          options: [
-            { label: i18n('schemas.text.synthetic'), value: FONT_VARIANT_FALLBACK_SYNTHETIC },
-            { label: i18n('schemas.text.plain'), value: FONT_VARIANT_FALLBACK_PLAIN },
-            { label: i18n('schemas.text.error'), value: FONT_VARIANT_FALLBACK_ERROR },
-          ],
-        },
-        span: 12,
       },
     };
 
