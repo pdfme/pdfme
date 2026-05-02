@@ -1,9 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const DEFAULT_VERSION = 'x.x.x';
 
 const updateVersion = (version) => {
   const filePath = path.join(__dirname, 'src/version.ts');
@@ -25,12 +26,19 @@ const updateVersion = (version) => {
   console.log(`Replaced PDFME_VERSION with '${version}' in ${filePath}`);
 };
 
-try {
-  const gitTag = execSync('git describe --tags $(git rev-list --tags --max-count=1)', {
-    encoding: 'utf8',
-  }).trim();
-  updateVersion(gitTag);
-} catch (error) {
-  console.error('Error replacing PDFME_VERSION:', error);
-  updateVersion('x.x.x');
-}
+const getLatestGitTag = () => {
+  try {
+    return execFileSync(
+      'git',
+      ['for-each-ref', '--sort=-creatordate', '--format=%(refname:short)', '--count=1', 'refs/tags'],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
+    ).trim();
+  } catch {
+    return '';
+  }
+};
+
+updateVersion(getLatestGitTag() || DEFAULT_VERSION);
