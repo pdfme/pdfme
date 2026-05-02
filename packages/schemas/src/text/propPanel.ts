@@ -68,9 +68,15 @@ export const propPanel: PropPanel<TextSchema> = {
     const disableTextFormat = activeTextSchema.type === 'text' && activeTextSchema.readOnly !== true;
     const enableInlineMarkdown =
       activeTextSchema.textFormat === TEXT_FORMAT_INLINE_MARKDOWN && !disableTextFormat;
+    const baseFontName =
+      activeTextSchema.fontName && font[activeTextSchema.fontName]
+        ? activeTextSchema.fontName
+        : fallbackFontName;
     const optionalFontNames = [
-      { label: i18n('schemas.text.defaultFont'), value: '' },
-      ...fontNames.map((name) => ({ label: name, value: name })),
+      { label: baseFontName, value: '' },
+      ...fontNames
+        .filter((name) => name !== baseFontName)
+        .map((name) => ({ label: name, value: name })),
     ];
 
     const textSchema: Record<string, PropPanelSchema> = {
