@@ -10,6 +10,7 @@ import { getFontKitFont } from '../text/helper.js';
 import { CODE_BACKGROUND_COLOR, SYNTHETIC_BOLD_CSS_TEXT_SHADOW } from '../text/constants.js';
 import { parseInlineMarkdown } from '../text/inlineMarkdown.js';
 import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText.js';
+import type { RichTextRun } from '../text/types.js';
 import { substituteVariables, substituteVariablesAsInlineMarkdownLiterals } from './helper.js';
 import { countUniqueVariableNames, visitVariables } from './variables.js';
 
@@ -88,6 +89,9 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     }
   }
   const substitutedText = substituteVariables(rawText, variables);
+  const inlineMarkdownRuns = isInlineMarkdownTextSchema(schema)
+    ? parseInlineMarkdown(rawText)
+    : undefined;
   const font = options?.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(
     schema.fontName,
@@ -98,14 +102,14 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const textBlock = buildStyledTextContainer(
     arg,
     fontKitFont,
-    isInlineMarkdownTextSchema(schema)
-      ? getInlineMarkdownFormDisplayText(rawText, variables)
+    inlineMarkdownRuns
+      ? getInlineMarkdownFormDisplayText(inlineMarkdownRuns, variables)
       : substitutedText,
   );
 
-  if (isInlineMarkdownTextSchema(schema)) {
+  if (inlineMarkdownRuns) {
     renderInlineMarkdownVariableSpans({
-      rawText,
+      runs: inlineMarkdownRuns,
       variables,
       textBlock,
       schema,
@@ -157,10 +161,10 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 };
 
 const getInlineMarkdownFormDisplayText = (
-  rawText: string,
+  runs: RichTextRun[],
   variables: Record<string, string>,
 ): string =>
-  parseInlineMarkdown(rawText)
+  runs
     .map((run) => substituteVariables(run.text, variables))
     .join('');
 
@@ -244,7 +248,7 @@ const appendVariableSpan = (arg: {
 };
 
 const renderInlineMarkdownVariableSpans = (arg: {
-  rawText: string;
+  runs: RichTextRun[];
   variables: Record<string, string>;
   textBlock: HTMLDivElement;
   schema: MultiVariableTextSchema;
@@ -253,10 +257,10 @@ const renderInlineMarkdownVariableSpans = (arg: {
   onChange: UIRenderProps<MultiVariableTextSchema>['onChange'];
   stopEditing: UIRenderProps<MultiVariableTextSchema>['stopEditing'];
 }) => {
-  const { rawText, variables, textBlock, schema, font, theme, onChange, stopEditing } = arg;
+  const { runs, variables, textBlock, schema, font, theme, onChange, stopEditing } = arg;
   textBlock.innerHTML = '';
 
-  parseInlineMarkdown(rawText).forEach((run) => {
+  runs.forEach((run) => {
     let lastIndex = 0;
 
     visitVariables(run.text, ({ name, startIndex, endIndex }) => {

@@ -40,6 +40,29 @@ const getPdfFont = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) =
   return pdfFont;
 };
 
+const drawDecorationLine = (arg: {
+  page: PDFRenderProps<TextSchema>['page'];
+  x: number;
+  y: number;
+  width: number;
+  rotate: Rotation;
+  pivotPoint: { x: number; y: number };
+  fontSize: number;
+  color: TextColor;
+  opacity: number | undefined;
+}) => {
+  const { page, x, y, width, rotate, pivotPoint, fontSize, color, opacity } = arg;
+  if (width <= 0) return;
+
+  page.drawLine({
+    start: rotatePoint({ x, y }, pivotPoint, rotate.angle),
+    end: rotatePoint({ x: x + width, y }, pivotPoint, rotate.angle),
+    thickness: (1 / 12) * fontSize,
+    color,
+    opacity,
+  });
+};
+
 const drawRun = (arg: {
   page: PDFRenderProps<TextSchema>['page'];
   pdfLib: PDFRenderProps<TextSchema>['pdfLib'];
@@ -56,7 +79,6 @@ const drawRun = (arg: {
   colorType: ColorType;
   characterSpacing: number;
   strikethrough: boolean;
-  underline: boolean;
 }) => {
   const {
     page,
@@ -74,7 +96,6 @@ const drawRun = (arg: {
     colorType,
     characterSpacing,
     strikethrough,
-    underline,
   } = arg;
   const runWidth = getRunWidth(run, fontSize, characterSpacing);
   const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
@@ -99,22 +120,14 @@ const drawRun = (arg: {
   }
 
   if (strikethrough && runWidth > 0) {
-    const yLine = y + textHeight / 3;
-    page.drawLine({
-      start: rotatePoint({ x, y: yLine }, pivotPoint, rotate.angle),
-      end: rotatePoint({ x: x + runWidth, y: yLine }, pivotPoint, rotate.angle),
-      thickness: (1 / 12) * fontSize,
-      color,
-      opacity,
-    });
-  }
-
-  if (underline && runWidth > 0) {
-    const yLine = y - textHeight / 12;
-    page.drawLine({
-      start: rotatePoint({ x, y: yLine }, pivotPoint, rotate.angle),
-      end: rotatePoint({ x: x + runWidth, y: yLine }, pivotPoint, rotate.angle),
-      thickness: (1 / 12) * fontSize,
+    drawDecorationLine({
+      page,
+      x,
+      y: y + textHeight / 3,
+      width: runWidth,
+      rotate,
+      pivotPoint,
+      fontSize,
       color,
       opacity,
     });
@@ -246,6 +259,38 @@ export const renderInlineMarkdownText = async (arg: {
       pageHeight - mm2pt(schema.position.y) - yOffset - lineHeight * fontSize * rowIndex;
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
+    if (schema.strikethrough || schema.underline) {
+      const textHeight = Math.max(
+        ...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)),
+      );
+      if (schema.strikethrough) {
+        drawDecorationLine({
+          page,
+          x: xLine,
+          y: yLine + textHeight / 3,
+          width: textWidth,
+          rotate,
+          pivotPoint,
+          fontSize,
+          color,
+          opacity,
+        });
+      }
+      if (schema.underline) {
+        drawDecorationLine({
+          page,
+          x: xLine,
+          y: yLine - textHeight / 12,
+          width: textWidth,
+          rotate,
+          pivotPoint,
+          fontSize,
+          color,
+          opacity,
+        });
+      }
+    }
+
     line.runs.reduce((currentX, run, runIndex) => {
       const runWidth = getRunWidth(run, fontSize, spacing);
       const pdfFont = getPdfFont(run, pdfFontObj);
@@ -264,8 +309,7 @@ export const renderInlineMarkdownText = async (arg: {
         opacity,
         colorType,
         characterSpacing: spacing,
-        strikethrough: Boolean(schema.strikethrough) || Boolean(run.strikethrough),
-        underline: Boolean(schema.underline),
+        strikethrough: Boolean(run.strikethrough),
       });
 
       return currentX + runWidth + (runIndex === line.runs.length - 1 ? 0 : spacing);

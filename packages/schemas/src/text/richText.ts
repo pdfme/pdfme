@@ -47,6 +47,9 @@ type RichTextRunPiece = {
   text: string;
 };
 
+const richTextWordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+const richTextGraphemeSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+
 const getBaseFontName = (schema: TextSchema, font: Font) =>
   schema.fontName && font[schema.fontName] ? schema.fontName : getFallbackFontName(font);
 
@@ -224,14 +227,13 @@ const segmentRunPiecesByWord = (
   onSegment: (pieces: RichTextRunPiece[]) => void,
   onHardBreak: () => void,
 ) => {
-  const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
   let paragraphPieces: RichTextRunPiece[] = [];
 
   const flushParagraph = () => {
     if (paragraphPieces.length === 0) return;
 
     const paragraphText = paragraphPieces.map((piece) => piece.text).join('');
-    Array.from(wordSegmenter.segment(paragraphText), ({ segment, index }) => {
+    Array.from(richTextWordSegmenter.segment(paragraphText), ({ segment, index }) => {
       const pieces = sliceRunPieces(paragraphPieces, index, index + segment.length);
       if (pieces.length > 0) onSegment(pieces);
     });
@@ -253,10 +255,8 @@ const segmentRunPiecesByWord = (
   flushParagraph();
 };
 
-const splitIntoGraphemes = (value: string) => {
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-  return Array.from(segmenter.segment(value), ({ segment }) => segment);
-};
+const splitIntoGraphemes = (value: string) =>
+  Array.from(richTextGraphemeSegmenter.segment(value), ({ segment }) => segment);
 
 export const countRichTextLineGraphemes = (line: RichTextLine) =>
   splitIntoGraphemes(line.runs.map((run) => run.text).join('')).length;

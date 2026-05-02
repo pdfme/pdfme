@@ -182,6 +182,11 @@ const DetailView = (props: DetailViewProps) => {
           changes.push({ key: 'readOnly', value: readOnlyValue, schemaId: activeSchema.id });
           if (readOnlyValue) {
             changes.push({ key: 'required', value: false, schemaId: activeSchema.id });
+          } else if (
+            activeSchema.type === 'text' &&
+            (activeSchema as Record<string, unknown>).textFormat === 'inline-markdown'
+          ) {
+            changes.push({ key: 'textFormat', value: 'plain', schemaId: activeSchema.id });
           }
           continue;
         }

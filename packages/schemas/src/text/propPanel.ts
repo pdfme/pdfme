@@ -271,7 +271,6 @@ export const propPanel: PropPanel<TextSchema> = {
     verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
     fontSize: DEFAULT_FONT_SIZE,
     textFormat: DEFAULT_TEXT_FORMAT,
-    fontVariants: undefined,
     fontVariantFallback: DEFAULT_FONT_VARIANT_FALLBACK,
     lineHeight: DEFAULT_LINE_HEIGHT,
     characterSpacing: DEFAULT_CHARACTER_SPACING,
