@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "cliVersion": "6.0.6",
+  "cliVersion": "6.1.0",
   "templates": [
     {
       "name": "invoice",
@@ -188,6 +188,23 @@
       ],
       "hasCJK": true,
       "basePdfKind": "dataUri"
+    },
+    {
+      "name": "inline-markdown-mvt",
+      "author": "pdfme",
+      "path": "inline-markdown-mvt/template.json",
+      "thumbnailPath": "inline-markdown-mvt/thumbnail.png",
+      "pageCount": 1,
+      "fieldCount": 2,
+      "schemaTypes": [
+        "multiVariableText",
+        "text"
+      ],
+      "fontNames": [
+        "NotoSansJP"
+      ],
+      "hasCJK": false,
+      "basePdfKind": "blank"
     },
     {
       "name": "invoice-blue",

@@ -187,6 +187,23 @@
     "basePdfKind": "dataUri"
   },
   {
+    "name": "inline-markdown-mvt",
+    "author": "pdfme",
+    "path": "inline-markdown-mvt/template.json",
+    "thumbnailPath": "inline-markdown-mvt/thumbnail.png",
+    "pageCount": 1,
+    "fieldCount": 2,
+    "schemaTypes": [
+      "multiVariableText",
+      "text"
+    ],
+    "fontNames": [
+      "NotoSansJP"
+    ],
+    "hasCJK": false,
+    "basePdfKind": "blank"
+  },
+  {
     "name": "invoice-blue",
     "author": "pdfme",
     "path": "invoice-blue/template.json",
