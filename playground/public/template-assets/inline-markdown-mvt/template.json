@@ -10,11 +10,11 @@
           "y": 30
         },
         "width": 170,
-        "height": 50,
+        "height": 70,
         "rotate": 0,
         "readOnly": false,
         "required": false,
-        "text": "Hello **{name}**\nRole: *{role}*\nStatus: ~~{status}~~ and `{code}`",
+        "text": "Hello **{name}**\nRole: *{role}*\nBold italic: ***{role}***\nStatus: ~~{status}~~ and `{code}`",
         "variables": ["name", "role", "status", "code"],
         "alignment": "left",
         "verticalAlignment": "top",
@@ -30,10 +30,10 @@
       {
         "name": "plainText",
         "type": "text",
-        "content": "Text schema: **bold**, *italic*, ~~strike~~, and `code`",
+        "content": "Text schema: **bold** | *italic* | ***bold italic*** | ~~strike~~ | `code`",
         "position": {
           "x": 20,
-          "y": 95
+          "y": 120
         },
         "width": 170,
         "height": 25,
