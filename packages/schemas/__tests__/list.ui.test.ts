@@ -252,6 +252,7 @@ describe('list UI rendering', () => {
   test('keeps Enter as an in-item line break and supports Tab indentation', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
+    document.body.appendChild(rootElement);
 
     await uiRender({
       value: 'One\nTwo',
@@ -303,6 +304,8 @@ describe('list UI rendering', () => {
       .map(([change]) => change as { key: string; value: unknown })
       .find(({ key }) => key === 'height');
     expect(Number(heightChange?.value)).toBeGreaterThan(8);
+    await new Promise((resolve) => setTimeout(resolve));
+    expect(document.activeElement).toBe(getRowEditor(rootElement.children[0]));
 
     await uiRender({
       value: 'One\nTwo',
@@ -326,6 +329,7 @@ describe('list UI rendering', () => {
       key: 'content',
       value: '\tOne\nTwo',
     });
+    rootElement.remove();
   });
 
   test('does not intercept Enter while confirming IME composition', async () => {

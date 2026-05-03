@@ -24,6 +24,7 @@ const focusDataKey = 'pdfmeListFocusIndex';
 const actionDataKey = 'pdfmeListAction';
 const internalFocusDataKey = 'pdfmeListInternalFocus';
 const caretMarker = '\u200B';
+const pendingFocusIndexes = new Map<string, number>();
 
 const isComposingKeyboardEvent = (event: KeyboardEvent) =>
   event.isComposing || event.keyCode === 229;
@@ -90,16 +91,17 @@ const getBodyEditor = (body: HTMLElement): HTMLDivElement | null =>
   body.querySelector<HTMLDivElement>('div[id^="text-"]');
 
 const insertLineBreakAtSelection = (element: HTMLElement) => {
+  const fallbackText = getText(element);
   const selection = window.getSelection();
   if (!selection?.rangeCount) {
-    element.innerText = `${getText(element)}\n${caretMarker}`;
+    element.innerText = `${fallbackText}\n${caretMarker}`;
     focusBody(element);
     return true;
   }
 
   const range = selection.getRangeAt(0);
   if (!element.contains(range.commonAncestorContainer)) {
-    element.innerText = `${getText(element)}\n${caretMarker}`;
+    element.innerText = `${fallbackText}\n${caretMarker}`;
     focusBody(element);
     return true;
   }
@@ -114,6 +116,10 @@ const insertLineBreakAtSelection = (element: HTMLElement) => {
   range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
+  if (!element.innerText.includes(caretMarker)) {
+    element.innerText = `${fallbackText}\n${caretMarker}`;
+    focusBody(element);
+  }
   return true;
 };
 
@@ -216,6 +222,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     if (!onChange) return;
     if (focusIndex !== undefined) {
       rootElement.dataset[focusDataKey] = String(focusIndex);
+      pendingFocusIndexes.set(schema.name, focusIndex);
     }
     onChange({ key: 'content', value: serializeListItems(nextItems) });
   };
@@ -514,7 +521,11 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     appendEmptyListControls();
   }
 
-  const requestedFocusIndex = Number(rootElement.dataset[focusDataKey]);
+  const pendingFocusIndex = pendingFocusIndexes.get(schema.name);
+  if (pendingFocusIndex !== undefined) {
+    pendingFocusIndexes.delete(schema.name);
+  }
+  const requestedFocusIndex = Number(rootElement.dataset[focusDataKey] ?? pendingFocusIndex);
   delete rootElement.dataset[focusDataKey];
   delete rootElement.dataset[actionDataKey];
   delete rootElement.dataset[internalFocusDataKey];
