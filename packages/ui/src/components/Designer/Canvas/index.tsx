@@ -513,12 +513,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                       // Use type assertion to safely handle the argument
                       type ChangeArg = { key: string; value: unknown };
                       const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
-                      const changeArgs = args.map(({ key, value }) => ({
-                        key,
-                        value,
-                        schemaId: schema.id,
-                      }));
-                      changeSchemas(changeArgs);
+                      changeSchemas(
+                        args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
+                      );
                     }
                   : undefined
               }

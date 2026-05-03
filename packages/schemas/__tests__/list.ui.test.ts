@@ -63,7 +63,7 @@ const i18n = (key: string) =>
 const getRowBody = (row: Element): HTMLElement => row.children[1] as HTMLElement;
 
 const getRowEditor = (row: Element): HTMLElement => {
-  const editor = getRowBody(row).querySelector<HTMLElement>('[data-pdfme-text-editor="true"]');
+  const editor = getRowBody(row).querySelector<HTMLElement>('[contenteditable], [tabindex]');
   if (!editor) throw new Error('Unable to find list item editor');
   return editor;
 };

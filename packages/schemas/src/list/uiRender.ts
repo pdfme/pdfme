@@ -90,7 +90,7 @@ const focusBodyFromMouseEvent = (body: HTMLElement, event: MouseEvent) => {
 };
 
 const getBodyEditor = (body: HTMLElement): HTMLDivElement | null =>
-  body.querySelector<HTMLDivElement>('[data-pdfme-text-editor="true"]');
+  body.querySelector<HTMLDivElement>('[contenteditable], [tabindex]');
 
 const insertLineBreakAtSelection = (element: HTMLElement) => {
   const fallbackText = getText(element);
