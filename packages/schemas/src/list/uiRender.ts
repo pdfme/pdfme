@@ -173,6 +173,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const layout = await calculateListLayout({
     schema,
     items: renderItems,
+    markerItems: items,
     startIndex: range.start,
     options: arg.options,
     _cache: arg._cache,

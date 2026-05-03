@@ -17,6 +17,7 @@ export const pdfRender = async (arg: PDFRenderProps<ListSchema>) => {
   const layout = await calculateListLayout({
     schema,
     items: visibleItems,
+    markerItems: items,
     startIndex: range.start,
     options: arg.options,
     _cache: arg._cache,

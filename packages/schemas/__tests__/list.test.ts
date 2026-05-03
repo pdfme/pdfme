@@ -2,7 +2,7 @@ import { getDefaultFont, pt2mm } from '@pdfme/common';
 import {
   calculateListLayout,
   getDynamicLayoutForList,
-  getListMarker,
+  getListMarkers,
   normalizeListItemEntries,
   normalizeListItems,
   serializeListItems,
@@ -72,15 +72,35 @@ describe('list schema helpers', () => {
     expect(serializeListItems([{ level: 0, text: '' }])).toBe('[""]');
   });
 
-  test('builds ordered markers from the absolute item index', () => {
-    const schema = getListSchema({
-      listStyle: 'ordered',
-      startNumber: 3,
-      orderedSuffix: ')',
+  test('builds ordered markers from indentation-level counters', () => {
+    const schema = getListSchema({ listStyle: 'ordered' });
+
+    expect(
+      getListMarkers(schema, [
+        'Parent',
+        '\tChild',
+        '\tSecond child',
+        'Sibling',
+        '\tNext child',
+        '\t\tGrandchild',
+        '\tAnother child',
+      ]),
+    ).toEqual(['1.', '1.', '2.', '2.', '1.', '1.', '2.']);
+  });
+
+  test('preserves ordered markers when rendering a split item range', async () => {
+    const schema = getListSchema({ listStyle: 'ordered' });
+    const allItems = ['Parent', '\tChild', '\tSecond child', 'Sibling', '\tNext child'];
+    const layout = await calculateListLayout({
+      schema,
+      items: allItems.slice(3),
+      markerItems: allItems,
+      startIndex: 3,
+      options: { font: getDefaultFont() },
+      _cache: new Map(),
     });
 
-    expect(getListMarker(schema, 0)).toBe('3)');
-    expect(getListMarker(schema, 4)).toBe('7)');
+    expect(layout.items.map((item) => item.marker)).toEqual(['2.', '1.']);
   });
 
   test('calculates item heights with wrapping and item spacing', async () => {
@@ -158,29 +178,13 @@ describe('list schema helpers', () => {
     expect(dynamicLayout.heights).toEqual([0]);
   });
 
-  test('shows bullet-specific prop panel fields in the requested rows', () => {
+  test('shows only simple list prop panel fields in the requested rows', () => {
     const schema = getPropPanelSchema({ listStyle: 'bullet' });
 
-    expect(schema.listStyle.span).toBe(12);
-    expect(schema.marker.hidden).toBe(false);
-    expect(schema.marker.span).toBe(12);
-    expect(schema.startNumber.hidden).toBe(true);
-    expect(schema.orderedSuffix.hidden).toBe(true);
-    expect(schema.markerWidth.span).toBe(6);
-    expect(schema.markerGap.span).toBe(6);
-    expect(schema.indentSize.span).toBe(6);
-    expect(schema.itemSpacing.span).toBe(6);
-  });
-
-  test('shows ordered-specific prop panel fields in the requested rows', () => {
-    const schema = getPropPanelSchema({ listStyle: 'ordered' });
-
-    expect(schema.listStyle.span).toBe(8);
-    expect(schema.marker.hidden).toBe(true);
-    expect(schema.startNumber.hidden).toBe(false);
-    expect(schema.startNumber.span).toBe(8);
-    expect(schema.orderedSuffix.hidden).toBe(false);
-    expect(schema.orderedSuffix.span).toBe(8);
+    expect(schema.listStyle.span).toBe(24);
+    expect(schema.marker).toBeUndefined();
+    expect(schema.startNumber).toBeUndefined();
+    expect(schema.orderedSuffix).toBeUndefined();
     expect(schema.markerWidth.span).toBe(6);
     expect(schema.markerGap.span).toBe(6);
     expect(schema.indentSize.span).toBe(6);

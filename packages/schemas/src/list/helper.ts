@@ -72,22 +72,35 @@ export const serializeListItems = (items: ListItem[]): string => {
 
 export const getListMarker = (schema: ListSchema, absoluteIndex: number): string => {
   if ((schema.listStyle ?? DEFAULT_LIST_STYLE) === LIST_STYLE_ORDERED) {
-    const startNumber = schema.startNumber ?? DEFAULT_START_NUMBER;
-    const suffix = schema.orderedSuffix ?? DEFAULT_ORDERED_SUFFIX;
-    return `${startNumber + absoluteIndex}${suffix}`;
+    return `${DEFAULT_START_NUMBER + absoluteIndex}${DEFAULT_ORDERED_SUFFIX}`;
   }
 
   return schema.marker || DEFAULT_MARKER;
 };
 
+export const getListMarkers = (schema: ListSchema, items: string[]): string[] => {
+  if ((schema.listStyle ?? DEFAULT_LIST_STYLE) !== LIST_STYLE_ORDERED) {
+    return items.map(() => schema.marker || DEFAULT_MARKER);
+  }
+
+  const counters = Array.from({ length: MAX_INDENT_LEVEL + 1 }, () => 0);
+  return items.map((rawItem) => {
+    const { level } = parseListItem(rawItem);
+    counters[level] += 1;
+    counters.fill(0, level + 1);
+    return `${counters[level]}${DEFAULT_ORDERED_SUFFIX}`;
+  });
+};
+
 export const calculateListLayout = async (arg: {
   schema: ListSchema;
   items: string[];
+  markerItems?: string[];
   startIndex: number;
   options: CommonOptions;
   _cache: Map<string | number, unknown>;
 }): Promise<ListLayout> => {
-  const { schema, items, startIndex, options, _cache } = arg;
+  const { schema, items, markerItems, startIndex, options, _cache } = arg;
   const markerWidth = schema.markerWidth ?? DEFAULT_MARKER_WIDTH;
   const markerGap = schema.markerGap ?? DEFAULT_MARKER_GAP;
   const indentSize = schema.indentSize ?? DEFAULT_INDENT_SIZE;
@@ -103,6 +116,9 @@ export const calculateListLayout = async (arg: {
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const itemSpacing = schema.itemSpacing ?? DEFAULT_ITEM_SPACING;
   const lineHeightMm = pt2mm(fontSize * lineHeight);
+  const markers = markerItems
+    ? getListMarkers(schema, markerItems).slice(startIndex, startIndex + items.length)
+    : getListMarkers(schema, items);
 
   const layoutItems: ListItemLayout[] = items.map((rawItem, index) => {
     const item = parseListItem(rawItem);
@@ -123,7 +139,7 @@ export const calculateListLayout = async (arg: {
       item: item.text,
       itemIndex: startIndex + index,
       level: item.level,
-      marker: getListMarker(schema, startIndex + index),
+      marker: markers[index] ?? getListMarker(schema, startIndex + index),
       lines,
       height,
       markerX,

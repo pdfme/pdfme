@@ -21,10 +21,6 @@ export const propPanel: PropPanel<ListSchema> = {
     }
     const parentSchema = parentPropPanel.schema(propPanelProps);
     const i18n = (propPanelProps as PropPanelWidgetProps).i18n;
-    const activeListSchema = (propPanelProps as PropPanelWidgetProps)
-      .activeSchema as unknown as ListSchema;
-    const listStyle = activeListSchema.listStyle ?? DEFAULT_LIST_STYLE;
-    const isOrdered = listStyle === LIST_STYLE_ORDERED;
     const listSchema: Record<string, PropPanelSchema> = { ...parentSchema };
     delete listSchema.useDynamicFontSize;
     delete listSchema.dynamicFontSize;
@@ -42,29 +38,7 @@ export const propPanel: PropPanel<ListSchema> = {
             { label: i18n('schemas.list.ordered'), value: LIST_STYLE_ORDERED },
           ],
         },
-        span: isOrdered ? 8 : 12,
-      },
-      marker: {
-        title: i18n('schemas.list.marker'),
-        type: 'string',
-        widget: 'input',
-        hidden: isOrdered,
-        span: 12,
-      },
-      startNumber: {
-        title: i18n('schemas.list.startNumber'),
-        type: 'number',
-        widget: 'inputNumber',
-        hidden: !isOrdered,
-        props: { min: 0 },
-        span: 8,
-      },
-      orderedSuffix: {
-        title: i18n('schemas.list.orderedSuffix'),
-        type: 'string',
-        widget: 'input',
-        hidden: !isOrdered,
-        span: 8,
+        span: 24,
       },
       markerWidth: {
         title: i18n('schemas.list.markerWidth'),
