@@ -39,22 +39,12 @@ type PdfFontCache = Record<string, Promise<PDFFont>>;
 const PDF_FONT_CACHE_KEY = 'text-pdf-font-cache';
 
 const getPdfFontCache = (
-  pdfDoc: PDFDocument,
   _cache: Map<string | number, unknown>,
 ): PdfFontCache => {
-  let pdfFontCacheByDocument = _cache.get(PDF_FONT_CACHE_KEY) as
-    | WeakMap<PDFDocument, PdfFontCache>
-    | undefined;
-
-  if (!pdfFontCacheByDocument) {
-    pdfFontCacheByDocument = new WeakMap<PDFDocument, PdfFontCache>();
-    _cache.set(PDF_FONT_CACHE_KEY, pdfFontCacheByDocument);
-  }
-
-  let pdfFontCache = pdfFontCacheByDocument.get(pdfDoc);
+  let pdfFontCache = _cache.get(PDF_FONT_CACHE_KEY) as PdfFontCache | undefined;
   if (!pdfFontCache) {
     pdfFontCache = {};
-    pdfFontCacheByDocument.set(pdfDoc, pdfFontCache);
+    _cache.set(PDF_FONT_CACHE_KEY, pdfFontCache);
   }
 
   return pdfFontCache;
@@ -67,7 +57,7 @@ const embedAndGetFont = (arg: {
   _cache: Map<string | number, unknown>;
 }) => {
   const { pdfDoc, font, fontName, _cache } = arg;
-  const pdfFontCache = getPdfFontCache(pdfDoc, _cache);
+  const pdfFontCache = getPdfFontCache(_cache);
   const cachedFont = pdfFontCache[fontName];
   if (cachedFont) {
     return cachedFont;
@@ -135,17 +125,21 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const { font = getDefaultFont(), colorType } = options;
   const fontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
-
-  const [pdfFontValue, fontKitFont] = await Promise.all([
-    embedAndGetFont({
-      pdfDoc,
-      font,
-      fontName,
-      _cache,
-    }),
-    getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>),
-  ]);
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+
+  const pdfFontValuePromise = enableInlineMarkdown
+    ? undefined
+    : embedAndGetFont({
+        pdfDoc,
+        font,
+        fontName,
+        _cache,
+      });
+  const fontKitFont = await getFontKitFont(
+    schema.fontName,
+    font,
+    _cache as Map<string, FontKitFont>,
+  );
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
     enableInlineMarkdown && schema.dynamicFontSize
@@ -210,6 +204,10 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     });
     return;
   }
+  if (!pdfFontValuePromise) {
+    throw new Error('[@pdfme/schemas] Failed to prepare PDF font for text rendering.');
+  }
+  const pdfFontValue = await pdfFontValuePromise;
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);

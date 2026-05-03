@@ -25,9 +25,16 @@ const measure = async (name: string, fn: () => Promise<void>) => {
   const measuredRuns = runs.slice(1);
   const average =
     measuredRuns.reduce((total, duration) => total + duration, 0) / measuredRuns.length;
+  const sortedRuns = [...measuredRuns].sort((a, b) => a - b);
+  const median = sortedRuns[Math.floor(sortedRuns.length / 2)];
+  const variance =
+    measuredRuns.reduce((total, duration) => total + (duration - average) ** 2, 0) /
+    measuredRuns.length;
+  const standardDeviation = Math.sqrt(variance);
 
   console.info(
-    `[@pdfme/generator benchmark] ${name}: ${average.toFixed(2)}ms average after warmup`,
+    `[@pdfme/generator benchmark] ${name}: ${average.toFixed(2)}ms average, ` +
+      `${median.toFixed(2)}ms median, ${standardDeviation.toFixed(2)}ms stddev after warmup`,
   );
   console.info(
     `[@pdfme/generator benchmark] ${name} runs: ${runs
@@ -68,7 +75,7 @@ describe('generator performance benchmarks', () => {
 
       const labelTemplatePath = path.join(
         __dirname,
-        '../../../playground/public/template-assets/address-label-30/template.json',
+        './assets/templates/addressLabel30.json',
       );
       const labelTemplate = JSON.parse(fs.readFileSync(labelTemplatePath, 'utf8')) as Template;
       const baseLabelInput = getInputFromTemplate(labelTemplate)[0];

@@ -100,6 +100,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
   const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
   const _cache = new Map<string, unknown>();
+  // Dynamic layout is only applied to blank PDFs, so custom base PDF pages can be embedded once.
   const cachedEmbedPdfPages = isBlankBasePdf
     ? undefined
     : await getEmbedPdfPages({
