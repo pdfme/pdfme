@@ -86,6 +86,7 @@ const createActionButton = (arg: {
 export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const { rootElement, schema, value, mode, onChange, stopEditing, tabIndex, placeholder } = arg;
   const editable = isEditable(mode, schema);
+  const showControls = editable && (mode === 'form' || mode === 'designer');
   const usePlaceholder = editable && !value && Boolean(placeholder);
   const sourceValue = usePlaceholder ? placeholder || '' : value;
   const items = normalizeListItems(sourceValue);
@@ -256,7 +257,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
 
     row.appendChild(marker);
     row.appendChild(body);
-    if (editable && mode === 'form') {
+    if (showControls) {
       const controls = document.createElement('div');
       setStyles(controls, {
         position: 'absolute',
@@ -268,7 +269,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '+',
-          title: 'Add item',
+          title: arg.i18n('schemas.list.addItem'),
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               nextItems.splice(itemIndex + 1, 0, {
@@ -283,7 +284,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '-',
-          title: 'Remove item',
+          title: arg.i18n('schemas.list.removeItem'),
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               if (nextItems.length <= 1) {
@@ -299,7 +300,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '<',
-          title: 'Outdent item',
+          title: arg.i18n('schemas.list.outdentItem'),
           disabled: item.level === 0,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
@@ -312,7 +313,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '>',
-          title: 'Indent item',
+          title: arg.i18n('schemas.list.indentItem'),
           disabled: item.level >= MAX_INDENT_LEVEL,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {

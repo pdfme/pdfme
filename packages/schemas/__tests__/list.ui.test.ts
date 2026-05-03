@@ -51,6 +51,14 @@ const font = {
 const getCache = () =>
   new Map<string | number, unknown>([['getFontKitFont-Base', createMockFont()]]);
 
+const i18n = (key: string) =>
+  ({
+    'schemas.list.addItem': 'Add item',
+    'schemas.list.removeItem': 'Remove item',
+    'schemas.list.indentItem': 'Indent item',
+    'schemas.list.outdentItem': 'Outdent item',
+  })[key] || key;
+
 describe('list UI rendering', () => {
   test('renders only the item range for split list chunks', async () => {
     const rootElement = document.createElement('div');
@@ -63,6 +71,7 @@ describe('list UI rendering', () => {
       options: { font },
       _cache: getCache(),
       theme: { colorPrimary: '#1677ff' },
+      i18n,
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
@@ -86,6 +95,7 @@ describe('list UI rendering', () => {
       options: { font },
       _cache: getCache(),
       theme: { colorPrimary: '#1677ff' },
+      i18n,
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
@@ -112,6 +122,7 @@ describe('list UI rendering', () => {
       options: { font },
       _cache: getCache(),
       theme: { colorPrimary: '#1677ff' },
+      i18n,
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
@@ -146,6 +157,7 @@ describe('list UI rendering', () => {
       options: { font },
       _cache: getCache(),
       theme: { colorPrimary: '#1677ff' },
+      i18n,
     } as Parameters<typeof uiRender>[0]);
 
     const indentedRows = Array.from(rootElement.children) as HTMLDivElement[];
@@ -170,6 +182,7 @@ describe('list UI rendering', () => {
       options: { font },
       _cache: getCache(),
       theme: { colorPrimary: '#1677ff' },
+      i18n,
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
@@ -191,5 +204,24 @@ describe('list UI rendering', () => {
       key: 'content',
       value: '\tOne\nTwo',
     });
+  });
+
+  test('shows list editing controls in designer edit mode', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'designer',
+      onChange: vi.fn(),
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    expect(rootElement.querySelectorAll('button[title="Add item"]')).toHaveLength(2);
+    expect(rootElement.querySelectorAll('button[title="Indent item"]')).toHaveLength(2);
   });
 });
