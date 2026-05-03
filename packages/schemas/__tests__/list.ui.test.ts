@@ -268,6 +268,48 @@ describe('list UI rendering', () => {
     });
   });
 
+  test('does not add a row when Enter confirms IME composition', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    onChange.mockClear();
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const firstBody = rows[0].children[1] as HTMLElement;
+    const composingEnter = new window.KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+      isComposing: true,
+    });
+
+    expect(firstBody.dispatchEvent(composingEnter)).toBe(true);
+    expect(composingEnter.defaultPrevented).toBe(false);
+    expect(onChange).not.toHaveBeenCalled();
+
+    const legacyComposingEnter = new window.KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+    Object.defineProperty(legacyComposingEnter, 'keyCode', { value: 229 });
+
+    expect(firstBody.dispatchEvent(legacyComposingEnter)).toBe(true);
+    expect(legacyComposingEnter.defaultPrevented).toBe(false);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   test('shows list editing controls in designer edit mode', async () => {
     const rootElement = document.createElement('div');
 

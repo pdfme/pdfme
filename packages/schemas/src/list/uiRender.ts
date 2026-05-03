@@ -23,6 +23,9 @@ const focusDataKey = 'pdfmeListFocusIndex';
 const actionDataKey = 'pdfmeListAction';
 const internalFocusDataKey = 'pdfmeListInternalFocus';
 
+const isComposingKeyboardEvent = (event: KeyboardEvent) =>
+  event.isComposing || event.keyCode === 229;
+
 const getText = (element: HTMLElement): string => {
   let text = element.innerText;
   if (text.endsWith('\n')) {
@@ -325,6 +328,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       });
       body.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
+          if (isComposingKeyboardEvent(event)) return;
           event.preventDefault();
           updateItems(index, (nextItems, itemIndex) => {
             nextItems.splice(itemIndex + 1, 0, {
