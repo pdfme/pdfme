@@ -128,21 +128,21 @@ describe('list UI rendering', () => {
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     const secondRow = rows[1];
 
-    secondRow.querySelector<HTMLButtonElement>('button[title="Indent item"]')?.click();
+    secondRow.querySelector<HTMLButtonElement>('button[aria-label="Indent item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
       value: 'One\n\tTwo\nThree',
     });
 
     onChange.mockClear();
-    secondRow.querySelector<HTMLButtonElement>('button[title="Add item"]')?.click();
+    secondRow.querySelector<HTMLButtonElement>('button[aria-label="Add item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
       value: 'One\nTwo\n\nThree',
     });
 
     onChange.mockClear();
-    secondRow.querySelector<HTMLButtonElement>('button[title="Remove item"]')?.click();
+    secondRow.querySelector<HTMLButtonElement>('button[aria-label="Remove item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
       value: 'One\nThree',
@@ -162,7 +162,7 @@ describe('list UI rendering', () => {
 
     const indentedRows = Array.from(rootElement.children) as HTMLDivElement[];
     onChange.mockClear();
-    indentedRows[1].querySelector<HTMLButtonElement>('button[title="Outdent item"]')?.click();
+    indentedRows[1].querySelector<HTMLButtonElement>('button[aria-label="Outdent item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
       value: 'One\nTwo\nThree',
@@ -221,7 +221,8 @@ describe('list UI rendering', () => {
       i18n,
     } as Parameters<typeof uiRender>[0]);
 
-    expect(rootElement.querySelectorAll('button[title="Add item"]')).toHaveLength(2);
-    expect(rootElement.querySelectorAll('button[title="Indent item"]')).toHaveLength(2);
+    expect(rootElement.querySelectorAll('button[aria-label="Add item"]')).toHaveLength(2);
+    expect(rootElement.querySelectorAll('button[aria-label="Indent item"]')).toHaveLength(2);
+    expect(rootElement.querySelector('button')?.hasAttribute('title')).toBe(false);
   });
 });

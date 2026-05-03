@@ -47,14 +47,14 @@ const focusBody = (body: HTMLDivElement) => {
 
 const createActionButton = (arg: {
   label: string;
-  title: string;
+  ariaLabel: string;
   disabled?: boolean;
   onClick: () => void;
 }) => {
   const button = document.createElement('button');
   button.type = 'button';
   button.innerText = arg.label;
-  button.title = arg.title;
+  button.setAttribute('aria-label', arg.ariaLabel);
   button.disabled = Boolean(arg.disabled);
   setStyles(button, {
     width: '18px',
@@ -269,7 +269,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '+',
-          title: arg.i18n('schemas.list.addItem'),
+          ariaLabel: arg.i18n('schemas.list.addItem'),
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               nextItems.splice(itemIndex + 1, 0, {
@@ -284,7 +284,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '-',
-          title: arg.i18n('schemas.list.removeItem'),
+          ariaLabel: arg.i18n('schemas.list.removeItem'),
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               if (nextItems.length <= 1) {
@@ -300,7 +300,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '<',
-          title: arg.i18n('schemas.list.outdentItem'),
+          ariaLabel: arg.i18n('schemas.list.outdentItem'),
           disabled: item.level === 0,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
@@ -313,7 +313,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       controls.appendChild(
         createActionButton({
           label: '>',
-          title: arg.i18n('schemas.list.indentItem'),
+          ariaLabel: arg.i18n('schemas.list.indentItem'),
           disabled: item.level >= MAX_INDENT_LEVEL,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {

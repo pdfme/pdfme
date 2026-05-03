@@ -6,7 +6,7 @@ import { getBody, getBodyWithRange } from './helper.js';
 import cell from './cell.js';
 import { Row } from './classes.js';
 
-const buttonSize = 30;
+const buttonSize = 18;
 
 function createButton(options: {
   width: number;
@@ -15,21 +15,45 @@ function createButton(options: {
   left?: string;
   right?: string;
   text: string;
+  ariaLabel?: string;
   onClick: (e: MouseEvent) => void;
 }): HTMLButtonElement {
   const button = document.createElement('button');
+  button.type = 'button';
+  button.innerText = options.text;
+  if (options.ariaLabel) {
+    button.setAttribute('aria-label', options.ariaLabel);
+  }
   button.style.width = `${options.width}px`;
   button.style.height = `${options.height}px`;
   button.style.position = 'absolute';
   button.style.top = options.top;
+  button.style.display = 'inline-flex';
+  button.style.alignItems = 'center';
+  button.style.justifyContent = 'center';
+  button.style.padding = '0';
+  button.style.border = '1px solid #d9d9d9';
+  button.style.borderRadius = '3px';
+  button.style.background = '#ffffff';
+  button.style.color = '#333333';
+  button.style.fontSize = '11px';
+  button.style.lineHeight = '1';
+  button.style.cursor = 'pointer';
+  button.style.zIndex = '20';
   if (options.left !== undefined) {
     button.style.left = options.left;
   }
   if (options.right !== undefined) {
     button.style.right = options.right;
   }
-  button.innerText = options.text;
-  button.onclick = options.onClick;
+  button.addEventListener('mousedown', (event) => {
+    event.preventDefault();
+  });
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    options.onClick(event);
+  });
   return button;
 }
 
@@ -248,6 +272,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       top: `${table.getHeight()}mm`,
       left: `calc(50% - ${buttonSize / 2}px)`,
       text: '+',
+      ariaLabel: 'Add row',
       onClick: () => {
         const newRow = Array(schema.head.length).fill('') as string[];
         if (onChange) onChange({ key: 'content', value: JSON.stringify(body.concat([newRow])) });
@@ -264,6 +289,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         top: `${offsetY - px2mm(buttonSize)}mm`,
         right: `-${buttonSize}px`,
         text: '-',
+        ariaLabel: 'Remove row',
         onClick: () => {
           const newTableBody = body.filter((_, j) => j !== i + (schema.__bodyRange?.start ?? 0));
           if (onChange) onChange({ key: 'content', value: JSON.stringify(newTableBody) });
@@ -291,6 +317,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
       top: `${(showHead ? table.getHeadHeight() : 0) - px2mm(buttonSize)}mm`,
       right: `-${buttonSize}px`,
       text: '+',
+      ariaLabel: 'Add column',
       onClick: (e) => {
         e.preventDefault();
         const newColumnWidthPercentage = 25;
@@ -326,6 +353,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         top: `${-buttonSize}px`,
         left: `${offsetX - px2mm(buttonSize)}mm`,
         text: '-',
+        ariaLabel: 'Remove column',
         onClick: () => {
           const totalWidthMinusRemoved = schema.headWidthPercentages.reduce(
             (sum, width, j) => (j !== i ? sum + width : sum),
