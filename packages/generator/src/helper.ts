@@ -12,7 +12,16 @@ import {
   BasePdf,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas/builtins';
-import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
+import {
+  PDFPage,
+  PDFDocument,
+  PDFEmbeddedPage,
+  TransformationMatrix,
+  PDFDict,
+  PDFName,
+  PDFArray,
+  PDFObjectCopier,
+} from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types.js';
 
@@ -46,6 +55,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
       mediaBox: p.getMediaBox(),
       bleedBox: p.getBleedBox(),
       trimBox: p.getTrimBox(),
+      sourcePage: p,
     }));
     const boundingBoxes = embedPdfPages.map((p) => {
       const { x, y, width, height } = p.getMediaBox();
@@ -57,6 +67,52 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
     basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
   return { basePages, embedPdfBoxes };
+};
+
+const isUriLinkAnnotation = (annotation: PDFDict) => {
+  if (annotation.lookupMaybe(PDFName.of('Subtype'), PDFName) !== PDFName.of('Link')) return false;
+
+  const action = annotation.lookupMaybe(PDFName.of('A'), PDFDict);
+  if (!action) return false;
+
+  return action.lookupMaybe(PDFName.of('S'), PDFName) === PDFName.of('URI');
+};
+
+const copyBasePdfUriLinkAnnotations = (arg: {
+  sourcePage: PDFPage;
+  targetPage: PDFPage;
+  pdfDoc: PDFDocument;
+}) => {
+  const { sourcePage, targetPage, pdfDoc } = arg;
+  const sourceAnnots = sourcePage.node.Annots();
+  if (!sourceAnnots) return;
+
+  const copier = PDFObjectCopier.for(sourcePage.doc.context, pdfDoc.context);
+
+  for (let idx = 0; idx < sourceAnnots.size(); idx += 1) {
+    const sourceAnnotation = sourceAnnots.lookupMaybe(idx, PDFDict);
+    if (!sourceAnnotation || !isUriLinkAnnotation(sourceAnnotation)) continue;
+
+    const rect = sourceAnnotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
+    const action = sourceAnnotation.lookupMaybe(PDFName.of('A'), PDFDict);
+    if (!rect || !action) continue;
+
+    const border = sourceAnnotation.lookupMaybe(PDFName.of('Border'), PDFArray);
+    const color = sourceAnnotation.lookupMaybe(PDFName.of('C'), PDFArray);
+    const highlightMode = sourceAnnotation.lookupMaybe(PDFName.of('H'), PDFName);
+
+    const copiedAnnotation = pdfDoc.context.obj({
+      Type: PDFName.of('Annot'),
+      Subtype: PDFName.of('Link'),
+      Rect: copier.copy(rect),
+      Border: border ? copier.copy(border) : pdfDoc.context.obj([0, 0, 0]),
+      C: color ? copier.copy(color) : undefined,
+      H: highlightMode ? copier.copy(highlightMode) : undefined,
+      A: copier.copy(action),
+    });
+
+    targetPage.node.addAnnot(pdfDoc.context.register(copiedAnnotation));
+  }
 };
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, unknown>[]) => {
@@ -166,6 +222,13 @@ export const insertPage = (arg: {
     insertedPage.setMediaBox(mediaBox.x, mediaBox.y, mediaBox.width, mediaBox.height);
     insertedPage.setBleedBox(bleedBox.x, bleedBox.y, bleedBox.width, bleedBox.height);
     insertedPage.setTrimBox(trimBox.x, trimBox.y, trimBox.width, trimBox.height);
+    if (embedPdfBox.sourcePage) {
+      copyBasePdfUriLinkAnnotations({
+        sourcePage: embedPdfBox.sourcePage,
+        targetPage: insertedPage,
+        pdfDoc,
+      });
+    }
   }
 
   return insertedPage;
