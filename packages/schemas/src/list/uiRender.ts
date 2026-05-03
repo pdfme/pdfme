@@ -50,6 +50,7 @@ const createActionButton = (arg: {
   label: string;
   ariaLabel: string;
   disabled?: boolean;
+  onPressStart?: () => void;
   onClick: () => void;
 }) => {
   const button = document.createElement('button');
@@ -73,8 +74,14 @@ const createActionButton = (arg: {
     cursor: arg.disabled ? 'not-allowed' : 'pointer',
     opacity: arg.disabled ? 0.45 : 1,
   });
+  button.addEventListener('pointerdown', (event) => {
+    arg.onPressStart?.();
+    event.stopPropagation();
+  });
   button.addEventListener('mousedown', (event) => {
+    arg.onPressStart?.();
     event.preventDefault();
+    event.stopPropagation();
   });
   button.addEventListener('click', (event) => {
     event.preventDefault();
@@ -279,6 +286,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
         createActionButton({
           label: '+',
           ariaLabel: arg.i18n('schemas.list.addItem'),
+          onPressStart: preserveEditingForAction,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               nextItems.splice(itemIndex + 1, 0, {
@@ -294,6 +302,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
         createActionButton({
           label: '-',
           ariaLabel: arg.i18n('schemas.list.removeItem'),
+          onPressStart: preserveEditingForAction,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               if (nextItems.length <= 1) {
@@ -311,6 +320,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
           label: '<',
           ariaLabel: arg.i18n('schemas.list.outdentItem'),
           disabled: item.level === 0,
+          onPressStart: preserveEditingForAction,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               nextItems[itemIndex].level = Math.max(nextItems[itemIndex].level - 1, 0);
@@ -324,6 +334,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
           label: '>',
           ariaLabel: arg.i18n('schemas.list.indentItem'),
           disabled: item.level >= MAX_INDENT_LEVEL,
+          onPressStart: preserveEditingForAction,
           onClick: () => {
             updateItems(index, (nextItems, itemIndex) => {
               nextItems[itemIndex].level = Math.min(

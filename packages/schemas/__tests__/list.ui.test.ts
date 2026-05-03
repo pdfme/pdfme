@@ -248,6 +248,8 @@ describe('list UI rendering', () => {
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     const firstBody = rows[0].children[1] as HTMLElement;
     const addButton = rows[0].querySelector<HTMLButtonElement>('button[aria-label="Add item"]');
+    const mouseDown = vi.fn();
+    rootElement.addEventListener('mousedown', mouseDown);
     firstBody.innerText = 'Edited one';
 
     addButton?.dispatchEvent(
@@ -257,6 +259,7 @@ describe('list UI rendering', () => {
     addButton?.click();
 
     expect(stopEditing).not.toHaveBeenCalled();
+    expect(mouseDown).not.toHaveBeenCalled();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
       value: 'Edited one\n\nTwo',
