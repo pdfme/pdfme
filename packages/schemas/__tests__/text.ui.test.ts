@@ -70,4 +70,34 @@ describe('text inline markdown UI rendering', () => {
     expect(spans.at(-1)?.textContent).toBe('★');
     expect(spans.at(-1)?.style.fontFamily).toContain('Code');
   });
+
+  it('renders inline markdown links as anchors in read-only mode', async () => {
+    const rootElement = document.createElement('div');
+    const schema = getTextSchema();
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Visit [pdfme](https://pdfme.com).',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const link = rootElement.querySelector('a') as HTMLAnchorElement;
+
+    expect(rootElement.textContent).toBe('Visit pdfme.');
+    expect(link.textContent).toBe('pdfme');
+    expect(link.href).toBe('https://pdfme.com/');
+    expect(link.target).toBe('_blank');
+    expect(link.rel).toBe('noopener noreferrer');
+    expect(link.style.textDecoration).toContain('underline');
+  });
 });

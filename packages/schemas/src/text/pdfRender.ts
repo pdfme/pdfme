@@ -184,6 +184,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       font,
       embedPdfFont: (fontName) => embedAndGetFont({ pdfDoc, font, fontName, _cache }),
       fontKitFont,
+      pdfDoc,
       page,
       pdfLib,
       _cache,

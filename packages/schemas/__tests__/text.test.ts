@@ -103,6 +103,23 @@ describe('parseInlineMarkdown', () => {
     expect(stripInlineMarkdown('Hello **bold** and `code`')).toBe('Hello bold and code');
   });
 
+  it('parses links as href runs while preserving nested style', () => {
+    expect(parseInlineMarkdown('See [**pdfme** docs](https://pdfme.com/docs).')).toEqual([
+      { text: 'See ' },
+      { text: 'pdfme', bold: true, href: 'https://pdfme.com/docs' },
+      { text: ' docs', href: 'https://pdfme.com/docs' },
+      { text: '.' },
+    ]);
+    expect(stripInlineMarkdown('See [pdfme](https://pdfme.com).')).toBe('See pdfme.');
+  });
+
+  it('keeps escaped links as literal text', () => {
+    const escaped = escapeInlineMarkdown('[pdfme](https://pdfme.com)');
+
+    expect(escaped).toBe('\\[pdfme\\]\\(https://pdfme.com\\)');
+    expect(parseInlineMarkdown(escaped)).toEqual([{ text: '[pdfme](https://pdfme.com)' }]);
+  });
+
   it('escapes markdown markers for literal content', () => {
     const escaped = escapeInlineMarkdown('**literal** and `code` with \\');
 

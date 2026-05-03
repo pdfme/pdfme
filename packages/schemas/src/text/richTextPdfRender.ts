@@ -13,6 +13,7 @@ import {
   VERTICAL_ALIGN_TOP,
 } from './constants.js';
 import { getFontDescentInPt, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
+import { addUriLinkAnnotation, type LinkAnnotationRect } from './linkAnnotation.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import {
   countRichTextLineGraphemes,
@@ -81,6 +82,61 @@ const drawDecorationLine = (arg: {
   });
 };
 
+const getAxisAlignedRect = (arg: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate: Rotation;
+  pivotPoint: { x: number; y: number };
+}): LinkAnnotationRect => {
+  const { x, y, width, height, rotate, pivotPoint } = arg;
+  if (rotate.angle === 0) return { x, y, width, height };
+
+  const points = [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ].map((point) => rotatePoint(point, pivotPoint, rotate.angle));
+  const xs = points.map((point) => point.x);
+  const ys = points.map((point) => point.y);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(...xs) - minX,
+    height: Math.max(...ys) - minY,
+  };
+};
+
+const getLinkAnnotationRect = (arg: {
+  run: RichTextLineRun;
+  x: number;
+  y: number;
+  width: number;
+  rotate: Rotation;
+  pivotPoint: { x: number; y: number };
+  fontSize: number;
+}): LinkAnnotationRect => {
+  const { run, x, y, width, rotate, pivotPoint, fontSize } = arg;
+  const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
+  const descent = getFontDescentInPt(run.fontKitFont, fontSize);
+  const rectY = y + descent;
+  const rectHeight = textHeight - descent;
+
+  return getAxisAlignedRect({
+    x,
+    y: rectY,
+    width,
+    height: rectHeight,
+    rotate,
+    pivotPoint,
+  });
+};
+
 const drawRun = (arg: {
   page: PDFRenderProps<TextSchema>['page'];
   pdfLib: PDFRenderProps<TextSchema>['pdfLib'];
@@ -97,6 +153,7 @@ const drawRun = (arg: {
   colorType: ColorType;
   characterSpacing: number;
   strikethrough: boolean;
+  underline: boolean;
 }) => {
   const {
     page,
@@ -114,6 +171,7 @@ const drawRun = (arg: {
     colorType,
     characterSpacing,
     strikethrough,
+    underline,
   } = arg;
   const runWidth = getRunWidth(run, fontSize, characterSpacing);
   const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
@@ -142,6 +200,20 @@ const drawRun = (arg: {
       page,
       x,
       y: y + textHeight / 3,
+      width: runWidth,
+      rotate,
+      pivotPoint,
+      fontSize,
+      color,
+      opacity,
+    });
+  }
+
+  if (underline && runWidth > 0) {
+    drawDecorationLine({
+      page,
+      x,
+      y: y - textHeight / 12,
       width: runWidth,
       rotate,
       pivotPoint,
@@ -182,6 +254,7 @@ export const renderInlineMarkdownText = async (arg: {
   font: Font;
   embedPdfFont: (fontName: string) => Promise<PDFFont>;
   fontKitFont: FontKitFont;
+  pdfDoc: PDFRenderProps<TextSchema>['pdfDoc'];
   page: PDFRenderProps<TextSchema>['page'];
   pdfLib: PDFRenderProps<TextSchema>['pdfLib'];
   _cache: Map<string | number, unknown>;
@@ -206,6 +279,7 @@ export const renderInlineMarkdownText = async (arg: {
     font,
     embedPdfFont,
     fontKitFont,
+    pdfDoc,
     page,
     pdfLib,
     _cache,
@@ -332,7 +406,24 @@ export const renderInlineMarkdownText = async (arg: {
         colorType,
         characterSpacing: spacing,
         strikethrough: Boolean(run.strikethrough),
+        underline: Boolean(run.href) && !schema.underline,
       });
+      if (run.href) {
+        addUriLinkAnnotation({
+          pdfDoc,
+          page,
+          uri: run.href,
+          rect: getLinkAnnotationRect({
+            run,
+            x: currentX,
+            y: yLine,
+            width: runWidth,
+            rotate,
+            pivotPoint,
+            fontSize,
+          }),
+        });
+      }
 
       return currentX + runWidth + (runIndex === line.runs.length - 1 ? 0 : spacing);
     }, xLine);
