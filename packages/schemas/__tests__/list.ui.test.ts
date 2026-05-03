@@ -169,6 +169,68 @@ describe('list UI rendering', () => {
     });
   });
 
+  test('supports removing all rows and adding an empty row back', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+
+    await uiRender({
+      value: 'Only row',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    rootElement.querySelector<HTMLButtonElement>('button[aria-label="Remove item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: '',
+    });
+
+    await uiRender({
+      value: '',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    expect(rootElement.querySelectorAll('button[aria-label="Remove item"]')).toHaveLength(0);
+    expect(rootElement.querySelectorAll('button[aria-label="Add item"]')).toHaveLength(1);
+
+    onChange.mockClear();
+    rootElement.querySelector<HTMLButtonElement>('button[aria-label="Add item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: '[""]',
+    });
+
+    await uiRender({
+      value: '[""]',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    expect(rootElement.querySelectorAll('button[aria-label="Remove item"]')).toHaveLength(1);
+    expect(((rootElement.children[0] as HTMLElement).children[1] as HTMLElement).innerText).toBe(
+      '',
+    );
+  });
+
   test('supports keyboard shortcuts for adding and indenting items', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();

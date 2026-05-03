@@ -212,13 +212,16 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
+            const hasInputValue = Boolean(
+              input && Object.prototype.hasOwnProperty.call(input, schema.name),
+            );
             const value = schema.readOnly
               ? replacePlaceholders({
                   content: schema.content || '',
                   variables: { ...input, totalPages: schemasList.length, currentPage: index + 1 },
                   schemas: schemasList,
                 })
-              : String((input && input[schema.name]) || '');
+              : String(hasInputValue ? (input?.[schema.name] ?? '') : '');
             return (
               <Renderer
                 key={schema.id}
@@ -226,7 +229,7 @@ const Preview = ({
                 basePdf={template.basePdf}
                 value={value}
                 mode={isForm ? 'form' : 'viewer'}
-                placeholder={schema.content}
+                placeholder={hasInputValue ? undefined : schema.content}
                 tabIndex={index + 100}
                 onChange={(arg) => {
                   const args = Array.isArray(arg) ? arg : [arg];

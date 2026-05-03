@@ -101,7 +101,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const originalItems = normalizeListItemEntries(value);
   const range = schema.__itemRange ?? { start: 0, end: items.length };
   const visibleItems = items.slice(range.start, range.end);
-  const renderItems = visibleItems.length > 0 ? visibleItems : editable ? [''] : [];
+  const renderItems = visibleItems;
 
   rootElement.innerHTML = '';
   setStyles(rootElement, {
@@ -163,6 +163,32 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
 
   const preserveEditingForAction = () => {
     rootElement.dataset[actionDataKey] = 'true';
+  };
+
+  const appendEmptyListControls = () => {
+    const controls = document.createElement('div');
+    controls.addEventListener('pointerdown', preserveEditingForAction);
+    controls.addEventListener('mousedown', preserveEditingForAction);
+    setStyles(controls, {
+      position: 'absolute',
+      top: '0mm',
+      right: '-20px',
+      display: 'flex',
+      gap: '2px',
+    });
+    controls.appendChild(
+      createActionButton({
+        label: '+',
+        ariaLabel: arg.i18n('schemas.list.addItem'),
+        onPressStart: preserveEditingForAction,
+        onClick: () => {
+          const nextItems = [...originalItems];
+          nextItems.splice(range.start, 0, { level: 0, text: '' });
+          commitItems(nextItems, range.start);
+        },
+      }),
+    );
+    rootElement.appendChild(controls);
   };
 
   let offsetY = 0;
@@ -352,16 +378,16 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     offsetY += item.height;
   }
 
+  if (showControls && visibleItems.length === 0) {
+    appendEmptyListControls();
+  }
+
   const requestedFocusIndex = Number(rootElement.dataset[focusDataKey]);
   delete rootElement.dataset[focusDataKey];
   delete rootElement.dataset[actionDataKey];
   const relativeFocusIndex = requestedFocusIndex - range.start;
 
-  if (
-    editable &&
-    Number.isFinite(requestedFocusIndex) &&
-    bodyElements[relativeFocusIndex]
-  ) {
+  if (editable && Number.isFinite(requestedFocusIndex) && bodyElements[relativeFocusIndex]) {
     setTimeout(() => focusBody(bodyElements[relativeFocusIndex]));
   } else if (editable && mode === 'designer' && bodyElements[0]) {
     setTimeout(() => {
@@ -369,7 +395,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     });
   }
 
-  if (layout.items.length > 0 && schema.height !== layout.totalHeight && onChange) {
+  if (schema.height !== layout.totalHeight && onChange) {
     onChange({ key: 'height', value: layout.totalHeight });
   }
 };

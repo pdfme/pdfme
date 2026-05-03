@@ -50,8 +50,25 @@ export const parseListItem = (value: string): ListItem => {
 export const normalizeListItemEntries = (value: unknown): ListItem[] =>
   normalizeListItems(value).map(parseListItem);
 
-export const serializeListItems = (items: ListItem[]): string =>
-  items.map((item) => `${'\t'.repeat(Math.max(0, item.level))}${item.text}`).join('\n');
+const formatListItem = (item: ListItem): string =>
+  `${'\t'.repeat(Math.max(0, item.level))}${item.text}`;
+
+const isSameListItem = (a: ListItem, b: ListItem): boolean =>
+  a.level === b.level && a.text === b.text;
+
+export const serializeListItems = (items: ListItem[]): string => {
+  const lines = items.map(formatListItem);
+  const textValue = lines.join('\n');
+
+  if (items.length === 0) return textValue;
+
+  const reparsedItems = normalizeListItemEntries(textValue);
+  const canUseTextValue =
+    reparsedItems.length === items.length &&
+    reparsedItems.every((item, index) => isSameListItem(item, items[index]));
+
+  return canUseTextValue ? textValue : JSON.stringify(lines);
+};
 
 export const getListMarker = (schema: ListSchema, absoluteIndex: number): string => {
   if ((schema.listStyle ?? DEFAULT_LIST_STYLE) === LIST_STYLE_ORDERED) {

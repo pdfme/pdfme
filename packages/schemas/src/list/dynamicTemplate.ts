@@ -10,7 +10,7 @@ export const getDynamicLayoutForList = async (
 
   const schema = args.schema as ListSchema;
   const items = normalizeListItems(value);
-  if (items.length === 0) return { heights: [schema.height] };
+  if (items.length === 0) return { heights: [0] };
 
   const layout = await calculateListLayout({
     schema,

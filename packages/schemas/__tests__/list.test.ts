@@ -41,6 +41,7 @@ describe('list schema helpers', () => {
       'Run tests',
     ]);
     expect(normalizeListItems('Install deps\nRun tests')).toEqual(['Install deps', 'Run tests']);
+    expect(normalizeListItems('[""]')).toEqual(['']);
     expect(normalizeListItems(['Install deps', 2])).toEqual(['Install deps', '2']);
     expect(normalizeListItems('')).toEqual([]);
     expect(normalizeListItems(null)).toEqual([]);
@@ -56,6 +57,7 @@ describe('list schema helpers', () => {
       { level: 2, text: 'Fix failures' },
     ]);
     expect(serializeListItems(items)).toBe('Install deps\n\tRun tests\n\t\tFix failures');
+    expect(serializeListItems([{ level: 0, text: '' }])).toBe('[""]');
   });
 
   test('builds ordered markers from the absolute item index', () => {
@@ -132,7 +134,7 @@ describe('list schema helpers', () => {
     });
   });
 
-  test('keeps the original height for empty list values', async () => {
+  test('uses zero height for empty list values', async () => {
     const schema = getListSchema({ height: 24 });
     const dynamicLayout = await getDynamicLayoutForList('', {
       schema,
@@ -141,6 +143,6 @@ describe('list schema helpers', () => {
       _cache: new Map(),
     });
 
-    expect(dynamicLayout.heights).toEqual([24]);
+    expect(dynamicLayout.heights).toEqual([0]);
   });
 });
