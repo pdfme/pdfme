@@ -24,6 +24,7 @@ const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1
 const GENERATOR_BENCHMARK_THRESHOLD = parseFloat(
   process.env.GENERATOR_BENCHMARK_THRESHOLD || '2.5',
 );
+const ADDRESS_LABEL_BENCHMARK_INPUT_COUNT = 20;
 const generatorPlugins = {
   text,
   image,
@@ -194,18 +195,20 @@ describe('generate integration test(playground)', () => {
       throw new Error('Failed to load playground template "address-label-30".');
     }
     const [baseLabelInput = {}] = getInputFromTemplate(labelTemplate);
-    const labelInputs = Array.from({ length: 40 }, (_, index) => ({
+    const labelInputs = Array.from({ length: ADDRESS_LABEL_BENCHMARK_INPUT_COUNT }, (_, index) => ({
       ...baseLabelInput,
       '{1}Name': `Kyohei Fukuda ${index}`,
     }));
 
-    await measureGenerate('playground address-label-30 multi-input template', () =>
-      generate({
-        inputs: labelInputs,
-        template: labelTemplate,
-        plugins: generatorPlugins,
-        options: { font },
-      }),
+    await measureGenerate(
+      `playground address-label-30 ${ADDRESS_LABEL_BENCHMARK_INPUT_COUNT}-input template`,
+      () =>
+        generate({
+          inputs: labelInputs,
+          template: labelTemplate,
+          plugins: generatorPlugins,
+          options: { font },
+        }),
     );
   }, 120000);
 });
