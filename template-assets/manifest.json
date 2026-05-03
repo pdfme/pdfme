@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "cliVersion": "6.1.0",
+  "cliVersion": "6.1.1",
   "templates": [
     {
       "name": "invoice",
@@ -79,6 +79,21 @@
       "pageCount": 1,
       "fieldCount": 0,
       "schemaTypes": [],
+      "fontNames": [],
+      "hasCJK": false,
+      "basePdfKind": "blank"
+    },
+    {
+      "name": "dynamic-list",
+      "author": "pdfme",
+      "path": "dynamic-list/template.json",
+      "thumbnailPath": "dynamic-list/thumbnail.png",
+      "pageCount": 1,
+      "fieldCount": 3,
+      "schemaTypes": [
+        "list",
+        "text"
+      ],
       "fontNames": [],
       "hasCJK": false,
       "basePdfKind": "blank"
