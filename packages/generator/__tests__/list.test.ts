@@ -13,7 +13,7 @@ describe('generate list schema', () => {
           {
             name: 'tasks',
             type: 'list',
-            content: '',
+            content: '[]',
             position: { x: 10, y: 10 },
             width: 70,
             height: 10,
@@ -46,7 +46,7 @@ describe('generate list schema', () => {
       template,
       inputs: [
         {
-          tasks: Array.from({ length: 18 }, (_, index) => `Task ${index + 1}`).join('\n'),
+          tasks: JSON.stringify(Array.from({ length: 18 }, (_, index) => `Task ${index + 1}`)),
           footer: 'Done',
         },
       ],

@@ -255,7 +255,7 @@ describe('getDynamicTemplate', () => {
             [
               {
                 name: 'a',
-                content: 'a',
+                content: '[]',
                 type: 'list',
                 position: { x: 10, y: 60 },
                 width: 80,
@@ -297,7 +297,7 @@ describe('getDynamicTemplate', () => {
           [
             {
               name: 'a',
-              content: 'a',
+              content: '[]',
               type: 'list',
               position: { x: 10, y: 60 },
               width: 80,

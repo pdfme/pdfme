@@ -585,6 +585,7 @@ describe('changeSchemas test', () => {
       ...getSchema(),
       name: 'items',
       type: 'list',
+      content: '[]',
       position: { x: 0, y: 20 },
       height: 10,
     };

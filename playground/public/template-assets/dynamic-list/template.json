@@ -25,7 +25,7 @@
       {
         "name": "tasks",
         "type": "list",
-        "content": "Confirm project goals\n\tAdd the acceptance notes\n\tMark the risky assumptions\nMap the current template\nCollect required fields\nDraft schema names\nDefine list item text\nCheck marker spacing\nReview page padding\nRun the first preview\nAdjust item spacing\nVerify ordered numbering\nTry a bullet style\nEdit values in Form\nGenerate the PDF\nInspect page two\nConfirm next-field pushdown\nTest a longer sentence that wraps onto the next line\nShort item\nAnother wrapped item for layout coverage\nCheck final numbering\nShare the sample",
+        "content": "[\"Confirm project goals\",\"\\tAdd the acceptance notes\",\"\\tMark the risky assumptions\",\"Map the current template\",\"Collect required fields\",\"Draft schema names\",\"Define list item text\",\"Check marker spacing\",\"Review page padding\",\"Run the first preview\",\"Adjust item spacing\",\"Verify ordered numbering\",\"Try a bullet style\",\"Edit values in Form\",\"Generate the PDF\",\"Inspect page two\",\"Confirm next-field pushdown\",\"Test a longer sentence that wraps onto the next line\",\"Short item\",\"Another wrapped item for layout coverage\",\"Check final numbering\",\"Share the sample\"]",
         "position": {
           "x": 18,
           "y": 24

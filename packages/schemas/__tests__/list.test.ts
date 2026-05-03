@@ -13,7 +13,7 @@ import type { ListSchema } from '../src/lists.js';
 const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   name: 'items',
   type: 'list',
-  content: '',
+  content: '[]',
   position: { x: 0, y: 0 },
   width: 50,
   height: 20,
@@ -68,8 +68,11 @@ describe('list schema helpers', () => {
       { level: 1, text: 'Run tests' },
       { level: 2, text: 'Fix failures' },
     ]);
-    expect(serializeListItems(items)).toBe('Install deps\n\tRun tests\n\t\tFix failures');
+    expect(serializeListItems(items)).toBe(
+      JSON.stringify(['Install deps', '\tRun tests', '\t\tFix failures']),
+    );
     expect(serializeListItems([{ level: 0, text: '' }])).toBe('[""]');
+    expect(serializeListItems([])).toBe('[]');
   });
 
   test('builds ordered markers from indentation-level counters', () => {

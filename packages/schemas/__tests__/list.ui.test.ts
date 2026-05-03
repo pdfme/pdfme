@@ -20,7 +20,7 @@ const createMockFont = () =>
 const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   name: 'items',
   type: 'list',
-  content: '',
+  content: '[]',
   position: { x: 0, y: 0 },
   width: 80,
   height: 20,
@@ -52,6 +52,8 @@ const font = {
 const getCache = () =>
   new Map<string | number, unknown>([['getFontKitFont-Base', createMockFont()]]);
 
+const listValue = (items: string[]) => JSON.stringify(items);
+
 const i18n = (key: string) =>
   ({
     'schemas.list.addItem': 'Add item',
@@ -82,7 +84,7 @@ describe('list UI rendering', () => {
     const rootElement = document.createElement('div');
 
     await uiRender({
-      value: 'One\nTwo\nThree\nFour',
+      value: listValue(['One', 'Two', 'Three', 'Four']),
       schema: getListSchema({ __itemRange: { start: 1, end: 3 } }),
       rootElement,
       mode: 'viewer',
@@ -105,7 +107,7 @@ describe('list UI rendering', () => {
     const onChange = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo\nThree\nFour',
+      value: listValue(['One', 'Two', 'Three', 'Four']),
       schema: getListSchema({ __itemRange: { start: 1, end: 3 } }),
       rootElement,
       mode: 'form',
@@ -123,7 +125,7 @@ describe('list UI rendering', () => {
 
     expect(onChange).toHaveBeenCalledWith({
       key: 'content',
-      value: 'One\nUpdated two\nThree\nFour',
+      value: listValue(['One', 'Updated two', 'Three', 'Four']),
     });
   });
 
@@ -132,7 +134,7 @@ describe('list UI rendering', () => {
     const onChange = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo\nThree',
+      value: listValue(['One', 'Two', 'Three']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -149,25 +151,25 @@ describe('list UI rendering', () => {
     secondRow.querySelector<HTMLButtonElement>('button[aria-label="Indent item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\n\tTwo\nThree',
+      value: listValue(['One', '\tTwo', 'Three']),
     });
 
     onChange.mockClear();
     secondRow.querySelector<HTMLButtonElement>('button[aria-label="Add item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\nTwo\n\nThree',
+      value: listValue(['One', 'Two', '', 'Three']),
     });
 
     onChange.mockClear();
     secondRow.querySelector<HTMLButtonElement>('button[aria-label="Remove item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\nThree',
+      value: listValue(['One', 'Three']),
     });
 
     await uiRender({
-      value: 'One\n\tTwo\nThree',
+      value: listValue(['One', '\tTwo', 'Three']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -183,7 +185,7 @@ describe('list UI rendering', () => {
     indentedRows[1].querySelector<HTMLButtonElement>('button[aria-label="Outdent item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\nTwo\nThree',
+      value: listValue(['One', 'Two', 'Three']),
     });
   });
 
@@ -192,7 +194,7 @@ describe('list UI rendering', () => {
     const onChange = vi.fn();
 
     await uiRender({
-      value: 'Only row',
+      value: listValue(['Only row']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -206,11 +208,11 @@ describe('list UI rendering', () => {
     rootElement.querySelector<HTMLButtonElement>('button[aria-label="Remove item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '',
+      value: listValue([]),
     });
 
     await uiRender({
-      value: '',
+      value: listValue([]),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -228,11 +230,11 @@ describe('list UI rendering', () => {
     rootElement.querySelector<HTMLButtonElement>('button[aria-label="Add item"]')?.click();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '[""]',
+      value: listValue(['']),
     });
 
     await uiRender({
-      value: '[""]',
+      value: listValue(['']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -255,7 +257,7 @@ describe('list UI rendering', () => {
     document.body.appendChild(rootElement);
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema({ height: 8 }),
       rootElement,
       mode: 'form',
@@ -286,7 +288,7 @@ describe('list UI rendering', () => {
     expect(Number(heightChange?.value)).toBeGreaterThan(8);
     expect(onChange).not.toHaveBeenCalledWith({
       key: 'content',
-      value: '["One\\n","Two"]',
+      value: listValue(['One\n', 'Two']),
     });
     expect(document.activeElement).toBe(firstBody);
 
@@ -294,11 +296,11 @@ describe('list UI rendering', () => {
     firstBody.dispatchEvent(new window.FocusEvent('blur'));
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '["One\\ncontinued","Two"]',
+      value: listValue(['One\ncontinued', 'Two']),
     });
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -317,7 +319,7 @@ describe('list UI rendering', () => {
     );
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '\tOne\nTwo',
+      value: listValue(['\tOne', 'Two']),
     });
     rootElement.remove();
   });
@@ -327,7 +329,7 @@ describe('list UI rendering', () => {
     const onChange = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'form',
@@ -368,7 +370,7 @@ describe('list UI rendering', () => {
     const rootElement = document.createElement('div');
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'designer',
@@ -390,7 +392,7 @@ describe('list UI rendering', () => {
     const stopEditing = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'designer',
@@ -420,7 +422,7 @@ describe('list UI rendering', () => {
     expect(mouseDown).not.toHaveBeenCalled();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'Edited one\n\nTwo',
+      value: listValue(['Edited one', '', 'Two']),
     });
   });
 
@@ -430,7 +432,7 @@ describe('list UI rendering', () => {
     const stopEditing = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'designer',
@@ -464,7 +466,7 @@ describe('list UI rendering', () => {
     expect(stopEditing).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\nEdited two',
+      value: listValue(['One', 'Edited two']),
     });
   });
 
@@ -474,7 +476,7 @@ describe('list UI rendering', () => {
     const stopEditing = vi.fn();
 
     await uiRender({
-      value: 'One\nTwo',
+      value: listValue(['One', 'Two']),
       schema: getListSchema(),
       rootElement,
       mode: 'designer',
@@ -498,7 +500,7 @@ describe('list UI rendering', () => {
     expect(stopEditing).not.toHaveBeenCalled();
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '["One\\n","Two"]',
+      value: listValue(['One\n', 'Two']),
     });
   });
 });

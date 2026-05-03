@@ -53,21 +53,9 @@ export const normalizeListItemEntries = (value: unknown): ListItem[] =>
 const formatListItem = (item: ListItem): string =>
   `${'\t'.repeat(Math.max(0, item.level))}${item.text}`;
 
-const isSameListItem = (a: ListItem, b: ListItem): boolean =>
-  a.level === b.level && a.text === b.text;
-
 export const serializeListItems = (items: ListItem[]): string => {
   const lines = items.map(formatListItem);
-  const textValue = lines.join('\n');
-
-  if (items.length === 0) return textValue;
-
-  const reparsedItems = normalizeListItemEntries(textValue);
-  const canUseTextValue =
-    reparsedItems.length === items.length &&
-    reparsedItems.every((item, index) => isSameListItem(item, items[index]));
-
-  return canUseTextValue ? textValue : JSON.stringify(lines);
+  return JSON.stringify(lines);
 };
 
 export const getListMarker = (schema: ListSchema, absoluteIndex: number): string => {

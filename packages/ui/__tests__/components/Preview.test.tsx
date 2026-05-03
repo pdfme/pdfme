@@ -24,7 +24,7 @@ const getFormReflowTemplate = (basePdf: Template['basePdf']): Template => ({
       {
         name: 'tasks',
         type: 'list',
-        content: '',
+        content: '[]',
         position: { x: 10, y: 20 },
         width: 60,
         height: 10,
@@ -56,7 +56,7 @@ const resizingListPlugin: Plugin = {
     defaultSchema: {
       name: 'tasks',
       type: 'list',
-      content: '',
+      content: '[]',
       position: { x: 0, y: 0 },
       width: 60,
       height: 10,
