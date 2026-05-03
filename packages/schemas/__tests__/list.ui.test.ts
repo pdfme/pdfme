@@ -94,9 +94,9 @@ describe('list UI rendering', () => {
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     expect(rows).toHaveLength(2);
-    expect((rows[0].children[0] as HTMLElement).innerText).toBe('2.');
+    expect((rows[0].children[0] as HTMLElement).textContent).toBe('2.');
     expect((rows[0].children[1] as HTMLElement).textContent).toBe('Two');
-    expect((rows[1].children[0] as HTMLElement).innerText).toBe('3.');
+    expect((rows[1].children[0] as HTMLElement).textContent).toBe('3.');
     expect((rows[1].children[1] as HTMLElement).textContent).toBe('Three');
   });
 

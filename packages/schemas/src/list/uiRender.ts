@@ -202,9 +202,6 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   });
 
   const bodyElements: HTMLDivElement[] = [];
-  const textDecorations = [];
-  if (schema.strikethrough) textDecorations.push('line-through');
-  if (schema.underline) textDecorations.push('underline');
 
   const getEditedItems = (): ListItem[] =>
     layout.items.map((item, index) => ({
@@ -330,23 +327,14 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     });
 
     const marker = document.createElement('div');
-    marker.innerText = item.marker;
     setStyles(marker, {
       position: 'absolute',
       top: '0mm',
       left: `${item.markerX}mm`,
       width: `${layout.markerWidth}mm`,
       height: '100%',
-      color: schema.fontColor || DEFAULT_FONT_COLOR,
-      fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
-      fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
-      letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
-      lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-      textAlign: 'right',
-      whiteSpace: 'pre-wrap',
-      wordBreak: 'break-word',
-      textDecoration: textDecorations.join(' '),
-      cursor: editable ? 'text' : 'default',
+      backgroundColor: 'transparent',
+      cursor: 'default',
     });
 
     const body = document.createElement('div');
@@ -377,6 +365,27 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       fontColor: usePlaceholder ? PLACEHOLDER_FONT_COLOR : schema.fontColor || DEFAULT_FONT_COLOR,
       backgroundColor: '',
     };
+    const markerTextSchema: TextSchema & { id?: string } = {
+      ...textSchema,
+      id: `${schemaForUI.id || schema.name}-list-marker-${item.itemIndex}`,
+      name: `${schema.name}-list-marker-${item.itemIndex}`,
+      content: item.marker,
+      width: layout.markerWidth,
+      height: item.height,
+      alignment: 'right',
+      fontColor: schema.fontColor || DEFAULT_FONT_COLOR,
+    };
+
+    await textUiRender({
+      ...arg,
+      rootElement: marker,
+      schema: markerTextSchema,
+      value: item.marker,
+      mode: 'viewer',
+      placeholder: '',
+      onChange: undefined,
+      stopEditing: undefined,
+    });
 
     await textUiRender({
       ...arg,
