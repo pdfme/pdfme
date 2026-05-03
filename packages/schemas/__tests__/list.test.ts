@@ -7,6 +7,7 @@ import {
   normalizeListItems,
   serializeListItems,
 } from '../src/lists.js';
+import listSchemaPlugin from '../src/list/index.js';
 import type { ListSchema } from '../src/lists.js';
 
 const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
@@ -33,6 +34,17 @@ const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   itemSpacing: 1,
   ...overrides,
 });
+
+const getPropPanelSchema = (overrides: Partial<ListSchema> = {}) => {
+  const schema = listSchemaPlugin.propPanel.schema;
+  if (typeof schema !== 'function') throw new Error('List prop panel schema should be a function');
+
+  return schema({
+    activeSchema: { ...getListSchema(overrides), id: 'items' },
+    options: { font: getDefaultFont() },
+    i18n: (key: string) => key,
+  } as Parameters<typeof schema>[0]);
+};
 
 describe('list schema helpers', () => {
   test('normalizes supported list input shapes', () => {
@@ -144,5 +156,34 @@ describe('list schema helpers', () => {
     });
 
     expect(dynamicLayout.heights).toEqual([0]);
+  });
+
+  test('shows bullet-specific prop panel fields in the requested rows', () => {
+    const schema = getPropPanelSchema({ listStyle: 'bullet' });
+
+    expect(schema.listStyle.span).toBe(12);
+    expect(schema.marker.hidden).toBe(false);
+    expect(schema.marker.span).toBe(12);
+    expect(schema.startNumber.hidden).toBe(true);
+    expect(schema.orderedSuffix.hidden).toBe(true);
+    expect(schema.markerWidth.span).toBe(6);
+    expect(schema.markerGap.span).toBe(6);
+    expect(schema.indentSize.span).toBe(6);
+    expect(schema.itemSpacing.span).toBe(6);
+  });
+
+  test('shows ordered-specific prop panel fields in the requested rows', () => {
+    const schema = getPropPanelSchema({ listStyle: 'ordered' });
+
+    expect(schema.listStyle.span).toBe(8);
+    expect(schema.marker.hidden).toBe(true);
+    expect(schema.startNumber.hidden).toBe(false);
+    expect(schema.startNumber.span).toBe(8);
+    expect(schema.orderedSuffix.hidden).toBe(false);
+    expect(schema.orderedSuffix.span).toBe(8);
+    expect(schema.markerWidth.span).toBe(6);
+    expect(schema.markerGap.span).toBe(6);
+    expect(schema.indentSize.span).toBe(6);
+    expect(schema.itemSpacing.span).toBe(6);
   });
 });

@@ -21,6 +21,10 @@ export const propPanel: PropPanel<ListSchema> = {
     }
     const parentSchema = parentPropPanel.schema(propPanelProps);
     const i18n = (propPanelProps as PropPanelWidgetProps).i18n;
+    const activeListSchema = (propPanelProps as PropPanelWidgetProps)
+      .activeSchema as unknown as ListSchema;
+    const listStyle = activeListSchema.listStyle ?? DEFAULT_LIST_STYLE;
+    const isOrdered = listStyle === LIST_STYLE_ORDERED;
     const listSchema: Record<string, PropPanelSchema> = { ...parentSchema };
     delete listSchema.useDynamicFontSize;
     delete listSchema.dynamicFontSize;
@@ -38,18 +42,20 @@ export const propPanel: PropPanel<ListSchema> = {
             { label: i18n('schemas.list.ordered'), value: LIST_STYLE_ORDERED },
           ],
         },
-        span: 12,
+        span: isOrdered ? 8 : 12,
       },
       marker: {
         title: i18n('schemas.list.marker'),
         type: 'string',
         widget: 'input',
+        hidden: isOrdered,
         span: 12,
       },
       startNumber: {
         title: i18n('schemas.list.startNumber'),
         type: 'number',
         widget: 'inputNumber',
+        hidden: !isOrdered,
         props: { min: 0 },
         span: 8,
       },
@@ -57,6 +63,7 @@ export const propPanel: PropPanel<ListSchema> = {
         title: i18n('schemas.list.orderedSuffix'),
         type: 'string',
         widget: 'input',
+        hidden: !isOrdered,
         span: 8,
       },
       markerWidth: {
@@ -64,28 +71,28 @@ export const propPanel: PropPanel<ListSchema> = {
         type: 'number',
         widget: 'inputNumber',
         props: { min: 0 },
-        span: 8,
+        span: 6,
       },
       markerGap: {
         title: i18n('schemas.list.markerGap'),
         type: 'number',
         widget: 'inputNumber',
         props: { min: 0 },
-        span: 8,
+        span: 6,
       },
       indentSize: {
         title: i18n('schemas.list.indentSize'),
         type: 'number',
         widget: 'inputNumber',
         props: { min: 0 },
-        span: 8,
+        span: 6,
       },
       itemSpacing: {
         title: i18n('schemas.list.itemSpacing'),
         type: 'number',
         widget: 'inputNumber',
         props: { min: 0 },
-        span: 8,
+        span: 6,
       },
     };
   },
