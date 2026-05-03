@@ -506,6 +506,30 @@ export const changeSchemas = (args: {
   commitSchemas(newSchemas);
 };
 
+export const getDynamicHeightReflowChanges = (args: {
+  schemas: SchemaForUI[];
+  schema: SchemaForUI;
+  height: unknown;
+}): { key: string; value: unknown; schemaId: string }[] => {
+  const { schemas, schema, height } = args;
+  if (!['list', 'table'].includes(schema.type)) return [];
+
+  const nextHeight = Number(height);
+  if (!Number.isFinite(nextHeight)) return [];
+
+  const delta = nextHeight - schema.height;
+  if (delta === 0) return [];
+
+  const baseBottom = schema.position.y + schema.height;
+  return schemas
+    .filter((s) => s.id !== schema.id && s.position.y >= baseBottom)
+    .map((s) => ({
+      key: 'position.y',
+      value: round(s.position.y + delta, 2),
+      schemaId: s.id,
+    }));
+};
+
 export const useMaxZoom = () => {
   const options = useContext(OptionsContext);
 

@@ -24,7 +24,7 @@ import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
-import { round, flatten, uuid } from '../../../helper.js';
+import { round, flatten, uuid, getDynamicHeightReflowChanges } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
 import Selecto from './Selecto.js';
@@ -513,9 +513,22 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                       // Use type assertion to safely handle the argument
                       type ChangeArg = { key: string; value: unknown };
                       const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
-                      changeSchemas(
-                        args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
-                      );
+                      const changeArgs = args.map(({ key, value }) => ({
+                        key,
+                        value,
+                        schemaId: schema.id,
+                      }));
+                      const heightChange = args.find(({ key }) => key === 'height');
+                      if (heightChange) {
+                        changeArgs.push(
+                          ...getDynamicHeightReflowChanges({
+                            schemas: schemasList[pageCursor] || [],
+                            schema,
+                            height: heightChange.value,
+                          }),
+                        );
+                      }
+                      changeSchemas(changeArgs);
                     }
                   : undefined
               }
