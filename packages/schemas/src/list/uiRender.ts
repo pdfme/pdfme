@@ -29,8 +29,10 @@ const isComposingKeyboardEvent = (event: KeyboardEvent) =>
   event.isComposing || event.keyCode === 229;
 
 const getText = (element: HTMLElement): string => {
-  let text = element.innerText.replace(/\u200B/g, '');
-  if (text.endsWith('\n')) {
+  const rawText = element.innerText;
+  const hasCaretMarker = rawText.includes(caretMarker);
+  let text = rawText.replace(/\u200B/g, '');
+  if (!hasCaretMarker && text.endsWith('\n')) {
     text = text.slice(0, -1);
   }
   return text;
@@ -87,12 +89,22 @@ const focusBodyFromMouseEvent = (body: HTMLElement, event: MouseEvent) => {
 const getBodyEditor = (body: HTMLElement): HTMLDivElement | null =>
   body.querySelector<HTMLDivElement>('div[id^="text-"]');
 
-const insertLineBreakAtSelection = () => {
+const insertLineBreakAtSelection = (element: HTMLElement) => {
   const selection = window.getSelection();
-  if (!selection?.rangeCount) return;
+  if (!selection?.rangeCount) {
+    element.innerText = `${getText(element)}\n${caretMarker}`;
+    focusBody(element);
+    return true;
+  }
+
+  const range = selection.getRangeAt(0);
+  if (!element.contains(range.commonAncestorContainer)) {
+    element.innerText = `${getText(element)}\n${caretMarker}`;
+    focusBody(element);
+    return true;
+  }
 
   selection.deleteFromDocument();
-  const range = selection.getRangeAt(0);
   const fragment = document.createDocumentFragment();
   const lineBreak = document.createElement('br');
   const marker = document.createTextNode(caretMarker);
@@ -102,6 +114,7 @@ const insertLineBreakAtSelection = () => {
   range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
+  return true;
 };
 
 const createActionButton = (arg: {
@@ -227,6 +240,15 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
 
   const preserveEditingForInternalFocus = () => {
     rootElement.dataset[internalFocusDataKey] = 'true';
+  };
+
+  const preserveEditingForKeyboardCommit = () => {
+    preserveEditingForInternalFocus();
+    setTimeout(() => {
+      if (rootElement.dataset[internalFocusDataKey] === 'true') {
+        delete rootElement.dataset[internalFocusDataKey];
+      }
+    });
   };
 
   const handleInternalFocusPointer = (event: Event) => {
@@ -377,7 +399,10 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
         if (event.key === 'Enter') {
           if (isComposingKeyboardEvent(event)) return;
           event.preventDefault();
-          insertLineBreakAtSelection();
+          if (insertLineBreakAtSelection(editor)) {
+            preserveEditingForKeyboardCommit();
+            commitItems(getNextItems(), range.start + index);
+          }
         } else if (event.key === 'Tab') {
           event.preventDefault();
           updateItems(index, (nextItems, itemIndex) => {

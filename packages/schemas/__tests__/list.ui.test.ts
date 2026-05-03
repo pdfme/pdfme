@@ -68,6 +68,15 @@ const getRowEditor = (row: Element): HTMLElement => {
   return editor;
 };
 
+const moveCaretToEnd = (element: HTMLElement) => {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+};
+
 describe('list UI rendering', () => {
   test('renders only the item range for split list chunks', async () => {
     const rootElement = document.createElement('div');
@@ -258,6 +267,7 @@ describe('list UI rendering', () => {
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     const firstBody = getRowEditor(rows[0]);
+    moveCaretToEnd(firstBody);
 
     onChange.mockClear();
     const enter = new window.KeyboardEvent('keydown', {
@@ -267,13 +277,32 @@ describe('list UI rendering', () => {
     });
     expect(firstBody.dispatchEvent(enter)).toBe(false);
     expect(enter.defaultPrevented).toBe(true);
-    firstBody.innerText = 'One\n\u200Bcontinued';
-    firstBody.dispatchEvent(new window.FocusEvent('blur'));
-
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: '["One\\ncontinued","Two"]',
+      value: '["One\\n","Two"]',
     });
+    const committedChange = onChange.mock.calls[onChange.mock.calls.length - 1][0] as {
+      key: string;
+      value: string;
+    };
+
+    onChange.mockClear();
+    await uiRender({
+      value: committedChange.value,
+      schema: getListSchema({ height: 8 }),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    const heightChange = onChange.mock.calls
+      .map(([change]) => change as { key: string; value: unknown })
+      .find(({ key }) => key === 'height');
+    expect(Number(heightChange?.value)).toBeGreaterThan(8);
 
     await uiRender({
       value: 'One\nTwo',
@@ -466,12 +495,16 @@ describe('list UI rendering', () => {
     onChange.mockClear();
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     const firstBody = getRowEditor(rows[0]);
+    moveCaretToEnd(firstBody);
 
     firstBody.dispatchEvent(
       new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
     );
 
     expect(stopEditing).not.toHaveBeenCalled();
-    expect(onChange).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: '["One\\n","Two"]',
+    });
   });
 });
