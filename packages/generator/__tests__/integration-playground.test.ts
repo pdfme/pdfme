@@ -21,7 +21,6 @@ import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
-const benchmarkTest = process.env.PDFME_GENERATOR_BENCHMARK ? test : test.skip;
 const generatorPlugins = {
   text,
   image,
@@ -34,6 +33,16 @@ const generatorPlugins = {
   list,
   multiVariableText,
   ...barcodes,
+};
+
+const checkPerformanceThreshold = (name: string, execSeconds: number) => {
+  if (process.env.CI) {
+    expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
+  } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
+    console.warn(
+      `Warning: Execution time for ${name} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`,
+    );
+  }
 };
 
 const measureGenerate = async (name: string, fn: () => Promise<void>) => {
@@ -65,6 +74,7 @@ const measureGenerate = async (name: string, fn: () => Promise<void>) => {
   );
 
   expect(average).toBeGreaterThan(0);
+  checkPerformanceThreshold(name, average / 1000);
 };
 
 // Load all templates from playground/public/template-assets
@@ -140,13 +150,7 @@ describe('generate integration test(playground)', () => {
 
         const hrend = process.hrtime(hrstart);
         const execSeconds = hrend[0] + hrend[1] / 1000000000;
-        if (process.env.CI) {
-          expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
-        } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
-          console.warn(
-            `Warning: Execution time for ${key} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`,
-          );
-        }
+        checkPerformanceThreshold(key, execSeconds);
 
         const images = await pdfToImages(pdf);
         for (let i = 0; i < images.length; i++) {
@@ -156,7 +160,7 @@ describe('generate integration test(playground)', () => {
     }
   });
 
-  benchmarkTest(
+  test(
     'benchmarks generator-only paths used by performance-sensitive templates',
     async () => {
       const font = getFont();
