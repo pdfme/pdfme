@@ -512,7 +512,7 @@ export const getDynamicHeightReflowChanges = (args: {
   height: unknown;
 }): { key: string; value: unknown; schemaId: string }[] => {
   const { schemas, schema, height } = args;
-  if (!['list', 'table'].includes(schema.type)) return [];
+  if (schema.type !== 'list') return [];
 
   const nextHeight = Number(height);
   if (!Number.isFinite(nextHeight)) return [];

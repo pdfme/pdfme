@@ -639,6 +639,33 @@ describe('changeSchemas test', () => {
       }),
     ).toStrictEqual([]);
   });
+
+  test('getDynamicHeightReflowChanges - ignores table schemas', () => {
+    const tableSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'items',
+      type: 'table',
+      position: { x: 0, y: 20 },
+      height: 10,
+    };
+    const belowSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'below',
+      content: 'below',
+      position: { x: 0, y: 35 },
+      height: 10,
+    };
+
+    expect(
+      getDynamicHeightReflowChanges({
+        schemas: [tableSchema, belowSchema],
+        schema: tableSchema,
+        height: 25,
+      }),
+    ).toStrictEqual([]);
+  });
 });
 
 describe('setFontNameRecursively', () => {
