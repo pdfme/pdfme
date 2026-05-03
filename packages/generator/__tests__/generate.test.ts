@@ -1,5 +1,6 @@
 import generate from '../src/generate.js';
-import { Template, BLANK_PDF, Schema } from '@pdfme/common';
+import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
+import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
 describe('generate integrate test', () => {
@@ -65,6 +66,49 @@ describe('generate integrate test', () => {
         }
       });
     }
+
+    test('does not accumulate custom base PDF media box offsets across inputs', async () => {
+      const basePdfDoc = await PDFDocument.create();
+      const basePage = basePdfDoc.addPage([120, 120]);
+      basePage.setMediaBox(10, 20, 120, 120);
+      basePage.setBleedBox(10, 20, 120, 120);
+      basePage.setTrimBox(10, 20, 120, 120);
+      basePage.drawText('base', { x: 12, y: 22, size: 4 });
+
+      const observedPositions: Schema['position'][] = [];
+      const probeSchema: Schema = {
+        name: 'probe',
+        type: 'probe',
+        content: '',
+        position: { x: 3, y: 30 },
+        width: 10,
+        height: 10,
+      };
+      const probePlugin: Plugin = {
+        pdf: ({ schema }) => {
+          observedPositions.push({ ...schema.position });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: probeSchema,
+        },
+      };
+
+      await generate({
+        template: {
+          basePdf: await basePdfDoc.save(),
+          schemas: [[probeSchema]],
+        },
+        inputs: [{ probe: 'first' }, { probe: 'second' }],
+        plugins: { probe: probePlugin },
+      });
+
+      expect(observedPositions).toHaveLength(2);
+      expect(observedPositions[0]).toEqual(observedPositions[1]);
+      expect(observedPositions[0].x).toBeGreaterThan(probeSchema.position.x);
+      expect(observedPositions[0].y).toBeLessThan(probeSchema.position.y);
+    });
   });
 
   describe('use fontColor template', () => {

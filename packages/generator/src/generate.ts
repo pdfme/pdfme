@@ -18,12 +18,76 @@ import {
   validateRequiredFields,
 } from './helper.js';
 
+type SchemaRenderInfo = {
+  schemaNames: string[];
+  schemaPages: Map<string, Schema>[];
+};
+
+const hasDynamicLayoutSchema = (schemas: Schema[][]) => {
+  for (let i = 0; i < schemas.length; i += 1) {
+    const schemaPage = schemas[i];
+    for (let j = 0; j < schemaPage.length; j += 1) {
+      const schemaType = schemaPage[j].type;
+      if (schemaType === 'table' || schemaType === 'list') {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const getSchemaRenderInfo = (schemas: Schema[][]): SchemaRenderInfo => {
+  const schemaNameSet = new Set<string>();
+  const schemaPages: Map<string, Schema>[] = [];
+
+  for (let i = 0; i < schemas.length; i += 1) {
+    const schemaPage = schemas[i];
+    const schemaMap = new Map<string, Schema>();
+
+    for (let j = 0; j < schemaPage.length; j += 1) {
+      const schema = schemaPage[j];
+      if (!schema.name) {
+        continue;
+      }
+      schemaNameSet.add(schema.name);
+      if (!schemaMap.has(schema.name)) {
+        schemaMap.set(schema.name, schema);
+      }
+    }
+
+    schemaPages.push(schemaMap);
+  }
+
+  return { schemaNames: Array.from(schemaNameSet), schemaPages };
+};
+
+const getAdjustedSchema = (
+  schema: Schema,
+  boundingBoxLeft: number,
+  boundingBoxBottom: number,
+): Schema => {
+  if (boundingBoxLeft === 0 && boundingBoxBottom === 0) {
+    return schema;
+  }
+
+  return {
+    ...schema,
+    position: {
+      x: schema.position.x + boundingBoxLeft,
+      y: schema.position.y - boundingBoxBottom,
+    },
+  };
+};
+
 const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> => {
   checkGenerateProps(props);
   const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
   const template = cloneDeep(_template);
 
   const basePdf = template.basePdf;
+  const isBlankBasePdf = isBlankPdf(basePdf);
+  const staticSchemas = isBlankBasePdf ? (basePdf.staticSchema ?? []) : [];
+  const shouldApplyDynamicTemplate = isBlankBasePdf && hasDynamicLayoutSchema(template.schemas);
 
   if (inputs.length === 0) {
     throw new Error(
@@ -36,43 +100,49 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
   const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
   const _cache = new Map<string, unknown>();
+  // Dynamic layout is only applied to blank PDFs, so custom base PDF pages can be embedded once.
+  const cachedEmbedPdfPages = isBlankBasePdf
+    ? undefined
+    : await getEmbedPdfPages({
+        template,
+        pdfDoc,
+      });
+  const cachedRenderInfo = shouldApplyDynamicTemplate
+    ? undefined
+    : getSchemaRenderInfo(template.schemas);
 
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
 
-    // Get the dynamic template with proper typing
-    const dynamicTemplate: Template = await getDynamicTemplate({
-      template,
-      input,
-      options,
-      _cache,
-      getDynamicHeights: (value, args) => {
-        switch (args.schema.type) {
-          case 'table':
-            return getDynamicLayoutForTable(value, args);
-          case 'list':
-            return getDynamicLayoutForList(value, args);
-          default:
-            return Promise.resolve([args.schema.height]);
-        }
-      },
-    });
-    const { basePages, embedPdfBoxes } = await getEmbedPdfPages({
-      template: dynamicTemplate,
-      pdfDoc,
-    });
+    const dynamicTemplate: Template = shouldApplyDynamicTemplate
+      ? await getDynamicTemplate({
+          template,
+          input,
+          options,
+          _cache,
+          getDynamicHeights: (value, args) => {
+            switch (args.schema.type) {
+              case 'table':
+                return getDynamicLayoutForTable(value, args);
+              case 'list':
+                return getDynamicLayoutForList(value, args);
+              default:
+                return Promise.resolve([args.schema.height]);
+            }
+          },
+        })
+      : template;
+    const { basePages, embedPdfBoxes } =
+      cachedEmbedPdfPages ??
+      (await getEmbedPdfPages({
+        template: dynamicTemplate,
+        pdfDoc,
+      }));
 
     const schemas = dynamicTemplate.schemas;
-    // Create a type-safe array of schema names without using Set spread which requires downlevelIteration
-    const schemaNameSet = new Set<string>();
-    schemas.forEach((page: Schema[]) => {
-      page.forEach((schema: Schema) => {
-        if (schema.name) {
-          schemaNameSet.add(schema.name);
-        }
-      });
-    });
-    const schemaNames = Array.from(schemaNameSet);
+    const { schemaNames, schemaPages } = shouldApplyDynamicTemplate
+      ? getSchemaRenderInfo(schemas)
+      : (cachedRenderInfo as SchemaRenderInfo);
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
@@ -84,10 +154,11 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         basePage instanceof pdfLib.PDFEmbeddedPage ? pt2mm(embedPdfBox.mediaBox.y) : 0;
 
       const page = insertPage({ basePage, embedPdfBox, pdfDoc });
+      const variables = { ...input, totalPages: basePages.length, currentPage: j + 1 };
 
-      if (isBlankPdf(basePdf) && basePdf.staticSchema) {
-        for (let k = 0; k < basePdf.staticSchema.length; k += 1) {
-          const staticSchema = basePdf.staticSchema[k];
+      if (staticSchemas.length > 0) {
+        for (let k = 0; k < staticSchemas.length; k += 1) {
+          const staticSchema = staticSchemas[k];
           const render = renderObj[staticSchema.type];
           if (!render) {
             continue;
@@ -95,20 +166,20 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           const value = staticSchema.readOnly
             ? replacePlaceholders({
                 content: staticSchema.content || '',
-                variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-                schemas: schemas, // Use the properly typed schemas variable
+                variables,
+                schemas,
               })
             : staticSchema.content || '';
 
-          staticSchema.position = {
-            x: staticSchema.position.x + boundingBoxLeft,
-            y: staticSchema.position.y - boundingBoxBottom,
-          };
+          const adjustedStaticSchema = getAdjustedSchema(
+            staticSchema,
+            boundingBoxLeft,
+            boundingBoxBottom,
+          );
 
-          // Create properly typed render props for static schema
           const staticRenderProps: PDFRenderProps<Schema> = {
             value,
-            schema: staticSchema,
+            schema: adjustedStaticSchema,
             basePdf,
             pdfLib,
             pdfDoc,
@@ -120,10 +191,14 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         }
       }
 
+      const schemaPage = schemaPages[j];
+      if (!schemaPage) {
+        continue;
+      }
+
       for (let l = 0; l < schemaNames.length; l += 1) {
         const name = schemaNames[l];
-        const schemaPage = schemas[j] || [];
-        const schema = schemaPage.find((s: Schema) => s.name == name);
+        const schema = schemaPage.get(name);
         if (!schema) {
           continue;
         }
@@ -135,20 +210,16 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         const value: string = schema.readOnly
           ? replacePlaceholders({
               content: schema.content || '',
-              variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
-              schemas: schemas, // Use the properly typed schemas variable
+              variables,
+              schemas,
             })
           : ((input[name] || '') as string);
 
-        schema.position = {
-          x: schema.position.x + boundingBoxLeft,
-          y: schema.position.y - boundingBoxBottom,
-        };
+        const adjustedSchema = getAdjustedSchema(schema, boundingBoxLeft, boundingBoxBottom);
 
-        // Create properly typed render props
         const renderProps: PDFRenderProps<Schema> = {
           value,
-          schema,
+          schema: adjustedSchema,
           basePdf,
           pdfLib,
           pdfDoc,

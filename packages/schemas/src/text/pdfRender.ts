@@ -34,35 +34,52 @@ import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 
-const embedAndGetFontObj = async (arg: {
-  pdfDoc: PDFDocument;
-  font: Font;
-  _cache: Map<PDFDocument, { [key: string]: PDFFont }>;
-}) => {
-  const { pdfDoc, font, _cache } = arg;
-  if (_cache.has(pdfDoc)) {
-    return _cache.get(pdfDoc) as { [key: string]: PDFFont };
+type PdfFontCache = Record<string, Promise<PDFFont>>;
+
+const PDF_FONT_CACHE_KEY = 'text-pdf-font-cache';
+
+const getPdfFontCache = (
+  _cache: Map<string | number, unknown>,
+): PdfFontCache => {
+  let pdfFontCache = _cache.get(PDF_FONT_CACHE_KEY) as PdfFontCache | undefined;
+  if (!pdfFontCache) {
+    pdfFontCache = {};
+    _cache.set(PDF_FONT_CACHE_KEY, pdfFontCache);
   }
 
-  const fontValues = await Promise.all(
-    Object.values(font).map(async (v) => {
-      let fontData = v.data;
-      if (typeof fontData === 'string' && fontData.startsWith('http')) {
-        fontData = await fetchRemoteFontData(fontData);
-      }
-      return pdfDoc.embedFont(fontData, {
-        subset: typeof v.subset === 'undefined' ? true : v.subset,
-      });
-    }),
-  );
+  return pdfFontCache;
+};
 
-  const fontObj = Object.keys(font).reduce(
-    (acc, cur, i) => Object.assign(acc, { [cur]: fontValues[i] }),
-    {} as { [key: string]: PDFFont },
-  );
+const embedAndGetFont = (arg: {
+  pdfDoc: PDFDocument;
+  font: Font;
+  fontName: string;
+  _cache: Map<string | number, unknown>;
+}) => {
+  const { pdfDoc, font, fontName, _cache } = arg;
+  const pdfFontCache = getPdfFontCache(_cache);
+  const cachedFont = pdfFontCache[fontName];
+  if (cachedFont) {
+    return cachedFont;
+  }
 
-  _cache.set(pdfDoc, fontObj);
-  return fontObj;
+  const fontValue = font[fontName];
+  if (!fontValue) {
+    return Promise.reject(new Error(`[@pdfme/schemas] Font "${fontName}" is not found.`));
+  }
+
+  const pdfFontPromise = (async () => {
+    let fontData = fontValue.data;
+    if (typeof fontData === 'string' && fontData.startsWith('http')) {
+      fontData = await fetchRemoteFontData(fontData);
+    }
+    return pdfDoc.embedFont(fontData, {
+      subset: typeof fontValue.subset === 'undefined' ? true : fontValue.subset,
+    });
+  })();
+
+  pdfFontCache[fontName] = pdfFontPromise;
+  return pdfFontPromise;
 };
 
 const getFontProp = ({
@@ -95,21 +112,34 @@ const getFontProp = ({
   };
 };
 
+let graphemeSegmenter: Intl.Segmenter | undefined;
+
+const getGraphemeSegmenter = () => {
+  graphemeSegmenter ??= new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+  return graphemeSegmenter;
+};
+
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const { value, pdfDoc, pdfLib, page, options, schema, _cache } = arg;
   if (!value) return;
 
   const { font = getDefaultFont(), colorType } = options;
-
-  const [pdfFontObj, fontKitFont] = await Promise.all([
-    embedAndGetFontObj({
-      pdfDoc,
-      font,
-      _cache: _cache as unknown as Map<PDFDocument, { [key: string]: PDFFont }>,
-    }),
-    getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>),
-  ]);
+  const fontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+
+  const pdfFontValuePromise = enableInlineMarkdown
+    ? undefined
+    : embedAndGetFont({
+        pdfDoc,
+        font,
+        fontName,
+        _cache,
+      });
+  const fontKitFont = await getFontKitFont(
+    schema.fontName,
+    font,
+    _cache as Map<string, FontKitFont>,
+  );
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
     enableInlineMarkdown && schema.dynamicFontSize
@@ -124,11 +154,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   });
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
-
-  const fontName = (
-    schema.fontName ? schema.fontName : getFallbackFontName(font)
-  ) as keyof typeof pdfFontObj;
-  const pdfFontValue = pdfFontObj && pdfFontObj[fontName];
 
   const pageHeight = page.getHeight();
   const {
@@ -157,7 +182,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       value,
       schema,
       font,
-      pdfFontObj,
+      embedPdfFont: (fontName) => embedAndGetFont({ pdfDoc, font, fontName, _cache }),
       fontKitFont,
       page,
       pdfLib,
@@ -179,6 +204,10 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     });
     return;
   }
+  if (!pdfFontValuePromise) {
+    throw new Error('[@pdfme/schemas] Failed to prepare PDF font for text rendering.');
+  }
+  const pdfFontValue = await pdfFontValuePromise;
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
@@ -191,6 +220,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     fontKitFont,
     boxWidthInPt: width,
   });
+  const needsTextWidth = alignment !== 'left' || Boolean(schema.strikethrough || schema.underline);
+  const needsTextHeight = Boolean(schema.strikethrough || schema.underline);
 
   // Text lines are rendered from the bottom upwards, we need to adjust the position down
   let yOffset = 0;
@@ -207,12 +238,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
   }
 
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-
   lines.forEach((line, rowIndex) => {
     const trimmed = line.replace('\n', '');
-    const textWidth = widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing);
-    const textHeight = heightOfFontAtSize(fontKitFont, fontSize);
+    const textWidth = needsTextWidth
+      ? widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing)
+      : 0;
+    const textHeight = needsTextHeight ? heightOfFontAtSize(fontKitFont, fontSize) : 0;
     const rowYOffset = lineHeight * fontSize * rowIndex;
 
     // Adobe Acrobat Reader shows an error if `drawText` is called with an empty text
@@ -267,6 +298,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     let spacing = characterSpacing;
     if (alignment === 'justify' && line.slice(-1) !== '\n') {
       // if alignment is `justify` but the end of line is not newline, then adjust the spacing
+      const segmenter = getGraphemeSegmenter();
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
       spacing += (width - textWidth) / len;
