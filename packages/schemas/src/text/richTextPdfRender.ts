@@ -39,12 +39,23 @@ const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: n
   getSyntheticBoldWidth(run, fontSize) +
   getSyntheticItalicWidth(run, fontSize);
 
-const getPdfFont = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
+const getPdfFontFromObj = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
   const pdfFont = pdfFontObj[run.fontName];
   if (!pdfFont) {
     throw new Error(`[@pdfme/schemas] Missing embedded font "${run.fontName}".`);
   }
   return pdfFont;
+};
+
+const embedFontsForRuns = async (
+  runs: RichTextLineRun[],
+  embedPdfFont: (fontName: string) => Promise<PDFFont>,
+) => {
+  const fontNames = Array.from(new Set(runs.map((run) => run.fontName)));
+  const pdfFonts = await Promise.all(
+    fontNames.map(async (fontName) => [fontName, await embedPdfFont(fontName)] as const),
+  );
+  return Object.fromEntries(pdfFonts);
 };
 
 const drawDecorationLine = (arg: {
@@ -169,7 +180,7 @@ export const renderInlineMarkdownText = async (arg: {
   value: string;
   schema: TextSchema;
   font: Font;
-  pdfFontObj: Record<string, PDFFont>;
+  embedPdfFont: (fontName: string) => Promise<PDFFont>;
   fontKitFont: FontKitFont;
   page: PDFRenderProps<TextSchema>['page'];
   pdfLib: PDFRenderProps<TextSchema>['pdfLib'];
@@ -193,7 +204,7 @@ export const renderInlineMarkdownText = async (arg: {
     value,
     schema,
     font,
-    pdfFontObj,
+    embedPdfFont,
     fontKitFont,
     page,
     pdfLib,
@@ -221,6 +232,10 @@ export const renderInlineMarkdownText = async (arg: {
     characterSpacing,
     boxWidthInPt: width,
   });
+  const pdfFontObj = await embedFontsForRuns(
+    lines.flatMap((line) => line.runs),
+    embedPdfFont,
+  );
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
@@ -300,7 +315,7 @@ export const renderInlineMarkdownText = async (arg: {
 
     line.runs.reduce((currentX, run, runIndex) => {
       const runWidth = getRunWidth(run, fontSize, spacing);
-      const pdfFont = getPdfFont(run, pdfFontObj);
+      const pdfFont = getPdfFontFromObj(run, pdfFontObj);
       drawRun({
         page,
         pdfLib,

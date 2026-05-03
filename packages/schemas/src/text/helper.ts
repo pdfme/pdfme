@@ -89,18 +89,44 @@ const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: nu
   return (textContent.length - 1) * textCharacterSpacing;
 };
 
+const TEXT_WIDTH_CACHE_LIMIT = 5000;
+const textWidthCache = new WeakMap<FontKitFont, Map<string, number>>();
+
+const getTextWidthCache = (fontKitFont: FontKitFont) => {
+  let cache = textWidthCache.get(fontKitFont);
+  if (!cache) {
+    cache = new Map<string, number>();
+    textWidthCache.set(fontKitFont, cache);
+  }
+  return cache;
+};
+
 export const widthOfTextAtSize = (
   text: string,
   fontKitFont: FontKitFont,
   fontSize: number,
   characterSpacing: number,
 ) => {
+  const cache = getTextWidthCache(fontKitFont);
+  const cacheKey = `${fontSize}\0${characterSpacing}\0${text}`;
+  const cachedWidth = cache.get(cacheKey);
+  if (cachedWidth !== undefined) {
+    return cachedWidth;
+  }
+
   const { glyphs } = fontKitFont.layout(text);
   const scale = 1000 / fontKitFont.unitsPerEm;
   const standardWidth =
     glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
     (fontSize / 1000);
-  return standardWidth + calculateCharacterSpacing(text, characterSpacing);
+  const width = standardWidth + calculateCharacterSpacing(text, characterSpacing);
+
+  if (cache.size >= TEXT_WIDTH_CACHE_LIMIT) {
+    cache.clear();
+  }
+  cache.set(cacheKey, width);
+
+  return width;
 };
 
 const getFallbackFont = (font: Font) => {
@@ -397,6 +423,13 @@ export const splitTextToSize = (arg: {
 };
 export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
+let wordSegmenter: Intl.Segmenter | undefined;
+
+const getWordSegmenter = () => {
+  wordSegmenter ??= new Intl.Segmenter(undefined, { granularity: 'word' });
+  return wordSegmenter;
+};
+
 const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValues): string[] => {
   // nothing to process but need to keep this for new lines.
   if (line.trim() === '') {
@@ -404,7 +437,7 @@ const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValu
   }
 
   const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
-  const segmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
+  const segmenter = getWordSegmenter();
   const iterator = segmenter.segment(line.trimEnd())[Symbol.iterator]();
 
   let lines: string[] = [];
