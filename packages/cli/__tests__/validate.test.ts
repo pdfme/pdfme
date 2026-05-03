@@ -796,7 +796,11 @@ describe('validate command', () => {
             ],
           ],
         },
-        inputs: [{ tasks: ['Install deps', 2] }],
+        inputs: [
+          { tasks: ['Install deps', 2] },
+          { tasks: '["Install deps",{"x":1}]' },
+          { tasks: '{"0":"Install deps"}' },
+        ],
       }),
     );
 

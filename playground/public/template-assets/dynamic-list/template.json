@@ -43,8 +43,6 @@
         "fontColor": "#111827",
         "backgroundColor": "",
         "listStyle": "ordered",
-        "startNumber": 1,
-        "orderedSuffix": ".",
         "markerWidth": 9,
         "markerGap": 2,
         "indentSize": 7,

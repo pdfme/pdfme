@@ -13,8 +13,6 @@ import {
   DEFAULT_MARKER,
   DEFAULT_MARKER_GAP,
   DEFAULT_MARKER_WIDTH,
-  DEFAULT_ORDERED_SUFFIX,
-  DEFAULT_START_NUMBER,
   LIST_STYLE_ORDERED,
   MAX_INDENT_LEVEL,
 } from './constants.js';
@@ -58,17 +56,9 @@ export const serializeListItems = (items: ListItem[]): string => {
   return JSON.stringify(lines);
 };
 
-export const getListMarker = (schema: ListSchema, absoluteIndex: number): string => {
-  if ((schema.listStyle ?? DEFAULT_LIST_STYLE) === LIST_STYLE_ORDERED) {
-    return `${DEFAULT_START_NUMBER + absoluteIndex}${DEFAULT_ORDERED_SUFFIX}`;
-  }
-
-  return schema.marker || DEFAULT_MARKER;
-};
-
 export const getListMarkers = (schema: ListSchema, items: string[]): string[] => {
   if ((schema.listStyle ?? DEFAULT_LIST_STYLE) !== LIST_STYLE_ORDERED) {
-    return items.map(() => schema.marker || DEFAULT_MARKER);
+    return items.map(() => DEFAULT_MARKER);
   }
 
   const counters = Array.from({ length: MAX_INDENT_LEVEL + 1 }, () => 0);
@@ -76,7 +66,7 @@ export const getListMarkers = (schema: ListSchema, items: string[]): string[] =>
     const { level } = parseListItem(rawItem);
     counters[level] += 1;
     counters.fill(0, level + 1);
-    return `${counters[level]}${DEFAULT_ORDERED_SUFFIX}`;
+    return `${counters[level]}.`;
   });
 };
 
@@ -127,7 +117,7 @@ export const calculateListLayout = async (arg: {
       item: item.text,
       itemIndex: startIndex + index,
       level: item.level,
-      marker: markers[index] ?? getListMarker(schema, startIndex + index),
+      marker: markers[index],
       lines,
       height,
       markerX,

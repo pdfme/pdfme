@@ -24,7 +24,6 @@ export const getDynamicLayoutForList = async (
     heights: layout.items.map((item) => item.height),
     avoidFirstUnitOnly: false,
     patchSplitSchema: ({ start, end, isSplit }) => ({
-      __splitRange: { start, end },
       __itemRange: { start, end },
       __isSplit: isSplit,
     }),

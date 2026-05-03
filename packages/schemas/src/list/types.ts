@@ -9,9 +9,6 @@ export type ListRange = {
 
 export type ListSchema = TextSchema & {
   listStyle: LIST_STYLE;
-  marker?: string;
-  startNumber?: number;
-  orderedSuffix?: string;
   markerWidth: number;
   markerGap: number;
   indentSize?: number;

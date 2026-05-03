@@ -319,6 +319,7 @@ export const buildStyledTextContainer = (
 
   const textBlock = document.createElement('div');
   textBlock.id = 'text-' + String(schema.id);
+  textBlock.dataset.pdfmeTextEditor = 'true';
   Object.assign(textBlock.style, textBlockStyle);
 
   container.appendChild(textBlock);

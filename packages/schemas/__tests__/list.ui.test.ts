@@ -36,8 +36,6 @@ const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   fontColor: '#000000',
   backgroundColor: '',
   listStyle: 'ordered',
-  startNumber: 10,
-  orderedSuffix: '.',
   markerWidth: 8,
   markerGap: 2,
   indentSize: 6,
@@ -65,7 +63,7 @@ const i18n = (key: string) =>
 const getRowBody = (row: Element): HTMLElement => row.children[1] as HTMLElement;
 
 const getRowEditor = (row: Element): HTMLElement => {
-  const editor = getRowBody(row).querySelector<HTMLElement>('div[id^="text-"]');
+  const editor = getRowBody(row).querySelector<HTMLElement>('[data-pdfme-text-editor="true"]');
   if (!editor) throw new Error('Unable to find list item editor');
   return editor;
 };

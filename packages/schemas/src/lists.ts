@@ -3,7 +3,6 @@ export {
   normalizeListItems,
   normalizeListItemEntries,
   serializeListItems,
-  getListMarker,
   getListMarkers,
   calculateListLayout,
 } from './list/helper.js';

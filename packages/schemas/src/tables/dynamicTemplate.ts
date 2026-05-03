@@ -105,7 +105,6 @@ export const getDynamicLayoutForTable = async (
     heights,
     avoidFirstUnitOnly: true,
     patchSplitSchema: ({ start, end, isSplit }) => ({
-      __splitRange: { start, end },
       __bodyRange: {
         start: start === 0 ? 0 : start - 1,
         end: end - 1,

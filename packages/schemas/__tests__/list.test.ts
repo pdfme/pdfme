@@ -25,9 +25,6 @@ const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   fontColor: '#000000',
   backgroundColor: '',
   listStyle: 'bullet',
-  marker: '\u2022',
-  startNumber: 1,
-  orderedSuffix: '.',
   markerWidth: 6,
   markerGap: 2,
   indentSize: 6,
@@ -163,7 +160,6 @@ describe('list schema helpers', () => {
         chunkHeight: 10,
       }),
     ).toEqual({
-      __splitRange: { start: 1, end: 3 },
       __itemRange: { start: 1, end: 3 },
       __isSplit: true,
     });
@@ -186,8 +182,6 @@ describe('list schema helpers', () => {
 
     expect(schema.listStyle.span).toBe(24);
     expect(schema.marker).toBeUndefined();
-    expect(schema.startNumber).toBeUndefined();
-    expect(schema.orderedSuffix).toBeUndefined();
     expect(schema.markerWidth.span).toBe(6);
     expect(schema.markerGap.span).toBe(6);
     expect(schema.indentSize.span).toBe(6);

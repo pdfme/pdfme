@@ -880,7 +880,7 @@ function getStringArrayInputIssue(
 
   const parsedValue =
     typeof rawValue === 'string' && hint.expectedInput.acceptsJsonString === true
-      ? (parseListStringArray(rawValue) ?? rawValue)
+      ? (parseListJsonInput(rawValue) ?? rawValue)
       : rawValue;
 
   const issue = getStringArrayShapeIssue(parsedValue);
@@ -1011,18 +1011,18 @@ function parseTableStringMatrix(rawValue: unknown): string[][] | null {
   }
 }
 
-function parseListStringArray(rawValue: unknown): string[] | null {
+function parseListJsonInput(rawValue: unknown): unknown | null {
   if (typeof rawValue !== 'string') {
     return null;
   }
 
   const trimmed = rawValue.trim();
-  if (!trimmed.startsWith('[')) {
+  if (!trimmed.startsWith('[') && !trimmed.startsWith('{')) {
     return null;
   }
 
   try {
-    return JSON.parse(trimmed) as string[];
+    return JSON.parse(trimmed) as unknown;
   } catch {
     return null;
   }

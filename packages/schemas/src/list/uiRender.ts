@@ -26,6 +26,8 @@ const internalFocusDataKey = 'pdfmeListInternalFocus';
 const caretMarker = '\u200B';
 const pendingFocusIndexes = new Map<string, number>();
 
+const getListFocusKey = (schema: ListSchema & { id?: string }) => schema.id || schema.name;
+
 const isComposingKeyboardEvent = (event: KeyboardEvent) =>
   event.isComposing || event.keyCode === 229;
 
@@ -88,7 +90,7 @@ const focusBodyFromMouseEvent = (body: HTMLElement, event: MouseEvent) => {
 };
 
 const getBodyEditor = (body: HTMLElement): HTMLDivElement | null =>
-  body.querySelector<HTMLDivElement>('div[id^="text-"]');
+  body.querySelector<HTMLDivElement>('[data-pdfme-text-editor="true"]');
 
 const insertLineBreakAtSelection = (element: HTMLElement) => {
   const fallbackText = getText(element);
@@ -170,6 +172,7 @@ const createActionButton = (arg: {
 
 export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const { rootElement, schema, value, mode, onChange, stopEditing, tabIndex, placeholder } = arg;
+  const focusKey = getListFocusKey(schema);
   const editable = isEditable(mode, schema);
   const showControls = editable && (mode === 'form' || mode === 'designer');
   const usePlaceholder = editable && !value && Boolean(placeholder);
@@ -222,7 +225,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     if (!onChange) return;
     if (focusIndex !== undefined) {
       rootElement.dataset[focusDataKey] = String(focusIndex);
-      pendingFocusIndexes.set(schema.name, focusIndex);
+      pendingFocusIndexes.set(focusKey, focusIndex);
     }
     onChange({ key: 'content', value: serializeListItems(nextItems) });
   };
@@ -231,7 +234,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     if (!onChange) return;
     if (focusIndex !== undefined) {
       rootElement.dataset[focusDataKey] = String(focusIndex);
-      pendingFocusIndexes.set(schema.name, focusIndex);
+      pendingFocusIndexes.set(focusKey, focusIndex);
     }
     const rawItems = normalizeListItems(serializeListItems(getNextItems()));
     const nextLayout = await calculateListLayout({
@@ -545,9 +548,9 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     appendEmptyListControls();
   }
 
-  const pendingFocusIndex = pendingFocusIndexes.get(schema.name);
+  const pendingFocusIndex = pendingFocusIndexes.get(focusKey);
   if (pendingFocusIndex !== undefined) {
-    pendingFocusIndexes.delete(schema.name);
+    pendingFocusIndexes.delete(focusKey);
   }
   const requestedFocusIndex = Number(rootElement.dataset[focusDataKey] ?? pendingFocusIndex);
   delete rootElement.dataset[focusDataKey];

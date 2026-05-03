@@ -23,8 +23,6 @@ describe('generate list schema', () => {
             fontColor: '#000000',
             backgroundColor: '',
             listStyle: 'ordered',
-            startNumber: 1,
-            orderedSuffix: '.',
             markerWidth: 7,
             markerGap: 2,
             itemSpacing: 1,
