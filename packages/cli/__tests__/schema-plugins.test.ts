@@ -7,6 +7,7 @@ describe('schema plugin discovery', () => {
       expect.arrayContaining([
         'text',
         'multiVariableText',
+        'list',
         'image',
         'signature',
         'table',

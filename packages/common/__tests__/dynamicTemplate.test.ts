@@ -247,6 +247,96 @@ describe('getDynamicTemplate', () => {
       verifyBasicStructure(dynamicTemplate);
       expect(dynamicTemplate.schemas.length).toBeGreaterThan(1);
     });
+
+    test('should apply schema-specific split patches without letting them override layout', async () => {
+      const dynamicTemplate = await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'a',
+                content: '[]',
+                type: 'list',
+                position: { x: 10, y: 60 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input,
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async () => ({
+          heights: [20, 20, 20],
+          patchSplitSchema: ({ start, end, isSplit }) => ({
+            __itemRange: { start, end },
+            __isSplit: isSplit,
+            height: 999,
+            position: { x: 999, y: 999 },
+          }),
+        }),
+      });
+
+      verifyBasicStructure(dynamicTemplate);
+      expect(dynamicTemplate.schemas.length).toBe(2);
+      expect(dynamicTemplate.schemas[0][0].height).toBe(20);
+      expect(dynamicTemplate.schemas[0][0].position).toEqual({ x: 10, y: 60 });
+      expect(dynamicTemplate.schemas[0][0].__itemRange).toEqual({ start: 0, end: 1 });
+      expect(dynamicTemplate.schemas[0][0].__isSplit).toBe(false);
+      expect(dynamicTemplate.schemas[1][0].height).toBe(40);
+      expect(dynamicTemplate.schemas[1][0].position).toEqual({ x: 10, y: 10 });
+      expect(dynamicTemplate.schemas[1][0].__itemRange).toEqual({ start: 1, end: 3 });
+      expect(dynamicTemplate.schemas[1][0].__isSplit).toBe(true);
+    });
+
+    test('should only avoid first-unit-only pages when requested', async () => {
+      const listLikeTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: '[]',
+              type: 'list',
+              position: { x: 10, y: 60 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: listLikeTemplate,
+        input,
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async () => ({
+          heights: [20, 20],
+          avoidFirstUnitOnly: false,
+        }),
+      });
+
+      expect(dynamicTemplate.schemas[0][0].height).toBe(20);
+      expect(dynamicTemplate.schemas[1][0].height).toBe(20);
+
+      const tableLikeTemplate = await getDynamicTemplate({
+        template: listLikeTemplate,
+        input,
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async () => ({
+          heights: [20, 20],
+          avoidFirstUnitOnly: true,
+        }),
+      });
+
+      expect(tableLikeTemplate.schemas[0]).toEqual([]);
+      expect(tableLikeTemplate.schemas[1][0].height).toBe(40);
+      expect(tableLikeTemplate.schemas[1][0].position.y).toBe(10);
+    });
   });
 
   describe('Long page flow (cross-template-page)', () => {

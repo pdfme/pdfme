@@ -5,9 +5,11 @@ import {
   PreviewProps,
   Size,
   getDynamicTemplate,
+  isBlankPdf,
   replacePlaceholders,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
 import StaticSchema from './StaticSchema.js';
@@ -17,10 +19,29 @@ import Paper from './Paper.js';
 import Renderer from './Renderer.js';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
 import { FontContext, OptionsContext } from '../contexts.js';
-import { template2SchemasList, getPagesScrollTopByIndex, useMaxZoom } from '../helper.js';
+import {
+  template2SchemasList,
+  getPagesScrollTopByIndex,
+  useMaxZoom,
+  getDynamicHeightReflowChanges,
+} from '../helper.js';
 import { theme } from 'antd';
 
 const _cache = new Map<string | number, unknown>();
+
+const applySchemaChange = (schema: SchemaForUI, key: string, value: unknown) => {
+  if (key === 'position.x') {
+    schema.position.x = value as number;
+    return;
+  }
+  if (key === 'position.y') {
+    schema.position.y = value as number;
+    return;
+  }
+
+  // @ts-expect-error Dynamic property assignment
+  schema[key] = value;
+};
 
 const Preview = ({
   template,
@@ -95,7 +116,9 @@ const Preview = ({
       getDynamicHeights: (value, args) => {
         switch (args.schema.type) {
           case 'table':
-            return getDynamicHeightsForTable(value, args);
+            return getDynamicLayoutForTable(value, args);
+          case 'list':
+            return getDynamicLayoutForList(value, args);
           default:
             return Promise.resolve([args.schema.height]);
         }
@@ -153,16 +176,27 @@ const Preview = ({
         if (newValue === oldValue) return;
         handleChangeInput({ name: schema.name, value: newValue });
         // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
-        if (schema.type === 'table') {
+        if (schema.type === 'table' || schema.type === 'list') {
           isNeedInit = true;
           newInputValue = newValue;
         }
       } else {
-        const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI;
+        const pageSchemas = schemasList[pageCursor] || [];
+        const targetSchema = pageSchemas.find((s) => s.id === schema.id) as SchemaForUI;
         if (!targetSchema) return;
 
-        // @ts-expect-error Dynamic property assignment
-        targetSchema[_key] = value as string;
+        if (_key === 'height' && isBlankPdf(template.basePdf)) {
+          getDynamicHeightReflowChanges({
+            schemas: pageSchemas,
+            schema: targetSchema,
+            height: value,
+          }).forEach(({ key, value, schemaId }) => {
+            const reflowTarget = pageSchemas.find((s) => s.id === schemaId);
+            if (reflowTarget) applySchemaChange(reflowTarget, key, value);
+          });
+        }
+
+        applySchemaChange(targetSchema, _key, value);
       }
     });
     if (isNeedInit && newInputValue !== undefined) {
@@ -209,13 +243,16 @@ const Preview = ({
           pageSizes={pageSizes}
           backgrounds={backgrounds}
           renderSchema={({ schema, index }) => {
+            const hasInputValue = Boolean(
+              input && Object.prototype.hasOwnProperty.call(input, schema.name),
+            );
             const value = schema.readOnly
               ? replacePlaceholders({
                   content: schema.content || '',
                   variables: { ...input, totalPages: schemasList.length, currentPage: index + 1 },
                   schemas: schemasList,
                 })
-              : String((input && input[schema.name]) || '');
+              : String(hasInputValue ? (input?.[schema.name] ?? '') : '');
             return (
               <Renderer
                 key={schema.id}
@@ -223,7 +260,7 @@ const Preview = ({
                 basePdf={template.basePdf}
                 value={value}
                 mode={isForm ? 'form' : 'viewer'}
-                placeholder={schema.content}
+                placeholder={hasInputValue ? undefined : schema.content}
                 tabIndex={index + 100}
                 onChange={(arg) => {
                   const args = Array.isArray(arg) ? arg : [arg];

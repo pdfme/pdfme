@@ -1,5 +1,5 @@
 import { SchemaForUI, Schema, Template, BLANK_PDF, BasePdf, pluginRegistry } from '@pdfme/common';
-import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas, setFontNameRecursively } from '../src/helper';
+import { uuid, getUniqueSchemaName, schemasList2template, changeSchemas, getDynamicHeightReflowChanges, setFontNameRecursively } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({
@@ -519,6 +519,74 @@ describe('changeSchemas test', () => {
         height: 100,
       },
     ]);
+  });
+});
+
+describe('getDynamicHeightReflowChanges', () => {
+  test('pushes lower schemas down for list auto height changes', () => {
+    const listSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'items',
+      type: 'list',
+      content: '[]',
+      position: { x: 0, y: 20 },
+      height: 10,
+    };
+    const belowSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'below',
+      content: 'below',
+      position: { x: 0, y: 35 },
+      height: 10,
+    };
+    const aboveSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'above',
+      content: 'above',
+      position: { x: 0, y: 5 },
+      height: 10,
+    };
+
+    expect(
+      getDynamicHeightReflowChanges({
+        schemas: [aboveSchema, listSchema, belowSchema],
+        schema: listSchema,
+        height: 25,
+      }),
+    ).toStrictEqual([{ key: 'position.y', value: 50, schemaId: belowSchema.id }]);
+  });
+
+  test('ignores non-list and table schemas', () => {
+    const belowSchema = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'below',
+      content: 'below',
+      position: { x: 0, y: 35 },
+      height: 10,
+    };
+
+    for (const type of ['text', 'table']) {
+      const schema = {
+        id: uuid(),
+        ...getSchema(),
+        name: 'items',
+        type,
+        position: { x: 0, y: 20 },
+        height: 10,
+      };
+
+      expect(
+        getDynamicHeightReflowChanges({
+          schemas: [schema, belowSchema],
+          schema,
+          height: 25,
+        }),
+      ).toStrictEqual([]);
+    }
   });
 });
 

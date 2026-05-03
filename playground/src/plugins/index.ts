@@ -1,6 +1,7 @@
 import {
   multiVariableText,
   text,
+  list,
   barcodes,
   image,
   signature,
@@ -22,6 +23,7 @@ export const getPlugins = () => {
     Text: text,
     'Multi-Variable Text': multiVariableText,
     Table: table,
+    List: list,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,

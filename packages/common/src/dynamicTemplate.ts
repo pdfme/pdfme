@@ -1,4 +1,12 @@
-import { Schema, Template, BasePdf, BlankPdf, CommonOptions } from './types.js';
+import {
+  Schema,
+  Template,
+  BasePdf,
+  BlankPdf,
+  CommonOptions,
+  DynamicLayoutCallbackResult,
+  DynamicLayoutResult,
+} from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
 
 /** Floating point tolerance for comparisons */
@@ -17,14 +25,14 @@ interface ModifyTemplateForDynamicTableArg {
       options: CommonOptions;
       _cache: Map<string | number, unknown>;
     },
-  ) => Promise<number[]>;
+  ) => Promise<DynamicLayoutCallbackResult>;
 }
 
 interface LayoutItem {
   schema: Schema;
   baseY: number;
   height: number;
-  dynamicHeights: number[];
+  dynamicLayout: DynamicLayoutResult;
 }
 
 /** Calculate the content height of a page (drawable area excluding padding) */
@@ -54,7 +62,7 @@ function normalizePageSchemas(
       schema: cloneDeep(schema),
       baseY: localY,
       height: schema.height,
-      dynamicHeights: [schema.height], // Will be updated later
+      dynamicLayout: { heights: [schema.height] }, // Will be updated later
     });
     orderMap.set(schema.name, index);
   });
@@ -71,18 +79,19 @@ function normalizePageSchemas(
 }
 
 /**
- * Place rows on pages, splitting across pages as needed.
+ * Place height units on pages, splitting across pages as needed.
  * @returns The final global Y coordinate after placement
  */
-function placeRowsOnPages(
+function placeUnitsOnPages(
   schema: Schema,
-  dynamicHeights: number[],
+  dynamicLayout: DynamicLayoutResult,
   startGlobalY: number,
   contentHeight: number,
   paddingTop: number,
   pages: Schema[][],
 ): number {
-  let currentRowIndex = 0;
+  const dynamicHeights = dynamicLayout.heights;
+  let currentUnitIndex = 0;
   let currentPageIndex = Math.floor(startGlobalY / contentHeight);
   let currentYInPage = startGlobalY % contentHeight;
 
@@ -91,15 +100,15 @@ function placeRowsOnPages(
   let actualGlobalEndY = 0;
   const isSplittable = dynamicHeights.length > 1;
 
-  while (currentRowIndex < dynamicHeights.length) {
+  while (currentUnitIndex < dynamicHeights.length) {
     // Ensure page exists
     while (pages.length <= currentPageIndex) pages.push([]);
 
     const spaceLeft = contentHeight - currentYInPage;
-    const rowHeight = dynamicHeights[currentRowIndex];
+    const unitHeight = dynamicHeights[currentUnitIndex];
 
-    // If row doesn't fit, move to next page
-    if (rowHeight > spaceLeft + EPSILON) {
+    // If a unit doesn't fit, move to next page
+    if (unitHeight > spaceLeft + EPSILON) {
       const isAtPageStart = Math.abs(spaceLeft - contentHeight) <= EPSILON;
 
       if (!isAtPageStart) {
@@ -107,63 +116,63 @@ function placeRowsOnPages(
         currentYInPage = 0;
         continue;
       }
-      // Force placement for oversized rows that don't fit even on a fresh page
+      // Force placement for oversized units that don't fit even on a fresh page
     }
 
-    // Pack as many rows as possible on this page
+    // Pack as many units as possible on this page
     let chunkHeight = 0;
-    const startRowIndex = currentRowIndex;
+    const startUnitIndex = currentUnitIndex;
 
-    while (currentRowIndex < dynamicHeights.length) {
-      const h = dynamicHeights[currentRowIndex];
+    while (currentUnitIndex < dynamicHeights.length) {
+      const h = dynamicHeights[currentUnitIndex];
       if (currentYInPage + chunkHeight + h <= contentHeight + EPSILON) {
         chunkHeight += h;
-        currentRowIndex++;
+        currentUnitIndex++;
       } else {
         break;
       }
     }
 
-    // Don't leave header alone on a page without any data rows
-    // If only header fits and there are data rows remaining, move everything to next page
+    // Some schemas, such as tables with headers, should not leave the first unit
+    // alone on a page without any following data units.
     // BUT: if already at page top, don't move (prevents infinite loop when data row is too large)
     const isAtPageTop = currentYInPage <= EPSILON;
     if (
+      dynamicLayout.avoidFirstUnitOnly &&
       isSplittable &&
-      startRowIndex === 0 &&
-      currentRowIndex === 1 &&
+      startUnitIndex === 0 &&
+      currentUnitIndex === 1 &&
       dynamicHeights.length > 1 &&
       !isAtPageTop
     ) {
-      currentRowIndex = 0;
+      currentUnitIndex = 0;
       currentPageIndex++;
       currentYInPage = 0;
       continue;
     }
 
-    // Force at least one row to prevent infinite loop
-    if (currentRowIndex === startRowIndex) {
-      chunkHeight += dynamicHeights[currentRowIndex];
-      currentRowIndex++;
+    // Force at least one unit to prevent infinite loop
+    if (currentUnitIndex === startUnitIndex) {
+      chunkHeight += dynamicHeights[currentUnitIndex];
+      currentUnitIndex++;
     }
 
     // Create schema for this chunk
+    const patch =
+      dynamicLayout.patchSplitSchema?.({
+        schema,
+        start: startUnitIndex,
+        end: currentUnitIndex,
+        isSplit: startUnitIndex > 0,
+        chunkHeight,
+      }) ?? {};
+
     const newSchema: Schema = {
       ...schema,
+      ...patch,
       height: chunkHeight,
       position: { ...schema.position, y: currentYInPage + paddingTop },
     };
-
-    // Set bodyRange for splittable elements
-    // dynamicHeights[0] = header row, dynamicHeights[1] = body[0]
-    // So subtract 1 to convert to body index
-    if (isSplittable) {
-      newSchema.__bodyRange = {
-        start: startRowIndex === 0 ? 0 : startRowIndex - 1,
-        end: currentRowIndex - 1,
-      };
-      newSchema.__isSplit = startRowIndex > 0;
-    }
 
     pages[currentPageIndex].push(newSchema);
 
@@ -212,9 +221,9 @@ function processDynamicPage(
   for (const item of items) {
     const currentGlobalStartY = item.baseY + totalYOffset;
 
-    const actualGlobalEndY = placeRowsOnPages(
+    const actualGlobalEndY = placeUnitsOnPages(
       item.schema,
-      item.dynamicHeights,
+      item.dynamicLayout,
       currentGlobalStartY,
       contentHeight,
       paddingTop,
@@ -231,6 +240,14 @@ function processDynamicPage(
 
   return pages;
 }
+
+const normalizeDynamicLayoutResult = (result: DynamicLayoutCallbackResult): DynamicLayoutResult => {
+  const dynamicLayout = Array.isArray(result) ? { heights: result } : result;
+  return {
+    ...dynamicLayout,
+    heights: dynamicLayout.heights.length === 0 ? [0] : dynamicLayout.heights,
+  };
+};
 
 /**
  * Process a template containing tables with dynamic heights
@@ -277,12 +294,12 @@ export const getDynamicTemplate = async (
             basePdf,
             options,
             _cache,
-          }).then((heights) => (heights.length === 0 ? [0] : heights));
+          }).then(normalizeDynamicLayoutResult);
         }),
       );
-      // Update items with calculated heights
+      // Update items with calculated dynamic layouts
       for (let j = 0; j < chunkResults.length; j++) {
-        items[i + j].dynamicHeights = chunkResults[j];
+        items[i + j].dynamicLayout = chunkResults[j];
       }
     }
 

@@ -1,4 +1,12 @@
-import { Schema, BasePdf, BlankPdf, CommonOptions, isBlankPdf } from '@pdfme/common';
+import {
+  Schema,
+  BasePdf,
+  BlankPdf,
+  CommonOptions,
+  DynamicLayoutArgs,
+  DynamicLayoutResult,
+  isBlankPdf,
+} from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBodyWithRange, getBody } from './helper.js';
 import { TableSchema } from './types.js';
@@ -85,4 +93,23 @@ export const getDynamicHeightsForTable = async (
   }
 
   return result;
+};
+
+export const getDynamicLayoutForTable = async (
+  value: string,
+  args: DynamicLayoutArgs,
+): Promise<DynamicLayoutResult> => {
+  const heights = await getDynamicHeightsForTable(value, args);
+
+  return {
+    heights,
+    avoidFirstUnitOnly: true,
+    patchSplitSchema: ({ start, end, isSplit }) => ({
+      __bodyRange: {
+        start: start === 0 ? 0 : start - 1,
+        end: end - 1,
+      },
+      __isSplit: isSplit,
+    }),
+  };
 };

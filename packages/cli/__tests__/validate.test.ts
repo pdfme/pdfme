@@ -732,6 +732,86 @@ describe('validate command', () => {
     );
   });
 
+  it('accepts list input as an array, JSON string array, or newline string', () => {
+    const file = join(TMP, 'job-valid-list.json');
+    const listSchema = {
+      name: 'tasks',
+      type: 'list',
+      position: { x: 20, y: 20 },
+      width: 120,
+      height: 20,
+    };
+    writeFileSync(
+      file,
+      JSON.stringify({
+        template: {
+          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+          schemas: [[listSchema]],
+        },
+        inputs: [
+          { tasks: ['Install deps', 'Run tests'] },
+          { tasks: '["Install deps","Run tests"]' },
+          { tasks: 'Install deps\nRun tests' },
+        ],
+      }),
+    );
+
+    const result = runCli(['validate', file, '--json']);
+    expect(result.exitCode).toBe(0);
+
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.valid).toBe(true);
+  });
+
+  it('marks unified jobs invalid when list array items are not strings', () => {
+    const file = join(TMP, 'job-invalid-list.json');
+    writeFileSync(
+      file,
+      JSON.stringify({
+        template: {
+          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+          schemas: [[
+            {
+              name: 'tasks',
+              type: 'list',
+              position: { x: 20, y: 20 },
+              width: 120,
+              height: 20,
+            },
+          ]],
+        },
+        inputs: [
+          { tasks: ['Install deps', 2] },
+          { tasks: '["Install deps",{"x":1}]' },
+          { tasks: '{"0":"Install deps"}' },
+        ],
+      }),
+    );
+
+    const result = runCli(['validate', file, '--json']);
+    expect(result.exitCode).toBe(1);
+
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.valid).toBe(false);
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Field "tasks" (list)'),
+      ]),
+    );
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Item 2 must be a string'),
+      ]),
+    );
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Received object'),
+      ]),
+    );
+  });
+
   it('marks unified jobs invalid when select input uses a value outside schema options', () => {
     const file = join(TMP, 'job-invalid-select.json');
     writeFileSync(

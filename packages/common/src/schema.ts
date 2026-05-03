@@ -102,6 +102,18 @@ export const Dict = z.object({
   'schemas.select.optionPlaceholder': z.string(),
 
   'schemas.radioGroup.groupName': z.string(),
+
+  'schemas.list.listStyle': z.string(),
+  'schemas.list.bullet': z.string(),
+  'schemas.list.ordered': z.string(),
+  'schemas.list.markerWidth': z.string(),
+  'schemas.list.markerGap': z.string(),
+  'schemas.list.indentSize': z.string(),
+  'schemas.list.itemSpacing': z.string(),
+  'schemas.list.addItem': z.string(),
+  'schemas.list.removeItem': z.string(),
+  'schemas.list.indentItem': z.string(),
+  'schemas.list.outdentItem': z.string(),
 });
 export const Mode = z.enum(['viewer', 'form', 'designer']);
 
@@ -122,6 +134,7 @@ export const Schema = z
     readOnly: z.boolean().optional(),
     required: z.boolean().optional(),
     __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
+    __itemRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __isSplit: z.boolean().optional(),
   })
   .passthrough();

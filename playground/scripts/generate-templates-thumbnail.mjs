@@ -15,6 +15,7 @@ import {
   svg,
   line,
   table,
+  list,
   rectangle,
   ellipse,
   dateTime,
@@ -34,6 +35,7 @@ const readFont = (fileName) => fs.readFileSync(path.join(fontDir, fileName));
 const plugins = {
   multiVariableText,
   text,
+  list,
   qrcode: barcodes.qrcode,
   japanpost: barcodes.japanpost,
   ean13: barcodes.ean13,

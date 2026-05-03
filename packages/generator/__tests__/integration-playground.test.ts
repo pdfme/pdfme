@@ -14,6 +14,7 @@ import {
   ellipse,
   barcodes,
   table,
+  list,
   multiVariableText,
 } from '@pdfme/schemas';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
@@ -98,6 +99,7 @@ describe('generate integration test(playground)', () => {
             ellipse,
             signature,
             table,
+            list,
             multiVariableText,
             ...barcodes,
           },

@@ -36,6 +36,7 @@ export default defineConfig({
       entry: {
         builtins: resolve(__dirname, 'src/builtins.ts'),
         index: resolve(__dirname, 'src/index.ts'),
+        lists: resolve(__dirname, 'src/lists.ts'),
         tables: resolve(__dirname, 'src/tables.ts'),
         utils: resolve(__dirname, 'src/utils.ts'),
       },
