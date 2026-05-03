@@ -1,1 +1,1 @@
-export { getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
+export { getDynamicHeightsForTable, getDynamicLayoutForTable } from './tables/dynamicTemplate.js';

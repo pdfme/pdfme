@@ -7,7 +7,8 @@ import {
   getDynamicTemplate,
   replacePlaceholders,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
 import StaticSchema from './StaticSchema.js';
@@ -95,7 +96,9 @@ const Preview = ({
       getDynamicHeights: (value, args) => {
         switch (args.schema.type) {
           case 'table':
-            return getDynamicHeightsForTable(value, args);
+            return getDynamicLayoutForTable(value, args);
+          case 'list':
+            return getDynamicLayoutForList(value, args);
           default:
             return Promise.resolve([args.schema.height]);
         }
@@ -153,7 +156,7 @@ const Preview = ({
         if (newValue === oldValue) return;
         handleChangeInput({ name: schema.name, value: newValue });
         // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
-        if (schema.type === 'table') {
+        if (schema.type === 'table' || schema.type === 'list') {
           isNeedInit = true;
           newInputValue = newValue;
         }

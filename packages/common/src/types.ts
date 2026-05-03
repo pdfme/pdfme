@@ -248,3 +248,31 @@ export type PreviewProps = Omit<z.infer<typeof PreviewProps>, 'plugins'> & { plu
 export type DesignerProps = Omit<z.infer<typeof DesignerProps>, 'plugins'> & { plugins?: Plugins };
 export type SchemaPageArray = z.infer<typeof SchemaPageArray>;
 export type LegacySchemaPageArray = z.infer<typeof LegacySchemaPageArray>;
+
+export type DynamicLayoutPatchArgs = {
+  schema: Schema;
+  start: number;
+  end: number;
+  isSplit: boolean;
+  chunkHeight: number;
+};
+
+export type DynamicLayoutResult = {
+  heights: number[];
+  avoidFirstUnitOnly?: boolean;
+  patchSplitSchema?: (args: DynamicLayoutPatchArgs) => Partial<Schema>;
+};
+
+export type DynamicLayoutCallbackResult = DynamicLayoutResult | number[];
+
+export type DynamicLayoutArgs = {
+  schema: Schema;
+  basePdf: BasePdf;
+  options: CommonOptions;
+  _cache: Map<string | number, unknown>;
+};
+
+export type GetDynamicLayout = (
+  value: string,
+  args: DynamicLayoutArgs,
+) => Promise<DynamicLayoutCallbackResult>;

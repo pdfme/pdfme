@@ -1,5 +1,6 @@
 import multiVariableText from './multiVariableText/index.js';
 import text from './text/index.js';
+import list from './list/index.js';
 import image from './graphics/image.js';
 import signature from './graphics/signature.js';
 import svg from './graphics/svg.js';
@@ -19,6 +20,7 @@ export {
   // schemas
   text,
   multiVariableText,
+  list,
   image,
   signature,
   svg,
@@ -36,4 +38,5 @@ export {
 };
 
 // Export utility functions
-export { getDynamicHeightsForTable } from './tables.js';
+export { getDynamicHeightsForTable, getDynamicLayoutForTable } from './tables.js';
+export { getDynamicLayoutForList } from './lists.js';

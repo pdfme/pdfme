@@ -1,0 +1,79 @@
+{
+  "author": "pdfme",
+  "schemas": [
+    [
+      {
+        "name": "title",
+        "type": "text",
+        "content": "Dynamic list sample",
+        "position": {
+          "x": 16,
+          "y": 10
+        },
+        "width": 178,
+        "height": 8,
+        "rotate": 0,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 14,
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": ""
+      },
+      {
+        "name": "tasks",
+        "type": "list",
+        "content": "Confirm project goals\nMap the current template\nCollect required fields\nDraft schema names\nDefine list item text\nCheck marker spacing\nReview page padding\nRun the first preview\nAdjust item spacing\nVerify ordered numbering\nTry a bullet style\nEdit values in Form\nGenerate the PDF\nInspect page two\nConfirm next-field pushdown\nTest a longer sentence that wraps onto the next line\nShort item\nAnother wrapped item for layout coverage\nCheck final numbering\nShare the sample",
+        "position": {
+          "x": 18,
+          "y": 24
+        },
+        "width": 174,
+        "height": 24,
+        "rotate": 0,
+        "readOnly": false,
+        "required": false,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 11,
+        "lineHeight": 1.2,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "listStyle": "ordered",
+        "startNumber": 1,
+        "orderedSuffix": ".",
+        "markerWidth": 9,
+        "markerGap": 2,
+        "itemSpacing": 1.5
+      },
+      {
+        "name": "afterList",
+        "type": "text",
+        "content": "This field should move below the generated list pages.",
+        "position": {
+          "x": 18,
+          "y": 58
+        },
+        "width": 174,
+        "height": 14,
+        "rotate": 0,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "lineHeight": 1.2,
+        "characterSpacing": 0,
+        "fontColor": "#374151",
+        "backgroundColor": ""
+      }
+    ]
+  ],
+  "basePdf": {
+    "width": 210,
+    "height": 120,
+    "padding": [14, 14, 14, 14]
+  }
+}

@@ -8,7 +8,8 @@ import {
   pt2mm,
   cloneDeep,
 } from '@pdfme/common';
-import { getDynamicHeightsForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
+import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
 import {
   insertPage,
   preprocessing,
@@ -48,7 +49,9 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
       getDynamicHeights: (value, args) => {
         switch (args.schema.type) {
           case 'table':
-            return getDynamicHeightsForTable(value, args);
+            return getDynamicLayoutForTable(value, args);
+          case 'list':
+            return getDynamicLayoutForList(value, args);
           default:
             return Promise.resolve([args.schema.height]);
         }

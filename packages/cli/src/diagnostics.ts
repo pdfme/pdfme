@@ -40,10 +40,10 @@ export interface FieldInputHint {
   pages: number[];
   required: boolean;
   expectedInput: {
-    kind: 'string' | 'jsonStringObject' | 'enumString' | 'stringMatrix';
+    kind: 'string' | 'jsonStringObject' | 'enumString' | 'stringMatrix' | 'stringArray';
     variableNames?: string[];
     allowedValues?: string[];
-    example?: string | string[][];
+    example?: string | string[] | string[][];
     format?: string;
     canonicalFormat?: string;
     contentKind?: string;
@@ -503,6 +503,20 @@ function buildFieldInputHint(
     };
   }
 
+  if (type === 'list') {
+    return {
+      name: schema.name as string,
+      type,
+      pages: [page],
+      required: schema.required === true,
+      expectedInput: {
+        kind: 'stringArray',
+        example: ['First item', 'Second item'],
+        acceptsJsonString: true,
+      },
+    };
+  }
+
   if (type === 'date' || type === 'time' || type === 'dateTime') {
     const canonicalFormat = getCanonicalDateStoredFormat(type);
 
@@ -655,6 +669,10 @@ function getInputContractIssue(
 
   if (hint.expectedInput.kind === 'stringMatrix') {
     return getStringMatrixInputIssue(hint, input, inputIndex);
+  }
+
+  if (hint.expectedInput.kind === 'stringArray') {
+    return getStringArrayInputIssue(hint, input, inputIndex);
   }
 
   if (isCanonicalDateHint(hint)) {
@@ -848,6 +866,36 @@ function getStringMatrixInputIssue(
   });
 }
 
+function getStringArrayInputIssue(
+  hint: FieldInputHint,
+  input: Record<string, unknown>,
+  inputIndex: number,
+): string | null {
+  const rawValue = input[hint.name];
+  const example = hint.expectedInput.example;
+
+  if (rawValue === undefined || rawValue === '') {
+    return null;
+  }
+
+  const parsedValue =
+    typeof rawValue === 'string' && hint.expectedInput.acceptsJsonString === true
+      ? (parseListStringArray(rawValue) ?? rawValue)
+      : rawValue;
+
+  const issue = getStringArrayShapeIssue(parsedValue);
+  if (!issue) {
+    return null;
+  }
+
+  return buildStringArrayErrorMessage({
+    hint,
+    inputIndex,
+    extra: issue,
+    example,
+  });
+}
+
 function isCanonicalDateHint(hint: FieldInputHint): hint is FieldInputHint & {
   type: 'date' | 'time' | 'dateTime';
   expectedInput: FieldInputHint['expectedInput'] & { canonicalFormat: string };
@@ -923,6 +971,24 @@ function getStringMatrixShapeIssue(value: unknown, expectedColumnCount?: number)
   return null;
 }
 
+function getStringArrayShapeIssue(value: unknown): string | null {
+  if (typeof value === 'string') {
+    return null;
+  }
+
+  if (!Array.isArray(value)) {
+    return `Received ${describeValue(value)}.`;
+  }
+
+  for (let index = 0; index < value.length; index++) {
+    if (typeof value[index] !== 'string') {
+      return `Item ${index + 1} must be a string. Received ${describeValue(value[index])}.`;
+    }
+  }
+
+  return null;
+}
+
 function getFirstArrayLength(rows: unknown[]): number {
   for (const row of rows) {
     if (Array.isArray(row)) {
@@ -940,6 +1006,23 @@ function parseTableStringMatrix(rawValue: unknown): string[][] | null {
 
   try {
     return JSON.parse(rawValue) as string[][];
+  } catch {
+    return null;
+  }
+}
+
+function parseListStringArray(rawValue: unknown): string[] | null {
+  if (typeof rawValue !== 'string') {
+    return null;
+  }
+
+  const trimmed = rawValue.trim();
+  if (!trimmed.startsWith('[')) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(trimmed) as string[];
   } catch {
     return null;
   }
@@ -1054,7 +1137,7 @@ function buildMultiVariableTextErrorMessage(args: {
   hint: FieldInputHint;
   inputIndex: number;
   extra: string;
-  example: string | string[][];
+  example: string | string[] | string[][];
 }): string {
   const variableLabel =
     args.hint.expectedInput.variableNames && args.hint.expectedInput.variableNames.length > 0
@@ -1068,7 +1151,7 @@ function buildEnumStringErrorMessage(args: {
   hint: FieldInputHint;
   inputIndex: number;
   extra: string;
-  example?: string | string[][];
+  example?: string | string[] | string[][];
 }): string {
   const allowedValues = (args.hint.expectedInput.allowedValues ?? []).map((value) =>
     JSON.stringify(value),
@@ -1085,7 +1168,7 @@ function buildStringMatrixErrorMessage(args: {
   hint: FieldInputHint;
   inputIndex: number;
   extra: string;
-  example?: string | string[][];
+  example?: string | string[] | string[][];
 }): string {
   const columnCount = args.hint.expectedInput.columnCount;
   const columnHeaders = args.hint.expectedInput.columnHeaders ?? [];
@@ -1103,6 +1186,22 @@ function buildStringMatrixErrorMessage(args: {
   return `Field "${args.hint.name}" (${args.hint.type}) in input ${args.inputIndex + 1} expects a JSON array of string arrays${columnLabel}.${headerLabel}${exampleLabel}${compatibilityLabel} ${args.extra}`.trim();
 }
 
+function buildStringArrayErrorMessage(args: {
+  hint: FieldInputHint;
+  inputIndex: number;
+  extra: string;
+  example?: string | string[] | string[][];
+}): string {
+  const exampleLabel =
+    args.example !== undefined ? ` Example: ${JSON.stringify(args.example)}.` : '';
+  const compatibilityLabel =
+    args.hint.expectedInput.acceptsJsonString === true
+      ? ' A newline string or JSON string array is also accepted.'
+      : '';
+
+  return `Field "${args.hint.name}" (${args.hint.type}) in input ${args.inputIndex + 1} expects an array of strings.${exampleLabel}${compatibilityLabel} ${args.extra}`.trim();
+}
+
 function buildCanonicalDateErrorMessage(args: {
   hint: FieldInputHint & {
     type: 'date' | 'time' | 'dateTime';
@@ -1110,7 +1209,7 @@ function buildCanonicalDateErrorMessage(args: {
   };
   inputIndex: number;
   extra: string;
-  example?: string | string[][];
+  example?: string | string[] | string[][];
 }): string {
   const displayFormat = args.hint.expectedInput.format;
   const displayLabel =

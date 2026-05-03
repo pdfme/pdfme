@@ -40,6 +40,11 @@ import type {
   UIProps,
   PreviewProps,
   DesignerProps,
+  DynamicLayoutArgs,
+  DynamicLayoutCallbackResult,
+  DynamicLayoutPatchArgs,
+  DynamicLayoutResult,
+  GetDynamicLayout,
 } from './types.js';
 import {
   cloneDeep,
@@ -135,4 +140,9 @@ export type {
   PDFRenderProps,
   UIRenderProps,
   Mode,
+  DynamicLayoutArgs,
+  DynamicLayoutCallbackResult,
+  DynamicLayoutPatchArgs,
+  DynamicLayoutResult,
+  GetDynamicLayout,
 };

@@ -45,6 +45,11 @@
       "import": "./dist/tables.js",
       "default": "./dist/tables.js"
     },
+    "./lists": {
+      "types": "./dist/lists.d.ts",
+      "import": "./dist/lists.js",
+      "default": "./dist/lists.js"
+    },
     "./utils": {
       "types": "./dist/utils.d.ts",
       "import": "./dist/utils.js",
