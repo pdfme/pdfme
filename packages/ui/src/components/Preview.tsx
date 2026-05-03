@@ -5,6 +5,7 @@ import {
   PreviewProps,
   Size,
   getDynamicTemplate,
+  isBlankPdf,
   replacePlaceholders,
 } from '@pdfme/common';
 import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
@@ -18,10 +19,29 @@ import Paper from './Paper.js';
 import Renderer from './Renderer.js';
 import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
 import { FontContext, OptionsContext } from '../contexts.js';
-import { template2SchemasList, getPagesScrollTopByIndex, useMaxZoom } from '../helper.js';
+import {
+  template2SchemasList,
+  getPagesScrollTopByIndex,
+  useMaxZoom,
+  getDynamicHeightReflowChanges,
+} from '../helper.js';
 import { theme } from 'antd';
 
 const _cache = new Map<string | number, unknown>();
+
+const applySchemaChange = (schema: SchemaForUI, key: string, value: unknown) => {
+  if (key === 'position.x') {
+    schema.position.x = value as number;
+    return;
+  }
+  if (key === 'position.y') {
+    schema.position.y = value as number;
+    return;
+  }
+
+  // @ts-expect-error Dynamic property assignment
+  schema[key] = value;
+};
 
 const Preview = ({
   template,
@@ -161,11 +181,22 @@ const Preview = ({
           newInputValue = newValue;
         }
       } else {
-        const targetSchema = schemasList[pageCursor].find((s) => s.id === schema.id) as SchemaForUI;
+        const pageSchemas = schemasList[pageCursor] || [];
+        const targetSchema = pageSchemas.find((s) => s.id === schema.id) as SchemaForUI;
         if (!targetSchema) return;
 
-        // @ts-expect-error Dynamic property assignment
-        targetSchema[_key] = value as string;
+        if (_key === 'height' && isBlankPdf(template.basePdf)) {
+          getDynamicHeightReflowChanges({
+            schemas: pageSchemas,
+            schema: targetSchema,
+            height: value,
+          }).forEach(({ key, value, schemaId }) => {
+            const reflowTarget = pageSchemas.find((s) => s.id === schemaId);
+            if (reflowTarget) applySchemaChange(reflowTarget, key, value);
+          });
+        }
+
+        applySchemaChange(targetSchema, _key, value);
       }
     });
     if (isNeedInit && newInputValue !== undefined) {

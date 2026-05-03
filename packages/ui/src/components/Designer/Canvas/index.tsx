@@ -519,7 +519,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                         schemaId: schema.id,
                       }));
                       const heightChange = args.find(({ key }) => key === 'height');
-                      if (heightChange) {
+                      if (heightChange && isBlankPdf(basePdf)) {
                         changeArgs.push(
                           ...getDynamicHeightReflowChanges({
                             schemas: schemasList[pageCursor] || [],
