@@ -60,16 +60,6 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
     });
 
     const schemas = dynamicTemplate.schemas;
-    // Create a type-safe array of schema names without using Set spread which requires downlevelIteration
-    const schemaNameSet = new Set<string>();
-    schemas.forEach((page: Schema[]) => {
-      page.forEach((schema: Schema) => {
-        if (schema.name) {
-          schemaNameSet.add(schema.name);
-        }
-      });
-    });
-    const schemaNames = Array.from(schemaNameSet);
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
@@ -117,11 +107,19 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         }
       }
 
-      for (let l = 0; l < schemaNames.length; l += 1) {
-        const name = schemaNames[l];
-        const schemaPage = schemas[j] || [];
-        const schema = schemaPage.find((s: Schema) => s.name == name);
-        if (!schema) {
+      // Iterate this page's schemas in their own array order. The previous
+      // implementation looped over a globally-deduplicated `schemaNames` Set
+      // and used `schemaPage.find(s => s.name == name)`, which (a) imposed
+      // page-1's name order on every later page (corrupting z-order when the
+      // same name appeared on multiple pages) and (b) silently dropped all
+      // but the first within-page same-named schema. pdfme.generate's input
+      // model already collapses by name (Set), so sharing a name across or
+      // within pages is the documented way to bind one input row to many
+      // visible fields — render order must follow each page's own schemas.
+      const schemaPage = schemas[j] || [];
+      for (let l = 0; l < schemaPage.length; l += 1) {
+        const schema = schemaPage[l];
+        if (!schema.name) {
           continue;
         }
 
@@ -135,7 +133,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
               variables: { ...input, totalPages: basePages.length, currentPage: j + 1 },
               schemas: schemas, // Use the properly typed schemas variable
             })
-          : ((input[name] || '') as string);
+          : ((input[schema.name] || '') as string);
 
         schema.position = {
           x: schema.position.x + boundingBoxLeft,
