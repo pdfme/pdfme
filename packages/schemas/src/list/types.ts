@@ -14,16 +14,26 @@ export type ListSchema = TextSchema & {
   orderedSuffix?: string;
   markerWidth: number;
   markerGap: number;
+  indentSize?: number;
   itemSpacing: number;
   __itemRange?: ListRange;
+};
+
+export type ListItem = {
+  text: string;
+  level: number;
 };
 
 export type ListItemLayout = {
   item: string;
   itemIndex: number;
+  level: number;
   marker: string;
   lines: string[];
   height: number;
+  markerX: number;
+  bodyX: number;
+  bodyWidth: number;
 };
 
 export type ListLayout = {
@@ -31,5 +41,5 @@ export type ListLayout = {
   totalHeight: number;
   markerWidth: number;
   markerGap: number;
-  bodyWidth: number;
+  indentSize: number;
 };

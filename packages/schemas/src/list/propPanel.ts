@@ -2,6 +2,7 @@ import type { PropPanel, PropPanelSchema, PropPanelWidgetProps } from '@pdfme/co
 import { propPanel as parentPropPanel } from '../text/propPanel.js';
 import type { ListSchema } from './types.js';
 import {
+  DEFAULT_INDENT_SIZE,
   DEFAULT_ITEM_SPACING,
   DEFAULT_LIST_STYLE,
   DEFAULT_MARKER,
@@ -71,6 +72,13 @@ export const propPanel: PropPanel<ListSchema> = {
         props: { min: 0 },
         span: 8,
       },
+      indentSize: {
+        title: 'Indent Size',
+        type: 'number',
+        widget: 'inputNumber',
+        props: { min: 0 },
+        span: 8,
+      },
       itemSpacing: {
         title: 'Item Spacing',
         type: 'number',
@@ -93,6 +101,7 @@ export const propPanel: PropPanel<ListSchema> = {
     orderedSuffix: DEFAULT_ORDERED_SUFFIX,
     markerWidth: DEFAULT_MARKER_WIDTH,
     markerGap: DEFAULT_MARKER_GAP,
+    indentSize: DEFAULT_INDENT_SIZE,
     itemSpacing: DEFAULT_ITEM_SPACING,
     dynamicFontSize: undefined,
     verticalAlignment: 'top',

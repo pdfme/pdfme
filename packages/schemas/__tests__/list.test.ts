@@ -3,7 +3,9 @@ import {
   calculateListLayout,
   getDynamicLayoutForList,
   getListMarker,
+  normalizeListItemEntries,
   normalizeListItems,
+  serializeListItems,
 } from '../src/lists.js';
 import type { ListSchema } from '../src/lists.js';
 
@@ -27,6 +29,7 @@ const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   orderedSuffix: '.',
   markerWidth: 6,
   markerGap: 2,
+  indentSize: 6,
   itemSpacing: 1,
   ...overrides,
 });
@@ -42,6 +45,17 @@ describe('list schema helpers', () => {
     expect(normalizeListItems('')).toEqual([]);
     expect(normalizeListItems(null)).toEqual([]);
     expect(normalizeListItems(123)).toEqual(['123']);
+  });
+
+  test('parses and serializes tab-indented list items', () => {
+    const items = normalizeListItemEntries('Install deps\n\tRun tests\n\t\tFix failures');
+
+    expect(items).toEqual([
+      { level: 0, text: 'Install deps' },
+      { level: 1, text: 'Run tests' },
+      { level: 2, text: 'Fix failures' },
+    ]);
+    expect(serializeListItems(items)).toBe('Install deps\n\tRun tests\n\t\tFix failures');
   });
 
   test('builds ordered markers from the absolute item index', () => {
@@ -73,6 +87,23 @@ describe('list schema helpers', () => {
         schema.itemSpacing,
     );
     expect(layout.items[1].height).toBeCloseTo(pt2mm(schema.fontSize * schema.lineHeight));
+  });
+
+  test('applies item indentation to marker and body positions', async () => {
+    const schema = getListSchema({ width: 80, markerWidth: 6, markerGap: 2, indentSize: 5 });
+    const layout = await calculateListLayout({
+      schema,
+      items: ['Parent', '\tChild'],
+      startIndex: 0,
+      options: { font: getDefaultFont() },
+      _cache: new Map(),
+    });
+
+    expect(layout.items[0].markerX).toBe(0);
+    expect(layout.items[0].bodyX).toBe(8);
+    expect(layout.items[1].markerX).toBe(5);
+    expect(layout.items[1].bodyX).toBe(13);
+    expect(layout.items[1].bodyWidth).toBe(67);
   });
 
   test('returns split metadata for dynamic list layout', async () => {

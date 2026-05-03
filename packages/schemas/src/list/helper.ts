@@ -5,8 +5,9 @@ import {
   DEFAULT_LINE_HEIGHT,
 } from '../text/constants.js';
 import { getFontKitFont, splitTextToSize } from '../text/helper.js';
-import type { ListItemLayout, ListLayout, ListSchema } from './types.js';
+import type { ListItem, ListItemLayout, ListLayout, ListSchema } from './types.js';
 import {
+  DEFAULT_INDENT_SIZE,
   DEFAULT_ITEM_SPACING,
   DEFAULT_LIST_STYLE,
   DEFAULT_MARKER,
@@ -15,6 +16,7 @@ import {
   DEFAULT_ORDERED_SUFFIX,
   DEFAULT_START_NUMBER,
   LIST_STYLE_ORDERED,
+  MAX_INDENT_LEVEL,
 } from './constants.js';
 
 export const normalizeListItems = (value: unknown): string[] => {
@@ -37,6 +39,20 @@ export const normalizeListItems = (value: unknown): string[] => {
   return value.split(/\r\n|\r|\n/g);
 };
 
+export const parseListItem = (value: string): ListItem => {
+  const indent = value.match(/^\t+/)?.[0].length ?? 0;
+  return {
+    level: Math.min(indent, MAX_INDENT_LEVEL),
+    text: value.slice(indent),
+  };
+};
+
+export const normalizeListItemEntries = (value: unknown): ListItem[] =>
+  normalizeListItems(value).map(parseListItem);
+
+export const serializeListItems = (items: ListItem[]): string =>
+  items.map((item) => `${'\t'.repeat(Math.max(0, item.level))}${item.text}`).join('\n');
+
 export const getListMarker = (schema: ListSchema, absoluteIndex: number): string => {
   if ((schema.listStyle ?? DEFAULT_LIST_STYLE) === LIST_STYLE_ORDERED) {
     const startNumber = schema.startNumber ?? DEFAULT_START_NUMBER;
@@ -57,7 +73,7 @@ export const calculateListLayout = async (arg: {
   const { schema, items, startIndex, options, _cache } = arg;
   const markerWidth = schema.markerWidth ?? DEFAULT_MARKER_WIDTH;
   const markerGap = schema.markerGap ?? DEFAULT_MARKER_GAP;
-  const bodyWidth = Math.max(schema.width - markerWidth - markerGap, 0);
+  const indentSize = schema.indentSize ?? DEFAULT_INDENT_SIZE;
   const font = options.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(
     schema.fontName,
@@ -71,9 +87,13 @@ export const calculateListLayout = async (arg: {
   const itemSpacing = schema.itemSpacing ?? DEFAULT_ITEM_SPACING;
   const lineHeightMm = pt2mm(fontSize * lineHeight);
 
-  const layoutItems: ListItemLayout[] = items.map((item, index) => {
+  const layoutItems: ListItemLayout[] = items.map((rawItem, index) => {
+    const item = parseListItem(rawItem);
+    const markerX = item.level * indentSize;
+    const bodyX = markerX + markerWidth + markerGap;
+    const bodyWidth = Math.max(schema.width - bodyX, 0);
     const lines = splitTextToSize({
-      value: item,
+      value: item.text,
       characterSpacing,
       boxWidthInPt: mm2pt(Math.max(bodyWidth, 0.1)),
       fontSize,
@@ -83,11 +103,15 @@ export const calculateListLayout = async (arg: {
       Math.max(lines.length, 1) * lineHeightMm + (index === items.length - 1 ? 0 : itemSpacing);
 
     return {
-      item,
+      item: item.text,
       itemIndex: startIndex + index,
+      level: item.level,
       marker: getListMarker(schema, startIndex + index),
       lines,
       height,
+      markerX,
+      bodyX,
+      bodyWidth,
     };
   });
 
@@ -96,6 +120,6 @@ export const calculateListLayout = async (arg: {
     totalHeight: layoutItems.reduce((sum, item) => sum + item.height, 0),
     markerWidth,
     markerGap,
-    bodyWidth,
+    indentSize,
   };
 };

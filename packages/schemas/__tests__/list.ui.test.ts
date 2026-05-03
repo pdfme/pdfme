@@ -39,6 +39,7 @@ const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
   orderedSuffix: '.',
   markerWidth: 8,
   markerGap: 2,
+  indentSize: 6,
   itemSpacing: 1,
   ...overrides,
 });
@@ -95,6 +96,100 @@ describe('list UI rendering', () => {
     expect(onChange).toHaveBeenCalledWith({
       key: 'content',
       value: 'One\nUpdated two\nThree\nFour',
+    });
+  });
+
+  test('adds, removes, indents, and outdents items in form mode', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo\nThree',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const secondRow = rows[1];
+
+    secondRow.querySelector<HTMLButtonElement>('button[title="Indent item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\n\tTwo\nThree',
+    });
+
+    onChange.mockClear();
+    secondRow.querySelector<HTMLButtonElement>('button[title="Add item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\nTwo\n\nThree',
+    });
+
+    onChange.mockClear();
+    secondRow.querySelector<HTMLButtonElement>('button[title="Remove item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\nThree',
+    });
+
+    await uiRender({
+      value: 'One\n\tTwo\nThree',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const indentedRows = Array.from(rootElement.children) as HTMLDivElement[];
+    onChange.mockClear();
+    indentedRows[1].querySelector<HTMLButtonElement>('button[title="Outdent item"]')?.click();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\nTwo\nThree',
+    });
+  });
+
+  test('supports keyboard shortcuts for adding and indenting items', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const firstBody = rows[0].children[1] as HTMLElement;
+
+    firstBody.dispatchEvent(
+      new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+    );
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\n\nTwo',
+    });
+
+    onChange.mockClear();
+    firstBody.dispatchEvent(
+      new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
+    );
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: '\tOne\nTwo',
     });
   });
 });

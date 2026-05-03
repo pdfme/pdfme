@@ -10,8 +10,16 @@ import {
   DEFAULT_LINE_HEIGHT,
   PLACEHOLDER_FONT_COLOR,
 } from '../text/constants.js';
-import type { ListSchema } from './types.js';
-import { calculateListLayout, normalizeListItems } from './helper.js';
+import type { ListItem, ListSchema } from './types.js';
+import {
+  calculateListLayout,
+  normalizeListItemEntries,
+  normalizeListItems,
+  serializeListItems,
+} from './helper.js';
+import { MAX_INDENT_LEVEL } from './constants.js';
+
+const focusDataKey = 'pdfmeListFocusIndex';
 
 const getText = (element: HTMLElement): string => {
   let text = element.innerText;
@@ -25,12 +33,63 @@ const setStyles = (element: HTMLElement, styles: CSS.Properties) => {
   Object.assign(element.style, styles);
 };
 
+const focusBody = (body: HTMLDivElement) => {
+  body.focus();
+  const selection = window.getSelection();
+  const range = document.createRange();
+  if (selection && range) {
+    range.selectNodeContents(body);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+};
+
+const createActionButton = (arg: {
+  label: string;
+  title: string;
+  disabled?: boolean;
+  onClick: () => void;
+}) => {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.innerText = arg.label;
+  button.title = arg.title;
+  button.disabled = Boolean(arg.disabled);
+  setStyles(button, {
+    width: '18px',
+    height: '18px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0',
+    border: '1px solid #d9d9d9',
+    borderRadius: '3px',
+    background: '#ffffff',
+    color: '#333333',
+    fontSize: '11px',
+    lineHeight: '1',
+    cursor: arg.disabled ? 'not-allowed' : 'pointer',
+    opacity: arg.disabled ? 0.45 : 1,
+  });
+  button.addEventListener('mousedown', (event) => {
+    event.preventDefault();
+  });
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!arg.disabled) arg.onClick();
+  });
+  return button;
+};
+
 export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const { rootElement, schema, value, mode, onChange, stopEditing, tabIndex, placeholder } = arg;
   const editable = isEditable(mode, schema);
   const usePlaceholder = editable && !value && Boolean(placeholder);
   const sourceValue = usePlaceholder ? placeholder || '' : value;
   const items = normalizeListItems(sourceValue);
+  const originalItems = normalizeListItemEntries(value);
   const range = schema.__itemRange ?? { start: 0, end: items.length };
   const visibleItems = items.slice(range.start, range.end);
   const renderItems = visibleItems.length > 0 ? visibleItems : editable ? [''] : [];
@@ -57,8 +116,45 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   if (schema.strikethrough) textDecorations.push('line-through');
   if (schema.underline) textDecorations.push('underline');
 
+  const getEditedItems = (): ListItem[] =>
+    layout.items.map((item, index) => ({
+      level: item.level,
+      text: getText(bodyElements[index]),
+    }));
+
+  const getNextItems = () => {
+    const editedItems = getEditedItems();
+    if (usePlaceholder) return editedItems;
+
+    const nextItems = [...originalItems];
+    nextItems.splice(range.start, visibleItems.length, ...editedItems);
+    return nextItems;
+  };
+
+  const commitItems = (nextItems: ListItem[], focusIndex?: number) => {
+    if (!onChange) return;
+    if (focusIndex !== undefined) {
+      rootElement.dataset[focusDataKey] = String(focusIndex);
+    }
+    onChange({ key: 'content', value: serializeListItems(nextItems) });
+  };
+
+  const updateItems = (
+    rowIndex: number,
+    mutate: (nextItems: ListItem[], itemIndex: number) => number | undefined,
+  ) => {
+    const nextItems = getNextItems();
+    if (nextItems.length === 0) {
+      nextItems.push({ level: 0, text: '' });
+    }
+    const itemIndex = Math.min(Math.max(range.start + rowIndex, 0), nextItems.length - 1);
+    const focusIndex = mutate(nextItems, itemIndex);
+    commitItems(nextItems, focusIndex);
+  };
+
   let offsetY = 0;
-  for (const item of layout.items) {
+  for (let index = 0; index < layout.items.length; index += 1) {
+    const item = layout.items[index];
     const row = document.createElement('div');
     setStyles(row, {
       position: 'absolute',
@@ -73,7 +169,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     setStyles(marker, {
       position: 'absolute',
       top: '0mm',
-      left: '0mm',
+      left: `${item.markerX}mm`,
       width: `${layout.markerWidth}mm`,
       height: '100%',
       color: schema.fontColor || DEFAULT_FONT_COLOR,
@@ -93,8 +189,8 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     setStyles(body, {
       position: 'absolute',
       top: '0mm',
-      left: `${layout.markerWidth + layout.markerGap}mm`,
-      width: `${layout.bodyWidth}mm`,
+      left: `${item.bodyX}mm`,
+      width: `${item.bodyWidth}mm`,
       minHeight: '100%',
       color: usePlaceholder ? PLACEHOLDER_FONT_COLOR : schema.fontColor || DEFAULT_FONT_COLOR,
       fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
@@ -121,34 +217,133 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
       });
       body.addEventListener('blur', () => {
         if (!onChange) return;
-        const editedItems = bodyElements.map(getText);
-        const nextItems = usePlaceholder ? editedItems : [...items];
-        if (!usePlaceholder) {
-          nextItems.splice(range.start, visibleItems.length, ...editedItems);
-        }
-        onChange({ key: 'content', value: nextItems.join('\n') });
+        commitItems(getNextItems());
         if (stopEditing) stopEditing();
+      });
+      body.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          updateItems(index, (nextItems, itemIndex) => {
+            nextItems.splice(itemIndex + 1, 0, {
+              level: nextItems[itemIndex]?.level ?? 0,
+              text: '',
+            });
+            return itemIndex + 1;
+          });
+        } else if (event.key === 'Tab') {
+          event.preventDefault();
+          updateItems(index, (nextItems, itemIndex) => {
+            const itemToUpdate = nextItems[itemIndex];
+            itemToUpdate.level = event.shiftKey
+              ? Math.max(itemToUpdate.level - 1, 0)
+              : Math.min(itemToUpdate.level + 1, MAX_INDENT_LEVEL);
+            return itemIndex;
+          });
+        } else if (event.key === 'Backspace' && getText(body) === '') {
+          event.preventDefault();
+          updateItems(index, (nextItems, itemIndex) => {
+            if (nextItems.length <= 1) {
+              nextItems.splice(0);
+              return undefined;
+            }
+            nextItems.splice(itemIndex, 1);
+            return Math.min(itemIndex, nextItems.length - 1);
+          });
+        }
       });
       bodyElements.push(body);
     }
 
     row.appendChild(marker);
     row.appendChild(body);
+    if (editable && mode === 'form') {
+      const controls = document.createElement('div');
+      setStyles(controls, {
+        position: 'absolute',
+        top: '0mm',
+        right: '-82px',
+        display: 'flex',
+        gap: '2px',
+      });
+      controls.appendChild(
+        createActionButton({
+          label: '+',
+          title: 'Add item',
+          onClick: () => {
+            updateItems(index, (nextItems, itemIndex) => {
+              nextItems.splice(itemIndex + 1, 0, {
+                level: nextItems[itemIndex]?.level ?? 0,
+                text: '',
+              });
+              return itemIndex + 1;
+            });
+          },
+        }),
+      );
+      controls.appendChild(
+        createActionButton({
+          label: '-',
+          title: 'Remove item',
+          onClick: () => {
+            updateItems(index, (nextItems, itemIndex) => {
+              if (nextItems.length <= 1) {
+                nextItems.splice(0);
+                return undefined;
+              }
+              nextItems.splice(itemIndex, 1);
+              return Math.min(itemIndex, nextItems.length - 1);
+            });
+          },
+        }),
+      );
+      controls.appendChild(
+        createActionButton({
+          label: '<',
+          title: 'Outdent item',
+          disabled: item.level === 0,
+          onClick: () => {
+            updateItems(index, (nextItems, itemIndex) => {
+              nextItems[itemIndex].level = Math.max(nextItems[itemIndex].level - 1, 0);
+              return itemIndex;
+            });
+          },
+        }),
+      );
+      controls.appendChild(
+        createActionButton({
+          label: '>',
+          title: 'Indent item',
+          disabled: item.level >= MAX_INDENT_LEVEL,
+          onClick: () => {
+            updateItems(index, (nextItems, itemIndex) => {
+              nextItems[itemIndex].level = Math.min(
+                nextItems[itemIndex].level + 1,
+                MAX_INDENT_LEVEL,
+              );
+              return itemIndex;
+            });
+          },
+        }),
+      );
+      row.appendChild(controls);
+    }
     rootElement.appendChild(row);
     offsetY += item.height;
   }
 
-  if (editable && mode === 'designer' && bodyElements[0]) {
+  const requestedFocusIndex = Number(rootElement.dataset[focusDataKey]);
+  delete rootElement.dataset[focusDataKey];
+  const relativeFocusIndex = requestedFocusIndex - range.start;
+
+  if (
+    editable &&
+    Number.isFinite(requestedFocusIndex) &&
+    bodyElements[relativeFocusIndex]
+  ) {
+    setTimeout(() => focusBody(bodyElements[relativeFocusIndex]));
+  } else if (editable && mode === 'designer' && bodyElements[0]) {
     setTimeout(() => {
-      bodyElements[0].focus();
-      const selection = window.getSelection();
-      const range = document.createRange();
-      if (selection && range) {
-        range.selectNodeContents(bodyElements[0]);
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+      focusBody(bodyElements[0]);
     });
   }
 

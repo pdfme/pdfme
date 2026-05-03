@@ -1,6 +1,13 @@
 export { getDynamicLayoutForList } from './list/dynamicTemplate.js';
-export { normalizeListItems, getListMarker, calculateListLayout } from './list/helper.js';
+export {
+  normalizeListItems,
+  normalizeListItemEntries,
+  serializeListItems,
+  getListMarker,
+  calculateListLayout,
+} from './list/helper.js';
 export type {
+  ListItem,
   ListSchema,
   ListLayout,
   ListItemLayout,

@@ -43,7 +43,7 @@ export const pdfRender = async (arg: PDFRenderProps<ListSchema>) => {
       schema: {
         ...schema,
         type: 'text',
-        position: { x: schema.position.x, y },
+        position: { x: schema.position.x + item.markerX, y },
         width: layout.markerWidth,
         height: item.height,
         backgroundColor: '',
@@ -60,10 +60,10 @@ export const pdfRender = async (arg: PDFRenderProps<ListSchema>) => {
         ...schema,
         type: 'text',
         position: {
-          x: schema.position.x + layout.markerWidth + layout.markerGap,
+          x: schema.position.x + item.bodyX,
           y,
         },
-        width: layout.bodyWidth,
+        width: item.bodyWidth,
         height: item.height,
         backgroundColor: '',
         verticalAlignment: 'top',

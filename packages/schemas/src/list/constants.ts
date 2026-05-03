@@ -8,4 +8,6 @@ export const DEFAULT_START_NUMBER = 1;
 export const DEFAULT_ORDERED_SUFFIX = '.';
 export const DEFAULT_MARKER_WIDTH = 6;
 export const DEFAULT_MARKER_GAP = 2;
+export const DEFAULT_INDENT_SIZE = 6;
 export const DEFAULT_ITEM_SPACING = 1;
+export const MAX_INDENT_LEVEL = 8;
