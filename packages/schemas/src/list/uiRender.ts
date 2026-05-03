@@ -22,12 +22,13 @@ import { MAX_INDENT_LEVEL } from './constants.js';
 const focusDataKey = 'pdfmeListFocusIndex';
 const actionDataKey = 'pdfmeListAction';
 const internalFocusDataKey = 'pdfmeListInternalFocus';
+const caretMarker = '\u200B';
 
 const isComposingKeyboardEvent = (event: KeyboardEvent) =>
   event.isComposing || event.keyCode === 229;
 
 const getText = (element: HTMLElement): string => {
-  let text = element.innerText;
+  let text = element.innerText.replace(/\u200B/g, '');
   if (text.endsWith('\n')) {
     text = text.slice(0, -1);
   }
@@ -78,6 +79,23 @@ const focusBodyFromMouseEvent = (body: HTMLDivElement, event: MouseEvent) => {
   const selection = window.getSelection();
   if (!selection) return;
 
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+
+const insertLineBreakAtSelection = () => {
+  const selection = window.getSelection();
+  if (!selection?.rangeCount) return;
+
+  selection.deleteFromDocument();
+  const range = selection.getRangeAt(0);
+  const fragment = document.createDocumentFragment();
+  const lineBreak = document.createElement('br');
+  const marker = document.createTextNode(caretMarker);
+  fragment.append(lineBreak, marker);
+  range.insertNode(fragment);
+  range.setStart(marker, marker.length);
+  range.collapse(true);
   selection.removeAllRanges();
   selection.addRange(range);
 };
@@ -330,13 +348,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
         if (event.key === 'Enter') {
           if (isComposingKeyboardEvent(event)) return;
           event.preventDefault();
-          updateItems(index, (nextItems, itemIndex) => {
-            nextItems.splice(itemIndex + 1, 0, {
-              level: nextItems[itemIndex]?.level ?? 0,
-              text: '',
-            });
-            return itemIndex + 1;
-          });
+          insertLineBreakAtSelection();
         } else if (event.key === 'Tab') {
           event.preventDefault();
           updateItems(index, (nextItems, itemIndex) => {

@@ -231,7 +231,7 @@ describe('list UI rendering', () => {
     );
   });
 
-  test('supports keyboard shortcuts for adding and indenting items', async () => {
+  test('keeps Enter as an in-item line break and supports Tab indentation', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
 
@@ -250,16 +250,38 @@ describe('list UI rendering', () => {
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     const firstBody = rows[0].children[1] as HTMLElement;
 
-    firstBody.dispatchEvent(
-      new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
-    );
+    onChange.mockClear();
+    const enter = new window.KeyboardEvent('keydown', {
+      key: 'Enter',
+      bubbles: true,
+      cancelable: true,
+    });
+    expect(firstBody.dispatchEvent(enter)).toBe(false);
+    expect(enter.defaultPrevented).toBe(true);
+    firstBody.innerText = 'One\n\u200Bcontinued';
+    firstBody.dispatchEvent(new window.FocusEvent('blur'));
+
     expect(onChange).toHaveBeenLastCalledWith({
       key: 'content',
-      value: 'One\n\nTwo',
+      value: '["One\\ncontinued","Two"]',
     });
 
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    const rerenderedRows = Array.from(rootElement.children) as HTMLDivElement[];
+    const rerenderedFirstBody = rerenderedRows[0].children[1] as HTMLElement;
     onChange.mockClear();
-    firstBody.dispatchEvent(
+    rerenderedFirstBody.dispatchEvent(
       new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
     );
     expect(onChange).toHaveBeenLastCalledWith({
@@ -268,7 +290,7 @@ describe('list UI rendering', () => {
     });
   });
 
-  test('does not add a row when Enter confirms IME composition', async () => {
+  test('does not intercept Enter while confirming IME composition', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
 
@@ -414,7 +436,7 @@ describe('list UI rendering', () => {
     });
   });
 
-  test('keeps designer edit mode when adding a row with Enter', async () => {
+  test('keeps designer edit mode when pressing Enter inside an item', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
     const stopEditing = vi.fn();
@@ -439,12 +461,8 @@ describe('list UI rendering', () => {
     firstBody.dispatchEvent(
       new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
     );
-    firstBody.dispatchEvent(new window.FocusEvent('blur'));
 
     expect(stopEditing).not.toHaveBeenCalled();
-    expect(onChange).toHaveBeenLastCalledWith({
-      key: 'content',
-      value: 'One\n\nTwo',
-    });
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
