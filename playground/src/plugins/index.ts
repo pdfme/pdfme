@@ -21,9 +21,9 @@ import {
 export const getPlugins = () => {
   return {
     Text: text,
-    List: list,
     'Multi-Variable Text': multiVariableText,
     Table: table,
+    List: list,
     Line: line,
     Rectangle: rectangle,
     Ellipse: ellipse,
