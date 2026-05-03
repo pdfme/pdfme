@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import { isEditable } from '../utils.js';
-import { makeElementPlainTextContentEditable } from '../text/uiRender.js';
+import { uiRender as textUiRender } from '../text/uiRender.js';
 import {
   DEFAULT_ALIGNMENT,
   DEFAULT_CHARACTER_SPACING,
@@ -10,6 +10,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   PLACEHOLDER_FONT_COLOR,
 } from '../text/constants.js';
+import type { TextSchema } from '../text/types.js';
 import type { ListItem, ListSchema } from './types.js';
 import {
   calculateListLayout,
@@ -39,7 +40,7 @@ const setStyles = (element: HTMLElement, styles: CSS.Properties) => {
   Object.assign(element.style, styles);
 };
 
-const focusBody = (body: HTMLDivElement) => {
+const focusBody = (body: HTMLElement) => {
   body.focus();
   const selection = window.getSelection();
   const range = document.createRange();
@@ -70,7 +71,7 @@ const getCaretRangeFromPoint = (x: number, y: number): Range | null => {
   return range;
 };
 
-const focusBodyFromMouseEvent = (body: HTMLDivElement, event: MouseEvent) => {
+const focusBodyFromMouseEvent = (body: HTMLElement, event: MouseEvent) => {
   body.focus();
 
   const range = getCaretRangeFromPoint(event.clientX, event.clientY);
@@ -82,6 +83,9 @@ const focusBodyFromMouseEvent = (body: HTMLDivElement, event: MouseEvent) => {
   selection.removeAllRanges();
   selection.addRange(range);
 };
+
+const getBodyEditor = (body: HTMLElement): HTMLDivElement | null =>
+  body.querySelector<HTMLDivElement>('div[id^="text-"]');
 
 const insertLineBreakAtSelection = () => {
   const selection = window.getSelection();
@@ -229,7 +233,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     event.stopPropagation();
   };
 
-  const handleBodyMouseDown = (body: HTMLDivElement, event: MouseEvent) => {
+  const handleBodyMouseDown = (body: HTMLElement, event: MouseEvent) => {
     handleInternalFocusPointer(event);
     focusBodyFromMouseEvent(body, event);
   };
@@ -293,58 +297,82 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     });
 
     const body = document.createElement('div');
-    body.innerText = item.item;
     setStyles(body, {
       position: 'absolute',
       top: '0mm',
       left: `${item.bodyX}mm`,
       width: `${item.bodyWidth}mm`,
-      minHeight: '100%',
-      color: usePlaceholder ? PLACEHOLDER_FONT_COLOR : schema.fontColor || DEFAULT_FONT_COLOR,
-      fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
-      fontSize: `${schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
-      letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
-      lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-      textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-      whiteSpace: 'pre-wrap',
-      wordBreak: 'break-word',
-      outline: 'none',
+      height: `${item.height}mm`,
       backgroundColor: 'transparent',
-      textDecoration: textDecorations.join(' '),
       cursor: editable ? 'text' : 'default',
     });
 
+    const schemaForUI = schema as ListSchema & { id?: string };
+    const textSchema: TextSchema & { id?: string } = {
+      ...schema,
+      id: `${schemaForUI.id || schema.name}-list-item-${item.itemIndex}`,
+      name: `${schema.name}-list-item-${item.itemIndex}`,
+      type: 'text',
+      content: item.item,
+      position: { x: 0, y: 0 },
+      width: item.bodyWidth,
+      height: item.height,
+      alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
+      fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
+      lineHeight: schema.lineHeight ?? DEFAULT_LINE_HEIGHT,
+      characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+      fontColor: usePlaceholder ? PLACEHOLDER_FONT_COLOR : schema.fontColor || DEFAULT_FONT_COLOR,
+      backgroundColor: '',
+    };
+
+    await textUiRender({
+      ...arg,
+      rootElement: body,
+      schema: textSchema,
+      value: item.item,
+      placeholder: '',
+      onChange: undefined,
+      stopEditing: undefined,
+    });
+
     if (editable) {
-      makeElementPlainTextContentEditable(body);
-      body.tabIndex = tabIndex || 0;
+      const editor = getBodyEditor(body);
+      if (!editor) {
+        throw new Error('Unable to find list item text editor');
+      }
+      editor.tabIndex = tabIndex || 0;
       body.addEventListener('pointerdown', handleInternalFocusPointer);
       body.addEventListener('mousedown', (event) => {
-        handleBodyMouseDown(body, event);
+        handleBodyMouseDown(editor, event);
       });
       body.addEventListener('click', (event) => {
         event.stopPropagation();
-        focusBodyFromMouseEvent(body, event);
+        focusBodyFromMouseEvent(editor, event);
       });
-      body.addEventListener('focus', () => {
+      editor.addEventListener('focus', () => {
         if (usePlaceholder) {
-          body.innerText = '';
-          body.style.color = schema.fontColor || DEFAULT_FONT_COLOR;
+          editor.innerText = '';
+          editor.style.color = schema.fontColor || DEFAULT_FONT_COLOR;
         }
       });
-      body.addEventListener('blur', (event) => {
-        const isListAction = rootElement.dataset[actionDataKey] === 'true';
-        const relatedTarget = event.relatedTarget;
-        const isInternalFocus =
-          rootElement.dataset[internalFocusDataKey] === 'true' ||
-          (relatedTarget instanceof Node && rootElement.contains(relatedTarget));
-        delete rootElement.dataset[internalFocusDataKey];
+      body.addEventListener(
+        'blur',
+        (event) => {
+          const isListAction = rootElement.dataset[actionDataKey] === 'true';
+          const relatedTarget = event.relatedTarget;
+          const isInternalFocus =
+            rootElement.dataset[internalFocusDataKey] === 'true' ||
+            (relatedTarget instanceof Node && rootElement.contains(relatedTarget));
+          delete rootElement.dataset[internalFocusDataKey];
 
-        if (isListAction || isInternalFocus) return;
-        if (!onChange) return;
-        commitItems(getNextItems());
-        if (stopEditing) stopEditing();
-      });
-      body.addEventListener('keydown', (event) => {
+          if (isListAction || isInternalFocus) return;
+          if (!onChange) return;
+          commitItems(getNextItems());
+          if (stopEditing) stopEditing();
+        },
+        true,
+      );
+      editor.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
           if (isComposingKeyboardEvent(event)) return;
           event.preventDefault();
@@ -358,7 +386,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
               : Math.min(itemToUpdate.level + 1, MAX_INDENT_LEVEL);
             return itemIndex;
           });
-        } else if (event.key === 'Backspace' && getText(body) === '') {
+        } else if (event.key === 'Backspace' && getText(editor) === '') {
           event.preventDefault();
           updateItems(index, (nextItems, itemIndex) => {
             if (nextItems.length <= 1) {
@@ -370,7 +398,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
           });
         }
       });
-      bodyElements.push(body);
+      bodyElements.push(editor);
     }
 
     row.appendChild(marker);

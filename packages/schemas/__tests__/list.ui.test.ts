@@ -14,6 +14,7 @@ const createMockFont = () =>
     layout: (text: string) => ({
       glyphs: Array.from(text, () => ({ advanceWidth: 500 })),
     }),
+    hasGlyphForCodePoint: () => true,
   }) as unknown as FontKitFont;
 
 const getListSchema = (overrides: Partial<ListSchema> = {}): ListSchema => ({
@@ -59,6 +60,14 @@ const i18n = (key: string) =>
     'schemas.list.outdentItem': 'Outdent item',
   })[key] || key;
 
+const getRowBody = (row: Element): HTMLElement => row.children[1] as HTMLElement;
+
+const getRowEditor = (row: Element): HTMLElement => {
+  const editor = getRowBody(row).querySelector<HTMLElement>('div[id^="text-"]');
+  if (!editor) throw new Error('Unable to find list item editor');
+  return editor;
+};
+
 describe('list UI rendering', () => {
   test('renders only the item range for split list chunks', async () => {
     const rootElement = document.createElement('div');
@@ -77,9 +86,9 @@ describe('list UI rendering', () => {
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
     expect(rows).toHaveLength(2);
     expect((rows[0].children[0] as HTMLElement).innerText).toBe('11.');
-    expect((rows[0].children[1] as HTMLElement).innerText).toBe('Two');
+    expect((rows[0].children[1] as HTMLElement).textContent).toBe('Two');
     expect((rows[1].children[0] as HTMLElement).innerText).toBe('12.');
-    expect((rows[1].children[1] as HTMLElement).innerText).toBe('Three');
+    expect((rows[1].children[1] as HTMLElement).textContent).toBe('Three');
   });
 
   test('writes split chunk edits back into the full list value', async () => {
@@ -99,7 +108,7 @@ describe('list UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
     firstBody.innerText = 'Updated two';
     firstBody.dispatchEvent(new window.Event('blur'));
 
@@ -226,7 +235,7 @@ describe('list UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     expect(rootElement.querySelectorAll('button[aria-label="Remove item"]')).toHaveLength(1);
-    expect(((rootElement.children[0] as HTMLElement).children[1] as HTMLElement).innerText).toBe(
+    expect(((rootElement.children[0] as HTMLElement).children[1] as HTMLElement).textContent).toBe(
       '',
     );
   });
@@ -248,7 +257,7 @@ describe('list UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
 
     onChange.mockClear();
     const enter = new window.KeyboardEvent('keydown', {
@@ -279,7 +288,7 @@ describe('list UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const rerenderedRows = Array.from(rootElement.children) as HTMLDivElement[];
-    const rerenderedFirstBody = rerenderedRows[0].children[1] as HTMLElement;
+    const rerenderedFirstBody = getRowEditor(rerenderedRows[0]);
     onChange.mockClear();
     rerenderedFirstBody.dispatchEvent(
       new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }),
@@ -308,7 +317,7 @@ describe('list UI rendering', () => {
 
     onChange.mockClear();
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
     const composingEnter = new window.KeyboardEvent('keydown', {
       key: 'Enter',
       bubbles: true,
@@ -372,7 +381,7 @@ describe('list UI rendering', () => {
 
     onChange.mockClear();
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
     const addButton = rows[0].querySelector<HTMLButtonElement>('button[aria-label="Add item"]');
     const mouseDown = vi.fn();
     rootElement.addEventListener('mousedown', mouseDown);
@@ -412,8 +421,8 @@ describe('list UI rendering', () => {
 
     onChange.mockClear();
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
-    const secondBody = rows[1].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
+    const secondBody = getRowEditor(rows[1]);
     const mouseDown = vi.fn();
     rootElement.addEventListener('mousedown', mouseDown);
 
@@ -456,7 +465,7 @@ describe('list UI rendering', () => {
 
     onChange.mockClear();
     const rows = Array.from(rootElement.children) as HTMLDivElement[];
-    const firstBody = rows[0].children[1] as HTMLElement;
+    const firstBody = getRowEditor(rows[0]);
 
     firstBody.dispatchEvent(
       new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
