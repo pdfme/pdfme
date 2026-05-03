@@ -20,6 +20,7 @@ import {
 import { MAX_INDENT_LEVEL } from './constants.js';
 
 const focusDataKey = 'pdfmeListFocusIndex';
+const actionDataKey = 'pdfmeListAction';
 
 const getText = (element: HTMLElement): string => {
   let text = element.innerText;
@@ -153,6 +154,10 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     commitItems(nextItems, focusIndex);
   };
 
+  const preserveEditingForAction = () => {
+    rootElement.dataset[actionDataKey] = 'true';
+  };
+
   let offsetY = 0;
   for (let index = 0; index < layout.items.length; index += 1) {
     const item = layout.items[index];
@@ -217,6 +222,8 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
         }
       });
       body.addEventListener('blur', () => {
+        const isListAction = rootElement.dataset[actionDataKey] === 'true';
+        if (isListAction) return;
         if (!onChange) return;
         commitItems(getNextItems());
         if (stopEditing) stopEditing();
@@ -259,6 +266,8 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     row.appendChild(body);
     if (showControls) {
       const controls = document.createElement('div');
+      controls.addEventListener('pointerdown', preserveEditingForAction);
+      controls.addEventListener('mousedown', preserveEditingForAction);
       setStyles(controls, {
         position: 'absolute',
         top: '0mm',
@@ -334,6 +343,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
 
   const requestedFocusIndex = Number(rootElement.dataset[focusDataKey]);
   delete rootElement.dataset[focusDataKey];
+  delete rootElement.dataset[actionDataKey];
   const relativeFocusIndex = requestedFocusIndex - range.start;
 
   if (

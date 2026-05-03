@@ -225,4 +225,41 @@ describe('list UI rendering', () => {
     expect(rootElement.querySelectorAll('button[aria-label="Indent item"]')).toHaveLength(2);
     expect(rootElement.querySelector('button')?.hasAttribute('title')).toBe(false);
   });
+
+  test('keeps designer edit mode when clicking a list action button', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const stopEditing = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'designer',
+      onChange,
+      stopEditing,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    onChange.mockClear();
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const firstBody = rows[0].children[1] as HTMLElement;
+    const addButton = rows[0].querySelector<HTMLButtonElement>('button[aria-label="Add item"]');
+    firstBody.innerText = 'Edited one';
+
+    addButton?.dispatchEvent(
+      new window.MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+    );
+    firstBody.dispatchEvent(new window.FocusEvent('blur'));
+    addButton?.click();
+
+    expect(stopEditing).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'Edited one\n\nTwo',
+    });
+  });
 });
