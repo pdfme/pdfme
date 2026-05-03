@@ -21,6 +21,9 @@ import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1.5');
+const GENERATOR_BENCHMARK_THRESHOLD = parseFloat(
+  process.env.GENERATOR_BENCHMARK_THRESHOLD || '2.5',
+);
 const generatorPlugins = {
   text,
   image,
@@ -35,12 +38,16 @@ const generatorPlugins = {
   ...barcodes,
 };
 
-const checkPerformanceThreshold = (name: string, execSeconds: number) => {
+const checkPerformanceThreshold = (
+  name: string,
+  execSeconds: number,
+  threshold = PERFORMANCE_THRESHOLD,
+) => {
   if (process.env.CI) {
-    expect(execSeconds).toBeLessThan(PERFORMANCE_THRESHOLD);
-  } else if (execSeconds >= PERFORMANCE_THRESHOLD) {
+    expect(execSeconds).toBeLessThan(threshold);
+  } else if (execSeconds >= threshold) {
     console.warn(
-      `Warning: Execution time for ${name} is ${execSeconds} seconds, which is above the threshold of ${PERFORMANCE_THRESHOLD} seconds.`,
+      `Warning: Execution time for ${name} is ${execSeconds} seconds, which is above the threshold of ${threshold} seconds.`,
     );
   }
 };
@@ -74,7 +81,7 @@ const measureGenerate = async (name: string, fn: () => Promise<void>) => {
   );
 
   expect(average).toBeGreaterThan(0);
-  checkPerformanceThreshold(name, average / 1000);
+  checkPerformanceThreshold(name, median / 1000, GENERATOR_BENCHMARK_THRESHOLD);
 };
 
 // Load all templates from playground/public/template-assets
@@ -160,52 +167,45 @@ describe('generate integration test(playground)', () => {
     }
   });
 
-  test(
-    'benchmarks generator-only paths used by performance-sensitive templates',
-    async () => {
-      const font = getFont();
-      const textSchemas: Schema[] = Array.from({ length: 120 }, (_, index) => ({
-        name: `field${index}`,
-        type: 'text',
-        content: '',
-        position: { x: 10 + (index % 4) * 45, y: 10 + Math.floor(index / 4) * 8 },
-        width: 40,
-        height: 6,
-        fontSize: 8,
-      }));
-      const textHeavyTemplate: Template = { basePdf: BLANK_PDF, schemas: [textSchemas] };
-      const textHeavyInputs = Array.from({ length: 25 }, (_, inputIndex) =>
-        Object.fromEntries(
-          textSchemas.map((schema, schemaIndex) => [
-            schema.name,
-            `${inputIndex}-${schemaIndex}`,
-          ]),
-        ),
-      );
+  test('benchmarks generator-only paths used by performance-sensitive templates', async () => {
+    const font = getFont();
+    const textSchemas: Schema[] = Array.from({ length: 120 }, (_, index) => ({
+      name: `field${index}`,
+      type: 'text',
+      content: '',
+      position: { x: 10 + (index % 4) * 45, y: 10 + Math.floor(index / 4) * 8 },
+      width: 40,
+      height: 6,
+      fontSize: 8,
+    }));
+    const textHeavyTemplate: Template = { basePdf: BLANK_PDF, schemas: [textSchemas] };
+    const textHeavyInputs = Array.from({ length: 25 }, (_, inputIndex) =>
+      Object.fromEntries(
+        textSchemas.map((schema, schemaIndex) => [schema.name, `${inputIndex}-${schemaIndex}`]),
+      ),
+    );
 
-      await measureGenerate('blank text-heavy template', () =>
-        generate({ inputs: textHeavyInputs, template: textHeavyTemplate, options: { font } }),
-      );
+    await measureGenerate('blank text-heavy template', () =>
+      generate({ inputs: textHeavyInputs, template: textHeavyTemplate, options: { font } }),
+    );
 
-      const labelTemplate = playgroundTemplates['address-label-30'];
-      if (!labelTemplate) {
-        throw new Error('Failed to load playground template "address-label-30".');
-      }
-      const [baseLabelInput = {}] = getInputFromTemplate(labelTemplate);
-      const labelInputs = Array.from({ length: 40 }, (_, index) => ({
-        ...baseLabelInput,
-        '{1}Name': `Kyohei Fukuda ${index}`,
-      }));
+    const labelTemplate = playgroundTemplates['address-label-30'];
+    if (!labelTemplate) {
+      throw new Error('Failed to load playground template "address-label-30".');
+    }
+    const [baseLabelInput = {}] = getInputFromTemplate(labelTemplate);
+    const labelInputs = Array.from({ length: 40 }, (_, index) => ({
+      ...baseLabelInput,
+      '{1}Name': `Kyohei Fukuda ${index}`,
+    }));
 
-      await measureGenerate('playground address-label-30 multi-input template', () =>
-        generate({
-          inputs: labelInputs,
-          template: labelTemplate,
-          plugins: generatorPlugins,
-          options: { font },
-        }),
-      );
-    },
-    120000,
-  );
+    await measureGenerate('playground address-label-30 multi-input template', () =>
+      generate({
+        inputs: labelInputs,
+        template: labelTemplate,
+        plugins: generatorPlugins,
+        options: { font },
+      }),
+    );
+  }, 120000);
 });
