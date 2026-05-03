@@ -327,4 +327,48 @@ describe('list UI rendering', () => {
       value: 'Edited one\n\nTwo',
     });
   });
+
+  test('keeps designer edit mode when moving between list item bodies', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const stopEditing = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'designer',
+      onChange,
+      stopEditing,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    onChange.mockClear();
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const firstBody = rows[0].children[1] as HTMLElement;
+    const secondBody = rows[1].children[1] as HTMLElement;
+    const mouseDown = vi.fn();
+    rootElement.addEventListener('mousedown', mouseDown);
+
+    secondBody.dispatchEvent(
+      new window.MouseEvent('mousedown', { bubbles: true, cancelable: true }),
+    );
+    firstBody.dispatchEvent(new window.FocusEvent('blur', { relatedTarget: secondBody }));
+
+    expect(mouseDown).not.toHaveBeenCalled();
+    expect(stopEditing).not.toHaveBeenCalled();
+    expect(onChange).not.toHaveBeenCalled();
+
+    secondBody.innerText = 'Edited two';
+    secondBody.dispatchEvent(new window.FocusEvent('blur', { relatedTarget: document.body }));
+
+    expect(stopEditing).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\nEdited two',
+    });
+  });
 });

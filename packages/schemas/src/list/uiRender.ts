@@ -21,6 +21,7 @@ import { MAX_INDENT_LEVEL } from './constants.js';
 
 const focusDataKey = 'pdfmeListFocusIndex';
 const actionDataKey = 'pdfmeListAction';
+const internalFocusDataKey = 'pdfmeListInternalFocus';
 
 const getText = (element: HTMLElement): string => {
   let text = element.innerText;
@@ -44,6 +45,38 @@ const focusBody = (body: HTMLDivElement) => {
     selection.removeAllRanges();
     selection.addRange(range);
   }
+};
+
+const getCaretRangeFromPoint = (x: number, y: number): Range | null => {
+  const documentWithCaret = document as Document & {
+    caretRangeFromPoint?: (x: number, y: number) => Range | null;
+    caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+  };
+
+  if (documentWithCaret.caretRangeFromPoint) {
+    return documentWithCaret.caretRangeFromPoint(x, y);
+  }
+
+  const caretPosition = documentWithCaret.caretPositionFromPoint?.(x, y);
+  if (!caretPosition) return null;
+
+  const range = document.createRange();
+  range.setStart(caretPosition.offsetNode, caretPosition.offset);
+  range.collapse(true);
+  return range;
+};
+
+const focusBodyFromMouseEvent = (body: HTMLDivElement, event: MouseEvent) => {
+  body.focus();
+
+  const range = getCaretRangeFromPoint(event.clientX, event.clientY);
+  if (!range || !body.contains(range.startContainer)) return;
+
+  const selection = window.getSelection();
+  if (!selection) return;
+
+  selection.removeAllRanges();
+  selection.addRange(range);
 };
 
 const createActionButton = (arg: {
@@ -165,6 +198,20 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     rootElement.dataset[actionDataKey] = 'true';
   };
 
+  const preserveEditingForInternalFocus = () => {
+    rootElement.dataset[internalFocusDataKey] = 'true';
+  };
+
+  const handleInternalFocusPointer = (event: Event) => {
+    preserveEditingForInternalFocus();
+    event.stopPropagation();
+  };
+
+  const handleBodyMouseDown = (body: HTMLDivElement, event: MouseEvent) => {
+    handleInternalFocusPointer(event);
+    focusBodyFromMouseEvent(body, event);
+  };
+
   const appendEmptyListControls = () => {
     const controls = document.createElement('div');
     controls.addEventListener('pointerdown', preserveEditingForAction);
@@ -248,15 +295,29 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     if (editable) {
       makeElementPlainTextContentEditable(body);
       body.tabIndex = tabIndex || 0;
+      body.addEventListener('pointerdown', handleInternalFocusPointer);
+      body.addEventListener('mousedown', (event) => {
+        handleBodyMouseDown(body, event);
+      });
+      body.addEventListener('click', (event) => {
+        event.stopPropagation();
+        focusBodyFromMouseEvent(body, event);
+      });
       body.addEventListener('focus', () => {
         if (usePlaceholder) {
           body.innerText = '';
           body.style.color = schema.fontColor || DEFAULT_FONT_COLOR;
         }
       });
-      body.addEventListener('blur', () => {
+      body.addEventListener('blur', (event) => {
         const isListAction = rootElement.dataset[actionDataKey] === 'true';
-        if (isListAction) return;
+        const relatedTarget = event.relatedTarget;
+        const isInternalFocus =
+          rootElement.dataset[internalFocusDataKey] === 'true' ||
+          (relatedTarget instanceof Node && rootElement.contains(relatedTarget));
+        delete rootElement.dataset[internalFocusDataKey];
+
+        if (isListAction || isInternalFocus) return;
         if (!onChange) return;
         commitItems(getNextItems());
         if (stopEditing) stopEditing();
@@ -385,13 +446,16 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const requestedFocusIndex = Number(rootElement.dataset[focusDataKey]);
   delete rootElement.dataset[focusDataKey];
   delete rootElement.dataset[actionDataKey];
+  delete rootElement.dataset[internalFocusDataKey];
   const relativeFocusIndex = requestedFocusIndex - range.start;
 
   if (editable && Number.isFinite(requestedFocusIndex) && bodyElements[relativeFocusIndex]) {
     setTimeout(() => focusBody(bodyElements[relativeFocusIndex]));
   } else if (editable && mode === 'designer' && bodyElements[0]) {
     setTimeout(() => {
-      focusBody(bodyElements[0]);
+      if (!rootElement.contains(document.activeElement)) {
+        focusBody(bodyElements[0]);
+      }
     });
   }
 
