@@ -24,6 +24,8 @@ const PERFORMANCE_THRESHOLD = parseFloat(process.env.PERFORMANCE_THRESHOLD || '1
 const GENERATOR_BENCHMARK_THRESHOLD = parseFloat(
   process.env.GENERATOR_BENCHMARK_THRESHOLD || '2.5',
 );
+const GENERATOR_BENCHMARK_RUN_COUNT = 6;
+const GENERATOR_BENCHMARK_WARMUP_RUN_COUNT = 1;
 const ADDRESS_LABEL_BENCHMARK_INPUT_COUNT = 20;
 const generatorPlugins = {
   text,
@@ -55,13 +57,13 @@ const checkPerformanceThreshold = (
 
 const measureGenerate = async (name: string, fn: () => Promise<void>) => {
   const runs: number[] = [];
-  for (let i = 0; i < 6; i += 1) {
+  for (let i = 0; i < GENERATOR_BENCHMARK_RUN_COUNT; i += 1) {
     const startedAt = process.hrtime.bigint();
     await fn();
     runs.push(Number(process.hrtime.bigint() - startedAt) / 1000000);
   }
 
-  const measuredRuns = runs.slice(1);
+  const measuredRuns = runs.slice(GENERATOR_BENCHMARK_WARMUP_RUN_COUNT);
   const average =
     measuredRuns.reduce((total, duration) => total + duration, 0) / measuredRuns.length;
   const sortedRuns = [...measuredRuns].sort((a, b) => a - b);
