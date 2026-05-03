@@ -181,6 +181,10 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     onChange({ key: 'content', value: serializeListItems(nextItems) });
   };
 
+  const preserveEditingForAction = () => {
+    rootElement.dataset[actionDataKey] = 'true';
+  };
+
   const updateItems = (
     rowIndex: number,
     mutate: (nextItems: ListItem[], itemIndex: number) => number | undefined,
@@ -191,11 +195,8 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     }
     const itemIndex = Math.min(Math.max(range.start + rowIndex, 0), nextItems.length - 1);
     const focusIndex = mutate(nextItems, itemIndex);
+    preserveEditingForAction();
     commitItems(nextItems, focusIndex);
-  };
-
-  const preserveEditingForAction = () => {
-    rootElement.dataset[actionDataKey] = 'true';
   };
 
   const preserveEditingForInternalFocus = () => {

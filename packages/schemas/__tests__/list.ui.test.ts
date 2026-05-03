@@ -371,4 +371,38 @@ describe('list UI rendering', () => {
       value: 'One\nEdited two',
     });
   });
+
+  test('keeps designer edit mode when adding a row with Enter', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const stopEditing = vi.fn();
+
+    await uiRender({
+      value: 'One\nTwo',
+      schema: getListSchema(),
+      rootElement,
+      mode: 'designer',
+      onChange,
+      stopEditing,
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    onChange.mockClear();
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    const firstBody = rows[0].children[1] as HTMLElement;
+
+    firstBody.dispatchEvent(
+      new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }),
+    );
+    firstBody.dispatchEvent(new window.FocusEvent('blur'));
+
+    expect(stopEditing).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: 'One\n\nTwo',
+    });
+  });
 });
