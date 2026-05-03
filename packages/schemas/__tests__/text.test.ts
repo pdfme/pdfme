@@ -113,6 +113,24 @@ describe('parseInlineMarkdown', () => {
     expect(stripInlineMarkdown('See [pdfme](https://pdfme.com).')).toBe('See pdfme.');
   });
 
+  it('only parses safe link destinations', () => {
+    expect(
+      parseInlineMarkdown('[web](https://pdfme.com) [mail](mailto:hello@pdfme.com)'),
+    ).toEqual([
+      { text: 'web', href: 'https://pdfme.com' },
+      { text: ' ' },
+      { text: 'mail', href: 'mailto:hello@pdfme.com' },
+    ]);
+    expect(parseInlineMarkdown('[bad](javascript:alert(1)) [file](file:///tmp/a)')).toEqual([
+      { text: '[bad](javascript:alert(1)) [file](file:///tmp/a)' },
+    ]);
+  });
+
+  it('handles empty link labels and destinations explicitly', () => {
+    expect(parseInlineMarkdown('Go [](https://pdfme.com).')).toEqual([{ text: 'Go .' }]);
+    expect(parseInlineMarkdown('Go [empty]().')).toEqual([{ text: 'Go [empty]().' }]);
+  });
+
   it('keeps escaped links as literal text', () => {
     const escaped = escapeInlineMarkdown('[pdfme](https://pdfme.com)');
 

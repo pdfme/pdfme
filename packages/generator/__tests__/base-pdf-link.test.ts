@@ -50,6 +50,25 @@ const createBasePdfWithLink = async () => {
   return pdfDoc.save();
 };
 
+const createBasePdfWithUnsafeAndSafeLinks = async () => {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([200, 120]);
+  page.drawText('links', { x: 20, y: 70, size: 16, color: rgb(0, 0, 1) });
+  addSourceUriLink({
+    pdfDoc,
+    pageIndex: 0,
+    uri: 'javascript:alert(1)',
+    rect: [20, 68, 70, 88],
+  });
+  addSourceUriLink({
+    pdfDoc,
+    pageIndex: 0,
+    uri: 'mailto:hello@pdfme.com',
+    rect: [80, 68, 130, 88],
+  });
+  return pdfDoc.save();
+};
+
 const getUriLinkAnnotations = async (pdf: Uint8Array<ArrayBuffer>) => {
   const pdfDoc = await PDFDocument.load(pdf);
   const page = pdfDoc.getPage(0);
@@ -125,5 +144,18 @@ describe('generate custom basePdf links', () => {
     const links = await getUriLinkAnnotations(pdf);
 
     expect(links.map(getAnnotationUri)).toEqual(['https://pdfme.com']);
+  });
+
+  test('does not preserve unsafe URI schemes from basePdf pages', async () => {
+    const basePdf = await createBasePdfWithUnsafeAndSafeLinks();
+    const template: Template = {
+      basePdf,
+      schemas: [[]],
+    };
+
+    const pdf = await generate({ template, inputs: [{}], plugins: {} });
+    const links = await getUriLinkAnnotations(pdf);
+
+    expect(links.map(getAnnotationUri)).toEqual(['mailto:hello@pdfme.com']);
   });
 });

@@ -100,4 +100,28 @@ describe('text inline markdown UI rendering', () => {
     expect(link.rel).toBe('noopener noreferrer');
     expect(link.style.textDecoration).toContain('underline');
   });
+
+  it('does not create anchors for unsafe inline markdown links', async () => {
+    const rootElement = document.createElement('div');
+    const schema = getTextSchema();
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Visit [bad](javascript:alert(1)).',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    expect(rootElement.querySelector('a')).toBeNull();
+    expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
+  });
 });

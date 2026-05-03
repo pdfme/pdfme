@@ -54,6 +54,27 @@ const renderMultiVariableText = async (mode: 'viewer' | 'form') => {
   return rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
 };
 
+const renderLinkedMultiVariableText = async (mode: 'viewer' | 'form') => {
+  const rootElement = document.createElement('div');
+  const schema: MultiVariableTextSchema = {
+    ...getSchema(),
+    text: '[docs](https://pdfme.com) for {name}',
+    variables: ['name'],
+  };
+
+  await uiRender({
+    value: JSON.stringify({ name: 'A **bold** user' }),
+    schema,
+    rootElement,
+    mode,
+    options: { font: getSampleFont() },
+    _cache: new Map(),
+    theme: { colorPrimary: '#1677ff' },
+  } as Parameters<typeof uiRender>[0]);
+
+  return rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+};
+
 describe('multiVariableText inline markdown UI rendering', () => {
   it('renders viewer variable values as literal text inside template markdown', async () => {
     const textBlock = await renderMultiVariableText('viewer');
@@ -77,5 +98,24 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(spans[0].style.textShadow).not.toBe('');
     expect(spans.at(-1)?.textContent).toBe('PDF `42`');
     expect(spans.at(-1)?.style.backgroundColor).not.toBe('');
+  });
+
+  it('renders viewer links through the parent text renderer', async () => {
+    const textBlock = await renderLinkedMultiVariableText('viewer');
+    const link = textBlock.querySelector('a') as HTMLAnchorElement;
+
+    expect(textBlock.textContent).toBe('docs for A **bold** user');
+    expect(link.textContent).toBe('docs');
+    expect(link.href).toBe('https://pdfme.com/');
+  });
+
+  it('does not underline form links when they are not clickable', async () => {
+    const textBlock = await renderLinkedMultiVariableText('form');
+    const docsSpan = Array.from(textBlock.querySelectorAll('span')).find(
+      (span) => span.textContent === 'docs',
+    );
+
+    expect(textBlock.querySelector('a')).toBeNull();
+    expect(docsSpan?.style.textDecoration).not.toContain('underline');
   });
 });

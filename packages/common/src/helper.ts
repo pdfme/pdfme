@@ -182,6 +182,22 @@ export const isUrlSafeToFetch = (urlString: string): boolean => {
   return true;
 };
 
+const SAFE_LINK_URI_PROTOCOLS = new Set(['http:', 'https:', 'mailto:']);
+
+export const normalizeSafeLinkUri = (uri: string): string | undefined => {
+  const trimmed = uri.trim();
+  if (!trimmed) return undefined;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return undefined;
+  }
+
+  return SAFE_LINK_URI_PROTOCOLS.has(parsed.protocol.toLowerCase()) ? trimmed : undefined;
+};
+
 export const getB64BasePdf = async (
   customPdf: ArrayBuffer | Uint8Array | string,
 ): Promise<string> => {

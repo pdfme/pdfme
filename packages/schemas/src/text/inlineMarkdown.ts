@@ -1,3 +1,4 @@
+import { normalizeSafeLinkUri } from '@pdfme/common';
 import type { RichTextRun } from './types.js';
 
 type InlineStyle = Omit<RichTextRun, 'text'>;
@@ -112,12 +113,13 @@ const parseLinkAt = (value: string, index: number, to: number) => {
   const href = value
     .slice(destinationStart, destinationEnd)
     .replace(MARKDOWN_UNESCAPE_PATTERN, '$1');
-  if (!href.trim()) return undefined;
+  const safeHref = normalizeSafeLinkUri(href);
+  if (!safeHref) return undefined;
 
   return {
     labelStart: index + 1,
     labelEnd,
-    href: href.trim(),
+    href: safeHref,
     end: destinationEnd + 1,
   };
 };

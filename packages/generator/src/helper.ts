@@ -8,6 +8,7 @@ import {
   getB64BasePdf,
   isBlankPdf,
   mm2pt,
+  normalizeSafeLinkUri,
   pluginRegistry,
   BasePdf,
 } from '@pdfme/common';
@@ -21,6 +22,8 @@ import {
   PDFName,
   PDFArray,
   PDFObjectCopier,
+  PDFString,
+  PDFHexString,
 } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types.js';
@@ -69,13 +72,16 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
   return { basePages, embedPdfBoxes };
 };
 
-const isUriLinkAnnotation = (annotation: PDFDict) => {
-  if (annotation.lookupMaybe(PDFName.of('Subtype'), PDFName) !== PDFName.of('Link')) return false;
+const getSafeUriFromLinkAnnotation = (annotation: PDFDict) => {
+  if (annotation.lookupMaybe(PDFName.of('Subtype'), PDFName) !== PDFName.of('Link')) return;
 
   const action = annotation.lookupMaybe(PDFName.of('A'), PDFDict);
-  if (!action) return false;
+  if (!action) return;
 
-  return action.lookupMaybe(PDFName.of('S'), PDFName) === PDFName.of('URI');
+  if (action.lookupMaybe(PDFName.of('S'), PDFName) !== PDFName.of('URI')) return;
+
+  const uri = action.lookupMaybe(PDFName.of('URI'), PDFString, PDFHexString);
+  return uri ? normalizeSafeLinkUri(uri.decodeText()) : undefined;
 };
 
 const copyBasePdfUriLinkAnnotations = (arg: {
@@ -91,16 +97,19 @@ const copyBasePdfUriLinkAnnotations = (arg: {
 
   for (let idx = 0; idx < sourceAnnots.size(); idx += 1) {
     const sourceAnnotation = sourceAnnots.lookupMaybe(idx, PDFDict);
-    if (!sourceAnnotation || !isUriLinkAnnotation(sourceAnnotation)) continue;
+    if (!sourceAnnotation) continue;
 
+    const safeUri = getSafeUriFromLinkAnnotation(sourceAnnotation);
+    if (!safeUri) continue;
     const rect = sourceAnnotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
-    const action = sourceAnnotation.lookupMaybe(PDFName.of('A'), PDFDict);
-    if (!rect || !action) continue;
+    if (!rect) continue;
 
     const border = sourceAnnotation.lookupMaybe(PDFName.of('Border'), PDFArray);
     const color = sourceAnnotation.lookupMaybe(PDFName.of('C'), PDFArray);
     const highlightMode = sourceAnnotation.lookupMaybe(PDFName.of('H'), PDFName);
 
+    // Preserve the clickable area and common link hints, but rebuild the URI action so page-bound
+    // or unsafe source annotation data is not copied into the generated document.
     const copiedAnnotation = pdfDoc.context.obj({
       Type: PDFName.of('Annot'),
       Subtype: PDFName.of('Link'),
@@ -108,7 +117,11 @@ const copyBasePdfUriLinkAnnotations = (arg: {
       Border: border ? copier.copy(border) : pdfDoc.context.obj([0, 0, 0]),
       C: color ? copier.copy(color) : undefined,
       H: highlightMode ? copier.copy(highlightMode) : undefined,
-      A: copier.copy(action),
+      A: {
+        Type: PDFName.of('Action'),
+        S: PDFName.of('URI'),
+        URI: PDFString.of(safeUri),
+      },
     });
 
     targetPage.node.addAnnot(pdfDoc.context.register(copiedAnnotation));

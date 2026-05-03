@@ -1,3 +1,4 @@
+import { normalizeSafeLinkUri } from '@pdfme/common';
 import type { PDFDocument, PDFPage } from '@pdfme/pdf-lib';
 import { PDFName, PDFString } from '@pdfme/pdf-lib';
 
@@ -16,7 +17,8 @@ export const addUriLinkAnnotation = (arg: {
   borderWidth?: number;
 }) => {
   const { pdfDoc, page, uri, rect, borderWidth = 0 } = arg;
-  if (!uri || rect.width <= 0 || rect.height <= 0) return;
+  const safeUri = normalizeSafeLinkUri(uri);
+  if (!safeUri || rect.width <= 0 || rect.height <= 0) return;
 
   const annotationRef = pdfDoc.context.register(
     pdfDoc.context.obj({
@@ -27,7 +29,7 @@ export const addUriLinkAnnotation = (arg: {
       A: {
         Type: PDFName.of('Action'),
         S: PDFName.of('URI'),
-        URI: PDFString.of(uri),
+        URI: PDFString.of(safeUri),
       },
     }),
   );

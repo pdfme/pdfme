@@ -166,4 +166,41 @@ describe('generate inline markdown links', () => {
       'https://example.com/second',
     ]);
   });
+
+  test('does not create annotations for unsafe URI schemes', async () => {
+    const template: Template = {
+      basePdf: { width: 100, height: 80, padding: [0, 0, 0, 0] },
+      schemas: [
+        [
+          {
+            name: 'message',
+            type: 'text',
+            readOnly: true,
+            content: '[Bad](javascript:alert(1)) [Mail](mailto:hello@pdfme.com)',
+            position: { x: 10, y: 10 },
+            width: 80,
+            height: 12,
+            fontSize: 12,
+            lineHeight: 1,
+            characterSpacing: 0,
+            alignment: 'left',
+            verticalAlignment: 'top',
+            fontColor: '#000000',
+            backgroundColor: '',
+            textFormat: 'inline-markdown',
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [{}],
+      plugins: { text },
+      options: { font: getFont() },
+    });
+    const links = await getUriLinkAnnotations(pdf);
+
+    expect(links.map(getAnnotationUri)).toEqual(['mailto:hello@pdfme.com']);
+  });
 });

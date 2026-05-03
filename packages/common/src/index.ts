@@ -68,6 +68,7 @@ import {
   getInputFromTemplate,
   isBlankPdf,
   isUrlSafeToFetch,
+  normalizeSafeLinkUri,
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
@@ -107,6 +108,7 @@ export {
   checkGenerateProps,
   pluginRegistry,
   isUrlSafeToFetch,
+  normalizeSafeLinkUri,
 };
 
 export type {
