@@ -227,6 +227,26 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
     onChange({ key: 'content', value: serializeListItems(nextItems) });
   };
 
+  const commitHeight = async (focusIndex?: number) => {
+    if (!onChange) return;
+    if (focusIndex !== undefined) {
+      rootElement.dataset[focusDataKey] = String(focusIndex);
+      pendingFocusIndexes.set(schema.name, focusIndex);
+    }
+    const rawItems = normalizeListItems(serializeListItems(getNextItems()));
+    const nextLayout = await calculateListLayout({
+      schema,
+      items: rawItems.slice(range.start, range.end),
+      markerItems: rawItems,
+      startIndex: range.start,
+      options: arg.options,
+      _cache: arg._cache,
+    });
+    if (schema.height !== nextLayout.totalHeight) {
+      onChange({ key: 'height', value: nextLayout.totalHeight });
+    }
+  };
+
   const preserveEditingForAction = () => {
     rootElement.dataset[actionDataKey] = 'true';
   };
@@ -408,7 +428,11 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
           event.preventDefault();
           if (insertLineBreakAtSelection(editor)) {
             preserveEditingForKeyboardCommit();
-            commitItems(getNextItems(), range.start + index);
+            if (mode === 'form') {
+              void commitHeight(range.start + index);
+            } else {
+              commitItems(getNextItems(), range.start + index);
+            }
           }
         } else if (event.key === 'Tab') {
           event.preventDefault();

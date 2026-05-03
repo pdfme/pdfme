@@ -256,7 +256,7 @@ describe('list UI rendering', () => {
 
     await uiRender({
       value: 'One\nTwo',
-      schema: getListSchema(),
+      schema: getListSchema({ height: 8 }),
       rootElement,
       mode: 'form',
       onChange,
@@ -278,34 +278,24 @@ describe('list UI rendering', () => {
     });
     expect(firstBody.dispatchEvent(enter)).toBe(false);
     expect(enter.defaultPrevented).toBe(true);
-    expect(onChange).toHaveBeenLastCalledWith({
-      key: 'content',
-      value: '["One\\n","Two"]',
-    });
-    const committedChange = onChange.mock.calls[onChange.mock.calls.length - 1][0] as {
-      key: string;
-      value: string;
-    };
-
-    onChange.mockClear();
-    await uiRender({
-      value: committedChange.value,
-      schema: getListSchema({ height: 8 }),
-      rootElement,
-      mode: 'form',
-      onChange,
-      options: { font },
-      _cache: getCache(),
-      theme: { colorPrimary: '#1677ff' },
-      i18n,
-    } as Parameters<typeof uiRender>[0]);
+    await new Promise((resolve) => setTimeout(resolve));
 
     const heightChange = onChange.mock.calls
       .map(([change]) => change as { key: string; value: unknown })
       .find(({ key }) => key === 'height');
     expect(Number(heightChange?.value)).toBeGreaterThan(8);
-    await new Promise((resolve) => setTimeout(resolve));
-    expect(document.activeElement).toBe(getRowEditor(rootElement.children[0]));
+    expect(onChange).not.toHaveBeenCalledWith({
+      key: 'content',
+      value: '["One\\n","Two"]',
+    });
+    expect(document.activeElement).toBe(firstBody);
+
+    firstBody.innerText = 'One\n\u200Bcontinued';
+    firstBody.dispatchEvent(new window.FocusEvent('blur'));
+    expect(onChange).toHaveBeenLastCalledWith({
+      key: 'content',
+      value: '["One\\ncontinued","Two"]',
+    });
 
     await uiRender({
       value: 'One\nTwo',
