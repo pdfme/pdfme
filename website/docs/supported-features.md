@@ -33,10 +33,14 @@ For using schemas other than the Text schema, please refer to the following docu
   - Support for multiple fonts and fallback fonts
   - Dynamic Font Sizing
     - Detailed options for Min, Max, Fit
+- Text Format
+  - Plain text
+  - Inline Markdown (`**bold**`, `*italic*`, `***bold italic***`, `~~strikethrough~~`) with automatic font variant fallback
 
 ### Multivariable Text (multiVariableText){#multivariable-text}
 
 - As per text, but supporting 0 to n variables in a single text field
+- Inline Markdown is supported in the template text while variable values are rendered as literal strings
 
 ### Shape
 
@@ -107,6 +111,19 @@ Details: [Tables with Dynamic Data](/docs/tables)
     - Padding
   - Column
     - Text Align
+
+### List (list)
+
+- List Style
+  - Bullet
+  - Ordered (numbered)
+- Layout
+  - Marker Width
+  - Marker Gap
+  - Indent Size (for nested items)
+  - Item Spacing
+- Dynamic height with automatic page breaking for long lists
+- Inherits text styling options (font, size, color, alignment, etc.) from the Text schema
 
 ### Select (select)
 
