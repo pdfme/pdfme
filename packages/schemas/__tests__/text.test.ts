@@ -115,11 +115,13 @@ describe('parseInlineMarkdown', () => {
 
   it('only parses safe link destinations', () => {
     expect(
-      parseInlineMarkdown('[web](https://pdfme.com) [mail](mailto:hello@pdfme.com)'),
+      parseInlineMarkdown('[web](https://pdfme.com) [mail](mailto:hello@pdfme.com) [toc](#toc)'),
     ).toEqual([
       { text: 'web', href: 'https://pdfme.com' },
       { text: ' ' },
       { text: 'mail', href: 'mailto:hello@pdfme.com' },
+      { text: ' ' },
+      { text: 'toc', href: '#toc' },
     ]);
     expect(parseInlineMarkdown('[bad](javascript:alert(1)) [file](file:///tmp/a)')).toEqual([
       { text: '[bad](javascript:alert(1)) [file](file:///tmp/a)' },

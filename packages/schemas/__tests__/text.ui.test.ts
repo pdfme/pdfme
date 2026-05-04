@@ -101,6 +101,36 @@ describe('text inline markdown UI rendering', () => {
     expect(link.style.textDecoration).toContain('underline');
   });
 
+  it('renders internal inline markdown links as same-document anchors', async () => {
+    const rootElement = document.createElement('div');
+    const schema = getTextSchema();
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Jump to [intro](#intro).',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const link = rootElement.querySelector('a') as HTMLAnchorElement;
+
+    expect(rootElement.textContent).toBe('Jump to intro.');
+    expect(link.textContent).toBe('intro');
+    expect(link.getAttribute('href')).toBe('#intro');
+    expect(link.target).toBe('');
+    expect(link.rel).toBe('');
+    expect(link.style.textDecoration).toContain('underline');
+  });
+
   it('does not create anchors for unsafe inline markdown links', async () => {
     const rootElement = document.createElement('div');
     const schema = getTextSchema();

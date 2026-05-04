@@ -1,6 +1,6 @@
 import type { PDFFont, Rotation } from '@pdfme/pdf-lib';
 import type { ColorType, Font, PDFRenderProps } from '@pdfme/common';
-import { mm2pt } from '@pdfme/common';
+import { getInternalLinkTarget, mm2pt, registerInternalLinkAnnotation } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import {
   CODE_BACKGROUND_COLOR,
@@ -409,20 +409,21 @@ export const renderInlineMarkdownText = async (arg: {
         underline: Boolean(run.href) && !schema.underline,
       });
       if (run.href) {
-        addUriLinkAnnotation({
-          pdfDoc,
-          page,
-          uri: run.href,
-          rect: getLinkAnnotationRect({
-            run,
-            x: currentX,
-            y: yLine,
-            width: runWidth,
-            rotate,
-            pivotPoint,
-            fontSize,
-          }),
+        const rect = getLinkAnnotationRect({
+          run,
+          x: currentX,
+          y: yLine,
+          width: runWidth,
+          rotate,
+          pivotPoint,
+          fontSize,
         });
+        const targetName = getInternalLinkTarget(run.href);
+        if (targetName) {
+          registerInternalLinkAnnotation({ _cache, page, targetName, rect });
+        } else {
+          addUriLinkAnnotation({ pdfDoc, page, uri: run.href, rect });
+        }
       }
 
       return currentX + runWidth + (runIndex === line.runs.length - 1 ? 0 : spacing);

@@ -1,6 +1,11 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
-import { UIRenderProps, getDefaultFont, normalizeSafeLinkUri } from '@pdfme/common';
+import {
+  UIRenderProps,
+  getDefaultFont,
+  getInternalLinkTarget,
+  normalizeLinkHref,
+} from '@pdfme/common';
 import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -212,7 +217,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
 
   textBlock.innerHTML = '';
   runs.forEach((run) => {
-    const href = run.href ? normalizeSafeLinkUri(run.href) : undefined;
+    const href = run.href ? normalizeLinkHref(run.href) : undefined;
     const span = href ? document.createElement('a') : document.createElement('span');
     const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
     const textDecorations: string[] = [];
@@ -221,8 +226,10 @@ const renderInlineMarkdownReadOnly = async (arg: {
     if (href) {
       const anchor = span as HTMLAnchorElement;
       anchor.href = href;
-      anchor.target = '_blank';
-      anchor.rel = 'noopener noreferrer';
+      if (!getInternalLinkTarget(href)) {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
       textDecorations.push('underline');
     }
     if (run.fontName) {
