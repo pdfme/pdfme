@@ -1,5 +1,5 @@
 export { Box, List, Page, PageBreak, Row, Spacer, Stack, Table, Text } from './components.js';
-export { renderToPdfmeTemplate, renderToTemplate } from './render.js';
+export { renderToTemplate } from './render.js';
 export type {
   BoxProps,
   BoxSides,

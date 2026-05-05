@@ -1,4 +1,4 @@
-import { resolvePageSize } from '@pdfme/common';
+import { pt2mm, resolvePageSize } from '@pdfme/common';
 import type { Schema, Template } from '@pdfme/common';
 import type {
   CellStyle as SchemaCellStyle,
@@ -30,7 +30,7 @@ type RenderCtx = {
   schemas: Schema[];
   inputs: Record<string, string>;
   usedNames: Set<string>;
-  nameCounter: number;
+  nameCounters: Record<string, number>;
   defaultFont?: string;
 };
 
@@ -45,6 +45,7 @@ const DEFAULT_DYNAMIC_FONT_SIZE = {
 } as const satisfies NonNullable<TextSchema['dynamicFontSize']>;
 
 export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {}): RenderResult => {
+  validatePageBreakPlacement(node);
   const expanded = expandPageBreaks(node);
   const pages = flattenChildren(expanded).filter(
     (child): child is PdfJsxElement<'page'> => isPdfJsxElement(child) && child.kind === 'page',
@@ -57,9 +58,10 @@ export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {})
   const firstPageProps = pages[0]?.props as PageProps;
   const firstMargin = resolveBoxSides(firstPageProps.margin);
   const pageSize = resolvePageSize(firstPageProps.size, firstPageProps.orientation);
+  validateConsistentPageProps(pages, pageSize, firstMargin);
   const inputs: Record<string, string> = {};
   const usedNames = new Set<string>();
-  let nameCounter = 0;
+  const nameCounters: Record<string, number> = {};
   const pageSchemas: Schema[][] = [];
 
   for (const page of pages) {
@@ -75,11 +77,10 @@ export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {})
       schemas: [],
       inputs,
       usedNames,
-      nameCounter,
+      nameCounters,
       defaultFont: props.font,
     };
     layoutChildren(page.children, frame, 'stack', { gap: 0 }, ctx);
-    nameCounter = ctx.nameCounter;
     pageSchemas.push(ctx.schemas);
   }
 
@@ -94,8 +95,6 @@ export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {})
 
   return { template, inputs: [inputs] };
 };
-
-export const renderToPdfmeTemplate = renderToTemplate;
 
 const flattenChildren = (
   children: PdfJsxChild | PdfJsxChild[],
@@ -358,7 +357,7 @@ const renderText = (
     readOnly,
     required: props.required,
     alignment: props.align ?? 'left',
-    verticalAlignment: props.valign ?? 'middle',
+    verticalAlignment: props.valign ?? 'top',
     fontSize,
     fontName: props.font ?? ctx.defaultFont,
     lineHeight,
@@ -563,12 +562,69 @@ const resolveName = (ctx: RenderCtx, prefix: string, userName?: string): string 
 
   let name = '';
   do {
-    ctx.nameCounter += 1;
-    name = `${prefix}_${ctx.nameCounter}`;
+    ctx.nameCounters[prefix] = (ctx.nameCounters[prefix] ?? 0) + 1;
+    name = `${prefix}_${ctx.nameCounters[prefix]}`;
   } while (ctx.usedNames.has(name));
   ctx.usedNames.add(name);
   return name;
 };
 
 const estimateTextHeight = (fontSize: number, lineHeight: number) =>
-  Math.max(4, fontSize * lineHeight * 0.5 + 1);
+  Math.max(4, pt2mm(fontSize * lineHeight));
+
+const validateConsistentPageProps = (
+  pages: PdfJsxElement<'page'>[],
+  firstPageSize: { width: number; height: number },
+  firstMargin: ReturnType<typeof resolveBoxSides>,
+) => {
+  for (let i = 1; i < pages.length; i += 1) {
+    const props = pages[i]?.props as PageProps;
+    const pageSize = resolvePageSize(props.size, props.orientation);
+    const margin = resolveBoxSides(props.margin);
+
+    if (!isSameSize(pageSize, firstPageSize) || !isSameBoxSides(margin, firstMargin)) {
+      throw new Error(
+        '@pdfme/jsx: all <Page> nodes must use the same size, orientation, and margin. pdfme templates have one blank basePdf size and padding.',
+      );
+    }
+  }
+};
+
+const isSameSize = (
+  first: { width: number; height: number },
+  second: { width: number; height: number },
+) => first.width === second.width && first.height === second.height;
+
+const isSameBoxSides = (
+  first: ReturnType<typeof resolveBoxSides>,
+  second: ReturnType<typeof resolveBoxSides>,
+) =>
+  first.top === second.top &&
+  first.right === second.right &&
+  first.bottom === second.bottom &&
+  first.left === second.left;
+
+const PAGE_BREAK_PARENT_KINDS = new Set(['page', 'stack', 'box']);
+
+const validatePageBreakPlacement = (
+  node: PdfJsxChild | PdfJsxChild[],
+  parentKind: string | undefined = undefined,
+  canBreak = false,
+) => {
+  for (const child of flattenForSplitting(node)) {
+    if (!isPdfJsxElement(child)) continue;
+
+    if (child.kind === 'pagebreak') {
+      if (!canBreak || !parentKind || !PAGE_BREAK_PARENT_KINDS.has(parentKind)) {
+        throw new Error(
+          '@pdfme/jsx: <PageBreak> can only be used inside <Page>, <Stack>, or <Box>.',
+        );
+      }
+      continue;
+    }
+
+    const childCanBreak =
+      child.kind === 'page' ? true : canBreak && PAGE_BREAK_PARENT_KINDS.has(child.kind);
+    validatePageBreakPlacement(child.children, child.kind, childCanBreak);
+  }
+};

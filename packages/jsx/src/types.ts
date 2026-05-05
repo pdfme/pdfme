@@ -3,7 +3,6 @@ import type {
   ALIGNMENT,
   LIST_STYLE,
   ListItem as SchemaListItem,
-  ListSchema,
   CellStyle as SchemaCellStyle,
   TableSchema,
   TextSchema,
@@ -50,11 +49,17 @@ export type RenderResult = {
 };
 
 export type BoxSides = {
+  /** Overrides y for the top side. */
   top?: number;
+  /** Overrides x for the right side. */
   right?: number;
+  /** Overrides y for the bottom side. */
   bottom?: number;
+  /** Overrides x for the left side. */
   left?: number;
+  /** Horizontal shorthand used when left/right are omitted. */
   x?: number;
+  /** Vertical shorthand used when top/bottom are omitted. */
   y?: number;
 };
 
@@ -161,6 +166,7 @@ export type TableProps = CommonProps & {
   head: string[];
   rows?: (string | number)[][];
   data?: (string | number)[][];
+  /** Column width percentages passed to pdfme headWidthPercentages. */
   widths?: number[];
   width?: number;
   height?: number;
@@ -183,5 +189,3 @@ export type PageBreakProps = Record<string, unknown>;
 export type RenderOptions = {
   basePdf?: BasePdf;
 };
-
-export type PdfJsxSchema = Schema | TextSchema | ListSchema | TableSchema;

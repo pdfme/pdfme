@@ -31,6 +31,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
       width: 190,
       fontSize: 14,
       alignment: 'center',
+      verticalAlignment: 'top',
     });
     expect(result.inputs).toEqual([{}]);
   });
@@ -54,7 +55,9 @@ describe('@pdfme/jsx renderToTemplate', () => {
   it('uses Page font as the default fontName', () => {
     const result = renderToTemplate(
       <Page font="Roboto">
-        <Text>Title</Text>
+        <Box>
+          <Text>Title</Text>
+        </Box>
       </Page>,
     );
 
@@ -130,6 +133,23 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
+  it('does not render a rectangle schema for a Box without visual styles', () => {
+    const result = renderToTemplate(
+      <Page margin={0}>
+        <Box padding={2}>
+          <Text height={6}>Inside</Text>
+        </Box>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]).toHaveLength(1);
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Inside',
+      position: { x: 2, y: 2 },
+    });
+  });
+
   it('renders List and Table schemas with readOnly content by default', () => {
     const result = renderToTemplate(
       <Page>
@@ -178,6 +198,32 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.template.schemas[1]?.[0]?.content).toBe('Second');
   });
 
+  it('rejects PageBreak inside Row', () => {
+    expect(() =>
+      renderToTemplate(
+        <Page>
+          <Row>
+            <Text>Before</Text>
+            <PageBreak />
+            <Text>After</Text>
+          </Row>
+        </Page>,
+      ),
+    ).toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
+
+    expect(() =>
+      renderToTemplate(
+        <Page>
+          <Row>
+            <Stack>
+              <PageBreak />
+            </Stack>
+          </Row>
+        </Page>,
+      ),
+    ).toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
+  });
+
   it('accepts a fragment of Page nodes', () => {
     const result = renderToTemplate(
       <>
@@ -193,6 +239,94 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.template.schemas).toHaveLength(2);
     expect(result.template.schemas[0]?.[0]?.content).toBe('First');
     expect(result.template.schemas[1]?.[0]?.content).toBe('Second');
+  });
+
+  it('rejects mixed Page sizes and margins', () => {
+    expect(() =>
+      renderToTemplate(
+        <>
+          <Page size="A4" margin={10}>
+            <Text>First</Text>
+          </Page>
+          <Page size="Letter" margin={10}>
+            <Text>Second</Text>
+          </Page>
+        </>,
+      ),
+    ).toThrow('all <Page> nodes must use the same size');
+
+    expect(() =>
+      renderToTemplate(
+        <>
+          <Page margin={10}>
+            <Text>First</Text>
+          </Page>
+          <Page margin={12}>
+            <Text>Second</Text>
+          </Page>
+        </>,
+      ),
+    ).toThrow('all <Page> nodes must use the same size');
+  });
+
+  it('uses per-prefix auto names', () => {
+    const result = renderToTemplate(
+      <Page>
+        <Text>First</Text>
+        <List items={['One']} />
+        <Text>Second</Text>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.map((schema) => schema.name)).toEqual([
+      'text_1',
+      'list_1',
+      'text_2',
+    ]);
+  });
+
+  it('throws on duplicate explicit schema names', () => {
+    expect(() =>
+      renderToTemplate(
+        <Page>
+          <Text name="field">First</Text>
+          <Text name="field">Second</Text>
+        </Page>,
+      ),
+    ).toThrow('duplicate schema name "field"');
+  });
+
+  it('keeps named inputs merged across rendered pages', () => {
+    const result = renderToTemplate(
+      <Page>
+        <Text name="first">First</Text>
+        <PageBreak />
+        <Text name="second">Second</Text>
+      </Page>,
+    );
+
+    expect(result.template.schemas).toHaveLength(2);
+    expect(result.inputs).toEqual([{ first: 'First', second: 'Second' }]);
+  });
+
+  it('supports Stack inside Row flex allocation', () => {
+    const result = renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Row gap={4}>
+          <Text width={20}>Fixed</Text>
+          <Stack>
+            <Text height={6}>Nested</Text>
+          </Stack>
+        </Row>
+      </Page>,
+    );
+
+    const [, nested] = result.template.schemas[0] ?? [];
+    expect(nested).toMatchObject({
+      content: 'Nested',
+      position: { x: 24, y: 0 },
+      width: 76,
+    });
   });
 
   it('preserves inline-markdown textFormat for linked text', () => {
