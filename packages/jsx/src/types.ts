@@ -1,4 +1,4 @@
-import type { BasePdf, PageOrientation, PageSize, Schema, Template } from '@pdfme/common';
+import type { BasePdf, Font, PageOrientation, PageSize, Schema, Template } from '@pdfme/common';
 import type {
   ALIGNMENT,
   LIST_STYLE,
@@ -188,4 +188,5 @@ export type PageBreakProps = Record<string, unknown>;
 
 export type RenderOptions = {
   basePdf?: BasePdf;
+  font?: Font;
 };

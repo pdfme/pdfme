@@ -1,11 +1,12 @@
-import { pt2mm, resolvePageSize } from '@pdfme/common';
-import type { Schema, Template } from '@pdfme/common';
+import { getDefaultFont, pt2mm, resolvePageSize } from '@pdfme/common';
+import type { Font, Schema, Template } from '@pdfme/common';
 import type {
   CellStyle as SchemaCellStyle,
   ListSchema,
   TableSchema,
   TextSchema,
 } from '@pdfme/schemas/types';
+import { measureTextHeight } from '@pdfme/schemas/utils';
 import { cloneElementWithChildren, isPdfJsxElement, isPdfJsxFragment } from './node.js';
 import type {
   BoxProps,
@@ -32,6 +33,8 @@ type RenderCtx = {
   usedNames: Set<string>;
   nameCounters: Record<string, number>;
   defaultFont?: string;
+  font: Font;
+  _cache: Map<string | number, unknown>;
 };
 
 const DEFAULT_FONT_SIZE = 10;
@@ -44,7 +47,10 @@ const DEFAULT_DYNAMIC_FONT_SIZE = {
   fit: 'vertical',
 } as const satisfies NonNullable<TextSchema['dynamicFontSize']>;
 
-export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {}): RenderResult => {
+export const renderToTemplate = async (
+  node: PdfJsxChild,
+  options: RenderOptions = {},
+): Promise<RenderResult> => {
   validatePageBreakPlacement(node);
   const expanded = expandPageBreaks(node);
   const pages = flattenChildren(expanded).filter(
@@ -62,6 +68,8 @@ export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {})
   const inputs: Record<string, string> = {};
   const usedNames = new Set<string>();
   const nameCounters: Record<string, number> = {};
+  const font = options.font ?? getDefaultFont();
+  const _cache = new Map<string | number, unknown>();
   const pageSchemas: Schema[][] = [];
 
   for (const page of pages) {
@@ -79,8 +87,10 @@ export const renderToTemplate = (node: PdfJsxChild, options: RenderOptions = {})
       usedNames,
       nameCounters,
       defaultFont: props.font,
+      font,
+      _cache,
     };
-    layoutChildren(page.children, frame, 'stack', { gap: 0 }, ctx);
+    await layoutChildren(page.children, frame, 'stack', { gap: 0 }, ctx);
     pageSchemas.push(ctx.schemas);
   }
 
@@ -157,13 +167,13 @@ const flattenForSplitting = (children: PdfJsxChild | PdfJsxChild[]): PdfJsxChild
 const expandPageBreaks = (node: PdfJsxChild): PdfJsxChild[] =>
   splitChildrenByPageBreak(node).flat();
 
-const layoutChildren = (
+const layoutChildren = async (
   children: PdfJsxChild | PdfJsxChild[],
   frame: Rect,
   mode: 'stack' | 'row',
   opts: { gap: number },
   ctx: RenderCtx,
-): { width: number; height: number } => {
+): Promise<{ width: number; height: number }> => {
   const items = flattenChildren(children);
   const widths = mode === 'row' ? resolveRowWidths(items, frame.width, opts.gap) : undefined;
   let cursor = 0;
@@ -179,8 +189,8 @@ const layoutChildren = (
 
     const size =
       typeof child === 'string' || typeof child === 'number'
-        ? renderText({ children: String(child) }, childFrame, ctx)
-        : renderElement(child, childFrame, mode, ctx);
+        ? await renderText({ children: String(child) }, childFrame, ctx)
+        : await renderElement(child, childFrame, mode, ctx);
 
     const advance = mode === 'stack' ? size.height : width;
     cursor += advance + (i < items.length - 1 ? opts.gap : 0);
@@ -218,12 +228,12 @@ const resolveRowWidths = (
   return widths.map((width) => width ?? flexWidth);
 };
 
-const renderElement = (
+const renderElement = async (
   element: PdfJsxElement,
   frame: Rect,
   parentMode: 'stack' | 'row',
   ctx: RenderCtx,
-): { width: number; height: number } => {
+): Promise<{ width: number; height: number }> => {
   switch (element.kind) {
     case 'stack':
       return renderStack(element.props as StackProps, element.children, frame, ctx);
@@ -232,7 +242,7 @@ const renderElement = (
     case 'box':
       return renderBox(element.props as BoxProps, element.children, frame, parentMode, ctx);
     case 'spacer':
-      return renderSpacer(element.props as SpacerProps);
+      return Promise.resolve(renderSpacer(element.props as SpacerProps));
     case 'text':
       return renderText(
         { ...(element.props as TextProps), children: element.children },
@@ -257,7 +267,7 @@ const renderStack = (
   children: PdfJsxChild[],
   frame: Rect,
   ctx: RenderCtx,
-): { width: number; height: number } =>
+): Promise<{ width: number; height: number }> =>
   layoutChildren(
     children,
     { ...frame, width: props.width ?? frame.width },
@@ -273,7 +283,7 @@ const renderRow = (
   children: PdfJsxChild[],
   frame: Rect,
   ctx: RenderCtx,
-): { width: number; height: number } =>
+): Promise<{ width: number; height: number }> =>
   layoutChildren(
     children,
     { ...frame, width: props.width ?? frame.width, height: props.height ?? frame.height },
@@ -282,13 +292,13 @@ const renderRow = (
     ctx,
   );
 
-const renderBox = (
+const renderBox = async (
   props: BoxProps,
   children: PdfJsxChild[],
   frame: Rect,
   _parentMode: 'stack' | 'row',
   ctx: RenderCtx,
-): { width: number; height: number } => {
+): Promise<{ width: number; height: number }> => {
   const width = props.width ?? frame.width;
   const padding = resolveBoxSides(props.padding);
   const needsRect = Boolean(props.background || props.borderColor || props.borderWidth);
@@ -317,7 +327,7 @@ const renderBox = (
     width: width - padding.left - padding.right,
     height: (props.height ?? frame.height) - padding.top - padding.bottom,
   };
-  const childSize = layoutChildren(children, innerFrame, 'stack', { gap: 0 }, ctx);
+  const childSize = await layoutChildren(children, innerFrame, 'stack', { gap: 0 }, ctx);
   const height = props.height ?? childSize.height + padding.top + padding.bottom;
 
   if (needsRect) {
@@ -332,15 +342,14 @@ const renderSpacer = (props: SpacerProps): { width: number; height: number } => 
   height: props.height ?? 0,
 });
 
-const renderText = (
+const renderText = async (
   props: TextProps,
   frame: Rect,
   ctx: RenderCtx,
-): { width: number; height: number } => {
+): Promise<{ width: number; height: number }> => {
   const fontSize = props.size ?? DEFAULT_FONT_SIZE;
   const lineHeight = props.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const width = props.width ?? frame.width;
-  const height = props.height ?? estimateTextHeight(fontSize, lineHeight);
   const value = childrenToString(props.children);
   const name = resolveName(ctx, 'text', props.name);
   const readOnly = props.readOnly ?? props.name == null;
@@ -351,7 +360,7 @@ const renderText = (
     content: value,
     position: { x: frame.x, y: frame.y },
     width,
-    height,
+    height: props.height ?? 0,
     rotate: props.rotate ?? 0,
     opacity: props.opacity ?? 1,
     readOnly,
@@ -378,10 +387,13 @@ const renderText = (
       fit: props.dynamicFontSize.fit ?? DEFAULT_DYNAMIC_FONT_SIZE.fit,
     };
   }
+  if (props.height == null) {
+    schema.height = await measureTextHeight({ value, schema, font: ctx.font, _cache: ctx._cache });
+  }
   if (!readOnly) ctx.inputs[name] = value;
   ctx.schemas.push(schema);
 
-  return { width, height };
+  return { width, height: schema.height };
 };
 
 const renderList = (

@@ -6,8 +6,8 @@ import { Box, List, Page, PageBreak, Row, Spacer, Stack, Table, Text } from '../
 import { renderToTemplate } from '../render.js';
 
 describe('@pdfme/jsx renderToTemplate', () => {
-  it('renders a Page with a fixed Text schema', () => {
-    const result = renderToTemplate(
+  it('renders a Page with a fixed Text schema', async () => {
+    const result = await renderToTemplate(
       <Page margin={{ x: 10, y: 12 }}>
         <Text size={14} align="center">
           Hello pdfme
@@ -36,8 +36,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.inputs).toEqual([{}]);
   });
 
-  it('renders named Text as an input-backed schema', () => {
-    const result = renderToTemplate(
+  it('renders named Text as an input-backed schema', async () => {
+    const result = await renderToTemplate(
       <Page>
         <Text name="customerName">Alice</Text>
       </Page>,
@@ -52,8 +52,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.inputs[0]).toEqual({ customerName: 'Alice' });
   });
 
-  it('uses Page font as the default fontName', () => {
-    const result = renderToTemplate(
+  it('uses Page font as the default fontName', async () => {
+    const result = await renderToTemplate(
       <Page font="Roboto">
         <Box>
           <Text>Title</Text>
@@ -64,8 +64,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.template.schemas[0]?.[0]?.fontName).toBe('Roboto');
   });
 
-  it('uses shared page size presets with orientation', () => {
-    const result = renderToTemplate(
+  it('uses shared page size presets with orientation', async () => {
+    const result = await renderToTemplate(
       <Page size="Letter" orientation="landscape">
         <Text>Landscape</Text>
       </Page>,
@@ -77,8 +77,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
-  it('stacks children with gaps and spacer height', () => {
-    const result = renderToTemplate(
+  it('stacks children with gaps and spacer height', async () => {
+    const result = await renderToTemplate(
       <Page margin={0}>
         <Stack gap={2}>
           <Text height={6}>A</Text>
@@ -93,8 +93,25 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(second?.position.y).toBe(14);
   });
 
-  it('distributes Row width across flex children', () => {
-    const result = renderToTemplate(
+  it('measures Text auto height with pdfme text wrapping', async () => {
+    const singleLine = await renderToTemplate(
+      <Page margin={0}>
+        <Text width={60}>Short text</Text>
+      </Page>,
+    );
+    const wrapped = await renderToTemplate(
+      <Page margin={0}>
+        <Text width={20}>This text should wrap into several rendered lines.</Text>
+      </Page>,
+    );
+
+    expect(wrapped.template.schemas[0]?.[0]?.height).toBeGreaterThan(
+      singleLine.template.schemas[0]?.[0]?.height ?? 0,
+    );
+  });
+
+  it('distributes Row width across flex children', async () => {
+    const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
         <Row gap={4}>
           <Text width={20}>Fixed</Text>
@@ -111,8 +128,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(flex2?.width).toBe(36);
   });
 
-  it('renders Box background before its children', () => {
-    const result = renderToTemplate(
+  it('renders Box background before its children', async () => {
+    const result = await renderToTemplate(
       <Page margin={0}>
         <Box background="#eeeeee" padding={2}>
           <Text height={6}>Inside</Text>
@@ -133,8 +150,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
-  it('does not render a rectangle schema for a Box without visual styles', () => {
-    const result = renderToTemplate(
+  it('does not render a rectangle schema for a Box without visual styles', async () => {
+    const result = await renderToTemplate(
       <Page margin={0}>
         <Box padding={2}>
           <Text height={6}>Inside</Text>
@@ -150,8 +167,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
-  it('renders List and Table schemas with readOnly content by default', () => {
-    const result = renderToTemplate(
+  it('renders List and Table schemas with readOnly content by default', async () => {
+    const result = await renderToTemplate(
       <Page>
         <List items={['One', { text: 'Two', level: 1 }]} listStyle="ordered" />
         <Table
@@ -184,8 +201,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ]);
   });
 
-  it('splits pages at PageBreak', () => {
-    const result = renderToTemplate(
+  it('splits pages at PageBreak', async () => {
+    const result = await renderToTemplate(
       <Page>
         <Text>First</Text>
         <PageBreak />
@@ -198,8 +215,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.template.schemas[1]?.[0]?.content).toBe('Second');
   });
 
-  it('rejects PageBreak inside Row', () => {
-    expect(() =>
+  it('rejects PageBreak inside Row', async () => {
+    await expect(
       renderToTemplate(
         <Page>
           <Row>
@@ -209,9 +226,9 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Row>
         </Page>,
       ),
-    ).toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
+    ).rejects.toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
 
-    expect(() =>
+    await expect(
       renderToTemplate(
         <Page>
           <Row>
@@ -221,11 +238,11 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Row>
         </Page>,
       ),
-    ).toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
+    ).rejects.toThrow('<PageBreak> can only be used inside <Page>, <Stack>, or <Box>');
   });
 
-  it('accepts a fragment of Page nodes', () => {
-    const result = renderToTemplate(
+  it('accepts a fragment of Page nodes', async () => {
+    const result = await renderToTemplate(
       <>
         <Page>
           <Text>First</Text>
@@ -241,8 +258,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.template.schemas[1]?.[0]?.content).toBe('Second');
   });
 
-  it('rejects mixed Page sizes and margins', () => {
-    expect(() =>
+  it('rejects mixed Page sizes and margins', async () => {
+    await expect(
       renderToTemplate(
         <>
           <Page size="A4" margin={10}>
@@ -253,9 +270,9 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Page>
         </>,
       ),
-    ).toThrow('all <Page> nodes must use the same size');
+    ).rejects.toThrow('all <Page> nodes must use the same size');
 
-    expect(() =>
+    await expect(
       renderToTemplate(
         <>
           <Page margin={10}>
@@ -266,11 +283,11 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Page>
         </>,
       ),
-    ).toThrow('all <Page> nodes must use the same size');
+    ).rejects.toThrow('all <Page> nodes must use the same size');
   });
 
-  it('uses per-prefix auto names', () => {
-    const result = renderToTemplate(
+  it('uses per-prefix auto names', async () => {
+    const result = await renderToTemplate(
       <Page>
         <Text>First</Text>
         <List items={['One']} />
@@ -285,19 +302,19 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ]);
   });
 
-  it('throws on duplicate explicit schema names', () => {
-    expect(() =>
+  it('throws on duplicate explicit schema names', async () => {
+    await expect(
       renderToTemplate(
         <Page>
           <Text name="field">First</Text>
           <Text name="field">Second</Text>
         </Page>,
       ),
-    ).toThrow('duplicate schema name "field"');
+    ).rejects.toThrow('duplicate schema name "field"');
   });
 
-  it('keeps named inputs merged across rendered pages', () => {
-    const result = renderToTemplate(
+  it('keeps named inputs merged across rendered pages', async () => {
+    const result = await renderToTemplate(
       <Page>
         <Text name="first">First</Text>
         <PageBreak />
@@ -309,8 +326,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.inputs).toEqual([{ first: 'First', second: 'Second' }]);
   });
 
-  it('supports Stack inside Row flex allocation', () => {
-    const result = renderToTemplate(
+  it('supports Stack inside Row flex allocation', async () => {
+    const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
         <Row gap={4}>
           <Text width={20}>Fixed</Text>
@@ -329,8 +346,8 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
-  it('preserves inline-markdown textFormat for linked text', () => {
-    const result = renderToTemplate(
+  it('preserves inline-markdown textFormat for linked text', async () => {
+    const result = await renderToTemplate(
       <Page>
         <Text textFormat="inline-markdown">[pdfme](https://pdfme.com)</Text>
       </Page>,
@@ -341,5 +358,6 @@ describe('@pdfme/jsx renderToTemplate', () => {
       textFormat: 'inline-markdown',
       content: '[pdfme](https://pdfme.com)',
     });
+    expect(result.template.schemas[0]?.[0]?.height).toBeGreaterThan(0);
   });
 });
