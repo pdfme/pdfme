@@ -191,10 +191,16 @@ function FormAndViewerApp() {
       label: '',
       content: (
         <div className="flex gap-2">
-          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onGetInputs}>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
+            onClick={onGetInputs}
+          >
             Get Inputs
           </button>
-          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onSetInputs}>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
+            onClick={onSetInputs}
+          >
             Set Inputs
           </button>
         </div>
@@ -204,10 +210,16 @@ function FormAndViewerApp() {
       label: '',
       content: (
         <div className="flex gap-2">
-          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onSaveInputs}>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
+            onClick={onSaveInputs}
+          >
             Save Inputs
           </button>
-          <button className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300" onClick={onResetInputs}>
+          <button
+            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
+            onClick={onResetInputs}
+          >
             Reset Inputs
           </button>
         </div>
