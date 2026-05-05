@@ -1,15 +1,12 @@
 import type { BasePdf, PageOrientation, PageSize, Schema, Template } from '@pdfme/common';
 import type {
   ALIGNMENT,
-  DYNAMIC_FONT_SIZE_FIT,
   LIST_STYLE,
   ListItem as SchemaListItem,
   ListSchema,
   CellStyle as SchemaCellStyle,
   TableSchema,
-  TEXT_FORMAT,
   TextSchema,
-  VERTICAL_ALIGNMENT,
 } from '@pdfme/schemas/types';
 export type { PageOrientation, PageSize, PageSizePreset } from '@pdfme/common';
 
@@ -61,10 +58,7 @@ export type BoxSides = {
   y?: number;
 };
 
-export type CommonProps = {
-  rotate?: number;
-  opacity?: number;
-};
+export type CommonProps = Partial<Pick<Schema, 'rotate' | 'opacity'>>;
 
 export type PageProps = {
   size?: PageSize;
@@ -103,32 +97,35 @@ export type SpacerProps = {
   height?: number;
 };
 
-export type TextProps = CommonProps & {
-  name?: string;
-  children?: PdfJsxChild;
-  width?: number;
-  height?: number;
-  size?: number;
-  font?: string;
-  align?: ALIGNMENT;
-  valign?: VERTICAL_ALIGNMENT;
-  lineHeight?: number;
-  spacing?: number;
-  color?: string;
-  background?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  strikethrough?: boolean;
-  underline?: boolean;
-  readOnly?: boolean;
-  required?: boolean;
-  textFormat?: TEXT_FORMAT;
-  dynamicFontSize?: {
-    min?: number;
-    max?: number;
-    fit?: DYNAMIC_FONT_SIZE_FIT;
+type TextSchemaProps = Partial<
+  Pick<
+    TextSchema,
+    | 'name'
+    | 'width'
+    | 'height'
+    | 'lineHeight'
+    | 'strikethrough'
+    | 'underline'
+    | 'readOnly'
+    | 'required'
+    | 'textFormat'
+  >
+>;
+
+export type TextProps = CommonProps &
+  TextSchemaProps & {
+    children?: PdfJsxChild;
+    size?: TextSchema['fontSize'];
+    font?: TextSchema['fontName'];
+    align?: TextSchema['alignment'];
+    valign?: TextSchema['verticalAlignment'];
+    spacing?: TextSchema['characterSpacing'];
+    color?: TextSchema['fontColor'];
+    background?: TextSchema['backgroundColor'];
+    borderColor?: string;
+    borderWidth?: number;
+    dynamicFontSize?: Partial<NonNullable<TextSchema['dynamicFontSize']>>;
   };
-};
 
 export type ListItem = string | { text: SchemaListItem['text']; level?: SchemaListItem['level'] };
 
