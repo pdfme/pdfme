@@ -46,6 +46,7 @@ import type {
   DynamicLayoutResult,
   GetDynamicLayout,
 } from './types.js';
+import type { PdfLinkAnnotationRect } from './helper.js';
 import {
   cloneDeep,
   getFallbackFontName,
@@ -68,6 +69,14 @@ import {
   getInputFromTemplate,
   isBlankPdf,
   isUrlSafeToFetch,
+  getInternalLinkTarget,
+  normalizeInternalLinkHref,
+  normalizeLinkHref,
+  normalizeSafeLinkUri,
+  registerInternalLinkAnchor,
+  registerInternalLinkAnnotation,
+  resetInternalLinkAnnotations,
+  applyInternalLinkAnnotations,
 } from './helper.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
@@ -107,6 +116,14 @@ export {
   checkGenerateProps,
   pluginRegistry,
   isUrlSafeToFetch,
+  getInternalLinkTarget,
+  normalizeInternalLinkHref,
+  normalizeLinkHref,
+  normalizeSafeLinkUri,
+  registerInternalLinkAnchor,
+  registerInternalLinkAnnotation,
+  resetInternalLinkAnnotations,
+  applyInternalLinkAnnotations,
 };
 
 export type {
@@ -145,4 +162,5 @@ export type {
   DynamicLayoutPatchArgs,
   DynamicLayoutResult,
   GetDynamicLayout,
+  PdfLinkAnnotationRect,
 };

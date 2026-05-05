@@ -8,11 +8,23 @@ import {
   getB64BasePdf,
   isBlankPdf,
   mm2pt,
+  normalizeSafeLinkUri,
   pluginRegistry,
   BasePdf,
 } from '@pdfme/common';
 import { builtInPlugins } from '@pdfme/schemas/builtins';
-import { PDFPage, PDFDocument, PDFEmbeddedPage, TransformationMatrix } from '@pdfme/pdf-lib';
+import {
+  PDFPage,
+  PDFDocument,
+  PDFEmbeddedPage,
+  TransformationMatrix,
+  PDFDict,
+  PDFName,
+  PDFArray,
+  PDFObjectCopier,
+  PDFString,
+  PDFHexString,
+} from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox } from './types.js';
 
@@ -46,6 +58,7 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
       mediaBox: p.getMediaBox(),
       bleedBox: p.getBleedBox(),
       trimBox: p.getTrimBox(),
+      sourcePage: p,
     }));
     const boundingBoxes = embedPdfPages.map((p) => {
       const { x, y, width, height } = p.getMediaBox();
@@ -57,6 +70,62 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
     basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
   }
   return { basePages, embedPdfBoxes };
+};
+
+const getSafeUriFromLinkAnnotation = (annotation: PDFDict) => {
+  if (annotation.lookupMaybe(PDFName.of('Subtype'), PDFName) !== PDFName.of('Link')) return;
+
+  const action = annotation.lookupMaybe(PDFName.of('A'), PDFDict);
+  if (!action) return;
+
+  if (action.lookupMaybe(PDFName.of('S'), PDFName) !== PDFName.of('URI')) return;
+
+  const uri = action.lookupMaybe(PDFName.of('URI'), PDFString, PDFHexString);
+  return uri ? normalizeSafeLinkUri(uri.decodeText()) : undefined;
+};
+
+const copyBasePdfUriLinkAnnotations = (arg: {
+  sourcePage: PDFPage;
+  targetPage: PDFPage;
+  pdfDoc: PDFDocument;
+}) => {
+  const { sourcePage, targetPage, pdfDoc } = arg;
+  const sourceAnnots = sourcePage.node.Annots();
+  if (!sourceAnnots) return;
+
+  const copier = PDFObjectCopier.for(sourcePage.doc.context, pdfDoc.context);
+
+  for (let idx = 0; idx < sourceAnnots.size(); idx += 1) {
+    const sourceAnnotation = sourceAnnots.lookupMaybe(idx, PDFDict);
+    if (!sourceAnnotation) continue;
+
+    const safeUri = getSafeUriFromLinkAnnotation(sourceAnnotation);
+    if (!safeUri) continue;
+    const rect = sourceAnnotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
+    if (!rect) continue;
+
+    const border = sourceAnnotation.lookupMaybe(PDFName.of('Border'), PDFArray);
+    const color = sourceAnnotation.lookupMaybe(PDFName.of('C'), PDFArray);
+    const highlightMode = sourceAnnotation.lookupMaybe(PDFName.of('H'), PDFName);
+
+    // Preserve the clickable area and common link hints, but rebuild the URI action so page-bound
+    // or unsafe source annotation data is not copied into the generated document.
+    const copiedAnnotation = pdfDoc.context.obj({
+      Type: PDFName.of('Annot'),
+      Subtype: PDFName.of('Link'),
+      Rect: copier.copy(rect),
+      Border: border ? copier.copy(border) : pdfDoc.context.obj([0, 0, 0]),
+      C: color ? copier.copy(color) : undefined,
+      H: highlightMode ? copier.copy(highlightMode) : undefined,
+      A: {
+        Type: PDFName.of('Action'),
+        S: PDFName.of('URI'),
+        URI: PDFString.of(safeUri),
+      },
+    });
+
+    targetPage.node.addAnnot(pdfDoc.context.register(copiedAnnotation));
+  }
 };
 
 export const validateRequiredFields = (template: Template, inputs: Record<string, unknown>[]) => {
@@ -166,6 +235,13 @@ export const insertPage = (arg: {
     insertedPage.setMediaBox(mediaBox.x, mediaBox.y, mediaBox.width, mediaBox.height);
     insertedPage.setBleedBox(bleedBox.x, bleedBox.y, bleedBox.width, bleedBox.height);
     insertedPage.setTrimBox(trimBox.x, trimBox.y, trimBox.width, trimBox.height);
+    if (embedPdfBox.sourcePage) {
+      copyBasePdfUriLinkAnnotations({
+        sourcePage: embedPdfBox.sourcePage,
+        targetPage: insertedPage,
+        pdfDoc,
+      });
+    }
   }
 
   return insertedPage;

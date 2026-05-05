@@ -187,8 +187,12 @@ const applyInlineMarkdownStyle = (arg: {
   if (resolvedFont.syntheticItalic) {
     element.style.fontStyle = 'italic';
   }
+  const textDecorations: string[] = [];
   if (run.strikethrough) {
-    element.style.textDecoration = 'line-through';
+    textDecorations.push('line-through');
+  }
+  if (textDecorations.length > 0) {
+    element.style.textDecoration = textDecorations.join(' ');
   }
   if (run.code) {
     element.style.backgroundColor = CODE_BACKGROUND_COLOR;

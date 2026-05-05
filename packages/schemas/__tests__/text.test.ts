@@ -103,6 +103,43 @@ describe('parseInlineMarkdown', () => {
     expect(stripInlineMarkdown('Hello **bold** and `code`')).toBe('Hello bold and code');
   });
 
+  it('parses links as href runs while preserving nested style', () => {
+    expect(parseInlineMarkdown('See [**pdfme** docs](https://pdfme.com/docs).')).toEqual([
+      { text: 'See ' },
+      { text: 'pdfme', bold: true, href: 'https://pdfme.com/docs' },
+      { text: ' docs', href: 'https://pdfme.com/docs' },
+      { text: '.' },
+    ]);
+    expect(stripInlineMarkdown('See [pdfme](https://pdfme.com).')).toBe('See pdfme.');
+  });
+
+  it('only parses safe link destinations', () => {
+    expect(
+      parseInlineMarkdown('[web](https://pdfme.com) [mail](mailto:hello@pdfme.com) [toc](#toc)'),
+    ).toEqual([
+      { text: 'web', href: 'https://pdfme.com' },
+      { text: ' ' },
+      { text: 'mail', href: 'mailto:hello@pdfme.com' },
+      { text: ' ' },
+      { text: 'toc', href: '#toc' },
+    ]);
+    expect(parseInlineMarkdown('[bad](javascript:alert(1)) [file](file:///tmp/a)')).toEqual([
+      { text: '[bad](javascript:alert(1)) [file](file:///tmp/a)' },
+    ]);
+  });
+
+  it('handles empty link labels and destinations explicitly', () => {
+    expect(parseInlineMarkdown('Go [](https://pdfme.com).')).toEqual([{ text: 'Go .' }]);
+    expect(parseInlineMarkdown('Go [empty]().')).toEqual([{ text: 'Go [empty]().' }]);
+  });
+
+  it('keeps escaped links as literal text', () => {
+    const escaped = escapeInlineMarkdown('[pdfme](https://pdfme.com)');
+
+    expect(escaped).toBe('\\[pdfme\\]\\(https://pdfme.com\\)');
+    expect(parseInlineMarkdown(escaped)).toEqual([{ text: '[pdfme](https://pdfme.com)' }]);
+  });
+
   it('escapes markdown markers for literal content', () => {
     const escaped = escapeInlineMarkdown('**literal** and `code` with \\');
 

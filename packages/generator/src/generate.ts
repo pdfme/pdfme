@@ -2,11 +2,15 @@ import * as pdfLib from '@pdfme/pdf-lib';
 import type { GenerateProps, Schema, PDFRenderProps, Template } from '@pdfme/common';
 import {
   checkGenerateProps,
+  applyInternalLinkAnnotations,
   getDynamicTemplate,
   isBlankPdf,
   replacePlaceholders,
   pt2mm,
   cloneDeep,
+  mm2pt,
+  registerInternalLinkAnchor,
+  resetInternalLinkAnnotations,
 } from '@pdfme/common';
 import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
 import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
@@ -79,6 +83,22 @@ const getAdjustedSchema = (
   };
 };
 
+const registerSchemaAnchor = (
+  _cache: Map<string | number, unknown>,
+  schema: Schema,
+  page: pdfLib.PDFPage,
+) => {
+  if (!schema.name) return;
+
+  registerInternalLinkAnchor({
+    _cache,
+    name: schema.name,
+    page,
+    x: mm2pt(schema.position.x),
+    y: page.getHeight() - mm2pt(schema.position.y),
+  });
+};
+
 const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> => {
   checkGenerateProps(props);
   const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
@@ -99,7 +119,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
 
   const { pdfDoc, renderObj } = await preprocessing({ template, userPlugins });
 
-  const _cache = new Map<string, unknown>();
+  const _cache = new Map<string | number, unknown>();
   // Dynamic layout is only applied to blank PDFs, so custom base PDF pages can be embedded once.
   const cachedEmbedPdfPages = isBlankBasePdf
     ? undefined
@@ -113,6 +133,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
 
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
+    resetInternalLinkAnnotations(_cache);
 
     const dynamicTemplate: Template = shouldApplyDynamicTemplate
       ? await getDynamicTemplate({
@@ -176,6 +197,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
             boundingBoxLeft,
             boundingBoxBottom,
           );
+          registerSchemaAnchor(_cache, adjustedStaticSchema, page);
 
           const staticRenderProps: PDFRenderProps<Schema> = {
             value,
@@ -216,6 +238,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           : ((input[name] || '') as string);
 
         const adjustedSchema = getAdjustedSchema(schema, boundingBoxLeft, boundingBoxBottom);
+        registerSchemaAnchor(_cache, adjustedSchema, page);
 
         const renderProps: PDFRenderProps<Schema> = {
           value,
@@ -230,6 +253,8 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         await render(renderProps);
       }
     }
+
+    applyInternalLinkAnnotations({ _cache, pdfDoc });
   }
 
   postProcessing({ pdfDoc, options });

@@ -1,6 +1,11 @@
 import type * as CSS from 'csstype';
 import type { Font as FontKitFont } from 'fontkit';
-import { UIRenderProps, getDefaultFont } from '@pdfme/common';
+import {
+  UIRenderProps,
+  getDefaultFont,
+  getInternalLinkTarget,
+  normalizeLinkHref,
+} from '@pdfme/common';
 import type { TextSchema } from './types.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -212,10 +217,21 @@ const renderInlineMarkdownReadOnly = async (arg: {
 
   textBlock.innerHTML = '';
   runs.forEach((run) => {
-    const span = document.createElement('span');
+    const href = run.href ? normalizeLinkHref(run.href) : undefined;
+    const span = href ? document.createElement('a') : document.createElement('span');
     const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
+    const textDecorations: string[] = [];
 
     span.textContent = processedText;
+    if (href) {
+      const anchor = span as HTMLAnchorElement;
+      anchor.href = href;
+      if (!getInternalLinkTarget(href)) {
+        anchor.target = '_blank';
+        anchor.rel = 'noopener noreferrer';
+      }
+      textDecorations.push('underline');
+    }
     if (run.fontName) {
       span.style.fontFamily = `'${run.fontName}'`;
     }
@@ -227,7 +243,10 @@ const renderInlineMarkdownReadOnly = async (arg: {
       span.style.fontStyle = 'italic';
     }
     if (run.strikethrough) {
-      span.style.textDecoration = 'line-through';
+      textDecorations.push('line-through');
+    }
+    if (textDecorations.length > 0) {
+      span.style.textDecoration = textDecorations.join(' ');
     }
     if (run.code) {
       span.style.backgroundColor = CODE_BACKGROUND_COLOR;
