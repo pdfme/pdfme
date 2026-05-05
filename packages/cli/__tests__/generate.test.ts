@@ -4,6 +4,7 @@ import { join, dirname, resolve } from 'node:path';
 import { writeFileSync, mkdirSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PDFDocument } from '@pdfme/pdf-lib';
+import { a4BasePdf } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -79,15 +80,17 @@ describe('generate command', () => {
       JSON.stringify({
         template: {
           basePdf: './base.pdf',
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 80,
-              height: 10,
-            },
-          ]],
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -113,16 +116,18 @@ describe('generate command', () => {
       jobPath,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -149,7 +154,7 @@ describe('generate command', () => {
     writeFileSync(
       jobPath,
       JSON.stringify({
-        template: { basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] } },
+        template: { basePdf: a4BasePdf() },
         inputs: {},
       }),
     );
@@ -169,16 +174,18 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -210,28 +217,24 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
     );
 
-    const result = runCli([
-      'generate',
-      join(workDir, 'job.json'),
-      '--scale',
-      'nope',
-      '--json',
-    ]);
+    const result = runCli(['generate', join(workDir, 'job.json'), '--scale', 'nope', '--json']);
 
     expect(result.exitCode).toBe(1);
     const parsed = JSON.parse(result.stdout);
@@ -248,16 +251,18 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'textbox',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'textbox',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -286,19 +291,21 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'invoiceMeta',
-              type: 'multiVariableText',
-              text: 'Invoice {inv}',
-              variables: ['inv'],
-              required: true,
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'invoiceMeta',
+                type: 'multiVariableText',
+                text: 'Invoice {inv}',
+                variables: ['inv'],
+                required: true,
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ invoiceMeta: 'INV-001' }],
       }),
@@ -331,45 +338,47 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'lineItems',
-              type: 'table',
-              head: ['Item', 'Qty'],
-              headWidthPercentages: [70, 30],
-              tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
-              headStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#ffffff',
-                backgroundColor: '#2980ba',
-                borderColor: '',
-                borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'lineItems',
+                type: 'table',
+                head: ['Item', 'Qty'],
+                headWidthPercentages: [70, 30],
+                tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
+                headStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#ffffff',
+                  backgroundColor: '#2980ba',
+                  borderColor: '',
+                  borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                bodyStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#000000',
+                  backgroundColor: '',
+                  alternateBackgroundColor: '#f5f5f5',
+                  borderColor: '#888888',
+                  borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                columnStyles: {},
+                position: { x: 20, y: 20 },
+                width: 120,
+                height: 20,
               },
-              bodyStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#000000',
-                backgroundColor: '',
-                alternateBackgroundColor: '#f5f5f5',
-                borderColor: '#888888',
-                borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
-              },
-              columnStyles: {},
-              position: { x: 20, y: 20 },
-              width: 120,
-              height: 20,
-            },
-          ]],
+            ],
+          ],
         },
         inputs: [{ lineItems: 'Paper x2' }],
       }),
@@ -388,7 +397,9 @@ describe('generate command', () => {
     expect(parsed.ok).toBe(false);
     expect(parsed.error.code).toBe('EVALIDATE');
     expect(parsed.error.message).toContain('Field "lineItems" (table)');
-    expect(parsed.error.message).toContain('expects a JSON array of string arrays with 2 cells per row');
+    expect(parsed.error.message).toContain(
+      'expects a JSON array of string arrays with 2 cells per row',
+    );
     expect(parsed.error.message).toContain('Column headers: Item, Qty.');
     expect(parsed.error.message).toContain('Example: [["Item value","Qty value"]]');
     expect(parsed.error.message).toContain('JSON string input is also accepted for compatibility.');
@@ -403,17 +414,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'status',
-              type: 'select',
-              options: ['draft', 'sent'],
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'status',
+                type: 'select',
+                options: ['draft', 'sent'],
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ status: 'archived' }],
       }),
@@ -445,16 +458,18 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'approved',
-              type: 'checkbox',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'approved',
+                type: 'checkbox',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ approved: true }],
       }),
@@ -486,25 +501,27 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'choiceA',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-            {
-              name: 'choiceB',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 40, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'choiceA',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+              {
+                name: 'choiceB',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 40, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ choiceA: 'true', choiceB: 'true' }],
       }),
@@ -535,17 +552,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'appointmentTime',
-              type: 'time',
-              format: 'HH:mm',
-              position: { x: 20, y: 20 },
-              width: 20,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'appointmentTime',
+                type: 'time',
+                format: 'HH:mm',
+                position: { x: 20, y: 20 },
+                width: 20,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ appointmentTime: '24:61' }],
       }),
@@ -577,17 +596,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'publishedAt',
-              type: 'dateTime',
-              format: 'MM/dd/yyyy HH:mm',
-              position: { x: 20, y: 20 },
-              width: 40,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'publishedAt',
+                type: 'dateTime',
+                format: 'MM/dd/yyyy HH:mm',
+                position: { x: 20, y: 20 },
+                width: 40,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ publishedAt: '2026/03/08 02:30' }],
       }),
@@ -603,7 +624,9 @@ describe('generate command', () => {
     expect(parsed.ok).toBe(false);
     expect(parsed.error.code).toBe('EVALIDATE');
     expect(parsed.error.message).toContain('Field "publishedAt" (dateTime)');
-    expect(parsed.error.message).toContain('expects canonical stored content in format yyyy/MM/dd HH:mm');
+    expect(parsed.error.message).toContain(
+      'expects canonical stored content in format yyyy/MM/dd HH:mm',
+    );
     expect(parsed.error.message).toContain('Received plain string "2026/03/08 02:30"');
   });
 
@@ -616,16 +639,18 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -658,17 +683,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -700,17 +727,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -725,13 +754,10 @@ describe('generate command', () => {
     );
 
     const outputPath = join(workDir, 'out.pdf');
-    const result = runCli(
-      ['generate', join(workDir, 'job.json'), '-o', outputPath, '--json'],
-      {
-        preload: FIXTURE_PRELOAD,
-        env: createFixtureEnv(workDir),
-      },
-    );
+    const result = runCli(['generate', join(workDir, 'job.json'), '-o', outputPath, '--json'], {
+      preload: FIXTURE_PRELOAD,
+      env: createFixtureEnv(workDir),
+    });
 
     expect(result.exitCode).toBe(0);
     expect(existsSync(outputPath)).toBe(true);
@@ -748,17 +774,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -802,17 +830,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -857,17 +887,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -909,17 +941,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -961,17 +995,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -996,24 +1032,28 @@ describe('generate command', () => {
 
   it('supports data URI ttf sources in options.font', () => {
     const workDir = join(TMP, 'options-font-data-uri');
-    const fontData = readFileSync(resolve(FONT_FIXTURES_DIR, 'PinyonScript-Regular.ttf')).toString('base64');
+    const fontData = readFileSync(resolve(FONT_FIXTURES_DIR, 'PinyonScript-Regular.ttf')).toString(
+      'base64',
+    );
     mkdirSync(workDir, { recursive: true });
 
     writeFileSync(
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1039,24 +1079,28 @@ describe('generate command', () => {
 
   it('supports data URI font sources with ambiguous media types', () => {
     const workDir = join(TMP, 'options-font-data-uri-ambiguous-media-type');
-    const fontData = readFileSync(resolve(FONT_FIXTURES_DIR, 'PinyonScript-Regular.ttf')).toString('base64');
+    const fontData = readFileSync(resolve(FONT_FIXTURES_DIR, 'PinyonScript-Regular.ttf')).toString(
+      'base64',
+    );
     mkdirSync(workDir, { recursive: true });
 
     writeFileSync(
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1088,17 +1132,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1113,13 +1159,10 @@ describe('generate command', () => {
     );
 
     const outputPath = join(workDir, 'out.pdf');
-    const result = runCli(
-      ['generate', join(workDir, 'job.json'), '-o', outputPath, '--json'],
-      {
-        preload: FIXTURE_PRELOAD,
-        env: createFixtureEnv(workDir),
-      },
-    );
+    const result = runCli(['generate', join(workDir, 'job.json'), '-o', outputPath, '--json'], {
+      preload: FIXTURE_PRELOAD,
+      env: createFixtureEnv(workDir),
+    });
 
     expect(result.exitCode).toBe(0);
     expect(existsSync(outputPath)).toBe(true);
@@ -1136,17 +1179,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1178,17 +1223,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1219,17 +1266,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1260,17 +1309,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1301,17 +1352,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1343,17 +1396,19 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1393,16 +1448,18 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'こんにちは' }],
       }),
@@ -1434,29 +1491,25 @@ describe('generate command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'こんにちは' }],
       }),
     );
 
     const result = runCli(
-      [
-        'generate',
-        join(workDir, 'job.json'),
-        '-o',
-        join(workDir, 'out.pdf'),
-        '--json',
-      ],
+      ['generate', join(workDir, 'job.json'), '-o', join(workDir, 'out.pdf'), '--json'],
       {
         preload: OFFLINE_PRELOAD,
         env: { ...process.env, HOME: join(workDir, 'home') },
@@ -1483,16 +1536,18 @@ describe('generate command', () => {
         'job.json',
         JSON.stringify({
           template: {
-            basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-            schemas: [[
-              {
-                name: 'title',
-                type: 'text',
-                position: { x: 20, y: 20 },
-                width: 100,
-                height: 10,
-              },
-            ]],
+            basePdf: a4BasePdf(),
+            schemas: [
+              [
+                {
+                  name: 'title',
+                  type: 'text',
+                  position: { x: 20, y: 20 },
+                  width: 100,
+                  height: 10,
+                },
+              ],
+            ],
           },
           inputs: [{ title: 'Hello' }],
         }),

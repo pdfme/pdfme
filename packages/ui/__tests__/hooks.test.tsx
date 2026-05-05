@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { BLANK_PDF, type SchemaForUI, type Template } from '@pdfme/common';
+import { BLANK_PDF, PAGE_SIZE_PRESETS, type SchemaForUI, type Template } from '@pdfme/common';
 import * as converter from '@pdfme/converter';
 import * as helper from '../src/helper';
 import { useInitEvents, useUIPreProcessor } from '../src/hooks';
@@ -66,9 +66,9 @@ test('useUIPreProcessor runs pdf sizing and imaging in parallel with isolated bu
   expect(pdf2sizeMock).toHaveBeenCalled();
   expect(pdf2sizeMock.mock.calls[0][0]).not.toBe(pdf2imgMock.mock.calls[0][0]);
 
-  resolvePdf2size([{ width: 210, height: 297 }]);
+  resolvePdf2size([PAGE_SIZE_PRESETS.A4]);
 
-  await waitFor(() => expect(result.current.pageSizes).toEqual([{ width: 210, height: 297 }]));
+  await waitFor(() => expect(result.current.pageSizes).toEqual([PAGE_SIZE_PRESETS.A4]));
 });
 
 test('useInitEvents paste ignores missing DOM nodes instead of storing null active elements', () => {
@@ -89,7 +89,7 @@ test('useInitEvents paste ignores missing DOM nodes instead of storing null acti
     basePdf: BLANK_PDF,
     schemas: [[schema]],
   };
-  const pageSizes = [{ width: 210, height: 297 }];
+  const pageSizes = [PAGE_SIZE_PRESETS.A4];
   const schemasList = [[schema]];
   const changeSchemas = vi.fn();
   const commitSchemas = vi.fn();
@@ -101,9 +101,7 @@ test('useInitEvents paste ignores missing DOM nodes instead of storing null acti
   const past = { current: [] as SchemaForUI[][] };
   const future = { current: [] as SchemaForUI[][] };
 
-  let shortcuts:
-    | Parameters<typeof helper.initShortCuts>[0]
-    | undefined;
+  let shortcuts: Parameters<typeof helper.initShortCuts>[0] | undefined;
 
   vi.spyOn(helper, 'initShortCuts').mockImplementation((arg) => {
     shortcuts = arg;

@@ -253,9 +253,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
       span.style.borderRadius = '2px';
       span.style.padding = '0 0.15em';
       if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
-        span.style.fontFamily = run.fontName
-          ? `'${run.fontName}', monospace`
-          : 'monospace';
+        span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
       }
     }
     textBlock.appendChild(span);

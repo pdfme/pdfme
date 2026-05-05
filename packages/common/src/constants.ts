@@ -1,4 +1,5 @@
 import { BlankPdf, CustomPdf } from './types';
+import { PAGE_SIZE_PRESETS } from './pageSize';
 export const PT_TO_PX_RATIO = 1.333;
 export const PT_TO_MM_RATIO = 0.3528;
 export const MM_TO_PT_RATIO = 2.8346; // https://www.ddc.co.jp/words/archives/20090701114500.html
@@ -8,8 +9,7 @@ export const ZOOM = 3.7795275591;
  * Blank A4 PDF size.
  */
 export const BLANK_A4_PDF: BlankPdf = {
-  width: 210,
-  height: 297,
+  ...PAGE_SIZE_PRESETS.A4,
   padding: [10, 10, 10, 10],
 };
 

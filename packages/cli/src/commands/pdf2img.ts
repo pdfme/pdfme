@@ -1,6 +1,7 @@
 import { basename, extname, join } from 'node:path';
 import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { defineCommand } from 'citty';
+import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 import { pdf2img, pdf2size } from '@pdfme/converter';
 import {
   assertNoUnknownFlags,
@@ -95,7 +96,7 @@ export default defineCommand({
 
       for (const pageIdx of pageIndices) {
         let imageData = allImages[pageIdx];
-        const size = sizes[pageIdx] ?? { width: 210, height: 297 };
+        const size = sizes[pageIdx] ?? PAGE_SIZE_PRESETS.A4;
 
         if (args.grid) {
           imageData = await drawGridOnPdfImage(

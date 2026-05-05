@@ -33,6 +33,10 @@ const workspaceTests: Record<
     setupFiles: [path.resolve(repoRoot, 'packages/generator/vitest.setup.ts')],
     testTimeout: 60000,
   },
+  'packages/jsx': {
+    name: 'jsx',
+    include: ['src/__tests__/**/*.test.ts', 'src/__tests__/**/*.test.tsx'],
+  },
   'packages/manipulator': {
     name: 'manipulator',
     include: ['__tests__/**/*.test.ts'],
@@ -97,6 +101,10 @@ const pdfmeAliases = usePublishedPdfmeExports
         replacement: path.resolve(repoRoot, 'packages/schemas/src/utils.ts'),
       },
       {
+        find: '@pdfme/schemas/types',
+        replacement: path.resolve(repoRoot, 'packages/schemas/src/types.ts'),
+      },
+      {
         find: '@pdfme/common',
         replacement: path.resolve(repoRoot, 'packages/common/src/index.ts'),
       },
@@ -107,6 +115,18 @@ const pdfmeAliases = usePublishedPdfmeExports
       {
         find: '@pdfme/generator',
         replacement: path.resolve(repoRoot, 'packages/generator/src/index.ts'),
+      },
+      {
+        find: '@pdfme/jsx/jsx-runtime',
+        replacement: path.resolve(repoRoot, 'packages/jsx/src/jsx-runtime.ts'),
+      },
+      {
+        find: '@pdfme/jsx/jsx-dev-runtime',
+        replacement: path.resolve(repoRoot, 'packages/jsx/src/jsx-dev-runtime.ts'),
+      },
+      {
+        find: '@pdfme/jsx',
+        replacement: path.resolve(repoRoot, 'packages/jsx/src/index.ts'),
       },
       {
         find: '@pdfme/manipulator',

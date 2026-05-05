@@ -3,6 +3,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { PAGE_SIZE_PRESETS } from '@pdfme/common';
+import { a4BasePdf } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -40,10 +42,10 @@ describe('validate command', () => {
 
   it('validates a valid template', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+      ],
     };
     const file = join(TMP, 'valid.json');
     writeFileSync(file, JSON.stringify(template));
@@ -57,10 +59,10 @@ describe('validate command', () => {
 
   it('reports unknown type with suggestion', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'title', type: 'textbox', position: { x: 20, y: 20 }, width: 170, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'title', type: 'textbox', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+      ],
     };
     const file = join(TMP, 'bad-type.json');
     writeFileSync(file, JSON.stringify(template));
@@ -73,10 +75,10 @@ describe('validate command', () => {
 
   it('warns about out-of-bounds field', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 }],
+      ],
     };
     const file = join(TMP, 'oob.json');
     writeFileSync(file, JSON.stringify(template));
@@ -89,10 +91,10 @@ describe('validate command', () => {
 
   it('--strict fails on warnings', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 }],
+      ],
     };
     const file = join(TMP, 'oob-strict.json');
     writeFileSync(file, JSON.stringify(template));
@@ -103,10 +105,10 @@ describe('validate command', () => {
 
   it('--strict --json preserves the validate contract', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'wide', type: 'text', position: { x: 200, y: 20 }, width: 50, height: 15 }],
+      ],
     };
     const file = join(TMP, 'oob-strict-json.json');
     writeFileSync(file, JSON.stringify(template));
@@ -124,10 +126,10 @@ describe('validate command', () => {
 
   it('--json outputs structured result', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+      ],
     };
     const file = join(TMP, 'json-out.json');
     writeFileSync(file, JSON.stringify(template));
@@ -146,8 +148,8 @@ describe('validate command', () => {
       requiredFonts: [],
       basePdf: {
         kind: 'blank',
-        width: 210,
-        height: 297,
+        width: PAGE_SIZE_PRESETS.A4.width,
+        height: PAGE_SIZE_PRESETS.A4.height,
         paperSize: 'A4 portrait',
       },
     });
@@ -155,10 +157,10 @@ describe('validate command', () => {
 
   it('supports verbose output without polluting JSON stdout', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+      ],
     };
     const file = join(TMP, 'verbose-json.json');
     writeFileSync(file, JSON.stringify(template));
@@ -185,17 +187,19 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'NotoSerifJP',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'NotoSerifJP',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -233,19 +237,21 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'invoiceMeta',
-              type: 'multiVariableText',
-              text: 'Invoice {inv}',
-              variables: ['inv'],
-              required: true,
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'invoiceMeta',
+                type: 'multiVariableText',
+                text: 'Invoice {inv}',
+                variables: ['inv'],
+                required: true,
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ invoiceMeta: 'INV-001' }],
       }),
@@ -258,9 +264,7 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "invoiceMeta" (multiVariableText)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "invoiceMeta" (multiVariableText)')]),
     );
   });
 
@@ -270,47 +274,56 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'lineItems',
-              type: 'table',
-              head: ['Item', 'Qty'],
-              headWidthPercentages: [70, 30],
-              tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
-              headStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#ffffff',
-                backgroundColor: '#2980ba',
-                borderColor: '',
-                borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'lineItems',
+                type: 'table',
+                head: ['Item', 'Qty'],
+                headWidthPercentages: [70, 30],
+                tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
+                headStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#ffffff',
+                  backgroundColor: '#2980ba',
+                  borderColor: '',
+                  borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                bodyStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#000000',
+                  backgroundColor: '',
+                  alternateBackgroundColor: '#f5f5f5',
+                  borderColor: '#888888',
+                  borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                columnStyles: {},
+                position: { x: 20, y: 20 },
+                width: 120,
+                height: 20,
               },
-              bodyStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#000000',
-                backgroundColor: '',
-                alternateBackgroundColor: '#f5f5f5',
-                borderColor: '#888888',
-                borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
-              },
-              columnStyles: {},
-              position: { x: 20, y: 20 },
-              width: 120,
-              height: 20,
-            },
-          ]],
+            ],
+          ],
         },
-        inputs: [{ lineItems: [['Paper', '2'], ['Pen', '1']] }],
+        inputs: [
+          {
+            lineItems: [
+              ['Paper', '2'],
+              ['Pen', '1'],
+            ],
+          },
+        ],
       }),
     );
 
@@ -325,10 +338,10 @@ describe('validate command', () => {
   it('accepts stdin input', () => {
     const result = runCli(['validate', '-', '--json'], {
       input: JSON.stringify({
-        basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-        schemas: [[
-          { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 },
-        ]],
+        basePdf: a4BasePdf(),
+        schemas: [
+          [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+        ],
       }),
     });
 
@@ -343,17 +356,19 @@ describe('validate command', () => {
 
   it('keeps inspection summary on validation errors', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        {
-          name: 'title',
-          type: 'textbox',
-          fontName: 'NotoSerifJP',
-          position: { x: 20, y: 20 },
-          width: 170,
-          height: 15,
-        },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [
+          {
+            name: 'title',
+            type: 'textbox',
+            fontName: 'NotoSerifJP',
+            position: { x: 20, y: 20 },
+            width: 170,
+            height: 15,
+          },
+        ],
+      ],
     };
     const file = join(TMP, 'json-error.json');
     writeFileSync(file, JSON.stringify(template));
@@ -371,8 +386,8 @@ describe('validate command', () => {
       requiredFonts: ['NotoSerifJP'],
       basePdf: {
         kind: 'blank',
-        width: 210,
-        height: 297,
+        width: PAGE_SIZE_PRESETS.A4.width,
+        height: PAGE_SIZE_PRESETS.A4.height,
         paperSize: 'A4 portrait',
       },
     });
@@ -383,125 +398,127 @@ describe('validate command', () => {
     writeFileSync(
       file,
       JSON.stringify({
-        basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-        schemas: [[
-          {
-            name: 'title',
-            type: 'text',
-            position: { x: 20, y: 20 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'invoiceMeta',
-            type: 'multiVariableText',
-            text: 'Invoice {inv}',
-            variables: ['inv'],
-            required: true,
-            position: { x: 20, y: 45 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'status',
-            type: 'select',
-            options: ['draft', 'sent'],
-            position: { x: 20, y: 70 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'approved',
-            type: 'checkbox',
-            position: { x: 20, y: 95 },
-            width: 10,
-            height: 10,
-          },
-          {
-            name: 'logo',
-            type: 'image',
-            position: { x: 20, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'signedByCustomer',
-            type: 'signature',
-            position: { x: 45, y: 105 },
-            width: 30,
-            height: 20,
-          },
-          {
-            name: 'brandMark',
-            type: 'svg',
-            position: { x: 80, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'orderCode',
-            type: 'qrcode',
-            position: { x: 105, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'productEan',
-            type: 'ean13',
-            position: { x: 130, y: 105 },
-            width: 30,
-            height: 20,
-          },
-          {
-            name: 'lineItems',
-            type: 'table',
-            head: ['Item', 'Qty', 'Price'],
-            headWidthPercentages: [50, 20, 30],
-            position: { x: 20, y: 145 },
-            width: 120,
-            height: 20,
-          },
-          {
-            name: 'dueDate',
-            type: 'date',
-            format: 'dd/MM/yyyy',
-            position: { x: 20, y: 175 },
-            width: 30,
-            height: 10,
-          },
-          {
-            name: 'appointmentTime',
-            type: 'time',
-            format: 'HH:mm',
-            position: { x: 55, y: 175 },
-            width: 20,
-            height: 10,
-          },
-          {
-            name: 'publishedAt',
-            type: 'dateTime',
-            format: 'dd/MM/yyyy HH:mm',
-            position: { x: 80, y: 175 },
-            width: 50,
-            height: 10,
-          },
-          {
-            name: 'choiceA',
-            type: 'radioGroup',
-            group: 'choices',
-            position: { x: 20, y: 185 },
-            width: 10,
-            height: 10,
-          },
-          {
-            name: 'choiceB',
-            type: 'radioGroup',
-            group: 'choices',
-            position: { x: 40, y: 185 },
-            width: 10,
-            height: 10,
-          },
-        ]],
+        basePdf: a4BasePdf(),
+        schemas: [
+          [
+            {
+              name: 'title',
+              type: 'text',
+              position: { x: 20, y: 20 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'invoiceMeta',
+              type: 'multiVariableText',
+              text: 'Invoice {inv}',
+              variables: ['inv'],
+              required: true,
+              position: { x: 20, y: 45 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'status',
+              type: 'select',
+              options: ['draft', 'sent'],
+              position: { x: 20, y: 70 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'approved',
+              type: 'checkbox',
+              position: { x: 20, y: 95 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'logo',
+              type: 'image',
+              position: { x: 20, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'signedByCustomer',
+              type: 'signature',
+              position: { x: 45, y: 105 },
+              width: 30,
+              height: 20,
+            },
+            {
+              name: 'brandMark',
+              type: 'svg',
+              position: { x: 80, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'orderCode',
+              type: 'qrcode',
+              position: { x: 105, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'productEan',
+              type: 'ean13',
+              position: { x: 130, y: 105 },
+              width: 30,
+              height: 20,
+            },
+            {
+              name: 'lineItems',
+              type: 'table',
+              head: ['Item', 'Qty', 'Price'],
+              headWidthPercentages: [50, 20, 30],
+              position: { x: 20, y: 145 },
+              width: 120,
+              height: 20,
+            },
+            {
+              name: 'dueDate',
+              type: 'date',
+              format: 'dd/MM/yyyy',
+              position: { x: 20, y: 175 },
+              width: 30,
+              height: 10,
+            },
+            {
+              name: 'appointmentTime',
+              type: 'time',
+              format: 'HH:mm',
+              position: { x: 55, y: 175 },
+              width: 20,
+              height: 10,
+            },
+            {
+              name: 'publishedAt',
+              type: 'dateTime',
+              format: 'dd/MM/yyyy HH:mm',
+              position: { x: 80, y: 175 },
+              width: 50,
+              height: 10,
+            },
+            {
+              name: 'choiceA',
+              type: 'radioGroup',
+              group: 'choices',
+              position: { x: 20, y: 185 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'choiceB',
+              type: 'radioGroup',
+              group: 'choices',
+              position: { x: 40, y: 185 },
+              width: 10,
+              height: 10,
+            },
+          ],
+        ],
       }),
     );
 
@@ -665,45 +682,47 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'lineItems',
-              type: 'table',
-              head: ['Item', 'Qty'],
-              headWidthPercentages: [70, 30],
-              tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
-              headStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#ffffff',
-                backgroundColor: '#2980ba',
-                borderColor: '',
-                borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'lineItems',
+                type: 'table',
+                head: ['Item', 'Qty'],
+                headWidthPercentages: [70, 30],
+                tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
+                headStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#ffffff',
+                  backgroundColor: '#2980ba',
+                  borderColor: '',
+                  borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                bodyStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#000000',
+                  backgroundColor: '',
+                  alternateBackgroundColor: '#f5f5f5',
+                  borderColor: '#888888',
+                  borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                columnStyles: {},
+                position: { x: 20, y: 20 },
+                width: 120,
+                height: 20,
               },
-              bodyStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#000000',
-                backgroundColor: '',
-                alternateBackgroundColor: '#f5f5f5',
-                borderColor: '#888888',
-                borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
-              },
-              columnStyles: {},
-              position: { x: 20, y: 20 },
-              width: 120,
-              height: 20,
-            },
-          ]],
+            ],
+          ],
         },
         inputs: [{ lineItems: [['Paper']] }],
       }),
@@ -716,9 +735,7 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "lineItems" (table)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "lineItems" (table)')]),
     );
     expect(parsed.errors).toEqual(
       expect.arrayContaining([
@@ -726,9 +743,7 @@ describe('validate command', () => {
       ]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Row 1 must contain 2 cells. Received 1.'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Row 1 must contain 2 cells. Received 1.')]),
     );
   });
 
@@ -745,7 +760,7 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+          basePdf: a4BasePdf(),
           schemas: [[listSchema]],
         },
         inputs: [
@@ -770,16 +785,18 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'tasks',
-              type: 'list',
-              position: { x: 20, y: 20 },
-              width: 120,
-              height: 20,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'tasks',
+                type: 'list',
+                position: { x: 20, y: 20 },
+                width: 120,
+                height: 20,
+              },
+            ],
+          ],
         },
         inputs: [
           { tasks: ['Install deps', 2] },
@@ -796,19 +813,13 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "tasks" (list)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "tasks" (list)')]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Item 2 must be a string'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Item 2 must be a string')]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Received object'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Received object')]),
     );
   });
 
@@ -818,17 +829,19 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'status',
-              type: 'select',
-              options: ['draft', 'sent'],
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'status',
+                type: 'select',
+                options: ['draft', 'sent'],
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ status: 'archived' }],
       }),
@@ -841,14 +854,10 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "status" (select)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "status" (select)')]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('expects one of: "draft", "sent"'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('expects one of: "draft", "sent"')]),
     );
   });
 
@@ -858,16 +867,18 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'approved',
-              type: 'checkbox',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'approved',
+                type: 'checkbox',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ approved: true }],
       }),
@@ -880,14 +891,10 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "approved" (checkbox)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "approved" (checkbox)')]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('expects one of: "false", "true"'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('expects one of: "false", "true"')]),
     );
   });
 
@@ -897,17 +904,19 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'dueDate',
-              type: 'date',
-              format: 'dd/MM/yyyy',
-              position: { x: 20, y: 20 },
-              width: 30,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'dueDate',
+                type: 'date',
+                format: 'dd/MM/yyyy',
+                position: { x: 20, y: 20 },
+                width: 30,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ dueDate: '2026/03/28' }],
       }),
@@ -928,17 +937,19 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'dueDate',
-              type: 'date',
-              format: 'dd/MM/yyyy',
-              position: { x: 20, y: 20 },
-              width: 30,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'dueDate',
+                type: 'date',
+                format: 'dd/MM/yyyy',
+                position: { x: 20, y: 20 },
+                width: 30,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ dueDate: '28/03/2026' }],
       }),
@@ -951,9 +962,7 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "dueDate" (date)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "dueDate" (date)')]),
     );
     expect(parsed.errors).toEqual(
       expect.arrayContaining([
@@ -961,9 +970,7 @@ describe('validate command', () => {
       ]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Display format hint: dd/MM/yyyy.'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Display format hint: dd/MM/yyyy.')]),
     );
   });
 
@@ -973,17 +980,19 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'publishedAt',
-              type: 'dateTime',
-              format: 'MM/dd/yyyy HH:mm',
-              position: { x: 20, y: 20 },
-              width: 40,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'publishedAt',
+                type: 'dateTime',
+                format: 'MM/dd/yyyy HH:mm',
+                position: { x: 20, y: 20 },
+                width: 40,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ publishedAt: '2026/03/08 02:30' }],
       }),
@@ -998,9 +1007,7 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "publishedAt" (dateTime)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "publishedAt" (dateTime)')]),
     );
     expect(parsed.errors).toEqual(
       expect.arrayContaining([
@@ -1015,25 +1022,27 @@ describe('validate command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'choiceA',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-            {
-              name: 'choiceB',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 40, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'choiceA',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+              {
+                name: 'choiceB',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 40, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ choiceA: 'true', choiceB: 'true' }],
       }),
@@ -1046,23 +1055,19 @@ describe('validate command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Radio group "choices"'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Radio group "choices"')]),
     );
     expect(parsed.errors).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('choiceA, choiceB'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('choiceA, choiceB')]),
     );
   });
 
   it('rejects unknown flags with structured JSON output', () => {
     const template = {
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-      schemas: [[
-        { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 },
-      ]],
+      basePdf: a4BasePdf(),
+      schemas: [
+        [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 170, height: 15 }],
+      ],
     };
     const file = join(TMP, 'unknown-flag.json');
     writeFileSync(file, JSON.stringify(template));

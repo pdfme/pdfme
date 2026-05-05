@@ -8,7 +8,7 @@ import { createSvgStr } from '../utils.js';
 
 const selectIcon = createSvgStr(ChevronDown);
 
-interface Select extends TextSchema {
+export interface SelectSchema extends TextSchema {
   options: string[];
 }
 
@@ -17,7 +17,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
 
   rootElement.style.width = '100%';
 
-  const selectSchema = activeSchema as SchemaForUI & Select;
+  const selectSchema = activeSchema as SchemaForUI & SelectSchema;
   const currentOptions = selectSchema.options ? [...selectSchema.options] : [];
 
   const inputStyle = {
@@ -111,7 +111,7 @@ const addOptions = (props: PropPanelWidgetProps) => {
   renderOptions();
 };
 
-const schema: Plugin<Select> = {
+const schema: Plugin<SelectSchema> = {
   ui: async (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     await text.ui(Object.assign(arg, { mode: 'viewer' }));

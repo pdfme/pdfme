@@ -38,9 +38,7 @@ type PdfFontCache = Record<string, Promise<PDFFont>>;
 
 const PDF_FONT_CACHE_KEY = 'text-pdf-font-cache';
 
-const getPdfFontCache = (
-  _cache: Map<string | number, unknown>,
-): PdfFontCache => {
+const getPdfFontCache = (_cache: Map<string | number, unknown>): PdfFontCache => {
   let pdfFontCache = _cache.get(PDF_FONT_CACHE_KEY) as PdfFontCache | undefined;
   if (!pdfFontCache) {
     pdfFontCache = {};

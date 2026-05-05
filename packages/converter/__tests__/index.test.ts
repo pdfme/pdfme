@@ -1,7 +1,13 @@
 // @ts-ignore
 import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
+import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
+
+const a4BasePdf = (padding: [number, number, number, number] = [20, 10, 20, 10]) => ({
+  ...PAGE_SIZE_PRESETS.A4,
+  padding,
+});
 
 describe('pdf2img tests', () => {
   let pdfArrayBuffer: ArrayBuffer | Uint8Array;
@@ -21,7 +27,7 @@ describe('pdf2img tests', () => {
             },
           ],
         ],
-        basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
+        basePdf: a4BasePdf(),
         pdfmeVersion: '5.2.16',
       },
       inputs: [
@@ -89,7 +95,7 @@ describe('pdf2img tests', () => {
   test('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(nodePdf2Img(emptyBuffer, { scale: 1 })).rejects.toThrow(
-      'The PDF file is empty, i.e. its size is zero by'
+      'The PDF file is empty, i.e. its size is zero by',
     );
   });
 });
@@ -113,7 +119,7 @@ describe('img2pdf tests', () => {
             },
           ],
         ],
-        basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
+        basePdf: a4BasePdf(),
         pdfmeVersion: '5.2.16',
       },
       inputs: [{ field1: 'hello-1' }],
@@ -155,29 +161,31 @@ describe('img2pdf tests', () => {
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
-  
+
   test('handles margin option', async () => {
     const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
     const pdf = await img2pdf([jpegImage], { margin: margins });
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
-  
+
   test('handles both size and margin options', async () => {
     const customSize = { width: 100, height: 150 }; // in millimeters
     const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
-    const pdf = await img2pdf([jpegImage], { 
-      size: customSize, 
-      margin: margins 
+    const pdf = await img2pdf([jpegImage], {
+      size: customSize,
+      margin: margins,
     });
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
-  
+
   test('uses default margin [0,0,0,0] when margin is omitted', async () => {
     // This test verifies the default behavior is maintained
     const pdf1 = await img2pdf([jpegImage]);
-    const pdf2 = await img2pdf([jpegImage], { margin: [0, 0, 0, 0] as [number, number, number, number] });
+    const pdf2 = await img2pdf([jpegImage], {
+      margin: [0, 0, 0, 0] as [number, number, number, number],
+    });
     // Both PDFs should have the same size
     expect(pdf1.byteLength).toBe(pdf2.byteLength);
   });
@@ -201,7 +209,7 @@ describe('pdf2size tests', () => {
             },
           ],
         ],
-        basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
+        basePdf: a4BasePdf(),
         pdfmeVersion: '5.2.16',
       },
       inputs: [{}, {}, {}, {}],
@@ -238,7 +246,7 @@ describe('pdf2size tests', () => {
   test('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(nodePdf2Size(emptyBuffer, { scale: 1 })).rejects.toThrow(
-      'The PDF file is empty, i.e. its size is zero by'
+      'The PDF file is empty, i.e. its size is zero by',
     );
   });
 });

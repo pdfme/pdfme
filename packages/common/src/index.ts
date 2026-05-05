@@ -47,6 +47,7 @@ import type {
   GetDynamicLayout,
 } from './types.js';
 import type { PdfLinkAnnotationRect } from './helper.js';
+import type { PageOrientation, PageSize, PageSizePreset } from './pageSize.js';
 import {
   cloneDeep,
   getFallbackFontName,
@@ -78,6 +79,7 @@ import {
   resetInternalLinkAnnotations,
   applyInternalLinkAnnotations,
 } from './helper.js';
+import { PAGE_SIZE_PRESETS, detectPaperSize, resolvePageSize } from './pageSize.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
 import { replacePlaceholders } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
@@ -124,6 +126,9 @@ export {
   registerInternalLinkAnnotation,
   resetInternalLinkAnnotations,
   applyInternalLinkAnnotations,
+  PAGE_SIZE_PRESETS,
+  detectPaperSize,
+  resolvePageSize,
 };
 
 export type {
@@ -163,4 +168,7 @@ export type {
   DynamicLayoutResult,
   GetDynamicLayout,
   PdfLinkAnnotationRect,
+  PageOrientation,
+  PageSize,
+  PageSizePreset,
 };

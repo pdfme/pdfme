@@ -19,29 +19,19 @@ const packageDependencies = [
   ...Object.keys(packageJson.peerDependencies ?? {}),
 ];
 
-const isExternal = (id: string) => {
-  if (id.startsWith('air-datepicker/locale/')) {
-    return false;
-  }
-
-  return (
-    builtinModuleSet.has(id) ||
-    packageDependencies.some((dependency) => id === dependency || id.startsWith(`${dependency}/`))
-  );
-};
+const isExternal = (id: string) =>
+  builtinModuleSet.has(id) ||
+  packageDependencies.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
 
 export default defineConfig({
   build: {
     lib: {
       entry: {
-        builtins: resolve(__dirname, 'src/builtins.ts'),
         index: resolve(__dirname, 'src/index.ts'),
-        lists: resolve(__dirname, 'src/lists.ts'),
-        tables: resolve(__dirname, 'src/tables.ts'),
-        types: resolve(__dirname, 'src/types.ts'),
-        utils: resolve(__dirname, 'src/utils.ts'),
+        'jsx-runtime': resolve(__dirname, 'src/jsx-runtime.ts'),
+        'jsx-dev-runtime': resolve(__dirname, 'src/jsx-dev-runtime.ts'),
       },
-      fileName: (_, entryName) => `${entryName}.js`,
+      fileName: (_format, entryName) => `${entryName}.js`,
       formats: ['es'],
     },
     minify: false,

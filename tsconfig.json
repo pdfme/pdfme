@@ -5,6 +5,7 @@
     { "path": "packages/common" },
     { "path": "packages/converter" },
     { "path": "packages/schemas" },
+    { "path": "packages/jsx" },
     { "path": "packages/generator" },
     { "path": "packages/manipulator" },
     { "path": "packages/ui/tsconfig.typecheck.json" },
