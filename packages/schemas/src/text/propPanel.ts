@@ -3,7 +3,6 @@ import {
   PropPanel,
   PropPanelWidgetProps,
   PropPanelSchema,
-  type ChangeSchemaItem,
   getFallbackFontName,
 } from '@pdfme/common';
 import type { TextSchema } from './types.js';
@@ -64,42 +63,6 @@ const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
-const UseTextOverflow = (props: PropPanelWidgetProps) => {
-  const { rootElement, changeSchemas, activeSchema, i18n } = props;
-
-  const label = document.createElement('label');
-  label.style.cssText = 'display: flex; flex-direction: column; gap: 0.25rem; width: 100%;';
-
-  const span = document.createElement('span');
-  span.innerText = i18n('schemas.text.overflow') || '';
-
-  const select = document.createElement('select');
-  select.value =
-    ((activeSchema as { overflow?: string }).overflow as string | undefined) ??
-    DEFAULT_TEXT_OVERFLOW;
-  [
-    { label: i18n('schemas.text.overflowVisible'), value: TEXT_OVERFLOW_VISIBLE },
-    { label: i18n('schemas.text.overflowExpand'), value: TEXT_OVERFLOW_EXPAND },
-  ].forEach((option) => {
-    const optionElement = document.createElement('option');
-    optionElement.value = option.value;
-    optionElement.textContent = option.label || option.value;
-    select.appendChild(optionElement);
-  });
-  select.onchange = (e: Event) => {
-    const value = (e.target as HTMLSelectElement).value;
-    const changes: ChangeSchemaItem[] = [{ key: 'overflow', value, schemaId: activeSchema.id }];
-    if (value === TEXT_OVERFLOW_EXPAND) {
-      changes.push({ key: 'dynamicFontSize', value: undefined, schemaId: activeSchema.id });
-    }
-    changeSchemas(changes);
-  };
-
-  label.appendChild(span);
-  label.appendChild(select);
-  rootElement.appendChild(label);
-};
-
 const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n } = props;
 
@@ -124,13 +87,16 @@ const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<TextSchema> = {
-  schema: ({ options, activeSchema, i18n }) => {
+  schema: ({ options, activeSchema, i18n, changeSchemas }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
 
     const activeTextSchema = activeSchema as unknown as TextSchema;
     const isExpand = isTextOverflowExpand(activeTextSchema);
+    if (isExpand && activeTextSchema.dynamicFontSize !== undefined) {
+      changeSchemas([{ key: 'dynamicFontSize', value: undefined, schemaId: activeSchema.id }]);
+    }
     const enableDynamicFont =
       !isExpand && Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
     const hideTextFormat = activeTextSchema.type === 'text' && activeTextSchema.readOnly !== true;
@@ -180,7 +146,19 @@ export const propPanel: PropPanel<TextSchema> = {
         props: { step: 0.1, min: 0 },
         span: 8,
       },
-      textOverflow: { type: 'string', widget: 'UseTextOverflow', bind: false, span: 8 },
+      overflow: {
+        title: i18n('schemas.text.overflow'),
+        type: 'string',
+        widget: 'select',
+        default: DEFAULT_TEXT_OVERFLOW,
+        props: {
+          options: [
+            { label: i18n('schemas.text.overflowVisible'), value: TEXT_OVERFLOW_VISIBLE },
+            { label: i18n('schemas.text.overflowExpand'), value: TEXT_OVERFLOW_EXPAND },
+          ],
+        },
+        span: 8,
+      },
       useDynamicFontSize: { type: 'boolean', widget: 'UseDynamicFontSize', bind: false, span: 16 },
       dynamicFontSize: {
         type: 'object',
@@ -302,7 +280,7 @@ export const propPanel: PropPanel<TextSchema> = {
 
     return textSchema;
   },
-  widgets: { UseDynamicFontSize, UseTextOverflow, UseInlineMarkdown },
+  widgets: { UseDynamicFontSize, UseInlineMarkdown },
   defaultSchema: {
     name: '',
     type: 'text',
