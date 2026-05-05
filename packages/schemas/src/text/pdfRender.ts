@@ -32,6 +32,7 @@ import {
 import { stripInlineMarkdown } from './inlineMarkdown.js';
 import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './richText.js';
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
+import { shouldUseDynamicFontSize } from './overflow.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 
 type PdfFontCache = Record<string, Promise<PDFFont>>;
@@ -95,7 +96,7 @@ const getFontProp = ({
 }) => {
   const fontSize =
     resolvedFontSize ??
-    (schema.dynamicFontSize
+    (shouldUseDynamicFontSize(schema)
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE));
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
@@ -140,7 +141,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   );
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
-    enableInlineMarkdown && schema.dynamicFontSize
+    enableInlineMarkdown && shouldUseDynamicFontSize(schema)
       ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
       : undefined;
   const fontProp = getFontProp({

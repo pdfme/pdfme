@@ -109,6 +109,59 @@ describe('generate integrate test', () => {
       expect(observedPositions[0].x).toBeGreaterThan(probeSchema.position.x);
       expect(observedPositions[0].y).toBeLessThan(probeSchema.position.y);
     });
+
+    test('expands text schemas and pushes following schemas on blank PDFs', async () => {
+      const renderedSchemas: Schema[] = [];
+      const textProbePlugin: Plugin = {
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: {
+            ...textObject(0, 0),
+            type: 'text',
+          },
+        },
+      };
+
+      await generate({
+        template: {
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+          schemas: [
+            [
+              {
+                ...textObject(10, 10, 'body'),
+                width: 30,
+                height: 5,
+                overflow: 'expand',
+                fontSize: 13,
+                lineHeight: 1,
+                characterSpacing: 0,
+              },
+              {
+                ...textObject(10, 20, 'after'),
+                width: 30,
+                height: 5,
+              },
+            ],
+          ],
+        },
+        inputs: [{ body: 'long text '.repeat(20), after: 'after' }],
+        options: { font: getFont() },
+        plugins: { text: textProbePlugin },
+      });
+
+      const body = renderedSchemas.find((schema) => schema.name === 'body');
+      const after = renderedSchemas.find((schema) => schema.name === 'after');
+
+      expect(body?.height).toBeGreaterThan(5);
+      expect(after?.position.y).toBeGreaterThan(20);
+    });
   });
 
   describe('use fontColor template', () => {

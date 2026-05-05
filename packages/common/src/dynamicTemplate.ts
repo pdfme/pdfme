@@ -8,6 +8,7 @@ import {
   DynamicLayoutResult,
 } from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
+import { replacePlaceholders } from './expression.js';
 
 /** Floating point tolerance for comparisons */
 const EPSILON = 0.01;
@@ -40,8 +41,25 @@ const getContentHeight = (basePdf: BlankPdf): number =>
   basePdf.height - basePdf.padding[0] - basePdf.padding[2];
 
 /** Get the input value for a schema */
-const getSchemaValue = (schema: Schema, input: Record<string, string>): string =>
-  (schema.readOnly ? schema.content : input?.[schema.name]) || '';
+const getSchemaValue = (
+  schema: Schema,
+  input: Record<string, string>,
+  schemas: Schema[][],
+): string => {
+  if (!schema.readOnly) {
+    return input?.[schema.name] || '';
+  }
+
+  if (schema.type !== 'text' && schema.type !== 'multiVariableText') {
+    return schema.content || '';
+  }
+
+  return replacePlaceholders({
+    content: schema.content || '',
+    variables: input,
+    schemas,
+  });
+};
 
 /**
  * Normalize schemas within a single page into layout items.
@@ -288,7 +306,7 @@ export const getDynamicTemplate = async (
       const chunk = items.slice(i, i + PARALLEL_LIMIT);
       const chunkResults = await Promise.all(
         chunk.map((item) => {
-          const value = getSchemaValue(item.schema, input);
+          const value = getSchemaValue(item.schema, input, template.schemas);
           return getDynamicHeights(value, {
             schema: item.schema,
             basePdf,

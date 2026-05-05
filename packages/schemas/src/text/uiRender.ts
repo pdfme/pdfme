@@ -28,6 +28,7 @@ import {
   isFirefox,
 } from './helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
+import { shouldUseDynamicFontSize } from './overflow.js';
 import {
   calculateDynamicRichTextFontSize,
   isInlineMarkdownTextSchema,
@@ -87,9 +88,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     _cache as Map<string, import('fontkit').Font>,
   );
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+  const enableDynamicFontSize = shouldUseDynamicFontSize(schema);
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
-    enableInlineMarkdown && schema.dynamicFontSize
+    enableInlineMarkdown && enableDynamicFontSize
       ? await calculateDynamicRichTextFontSize({
           value: usePlaceholder ? (placeholder as string) : value,
           schema,
@@ -143,7 +145,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     if (stopEditing) stopEditing();
   });
 
-  if (schema.dynamicFontSize) {
+  if (enableDynamicFontSize) {
     let dynamicFontSize: undefined | number = undefined;
 
     textBlock.addEventListener('keyup', () => {
@@ -270,7 +272,7 @@ export const buildStyledTextContainer = (
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 
-  if (dynamicFontSize === undefined && schema.dynamicFontSize && value) {
+  if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema) && value) {
     dynamicFontSize = calculateDynamicFontSize({
       textSchema: schema,
       fontKitFont,

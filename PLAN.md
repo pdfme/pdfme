@@ -69,12 +69,32 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 最優先候補。blank PDF で `table` / `list` が後続要素を押し下げるように、`text` と
 `multiVariableText` も実描画高さに応じて後続要素を押し下げられる可能性がある。
 
+現在の初回実装方針:
+
+- 既存互換性を優先し、未指定時は従来通り `overflow: "visible"` として扱う。
+- `overflow: "expand"` の時だけ `measureTextHeight` で実描画高さを測り、schema の高さを
+  広げて後続要素を押し下げる。
+- `expand` は grow-only とし、計測結果が元の schema height より小さい場合は縮めない。
+- `dynamicFontSize` と `overflow: "expand"` が同時指定された場合は `expand` を優先する。
+  計測と生成後の schema では `dynamicFontSize` を無効化し、元 box に縮小フィットして
+  expand が効かなくなる silent な挙動を避ける。
+- Designer では `overflow: "expand"` を選んだ時点で `dynamicFontSize` をクリアし、
+  `expand` 中は Dynamic Font Size の切り替えを無効化する。JSON 由来で両方が残っている場合も
+  runtime 側で `dynamicFontSize` を無視する。
+- この排他制御は仕様として扱い、将来の docs / website / schema API docs では
+  `overflow: "expand"` と `dynamicFontSize` は同時利用できないこと、expand では通常の
+  `fontSize` を使って高さを広げることを明記する。
+- `multiVariableText` は変数置換後の実描画テキストで高さを測る。
+- ページ末尾を超える場合、今回の初回実装では「高さを持つ 1 つの単位」として次ページに
+  回す、または大きすぎる場合はそのまま配置する。文章を行・段落単位で分割して次ページへ
+  続ける処理は、text split range / rich text run / Form 編集体験まで含めた別設計として扱う。
+
 検討すること:
 
 - `measureTextHeight` を generator の dynamic layout に接続するか。
 - `multiVariableText` も同じ計測・押し下げの仕組みに乗せられるか。
 - `text`, `multiVariableText`, `list`, `table` の dynamic layout contract を共通化できるか。
-- 長文 text / MVT がページ末尾を超える場合、ページ分割まで扱うか、まずは高さだけに絞るか。
+- 長文 text / MVT がページ末尾を超える場合、行・段落単位のページ分割まで扱うか。
 - blank PDF と custom `basePdf` で挙動を分ける必要があるか。
 - 既存テンプレートへの互換性リスクをどう抑えるか。
 

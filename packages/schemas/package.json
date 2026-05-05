@@ -40,6 +40,11 @@
       "import": "./dist/builtins.js",
       "default": "./dist/builtins.js"
     },
+    "./dynamicLayout": {
+      "types": "./dist/dynamicLayout.d.ts",
+      "import": "./dist/dynamicLayout.js",
+      "default": "./dist/dynamicLayout.js"
+    },
     "./tables": {
       "types": "./dist/tables.d.ts",
       "import": "./dist/tables.js",
@@ -49,6 +54,11 @@
       "types": "./dist/lists.d.ts",
       "import": "./dist/lists.js",
       "default": "./dist/lists.js"
+    },
+    "./texts": {
+      "types": "./dist/texts.d.ts",
+      "import": "./dist/texts.js",
+      "default": "./dist/texts.js"
     },
     "./types": {
       "types": "./dist/types.d.ts",

@@ -22,6 +22,7 @@ type MeasureTextHeightArgs = {
   schema: TextSchema;
   font?: Font;
   _cache?: Map<string | number, unknown>;
+  ignoreDynamicFontSize?: boolean;
 };
 
 export const measureTextHeight = async ({
@@ -29,6 +30,7 @@ export const measureTextHeight = async ({
   schema,
   font = getDefaultFont(),
   _cache = new Map<string | number, unknown>(),
+  ignoreDynamicFontSize = false,
 }: MeasureTextHeightArgs): Promise<number> => {
   const fontSize = schema.fontSize ?? DEFAULT_FONT_SIZE;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
@@ -39,7 +41,7 @@ export const measureTextHeight = async ({
     const richTextRuns = parseInlineMarkdown(value);
     const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
     const resolvedFontSize =
-      schema.dynamicFontSize && schema.height > 0
+      schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
         ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
         : fontSize;
     const lines = layoutRichTextLines({
@@ -58,7 +60,7 @@ export const measureTextHeight = async ({
     _cache as Map<string, FontKitFont>,
   );
   const resolvedFontSize =
-    schema.dynamicFontSize && schema.height > 0
+    schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : fontSize;
   const lines = splitTextToSize({

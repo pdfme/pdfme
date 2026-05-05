@@ -374,6 +374,7 @@ const renderText = async (
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
     textFormat: props.textFormat ?? 'plain',
+    overflow: props.overflow,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
   };
