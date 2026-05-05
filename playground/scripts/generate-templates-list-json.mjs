@@ -17,7 +17,6 @@ const featuredTemplates = [
   'pedigree',
   'certificate-black',
   'a4-blank',
-  'dynamic-list',
   'QR-lines',
 ];
 
