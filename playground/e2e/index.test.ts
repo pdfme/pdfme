@@ -1,6 +1,6 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
-import { Template, Schema, cloneDeep } from '@pdfme/common';
+import { Template, Schema, PAGE_SIZE_PRESETS, cloneDeep } from '@pdfme/common';
 import { text, table, image, barcodes, select, checkbox, radioGroup } from '@pdfme/schemas';
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { stripVTControlCharacters } from 'node:util';
@@ -169,8 +169,7 @@ const cloneSchema = <T extends Schema>(schema: T, overrides: Partial<T>): T =>
 
 function buildModifiedTemplate(): Template {
   const basePdf: Template['basePdf'] = {
-    width: 210,
-    height: 297,
+    ...PAGE_SIZE_PRESETS.A4,
     padding: [20, 10, 20, 10],
   };
 

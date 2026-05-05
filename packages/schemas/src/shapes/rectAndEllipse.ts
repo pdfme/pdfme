@@ -4,7 +4,7 @@ import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../ut
 import { toRadians } from '@pdfme/pdf-lib';
 import { Circle, Square } from 'lucide';
 
-interface ShapeSchema extends Schema {
+export interface ShapeSchema extends Schema {
   type: 'ellipse' | 'rectangle';
   borderWidth: number;
   borderColor: string;

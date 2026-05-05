@@ -2,7 +2,7 @@ import { defineCommand } from 'citty';
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { generate } from '@pdfme/generator';
 import { pdf2img, pdf2size } from '@pdfme/converter';
-import { checkGenerateProps } from '@pdfme/common';
+import { PAGE_SIZE_PRESETS, checkGenerateProps } from '@pdfme/common';
 import type { Font, GenerateProps, Template } from '@pdfme/common';
 import {
   assertNoUnknownFlags,
@@ -209,8 +209,7 @@ export default defineCommand({
               height: number;
             }>;
 
-            const size = renderedPageSizes[i] ??
-              renderedPageSizes[0] ?? { width: 210, height: 297 };
+            const size = renderedPageSizes[i] ?? renderedPageSizes[0] ?? PAGE_SIZE_PRESETS.A4;
 
             const gridImage = await drawGridOnImage(
               images[i],

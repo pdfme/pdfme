@@ -10,14 +10,14 @@ const defaultStroke = 'currentColor';
 const getCheckedIcon = (stroke = defaultStroke) => createSvgStr(SquareCheck, { stroke });
 const getUncheckedIcon = (stroke = defaultStroke) => createSvgStr(Square, { stroke });
 
-interface Checkbox extends Schema {
+export interface CheckboxSchema extends Schema {
   color: string;
 }
 
 const getIcon = ({ value, color }: { value: string; color: string }) =>
   value === 'true' ? getCheckedIcon(color) : getUncheckedIcon(color);
 
-const schema: Plugin<Checkbox> = {
+const schema: Plugin<CheckboxSchema> = {
   ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');

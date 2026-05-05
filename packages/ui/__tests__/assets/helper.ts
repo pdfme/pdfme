@@ -1,10 +1,10 @@
 import * as hooks from '../../src/hooks';
 import * as helper from '../../src/helper';
-import { BLANK_PDF, Template } from '@pdfme/common';
+import { BLANK_PDF, PAGE_SIZE_PRESETS, Template } from '@pdfme/common';
 
 export const setupUIMock = () => {
   const backgrounds = ['data:image/png;base64,a...'];
-  const pageSizes = [{ height: 297, width: 210 }];
+  const pageSizes = [PAGE_SIZE_PRESETS.A4];
   const mock = vi.spyOn(hooks, 'useUIPreProcessor');
   mock.mockImplementation(() => ({
     backgrounds,
@@ -13,8 +13,7 @@ export const setupUIMock = () => {
     error: null,
     refresh: () => Promise.resolve(),
   }));
-  vi
-    .spyOn(helper, 'uuid')
+  vi.spyOn(helper, 'uuid')
     .mockReturnValueOnce('1')
     .mockReturnValueOnce('2')
     .mockReturnValueOnce('3')

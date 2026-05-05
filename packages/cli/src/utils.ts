@@ -8,7 +8,10 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { dirname, extname, basename, join, resolve } from 'node:path';
+import { detectPaperSize } from '@pdfme/common';
 import { fail, isOptionProvided } from './contract.js';
+
+export { detectPaperSize };
 
 export interface UnifiedJob {
   template: Record<string, unknown>;
@@ -176,33 +179,6 @@ export function readPdfFile(filePath: string): Uint8Array {
       },
     );
   }
-}
-
-// Standard paper sizes in mm (portrait)
-const PAPER_SIZES: Record<string, [number, number]> = {
-  A3: [297, 420],
-  A4: [210, 297],
-  A5: [148, 210],
-  A6: [105, 148],
-  B4: [250, 353],
-  B5: [176, 250],
-  Letter: [216, 279],
-  Legal: [216, 356],
-  Tabloid: [279, 432],
-};
-
-export function detectPaperSize(width: number, height: number): string | null {
-  const tolerance = 2; // mm
-  for (const [name, [w, h]] of Object.entries(PAPER_SIZES)) {
-    if (
-      (Math.abs(width - w) <= tolerance && Math.abs(height - h) <= tolerance) ||
-      (Math.abs(width - h) <= tolerance && Math.abs(height - w) <= tolerance)
-    ) {
-      const orientation = width < height ? 'portrait' : 'landscape';
-      return `${name} ${orientation}`;
-    }
-  }
-  return null;
 }
 
 export function parsePageRange(rangeStr: string, totalPages: number): number[] {

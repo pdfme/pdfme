@@ -1,13 +1,18 @@
 import { describe, it, expect } from 'vitest';
+import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 import { detectPaperSize, parsePageRange, getImageOutputPaths } from '../src/utils.js';
 
 describe('detectPaperSize', () => {
   it('detects A4 portrait', () => {
-    expect(detectPaperSize(210, 297)).toBe('A4 portrait');
+    expect(detectPaperSize(PAGE_SIZE_PRESETS.A4.width, PAGE_SIZE_PRESETS.A4.height)).toBe(
+      'A4 portrait',
+    );
   });
 
   it('detects A4 landscape', () => {
-    expect(detectPaperSize(297, 210)).toBe('A4 landscape');
+    expect(detectPaperSize(PAGE_SIZE_PRESETS.A4.height, PAGE_SIZE_PRESETS.A4.width)).toBe(
+      'A4 landscape',
+    );
   });
 
   it('detects Letter portrait', () => {
@@ -19,7 +24,9 @@ describe('detectPaperSize', () => {
   });
 
   it('tolerates small differences', () => {
-    expect(detectPaperSize(210.01, 297.01)).toBe('A4 portrait');
+    expect(
+      detectPaperSize(PAGE_SIZE_PRESETS.A4.width + 0.01, PAGE_SIZE_PRESETS.A4.height + 0.01),
+    ).toBe('A4 portrait');
   });
 });
 

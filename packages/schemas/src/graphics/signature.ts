@@ -2,7 +2,7 @@ import type { Plugin, Schema } from '@pdfme/common';
 import { ZOOM } from '@pdfme/common';
 import image from './image.js';
 
-type SignatureSchema = Schema;
+export type SignatureSchema = Schema;
 
 const createLoadErrorBadge = (message: string) => {
   const badge = document.createElement('div');

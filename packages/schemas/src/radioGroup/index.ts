@@ -9,7 +9,7 @@ const defaultStroke = 'currentColor';
 const getCheckedIcon = (stroke = defaultStroke) => createSvgStr(CircleDot, { stroke });
 const getUncheckedIcon = (stroke = defaultStroke) => createSvgStr(Circle, { stroke });
 
-interface RadioGroup extends Schema {
+export interface RadioGroupSchema extends Schema {
   group: string;
   color: string;
 }
@@ -27,7 +27,7 @@ interface RadioButtonState {
 const radioButtonStates = new Map<string, RadioButtonState>();
 const eventListeners = new Map<string, EventListener>();
 
-const schema: Plugin<RadioGroup> = {
+const schema: Plugin<RadioGroupSchema> = {
   ui: (arg) => {
     const { schema, value, onChange, rootElement, mode } = arg;
     const container = document.createElement('div');

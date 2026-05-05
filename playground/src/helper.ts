@@ -1,4 +1,11 @@
-import { Template, Font, checkTemplate, getInputFromTemplate, getDefaultFont } from '@pdfme/common';
+import {
+  Template,
+  Font,
+  PAGE_SIZE_PRESETS,
+  checkTemplate,
+  getInputFromTemplate,
+  getDefaultFont,
+} from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate, generateForm } from '@pdfme/generator';
 import { getPlugins } from './plugins';
@@ -154,8 +161,7 @@ export const getBlankTemplate = () =>
   ({
     schemas: [{}],
     basePdf: {
-      width: 210,
-      height: 297,
+      ...PAGE_SIZE_PRESETS.A4,
       padding: [20, 10, 20, 10],
     },
   }) as Template;

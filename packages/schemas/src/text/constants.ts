@@ -24,8 +24,7 @@ export const PLACEHOLDER_FONT_COLOR = '#A0A0A0';
 export const TEXT_FORMAT_PLAIN = 'plain' as const satisfies TEXT_FORMAT;
 export const TEXT_FORMAT_INLINE_MARKDOWN = 'inline-markdown' as const satisfies TEXT_FORMAT;
 export const DEFAULT_TEXT_FORMAT = TEXT_FORMAT_PLAIN;
-export const FONT_VARIANT_FALLBACK_SYNTHETIC =
-  'synthetic' as const satisfies FONT_VARIANT_FALLBACK;
+export const FONT_VARIANT_FALLBACK_SYNTHETIC = 'synthetic' as const satisfies FONT_VARIANT_FALLBACK;
 export const FONT_VARIANT_FALLBACK_PLAIN = 'plain' as const satisfies FONT_VARIANT_FALLBACK;
 export const FONT_VARIANT_FALLBACK_ERROR = 'error' as const satisfies FONT_VARIANT_FALLBACK;
 export const DEFAULT_FONT_VARIANT_FALLBACK = FONT_VARIANT_FALLBACK_SYNTHETIC;

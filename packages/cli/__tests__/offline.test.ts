@@ -4,6 +4,7 @@ import { join, dirname } from 'node:path';
 import { writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PDFDocument } from '@pdfme/pdf-lib';
+import { a4BasePdf } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -49,16 +50,18 @@ describe('CLI offline local-input contract', () => {
       jobPath,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 100,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 100,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello offline' }],
       }),
@@ -84,10 +87,10 @@ describe('CLI offline local-input contract', () => {
     writeFileSync(
       templatePath,
       JSON.stringify({
-        basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-        schemas: [[
-          { name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 100, height: 10 },
-        ]],
+        basePdf: a4BasePdf(),
+        schemas: [
+          [{ name: 'title', type: 'text', position: { x: 20, y: 20 }, width: 100, height: 10 }],
+        ],
       }),
     );
 

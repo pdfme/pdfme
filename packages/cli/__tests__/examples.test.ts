@@ -9,6 +9,7 @@ import {
   getExampleTemplateNames,
 } from '../src/example-templates.js';
 import { OFFICIAL_EXAMPLE_FONT_URLS } from '../src/example-fonts.js';
+import { a4BasePdf } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TMP = join(__dirname, '..', '.test-tmp-examples');
@@ -101,18 +102,19 @@ describe('examples command', () => {
   it('normalizes manifest entries to a complete metadata shape', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async () =>
-        new Response(
-          JSON.stringify({
-            schemaVersion: 1,
-            cliVersion: '0.1.0-alpha.0',
-            templates: [{ name: 'invoice' }],
-          }),
-          {
-            status: 200,
-            headers: { 'content-type': 'application/json' },
-          },
-        ),
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({
+              schemaVersion: 1,
+              cliVersion: '0.1.0-alpha.0',
+              templates: [{ name: 'invoice' }],
+            }),
+            {
+              status: 200,
+              headers: { 'content-type': 'application/json' },
+            },
+          ),
       ),
     );
 
@@ -155,7 +157,7 @@ describe('examples command', () => {
         if (url.endsWith('/invoice/template.json')) {
           return new Response(
             JSON.stringify({
-              basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+              basePdf: a4BasePdf(),
               schemas: [[{ name: 'title', type: 'text' }]],
             }),
             { status: 200, headers: { 'content-type': 'application/json' } },
@@ -168,7 +170,7 @@ describe('examples command', () => {
 
     const template = await fetchExampleTemplate('invoice');
     expect(template).toEqual({
-      basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+      basePdf: a4BasePdf(),
       schemas: [[{ name: 'title', type: 'text' }]],
     });
   });
@@ -196,7 +198,7 @@ describe('examples command', () => {
         if (url.endsWith('/invoice/template.json')) {
           return new Response(
             JSON.stringify({
-              basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+              basePdf: a4BasePdf(),
               schemas: [[{ name: 'title', type: 'text' }]],
             }),
             { status: 200, headers: { 'content-type': 'application/json' } },
@@ -254,7 +256,7 @@ describe('examples command', () => {
         if (url.endsWith('/multi-page/template.json')) {
           return new Response(
             JSON.stringify({
-              basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
+              basePdf: a4BasePdf(),
               schemas: [
                 [
                   { name: 'page1', type: 'text', content: 'Page 1' },
@@ -316,17 +318,19 @@ describe('examples command', () => {
         if (url.endsWith('/certificate-black/template.json')) {
           return new Response(
             JSON.stringify({
-              basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-              schemas: [[
-                {
-                  name: 'signature',
-                  type: 'text',
-                  fontName: 'PinyonScript-Regular',
-                  position: { x: 20, y: 20 },
-                  width: 100,
-                  height: 20,
-                },
-              ]],
+              basePdf: a4BasePdf(),
+              schemas: [
+                [
+                  {
+                    name: 'signature',
+                    type: 'text',
+                    fontName: 'PinyonScript-Regular',
+                    position: { x: 20, y: 20 },
+                    width: 100,
+                    height: 20,
+                  },
+                ],
+              ],
             }),
             { status: 200, headers: { 'content-type': 'application/json' } },
           );

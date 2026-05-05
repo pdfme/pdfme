@@ -4,6 +4,7 @@ import { join, dirname } from 'node:path';
 import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { PDFDocument } from '@pdfme/pdf-lib';
+import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -49,8 +50,8 @@ describe('pdf2size command', () => {
     expect(parsed.pageCount).toBe(1);
     expect(parsed.pages).toHaveLength(1);
     expect(parsed.pages[0].pageNumber).toBe(1);
-    expect(parsed.pages[0].width).toBeCloseTo(210, 0);
-    expect(parsed.pages[0].height).toBeCloseTo(297, 0);
+    expect(parsed.pages[0].width).toBeCloseTo(PAGE_SIZE_PRESETS.A4.width, 0);
+    expect(parsed.pages[0].height).toBeCloseTo(PAGE_SIZE_PRESETS.A4.height, 0);
   });
 
   it('returns structured EIO for missing PDF files', () => {

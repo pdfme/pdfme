@@ -1,5 +1,5 @@
 import { dirname, resolve } from 'node:path';
-import { checkTemplate } from '@pdfme/common';
+import { PAGE_SIZE_PRESETS, checkTemplate } from '@pdfme/common';
 import { fail } from './contract.js';
 import { schemaTypes } from './schema-plugins.js';
 import { detectPaperSize, readJsonFile, readJsonFromStdin } from './utils.js';
@@ -112,8 +112,8 @@ export function validateTemplate(template: Record<string, unknown>): ValidationR
   }
 
   const totalFields = schemaPages.reduce((sum, page) => sum + page.length, 0);
-  let pageWidth = 210;
-  let pageHeight = 297;
+  let pageWidth: number = PAGE_SIZE_PRESETS.A4.width;
+  let pageHeight: number = PAGE_SIZE_PRESETS.A4.height;
   if (
     template.basePdf &&
     typeof template.basePdf === 'object' &&

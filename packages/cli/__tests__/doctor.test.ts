@@ -3,6 +3,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { writeFileSync, mkdirSync, rmSync, chmodSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { a4BasePdf } from './helpers.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'dist', 'index.js');
@@ -58,16 +59,18 @@ describe('doctor command', () => {
     writeFileSync(
       file,
       JSON.stringify({
-        basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-        schemas: [[
-          {
-            name: 'title',
-            type: 'text',
-            position: { x: 20, y: 20 },
-            width: 170,
-            height: 15,
-          },
-        ]],
+        basePdf: a4BasePdf(),
+        schemas: [
+          [
+            {
+              name: 'title',
+              type: 'text',
+              position: { x: 20, y: 20 },
+              width: 170,
+              height: 15,
+            },
+          ],
+        ],
       }),
     );
 
@@ -110,16 +113,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         basePdf: './missing.pdf',
-        schemas: [[
-          {
-            name: 'title',
-            type: 'text',
-            fontName: 'NotoSerifJP',
-            position: { x: 20, y: 20 },
-            width: 170,
-            height: 15,
-          },
-        ]],
+        schemas: [
+          [
+            {
+              name: 'title',
+              type: 'text',
+              fontName: 'NotoSerifJP',
+              position: { x: 20, y: 20 },
+              width: 170,
+              height: 15,
+            },
+          ],
+        ],
       }),
     );
 
@@ -136,7 +141,9 @@ describe('doctor command', () => {
     expect(parsed.issues).toContain(
       `Template references font(s) that are not available by default: NotoSerifJP. Provide them via generate --font or unified job options.font.`,
     );
-    expect(parsed.issues.some((issue: string) => issue.includes('Base PDF file not found'))).toBe(true);
+    expect(parsed.issues.some((issue: string) => issue.includes('Base PDF file not found'))).toBe(
+      true,
+    );
   });
 
   it('returns field-level input hints for asset-like strings, barcode strings, table, date/time, select, checkbox, radioGroup, and multiVariableText discovery', () => {
@@ -144,125 +151,127 @@ describe('doctor command', () => {
     writeFileSync(
       file,
       JSON.stringify({
-        basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-        schemas: [[
-          {
-            name: 'title',
-            type: 'text',
-            position: { x: 20, y: 20 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'invoiceMeta',
-            type: 'multiVariableText',
-            text: 'Invoice {inv}',
-            variables: ['inv'],
-            required: true,
-            position: { x: 20, y: 45 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'status',
-            type: 'select',
-            options: ['draft', 'sent'],
-            position: { x: 20, y: 70 },
-            width: 170,
-            height: 15,
-          },
-          {
-            name: 'approved',
-            type: 'checkbox',
-            position: { x: 20, y: 95 },
-            width: 10,
-            height: 10,
-          },
-          {
-            name: 'logo',
-            type: 'image',
-            position: { x: 20, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'signedByCustomer',
-            type: 'signature',
-            position: { x: 45, y: 105 },
-            width: 30,
-            height: 20,
-          },
-          {
-            name: 'brandMark',
-            type: 'svg',
-            position: { x: 80, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'orderCode',
-            type: 'qrcode',
-            position: { x: 105, y: 105 },
-            width: 20,
-            height: 20,
-          },
-          {
-            name: 'productEan',
-            type: 'ean13',
-            position: { x: 130, y: 105 },
-            width: 30,
-            height: 20,
-          },
-          {
-            name: 'lineItems',
-            type: 'table',
-            head: ['Item', 'Qty', 'Price'],
-            headWidthPercentages: [50, 20, 30],
-            position: { x: 20, y: 145 },
-            width: 120,
-            height: 20,
-          },
-          {
-            name: 'dueDate',
-            type: 'date',
-            format: 'dd/MM/yyyy',
-            position: { x: 20, y: 175 },
-            width: 30,
-            height: 10,
-          },
-          {
-            name: 'appointmentTime',
-            type: 'time',
-            format: 'HH:mm',
-            position: { x: 55, y: 175 },
-            width: 20,
-            height: 10,
-          },
-          {
-            name: 'publishedAt',
-            type: 'dateTime',
-            format: 'dd/MM/yyyy HH:mm',
-            position: { x: 80, y: 175 },
-            width: 50,
-            height: 10,
-          },
-          {
-            name: 'choiceA',
-            type: 'radioGroup',
-            group: 'choices',
-            position: { x: 20, y: 185 },
-            width: 10,
-            height: 10,
-          },
-          {
-            name: 'choiceB',
-            type: 'radioGroup',
-            group: 'choices',
-            position: { x: 40, y: 185 },
-            width: 10,
-            height: 10,
-          },
-        ]],
+        basePdf: a4BasePdf(),
+        schemas: [
+          [
+            {
+              name: 'title',
+              type: 'text',
+              position: { x: 20, y: 20 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'invoiceMeta',
+              type: 'multiVariableText',
+              text: 'Invoice {inv}',
+              variables: ['inv'],
+              required: true,
+              position: { x: 20, y: 45 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'status',
+              type: 'select',
+              options: ['draft', 'sent'],
+              position: { x: 20, y: 70 },
+              width: 170,
+              height: 15,
+            },
+            {
+              name: 'approved',
+              type: 'checkbox',
+              position: { x: 20, y: 95 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'logo',
+              type: 'image',
+              position: { x: 20, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'signedByCustomer',
+              type: 'signature',
+              position: { x: 45, y: 105 },
+              width: 30,
+              height: 20,
+            },
+            {
+              name: 'brandMark',
+              type: 'svg',
+              position: { x: 80, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'orderCode',
+              type: 'qrcode',
+              position: { x: 105, y: 105 },
+              width: 20,
+              height: 20,
+            },
+            {
+              name: 'productEan',
+              type: 'ean13',
+              position: { x: 130, y: 105 },
+              width: 30,
+              height: 20,
+            },
+            {
+              name: 'lineItems',
+              type: 'table',
+              head: ['Item', 'Qty', 'Price'],
+              headWidthPercentages: [50, 20, 30],
+              position: { x: 20, y: 145 },
+              width: 120,
+              height: 20,
+            },
+            {
+              name: 'dueDate',
+              type: 'date',
+              format: 'dd/MM/yyyy',
+              position: { x: 20, y: 175 },
+              width: 30,
+              height: 10,
+            },
+            {
+              name: 'appointmentTime',
+              type: 'time',
+              format: 'HH:mm',
+              position: { x: 55, y: 175 },
+              width: 20,
+              height: 10,
+            },
+            {
+              name: 'publishedAt',
+              type: 'dateTime',
+              format: 'dd/MM/yyyy HH:mm',
+              position: { x: 80, y: 175 },
+              width: 50,
+              height: 10,
+            },
+            {
+              name: 'choiceA',
+              type: 'radioGroup',
+              group: 'choices',
+              position: { x: 20, y: 185 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'choiceB',
+              type: 'radioGroup',
+              group: 'choices',
+              position: { x: 40, y: 185 },
+              width: 10,
+              height: 10,
+            },
+          ],
+        ],
       }),
     );
 
@@ -413,19 +422,21 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'invoiceMeta',
-              type: 'multiVariableText',
-              text: 'Invoice {inv}',
-              variables: ['inv'],
-              required: true,
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'invoiceMeta',
+                type: 'multiVariableText',
+                text: 'Invoice {inv}',
+                variables: ['inv'],
+                required: true,
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ invoiceMeta: 'INV-001' }],
       }),
@@ -438,9 +449,7 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "invoiceMeta" (multiVariableText)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "invoiceMeta" (multiVariableText)')]),
     );
   });
 
@@ -450,16 +459,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'approved',
-              type: 'checkbox',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'approved',
+                type: 'checkbox',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ approved: true }],
       }),
@@ -472,14 +483,10 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "approved" (checkbox)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "approved" (checkbox)')]),
     );
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('expects one of: "false", "true"'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('expects one of: "false", "true"')]),
     );
   });
 
@@ -489,17 +496,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'publishedAt',
-              type: 'dateTime',
-              format: 'dd/MM/yyyy HH:mm',
-              position: { x: 20, y: 20 },
-              width: 40,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'publishedAt',
+                type: 'dateTime',
+                format: 'dd/MM/yyyy HH:mm',
+                position: { x: 20, y: 20 },
+                width: 40,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ publishedAt: '2026/02/30 14:30' }],
       }),
@@ -512,9 +521,7 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "publishedAt" (dateTime)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "publishedAt" (dateTime)')]),
     );
     expect(parsed.issues).toEqual(
       expect.arrayContaining([
@@ -522,9 +529,7 @@ describe('doctor command', () => {
       ]),
     );
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Display format hint: dd/MM/yyyy HH:mm.'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Display format hint: dd/MM/yyyy HH:mm.')]),
     );
   });
 
@@ -534,17 +539,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'publishedAt',
-              type: 'dateTime',
-              format: 'MM/dd/yyyy HH:mm',
-              position: { x: 20, y: 20 },
-              width: 40,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'publishedAt',
+                type: 'dateTime',
+                format: 'MM/dd/yyyy HH:mm',
+                position: { x: 20, y: 20 },
+                width: 40,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ publishedAt: '2026/03/08 02:30' }],
       }),
@@ -559,9 +566,7 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "publishedAt" (dateTime)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "publishedAt" (dateTime)')]),
     );
     expect(parsed.issues).toEqual(
       expect.arrayContaining([
@@ -576,45 +581,47 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'lineItems',
-              type: 'table',
-              head: ['Item', 'Qty'],
-              headWidthPercentages: [70, 30],
-              tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
-              headStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#ffffff',
-                backgroundColor: '#2980ba',
-                borderColor: '',
-                borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'lineItems',
+                type: 'table',
+                head: ['Item', 'Qty'],
+                headWidthPercentages: [70, 30],
+                tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
+                headStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#ffffff',
+                  backgroundColor: '#2980ba',
+                  borderColor: '',
+                  borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                bodyStyles: {
+                  fontSize: 10,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                  fontColor: '#000000',
+                  backgroundColor: '',
+                  alternateBackgroundColor: '#f5f5f5',
+                  borderColor: '#888888',
+                  borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+                  padding: { top: 5, right: 5, bottom: 5, left: 5 },
+                  alignment: 'left',
+                  verticalAlignment: 'middle',
+                },
+                columnStyles: {},
+                position: { x: 20, y: 20 },
+                width: 120,
+                height: 20,
               },
-              bodyStyles: {
-                fontSize: 10,
-                lineHeight: 1,
-                characterSpacing: 0,
-                fontColor: '#000000',
-                backgroundColor: '',
-                alternateBackgroundColor: '#f5f5f5',
-                borderColor: '#888888',
-                borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
-                padding: { top: 5, right: 5, bottom: 5, left: 5 },
-                alignment: 'left',
-                verticalAlignment: 'middle',
-              },
-              columnStyles: {},
-              position: { x: 20, y: 20 },
-              width: 120,
-              height: 20,
-            },
-          ]],
+            ],
+          ],
         },
         inputs: [{ lineItems: [['Paper', 2]] }],
       }),
@@ -627,9 +634,7 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Field "lineItems" (table)'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Field "lineItems" (table)')]),
     );
     expect(parsed.issues).toEqual(
       expect.arrayContaining([
@@ -644,25 +649,27 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'choiceA',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 20, y: 20 },
-              width: 10,
-              height: 10,
-            },
-            {
-              name: 'choiceB',
-              type: 'radioGroup',
-              group: 'choices',
-              position: { x: 40, y: 20 },
-              width: 10,
-              height: 10,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'choiceA',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+              {
+                name: 'choiceB',
+                type: 'radioGroup',
+                group: 'choices',
+                position: { x: 40, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
         },
         inputs: [{ choiceA: 'true', choiceB: 'true' }],
       }),
@@ -675,14 +682,10 @@ describe('doctor command', () => {
     expect(parsed.ok).toBe(true);
     expect(parsed.healthy).toBe(false);
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('Radio group "choices"'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('Radio group "choices"')]),
     );
     expect(parsed.issues).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining('choiceA, choiceB'),
-      ]),
+      expect.arrayContaining([expect.stringContaining('choiceA, choiceB')]),
     );
   });
 
@@ -692,17 +695,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'NotoSerifJP',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'NotoSerifJP',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -747,17 +752,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -801,17 +808,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandTtf',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandTtf',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -853,17 +862,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'UnsafeFont',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'UnsafeFont',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -908,17 +919,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'PinyonScript',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'PinyonScript',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -963,17 +976,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'LocalFileFont',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'LocalFileFont',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1027,17 +1042,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandBytes',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandBytes',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1083,17 +1100,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandUrl',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandUrl',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1140,16 +1159,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'こんにちは' }],
       }),
@@ -1168,7 +1189,11 @@ describe('doctor command', () => {
       expect(parsed.healthy).toBe(false);
       expect(parsed.diagnosis.fonts.autoNotoSansJP.needed).toBe(true);
       expect(parsed.diagnosis.fonts.autoNotoSansJP.cached).toBe(false);
-      expect(parsed.issues.some((issue: string) => issue.includes('font cache directory is not writable'))).toBe(true);
+      expect(
+        parsed.issues.some((issue: string) =>
+          issue.includes('font cache directory is not writable'),
+        ),
+      ).toBe(true);
     } finally {
       chmodSync(homeDir, 0o755);
     }
@@ -1185,25 +1210,27 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandTtf',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-            {
-              name: 'subtitle',
-              type: 'text',
-              fontName: 'BrandOtf',
-              position: { x: 20, y: 45 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandTtf',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+              {
+                name: 'subtitle',
+                type: 'text',
+                fontName: 'BrandOtf',
+                position: { x: 20, y: 45 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello', subtitle: 'World' }],
         options: {
@@ -1259,16 +1286,18 @@ describe('doctor command', () => {
       JSON.stringify({
         template: {
           basePdf: './missing.pdf',
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandTtf',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandTtf',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1309,16 +1338,18 @@ describe('doctor command', () => {
       join(workDir, 'job.json'),
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -1347,22 +1378,33 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'One' }, { title: 'Two' }],
       }),
     );
 
-    const result = runCli(['doctor', file, '-o', outputPath, '--image', '--imageFormat', 'jpeg', '--json']);
+    const result = runCli([
+      'doctor',
+      file,
+      '-o',
+      outputPath,
+      '--image',
+      '--imageFormat',
+      'jpeg',
+      '--json',
+    ]);
 
     expect(result.exitCode).toBe(0);
     const parsed = JSON.parse(result.stdout);
@@ -1397,16 +1439,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -1452,16 +1496,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -1498,16 +1544,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
@@ -1545,17 +1593,19 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              fontName: 'BrandTtf',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                fontName: 'BrandTtf',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
         options: {
@@ -1569,7 +1619,17 @@ describe('doctor command', () => {
     );
 
     const result = runCli(
-      ['doctor', 'fonts', 'job.json', '-o', 'output.pdf', '--image', '--imageFormat', 'jpeg', '--json'],
+      [
+        'doctor',
+        'fonts',
+        'job.json',
+        '-o',
+        'output.pdf',
+        '--image',
+        '--imageFormat',
+        'jpeg',
+        '--json',
+      ],
       { cwd: workDir },
     );
 
@@ -1590,16 +1650,18 @@ describe('doctor command', () => {
       file,
       JSON.stringify({
         template: {
-          basePdf: { width: 210, height: 297, padding: [20, 20, 20, 20] },
-          schemas: [[
-            {
-              name: 'title',
-              type: 'text',
-              position: { x: 20, y: 20 },
-              width: 170,
-              height: 15,
-            },
-          ]],
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'title',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 170,
+                height: 15,
+              },
+            ],
+          ],
         },
         inputs: [{ title: 'Hello' }],
       }),
