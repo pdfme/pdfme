@@ -30,7 +30,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - GFM 準拠だけにこだわりすぎない。PDF 生成として自然で便利な表現は、GFM にないものでも
   pdfme の拡張として扱ってよい。ただし、その差分はドキュメントに明記する。
 
-## 完了済み / PR 中
+## 完了済み
 
 ### PR #1463: リンク基盤
 
@@ -107,20 +107,20 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - 既存テンプレートで `expand` が残っている場合も、custom `basePdf` では effective
   `visible` として扱い、効かない `expand` が `dynamicFontSize` まで無効化する状態を避ける。
 
-## 次 PR 候補
+### Docs: dynamic layout の仕様整理
 
-### 1. dynamic layout docs
-
-- docs / website / schema API docs に `overflow: "expand"` の仕様を書く。
+- docs / website に `overflow: "expand"` の仕様を書く。
 - `overflow: "expand"` と `dynamicFontSize` は同時利用できないことを明記する。
-- custom `basePdf` では `text` / `multiVariableText` の `overflow: "expand"` を使えないことを
-  明記する。
-- Designer 上では dynamic layout を実行せず、Preview / Form / Viewer / generate で reflow される
-  ことを明記する。
+- custom `basePdf` では dynamic layout / page break が適用されず、`text` / `multiVariableText`
+  の `overflow: "expand"` を使えないことを明記する。
+- Designer 上では dynamic layout を実行せず、Preview / Form / Viewer / generate で reflow
+  されることを明記する。
 - `__splitRange` は内部 dynamic layout metadata であり、通常テンプレート authoring API では
   直接触らないことを説明する。
 
-### 2. dynamic layout の品質改善
+## 次 PR 候補
+
+### 1. dynamic layout の品質改善
 
 - 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか決める。
 - Form 編集中の live pagination を入れるか、Preview / generate 時のみ reflow する仕様で固定するか決める。
@@ -129,7 +129,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
   model を合わせて設計する。
 - 既存テンプレートに旧 dynamic metadata が残っている場合の扱いを docs / migration note に書く。
 
-### 3. `@pdfme/jsx` component 拡張
+### 2. `@pdfme/jsx` component 拡張
 
 `md2pdf` を見据えると、MVP だけでは表現力が足りない。優先度は以下。
 
@@ -140,7 +140,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - `Absolute`: stacking layout から外れた補助配置に必要。ただし乱用されると JSX の価値が
   薄れるため、API は慎重にする。
 
-### 4. `@pdfme/jsx` layout 品質の改善
+### 3. `@pdfme/jsx` layout 品質の改善
 
 - CSS/Flexbox 互換を目指すのではなく、flexbox の使いやすさだけを `Stack` / `Row`
   の authoring API に取り込む。
@@ -154,7 +154,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - header / footer を `basePdf.staticSchema` に接続するか検討する。
 - row/stack/box の layout core を Markdown frontend から使えるように切り出せるか検討する。
 
-### 5. `md2pdf` / GFM MVP
+### 4. `md2pdf` / GFM MVP
 
 - `converter` package に `md2pdf` の入口を追加する。
 - Markdown parser は `remark-gfm` / `micromark` 系を候補にする。

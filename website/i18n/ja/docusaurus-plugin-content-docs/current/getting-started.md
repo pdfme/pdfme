@@ -77,7 +77,7 @@ pdfmeライブラリの中核はテンプレートです。
 - **basePdf**: 生成されるPDFの固定部分のPDFデータ。
 - **schemas**: 生成されるPDFの可変部分の定義データ。
 
-**basePdf**プロパティは、`string`（base64エンコード）、`ArrayBuffer`、または`Uint8Array`としてPDFデータを受け入れます。`BLANK_PDF`を使用して空白のA4 PDFをインポートして動作を確認できます。または、以下のように空のPDFを定義することもできます。ページ区切りが必要なテーブルなどのスキーマを使用する場合は、以下の形式でPDFを指定してください：
+**basePdf**プロパティは、`string`（base64エンコード）、`ArrayBuffer`、または`Uint8Array`としてPDFデータを受け入れます。`BLANK_PDF`を使用して空白のA4 PDFをインポートして動作を確認できます。または、以下のように空のPDFを定義することもできます。`overflow: "expand"` を使うテキスト、リスト、テーブルなど、動的レイアウトやページ区切りが必要なスキーマを使用する場合は、以下の形式でPDFを指定してください：
 
 ```json
 basePdf: { "width": 210, "height": 297, "padding": [10, 10, 10, 10] }
