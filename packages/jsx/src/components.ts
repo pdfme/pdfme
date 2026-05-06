@@ -12,6 +12,7 @@ import type {
   RowProps,
   SpacerProps,
   StackProps,
+  StaticProps,
   SvgProps,
   TableProps,
   TextProps,
@@ -25,6 +26,7 @@ const makeBuiltin =
     createElementNode(kind, props);
 
 export const Page = makeBuiltin<PageProps, 'page'>('page');
+export const Static = makeBuiltin<StaticProps, 'static'>('static');
 export const Stack = makeBuiltin<StackProps, 'stack'>('stack');
 export const Row = makeBuiltin<RowProps, 'row'>('row');
 export const Box = makeBuiltin<BoxProps, 'box'>('box');

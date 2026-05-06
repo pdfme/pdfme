@@ -1,6 +1,6 @@
 /** @jsxImportSource @pdfme/jsx */
 import { describe, expect, it } from 'vitest';
-import { PAGE_SIZE_PRESETS } from '@pdfme/common';
+import { isBlankPdf, PAGE_SIZE_PRESETS } from '@pdfme/common';
 
 import {
   Box,
@@ -15,6 +15,7 @@ import {
   Row,
   Spacer,
   Stack,
+  Static,
   Svg,
   Table,
   Text,
@@ -833,6 +834,130 @@ describe('@pdfme/jsx renderToTemplate', () => {
 
     expect(result.template.schemas).toHaveLength(2);
     expect(result.inputs).toEqual([{ first: 'First', second: 'Second' }]);
+  });
+
+  it('renders Static children into blank basePdf staticSchema using page coordinates', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static>
+          <Text height={6}>Header</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema).toHaveLength(1);
+    expect(result.template.basePdf.staticSchema?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Header',
+      readOnly: true,
+      position: { x: 0, y: 0 },
+      width: 100,
+      height: 6,
+    });
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Body',
+      position: { x: 10, y: 10 },
+      width: 80,
+    });
+    expect(result.inputs).toEqual([{}]);
+  });
+
+  it('allows named read-only Static children and keeps names unique', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static>
+          <Text name="staticTitle" readOnly height={6}>
+            Header
+          </Text>
+        </Static>
+        <Text name="body">Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.[0]?.name).toBe('staticTitle');
+    expect(result.inputs).toEqual([{ body: 'Body' }]);
+  });
+
+  it('rejects input-backed Static children', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text name="editable">Header</Text>
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> children must be read-only');
+  });
+
+  it('rejects Static outside the first Page direct children', async () => {
+    await expect(
+      renderToTemplate([
+        <Static key="static">
+          <Text>Header</Text>
+        </Static>,
+        <Page key="page">
+          <Text>Body</Text>
+        </Page>,
+      ]),
+    ).rejects.toThrow('<Static> can only be used as a direct child of the first <Page>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Text>First</Text>
+          <PageBreak />
+          <Static>
+            <Text>Header</Text>
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> can only be used inside the first <Page>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Stack>
+            <Static>
+              <Text>Header</Text>
+            </Static>
+          </Stack>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> can only be used as a direct child of the first <Page>');
+  });
+
+  it('rejects unsupported Static child schema types', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <MultiVariableText text="Hello {name}" values={{ name: 'Alice' }} />
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> supports only read-only');
+  });
+
+  it('rejects Static with a custom basePdf', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text>Header</Text>
+          </Static>
+        </Page>,
+        { basePdf: 'data:application/pdf;base64,JVBERi0xLjQK' },
+      ),
+    ).rejects.toThrow('<Static> is supported only with a blank basePdf');
   });
 
   it('supports Stack inside Row flex allocation', async () => {

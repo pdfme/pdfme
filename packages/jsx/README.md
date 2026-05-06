@@ -40,6 +40,12 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   content.
 - `Rectangle`, `Ellipse`, and `Line` are static visual schemas for backgrounds, dividers, and simple
   shapes.
+- `Static` can be used as a direct child of the first `Page` to render read-only header/footer style
+  content into blank `basePdf.staticSchema`. Its children use page coordinates, not page margin
+  coordinates, and custom `basePdf` is not supported.
+- `Static` currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
+  `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
+  schemas, and `PageBreak` are rejected.
 - Layout children can use `margin`. `Stack` and `Row` support `alignItems` for simple cross-axis
   alignment without trying to implement full CSS/Flexbox.
 - `Stack` and `Row` support `justifyContent="start" | "center" | "end" | "space-between"` for

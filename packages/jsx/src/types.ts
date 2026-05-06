@@ -16,6 +16,7 @@ export type { PageOrientation, PageSize, PageSizePreset } from '@pdfme/common';
 
 export type BuiltinKind =
   | 'page'
+  | 'static'
   | 'stack'
   | 'row'
   | 'box'
@@ -92,6 +93,10 @@ export type PageProps = {
   orientation?: PageOrientation;
   margin?: number | BoxSides;
   font?: string;
+  children?: PdfJsxChild;
+};
+
+export type StaticProps = {
   children?: PdfJsxChild;
 };
 
