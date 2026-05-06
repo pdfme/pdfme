@@ -1,4 +1,9 @@
-import { getDefaultFont, UIRenderProps } from '@pdfme/common';
+import {
+  getDefaultFont,
+  getInternalLinkTarget,
+  normalizeLinkHref,
+  UIRenderProps,
+} from '@pdfme/common';
 import { MultiVariableTextSchema } from './types.js';
 import {
   uiRender as parentUiRender,
@@ -255,7 +260,9 @@ const renderSplitVariableSpans = (arg: {
         return;
       }
 
-      const span = document.createElement('span');
+      const span = segment.run
+        ? createStaticInlineMarkdownElement(segment.run)
+        : document.createElement('span');
       span.style.letterSpacing = lineIndex === lineSegments.length - 1 ? '0' : 'inherit';
       span.textContent = segment.text;
       if (segment.run) {
@@ -560,6 +567,19 @@ const applyInlineMarkdownStyle = (arg: {
   }
 };
 
+const createStaticInlineMarkdownElement = (run: RichTextRun) => {
+  const href = run.href ? normalizeLinkHref(run.href) : undefined;
+  if (!href) return document.createElement('span');
+
+  const anchor = document.createElement('a');
+  anchor.href = href;
+  if (!getInternalLinkTarget(href)) {
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+  }
+  return anchor;
+};
+
 const appendTextSpan = (arg: {
   textBlock: HTMLDivElement;
   text: string;
@@ -570,7 +590,7 @@ const appendTextSpan = (arg: {
   const { textBlock, text, run, schema, font } = arg;
   if (!text) return;
 
-  const span = document.createElement('span');
+  const span = createStaticInlineMarkdownElement(run);
   span.textContent = text;
   applyInlineMarkdownStyle({ element: span, run, schema, font });
   textBlock.appendChild(span);

@@ -109,14 +109,46 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(link.href).toBe('https://pdfme.com/');
   });
 
-  it('styles form links like viewer links without making them clickable', async () => {
+  it('keeps static form links clickable while editing variables', async () => {
     const textBlock = await renderLinkedMultiVariableText('form');
-    const docsSpan = Array.from(textBlock.querySelectorAll('span')).find(
-      (span) => span.textContent === 'docs',
-    );
+    const link = textBlock.querySelector('a') as HTMLAnchorElement;
+    const variableSpan = Array.from(textBlock.querySelectorAll('span')).find(
+      (span) => span.contentEditable === 'plaintext-only',
+    ) as HTMLSpanElement;
+
+    expect(link.textContent).toBe('docs');
+    expect(link.href).toBe('https://pdfme.com/');
+    expect(link.target).toBe('_blank');
+    expect(link.rel).toBe('noopener noreferrer');
+    expect(link.style.textDecoration).toContain('underline');
+    expect(variableSpan.textContent).toBe('A **bold** user');
+  });
+
+  it('does not turn linked variable form inputs into anchors', async () => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '[{name}](https://pdfme.com)',
+      variables: ['name'],
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'A **bold** user' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
 
     expect(textBlock.querySelector('a')).toBeNull();
-    expect(docsSpan?.style.textDecoration).toContain('underline');
+    expect(variableSpan.contentEditable).toBe('plaintext-only');
+    expect(variableSpan.textContent).toBe('A **bold** user');
+    expect(variableSpan.style.textDecoration).toContain('underline');
   });
 
   it('writes split form chunk edits back into the full variable value', async () => {
@@ -433,7 +465,7 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('keeps split inline markdown links non-clickable while editing variables', async () => {
+  it('keeps split inline markdown static links clickable while editing variables', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
     const schema: MultiVariableTextSchema = {
@@ -460,9 +492,13 @@ describe('multiVariableText inline markdown UI rendering', () => {
       (span) => span.contentEditable === 'plaintext-only',
     ) as HTMLSpanElement;
 
-    expect(textBlock.querySelector('a')).toBeNull();
+    const link = textBlock.querySelector('a') as HTMLAnchorElement;
+    expect(link.textContent).toBe('docs');
+    expect(link.href).toBe('https://pdfme.com/');
+    expect(link.target).toBe('_blank');
+    expect(link.rel).toBe('noopener noreferrer');
     expect(textBlock.textContent).toBe('docs for Alice');
-    expect(textBlock.querySelector('span')?.style.textDecoration).toContain('underline');
+    expect(link.style.textDecoration).toContain('underline');
     expect(variableSpan.textContent).toBe('Alice');
     expect(variableSpan.style.fontWeight).toBe('800');
 

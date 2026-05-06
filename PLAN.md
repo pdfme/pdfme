@@ -35,7 +35,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - リンク基盤、`@pdfme/jsx` MVP、text / MVT の `overflow: "expand"`、行単位 page split、
   custom `basePdf` 制御、dynamic layout docs は main に入った。
 - `multiVariableText` の split chunk は、plain / inline-markdown ともに Form 上で変数値だけ編集できる。
-- Form mode の inline link は clickable にしないまま、viewer と同じく underline で表示する。
+- Form mode の inline link は、入力要素ではない static text 部分だけ viewer と同じく clickable にする。
+  変数 span 自体が link run に含まれる場合は入力を優先し、clickable anchor にはしない。
 - `text` schema の inline-markdown split chunk は Form 上では read-only のまま残す。
 - 次の大きな判断は、dynamic layout の編集体験をどこまで広げるかと、`@pdfme/jsx` / `md2pdf`
   に進む前にどの schema 表現を追加するか。
@@ -138,7 +139,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - template の markdown 記法、static text、link は Form では編集対象にしない。
 - 変数値に `**` や `` ` `` などの markdown delimiter が含まれても、変数値として literal に扱う。
   計測時は escape 済みの値を使い、再描画時に変数値が markdown として再解釈されないようにする。
-- link は Form 上では clickable にしないが、viewer と同じく underline で表示する。
+- link は Form 上でも static text 部分なら clickable にする。変数 span が link run に含まれる場合は
+  入力を優先し、clickable anchor にはしない。
 
 ## 次 PR 候補
 
