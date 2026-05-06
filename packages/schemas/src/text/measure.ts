@@ -38,7 +38,22 @@ export const applyTextLineRange = <T>(lines: T[], range?: TextLineRange) => {
 export const plainTextLinesToValue = (lines: string[]) =>
   lines.map((line) => line.replace(/[\r\n]+$/g, '')).join('\n');
 
-const splitReplacementTextToLines = (value: string) => value.split(/\r\n|\r|\n/g);
+const splitReplacementTextToLines = (value: string) => {
+  const lines: string[] = [];
+  let start = 0;
+
+  for (let i = 0; i < value.length; i += 1) {
+    const charCode = value.charCodeAt(i);
+    if (charCode !== 10 && charCode !== 13) continue;
+
+    lines.push(value.slice(start, i));
+    if (charCode === 13 && value.charCodeAt(i + 1) === 10) i += 1;
+    start = i + 1;
+  }
+
+  lines.push(value.slice(start));
+  return lines;
+};
 
 export const measureTextLines = async ({
   value,

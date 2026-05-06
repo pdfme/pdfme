@@ -393,14 +393,14 @@ describe('text dynamic layout', () => {
 
     const result = await mergeTextLineRangeValue({
       value: 'long text '.repeat(8),
-      replacement: 'edited chunk',
+      replacement: 'edited one\r\nedited two\redited three\nedited four',
       schema,
       font: getSampleFont(),
       _cache: new Map<string | number, unknown>(),
     });
 
-    expect(result).toContain('edited chunk');
-    expect(result).not.toBe('edited chunk');
+    expect(result).toContain('edited one\nedited two\nedited three\nedited four');
+    expect(result).not.toBe('edited one\nedited two\nedited three\nedited four');
   });
 
   it('does not use dynamic font size while text overflow is expand', () => {
