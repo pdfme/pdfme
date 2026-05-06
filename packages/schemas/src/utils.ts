@@ -4,6 +4,8 @@ import { Schema, mm2pt, Mode, isHexValid, ColorType } from '@pdfme/common';
 import { IconNode } from 'lucide';
 import { getDynamicHeightsForTable as _getDynamicHeightsForTable } from './tables/dynamicTemplate.js';
 export { measureTextHeight } from './text/measure.js';
+export { escapeInlineMarkdown } from './text/inlineMarkdown.js';
+export { getVariableNames, visitVariables } from './multiVariableText/variables.js';
 export const convertForPdfLayoutProps = ({
   schema,
   pageHeight,

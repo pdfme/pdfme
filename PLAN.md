@@ -37,6 +37,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - `multiVariableText` の split chunk は、plain / inline-markdown ともに Form 上で変数値だけ編集できる。
 - Form mode の inline link は、入力要素ではない static text 部分だけ viewer と同じく clickable にする。
   変数 span 自体が link run に含まれる場合は入力を優先し、clickable anchor にはしない。
+- `@pdfme/jsx` component 拡張は `MultiVariableText` から進める。
 - `text` schema の inline-markdown split chunk は Form 上では read-only のまま残す。
 - 次の大きな判断は、dynamic layout の編集体験をどこまで広げるかと、`@pdfme/jsx` / `md2pdf`
   に進む前にどの schema 表現を追加するか。
@@ -167,7 +168,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 `md2pdf` を見据えると、MVP だけでは表現力が足りない。優先度は以下。
 
-- `MultiVariableText`: 固定文の中に入力欄を含む文章のために必要。
+- `MultiVariableText`: 固定文の中に入力欄を含む文章のために必要。`text` / children を template
+  string、`values` を JSON input として扱い、`{name}` placeholder から variables を推論する。
 - `Image`: Markdown image と AI template generation の両方で必要。
 - `Svg`: アイコンや簡単な図形に必要。
 - `Line`: blockquote や区切り線に必要。

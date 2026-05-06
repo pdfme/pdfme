@@ -6,6 +6,7 @@ import type {
   CellStyle as SchemaCellStyle,
   TableSchema,
   TextSchema,
+  MultiVariableTextSchema,
 } from '@pdfme/schemas/types';
 export type { PageOrientation, PageSize, PageSizePreset } from '@pdfme/common';
 
@@ -16,6 +17,7 @@ export type BuiltinKind =
   | 'box'
   | 'spacer'
   | 'text'
+  | 'multiVariableText'
   | 'list'
   | 'table'
   | 'pagebreak';
@@ -131,6 +133,42 @@ export type TextProps = CommonProps &
     borderColor?: string;
     borderWidth?: number;
     dynamicFontSize?: Partial<NonNullable<TextSchema['dynamicFontSize']>>;
+  };
+
+export type MultiVariableTextValues = Record<string, string | number | boolean | null | undefined>;
+
+type MultiVariableTextSchemaProps = Partial<
+  Pick<
+    MultiVariableTextSchema,
+    | 'name'
+    | 'width'
+    | 'height'
+    | 'lineHeight'
+    | 'strikethrough'
+    | 'underline'
+    | 'readOnly'
+    | 'required'
+    | 'textFormat'
+    | 'overflow'
+  >
+>;
+
+export type MultiVariableTextProps = CommonProps &
+  MultiVariableTextSchemaProps & {
+    children?: PdfJsxChild;
+    text?: string;
+    variables?: string[];
+    values?: MultiVariableTextValues;
+    size?: MultiVariableTextSchema['fontSize'];
+    font?: MultiVariableTextSchema['fontName'];
+    align?: MultiVariableTextSchema['alignment'];
+    valign?: MultiVariableTextSchema['verticalAlignment'];
+    spacing?: MultiVariableTextSchema['characterSpacing'];
+    color?: MultiVariableTextSchema['fontColor'];
+    background?: MultiVariableTextSchema['backgroundColor'];
+    borderColor?: string;
+    borderWidth?: number;
+    dynamicFontSize?: Partial<NonNullable<MultiVariableTextSchema['dynamicFontSize']>>;
   };
 
 export type ListItem = string | { text: SchemaListItem['text']; level?: SchemaListItem['level'] };

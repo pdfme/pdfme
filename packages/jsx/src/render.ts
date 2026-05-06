@@ -3,16 +3,24 @@ import type { Font, Schema, Template } from '@pdfme/common';
 import type {
   CellStyle as SchemaCellStyle,
   ListSchema,
+  MultiVariableTextSchema,
   TableSchema,
   TextSchema,
 } from '@pdfme/schemas/types';
-import { measureTextHeight } from '@pdfme/schemas/utils';
+import {
+  escapeInlineMarkdown,
+  getVariableNames,
+  measureTextHeight,
+  visitVariables,
+} from '@pdfme/schemas/utils';
 import { cloneElementWithChildren, isPdfJsxElement, isPdfJsxFragment } from './node.js';
 import type {
   BoxProps,
   BoxSides,
   CellStyle,
   ListProps,
+  MultiVariableTextProps,
+  MultiVariableTextValues,
   PageProps,
   PdfJsxChild,
   PdfJsxElement,
@@ -249,6 +257,12 @@ const renderElement = async (
         frame,
         ctx,
       );
+    case 'multiVariableText':
+      return renderMultiVariableText(
+        { ...(element.props as MultiVariableTextProps), children: element.children },
+        frame,
+        ctx,
+      );
     case 'list':
       return renderList(
         { ...(element.props as ListProps), children: element.children },
@@ -397,6 +411,77 @@ const renderText = async (
   return { width, height: schema.height };
 };
 
+const renderMultiVariableText = async (
+  props: MultiVariableTextProps,
+  frame: Rect,
+  ctx: RenderCtx,
+): Promise<{ width: number; height: number }> => {
+  const fontSize = props.size ?? DEFAULT_FONT_SIZE;
+  const lineHeight = props.lineHeight ?? DEFAULT_LINE_HEIGHT;
+  const width = props.width ?? frame.width;
+  const templateText = props.text ?? childrenToString(props.children);
+  const values = normalizeMultiVariableTextValues(props.values);
+  const variables = resolveMultiVariableTextVariables(templateText, props.variables, values);
+  const name = resolveName(ctx, 'multiVariableText', props.name);
+  const readOnly = props.readOnly ?? props.name == null;
+  const textFormat = props.textFormat ?? 'plain';
+  const content = readOnly
+    ? substituteMultiVariableText(templateText, values, textFormat === 'inline-markdown')
+    : JSON.stringify(values);
+
+  const schema: MultiVariableTextSchema = {
+    name,
+    type: 'multiVariableText',
+    content,
+    position: { x: frame.x, y: frame.y },
+    width,
+    height: props.height ?? 0,
+    rotate: props.rotate ?? 0,
+    opacity: props.opacity ?? 1,
+    readOnly,
+    required: props.required,
+    alignment: props.align ?? 'left',
+    verticalAlignment: props.valign ?? 'top',
+    fontSize,
+    fontName: props.font ?? ctx.defaultFont,
+    lineHeight,
+    characterSpacing: props.spacing ?? DEFAULT_CHARACTER_SPACING,
+    fontColor: props.color ?? DEFAULT_FONT_COLOR,
+    backgroundColor: props.background ?? '',
+    textFormat,
+    overflow: props.overflow,
+    strikethrough: props.strikethrough ?? false,
+    underline: props.underline ?? false,
+    text: templateText,
+    variables,
+  };
+
+  if (props.borderColor) schema.borderColor = props.borderColor;
+  if (props.borderWidth != null) schema.borderWidth = props.borderWidth;
+  if (props.dynamicFontSize) {
+    schema.dynamicFontSize = {
+      min: props.dynamicFontSize.min ?? DEFAULT_DYNAMIC_FONT_SIZE.min,
+      max: props.dynamicFontSize.max ?? DEFAULT_DYNAMIC_FONT_SIZE.max,
+      fit: props.dynamicFontSize.fit ?? DEFAULT_DYNAMIC_FONT_SIZE.fit,
+    };
+  }
+  if (props.height == null) {
+    const measureValue = readOnly
+      ? content
+      : substituteMultiVariableText(templateText, values, textFormat === 'inline-markdown');
+    schema.height = await measureTextHeight({
+      value: measureValue,
+      schema,
+      font: ctx.font,
+      _cache: ctx._cache,
+    });
+  }
+  if (!readOnly) ctx.inputs[name] = content;
+  ctx.schemas.push(schema);
+
+  return { width, height: schema.height };
+};
+
 const renderList = (
   props: ListProps,
   frame: Rect,
@@ -518,6 +603,56 @@ const normalizeListItems = (props: ListProps): { text: string; level: number }[]
 
 const serializeListItem = (item: { text: string; level: number }) =>
   `${'\t'.repeat(Math.max(0, item.level))}${item.text}`;
+
+const normalizeMultiVariableTextValues = (
+  values: MultiVariableTextValues | undefined,
+): Record<string, string> => {
+  const normalized: Record<string, string> = {};
+  Object.entries(values ?? {}).forEach(([key, value]) => {
+    normalized[key] = value == null ? '' : String(value);
+  });
+  return normalized;
+};
+
+const resolveMultiVariableTextVariables = (
+  templateText: string,
+  variables: string[] | undefined,
+  values: Record<string, string>,
+) => {
+  const result: string[] = [];
+  const seen = new Set<string>();
+  const add = (name: string) => {
+    if (!seen.has(name)) {
+      seen.add(name);
+      result.push(name);
+    }
+  };
+
+  variables?.forEach(add);
+  getVariableNames(templateText).forEach(add);
+  Object.keys(values).forEach(add);
+  return result;
+};
+
+const substituteMultiVariableText = (
+  templateText: string,
+  values: Record<string, string>,
+  escapeMarkdown: boolean,
+) => {
+  let result = '';
+  let lastIndex = 0;
+
+  visitVariables(templateText, ({ name, startIndex, endIndex }) => {
+    result += templateText.slice(lastIndex, startIndex);
+    const value = values[name];
+    if (value != null) {
+      result += escapeMarkdown ? escapeInlineMarkdown(value) : value;
+    }
+    lastIndex = endIndex + 1;
+  });
+
+  return result + templateText.slice(lastIndex);
+};
 
 const normalizeColumnWidths = (widths: number[] | undefined, columnCount: number): number[] => {
   if (widths && widths.length > 0) return widths;
