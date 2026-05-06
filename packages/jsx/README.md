@@ -56,7 +56,9 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 ```
 
 - Multiple `Static` blocks with the same placement are concatenated in declaration order. Top blocks
-  start at the top of the page; bottom blocks are stacked together and anchored to the page bottom.
+  start at the top of the page; bottom blocks are stacked together in declaration order and anchored
+  to the page bottom, so the last bottom block sits at the page edge. If top and bottom static
+  content together exceed the page height, they may overlap.
 - Static content currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
   `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
   schemas, and `PageBreak` are rejected.

@@ -28,6 +28,10 @@ const SAMPLE_PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 
 const SAMPLE_SVG = '<svg viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>';
+const RuntimeStatic = Static as unknown as (props: {
+  placement: string;
+  children?: unknown;
+}) => ReturnType<typeof Static>;
 
 describe('@pdfme/jsx renderToTemplate', () => {
   it('renders a Page with a fixed Text schema', async () => {
@@ -933,6 +937,31 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 96 } });
   });
 
+  it('supports layout containers inside Static blocks', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Header>
+          <Row gap={4}>
+            <Text width={40} height={6}>
+              Left
+            </Text>
+            <Text width={20} height={6}>
+              Right
+            </Text>
+          </Row>
+        </Header>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [left, right] = result.template.basePdf.staticSchema ?? [];
+    expect(left).toMatchObject({ content: 'Left', position: { x: 0, y: 0 }, width: 40 });
+    expect(right).toMatchObject({ content: 'Right', position: { x: 44, y: 0 }, width: 20 });
+  });
+
   it('concatenates multiple Static blocks in declaration order', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
@@ -1025,6 +1054,18 @@ describe('@pdfme/jsx renderToTemplate', () => {
         </Page>,
       ),
     ).rejects.toThrow('<Static> children must be read-only');
+  });
+
+  it('rejects invalid Static placement values at runtime', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <RuntimeStatic placement="middle">
+            <Text>Header</Text>
+          </RuntimeStatic>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> placement must be "top" or "bottom"');
   });
 
   it('rejects Static outside the first Page direct children', async () => {

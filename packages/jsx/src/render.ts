@@ -1213,6 +1213,7 @@ const validateStaticPlacement = (pages: PdfJsxElement<'page'>[]) => {
             '@pdfme/jsx: <Static> must appear before any <PageBreak> and can only be used inside the first <Page>.',
           );
         }
+        // Validate dynamic JavaScript callers before static children are extracted for layout.
         getStaticPlacement(child as PdfJsxElement<'static'>);
         validateStaticChildren(child.children);
         continue;
