@@ -6,11 +6,4 @@ export {
   getListMarkers,
   calculateListLayout,
 } from './list/helper.js';
-export type {
-  ListItem,
-  ListSchema,
-  ListLayout,
-  ListItemLayout,
-  ListRange,
-  LIST_STYLE,
-} from './list/types.js';
+export type { ListItem, ListSchema, ListLayout, ListItemLayout, LIST_STYLE } from './list/types.js';

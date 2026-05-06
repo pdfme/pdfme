@@ -337,7 +337,6 @@ describe('getDynamicTemplate', () => {
           heights: [20, 20, 20],
           patchSplitSchema: ({ start, end, isSplit }) => ({
             __splitRange: { unit: 'listItem', start, end },
-            __itemRange: { start, end },
             __isSplit: isSplit,
             height: 999,
             position: { x: 999, y: 999 },
@@ -354,7 +353,6 @@ describe('getDynamicTemplate', () => {
         start: 0,
         end: 1,
       });
-      expect(dynamicTemplate.schemas[0][0].__itemRange).toEqual({ start: 0, end: 1 });
       expect(dynamicTemplate.schemas[0][0].__isSplit).toBe(false);
       expect(dynamicTemplate.schemas[1][0].height).toBe(40);
       expect(dynamicTemplate.schemas[1][0].position).toEqual({ x: 10, y: 10 });
@@ -363,7 +361,6 @@ describe('getDynamicTemplate', () => {
         start: 1,
         end: 3,
       });
-      expect(dynamicTemplate.schemas[1][0].__itemRange).toEqual({ start: 1, end: 3 });
       expect(dynamicTemplate.schemas[1][0].__isSplit).toBe(true);
     });
 

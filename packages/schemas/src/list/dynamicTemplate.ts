@@ -26,7 +26,6 @@ export const getDynamicLayoutForList = async (
     avoidFirstUnitOnly: false,
     patchSplitSchema: ({ start, end, isSplit }) => ({
       __splitRange: createListItemSplitRange(start, end),
-      __itemRange: { start, end },
       __isSplit: isSplit,
     }),
   };

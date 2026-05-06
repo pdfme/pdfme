@@ -112,7 +112,6 @@ export const getDynamicLayoutForTable = async (
       };
       return {
         __splitRange: createTableBodySplitRange(range.start, range.end),
-        __bodyRange: range,
         __isSplit: isSplit,
       };
     },

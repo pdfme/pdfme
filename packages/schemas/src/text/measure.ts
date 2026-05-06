@@ -15,7 +15,7 @@ import {
   resolveRichTextRuns,
   type RichTextLine,
 } from './richText.js';
-import type { TextLineRange, TextSchema } from './types.js';
+import type { TextSchema } from './types.js';
 import { getTextLineRange } from '../splitRange.js';
 
 type MeasureTextHeightArgs = {
@@ -31,7 +31,7 @@ type MeasureTextLinesResult = {
   lineHeights: number[];
 };
 
-export const applyTextLineRange = <T>(lines: T[], range?: TextLineRange) => {
+export const applyTextLineRange = <T>(lines: T[], range?: { start: number; end?: number }) => {
   if (!range) return lines;
   return lines.slice(range.start, range.end ?? lines.length);
 };

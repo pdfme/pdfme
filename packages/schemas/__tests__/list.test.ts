@@ -161,7 +161,6 @@ describe('list schema helpers', () => {
       }),
     ).toEqual({
       __splitRange: { unit: 'listItem', start: 1, end: 3 },
-      __itemRange: { start: 1, end: 3 },
       __isSplit: true,
     });
   });

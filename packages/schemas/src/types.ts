@@ -11,14 +11,7 @@ export type {
   VERTICAL_ALIGNMENT,
 } from './text/types.js';
 export type { MultiVariableTextSchema } from './multiVariableText/types.js';
-export type {
-  LIST_STYLE,
-  ListItem,
-  ListItemLayout,
-  ListLayout,
-  ListRange,
-  ListSchema,
-} from './list/types.js';
+export type { LIST_STYLE, ListItem, ListItemLayout, ListLayout, ListSchema } from './list/types.js';
 export type {
   CellSchema,
   CellStyle,

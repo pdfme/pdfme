@@ -143,9 +143,6 @@ export const Schema = z
     readOnly: z.boolean().optional(),
     required: z.boolean().optional(),
     __splitRange: DynamicLayoutSplitRange.optional(),
-    __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
-    __itemRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
-    __textLineRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __isSplit: z.boolean().optional(),
   })
   .passthrough();

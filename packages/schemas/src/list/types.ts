@@ -1,9 +1,6 @@
-import type { DynamicLayoutRange } from '@pdfme/common';
 import type { TextSchema } from '../text/types.js';
 
 export type LIST_STYLE = 'bullet' | 'ordered';
-
-export type ListRange = DynamicLayoutRange;
 
 export type ListSchema = TextSchema & {
   listStyle: LIST_STYLE;
@@ -11,7 +8,6 @@ export type ListSchema = TextSchema & {
   markerGap: number;
   indentSize?: number;
   itemSpacing: number;
-  __itemRange?: ListRange;
 };
 
 export type ListItem = {

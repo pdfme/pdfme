@@ -38,7 +38,6 @@ export const getDynamicLayoutForText = async (
     patchSplitSchema: ({ start, end, isSplit }) => ({
       dynamicFontSize: undefined,
       __splitRange: lineHeights.length === 1 ? undefined : createTextLineSplitRange(start, end),
-      __textLineRange: lineHeights.length === 1 ? undefined : { start, end },
       __isSplit: isSplit,
     }),
   };

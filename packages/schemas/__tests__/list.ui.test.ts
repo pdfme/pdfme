@@ -106,7 +106,7 @@ describe('list UI rendering', () => {
 
     await uiRender({
       value: listValue(['One', 'Two', 'Three', 'Four']),
-      schema: getListSchema({ __itemRange: { start: 1, end: 3 } }),
+      schema: getListSchema({ __splitRange: { unit: 'listItem', start: 1, end: 3 } }),
       rootElement,
       mode: 'form',
       onChange,
