@@ -96,9 +96,16 @@ export type PageProps = {
   children?: PdfJsxChild;
 };
 
+export type StaticPlacement = 'top' | 'bottom';
+
 export type StaticProps = {
+  /** Page edge used to anchor this read-only static block. Defaults to top. */
+  placement?: StaticPlacement;
   children?: PdfJsxChild;
 };
+
+export type HeaderProps = Omit<StaticProps, 'placement'>;
+export type FooterProps = Omit<StaticProps, 'placement'>;
 
 export type StackProps = LayoutProps & {
   gap?: number;

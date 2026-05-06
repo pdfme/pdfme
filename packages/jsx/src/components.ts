@@ -2,6 +2,8 @@ import { createElementNode } from './node.js';
 import type {
   BoxProps,
   EllipseProps,
+  FooterProps,
+  HeaderProps,
   ImageProps,
   LineProps,
   ListProps,
@@ -27,6 +29,10 @@ const makeBuiltin =
 
 export const Page = makeBuiltin<PageProps, 'page'>('page');
 export const Static = makeBuiltin<StaticProps, 'static'>('static');
+export const Header = (props: HeaderProps): ReturnType<typeof createElementNode<'static'>> =>
+  createElementNode('static', { ...props, placement: 'top' });
+export const Footer = (props: FooterProps): ReturnType<typeof createElementNode<'static'>> =>
+  createElementNode('static', { ...props, placement: 'bottom' });
 export const Stack = makeBuiltin<StackProps, 'stack'>('stack');
 export const Row = makeBuiltin<RowProps, 'row'>('row');
 export const Box = makeBuiltin<BoxProps, 'box'>('box');

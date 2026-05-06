@@ -5,6 +5,8 @@ import { isBlankPdf, PAGE_SIZE_PRESETS } from '@pdfme/common';
 import {
   Box,
   Ellipse,
+  Footer,
+  Header,
   Image,
   Line,
   List,
@@ -888,6 +890,49 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 94 } });
   });
 
+  it('places bottom Static blocks at the page bottom', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static placement="bottom">
+          <Text height={6}>Footer</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Footer',
+      position: { x: 0, y: 94 },
+      width: 100,
+      height: 6,
+    });
+  });
+
+  it('renders Header and Footer aliases as top and bottom static content', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Header>
+          <Text height={5}>Header</Text>
+        </Header>
+        <Footer>
+          <Text height={4}>Footer</Text>
+        </Footer>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [header, footer] = result.template.basePdf.staticSchema ?? [];
+    expect(header).toMatchObject({ content: 'Header', position: { x: 0, y: 0 } });
+    expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 96 } });
+  });
+
   it('concatenates multiple Static blocks in declaration order', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
@@ -910,6 +955,30 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ]);
     expect(result.template.basePdf.staticSchema?.[0]?.position.y).toBe(0);
     expect(result.template.basePdf.staticSchema?.[1]?.position.y).toBe(6);
+  });
+
+  it('concatenates bottom Static blocks before anchoring them to the page bottom', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static placement="bottom">
+          <Text height={6}>First footer</Text>
+        </Static>
+        <Static placement="bottom">
+          <Text height={4}>Second footer</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.map((schema) => schema.content)).toEqual([
+      'First footer',
+      'Second footer',
+    ]);
+    expect(result.template.basePdf.staticSchema?.[0]?.position.y).toBe(90);
+    expect(result.template.basePdf.staticSchema?.[1]?.position.y).toBe(96);
   });
 
   it('allows named read-only Static children and keeps names unique', async () => {

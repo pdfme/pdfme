@@ -37,8 +37,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 ### 1. `@pdfme/jsx` static schema support
 
-- `<Static>` component を追加し、header / footer / watermark などの全ページ共通要素を
-  blank `basePdf.staticSchema` に接続する。
+- `<Static placement="top" | "bottom">` component と `<Header>` / `<Footer>` alias を追加し、
+  header / footer / watermark などの全ページ共通要素を blank `basePdf.staticSchema` に接続する。
 - `<Static>` は最初の `<Page>` 直下のみ、page 全体座標、read-only schema のみ、custom `basePdf`
   では未対応とする。
 
