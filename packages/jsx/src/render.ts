@@ -106,6 +106,10 @@ export const renderToTemplate = async (
   const pageSchemas: Schema[][] = [];
   const staticSchemas: Schema[] = [];
 
+  if (staticChildren.length > 0 && options.basePdf != null && !isBlankPdf(options.basePdf)) {
+    throw new Error('@pdfme/jsx: <Static> is supported only with a blank basePdf.');
+  }
+
   if (staticChildren.length > 0) {
     const staticCtx: RenderCtx = {
       schemas: staticSchemas,
@@ -158,10 +162,6 @@ export const renderToTemplate = async (
     height: pageSize.height,
     padding: [firstMargin.top, firstMargin.right, firstMargin.bottom, firstMargin.left],
   };
-
-  if (staticSchemas.length > 0 && !isBlankPdf(basePdf)) {
-    throw new Error('@pdfme/jsx: <Static> is supported only with a blank basePdf.');
-  }
 
   const template: Template = {
     basePdf:
@@ -1153,7 +1153,9 @@ const validateStaticPlacement = (pages: PdfJsxElement<'page'>[]) => {
     for (const child of flattenForSplitting(page?.children ?? [])) {
       if (isPdfJsxElement(child) && child.kind === 'static') {
         if (pageIndex !== 0) {
-          throw new Error('@pdfme/jsx: <Static> can only be used inside the first <Page>.');
+          throw new Error(
+            '@pdfme/jsx: <Static> must appear before any <PageBreak> and can only be used inside the first <Page>.',
+          );
         }
         validateStaticChildren(child.children);
         continue;
@@ -1196,7 +1198,7 @@ const validateStaticChildren = (children: PdfJsxChild | PdfJsxChild[]) => {
 
     if (!STATIC_LEAF_KINDS.has(child.kind)) {
       throw new Error(
-        '@pdfme/jsx: <Static> supports only read-only Stack, Row, Box, Spacer, Text, Image, Svg, Rectangle, Ellipse, and Line children.',
+        `@pdfme/jsx: <Static> does not support <${child.kind}> children. Supported: read-only Stack, Row, Box, Spacer, Text, Image, Svg, Rectangle, Ellipse, and Line.`,
       );
     }
 

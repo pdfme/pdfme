@@ -43,6 +43,18 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 - `Static` can be used as a direct child of the first `Page` to render read-only header/footer style
   content into blank `basePdf.staticSchema`. Its children use page coordinates, not page margin
   coordinates, and custom `basePdf` is not supported.
+- Multiple `Static` blocks are concatenated in declaration order. For bottom-of-page content, use a
+  full-page `Stack` with `height` and `justifyContent`, for example:
+
+```tsx
+<Static>
+  <Stack height={297} justifyContent="space-between">
+    <Text height={8}>Header</Text>
+    <Text height={8}>Footer</Text>
+  </Stack>
+</Static>
+```
+
 - `Static` currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
   `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
   schemas, and `PageBreak` are rejected.

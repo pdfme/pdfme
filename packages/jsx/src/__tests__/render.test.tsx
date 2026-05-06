@@ -867,6 +867,51 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.inputs).toEqual([{}]);
   });
 
+  it('can place Static footer content with full-page Stack justification', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static>
+          <Stack height={100} justifyContent="space-between">
+            <Text height={6}>Header</Text>
+            <Text height={6}>Footer</Text>
+          </Stack>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [header, footer] = result.template.basePdf.staticSchema ?? [];
+    expect(header).toMatchObject({ content: 'Header', position: { x: 0, y: 0 } });
+    expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 94 } });
+  });
+
+  it('concatenates multiple Static blocks in declaration order', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static>
+          <Text height={6}>First static</Text>
+        </Static>
+        <Static>
+          <Text height={4}>Second static</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.map((schema) => schema.content)).toEqual([
+      'First static',
+      'Second static',
+    ]);
+    expect(result.template.basePdf.staticSchema?.[0]?.position.y).toBe(0);
+    expect(result.template.basePdf.staticSchema?.[1]?.position.y).toBe(6);
+  });
+
   it('allows named read-only Static children and keeps names unique', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
@@ -884,6 +929,21 @@ describe('@pdfme/jsx renderToTemplate', () => {
 
     expect(result.template.basePdf.staticSchema?.[0]?.name).toBe('staticTitle');
     expect(result.inputs).toEqual([{ body: 'Body' }]);
+  });
+
+  it('rejects duplicate names between Static and body schemas', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text name="title" readOnly>
+              Header
+            </Text>
+          </Static>
+          <Text name="title">Body</Text>
+        </Page>,
+      ),
+    ).rejects.toThrow('duplicate schema name "title"');
   });
 
   it('rejects input-backed Static children', async () => {
@@ -922,7 +982,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Static>
         </Page>,
       ),
-    ).rejects.toThrow('<Static> can only be used inside the first <Page>');
+    ).rejects.toThrow('<Static> must appear before any <PageBreak>');
 
     await expect(
       renderToTemplate(
@@ -946,7 +1006,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
           </Static>
         </Page>,
       ),
-    ).rejects.toThrow('<Static> supports only read-only');
+    ).rejects.toThrow('<Static> does not support <multiVariableText>');
   });
 
   it('rejects Static with a custom basePdf', async () => {
