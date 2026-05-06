@@ -99,7 +99,9 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 残りの検討事項:
 
-- `text`, `multiVariableText`, `list`, `table` の dynamic layout contract を共通化できるか。
+- `text`, `multiVariableText`, `list`, `table` の dynamic layout contract は、まず split chunk の
+  範囲表現を `__splitRange: { unit, start, end }` に寄せる。既存の `__bodyRange` /
+  `__itemRange` / `__textLineRange` は renderer の fallback として残し、段階的に移行する。
 - 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか。
 - blank PDF と custom `basePdf` で挙動を分ける必要があるか。
 - 既存テンプレートへの互換性リスクをどう抑えるか。

@@ -12,6 +12,8 @@ import {
   VERTICAL_ALIGN_BOTTOM,
 } from '../text/constants.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import type { TableSchema } from './types.js';
+import { getTableBodyRange } from '../splitRange.js';
 
 export const getDefaultCellStyles = () => ({
   fontName: undefined,
@@ -214,3 +216,6 @@ export const getBodyWithRange = (
   if (!range) return body;
   return body.slice(range.start, range.end);
 };
+
+export const getBodyWithSchemaRange = (value: string | string[][], schema: TableSchema) =>
+  getBodyWithRange(value, getTableBodyRange(schema));

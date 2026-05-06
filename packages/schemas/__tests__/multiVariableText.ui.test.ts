@@ -128,7 +128,7 @@ describe('multiVariableText inline markdown UI rendering', () => {
       variables: ['name'],
       textFormat: 'plain',
       width: 100,
-      __textLineRange: { start: 0, end: 1 },
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
     };
 
     await uiRender({

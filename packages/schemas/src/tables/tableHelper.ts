@@ -18,6 +18,7 @@ import type {
   Section,
 } from './types.js';
 import { Cell, Column, Row, Table } from './classes.js';
+import { getTableBodyRange } from '../splitRange.js';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
@@ -263,7 +264,7 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
   }
 
   const schema = cloneDeep(args.schema) as TableSchema;
-  const { start } = schema.__bodyRange || { start: 0 };
+  const { start } = getTableBodyRange(schema) || { start: 0 };
   if (start % 2 === 1) {
     const alternateBackgroundColor = schema.bodyStyles.alternateBackgroundColor;
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;

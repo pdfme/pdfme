@@ -16,6 +16,7 @@ import {
   type RichTextLine,
 } from './richText.js';
 import type { TextLineRange, TextSchema } from './types.js';
+import { getTextLineRange } from '../splitRange.js';
 
 type MeasureTextHeightArgs = {
   value: string;
@@ -123,7 +124,8 @@ export const mergeTextLineRangeValue = async ({
   font?: Font;
   _cache?: Map<string | number, unknown>;
 }) => {
-  if (!schema.__textLineRange) return replacement;
+  const range = getTextLineRange(schema);
+  if (!range) return replacement;
 
   const { lines } = await measureTextLines({
     value,
@@ -132,7 +134,7 @@ export const mergeTextLineRangeValue = async ({
     _cache,
     ignoreDynamicFontSize: true,
   });
-  const { start, end = lines.length } = schema.__textLineRange;
+  const { start, end = lines.length } = range;
   const nextLines = [...lines];
   nextLines.splice(start, end - start, ...splitReplacementTextToLines(replacement));
   return plainTextLinesToValue(nextLines);

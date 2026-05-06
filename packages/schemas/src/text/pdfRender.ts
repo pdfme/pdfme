@@ -35,6 +35,7 @@ import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
+import { getTextLineRange } from '../splitRange.js';
 
 type PdfFontCache = Record<string, Promise<PDFFont>>;
 
@@ -222,7 +223,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       fontKitFont,
       boxWidthInPt: width,
     }),
-    schema.__textLineRange,
+    getTextLineRange(schema),
   );
   const needsTextWidth = alignment !== 'left' || Boolean(schema.strikethrough || schema.underline);
   const needsTextHeight = Boolean(schema.strikethrough || schema.underline);

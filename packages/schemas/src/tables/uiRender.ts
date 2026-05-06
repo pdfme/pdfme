@@ -2,9 +2,10 @@ import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
 import { px2mm, ZOOM } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
-import { getBody, getBodyWithRange } from './helper.js';
+import { getBody, getBodyWithSchemaRange } from './helper.js';
 import cell from './cell.js';
 import { Row } from './classes.js';
+import { getTableBodyRange } from '../splitRange.js';
 
 const buttonSize = 18;
 
@@ -189,7 +190,7 @@ const renderRowUi = (args: {
           if (!arg.onChange) return;
           const newValue = (Array.isArray(v) ? v[0].value : v.value) as string;
           if (section === 'body') {
-            const startRange = arg.schema.__bodyRange?.start ?? 0;
+            const startRange = getTableBodyRange(arg.schema)?.start ?? 0;
             value[rowIndex + startRange][colIndex] = newValue;
             arg.onChange({ key: 'content', value: JSON.stringify(value) });
           } else {
@@ -229,7 +230,8 @@ const resetEditingPosition = () => {
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const { rootElement, onChange, schema, value, mode, scale } = arg;
   const body = getBody(value);
-  const bodyWidthRange = getBodyWithRange(value, schema.__bodyRange);
+  const bodyRange = getTableBodyRange(schema);
+  const bodyWidthRange = getBodyWithSchemaRange(value, schema);
   const table = await createSingleTable(bodyWidthRange, arg);
   const showHead = table.settings.showHead;
 
@@ -291,7 +293,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         text: '-',
         ariaLabel: 'Remove row',
         onClick: () => {
-          const newTableBody = body.filter((_, j) => j !== i + (schema.__bodyRange?.start ?? 0));
+          const newTableBody = body.filter((_, j) => j !== i + (bodyRange?.start ?? 0));
           if (onChange) onChange({ key: 'content', value: JSON.stringify(newTableBody) });
         },
       });
@@ -301,8 +303,8 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
 
   if (mode === 'form' && onChange && !schema.readOnly) {
     if (
-      schema.__bodyRange?.end === undefined ||
-      schema.__bodyRange.end >= (JSON.parse(value || '[]') as string[][]).length
+      bodyRange?.end === undefined ||
+      bodyRange.end >= (JSON.parse(value || '[]') as string[][]).length
     ) {
       rootElement.appendChild(createAddRowButton());
     }

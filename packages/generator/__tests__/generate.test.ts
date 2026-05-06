@@ -205,12 +205,13 @@ describe('generate integrate test', () => {
       });
 
       const bodySchemas = renderedSchemas.filter((schema) => schema.name === 'body');
-      const firstRange = bodySchemas[0].__textLineRange;
+      const firstRange = bodySchemas[0].__splitRange;
       expect(bodySchemas.length).toBeGreaterThan(1);
+      expect(firstRange?.unit).toBe('textLine');
       expect(firstRange?.start).toBe(0);
       expect(firstRange?.end).toBeGreaterThan(0);
       expect(bodySchemas[0].__isSplit).toBe(false);
-      expect(bodySchemas[1].__textLineRange?.start).toBe(firstRange?.end);
+      expect(bodySchemas[1].__splitRange?.start).toBe(firstRange?.end);
       expect(bodySchemas[1].__isSplit).toBe(true);
       expect(bodySchemas[1].position.y).toBe(10);
     });

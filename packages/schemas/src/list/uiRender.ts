@@ -1,6 +1,7 @@
 import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import { isEditable } from '../utils.js';
+import { getListItemRange } from '../splitRange.js';
 import { uiRender as textUiRender } from '../text/uiRender.js';
 import {
   DEFAULT_ALIGNMENT,
@@ -179,7 +180,7 @@ export const uiRender = async (arg: UIRenderProps<ListSchema>) => {
   const sourceValue = usePlaceholder ? placeholder || '' : value;
   const items = normalizeListItems(sourceValue);
   const originalItems = normalizeListItemEntries(value);
-  const range = schema.__itemRange ?? { start: 0, end: items.length };
+  const range = getListItemRange(schema) ?? { start: 0, end: items.length };
   const visibleItems = items.slice(range.start, range.end);
   const renderItems = visibleItems;
 

@@ -3,13 +3,14 @@ import type { ListSchema } from './types.js';
 import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
 import { calculateListLayout, normalizeListItems } from './helper.js';
+import { getListItemRange } from '../splitRange.js';
 
 const rectanglePdfRender = rectangle.pdf;
 
 export const pdfRender = async (arg: PDFRenderProps<ListSchema>) => {
   const { schema, value } = arg;
   const items = normalizeListItems(value);
-  const range = schema.__itemRange ?? { start: 0, end: items.length };
+  const range = getListItemRange(schema) ?? { start: 0, end: items.length };
   const visibleItems = items.slice(range.start, range.end);
 
   if (visibleItems.length === 0) return;

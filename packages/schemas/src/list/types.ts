@@ -1,11 +1,9 @@
+import type { DynamicLayoutRange } from '@pdfme/common';
 import type { TextSchema } from '../text/types.js';
 
 export type LIST_STYLE = 'bullet' | 'ordered';
 
-export type ListRange = {
-  start: number;
-  end?: number;
-};
+export type ListRange = DynamicLayoutRange;
 
 export type ListSchema = TextSchema & {
   listStyle: LIST_STYLE;

@@ -1,4 +1,4 @@
-import type { Schema } from '@pdfme/common';
+import type { DynamicLayoutRange, Schema } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 
 export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
@@ -31,10 +31,7 @@ export type FontWidthCalcValues = {
   boxWidthInPt: number;
 };
 
-export type TextLineRange = {
-  start: number;
-  end?: number;
-};
+export type TextLineRange = DynamicLayoutRange;
 
 export type TextSchema = Schema & {
   fontName?: string;

@@ -3,7 +3,7 @@ import type { PDFRenderProps, Schema, BasePdf, CommonOptions } from '@pdfme/comm
 import { Cell, Table, Row, Column } from './classes.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
 import cell from './cell.js';
-import { getBodyWithRange } from './helper.js';
+import { getBodyWithSchemaRange } from './helper.js';
 import { createSingleTable } from './tableHelper.js';
 
 // Define the CreateTableArgs interface locally since it's not exported from tableHelper.js
@@ -118,9 +118,9 @@ async function drawTable(arg: PDFRenderProps<TableSchema>, table: Table): Promis
 export const pdfRender = async (arg: PDFRenderProps<TableSchema>) => {
   const { value, schema, basePdf, options, _cache } = arg;
 
-  const body = getBodyWithRange(
+  const body = getBodyWithSchemaRange(
     typeof value !== 'string' ? JSON.stringify(value || '[]') : value,
-    schema.__bodyRange,
+    schema,
   );
 
   // Create a properly typed CreateTableArgs object

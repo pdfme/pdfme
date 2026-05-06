@@ -5,6 +5,7 @@ import {
   Dict,
   Mode,
   Size,
+  DynamicLayoutSplitRange,
   Schema,
   Font,
   SchemaForUI,
@@ -223,6 +224,8 @@ export type Lang = z.infer<typeof Lang>;
 export type Dict = z.infer<typeof Dict>;
 export type Mode = z.infer<typeof Mode>;
 export type Size = z.infer<typeof Size>;
+export type DynamicLayoutSplitRange = z.infer<typeof DynamicLayoutSplitRange>;
+export type DynamicLayoutRange = Omit<DynamicLayoutSplitRange, 'unit'>;
 export type Schema = z.infer<typeof Schema>;
 export type SchemaForUI = z.infer<typeof SchemaForUI>;
 

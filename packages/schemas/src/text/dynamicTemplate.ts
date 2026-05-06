@@ -2,6 +2,7 @@ import type { DynamicLayoutArgs, DynamicLayoutResult } from '@pdfme/common';
 import { TEXT_OVERFLOW_EXPAND } from './constants.js';
 import { measureTextLines, sumLineHeights } from './measure.js';
 import type { TextSchema } from './types.js';
+import { createTextLineSplitRange } from '../splitRange.js';
 
 export const getDynamicLayoutForText = async (
   value: string,
@@ -36,6 +37,7 @@ export const getDynamicLayoutForText = async (
     heights: lineHeights.length === 1 ? [Math.max(schema.height, measuredHeight)] : lineHeights,
     patchSplitSchema: ({ start, end, isSplit }) => ({
       dynamicFontSize: undefined,
+      __splitRange: lineHeights.length === 1 ? undefined : createTextLineSplitRange(start, end),
       __textLineRange: lineHeights.length === 1 ? undefined : { start, end },
       __isSplit: isSplit,
     }),

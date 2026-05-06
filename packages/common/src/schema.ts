@@ -124,6 +124,12 @@ export const ColorType = z.enum(['rgb', 'cmyk']).optional();
 
 export const Size = z.object({ height: z.number(), width: z.number() });
 
+export const DynamicLayoutSplitRange = z.object({
+  unit: z.string(),
+  start: z.number(),
+  end: z.number().optional(),
+});
+
 export const Schema = z
   .object({
     name: z.string(),
@@ -136,6 +142,7 @@ export const Schema = z
     opacity: z.number().optional(),
     readOnly: z.boolean().optional(),
     required: z.boolean().optional(),
+    __splitRange: DynamicLayoutSplitRange.optional(),
     __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __itemRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __textLineRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),

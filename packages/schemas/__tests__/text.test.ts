@@ -349,6 +349,7 @@ describe('text dynamic layout', () => {
       }),
     ).toEqual({
       dynamicFontSize: undefined,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
       __textLineRange: { start: 0, end: 1 },
       __isSplit: false,
     });
@@ -378,6 +379,7 @@ describe('text dynamic layout', () => {
       }),
     ).toEqual({
       dynamicFontSize: undefined,
+      __splitRange: { unit: 'textLine', start: 1, end: 3 },
       __textLineRange: { start: 1, end: 3 },
       __isSplit: true,
     });
@@ -388,7 +390,7 @@ describe('text dynamic layout', () => {
       ...getTextSchema(),
       width: 20,
       overflow: 'expand',
-      __textLineRange: { start: 1, end: 3 },
+      __splitRange: { unit: 'textLine', start: 1, end: 3 },
     } as TextSchema;
 
     const result = await mergeTextLineRangeValue({

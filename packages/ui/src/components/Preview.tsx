@@ -9,7 +9,7 @@ import {
   replacePlaceholders,
 } from '@pdfme/common';
 import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
-import { mergeTextLineRangeValue } from '@pdfme/schemas/texts';
+import { getTextLineRange, mergeTextLineRangeValue } from '@pdfme/schemas/texts';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
 import StaticSchema from './StaticSchema.js';
@@ -168,7 +168,7 @@ const Preview = ({
         const oldValue = (input?.[schema.name] as string) || '';
         const rawNewValue = value as string;
         const newValue =
-          schema.type === 'text' && schema.__textLineRange
+          schema.type === 'text' && getTextLineRange(schema)
             ? await mergeTextLineRangeValue({
                 value: oldValue,
                 replacement: rawNewValue,
