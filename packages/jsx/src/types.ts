@@ -74,7 +74,13 @@ export type BoxSides = {
   y?: number;
 };
 
-export type CommonProps = Partial<Pick<Schema, 'rotate' | 'opacity'>>;
+export type LayoutAlignItems = 'start' | 'center' | 'end' | 'stretch';
+
+export type LayoutProps = {
+  margin?: number | BoxSides;
+};
+
+export type CommonProps = LayoutProps & Partial<Pick<Schema, 'rotate' | 'opacity'>>;
 
 export type PageProps = {
   size?: PageSize;
@@ -84,16 +90,18 @@ export type PageProps = {
   children?: PdfJsxChild;
 };
 
-export type StackProps = {
+export type StackProps = LayoutProps & {
   gap?: number;
   width?: number;
+  alignItems?: LayoutAlignItems;
   children?: PdfJsxChild;
 };
 
-export type RowProps = {
+export type RowProps = LayoutProps & {
   gap?: number;
   width?: number;
   height?: number;
+  alignItems?: Exclude<LayoutAlignItems, 'stretch'>;
   children?: PdfJsxChild;
 };
 
@@ -108,7 +116,7 @@ export type BoxProps = CommonProps & {
   children?: PdfJsxChild;
 };
 
-export type SpacerProps = {
+export type SpacerProps = LayoutProps & {
   width?: number;
   height?: number;
 };
