@@ -25,6 +25,7 @@ import type {
   EllipseProps,
   ImageProps,
   LineProps,
+  LayoutAlignItems,
   ListProps,
   MultiVariableTextProps,
   MultiVariableTextValues,
@@ -45,7 +46,6 @@ import type {
 type Rect = { x: number; y: number; width: number; height: number };
 type Box = ReturnType<typeof resolveBoxSides>;
 type LayoutMode = 'stack' | 'row';
-type LayoutAlignItems = 'start' | 'center' | 'end' | 'stretch';
 
 type RenderCtx = {
   schemas: Schema[];
@@ -312,6 +312,7 @@ const resolveAlignOffset = (
   itemSize: number,
   alignItems: LayoutAlignItems,
 ) => {
+  // Overflowing children stay pinned to start instead of being pulled outside the frame.
   if (alignItems === 'center') return Math.max(0, (containerSize - itemSize) / 2);
   if (alignItems === 'end') return Math.max(0, containerSize - itemSize);
   return 0;

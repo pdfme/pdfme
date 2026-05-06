@@ -252,6 +252,21 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(second?.position.y).toBe(11);
   });
 
+  it('accounts for Spacer margins in Stack layout', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack gap={1}>
+          <Text height={4}>A</Text>
+          <Spacer height={3} margin={{ top: 2, bottom: 5 }} />
+          <Text height={4}>B</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [, second] = result.template.schemas[0] ?? [];
+    expect(second?.position.y).toBe(16);
+  });
+
   it('aligns fixed-width Stack children on the cross axis', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
