@@ -33,29 +33,54 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - `md2pdf` MVP は `converter` package に実装を開始した。初期 API は `Template + inputs` を返し、
   parser は `unified` + `remark-parse` + `remark-gfm` を使う。bundle size を考慮し、
   `@pdfme/converter/md2pdf` の subpath export として opt-in にする。
+- PR #1483 では、md から pdfme `Template + inputs` を作り、generator で PDF 生成まで通ることを
+  証明する。見た目の作り込みは次 PR に分ける。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
 
 ## 次に進めること
 
-### 1. `md2pdf` / GFM MVP の実装
+### 1. PR #1483: `md2pdf` MVP を閉じる
 
-- `converter` package の `md2pdf` 入口を整える。
+- CI が通ればマージしてよい。追加で style 品質を深追いしない。
+- MVP の範囲は paragraph, heading, list, table, code block, blockquote, horizontal rule, link,
+  data URI image。
 - 初期 API は `Template + inputs` を返す。warnings / assets / anchors metadata は必要になった時に
   追加検討する。
-- MVP の対象は paragraph, heading, list, table, code block, blockquote, horizontal rule, link,
-  data URI image。
-- remote Markdown image は初期実装では link text に fallback する。画像 fetch / asset metadata は
-  次段階で検討する。
 - pagination は converter 側で事前に template page を切らず、generator の dynamic layout に任せる。
-  image の keep-together や widow/orphan は後続課題。
-- `@pdfme/jsx` と同じ layout tree / builder を共有できるかは継続検討。直接 JSX runtime に依存するより、
-  Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
-- 追加で確認したいこと: generator + built-in schemas で実際に PDF 生成する integration test、
-  playground / docs への最小サンプル、heading anchor の出力仕様。
+- remote Markdown image は link text に fallback する。
 
-### 2. `@pdfme/jsx` layout 品質フォローアップ
+### 2. `md2pdf` style preset
+
+- 次 PR の第一候補。MVP の「作れる」状態から「自然に読める」状態へ近づける。
+- default preset として、heading scale / heading margin、paragraph spacing、lineHeight、link color、
+  list spacing、table style、code block background / padding / monospace、blockquote left border or indent
+  を決める。
+- API はまず `style?: { preset?: "default"; ...overrides }` くらいに留め、full CSS parser にはしない。
+- `@pdfme/jsx` の layout / schema defaults と揃えられる部分は揃える。
+
+### 3. `md2pdf` examples / docs
+
+- sample Markdown と生成 PDF screenshot を追加する。README だけでなく docs / playground への配置も検討する。
+- `md2pdf` の import は `@pdfme/converter/md2pdf` を使うことを明記する。
+- generator で PDF 化する時に必要な plugins 例を載せる。
+- current limitations は維持する: table cell は plain、remote image は link fallback、image aspect ratio は未対応。
+
+### 4. `md2pdf` layout 品質フォローアップ
+
+- heading 直後の keep-with-next、table / image / code block の keep-together、widow/orphan を検討する。
+- 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
+- blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
+
+### 5. `md2pdf` assets / rich content 方針
+
+- remote image は converter 内で fetch して data URI 化するか、引き続き link fallback とするかを決める。
+- `Template + inputs` API を崩さずに済むなら、まず converter 内 fetch + data URI 化を検討する。
+- table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
+  分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
+
+### 6. `@pdfme/jsx` layout 品質フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
@@ -63,7 +88,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 
-### 3. `@pdfme/jsx` examples / docs
+### 7. `@pdfme/jsx` examples / docs
 
 - invoice / report / markdown article など、AI や人間が真似しやすい `@pdfme/jsx` サンプルを追加する。
 - `Static`, `Header`, `Footer`, `Absolute`, dynamic height の使いどころを docs に整理する。
