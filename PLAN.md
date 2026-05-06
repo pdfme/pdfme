@@ -26,8 +26,9 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 - main にはリンク基盤、`@pdfme/jsx` MVP、text / MVT dynamic layout、split metadata 共通化、
   custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
-  component まで入っている。
-- PR #1476 では `@pdfme/jsx` に `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line` を追加中。
+  component、visual components まで入っている。
+- 別 PR で、`@pdfme/jsx` の editable `Text` に `textFormat: "inline-markdown"` を指定できない
+  guard を追加中。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
@@ -125,6 +126,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - PR #1472: plain MVT split chunk の Form 変数編集。
 - PR #1474: inline-markdown MVT split chunk の Form 変数編集、static link の clickable 表示。
 - PR #1475: `@pdfme/jsx` `MultiVariableText` component。
+- PR #1476: `@pdfme/jsx` `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line` visual components。
 
 ## 参考
 

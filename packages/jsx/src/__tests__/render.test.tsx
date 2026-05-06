@@ -629,4 +629,16 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
     expect(result.template.schemas[0]?.[0]?.height).toBeGreaterThan(0);
   });
+
+  it('rejects inline-markdown for editable Text', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Text name="message" textFormat="inline-markdown">
+            [pdfme](https://pdfme.com)
+          </Text>
+        </Page>,
+      ),
+    ).rejects.toThrow('editable <Text> does not support textFormat="inline-markdown"');
+  });
 });
