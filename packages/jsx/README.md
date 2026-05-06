@@ -62,9 +62,11 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 - Static content currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
   `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
   schemas, and `PageBreak` are rejected.
-- `Absolute` can be used inside `Page`, `Static`, or `Box` as a small manual placement escape hatch.
-  It uses the parent layout frame as its coordinate origin and does not advance the surrounding
-  stack/row flow.
+- `Absolute` can be used inside `Page`, top `Static`, or `Box` as a small manual placement escape
+  hatch. It uses the parent layout frame as its coordinate origin and does not advance the
+  surrounding stack/row flow. When `width` or `height` is omitted, it uses the remaining parent
+  frame size from `x` / `y`. Direct `Stack` / `Row` support is intentionally left for later; wrap
+  with an explicit-size `Box` when you need a local manual-placement frame inside flow content.
 
 ```tsx
 <Page margin={12}>

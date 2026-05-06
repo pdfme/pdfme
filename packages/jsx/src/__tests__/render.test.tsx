@@ -740,6 +740,42 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(after).toMatchObject({ content: 'After', position: { x: 10, y: 15 } });
   });
 
+  it('uses the full parent frame for Absolute when placement props are omitted', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Absolute>
+          <Text height={6}>Overlay</Text>
+        </Absolute>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      content: 'Overlay',
+      position: { x: 10, y: 10 },
+      width: 80,
+    });
+  });
+
+  it('renders multiple Absolute siblings independently in declaration order', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Absolute x={10} y={5} width={20}>
+          <Text height={6}>First</Text>
+        </Absolute>
+        <Absolute x={50} y={8} width={30}>
+          <Text height={6}>Second</Text>
+        </Absolute>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.map((schema) => schema.content)).toEqual([
+      'First',
+      'Second',
+    ]);
+    expect(result.template.schemas[0]?.[0]).toMatchObject({ position: { x: 10, y: 5 } });
+    expect(result.template.schemas[0]?.[1]).toMatchObject({ position: { x: 50, y: 8 } });
+  });
+
   it('uses the Box content frame as the Absolute coordinate origin', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
@@ -770,6 +806,30 @@ describe('@pdfme/jsx renderToTemplate', () => {
               <Text>Pin</Text>
             </Absolute>
           </Stack>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Absolute> can only be used inside <Page>, <Static>, or <Box>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Row>
+            <Absolute>
+              <Text>Pin</Text>
+            </Absolute>
+          </Row>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Absolute> can only be used inside <Page>, <Static>, or <Box>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Absolute>
+            <Absolute>
+              <Text>Pin</Text>
+            </Absolute>
+          </Absolute>
         </Page>,
       ),
     ).rejects.toThrow('<Absolute> can only be used inside <Page>, <Static>, or <Box>');
@@ -994,6 +1054,36 @@ describe('@pdfme/jsx renderToTemplate', () => {
       position: { x: 80, y: 90 },
       width: 15,
     });
+  });
+
+  it('rejects Absolute inside bottom Static', async () => {
+    await expect(
+      renderToTemplate(
+        <Page size={{ width: 100, height: 100 }} margin={10}>
+          <Static placement="bottom">
+            <Absolute x={10} y={10}>
+              <Text>Stamp</Text>
+            </Absolute>
+          </Static>
+          <Text height={6}>Body</Text>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Absolute> is not supported inside bottom <Static>');
+  });
+
+  it('rejects input-backed Static children inside Absolute', async () => {
+    await expect(
+      renderToTemplate(
+        <Page size={{ width: 100, height: 100 }} margin={10}>
+          <Static>
+            <Absolute x={10} y={10}>
+              <Text name="editable">Stamp</Text>
+            </Absolute>
+          </Static>
+          <Text height={6}>Body</Text>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> children must be read-only');
   });
 
   it('renders Header and Footer aliases as top and bottom static content', async () => {

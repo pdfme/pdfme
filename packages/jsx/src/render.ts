@@ -369,6 +369,7 @@ const layoutChildren = async (
       if (dx !== 0) shiftSchemas(ctx.schemas, schemaStart, schemaEnd, dx, 0);
     }
 
+    // flowIndex tracks the flow-only list so Absolute siblings do not affect gap accounting.
     cursor += mainSize + (flowIndex < flowItems.length - 1 ? opts.gap : 0);
     flowIndex += 1;
     crossMax = Math.max(
@@ -1273,7 +1274,12 @@ const validateStaticPlacement = (pages: PdfJsxElement<'page'>[]) => {
           );
         }
         // Validate dynamic JavaScript callers before static children are extracted for layout.
-        getStaticPlacement(child as PdfJsxElement<'static'>);
+        const placement = getStaticPlacement(child as PdfJsxElement<'static'>);
+        if (placement === 'bottom' && hasElementKind(child.children, 'absolute')) {
+          throw new Error(
+            '@pdfme/jsx: <Absolute> is not supported inside bottom <Static>. Use top <Static> or <Page> for fixed page coordinates.',
+          );
+        }
         validateStaticChildren(child.children);
         continue;
       }
@@ -1292,6 +1298,14 @@ const validateNoNestedStatic = (node: PdfJsxChild) => {
     }
     validateNoNestedStatic(child);
   }
+};
+
+const hasElementKind = (node: PdfJsxChild | PdfJsxChild[], kind: string): boolean => {
+  for (const child of flattenForSplitting(node)) {
+    if (!isPdfJsxElement(child)) continue;
+    if (child.kind === kind || hasElementKind(child.children, kind)) return true;
+  }
+  return false;
 };
 
 const validateNoTopLevelStatic = (node: PdfJsxChild | PdfJsxChild[]) => {
