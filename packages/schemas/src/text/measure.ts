@@ -26,6 +26,7 @@ type MeasureTextHeightArgs = {
 };
 
 type MeasureTextLinesResult = {
+  lines: string[];
   lineHeights: number[];
 };
 
@@ -36,6 +37,8 @@ export const applyTextLineRange = <T>(lines: T[], range?: TextLineRange) => {
 
 export const plainTextLinesToValue = (lines: string[]) =>
   lines.map((line) => line.replace(/[\r\n]+$/g, '')).join('\n');
+
+const splitReplacementTextToLines = (value: string) => value.split(/\r\n|\r|\n/g);
 
 export const measureTextLines = async ({
   value,
@@ -64,6 +67,7 @@ export const measureTextLines = async ({
     });
 
     return {
+      lines: lines.map((line) => line.runs.map((run) => run.text).join('')),
       lineHeights: measureRichTextLineHeights(lines, resolvedFontSize, lineHeight),
     };
   }
@@ -86,8 +90,37 @@ export const measureTextLines = async ({
   });
 
   return {
+    lines,
     lineHeights: measurePlainTextLineHeights(lines, fontKitFont, resolvedFontSize, lineHeight),
   };
+};
+
+export const mergeTextLineRangeValue = async ({
+  value,
+  replacement,
+  schema,
+  font = getDefaultFont(),
+  _cache = new Map<string | number, unknown>(),
+}: {
+  value: string;
+  replacement: string;
+  schema: TextSchema;
+  font?: Font;
+  _cache?: Map<string | number, unknown>;
+}) => {
+  if (!schema.__textLineRange) return replacement;
+
+  const { lines } = await measureTextLines({
+    value,
+    schema,
+    font,
+    _cache,
+    ignoreDynamicFontSize: true,
+  });
+  const { start, end = lines.length } = schema.__textLineRange;
+  const nextLines = [...lines];
+  nextLines.splice(start, end - start, ...splitReplacementTextToLines(replacement));
+  return plainTextLinesToValue(nextLines);
 };
 
 export const measureTextHeight = async (args: MeasureTextHeightArgs): Promise<number> => {

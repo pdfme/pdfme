@@ -28,6 +28,7 @@ import {
 } from '../src/text/richText.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
 import { getDynamicLayoutForText } from '../src/text/dynamicTemplate.js';
+import { mergeTextLineRangeValue } from '../src/text/measure.js';
 import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
 import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
 
@@ -380,6 +381,26 @@ describe('text dynamic layout', () => {
       __textLineRange: { start: 1, end: 3 },
       __isSplit: true,
     });
+  });
+
+  it('merges form edits from a split text line range into the full value', async () => {
+    const schema = {
+      ...getTextSchema(),
+      width: 20,
+      overflow: 'expand',
+      __textLineRange: { start: 1, end: 3 },
+    } as TextSchema;
+
+    const result = await mergeTextLineRangeValue({
+      value: 'long text '.repeat(8),
+      replacement: 'edited chunk',
+      schema,
+      font: getSampleFont(),
+      _cache: new Map<string | number, unknown>(),
+    });
+
+    expect(result).toContain('edited chunk');
+    expect(result).not.toBe('edited chunk');
   });
 
   it('does not use dynamic font size while text overflow is expand', () => {
