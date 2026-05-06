@@ -26,6 +26,7 @@ import type {
   ImageProps,
   LineProps,
   LayoutAlignItems,
+  LayoutJustifyContent,
   ListProps,
   MultiVariableTextProps,
   MultiVariableTextValues,
@@ -46,6 +47,11 @@ import type {
 type Rect = { x: number; y: number; width: number; height: number };
 type Box = ReturnType<typeof resolveBoxSides>;
 type LayoutMode = 'stack' | 'row';
+type LayoutItem = {
+  schemaStart: number;
+  schemaEnd: number;
+  outerHeight: number;
+};
 
 type RenderCtx = {
   schemas: Schema[];
@@ -114,7 +120,13 @@ export const renderToTemplate = async (
       font,
       _cache,
     };
-    await layoutChildren(page.children, frame, 'stack', { gap: 0, alignItems: 'stretch' }, ctx);
+    await layoutChildren(
+      page.children,
+      frame,
+      'stack',
+      { gap: 0, alignItems: 'stretch', justifyContent: 'start' },
+      ctx,
+    );
     pageSchemas.push(ctx.schemas);
   }
 
@@ -195,14 +207,20 @@ const layoutChildren = async (
   children: PdfJsxChild | PdfJsxChild[],
   frame: Rect,
   mode: LayoutMode,
-  opts: { gap: number; alignItems: LayoutAlignItems; crossSize?: number },
+  opts: {
+    gap: number;
+    alignItems: LayoutAlignItems;
+    justifyContent: LayoutJustifyContent;
+    mainSize?: number;
+    crossSize?: number;
+  },
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
   const items = flattenChildren(children);
   const widths = mode === 'row' ? resolveRowWidths(items, frame.width, opts.gap) : undefined;
   let cursor = 0;
   let crossMax = 0;
-  const rowItems: { schemaStart: number; schemaEnd: number; outerHeight: number }[] = [];
+  const layoutItems: LayoutItem[] = [];
 
   for (let i = 0; i < items.length; i += 1) {
     const child = items[i];
@@ -224,23 +242,21 @@ const layoutChildren = async (
         : await renderElement(child, childFrame, mode, ctx);
     const schemaEnd = ctx.schemas.length;
 
+    const mainSize =
+      mode === 'stack'
+        ? margin.top + size.height + margin.bottom
+        : margin.left + width + margin.right;
+    const outerHeight = margin.top + size.height + margin.bottom;
+
+    layoutItems.push({ schemaStart, schemaEnd, outerHeight });
+
     if (mode === 'stack') {
       const outerWidth = margin.left + size.width + margin.right;
       const dx = resolveAlignOffset(frame.width, outerWidth, opts.alignItems);
       if (dx !== 0) shiftSchemas(ctx.schemas, schemaStart, schemaEnd, dx, 0);
-    } else {
-      rowItems.push({
-        schemaStart,
-        schemaEnd,
-        outerHeight: margin.top + size.height + margin.bottom,
-      });
     }
 
-    const advance =
-      mode === 'stack'
-        ? margin.top + size.height + margin.bottom
-        : margin.left + width + margin.right;
-    cursor += advance + (i < items.length - 1 ? opts.gap : 0);
+    cursor += mainSize + (i < items.length - 1 ? opts.gap : 0);
     crossMax = Math.max(
       crossMax,
       mode === 'stack'
@@ -249,16 +265,20 @@ const layoutChildren = async (
     );
   }
 
+  const contentMainSize = cursor;
+  const containerMainSize = opts.mainSize ?? contentMainSize;
+  applyJustifyContent(ctx.schemas, layoutItems, mode, contentMainSize, containerMainSize, opts);
+
   if (mode === 'row') {
     const rowHeight = opts.crossSize ?? crossMax;
-    for (const item of rowItems) {
+    for (const item of layoutItems) {
       const dy = resolveAlignOffset(rowHeight, item.outerHeight, opts.alignItems);
       if (dy !== 0) shiftSchemas(ctx.schemas, item.schemaStart, item.schemaEnd, 0, dy);
     }
-    return { width: cursor, height: rowHeight };
+    return { width: containerMainSize, height: rowHeight };
   }
 
-  return { width: crossMax, height: cursor };
+  return { width: crossMax, height: containerMainSize };
 };
 
 const resolveRowWidths = (
@@ -266,28 +286,22 @@ const resolveRowWidths = (
   frameWidth: number,
   gap: number,
 ): number[] => {
-  let fixedWidth = 0;
-  let flexCount = 0;
-  const widths = items.map((item) => {
+  let usedWidth = 0;
+  let totalGrow = 0;
+  const parts = items.map((item) => {
     const margin = getChildMargin(item);
-    if (typeof item === 'string' || typeof item === 'number') {
-      flexCount += 1;
-      fixedWidth += margin.left + margin.right;
-      return undefined;
-    }
-    const width = (item.props as { width?: number }).width;
-    if (typeof width === 'number') {
-      fixedWidth += width + margin.left + margin.right;
-      return width;
-    }
-    flexCount += 1;
-    fixedWidth += margin.left + margin.right;
-    return undefined;
+    const width = getChildWidth(item);
+    const flexGrow = getChildFlexGrow(item);
+    const grow = flexGrow ?? (width == null ? 1 : 0);
+    const basis = width ?? 0;
+    usedWidth += basis + margin.left + margin.right;
+    totalGrow += grow;
+    return { basis, grow };
   });
 
-  const remaining = Math.max(0, frameWidth - fixedWidth - Math.max(0, items.length - 1) * gap);
-  const flexWidth = flexCount > 0 ? remaining / flexCount : 0;
-  return widths.map((width) => width ?? flexWidth);
+  const remaining = Math.max(0, frameWidth - usedWidth - Math.max(0, items.length - 1) * gap);
+  const flexUnit = totalGrow > 0 ? remaining / totalGrow : 0;
+  return parts.map(({ basis, grow }) => basis + grow * flexUnit);
 };
 
 const getChildMargin = (child: PdfJsxElement | string | number): Box => {
@@ -295,16 +309,66 @@ const getChildMargin = (child: PdfJsxElement | string | number): Box => {
   return resolveBoxSides((child.props as { margin?: number | BoxSides }).margin);
 };
 
+const getChildWidth = (child: PdfJsxElement | string | number): number | undefined => {
+  if (typeof child === 'string' || typeof child === 'number') return undefined;
+  const width = (child.props as { width?: number }).width;
+  return typeof width === 'number' ? width : undefined;
+};
+
+const getChildFlexGrow = (child: PdfJsxElement | string | number): number | undefined => {
+  if (typeof child === 'string' || typeof child === 'number') return undefined;
+  const props = child.props as { flex?: number; flexGrow?: number };
+  const flexGrow = props.flexGrow ?? props.flex;
+  return typeof flexGrow === 'number' ? Math.max(0, flexGrow) : undefined;
+};
+
 const resolveStackChildWidth = (
   child: PdfJsxElement | string | number,
   frameWidth: number,
   margin: Box,
 ) => {
-  if (typeof child !== 'string' && typeof child !== 'number') {
-    const width = (child.props as { width?: number }).width;
-    if (typeof width === 'number') return width;
-  }
+  const width = getChildWidth(child);
+  if (width != null) return width;
   return Math.max(0, frameWidth - margin.left - margin.right);
+};
+
+const applyJustifyContent = (
+  schemas: Schema[],
+  items: LayoutItem[],
+  mode: LayoutMode,
+  contentMainSize: number,
+  containerMainSize: number,
+  opts: { justifyContent: LayoutJustifyContent },
+) => {
+  // Overflowing content has no extra main-axis space to distribute.
+  const extraSpace = Math.max(0, containerMainSize - contentMainSize);
+  if (extraSpace === 0 || opts.justifyContent === 'start') return;
+
+  const extraGap =
+    opts.justifyContent === 'space-between' && items.length > 1
+      ? extraSpace / (items.length - 1)
+      : 0;
+  const startOffset =
+    opts.justifyContent === 'center'
+      ? extraSpace / 2
+      : opts.justifyContent === 'end'
+        ? extraSpace
+        : 0;
+
+  let runningExtraGap = 0;
+  for (const item of items) {
+    const offset = startOffset + runningExtraGap;
+    if (offset !== 0) {
+      shiftSchemas(
+        schemas,
+        item.schemaStart,
+        item.schemaEnd,
+        mode === 'row' ? offset : 0,
+        mode === 'stack' ? offset : 0,
+      );
+    }
+    runningExtraGap += extraGap;
+  }
 };
 
 const resolveAlignOffset = (
@@ -335,45 +399,42 @@ const renderElement = async (
   parentMode: LayoutMode,
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
+  const shouldUseResolvedRowWidth = parentMode === 'row' && getChildFlexGrow(element) != null;
+  const props = shouldUseResolvedRowWidth
+    ? { ...element.props, width: frame.width }
+    : element.props;
+
   switch (element.kind) {
     case 'stack':
-      return renderStack(element.props as StackProps, element.children, frame, ctx);
+      return renderStack(props as StackProps, element.children, frame, ctx);
     case 'row':
-      return renderRow(element.props as RowProps, element.children, frame, ctx);
+      return renderRow(props as RowProps, element.children, frame, ctx);
     case 'box':
-      return renderBox(element.props as BoxProps, element.children, frame, parentMode, ctx);
+      return renderBox(props as BoxProps, element.children, frame, parentMode, ctx);
     case 'spacer':
-      return Promise.resolve(renderSpacer(element.props as SpacerProps));
+      return Promise.resolve(renderSpacer(props as SpacerProps));
     case 'text':
-      return renderText(
-        { ...(element.props as TextProps), children: element.children },
-        frame,
-        ctx,
-      );
+      return renderText({ ...(props as TextProps), children: element.children }, frame, ctx);
     case 'multiVariableText':
       return renderMultiVariableText(
-        { ...(element.props as MultiVariableTextProps), children: element.children },
+        { ...(props as MultiVariableTextProps), children: element.children },
         frame,
         ctx,
       );
     case 'image':
-      return renderImage(element.props as ImageProps, frame, ctx);
+      return renderImage(props as ImageProps, frame, ctx);
     case 'svg':
-      return renderSvg({ ...(element.props as SvgProps), children: element.children }, frame, ctx);
+      return renderSvg({ ...(props as SvgProps), children: element.children }, frame, ctx);
     case 'rectangle':
-      return renderShape('rectangle', element.props as RectangleProps, frame, ctx);
+      return renderShape('rectangle', props as RectangleProps, frame, ctx);
     case 'ellipse':
-      return renderShape('ellipse', element.props as EllipseProps, frame, ctx);
+      return renderShape('ellipse', props as EllipseProps, frame, ctx);
     case 'line':
-      return renderLine(element.props as LineProps, frame, ctx);
+      return renderLine(props as LineProps, frame, ctx);
     case 'list':
-      return renderList(
-        { ...(element.props as ListProps), children: element.children },
-        frame,
-        ctx,
-      );
+      return renderList({ ...(props as ListProps), children: element.children }, frame, ctx);
     case 'table':
-      return renderTable(element.props as TableProps, frame, ctx);
+      return renderTable(props as TableProps, frame, ctx);
     default:
       return { width: 0, height: 0 };
   }
@@ -387,11 +448,13 @@ const renderStack = (
 ): Promise<{ width: number; height: number }> =>
   layoutChildren(
     children,
-    { ...frame, width: props.width ?? frame.width },
+    { ...frame, width: props.width ?? frame.width, height: props.height ?? frame.height },
     'stack',
     {
       gap: props.gap ?? 0,
       alignItems: props.alignItems ?? 'stretch',
+      justifyContent: props.justifyContent ?? 'start',
+      mainSize: props.height,
     },
     ctx,
   );
@@ -406,7 +469,13 @@ const renderRow = (
     children,
     { ...frame, width: props.width ?? frame.width, height: props.height ?? frame.height },
     'row',
-    { gap: props.gap ?? 0, alignItems: props.alignItems ?? 'start', crossSize: props.height },
+    {
+      gap: props.gap ?? 0,
+      alignItems: props.alignItems ?? 'start',
+      justifyContent: props.justifyContent ?? 'start',
+      mainSize: props.width,
+      crossSize: props.height,
+    },
     ctx,
   );
 
@@ -449,7 +518,7 @@ const renderBox = async (
     children,
     innerFrame,
     'stack',
-    { gap: 0, alignItems: 'stretch' },
+    { gap: 0, alignItems: 'stretch', justifyContent: 'start' },
     ctx,
   );
   const height = props.height ?? childSize.height + padding.top + padding.bottom;
