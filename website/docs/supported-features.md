@@ -12,6 +12,13 @@ For using schemas other than the Text schema, please refer to the following docu
 
 :::
 
+## Dynamic Layout and Page Breaks
+
+Some schemas can reflow their height before rendering. Text and Multivariable Text support this through `overflow: "expand"`, while List and Table use dynamic layout for long content and page breaks.
+
+Dynamic layout and automatic page breaks require a blank `basePdf` object, such as `{ width: 210, height: 297, padding: [10, 10, 10, 10] }`. When `basePdf` is custom PDF data, pdfme keeps the original pages fixed and does not reflow schemas across pages. In the Designer, `overflow: "expand"` is disabled for Text and Multivariable Text when a custom `basePdf` is used.
+
+The Designer canvas shows the authored schema boxes. Reflow is applied in Preview, Form, Viewer, and PDF generation.
 
 ### Text (text)
 
@@ -33,6 +40,11 @@ For using schemas other than the Text schema, please refer to the following docu
   - Support for multiple fonts and fallback fonts
   - Dynamic Font Sizing
     - Detailed options for Min, Max, Fit
+- Overflow
+  - Visible: keeps the schema's authored height and allows overflowing text to remain visible
+  - Expand: measures the rendered text, grows the schema height, pushes following schemas down, and splits long text across pages when blank `basePdf` is used
+  - Expand is grow-only and does not shrink below the authored height
+  - Expand cannot be combined with Dynamic Font Sizing; when Expand is active, the normal Font Size is used for measuring and rendering
 - Text Format
   - Plain text
   - Inline Markdown (`**bold**`, `*italic*`, `***bold italic***`, `~~strikethrough~~`) with automatic font variant fallback
@@ -41,6 +53,8 @@ For using schemas other than the Text schema, please refer to the following docu
 
 - As per text, but supporting 0 to n variables in a single text field
 - Inline Markdown is supported in the template text while variable values are rendered as literal strings
+- Supports the same `overflow: "expand"` behavior as Text after variable values are resolved
+- Split Multivariable Text chunks are rendered as read-only text in Form mode
 
 ### Shape
 
@@ -123,7 +137,14 @@ Details: [Tables with Dynamic Data](/docs/tables)
   - Indent Size (for nested items)
   - Item Spacing
 - Dynamic height with automatic page breaking for long lists
+- Dynamic layout requires a blank `basePdf` object
 - Inherits text styling options (font, size, color, alignment, etc.) from the Text schema
+
+:::note
+
+`__splitRange` is internal metadata used by pdfme while splitting Text, Multivariable Text, List, and Table schemas across pages. Template authors usually should not set or edit it directly.
+
+:::
 
 ### Select (select)
 

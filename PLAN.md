@@ -1,6 +1,6 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-05
+最終更新: 2026-05-06
 
 ## 目的
 
@@ -30,7 +30,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - GFM 準拠だけにこだわりすぎない。PDF 生成として自然で便利な表現は、GFM にないものでも
   pdfme の拡張として扱ってよい。ただし、その差分はドキュメントに明記する。
 
-## 完了済み / PR 中
+## 完了済み
 
 ### PR #1463: リンク基盤
 
@@ -62,18 +62,9 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - 複数 `Page` の `size` / `orientation` / `margin` 不一致や、非対応位置の `PageBreak`
   は silent ignore せず error にする。
 
-## 次 PR 候補
+### PR #1467: `text` / `multiVariableText` の dynamic height
 
-### 1. `text` / `multiVariableText` の dynamic height
-
-最優先候補。blank PDF で `table` / `list` が後続要素を押し下げるように、`text` と
-`multiVariableText` も実描画高さに応じて後続要素を押し下げられる可能性がある。
-
-現在の初回実装方針:
-
-- 既存互換性を優先し、未指定時は従来通り `overflow: "visible"` として扱う。
-- `overflow: "expand"` の時だけ `measureTextHeight` で実描画高さを測り、schema の高さを
-  広げて後続要素を押し下げる。
+- `overflow: "expand"` を追加し、blank PDF では実描画高さに応じて後続 schema を押し下げる。
 - `expand` は grow-only とし、計測結果が元の schema height より小さい場合は縮めない。
 - `dynamicFontSize` と `overflow: "expand"` が同時指定された場合は `expand` を優先する。
   計測と生成後の schema では `dynamicFontSize` を無効化し、元 box に縮小フィットして
@@ -100,21 +91,43 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - inline-markdown の split chunk は markdown 記法が行境界で分断される可能性があるため、Form 上では
   初回は read-only 表示に寄せる。将来的に編集可能にする場合は rich text AST と selection/editing
   model を合わせて設計する。
-- 段落単位の keep-together、widow/orphan 制御、Form 編集中の live pagination は別設計として扱う。
 
-残りの検討事項:
+### PR #1469: dynamic layout split range の共通化
 
-- `text`, `multiVariableText`, `list`, `table` の dynamic layout contract は、split chunk の
-  範囲表現を `__splitRange: { unit, start, end }` に一本化する。
-- 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか。
-- 既存テンプレートへの互換性リスクをどう抑えるか。
+- `table`, `list`, `text`, `multiVariableText` の split chunk 範囲表現を
+  `__splitRange: { unit, start, end }` に一本化する。
+- 旧 `__bodyRange` / `__itemRange` / `__textLineRange` は削除する。
+- 内蔵 unit は `tableBody`, `listItem`, `textLine` として公開し、外部 plugin 用の独自 unit は
+  `string` として許容する。
 
-初回スコープ案:
+### PR #1470: custom `basePdf` での `overflow: "expand"` 制御
 
-- まず blank PDF の dynamic template のみ対象にする。
-- `text` の auto height と後続 schema の押し下げを実装する。
-- MVT は同じ設計で入れられるか確認し、リスクが高ければ別 PR に分ける。
-- page split は設計だけ残し、初回は split しない選択肢も持つ。
+- custom `basePdf` では dynamic template による reflow / page split が適用されないため、
+  Designer では `text` / `multiVariableText` の `overflow: "expand"` を選択不可にする。
+- 既存テンプレートで `expand` が残っている場合も、custom `basePdf` では effective
+  `visible` として扱い、効かない `expand` が `dynamicFontSize` まで無効化する状態を避ける。
+
+### PR #1471: dynamic layout docs
+
+- docs / website に `overflow: "expand"` の仕様を書く。
+- `overflow: "expand"` と `dynamicFontSize` は同時利用できないことを明記する。
+- custom `basePdf` では dynamic layout / page break が適用されず、`text` / `multiVariableText`
+  の `overflow: "expand"` を使えないことを明記する。
+- Designer 上では dynamic layout を実行せず、Preview / Form / Viewer / generate で reflow
+  されることを明記する。
+- `__splitRange` は内部 dynamic layout metadata であり、通常テンプレート authoring API では
+  直接触らないことを説明する。
+
+## 次 PR 候補
+
+### 1. dynamic layout の品質改善
+
+- 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか決める。
+- Form 編集中の live pagination を入れるか、Preview / generate 時のみ reflow する仕様で固定するか決める。
+- split 後の `multiVariableText` を将来的に Form 上でも編集可能にするか、read-only chunk のままにするか決める。
+- split 後の inline-markdown を将来的に編集可能にする場合は、rich text AST と selection/editing
+  model を合わせて設計する。
+- 既存テンプレートに旧 dynamic metadata が残っている場合の扱いを docs / migration note に書く。
 
 ### 2. `@pdfme/jsx` component 拡張
 
@@ -180,8 +193,10 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 ### Pagination
 
-- Markdown paragraph は可変長なので、自動高さ計算と後続要素の押し下げが必要。
-- 長文 text / code block / blockquote / list item をページ分割する contract が必要。
+- Markdown paragraph は可変長なので、`overflow: "expand"` と dynamic template reflow を
+  md2pdf / JSX の layout pipeline から自然に使えるようにする。
+- 長文 text は `__splitRange` で行単位分割できる。code block / blockquote / 複雑な list item は、
+  既存 schema の split で足りるか、layout container 単位の分割が必要かを検証する。
 - `@pdfme/jsx`, `converter`, `generator` のどこが pagination 責務を持つか決める。
 
 ### Documentation
@@ -194,12 +209,14 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 ## 未決事項
 
-- `text` / `multiVariableText` の dynamic height を既存 dynamic template にどう統合するか。
+- `multiVariableText` の split chunk を Form 上で編集可能にするべきか、read-only chunk のままでよいか。
+- split 後の inline-markdown 編集をサポートするか、read-only 表示に限定するか。
 - MVT の inline link 対応をどのタイミングで入れるか。
 - table cell / list item の rich inline content を schema 拡張で扱うか、複数 schema に分解するか。
 - link の見た目をデフォルトで青 + 下線にするか、明示的 styling に任せるか。
 - Designer で通常のテキスト編集を難しくせずにリンク編集 UI をどう出すか。
 - 独立 `link` schema をクリック領域用の補助として追加するべきか。
+- custom `basePdf` で dynamic layout を一切無効にする現行方針を docs にどう説明するか。
 - `@pdfme/jsx` の `Absolute` をどこまで推奨するか。
 - `md2pdf` の出力 API を `Template` のみにするか、`Template` + `inputs` + assets metadata にするか。
 

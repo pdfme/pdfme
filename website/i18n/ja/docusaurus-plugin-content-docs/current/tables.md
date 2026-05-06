@@ -10,7 +10,7 @@
 テーブルスキーマは`@pdfme/schemas`パッケージに含まれており、`table`としてエクスポートされています。  
 以下のコードを使用して、テーブルスキーマを`@pdfme/ui`と`@pdfme/generator`のプラグインとして追加できます。
 
-ページ区切りをサポートするには、テンプレートの`basePdf`プロパティを`{ width: number, height: number, padding: [number,number,number,number] }`に設定してください。
+ページ区切りをサポートするには、テンプレートの`basePdf`プロパティを`{ width: number, height: number, padding: [number,number,number,number] }`に設定してください。`basePdf` にカスタム PDF データを使う場合、元のページは固定されるため、動的レイアウトと自動ページ区切りは適用されません。
 
 ```javascript
 import { table } from '@pdfme/schemas';

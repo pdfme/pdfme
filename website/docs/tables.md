@@ -10,7 +10,7 @@ This schema allows you to add tables to PDFs and dynamically modify the table da
 The table schema is included in the `@pdfme/schemas` package and is exported as `table`.  
 You can add the table schema as a plugin to `@pdfme/ui` and `@pdfme/generator` using the code below.
 
-To support page breaks, ensure to set the `basePdf` property in the template to `{ width: number, height: number, padding: [number,number,number,number] }`.
+To support page breaks, ensure to set the `basePdf` property in the template to `{ width: number, height: number, padding: [number,number,number,number] }`. Custom PDF data used as `basePdf` keeps the original pages fixed, so dynamic layout and automatic page breaks are not applied.
 
 ```javascript
 import { table } from '@pdfme/schemas';

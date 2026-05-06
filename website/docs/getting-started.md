@@ -77,7 +77,7 @@ The following image is a good illustration of a template.
 - **basePdf**: PDF data for the fixed part of the PDF to be generated.
 - **schemas**: Definition data for the variable part of the PDF to be generated.
 
-The **basePdf** property accepts PDF data as a `string` (base64 encoded), an `ArrayBuffer`, or a `Uint8Array`. You can import a blank A4 PDF using `BLANK_PDF` to see how it works. Alternatively, you can define an empty PDF as shown below. When using schemas—such as tables that require page breaks—ensure you specify the PDF in the following format:
+The **basePdf** property accepts PDF data as a `string` (base64 encoded), an `ArrayBuffer`, or a `Uint8Array`. You can import a blank A4 PDF using `BLANK_PDF` to see how it works. Alternatively, you can define an empty PDF as shown below. When using schemas that require dynamic layout or page breaks, such as Text with `overflow: "expand"`, List, or Table, ensure you specify the PDF in the following format:
 
 ```json
 basePdf: { "width": 210, "height": 297, "padding": [10, 10, 10, 10] }
