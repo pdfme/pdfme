@@ -107,7 +107,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - 既存テンプレートで `expand` が残っている場合も、custom `basePdf` では effective
   `visible` として扱い、効かない `expand` が `dynamicFontSize` まで無効化する状態を避ける。
 
-### Docs: dynamic layout の仕様整理
+### PR #1471: dynamic layout docs
 
 - docs / website に `overflow: "expand"` の仕様を書く。
 - `overflow: "expand"` と `dynamicFontSize` は同時利用できないことを明記する。
