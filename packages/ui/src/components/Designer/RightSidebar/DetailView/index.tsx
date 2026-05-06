@@ -10,7 +10,7 @@ import type {
   Schema,
 } from '@pdfme/common';
 import { isBlankPdf } from '@pdfme/common';
-import { TEXT_OVERFLOW_EXPAND } from '@pdfme/schemas/texts';
+import { TEXT_OVERFLOW_EXPAND, TEXT_OVERFLOW_VISIBLE } from '@pdfme/schemas/texts';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
@@ -27,6 +27,8 @@ import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '
 import FormRenderComponent from 'form-render';
 
 const { Text } = Typography;
+
+const TEXT_OVERFLOW_SCHEMA_TYPES = new Set(['text', 'multiVariableText', 'list', 'select']);
 
 type DetailViewProps = Pick<
   SidebarProps,
@@ -105,6 +107,13 @@ const DetailView = (props: DetailViewProps) => {
     values.editable = !readOnly;
     form.setValues(values);
   }, [activeSchema, form]);
+
+  useEffect(() => {
+    if (isBlankPdf(basePdf) || !TEXT_OVERFLOW_SCHEMA_TYPES.has(activeSchema.type)) return;
+    if ((activeSchema as Record<string, unknown>).overflow !== TEXT_OVERFLOW_EXPAND) return;
+
+    changeSchemas([{ key: 'overflow', value: TEXT_OVERFLOW_VISIBLE, schemaId: activeSchema.id }]);
+  }, [activeSchema, basePdf, changeSchemas]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {
@@ -393,12 +402,21 @@ const DetailView = (props: DetailViewProps) => {
 
   if (typeof activePropPanelSchema === 'function') {
     // Create a new object without the schemasList property
-    const { size, schemas, pageSize, changeSchemas, activeElements, deselectSchema, activeSchema } =
-      props;
+    const {
+      size,
+      schemas,
+      pageSize,
+      basePdf,
+      changeSchemas,
+      activeElements,
+      deselectSchema,
+      activeSchema,
+    } = props;
     const propPanelProps = {
       size,
       schemas,
       pageSize,
+      basePdf,
       changeSchemas,
       activeElements,
       deselectSchema,

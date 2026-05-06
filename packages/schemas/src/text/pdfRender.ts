@@ -86,6 +86,7 @@ const getFontProp = ({
   value,
   fontKitFont,
   schema,
+  basePdf,
   colorType,
   fontSize: resolvedFontSize,
 }: {
@@ -93,11 +94,12 @@ const getFontProp = ({
   fontKitFont: FontKitFont;
   colorType?: ColorType;
   schema: TextSchema;
+  basePdf: PDFRenderProps<TextSchema>['basePdf'];
   fontSize?: number;
 }) => {
   const fontSize =
     resolvedFontSize ??
-    (shouldUseDynamicFontSize(schema)
+    (shouldUseDynamicFontSize(schema, basePdf)
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE));
   const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
@@ -120,7 +122,7 @@ const getGraphemeSegmenter = () => {
 };
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
-  const { value, pdfDoc, pdfLib, page, options, schema, _cache } = arg;
+  const { value, pdfDoc, pdfLib, page, options, schema, basePdf, _cache } = arg;
   if (!value) return;
 
   const { font = getDefaultFont(), colorType } = options;
@@ -142,13 +144,14 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   );
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
-    enableInlineMarkdown && shouldUseDynamicFontSize(schema)
+    enableInlineMarkdown && shouldUseDynamicFontSize(schema, basePdf)
       ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
       : undefined;
   const fontProp = getFontProp({
     value: displayValue,
     fontKitFont,
     schema,
+    basePdf,
     colorType,
     fontSize: dynamicRichTextFontSize,
   });

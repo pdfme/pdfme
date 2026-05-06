@@ -147,6 +147,7 @@ export type UIRenderProps<T extends Schema> = {
  * @property {HTMLElement[]} activeElements - Array of currently active HTML elements in the UI.
  * @property {ChangeSchemas} changeSchemas - Function to change multiple schemas simultaneously.
  * @property {SchemaForUI[]} schemas - Array of schemas for UI rendering.
+ * @property {BasePdf} basePdf - The base PDF used by the current template.
  * @property {Size} pageSize - The size of the page being edited.
  * @property {UIOptions} options - UI options for the property panel.
  * @property {UITheme} theme - The theme token used in the UI.
@@ -158,6 +159,7 @@ type PropPanelProps = {
   activeElements: HTMLElement[];
   changeSchemas: ChangeSchemas;
   schemas: SchemaForUI[];
+  basePdf?: BasePdf;
   options: UIOptions;
   theme: UITheme;
   i18n: (key: string) => string;

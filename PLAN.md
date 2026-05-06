@@ -85,6 +85,10 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - この排他制御は仕様として扱い、将来の docs / website / schema API docs では
   `overflow: "expand"` と `dynamicFontSize` は同時利用できないこと、expand では通常の
   `fontSize` を使って高さを広げることを明記する。
+- custom `basePdf` では dynamic template による reflow / page split が適用されないため、
+  Designer では `overflow: "expand"` を選択不可にする。既存テンプレートで `expand` が残っている
+  場合も Designer 上では `visible` に戻し、効かない `expand` が `dynamicFontSize` まで無効化する
+  中途半端な状態を避ける。この制約も docs に明記する。
 - `multiVariableText` は変数置換後の実描画テキストで高さを測る。
 - ページ末尾を超える場合、text / `multiVariableText` は行単位で `__textLineRange` を持つ
   split schema に分割し、次ページへ続ける。plain text と inline-markdown は同じ line layout を
@@ -101,7 +105,6 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 - `text`, `multiVariableText`, `list`, `table` の dynamic layout contract を共通化できるか。
 - 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか。
-- blank PDF と custom `basePdf` で挙動を分ける必要があるか。
 - 既存テンプレートへの互換性リスクをどう抑えるか。
 
 初回スコープ案:
