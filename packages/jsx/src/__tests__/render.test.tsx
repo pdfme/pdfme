@@ -4,17 +4,27 @@ import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 
 import {
   Box,
+  Ellipse,
+  Image,
+  Line,
   List,
   MultiVariableText,
   Page,
   PageBreak,
+  Rectangle,
   Row,
   Spacer,
   Stack,
+  Svg,
   Table,
   Text,
 } from '../components.js';
 import { renderToTemplate } from '../render.js';
+
+const SAMPLE_PNG =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
+
+const SAMPLE_SVG = '<svg viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>';
 
 describe('@pdfme/jsx renderToTemplate', () => {
   it('renders a Page with a fixed Text schema', async () => {
@@ -328,6 +338,136 @@ describe('@pdfme/jsx renderToTemplate', () => {
       ['Alice', '10'],
       ['Bob', '12'],
     ]);
+  });
+
+  it('renders Image and Svg schemas', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Stack gap={2}>
+          <Image src={SAMPLE_PNG} width={20} height={12} rotate={5} opacity={0.8} />
+          <Svg width={18} height={10} rotate={10} opacity={0.6}>
+            {SAMPLE_SVG}
+          </Svg>
+        </Stack>
+      </Page>,
+    );
+
+    const [image, svg] = result.template.schemas[0] ?? [];
+    expect(image).toMatchObject({
+      type: 'image',
+      content: SAMPLE_PNG,
+      readOnly: true,
+      position: { x: 0, y: 0 },
+      width: 20,
+      height: 12,
+      rotate: 5,
+      opacity: 0.8,
+    });
+    expect(svg).toMatchObject({
+      type: 'svg',
+      content: SAMPLE_SVG,
+      readOnly: true,
+      position: { x: 0, y: 14 },
+      width: 18,
+      height: 10,
+      rotate: 10,
+      opacity: 0.6,
+    });
+  });
+
+  it('renders named Image and Svg as input-backed schemas', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Image name="logo" src={SAMPLE_PNG} width={20} height={12} />
+        <Svg name="icon" svg={SAMPLE_SVG} width={10} height={10} />
+      </Page>,
+    );
+
+    const [image, svg] = result.template.schemas[0] ?? [];
+    expect(image).toMatchObject({ name: 'logo', type: 'image', readOnly: false });
+    expect(svg).toMatchObject({ name: 'icon', type: 'svg', readOnly: false });
+    expect(result.inputs[0]).toEqual({ logo: SAMPLE_PNG, icon: SAMPLE_SVG });
+  });
+
+  it('uses empty input values for named Image and Svg without initial content', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Image name="logo" width={20} height={12} />
+        <Svg name="icon" width={10} height={10} />
+      </Page>,
+    );
+
+    const [image, svg] = result.template.schemas[0] ?? [];
+    expect(image).toMatchObject({ name: 'logo', type: 'image', content: '', readOnly: false });
+    expect(svg).toMatchObject({ name: 'icon', type: 'svg', content: '', readOnly: false });
+    expect(result.inputs[0]).toEqual({ logo: '', icon: '' });
+  });
+
+  it('renders visual shape and line schemas', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Stack gap={1}>
+          <Rectangle width={30} height={10} fill="#eeeeee" radius={2} />
+          <Ellipse width={12} height={8} fill="#00aa88" borderColor="#004433" />
+          <Line height={0.8} color="#555555" />
+        </Stack>
+      </Page>,
+    );
+
+    const [rectangle, ellipse, line] = result.template.schemas[0] ?? [];
+    expect(rectangle).toMatchObject({
+      type: 'rectangle',
+      color: '#eeeeee',
+      borderWidth: 0,
+      radius: 2,
+      position: { x: 0, y: 0 },
+      width: 30,
+      height: 10,
+      readOnly: true,
+    });
+    expect(ellipse).toMatchObject({
+      type: 'ellipse',
+      color: '#00aa88',
+      borderWidth: 1,
+      borderColor: '#004433',
+      position: { x: 0, y: 11 },
+      width: 12,
+      height: 8,
+    });
+    expect(line).toMatchObject({
+      type: 'line',
+      color: '#555555',
+      position: { x: 0, y: 20 },
+      width: 210,
+      height: 0.8,
+      readOnly: true,
+    });
+  });
+
+  it('uses an outline by default for empty Rectangle', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Rectangle width={20} height={8} />
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'rectangle',
+      color: '',
+      borderWidth: 1,
+      borderColor: '#000000',
+    });
+  });
+
+  it('rejects duplicate names across visual schemas', async () => {
+    await expect(
+      renderToTemplate(
+        <Page margin={0}>
+          <Rectangle name="mark" width={20} height={8} />
+          <Ellipse name="mark" width={8} height={8} />
+        </Page>,
+      ),
+    ).rejects.toThrow('duplicate schema name "mark"');
   });
 
   it('splits pages at PageBreak', async () => {
