@@ -119,7 +119,7 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(docsSpan?.style.textDecoration).not.toContain('underline');
   });
 
-  it('renders split form chunks as read-only resolved text', async () => {
+  it('writes split form chunk edits back into the full variable value', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
     const schema: MultiVariableTextSchema = {
@@ -143,9 +143,220 @@ describe('multiVariableText inline markdown UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('first line');
+
+    variableSpan.textContent = 'edited first line';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'edited first line\nsecond line' }),
+    });
+  });
+
+  it('writes later split form chunk edits back into the correct variable range', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 1, end: 2 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'first line\nsecond line' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('second line');
+
+    variableSpan.textContent = 'edited second line';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'first line\nedited second line' }),
+    });
+  });
+
+  it('updates repeated variable references without duplicating the replacement', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}\n{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 1, end: 2 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'Alice' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('Alice');
+
+    variableSpan.textContent = 'Bob';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'Bob' }),
+    });
+  });
+
+  it('preserves variable whitespace around split form chunk edits', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: '  first line  \n  second line  ' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('  first line');
+
+    variableSpan.textContent = '  edited line  ';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: '  edited line  \n  second line  ' }),
+    });
+  });
+
+  it('does not create an editable split span for an empty variable value', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: '' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    textBlock.dispatchEvent(new Event('blur'));
+
+    expect(textBlock.textContent).toBe('');
+    expect(textBlock.querySelector('span')).toBeNull();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('merges soft-wrapped split form chunk edits without replacing the whole variable', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 20,
+      __splitRange: { unit: 'textLine', start: 1, end: 2 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'alpha beta gamma delta epsilon' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).not.toBe('');
+    expect(textBlock.textContent).not.toBe('alpha beta gamma delta epsilon');
+
+    variableSpan.textContent = 'edited chunk';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    const newValue = JSON.parse(onChange.mock.calls[0][0].value) as { name: string };
+    expect(newValue.name).toContain('edited chunk');
+    expect(newValue.name).not.toBe('edited chunk');
+  });
+
+  it('keeps split inline markdown form chunks as read-only resolved text', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '**{name}**',
+      variables: ['name'],
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'first line\nsecond line' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
     textBlock.dispatchEvent(new Event('blur'));
 
     expect(onChange).not.toHaveBeenCalled();
+    expect(textBlock.querySelector('span')?.contentEditable).not.toBe('plaintext-only');
     expect(textBlock.textContent).toBe('first line');
   });
 });
