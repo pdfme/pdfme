@@ -388,8 +388,15 @@ const renderText = async (
   const lineHeight = props.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const width = props.width ?? frame.width;
   const value = childrenToString(props.children);
-  const name = resolveName(ctx, 'text', props.name);
   const readOnly = props.readOnly ?? props.name == null;
+  const textFormat = props.textFormat ?? 'plain';
+
+  if (!readOnly && textFormat === 'inline-markdown') {
+    throw new Error(
+      '@pdfme/jsx: editable <Text> does not support textFormat="inline-markdown". Use read-only <Text> or <MultiVariableText>.',
+    );
+  }
+  const name = resolveName(ctx, 'text', props.name);
 
   const schema: TextSchema = {
     name,
@@ -410,7 +417,7 @@ const renderText = async (
     characterSpacing: props.spacing ?? DEFAULT_CHARACTER_SPACING,
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
-    textFormat: props.textFormat ?? 'plain',
+    textFormat,
     overflow: props.overflow,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
