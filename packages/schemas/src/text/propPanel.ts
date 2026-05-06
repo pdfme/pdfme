@@ -31,11 +31,11 @@ import {
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
-import { isTextOverflowExpand } from './overflow.js';
+import { canUseTextOverflowExpand, isTextOverflowExpand } from './overflow.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
-  const { rootElement, changeSchemas, activeSchema, i18n } = props;
-  const isExpand = isTextOverflowExpand(activeSchema as unknown as TextSchema);
+  const { rootElement, changeSchemas, activeSchema, i18n, basePdf } = props;
+  const isExpand = isTextOverflowExpand(activeSchema as unknown as TextSchema, basePdf);
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -87,13 +87,14 @@ const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<TextSchema> = {
-  schema: ({ options, activeSchema, i18n }) => {
+  schema: ({ options, activeSchema, i18n, basePdf }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
 
     const activeTextSchema = activeSchema as unknown as TextSchema;
-    const isExpand = isTextOverflowExpand(activeTextSchema);
+    const canExpandOverflow = canUseTextOverflowExpand(activeTextSchema, basePdf);
+    const isExpand = isTextOverflowExpand(activeTextSchema, basePdf);
     const enableDynamicFont =
       !isExpand && Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
     const hideTextFormat = activeTextSchema.type === 'text' && activeTextSchema.readOnly !== true;
@@ -108,6 +109,12 @@ export const propPanel: PropPanel<TextSchema> = {
       ...fontNames
         .filter((name) => name !== baseFontName)
         .map((name) => ({ label: name, value: name })),
+    ];
+    const overflowOptions = [
+      { label: i18n('schemas.text.overflowVisible'), value: TEXT_OVERFLOW_VISIBLE },
+      ...(canExpandOverflow
+        ? [{ label: i18n('schemas.text.overflowExpand'), value: TEXT_OVERFLOW_EXPAND }]
+        : []),
     ];
 
     const textSchema: Record<string, PropPanelSchema> = {
@@ -149,10 +156,7 @@ export const propPanel: PropPanel<TextSchema> = {
         widget: 'select',
         default: DEFAULT_TEXT_OVERFLOW,
         props: {
-          options: [
-            { label: i18n('schemas.text.overflowVisible'), value: TEXT_OVERFLOW_VISIBLE },
-            { label: i18n('schemas.text.overflowExpand'), value: TEXT_OVERFLOW_EXPAND },
-          ],
+          options: overflowOptions,
         },
         span: 8,
       },

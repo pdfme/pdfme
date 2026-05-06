@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Font as FontKitFont } from 'fontkit';
 import { Font, getDefaultFont, mm2pt } from '@pdfme/common';
+import type { BasePdf, PropPanelSchema, PropPanelWidgetProps } from '@pdfme/common';
 import {
   calculateDynamicFontSize,
   getBrowserVerticalFontAdjustments,
@@ -26,10 +27,16 @@ import {
   resolveFontVariant,
   type ResolvedRichTextRun,
 } from '../src/text/richText.js';
-import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
+import {
+  LINE_START_FORBIDDEN_CHARS,
+  LINE_END_FORBIDDEN_CHARS,
+  TEXT_OVERFLOW_EXPAND,
+  TEXT_OVERFLOW_VISIBLE,
+} from '../src/text/constants.js';
 import { getDynamicLayoutForText } from '../src/text/dynamicTemplate.js';
 import { mergeTextLineRangeValue } from '../src/text/measure.js';
 import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
+import { propPanel as textPropPanel } from '../src/text/propPanel.js';
 import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
@@ -76,6 +83,40 @@ const getTextSchema = () => {
     fontSize: 14,
   };
   return textSchema;
+};
+
+const getTextPropPanelSchema = ({
+  basePdf,
+  activeSchema,
+}: {
+  basePdf?: BasePdf;
+  activeSchema?: Partial<TextSchema>;
+} = {}) => {
+  if (typeof textPropPanel.schema !== 'function') {
+    throw new Error('Text propPanel schema should be a function.');
+  }
+
+  return textPropPanel.schema({
+    activeSchema: {
+      ...getTextSchema(),
+      id: 'text-id',
+      ...activeSchema,
+    },
+    activeElements: [],
+    changeSchemas: () => undefined,
+    schemas: [],
+    basePdf,
+    options: { font: getSampleFont() },
+    theme: {},
+    i18n: (key: string) => key,
+  } as unknown as Omit<PropPanelWidgetProps, 'rootElement'>);
+};
+
+const getOverflowOptionValues = (schema: Record<string, PropPanelSchema>) => {
+  const overflow = schema.overflow as PropPanelSchema & {
+    props: { options: Array<{ value: string }> };
+  };
+  return overflow.props.options.map((option) => option.value);
 };
 
 describe('parseInlineMarkdown', () => {
@@ -253,6 +294,53 @@ describe('isInlineMarkdownTextSchema', () => {
   });
 });
 
+describe('text prop panel', () => {
+  it('offers overflow expand for blank basePdf', () => {
+    const schema = getTextPropPanelSchema({
+      basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] },
+    });
+
+    expect(getOverflowOptionValues(schema)).toEqual([
+      TEXT_OVERFLOW_VISIBLE,
+      TEXT_OVERFLOW_EXPAND,
+    ]);
+  });
+
+  it('hides overflow expand for custom basePdf', () => {
+    const schema = getTextPropPanelSchema({
+      basePdf: 'data:application/pdf;base64,AA==' as BasePdf,
+    });
+
+    expect(getOverflowOptionValues(schema)).toEqual([TEXT_OVERFLOW_VISIBLE]);
+  });
+
+  it('keeps overflow expand available for text-derived schemas that do not use text expand', () => {
+    const schema = getTextPropPanelSchema({
+      basePdf: 'data:application/pdf;base64,AA==' as BasePdf,
+      activeSchema: { type: 'select' },
+    });
+
+    expect(getOverflowOptionValues(schema)).toEqual([
+      TEXT_OVERFLOW_VISIBLE,
+      TEXT_OVERFLOW_EXPAND,
+    ]);
+  });
+
+  it('keeps dynamic font size controls enabled when custom basePdf has stale overflow expand', () => {
+    const schema = getTextPropPanelSchema({
+      basePdf: 'data:application/pdf;base64,AA==' as BasePdf,
+      activeSchema: {
+        overflow: TEXT_OVERFLOW_EXPAND,
+        dynamicFontSize: { min: 20, max: 30, fit: 'vertical' },
+      },
+    });
+    const dynamicFontSize = schema.dynamicFontSize as PropPanelSchema;
+    const minFontSize = dynamicFontSize.properties?.min;
+
+    expect(minFontSize?.hidden).toBe(false);
+  });
+});
+
 describe('text dynamic layout', () => {
   const baseArgs = {
     basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
@@ -410,6 +498,19 @@ describe('text dynamic layout', () => {
         overflow: 'expand',
       }),
     ).toBe(false);
+  });
+
+  it('treats overflow expand as visible for custom basePdf dynamic font sizing', () => {
+    expect(
+      shouldUseDynamicFontSize(
+        {
+          type: 'text',
+          dynamicFontSize: { min: 20, max: 30, fit: 'vertical' },
+          overflow: 'expand',
+        },
+        'data:application/pdf;base64,AA==' as BasePdf,
+      ),
+    ).toBe(true);
   });
 
   it('expands multiVariableText after substituting variables', async () => {

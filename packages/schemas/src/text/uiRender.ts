@@ -76,8 +76,18 @@ const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string
 };
 
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
-  const { value, schema, mode, onChange, stopEditing, tabIndex, placeholder, options, _cache } =
-    arg;
+  const {
+    value,
+    schema,
+    basePdf,
+    mode,
+    onChange,
+    stopEditing,
+    tabIndex,
+    placeholder,
+    options,
+    _cache,
+  } = arg;
   const hasInlineMarkdownFormat = schema.textFormat === TEXT_FORMAT_INLINE_MARKDOWN;
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
   const isReadOnlySplitInlineMarkdownFormChunk =
@@ -100,7 +110,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
-  const enableDynamicFontSize = shouldUseDynamicFontSize(schema);
+  const enableDynamicFontSize = shouldUseDynamicFontSize(schema, basePdf);
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
     enableInlineMarkdown && enableDynamicFontSize
@@ -346,7 +356,7 @@ export const buildStyledTextContainer = (
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 
-  if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema) && value) {
+  if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema, arg.basePdf) && value) {
     dynamicFontSize = calculateDynamicFontSize({
       textSchema: schema,
       fontKitFont,
