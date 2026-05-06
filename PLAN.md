@@ -26,22 +26,14 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 - main にはリンク基盤、`@pdfme/jsx` MVP、text / MVT dynamic layout、split metadata 共通化、
   custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
-  component、visual components まで入っている。
-- 別 PR で、`@pdfme/jsx` の editable `Text` に `textFormat: "inline-markdown"` を指定できない
-  guard を追加中。
+  component、visual components、editable `Text` の inline-markdown guard まで入っている。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
 
 ## 次に進めること
 
-### 1. PR #1476: `@pdfme/jsx` visual components
-
-- `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line` の API と命名を確認する。
-- Markdown image、blockquote の罫線、horizontal rule、code block 背景に使いやすいか確認する。
-- SVG は既存 schema の sanitizer / renderer に任せ、JSX 側では薄い wrapper に留める。
-
-### 2. `@pdfme/jsx` layout 品質
+### 1. `@pdfme/jsx` layout 品質
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - 優先候補は `justifyContent`, `alignItems`, `flex` / `flexGrow`, `margin`。
@@ -51,7 +43,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
   価値が薄れるため API は慎重にする。
 - header / footer を `staticSchemas` に接続するか検討する。
 
-### 3. `md2pdf` / GFM MVP
+### 2. `md2pdf` / GFM MVP
 
 - `converter` package に `md2pdf` の入口を追加する。
 - Markdown parser は `remark-gfm` / `micromark` 系を候補にする。
@@ -72,6 +64,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
   直接触らない。
 - `text` schema の inline-markdown split chunk は Form 上では read-only のまま。MVT は
   plain / inline-markdown ともに変数値だけ編集できる。
+- MVT split chunk の連続編集は、各 blur 後に reflow された最新 input を次の chunk が受け取る
+  前提で扱う。plain / inline-markdown ともに回帰テストで固定する。
 - `@pdfme/jsx` の `Text` component は read-only authoring が主用途。editable `Text` には
   `textFormat: "inline-markdown"` を指定できないようにする。
 - MVT の static link は Form 上でも clickable。変数 span が link run に含まれる場合は入力を優先する。
@@ -109,10 +103,6 @@ pdfme `Template` と `inputs` を生成できるようにする。
   の split で足りるか、container 単位の分割が必要かを検証する。
 - keep-together、widow/orphan、live pagination は layout 品質改善の中で扱う。
 
-## 未決事項 / 検証事項
-
-- MVT split chunk で同一 input / variable を連続編集した時に、後続 blur が先行編集を上書きしないか検証する。
-
 ## 完了済み
 
 - PR #1463: text inline-markdown link、PDF URI / GoTo annotation、basePdf 由来 URI link 保持。
@@ -127,6 +117,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - PR #1474: inline-markdown MVT split chunk の Form 変数編集、static link の clickable 表示。
 - PR #1475: `@pdfme/jsx` `MultiVariableText` component。
 - PR #1476: `@pdfme/jsx` `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line` visual components。
+- PR #1477: `@pdfme/jsx` editable `Text` で `textFormat: "inline-markdown"` を禁止。
 
 ## 参考
 
