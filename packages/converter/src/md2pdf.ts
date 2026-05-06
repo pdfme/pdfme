@@ -73,6 +73,7 @@ type Builder = {
   fontColor: string;
   headingScale: Record<HeadingDepth, number>;
   nameCounters: Record<string, number>;
+  pages: Schema[][];
   schemas: Schema[];
   usedNames: Set<string>;
 };
@@ -112,6 +113,16 @@ const IMAGE_HEIGHT = 45;
 
 const MARKDOWN_ESCAPE_PATTERN = /[\\*~`[\]()]/g;
 const DATA_IMAGE_PATTERN = /^data:image\/(?:png|jpe?g);base64,/i;
+const RENDERABLE_BLOCK_TYPES = new Set([
+  'blockquote',
+  'code',
+  'heading',
+  'html',
+  'list',
+  'paragraph',
+  'table',
+  'thematicBreak',
+]);
 
 const markdownProcessor = unified().use(remarkParse).use(remarkGfm);
 
@@ -127,7 +138,7 @@ export const md2pdf = async (
   return {
     template: {
       basePdf: builder.basePdf,
-      schemas: [builder.schemas],
+      schemas: builder.pages,
     },
     inputs: [{}],
   };
@@ -137,6 +148,7 @@ const createBuilder = (options: Md2PdfOptions): Builder => {
   const basePdf = options.basePdf ?? createBlankPdf(options);
   const [top, right, bottom, left] = basePdf.padding;
   const headingScale = { ...DEFAULT_HEADING_SCALE, ...options.style?.headingScale };
+  const schemas: Schema[] = [];
 
   return {
     basePdf,
@@ -153,7 +165,8 @@ const createBuilder = (options: Md2PdfOptions): Builder => {
     fontColor: options.style?.fontColor ?? DEFAULT_FONT_COLOR,
     headingScale,
     nameCounters: {},
-    schemas: [],
+    pages: [schemas],
+    schemas,
     usedNames: new Set(),
   };
 };
@@ -286,7 +299,7 @@ const renderList = (node: List, builder: Builder): void => {
 };
 
 const renderCode = (node: Code, builder: Builder): void => {
-  const content = node.lang ? `${node.lang}\n${node.value}` : node.value;
+  const content = node.value;
   addTextSchema(builder, {
     content,
     backgroundColor: '#f5f5f5',
@@ -299,15 +312,15 @@ const renderBlockquote = (node: Blockquote, builder: Builder): void => {
   const content = node.children
     .map((child) => blockToMarkdown(child))
     .join('\n')
-    .split('\n')
-    .map((line) => `> ${line}`)
-    .join('\n');
+    .trim();
 
   if (!content.trim()) return;
   addTextSchema(builder, {
     content,
     backgroundColor: '#f8f8f8',
     textFormat: 'inline-markdown',
+    x: builder.contentFrame.x + 3,
+    width: Math.max(0, builder.contentFrame.width - 3),
   });
 };
 
@@ -402,6 +415,8 @@ const addTextSchema = (
     gap?: number;
     backgroundColor?: string;
     textFormat?: 'plain' | 'inline-markdown';
+    x?: number;
+    width?: number;
   },
 ): void => {
   const fontSize = options.fontSize ?? builder.fontSize;
@@ -410,8 +425,8 @@ const addTextSchema = (
     name: options.name ?? resolveAutoName(builder, 'text'),
     type: 'text',
     content,
-    position: { x: builder.contentFrame.x, y: builder.cursorY },
-    width: builder.contentFrame.width,
+    position: { x: options.x ?? builder.contentFrame.x, y: builder.cursorY },
+    width: options.width ?? builder.contentFrame.width,
     height: options.height ?? estimateTextHeight(content, fontSize, builder.lineHeight),
     readOnly: true,
     alignment: 'left',
@@ -430,8 +445,25 @@ const addTextSchema = (
 };
 
 const addSchema = (builder: Builder, schema: Schema, gap = BLOCK_GAP): void => {
+  if (shouldStartNewPage(builder, schema.height)) {
+    startNewPage(builder);
+    schema.position = { ...schema.position, y: builder.cursorY };
+  }
   builder.schemas.push(schema);
   builder.cursorY += schema.height + gap;
+};
+
+const shouldStartNewPage = (builder: Builder, height: number): boolean => {
+  if (builder.schemas.length === 0) return false;
+  const pageBottom = builder.contentFrame.y + builder.contentFrame.height;
+  return builder.cursorY + height > pageBottom;
+};
+
+const startNewPage = (builder: Builder): void => {
+  const schemas: Schema[] = [];
+  builder.pages.push(schemas);
+  builder.schemas = schemas;
+  builder.cursorY = builder.contentFrame.y;
 };
 
 const collectListItems = (node: List, level = 0): string[] =>
@@ -517,7 +549,8 @@ const renderInlineImage = (node: Image): string => {
 
 const tableRowToStrings = (row: TableRow): string[] => row.children.map(tableCellToString);
 
-const tableCellToString = (cell: TableCell): string => renderInlineChildren(cell.children);
+const tableCellToString = (cell: TableCell): string =>
+  cell.children.map(inlineToPlainText).join('');
 
 const normalizeRowLength = (row: string[], columnCount: number): string[] =>
   Array.from({ length: columnCount }, (_, index) => row[index] ?? '');
@@ -573,7 +606,7 @@ const escapeInlineMarkdown = (value: string): string =>
   value.replace(MARKDOWN_ESCAPE_PATTERN, (match) => `\\${match}`);
 
 const escapeLinkDestination = (href: string): string =>
-  href.replace(/[\s\\()]/g, (match) => (match === ' ' ? '%20' : `\\${match}`));
+  encodeURI(href).replace(/[\\()]/g, (match) => `\\${match}`);
 
 const slugify = (value: string): string =>
   value
@@ -605,7 +638,34 @@ const toPlainInlineText = (node: PhrasingContent): string => {
   return '';
 };
 
+const inlineToPlainText = (node: PhrasingContent): string => {
+  switch (node.type) {
+    case 'text':
+    case 'inlineCode':
+      return node.value;
+    case 'break':
+      return '\n';
+    case 'image':
+      return node.alt || node.title || node.url;
+    case 'link':
+    case 'emphasis':
+    case 'strong':
+    case 'delete':
+      return node.children.map(inlineToPlainText).join('');
+    case 'html':
+      return '';
+    default:
+      return 'children' in node && Array.isArray(node.children)
+        ? (node.children as PhrasingContent[]).map(inlineToPlainText).join('')
+        : '';
+  }
+};
+
 const isBlockContent = (node: unknown): node is BlockContent =>
-  typeof node === 'object' && node !== null && 'type' in node;
+  typeof node === 'object' &&
+  node !== null &&
+  'type' in node &&
+  typeof node.type === 'string' &&
+  RENDERABLE_BLOCK_TYPES.has(node.type);
 
 const isList = (node: ListItem['children'][number]): node is List => node.type === 'list';

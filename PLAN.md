@@ -31,7 +31,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
   `Static` / `Header` / `Footer` による `staticSchema` support、`Absolute` による manual placement
   補助まで入っている。
 - `md2pdf` MVP は `converter` package に実装を開始した。初期 API は `Template + inputs` を返し、
-  parser は `unified` + `remark-parse` + `remark-gfm` を使う。
+  parser は `unified` + `remark-parse` + `remark-gfm` を使う。bundle size を考慮し、
+  `@pdfme/converter/md2pdf` の subpath export として opt-in にする。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
@@ -47,6 +48,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
   data URI image。
 - remote Markdown image は初期実装では link text に fallback する。画像 fetch / asset metadata は
   次段階で検討する。
+- pagination は初期実装では block 単位でページを切る。長い text/list の行単位分割は既存 dynamic
+  layout に任せるが、table/image の keep-together や widow/orphan は後続課題。
 - `@pdfme/jsx` と同じ layout tree / builder を共有できるかは継続検討。直接 JSX runtime に依存するより、
   Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
 - 追加で確認したいこと: generator + built-in schemas で実際に PDF 生成する integration test、
@@ -108,10 +111,12 @@ pdfme `Template` と `inputs` を生成できるようにする。
   schema の `string[] + tab indent` に落とすが、複雑な list item は表現しきれない可能性がある。
 - task list は MVP では `[x]` / `[ ]` prefix に落とす。checkbox + text/list の組み合わせや
   list schema 拡張は後回し。
-- GFM table の基本形は `table` schema に落とせるが、cell 内 rich inline content は追加検討。
-- code block は `rectangle + text` で始められるが、等幅フォント、空白保持、長い行、syntax highlight、
+- GFM table の基本形は `table` schema に落とす。MVP では cell 内 rich inline content は plain text
+  に落とし、装飾や link は保持しない。
+- code block は `text` + background で始める。等幅フォント、空白保持、長い行、syntax highlight、
   ページ分割を考えると専用 layout が欲しい。
-- blockquote は `line + text` で始められるが、中に paragraph / list / code / table を持てる点に注意する。
+- blockquote は indented text + background で始める。中に paragraph / list / code / table を持てる点に
+  注意する。
 - remote Markdown image と `[![alt](img)](url)` は image fetch / link annotation の設計が必要。
 
 ### Pagination

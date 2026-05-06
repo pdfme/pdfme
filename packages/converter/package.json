@@ -35,6 +35,12 @@
       "browser": "./dist/index.js",
       "node": "./dist/index.node.js",
       "default": "./dist/index.js"
+    },
+    "./md2pdf": {
+      "types": "./dist/md2pdf.d.ts",
+      "browser": "./dist/md2pdf.js",
+      "node": "./dist/md2pdf.js",
+      "default": "./dist/md2pdf.js"
     }
   },
   "publishConfig": {

@@ -41,5 +41,3 @@ export const pdf2size = async (pdf: ArrayBuffer | Uint8Array, options: Pdf2SizeO
 };
 
 export { img2pdf } from './img2pdf.js';
-export { md2pdf } from './md2pdf.js';
-export type { Md2PdfOptions, Md2PdfResult } from './md2pdf.js';

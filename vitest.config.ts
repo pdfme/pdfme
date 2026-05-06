@@ -117,6 +117,10 @@ const pdfmeAliases = usePublishedPdfmeExports
         replacement: path.resolve(repoRoot, 'packages/common/src/index.ts'),
       },
       {
+        find: '@pdfme/converter/md2pdf',
+        replacement: path.resolve(repoRoot, 'packages/converter/src/md2pdf.ts'),
+      },
+      {
         find: '@pdfme/converter',
         replacement: converterReplacement,
       },

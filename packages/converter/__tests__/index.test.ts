@@ -3,11 +3,11 @@ import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 import { list, table, text } from '@pdfme/schemas';
+import { md2pdf } from '../src/md2pdf.js';
 import {
   pdf2img as nodePdf2Img,
   pdf2size as nodePdf2Size,
   img2pdf,
-  md2pdf,
 } from '../src/index.node.js';
 
 const a4BasePdf = (padding: [number, number, number, number] = [20, 10, 20, 10]) => ({
@@ -269,7 +269,7 @@ A **bold** paragraph with ~~deleted~~ text.
 
 | Name | Value |
 | ---- | ----- |
-| A | 1 |
+| **A** | [1](https://example.com) |
 | B | 2 |
 
 \`\`\`ts
@@ -315,7 +315,7 @@ const value = 1;
     ]);
     expect(schemas[4]).toMatchObject({
       type: 'text',
-      content: 'ts\nconst value = 1;',
+      content: 'const value = 1;',
       textFormat: 'plain',
       overflow: 'expand',
     });
@@ -361,6 +361,26 @@ const value = 1;
       height: 215.9,
       padding: [12, 10, 12, 10],
     });
+  });
+
+  test('splits blocks across template pages when the cursor exceeds the page frame', async () => {
+    const markdown = Array.from({ length: 70 }, (_, index) => `Paragraph ${index + 1}`).join('\n\n');
+    const { template } = await md2pdf(markdown);
+
+    expect(template.schemas.length).toBeGreaterThan(1);
+    expect(template.schemas[1][0].position.y).toBe(20);
+  });
+
+  test('renders blockquotes as indented text instead of literal markdown quotes', async () => {
+    const { template } = await md2pdf('> Quote line');
+    const schema = template.schemas[0][0];
+
+    expect(schema).toMatchObject({
+      type: 'text',
+      content: 'Quote line',
+      backgroundColor: '#f8f8f8',
+    });
+    expect(schema.position.x).toBe(18);
   });
 
   test('generates a PDF from the converted markdown template', async () => {
