@@ -118,4 +118,34 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(textBlock.querySelector('a')).toBeNull();
     expect(docsSpan?.style.textDecoration).not.toContain('underline');
   });
+
+  it('renders split form chunks as read-only resolved text', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+      width: 100,
+      __textLineRange: { start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'first line\nsecond line' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    textBlock.dispatchEvent(new Event('blur'));
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(textBlock.textContent).toBe('first line');
+  });
 });

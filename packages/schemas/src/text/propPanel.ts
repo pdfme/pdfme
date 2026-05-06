@@ -87,16 +87,13 @@ const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
 };
 
 export const propPanel: PropPanel<TextSchema> = {
-  schema: ({ options, activeSchema, i18n, changeSchemas }) => {
+  schema: ({ options, activeSchema, i18n }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
     const fallbackFontName = getFallbackFontName(font);
 
     const activeTextSchema = activeSchema as unknown as TextSchema;
     const isExpand = isTextOverflowExpand(activeTextSchema);
-    if (isExpand && activeTextSchema.dynamicFontSize !== undefined) {
-      changeSchemas([{ key: 'dynamicFontSize', value: undefined, schemaId: activeSchema.id }]);
-    }
     const enableDynamicFont =
       !isExpand && Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);
     const hideTextFormat = activeTextSchema.type === 'text' && activeTextSchema.readOnly !== true;

@@ -10,6 +10,7 @@ import type {
   Schema,
 } from '@pdfme/common';
 import { isBlankPdf } from '@pdfme/common';
+import { TEXT_OVERFLOW_EXPAND } from '@pdfme/schemas/texts';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
@@ -192,6 +193,17 @@ const DetailView = (props: DetailViewProps) => {
         }
 
         changes.push({ key, value, schemaId: activeSchema.id });
+        if (
+          key === 'overflow' &&
+          value === TEXT_OVERFLOW_EXPAND &&
+          ['text', 'multiVariableText'].includes(activeSchema.type)
+        ) {
+          changes.push({
+            key: 'dynamicFontSize',
+            value: undefined,
+            schemaId: activeSchema.id,
+          });
+        }
       }
     }
 

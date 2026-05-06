@@ -78,8 +78,9 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - `dynamicFontSize` と `overflow: "expand"` が同時指定された場合は `expand` を優先する。
   計測と生成後の schema では `dynamicFontSize` を無効化し、元 box に縮小フィットして
   expand が効かなくなる silent な挙動を避ける。
-- Designer では `overflow: "expand"` を選んだ時点で `dynamicFontSize` をクリアし、
-  `expand` 中は Dynamic Font Size の切り替えを無効化する。JSON 由来で両方が残っている場合も
+- Designer では `overflow: "expand"` へ変更した時点で `dynamicFontSize` をクリアし、
+  `expand` 中は Dynamic Font Size の切り替えを無効化する。このクリア処理は prop panel
+  schema 生成中の副作用ではなく、UI の変更イベント側で行う。JSON 由来で両方が残っている場合も
   runtime 側で `dynamicFontSize` を無視する。
 - この排他制御は仕様として扱い、将来の docs / website / schema API docs では
   `overflow: "expand"` と `dynamicFontSize` は同時利用できないこと、expand では通常の
@@ -88,6 +89,12 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - ページ末尾を超える場合、text / `multiVariableText` は行単位で `__textLineRange` を持つ
   split schema に分割し、次ページへ続ける。plain text と inline-markdown は同じ line layout を
   使い、PDF / UI preview で split chunk が同じ input 全体を重複描画しないようにする。
+- `multiVariableText` の split chunk は、変数入力の一部だけを安全に編集・復元する設計が必要なため、
+  初回は Form 上では resolved text の read-only 表示にする。変数単位の編集をページ分割後も維持する
+  かどうかは、MVT の variable-aware layout と合わせて別途検討する。
+- inline-markdown の split chunk は markdown 記法が行境界で分断される可能性があるため、Form 上では
+  初回は read-only 表示に寄せる。将来的に編集可能にする場合は rich text AST と selection/editing
+  model を合わせて設計する。
 - 段落単位の keep-together、widow/orphan 制御、Form 編集中の live pagination は別設計として扱う。
 
 残りの検討事項:

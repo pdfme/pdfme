@@ -435,6 +435,28 @@ describe('text dynamic layout', () => {
 
     expect(result.heights[0]).toBeGreaterThan(5);
   });
+
+  it('expands read-only multiVariableText as resolved text', async () => {
+    const schema = {
+      ...getTextSchema(),
+      name: 'message',
+      type: 'multiVariableText',
+      readOnly: true,
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      text: 'Hello {name}',
+      variables: ['name'],
+      required: true,
+    } as MultiVariableTextSchema;
+
+    const result = await getDynamicLayoutForMultiVariableText('Hello long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights[0]).toBeGreaterThan(5);
+  });
 });
 
 describe('layoutRichTextLines', () => {

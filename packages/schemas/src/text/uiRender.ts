@@ -21,6 +21,7 @@ import {
   PLACEHOLDER_FONT_COLOR,
   CODE_BACKGROUND_COLOR,
   SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
+  TEXT_FORMAT_INLINE_MARKDOWN,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -76,7 +77,14 @@ const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string
 export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const { value, schema, mode, onChange, stopEditing, tabIndex, placeholder, options, _cache } =
     arg;
-  const usePlaceholder = isEditable(mode, schema) && placeholder && !value;
+  const hasInlineMarkdownFormat = schema.textFormat === TEXT_FORMAT_INLINE_MARKDOWN;
+  const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+  const isReadOnlySplitInlineMarkdownFormChunk =
+    mode === 'form' && Boolean(schema.__textLineRange) && hasInlineMarkdownFormat;
+  const renderInlineMarkdownReadOnlyChunk =
+    enableInlineMarkdown || isReadOnlySplitInlineMarkdownFormChunk;
+  const editable = isEditable(mode, schema) && !isReadOnlySplitInlineMarkdownFormChunk;
+  const usePlaceholder = editable && placeholder && !value;
   const getText = (element: HTMLDivElement) => {
     let text = element.innerText;
     if (text.endsWith('\n')) {
@@ -91,7 +99,6 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
-  const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
   const enableDynamicFontSize = shouldUseDynamicFontSize(schema);
   const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
   const dynamicRichTextFontSize =
@@ -104,7 +111,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
         })
       : undefined;
   const textBlock = buildStyledTextContainer(
-    arg,
+    isReadOnlySplitInlineMarkdownFormChunk ? { ...arg, mode: 'viewer' } : arg,
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
     dynamicRichTextFontSize,
@@ -120,8 +127,8 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     fontKitFont,
   );
 
-  if (!isEditable(mode, schema)) {
-    if (enableInlineMarkdown) {
+  if (!editable) {
+    if (renderInlineMarkdownReadOnlyChunk) {
       await renderInlineMarkdownReadOnly({
         textBlock,
         value,

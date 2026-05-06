@@ -20,13 +20,16 @@ export const getDynamicLayoutForMultiVariableText = async (
     return { heights: [schema.height] };
   }
 
-  if (!validateVariables(value, schema)) {
-    return { heights: [schema.height] };
-  }
+  let renderValue = value;
+  if (!schema.readOnly) {
+    if (!validateVariables(value, schema)) {
+      return { heights: [schema.height] };
+    }
 
-  const renderValue = isInlineMarkdownTextSchema(schema)
-    ? substituteVariablesAsInlineMarkdownLiterals(schema.text || '', value)
-    : substituteVariables(schema.text || '', value);
+    renderValue = isInlineMarkdownTextSchema(schema)
+      ? substituteVariablesAsInlineMarkdownLiterals(schema.text || '', value)
+      : substituteVariables(schema.text || '', value);
+  }
   const { lineHeights } = await measureTextLines({
     value: renderValue,
     schema,

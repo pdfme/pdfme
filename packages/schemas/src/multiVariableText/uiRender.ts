@@ -19,15 +19,29 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 
   let text = schema.text;
   let numVariables = schema.variables.length;
+  const renderResolvedValue = schema.readOnly === true && mode !== 'designer';
 
-  if (mode === 'form' && numVariables > 0) {
+  const renderValue = renderResolvedValue
+    ? value
+    : isInlineMarkdownTextSchema(schema)
+      ? substituteVariablesAsInlineMarkdownLiterals(text, value)
+      : substituteVariables(text, value);
+
+  if (mode === 'form' && numVariables > 0 && !renderResolvedValue) {
+    if (schema.__textLineRange) {
+      await parentUiRender({
+        value: renderValue,
+        schema,
+        mode: 'viewer',
+        rootElement,
+        ...rest,
+      });
+      return;
+    }
+
     await formUiRender(arg);
     return;
   }
-
-  const renderValue = isInlineMarkdownTextSchema(schema)
-    ? substituteVariablesAsInlineMarkdownLiterals(text, value)
-    : substituteVariables(text, value);
 
   await parentUiRender({
     value: isEditable(mode, schema) ? text : renderValue,
