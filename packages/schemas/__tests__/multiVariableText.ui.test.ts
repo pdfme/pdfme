@@ -109,14 +109,14 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(link.href).toBe('https://pdfme.com/');
   });
 
-  it('does not underline form links when they are not clickable', async () => {
+  it('styles form links like viewer links without making them clickable', async () => {
     const textBlock = await renderLinkedMultiVariableText('form');
     const docsSpan = Array.from(textBlock.querySelectorAll('span')).find(
       (span) => span.textContent === 'docs',
     );
 
     expect(textBlock.querySelector('a')).toBeNull();
-    expect(docsSpan?.style.textDecoration).not.toContain('underline');
+    expect(docsSpan?.style.textDecoration).toContain('underline');
   });
 
   it('writes split form chunk edits back into the full variable value', async () => {
@@ -462,6 +462,7 @@ describe('multiVariableText inline markdown UI rendering', () => {
 
     expect(textBlock.querySelector('a')).toBeNull();
     expect(textBlock.textContent).toBe('docs for Alice');
+    expect(textBlock.querySelector('span')?.style.textDecoration).toContain('underline');
     expect(variableSpan.textContent).toBe('Alice');
     expect(variableSpan.style.fontWeight).toBe('800');
 

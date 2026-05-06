@@ -35,6 +35,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - リンク基盤、`@pdfme/jsx` MVP、text / MVT の `overflow: "expand"`、行単位 page split、
   custom `basePdf` 制御、dynamic layout docs は main に入った。
 - `multiVariableText` の split chunk は、plain / inline-markdown ともに Form 上で変数値だけ編集できる。
+- Form mode の inline link は clickable にしないまま、viewer と同じく underline で表示する。
 - `text` schema の inline-markdown split chunk は Form 上では read-only のまま残す。
 - 次の大きな判断は、dynamic layout の編集体験をどこまで広げるかと、`@pdfme/jsx` / `md2pdf`
   に進む前にどの schema 表現を追加するか。
@@ -137,7 +138,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - template の markdown 記法、static text、link は Form では編集対象にしない。
 - 変数値に `**` や `` ` `` などの markdown delimiter が含まれても、変数値として literal に扱う。
   計測時は escape 済みの値を使い、再描画時に変数値が markdown として再解釈されないようにする。
-- link は Form 上では clickable にしない。link の見た目を Form mode でも維持するかは follow-up とする。
+- link は Form 上では clickable にしないが、viewer と同じく underline で表示する。
 
 ## 次 PR 候補
 
@@ -252,8 +253,6 @@ Dynamic layout / editing:
 Rich content / link:
 
 - MVT の inline link 対応をどのタイミングで入れるか。
-- Form mode の inline link は clickable にしないまま、色や underline などの視覚表現だけを
-  viewer と揃えるべきか決める。
 - table cell / list item の rich inline content を schema 拡張で扱うか、複数 schema に分解するか。
 - link の見た目をデフォルトで青 + 下線にするか、明示的 styling に任せるか。
 - Designer で通常のテキスト編集を難しくせずにリンク編集 UI をどう出すか。

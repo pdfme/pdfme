@@ -539,6 +539,9 @@ const applyInlineMarkdownStyle = (arg: {
     element.style.fontStyle = 'italic';
   }
   const textDecorations: string[] = [];
+  if (run.href) {
+    textDecorations.push('underline');
+  }
   if (run.strikethrough) {
     textDecorations.push('line-through');
   }
