@@ -93,7 +93,7 @@ export const propPanel: PropPanel<TextSchema> = {
     const fallbackFontName = getFallbackFontName(font);
 
     const activeTextSchema = activeSchema as unknown as TextSchema;
-    const canExpandOverflow = canUseTextOverflowExpand(basePdf);
+    const canExpandOverflow = canUseTextOverflowExpand(activeTextSchema, basePdf);
     const isExpand = isTextOverflowExpand(activeTextSchema, basePdf);
     const enableDynamicFont =
       !isExpand && Boolean((activeSchema as { dynamicFontSize?: unknown })?.dynamicFontSize);

@@ -28,7 +28,7 @@ import FormRenderComponent from 'form-render';
 
 const { Text } = Typography;
 
-const TEXT_OVERFLOW_SCHEMA_TYPES = new Set(['text', 'multiVariableText', 'list', 'select']);
+const TEXT_OVERFLOW_EXPAND_SCHEMA_TYPES = new Set(['text', 'multiVariableText']);
 
 type DetailViewProps = Pick<
   SidebarProps,
@@ -109,7 +109,7 @@ const DetailView = (props: DetailViewProps) => {
   }, [activeSchema, form]);
 
   useEffect(() => {
-    if (isBlankPdf(basePdf) || !TEXT_OVERFLOW_SCHEMA_TYPES.has(activeSchema.type)) return;
+    if (isBlankPdf(basePdf) || !TEXT_OVERFLOW_EXPAND_SCHEMA_TYPES.has(activeSchema.type)) return;
     if ((activeSchema as Record<string, unknown>).overflow !== TEXT_OVERFLOW_EXPAND) return;
 
     changeSchemas([{ key: 'overflow', value: TEXT_OVERFLOW_VISIBLE, schemaId: activeSchema.id }]);

@@ -314,6 +314,18 @@ describe('text prop panel', () => {
     expect(getOverflowOptionValues(schema)).toEqual([TEXT_OVERFLOW_VISIBLE]);
   });
 
+  it('keeps overflow expand available for text-derived schemas that do not use text expand', () => {
+    const schema = getTextPropPanelSchema({
+      basePdf: 'data:application/pdf;base64,AA==' as BasePdf,
+      activeSchema: { type: 'select' },
+    });
+
+    expect(getOverflowOptionValues(schema)).toEqual([
+      TEXT_OVERFLOW_VISIBLE,
+      TEXT_OVERFLOW_EXPAND,
+    ]);
+  });
+
   it('keeps dynamic font size controls enabled when custom basePdf has stale overflow expand', () => {
     const schema = getTextPropPanelSchema({
       basePdf: 'data:application/pdf;base64,AA==' as BasePdf,
@@ -492,6 +504,7 @@ describe('text dynamic layout', () => {
     expect(
       shouldUseDynamicFontSize(
         {
+          type: 'text',
           dynamicFontSize: { min: 20, max: 30, fit: 'vertical' },
           overflow: 'expand',
         },
