@@ -16,7 +16,7 @@ The initial MVP emits text, headings, lists, tables, code blocks, blockquotes, h
 
 Current limitations:
 
-- Pagination is block-level. Long text/list blocks still rely on pdfme dynamic layout, while table/image keep-together behavior is intentionally basic.
+- Pagination is handled by pdfme dynamic layout after conversion. Long text/list/table content can split across pages, while image keep-together behavior is intentionally basic.
 - Table cells are plain text; inline Markdown styling inside cells is stripped.
 - Code block language tags are parsed but not rendered yet.
 - Blockquotes are rendered as indented text with a light background, not as full nested block layouts.

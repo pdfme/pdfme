@@ -48,8 +48,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
   data URI image。
 - remote Markdown image は初期実装では link text に fallback する。画像 fetch / asset metadata は
   次段階で検討する。
-- pagination は初期実装では block 単位でページを切る。長い text/list の行単位分割は既存 dynamic
-  layout に任せるが、table/image の keep-together や widow/orphan は後続課題。
+- pagination は converter 側で事前に template page を切らず、generator の dynamic layout に任せる。
+  image の keep-together や widow/orphan は後続課題。
 - `@pdfme/jsx` と同じ layout tree / builder を共有できるかは継続検討。直接 JSX runtime に依存するより、
   Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
 - 追加で確認したいこと: generator + built-in schemas で実際に PDF 生成する integration test、

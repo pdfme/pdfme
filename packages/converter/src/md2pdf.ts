@@ -73,7 +73,6 @@ type Builder = {
   fontColor: string;
   headingScale: Record<HeadingDepth, number>;
   nameCounters: Record<string, number>;
-  pages: Schema[][];
   schemas: Schema[];
   usedNames: Set<string>;
 };
@@ -138,7 +137,7 @@ export const md2pdf = async (
   return {
     template: {
       basePdf: builder.basePdf,
-      schemas: builder.pages,
+      schemas: [builder.schemas],
     },
     inputs: [{}],
   };
@@ -148,7 +147,6 @@ const createBuilder = (options: Md2PdfOptions): Builder => {
   const basePdf = options.basePdf ?? createBlankPdf(options);
   const [top, right, bottom, left] = basePdf.padding;
   const headingScale = { ...DEFAULT_HEADING_SCALE, ...options.style?.headingScale };
-  const schemas: Schema[] = [];
 
   return {
     basePdf,
@@ -165,8 +163,7 @@ const createBuilder = (options: Md2PdfOptions): Builder => {
     fontColor: options.style?.fontColor ?? DEFAULT_FONT_COLOR,
     headingScale,
     nameCounters: {},
-    pages: [schemas],
-    schemas,
+    schemas: [],
     usedNames: new Set(),
   };
 };
@@ -445,25 +442,8 @@ const addTextSchema = (
 };
 
 const addSchema = (builder: Builder, schema: Schema, gap = BLOCK_GAP): void => {
-  if (shouldStartNewPage(builder, schema.height)) {
-    startNewPage(builder);
-    schema.position = { ...schema.position, y: builder.cursorY };
-  }
   builder.schemas.push(schema);
   builder.cursorY += schema.height + gap;
-};
-
-const shouldStartNewPage = (builder: Builder, height: number): boolean => {
-  if (builder.schemas.length === 0) return false;
-  const pageBottom = builder.contentFrame.y + builder.contentFrame.height;
-  return builder.cursorY + height > pageBottom;
-};
-
-const startNewPage = (builder: Builder): void => {
-  const schemas: Schema[] = [];
-  builder.pages.push(schemas);
-  builder.schemas = schemas;
-  builder.cursorY = builder.contentFrame.y;
 };
 
 const collectListItems = (node: List, level = 0): string[] =>

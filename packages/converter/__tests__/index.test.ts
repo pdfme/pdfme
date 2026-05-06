@@ -363,12 +363,20 @@ const value = 1;
     });
   });
 
-  test('splits blocks across template pages when the cursor exceeds the page frame', async () => {
+  test('lets generator dynamic layout split long markdown without pre-splitting the template', async () => {
     const markdown = Array.from({ length: 70 }, (_, index) => `Paragraph ${index + 1}`).join('\n\n');
-    const { template } = await md2pdf(markdown);
+    const { template, inputs } = await md2pdf(markdown);
 
-    expect(template.schemas.length).toBeGreaterThan(1);
-    expect(template.schemas[1][0].position.y).toBe(20);
+    expect(template.schemas.length).toBe(1);
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text },
+    });
+    const pageSizes = await nodePdf2Size(pdf);
+
+    expect(pageSizes.length).toBeGreaterThan(1);
   });
 
   test('renders blockquotes as indented text instead of literal markdown quotes', async () => {
