@@ -900,14 +900,16 @@ describe('@pdfme/jsx renderToTemplate', () => {
 
   it('rejects Static outside the first Page direct children', async () => {
     await expect(
-      renderToTemplate([
-        <Static key="static">
-          <Text>Header</Text>
-        </Static>,
-        <Page key="page">
-          <Text>Body</Text>
-        </Page>,
-      ]),
+      renderToTemplate(
+        <>
+          <Static>
+            <Text>Header</Text>
+          </Static>
+          <Page>
+            <Text>Body</Text>
+          </Page>
+        </>,
+      ),
     ).rejects.toThrow('<Static> can only be used as a direct child of the first <Page>');
 
     await expect(
