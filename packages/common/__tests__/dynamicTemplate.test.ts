@@ -248,6 +248,71 @@ describe('getDynamicTemplate', () => {
       expect(dynamicTemplate.schemas.length).toBeGreaterThan(1);
     });
 
+    test('should pass placeholder-resolved read-only content to dynamic height callbacks', async () => {
+      const observedValues: string[] = [];
+
+      await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'a',
+                content: 'Hello {name}',
+                type: 'text',
+                readOnly: true,
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input: { name: 'PDFme' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          observedValues.push(value);
+          return [args.schema.height];
+        },
+      });
+
+      expect(observedValues).toEqual(['Hello PDFme']);
+    });
+
+    test('should not resolve placeholders for non-text read-only content', async () => {
+      const content = JSON.stringify([[{ name: '{name}' }]]);
+      const observedValues: string[] = [];
+
+      await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'a',
+                content,
+                type: 'table',
+                readOnly: true,
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input: { name: 'PDFme' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          observedValues.push(value);
+          return [args.schema.height];
+        },
+      });
+
+      expect(observedValues).toEqual([content]);
+    });
+
     test('should apply schema-specific split patches without letting them override layout', async () => {
       const dynamicTemplate = await getDynamicTemplate({
         template: {

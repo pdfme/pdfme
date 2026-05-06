@@ -66,6 +66,9 @@ export const Dict = z.object({
   'schemas.text.max': z.string(),
   'schemas.text.fit': z.string(),
   'schemas.text.dynamicFontSize': z.string(),
+  'schemas.text.overflow': z.string(),
+  'schemas.text.overflowVisible': z.string(),
+  'schemas.text.overflowExpand': z.string(),
   'schemas.text.format': z.string(),
   'schemas.text.plain': z.string(),
   'schemas.text.inlineMarkdown': z.string(),
@@ -135,6 +138,7 @@ export const Schema = z
     required: z.boolean().optional(),
     __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __itemRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
+    __textLineRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __isSplit: z.boolean().optional(),
   })
   .passthrough();

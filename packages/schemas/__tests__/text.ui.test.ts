@@ -154,4 +154,39 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.querySelector('a')).toBeNull();
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
+
+  it('renders split inline markdown form chunks as read-only', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      readOnly: false,
+      width: 20,
+      __textLineRange: { start: 0, end: 1 },
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: '**Hello** world',
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    textBlock.dispatchEvent(new Event('blur'));
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(textBlock.textContent).toContain('Hello');
+    expect(textBlock.textContent).not.toContain('world');
+  });
 });

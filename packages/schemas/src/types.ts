@@ -6,6 +6,7 @@ export type {
   FontWidthCalcValues,
   RichTextRun,
   TEXT_FORMAT,
+  TEXT_OVERFLOW,
   TextSchema,
   VERTICAL_ALIGNMENT,
 } from './text/types.js';

@@ -114,6 +114,7 @@ type TextSchemaProps = Partial<
     | 'readOnly'
     | 'required'
     | 'textFormat'
+    | 'overflow'
   >
 >;
 

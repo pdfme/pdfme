@@ -27,8 +27,13 @@ import {
   type ResolvedRichTextRun,
 } from '../src/text/richText.js';
 import { LINE_START_FORBIDDEN_CHARS, LINE_END_FORBIDDEN_CHARS } from '../src/text/constants.js';
+import { getDynamicLayoutForText } from '../src/text/dynamicTemplate.js';
+import { mergeTextLineRangeValue } from '../src/text/measure.js';
+import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
+import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
+import type { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
@@ -245,6 +250,212 @@ describe('isInlineMarkdownTextSchema', () => {
         readOnly: false,
       }),
     ).toBe(true);
+  });
+});
+
+describe('text dynamic layout', () => {
+  const baseArgs = {
+    basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+    options: { font: getSampleFont() },
+    _cache: new Map<string | number, unknown>(),
+  };
+
+  it('keeps the schema height when text overflow is undefined', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights).toEqual([5]);
+  });
+
+  it('keeps the schema height when text overflow is visible', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'visible',
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights).toEqual([5]);
+  });
+
+  it('expands text height when text overflow is expand', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights.reduce((sum, height) => sum + height, 0)).toBeGreaterThan(5);
+    expect(result.heights.length).toBeGreaterThan(1);
+  });
+
+  it('does not shrink text height when the measured height is smaller', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 40,
+      width: 60,
+      overflow: 'expand',
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('short', {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights).toEqual([40]);
+  });
+
+  it('lets overflow expand take priority over dynamic font size', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      dynamicFontSize: { min: 4, max: 20, fit: 'vertical' },
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights.reduce((sum, height) => sum + height, 0)).toBeGreaterThan(5);
+    expect(
+      result.patchSplitSchema?.({
+        schema,
+        start: 0,
+        end: 1,
+        isSplit: false,
+        chunkHeight: result.heights[0],
+      }),
+    ).toEqual({
+      dynamicFontSize: undefined,
+      __textLineRange: { start: 0, end: 1 },
+      __isSplit: false,
+    });
+  });
+
+  it('patches expanded text chunks with line ranges', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights.length).toBeGreaterThan(2);
+    expect(
+      result.patchSplitSchema?.({
+        schema,
+        start: 1,
+        end: 3,
+        isSplit: true,
+        chunkHeight: result.heights[1] + result.heights[2],
+      }),
+    ).toEqual({
+      dynamicFontSize: undefined,
+      __textLineRange: { start: 1, end: 3 },
+      __isSplit: true,
+    });
+  });
+
+  it('merges form edits from a split text line range into the full value', async () => {
+    const schema = {
+      ...getTextSchema(),
+      width: 20,
+      overflow: 'expand',
+      __textLineRange: { start: 1, end: 3 },
+    } as TextSchema;
+
+    const result = await mergeTextLineRangeValue({
+      value: 'long text '.repeat(8),
+      replacement: 'edited one\r\nedited two\redited three\nedited four',
+      schema,
+      font: getSampleFont(),
+      _cache: new Map<string | number, unknown>(),
+    });
+
+    expect(result).toContain('edited one\nedited two\nedited three\nedited four');
+    expect(result).not.toBe('edited one\nedited two\nedited three\nedited four');
+  });
+
+  it('does not use dynamic font size while text overflow is expand', () => {
+    expect(
+      shouldUseDynamicFontSize({
+        dynamicFontSize: { min: 20, max: 30, fit: 'vertical' },
+        overflow: 'expand',
+      }),
+    ).toBe(false);
+  });
+
+  it('expands multiVariableText after substituting variables', async () => {
+    const schema = {
+      ...getTextSchema(),
+      name: 'message',
+      type: 'multiVariableText',
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      text: 'Hello {name}',
+      variables: ['name'],
+      required: true,
+    } as MultiVariableTextSchema;
+
+    const result = await getDynamicLayoutForMultiVariableText(
+      JSON.stringify({ name: 'long text '.repeat(20) }),
+      {
+        ...baseArgs,
+        schema,
+      },
+    );
+
+    expect(result.heights[0]).toBeGreaterThan(5);
+  });
+
+  it('expands read-only multiVariableText as resolved text', async () => {
+    const schema = {
+      ...getTextSchema(),
+      name: 'message',
+      type: 'multiVariableText',
+      readOnly: true,
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      text: 'Hello {name}',
+      variables: ['name'],
+      required: true,
+    } as MultiVariableTextSchema;
+
+    const result = await getDynamicLayoutForMultiVariableText('Hello long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights[0]).toBeGreaterThan(5);
   });
 });
 

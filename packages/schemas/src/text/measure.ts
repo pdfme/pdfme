@@ -15,21 +15,53 @@ import {
   resolveRichTextRuns,
   type RichTextLine,
 } from './richText.js';
-import type { TextSchema } from './types.js';
+import type { TextLineRange, TextSchema } from './types.js';
 
 type MeasureTextHeightArgs = {
   value: string;
   schema: TextSchema;
   font?: Font;
   _cache?: Map<string | number, unknown>;
+  ignoreDynamicFontSize?: boolean;
 };
 
-export const measureTextHeight = async ({
+type MeasureTextLinesResult = {
+  lines: string[];
+  lineHeights: number[];
+};
+
+export const applyTextLineRange = <T>(lines: T[], range?: TextLineRange) => {
+  if (!range) return lines;
+  return lines.slice(range.start, range.end ?? lines.length);
+};
+
+export const plainTextLinesToValue = (lines: string[]) =>
+  lines.map((line) => line.replace(/[\r\n]+$/g, '')).join('\n');
+
+const splitReplacementTextToLines = (value: string) => {
+  const lines: string[] = [];
+  let start = 0;
+
+  for (let i = 0; i < value.length; i += 1) {
+    const charCode = value.charCodeAt(i);
+    if (charCode !== 10 && charCode !== 13) continue;
+
+    lines.push(value.slice(start, i));
+    if (charCode === 13 && value.charCodeAt(i + 1) === 10) i += 1;
+    start = i + 1;
+  }
+
+  lines.push(value.slice(start));
+  return lines;
+};
+
+export const measureTextLines = async ({
   value,
   schema,
   font = getDefaultFont(),
   _cache = new Map<string | number, unknown>(),
-}: MeasureTextHeightArgs): Promise<number> => {
+  ignoreDynamicFontSize = false,
+}: MeasureTextHeightArgs): Promise<MeasureTextLinesResult> => {
   const fontSize = schema.fontSize ?? DEFAULT_FONT_SIZE;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
@@ -39,7 +71,7 @@ export const measureTextHeight = async ({
     const richTextRuns = parseInlineMarkdown(value);
     const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
     const resolvedFontSize =
-      schema.dynamicFontSize && schema.height > 0
+      schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
         ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
         : fontSize;
     const lines = layoutRichTextLines({
@@ -49,7 +81,10 @@ export const measureTextHeight = async ({
       boxWidthInPt,
     });
 
-    return measureRichTextLinesHeight(lines, resolvedFontSize, lineHeight);
+    return {
+      lines: lines.map((line) => line.runs.map((run) => run.text).join('')),
+      lineHeights: measureRichTextLineHeights(lines, resolvedFontSize, lineHeight),
+    };
   }
 
   const fontKitFont = await getFontKitFont(
@@ -58,7 +93,7 @@ export const measureTextHeight = async ({
     _cache as Map<string, FontKitFont>,
   );
   const resolvedFontSize =
-    schema.dynamicFontSize && schema.height > 0
+    schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : fontSize;
   const lines = splitTextToSize({
@@ -69,31 +104,69 @@ export const measureTextHeight = async ({
     boxWidthInPt,
   });
 
-  return measurePlainTextLinesHeight(lines, fontKitFont, resolvedFontSize, lineHeight);
+  return {
+    lines,
+    lineHeights: measurePlainTextLineHeights(lines, fontKitFont, resolvedFontSize, lineHeight),
+  };
 };
 
-const measurePlainTextLinesHeight = (
+export const mergeTextLineRangeValue = async ({
+  value,
+  replacement,
+  schema,
+  font = getDefaultFont(),
+  _cache = new Map<string | number, unknown>(),
+}: {
+  value: string;
+  replacement: string;
+  schema: TextSchema;
+  font?: Font;
+  _cache?: Map<string | number, unknown>;
+}) => {
+  if (!schema.__textLineRange) return replacement;
+
+  const { lines } = await measureTextLines({
+    value,
+    schema,
+    font,
+    _cache,
+    ignoreDynamicFontSize: true,
+  });
+  const { start, end = lines.length } = schema.__textLineRange;
+  const nextLines = [...lines];
+  nextLines.splice(start, end - start, ...splitReplacementTextToLines(replacement));
+  return plainTextLinesToValue(nextLines);
+};
+
+export const measureTextHeight = async (args: MeasureTextHeightArgs): Promise<number> => {
+  const { lineHeights } = await measureTextLines(args);
+  return sumLineHeights(lineHeights);
+};
+
+export const sumLineHeights = (lineHeights: number[]) =>
+  lineHeights.reduce((sum, height) => sum + height, 0);
+
+const measurePlainTextLineHeights = (
   lines: string[],
   fontKitFont: FontKitFont,
   fontSize: number,
   lineHeight: number,
 ) => {
-  if (lines.length === 0) return 0;
+  if (lines.length === 0) return [];
   const firstLineHeight = heightOfFontAtSize(fontKitFont, fontSize) * lineHeight;
-  const otherLinesHeight = fontSize * lineHeight * Math.max(0, lines.length - 1);
-  return pt2mm(firstLineHeight + otherLinesHeight);
+  const otherLineHeight = fontSize * lineHeight;
+  return lines.map((_, index) => pt2mm(index === 0 ? firstLineHeight : otherLineHeight));
 };
 
-const measureRichTextLinesHeight = (
+const measureRichTextLineHeights = (
   lines: RichTextLine[],
   fontSize: number,
   lineHeight: number,
 ) => {
-  if (lines.length === 0) return 0;
-  return lines.reduce((height, line, index) => {
-    if (index === 0) return height + pt2mm(getRichTextLineHeight(line, fontSize) * lineHeight);
-    return height + pt2mm(fontSize * lineHeight);
-  }, 0);
+  if (lines.length === 0) return [];
+  return lines.map((line, index) =>
+    pt2mm((index === 0 ? getRichTextLineHeight(line, fontSize) : fontSize) * lineHeight),
+  );
 };
 
 const getRichTextLineHeight = (line: RichTextLine, fontSize: number) => {

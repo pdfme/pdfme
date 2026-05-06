@@ -12,8 +12,7 @@ import {
   registerInternalLinkAnchor,
   resetInternalLinkAnnotations,
 } from '@pdfme/common';
-import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
-import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
+import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
 import {
   insertPage,
   preprocessing,
@@ -31,8 +30,7 @@ const hasDynamicLayoutSchema = (schemas: Schema[][]) => {
   for (let i = 0; i < schemas.length; i += 1) {
     const schemaPage = schemas[i];
     for (let j = 0; j < schemaPage.length; j += 1) {
-      const schemaType = schemaPage[j].type;
-      if (schemaType === 'table' || schemaType === 'list') {
+      if (isDynamicLayoutSchema(schemaPage[j])) {
         return true;
       }
     }
@@ -141,16 +139,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           input,
           options,
           _cache,
-          getDynamicHeights: (value, args) => {
-            switch (args.schema.type) {
-              case 'table':
-                return getDynamicLayoutForTable(value, args);
-              case 'list':
-                return getDynamicLayoutForList(value, args);
-              default:
-                return Promise.resolve([args.schema.height]);
-            }
-          },
+          getDynamicHeights: getDynamicLayoutForSchema,
         })
       : template;
     const { basePages, embedPdfBoxes } =

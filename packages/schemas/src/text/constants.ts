@@ -3,6 +3,7 @@ import {
   VERTICAL_ALIGNMENT,
   DYNAMIC_FONT_SIZE_FIT,
   TEXT_FORMAT,
+  TEXT_OVERFLOW,
   FONT_VARIANT_FALLBACK,
 } from './types.js';
 
@@ -24,6 +25,9 @@ export const PLACEHOLDER_FONT_COLOR = '#A0A0A0';
 export const TEXT_FORMAT_PLAIN = 'plain' as const satisfies TEXT_FORMAT;
 export const TEXT_FORMAT_INLINE_MARKDOWN = 'inline-markdown' as const satisfies TEXT_FORMAT;
 export const DEFAULT_TEXT_FORMAT = TEXT_FORMAT_PLAIN;
+export const TEXT_OVERFLOW_VISIBLE = 'visible' as const satisfies TEXT_OVERFLOW;
+export const TEXT_OVERFLOW_EXPAND = 'expand' as const satisfies TEXT_OVERFLOW;
+export const DEFAULT_TEXT_OVERFLOW = TEXT_OVERFLOW_VISIBLE;
 export const FONT_VARIANT_FALLBACK_SYNTHETIC = 'synthetic' as const satisfies FONT_VARIANT_FALLBACK;
 export const FONT_VARIANT_FALLBACK_PLAIN = 'plain' as const satisfies FONT_VARIANT_FALLBACK;
 export const FONT_VARIANT_FALLBACK_ERROR = 'error' as const satisfies FONT_VARIANT_FALLBACK;

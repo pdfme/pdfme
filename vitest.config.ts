@@ -89,12 +89,20 @@ const pdfmeAliases = usePublishedPdfmeExports
         replacement: path.resolve(repoRoot, 'packages/schemas/src/builtins.ts'),
       },
       {
+        find: '@pdfme/schemas/dynamicLayout',
+        replacement: path.resolve(repoRoot, 'packages/schemas/src/dynamicLayout.ts'),
+      },
+      {
         find: '@pdfme/schemas/tables',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/tables.ts'),
       },
       {
         find: '@pdfme/schemas/lists',
         replacement: path.resolve(repoRoot, 'packages/schemas/src/lists.ts'),
+      },
+      {
+        find: '@pdfme/schemas/texts',
+        replacement: path.resolve(repoRoot, 'packages/schemas/src/texts.ts'),
       },
       {
         find: '@pdfme/schemas/utils',

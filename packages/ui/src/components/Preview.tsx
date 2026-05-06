@@ -8,8 +8,8 @@ import {
   isBlankPdf,
   replacePlaceholders,
 } from '@pdfme/common';
-import { getDynamicLayoutForTable } from '@pdfme/schemas/tables';
-import { getDynamicLayoutForList } from '@pdfme/schemas/lists';
+import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
+import { mergeTextLineRangeValue } from '@pdfme/schemas/texts';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
 import StaticSchema from './StaticSchema.js';
@@ -113,16 +113,7 @@ const Preview = ({
       input: currentInput,
       options,
       _cache,
-      getDynamicHeights: (value, args) => {
-        switch (args.schema.type) {
-          case 'table':
-            return getDynamicLayoutForTable(value, args);
-          case 'list':
-            return getDynamicLayoutForList(value, args);
-          default:
-            return Promise.resolve([args.schema.height]);
-        }
-      },
+      getDynamicHeights: getDynamicLayoutForSchema,
     })
       .then(async (dynamicTemplate) => {
         const sl = await template2SchemasList(dynamicTemplate);
@@ -165,25 +156,40 @@ const Preview = ({
   const handleChangeInput = ({ name, value }: { name: string; value: string }) =>
     onChangeInput && onChangeInput({ index: unitCursor, name, value });
 
-  const handleOnChangeRenderer = (args: { key: string; value: unknown }[], schema: SchemaForUI) => {
+  const handleOnChangeRenderer = async (
+    args: { key: string; value: unknown }[],
+    schema: SchemaForUI,
+  ) => {
     let isNeedInit = false;
     let newInputValue: string | undefined;
 
-    args.forEach(({ key: _key, value }) => {
+    for (const { key: _key, value } of args) {
       if (_key === 'content') {
-        const newValue = value as string;
         const oldValue = (input?.[schema.name] as string) || '';
-        if (newValue === oldValue) return;
+        const rawNewValue = value as string;
+        const newValue =
+          schema.type === 'text' && schema.__textLineRange
+            ? await mergeTextLineRangeValue({
+                value: oldValue,
+                replacement: rawNewValue,
+                schema: schema as unknown as Parameters<
+                  typeof mergeTextLineRangeValue
+                >[0]['schema'],
+                font,
+                _cache,
+              })
+            : rawNewValue;
+        if (newValue === oldValue) continue;
         handleChangeInput({ name: schema.name, value: newValue });
         // TODO Improve this to allow schema types to determine whether the execution of getDynamicTemplate is required.
-        if (schema.type === 'table' || schema.type === 'list') {
+        if (isDynamicLayoutSchema(schema)) {
           isNeedInit = true;
           newInputValue = newValue;
         }
       } else {
         const pageSchemas = schemasList[pageCursor] || [];
         const targetSchema = pageSchemas.find((s) => s.id === schema.id) as SchemaForUI;
-        if (!targetSchema) return;
+        if (!targetSchema) continue;
 
         if (_key === 'height' && isBlankPdf(template.basePdf)) {
           getDynamicHeightReflowChanges({
@@ -198,7 +204,7 @@ const Preview = ({
 
         applySchemaChange(targetSchema, _key, value);
       }
-    });
+    }
     if (isNeedInit && newInputValue !== undefined) {
       // Pass the updated input directly to recalculate with new value
       const updatedInput = { ...input, [schema.name]: newInputValue };
@@ -264,7 +270,7 @@ const Preview = ({
                 tabIndex={index + 100}
                 onChange={(arg) => {
                   const args = Array.isArray(arg) ? arg : [arg];
-                  handleOnChangeRenderer(args, schema);
+                  void handleOnChangeRenderer(args, schema);
                 }}
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'

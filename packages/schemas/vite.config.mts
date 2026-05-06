@@ -35,9 +35,11 @@ export default defineConfig({
     lib: {
       entry: {
         builtins: resolve(__dirname, 'src/builtins.ts'),
+        dynamicLayout: resolve(__dirname, 'src/dynamicLayout.ts'),
         index: resolve(__dirname, 'src/index.ts'),
         lists: resolve(__dirname, 'src/lists.ts'),
         tables: resolve(__dirname, 'src/tables.ts'),
+        texts: resolve(__dirname, 'src/texts.ts'),
         types: resolve(__dirname, 'src/types.ts'),
         utils: resolve(__dirname, 'src/utils.ts'),
       },

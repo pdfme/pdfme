@@ -15,6 +15,7 @@ import {
 import { getFontDescentInPt, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
 import { addUriLinkAnnotation, type LinkAnnotationRect } from './linkAnnotation.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
+import { applyTextLineRange } from './measure.js';
 import {
   countRichTextLineGraphemes,
   layoutRichTextLines,
@@ -300,12 +301,14 @@ export const renderInlineMarkdownText = async (arg: {
   } = arg;
   const richTextRuns = parseInlineMarkdown(value);
   const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
-  const lines = layoutRichTextLines({
+  const allLines = layoutRichTextLines({
     runs: resolvedRuns,
     fontSize,
     characterSpacing,
     boxWidthInPt: width,
   });
+  const lines = applyTextLineRange(allLines, schema.__textLineRange);
+  const lineRangeStart = schema.__textLineRange?.start ?? 0;
   const pdfFontObj = await embedFontsForRuns(
     lines.flatMap((line) => line.runs),
     embedPdfFont,
@@ -334,7 +337,8 @@ export const renderInlineMarkdownText = async (arg: {
 
     let textWidth = line.width;
     let spacing = characterSpacing;
-    const shouldJustify = alignment === 'justify' && !line.hardBreak && rowIndex < lines.length - 1;
+    const shouldJustify =
+      alignment === 'justify' && !line.hardBreak && lineRangeStart + rowIndex < allLines.length - 1;
 
     if (shouldJustify) {
       const graphemeCount = countRichTextLineGraphemes(line);

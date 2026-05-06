@@ -5,6 +5,7 @@ export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
 export type VERTICAL_ALIGNMENT = 'top' | 'middle' | 'bottom';
 export type DYNAMIC_FONT_SIZE_FIT = 'horizontal' | 'vertical';
 export type TEXT_FORMAT = 'plain' | 'inline-markdown';
+export type TEXT_OVERFLOW = 'visible' | 'expand';
 export type FONT_VARIANT_FALLBACK = 'synthetic' | 'plain' | 'error';
 
 export type FontVariants = {
@@ -29,6 +30,12 @@ export type FontWidthCalcValues = {
   characterSpacing: number;
   boxWidthInPt: number;
 };
+
+export type TextLineRange = {
+  start: number;
+  end?: number;
+};
+
 export type TextSchema = Schema & {
   fontName?: string;
   textFormat?: TEXT_FORMAT;
@@ -46,6 +53,8 @@ export type TextSchema = Schema & {
     max: number;
     fit: DYNAMIC_FONT_SIZE_FIT;
   };
+  overflow?: TEXT_OVERFLOW;
+  __textLineRange?: TextLineRange;
   fontColor: string;
   backgroundColor: string;
 };
