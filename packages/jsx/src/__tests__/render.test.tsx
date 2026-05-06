@@ -1,10 +1,12 @@
 /** @jsxImportSource @pdfme/jsx */
 import { describe, expect, it } from 'vitest';
-import { PAGE_SIZE_PRESETS } from '@pdfme/common';
+import { isBlankPdf, PAGE_SIZE_PRESETS } from '@pdfme/common';
 
 import {
   Box,
   Ellipse,
+  Footer,
+  Header,
   Image,
   Line,
   List,
@@ -15,6 +17,7 @@ import {
   Row,
   Spacer,
   Stack,
+  Static,
   Svg,
   Table,
   Text,
@@ -25,6 +28,10 @@ const SAMPLE_PNG =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
 
 const SAMPLE_SVG = '<svg viewBox="0 0 10 10"><path d="M0 0h10v10H0z"/></svg>';
+const RuntimeStatic = Static as unknown as (props: {
+  placement: string;
+  children?: unknown;
+}) => ReturnType<typeof Static>;
 
 describe('@pdfme/jsx renderToTemplate', () => {
   it('renders a Page with a fixed Text schema', async () => {
@@ -833,6 +840,296 @@ describe('@pdfme/jsx renderToTemplate', () => {
 
     expect(result.template.schemas).toHaveLength(2);
     expect(result.inputs).toEqual([{ first: 'First', second: 'Second' }]);
+  });
+
+  it('renders Static children into blank basePdf staticSchema using page coordinates', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static>
+          <Text height={6}>Header</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema).toHaveLength(1);
+    expect(result.template.basePdf.staticSchema?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Header',
+      readOnly: true,
+      position: { x: 0, y: 0 },
+      width: 100,
+      height: 6,
+    });
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Body',
+      position: { x: 10, y: 10 },
+      width: 80,
+    });
+    expect(result.inputs).toEqual([{}]);
+  });
+
+  it('can place Static footer content with full-page Stack justification', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static>
+          <Stack height={100} justifyContent="space-between">
+            <Text height={6}>Header</Text>
+            <Text height={6}>Footer</Text>
+          </Stack>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [header, footer] = result.template.basePdf.staticSchema ?? [];
+    expect(header).toMatchObject({ content: 'Header', position: { x: 0, y: 0 } });
+    expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 94 } });
+  });
+
+  it('places bottom Static blocks at the page bottom', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static placement="bottom">
+          <Text height={6}>Footer</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.[0]).toMatchObject({
+      type: 'text',
+      content: 'Footer',
+      position: { x: 0, y: 94 },
+      width: 100,
+      height: 6,
+    });
+  });
+
+  it('renders Header and Footer aliases as top and bottom static content', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Header>
+          <Text height={5}>Header</Text>
+        </Header>
+        <Footer>
+          <Text height={4}>Footer</Text>
+        </Footer>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [header, footer] = result.template.basePdf.staticSchema ?? [];
+    expect(header).toMatchObject({ content: 'Header', position: { x: 0, y: 0 } });
+    expect(footer).toMatchObject({ content: 'Footer', position: { x: 0, y: 96 } });
+  });
+
+  it('supports layout containers inside Static blocks', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Header>
+          <Row gap={4}>
+            <Text width={40} height={6}>
+              Left
+            </Text>
+            <Text width={20} height={6}>
+              Right
+            </Text>
+          </Row>
+        </Header>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    const [left, right] = result.template.basePdf.staticSchema ?? [];
+    expect(left).toMatchObject({ content: 'Left', position: { x: 0, y: 0 }, width: 40 });
+    expect(right).toMatchObject({ content: 'Right', position: { x: 44, y: 0 }, width: 20 });
+  });
+
+  it('concatenates multiple Static blocks in declaration order', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static>
+          <Text height={6}>First static</Text>
+        </Static>
+        <Static>
+          <Text height={4}>Second static</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.map((schema) => schema.content)).toEqual([
+      'First static',
+      'Second static',
+    ]);
+    expect(result.template.basePdf.staticSchema?.[0]?.position.y).toBe(0);
+    expect(result.template.basePdf.staticSchema?.[1]?.position.y).toBe(6);
+  });
+
+  it('concatenates bottom Static blocks before anchoring them to the page bottom', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static placement="bottom">
+          <Text height={6}>First footer</Text>
+        </Static>
+        <Static placement="bottom">
+          <Text height={4}>Second footer</Text>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.map((schema) => schema.content)).toEqual([
+      'First footer',
+      'Second footer',
+    ]);
+    expect(result.template.basePdf.staticSchema?.[0]?.position.y).toBe(90);
+    expect(result.template.basePdf.staticSchema?.[1]?.position.y).toBe(96);
+  });
+
+  it('allows named read-only Static children and keeps names unique', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Static>
+          <Text name="staticTitle" readOnly height={6}>
+            Header
+          </Text>
+        </Static>
+        <Text name="body">Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.[0]?.name).toBe('staticTitle');
+    expect(result.inputs).toEqual([{ body: 'Body' }]);
+  });
+
+  it('rejects duplicate names between Static and body schemas', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text name="title" readOnly>
+              Header
+            </Text>
+          </Static>
+          <Text name="title">Body</Text>
+        </Page>,
+      ),
+    ).rejects.toThrow('duplicate schema name "title"');
+  });
+
+  it('rejects input-backed Static children', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text name="editable">Header</Text>
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> children must be read-only');
+  });
+
+  it('rejects invalid Static placement values at runtime', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <RuntimeStatic placement="middle">
+            <Text>Header</Text>
+          </RuntimeStatic>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> placement must be "top" or "bottom"');
+  });
+
+  it('rejects Static outside the first Page direct children', async () => {
+    await expect(
+      renderToTemplate(
+        <>
+          <Static>
+            <Text>Header</Text>
+          </Static>
+          <Page>
+            <Text>Body</Text>
+          </Page>
+        </>,
+      ),
+    ).rejects.toThrow('<Static> can only be used as a direct child of the first <Page>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Text>First</Text>
+          <PageBreak />
+          <Static>
+            <Text>Header</Text>
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> must appear before any <PageBreak>');
+
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Stack>
+            <Static>
+              <Text>Header</Text>
+            </Static>
+          </Stack>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> can only be used as a direct child of the first <Page>');
+  });
+
+  it('rejects unsupported Static child schema types', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <MultiVariableText text="Hello {name}" values={{ name: 'Alice' }} />
+          </Static>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Static> does not support <multiVariableText>');
+  });
+
+  it('rejects Static with a custom basePdf', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Static>
+            <Text>Header</Text>
+          </Static>
+        </Page>,
+        { basePdf: 'data:application/pdf;base64,JVBERi0xLjQK' },
+      ),
+    ).rejects.toThrow('<Static> is supported only with a blank basePdf');
   });
 
   it('supports Stack inside Row flex allocation', async () => {

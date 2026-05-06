@@ -40,6 +40,28 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   content.
 - `Rectangle`, `Ellipse`, and `Line` are static visual schemas for backgrounds, dividers, and simple
   shapes.
+- `Static`, `Header`, and `Footer` can be used as direct children of the first `Page` to render
+  read-only header/footer style content into blank `basePdf.staticSchema`. Their children use page
+  coordinates, not page margin coordinates, and custom `basePdf` is not supported.
+- `Header` is a shorthand for `<Static placement="top">`; `Footer` is a shorthand for
+  `<Static placement="bottom">`.
+
+```tsx
+<Header>
+  <Text height={8}>Header</Text>
+</Header>
+<Footer>
+  <Text height={8}>Footer</Text>
+</Footer>
+```
+
+- Multiple `Static` blocks with the same placement are concatenated in declaration order. Top blocks
+  start at the top of the page; bottom blocks are stacked together in declaration order and anchored
+  to the page bottom, so the last bottom block sits at the page edge. If top and bottom static
+  content together exceed the page height, they may overlap.
+- Static content currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
+  `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
+  schemas, and `PageBreak` are rejected.
 - Layout children can use `margin`. `Stack` and `Row` support `alignItems` for simple cross-axis
   alignment without trying to implement full CSS/Flexbox.
 - `Stack` and `Row` support `justifyContent="start" | "center" | "end" | "space-between"` for
