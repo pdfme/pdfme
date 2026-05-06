@@ -1,6 +1,6 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-06
+最終更新: 2026-05-07
 
 ## 目的
 
@@ -21,23 +21,6 @@ pdfme `Template` と `inputs` を生成できるようにする。
   `Text`, `List`, `Table` などの意味構造から template に変換する方が失敗しにくい。
 - GFM 準拠だけにこだわりすぎない。PDF 生成として自然で便利な表現は pdfme の拡張として扱い、
   GFM との差分は docs に明記する。
-
-## 現在地
-
-- main にはリンク基盤、`@pdfme/jsx` MVP、text / MVT dynamic layout、split metadata 共通化、
-  custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
-  component、visual components、editable `Text` の inline-markdown guard、MVT split chunk の
-  連続編集検証、JSX layout の `margin` / `alignItems` / `justifyContent` / `flexGrow`、
-  `Static` / `Header` / `Footer` による `staticSchema` support、`Absolute` による manual placement
-  補助まで入っている。
-- `md2pdf` MVP は `converter` package に実装を開始した。初期 API は `Template + inputs` を返し、
-  parser は `unified` + `remark-parse` + `remark-gfm` を使う。bundle size を考慮し、
-  `@pdfme/converter/md2pdf` の subpath export として opt-in にする。
-- PR #1483 では、md から pdfme `Template + inputs` を作り、generator で PDF 生成まで通ることを
-  証明する。見た目の作り込みは次 PR に分ける。
-- `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
-- 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
-  独自拡張の境界。
 
 ## 次に進めること
 
