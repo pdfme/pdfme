@@ -26,7 +26,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 - main にはリンク基盤、`@pdfme/jsx` MVP、text / MVT dynamic layout、split metadata 共通化、
   custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
-  component、visual components、editable `Text` の inline-markdown guard まで入っている。
+  component、visual components、editable `Text` の inline-markdown guard、MVT split chunk の
+  連続編集検証まで入っている。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
@@ -36,7 +37,9 @@ pdfme `Template` と `inputs` を生成できるようにする。
 ### 1. `@pdfme/jsx` layout 品質
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
-- 優先候補は `justifyContent`, `alignItems`, `flex` / `flexGrow`, `margin`。
+- まず `margin` と `alignItems` を小さく入れ、Markdown block の余白と cross-axis の揃えを
+  表現しやすくする。
+- 次の候補は `justifyContent`, `flex` / `flexGrow`。複雑な flexbox 互換に寄せすぎない。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
 - `%` width は将来検討でよい。まずは `flex` / `flexGrow` で比率指定を表現できるか見る。
 - `Absolute` は stacking layout から外れた補助配置として必要になりうるが、乱用されると JSX の
@@ -118,6 +121,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - PR #1475: `@pdfme/jsx` `MultiVariableText` component。
 - PR #1476: `@pdfme/jsx` `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line` visual components。
 - PR #1477: `@pdfme/jsx` editable `Text` で `textFormat: "inline-markdown"` を禁止。
+- PR #1478: MVT split chunk の連続編集を plain / inline-markdown ともに回帰テストで固定。
 
 ## 参考
 

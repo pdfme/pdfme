@@ -25,6 +25,7 @@ import type {
   EllipseProps,
   ImageProps,
   LineProps,
+  LayoutAlignItems,
   ListProps,
   MultiVariableTextProps,
   MultiVariableTextValues,
@@ -43,6 +44,8 @@ import type {
 } from './types.js';
 
 type Rect = { x: number; y: number; width: number; height: number };
+type Box = ReturnType<typeof resolveBoxSides>;
+type LayoutMode = 'stack' | 'row';
 
 type RenderCtx = {
   schemas: Schema[];
@@ -111,7 +114,7 @@ export const renderToTemplate = async (
       font,
       _cache,
     };
-    await layoutChildren(page.children, frame, 'stack', { gap: 0 }, ctx);
+    await layoutChildren(page.children, frame, 'stack', { gap: 0, alignItems: 'stretch' }, ctx);
     pageSchemas.push(ctx.schemas);
   }
 
@@ -191,36 +194,71 @@ const expandPageBreaks = (node: PdfJsxChild): PdfJsxChild[] =>
 const layoutChildren = async (
   children: PdfJsxChild | PdfJsxChild[],
   frame: Rect,
-  mode: 'stack' | 'row',
-  opts: { gap: number },
+  mode: LayoutMode,
+  opts: { gap: number; alignItems: LayoutAlignItems; crossSize?: number },
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
   const items = flattenChildren(children);
   const widths = mode === 'row' ? resolveRowWidths(items, frame.width, opts.gap) : undefined;
   let cursor = 0;
   let crossMax = 0;
+  const rowItems: { schemaStart: number; schemaEnd: number; outerHeight: number }[] = [];
 
   for (let i = 0; i < items.length; i += 1) {
     const child = items[i];
-    const width = mode === 'row' ? (widths?.[i] ?? 0) : frame.width;
+    const margin = getChildMargin(child);
+    const width =
+      mode === 'row' ? (widths?.[i] ?? 0) : resolveStackChildWidth(child, frame.width, margin);
     const childFrame =
       mode === 'stack'
         ? { x: frame.x, y: frame.y + cursor, width, height: Math.max(0, frame.height - cursor) }
         : { x: frame.x + cursor, y: frame.y, width, height: frame.height };
+    childFrame.x += margin.left;
+    childFrame.y += margin.top;
+    childFrame.height = Math.max(0, childFrame.height - margin.top - margin.bottom);
 
+    const schemaStart = ctx.schemas.length;
     const size =
       typeof child === 'string' || typeof child === 'number'
         ? await renderText({ children: String(child) }, childFrame, ctx)
         : await renderElement(child, childFrame, mode, ctx);
+    const schemaEnd = ctx.schemas.length;
 
-    const advance = mode === 'stack' ? size.height : width;
+    if (mode === 'stack') {
+      const outerWidth = margin.left + size.width + margin.right;
+      const dx = resolveAlignOffset(frame.width, outerWidth, opts.alignItems);
+      if (dx !== 0) shiftSchemas(ctx.schemas, schemaStart, schemaEnd, dx, 0);
+    } else {
+      rowItems.push({
+        schemaStart,
+        schemaEnd,
+        outerHeight: margin.top + size.height + margin.bottom,
+      });
+    }
+
+    const advance =
+      mode === 'stack'
+        ? margin.top + size.height + margin.bottom
+        : margin.left + width + margin.right;
     cursor += advance + (i < items.length - 1 ? opts.gap : 0);
-    crossMax = Math.max(crossMax, mode === 'stack' ? size.width : size.height);
+    crossMax = Math.max(
+      crossMax,
+      mode === 'stack'
+        ? margin.left + size.width + margin.right
+        : margin.top + size.height + margin.bottom,
+    );
   }
 
-  return mode === 'stack'
-    ? { width: crossMax, height: cursor }
-    : { width: cursor, height: crossMax };
+  if (mode === 'row') {
+    const rowHeight = opts.crossSize ?? crossMax;
+    for (const item of rowItems) {
+      const dy = resolveAlignOffset(rowHeight, item.outerHeight, opts.alignItems);
+      if (dy !== 0) shiftSchemas(ctx.schemas, item.schemaStart, item.schemaEnd, 0, dy);
+    }
+    return { width: cursor, height: rowHeight };
+  }
+
+  return { width: crossMax, height: cursor };
 };
 
 const resolveRowWidths = (
@@ -231,16 +269,19 @@ const resolveRowWidths = (
   let fixedWidth = 0;
   let flexCount = 0;
   const widths = items.map((item) => {
+    const margin = getChildMargin(item);
     if (typeof item === 'string' || typeof item === 'number') {
       flexCount += 1;
+      fixedWidth += margin.left + margin.right;
       return undefined;
     }
     const width = (item.props as { width?: number }).width;
     if (typeof width === 'number') {
-      fixedWidth += width;
+      fixedWidth += width + margin.left + margin.right;
       return width;
     }
     flexCount += 1;
+    fixedWidth += margin.left + margin.right;
     return undefined;
   });
 
@@ -249,10 +290,49 @@ const resolveRowWidths = (
   return widths.map((width) => width ?? flexWidth);
 };
 
+const getChildMargin = (child: PdfJsxElement | string | number): Box => {
+  if (typeof child === 'string' || typeof child === 'number') return resolveBoxSides();
+  return resolveBoxSides((child.props as { margin?: number | BoxSides }).margin);
+};
+
+const resolveStackChildWidth = (
+  child: PdfJsxElement | string | number,
+  frameWidth: number,
+  margin: Box,
+) => {
+  if (typeof child !== 'string' && typeof child !== 'number') {
+    const width = (child.props as { width?: number }).width;
+    if (typeof width === 'number') return width;
+  }
+  return Math.max(0, frameWidth - margin.left - margin.right);
+};
+
+const resolveAlignOffset = (
+  containerSize: number,
+  itemSize: number,
+  alignItems: LayoutAlignItems,
+) => {
+  // Overflowing children stay pinned to start instead of being pulled outside the frame.
+  if (alignItems === 'center') return Math.max(0, (containerSize - itemSize) / 2);
+  if (alignItems === 'end') return Math.max(0, containerSize - itemSize);
+  return 0;
+};
+
+const shiftSchemas = (schemas: Schema[], start: number, end: number, dx: number, dy: number) => {
+  for (let i = start; i < end; i += 1) {
+    const schema = schemas[i];
+    if (!schema) continue;
+    schema.position = {
+      x: schema.position.x + dx,
+      y: schema.position.y + dy,
+    };
+  }
+};
+
 const renderElement = async (
   element: PdfJsxElement,
   frame: Rect,
-  parentMode: 'stack' | 'row',
+  parentMode: LayoutMode,
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
   switch (element.kind) {
@@ -311,6 +391,7 @@ const renderStack = (
     'stack',
     {
       gap: props.gap ?? 0,
+      alignItems: props.alignItems ?? 'stretch',
     },
     ctx,
   );
@@ -325,7 +406,7 @@ const renderRow = (
     children,
     { ...frame, width: props.width ?? frame.width, height: props.height ?? frame.height },
     'row',
-    { gap: props.gap ?? 0 },
+    { gap: props.gap ?? 0, alignItems: props.alignItems ?? 'start', crossSize: props.height },
     ctx,
   );
 
@@ -333,7 +414,7 @@ const renderBox = async (
   props: BoxProps,
   children: PdfJsxChild[],
   frame: Rect,
-  _parentMode: 'stack' | 'row',
+  _parentMode: LayoutMode,
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
   const width = props.width ?? frame.width;
@@ -364,7 +445,13 @@ const renderBox = async (
     width: width - padding.left - padding.right,
     height: (props.height ?? frame.height) - padding.top - padding.bottom,
   };
-  const childSize = await layoutChildren(children, innerFrame, 'stack', { gap: 0 }, ctx);
+  const childSize = await layoutChildren(
+    children,
+    innerFrame,
+    'stack',
+    { gap: 0, alignItems: 'stretch' },
+    ctx,
+  );
   const height = props.height ?? childSize.height + padding.top + padding.bottom;
 
   if (needsRect) {

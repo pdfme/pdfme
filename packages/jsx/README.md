@@ -40,6 +40,11 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   content.
 - `Rectangle`, `Ellipse`, and `Line` are static visual schemas for backgrounds, dividers, and simple
   shapes.
+- Layout children can use `margin`. `Stack` and `Row` support `alignItems` for simple cross-axis
+  alignment without trying to implement full CSS/Flexbox.
+- `Stack` defaults to `alignItems="stretch"` to preserve full-width stacking. Use an explicit child
+  `width` when you want `alignItems="center"` or `"end"` to visibly move that child.
+- `Row` defaults to `alignItems="start"` and intentionally does not support cross-axis stretch yet.
 - `PageBreak` is supported only along a `Page` / `Stack` / `Box` layout path. It is rejected inside
   `Row`, leaf schemas, `List`, and `Table`.
 - All `Page` nodes in one `renderToTemplate` call must use the same page size, orientation, and

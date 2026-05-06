@@ -232,6 +232,58 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(second?.position.y).toBe(14);
   });
 
+  it('accounts for child margins in Stack layout', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack gap={2}>
+          <Text height={6} margin={{ top: 1, bottom: 2, left: 3 }}>
+            A
+          </Text>
+          <Text height={6}>B</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [first, second] = result.template.schemas[0] ?? [];
+    expect(first).toMatchObject({
+      position: { x: 3, y: 1 },
+      width: 97,
+    });
+    expect(second?.position.y).toBe(11);
+  });
+
+  it('accounts for Spacer margins in Stack layout', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack gap={1}>
+          <Text height={4}>A</Text>
+          <Spacer height={3} margin={{ top: 2, bottom: 5 }} />
+          <Text height={4}>B</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [, second] = result.template.schemas[0] ?? [];
+    expect(second?.position.y).toBe(16);
+  });
+
+  it('aligns fixed-width Stack children on the cross axis', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack alignItems="center">
+          <Text width={40} height={6}>
+            Centered
+          </Text>
+        </Stack>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      position: { x: 30, y: 0 },
+      width: 40,
+    });
+  });
+
   it('measures Text auto height with pdfme text wrapping', async () => {
     const singleLine = await renderToTemplate(
       <Page margin={0}>
@@ -265,6 +317,67 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(flex1?.width).toBe(36);
     expect(flex2?.position.x).toBe(64);
     expect(flex2?.width).toBe(36);
+  });
+
+  it('accounts for child margins when distributing Row width', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Row gap={4}>
+          <Text width={20} margin={{ right: 2 }}>
+            Fixed
+          </Text>
+          <Text margin={{ left: 2 }}>Flex 1</Text>
+          <Text>Flex 2</Text>
+        </Row>
+      </Page>,
+    );
+
+    const [, flex1, flex2] = result.template.schemas[0] ?? [];
+    expect(flex1).toMatchObject({
+      position: { x: 28, y: 0 },
+      width: 34,
+    });
+    expect(flex2).toMatchObject({
+      position: { x: 66, y: 0 },
+      width: 34,
+    });
+  });
+
+  it('aligns Row children on the cross axis', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Row alignItems="center">
+          <Text width={20} height={6}>
+            Small
+          </Text>
+          <Text width={20} height={14}>
+            Tall
+          </Text>
+        </Row>
+      </Page>,
+    );
+
+    const [small, tall] = result.template.schemas[0] ?? [];
+    expect(small?.position.y).toBe(4);
+    expect(tall?.position.y).toBe(0);
+  });
+
+  it('uses explicit Row height for Stack advancement', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack>
+          <Row height={20}>
+            <Text width={20} height={6}>
+              Row item
+            </Text>
+          </Row>
+          <Text height={6}>After row</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [, after] = result.template.schemas[0] ?? [];
+    expect(after?.position.y).toBe(20);
   });
 
   it('renders Box background before its children', async () => {
