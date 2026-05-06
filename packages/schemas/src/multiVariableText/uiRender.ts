@@ -9,6 +9,7 @@ import { isEditable } from '../utils.js';
 import { getFontKitFont } from '../text/helper.js';
 import { CODE_BACKGROUND_COLOR, SYNTHETIC_BOLD_CSS_TEXT_SHADOW } from '../text/constants.js';
 import { parseInlineMarkdown } from '../text/inlineMarkdown.js';
+import { measureTextLines } from '../text/measure.js';
 import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText.js';
 import type { RichTextRun } from '../text/types.js';
 import { substituteVariables, substituteVariablesAsInlineMarkdownLiterals } from './helper.js';
@@ -29,7 +30,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       : substituteVariables(text, value);
 
   if (mode === 'form' && numVariables > 0 && !renderResolvedValue) {
-    if (getTextLineRange(schema)) {
+    if (getTextLineRange(schema) && isInlineMarkdownTextSchema(schema)) {
       await parentUiRender({
         value: renderValue,
         schema,
@@ -122,6 +123,28 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       : substitutedText,
   );
 
+  const lineRange = getTextLineRange(schema);
+  if (lineRange) {
+    const { lines } = await measureTextLines({
+      value: substitutedText,
+      schema,
+      font,
+      _cache,
+      ignoreDynamicFontSize: true,
+    });
+    renderSplitPlainVariableSpans({
+      textBlock,
+      lines,
+      rawText,
+      variables,
+      schema,
+      theme,
+      onChange,
+      stopEditing,
+    });
+    return;
+  }
+
   if (inlineMarkdownRuns) {
     renderInlineMarkdownVariableSpans({
       runs: inlineMarkdownRuns,
@@ -173,6 +196,269 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       textBlock.appendChild(span);
     }
   }
+};
+
+type SplitChunkSegment = {
+  text: string;
+  variableName?: string;
+  variableStart?: number;
+  variableEnd?: number;
+};
+
+type ResolvedPlainChar = {
+  char: string;
+  variableName?: string;
+  variableOffset?: number;
+};
+
+const renderSplitPlainVariableSpans = (arg: {
+  textBlock: HTMLDivElement;
+  lines: string[];
+  rawText: string;
+  variables: Record<string, string>;
+  schema: MultiVariableTextSchema;
+  theme: UIRenderProps<MultiVariableTextSchema>['theme'];
+  onChange: UIRenderProps<MultiVariableTextSchema>['onChange'];
+  stopEditing: UIRenderProps<MultiVariableTextSchema>['stopEditing'];
+}) => {
+  const { textBlock, lines, rawText, variables, schema, theme, onChange, stopEditing } = arg;
+  const lineRange = getTextLineRange(schema);
+  const lineSegments = getSplitPlainLineSegments({
+    lines,
+    rawText,
+    variables,
+    start: lineRange?.start ?? 0,
+    end: lineRange?.end ?? lines.length,
+  });
+
+  textBlock.innerHTML = '';
+  lineSegments.forEach((segments, lineIndex) => {
+    segments.forEach((segment) => {
+      if (segment.variableName) {
+        appendRangedVariableSpan({
+          textBlock,
+          segment,
+          variables,
+          theme,
+          onChange,
+          stopEditing,
+        });
+        return;
+      }
+
+      const span = document.createElement('span');
+      span.style.letterSpacing = lineIndex === lineSegments.length - 1 ? '0' : 'inherit';
+      span.textContent = segment.text;
+      textBlock.appendChild(span);
+    });
+
+    if (lineIndex < lineSegments.length - 1) {
+      textBlock.appendChild(document.createElement('br'));
+    }
+  });
+};
+
+const getSplitPlainLineSegments = (arg: {
+  lines: string[];
+  rawText: string;
+  variables: Record<string, string>;
+  start: number;
+  end: number;
+}): SplitChunkSegment[][] => {
+  const { lines, rawText, variables, start, end } = arg;
+  const resolvedChars = buildResolvedPlainChars(rawText, variables);
+  const allLineSegments = consumeMeasuredLineSegments(lines, resolvedChars);
+  return allLineSegments.slice(start, end);
+};
+
+const buildResolvedPlainChars = (
+  rawText: string,
+  variables: Record<string, string>,
+): ResolvedPlainChar[] => {
+  const chars: ResolvedPlainChar[] = [];
+  let lastIndex = 0;
+
+  visitVariables(rawText, ({ name, startIndex, endIndex }) => {
+    appendTextChars(chars, rawText.slice(lastIndex, startIndex));
+    const value = variables[name] ?? '';
+    // Empty variables have no rendered characters, so split chunks cannot infer which
+    // page line should receive an empty editable span. The normal non-split form path
+    // still supports editing them.
+    for (let i = 0; i < value.length; i += 1) {
+      chars.push({ char: value[i], variableName: name, variableOffset: i });
+    }
+    lastIndex = endIndex + 1;
+  });
+
+  appendTextChars(chars, rawText.slice(lastIndex));
+  return chars;
+};
+
+const appendTextChars = (chars: ResolvedPlainChar[], text: string) => {
+  for (let i = 0; i < text.length; i += 1) {
+    chars.push({ char: text[i] });
+  }
+};
+
+const consumeMeasuredLineSegments = (
+  lines: string[],
+  resolvedChars: ResolvedPlainChar[],
+): SplitChunkSegment[][] => {
+  const lineSegments: SplitChunkSegment[][] = [];
+  let cursor = 0;
+
+  lines.forEach((line) => {
+    const segments: SplitChunkSegment[] = [];
+    const lineText = stripTrailingLineBreaks(line);
+
+    // `lines` must come from measuring the substituted plain MVT value. We map those
+    // measured characters back to the same substituted value, annotated with variable
+    // offsets, so each editable span can update only the touched variable range.
+    for (let i = 0; i < lineText.length; i += 1) {
+      const target = lineText[i];
+      while (
+        cursor < resolvedChars.length &&
+        resolvedChars[cursor].char !== target &&
+        isWhitespaceChar(resolvedChars[cursor].char) &&
+        !isWhitespaceChar(target)
+      ) {
+        cursor += 1;
+      }
+
+      if (cursor >= resolvedChars.length) {
+        appendSegment(segments, { char: target });
+        continue;
+      }
+
+      const sourceChar = resolvedChars[cursor];
+      if (sourceChar.char === target) {
+        appendSegment(segments, sourceChar);
+        cursor += 1;
+      } else {
+        // If a future text measurement path normalizes characters differently, keep
+        // rendering the chunk but do not attach the mismatched character to a variable
+        // offset. Advancing the cursor here would corrupt all following mappings.
+        appendSegment(segments, { char: target });
+      }
+    }
+
+    cursor = absorbHiddenTrailingWhitespace(segments, resolvedChars, cursor);
+
+    // splitTextToSize appends a trailing line break marker to the last measured line of
+    // each source paragraph. Advance past the original hard break when it exists.
+    if (line.endsWith('\r\n') || line.endsWith('\n') || line.endsWith('\r')) {
+      if (resolvedChars[cursor]?.char === '\r' && resolvedChars[cursor + 1]?.char === '\n') {
+        cursor += 2;
+      } else if (resolvedChars[cursor]?.char === '\n' || resolvedChars[cursor]?.char === '\r') {
+        cursor += 1;
+      }
+    }
+
+    lineSegments.push(segments);
+  });
+
+  return lineSegments;
+};
+
+const absorbHiddenTrailingWhitespace = (
+  segments: SplitChunkSegment[],
+  resolvedChars: ResolvedPlainChar[],
+  cursor: number,
+) => {
+  let nextCursor = cursor;
+  while (
+    nextCursor < resolvedChars.length &&
+    isHorizontalWhitespaceChar(resolvedChars[nextCursor].char)
+  ) {
+    const sourceChar = resolvedChars[nextCursor];
+    const lastSegment = segments.at(-1);
+    if (
+      lastSegment &&
+      lastSegment.variableName === sourceChar.variableName &&
+      lastSegment.variableEnd === sourceChar.variableOffset &&
+      sourceChar.variableOffset !== undefined
+    ) {
+      lastSegment.variableEnd = sourceChar.variableOffset + 1;
+    }
+    nextCursor += 1;
+  }
+  return nextCursor;
+};
+
+const stripTrailingLineBreaks = (value: string) => {
+  let end = value.length;
+  while (end > 0) {
+    const char = value[end - 1];
+    if (char !== '\n' && char !== '\r') break;
+    end -= 1;
+  }
+  return value.slice(0, end);
+};
+
+const isWhitespaceChar = (value: string) =>
+  value === ' ' ||
+  value === '\t' ||
+  value === '\n' ||
+  value === '\r' ||
+  value === '\f' ||
+  value === '\v';
+
+const isHorizontalWhitespaceChar = (value: string) =>
+  value === ' ' || value === '\t' || value === '\f' || value === '\v';
+
+const appendSegment = (segments: SplitChunkSegment[], sourceChar: ResolvedPlainChar) => {
+  const lastSegment = segments.at(-1);
+  if (
+    lastSegment &&
+    lastSegment.variableName === sourceChar.variableName &&
+    lastSegment.variableEnd === sourceChar.variableOffset
+  ) {
+    lastSegment.text += sourceChar.char;
+    if (sourceChar.variableOffset !== undefined) {
+      lastSegment.variableEnd = sourceChar.variableOffset + 1;
+    }
+    return;
+  }
+
+  segments.push({
+    text: sourceChar.char,
+    variableName: sourceChar.variableName,
+    variableStart: sourceChar.variableOffset,
+    variableEnd:
+      sourceChar.variableOffset === undefined ? undefined : sourceChar.variableOffset + 1,
+  });
+};
+
+const appendRangedVariableSpan = (arg: {
+  textBlock: HTMLDivElement;
+  segment: SplitChunkSegment;
+  variables: Record<string, string>;
+  theme: UIRenderProps<MultiVariableTextSchema>['theme'];
+  onChange: UIRenderProps<MultiVariableTextSchema>['onChange'];
+  stopEditing: UIRenderProps<MultiVariableTextSchema>['stopEditing'];
+}) => {
+  const { textBlock, segment, variables, theme, onChange, stopEditing } = arg;
+  if (!segment.variableName) return;
+
+  const span = document.createElement('span');
+  span.style.outline = `${theme.colorPrimary} dashed 1px`;
+  makeElementPlainTextContentEditable(span);
+  span.textContent = segment.text;
+  span.addEventListener('blur', (e: Event) => {
+    const variableName = segment.variableName;
+    if (!variableName) return;
+
+    const newValue = (e.target as HTMLSpanElement).textContent || '';
+    if (newValue === segment.text) return;
+
+    const currentValue = variables[variableName] ?? '';
+    const start = Math.min(segment.variableStart ?? 0, currentValue.length);
+    const end = Math.min(segment.variableEnd ?? currentValue.length, currentValue.length);
+    variables[variableName] = currentValue.slice(0, start) + newValue + currentValue.slice(end);
+    if (onChange) onChange({ key: 'content', value: JSON.stringify(variables) });
+    if (stopEditing) stopEditing();
+  });
+  textBlock.appendChild(span);
 };
 
 const getInlineMarkdownFormDisplayText = (

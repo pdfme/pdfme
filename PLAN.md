@@ -85,9 +85,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
   `__splitRange: { unit: "textLine", start, end }` を持つ split schema に分割し、次ページへ続ける。
   plain text と inline-markdown は同じ line layout を使い、PDF / UI preview で split chunk が
   同じ input 全体を重複描画しないようにする。
-- `multiVariableText` の split chunk は、変数入力の一部だけを安全に編集・復元する設計が必要なため、
-  初回は Form 上では resolved text の read-only 表示にする。変数単位の編集をページ分割後も維持する
-  かどうかは、MVT の variable-aware layout と合わせて別途検討する。
+- plain `multiVariableText` の split chunk は、Form 上で表示範囲内の変数 span を編集できるようにする。
+  編集結果は JSON input の該当変数へ戻し、別ページに分割された同じ input の内容を消さない。
 - inline-markdown の split chunk は markdown 記法が行境界で分断される可能性があるため、Form 上では
   初回は read-only 表示に寄せる。将来的に編集可能にする場合は rich text AST と selection/editing
   model を合わせて設計する。
@@ -124,7 +123,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 - 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか決める。
 - Form 編集中の live pagination を入れるか、Preview / generate 時のみ reflow する仕様で固定するか決める。
-- split 後の `multiVariableText` を将来的に Form 上でも編集可能にするか、read-only chunk のままにするか決める。
+- split 後の `multiVariableText` は plain text では Form 編集できる。inline-markdown MVT も編集可能にするか、
+  read-only chunk のままにするか決める。
 - split 後の inline-markdown を将来的に編集可能にする場合は、rich text AST と selection/editing
   model を合わせて設計する。
 - 既存テンプレートに旧 dynamic metadata が残っている場合の扱いを docs / migration note に書く。
@@ -209,8 +209,10 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 ## 未決事項
 
-- `multiVariableText` の split chunk を Form 上で編集可能にするべきか、read-only chunk のままでよいか。
+- inline-markdown の `multiVariableText` split chunk を Form 上で編集可能にするべきか、read-only chunk のままでよいか。
 - split 後の inline-markdown 編集をサポートするか、read-only 表示に限定するか。
+- split chunk 内の複数 variable span を連続編集した場合、blur の順序と reflow 後の最新 input を
+  どう同期するか。必要なら live pagination / editing session の設計と合わせて扱う。
 - MVT の inline link 対応をどのタイミングで入れるか。
 - table cell / list item の rich inline content を schema 拡張で扱うか、複数 schema に分解するか。
 - link の見た目をデフォルトで青 + 下線にするか、明示的 styling に任せるか。
