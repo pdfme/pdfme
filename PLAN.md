@@ -30,21 +30,27 @@ pdfme `Template` と `inputs` を生成できるようにする。
   連続編集検証、JSX layout の `margin` / `alignItems` / `justifyContent` / `flexGrow`、
   `Static` / `Header` / `Footer` による `staticSchema` support、`Absolute` による manual placement
   補助まで入っている。
+- `md2pdf` MVP は `converter` package に実装を開始した。初期 API は `Template + inputs` を返し、
+  parser は `unified` + `remark-parse` + `remark-gfm` を使う。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
 
 ## 次に進めること
 
-### 1. `md2pdf` / GFM MVP の設計と入口
+### 1. `md2pdf` / GFM MVP の実装
 
-- `converter` package に `md2pdf` の入口を追加する。
-- Markdown parser は `remark-gfm` / `micromark` 系を候補にする。
-- 初期 API は `Template + inputs` を返す形にする。warnings / assets / anchors metadata は
-  必要になった時に追加検討する。
-- まず paragraph, heading, list, table, code block, blockquote, link, image を対象にする。
-- `@pdfme/jsx` と同じ layout tree / builder を共有できるか検討する。直接 JSX runtime に依存するより、
+- `converter` package の `md2pdf` 入口を整える。
+- 初期 API は `Template + inputs` を返す。warnings / assets / anchors metadata は必要になった時に
+  追加検討する。
+- MVP の対象は paragraph, heading, list, table, code block, blockquote, horizontal rule, link,
+  data URI image。
+- remote Markdown image は初期実装では link text に fallback する。画像 fetch / asset metadata は
+  次段階で検討する。
+- `@pdfme/jsx` と同じ layout tree / builder を共有できるかは継続検討。直接 JSX runtime に依存するより、
   Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
+- 追加で確認したいこと: generator + built-in schemas で実際に PDF 生成する integration test、
+  playground / docs への最小サンプル、heading anchor の出力仕様。
 
 ### 2. `@pdfme/jsx` layout 品質フォローアップ
 
@@ -98,14 +104,15 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 ### Block Layout
 
-- GFM list item は paragraph, nested list, code block, blockquote を含められる。現在の `list`
-  schema の `string[] + tab indent` だけでは表現しきれない可能性がある。
-- task list は checkbox + text/list の組み合わせか、list schema 拡張が必要。
+- GFM list item は paragraph, nested list, code block, blockquote を含められる。MVP では `list`
+  schema の `string[] + tab indent` に落とすが、複雑な list item は表現しきれない可能性がある。
+- task list は MVP では `[x]` / `[ ]` prefix に落とす。checkbox + text/list の組み合わせや
+  list schema 拡張は後回し。
 - GFM table の基本形は `table` schema に落とせるが、cell 内 rich inline content は追加検討。
 - code block は `rectangle + text` で始められるが、等幅フォント、空白保持、長い行、syntax highlight、
   ページ分割を考えると専用 layout が欲しい。
 - blockquote は `line + text` で始められるが、中に paragraph / list / code / table を持てる点に注意する。
-- `[![alt](img)](url)` は image schema + link annotation として表現する。
+- remote Markdown image と `[![alt](img)](url)` は image fetch / link annotation の設計が必要。
 
 ### Pagination
 

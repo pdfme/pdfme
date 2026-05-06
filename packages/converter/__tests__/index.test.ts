@@ -2,7 +2,13 @@
 import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { PAGE_SIZE_PRESETS } from '@pdfme/common';
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
+import { list, table, text } from '@pdfme/schemas';
+import {
+  pdf2img as nodePdf2Img,
+  pdf2size as nodePdf2Size,
+  img2pdf,
+  md2pdf,
+} from '../src/index.node.js';
 
 const a4BasePdf = (padding: [number, number, number, number] = [20, 10, 20, 10]) => ({
   ...PAGE_SIZE_PRESETS.A4,
@@ -248,5 +254,135 @@ describe('pdf2size tests', () => {
     await expect(nodePdf2Size(emptyBuffer, { scale: 1 })).rejects.toThrow(
       'The PDF file is empty, i.e. its size is zero by',
     );
+  });
+});
+
+describe('md2pdf tests', () => {
+  test('converts GFM blocks into a pdfme template and inputs', async () => {
+    const { template, inputs } = await md2pdf(`# Hello [PDFme](https://pdfme.com)
+
+A **bold** paragraph with ~~deleted~~ text.
+
+- [x] Done
+- [ ] Todo
+  - Nested
+
+| Name | Value |
+| ---- | ----- |
+| A | 1 |
+| B | 2 |
+
+\`\`\`ts
+const value = 1;
+\`\`\`
+`);
+
+    const schemas = template.schemas[0];
+    expect(template.basePdf).toEqual({
+      width: 210,
+      height: 297,
+      padding: [20, 15, 20, 15],
+    });
+    expect(inputs).toEqual([{}]);
+    expect(schemas.map((schema) => schema.type)).toEqual(['text', 'text', 'list', 'table', 'text']);
+
+    expect(schemas[0]).toMatchObject({
+      name: 'hello-pdfme',
+      type: 'text',
+      content: 'Hello [PDFme](https://pdfme.com)',
+      textFormat: 'inline-markdown',
+      overflow: 'expand',
+    });
+    expect(schemas[1]).toMatchObject({
+      content: 'A **bold** paragraph with ~~deleted~~ text.',
+      textFormat: 'inline-markdown',
+    });
+    expect(JSON.parse(String(schemas[2].content))).toEqual(['[x] Done', '[ ] Todo', '\tNested']);
+    expect(schemas[2]).toMatchObject({
+      type: 'list',
+      listStyle: 'bullet',
+      textFormat: 'inline-markdown',
+      overflow: 'expand',
+    });
+    expect(schemas[3]).toMatchObject({
+      type: 'table',
+      head: ['Name', 'Value'],
+      headWidthPercentages: [50, 50],
+    });
+    expect(JSON.parse(String(schemas[3].content))).toEqual([
+      ['A', '1'],
+      ['B', '2'],
+    ]);
+    expect(schemas[4]).toMatchObject({
+      type: 'text',
+      content: 'ts\nconst value = 1;',
+      textFormat: 'plain',
+      overflow: 'expand',
+    });
+  });
+
+  test('sanitizes unsafe links and falls back for remote markdown images', async () => {
+    const { template } = await md2pdf(
+      '[safe](#hello) [bad](javascript:alert(1))\n\n![Logo](https://example.com/logo.png)',
+    );
+    const schemas = template.schemas[0];
+
+    expect(schemas[0].content).toBe('[safe](#hello) bad');
+    expect(schemas[1]).toMatchObject({
+      type: 'text',
+      content: '[Logo](https://example.com/logo.png)',
+      textFormat: 'inline-markdown',
+    });
+  });
+
+  test('emits data URI markdown images as image schemas', async () => {
+    const png =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
+    const { template } = await md2pdf(`![pixel](${png})`);
+
+    expect(template.schemas[0][0]).toMatchObject({
+      type: 'image',
+      content: png,
+      readOnly: true,
+    });
+  });
+
+  test('accepts page size and margin options', async () => {
+    const { template } = await md2pdf('Hello', {
+      page: {
+        size: 'Letter',
+        orientation: 'landscape',
+        margin: { x: 10, y: 12 },
+      },
+    });
+
+    expect(template.basePdf).toEqual({
+      width: 279.4,
+      height: 215.9,
+      padding: [12, 10, 12, 10],
+    });
+  });
+
+  test('generates a PDF from the converted markdown template', async () => {
+    const { template, inputs } = await md2pdf(`# Title
+
+Visit [pdfme](https://pdfme.com).
+
+- Alpha
+- Beta
+
+| Key | Value |
+| --- | ----- |
+| One | 1 |
+`);
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text, List: list, Table: table },
+    });
+
+    expect(pdf).toBeInstanceOf(Uint8Array);
+    expect(pdf.byteLength).toBeGreaterThan(0);
   });
 });
