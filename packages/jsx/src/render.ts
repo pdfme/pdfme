@@ -340,6 +340,7 @@ const applyJustifyContent = (
   containerMainSize: number,
   opts: { justifyContent: LayoutJustifyContent },
 ) => {
+  // Overflowing content has no extra main-axis space to distribute.
   const extraSpace = Math.max(0, containerMainSize - contentMainSize);
   if (extraSpace === 0 || opts.justifyContent === 'start') return;
 
@@ -398,10 +399,10 @@ const renderElement = async (
   parentMode: LayoutMode,
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
-  const props =
-    parentMode === 'row' && getChildFlexGrow(element) != null
-      ? { ...element.props, width: frame.width }
-      : element.props;
+  const shouldUseResolvedRowWidth = parentMode === 'row' && getChildFlexGrow(element) != null;
+  const props = shouldUseResolvedRowWidth
+    ? { ...element.props, width: frame.width }
+    : element.props;
 
   switch (element.kind) {
     case 'stack':

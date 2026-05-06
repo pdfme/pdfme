@@ -50,6 +50,17 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 - `Row` defaults to `alignItems="start"` and intentionally does not support cross-axis stretch yet.
 - Row children can use `flexGrow` or `flex` as a grow weight. If `width` is also set, it is used as
   the basis before remaining width is distributed.
+  `flex` is only a short alias for `flexGrow`, not the CSS `flex` shorthand.
+
+```tsx
+<Row width={120}>
+  <Text width={20} flex={1}>A</Text>
+  <Text width={20} flex={3}>B</Text>
+</Row>
+// A width: 40, B width: 80
+```
+
+- `flexGrow={0}` without `width` produces a zero-width Row child.
 - `PageBreak` is supported only along a `Page` / `Stack` / `Box` layout path. It is rejected inside
   `Row`, leaf schemas, `List`, and `Table`.
 - All `Page` nodes in one `renderToTemplate` call must use the same page size, orientation, and

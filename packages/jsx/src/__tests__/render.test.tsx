@@ -301,6 +301,21 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(after?.position.y).toBe(30);
   });
 
+  it('returns explicit Stack height even when content overflows', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack height={5} justifyContent="center">
+          <Text height={10}>Overflow</Text>
+        </Stack>
+        <Text height={4}>After</Text>
+      </Page>,
+    );
+
+    const [overflow, after] = result.template.schemas[0] ?? [];
+    expect(overflow?.position.y).toBe(0);
+    expect(after?.position.y).toBe(5);
+  });
+
   it('measures Text auto height with pdfme text wrapping', async () => {
     const singleLine = await renderToTemplate(
       <Page margin={0}>
@@ -374,6 +389,38 @@ describe('@pdfme/jsx renderToTemplate', () => {
     const [first, second] = result.template.schemas[0] ?? [];
     expect(first).toMatchObject({ position: { x: 0, y: 0 }, width: 40 });
     expect(second).toMatchObject({ position: { x: 40, y: 0 }, width: 80 });
+  });
+
+  it('accounts for margins when distributing Row flexGrow width', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 120, height: 100 }} margin={0}>
+        <Row gap={4}>
+          <Text flexGrow={1} margin={{ left: 5, right: 5 }}>
+            A
+          </Text>
+          <Text flexGrow={1}>B</Text>
+        </Row>
+      </Page>,
+    );
+
+    const [first, second] = result.template.schemas[0] ?? [];
+    expect(first).toMatchObject({ position: { x: 5, y: 0 }, width: 53 });
+    expect(second).toMatchObject({ position: { x: 67, y: 0 }, width: 53 });
+  });
+
+  it('renders zero-width Row child when flexGrow is zero without width', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 120, height: 100 }} margin={0}>
+        <Row>
+          <Text flexGrow={0}>Zero</Text>
+          <Text>B</Text>
+        </Row>
+      </Page>,
+    );
+
+    const [zero, second] = result.template.schemas[0] ?? [];
+    expect(zero).toMatchObject({ position: { x: 0, y: 0 }, width: 0 });
+    expect(second).toMatchObject({ position: { x: 0, y: 0 }, width: 120 });
   });
 
   it('accounts for child margins when distributing Row width', async () => {
