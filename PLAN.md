@@ -28,38 +28,36 @@ pdfme `Template` と `inputs` を生成できるようにする。
   custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
   component、visual components、editable `Text` の inline-markdown guard、MVT split chunk の
   連続編集検証、JSX layout の `margin` / `alignItems` / `justifyContent` / `flexGrow`、
-  `Static` / `Header` / `Footer` による `staticSchema` support まで入っている。
+  `Static` / `Header` / `Footer` による `staticSchema` support、`Absolute` による manual placement
+  補助まで入っている。
 - `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
 - 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
   独自拡張の境界。
 
 ## 次に進めること
 
-### 1. `@pdfme/jsx` Absolute / manual placement 補助の初期実装
+### 1. `md2pdf` / GFM MVP の設計と入口
 
-- stacking layout では表現しにくい watermark、badge、右上固定ラベル、ページ上の細かい手動調整の
-  逃げ道として `Absolute` / manual placement helper を検討する。
-- ただし `@pdfme/jsx` の主軸は stacking layout に置く。通常の本文、Markdown 由来の文書、
-  AI template authoring は `Stack` / `Row` / `Box` / `Text` などで組む前提にする。
-- `Absolute` は flow に参加しない overlay として扱い、子要素の高さで後続要素を
-  押し出さない。乱用すると絶対座標 JSON と同じ難しさに戻るため、API と docs で用途を絞る。
-- 初期実装では `Page`, `Static`, `Box` の直下で許可する。座標は親の layout frame 基準にする。
-  `Page` body 内では page margin 内、`Static` 内では page 全体、`Box` 内では box content frame。
-- 初期 API は `x`, `y`, `width`, `height` 程度に留め、CSS `position` / `style` 互換は目指さない。
+- `converter` package に `md2pdf` の入口を追加する。
+- Markdown parser は `remark-gfm` / `micromark` 系を候補にする。
+- 初期 API は `Template + inputs` を返す形にする。warnings / assets / anchors metadata は
+  必要になった時に追加検討する。
+- まず paragraph, heading, list, table, code block, blockquote, link, image を対象にする。
+- `@pdfme/jsx` と同じ layout tree / builder を共有できるか検討する。直接 JSX runtime に依存するより、
+  Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
 
 ### 2. `@pdfme/jsx` layout 品質フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
 - `%` width は将来検討でよい。まずは `flex` / `flexGrow` で比率指定を表現する。
-- `Absolute` を追加する場合も、stacking layout を壊さない小さな逃げ道として扱う。
+- `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
+  直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 
-### 3. `md2pdf` / GFM MVP
+### 3. `@pdfme/jsx` examples / docs
 
-- `converter` package に `md2pdf` の入口を追加する。
-- Markdown parser は `remark-gfm` / `micromark` 系を候補にする。
-- まず paragraph, heading, list, table, code block, blockquote, link, image を扱う。
-- `@pdfme/jsx` と同じ layout tree / builder を共有できるか検討する。
+- invoice / report / markdown article など、AI や人間が真似しやすい `@pdfme/jsx` サンプルを追加する。
+- `Static`, `Header`, `Footer`, `Absolute`, dynamic height の使いどころを docs に整理する。
 
 ## 仕様メモ
 
@@ -84,6 +82,8 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - Designer の link 編集は、当面 inline-markdown 文字列を直接編集する前提にする。専用 UI は後回し。
 - `md2pdf` の初期 API は `Template + inputs` を返す形でよい。warnings / assets / anchors metadata は
   必要になった時に追加検討する。
+- `Absolute` は flow に参加しない overlay。座標は親の layout frame 基準で、`Page` body 内では page
+  margin 内、`Static` 内では page 全体、`Box` 内では box content frame。bottom `Static` 内では使えない。
 
 ## GFM / md2pdf で足りないこと
 
@@ -134,6 +134,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - PR #1480: `@pdfme/jsx` layout に `justifyContent`, `flexGrow`, `flex` を追加。
 - PR #1481: `@pdfme/jsx` `Static placement="top" | "bottom"`、`Header` / `Footer` alias、
   blank `basePdf.staticSchema` support を追加。
+- PR #1482: `@pdfme/jsx` `Absolute` manual placement helper を追加。
 
 ## 参考
 
