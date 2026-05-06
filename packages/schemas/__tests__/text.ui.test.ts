@@ -162,7 +162,7 @@ describe('text inline markdown UI rendering', () => {
       ...getTextSchema(),
       readOnly: false,
       width: 20,
-      __textLineRange: { start: 0, end: 1 },
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
     };
     const font = {
       Base: { data: new Uint8Array(), fallback: true },

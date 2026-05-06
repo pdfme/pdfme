@@ -10,6 +10,7 @@ import {
 import { createSingleTable } from './tableHelper.js';
 import { getBodyWithRange, getBody } from './helper.js';
 import { TableSchema } from './types.js';
+import { createTableBodySplitRange, getTableBodyRange } from '../splitRange.js';
 
 export const getDynamicHeightsForTable = async (
   value: string,
@@ -22,8 +23,8 @@ export const getDynamicHeightsForTable = async (
 ): Promise<number[]> => {
   if (args.schema.type !== 'table') return Promise.resolve([args.schema.height]);
   const schema = args.schema as TableSchema;
-  const body =
-    schema.__bodyRange?.start === 0 ? getBody(value) : getBodyWithRange(value, schema.__bodyRange);
+  const bodyRange = getTableBodyRange(schema);
+  const body = bodyRange?.start === 0 ? getBody(value) : getBodyWithRange(value, bodyRange);
   const table = await createSingleTable(body, args);
 
   const baseHeights = schema.showHead
@@ -104,12 +105,15 @@ export const getDynamicLayoutForTable = async (
   return {
     heights,
     avoidFirstUnitOnly: true,
-    patchSplitSchema: ({ start, end, isSplit }) => ({
-      __bodyRange: {
+    patchSplitSchema: ({ start, end, isSplit }) => {
+      const range = {
         start: start === 0 ? 0 : start - 1,
         end: end - 1,
-      },
-      __isSplit: isSplit,
-    }),
+      };
+      return {
+        __splitRange: createTableBodySplitRange(range.start, range.end),
+        __isSplit: isSplit,
+      };
+    },
   };
 };

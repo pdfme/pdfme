@@ -8,6 +8,7 @@ import {
   substituteVariablesAsInlineMarkdownLiterals,
   validateVariables,
 } from './helper.js';
+import { createTextLineSplitRange } from '../splitRange.js';
 
 export const getDynamicLayoutForMultiVariableText = async (
   value: string,
@@ -52,7 +53,7 @@ export const getDynamicLayoutForMultiVariableText = async (
     heights: lineHeights.length === 1 ? [Math.max(schema.height, measuredHeight)] : lineHeights,
     patchSplitSchema: ({ start, end, isSplit }) => ({
       dynamicFontSize: undefined,
-      __textLineRange: lineHeights.length === 1 ? undefined : { start, end },
+      __splitRange: lineHeights.length === 1 ? undefined : createTextLineSplitRange(start, end),
       __isSplit: isSplit,
     }),
   };

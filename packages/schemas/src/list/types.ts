@@ -2,18 +2,12 @@ import type { TextSchema } from '../text/types.js';
 
 export type LIST_STYLE = 'bullet' | 'ordered';
 
-export type ListRange = {
-  start: number;
-  end?: number;
-};
-
 export type ListSchema = TextSchema & {
   listStyle: LIST_STYLE;
   markerWidth: number;
   markerGap: number;
   indentSize?: number;
   itemSpacing: number;
-  __itemRange?: ListRange;
 };
 
 export type ListItem = {

@@ -24,6 +24,7 @@ import {
 } from './richText.js';
 import type { TextSchema } from './types.js';
 import { hex2PrintingColor, rotatePoint } from '../utils.js';
+import { getTextLineRange } from '../splitRange.js';
 
 type TextColor = ReturnType<typeof hex2PrintingColor>;
 
@@ -307,8 +308,9 @@ export const renderInlineMarkdownText = async (arg: {
     characterSpacing,
     boxWidthInPt: width,
   });
-  const lines = applyTextLineRange(allLines, schema.__textLineRange);
-  const lineRangeStart = schema.__textLineRange?.start ?? 0;
+  const lineRange = getTextLineRange(schema);
+  const lines = applyTextLineRange(allLines, lineRange);
+  const lineRangeStart = lineRange?.start ?? 0;
   const pdfFontObj = await embedFontsForRuns(
     lines.flatMap((line) => line.runs),
     embedPdfFont,

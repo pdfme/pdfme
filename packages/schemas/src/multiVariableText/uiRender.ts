@@ -13,6 +13,7 @@ import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText
 import type { RichTextRun } from '../text/types.js';
 import { substituteVariables, substituteVariablesAsInlineMarkdownLiterals } from './helper.js';
 import { countUniqueVariableNames, visitVariables } from './variables.js';
+import { getTextLineRange } from '../splitRange.js';
 
 export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const { value, schema, rootElement, mode, onChange, ...rest } = arg;
@@ -28,7 +29,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       : substituteVariables(text, value);
 
   if (mode === 'form' && numVariables > 0 && !renderResolvedValue) {
-    if (schema.__textLineRange) {
+    if (getTextLineRange(schema)) {
       await parentUiRender({
         value: renderValue,
         schema,

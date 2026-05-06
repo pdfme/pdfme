@@ -27,6 +27,8 @@ import type {
   SchemaForUI,
   Font,
   ColorType,
+  DynamicLayoutRange,
+  DynamicLayoutSplitRange,
   BasePdf,
   BlankPdf,
   CustomPdf,
@@ -81,6 +83,7 @@ import {
 } from './helper.js';
 import { PAGE_SIZE_PRESETS, detectPaperSize, resolvePageSize } from './pageSize.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
+import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './splitRange.js';
 import { replacePlaceholders } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
 
@@ -129,6 +132,8 @@ export {
   PAGE_SIZE_PRESETS,
   detectPaperSize,
   resolvePageSize,
+  createDynamicLayoutSplitRange,
+  getDynamicLayoutSplitRange,
 };
 
 export type {
@@ -139,6 +144,8 @@ export type {
   SchemaForUI,
   Font,
   ColorType,
+  DynamicLayoutRange,
+  DynamicLayoutSplitRange,
   BasePdf,
   BlankPdf,
   CustomPdf,

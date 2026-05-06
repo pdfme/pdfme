@@ -40,6 +40,7 @@ import {
   resolveRichTextRuns,
 } from './richText.js';
 import { isEditable } from '../utils.js';
+import { getTextLineRange } from '../splitRange.js';
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -80,7 +81,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   const hasInlineMarkdownFormat = schema.textFormat === TEXT_FORMAT_INLINE_MARKDOWN;
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
   const isReadOnlySplitInlineMarkdownFormChunk =
-    mode === 'form' && Boolean(schema.__textLineRange) && hasInlineMarkdownFormat;
+    mode === 'form' && Boolean(getTextLineRange(schema)) && hasInlineMarkdownFormat;
   const renderInlineMarkdownReadOnlyChunk =
     enableInlineMarkdown || isReadOnlySplitInlineMarkdownFormChunk;
   const editable = isEditable(mode, schema) && !isReadOnlySplitInlineMarkdownFormChunk;
@@ -235,7 +236,8 @@ const renderInlineMarkdownReadOnly = async (arg: {
     font,
     _cache,
   });
-  if (schema.__textLineRange) {
+  const lineRange = getTextLineRange(schema);
+  if (lineRange) {
     const lines = applyTextLineRange(
       layoutRichTextLines({
         runs,
@@ -243,7 +245,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
         characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
         boxWidthInPt: mm2pt(schema.width),
       }),
-      schema.__textLineRange,
+      lineRange,
     );
 
     textBlock.innerHTML = '';
@@ -318,7 +320,8 @@ const getRangedPlainTextValue = (arg: {
   fontSize: number;
 }) => {
   const { value, schema, fontKitFont, fontSize } = arg;
-  if (!schema.__textLineRange) return value;
+  const lineRange = getTextLineRange(schema);
+  if (!lineRange) return value;
 
   const lines = applyTextLineRange(
     splitTextToSize({
@@ -328,7 +331,7 @@ const getRangedPlainTextValue = (arg: {
       fontKitFont,
       boxWidthInPt: mm2pt(schema.width),
     }),
-    schema.__textLineRange,
+    lineRange,
   );
   return plainTextLinesToValue(lines);
 };

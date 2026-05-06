@@ -1,6 +1,7 @@
 import type { DynamicLayoutArgs, DynamicLayoutResult } from '@pdfme/common';
 import type { ListSchema } from './types.js';
 import { calculateListLayout, normalizeListItems } from './helper.js';
+import { createListItemSplitRange } from '../splitRange.js';
 
 export const getDynamicLayoutForList = async (
   value: string,
@@ -24,7 +25,7 @@ export const getDynamicLayoutForList = async (
     heights: layout.items.map((item) => item.height),
     avoidFirstUnitOnly: false,
     patchSplitSchema: ({ start, end, isSplit }) => ({
-      __itemRange: { start, end },
+      __splitRange: createListItemSplitRange(start, end),
       __isSplit: isSplit,
     }),
   };

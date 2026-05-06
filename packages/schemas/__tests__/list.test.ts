@@ -160,7 +160,7 @@ describe('list schema helpers', () => {
         chunkHeight: 10,
       }),
     ).toEqual({
-      __itemRange: { start: 1, end: 3 },
+      __splitRange: { unit: 'listItem', start: 1, end: 3 },
       __isSplit: true,
     });
   });

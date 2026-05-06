@@ -31,11 +31,6 @@ export type FontWidthCalcValues = {
   boxWidthInPt: number;
 };
 
-export type TextLineRange = {
-  start: number;
-  end?: number;
-};
-
 export type TextSchema = Schema & {
   fontName?: string;
   textFormat?: TEXT_FORMAT;
@@ -54,7 +49,6 @@ export type TextSchema = Schema & {
     fit: DYNAMIC_FONT_SIZE_FIT;
   };
   overflow?: TEXT_OVERFLOW;
-  __textLineRange?: TextLineRange;
   fontColor: string;
   backgroundColor: string;
 };

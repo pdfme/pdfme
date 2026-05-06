@@ -1,4 +1,4 @@
-import { getDefaultFont, mm2pt, pt2mm, type Font } from '@pdfme/common';
+import { getDefaultFont, mm2pt, pt2mm, type DynamicLayoutRange, type Font } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import { DEFAULT_CHARACTER_SPACING, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT } from './constants.js';
 import {
@@ -15,7 +15,8 @@ import {
   resolveRichTextRuns,
   type RichTextLine,
 } from './richText.js';
-import type { TextLineRange, TextSchema } from './types.js';
+import type { TextSchema } from './types.js';
+import { getTextLineRange } from '../splitRange.js';
 
 type MeasureTextHeightArgs = {
   value: string;
@@ -30,7 +31,7 @@ type MeasureTextLinesResult = {
   lineHeights: number[];
 };
 
-export const applyTextLineRange = <T>(lines: T[], range?: TextLineRange) => {
+export const applyTextLineRange = <T>(lines: T[], range?: DynamicLayoutRange) => {
   if (!range) return lines;
   return lines.slice(range.start, range.end ?? lines.length);
 };
@@ -123,7 +124,8 @@ export const mergeTextLineRangeValue = async ({
   font?: Font;
   _cache?: Map<string | number, unknown>;
 }) => {
-  if (!schema.__textLineRange) return replacement;
+  const range = getTextLineRange(schema);
+  if (!range) return replacement;
 
   const { lines } = await measureTextLines({
     value,
@@ -132,7 +134,7 @@ export const mergeTextLineRangeValue = async ({
     _cache,
     ignoreDynamicFontSize: true,
   });
-  const { start, end = lines.length } = schema.__textLineRange;
+  const { start, end = lines.length } = range;
   const nextLines = [...lines];
   nextLines.splice(start, end - start, ...splitReplacementTextToLines(replacement));
   return plainTextLinesToValue(nextLines);
