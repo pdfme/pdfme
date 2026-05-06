@@ -1,4 +1,15 @@
-export { Box, List, Page, PageBreak, Row, Spacer, Stack, Table, Text } from './components.js';
+export {
+  Box,
+  List,
+  MultiVariableText,
+  Page,
+  PageBreak,
+  Row,
+  Spacer,
+  Stack,
+  Table,
+  Text,
+} from './components.js';
 export { renderToTemplate } from './render.js';
 export type {
   BoxProps,
@@ -6,6 +17,8 @@ export type {
   CellStyle,
   ListItem,
   ListProps,
+  MultiVariableTextProps,
+  MultiVariableTextValues,
   PageBreakProps,
   PageOrientation,
   PageProps,

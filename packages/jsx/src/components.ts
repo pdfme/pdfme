@@ -2,6 +2,7 @@ import { createElementNode } from './node.js';
 import type {
   BoxProps,
   ListProps,
+  MultiVariableTextProps,
   PageBreakProps,
   PageProps,
   RowProps,
@@ -24,6 +25,9 @@ export const Row = makeBuiltin<RowProps, 'row'>('row');
 export const Box = makeBuiltin<BoxProps, 'box'>('box');
 export const Spacer = makeBuiltin<SpacerProps, 'spacer'>('spacer');
 export const Text = makeBuiltin<TextProps, 'text'>('text');
+export const MultiVariableText = makeBuiltin<MultiVariableTextProps, 'multiVariableText'>(
+  'multiVariableText',
+);
 export const List = makeBuiltin<ListProps, 'list'>('list');
 export const Table = makeBuiltin<TableProps, 'table'>('table');
 export const PageBreak = (props?: PageBreakProps) => createElementNode('pagebreak', props);

@@ -2,7 +2,18 @@
 import { describe, expect, it } from 'vitest';
 import { PAGE_SIZE_PRESETS } from '@pdfme/common';
 
-import { Box, List, Page, PageBreak, Row, Spacer, Stack, Table, Text } from '../components.js';
+import {
+  Box,
+  List,
+  MultiVariableText,
+  Page,
+  PageBreak,
+  Row,
+  Spacer,
+  Stack,
+  Table,
+  Text,
+} from '../components.js';
 import { renderToTemplate } from '../render.js';
 
 describe('@pdfme/jsx renderToTemplate', () => {
@@ -50,6 +61,124 @@ describe('@pdfme/jsx renderToTemplate', () => {
       content: 'Alice',
     });
     expect(result.inputs[0]).toEqual({ customerName: 'Alice' });
+  });
+
+  it('renders named MultiVariableText as a JSON input-backed schema', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText
+          name="message"
+          text="Hello **{name}**, status: `{status}`"
+          values={{ name: 'Alice **literal**', status: 'draft' }}
+          textFormat="inline-markdown"
+          size={12}
+        />
+      </Page>,
+    );
+
+    const schema = result.template.schemas[0]?.[0];
+    const value = JSON.stringify({ name: 'Alice **literal**', status: 'draft' });
+    expect(schema).toMatchObject({
+      name: 'message',
+      type: 'multiVariableText',
+      readOnly: false,
+      content: value,
+      text: 'Hello **{name}**, status: `{status}`',
+      variables: ['name', 'status'],
+      textFormat: 'inline-markdown',
+      fontSize: 12,
+    });
+    expect(schema?.height).toBeGreaterThan(0);
+    expect(result.inputs[0]).toEqual({ message: value });
+  });
+
+  it('renders unnamed MultiVariableText as resolved read-only text', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText text="Hello {name}" values={{ name: 'Alice' }} />
+      </Page>,
+    );
+
+    const schema = result.template.schemas[0]?.[0];
+    expect(schema).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      content: 'Hello Alice',
+      text: 'Hello {name}',
+      variables: ['name'],
+    });
+    expect(schema?.height).toBeGreaterThan(0);
+    expect(result.inputs[0]).toEqual({});
+  });
+
+  it('orders MultiVariableText variables from props, template placeholders, then values', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText
+          name="message"
+          text="Hello {name}, role: {role}"
+          variables={['manual', 'role']}
+          values={{ status: 'draft' }}
+        />
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'multiVariableText',
+      variables: ['manual', 'role', 'name', 'status'],
+    });
+  });
+
+  it('escapes read-only MultiVariableText values inside inline-markdown', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText
+          text="Hello **{name}**"
+          values={{ name: 'Alice **literal**' }}
+          textFormat="inline-markdown"
+        />
+      </Page>,
+    );
+
+    const schema = result.template.schemas[0]?.[0];
+    expect(schema).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      textFormat: 'inline-markdown',
+    });
+    expect(schema?.content).toContain('Alice \\*\\*literal\\*\\*');
+    expect(schema?.content).not.toContain('Alice **literal**');
+  });
+
+  it('uses MultiVariableText children as the template string', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText values={{ name: 'Alice' }}>{'Hello {name}'}</MultiVariableText>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      text: 'Hello {name}',
+      content: 'Hello Alice',
+      variables: ['name'],
+    });
+  });
+
+  it('removes missing MultiVariableText placeholder values from read-only content', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText text="Hello {name}, {missing}" values={{ name: 'Alice' }} />
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      content: 'Hello Alice, ',
+      variables: ['name', 'missing'],
+    });
   });
 
   it('uses Page font as the default fontName', async () => {
