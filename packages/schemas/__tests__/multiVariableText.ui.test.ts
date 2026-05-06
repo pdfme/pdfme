@@ -75,6 +75,37 @@ const renderLinkedMultiVariableText = async (mode: 'viewer' | 'form') => {
   return rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
 };
 
+const renderSplitFormMultiVariableText = async (
+  schemaOverrides: Partial<MultiVariableTextSchema>,
+  value: string,
+) => {
+  const rootElement = document.createElement('div');
+  const onChange = vi.fn();
+  const schema: MultiVariableTextSchema = {
+    ...getSchema(),
+    text: '{name}',
+    variables: ['name'],
+    textFormat: 'plain',
+    width: 100,
+    ...schemaOverrides,
+  };
+
+  await uiRender({
+    value,
+    schema,
+    rootElement,
+    mode: 'form',
+    onChange,
+    options: { font: getSampleFont() },
+    _cache: new Map(),
+    theme: { colorPrimary: '#1677ff' },
+  } as Parameters<typeof uiRender>[0]);
+
+  const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+  const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+  return { onChange, textBlock, variableSpan };
+};
+
 describe('multiVariableText inline markdown UI rendering', () => {
   it('renders viewer variable values as literal text inside template markdown', async () => {
     const textBlock = await renderMultiVariableText('viewer');
@@ -220,6 +251,36 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(onChange).toHaveBeenCalledWith({
       key: 'content',
       value: JSON.stringify({ name: 'first line\nedited second line' }),
+    });
+  });
+
+  it('keeps earlier split form edits when the next render receives the reflowed input', async () => {
+    const first = await renderSplitFormMultiVariableText(
+      {
+        __splitRange: { unit: 'textLine', start: 0, end: 1 },
+      },
+      JSON.stringify({ name: 'first line\nsecond line' }),
+    );
+
+    first.variableSpan.textContent = 'edited first line';
+    first.variableSpan.dispatchEvent(new Event('blur'));
+    expect(first.onChange).toHaveBeenCalledTimes(1);
+    const valueAfterFirstEdit = first.onChange.mock.calls[0][0].value as string;
+
+    const second = await renderSplitFormMultiVariableText(
+      {
+        __splitRange: { unit: 'textLine', start: 1, end: 2 },
+      },
+      valueAfterFirstEdit,
+    );
+
+    expect(second.textBlock.textContent).toBe('second line');
+    second.variableSpan.textContent = 'edited second line';
+    second.variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(second.onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'edited first line\nedited second line' }),
     });
   });
 
@@ -432,6 +493,40 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(onChange).toHaveBeenCalledWith({
       key: 'content',
       value: JSON.stringify({ name: 'first line\nedited second line' }),
+    });
+  });
+
+  it('keeps earlier split inline markdown edits when the next render receives the reflowed input', async () => {
+    const first = await renderSplitFormMultiVariableText(
+      {
+        text: '**{name}**',
+        textFormat: 'inline-markdown',
+        __splitRange: { unit: 'textLine', start: 0, end: 1 },
+      },
+      JSON.stringify({ name: 'first **line**\nsecond line' }),
+    );
+
+    first.variableSpan.textContent = 'edited **first** line';
+    first.variableSpan.dispatchEvent(new Event('blur'));
+    expect(first.onChange).toHaveBeenCalledTimes(1);
+    const valueAfterFirstEdit = first.onChange.mock.calls[0][0].value as string;
+
+    const second = await renderSplitFormMultiVariableText(
+      {
+        text: '**{name}**',
+        textFormat: 'inline-markdown',
+        __splitRange: { unit: 'textLine', start: 1, end: 2 },
+      },
+      valueAfterFirstEdit,
+    );
+
+    expect(second.textBlock.textContent).toBe('second line');
+    second.variableSpan.textContent = 'edited second line';
+    second.variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(second.onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'edited **first** line\nedited second line' }),
     });
   });
 
