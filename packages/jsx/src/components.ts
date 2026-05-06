@@ -1,5 +1,6 @@
 import { createElementNode } from './node.js';
 import type {
+  AbsoluteProps,
   BoxProps,
   EllipseProps,
   FooterProps,
@@ -33,6 +34,7 @@ export const Header = (props: HeaderProps): ReturnType<typeof createElementNode<
   createElementNode('static', { ...props, placement: 'top' });
 export const Footer = (props: FooterProps): ReturnType<typeof createElementNode<'static'>> =>
   createElementNode('static', { ...props, placement: 'bottom' });
+export const Absolute = makeBuiltin<AbsoluteProps, 'absolute'>('absolute');
 export const Stack = makeBuiltin<StackProps, 'stack'>('stack');
 export const Row = makeBuiltin<RowProps, 'row'>('row');
 export const Box = makeBuiltin<BoxProps, 'box'>('box');

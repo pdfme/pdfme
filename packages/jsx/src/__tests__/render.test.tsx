@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { isBlankPdf, PAGE_SIZE_PRESETS } from '@pdfme/common';
 
 import {
+  Absolute,
   Box,
   Ellipse,
   Footer,
@@ -717,6 +718,63 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ).rejects.toThrow('duplicate schema name "mark"');
   });
 
+  it('renders Absolute children without advancing Page flow', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Text height={5}>Before</Text>
+        <Absolute x={20} y={30} width={40}>
+          <Text height={6}>Pinned</Text>
+        </Absolute>
+        <Text height={5}>After</Text>
+      </Page>,
+    );
+
+    const [before, pinned, after] = result.template.schemas[0] ?? [];
+    expect(before).toMatchObject({ content: 'Before', position: { x: 10, y: 10 } });
+    expect(pinned).toMatchObject({
+      content: 'Pinned',
+      position: { x: 30, y: 40 },
+      width: 40,
+      height: 6,
+    });
+    expect(after).toMatchObject({ content: 'After', position: { x: 10, y: 15 } });
+  });
+
+  it('uses the Box content frame as the Absolute coordinate origin', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Box padding={5}>
+          <Absolute x={10} y={8} width={20}>
+            <Text height={6}>Badge</Text>
+          </Absolute>
+          <Text height={6}>Flow</Text>
+        </Box>
+      </Page>,
+    );
+
+    const [badge, flow] = result.template.schemas[0] ?? [];
+    expect(badge).toMatchObject({
+      content: 'Badge',
+      position: { x: 15, y: 13 },
+      width: 20,
+    });
+    expect(flow).toMatchObject({ content: 'Flow', position: { x: 5, y: 5 } });
+  });
+
+  it('rejects Absolute outside Page, Static, or Box', async () => {
+    await expect(
+      renderToTemplate(
+        <Page>
+          <Stack>
+            <Absolute>
+              <Text>Pin</Text>
+            </Absolute>
+          </Stack>
+        </Page>,
+      ),
+    ).rejects.toThrow('<Absolute> can only be used inside <Page>, <Static>, or <Box>');
+  });
+
   it('splits pages at PageBreak', async () => {
     const result = await renderToTemplate(
       <Page>
@@ -913,6 +971,28 @@ describe('@pdfme/jsx renderToTemplate', () => {
       position: { x: 0, y: 94 },
       width: 100,
       height: 6,
+    });
+  });
+
+  it('uses the full page as the Absolute coordinate origin inside Static', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={10}>
+        <Static>
+          <Absolute x={80} y={90} width={15}>
+            <Text height={4}>Stamp</Text>
+          </Absolute>
+        </Static>
+        <Text height={6}>Body</Text>
+      </Page>,
+    );
+
+    expect(isBlankPdf(result.template.basePdf)).toBe(true);
+    if (!isBlankPdf(result.template.basePdf)) throw new Error('Expected blank basePdf');
+
+    expect(result.template.basePdf.staticSchema?.[0]).toMatchObject({
+      content: 'Stamp',
+      position: { x: 80, y: 90 },
+      width: 15,
     });
   });
 

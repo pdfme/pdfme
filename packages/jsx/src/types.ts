@@ -17,6 +17,7 @@ export type { PageOrientation, PageSize, PageSizePreset } from '@pdfme/common';
 export type BuiltinKind =
   | 'page'
   | 'static'
+  | 'absolute'
   | 'stack'
   | 'row'
   | 'box'
@@ -106,6 +107,14 @@ export type StaticProps = {
 
 export type HeaderProps = Omit<StaticProps, 'placement'>;
 export type FooterProps = Omit<StaticProps, 'placement'>;
+
+export type AbsoluteProps = {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  children?: PdfJsxChild;
+};
 
 export type StackProps = LayoutProps & {
   gap?: number;

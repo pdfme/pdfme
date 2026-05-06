@@ -19,6 +19,7 @@ import {
 } from '@pdfme/schemas/utils';
 import { cloneElementWithChildren, isPdfJsxElement, isPdfJsxFragment } from './node.js';
 import type {
+  AbsoluteProps,
   BoxProps,
   BoxSides,
   CellStyle,
@@ -86,6 +87,7 @@ export const renderToTemplate = async (
 ): Promise<RenderResult> => {
   validatePageBreakPlacement(node);
   const expanded = expandPageBreaks(node);
+  validateAbsolutePlacement(expanded);
   validateNoTopLevelStatic(expanded);
   const pages = flattenChildren(expanded).filter(
     (child): child is PdfJsxElement<'page'> => isPdfJsxElement(child) && child.kind === 'page',
@@ -319,16 +321,25 @@ const layoutChildren = async (
   ctx: RenderCtx,
 ): Promise<{ width: number; height: number }> => {
   const items = flattenChildren(children);
-  const widths = mode === 'row' ? resolveRowWidths(items, frame.width, opts.gap) : undefined;
+  const flowItems = items.filter((item) => !isAbsoluteElement(item));
+  const widths = mode === 'row' ? resolveRowWidths(flowItems, frame.width, opts.gap) : undefined;
   let cursor = 0;
   let crossMax = 0;
+  let flowIndex = 0;
   const layoutItems: LayoutItem[] = [];
 
   for (let i = 0; i < items.length; i += 1) {
     const child = items[i];
+    if (isAbsoluteElement(child)) {
+      await renderAbsolute(child.props as AbsoluteProps, child.children, frame, ctx);
+      continue;
+    }
+
     const margin = getChildMargin(child);
     const width =
-      mode === 'row' ? (widths?.[i] ?? 0) : resolveStackChildWidth(child, frame.width, margin);
+      mode === 'row'
+        ? (widths?.[flowIndex] ?? 0)
+        : resolveStackChildWidth(child, frame.width, margin);
     const childFrame =
       mode === 'stack'
         ? { x: frame.x, y: frame.y + cursor, width, height: Math.max(0, frame.height - cursor) }
@@ -358,7 +369,8 @@ const layoutChildren = async (
       if (dx !== 0) shiftSchemas(ctx.schemas, schemaStart, schemaEnd, dx, 0);
     }
 
-    cursor += mainSize + (i < items.length - 1 ? opts.gap : 0);
+    cursor += mainSize + (flowIndex < flowItems.length - 1 ? opts.gap : 0);
+    flowIndex += 1;
     crossMax = Math.max(
       crossMax,
       mode === 'stack'
@@ -423,6 +435,10 @@ const getChildFlexGrow = (child: PdfJsxElement | string | number): number | unde
   const flexGrow = props.flexGrow ?? props.flex;
   return typeof flexGrow === 'number' ? Math.max(0, flexGrow) : undefined;
 };
+
+const isAbsoluteElement = (
+  child: PdfJsxElement | string | number,
+): child is PdfJsxElement<'absolute'> => isPdfJsxElement(child) && child.kind === 'absolute';
 
 const getStaticPlacement = (element: PdfJsxElement<'static'>): StaticPlacement => {
   const placement = (element.props as StaticProps).placement ?? 'top';
@@ -549,9 +565,36 @@ const renderElement = async (
       throw new Error(
         '@pdfme/jsx: <Static> can only be used as a direct child of the first <Page>.',
       );
+    case 'absolute':
+      return renderAbsolute(props as AbsoluteProps, element.children, frame, ctx);
     default:
       return { width: 0, height: 0 };
   }
+};
+
+const renderAbsolute = async (
+  props: AbsoluteProps,
+  children: PdfJsxChild[],
+  frame: Rect,
+  ctx: RenderCtx,
+): Promise<{ width: number; height: number }> => {
+  const x = props.x ?? 0;
+  const y = props.y ?? 0;
+  const childFrame = {
+    x: frame.x + x,
+    y: frame.y + y,
+    width: props.width ?? Math.max(0, frame.width - x),
+    height: props.height ?? Math.max(0, frame.height - y),
+  };
+
+  await layoutChildren(
+    children,
+    childFrame,
+    'stack',
+    { gap: 0, alignItems: 'stretch', justifyContent: 'start' },
+    ctx,
+  );
+  return { width: 0, height: 0 };
 };
 
 const renderStack = (
@@ -1169,7 +1212,7 @@ const isSameBoxSides = (
   first.left === second.left;
 
 const PAGE_BREAK_PARENT_KINDS = new Set(['page', 'stack', 'box']);
-const STATIC_CONTAINER_KINDS = new Set(['stack', 'row', 'box']);
+const STATIC_CONTAINER_KINDS = new Set(['absolute', 'stack', 'row', 'box']);
 const STATIC_LEAF_KINDS = new Set([
   'spacer',
   'text',
@@ -1179,6 +1222,7 @@ const STATIC_LEAF_KINDS = new Set([
   'ellipse',
   'line',
 ]);
+const ABSOLUTE_PARENT_KINDS = new Set(['page', 'static', 'box']);
 
 const validatePageBreakPlacement = (
   node: PdfJsxChild | PdfJsxChild[],
@@ -1200,6 +1244,21 @@ const validatePageBreakPlacement = (
     const childCanBreak =
       child.kind === 'page' ? true : canBreak && PAGE_BREAK_PARENT_KINDS.has(child.kind);
     validatePageBreakPlacement(child.children, child.kind, childCanBreak);
+  }
+};
+
+const validateAbsolutePlacement = (
+  node: PdfJsxChild | PdfJsxChild[],
+  parentKind: string | undefined = undefined,
+) => {
+  for (const child of flattenForSplitting(node)) {
+    if (!isPdfJsxElement(child)) continue;
+
+    if (child.kind === 'absolute' && (!parentKind || !ABSOLUTE_PARENT_KINDS.has(parentKind))) {
+      throw new Error('@pdfme/jsx: <Absolute> can only be used inside <Page>, <Static>, or <Box>.');
+    }
+
+    validateAbsolutePlacement(child.children, child.kind);
   }
 };
 

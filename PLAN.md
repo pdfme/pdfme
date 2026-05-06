@@ -35,16 +35,16 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 ## 次に進めること
 
-### 1. `@pdfme/jsx` Absolute / manual placement 補助の判断
+### 1. `@pdfme/jsx` Absolute / manual placement 補助の初期実装
 
 - stacking layout では表現しにくい watermark、badge、右上固定ラベル、ページ上の細かい手動調整の
   逃げ道として `Absolute` / manual placement helper を検討する。
 - ただし `@pdfme/jsx` の主軸は stacking layout に置く。通常の本文、Markdown 由来の文書、
   AI template authoring は `Stack` / `Row` / `Box` / `Text` などで組む前提にする。
-- `Absolute` を入れる場合は flow に参加しない overlay として扱い、子要素の高さで後続要素を
+- `Absolute` は flow に参加しない overlay として扱い、子要素の高さで後続要素を
   押し出さない。乱用すると絶対座標 JSON と同じ難しさに戻るため、API と docs で用途を絞る。
-- 座標は親の layout frame 基準を基本にする。`Page` body 内では page margin 内、`Static` 内では
-  page 全体、`Box` 内では box content frame のように、親によって自然な基準を決める。
+- 初期実装では `Page`, `Static`, `Box` の直下で許可する。座標は親の layout frame 基準にする。
+  `Page` body 内では page margin 内、`Static` 内では page 全体、`Box` 内では box content frame。
 - 初期 API は `x`, `y`, `width`, `height` 程度に留め、CSS `position` / `style` 互換は目指さない。
 
 ### 2. `@pdfme/jsx` layout 品質フォローアップ

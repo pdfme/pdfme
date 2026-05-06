@@ -1,4 +1,5 @@
 export {
+  Absolute,
   Box,
   Ellipse,
   Footer,
@@ -20,6 +21,7 @@ export {
 } from './components.js';
 export { renderToTemplate } from './render.js';
 export type {
+  AbsoluteProps,
   BoxProps,
   BoxSides,
   CellStyle,
