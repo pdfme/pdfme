@@ -418,6 +418,7 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
+    height: '100%',
   };
 
   const textBlock = document.createElement('div');
