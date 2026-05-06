@@ -1,9 +1,13 @@
 import type { BasePdf, Font, PageOrientation, PageSize, Schema, Template } from '@pdfme/common';
 import type {
   ALIGNMENT,
+  ImageSchema,
   LIST_STYLE,
   ListItem as SchemaListItem,
+  LineSchema,
   CellStyle as SchemaCellStyle,
+  ShapeSchema,
+  SVGSchema,
   TableSchema,
   TextSchema,
   MultiVariableTextSchema,
@@ -18,6 +22,11 @@ export type BuiltinKind =
   | 'spacer'
   | 'text'
   | 'multiVariableText'
+  | 'image'
+  | 'svg'
+  | 'rectangle'
+  | 'ellipse'
+  | 'line'
   | 'list'
   | 'table'
   | 'pagebreak';
@@ -170,6 +179,41 @@ export type MultiVariableTextProps = CommonProps &
     borderWidth?: number;
     dynamicFontSize?: Partial<NonNullable<MultiVariableTextSchema['dynamicFontSize']>>;
   };
+
+type ImageSchemaProps = Partial<
+  Pick<ImageSchema, 'name' | 'width' | 'height' | 'readOnly' | 'required'>
+>;
+
+export type ImageProps = CommonProps &
+  ImageSchemaProps & {
+    src?: string;
+  };
+
+type SvgSchemaProps = Partial<
+  Pick<SVGSchema, 'name' | 'width' | 'height' | 'readOnly' | 'required'>
+>;
+
+export type SvgProps = SvgSchemaProps & {
+  svg?: string;
+  children?: PdfJsxChild;
+} & CommonProps;
+
+type ShapeSchemaProps = Partial<
+  Pick<ShapeSchema, 'name' | 'width' | 'height' | 'borderWidth' | 'borderColor' | 'radius'>
+>;
+
+export type RectangleProps = CommonProps &
+  ShapeSchemaProps & {
+    fill?: ShapeSchema['color'];
+  };
+
+export type EllipseProps = CommonProps &
+  Omit<ShapeSchemaProps, 'radius'> & {
+    fill?: ShapeSchema['color'];
+  };
+
+export type LineProps = CommonProps &
+  Partial<Pick<LineSchema, 'name' | 'width' | 'height' | 'color'>>;
 
 export type ListItem = string | { text: SchemaListItem['text']; level?: SchemaListItem['level'] };
 

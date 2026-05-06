@@ -33,8 +33,14 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 - `MultiVariableText` uses `text` or children as the template string and stores `values` as the
   JSON input. Variable names are inferred from `{name}` placeholders and can also be passed with
   `variables`.
+- `Image` uses `src` as its initial content and is intended to be self-closing.
+- `Svg` uses `svg` or children as its initial content.
+- With `name`, `Image` and `Svg` become input-backed schemas; without `name`, they are read-only
+  content.
+- `Rectangle`, `Ellipse`, and `Line` are static visual schemas for backgrounds, dividers, and simple
+  shapes.
 - `PageBreak` is supported only along a `Page` / `Stack` / `Box` layout path. It is rejected inside
-  `Row`, `Text`, `MultiVariableText`, `List`, and `Table`.
+  `Row`, leaf schemas, `List`, and `Table`.
 - All `Page` nodes in one `renderToTemplate` call must use the same page size, orientation, and
   margin because a pdfme blank `basePdf` has one shared size and padding.
 - `Table widths` are percentages passed to pdfme `headWidthPercentages`, for example

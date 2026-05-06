@@ -1,13 +1,18 @@
 import { createElementNode } from './node.js';
 import type {
   BoxProps,
+  EllipseProps,
+  ImageProps,
+  LineProps,
   ListProps,
   MultiVariableTextProps,
   PageBreakProps,
   PageProps,
+  RectangleProps,
   RowProps,
   SpacerProps,
   StackProps,
+  SvgProps,
   TableProps,
   TextProps,
 } from './types.js';
@@ -28,6 +33,11 @@ export const Text = makeBuiltin<TextProps, 'text'>('text');
 export const MultiVariableText = makeBuiltin<MultiVariableTextProps, 'multiVariableText'>(
   'multiVariableText',
 );
+export const Image = makeBuiltin<ImageProps, 'image'>('image');
+export const Svg = makeBuiltin<SvgProps, 'svg'>('svg');
+export const Rectangle = makeBuiltin<RectangleProps, 'rectangle'>('rectangle');
+export const Ellipse = makeBuiltin<EllipseProps, 'ellipse'>('ellipse');
+export const Line = makeBuiltin<LineProps, 'line'>('line');
 export const List = makeBuiltin<ListProps, 'list'>('list');
 export const Table = makeBuiltin<TableProps, 'table'>('table');
 export const PageBreak = (props?: PageBreakProps) => createElementNode('pagebreak', props);

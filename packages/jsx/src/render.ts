@@ -2,8 +2,12 @@ import { getDefaultFont, pt2mm, resolvePageSize } from '@pdfme/common';
 import type { Font, Schema, Template } from '@pdfme/common';
 import type {
   CellStyle as SchemaCellStyle,
+  ImageSchema,
+  LineSchema,
   ListSchema,
   MultiVariableTextSchema,
+  ShapeSchema,
+  SVGSchema,
   TableSchema,
   TextSchema,
 } from '@pdfme/schemas/types';
@@ -18,17 +22,22 @@ import type {
   BoxProps,
   BoxSides,
   CellStyle,
+  EllipseProps,
+  ImageProps,
+  LineProps,
   ListProps,
   MultiVariableTextProps,
   MultiVariableTextValues,
   PageProps,
   PdfJsxChild,
   PdfJsxElement,
+  RectangleProps,
   RenderOptions,
   RenderResult,
   RowProps,
   SpacerProps,
   StackProps,
+  SvgProps,
   TableProps,
   TextProps,
 } from './types.js';
@@ -49,6 +58,10 @@ const DEFAULT_FONT_SIZE = 10;
 const DEFAULT_LINE_HEIGHT = 1;
 const DEFAULT_CHARACTER_SPACING = 0;
 const DEFAULT_FONT_COLOR = '#000000';
+const DEFAULT_VISUAL_HEIGHT = 40;
+const DEFAULT_LINE_THICKNESS = 0.5;
+const DEFAULT_LINE_COLOR = '#000000';
+const DEFAULT_SHAPE_BORDER_COLOR = '#000000';
 const DEFAULT_DYNAMIC_FONT_SIZE = {
   min: 4,
   max: 72,
@@ -263,6 +276,16 @@ const renderElement = async (
         frame,
         ctx,
       );
+    case 'image':
+      return renderImage(element.props as ImageProps, frame, ctx);
+    case 'svg':
+      return renderSvg({ ...(element.props as SvgProps), children: element.children }, frame, ctx);
+    case 'rectangle':
+      return renderShape('rectangle', element.props as RectangleProps, frame, ctx);
+    case 'ellipse':
+      return renderShape('ellipse', element.props as EllipseProps, frame, ctx);
+    case 'line':
+      return renderLine(element.props as LineProps, frame, ctx);
     case 'list':
       return renderList(
         { ...(element.props as ListProps), children: element.children },
@@ -480,6 +503,122 @@ const renderMultiVariableText = async (
   ctx.schemas.push(schema);
 
   return { width, height: schema.height };
+};
+
+const renderImage = (
+  props: ImageProps,
+  frame: Rect,
+  ctx: RenderCtx,
+): { width: number; height: number } => {
+  const width = props.width ?? frame.width;
+  const height = props.height ?? DEFAULT_VISUAL_HEIGHT;
+  const name = resolveName(ctx, 'image', props.name);
+  const readOnly = props.readOnly ?? props.name == null;
+  const content = props.src ?? '';
+
+  const schema: ImageSchema = {
+    name,
+    type: 'image',
+    content,
+    position: { x: frame.x, y: frame.y },
+    width,
+    height,
+    rotate: props.rotate ?? 0,
+    opacity: props.opacity ?? 1,
+    readOnly,
+    required: props.required,
+  };
+
+  if (!readOnly) ctx.inputs[name] = content;
+  ctx.schemas.push(schema);
+
+  return { width, height };
+};
+
+const renderSvg = (
+  props: SvgProps,
+  frame: Rect,
+  ctx: RenderCtx,
+): { width: number; height: number } => {
+  const width = props.width ?? frame.width;
+  const height = props.height ?? DEFAULT_VISUAL_HEIGHT;
+  const name = resolveName(ctx, 'svg', props.name);
+  const readOnly = props.readOnly ?? props.name == null;
+  const content = props.svg ?? childrenToString(props.children);
+
+  const schema: SVGSchema = {
+    name,
+    type: 'svg',
+    content,
+    position: { x: frame.x, y: frame.y },
+    width,
+    height,
+    rotate: props.rotate ?? 0,
+    opacity: props.opacity ?? 1,
+    readOnly,
+    required: props.required,
+  };
+
+  if (!readOnly) ctx.inputs[name] = content;
+  ctx.schemas.push(schema);
+
+  return { width, height };
+};
+
+const renderShape = (
+  type: ShapeSchema['type'],
+  props: RectangleProps | EllipseProps,
+  frame: Rect,
+  ctx: RenderCtx,
+): { width: number; height: number } => {
+  const width = props.width ?? frame.width;
+  const height = props.height ?? DEFAULT_VISUAL_HEIGHT;
+  const fill = props.fill ?? '';
+  const borderWidth = props.borderWidth ?? (props.borderColor || !fill ? 1 : 0);
+
+  const schema: ShapeSchema = {
+    name: resolveName(ctx, type, props.name),
+    type,
+    position: { x: frame.x, y: frame.y },
+    width,
+    height,
+    rotate: props.rotate ?? 0,
+    opacity: props.opacity ?? 1,
+    readOnly: true,
+    borderWidth,
+    borderColor: props.borderColor ?? (borderWidth > 0 ? DEFAULT_SHAPE_BORDER_COLOR : ''),
+    color: fill,
+    radius: type === 'rectangle' ? ((props as RectangleProps).radius ?? 0) : 0,
+  };
+
+  ctx.schemas.push(schema);
+
+  return { width, height };
+};
+
+const renderLine = (
+  props: LineProps,
+  frame: Rect,
+  ctx: RenderCtx,
+): { width: number; height: number } => {
+  const width = props.width ?? frame.width;
+  const height = props.height ?? DEFAULT_LINE_THICKNESS;
+
+  const schema: LineSchema = {
+    name: resolveName(ctx, 'line', props.name),
+    type: 'line',
+    position: { x: frame.x, y: frame.y },
+    width,
+    height,
+    rotate: props.rotate ?? 0,
+    opacity: props.opacity ?? 1,
+    readOnly: true,
+    color: props.color ?? DEFAULT_LINE_COLOR,
+  };
+
+  ctx.schemas.push(schema);
+
+  return { width, height };
 };
 
 const renderList = (
