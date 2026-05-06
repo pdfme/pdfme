@@ -34,8 +34,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 - リンク基盤、`@pdfme/jsx` MVP、text / MVT の `overflow: "expand"`、行単位 page split、
   custom `basePdf` 制御、dynamic layout docs は main に入った。
-- plain `multiVariableText` の split chunk は Form 上でも編集できる。
-- inline-markdown の split chunk は、plain text / MVT ともに Form 上では read-only のまま残す。
+- `multiVariableText` の split chunk は、plain / inline-markdown ともに Form 上で変数値だけ編集できる。
+- `text` schema の inline-markdown split chunk は Form 上では read-only のまま残す。
 - 次の大きな判断は、dynamic layout の編集体験をどこまで広げるかと、`@pdfme/jsx` / `md2pdf`
   に進む前にどの schema 表現を追加するか。
 
@@ -94,9 +94,8 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
   `__splitRange: { unit: "textLine", start, end }` を持つ split schema に分割し、次ページへ続ける。
   plain text と inline-markdown は同じ line layout を使い、PDF / UI preview で split chunk が
   同じ input 全体を重複描画しないようにする。
-- inline-markdown の split chunk は markdown 記法が行境界で分断される可能性があるため、Form 上では
-  初回は read-only 表示に寄せる。将来的に編集可能にする場合は rich text AST と selection/editing
-  model を合わせて設計する。
+- inline-markdown の split chunk は markdown 記法が行境界で分断される可能性があるため、`text`
+  schema は Form 上では read-only 表示に寄せる。編集対象は Designer / template authoring 側に寄せる。
 
 ### PR #1469: dynamic layout split range の共通化
 
@@ -132,13 +131,21 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 - inline-markdown の split chunk は、rich text AST / selection editing の設計が必要なため read-only
   のまま残す。
 
+### PR #1474: inline-markdown `multiVariableText` split chunk の変数編集
+
+- inline-markdown `multiVariableText` の split chunk は、Form 上で表示範囲内の変数値だけ編集できる。
+- template の markdown 記法、static text、link は Form では編集対象にしない。
+- 変数値に `**` や `` ` `` などの markdown delimiter が含まれても、変数値として literal に扱う。
+  計測時は escape 済みの値を使い、再描画時に変数値が markdown として再解釈されないようにする。
+- link は Form 上では clickable にしない。link の見た目を Form mode でも維持するかは follow-up とする。
+
 ## 次 PR 候補
 
-### 1. inline-markdown split chunk 編集方針
+### 1. `text` schema inline-markdown split chunk 編集方針
 
 直近で一番悩ましい残論点。すぐ実装するより、先に仕様を固定した方がよい。
 
-- split 後の inline-markdown text / MVT を Form 上でも編集可能にするか、read-only 表示に限定するか決める。
+- split 後の inline-markdown `text` を Form 上でも編集可能にするか、read-only 表示に限定するか決める。
 - 編集可能にする場合は、markdown source string を直接編集するのか、rich text AST / run model を編集して
   source へ戻すのか決める。
 - link / bold / italic / inline code が行境界で分断された場合の selection / blur / input merge 方針を決める。
@@ -235,8 +242,7 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
 
 Dynamic layout / editing:
 
-- inline-markdown の `multiVariableText` split chunk を Form 上で編集可能にするべきか、read-only chunk のままでよいか。
-- split 後の inline-markdown 編集をサポートするか、read-only 表示に限定するか。
+- `text` schema の split inline-markdown 編集をサポートするか、read-only 表示に限定するか。
 - split chunk 内の複数 variable span を連続編集した場合、blur の順序と reflow 後の最新 input を
   どう同期するか。必要なら live pagination / editing session の設計と合わせて扱う。
 - custom `basePdf` では dynamic layout を無効にする現行方針で固定するか、将来的に限定的な reflow
@@ -246,6 +252,8 @@ Dynamic layout / editing:
 Rich content / link:
 
 - MVT の inline link 対応をどのタイミングで入れるか。
+- Form mode の inline link は clickable にしないまま、色や underline などの視覚表現だけを
+  viewer と揃えるべきか決める。
 - table cell / list item の rich inline content を schema 拡張で扱うか、複数 schema に分解するか。
 - link の見た目をデフォルトで青 + 下線にするか、明示的 styling に任せるか。
 - Designer で通常のテキスト編集を難しくせずにリンク編集 UI をどう出すか。
