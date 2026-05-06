@@ -42,9 +42,14 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   shapes.
 - Layout children can use `margin`. `Stack` and `Row` support `alignItems` for simple cross-axis
   alignment without trying to implement full CSS/Flexbox.
+- `Stack` and `Row` support `justifyContent="start" | "center" | "end" | "space-between"` for
+  main-axis spacing. `Stack` uses this most predictably with an explicit `height`; `Row` uses it most
+  predictably with an explicit `width`.
 - `Stack` defaults to `alignItems="stretch"` to preserve full-width stacking. Use an explicit child
   `width` when you want `alignItems="center"` or `"end"` to visibly move that child.
 - `Row` defaults to `alignItems="start"` and intentionally does not support cross-axis stretch yet.
+- Row children can use `flexGrow` or `flex` as a grow weight. If `width` is also set, it is used as
+  the basis before remaining width is distributed.
 - `PageBreak` is supported only along a `Page` / `Stack` / `Box` layout path. It is rejected inside
   `Row`, leaf schemas, `List`, and `Table`.
 - All `Page` nodes in one `renderToTemplate` call must use the same page size, orientation, and

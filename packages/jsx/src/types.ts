@@ -75,9 +75,14 @@ export type BoxSides = {
 };
 
 export type LayoutAlignItems = 'start' | 'center' | 'end' | 'stretch';
+export type LayoutJustifyContent = 'start' | 'center' | 'end' | 'space-between';
 
 export type LayoutProps = {
   margin?: number | BoxSides;
+  /** Row-only grow weight. Explicit width is used as the basis when present. */
+  flexGrow?: number;
+  /** Short alias for flexGrow. */
+  flex?: number;
 };
 
 export type CommonProps = LayoutProps & Partial<Pick<Schema, 'rotate' | 'opacity'>>;
@@ -93,7 +98,9 @@ export type PageProps = {
 export type StackProps = LayoutProps & {
   gap?: number;
   width?: number;
+  height?: number;
   alignItems?: LayoutAlignItems;
+  justifyContent?: LayoutJustifyContent;
   children?: PdfJsxChild;
 };
 
@@ -102,6 +109,7 @@ export type RowProps = LayoutProps & {
   width?: number;
   height?: number;
   alignItems?: Exclude<LayoutAlignItems, 'stretch'>;
+  justifyContent?: LayoutJustifyContent;
   children?: PdfJsxChild;
 };
 

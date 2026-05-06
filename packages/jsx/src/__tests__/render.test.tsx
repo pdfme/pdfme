@@ -284,6 +284,23 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
+  it('justifies Stack children on the main axis when height is explicit', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Stack height={30} justifyContent="end">
+          <Text height={6}>A</Text>
+          <Text height={4}>B</Text>
+        </Stack>
+        <Text height={4}>After</Text>
+      </Page>,
+    );
+
+    const [first, second, after] = result.template.schemas[0] ?? [];
+    expect(first?.position.y).toBe(20);
+    expect(second?.position.y).toBe(26);
+    expect(after?.position.y).toBe(30);
+  });
+
   it('measures Text auto height with pdfme text wrapping', async () => {
     const singleLine = await renderToTemplate(
       <Page margin={0}>
@@ -317,6 +334,46 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(flex1?.width).toBe(36);
     expect(flex2?.position.x).toBe(64);
     expect(flex2?.width).toBe(36);
+  });
+
+  it('distributes Row width by flexGrow weights', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 120, height: 100 }} margin={0}>
+        <Row>
+          <Text flexGrow={2}>Wide</Text>
+          <Text flex={1}>Narrow</Text>
+        </Row>
+      </Page>,
+    );
+
+    const [wide, narrow] = result.template.schemas[0] ?? [];
+    expect(wide).toMatchObject({
+      position: { x: 0, y: 0 },
+      width: 80,
+    });
+    expect(narrow).toMatchObject({
+      position: { x: 80, y: 0 },
+      width: 40,
+    });
+  });
+
+  it('uses explicit Row width as flex basis before flexGrow', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 120, height: 100 }} margin={0}>
+        <Row width={120}>
+          <Text width={20} flexGrow={1}>
+            A
+          </Text>
+          <Text width={20} flexGrow={3}>
+            B
+          </Text>
+        </Row>
+      </Page>,
+    );
+
+    const [first, second] = result.template.schemas[0] ?? [];
+    expect(first).toMatchObject({ position: { x: 0, y: 0 }, width: 40 });
+    expect(second).toMatchObject({ position: { x: 40, y: 0 }, width: 80 });
   });
 
   it('accounts for child margins when distributing Row width', async () => {
@@ -360,6 +417,29 @@ describe('@pdfme/jsx renderToTemplate', () => {
     const [small, tall] = result.template.schemas[0] ?? [];
     expect(small?.position.y).toBe(4);
     expect(tall?.position.y).toBe(0);
+  });
+
+  it('justifies fixed-width Row children on the main axis', async () => {
+    const result = await renderToTemplate(
+      <Page size={{ width: 100, height: 100 }} margin={0}>
+        <Row width={100} justifyContent="space-between">
+          <Text width={20} height={6}>
+            A
+          </Text>
+          <Text width={20} height={6}>
+            B
+          </Text>
+          <Text width={20} height={6}>
+            C
+          </Text>
+        </Row>
+      </Page>,
+    );
+
+    const [first, second, third] = result.template.schemas[0] ?? [];
+    expect(first?.position.x).toBe(0);
+    expect(second?.position.x).toBe(40);
+    expect(third?.position.x).toBe(80);
   });
 
   it('uses explicit Row height for Stack advancement', async () => {
