@@ -1,4 +1,5 @@
 export { getDynamicLayoutForList } from './list/dynamicTemplate.js';
+export { createListItemSplitRange, getListItemRange, LIST_ITEM_SPLIT_UNIT } from './splitRange.js';
 export {
   normalizeListItems,
   normalizeListItemEntries,

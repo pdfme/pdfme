@@ -6,9 +6,20 @@ import {
   type Schema,
 } from '@pdfme/common';
 
-export const TABLE_BODY_SPLIT_UNIT = 'tableBody';
-export const LIST_ITEM_SPLIT_UNIT = 'listItem';
-export const TEXT_LINE_SPLIT_UNIT = 'textLine';
+// Keep the common schema open for external plugin units while exposing the built-in units as
+// typed constants for pdfme's bundled dynamic layout schemas.
+export const BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS = {
+  tableBody: 'tableBody',
+  listItem: 'listItem',
+  textLine: 'textLine',
+} as const;
+
+export type BuiltInDynamicLayoutSplitUnit =
+  (typeof BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS)[keyof typeof BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS];
+
+export const TABLE_BODY_SPLIT_UNIT = BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS.tableBody;
+export const LIST_ITEM_SPLIT_UNIT = BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS.listItem;
+export const TEXT_LINE_SPLIT_UNIT = BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS.textLine;
 
 export const createTableBodySplitRange = (start: number, end?: number): DynamicLayoutSplitRange =>
   createDynamicLayoutSplitRange(TABLE_BODY_SPLIT_UNIT, start, end);

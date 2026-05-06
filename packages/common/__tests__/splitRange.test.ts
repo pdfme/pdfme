@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from '../src/index.js';
+import { Schema } from '../src/schema.js';
 
 describe('dynamic layout split range', () => {
   test('creates a generic split range', () => {
@@ -10,16 +11,29 @@ describe('dynamic layout split range', () => {
     });
   });
 
-  test('reads matching ranges and falls back for non-matching units', () => {
+  test('reads matching ranges and ignores non-matching units', () => {
     const schema = {
       __splitRange: { unit: 'textLine', start: 2, end: 4 },
     };
-    const fallback = { start: 0, end: 1 };
 
-    expect(getDynamicLayoutSplitRange(schema, 'textLine', fallback)).toEqual({
+    expect(getDynamicLayoutSplitRange(schema, 'textLine')).toEqual({
       start: 2,
       end: 4,
     });
-    expect(getDynamicLayoutSplitRange(schema, 'listItem', fallback)).toEqual(fallback);
+    expect(getDynamicLayoutSplitRange(schema, 'listItem')).toBeUndefined();
+  });
+
+  test('requires non-empty split range units', () => {
+    const result = Schema.safeParse({
+      name: 'field',
+      type: 'text',
+      content: '',
+      position: { x: 0, y: 0 },
+      width: 10,
+      height: 10,
+      __splitRange: { unit: '', start: 0 },
+    });
+
+    expect(result.success).toBe(false);
   });
 });

@@ -14,6 +14,7 @@ import {
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import type { TableSchema } from './types.js';
 import { getTableBodyRange } from '../splitRange.js';
+import type { DynamicLayoutRange } from '@pdfme/common';
 
 export const getDefaultCellStyles = () => ({
   fontName: undefined,
@@ -208,14 +209,14 @@ export const getBody = (value: string | string[][]): string[][] => {
   return value || [];
 };
 
-export const getBodyWithRange = (
-  value: string | string[][],
-  range?: { start: number; end?: number | undefined },
-) => {
+export const getBodyWithRange = (value: string | string[][], range?: DynamicLayoutRange) => {
   const body = getBody(value);
   if (!range) return body;
   return body.slice(range.start, range.end);
 };
 
-export const getBodyWithSchemaRange = (value: string | string[][], schema: TableSchema) =>
-  getBodyWithRange(value, getTableBodyRange(schema));
+export const getBodyWithSchemaRange = (
+  value: string | string[][],
+  schema: TableSchema,
+  range = getTableBodyRange(schema),
+) => getBodyWithRange(value, range);

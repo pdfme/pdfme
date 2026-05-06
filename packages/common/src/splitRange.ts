@@ -13,10 +13,9 @@ export const createDynamicLayoutSplitRange = (
 export const getDynamicLayoutSplitRange = (
   schema: { __splitRange?: DynamicLayoutSplitRange },
   unit: string,
-  fallback?: DynamicLayoutRange,
 ): DynamicLayoutRange | undefined => {
   const range = schema.__splitRange;
-  if (range?.unit !== unit) return fallback;
+  if (range?.unit !== unit) return undefined;
 
   return {
     start: range.start,

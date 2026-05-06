@@ -86,9 +86,10 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
   `overflow: "expand"` と `dynamicFontSize` は同時利用できないこと、expand では通常の
   `fontSize` を使って高さを広げることを明記する。
 - `multiVariableText` は変数置換後の実描画テキストで高さを測る。
-- ページ末尾を超える場合、text / `multiVariableText` は行単位で `__textLineRange` を持つ
-  split schema に分割し、次ページへ続ける。plain text と inline-markdown は同じ line layout を
-  使い、PDF / UI preview で split chunk が同じ input 全体を重複描画しないようにする。
+- ページ末尾を超える場合、text / `multiVariableText` は行単位で
+  `__splitRange: { unit: "textLine", start, end }` を持つ split schema に分割し、次ページへ続ける。
+  plain text と inline-markdown は同じ line layout を使い、PDF / UI preview で split chunk が
+  同じ input 全体を重複描画しないようにする。
 - `multiVariableText` の split chunk は、変数入力の一部だけを安全に編集・復元する設計が必要なため、
   初回は Form 上では resolved text の read-only 表示にする。変数単位の編集をページ分割後も維持する
   かどうかは、MVT の variable-aware layout と合わせて別途検討する。

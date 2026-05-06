@@ -1,4 +1,4 @@
-import { getDefaultFont, mm2pt, pt2mm, type Font } from '@pdfme/common';
+import { getDefaultFont, mm2pt, pt2mm, type DynamicLayoutRange, type Font } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import { DEFAULT_CHARACTER_SPACING, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT } from './constants.js';
 import {
@@ -31,7 +31,7 @@ type MeasureTextLinesResult = {
   lineHeights: number[];
 };
 
-export const applyTextLineRange = <T>(lines: T[], range?: { start: number; end?: number }) => {
+export const applyTextLineRange = <T>(lines: T[], range?: DynamicLayoutRange) => {
   if (!range) return lines;
   return lines.slice(range.start, range.end ?? lines.length);
 };

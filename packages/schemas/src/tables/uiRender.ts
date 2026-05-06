@@ -231,7 +231,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const { rootElement, onChange, schema, value, mode, scale } = arg;
   const body = getBody(value);
   const bodyRange = getTableBodyRange(schema);
-  const bodyWidthRange = getBodyWithSchemaRange(value, schema);
+  const bodyWidthRange = getBodyWithSchemaRange(value, schema, bodyRange);
   const table = await createSingleTable(bodyWidthRange, arg);
   const showHead = table.settings.showHead;
 

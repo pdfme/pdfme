@@ -40,3 +40,16 @@ export {
 // Export utility functions
 export { getDynamicHeightsForTable, getDynamicLayoutForTable } from './tables.js';
 export { getDynamicLayoutForList } from './lists.js';
+export {
+  BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS,
+  LIST_ITEM_SPLIT_UNIT,
+  TABLE_BODY_SPLIT_UNIT,
+  TEXT_LINE_SPLIT_UNIT,
+  createListItemSplitRange,
+  createTableBodySplitRange,
+  createTextLineSplitRange,
+  getListItemRange,
+  getTableBodyRange,
+  getTextLineRange,
+  type BuiltInDynamicLayoutSplitUnit,
+} from './splitRange.js';

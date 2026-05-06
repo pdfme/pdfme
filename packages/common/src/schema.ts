@@ -125,7 +125,7 @@ export const ColorType = z.enum(['rgb', 'cmyk']).optional();
 export const Size = z.object({ height: z.number(), width: z.number() });
 
 export const DynamicLayoutSplitRange = z.object({
-  unit: z.string(),
+  unit: z.string().min(1),
   start: z.number(),
   end: z.number().optional(),
 });

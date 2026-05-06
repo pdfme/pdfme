@@ -33,3 +33,4 @@ export type { ShapeSchema } from './shapes/rectAndEllipse.js';
 export type { SelectSchema } from './select/index.js';
 export type { RadioGroupSchema } from './radioGroup/index.js';
 export type { CheckboxSchema } from './checkbox/index.js';
+export type { BuiltInDynamicLayoutSplitUnit } from './splitRange.js';
