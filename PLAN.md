@@ -85,16 +85,15 @@ layout/builder の考え方を `converter` package の `md2pdf` に応用し、M
   `overflow: "expand"` と `dynamicFontSize` は同時利用できないこと、expand では通常の
   `fontSize` を使って高さを広げることを明記する。
 - `multiVariableText` は変数置換後の実描画テキストで高さを測る。
-- ページ末尾を超える場合、今回の初回実装では「高さを持つ 1 つの単位」として次ページに
-  回す、または大きすぎる場合はそのまま配置する。文章を行・段落単位で分割して次ページへ
-  続ける処理は、text split range / rich text run / Form 編集体験まで含めた別設計として扱う。
+- ページ末尾を超える場合、text / `multiVariableText` は行単位で `__textLineRange` を持つ
+  split schema に分割し、次ページへ続ける。plain text と inline-markdown は同じ line layout を
+  使い、PDF / UI preview で split chunk が同じ input 全体を重複描画しないようにする。
+- 段落単位の keep-together、widow/orphan 制御、Form 編集中の live pagination は別設計として扱う。
 
-検討すること:
+残りの検討事項:
 
-- `measureTextHeight` を generator の dynamic layout に接続するか。
-- `multiVariableText` も同じ計測・押し下げの仕組みに乗せられるか。
 - `text`, `multiVariableText`, `list`, `table` の dynamic layout contract を共通化できるか。
-- 長文 text / MVT がページ末尾を超える場合、行・段落単位のページ分割まで扱うか。
+- 長文 text / MVT の段落単位 keep-together や widow/orphan 制御をどこまで扱うか。
 - blank PDF と custom `basePdf` で挙動を分ける必要があるか。
 - 既存テンプレートへの互換性リスクをどう抑えるか。
 

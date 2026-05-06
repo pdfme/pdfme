@@ -30,6 +30,7 @@ import {
   splitTextToSize,
 } from './helper.js';
 import { stripInlineMarkdown } from './inlineMarkdown.js';
+import { applyTextLineRange } from './measure.js';
 import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './richText.js';
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
@@ -213,13 +214,16 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const descent = getFontDescentInPt(fontKitFont, fontSize);
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
-  const lines = splitTextToSize({
-    value,
-    characterSpacing,
-    fontSize,
-    fontKitFont,
-    boxWidthInPt: width,
-  });
+  const lines = applyTextLineRange(
+    splitTextToSize({
+      value,
+      characterSpacing,
+      fontSize,
+      fontKitFont,
+      boxWidthInPt: width,
+    }),
+    schema.__textLineRange,
+  );
   const needsTextWidth = alignment !== 'left' || Boolean(schema.strikethrough || schema.underline);
   const needsTextHeight = Boolean(schema.strikethrough || schema.underline);
 

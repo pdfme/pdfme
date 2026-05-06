@@ -4,6 +4,7 @@ import {
   UIRenderProps,
   getDefaultFont,
   getInternalLinkTarget,
+  mm2pt,
   normalizeLinkHref,
 } from '@pdfme/common';
 import type { TextSchema } from './types.js';
@@ -26,12 +27,15 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
+  splitTextToSize,
 } from './helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
+import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
 import {
   calculateDynamicRichTextFontSize,
   isInlineMarkdownTextSchema,
+  layoutRichTextLines,
   resolveRichTextRuns,
 } from './richText.js';
 import { isEditable } from '../utils.js';
@@ -106,7 +110,15 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     dynamicRichTextFontSize,
   );
 
-  const processedText = replaceUnsupportedChars(value, fontKitFont);
+  const processedText = replaceUnsupportedChars(
+    getRangedPlainTextValue({
+      value,
+      schema,
+      fontKitFont,
+      fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
+    }),
+    fontKitFont,
+  );
 
   if (!isEditable(mode, schema)) {
     if (enableInlineMarkdown) {
@@ -216,50 +228,102 @@ const renderInlineMarkdownReadOnly = async (arg: {
     font,
     _cache,
   });
+  if (schema.__textLineRange) {
+    const lines = applyTextLineRange(
+      layoutRichTextLines({
+        runs,
+        fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
+        characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+        boxWidthInPt: mm2pt(schema.width),
+      }),
+      schema.__textLineRange,
+    );
+
+    textBlock.innerHTML = '';
+    lines.forEach((line, lineIndex) => {
+      line.runs.forEach((run) => {
+        appendInlineMarkdownRun({ textBlock, run, schema, font });
+      });
+      if (lineIndex < lines.length - 1) textBlock.appendChild(document.createElement('br'));
+    });
+    return;
+  }
 
   textBlock.innerHTML = '';
   runs.forEach((run) => {
-    const href = run.href ? normalizeLinkHref(run.href) : undefined;
-    const span = href ? document.createElement('a') : document.createElement('span');
-    const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
-    const textDecorations: string[] = [];
-
-    span.textContent = processedText;
-    if (href) {
-      const anchor = span as HTMLAnchorElement;
-      anchor.href = href;
-      if (!getInternalLinkTarget(href)) {
-        anchor.target = '_blank';
-        anchor.rel = 'noopener noreferrer';
-      }
-      textDecorations.push('underline');
-    }
-    if (run.fontName) {
-      span.style.fontFamily = `'${run.fontName}'`;
-    }
-    if (run.syntheticBold) {
-      span.style.fontWeight = '800';
-      span.style.textShadow = SYNTHETIC_BOLD_CSS_TEXT_SHADOW;
-    }
-    if (run.syntheticItalic) {
-      span.style.fontStyle = 'italic';
-    }
-    if (run.strikethrough) {
-      textDecorations.push('line-through');
-    }
-    if (textDecorations.length > 0) {
-      span.style.textDecoration = textDecorations.join(' ');
-    }
-    if (run.code) {
-      span.style.backgroundColor = CODE_BACKGROUND_COLOR;
-      span.style.borderRadius = '2px';
-      span.style.padding = '0 0.15em';
-      if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
-        span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
-      }
-    }
-    textBlock.appendChild(span);
+    appendInlineMarkdownRun({ textBlock, run, schema, font });
   });
+};
+
+const appendInlineMarkdownRun = (arg: {
+  textBlock: HTMLDivElement;
+  run: Awaited<ReturnType<typeof resolveRichTextRuns>>[number];
+  schema: TextSchema;
+  font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
+}) => {
+  const { textBlock, run, schema, font } = arg;
+  const href = run.href ? normalizeLinkHref(run.href) : undefined;
+  const span = href ? document.createElement('a') : document.createElement('span');
+  const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
+  const textDecorations: string[] = [];
+
+  span.textContent = processedText;
+  if (href) {
+    const anchor = span as HTMLAnchorElement;
+    anchor.href = href;
+    if (!getInternalLinkTarget(href)) {
+      anchor.target = '_blank';
+      anchor.rel = 'noopener noreferrer';
+    }
+    textDecorations.push('underline');
+  }
+  if (run.fontName) {
+    span.style.fontFamily = `'${run.fontName}'`;
+  }
+  if (run.syntheticBold) {
+    span.style.fontWeight = '800';
+    span.style.textShadow = SYNTHETIC_BOLD_CSS_TEXT_SHADOW;
+  }
+  if (run.syntheticItalic) {
+    span.style.fontStyle = 'italic';
+  }
+  if (run.strikethrough) {
+    textDecorations.push('line-through');
+  }
+  if (textDecorations.length > 0) {
+    span.style.textDecoration = textDecorations.join(' ');
+  }
+  if (run.code) {
+    span.style.backgroundColor = CODE_BACKGROUND_COLOR;
+    span.style.borderRadius = '2px';
+    span.style.padding = '0 0.15em';
+    if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
+      span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
+    }
+  }
+  textBlock.appendChild(span);
+};
+
+const getRangedPlainTextValue = (arg: {
+  value: string;
+  schema: TextSchema;
+  fontKitFont: FontKitFont;
+  fontSize: number;
+}) => {
+  const { value, schema, fontKitFont, fontSize } = arg;
+  if (!schema.__textLineRange) return value;
+
+  const lines = applyTextLineRange(
+    splitTextToSize({
+      value,
+      characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+      fontSize,
+      fontKitFont,
+      boxWidthInPt: mm2pt(schema.width),
+    }),
+    schema.__textLineRange,
+  );
+  return plainTextLinesToValue(lines);
 };
 
 export const buildStyledTextContainer = (

@@ -156,11 +156,63 @@ describe('generate integrate test', () => {
         plugins: { text: textProbePlugin },
       });
 
-      const body = renderedSchemas.find((schema) => schema.name === 'body');
+      const bodySchemas = renderedSchemas.filter((schema) => schema.name === 'body');
       const after = renderedSchemas.find((schema) => schema.name === 'after');
 
-      expect(body?.height).toBeGreaterThan(5);
+      expect(bodySchemas.reduce((sum, schema) => sum + schema.height, 0)).toBeGreaterThan(5);
       expect(after?.position.y).toBeGreaterThan(20);
+    });
+
+    test('splits expanded text schemas by line across blank PDF pages', async () => {
+      const renderedSchemas: Schema[] = [];
+      const textProbePlugin: Plugin = {
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: {
+            ...textObject(0, 0),
+            type: 'text',
+          },
+        },
+      };
+
+      await generate({
+        template: {
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+          schemas: [
+            [
+              {
+                ...textObject(10, 70, 'body'),
+                width: 20,
+                height: 5,
+                overflow: 'expand',
+                fontSize: 13,
+                lineHeight: 1,
+                characterSpacing: 0,
+              },
+            ],
+          ],
+        },
+        inputs: [{ body: 'long text '.repeat(30) }],
+        options: { font: getFont() },
+        plugins: { text: textProbePlugin },
+      });
+
+      const bodySchemas = renderedSchemas.filter((schema) => schema.name === 'body');
+      const firstRange = bodySchemas[0].__textLineRange;
+      expect(bodySchemas.length).toBeGreaterThan(1);
+      expect(firstRange?.start).toBe(0);
+      expect(firstRange?.end).toBeGreaterThan(0);
+      expect(bodySchemas[0].__isSplit).toBe(false);
+      expect(bodySchemas[1].__textLineRange?.start).toBe(firstRange?.end);
+      expect(bodySchemas[1].__isSplit).toBe(true);
+      expect(bodySchemas[1].position.y).toBe(10);
     });
   });
 

@@ -138,6 +138,7 @@ export const Schema = z
     required: z.boolean().optional(),
     __bodyRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __itemRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
+    __textLineRange: z.object({ start: z.number(), end: z.number().optional() }).optional(),
     __isSplit: z.boolean().optional(),
   })
   .passthrough();

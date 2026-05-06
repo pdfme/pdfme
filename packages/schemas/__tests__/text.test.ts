@@ -303,7 +303,8 @@ describe('text dynamic layout', () => {
       schema,
     });
 
-    expect(result.heights[0]).toBeGreaterThan(5);
+    expect(result.heights.reduce((sum, height) => sum + height, 0)).toBeGreaterThan(5);
+    expect(result.heights.length).toBeGreaterThan(1);
   });
 
   it('does not shrink text height when the measured height is smaller', async () => {
@@ -336,7 +337,7 @@ describe('text dynamic layout', () => {
       schema,
     });
 
-    expect(result.heights[0]).toBeGreaterThan(5);
+    expect(result.heights.reduce((sum, height) => sum + height, 0)).toBeGreaterThan(5);
     expect(
       result.patchSplitSchema?.({
         schema,
@@ -345,7 +346,40 @@ describe('text dynamic layout', () => {
         isSplit: false,
         chunkHeight: result.heights[0],
       }),
-    ).toEqual({ dynamicFontSize: undefined });
+    ).toEqual({
+      dynamicFontSize: undefined,
+      __textLineRange: { start: 0, end: 1 },
+      __isSplit: false,
+    });
+  });
+
+  it('patches expanded text chunks with line ranges', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights.length).toBeGreaterThan(2);
+    expect(
+      result.patchSplitSchema?.({
+        schema,
+        start: 1,
+        end: 3,
+        isSplit: true,
+        chunkHeight: result.heights[1] + result.heights[2],
+      }),
+    ).toEqual({
+      dynamicFontSize: undefined,
+      __textLineRange: { start: 1, end: 3 },
+      __isSplit: true,
+    });
   });
 
   it('does not use dynamic font size while text overflow is expand', () => {
