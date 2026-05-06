@@ -330,7 +330,7 @@ describe('multiVariableText inline markdown UI rendering', () => {
     expect(newValue.name).not.toBe('edited chunk');
   });
 
-  it('keeps split inline markdown form chunks as read-only resolved text', async () => {
+  it('writes split inline markdown form chunk edits back into the full variable value', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
     const schema: MultiVariableTextSchema = {
@@ -339,6 +339,44 @@ describe('multiVariableText inline markdown UI rendering', () => {
       variables: ['name'],
       width: 100,
       __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'first **line**\nsecond line' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('first **line**');
+    expect(variableSpan.contentEditable).toBe('plaintext-only');
+    expect(variableSpan.style.fontWeight).toBe('800');
+    expect(variableSpan.style.textShadow).not.toBe('');
+
+    variableSpan.textContent = 'edited **first** line';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'edited **first** line\nsecond line' }),
+    });
+  });
+
+  it('writes later split inline markdown chunk edits back into the correct variable range', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '**{name}**',
+      variables: ['name'],
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 1, end: 2 },
     };
 
     await uiRender({
@@ -353,10 +391,86 @@ describe('multiVariableText inline markdown UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = textBlock.querySelector('span') as HTMLSpanElement;
+    expect(textBlock.textContent).toBe('second line');
+
+    variableSpan.textContent = 'edited second line';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'first line\nedited second line' }),
+    });
+  });
+
+  it('does not create an editable split inline markdown span for an empty variable value', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '**{name}**',
+      variables: ['name'],
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: '' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
     textBlock.dispatchEvent(new Event('blur'));
 
+    expect(textBlock.textContent).toBe('');
+    expect(textBlock.querySelector('span')).toBeNull();
     expect(onChange).not.toHaveBeenCalled();
-    expect(textBlock.querySelector('span')?.contentEditable).not.toBe('plaintext-only');
-    expect(textBlock.textContent).toBe('first line');
+  });
+
+  it('keeps split inline markdown links non-clickable while editing variables', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '[docs](https://pdfme.com) for **{name}**',
+      variables: ['name'],
+      width: 100,
+      __splitRange: { unit: 'textLine', start: 0, end: 1 },
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'Alice\nBob' }),
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const variableSpan = Array.from(textBlock.querySelectorAll('span')).find(
+      (span) => span.contentEditable === 'plaintext-only',
+    ) as HTMLSpanElement;
+
+    expect(textBlock.querySelector('a')).toBeNull();
+    expect(textBlock.textContent).toBe('docs for Alice');
+    expect(variableSpan.textContent).toBe('Alice');
+    expect(variableSpan.style.fontWeight).toBe('800');
+
+    variableSpan.textContent = 'Carol';
+    variableSpan.dispatchEvent(new Event('blur'));
+
+    expect(onChange).toHaveBeenCalledWith({
+      key: 'content',
+      value: JSON.stringify({ name: 'Carol\nBob' }),
+    });
   });
 });
