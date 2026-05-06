@@ -14,6 +14,33 @@ const { template, inputs } = await md2pdf('# Hello\n\nVisit [pdfme](https://pdfm
 
 The initial MVP emits text, headings, lists, tables, code blocks, blockquotes, horizontal rules, and data URI images. `md2pdf` is exposed as a subpath export so normal converter imports do not pull the Markdown parser into browser bundles.
 
+### CJK and Japanese text
+
+The default pdfme font is Roboto, which does not include Japanese/CJK glyphs. For Japanese Markdown, set a CJK-capable `fontName` during conversion and pass the same font to `generate` or UI options.
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { md2pdf } from '@pdfme/converter/md2pdf';
+import { generate } from '@pdfme/generator';
+import { image, line, list, table, text } from '@pdfme/schemas';
+
+const fontData = await readFile('./fonts/NotoSansJP-Regular.ttf');
+const { template, inputs } = await md2pdf('# 日本語\n\nこれはPDF生成のテストです。', {
+  style: { fontName: 'NotoSansJP' },
+});
+
+const pdf = await generate({
+  template,
+  inputs,
+  plugins: { Text: text, List: list, Table: table, Image: image, Line: line },
+  options: {
+    font: {
+      NotoSansJP: { data: fontData, fallback: true, subset: false },
+    },
+  },
+});
+```
+
 Current limitations:
 
 - Pagination is handled by pdfme dynamic layout after conversion. Long text/list/table content can split across pages, while image keep-together behavior is intentionally basic.

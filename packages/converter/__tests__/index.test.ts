@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 // @ts-ignore
 import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
@@ -9,6 +12,11 @@ import {
   pdf2size as nodePdf2Size,
   img2pdf,
 } from '../src/index.node.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const notoSansJPData = readFileSync(
+  path.join(__dirname, '../../generator/__tests__/assets/fonts/NotoSansJP-Regular.ttf'),
+);
 
 const a4BasePdf = (padding: [number, number, number, number] = [20, 10, 20, 10]) => ({
   ...PAGE_SIZE_PRESETS.A4,
@@ -408,6 +416,32 @@ Visit [pdfme](https://pdfme.com).
       template,
       inputs,
       plugins: { Text: text, List: list, Table: table },
+    });
+
+    expect(pdf).toBeInstanceOf(Uint8Array);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+
+  test('generates a Japanese PDF when the caller provides a CJK font', async () => {
+    const { template, inputs } = await md2pdf('# 日本語\n\nこれはPDF生成のテストです。', {
+      style: { fontName: 'NotoSansJP' },
+    });
+
+    expect(template.schemas[0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'text', fontName: 'NotoSansJP' }),
+      ]),
+    );
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text },
+      options: {
+        font: {
+          NotoSansJP: { data: notoSansJPData, fallback: true, subset: false },
+        },
+      },
     });
 
     expect(pdf).toBeInstanceOf(Uint8Array);
