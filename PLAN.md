@@ -34,6 +34,7 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
   `md2pdf` playground と揃える。
 - 最初の examples は invoice / report / article / header-footer / absolute badge など、AI や人間が
   真似しやすいものに絞る。
+- `md2pdf` / `jsx` playground は、将来それぞれ複数の sample preset を切り替えられるようにする。
 - `Static`, `Header`, `Footer`, `Absolute`, dynamic height, `Text` / `MultiVariableText`,
   `Image` / `Svg` / visual schemas, `List` / `Table` の使いどころを docs に整理する。
 - website docs に `@pdfme/jsx` の beta ページを追加する。`jsxImportSource`, `renderToTemplate`,
@@ -60,20 +61,33 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
   受けたい場合は、import stripping / sandbox / Blob module resolution を別途設計する。
 - preview 更新は debounce し、compile / render error を editor 下か viewer header に表示する。
 
-### 4. `md2pdf` layout 品質フォローアップ
+### 4. playground / examples UX フォローアップ
+
+- JSX playground は Viewer だけでなく Form preview も切り替えられるようにする。生成 template から
+  Designer に遷移する導線も検討する。
+- JSX static schema API は、`Header` / `Footer` / `Static` が後続 `Page` に暗黙反映される点と、
+  page margin の影響を受けない点が直感に反する。`Document` component を `Page` の上位に置き、
+  `Document` 内に `Header` / `Footer` / `Static` を宣言する API も含めて、react-pdf の component
+  model を参考に再設計を検討する。
+- Template 一覧は template type に応じて Designer / FormViewer / `md2pdf` / `jsx` playground へ
+  遷移する導線を検討する。ただし preset が増えた時に一覧性が落ちないかも検証する。
+- playground の `localStorage` 保存運用は、preset / draft / imported template の扱いが混ざりやすい。
+  永続化スコープ、reset、共有可能 URL、保存済み template の見せ方を整理する。
+
+### 5. `md2pdf` layout 品質フォローアップ
 
 - heading 直後の keep-with-next、table / image / code block の keep-together、widow/orphan を検討する。
 - 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
 - blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
 
-### 5. `md2pdf` assets / rich content 方針
+### 6. `md2pdf` assets / rich content 方針
 
 - remote image は converter 内で fetch して data URI 化するか、引き続き link fallback とするかを決める。
 - `Template + inputs` API を崩さずに済むなら、まず converter 内 fetch + data URI 化を検討する。
 - table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
   分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
 
-### 6. `@pdfme/jsx` layout 品質フォローアップ
+### 7. `@pdfme/jsx` layout 品質フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。

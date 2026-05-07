@@ -1,5 +1,6 @@
 import Editor, { loader, type BeforeMount, type OnMount } from '@monaco-editor/react';
 import 'monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution.js';
+import 'monaco-editor/esm/vs/basic-languages/typescript/typescript.contribution.js';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -13,6 +14,7 @@ type CodeEditorProps = {
   onChange: (value: string) => void;
   language: 'json' | 'markdown' | 'typescript';
   path?: string;
+  inferLanguageFromPath?: boolean;
   readOnly?: boolean;
   autoFocus?: boolean;
   className?: string;
@@ -50,6 +52,7 @@ export default function CodeEditor({
   onChange,
   language,
   path,
+  inferLanguageFromPath = false,
   readOnly = false,
   autoFocus = false,
   className = 'min-h-0 flex-1',
@@ -63,8 +66,9 @@ export default function CodeEditor({
     <div className={className}>
       <Editor
         beforeMount={beforeMount}
-        defaultLanguage={language}
-        language={language}
+        defaultLanguage={inferLanguageFromPath ? undefined : language}
+        defaultPath={path}
+        language={inferLanguageFromPath ? undefined : language}
         onChange={(nextValue) => onChange(nextValue ?? '')}
         onMount={handleMount}
         options={{

@@ -11,7 +11,7 @@ import { initialJsx } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
-const JSX_EDITOR_PATH = 'jsx-playground.tsx';
+const JSX_EDITOR_PATH = 'file:///jsx-playground.tsx';
 const RENDER_TIMEOUT_MS = 15_000;
 
 type WorkerResponse =
@@ -235,6 +235,7 @@ export default function JsxPlayground() {
           <CodeEditor
             ariaLabel="JSX"
             beforeMount={configureJsxEditor}
+            inferLanguageFromPath
             language="typescript"
             onChange={setSource}
             path={JSX_EDITOR_PATH}
