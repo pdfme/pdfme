@@ -52,9 +52,10 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
 - beta では任意 import を実行する playground にしない。`Page`, `Stack`, `Row`, `Box`, `Text`,
   `MultiVariableText`, `List`, `Table`, `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line`, `Header`,
   `Footer`, `Absolute` などを評価スコープに渡す。
-- editor の入力はまず `return (<Page>...</Page>);` のような function body 形式を検討する。これなら
-  `typescript.transpileModule` で JSX を `jsx(...)` call に落とし、bare module import を browser runtime
-  で解決する問題を避けられる。
+- editor の入力はまず `return (<Page>...</Page>);` のような function body 形式を採用する。Sucrase で
+  JSX を `createElement(...)` call に落とし、bare module import を browser runtime で解決する問題を避ける。
+- evaluation は main thread ではなく Web Worker 側で行い、common browser globals は beta playground では
+  ブロックする。完全な untrusted-code sandbox としては扱わない。
 - 将来、copy-paste しやすい full module 形式 (`import ... from "@pdfme/jsx"; export default ...`) を
   受けたい場合は、import stripping / sandbox / Blob module resolution を別途設計する。
 - preview 更新は debounce し、compile / render error を editor 下か viewer header に表示する。

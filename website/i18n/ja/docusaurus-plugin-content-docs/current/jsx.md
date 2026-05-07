@@ -100,8 +100,9 @@ return (
 );
 ```
 
-現時点では playground 側が pdfme JSX component を evaluation scope に注入します。`import` / `export`
-文にはまだ対応していません。API が beta の間は、ブラウザ上の sandbox と module 解決を小さく保つ方針です。
+現時点では playground 側が pdfme JSX component を evaluation scope に注入します。rendering は Web Worker
+内で実行し、よく使われる browser global をブロックします。`import` / `export` 文にはまだ対応していません。
+API が beta の間は、ブラウザ上の sandbox と module 解決を小さく保つ方針です。
 
 ## 現在の制限
 

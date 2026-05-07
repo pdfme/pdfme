@@ -101,9 +101,9 @@ return (
 );
 ```
 
-For now, the playground injects pdfme JSX components into the evaluation scope. It does not support
-`import` or `export` statements yet. This keeps the browser sandbox and module resolution small while
-the API is still beta.
+For now, the playground injects pdfme JSX components into the evaluation scope. It runs rendering in a
+Web Worker, blocks common browser globals, and does not support `import` or `export` statements yet.
+This keeps the browser sandbox and module resolution small while the API is still beta.
 
 ## Current Limitations
 

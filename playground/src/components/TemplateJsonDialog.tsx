@@ -234,7 +234,11 @@ export default function TemplateJsonDialog({
           </div>
         )}
         <Suspense
-          fallback={<div className="min-h-0 flex-1 bg-white px-4 py-3 text-sm text-gray-500" />}
+          fallback={
+            <div className="min-h-0 flex-1 bg-white px-4 py-3 text-sm text-gray-500">
+              Loading editor...
+            </div>
+          }
         >
           <CodeEditor
             ariaLabel="Template JSON"
