@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { PAGE_SIZE_PRESETS } from '@pdfme/common';
-import { list, table, text } from '@pdfme/schemas';
+import { line, list, table, text } from '@pdfme/schemas';
 import { md2pdf } from '../src/md2pdf.js';
 import {
   pdf2img as nodePdf2Img,
@@ -271,6 +271,8 @@ describe('md2pdf tests', () => {
 
 A **bold** paragraph with ~~deleted~~ text.
 
+---
+
 - [x] Done
 - [ ] Todo
   - Nested
@@ -292,7 +294,14 @@ const value = 1;
       padding: [20, 15, 20, 15],
     });
     expect(inputs).toEqual([{}]);
-    expect(schemas.map((schema) => schema.type)).toEqual(['text', 'text', 'list', 'table', 'text']);
+    expect(schemas.map((schema) => schema.type)).toEqual([
+      'text',
+      'text',
+      'line',
+      'list',
+      'table',
+      'text',
+    ]);
 
     expect(schemas[0]).toMatchObject({
       name: 'hello-pdfme',
@@ -305,23 +314,27 @@ const value = 1;
       content: 'A **bold** paragraph with ~~deleted~~ text.',
       textFormat: 'inline-markdown',
     });
-    expect(JSON.parse(String(schemas[2].content))).toEqual(['[x] Done', '[ ] Todo', '\tNested']);
     expect(schemas[2]).toMatchObject({
+      type: 'line',
+      color: '#000000',
+    });
+    expect(JSON.parse(String(schemas[3].content))).toEqual(['[x] Done', '[ ] Todo', '\tNested']);
+    expect(schemas[3]).toMatchObject({
       type: 'list',
       listStyle: 'bullet',
       textFormat: 'inline-markdown',
       overflow: 'expand',
     });
-    expect(schemas[3]).toMatchObject({
+    expect(schemas[4]).toMatchObject({
       type: 'table',
       head: ['Name', 'Value'],
       headWidthPercentages: [50, 50],
     });
-    expect(JSON.parse(String(schemas[3].content))).toEqual([
+    expect(JSON.parse(String(schemas[4].content))).toEqual([
       ['A', '1'],
       ['B', '2'],
     ]);
-    expect(schemas[4]).toMatchObject({
+    expect(schemas[5]).toMatchObject({
       type: 'text',
       content: 'const value = 1;',
       textFormat: 'plain',
@@ -399,10 +412,18 @@ const value = 1;
     expect(schema.position.x).toBe(18);
   });
 
+  test('deduplicates heading slugs with a _1 suffix', async () => {
+    const { template } = await md2pdf('# Same\n\n# Same');
+
+    expect(template.schemas[0].map((schema) => schema.name)).toEqual(['same', 'same_1']);
+  });
+
   test('generates a PDF from the converted markdown template', async () => {
     const { template, inputs } = await md2pdf(`# Title
 
 Visit [pdfme](https://pdfme.com).
+
+---
 
 - Alpha
 - Beta
@@ -415,7 +436,7 @@ Visit [pdfme](https://pdfme.com).
     const pdf = await generate({
       template,
       inputs,
-      plugins: { Text: text, List: list, Table: table },
+      plugins: { Text: text, List: list, Table: table, Line: line },
     });
 
     expect(pdf).toBeInstanceOf(Uint8Array);

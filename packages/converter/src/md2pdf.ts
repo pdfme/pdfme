@@ -568,7 +568,7 @@ const resolveAutoName = (builder: Builder, prefix: string): string => {
 
 const resolveName = (builder: Builder, baseName: string): string => {
   let name = baseName;
-  let index = 1;
+  let index = 0;
   while (builder.usedNames.has(name)) {
     index += 1;
     name = `${baseName}_${index}`;

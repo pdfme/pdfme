@@ -14,6 +14,8 @@ const { template, inputs } = await md2pdf('# Hello\n\nVisit [pdfme](https://pdfm
 
 The initial MVP emits text, headings, lists, tables, code blocks, blockquotes, horizontal rules, and data URI images. `md2pdf` is exposed as a subpath export so normal converter imports do not pull the Markdown parser into browser bundles.
 
+When passing the result to `generate`, register the plugins for the Markdown features you use. Horizontal rules (`---`) are emitted as `line` schemas, so documents that contain them need the `Line` plugin.
+
 ### CJK and Japanese text
 
 The default pdfme font is Roboto, which does not include Japanese/CJK glyphs. For Japanese Markdown, set a CJK-capable `fontName` during conversion and pass the same font to `generate` or UI options.
@@ -48,7 +50,7 @@ Current limitations:
 - Code block language tags are parsed but not rendered yet.
 - Blockquotes are rendered as indented text with a light background, not as full nested block layouts.
 - Remote Markdown images are emitted as links for now; image fetching/asset metadata is left for a later step.
-- Data URI images are rendered at a fixed initial height and do not preserve aspect ratio yet.
+- PNG/JPEG data URI images are rendered at a fixed initial height and do not preserve aspect ratio yet.
 - Complex list item children such as nested code blocks or blockquotes are flattened into list item text.
 
 For the complete pdfme documentation, see [this link](https://pdfme.com/docs/converter).
