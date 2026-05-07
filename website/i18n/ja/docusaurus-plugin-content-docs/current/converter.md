@@ -139,6 +139,8 @@ const pdf = await generate({
 });
 ```
 
+`basePdf` を渡した場合、`md2pdf` は `page` options から blank PDF を作らず、その値をそのまま使います。これは pdfme template と同じ `BlankPdf` object なので、`staticSchema` も含められます。
+
 #### 現在の制限
 `md2pdf` は実用的な GFM block を扱えますが、GitHub Markdown renderer の完全互換ではありません。
 
@@ -164,6 +166,8 @@ const pdf = await generate({
 ## 型定義
 
 ```ts
+import type { BlankPdf, PageOrientation, PageSize } from '@pdfme/common';
+
 type ImageType = 'jpeg' | 'png';
 
 interface PageRange {
@@ -188,17 +192,16 @@ interface Img2PdfOptions {
   margin?: [number, number, number, number]; // ミリメートル単位 [上, 右, 下, 左]
 }
 
-type PageSizePreset = 'A3' | 'A4' | 'A5' | 'A6' | 'B4' | 'B5' | 'B6' | 'Letter' | 'Legal' | 'Tabloid';
 type BoxSides = { top?: number, right?: number, bottom?: number, left?: number, x?: number, y?: number };
 type MarkdownMargin = number | [number, number, number, number] | BoxSides;
 
 interface Md2PdfOptions {
   page?: {
-    size?: PageSizePreset | { width: number, height: number };
-    orientation?: 'portrait' | 'landscape';
+    size?: PageSize;
+    orientation?: PageOrientation;
     margin?: MarkdownMargin;
   };
-  basePdf?: { width: number, height: number, padding: [number, number, number, number] };
+  basePdf?: BlankPdf;
   style?: {
     fontName?: string;
     fontSize?: number;

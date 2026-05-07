@@ -139,6 +139,8 @@ const pdf = await generate({
 });
 ```
 
+If you pass `basePdf`, `md2pdf` uses it directly instead of creating a blank PDF from `page` options. The value is the same `BlankPdf` object used by pdfme templates, so it can include `staticSchema`.
+
 #### Current limitations
 `md2pdf` covers practical GFM blocks, but it is not a complete GitHub Markdown renderer yet.
 
@@ -164,6 +166,8 @@ All functions throw descriptive errors when invalid parameters are provided:
 ## Types
 
 ```ts
+import type { BlankPdf, PageOrientation, PageSize } from '@pdfme/common';
+
 type ImageType = 'jpeg' | 'png';
 
 interface PageRange {
@@ -188,17 +192,16 @@ interface Img2PdfOptions {
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }
 
-type PageSizePreset = 'A3' | 'A4' | 'A5' | 'A6' | 'B4' | 'B5' | 'B6' | 'Letter' | 'Legal' | 'Tabloid';
 type BoxSides = { top?: number, right?: number, bottom?: number, left?: number, x?: number, y?: number };
 type MarkdownMargin = number | [number, number, number, number] | BoxSides;
 
 interface Md2PdfOptions {
   page?: {
-    size?: PageSizePreset | { width: number, height: number };
-    orientation?: 'portrait' | 'landscape';
+    size?: PageSize;
+    orientation?: PageOrientation;
     margin?: MarkdownMargin;
   };
-  basePdf?: { width: number, height: number, padding: [number, number, number, number] };
+  basePdf?: BlankPdf;
   style?: {
     fontName?: string;
     fontSize?: number;
