@@ -16,7 +16,6 @@ import {
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
-import ExternalButton from '../components/ExternalButton';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
 
 function DesignerApp() {
@@ -333,13 +332,6 @@ function DesignerApp() {
           </button>
         </div>
       ),
-    },
-    {
-      label: '',
-      content: React.createElement(ExternalButton, {
-        href: 'https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME',
-        title: 'Feedback this template',
-      }),
     },
   ];
 

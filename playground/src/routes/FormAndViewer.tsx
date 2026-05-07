@@ -14,7 +14,6 @@ import {
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavItem, NavBar } from '../components/NavBar';
-import ExternalButton from '../components/ExternalButton';
 
 type Mode = 'form' | 'viewer';
 
@@ -246,13 +245,6 @@ function FormAndViewerApp() {
           Generate PDF
         </button>
       ),
-    },
-    {
-      label: '',
-      content: React.createElement(ExternalButton, {
-        href: 'https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME',
-        title: 'Feedback this template',
-      }),
     },
   ];
 
