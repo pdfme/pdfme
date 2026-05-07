@@ -94,21 +94,30 @@ type TableCellStyle = {
 
 const DEFAULT_PAGE_MARGIN: [number, number, number, number] = [20, 15, 20, 15];
 const DEFAULT_FONT_SIZE = 10;
-const DEFAULT_LINE_HEIGHT = 1;
-const DEFAULT_FONT_COLOR = '#000000';
+const DEFAULT_LINE_HEIGHT = 1.25;
+const DEFAULT_FONT_COLOR = '#111827';
 const DEFAULT_HEADING_SCALE: Record<HeadingDepth, number> = {
   1: 2,
   2: 1.65,
   3: 1.35,
   4: 1.15,
   5: 1,
-  6: 0.9,
+  6: 1,
 };
-const BLOCK_GAP = 3;
-const LIST_ITEM_SPACING = 1;
-const TABLE_HEADER_HEIGHT = 9;
-const TABLE_ROW_HEIGHT = 6.5;
+const BLOCK_GAP = 4;
+const LIST_ITEM_SPACING = 1.4;
+const TABLE_HEADER_HEIGHT = 8.5;
+const TABLE_ROW_HEIGHT = 7.5;
 const IMAGE_HEIGHT = 45;
+const CODE_BLOCK_BACKGROUND_COLOR = '#f6f8fa';
+const BLOCKQUOTE_BACKGROUND_COLOR = '#f8fafc';
+const BLOCKQUOTE_INDENT = 4;
+const HORIZONTAL_RULE_COLOR = '#d0d7de';
+const HORIZONTAL_RULE_HEIGHT = 0.25;
+const TABLE_BORDER_COLOR = '#d0d7de';
+const TABLE_HEAD_BACKGROUND_COLOR = '#f6f8fa';
+const TABLE_BODY_ALTERNATE_BACKGROUND_COLOR = '#f9fafb';
+const TABLE_CELL_PADDING = 3;
 
 const MARKDOWN_ESCAPE_PATTERN = /[\\*~`[\]()]/g;
 const DATA_IMAGE_PATTERN = /^data:image\/(?:png|jpe?g);base64,/i;
@@ -239,7 +248,7 @@ const renderHeading = (node: Heading, builder: Builder): void => {
     content,
     fontSize,
     height: estimateTextHeight(content, fontSize, builder.lineHeight),
-    gap: depth <= 2 ? 4 : BLOCK_GAP,
+    gap: depth <= 1 ? 5 : depth === 2 ? 4.5 : BLOCK_GAP,
     textFormat: 'inline-markdown',
   });
 };
@@ -299,7 +308,7 @@ const renderCode = (node: Code, builder: Builder): void => {
   const content = node.value;
   addTextSchema(builder, {
     content,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: CODE_BLOCK_BACKGROUND_COLOR,
     textFormat: 'plain',
     height: estimateTextHeight(content, builder.fontSize, builder.lineHeight) + 2,
   });
@@ -314,10 +323,10 @@ const renderBlockquote = (node: Blockquote, builder: Builder): void => {
   if (!content.trim()) return;
   addTextSchema(builder, {
     content,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: BLOCKQUOTE_BACKGROUND_COLOR,
     textFormat: 'inline-markdown',
-    x: builder.contentFrame.x + 3,
-    width: Math.max(0, builder.contentFrame.width - 3),
+    x: builder.contentFrame.x + BLOCKQUOTE_INDENT,
+    width: Math.max(0, builder.contentFrame.width - BLOCKQUOTE_INDENT),
   });
 };
 
@@ -344,17 +353,18 @@ const renderTable = (node: Table, builder: Builder): void => {
     head,
     headWidthPercentages: columnWidths,
     tableStyles: {
-      borderColor: '#000000',
-      borderWidth: 0.3,
+      borderColor: TABLE_BORDER_COLOR,
+      borderWidth: 0.2,
     },
     headStyles: {
       ...defaultCellStyle(builder),
-      fontColor: '#ffffff',
-      backgroundColor: '#2980ba',
+      backgroundColor: TABLE_HEAD_BACKGROUND_COLOR,
+      borderColor: TABLE_BORDER_COLOR,
     },
     bodyStyles: {
       ...defaultCellStyle(builder),
-      alternateBackgroundColor: '#f5f5f5',
+      borderColor: TABLE_BORDER_COLOR,
+      alternateBackgroundColor: TABLE_BODY_ALTERNATE_BACKGROUND_COLOR,
     },
     columnStyles: {},
   };
@@ -394,9 +404,9 @@ const renderLine = (builder: Builder): void => {
     type: 'line',
     position: { x: builder.contentFrame.x, y: builder.cursorY },
     width: builder.contentFrame.width,
-    height: 0.3,
+    height: HORIZONTAL_RULE_HEIGHT,
     readOnly: true,
-    color: '#000000',
+    color: HORIZONTAL_RULE_COLOR,
   };
 
   addSchema(builder, schema);
@@ -544,9 +554,9 @@ const defaultCellStyle = (builder: Builder): TableCellStyle => ({
   characterSpacing: 0,
   fontColor: builder.fontColor,
   backgroundColor: '#ffffff',
-  borderColor: '#000000',
+  borderColor: TABLE_BORDER_COLOR,
   borderWidth: resolveBoxSides(0),
-  padding: resolveBoxSides(5),
+  padding: resolveBoxSides(TABLE_CELL_PADDING),
 });
 
 const resolveBoxSides = (value: number): ResolvedBoxSides => ({

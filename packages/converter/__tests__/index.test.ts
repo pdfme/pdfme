@@ -307,6 +307,8 @@ const value = 1;
       name: 'hello-pdfme',
       type: 'text',
       content: 'Hello [PDFme](https://pdfme.com)',
+      lineHeight: 1.25,
+      fontColor: '#111827',
       textFormat: 'inline-markdown',
       overflow: 'expand',
     });
@@ -316,7 +318,8 @@ const value = 1;
     });
     expect(schemas[2]).toMatchObject({
       type: 'line',
-      color: '#000000',
+      height: 0.25,
+      color: '#d0d7de',
     });
     expect(JSON.parse(String(schemas[3].content))).toEqual(['[x] Done', '[ ] Todo', '\tNested']);
     expect(schemas[3]).toMatchObject({
@@ -329,6 +332,16 @@ const value = 1;
       type: 'table',
       head: ['Name', 'Value'],
       headWidthPercentages: [50, 50],
+      tableStyles: {
+        borderColor: '#d0d7de',
+        borderWidth: 0.2,
+      },
+      headStyles: {
+        backgroundColor: '#f6f8fa',
+      },
+      bodyStyles: {
+        alternateBackgroundColor: '#f9fafb',
+      },
     });
     expect(JSON.parse(String(schemas[4].content))).toEqual([
       ['A', '1'],
@@ -337,6 +350,7 @@ const value = 1;
     expect(schemas[5]).toMatchObject({
       type: 'text',
       content: 'const value = 1;',
+      backgroundColor: '#f6f8fa',
       textFormat: 'plain',
       overflow: 'expand',
     });
@@ -407,9 +421,9 @@ const value = 1;
     expect(schema).toMatchObject({
       type: 'text',
       content: 'Quote line',
-      backgroundColor: '#f8f8f8',
+      backgroundColor: '#f8fafc',
     });
-    expect(schema.position.x).toBe(18);
+    expect(schema.position.x).toBe(19);
   });
 
   test('deduplicates heading slugs with a _1 suffix', async () => {
