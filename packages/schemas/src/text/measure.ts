@@ -17,6 +17,13 @@ import {
 } from './richText.js';
 import type { TextSchema } from './types.js';
 import { getTextLineRange } from '../splitRange.js';
+import {
+  getBoxContentArea,
+  getBoxInsets,
+  getBoxVerticalInset,
+  getSplitBoxDimension,
+  hasBoxDimension,
+} from '../box.js';
 
 type MeasureTextHeightArgs = {
   value: string;
@@ -66,7 +73,7 @@ export const measureTextLines = async ({
   const fontSize = schema.fontSize ?? DEFAULT_FONT_SIZE;
   const lineHeight = schema.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const boxWidthInPt = mm2pt(schema.width);
+  const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
 
   if (isInlineMarkdownTextSchema(schema)) {
     const richTextRuns = parseInlineMarkdown(value);
@@ -142,11 +149,45 @@ export const mergeTextLineRangeValue = async ({
 
 export const measureTextHeight = async (args: MeasureTextHeightArgs): Promise<number> => {
   const { lineHeights } = await measureTextLines(args);
-  return sumLineHeights(lineHeights);
+  return sumLineHeights(lineHeights) + getBoxVerticalInset(args.schema);
 };
 
 export const sumLineHeights = (lineHeights: number[]) =>
   lineHeights.reduce((sum, height) => sum + height, 0);
+
+export const getTextLineHeightsWithBox = (lineHeights: number[], schema: TextSchema) =>
+  lineHeights.map(
+    (height, index) =>
+      height +
+      getTextBoxVerticalInsetForRange(schema, { start: index, end: index + 1 }, lineHeights.length),
+  );
+
+export const getTextSplitBoxStyle = (
+  schema: TextSchema,
+  range: DynamicLayoutRange,
+  totalLines: number,
+) => {
+  const { borderWidth, padding } = getBoxInsets(schema);
+  return {
+    ...(hasBoxDimension(schema.borderWidth)
+      ? { borderWidth: getSplitBoxDimension(borderWidth, range, totalLines) }
+      : {}),
+    ...(hasBoxDimension(schema.padding)
+      ? { padding: getSplitBoxDimension(padding, range, totalLines) }
+      : {}),
+  };
+};
+
+export const getTextBoxVerticalInsetForRange = (
+  schema: TextSchema,
+  range: DynamicLayoutRange,
+  totalLines: number,
+) => {
+  const { borderWidth, padding } = getBoxInsets(schema);
+  const splitBorderWidth = getSplitBoxDimension(borderWidth, range, totalLines);
+  const splitPadding = getSplitBoxDimension(padding, range, totalLines);
+  return splitBorderWidth.top + splitBorderWidth.bottom + splitPadding.top + splitPadding.bottom;
+};
 
 const measurePlainTextLineHeights = (
   lines: string[],

@@ -177,7 +177,8 @@ export type TextProps = CommonProps &
     color?: TextSchema['fontColor'];
     background?: TextSchema['backgroundColor'];
     borderColor?: string;
-    borderWidth?: number;
+    borderWidth?: number | BoxSides;
+    padding?: number | BoxSides;
     dynamicFontSize?: Partial<NonNullable<TextSchema['dynamicFontSize']>>;
   };
 
@@ -213,7 +214,8 @@ export type MultiVariableTextProps = CommonProps &
     color?: MultiVariableTextSchema['fontColor'];
     background?: MultiVariableTextSchema['backgroundColor'];
     borderColor?: string;
-    borderWidth?: number;
+    borderWidth?: number | BoxSides;
+    padding?: number | BoxSides;
     dynamicFontSize?: Partial<NonNullable<MultiVariableTextSchema['dynamicFontSize']>>;
   };
 

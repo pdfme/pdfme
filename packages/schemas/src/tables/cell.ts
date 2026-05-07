@@ -5,6 +5,7 @@ import line from '../shapes/line.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
 import type { CellSchema } from './types.js';
 import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
+import { createBoxDimension, getBoxContentArea } from '../box.js';
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
 
@@ -21,14 +22,14 @@ const renderLine = async (
   });
 
 const createTextDiv = (schema: CellSchema) => {
-  const { borderWidth: bw, width, height, padding: pd } = schema;
+  const contentArea = getBoxContentArea(schema);
   const textDiv = document.createElement('div');
   textDiv.style.position = 'absolute';
   textDiv.style.zIndex = '1';
-  textDiv.style.width = `${width - bw.left - bw.right - pd.left - pd.right}mm`;
-  textDiv.style.height = `${height - bw.top - bw.bottom - pd.top - pd.bottom}mm`;
-  textDiv.style.top = `${bw.top + pd.top}mm`;
-  textDiv.style.left = `${bw.left + pd.left}mm`;
+  textDiv.style.width = `${contentArea.width}mm`;
+  textDiv.style.height = `${contentArea.height}mm`;
+  textDiv.style.top = `${contentArea.topInset}mm`;
+  textDiv.style.left = `${contentArea.leftInset}mm`;
   return textDiv;
 };
 
@@ -56,7 +57,8 @@ const createLineDiv = (
 const cellSchema: Plugin<CellSchema> = {
   pdf: async (arg) => {
     const { schema } = arg;
-    const { position, width, height, borderWidth, padding } = schema;
+    const { position, width, height, borderWidth } = schema;
+    const contentArea = getBoxContentArea(schema);
 
     await Promise.all([
       // BACKGROUND
@@ -100,12 +102,12 @@ const cellSchema: Plugin<CellSchema> = {
         ...schema,
         type: 'text',
         backgroundColor: '',
-        position: {
-          x: position.x + borderWidth.left + padding.left,
-          y: position.y + borderWidth.top + padding.top,
-        },
-        width: width - borderWidth.left - borderWidth.right - padding.left - padding.right,
-        height: height - borderWidth.top - borderWidth.bottom - padding.top - padding.bottom,
+        borderColor: '',
+        borderWidth: createBoxDimension(0),
+        padding: createBoxDimension(0),
+        position: contentArea.position,
+        width: contentArea.width,
+        height: contentArea.height,
       },
     });
   },
@@ -117,7 +119,13 @@ const cellSchema: Plugin<CellSchema> = {
     const textDiv = createTextDiv(schema);
     await textUiRender({
       ...arg,
-      schema: { ...schema, backgroundColor: '' },
+      schema: {
+        ...schema,
+        backgroundColor: '',
+        borderColor: '',
+        borderWidth: createBoxDimension(0),
+        padding: createBoxDimension(0),
+      },
       rootElement: textDiv,
     });
     rootElement.appendChild(textDiv);

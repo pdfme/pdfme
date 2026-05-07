@@ -1,5 +1,6 @@
 import type { Schema } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
+import type { BoxDimension } from '../box.js';
 
 export type ALIGNMENT = 'left' | 'center' | 'right' | 'justify';
 export type VERTICAL_ALIGNMENT = 'top' | 'middle' | 'bottom';
@@ -51,4 +52,7 @@ export type TextSchema = Schema & {
   overflow?: TEXT_OVERFLOW;
   fontColor: string;
   backgroundColor: string;
+  borderColor?: string;
+  borderWidth?: BoxDimension;
+  padding?: BoxDimension;
 };

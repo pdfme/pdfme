@@ -15,6 +15,7 @@ import { HEX_COLOR_PATTERN } from '../constants.js';
 import type { TableSchema } from './types.js';
 import { getTableBodyRange } from '../splitRange.js';
 import type { DynamicLayoutRange } from '@pdfme/common';
+import { createBoxDimension, getBoxDimensionPropPanelSchema } from '../box.js';
 
 export const getDefaultCellStyles = () => ({
   fontName: undefined,
@@ -26,24 +27,9 @@ export const getDefaultCellStyles = () => ({
   fontColor: DEFAULT_FONT_COLOR,
   backgroundColor: '',
   borderColor: '#888888',
-  borderWidth: { top: 0.1, bottom: 0.1, left: 0.1, right: 0.1 },
-  padding: { top: 5, bottom: 5, left: 5, right: 5 },
+  borderWidth: createBoxDimension(0.1),
+  padding: createBoxDimension(5),
 });
-
-const getBoxDimensionProp = (step = 1) => {
-  const getCommonProp = () => ({
-    type: 'number',
-    widget: 'inputNumber',
-    props: { min: 0, step },
-    span: 6,
-  });
-  return {
-    top: { title: 'Top', ...getCommonProp() },
-    right: { title: 'Right', ...getCommonProp() },
-    bottom: { title: 'Bottom', ...getCommonProp() },
-    left: { title: 'Left', ...getCommonProp() },
-  };
-};
 
 export const getCellPropPanelSchema = (arg: {
   i18n: (key: string) => string;
@@ -156,7 +142,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'object',
       widget: 'lineTitle',
       span: 24,
-      properties: getBoxDimensionProp(0.1),
+      properties: getBoxDimensionPropPanelSchema(0.1),
     },
     '--': { type: 'void', widget: 'Divider' },
     padding: {
@@ -164,7 +150,7 @@ export const getCellPropPanelSchema = (arg: {
       type: 'object',
       widget: 'lineTitle',
       span: 24,
-      properties: getBoxDimensionProp(),
+      properties: getBoxDimensionPropPanelSchema(),
     },
   };
 };

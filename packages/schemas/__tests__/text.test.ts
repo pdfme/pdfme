@@ -471,6 +471,49 @@ describe('text dynamic layout', () => {
     });
   });
 
+  it('keeps text box padding and borders on the visible edges of split chunks', async () => {
+    const schema = {
+      ...getTextSchema(),
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      borderColor: '#d0d7de',
+      borderWidth: { top: 0.5, right: 0.2, bottom: 0.5, left: 0.2 },
+      padding: { top: 2, right: 3, bottom: 2, left: 3 },
+    } as TextSchema;
+
+    const result = await getDynamicLayoutForText('long text '.repeat(20), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights.length).toBeGreaterThan(2);
+    expect(
+      result.patchSplitSchema?.({
+        schema,
+        start: 0,
+        end: 1,
+        isSplit: true,
+        chunkHeight: result.heights[0],
+      }),
+    ).toMatchObject({
+      borderWidth: { top: 0.5, right: 0.2, bottom: 0, left: 0.2 },
+      padding: { top: 2, right: 3, bottom: 0, left: 3 },
+    });
+    expect(
+      result.patchSplitSchema?.({
+        schema,
+        start: result.heights.length - 1,
+        end: result.heights.length,
+        isSplit: true,
+        chunkHeight: result.heights[result.heights.length - 1],
+      }),
+    ).toMatchObject({
+      borderWidth: { top: 0, right: 0.2, bottom: 0.5, left: 0.2 },
+      padding: { top: 0, right: 3, bottom: 2, left: 3 },
+    });
+  });
+
   it('merges form edits from a split text line range into the full value', async () => {
     const schema = {
       ...getTextSchema(),
@@ -592,7 +635,7 @@ describe('layoutRichTextLines', () => {
       runs: [createRun('abc '), createRun('123456', { code: true })],
       fontSize: 12,
       characterSpacing: 0,
-      boxWidthInPt: 4,
+      boxWidthInPt: 7,
     });
 
     expect(lines.map(getRichTextLineText)).toEqual(['abc ', '1234', '56']);

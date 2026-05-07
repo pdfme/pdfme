@@ -13,6 +13,7 @@ import {
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
+import { getBoxContentArea } from '../box.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -292,10 +293,9 @@ export const calculateDynamicFontSize = ({
     fontSize: schemaFontSize,
     dynamicFontSize: dynamicFontSizeSetting,
     characterSpacing: schemaCharacterSpacing,
-    width: boxWidth,
-    height: boxHeight,
     lineHeight = DEFAULT_LINE_HEIGHT,
   } = textSchema;
+  const { width: boxWidth, height: boxHeight } = getBoxContentArea(textSchema);
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;

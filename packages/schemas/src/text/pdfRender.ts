@@ -36,6 +36,7 @@ import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
 import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
+import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 
 type PdfFontCache = Record<string, Promise<PDFFont>>;
 
@@ -124,11 +125,29 @@ const getGraphemeSegmenter = () => {
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const { value, pdfDoc, pdfLib, page, options, schema, basePdf, _cache } = arg;
+  const { font = getDefaultFont(), colorType } = options;
+
+  const pageHeight = page.getHeight();
+  const {
+    width,
+    height,
+    rotate,
+    position: { x, y },
+    opacity,
+  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
+
+  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
+
+  drawTextBoxDecoration({ page, schema, colorType, x, y, width, height, rotate, pivotPoint });
   if (!value) return;
 
-  const { font = getDefaultFont(), colorType } = options;
   const fontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
+  const contentArea = getBoxContentArea(schema);
+  const contentX = x + mm2pt(contentArea.leftInset);
+  const contentY = y + mm2pt(contentArea.bottomInset);
+  const contentWidth = mm2pt(contentArea.width);
+  const contentHeight = mm2pt(contentArea.height);
 
   const pdfFontValuePromise = enableInlineMarkdown
     ? undefined
@@ -159,28 +178,6 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
 
-  const pageHeight = page.getHeight();
-  const {
-    width,
-    height,
-    rotate,
-    position: { x, y },
-    opacity,
-  } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
-
-  const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
-
-  if (schema.backgroundColor) {
-    const color = hex2PrintingColor(schema.backgroundColor, colorType);
-    if (rotate.angle !== 0) {
-      // Apply the same rotation logic as text rendering to match UI behavior
-      const rotatedPoint = rotatePoint({ x, y }, pivotPoint, rotate.angle);
-      page.drawRectangle({ x: rotatedPoint.x, y: rotatedPoint.y, width, height, rotate, color });
-    } else {
-      page.drawRectangle({ x, y, width, height, rotate, color });
-    }
-  }
-
   if (enableInlineMarkdown) {
     await renderInlineMarkdownText({
       value,
@@ -199,10 +196,10 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       verticalAlignment,
       lineHeight,
       characterSpacing,
-      x,
-      width,
-      height,
-      pageHeight,
+      x: contentX,
+      y: contentY,
+      width: contentWidth,
+      height: contentHeight,
       pivotPoint,
       rotate,
       opacity,
@@ -224,7 +221,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       characterSpacing,
       fontSize,
       fontKitFont,
-      boxWidthInPt: width,
+      boxWidthInPt: contentWidth,
     }),
     getTextLineRange(schema),
   );
@@ -239,10 +236,11 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     const otherLinesHeight = lineHeight * fontSize * (lines.length - 1);
 
     if (verticalAlignment === VERTICAL_ALIGN_BOTTOM) {
-      yOffset = height - otherLinesHeight + descent - halfLineHeightAdjustment;
+      yOffset = contentHeight - otherLinesHeight + descent - halfLineHeightAdjustment;
     } else if (verticalAlignment === VERTICAL_ALIGN_MIDDLE) {
       yOffset =
-        (height - otherLinesHeight - firstLineTextHeight + descent) / 2 + firstLineTextHeight;
+        (contentHeight - otherLinesHeight - firstLineTextHeight + descent) / 2 +
+        firstLineTextHeight;
     }
   }
 
@@ -260,14 +258,14 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       line = '\r\n';
     }
 
-    let xLine = x;
+    let xLine = contentX;
     if (alignment === 'center') {
-      xLine += (width - textWidth) / 2;
+      xLine += (contentWidth - textWidth) / 2;
     } else if (alignment === 'right') {
-      xLine += width - textWidth;
+      xLine += contentWidth - textWidth;
     }
 
-    let yLine = pageHeight - mm2pt(schema.position.y) - yOffset - rowYOffset;
+    let yLine = contentY + contentHeight - yOffset - rowYOffset;
 
     // draw strikethrough
     if (schema.strikethrough && textWidth > 0) {
@@ -309,7 +307,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       const segmenter = getGraphemeSegmenter();
       const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
       const len = Array.from(iterator).length;
-      spacing += (width - textWidth) / len;
+      spacing += (contentWidth - textWidth) / len;
     }
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
@@ -324,4 +322,63 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       opacity,
     });
   });
+};
+
+const drawTextBoxDecoration = (arg: {
+  page: PDFRenderProps<TextSchema>['page'];
+  schema: TextSchema;
+  colorType?: ColorType;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotate: ReturnType<typeof convertForPdfLayoutProps>['rotate'];
+  pivotPoint: { x: number; y: number };
+}) => {
+  const { page, schema, colorType, x, y, width, height, rotate, pivotPoint } = arg;
+  const { borderWidth } = getBoxInsets(schema);
+  const opacity = schema.opacity ?? 1;
+
+  const drawRectangle = (rect: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color: NonNullable<ReturnType<typeof hex2PrintingColor>>;
+  }) => {
+    if (rect.width <= 0 || rect.height <= 0) return;
+    const point =
+      rotate.angle === 0
+        ? { x: rect.x, y: rect.y }
+        : rotatePoint({ x: rect.x, y: rect.y }, pivotPoint, rotate.angle);
+    page.drawRectangle({
+      x: point.x,
+      y: point.y,
+      width: rect.width,
+      height: rect.height,
+      rotate,
+      color: rect.color,
+      opacity,
+    });
+  };
+
+  if (schema.backgroundColor) {
+    const color = hex2PrintingColor(schema.backgroundColor, colorType);
+    if (color) drawRectangle({ x, y, width, height, color });
+  }
+
+  if (!schema.borderColor || !hasBoxDimension(schema.borderWidth)) return;
+
+  const color = hex2PrintingColor(schema.borderColor, colorType);
+  if (!color) return;
+
+  const top = mm2pt(borderWidth.top);
+  const right = mm2pt(borderWidth.right);
+  const bottom = mm2pt(borderWidth.bottom);
+  const left = mm2pt(borderWidth.left);
+
+  drawRectangle({ x, y: y + height - top, width, height: top, color });
+  drawRectangle({ x: x + width - right, y, width: right, height, color });
+  drawRectangle({ x, y, width, height: bottom, color });
+  drawRectangle({ x, y, width: left, height, color });
 };

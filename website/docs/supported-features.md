@@ -30,6 +30,9 @@ The Designer canvas shows the authored schema boxes. Reflow is applied in Previe
   - Line Height
   - Text Color
   - Background Color
+  - Border Color
+  - Border Width
+  - Padding
   - Underline
   - Strikethrough
 - Font-related
@@ -48,13 +51,15 @@ The Designer canvas shows the authored schema boxes. Reflow is applied in Previe
 - Text Format
   - Plain text
   - Inline Markdown (`**bold**`, `*italic*`, `***bold italic***`, `~~strikethrough~~`) with automatic font variant fallback
+- Text box styling
+  - Background, border, and padding are rendered as the schema box, including when the text content is empty
 
 ### Multivariable Text (multiVariableText){#multivariable-text}
 
 - As per text, but supporting 0 to n variables in a single text field
 - Inline Markdown is supported in the template text while variable values are rendered as literal strings
 - Supports the same `overflow: "expand"` behavior as Text after variable values are resolved
-- Split plain Multivariable Text chunks remain editable in Form mode; split inline-markdown chunks are rendered as read-only text
+- Split Multivariable Text chunks remain editable for variable values in Form mode. Static inline-markdown text remains read-only.
 
 ### Shape
 

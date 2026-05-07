@@ -32,6 +32,7 @@ import {
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
 import { canUseTextOverflowExpand, isTextOverflowExpand } from './overflow.js';
+import { createBoxDimension, getBoxDimensionPropPanelSchema } from '../box.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n, basePdf } = props;
@@ -222,6 +223,34 @@ export const propPanel: PropPanel<TextSchema> = {
           },
         ],
       },
+      borderColor: {
+        title: i18n('schemas.borderColor'),
+        type: 'string',
+        widget: 'color',
+        props: {
+          disabledAlpha: true,
+        },
+        rules: [
+          {
+            pattern: HEX_COLOR_PATTERN,
+            message: i18n('validation.hexColor'),
+          },
+        ],
+      },
+      borderWidth: {
+        title: i18n('schemas.borderWidth'),
+        type: 'object',
+        widget: 'lineTitle',
+        span: 24,
+        properties: getBoxDimensionPropPanelSchema(0.1),
+      },
+      padding: {
+        title: i18n('schemas.padding'),
+        type: 'object',
+        widget: 'lineTitle',
+        span: 24,
+        properties: getBoxDimensionPropPanelSchema(),
+      },
       useInlineMarkdown: {
         type: 'boolean',
         widget: 'UseInlineMarkdown',
@@ -304,6 +333,9 @@ export const propPanel: PropPanel<TextSchema> = {
     fontColor: DEFAULT_FONT_COLOR,
     fontName: undefined,
     backgroundColor: '',
+    borderColor: '#000000',
+    borderWidth: createBoxDimension(0),
+    padding: createBoxDimension(0),
     opacity: DEFAULT_OPACITY,
     strikethrough: false,
     underline: false,

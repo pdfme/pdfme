@@ -41,6 +41,7 @@ import {
 } from './richText.js';
 import { isEditable } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
+import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -253,7 +254,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
         runs,
         fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
         characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
-        boxWidthInPt: mm2pt(schema.width),
+        boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
       }),
       lineRange,
     );
@@ -339,7 +340,7 @@ const getRangedPlainTextValue = (arg: {
       characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
       fontSize,
       fontKitFont,
-      boxWidthInPt: mm2pt(schema.width),
+      boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
     }),
     lineRange,
   );
@@ -376,17 +377,35 @@ export const buildStyledTextContainer = (
 
   const topAdjustment = topAdj.toString();
   const bottomAdjustment = bottomAdj.toString();
+  const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;
+  const isTopAligned = verticalAlignment === VERTICAL_ALIGN_TOP;
 
   const container = document.createElement('div');
+  const { borderWidth, padding } = getBoxInsets(schema);
+  const hasPadding = hasBoxDimension(schema.padding);
+  const hasBorder = Boolean(schema.borderColor && hasBoxDimension(schema.borderWidth));
 
   const containerStyle: CSS.Properties = {
-    padding: 0,
+    padding: hasPadding
+      ? `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`
+      : 0,
     resize: 'none',
-    backgroundColor: getBackgroundColor(value, schema),
-    border: 'none',
+    backgroundColor: getBackgroundColor(schema),
+    border: hasBorder ? undefined : 'none',
+    ...(hasBorder
+      ? {
+          borderTopWidth: `${borderWidth.top}mm`,
+          borderRightWidth: `${borderWidth.right}mm`,
+          borderBottomWidth: `${borderWidth.bottom}mm`,
+          borderLeftWidth: `${borderWidth.left}mm`,
+          borderStyle: 'solid',
+          borderColor: schema.borderColor,
+        }
+      : {}),
+    ...(hasPadding || hasBorder ? { boxSizing: 'border-box' } : {}),
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
+    justifyContent: mapVerticalAlignToFlex(verticalAlignment),
     width: '100%',
     height: '100%',
     cursor: isEditable(mode, schema) ? 'text' : 'default',
@@ -418,7 +437,7 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
-    height: '100%',
+    ...(isTopAligned ? { height: '100%' } : {}),
   };
 
   const textBlock = document.createElement('div');
@@ -471,7 +490,7 @@ export const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefine
   return 'flex-start';
 };
 
-const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
-  if (!value || !schema.backgroundColor) return 'transparent';
+const getBackgroundColor = (schema: { backgroundColor?: string }) => {
+  if (!schema.backgroundColor) return 'transparent';
   return schema.backgroundColor;
 };

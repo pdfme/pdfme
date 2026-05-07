@@ -1,6 +1,11 @@
 import type { DynamicLayoutArgs, DynamicLayoutResult } from '@pdfme/common';
 import { TEXT_OVERFLOW_EXPAND } from '../text/constants.js';
-import { measureTextLines, sumLineHeights } from '../text/measure.js';
+import {
+  getTextLineHeightsWithBox,
+  getTextSplitBoxStyle,
+  measureTextLines,
+  sumLineHeights,
+} from '../text/measure.js';
 import { isInlineMarkdownTextSchema } from '../text/richText.js';
 import type { MultiVariableTextSchema } from './types.js';
 import {
@@ -40,7 +45,8 @@ export const getDynamicLayoutForMultiVariableText = async (
     // would make the field keep its original box instead of growing.
     ignoreDynamicFontSize: true,
   });
-  const measuredHeight = sumLineHeights(lineHeights);
+  const heights = getTextLineHeightsWithBox(lineHeights, schema);
+  const measuredHeight = sumLineHeights(heights);
 
   if (measuredHeight <= schema.height || lineHeights.length === 0) {
     return {
@@ -50,11 +56,12 @@ export const getDynamicLayoutForMultiVariableText = async (
   }
 
   return {
-    heights: lineHeights.length === 1 ? [Math.max(schema.height, measuredHeight)] : lineHeights,
+    heights: lineHeights.length === 1 ? [Math.max(schema.height, measuredHeight)] : heights,
     patchSplitSchema: ({ start, end, isSplit }) => ({
       dynamicFontSize: undefined,
       __splitRange: lineHeights.length === 1 ? undefined : createTextLineSplitRange(start, end),
       __isSplit: isSplit,
+      ...getTextSplitBoxStyle(schema, { start, end }, lineHeights.length),
     }),
   };
 };
