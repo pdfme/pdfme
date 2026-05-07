@@ -738,7 +738,8 @@ const renderText = async (
   };
 
   if (props.borderColor) schema.borderColor = props.borderColor;
-  if (props.borderWidth != null) schema.borderWidth = props.borderWidth;
+  if (props.borderWidth != null) schema.borderWidth = resolveBoxSides(props.borderWidth);
+  if (props.padding != null) schema.padding = resolveBoxSides(props.padding);
   if (props.dynamicFontSize) {
     schema.dynamicFontSize = {
       min: props.dynamicFontSize.min ?? DEFAULT_DYNAMIC_FONT_SIZE.min,
@@ -801,7 +802,8 @@ const renderMultiVariableText = async (
   };
 
   if (props.borderColor) schema.borderColor = props.borderColor;
-  if (props.borderWidth != null) schema.borderWidth = props.borderWidth;
+  if (props.borderWidth != null) schema.borderWidth = resolveBoxSides(props.borderWidth);
+  if (props.padding != null) schema.padding = resolveBoxSides(props.padding);
   if (props.dynamicFontSize) {
     schema.dynamicFontSize = {
       min: props.dynamicFontSize.min ?? DEFAULT_DYNAMIC_FONT_SIZE.min,

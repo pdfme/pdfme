@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_FONT_VARIANT_FALLBACK,
+  CODE_HORIZONTAL_PADDING,
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
   FONT_SIZE_ADJUSTMENT,
@@ -19,6 +20,7 @@ import {
 import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
+import { getBoxContentArea } from '../box.js';
 
 export type ResolvedRichTextRun = RichTextRun & {
   fontName: string;
@@ -168,7 +170,8 @@ const measureRunText = (
   return (
     widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing) +
     syntheticBoldWidth +
-    syntheticItalicWidth
+    syntheticItalicWidth +
+    (run.code ? CODE_HORIZONTAL_PADDING * 2 : 0)
   );
 };
 
@@ -183,10 +186,30 @@ const pushRunToLine = (
 ) => {
   if (!text) return;
   const width = measureRunText(run, text, fontSize, characterSpacing);
+  const lastRun = line.runs[line.runs.length - 1];
+  if (lastRun && canMergeRichTextRuns(lastRun, run)) {
+    const previousWidth = lastRun.width;
+    lastRun.text += text;
+    lastRun.width = measureRunText(lastRun, lastRun.text, fontSize, characterSpacing);
+    line.width += lastRun.width - previousWidth;
+    return;
+  }
+
   if (line.runs.length > 0) line.width += characterSpacing;
   line.runs.push({ ...run, text, width });
   line.width += width;
 };
+
+const canMergeRichTextRuns = (a: ResolvedRichTextRun, b: ResolvedRichTextRun) =>
+  a.fontName === b.fontName &&
+  a.fontKitFont === b.fontKitFont &&
+  a.syntheticBold === b.syntheticBold &&
+  a.syntheticItalic === b.syntheticItalic &&
+  a.bold === b.bold &&
+  a.italic === b.italic &&
+  a.strikethrough === b.strikethrough &&
+  a.code === b.code &&
+  a.href === b.href;
 
 const measurePiecesWidth = (
   pieces: RichTextRunPiece[],
@@ -422,10 +445,9 @@ export const calculateDynamicRichTextFontSize = async (arg: {
     fontSize: schemaFontSize,
     dynamicFontSize: dynamicFontSizeSetting,
     characterSpacing: schemaCharacterSpacing,
-    width: boxWidth,
-    height: boxHeight,
     lineHeight = DEFAULT_LINE_HEIGHT,
   } = schema;
+  const { width: boxWidth, height: boxHeight } = getBoxContentArea(schema);
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;

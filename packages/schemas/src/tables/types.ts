@@ -1,7 +1,8 @@
 import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types.js';
+import type { BoxDimension } from '../box.js';
 import type { Schema } from '@pdfme/common';
 
-export type Spacing = { top: number; right: number; bottom: number; left: number };
+export type Spacing = BoxDimension;
 type BorderInsets = Spacing;
 type BoxDimensions = Spacing;
 

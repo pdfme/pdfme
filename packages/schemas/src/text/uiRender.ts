@@ -41,6 +41,7 @@ import {
 } from './richText.js';
 import { isEditable } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
+import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -253,7 +254,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
         runs,
         fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
         characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
-        boxWidthInPt: mm2pt(schema.width),
+        boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
       }),
       lineRange,
     );
@@ -339,7 +340,7 @@ const getRangedPlainTextValue = (arg: {
       characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
       fontSize,
       fontKitFont,
-      boxWidthInPt: mm2pt(schema.width),
+      boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
     }),
     lineRange,
   );
@@ -378,12 +379,19 @@ export const buildStyledTextContainer = (
   const bottomAdjustment = bottomAdj.toString();
 
   const container = document.createElement('div');
+  const { borderWidth, padding } = getBoxInsets(schema);
 
   const containerStyle: CSS.Properties = {
-    padding: 0,
+    padding: `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`,
     resize: 'none',
-    backgroundColor: getBackgroundColor(value, schema),
-    border: 'none',
+    backgroundColor: getBackgroundColor(schema),
+    borderTopWidth: `${borderWidth.top}mm`,
+    borderRightWidth: `${borderWidth.right}mm`,
+    borderBottomWidth: `${borderWidth.bottom}mm`,
+    borderLeftWidth: `${borderWidth.left}mm`,
+    borderStyle: schema.borderColor && hasBoxDimension(schema.borderWidth) ? 'solid' : 'none',
+    borderColor: schema.borderColor ?? 'transparent',
+    boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
@@ -471,7 +479,7 @@ export const mapVerticalAlignToFlex = (verticalAlignmentValue: string | undefine
   return 'flex-start';
 };
 
-const getBackgroundColor = (value: string, schema: { backgroundColor?: string }) => {
-  if (!value || !schema.backgroundColor) return 'transparent';
+const getBackgroundColor = (schema: { backgroundColor?: string }) => {
+  if (!schema.backgroundColor) return 'transparent';
   return schema.backgroundColor;
 };

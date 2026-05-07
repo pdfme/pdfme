@@ -338,8 +338,10 @@ const value = 1;
       },
       headStyles: {
         backgroundColor: '#f6f8fa',
+        borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
       },
       bodyStyles: {
+        borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
         alternateBackgroundColor: '#f9fafb',
       },
     });
@@ -351,6 +353,9 @@ const value = 1;
       type: 'text',
       content: 'const value = 1;',
       backgroundColor: '#f6f8fa',
+      borderColor: '#d0d7de',
+      borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+      padding: { top: 2, right: 3, bottom: 2, left: 3 },
       textFormat: 'plain',
       overflow: 'expand',
     });
@@ -422,8 +427,11 @@ const value = 1;
       type: 'text',
       content: 'Quote line',
       backgroundColor: '#f8fafc',
+      borderColor: '#d0d7de',
+      borderWidth: { top: 0, right: 0, bottom: 0, left: 0.8 },
+      padding: { top: 2, right: 3, bottom: 2, left: 3 },
     });
-    expect(schema.position.x).toBe(19);
+    expect(schema.position.x).toBe(15);
   });
 
   test('deduplicates heading slugs with a _1 suffix', async () => {

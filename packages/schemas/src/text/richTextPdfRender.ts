@@ -1,6 +1,6 @@
 import type { PDFFont, Rotation } from '@pdfme/pdf-lib';
 import type { ColorType, Font, PDFRenderProps } from '@pdfme/common';
-import { getInternalLinkTarget, mm2pt, registerInternalLinkAnnotation } from '@pdfme/common';
+import { getInternalLinkTarget, registerInternalLinkAnnotation } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import {
   CODE_BACKGROUND_COLOR,
@@ -40,7 +40,8 @@ const getSyntheticItalicWidth = (run: RichTextLineRun, fontSize: number) =>
 const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: number) =>
   widthOfTextAtSize(run.text, run.fontKitFont, fontSize, characterSpacing) +
   getSyntheticBoldWidth(run, fontSize) +
-  getSyntheticItalicWidth(run, fontSize);
+  getSyntheticItalicWidth(run, fontSize) +
+  (run.code ? CODE_HORIZONTAL_PADDING * 2 : 0);
 
 const getPdfFontFromObj = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
   const pdfFont = pdfFontObj[run.fontName];
@@ -176,11 +177,13 @@ const drawRun = (arg: {
     underline,
   } = arg;
   const runWidth = getRunWidth(run, fontSize, characterSpacing);
+  const codePadding = run.code ? CODE_HORIZONTAL_PADDING : 0;
+  const textX = x + codePadding;
+  const textWidth = runWidth - codePadding * 2;
   const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
 
   if (run.code) {
-    const padding = CODE_HORIZONTAL_PADDING;
-    const bgX = x - padding;
+    const bgX = x;
     const bgY = y - textHeight * 0.2;
     const bgPoint =
       rotate.angle === 0
@@ -189,7 +192,7 @@ const drawRun = (arg: {
     page.drawRectangle({
       x: bgPoint.x,
       y: bgPoint.y,
-      width: runWidth + padding * 2,
+      width: runWidth,
       height: textHeight * 1.2,
       rotate,
       color: hex2PrintingColor(CODE_BACKGROUND_COLOR, colorType),
@@ -200,9 +203,9 @@ const drawRun = (arg: {
   if (strikethrough && runWidth > 0) {
     drawDecorationLine({
       page,
-      x,
+      x: textX,
       y: y + textHeight / 3,
-      width: runWidth,
+      width: textWidth,
       rotate,
       pivotPoint,
       fontSize,
@@ -214,9 +217,9 @@ const drawRun = (arg: {
   if (underline && runWidth > 0) {
     drawDecorationLine({
       page,
-      x,
+      x: textX,
       y: y - textHeight / 12,
-      width: runWidth,
+      width: textWidth,
       rotate,
       pivotPoint,
       fontSize,
@@ -241,11 +244,11 @@ const drawRun = (arg: {
     });
   };
 
-  drawAt(x);
+  drawAt(textX);
   if (run.syntheticBold) {
     const offset = fontSize * SYNTHETIC_BOLD_OFFSET_RATIO;
     for (let i = 1; i <= SYNTHETIC_BOLD_PDF_EXTRA_DRAWS; i++) {
-      drawAt(x + offset * i);
+      drawAt(textX + offset * i);
     }
   }
 };
@@ -268,9 +271,9 @@ export const renderInlineMarkdownText = async (arg: {
   lineHeight: number;
   characterSpacing: number;
   x: number;
+  y: number;
   width: number;
   height: number;
-  pageHeight: number;
   pivotPoint: { x: number; y: number };
   rotate: Rotation;
   opacity: number | undefined;
@@ -293,9 +296,9 @@ export const renderInlineMarkdownText = async (arg: {
     lineHeight,
     characterSpacing,
     x,
+    y,
     width,
     height,
-    pageHeight,
     pivotPoint,
     rotate,
     opacity,
@@ -357,8 +360,7 @@ export const renderInlineMarkdownText = async (arg: {
       xLine += width - textWidth;
     }
 
-    const yLine =
-      pageHeight - mm2pt(schema.position.y) - yOffset - lineHeight * fontSize * rowIndex;
+    const yLine = y + height - yOffset - lineHeight * fontSize * rowIndex;
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
     if (schema.strikethrough || schema.underline) {

@@ -23,6 +23,7 @@ export type {
   TableInput,
   TableSchema,
 } from './tables/types.js';
+export type { BoxDimension } from './box.js';
 export type { BarcodeSchema, BarcodeTypes } from './barcodes/types.js';
 export type { DateSchema } from './date/types.js';
 export type { ImageSchema } from './graphics/image.js';

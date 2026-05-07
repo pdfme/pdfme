@@ -81,6 +81,27 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(result.inputs[0]).toEqual({ customerName: 'Alice' });
   });
 
+  it('renders Text padding and border box props', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Text
+          borderColor="#d0d7de"
+          borderWidth={{ left: 0.8 }}
+          padding={{ x: 3, y: 2 }}
+        >
+          Boxed text
+        </Text>
+      </Page>,
+    );
+
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      type: 'text',
+      borderColor: '#d0d7de',
+      borderWidth: { top: 0, right: 0, bottom: 0, left: 0.8 },
+      padding: { top: 2, right: 3, bottom: 2, left: 3 },
+    });
+  });
+
   it('renders named MultiVariableText as a JSON input-backed schema', async () => {
     const result = await renderToTemplate(
       <Page>
