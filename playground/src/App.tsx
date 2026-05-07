@@ -1,10 +1,13 @@
+import { Suspense, lazy } from 'react';
 import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Designer from './routes/Designer';
 import FormAndViewer from './routes/FormAndViewer';
-import Md2Pdf from './routes/Md2Pdf';
 import Templates from './routes/Templates';
 import Header from './components/Header';
+
+const JsxPlayground = lazy(() => import('./routes/JsxPlayground'));
+const Md2Pdf = lazy(() => import('./routes/Md2Pdf'));
 
 export default function App() {
   const [searchParams] = useSearchParams();
@@ -13,13 +16,16 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       {!isEmbedded && <Header />}
-      <Routes>
-        <Route path={'/'} element={<Designer />} />
-        <Route path={'/designer'} element={<Designer />} />
-        <Route path="/form-viewer" element={<FormAndViewer />} />
-        <Route path="/md2pdf" element={<Md2Pdf />} />
-        <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
-      </Routes>
+      <Suspense fallback={<main className="min-h-0 flex-1 bg-gray-100" />}>
+        <Routes>
+          <Route path={'/'} element={<Designer />} />
+          <Route path={'/designer'} element={<Designer />} />
+          <Route path="/form-viewer" element={<FormAndViewer />} />
+          <Route path="/jsx" element={<JsxPlayground />} />
+          <Route path="/md2pdf" element={<Md2Pdf />} />
+          <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
+        </Routes>
+      </Suspense>
       <ToastContainer />
     </div>
   );

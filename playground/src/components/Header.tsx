@@ -111,6 +111,7 @@ export default function Navigation() {
     { id: 'templates-nav', to: '/templates', label: 'Templates' },
     { id: 'designer-nav', to: '/designer', label: 'Designer' },
     { id: 'form-viewer-nav', to: '/form-viewer', label: 'Form/Viewer' },
+    { id: 'jsx-nav', to: '/jsx', label: 'JSX' },
     { id: 'md2pdf-nav', to: '/md2pdf', label: 'md2pdf' },
   ];
 

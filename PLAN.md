@@ -42,12 +42,10 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
 ### 2. playground editor の Monaco 統一
 
 - Template JSON dialog、`md2pdf` editor、新しい JSX playground editor を共通の Monaco editor component に寄せる。
-- language は JSON / Markdown / TypeScript-TSX を使い分ける。theme は playground の既存 dark editor
-  見た目に合わせる。
+- language は JSON / Markdown / TypeScript-TSX を使い分ける。theme は Monaco の system/default に寄せる。
 - Template JSON dialog の embedded asset placeholder 保護は維持する。Monaco 化しても Commit 前に
   `restoreEmbeddedAssetsFromPlaceholders` と `checkTemplate` を通す。
-- `@monaco-editor/react` + `monaco-editor` か、素の `monaco-editor` を使うかを実装前に決める。
-  Vite worker / bundle size / lazy load を確認する。
+- `@monaco-editor/react` + `monaco-editor` を使う。Vite worker は明示し、必要な language contribution だけを読む。
 
 ### 3. JSX playground の TSX evaluation 方針
 
