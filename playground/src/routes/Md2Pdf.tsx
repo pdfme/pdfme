@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
+import { ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
@@ -106,15 +107,34 @@ export default function Md2Pdf() {
   return (
     <main className="flex min-h-0 flex-1 flex-col bg-gray-100">
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
-        <h1 className="text-sm font-semibold text-gray-900">md2pdf</h1>
-        <button
-          type="button"
-          disabled={!template || Boolean(error)}
-          onClick={onGeneratePdf}
-          className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          Generate PDF
-        </button>
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            <h1 className="text-sm font-semibold text-gray-900">md2pdf</h1>
+            <a
+              href="https://pdfme.com/docs/converter"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-600"
+            >
+              Docs
+              <ExternalLink className="size-3" />
+            </a>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            GFM support is intentionally partial: complex table/list content and remote images are
+            simplified.
+          </p>
+        </div>
+        <div className="shrink-0 pl-4">
+          <button
+            type="button"
+            disabled={!template || Boolean(error)}
+            onClick={onGeneratePdf}
+            className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Generate PDF
+          </button>
+        </div>
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 lg:grid-cols-2">
         <section className="flex min-h-[45vh] flex-col border-b border-gray-200 bg-white lg:min-h-0 lg:border-b-0 lg:border-r">
