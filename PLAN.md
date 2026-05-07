@@ -5,9 +5,9 @@
 ## 目的
 
 `@pdfme/jsx` で stacking layout を使った template authoring を整備し、その考え方を
-`converter` package の `md2pdf` に応用する。`md2pdf` MVP では Markdown/GFM AST から通常の
-pdfme `Template` と `inputs` を生成でき、default style も一段整った。次は examples / docs で
-使い方と制約を説明し、その後に layout 品質と rich content の応用範囲を広げる。
+`converter` package の `md2pdf` に応用する。`md2pdf` / `@pdfme/jsx` ともに beta playground と
+docs が入り、実際に試しながら仕様を磨ける状態になった。次は presets / preview 導線を整えつつ、
+layout 品質と rich content の応用範囲を広げる。
 
 ## 基本方針
 
@@ -25,44 +25,10 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
 
 ## 次に進めること
 
-### 1. `@pdfme/jsx` examples / docs
+### 1. playground / examples UX フォローアップ
 
-- beta として試せる `/jsx` playground を追加する。左に JSX editor、右に pdfme Viewer preview を置く
-  2 カラム構成にする。
-- JSX editor の出力は `renderToTemplate` に渡し、通常の pdfme `Template + inputs` として preview する。
-- 生成した template JSON を download できるようにする。必要なら PDF generation と render time 表示も
-  `md2pdf` playground と揃える。
-- 最初の examples は invoice / report / article / header-footer / absolute badge など、AI や人間が
-  真似しやすいものに絞る。
-- `md2pdf` / `jsx` playground は、将来それぞれ複数の sample preset を切り替えられるようにする。
-- `Static`, `Header`, `Footer`, `Absolute`, dynamic height, `Text` / `MultiVariableText`,
-  `Image` / `Svg` / visual schemas, `List` / `Table` の使いどころを docs に整理する。
-- website docs に `@pdfme/jsx` の beta ページを追加する。`jsxImportSource`, `renderToTemplate`,
-  `Template + inputs`, current limitations, playground link を載せる。
-
-### 2. playground editor の Monaco 統一
-
-- Template JSON dialog、`md2pdf` editor、新しい JSX playground editor を共通の Monaco editor component に寄せる。
-- language は JSON / Markdown / TypeScript-TSX を使い分ける。theme は Monaco の system/default に寄せる。
-- Template JSON dialog の embedded asset placeholder 保護は維持する。Monaco 化しても Commit 前に
-  `restoreEmbeddedAssetsFromPlaceholders` と `checkTemplate` を通す。
-- `@monaco-editor/react` + `monaco-editor` を使う。Vite worker は明示し、必要な language contribution だけを読む。
-
-### 3. JSX playground の TSX evaluation 方針
-
-- beta では任意 import を実行する playground にしない。`Page`, `Stack`, `Row`, `Box`, `Text`,
-  `MultiVariableText`, `List`, `Table`, `Image`, `Svg`, `Rectangle`, `Ellipse`, `Line`, `Header`,
-  `Footer`, `Absolute` などを評価スコープに渡す。
-- editor の入力はまず `return (<Page>...</Page>);` のような function body 形式を採用する。Sucrase で
-  JSX を `createElement(...)` call に落とし、bare module import を browser runtime で解決する問題を避ける。
-- evaluation は main thread ではなく Web Worker 側で行い、common browser globals は beta playground では
-  ブロックする。完全な untrusted-code sandbox としては扱わない。
-- 将来、copy-paste しやすい full module 形式 (`import ... from "@pdfme/jsx"; export default ...`) を
-  受けたい場合は、import stripping / sandbox / Blob module resolution を別途設計する。
-- preview 更新は debounce し、compile / render error を editor 下か viewer header に表示する。
-
-### 4. playground / examples UX フォローアップ
-
+- `md2pdf` / `jsx` playground は複数の sample preset を切り替えられるようにする。invoice / report /
+  article / header-footer / absolute badge など、AI や人間が真似しやすい例を優先する。
 - JSX playground は Viewer だけでなく Form preview も切り替えられるようにする。生成 template から
   Designer に遷移する導線も検討する。
 - JSX static schema API は、`Header` / `Footer` / `Static` が後続 `Page` に暗黙反映される点と、
@@ -74,20 +40,20 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
 - playground の `localStorage` 保存運用は、preset / draft / imported template の扱いが混ざりやすい。
   永続化スコープ、reset、共有可能 URL、保存済み template の見せ方を整理する。
 
-### 5. `md2pdf` layout 品質フォローアップ
+### 2. `md2pdf` layout 品質フォローアップ
 
 - heading 直後の keep-with-next、table / image / code block の keep-together、widow/orphan を検討する。
 - 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
 - blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
 
-### 6. `md2pdf` assets / rich content 方針
+### 3. `md2pdf` assets / rich content 方針
 
 - remote image は converter 内で fetch して data URI 化するか、引き続き link fallback とするかを決める。
 - `Template + inputs` API を崩さずに済むなら、まず converter 内 fetch + data URI 化を検討する。
 - table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
   分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
 
-### 7. `@pdfme/jsx` layout 品質フォローアップ
+### 4. `@pdfme/jsx` layout 品質フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
@@ -186,6 +152,10 @@ pdfme `Template` と `inputs` を生成でき、default style も一段整った
 - PR #1485: `md2pdf` default style 品質改善。table grid、code block background + padding、
   blockquote left rule、horizontal rule color などを調整し、text / MVT に `padding`, `borderWidth`,
   `borderColor` を追加して table cell と共通の box helper に寄せた。
+- PR #1486: `/md2pdf` playground lab と converter docs を追加。Markdown editor / Viewer preview /
+  PDF generation / render timing を同じ画面で試せるようにした。
+- PR #1487: `/jsx` playground、共有 Monaco `CodeEditor`、Template JSON / `md2pdf` editor の Monaco 化、
+  `@pdfme/jsx` beta docs を追加。JSX evaluation は Web Worker + Sucrase + restricted globals で扱う。
 
 ## 参考
 
