@@ -111,7 +111,7 @@ export default function Md2Pdf() {
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-gray-900">md2pdf</h1>
             <a
-              href="https://pdfme.com/docs/converter"
+              href="https://pdfme.com/docs/converter#md2pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-600"
