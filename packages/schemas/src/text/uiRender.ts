@@ -380,18 +380,27 @@ export const buildStyledTextContainer = (
 
   const container = document.createElement('div');
   const { borderWidth, padding } = getBoxInsets(schema);
+  const hasPadding = hasBoxDimension(schema.padding);
+  const hasBorder = Boolean(schema.borderColor && hasBoxDimension(schema.borderWidth));
 
   const containerStyle: CSS.Properties = {
-    padding: `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`,
+    padding: hasPadding
+      ? `${padding.top}mm ${padding.right}mm ${padding.bottom}mm ${padding.left}mm`
+      : 0,
     resize: 'none',
     backgroundColor: getBackgroundColor(schema),
-    borderTopWidth: `${borderWidth.top}mm`,
-    borderRightWidth: `${borderWidth.right}mm`,
-    borderBottomWidth: `${borderWidth.bottom}mm`,
-    borderLeftWidth: `${borderWidth.left}mm`,
-    borderStyle: schema.borderColor && hasBoxDimension(schema.borderWidth) ? 'solid' : 'none',
-    borderColor: schema.borderColor ?? 'transparent',
-    boxSizing: 'border-box',
+    border: hasBorder ? undefined : 'none',
+    ...(hasBorder
+      ? {
+          borderTopWidth: `${borderWidth.top}mm`,
+          borderRightWidth: `${borderWidth.right}mm`,
+          borderBottomWidth: `${borderWidth.bottom}mm`,
+          borderLeftWidth: `${borderWidth.left}mm`,
+          borderStyle: 'solid',
+          borderColor: schema.borderColor,
+        }
+      : {}),
+    ...(hasPadding || hasBorder ? { boxSizing: 'border-box' } : {}),
     display: 'flex',
     flexDirection: 'column',
     justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
