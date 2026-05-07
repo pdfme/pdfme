@@ -67,7 +67,7 @@ const pdf = await img2pdf([image1, image2], {
 });
 ```
 
-### md2pdf
+### md2pdf (beta)
 GitHub Flavored Markdown を pdfme の `Template` と `inputs` の組に変換します。
 
 ```ts
