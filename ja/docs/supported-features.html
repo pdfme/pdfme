@@ -13,7 +13,7 @@
 <link rel="search" type="application/opensearchdescription+xml" title="pdfme" href="/ja/opensearch.xml">
 
 <script src="https://media.ethicalads.io/media/client/ethicalads.min.js" async></script><link rel="stylesheet" href="/ja/assets/css/styles.5431d87a.css">
-<script src="/ja/assets/js/runtime~main.93f4bcfc.js" defer="defer"></script>
+<script src="/ja/assets/js/runtime~main.e1ff89a4.js" defer="defer"></script>
 <script src="/ja/assets/js/main.29a519aa.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -26,6 +26,10 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="現在サポートされている機能">現在サポートされている機能<a href="#現在サポートされている機能" class="hash-link" aria-label="現在サポートされている機能 への直接リンク" title="現在サポートされている機能 への直接リンク" translate="no">​</a></h2>
 <div class="theme-admonition theme-admonition-info admonition_xJq3 alert alert--info"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>備考</div><div class="admonitionContent_BuS1"><p>テキストスキーマ以外のスキーマを使用する場合は、以下のドキュメントを参照してください。<br>
 <a class="" href="/ja/docs/custom-schemas#using-schemas-from-pdfmeschemas">@pdfme/schemasからのスキーマの使用</a></p></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="動的レイアウトとページ区切り">動的レイアウトとページ区切り<a href="#動的レイアウトとページ区切り" class="hash-link" aria-label="動的レイアウトとページ区切り への直接リンク" title="動的レイアウトとページ区切り への直接リンク" translate="no">​</a></h2>
+<p>一部のスキーマは、描画前に高さを再計算できます。テキストと複数変数テキストは <code>overflow: &quot;expand&quot;</code> でこの挙動を利用でき、リストとテーブルは長い内容やページ区切りのために動的レイアウトを使います。</p>
+<p>動的レイアウトと自動ページ区切りを使うには、<code>basePdf</code> を <code>{ width: 210, height: 297, padding: [10, 10, 10, 10] }</code> のような blank PDF オブジェクトとして設定する必要があります。<code>basePdf</code> がカスタム PDF データの場合、pdfme は元のページを固定して扱うため、スキーマをページまたぎで reflow しません。Designer では、カスタム <code>basePdf</code> を使っている場合、テキストと複数変数テキストの <code>overflow: &quot;expand&quot;</code> は選択できません。</p>
+<p>Designer のキャンバスでは、作成時のスキーマの box が表示されます。reflow は Preview、Form、Viewer、PDF 生成時に適用されます。</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="テキスト-text">テキスト (text)<a href="#テキスト-text" class="hash-link" aria-label="テキスト (text) への直接リンク" title="テキスト (text) への直接リンク" translate="no">​</a></h3>
 <ul>
 <li class="">スタイル関連<!-- -->
@@ -37,6 +41,9 @@
 <li class="">行の高さ</li>
 <li class="">テキスト色</li>
 <li class="">背景色</li>
+<li class="">枠線の色</li>
+<li class="">枠線の幅</li>
+<li class="">パディング</li>
 <li class="">下線</li>
 <li class="">取り消し線</li>
 </ul>
@@ -55,10 +62,23 @@
 </li>
 </ul>
 </li>
+<li class="">Overflow<!-- -->
+<ul>
+<li class="">Visible: スキーマ作成時の高さを保ち、はみ出したテキストも表示します</li>
+<li class="">Expand: blank <code>basePdf</code> の場合に描画テキストを計測して高さを広げ、後続スキーマを押し下げ、長いテキストをページ分割します</li>
+<li class="">Expand は grow-only で、作成時の高さより小さくはしません</li>
+<li class="">Expand は動的フォントサイジングと同時利用できません。Expand が有効な場合は、通常のフォントサイズを使って計測・描画します</li>
+</ul>
+</li>
 <li class="">テキストフォーマット<!-- -->
 <ul>
 <li class="">プレーンテキスト</li>
 <li class="">インラインMarkdown（<code>**太字**</code>、<code>*斜体*</code>、<code>***太字斜体***</code>、<code>~~取り消し線~~</code>）とフォントバリアントの自動フォールバック</li>
+</ul>
+</li>
+<li class="">テキスト box のスタイル<!-- -->
+<ul>
+<li class="">背景、枠線、パディングはスキーマの box として描画され、テキスト内容が空でも表示されます</li>
 </ul>
 </li>
 </ul>
@@ -66,6 +86,8 @@
 <ul>
 <li class="">テキストと同様ですが、1つのテキストフィールドで0からn個の変数をサポートします</li>
 <li class="">テンプレート本文でインラインMarkdownをサポート（変数の値はリテラル文字列として描画されます）</li>
+<li class="">変数の値を解決した後、テキストと同じ <code>overflow: &quot;expand&quot;</code> の挙動をサポートします</li>
+<li class="">ページ分割された複数変数テキストの chunk は、Form モードでも変数値を編集できます。静的な inline-markdown テキストは read-only のままです</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="図形">図形<a href="#図形" class="hash-link" aria-label="図形 への直接リンク" title="図形 への直接リンク" translate="no">​</a></h3>
 <ul>
@@ -195,8 +217,10 @@
 </ul>
 </li>
 <li class="">長いリストの動的な高さ計算と自動ページ送り</li>
+<li class="">動的レイアウトには blank <code>basePdf</code> オブジェクトが必要です</li>
 <li class="">フォント・サイズ・色・配置などのテキストスタイルはテキストスキーマから継承</li>
 </ul>
+<div class="theme-admonition theme-admonition-note admonition_xJq3 alert alert--secondary"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"></path></svg></span>注記</div><div class="admonitionContent_BuS1"><p><code>__splitRange</code> は、テキスト、複数変数テキスト、リスト、テーブルをページ分割するために pdfme が内部で使うメタデータです。通常、テンプレート作成者が直接設定・編集する必要はありません。</p></div></div>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="セレクト-select">セレクト (select)<a href="#セレクト-select" class="hash-link" aria-label="セレクト (select) への直接リンク" title="セレクト (select) への直接リンク" translate="no">​</a></h3>
 <ul>
 <li class="">オプション</li>
@@ -242,6 +266,6 @@
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="カスタム機能リクエスト">カスタム機能リクエスト<a href="#カスタム機能リクエスト" class="hash-link" aria-label="カスタム機能リクエスト への直接リンク" title="カスタム機能リクエスト への直接リンク" translate="no">​</a></h2>
 <p>pdfmeはMITライセンスの下でリリースされているオープンソースプロジェクトですが、有料でのカスタム機能追加を検討することも可能です。<br>
 <strong>お支払いいただける場合は、ご要望の機能を評価し実装することができます。</strong><br>
-<!-- -->なお、追加された機能はすべてオープンソースとしてリリースされます。このアプローチがご希望に合う場合は、<a href="https://app.pdfme.com/contact" target="_blank" rel="noopener noreferrer" class="">お問い合わせ</a>ください。</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/pdfme/pdfme/tree/main/website/docs/supported-features.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>このページを編集</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="ドキュメントページ"><a class="pagination-nav__link pagination-nav__link--prev" href="/ja/docs/getting-started"><div class="pagination-nav__sublabel">前へ</div><div class="pagination-nav__label">はじめに</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/ja/docs/tables"><div class="pagination-nav__sublabel">次へ</div><div class="pagination-nav__label">動的データを持つテーブル</div></a></nav></div></div><div class="col col--3"><div style="position:sticky;top:76px"><div class="tableOfContents_bqdL thin-scrollbar custom-toc"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#現在サポートされている機能" class="table-of-contents__link toc-highlight">現在サポートされている機能</a><ul><li><a href="#テキスト-text" class="table-of-contents__link toc-highlight">テキスト (text)</a></li><li><a href="#multivariable-text" class="table-of-contents__link toc-highlight">複数変数テキスト (multiVariableText)</a></li><li><a href="#図形" class="table-of-contents__link toc-highlight">図形</a></li><li><a href="#グラフィックス" class="table-of-contents__link toc-highlight">グラフィックス</a></li><li><a href="#バーコード" class="table-of-contents__link toc-highlight">バーコード</a></li><li><a href="#table" class="table-of-contents__link toc-highlight">テーブル (table)</a></li><li><a href="#リスト-list" class="table-of-contents__link toc-highlight">リスト (list)</a></li><li><a href="#セレクト-select" class="table-of-contents__link toc-highlight">セレクト (select)</a></li><li><a href="#日付-date--時間-time--日時-datetime" class="table-of-contents__link toc-highlight">日付 (date) / 時間 (time) / 日時 (dateTime)</a></li><li><a href="#ラジオボタン-radiogroup--チェックボックス-checkbox" class="table-of-contents__link toc-highlight">ラジオボタン (radioGroup) / チェックボックス (checkbox)</a></li></ul></li><li><a href="#計画中のサポート" class="table-of-contents__link toc-highlight">計画中のサポート</a></li><li><a href="#カスタム機能リクエスト" class="table-of-contents__link toc-highlight">カスタム機能リクエスト</a></li></ul></div><div data-ea-publisher="pdfmecom" data-ea-type="image"></div></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">ドキュメント</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/ja/docs/getting-started">はじめに</a></li><li class="footer__item"><a class="footer__link-item" href="/ja/docs/supported-features">サポートされている機能</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">その他</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/ja/templates">サンプル</a></li><li class="footer__item"><a class="footer__link-item" href="/ja/template-design">テンプレート設計</a></li><li class="footer__item"><a href="https://app.pdfme.com?utm_source=website&amp;utm_content=footer" target="_blank" rel="noopener noreferrer" class="footer__link-item">pdfme Cloudを試す<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">コミュニティ</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/pdfme/pdfme" target="_blank" rel="noopener noreferrer" class="footer__link-item">Github<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://discord.gg/xWPTJbmgNV" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 pdfme</div></div></div></footer></div>
+<!-- -->なお、追加された機能はすべてオープンソースとしてリリースされます。このアプローチがご希望に合う場合は、<a href="https://app.pdfme.com/contact" target="_blank" rel="noopener noreferrer" class="">お問い合わせ</a>ください。</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_WFHX"><a href="https://github.com/pdfme/pdfme/tree/main/website/docs/supported-features.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>このページを編集</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="ドキュメントページ"><a class="pagination-nav__link pagination-nav__link--prev" href="/ja/docs/getting-started"><div class="pagination-nav__sublabel">前へ</div><div class="pagination-nav__label">はじめに</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/ja/docs/tables"><div class="pagination-nav__sublabel">次へ</div><div class="pagination-nav__label">動的データを持つテーブル</div></a></nav></div></div><div class="col col--3"><div style="position:sticky;top:76px"><div class="tableOfContents_bqdL thin-scrollbar custom-toc"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#現在サポートされている機能" class="table-of-contents__link toc-highlight">現在サポートされている機能</a></li><li><a href="#動的レイアウトとページ区切り" class="table-of-contents__link toc-highlight">動的レイアウトとページ区切り</a><ul><li><a href="#テキスト-text" class="table-of-contents__link toc-highlight">テキスト (text)</a></li><li><a href="#multivariable-text" class="table-of-contents__link toc-highlight">複数変数テキスト (multiVariableText)</a></li><li><a href="#図形" class="table-of-contents__link toc-highlight">図形</a></li><li><a href="#グラフィックス" class="table-of-contents__link toc-highlight">グラフィックス</a></li><li><a href="#バーコード" class="table-of-contents__link toc-highlight">バーコード</a></li><li><a href="#table" class="table-of-contents__link toc-highlight">テーブル (table)</a></li><li><a href="#リスト-list" class="table-of-contents__link toc-highlight">リスト (list)</a></li><li><a href="#セレクト-select" class="table-of-contents__link toc-highlight">セレクト (select)</a></li><li><a href="#日付-date--時間-time--日時-datetime" class="table-of-contents__link toc-highlight">日付 (date) / 時間 (time) / 日時 (dateTime)</a></li><li><a href="#ラジオボタン-radiogroup--チェックボックス-checkbox" class="table-of-contents__link toc-highlight">ラジオボタン (radioGroup) / チェックボックス (checkbox)</a></li></ul></li><li><a href="#計画中のサポート" class="table-of-contents__link toc-highlight">計画中のサポート</a></li><li><a href="#カスタム機能リクエスト" class="table-of-contents__link toc-highlight">カスタム機能リクエスト</a></li></ul></div><div data-ea-publisher="pdfmecom" data-ea-type="image"></div></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">ドキュメント</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/ja/docs/getting-started">はじめに</a></li><li class="footer__item"><a class="footer__link-item" href="/ja/docs/supported-features">サポートされている機能</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">その他</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/ja/templates">サンプル</a></li><li class="footer__item"><a class="footer__link-item" href="/ja/template-design">テンプレート設計</a></li><li class="footer__item"><a href="https://app.pdfme.com?utm_source=website&amp;utm_content=footer" target="_blank" rel="noopener noreferrer" class="footer__link-item">pdfme Cloudを試す<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">コミュニティ</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/pdfme/pdfme" target="_blank" rel="noopener noreferrer" class="footer__link-item">Github<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://discord.gg/xWPTJbmgNV" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 pdfme</div></div></div></footer></div>
 </body>
 </html>
