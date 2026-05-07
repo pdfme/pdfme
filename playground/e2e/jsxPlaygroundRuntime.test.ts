@@ -21,6 +21,20 @@ describe('JSX playground runtime', () => {
     expect(() => compileJsxFunctionBody('return window.localStorage;')).toThrow(
       'does not allow window',
     );
+    expect(() =>
+      compileJsxFunctionBody('return importScripts("https://example.com/a.js");'),
+    ).toThrow('does not allow importScripts');
+    expect(() =>
+      compileJsxFunctionBody('return (<Page><Text height={10}>{fetch("/")}</Text></Page>);'),
+    ).toThrow('does not allow fetch');
+  });
+
+  it('allows restricted words in rendered text content', () => {
+    expect(() =>
+      compileJsxFunctionBody(
+        'return (<Page><Text height={10}>window document importScripts</Text></Page>);',
+      ),
+    ).not.toThrow();
   });
 
   it('renders JSX into a normal pdfme template result', async () => {

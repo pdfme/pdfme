@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Template } from '@pdfme/common';
 import type { RenderResult } from '@pdfme/jsx';
 import { Viewer } from '@pdfme/ui';
@@ -16,43 +16,22 @@ const RENDER_TIMEOUT_MS = 15_000;
 
 type WorkerResponse =
   | {
+      id: number;
       ok: true;
       result: RenderResult;
     }
   | {
       error: string;
+      id: number;
       ok: false;
     };
 
-const renderJsxSourceInWorker = (source: string) =>
-  new Promise<RenderResult>((resolve, reject) => {
-    const worker = new JsxPlaygroundWorker();
-    const timeoutId = window.setTimeout(() => {
-      worker.terminate();
-      reject(new Error('JSX render timed out.'));
-    }, RENDER_TIMEOUT_MS);
-
-    const cleanup = () => {
-      window.clearTimeout(timeoutId);
-      worker.terminate();
-    };
-
-    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
-      cleanup();
-      if (event.data.ok) {
-        resolve(event.data.result);
-      } else {
-        reject(new Error(event.data.error));
-      }
-    };
-
-    worker.onerror = (event) => {
-      cleanup();
-      reject(new Error(event.message || 'JSX render worker failed.'));
-    };
-
-    worker.postMessage({ font: getFontsData(), source });
-  });
+type PendingRender = {
+  id: number;
+  reject: (error: Error) => void;
+  resolve: (result: RenderResult) => void;
+  timeoutId: number;
+};
 
 const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
   const typeScriptLanguage = monaco.languages.typescript;
@@ -96,6 +75,9 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 export default function JsxPlayground() {
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
+  const renderWorkerRef = useRef<Worker | null>(null);
+  const pendingRenderRef = useRef<PendingRender | null>(null);
+  const nextRenderRequestIdRef = useRef(0);
   const [source, setSource] = useState(initialJsx);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
@@ -103,6 +85,69 @@ export default function JsxPlayground() {
   const [renderDuration, setRenderDuration] = useState<number | null>(null);
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const terminateRenderWorker = useCallback(() => {
+    renderWorkerRef.current?.terminate();
+    renderWorkerRef.current = null;
+  }, []);
+
+  const clearPendingRender = useCallback((error?: Error) => {
+    const pendingRender = pendingRenderRef.current;
+    if (!pendingRender) return;
+
+    window.clearTimeout(pendingRender.timeoutId);
+    pendingRenderRef.current = null;
+    if (error) pendingRender.reject(error);
+  }, []);
+
+  const getRenderWorker = useCallback(() => {
+    if (renderWorkerRef.current) return renderWorkerRef.current;
+
+    const worker = new JsxPlaygroundWorker();
+    worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
+      const pendingRender = pendingRenderRef.current;
+      if (!pendingRender || event.data.id !== pendingRender.id) return;
+
+      clearPendingRender();
+      if (event.data.ok) {
+        pendingRender.resolve(event.data.result);
+      } else {
+        pendingRender.reject(new Error(event.data.error));
+      }
+    };
+    worker.onerror = (event) => {
+      const pendingRender = pendingRenderRef.current;
+      clearPendingRender();
+      terminateRenderWorker();
+      pendingRender?.reject(new Error(event.message || 'JSX render worker failed.'));
+    };
+    renderWorkerRef.current = worker;
+    return worker;
+  }, [clearPendingRender, terminateRenderWorker]);
+
+  const renderJsxSourceInWorker = useCallback(
+    (nextSource: string) =>
+      new Promise<RenderResult>((resolve, reject) => {
+        if (pendingRenderRef.current) {
+          clearPendingRender(new Error('JSX render cancelled.'));
+          terminateRenderWorker();
+        }
+
+        const worker = getRenderWorker();
+        const id = (nextRenderRequestIdRef.current += 1);
+        const timeoutId = window.setTimeout(() => {
+          const pendingRender = pendingRenderRef.current;
+          if (!pendingRender || pendingRender.id !== id) return;
+
+          clearPendingRender(new Error('JSX render timed out.'));
+          terminateRenderWorker();
+        }, RENDER_TIMEOUT_MS);
+
+        pendingRenderRef.current = { id, reject, resolve, timeoutId };
+        worker.postMessage({ font: getFontsData(), id, source: nextSource });
+      }),
+    [clearPendingRender, getRenderWorker, terminateRenderWorker],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -126,7 +171,7 @@ export default function JsxPlayground() {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [source]);
+  }, [renderJsxSourceInWorker, source]);
 
   useEffect(() => {
     if (!viewerRootRef.current || !template) return;
@@ -155,10 +200,12 @@ export default function JsxPlayground() {
 
   useEffect(() => {
     return () => {
+      clearPendingRender(new Error('JSX render cancelled.'));
+      terminateRenderWorker();
       viewerRef.current?.destroy();
       viewerRef.current = null;
     };
-  }, []);
+  }, [clearPendingRender, terminateRenderWorker]);
 
   const onGeneratePdf = async () => {
     if (isGeneratingPdf) return;

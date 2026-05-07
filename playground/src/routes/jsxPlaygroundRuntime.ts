@@ -33,6 +33,7 @@ const RESTRICTED_GLOBALS = [
   'fetch',
   'Function',
   'globalThis',
+  'importScripts',
   'indexedDB',
   'localStorage',
   'location',
@@ -50,6 +51,8 @@ const RESTRICTED_GLOBALS = [
 
 const IMPORT_EXPORT_PATTERN = /^\s*(import|export)\b/m;
 const RESTRICTED_GLOBAL_PATTERN = new RegExp(`\\b(${RESTRICTED_GLOBALS.join('|')})\\b`);
+const JS_COMMENT_OR_STRING_PATTERN =
+  /\/\*[\s\S]*?\*\/|\/\/[^\r\n]*|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'/g;
 
 const jsxScope = {
   Absolute,
@@ -85,14 +88,20 @@ const createElement = (
   return jsx(type, nextProps);
 };
 
-const assertAllowedJsxSource = (source: string) => {
+const stripCommentsAndQuotedStrings = (source: string) =>
+  source.replace(JS_COMMENT_OR_STRING_PATTERN, '');
+
+const assertNoImportExport = (source: string) => {
   if (IMPORT_EXPORT_PATTERN.test(source)) {
     throw new Error(
       'The JSX playground beta does not support import/export. Use a function body that returns <Page> nodes.',
     );
   }
+};
 
-  const restrictedGlobal = source.match(RESTRICTED_GLOBAL_PATTERN)?.[1];
+const assertNoRestrictedGlobals = (source: string) => {
+  const restrictedGlobal =
+    stripCommentsAndQuotedStrings(source).match(RESTRICTED_GLOBAL_PATTERN)?.[1];
   if (restrictedGlobal) {
     throw new Error(
       `The JSX playground beta does not allow ${restrictedGlobal}. Only pdfme JSX components are available.`,
@@ -101,16 +110,18 @@ const assertAllowedJsxSource = (source: string) => {
 };
 
 export const compileJsxFunctionBody = (source: string) => {
-  assertAllowedJsxSource(source);
+  assertNoImportExport(source);
 
   try {
-    return transform(source, {
+    const compiled = transform(source, {
       filePath: 'playground.tsx',
       jsxFragmentPragma: 'Fragment',
       jsxPragma: 'createElement',
       production: true,
       transforms: ['typescript', 'jsx'],
     }).code;
+    assertNoRestrictedGlobals(compiled);
+    return compiled;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
