@@ -450,8 +450,8 @@ const addTextSchema = (
     position: { x: options.x ?? builder.contentFrame.x, y: builder.cursorY },
     width: options.width ?? builder.contentFrame.width,
     height:
-      options.height ??
-      estimateTextHeight(content, fontSize, builder.lineHeight) + boxVerticalInset,
+      (options.height ?? estimateTextHeight(content, fontSize, builder.lineHeight)) +
+      boxVerticalInset,
     readOnly: true,
     alignment: 'left',
     verticalAlignment: 'top',

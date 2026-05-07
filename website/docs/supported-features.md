@@ -51,6 +51,8 @@ The Designer canvas shows the authored schema boxes. Reflow is applied in Previe
 - Text Format
   - Plain text
   - Inline Markdown (`**bold**`, `*italic*`, `***bold italic***`, `~~strikethrough~~`) with automatic font variant fallback
+- Text box styling
+  - Background, border, and padding are rendered as the schema box, including when the text content is empty
 
 ### Multivariable Text (multiVariableText){#multivariable-text}
 

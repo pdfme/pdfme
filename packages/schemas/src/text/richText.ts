@@ -188,6 +188,8 @@ const pushRunToLine = (
   const width = measureRunText(run, text, fontSize, characterSpacing);
   const lastRun = line.runs[line.runs.length - 1];
   if (lastRun && canMergeRichTextRuns(lastRun, run)) {
+    // Adjacent pieces from the same logical rich-text span should stay one run so spacing,
+    // inline code padding, and synthetic font offsets are measured for the combined span.
     const previousWidth = lastRun.width;
     lastRun.text += text;
     lastRun.width = measureRunText(lastRun, lastRun.text, fontSize, characterSpacing);
