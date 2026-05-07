@@ -35,6 +35,12 @@
       "browser": "./dist/index.js",
       "node": "./dist/index.node.js",
       "default": "./dist/index.js"
+    },
+    "./md2pdf": {
+      "types": "./dist/md2pdf.d.ts",
+      "browser": "./dist/md2pdf.js",
+      "node": "./dist/md2pdf.js",
+      "default": "./dist/md2pdf.js"
     }
   },
   "publishConfig": {
@@ -52,9 +58,14 @@
     "@napi-rs/canvas": "^0.1.100",
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^5.7.284"
+    "pdfjs-dist": "^5.7.284",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
-    "@pdfme/generator": "*"
+    "@pdfme/generator": "*",
+    "@pdfme/schemas": "*",
+    "@types/mdast": "^4.0.4"
   }
 }

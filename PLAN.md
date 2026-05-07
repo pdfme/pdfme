@@ -1,6 +1,6 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-06
+最終更新: 2026-05-07
 
 ## 目的
 
@@ -22,31 +22,48 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - GFM 準拠だけにこだわりすぎない。PDF 生成として自然で便利な表現は pdfme の拡張として扱い、
   GFM との差分は docs に明記する。
 
-## 現在地
-
-- main にはリンク基盤、`@pdfme/jsx` MVP、text / MVT dynamic layout、split metadata 共通化、
-  custom `basePdf` 制御、dynamic layout docs、MVT split chunk 編集、`MultiVariableText`
-  component、visual components、editable `Text` の inline-markdown guard、MVT split chunk の
-  連続編集検証、JSX layout の `margin` / `alignItems` / `justifyContent` / `flexGrow`、
-  `Static` / `Header` / `Footer` による `staticSchema` support、`Absolute` による manual placement
-  補助まで入っている。
-- `Barcode`, `Date`, Form 系 schema は md2pdf でのユースケースがまだ薄いため一旦スキップする。
-- 次の主な判断軸は、`@pdfme/jsx` の layout 品質、`md2pdf` MVP の写像範囲、GFM と pdfme
-  独自拡張の境界。
-
 ## 次に進めること
 
-### 1. `md2pdf` / GFM MVP の設計と入口
+### 1. PR #1483: `md2pdf` MVP を閉じる
 
-- `converter` package に `md2pdf` の入口を追加する。
-- Markdown parser は `remark-gfm` / `micromark` 系を候補にする。
-- 初期 API は `Template + inputs` を返す形にする。warnings / assets / anchors metadata は
-  必要になった時に追加検討する。
-- まず paragraph, heading, list, table, code block, blockquote, link, image を対象にする。
-- `@pdfme/jsx` と同じ layout tree / builder を共有できるか検討する。直接 JSX runtime に依存するより、
-  Markdown AST -> intermediate layout nodes -> pdfme template の形にできると保守しやすい。
+- CI が通ればマージしてよい。追加で style 品質を深追いしない。
+- MVP の範囲は paragraph, heading, list, table, code block, blockquote, horizontal rule, link,
+  data URI image。
+- 初期 API は `Template + inputs` を返す。warnings / assets / anchors metadata は必要になった時に
+  追加検討する。
+- pagination は converter 側で事前に template page を切らず、generator の dynamic layout に任せる。
+- remote Markdown image は link text に fallback する。
 
-### 2. `@pdfme/jsx` layout 品質フォローアップ
+### 2. `md2pdf` style preset
+
+- 次 PR の第一候補。MVP の「作れる」状態から「自然に読める」状態へ近づける。
+- default preset として、heading scale / heading margin、paragraph spacing、lineHeight、link color、
+  list spacing、table style、code block background / padding / monospace、blockquote left border or indent
+  を決める。
+- API はまず `style?: { preset?: "default"; ...overrides }` くらいに留め、full CSS parser にはしない。
+- `@pdfme/jsx` の layout / schema defaults と揃えられる部分は揃える。
+
+### 3. `md2pdf` examples / docs
+
+- sample Markdown と生成 PDF screenshot を追加する。README だけでなく docs / playground への配置も検討する。
+- `md2pdf` の import は `@pdfme/converter/md2pdf` を使うことを明記する。
+- generator で PDF 化する時に必要な plugins 例を載せる。
+- current limitations は維持する: table cell は plain、remote image は link fallback、image aspect ratio は未対応。
+
+### 4. `md2pdf` layout 品質フォローアップ
+
+- heading 直後の keep-with-next、table / image / code block の keep-together、widow/orphan を検討する。
+- 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
+- blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
+
+### 5. `md2pdf` assets / rich content 方針
+
+- remote image は converter 内で fetch して data URI 化するか、引き続き link fallback とするかを決める。
+- `Template + inputs` API を崩さずに済むなら、まず converter 内 fetch + data URI 化を検討する。
+- table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
+  分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
+
+### 6. `@pdfme/jsx` layout 品質フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
@@ -54,7 +71,7 @@ pdfme `Template` と `inputs` を生成できるようにする。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 
-### 3. `@pdfme/jsx` examples / docs
+### 7. `@pdfme/jsx` examples / docs
 
 - invoice / report / markdown article など、AI や人間が真似しやすい `@pdfme/jsx` サンプルを追加する。
 - `Static`, `Header`, `Footer`, `Absolute`, dynamic height の使いどころを docs に整理する。
@@ -98,14 +115,17 @@ pdfme `Template` と `inputs` を生成できるようにする。
 
 ### Block Layout
 
-- GFM list item は paragraph, nested list, code block, blockquote を含められる。現在の `list`
-  schema の `string[] + tab indent` だけでは表現しきれない可能性がある。
-- task list は checkbox + text/list の組み合わせか、list schema 拡張が必要。
-- GFM table の基本形は `table` schema に落とせるが、cell 内 rich inline content は追加検討。
-- code block は `rectangle + text` で始められるが、等幅フォント、空白保持、長い行、syntax highlight、
+- GFM list item は paragraph, nested list, code block, blockquote を含められる。MVP では `list`
+  schema の `string[] + tab indent` に落とすが、複雑な list item は表現しきれない可能性がある。
+- task list は MVP では `[x]` / `[ ]` prefix に落とす。checkbox + text/list の組み合わせや
+  list schema 拡張は後回し。
+- GFM table の基本形は `table` schema に落とす。MVP では cell 内 rich inline content は plain text
+  に落とし、装飾や link は保持しない。
+- code block は `text` + background で始める。等幅フォント、空白保持、長い行、syntax highlight、
   ページ分割を考えると専用 layout が欲しい。
-- blockquote は `line + text` で始められるが、中に paragraph / list / code / table を持てる点に注意する。
-- `[![alt](img)](url)` は image schema + link annotation として表現する。
+- blockquote は indented text + background で始める。中に paragraph / list / code / table を持てる点に
+  注意する。
+- remote Markdown image と `[![alt](img)](url)` は image fetch / link annotation の設計が必要。
 
 ### Pagination
 

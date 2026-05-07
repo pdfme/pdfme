@@ -48,6 +48,7 @@ export default defineConfig(() => {
         entry: {
           index: resolve(__dirname, 'src/index.browser.ts'),
           'index.node': resolve(__dirname, 'src/index.node.ts'),
+          md2pdf: resolve(__dirname, 'src/md2pdf.ts'),
         },
         fileName: (_, entryName) => `${entryName}.js`,
         formats: ['es'],

@@ -1,8 +1,22 @@
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 // @ts-ignore
 import { generate } from '@pdfme/generator';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { PAGE_SIZE_PRESETS } from '@pdfme/common';
-import { pdf2img as nodePdf2Img, pdf2size as nodePdf2Size, img2pdf } from '../src/index.node.js';
+import { line, list, table, text } from '@pdfme/schemas';
+import { md2pdf } from '../src/md2pdf.js';
+import {
+  pdf2img as nodePdf2Img,
+  pdf2size as nodePdf2Size,
+  img2pdf,
+} from '../src/index.node.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const notoSansJPData = readFileSync(
+  path.join(__dirname, '../../generator/__tests__/assets/fonts/NotoSansJP-Regular.ttf'),
+);
 
 const a4BasePdf = (padding: [number, number, number, number] = [20, 10, 20, 10]) => ({
   ...PAGE_SIZE_PRESETS.A4,
@@ -248,5 +262,210 @@ describe('pdf2size tests', () => {
     await expect(nodePdf2Size(emptyBuffer, { scale: 1 })).rejects.toThrow(
       'The PDF file is empty, i.e. its size is zero by',
     );
+  });
+});
+
+describe('md2pdf tests', () => {
+  test('converts GFM blocks into a pdfme template and inputs', async () => {
+    const { template, inputs } = await md2pdf(`# Hello [PDFme](https://pdfme.com)
+
+A **bold** paragraph with ~~deleted~~ text.
+
+---
+
+- [x] Done
+- [ ] Todo
+  - Nested
+
+| Name | Value |
+| ---- | ----- |
+| **A** | [1](https://example.com) |
+| B | 2 |
+
+\`\`\`ts
+const value = 1;
+\`\`\`
+`);
+
+    const schemas = template.schemas[0];
+    expect(template.basePdf).toEqual({
+      width: 210,
+      height: 297,
+      padding: [20, 15, 20, 15],
+    });
+    expect(inputs).toEqual([{}]);
+    expect(schemas.map((schema) => schema.type)).toEqual([
+      'text',
+      'text',
+      'line',
+      'list',
+      'table',
+      'text',
+    ]);
+
+    expect(schemas[0]).toMatchObject({
+      name: 'hello-pdfme',
+      type: 'text',
+      content: 'Hello [PDFme](https://pdfme.com)',
+      textFormat: 'inline-markdown',
+      overflow: 'expand',
+    });
+    expect(schemas[1]).toMatchObject({
+      content: 'A **bold** paragraph with ~~deleted~~ text.',
+      textFormat: 'inline-markdown',
+    });
+    expect(schemas[2]).toMatchObject({
+      type: 'line',
+      color: '#000000',
+    });
+    expect(JSON.parse(String(schemas[3].content))).toEqual(['[x] Done', '[ ] Todo', '\tNested']);
+    expect(schemas[3]).toMatchObject({
+      type: 'list',
+      listStyle: 'bullet',
+      textFormat: 'inline-markdown',
+      overflow: 'expand',
+    });
+    expect(schemas[4]).toMatchObject({
+      type: 'table',
+      head: ['Name', 'Value'],
+      headWidthPercentages: [50, 50],
+    });
+    expect(JSON.parse(String(schemas[4].content))).toEqual([
+      ['A', '1'],
+      ['B', '2'],
+    ]);
+    expect(schemas[5]).toMatchObject({
+      type: 'text',
+      content: 'const value = 1;',
+      textFormat: 'plain',
+      overflow: 'expand',
+    });
+  });
+
+  test('sanitizes unsafe links and falls back for remote markdown images', async () => {
+    const { template } = await md2pdf(
+      '[safe](#hello) [bad](javascript:alert(1))\n\n![Logo](https://example.com/logo.png)',
+    );
+    const schemas = template.schemas[0];
+
+    expect(schemas[0].content).toBe('[safe](#hello) bad');
+    expect(schemas[1]).toMatchObject({
+      type: 'text',
+      content: '[Logo](https://example.com/logo.png)',
+      textFormat: 'inline-markdown',
+    });
+  });
+
+  test('emits data URI markdown images as image schemas', async () => {
+    const png =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
+    const { template } = await md2pdf(`![pixel](${png})`);
+
+    expect(template.schemas[0][0]).toMatchObject({
+      type: 'image',
+      content: png,
+      readOnly: true,
+    });
+  });
+
+  test('accepts page size and margin options', async () => {
+    const { template } = await md2pdf('Hello', {
+      page: {
+        size: 'Letter',
+        orientation: 'landscape',
+        margin: { x: 10, y: 12 },
+      },
+    });
+
+    expect(template.basePdf).toEqual({
+      width: 279.4,
+      height: 215.9,
+      padding: [12, 10, 12, 10],
+    });
+  });
+
+  test('lets generator dynamic layout split long markdown without pre-splitting the template', async () => {
+    const markdown = Array.from({ length: 70 }, (_, index) => `Paragraph ${index + 1}`).join('\n\n');
+    const { template, inputs } = await md2pdf(markdown);
+
+    expect(template.schemas.length).toBe(1);
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text },
+    });
+    const pageSizes = await nodePdf2Size(pdf);
+
+    expect(pageSizes.length).toBeGreaterThan(1);
+  });
+
+  test('renders blockquotes as indented text instead of literal markdown quotes', async () => {
+    const { template } = await md2pdf('> Quote line');
+    const schema = template.schemas[0][0];
+
+    expect(schema).toMatchObject({
+      type: 'text',
+      content: 'Quote line',
+      backgroundColor: '#f8f8f8',
+    });
+    expect(schema.position.x).toBe(18);
+  });
+
+  test('deduplicates heading slugs with a _1 suffix', async () => {
+    const { template } = await md2pdf('# Same\n\n# Same');
+
+    expect(template.schemas[0].map((schema) => schema.name)).toEqual(['same', 'same_1']);
+  });
+
+  test('generates a PDF from the converted markdown template', async () => {
+    const { template, inputs } = await md2pdf(`# Title
+
+Visit [pdfme](https://pdfme.com).
+
+---
+
+- Alpha
+- Beta
+
+| Key | Value |
+| --- | ----- |
+| One | 1 |
+`);
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text, List: list, Table: table, Line: line },
+    });
+
+    expect(pdf).toBeInstanceOf(Uint8Array);
+    expect(pdf.byteLength).toBeGreaterThan(0);
+  });
+
+  test('generates a Japanese PDF when the caller provides a CJK font', async () => {
+    const { template, inputs } = await md2pdf('# 日本語\n\nこれはPDF生成のテストです。', {
+      style: { fontName: 'NotoSansJP' },
+    });
+
+    expect(template.schemas[0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'text', fontName: 'NotoSansJP' }),
+      ]),
+    );
+
+    const pdf = await generate({
+      template,
+      inputs,
+      plugins: { Text: text },
+      options: {
+        font: {
+          NotoSansJP: { data: notoSansJPData, fallback: true, subset: false },
+        },
+      },
+    });
+
+    expect(pdf).toBeInstanceOf(Uint8Array);
+    expect(pdf.byteLength).toBeGreaterThan(0);
   });
 });

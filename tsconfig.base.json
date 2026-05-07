@@ -15,6 +15,7 @@
     "paths": {
       "@pdfme/common": ["packages/common/src/index.ts"],
       "@pdfme/converter": ["packages/converter/src/index.ts"],
+      "@pdfme/converter/md2pdf": ["packages/converter/src/md2pdf.ts"],
       "@pdfme/generator": ["packages/generator/src/index.ts"],
       "@pdfme/jsx": ["packages/jsx/src/index.ts"],
       "@pdfme/jsx/jsx-runtime": ["packages/jsx/src/jsx-runtime.ts"],
