@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 
+const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
+
 const initialMarkdown = `# md2pdf playground
 
 Markdownからpdfme Templateを作ります。日本語もフォントを指定すれば表示できます。
@@ -40,6 +42,7 @@ export default function Md2Pdf() {
   const [error, setError] = useState<string | null>(null);
   const [renderDuration, setRenderDuration] = useState<number | null>(null);
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,9 +60,9 @@ export default function Md2Pdf() {
         setInputs(result.inputs);
         setRenderDuration(Math.round(performance.now() - startTimer));
         setError(null);
-      } catch (error) {
+      } catch (err) {
         if (cancelled) return;
-        setError(error instanceof Error ? error.message : String(error));
+        setError(err instanceof Error ? err.message : String(err));
         setRenderDuration(null);
       }
     }, 250);
@@ -73,35 +76,48 @@ export default function Md2Pdf() {
   useEffect(() => {
     if (!viewerRootRef.current || !template) return;
 
-    viewerRef.current?.destroy();
-    viewerRef.current = new Viewer({
-      domContainer: viewerRootRef.current,
-      template,
-      inputs,
-      options: {
-        font: getFontsData(),
-        lang: 'en',
-        theme: {
-          token: {
-            colorPrimary: '#25c2a0',
+    if (viewerRef.current) {
+      viewerRef.current.updateTemplate(template);
+      viewerRef.current.setInputs(inputs);
+    } else {
+      viewerRef.current = new Viewer({
+        domContainer: viewerRootRef.current,
+        template,
+        inputs,
+        options: {
+          font: getFontsData(),
+          lang: 'en',
+          theme: {
+            token: {
+              colorPrimary: '#25c2a0',
+            },
           },
         },
-      },
-      plugins: getPlugins(),
-    });
+        plugins: getPlugins(),
+      });
+    }
+  }, [template, inputs]);
 
+  useEffect(() => {
     return () => {
       viewerRef.current?.destroy();
       viewerRef.current = null;
     };
-  }, [template, inputs]);
+  }, []);
 
   const onGeneratePdf = async () => {
+    if (isGeneratingPdf) return;
+
     const startTimer = performance.now();
-    await generatePDF(viewerRef.current);
-    const duration = Math.round(performance.now() - startTimer);
-    setPdfDuration(duration);
-    toast.info(`Generated PDF in ${duration}ms`);
+    setIsGeneratingPdf(true);
+    try {
+      await generatePDF(viewerRef.current);
+      const duration = Math.round(performance.now() - startTimer);
+      setPdfDuration(duration);
+      toast.info(`Generated PDF in ${duration}ms`);
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   return (
@@ -111,7 +127,7 @@ export default function Md2Pdf() {
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-gray-900">md2pdf (beta)</h1>
             <a
-              href="https://pdfme.com/docs/converter#md2pdf"
+              href={MD2PDF_DOCS_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-600"
@@ -128,11 +144,11 @@ export default function Md2Pdf() {
         <div className="shrink-0 pl-4">
           <button
             type="button"
-            disabled={!template || Boolean(error)}
+            disabled={!template || Boolean(error) || isGeneratingPdf}
             onClick={onGeneratePdf}
             className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Generate PDF
+            {isGeneratingPdf ? 'Generating...' : 'Generate PDF'}
           </button>
         </div>
       </div>
