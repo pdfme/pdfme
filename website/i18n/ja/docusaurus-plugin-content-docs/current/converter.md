@@ -9,9 +9,9 @@
 - **PDFを画像に変換**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
 - **各ページの幅と高さを取得**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
 - **画像をPDFに変換**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
+- **MarkdownからPDF**: `md2pdf`
 
 計画されている変換機能には以下が含まれます：
-- **MarkdownからPDF**: `md2pdf`
 - **PDFからMarkdown**: `pdf2md`
 
 ## インストール
@@ -67,6 +67,92 @@ const pdf = await img2pdf([image1, image2], {
 });
 ```
 
+### md2pdf (beta)
+GitHub Flavored Markdown を pdfme の `Template` と `inputs` の組に変換します。
+
+```ts
+import { md2pdf } from '@pdfme/converter/md2pdf';
+
+const { template, inputs } = await md2pdf('# Hello\n\nVisit [pdfme](https://pdfme.com).');
+```
+
+[md2pdf playground](https://playground.pdfme.com/md2pdf) で実際に試せます。
+
+`md2pdf` は subpath export として公開されています。通常の `@pdfme/converter` import では Markdown parser の依存をブラウザ bundle に含めません。
+
+PDFを生成するには、返された `template` と `inputs` を `@pdfme/generator` に渡し、Markdownで使われる schema plugin を登録してください。
+
+```ts
+import { md2pdf } from '@pdfme/converter/md2pdf';
+import { generate } from '@pdfme/generator';
+import { image, line, list, table, text } from '@pdfme/schemas';
+
+const { template, inputs } = await md2pdf(`
+# リリースノート
+
+- Markdown が pdfme schemas に変換されます。
+- 水平線は line schema になります。
+
+---
+
+| Feature | Status |
+| --- | --- |
+| Tables | Supported |
+`);
+
+const pdf = await generate({
+  template,
+  inputs,
+  plugins: {
+    Text: text,
+    List: list,
+    Table: table,
+    Image: image,
+    Line: line,
+  },
+});
+```
+
+#### 日本語とCJKテキスト
+pdfme のデフォルトフォントは Roboto で、日本語/CJK glyph を含みません。日本語 Markdown を扱う場合は、変換時に CJK 対応の `fontName` を指定し、generator または UI options に同じフォントを渡してください。
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { md2pdf } from '@pdfme/converter/md2pdf';
+import { generate } from '@pdfme/generator';
+import { image, line, list, table, text } from '@pdfme/schemas';
+
+const fontData = await readFile('./fonts/NotoSansJP-Regular.ttf');
+const { template, inputs } = await md2pdf('# 日本語\n\nこれはPDF生成のテストです。', {
+  style: { fontName: 'NotoSansJP' },
+});
+
+const pdf = await generate({
+  template,
+  inputs,
+  plugins: { Text: text, List: list, Table: table, Image: image, Line: line },
+  options: {
+    font: {
+      NotoSansJP: { data: fontData, fallback: true, subset: false },
+    },
+  },
+});
+```
+
+`basePdf` を渡した場合、`md2pdf` は `page` options から blank PDF を作らず、その値をそのまま使います。これは pdfme template と同じ `BlankPdf` object なので、`staticSchema` も含められます。
+
+#### 現在の制限
+`md2pdf` は実用的な GFM block を扱えますが、GitHub Markdown renderer の完全互換ではありません。
+
+- paragraph、heading、list、table、code block、blockquote、horizontal rule、link、PNG/JPEG data URI image に対応しています。
+- pagination は変換後に pdfme dynamic layout が処理します。text、list、table はページ分割できますが、image の keep-together はまだ基本的な扱いです。
+- table cell は plain text です。table cell 内の inline Markdown 装飾は取り除かれます。
+- code block の language tag は parse されますが、まだ描画されません。
+- blockquote は簡単な background、padding、left rule で表現され、nested block layout としては扱いません。
+- remote Markdown image は現時点では link として出力されます。remote image の fetch と asset metadata は今後の対応です。
+- PNG/JPEG data URI image は固定の初期高さで描画され、まだ aspect ratio を保持しません。
+- list item 内の nested code block や blockquote など複雑な子要素は、list item text に単純化されます。
+
 ## エラー処理
 
 無効なパラメータが提供された場合、すべての関数は説明的なエラーをスローします：
@@ -80,6 +166,8 @@ const pdf = await img2pdf([image1, image2], {
 ## 型定義
 
 ```ts
+import type { BlankPdf, PageOrientation, PageSize } from '@pdfme/common';
+
 type ImageType = 'jpeg' | 'png';
 
 interface PageRange {
@@ -102,6 +190,25 @@ interface Img2PdfOptions {
   imageType?: ImageType;
   size?: { height: number, width: number }; // ミリメートル単位
   margin?: [number, number, number, number]; // ミリメートル単位 [上, 右, 下, 左]
+}
+
+type BoxSides = { top?: number, right?: number, bottom?: number, left?: number, x?: number, y?: number };
+type MarkdownMargin = number | [number, number, number, number] | BoxSides;
+
+interface Md2PdfOptions {
+  page?: {
+    size?: PageSize;
+    orientation?: PageOrientation;
+    margin?: MarkdownMargin;
+  };
+  basePdf?: BlankPdf;
+  style?: {
+    fontName?: string;
+    fontSize?: number;
+    lineHeight?: number;
+    fontColor?: string;
+    headingScale?: Partial<Record<1 | 2 | 3 | 4 | 5 | 6, number>>;
+  };
 }
 ```
 

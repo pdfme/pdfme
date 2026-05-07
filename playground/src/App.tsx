@@ -2,6 +2,7 @@ import { Routes, Route, useSearchParams } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Designer from './routes/Designer';
 import FormAndViewer from './routes/FormAndViewer';
+import Md2Pdf from './routes/Md2Pdf';
 import Templates from './routes/Templates';
 import Header from './components/Header';
 
@@ -16,6 +17,7 @@ export default function App() {
         <Route path={'/'} element={<Designer />} />
         <Route path={'/designer'} element={<Designer />} />
         <Route path="/form-viewer" element={<FormAndViewer />} />
+        <Route path="/md2pdf" element={<Md2Pdf />} />
         <Route path="/templates" element={<Templates isEmbedded={isEmbedded} />} />
       </Routes>
       <ToastContainer />

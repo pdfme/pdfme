@@ -16,7 +16,6 @@ import {
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
-import ExternalButton from '../components/ExternalButton';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
 
 function DesignerApp() {
@@ -248,7 +247,7 @@ function DesignerApp() {
       label: 'Edit static schema',
       content: (
         <button
-          className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed`}
           onClick={toggleEditingStaticSchemas}
         >
           {editingStaticSchemas ? 'End editing' : 'Start editing'}
@@ -261,7 +260,7 @@ function DesignerApp() {
         <button
           type="button"
           disabled={editingStaticSchemas}
-          className={`inline-flex items-center justify-center gap-1 px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full ${
+          className={`inline-flex items-center justify-center gap-1 px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full whitespace-nowrap ${
             editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
           }`}
           onClick={onOpenTemplateJson}
@@ -278,7 +277,7 @@ function DesignerApp() {
           <button
             id="save-local"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full ${
+            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
               editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={() => onSaveTemplate()}
@@ -288,7 +287,7 @@ function DesignerApp() {
           <button
             id="reset-template"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full ${
+            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
               editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={onResetTemplate}
@@ -304,7 +303,7 @@ function DesignerApp() {
         <div className="flex gap-2">
           <button
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full ${
+            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
               editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={onDownloadTemplate}
@@ -314,7 +313,7 @@ function DesignerApp() {
           <button
             id="generate-pdf"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full ${
+            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
               editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
             }`}
             onClick={async (e) => {
@@ -333,13 +332,6 @@ function DesignerApp() {
           </button>
         </div>
       ),
-    },
-    {
-      label: '',
-      content: React.createElement(ExternalButton, {
-        href: 'https://github.com/pdfme/pdfme/issues/new?template=template_feedback.yml&title=TEMPLATE_NAME',
-        title: 'Feedback this template',
-      }),
     },
   ];
 

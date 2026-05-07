@@ -200,8 +200,26 @@ describe('img2pdf tests', () => {
     const pdf2 = await img2pdf([jpegImage], {
       margin: [0, 0, 0, 0] as [number, number, number, number],
     });
-    // Both PDFs should have the same size
-    expect(pdf1.byteLength).toBe(pdf2.byteLength);
+
+    const [rendered1] = await nodePdf2Img(pdf1, { imageType: 'png' });
+    const [rendered2] = await nodePdf2Img(pdf2, { imageType: 'png' });
+    const image1 = await loadImage(Buffer.from(new Uint8Array(rendered1)));
+    const image2 = await loadImage(Buffer.from(new Uint8Array(rendered2)));
+
+    expect(image1.width).toBe(image2.width);
+    expect(image1.height).toBe(image2.height);
+
+    const canvas1 = createCanvas(image1.width, image1.height);
+    const context1 = canvas1.getContext('2d');
+    context1.drawImage(image1, 0, 0);
+    const pixels1 = context1.getImageData(0, 0, image1.width, image1.height).data;
+
+    const canvas2 = createCanvas(image2.width, image2.height);
+    const context2 = canvas2.getContext('2d');
+    context2.drawImage(image2, 0, 0);
+    const pixels2 = context2.getImageData(0, 0, image2.width, image2.height).data;
+
+    expect(Buffer.compare(Buffer.from(pixels1), Buffer.from(pixels2))).toBe(0);
   });
 });
 
