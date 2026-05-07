@@ -9,9 +9,9 @@ Although it's still under development, you can already use the following feature
 - **Convert PDF to Images**: [pdf2img](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2img.ts)
 - **Retrieve Each Page's Width and Height**: [pdf2size](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/pdf2size.ts)
 - **Convert Images to PDF**: [img2pdf](https://github.com/pdfme/pdfme/blob/main/packages/converter/src/img2pdf.ts)
+- **Markdown to PDF**: `md2pdf`
 
 Planned conversion features include:
-- **Markdown to PDF**: `md2pdf`
 - **PDF to Markdown**: `pdf2md`
 
 ## Installation
@@ -67,6 +67,90 @@ const pdf = await img2pdf([image1, image2], {
 });
 ```
 
+### md2pdf
+Converts GitHub Flavored Markdown into a pdfme `Template` and `inputs` pair.
+
+```ts
+import { md2pdf } from '@pdfme/converter/md2pdf';
+
+const { template, inputs } = await md2pdf('# Hello\n\nVisit [pdfme](https://pdfme.com).');
+```
+
+You can try it in the [md2pdf playground](https://playground.pdfme.com/md2pdf).
+
+`md2pdf` is exposed as a subpath export so regular `@pdfme/converter` imports do not pull Markdown parser dependencies into browser bundles.
+
+To generate a PDF, pass the returned `template` and `inputs` to `@pdfme/generator` and register the schema plugins used by your Markdown document.
+
+```ts
+import { md2pdf } from '@pdfme/converter/md2pdf';
+import { generate } from '@pdfme/generator';
+import { image, line, list, table, text } from '@pdfme/schemas';
+
+const { template, inputs } = await md2pdf(`
+# Release notes
+
+- Markdown becomes pdfme schemas.
+- Horizontal rules become line schemas.
+
+---
+
+| Feature | Status |
+| --- | --- |
+| Tables | Supported |
+`);
+
+const pdf = await generate({
+  template,
+  inputs,
+  plugins: {
+    Text: text,
+    List: list,
+    Table: table,
+    Image: image,
+    Line: line,
+  },
+});
+```
+
+#### Japanese and CJK text
+The default pdfme font is Roboto, which does not include Japanese/CJK glyphs. For Japanese Markdown, set a CJK-capable `fontName` during conversion and pass the same font to the generator or UI options.
+
+```ts
+import { readFile } from 'node:fs/promises';
+import { md2pdf } from '@pdfme/converter/md2pdf';
+import { generate } from '@pdfme/generator';
+import { image, line, list, table, text } from '@pdfme/schemas';
+
+const fontData = await readFile('./fonts/NotoSansJP-Regular.ttf');
+const { template, inputs } = await md2pdf('# 日本語\n\nこれはPDF生成のテストです。', {
+  style: { fontName: 'NotoSansJP' },
+});
+
+const pdf = await generate({
+  template,
+  inputs,
+  plugins: { Text: text, List: list, Table: table, Image: image, Line: line },
+  options: {
+    font: {
+      NotoSansJP: { data: fontData, fallback: true, subset: false },
+    },
+  },
+});
+```
+
+#### Current limitations
+`md2pdf` covers practical GFM blocks, but it is not a complete GitHub Markdown renderer yet.
+
+- Paragraphs, headings, lists, tables, code blocks, blockquotes, horizontal rules, links, and PNG/JPEG data URI images are supported.
+- Pagination is handled by pdfme dynamic layout after conversion. Text, lists, and tables can split across pages; image keep-together behavior is intentionally basic.
+- Table cells are plain text. Inline Markdown styling inside table cells is stripped.
+- Code block language tags are parsed but not rendered yet.
+- Blockquotes are rendered with a simple background, padding, and left rule, not as nested block layouts.
+- Remote Markdown images are emitted as links for now. Fetching remote images and carrying asset metadata is left for a later step.
+- PNG/JPEG data URI images use a fixed initial height and do not preserve aspect ratio yet.
+- Complex list item children such as nested code blocks or blockquotes are flattened into list item text.
+
 ## Error Handling
 
 All functions throw descriptive errors when invalid parameters are provided:
@@ -102,6 +186,26 @@ interface Img2PdfOptions {
   imageType?: ImageType;
   size?: { height: number, width: number }; // in millimeters
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
+}
+
+type PageSizePreset = 'A3' | 'A4' | 'A5' | 'A6' | 'B4' | 'B5' | 'B6' | 'Letter' | 'Legal' | 'Tabloid';
+type BoxSides = { top?: number, right?: number, bottom?: number, left?: number, x?: number, y?: number };
+type MarkdownMargin = number | [number, number, number, number] | BoxSides;
+
+interface Md2PdfOptions {
+  page?: {
+    size?: PageSizePreset | { width: number, height: number };
+    orientation?: 'portrait' | 'landscape';
+    margin?: MarkdownMargin;
+  };
+  basePdf?: { width: number, height: number, padding: [number, number, number, number] };
+  style?: {
+    fontName?: string;
+    fontSize?: number;
+    lineHeight?: number;
+    fontColor?: string;
+    headingScale?: Partial<Record<1 | 2 | 3 | 4 | 5 | 6, number>>;
+  };
 }
 ```
 
