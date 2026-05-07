@@ -37,10 +37,13 @@ export default function Md2Pdf() {
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
   const [error, setError] = useState<string | null>(null);
+  const [renderDuration, setRenderDuration] = useState<number | null>(null);
+  const [pdfDuration, setPdfDuration] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     const timer = window.setTimeout(async () => {
+      const startTimer = performance.now();
       try {
         const result = await md2pdf(markdown, {
           style: {
@@ -51,10 +54,12 @@ export default function Md2Pdf() {
         if (cancelled) return;
         setTemplate(result.template);
         setInputs(result.inputs);
+        setRenderDuration(Math.round(performance.now() - startTimer));
         setError(null);
       } catch (error) {
         if (cancelled) return;
         setError(error instanceof Error ? error.message : String(error));
+        setRenderDuration(null);
       }
     }, 250);
 
@@ -93,7 +98,9 @@ export default function Md2Pdf() {
   const onGeneratePdf = async () => {
     const startTimer = performance.now();
     await generatePDF(viewerRef.current);
-    toast.info(`Generated PDF in ${Math.round(performance.now() - startTimer)}ms`);
+    const duration = Math.round(performance.now() - startTimer);
+    setPdfDuration(duration);
+    toast.info(`Generated PDF in ${duration}ms`);
   };
 
   return (
@@ -125,7 +132,11 @@ export default function Md2Pdf() {
         <section className="flex min-h-[55vh] flex-col bg-gray-100 lg:min-h-0">
           <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
             <span>Viewer</span>
-            {error && <span className="normal-case tracking-normal text-red-600">{error}</span>}
+            <div className="flex items-center gap-3 normal-case tracking-normal">
+              {renderDuration !== null && <span>render {renderDuration}ms</span>}
+              {pdfDuration !== null && <span>pdf {pdfDuration}ms</span>}
+              {error && <span className="text-red-600">{error}</span>}
+            </div>
           </div>
           <div ref={viewerRootRef} className="min-h-0 flex-1" />
         </section>
