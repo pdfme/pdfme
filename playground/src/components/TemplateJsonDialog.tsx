@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Check, X } from 'lucide-react';
 import { Template, checkTemplate } from '@pdfme/common';
+
+const CodeEditor = lazy(() => import('./CodeEditor'));
 
 const ASSET_PLACEHOLDER_PREFIX = '__PDFME_ASSET__:';
 const EMBEDDED_ASSET_MIN_LENGTH = 1000;
@@ -28,8 +30,8 @@ type TemplateJsonDialogProps = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Object.prototype.toString.call(value) === '[object Object]';
 
-const formatJsonPath = (path: JsonPathSegment[]) =>
-  path.reduce(
+const formatJsonPath = (path: JsonPathSegment[]): string =>
+  path.reduce<string>(
     (result, segment) =>
       typeof segment === 'number' ? `${result}[${segment}]` : `${result}.${segment}`,
     '$',
@@ -231,17 +233,25 @@ export default function TemplateJsonDialog({
             </div>
           </div>
         )}
-        <textarea
-          aria-label="Template JSON"
-          autoFocus
-          value={value}
-          onChange={(e) => {
-            setValue(e.target.value);
-            setError(null);
-          }}
-          spellCheck={false}
-          className="min-h-0 flex-1 resize-none border-0 bg-gray-950 p-4 font-mono text-sm leading-6 text-gray-100 outline-none focus:ring-0 sm:p-6"
-        />
+        <Suspense
+          fallback={
+            <div className="min-h-0 flex-1 bg-white px-4 py-3 text-sm text-gray-500">
+              Loading editor...
+            </div>
+          }
+        >
+          <CodeEditor
+            ariaLabel="Template JSON"
+            autoFocus
+            language="json"
+            onChange={(e) => {
+              setValue(e);
+              setError(null);
+            }}
+            path="template.json"
+            value={value}
+          />
+        </Suspense>
       </DialogPanel>
     </Dialog>
   );

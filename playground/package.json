@@ -18,18 +18,22 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",
+    "@monaco-editor/react": "^4.7.0",
     "@pdfme/common": "file:../packages/common",
     "@pdfme/converter": "file:../packages/converter",
     "@pdfme/generator": "file:../packages/generator",
+    "@pdfme/jsx": "file:../packages/jsx",
     "@pdfme/schemas": "file:../packages/schemas",
     "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^10.50.0",
     "lucide-react": "^0.475.0",
+    "monaco-editor": "^0.55.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^7.14.2",
     "react-toastify": "^11.1.0",
-    "signature_pad": "^5.1.3"
+    "signature_pad": "^5.1.3",
+    "sucrase": "^3.35.1"
   },
   "devDependencies": {
     "@puppeteer/replay": "^3.1.3",

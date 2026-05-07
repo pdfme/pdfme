@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
+import CodeEditor from '../components/CodeEditor';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
 
@@ -157,12 +158,12 @@ export default function Md2Pdf() {
           <div className="border-b border-gray-200 px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
             Markdown
           </div>
-          <textarea
-            aria-label="Markdown"
+          <CodeEditor
+            ariaLabel="Markdown"
+            language="markdown"
+            onChange={setMarkdown}
+            path="md2pdf.md"
             value={markdown}
-            onChange={(event) => setMarkdown(event.target.value)}
-            spellCheck={false}
-            className="min-h-0 flex-1 resize-none bg-white p-4 font-mono text-sm leading-6 text-gray-900 outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
           />
         </section>
         <section className="flex min-h-[55vh] flex-col bg-gray-100 lg:min-h-0">

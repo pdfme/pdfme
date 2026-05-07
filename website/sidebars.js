@@ -18,7 +18,7 @@ const sidebars = {
       type: 'category',
       collapsed: true,
       label: 'Tools(New)',
-      items: ['cli', 'converter', 'manipulator'],
+      items: ['cli', 'jsx', 'converter', 'manipulator'],
     },
     'development-guide',
     'migration-v6',
