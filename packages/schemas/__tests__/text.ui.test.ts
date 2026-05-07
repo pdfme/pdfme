@@ -155,6 +155,37 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
 
+  it('lets non-top vertical alignment move the UI text block', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      textFormat: 'plain',
+      verticalAlignment: 'middle',
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Centered',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const container = rootElement.firstElementChild as HTMLDivElement;
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+
+    expect(container.style.justifyContent).toBe('center');
+    expect(textBlock.style.height).toBe('');
+  });
+
   it('renders split inline markdown form chunks as read-only', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();

@@ -377,6 +377,8 @@ export const buildStyledTextContainer = (
 
   const topAdjustment = topAdj.toString();
   const bottomAdjustment = bottomAdj.toString();
+  const verticalAlignment = schema.verticalAlignment ?? DEFAULT_VERTICAL_ALIGNMENT;
+  const isTopAligned = verticalAlignment === VERTICAL_ALIGN_TOP;
 
   const container = document.createElement('div');
   const { borderWidth, padding } = getBoxInsets(schema);
@@ -403,7 +405,7 @@ export const buildStyledTextContainer = (
     ...(hasPadding || hasBorder ? { boxSizing: 'border-box' } : {}),
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: mapVerticalAlignToFlex(schema.verticalAlignment),
+    justifyContent: mapVerticalAlignToFlex(verticalAlignment),
     width: '100%',
     height: '100%',
     cursor: isEditable(mode, schema) ? 'text' : 'default',
@@ -435,7 +437,7 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
-    height: '100%',
+    ...(isTopAligned ? { height: '100%' } : {}),
   };
 
   const textBlock = document.createElement('div');
