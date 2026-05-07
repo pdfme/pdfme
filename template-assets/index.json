@@ -81,21 +81,6 @@
     "basePdfKind": "blank"
   },
   {
-    "name": "dynamic-list",
-    "author": "pdfme",
-    "path": "dynamic-list/template.json",
-    "thumbnailPath": "dynamic-list/thumbnail.png",
-    "pageCount": 1,
-    "fieldCount": 3,
-    "schemaTypes": [
-      "list",
-      "text"
-    ],
-    "fontNames": [],
-    "hasCJK": false,
-    "basePdfKind": "blank"
-  },
-  {
     "name": "address-label-10",
     "author": "pdfme",
     "path": "address-label-10/template.json",
