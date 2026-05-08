@@ -336,7 +336,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           ['出力', 'Template + inputs'],
           ['プレビュー', 'Viewer / Form'],
         ]}
-        columnWeights={[38, 92]}
+        columnWeights={[30, 70]}
         rowHeight={9}
         headerHeight={9}
         font="NotoSansJP"
