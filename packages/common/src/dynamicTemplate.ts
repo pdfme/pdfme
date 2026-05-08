@@ -224,8 +224,28 @@ function removeTrailingEmptyPages(pages: Schema[][]): void {
 
 /**
  * Process a single template page that has dynamic content.
- * Uses the same layout algorithm as the original implementation,
- * but scoped to a single page's schemas.
+ *
+ * Two schemas are treated as part of the same horizontal group when their
+ * *original* Y ranges (`baseY` to `baseY + height`) overlap. Strict baseY
+ * equality would falsely separate side-by-side schemas placed at e.g. y=20
+ * and y=21 due to manual layout drift. Items in a group share the same
+ * offset; schemas below the group are pushed down by how far the group as
+ * a whole expanded.
+ *
+ * The offset for a group is computed as `cumMaxActualEnd - cumMaxOriginalEnd`
+ * over all already-committed groups. This formulation has two important
+ * properties:
+ * 1. When a single schema spans multiple pages (e.g. a long table that breaks
+ *    across 5 pages), downstream schemas correctly land below the last page,
+ *    because actualEnd reflects the page-break drift.
+ * 2. When an unrelated schema is merely *pushed* onto a later page without
+ *    expanding itself, both its actualEnd and originalEnd increase by similar
+ *    amounts (the page-break drift cancels), so the offset for the *next*
+ *    group does not accumulate the drift twice.
+ *
+ * `items` is pre-sorted by `normalizePageSchemas` (baseY ascending; original
+ * order preserved for ties), so each new item only needs to check whether it
+ * starts before the running `groupYEnd`.
  */
 function processDynamicPage(
   items: LayoutItem[],
@@ -234,10 +254,33 @@ function processDynamicPage(
   paddingTop: number,
 ): Schema[][] {
   const pages: Schema[][] = [];
-  let totalYOffset = 0;
+  let cumMaxActualEnd = 0;
+  let cumMaxOriginalEnd = 0;
+  let groupYEnd = Number.NEGATIVE_INFINITY;
+  let groupMaxActualEnd = Number.NEGATIVE_INFINITY;
+  let groupMaxOriginalEnd = Number.NEGATIVE_INFINITY;
+
+  const commitGroup = () => {
+    if (groupMaxActualEnd === Number.NEGATIVE_INFINITY) return;
+    if (groupMaxActualEnd > cumMaxActualEnd) cumMaxActualEnd = groupMaxActualEnd;
+    if (groupMaxOriginalEnd > cumMaxOriginalEnd) cumMaxOriginalEnd = groupMaxOriginalEnd;
+    groupMaxActualEnd = Number.NEGATIVE_INFINITY;
+    groupMaxOriginalEnd = Number.NEGATIVE_INFINITY;
+  };
 
   for (const item of items) {
-    const currentGlobalStartY = item.baseY + totalYOffset;
+    const itemBaseEnd = item.baseY + item.height;
+    const overlapsCurrentGroup = item.baseY < groupYEnd - EPSILON;
+
+    if (!overlapsCurrentGroup) {
+      commitGroup();
+      groupYEnd = itemBaseEnd;
+    } else if (itemBaseEnd > groupYEnd) {
+      groupYEnd = itemBaseEnd;
+    }
+
+    const groupOffset = Math.max(0, cumMaxActualEnd - cumMaxOriginalEnd);
+    const currentGlobalStartY = item.baseY + groupOffset;
 
     const actualGlobalEndY = placeUnitsOnPages(
       item.schema,
@@ -248,10 +291,10 @@ function processDynamicPage(
       pages,
     );
 
-    // Update offset: difference between actual and original end position
-    const originalGlobalEndY = item.baseY + item.height;
-    totalYOffset = actualGlobalEndY - originalGlobalEndY;
+    if (actualGlobalEndY > groupMaxActualEnd) groupMaxActualEnd = actualGlobalEndY;
+    if (itemBaseEnd > groupMaxOriginalEnd) groupMaxOriginalEnd = itemBaseEnd;
   }
+  commitGroup();
 
   sortPagesByOrder(pages, orderMap);
   removeTrailingEmptyPages(pages);

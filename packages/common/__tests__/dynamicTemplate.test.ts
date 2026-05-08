@@ -528,4 +528,278 @@ describe('getDynamicTemplate', () => {
       expect(text!.position.y).toBe(60);
     });
   });
+
+  describe('Same Y position scenarios (horizontal layout)', () => {
+    // Two expandable schemas placed side by side at the same baseY must not
+    // affect each other's position when one expands. Schemas below the group
+    // get pushed down by the group's largest expansion.
+
+    const sameYBasePdf = { width: 200, height: 200, padding: [10, 10, 10, 10] };
+
+    test('should not push sibling at same Y down when one schema expands', async () => {
+      const sameYTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: 'a',
+              type: 'a',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'b',
+              content: 'b',
+              type: 'b',
+              position: { x: 100, y: 10 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: sameYBasePdf,
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: sameYTemplate,
+        input: { a: 'a', b: 'b' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'a') return [10, 10, 10];
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      const a = dynamicTemplate.schemas[0].find((s) => s.name === 'a');
+      const b = dynamicTemplate.schemas[0].find((s) => s.name === 'b');
+      expect(a).toBeDefined();
+      expect(b).toBeDefined();
+      expect(a!.position.y).toBe(10);
+      expect(a!.height).toBe(30);
+      // b is at the same Y as a and must remain at its original position
+      expect(b!.position.y).toBe(10);
+      expect(b!.height).toBe(10);
+    });
+
+    test('should push schema below same-Y group by the largest expansion in the group', async () => {
+      const tripleTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: 'a',
+              type: 'a',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'b',
+              content: 'b',
+              type: 'b',
+              position: { x: 100, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'c',
+              content: 'c',
+              type: 'c',
+              position: { x: 10, y: 30 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: sameYBasePdf,
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: tripleTemplate,
+        input: { a: 'a', b: 'b', c: 'c' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'a') return [10, 10, 10]; // +20
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      const a = dynamicTemplate.schemas[0].find((s) => s.name === 'a');
+      const b = dynamicTemplate.schemas[0].find((s) => s.name === 'b');
+      const c = dynamicTemplate.schemas[0].find((s) => s.name === 'c');
+      expect(a!.position.y).toBe(10);
+      expect(b!.position.y).toBe(10);
+      // c sits below the group; pushed down by max group expansion (+20)
+      expect(c!.position.y).toBe(50);
+    });
+
+    test('should treat near-Y schemas (overlapping ranges) as one group', async () => {
+      // y=20 and y=21 with height=10 each: ranges [20,30] and [21,31] overlap.
+      // Manual placement drift of 1pt should not split them into separate groups.
+      const driftTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: 'a',
+              type: 'a',
+              position: { x: 10, y: 20 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'b',
+              content: 'b',
+              type: 'b',
+              position: { x: 100, y: 21 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: sameYBasePdf,
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: driftTemplate,
+        input: { a: 'a', b: 'b' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'a') return [10, 10, 10];
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      const a = dynamicTemplate.schemas[0].find((s) => s.name === 'a');
+      const b = dynamicTemplate.schemas[0].find((s) => s.name === 'b');
+      // a expanded to height 30 starting at y=20
+      expect(a!.position.y).toBe(20);
+      expect(a!.height).toBe(30);
+      // b is overlapping a's range, so it stays at its original y=21
+      expect(b!.position.y).toBe(21);
+      expect(b!.height).toBe(10);
+    });
+
+    test('should use the larger expansion when both same-Y schemas expand', async () => {
+      const tripleTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: 'a',
+              type: 'a',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'b',
+              content: 'b',
+              type: 'b',
+              position: { x: 100, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'c',
+              content: 'c',
+              type: 'c',
+              position: { x: 10, y: 30 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: sameYBasePdf,
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: tripleTemplate,
+        input: { a: 'a', b: 'b', c: 'c' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'a') return [10, 10]; // +10
+          if (args.schema.name === 'b') return [10, 10, 10]; // +20
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas.length).toBe(1);
+      const a = dynamicTemplate.schemas[0].find((s) => s.name === 'a');
+      const b = dynamicTemplate.schemas[0].find((s) => s.name === 'b');
+      const c = dynamicTemplate.schemas[0].find((s) => s.name === 'c');
+      expect(a!.position.y).toBe(10);
+      expect(b!.position.y).toBe(10);
+      // c is pushed down by max(b's +20, a's +10) = +20
+      expect(c!.position.y).toBe(50);
+    });
+
+    test('should push schemas below same-Y group after a sibling spans pages', async () => {
+      const pageSplitTemplate: Template = {
+        schemas: [
+          [
+            {
+              name: 'a',
+              content: 'a',
+              type: 'a',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'b',
+              content: 'b',
+              type: 'b',
+              position: { x: 100, y: 10 },
+              width: 80,
+              height: 10,
+            },
+            {
+              name: 'c',
+              content: 'c',
+              type: 'c',
+              position: { x: 10, y: 30 },
+              width: 80,
+              height: 10,
+            },
+          ],
+        ],
+        basePdf: sameYBasePdf,
+      };
+
+      const dynamicTemplate = await getDynamicTemplate({
+        template: pageSplitTemplate,
+        input: { a: 'a', b: 'b', c: 'c' },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'a') return [90, 90, 30];
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas.length).toBe(2);
+      const firstPageA = dynamicTemplate.schemas[0].find((s) => s.name === 'a');
+      const firstPageB = dynamicTemplate.schemas[0].find((s) => s.name === 'b');
+      const secondPageA = dynamicTemplate.schemas[1].find((s) => s.name === 'a');
+      const secondPageC = dynamicTemplate.schemas[1].find((s) => s.name === 'c');
+      expect(firstPageA!.position.y).toBe(10);
+      expect(firstPageA!.height).toBe(180);
+      expect(firstPageB!.position.y).toBe(10);
+      expect(firstPageB!.height).toBe(10);
+      expect(secondPageA!.position.y).toBe(10);
+      expect(secondPageA!.height).toBe(30);
+      // c preserves its original 10pt gap below the same-Y group after a splits.
+      expect(secondPageC!.position.y).toBe(50);
+      expect(secondPageC!.height).toBe(10);
+    });
+  });
 });
