@@ -1,6 +1,6 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-07
+最終更新: 2026-05-08
 
 ## 目的
 
@@ -58,6 +58,10 @@ layout 品質と rich content の応用範囲を広げる。
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
 - `%` width は将来検討でよい。まずは `flex` / `flexGrow` で比率指定を表現する。
+- Form 入力や dynamic layout reflow で `Text` / MVT が runtime に `overflow: "expand"` した場合、
+  JSX の親 `Box` / container は自動では広がらない。生成後の `Box` は rectangle schema であり、
+  子 schema の実描画高さと親 container を結び直す contract がまだないため。親子 container dynamic
+  layout は将来の設計課題として扱う。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 

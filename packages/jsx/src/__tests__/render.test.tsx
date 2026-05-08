@@ -84,11 +84,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
   it('renders Text padding and border box props', async () => {
     const result = await renderToTemplate(
       <Page>
-        <Text
-          borderColor="#d0d7de"
-          borderWidth={{ left: 0.8 }}
-          padding={{ x: 3, y: 2 }}
-        >
+        <Text borderColor="#d0d7de" borderWidth={{ left: 0.8 }} padding={{ x: 3, y: 2 }}>
           Boxed text
         </Text>
       </Page>,
@@ -585,7 +581,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
             ['Alice', 10],
             ['Bob', 12],
           ]}
-          widths={[70, 30]}
+          columnWeights={[70, 30]}
         />
       </Page>,
     );
@@ -607,6 +603,41 @@ describe('@pdfme/jsx renderToTemplate', () => {
       ['Alice', '10'],
       ['Bob', '12'],
     ]);
+  });
+
+  it('normalizes Table columnWeights as relative column weights', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table
+          head={['Label', 'Description']}
+          rows={[['Font', 'NotoSansJP']]}
+          columnWeights={[38, 92]}
+        />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    expect(table?.headWidthPercentages).toEqual([29.230769230769234, 70.76923076923077]);
+  });
+
+  it('defaults missing or invalid Table columnWeights to 1', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table
+          head={['A', 'B', 'C', 'D']}
+          rows={[['1', '2', '3', '4']]}
+          columnWeights={[50, 0, Number.NaN]}
+        />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    const widths = Array.isArray(table?.headWidthPercentages) ? table.headWidthPercentages : [];
+    expect(widths).toHaveLength(4);
+    expect(widths[0]).toBeCloseTo((50 / 53) * 100);
+    expect(widths[1]).toBeCloseTo((1 / 53) * 100);
+    expect(widths[2]).toBeCloseTo((1 / 53) * 100);
+    expect(widths[3]).toBeCloseTo((1 / 53) * 100);
   });
 
   it('renders Image and Svg schemas', async () => {

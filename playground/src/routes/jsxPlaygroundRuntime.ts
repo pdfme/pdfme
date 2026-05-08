@@ -1,4 +1,4 @@
-import type { Font } from '@pdfme/common';
+import { checkTemplate, type Font } from '@pdfme/common';
 import {
   Absolute,
   Box,
@@ -136,5 +136,8 @@ export const evaluateJsxFunctionBody = (source: string): PdfJsxChild => {
   return evaluate(...scopeValues) as PdfJsxChild;
 };
 
-export const renderJsxSource = async (source: string, font?: Font): Promise<RenderResult> =>
-  renderToTemplate(evaluateJsxFunctionBody(source), { font });
+export const renderJsxSource = async (source: string, font?: Font): Promise<RenderResult> => {
+  const result = await renderToTemplate(evaluateJsxFunctionBody(source), { font });
+  checkTemplate(result.template);
+  return result;
+};

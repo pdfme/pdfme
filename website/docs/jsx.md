@@ -6,7 +6,8 @@
 It is an authoring layer only. The output is a normal pdfme `Template` plus `inputs`, so you can pass
 the result to `generate`, `Designer`, `Form`, or `Viewer` with the usual plugins and fonts.
 
-You can try the browser version in the [JSX playground](https://playground.pdfme.com/jsx).
+You can try the browser version in the [JSX playground](https://playground.pdfme.com/jsx). The
+playground includes sample presets and can switch the preview between `Viewer` and `Form`.
 
 ## Installation
 
@@ -88,6 +89,11 @@ Use `gap`, `margin`, `alignItems`, `justifyContent`, and `flex` / `flexGrow` for
 
 If a component has a `name`, it becomes input-backed by default. If it has no `name`, it is rendered as
 read-only content. This mirrors the pdfme template data model.
+
+`Table` uses `columnWeights` for relative column sizing. The values are normalized to pdfme
+`headWidthPercentages`, so `columnWeights={[30, 70]}` means a 30/70 split, not `30mm` / `70mm`.
+Missing or invalid weights default to `1`, so pass one weight per column when the exact ratio
+matters. Earlier beta builds used `widths`; use `columnWeights` going forward.
 
 ## JSX Playground Beta
 

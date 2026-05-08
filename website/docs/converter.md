@@ -76,7 +76,8 @@ import { md2pdf } from '@pdfme/converter/md2pdf';
 const { template, inputs } = await md2pdf('# Hello\n\nVisit [pdfme](https://pdfme.com).');
 ```
 
-You can try it in the [md2pdf playground](https://playground.pdfme.com/md2pdf).
+You can try it in the [md2pdf playground](https://playground.pdfme.com/md2pdf), which includes a few
+sample Markdown presets for quick checks.
 
 `md2pdf` is exposed as a subpath export so regular `@pdfme/converter` imports do not pull Markdown parser dependencies into browser bundles.
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
@@ -7,36 +7,15 @@ import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
+import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
+import { shouldRefreshCollapsedPreview } from './previewSizing';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
-
-const initialMarkdown = `# md2pdf playground
-
-Markdownからpdfme Templateを作ります。日本語もフォントを指定すれば表示できます。
-
-## Blocks
-
-- Paragraph
-- **Bold**, *italic*, ~~strike~~, \`inline code\`
-- [pdfme](https://pdfme.com)
-
----
-
-> Blockquote uses a left rule and padding.
-
-\`\`\`ts
-const template = await md2pdf(markdown);
-\`\`\`
-
-| Feature | Status |
-| --- | --- |
-| Table grid | Supported |
-| Remote image | Link fallback |
-`;
 
 export default function Md2Pdf() {
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
+  const [selectedPresetId, setSelectedPresetId] = useState(md2PdfPresets[0]?.id ?? '');
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
@@ -44,6 +23,9 @@ export default function Md2Pdf() {
   const [renderDuration, setRenderDuration] = useState<number | null>(null);
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [viewerRefreshKey, setViewerRefreshKey] = useState(0);
+  const selectedPreset =
+    md2PdfPresets.find((preset) => preset.id === selectedPresetId) ?? md2PdfPresets[0];
 
   useEffect(() => {
     let cancelled = false;
@@ -97,7 +79,38 @@ export default function Md2Pdf() {
         plugins: getPlugins(),
       });
     }
-  }, [template, inputs]);
+  }, [template, inputs, viewerRefreshKey]);
+
+  useEffect(() => {
+    if (!template) return;
+
+    let frameId: number | null = null;
+    const refreshViewerIfVisible = () => {
+      if (frameId !== null) return;
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        const container = viewerRootRef.current;
+        const viewer = viewerRef.current;
+        if (!container || !viewer || !shouldRefreshCollapsedPreview(container)) return;
+
+        viewer.destroy();
+        viewerRef.current = null;
+        setViewerRefreshKey((key) => key + 1);
+      });
+    };
+
+    window.addEventListener('scroll', refreshViewerIfVisible, { passive: true });
+    window.addEventListener('resize', refreshViewerIfVisible);
+    const timeoutId = window.setTimeout(refreshViewerIfVisible, 150);
+
+    return () => {
+      window.removeEventListener('scroll', refreshViewerIfVisible);
+      window.removeEventListener('resize', refreshViewerIfVisible);
+      window.clearTimeout(timeoutId);
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+    };
+  }, [template]);
 
   useEffect(() => {
     return () => {
@@ -121,9 +134,18 @@ export default function Md2Pdf() {
     }
   };
 
+  const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
+    const preset = md2PdfPresets.find((item) => item.id === event.target.value);
+    if (!preset) return;
+    setSelectedPresetId(preset.id);
+    setMarkdown(preset.markdown);
+    setError(null);
+    setPdfDuration(null);
+  };
+
   return (
-    <main className="flex min-h-0 flex-1 flex-col bg-gray-100">
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+    <main className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden">
+      <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             <h1 className="text-sm font-semibold text-gray-900">md2pdf (beta)</h1>
@@ -137,24 +159,37 @@ export default function Md2Pdf() {
               <ExternalLink className="size-3" />
             </a>
           </div>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 break-words text-xs text-gray-500">{selectedPreset?.description}</p>
+          <p className="mt-1 break-words text-xs text-gray-500">
             GFM support is intentionally partial: complex table/list content and remote images are
             simplified.
           </p>
         </div>
-        <div className="shrink-0 pl-4">
+        <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:pl-4">
+          <select
+            aria-label="Markdown preset"
+            value={selectedPresetId}
+            onChange={onChangePreset}
+            className="col-span-2 max-w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700 sm:col-span-1 sm:min-w-40"
+          >
+            {md2PdfPresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             disabled={!template || Boolean(error) || isGeneratingPdf}
             onClick={onGeneratePdf}
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="col-span-2 min-w-0 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-1 sm:px-3"
           >
             {isGeneratingPdf ? 'Generating...' : 'Generate PDF'}
           </button>
         </div>
       </div>
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 lg:grid-cols-2">
-        <section className="flex min-h-[45vh] flex-col border-b border-gray-200 bg-white lg:min-h-0 lg:border-b-0 lg:border-r">
+      <div className="grid min-w-0 flex-none grid-cols-1 gap-0 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
+        <section className="flex min-h-[28rem] min-w-0 flex-col border-b border-gray-200 bg-white lg:min-h-0 lg:border-b-0 lg:border-r">
           <div className="border-b border-gray-200 px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
             Markdown
           </div>
@@ -166,8 +201,8 @@ export default function Md2Pdf() {
             value={markdown}
           />
         </section>
-        <section className="flex min-h-[55vh] flex-col bg-gray-100 lg:min-h-0">
-          <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+        <section className="flex min-h-[44rem] min-w-0 flex-col bg-gray-100 lg:min-h-0">
+          <div className="flex flex-col gap-2 border-b border-gray-200 bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500 sm:flex-row sm:items-center sm:justify-between">
             <span>Viewer</span>
             <div className="flex items-center gap-3 normal-case tracking-normal">
               {renderDuration !== null && <span>render {renderDuration}ms</span>}
@@ -175,7 +210,7 @@ export default function Md2Pdf() {
               {error && <span className="text-red-600">{error}</span>}
             </div>
           </div>
-          <div ref={viewerRootRef} className="min-h-0 flex-1" />
+          <div ref={viewerRootRef} className="h-[38rem] flex-none lg:h-auto lg:min-h-0 lg:flex-1" />
         </section>
       </div>
     </main>
