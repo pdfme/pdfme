@@ -201,13 +201,13 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           </Text>
           <MultiVariableText
             name="message"
-            height={28}
             size={10}
             lineHeight={1.3}
             padding={2}
             borderColor="#cbd5e1"
             borderWidth={0.3}
             text={'Hello {firstName},\\nYour plan is {plan}.\\nStatus: {status}'}
+            overflow="expand"
             values={{ firstName: 'Mina', plan: 'Growth', status: 'Ready for review' }}
           />
         </Stack>
