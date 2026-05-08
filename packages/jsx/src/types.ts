@@ -288,7 +288,7 @@ export type TableProps = CommonProps & {
   head: string[];
   rows?: (string | number)[][];
   data?: (string | number)[][];
-  /** Column width percentages passed to pdfme headWidthPercentages. */
+  /** Relative column widths. Values are normalized to pdfme headWidthPercentages. */
   widths?: number[];
   width?: number;
   height?: number;

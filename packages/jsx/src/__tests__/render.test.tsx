@@ -609,6 +609,17 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ]);
   });
 
+  it('normalizes Table widths as relative column weights', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table head={['Label', 'Description']} rows={[['Font', 'NotoSansJP']]} widths={[38, 92]} />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    expect(table?.headWidthPercentages).toEqual([29.230769230769234, 70.76923076923077]);
+  });
+
   it('renders Image and Svg schemas', async () => {
     const result = await renderToTemplate(
       <Page margin={0}>

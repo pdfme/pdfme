@@ -1117,7 +1117,16 @@ const substituteMultiVariableText = (
 };
 
 const normalizeColumnWidths = (widths: number[] | undefined, columnCount: number): number[] => {
-  if (widths && widths.length > 0) return widths;
+  if (widths && widths.length > 0) {
+    const normalizedWidths = Array.from({ length: columnCount }, (_, index) => {
+      const width = widths[index];
+      return Number.isFinite(width) && Number(width) > 0 ? Number(width) : 1;
+    });
+
+    const totalWidth = normalizedWidths.reduce((sum, width) => sum + width, 0);
+    if (totalWidth > 0) return normalizedWidths.map((width) => (width / totalWidth) * 100);
+  }
+
   if (columnCount <= 0) return [];
   return Array.from({ length: columnCount }, () => 100 / columnCount);
 };
