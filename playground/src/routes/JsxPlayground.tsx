@@ -9,7 +9,7 @@ import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
-import { shouldRefreshCollapsedPreview } from './previewSizing';
+import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
 const JSX_EDITOR_PATH = 'file:///jsx-playground.tsx';
@@ -84,6 +84,7 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 };
 
 export default function JsxPlayground() {
+  const pageRootRef = useRef<HTMLElement | null>(null);
   const previewRootRef = useRef<HTMLDivElement | null>(null);
   const previewRef = useRef<PreviewInstance | null>(null);
   const inputsRef = useRef<Record<string, string>[]>([{}]);
@@ -268,36 +269,21 @@ export default function JsxPlayground() {
     }
   }, [inputs, previewMode]);
 
-  useEffect(() => {
-    if (!template) return;
+  const refreshCollapsedPreview = useCallback(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
 
-    let frameId: number | null = null;
-    const refreshPreviewIfVisible = () => {
-      if (frameId !== null) return;
+    preview.ui.destroy();
+    previewRef.current = null;
+    setPreviewRefreshKey((key) => key + 1);
+  }, []);
 
-      frameId = window.requestAnimationFrame(() => {
-        frameId = null;
-        const container = previewRootRef.current;
-        const preview = previewRef.current;
-        if (!container || !preview || !shouldRefreshCollapsedPreview(container)) return;
-
-        preview.ui.destroy();
-        previewRef.current = null;
-        setPreviewRefreshKey((key) => key + 1);
-      });
-    };
-
-    window.addEventListener('scroll', refreshPreviewIfVisible, { passive: true });
-    window.addEventListener('resize', refreshPreviewIfVisible);
-    const timeoutId = window.setTimeout(refreshPreviewIfVisible, 150);
-
-    return () => {
-      window.removeEventListener('scroll', refreshPreviewIfVisible);
-      window.removeEventListener('resize', refreshPreviewIfVisible);
-      window.clearTimeout(timeoutId);
-      if (frameId !== null) window.cancelAnimationFrame(frameId);
-    };
-  }, [template, previewMode]);
+  useRefreshCollapsedPreview({
+    containerRef: previewRootRef,
+    enabled: template != null,
+    onRefresh: refreshCollapsedPreview,
+    scrollRootRef: pageRootRef,
+  });
 
   useEffect(() => {
     return () => {
@@ -340,7 +326,10 @@ export default function JsxPlayground() {
   };
 
   return (
-    <main className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden">
+    <main
+      ref={pageRootRef}
+      className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden"
+    >
       <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-3">

@@ -21,7 +21,6 @@ export const shouldRefreshCollapsedPreviewSnapshot = ({
 
   return (
     visibleHeight >= MIN_VISIBLE_PREVIEW_HEIGHT &&
-    renderedHeight > 0 &&
     renderedHeight < visibleHeight * COLLAPSED_PREVIEW_RATIO
   );
 };
@@ -29,8 +28,9 @@ export const shouldRefreshCollapsedPreviewSnapshot = ({
 export const shouldRefreshCollapsedPreview = (container: HTMLElement) => {
   const rect = container.getBoundingClientRect();
   const renderedRoot = container.firstElementChild;
-  const renderedHeight =
-    renderedRoot instanceof HTMLElement ? renderedRoot.getBoundingClientRect().height : 0;
+  if (!(renderedRoot instanceof HTMLElement)) return false;
+
+  const renderedHeight = renderedRoot.getBoundingClientRect().height;
 
   return shouldRefreshCollapsedPreviewSnapshot({
     containerBottom: rect.bottom,
