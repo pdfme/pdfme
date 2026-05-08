@@ -13,6 +13,7 @@ import { shouldRefreshCollapsedPreview } from './previewSizing';
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
 
 export default function Md2Pdf() {
+  const pageRootRef = useRef<HTMLElement | null>(null);
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const [selectedPresetId, setSelectedPresetId] = useState(md2PdfPresets[0]?.id ?? '');
@@ -100,11 +101,14 @@ export default function Md2Pdf() {
       });
     };
 
+    const scrollContainer = pageRootRef.current;
+    scrollContainer?.addEventListener('scroll', refreshViewerIfVisible, { passive: true });
     window.addEventListener('scroll', refreshViewerIfVisible, { passive: true });
     window.addEventListener('resize', refreshViewerIfVisible);
     const timeoutId = window.setTimeout(refreshViewerIfVisible, 150);
 
     return () => {
+      scrollContainer?.removeEventListener('scroll', refreshViewerIfVisible);
       window.removeEventListener('scroll', refreshViewerIfVisible);
       window.removeEventListener('resize', refreshViewerIfVisible);
       window.clearTimeout(timeoutId);
@@ -144,7 +148,10 @@ export default function Md2Pdf() {
   };
 
   return (
-    <main className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden">
+    <main
+      ref={pageRootRef}
+      className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden"
+    >
       <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-3">

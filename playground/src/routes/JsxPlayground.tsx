@@ -84,6 +84,7 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 };
 
 export default function JsxPlayground() {
+  const pageRootRef = useRef<HTMLElement | null>(null);
   const previewRootRef = useRef<HTMLDivElement | null>(null);
   const previewRef = useRef<PreviewInstance | null>(null);
   const inputsRef = useRef<Record<string, string>[]>([{}]);
@@ -287,11 +288,14 @@ export default function JsxPlayground() {
       });
     };
 
+    const scrollContainer = pageRootRef.current;
+    scrollContainer?.addEventListener('scroll', refreshPreviewIfVisible, { passive: true });
     window.addEventListener('scroll', refreshPreviewIfVisible, { passive: true });
     window.addEventListener('resize', refreshPreviewIfVisible);
     const timeoutId = window.setTimeout(refreshPreviewIfVisible, 150);
 
     return () => {
+      scrollContainer?.removeEventListener('scroll', refreshPreviewIfVisible);
       window.removeEventListener('scroll', refreshPreviewIfVisible);
       window.removeEventListener('resize', refreshPreviewIfVisible);
       window.clearTimeout(timeoutId);
@@ -340,7 +344,10 @@ export default function JsxPlayground() {
   };
 
   return (
-    <main className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden">
+    <main
+      ref={pageRootRef}
+      className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden"
+    >
       <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-3">

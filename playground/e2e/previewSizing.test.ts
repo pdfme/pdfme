@@ -10,6 +10,15 @@ describe('preview sizing helpers', () => {
         viewportHeight: 900,
       }),
     ).toBe(true);
+
+    expect(
+      shouldRefreshCollapsedPreviewSnapshot({
+        containerBottom: 800,
+        containerTop: 100,
+        renderedHeight: 0,
+        viewportHeight: 900,
+      }),
+    ).toBe(true);
   });
 
   it('does not refresh when the visible area is too small or the preview is not collapsed', () => {
