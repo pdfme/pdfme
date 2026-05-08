@@ -64,6 +64,15 @@ describe('JSX playground runtime', () => {
     });
   });
 
+  it('rejects JSX that renders an invalid pdfme template', async () => {
+    await expect(
+      renderJsxSource(
+        'return (<Page><Text name={123} height={10}>Bad name</Text></Page>);',
+        testFont,
+      ),
+    ).rejects.toThrow('Invalid argument');
+  });
+
   it.each(jsxPlaygroundPresets)('renders the $label preset', async ({ source }) => {
     const result = await renderJsxSource(source, testFont);
 

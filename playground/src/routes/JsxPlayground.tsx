@@ -40,6 +40,9 @@ type PreviewInstance = {
   ui: Form | Viewer;
 };
 
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : String(error);
+
 const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
   const typeScriptLanguage = monaco.languages.typescript;
   if (!typeScriptLanguage) return;
@@ -174,7 +177,7 @@ export default function JsxPlayground() {
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : String(err));
+        setError(getErrorMessage(err));
         setRenderDuration(null);
       }
     }, 250);
@@ -188,43 +191,47 @@ export default function JsxPlayground() {
   useEffect(() => {
     if (!previewRootRef.current || !template) return;
 
-    if (previewRef.current && previewRef.current.mode !== previewMode) {
-      previewRef.current.ui.destroy();
-      previewRef.current = null;
-    }
-
-    if (previewRef.current) {
-      previewRef.current.ui.updateTemplate(template);
-      previewRef.current.ui.setInputs(inputs);
-    } else {
-      const Ui = previewMode === 'form' ? Form : Viewer;
-      const ui = new Ui({
-        domContainer: previewRootRef.current,
-        template,
-        inputs,
-        options: {
-          font: getFontsData(),
-          lang: 'en',
-          theme: {
-            token: {
-              colorPrimary: '#25c2a0',
-            },
-          },
-        },
-        plugins: getPlugins(),
-      });
-
-      if (previewMode === 'form') {
-        (ui as Form).onChangeInput(({ index, name, value }) => {
-          setInputs((previousInputs) => {
-            const nextInputs = [...previousInputs];
-            nextInputs[index] = { ...nextInputs[index], [name]: value };
-            return nextInputs;
-          });
-        });
+    try {
+      if (previewRef.current && previewRef.current.mode !== previewMode) {
+        previewRef.current.ui.destroy();
+        previewRef.current = null;
       }
 
-      previewRef.current = { mode: previewMode, ui };
+      if (previewRef.current) {
+        previewRef.current.ui.updateTemplate(template);
+        previewRef.current.ui.setInputs(inputs);
+      } else {
+        const Ui = previewMode === 'form' ? Form : Viewer;
+        const ui = new Ui({
+          domContainer: previewRootRef.current,
+          template,
+          inputs,
+          options: {
+            font: getFontsData(),
+            lang: 'en',
+            theme: {
+              token: {
+                colorPrimary: '#25c2a0',
+              },
+            },
+          },
+          plugins: getPlugins(),
+        });
+
+        if (previewMode === 'form') {
+          (ui as Form).onChangeInput(({ index, name, value }) => {
+            setInputs((previousInputs) => {
+              const nextInputs = [...previousInputs];
+              nextInputs[index] = { ...nextInputs[index], [name]: value };
+              return nextInputs;
+            });
+          });
+        }
+
+        previewRef.current = { mode: previewMode, ui };
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
     }
   }, [template, inputs, previewMode]);
 
@@ -248,7 +255,7 @@ export default function JsxPlayground() {
       setPdfDuration(duration);
       toast.info(`Generated PDF in ${duration}ms`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error));
+      toast.error(getErrorMessage(error));
     } finally {
       setIsGeneratingPdf(false);
     }
