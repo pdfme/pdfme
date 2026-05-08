@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
@@ -8,7 +8,7 @@ import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
 import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
-import { shouldRefreshCollapsedPreview } from './previewSizing';
+import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
 
@@ -82,39 +82,21 @@ export default function Md2Pdf() {
     }
   }, [template, inputs, viewerRefreshKey]);
 
-  useEffect(() => {
-    if (!template) return;
+  const refreshCollapsedViewer = useCallback(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
 
-    let frameId: number | null = null;
-    const refreshViewerIfVisible = () => {
-      if (frameId !== null) return;
+    viewer.destroy();
+    viewerRef.current = null;
+    setViewerRefreshKey((key) => key + 1);
+  }, []);
 
-      frameId = window.requestAnimationFrame(() => {
-        frameId = null;
-        const container = viewerRootRef.current;
-        const viewer = viewerRef.current;
-        if (!container || !viewer || !shouldRefreshCollapsedPreview(container)) return;
-
-        viewer.destroy();
-        viewerRef.current = null;
-        setViewerRefreshKey((key) => key + 1);
-      });
-    };
-
-    const scrollContainer = pageRootRef.current;
-    scrollContainer?.addEventListener('scroll', refreshViewerIfVisible, { passive: true });
-    window.addEventListener('scroll', refreshViewerIfVisible, { passive: true });
-    window.addEventListener('resize', refreshViewerIfVisible);
-    const timeoutId = window.setTimeout(refreshViewerIfVisible, 150);
-
-    return () => {
-      scrollContainer?.removeEventListener('scroll', refreshViewerIfVisible);
-      window.removeEventListener('scroll', refreshViewerIfVisible);
-      window.removeEventListener('resize', refreshViewerIfVisible);
-      window.clearTimeout(timeoutId);
-      if (frameId !== null) window.cancelAnimationFrame(frameId);
-    };
-  }, [template]);
+  useRefreshCollapsedPreview({
+    containerRef: viewerRootRef,
+    enabled: template != null,
+    onRefresh: refreshCollapsedViewer,
+    scrollRootRef: pageRootRef,
+  });
 
   useEffect(() => {
     return () => {

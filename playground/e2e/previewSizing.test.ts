@@ -33,6 +33,15 @@ describe('preview sizing helpers', () => {
 
     expect(
       shouldRefreshCollapsedPreviewSnapshot({
+        containerBottom: 200,
+        containerTop: 0,
+        renderedHeight: 0,
+        viewportHeight: 900,
+      }),
+    ).toBe(false);
+
+    expect(
+      shouldRefreshCollapsedPreviewSnapshot({
         containerBottom: 800,
         containerTop: 100,
         renderedHeight: 600,

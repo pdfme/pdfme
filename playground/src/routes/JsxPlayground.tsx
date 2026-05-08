@@ -9,7 +9,7 @@ import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
-import { shouldRefreshCollapsedPreview } from './previewSizing';
+import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
 const JSX_EDITOR_PATH = 'file:///jsx-playground.tsx';
@@ -269,39 +269,21 @@ export default function JsxPlayground() {
     }
   }, [inputs, previewMode]);
 
-  useEffect(() => {
-    if (!template) return;
+  const refreshCollapsedPreview = useCallback(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
 
-    let frameId: number | null = null;
-    const refreshPreviewIfVisible = () => {
-      if (frameId !== null) return;
+    preview.ui.destroy();
+    previewRef.current = null;
+    setPreviewRefreshKey((key) => key + 1);
+  }, []);
 
-      frameId = window.requestAnimationFrame(() => {
-        frameId = null;
-        const container = previewRootRef.current;
-        const preview = previewRef.current;
-        if (!container || !preview || !shouldRefreshCollapsedPreview(container)) return;
-
-        preview.ui.destroy();
-        previewRef.current = null;
-        setPreviewRefreshKey((key) => key + 1);
-      });
-    };
-
-    const scrollContainer = pageRootRef.current;
-    scrollContainer?.addEventListener('scroll', refreshPreviewIfVisible, { passive: true });
-    window.addEventListener('scroll', refreshPreviewIfVisible, { passive: true });
-    window.addEventListener('resize', refreshPreviewIfVisible);
-    const timeoutId = window.setTimeout(refreshPreviewIfVisible, 150);
-
-    return () => {
-      scrollContainer?.removeEventListener('scroll', refreshPreviewIfVisible);
-      window.removeEventListener('scroll', refreshPreviewIfVisible);
-      window.removeEventListener('resize', refreshPreviewIfVisible);
-      window.clearTimeout(timeoutId);
-      if (frameId !== null) window.cancelAnimationFrame(frameId);
-    };
-  }, [template, previewMode]);
+  useRefreshCollapsedPreview({
+    containerRef: previewRootRef,
+    enabled: template != null,
+    onRefresh: refreshCollapsedPreview,
+    scrollRootRef: pageRootRef,
+  });
 
   useEffect(() => {
     return () => {
