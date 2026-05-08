@@ -229,10 +229,20 @@ export default function JsxPlayground() {
 
         if (previewMode === 'form') {
           (ui as Form).onChangeInput(({ index, name, value }) => {
+            const nextValue = value as string | undefined;
             setInputs((previousInputs) => {
-              if (previousInputs[index]?.[name] === value) return previousInputs;
+              const previousInput = previousInputs[index] ?? {};
+              if (nextValue === undefined && !(name in previousInput)) return previousInputs;
+              if (previousInput[name] === nextValue) return previousInputs;
+
               const nextInputs = [...previousInputs];
-              nextInputs[index] = { ...nextInputs[index], [name]: value };
+              const nextInput = { ...previousInput };
+              if (nextValue === undefined) {
+                delete nextInput[name];
+              } else {
+                nextInput[name] = nextValue;
+              }
+              nextInputs[index] = nextInput;
               inputsRef.current = nextInputs;
               return nextInputs;
             });
