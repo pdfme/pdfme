@@ -632,7 +632,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
     );
 
     const [table] = result.template.schemas[0] ?? [];
-    const widths = table?.headWidthPercentages ?? [];
+    const widths = Array.isArray(table?.headWidthPercentages) ? table.headWidthPercentages : [];
     expect(widths).toHaveLength(4);
     expect(widths[0]).toBeCloseTo((50 / 53) * 100);
     expect(widths[1]).toBeCloseTo((1 / 53) * 100);
