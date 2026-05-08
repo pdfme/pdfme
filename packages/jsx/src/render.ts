@@ -1023,7 +1023,7 @@ const renderTable = (
     showHead,
     repeatHead: props.repeatHead ?? false,
     head: props.head,
-    headWidthPercentages: normalizeColumnWidths(props.widths, props.head.length),
+    headWidthPercentages: normalizeColumnWeights(props.columnWeights, props.head.length),
     tableStyles: {
       borderColor: props.tableStyles?.borderColor ?? '#000000',
       borderWidth: props.tableStyles?.borderWidth ?? 0.3,
@@ -1116,10 +1116,13 @@ const substituteMultiVariableText = (
   return result + templateText.slice(lastIndex);
 };
 
-const normalizeColumnWidths = (widths: number[] | undefined, columnCount: number): number[] => {
-  if (widths && widths.length > 0) {
+const normalizeColumnWeights = (
+  columnWeights: number[] | undefined,
+  columnCount: number,
+): number[] => {
+  if (columnWeights && columnWeights.length > 0) {
     const normalizedWidths = Array.from({ length: columnCount }, (_, index) => {
-      const width = widths[index];
+      const width = columnWeights[index];
       return Number.isFinite(width) && Number(width) > 0 ? Number(width) : 1;
     });
 

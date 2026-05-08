@@ -84,11 +84,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
   it('renders Text padding and border box props', async () => {
     const result = await renderToTemplate(
       <Page>
-        <Text
-          borderColor="#d0d7de"
-          borderWidth={{ left: 0.8 }}
-          padding={{ x: 3, y: 2 }}
-        >
+        <Text borderColor="#d0d7de" borderWidth={{ left: 0.8 }} padding={{ x: 3, y: 2 }}>
           Boxed text
         </Text>
       </Page>,
@@ -585,7 +581,7 @@ describe('@pdfme/jsx renderToTemplate', () => {
             ['Alice', 10],
             ['Bob', 12],
           ]}
-          widths={[70, 30]}
+          columnWeights={[70, 30]}
         />
       </Page>,
     );
@@ -609,10 +605,14 @@ describe('@pdfme/jsx renderToTemplate', () => {
     ]);
   });
 
-  it('normalizes Table widths as relative column weights', async () => {
+  it('normalizes Table columnWeights as relative column weights', async () => {
     const result = await renderToTemplate(
       <Page>
-        <Table head={['Label', 'Description']} rows={[['Font', 'NotoSansJP']]} widths={[38, 92]} />
+        <Table
+          head={['Label', 'Description']}
+          rows={[['Font', 'NotoSansJP']]}
+          columnWeights={[38, 92]}
+        />
       </Page>,
     );
 

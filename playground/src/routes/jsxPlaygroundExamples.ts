@@ -102,7 +102,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
             ['PDF template automation', 2, '$1,200'],
             ['QA and playground review', 1, '$350'],
           ]}
-          widths={[55, 15, 30]}
+          columnWeights={[55, 15, 30]}
           rowHeight={9}
           headerHeight={9}
           font="NotoSansJP"
@@ -336,7 +336,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           ['出力', 'Template + inputs'],
           ['プレビュー', 'Viewer / Form'],
         ]}
-        widths={[38, 92]}
+        columnWeights={[38, 92]}
         rowHeight={9}
         headerHeight={9}
         font="NotoSansJP"

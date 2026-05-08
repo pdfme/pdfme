@@ -102,5 +102,5 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   `Row`, leaf schemas, `List`, and `Table`.
 - All `Page` nodes in one `renderToTemplate` call must use the same page size, orientation, and
   margin because a pdfme blank `basePdf` has one shared size and padding.
-- `Table widths` are percentages passed to pdfme `headWidthPercentages`, for example
-  `widths={[70, 30]}`.
+- `Table columnWeights` are relative column width weights that are normalized to pdfme
+  `headWidthPercentages`, for example `columnWeights={[70, 30]}`.
