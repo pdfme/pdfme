@@ -270,8 +270,12 @@ const resolveRenderRoot = (node: PdfJsxChild): RenderRoot => {
     return { children: expandPageBreaks(node), hasDocument: false };
   }
 
-  if (documents.length > 1 || topLevelChildren.some((child) => child !== documents[0])) {
-    throw new Error('@pdfme/jsx: <Document> must be the root element.');
+  if (documents.length > 1) {
+    throw new Error('@pdfme/jsx: only one <Document> root is supported.');
+  }
+
+  if (topLevelChildren.some((child) => child !== documents[0])) {
+    throw new Error('@pdfme/jsx: <Document> must be the only root element.');
   }
 
   const document = documents[0];
@@ -1386,7 +1390,14 @@ const validateAbsolutePlacement = (
 
 const validateStaticPlacement = (children: PdfJsxChild[], hasDocument: boolean) => {
   for (const child of flattenChildren(children)) {
-    if (!isPdfJsxElement(child)) continue;
+    if (!isPdfJsxElement(child)) {
+      if (hasDocument && String(child).trim() !== '') {
+        throw new Error(
+          '@pdfme/jsx: <Document> children must be <Header>, <Footer>, <Static>, or <Page>.',
+        );
+      }
+      continue;
+    }
 
     if (STATIC_BLOCK_KINDS.has(child.kind)) {
       if (!hasDocument) {

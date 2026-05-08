@@ -67,6 +67,9 @@ const pdf = await generate({
 - `Document` は共有 page 設定と繰り返し static content の root component です。
 - `Page` は page を作ります。複数の `Page` は `template.schemas` の複数 page になります。
   `Document` 内の `Page` は、`size`, `orientation`, `margin`, `font` を `Document` から継承します。
+- `Document` props は default であり、deep merge される style object ではありません。`Page` が
+  `margin`, `size`, `orientation`, `font` を指定した場合、その prop は `Document` 側の値を置き換えます。
+  生成される blank `basePdf.padding` は、最初に render される page の解決後 margin から作られます。
 - `Stack` は縦方向、`Row` は横方向に children を並べます。
 - `Box` は padding, background, border を持つ container です。
 - `Spacer` は空白の layout space を作ります。
@@ -110,6 +113,9 @@ return (
   </Page>
 );
 ```
+
+以前の beta static API から移行する場合は、`Header` / `Footer` / `Static` を `Page` の外に出し、
+`Document` の direct child として置いてください。
 
 現時点では playground 側が pdfme JSX component を evaluation scope に注入します。rendering は Web Worker
 内で実行し、よく使われる browser global をブロックします。`import` / `export` 文にはまだ対応していません。

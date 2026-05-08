@@ -1083,6 +1083,28 @@ describe('@pdfme/jsx renderToTemplate', () => {
     });
   });
 
+  it('lets Page props override Document defaults', async () => {
+    const result = await renderToTemplate(
+      <Document size={{ width: 100, height: 100 }} margin={10} font="NotoSansJP">
+        <Page margin={{ x: 6, y: 14 }} font="Helvetica">
+          <Text height={6}>Override</Text>
+        </Page>
+      </Document>,
+    );
+
+    expect(result.template.basePdf).toMatchObject({
+      width: 100,
+      height: 100,
+      padding: [14, 6, 14, 6],
+    });
+    expect(result.template.schemas[0]?.[0]).toMatchObject({
+      content: 'Override',
+      fontName: 'Helvetica',
+      position: { x: 6, y: 14 },
+      width: 88,
+    });
+  });
+
   it('places Header and Footer inside the page margin areas', async () => {
     const result = await renderToTemplate(
       <Document size={{ width: 100, height: 100 }} margin={10}>
@@ -1423,6 +1445,62 @@ describe('@pdfme/jsx renderToTemplate', () => {
         </Document>,
       ),
     ).rejects.toThrow('can only be used as direct children of <Document>');
+  });
+
+  it('rejects invalid Document roots and children', async () => {
+    await expect(
+      renderToTemplate(
+        <>
+          <Document>
+            <Page>
+              <Text>First</Text>
+            </Page>
+          </Document>
+          <Document>
+            <Page>
+              <Text>Second</Text>
+            </Page>
+          </Document>
+        </>,
+      ),
+    ).rejects.toThrow('only one <Document> root is supported');
+
+    await expect(
+      renderToTemplate(
+        <>
+          <Document>
+            <Page>
+              <Text>First</Text>
+            </Page>
+          </Document>
+          <Page>
+            <Text>Second</Text>
+          </Page>
+        </>,
+      ),
+    ).rejects.toThrow('<Document> must be the only root element');
+
+    await expect(
+      renderToTemplate(
+        <Document>
+          <Text>Loose text</Text>
+          <Page>
+            <Text>Body</Text>
+          </Page>
+        </Document>,
+      ),
+    ).rejects.toThrow('<Document> children must be <Header>, <Footer>, <Static>, or <Page>');
+
+    await expect(
+      renderToTemplate(
+        <Document>
+          {'Loose text'}
+          <Page>
+            <Text>Body</Text>
+          </Page>
+        </Document>,
+      ),
+    ).rejects.toThrow('<Document> children must be <Header>, <Footer>, <Static>, or <Page>');
   });
 
   it('rejects unsupported Static child schema types', async () => {

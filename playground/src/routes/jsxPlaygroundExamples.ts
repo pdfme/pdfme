@@ -13,26 +13,26 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     source: `return (
   <Document size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
     <Header>
-        <Row height={12} alignItems="center" justifyContent="space-between">
-          <Text width={80} height={6} size={8} color="#64748b">
-            @pdfme/jsx beta
-          </Text>
-          <Text width={80} height={6} size={8} align="right" color="#64748b">
-            Header / Footer / Absolute
-          </Text>
-        </Row>
+      <Row height={12} alignItems="center" justifyContent="space-between">
+        <Text width={80} height={6} size={8} color="#64748b">
+          @pdfme/jsx beta
+        </Text>
+        <Text width={80} height={6} size={8} align="right" color="#64748b">
+          Header / Footer / Absolute
+        </Text>
+      </Row>
     </Header>
 
     <Footer>
-        <Line height={0.3} color="#cbd5e1" />
-        <Row height={10} alignItems="center" justifyContent="space-between">
-          <Text width={80} height={5} size={7} color="#64748b">
-            Generated from JSX
-          </Text>
-          <Text width={54} height={5} size={7} align="right" color="#64748b">
-            {'Page {currentPage} of {totalPages}'}
-          </Text>
-        </Row>
+      <Line height={0.3} color="#cbd5e1" />
+      <Row height={10} alignItems="center" justifyContent="space-between">
+        <Text width={80} height={5} size={7} color="#64748b">
+          Generated from JSX
+        </Text>
+        <Text width={54} height={5} size={7} align="right" color="#64748b">
+          {'Page {currentPage} of {totalPages}'}
+        </Text>
+      </Row>
     </Footer>
 
     <Page>
@@ -164,72 +164,72 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     </Footer>
 
     <Page>
-    <Stack gap={7}>
-      <Text height={12} size={22} color="#111827">
-        Customer Intake Form
-      </Text>
-      <Text height={8} size={9} color="#6b7280">
-        Switch the preview to Form and edit the fields directly.
-      </Text>
+      <Stack gap={7}>
+        <Text height={12} size={22} color="#111827">
+          Customer Intake Form
+        </Text>
+        <Text height={8} size={9} color="#6b7280">
+          Switch the preview to Form and edit the fields directly.
+        </Text>
 
-      <Row gap={6}>
-        <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
+        <Row gap={6}>
+          <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
+            <Stack gap={2}>
+              <Text height={5} size={7} color="#6b7280">
+                Customer name
+              </Text>
+              <Text name="customerName" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
+                Mina Carter
+              </Text>
+            </Stack>
+          </Box>
+          <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
+            <Stack gap={2}>
+              <Text height={5} size={7} color="#6b7280">
+                Email
+              </Text>
+              <Text name="email" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
+                mina@example.com
+              </Text>
+            </Stack>
+          </Box>
+        </Row>
+
+        <Box padding={4} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
           <Stack gap={2}>
-            <Text height={5} size={7} color="#6b7280">
-              Customer name
+            <Text height={5} size={7} color="#64748b">
+              Message
             </Text>
-            <Text name="customerName" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
-              Mina Carter
-            </Text>
+            <MultiVariableText
+              name="message"
+              size={10}
+              lineHeight={1.3}
+              padding={2}
+              borderColor="#cbd5e1"
+              borderWidth={0.3}
+              text={'Hello {firstName},\\nYour plan is {plan}.\\nStatus: {status}'}
+              overflow="expand"
+              values={{ firstName: 'Mina', plan: 'Growth', status: 'Ready for review' }}
+            />
           </Stack>
         </Box>
-        <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
-          <Stack gap={2}>
-            <Text height={5} size={7} color="#6b7280">
-              Email
-            </Text>
-            <Text name="email" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
-              mina@example.com
-            </Text>
-          </Stack>
-        </Box>
-      </Row>
 
-      <Box padding={4} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
-        <Stack gap={2}>
-          <Text height={5} size={7} color="#64748b">
-            Message
-          </Text>
-          <MultiVariableText
-            name="message"
-            size={10}
-            lineHeight={1.3}
-            padding={2}
-            borderColor="#cbd5e1"
-            borderWidth={0.3}
-            text={'Hello {firstName},\\nYour plan is {plan}.\\nStatus: {status}'}
-            overflow="expand"
-            values={{ firstName: 'Mina', plan: 'Growth', status: 'Ready for review' }}
-          />
-        </Stack>
-      </Box>
-
-      <Row gap={6}>
-        <Box width={56} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
-          <Stack gap={2}>
-            <Text height={5} size={7} color="#6b7280">
-              Logo upload
+        <Row gap={6}>
+          <Box width={56} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
+            <Stack gap={2}>
+              <Text height={5} size={7} color="#6b7280">
+                Logo upload
+              </Text>
+              <Image name="logo" width={48} height={28} />
+            </Stack>
+          </Box>
+          <Box flex={1} padding={4} background="#ecfeff" borderColor="#06b6d4" borderWidth={0.4}>
+            <Text height={30} size={9} lineHeight={1.35}>
+              This preset keeps the generated template editable. The Form preview writes changed input values back into the playground state, so Generate PDF uses the latest edits.
             </Text>
-            <Image name="logo" width={48} height={28} />
-          </Stack>
-        </Box>
-        <Box flex={1} padding={4} background="#ecfeff" borderColor="#06b6d4" borderWidth={0.4}>
-          <Text height={30} size={9} lineHeight={1.35}>
-            This preset keeps the generated template editable. The Form preview writes changed input values back into the playground state, so Generate PDF uses the latest edits.
-          </Text>
-        </Box>
-      </Row>
-    </Stack>
+          </Box>
+        </Row>
+      </Stack>
     </Page>
   </Document>
 );`,
@@ -253,56 +253,56 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     </Footer>
 
     <Page>
-    <Stack gap={7}>
-      <Row justifyContent="space-between" alignItems="end">
-        <Stack width={110} gap={2}>
-          <Text height={10} size={20} color="#0f172a">
-            Product Health Report
+      <Stack gap={7}>
+        <Row justifyContent="space-between" alignItems="end">
+          <Stack width={110} gap={2}>
+            <Text height={10} size={20} color="#0f172a">
+              Product Health Report
+            </Text>
+            <Text height={7} size={9} color="#64748b">
+              A layout-focused preset for reports and internal briefs.
+            </Text>
+          </Stack>
+          <Text width={42} height={8} size={8} align="right" color="#16a34a">
+            Healthy
           </Text>
-          <Text height={7} size={9} color="#64748b">
-            A layout-focused preset for reports and internal briefs.
-          </Text>
-        </Stack>
-        <Text width={42} height={8} size={8} align="right" color="#16a34a">
-          Healthy
-        </Text>
-      </Row>
+        </Row>
 
-      <Row gap={5}>
-        {[
-          ['Activation', '74%', '#dcfce7'],
-          ['Retention', '61%', '#e0f2fe'],
-          ['Expansion', '28%', '#fef3c7'],
-        ].map(([label, value, background]) => (
-          <Box flex={1} padding={4} background={background} borderColor="#d1d5db" borderWidth={0.3}>
-            <Stack gap={2}>
-              <Text height={5} size={7} color="#64748b">{label}</Text>
-              <Text height={9} size={18} color="#0f172a">{value}</Text>
-            </Stack>
-          </Box>
-        ))}
-      </Row>
+        <Row gap={5}>
+          {[
+            ['Activation', '74%', '#dcfce7'],
+            ['Retention', '61%', '#e0f2fe'],
+            ['Expansion', '28%', '#fef3c7'],
+          ].map(([label, value, background]) => (
+            <Box flex={1} padding={4} background={background} borderColor="#d1d5db" borderWidth={0.3}>
+              <Stack gap={2}>
+                <Text height={5} size={7} color="#64748b">{label}</Text>
+                <Text height={9} size={18} color="#0f172a">{value}</Text>
+              </Stack>
+            </Box>
+          ))}
+        </Row>
 
-      <Box padding={5} borderColor="#cbd5e1" borderWidth={0.4}>
-        <Stack gap={4}>
-          <Text height={7} size={12} color="#0f172a">
-            Notes
-          </Text>
-          <Text height={28} size={9} lineHeight={1.35} overflow="expand">
-            The JSX authoring layer is useful when a document has repeated visual patterns but still needs to become a normal pdfme template. This example uses boxes, rows, static footer content, and simple visual bars.
-          </Text>
-          <List
-            height={24}
-            size={8}
-            items={[
-              'Use Row and Stack for predictable layout.',
-              'Use Box for padding, borders, and backgrounds.',
-              'Use Static or Footer for repeated page content.',
-            ]}
-          />
-        </Stack>
-      </Box>
-    </Stack>
+        <Box padding={5} borderColor="#cbd5e1" borderWidth={0.4}>
+          <Stack gap={4}>
+            <Text height={7} size={12} color="#0f172a">
+              Notes
+            </Text>
+            <Text height={28} size={9} lineHeight={1.35} overflow="expand">
+              The JSX authoring layer is useful when a document has repeated visual patterns but still needs to become a normal pdfme template. This example uses boxes, rows, static footer content, and simple visual bars.
+            </Text>
+            <List
+              height={24}
+              size={8}
+              items={[
+                'Use Row and Stack for predictable layout.',
+                'Use Box for padding, borders, and backgrounds.',
+                'Use Static or Footer for repeated page content.',
+              ]}
+            />
+          </Stack>
+        </Box>
+      </Stack>
     </Page>
   </Document>
 );`,
@@ -320,36 +320,36 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     </Footer>
 
     <Page>
-    <Stack gap={7}>
-      <Text height={12} size={22} color="#0f172a">
-        お知らせ
-      </Text>
-      <Text height={8} size={9} color="#64748b">
-        JSX から日本語を含むテンプレートを作成する例です。
-      </Text>
-
-      <Box padding={5} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
-        <Text height={36} size={10} lineHeight={1.45} overflow="expand">
-          pdfme の JSX authoring は、通常の pdfme Template と inputs を生成するための薄いレイヤーです。日本語を扱う場合は、Viewer や generator の options.font に NotoSansJP などのフォントを登録してください。
+      <Stack gap={7}>
+        <Text height={12} size={22} color="#0f172a">
+          お知らせ
         </Text>
-      </Box>
+        <Text height={8} size={9} color="#64748b">
+          JSX から日本語を含むテンプレートを作成する例です。
+        </Text>
 
-      <Table
-        head={['項目', '内容']}
-        rows={[
-          ['フォント', 'NotoSansJP'],
-          ['出力', 'Template + inputs'],
-          ['プレビュー', 'Viewer / Form'],
-        ]}
-        columnWeights={[30, 70]}
-        rowHeight={9}
-        headerHeight={9}
-        font="NotoSansJP"
-        fontSize={8}
-        headStyles={{ backgroundColor: '#0f766e', borderColor: '#0f766e', padding: 2 }}
-        bodyStyles={{ borderColor: '#cbd5e1', borderWidth: 0.25, padding: 2 }}
-      />
-    </Stack>
+        <Box padding={5} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
+          <Text height={36} size={10} lineHeight={1.45} overflow="expand">
+            pdfme の JSX authoring は、通常の pdfme Template と inputs を生成するための薄いレイヤーです。日本語を扱う場合は、Viewer や generator の options.font に NotoSansJP などのフォントを登録してください。
+          </Text>
+        </Box>
+
+        <Table
+          head={['項目', '内容']}
+          rows={[
+            ['フォント', 'NotoSansJP'],
+            ['出力', 'Template + inputs'],
+            ['プレビュー', 'Viewer / Form'],
+          ]}
+          columnWeights={[30, 70]}
+          rowHeight={9}
+          headerHeight={9}
+          font="NotoSansJP"
+          fontSize={8}
+          headStyles={{ backgroundColor: '#0f766e', borderColor: '#0f766e', padding: 2 }}
+          bodyStyles={{ borderColor: '#cbd5e1', borderWidth: 0.25, padding: 2 }}
+        />
+      </Stack>
     </Page>
   </Document>
 );`,

@@ -68,6 +68,9 @@ const pdf = await generate({
 - `Page` creates a page in the generated template. Multiple `Page` nodes become multiple entries in
   `template.schemas`. If `Page` is inside `Document`, it inherits `size`, `orientation`, `margin`,
   and `font` from `Document` unless those props are specified on the `Page`.
+- `Document` props are defaults, not deep-merged style objects. If a `Page` specifies `margin`,
+  `size`, `orientation`, or `font`, that `Page` value replaces the `Document` value for that prop.
+  The generated blank `basePdf.padding` comes from the resolved margin of the first rendered page.
 - `Stack` lays children vertically. `Row` lays children horizontally.
 - `Box` adds padding, background, and border around nested content.
 - `Spacer` reserves empty layout space.
@@ -135,6 +138,9 @@ return (
   </Document>
 );
 ```
+
+To migrate from the earlier beta static API, move `Header` / `Footer` / `Static` out of `Page` and
+place them directly inside `Document`.
 
 ## Current Limitations
 

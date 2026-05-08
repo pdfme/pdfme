@@ -44,6 +44,9 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   shapes.
 - `Document` is the root component for document-level settings and repeated static content. It can
   contain `Header`, `Footer`, `Static`, and `Page` children.
+- `Document` props are defaults, not deep-merged style objects. If a `Page` specifies `margin`,
+  `size`, `orientation`, or `font`, that `Page` value replaces the `Document` value for that prop.
+  The generated blank `basePdf.padding` comes from the resolved margin of the first rendered page.
 - `Header` and `Footer` render read-only content into blank `basePdf.staticSchema`. `Header` uses the
   top margin area and `Footer` uses the bottom margin area, so body content stays inside the `Page`
   margin frame.

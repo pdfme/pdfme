@@ -53,6 +53,7 @@ const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (mon
     jsx: typeScriptLanguage.JsxEmit.React,
     jsxFactory: 'createElement',
     jsxFragmentFactory: 'Fragment',
+    lib: ['es2020'],
     moduleResolution: typeScriptLanguage.ModuleResolutionKind.NodeJs,
     target: typeScriptLanguage.ScriptTarget.ES2020,
   });
