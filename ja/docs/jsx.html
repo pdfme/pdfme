@@ -13,7 +13,7 @@
 <link rel="search" type="application/opensearchdescription+xml" title="pdfme" href="/ja/opensearch.xml">
 
 <script src="https://media.ethicalads.io/media/client/ethicalads.min.js" async></script><link rel="stylesheet" href="/ja/assets/css/styles.2b55c8de.css">
-<script src="/ja/assets/js/runtime~main.6530df45.js" defer="defer"></script>
+<script src="/ja/assets/js/runtime~main.acdbf407.js" defer="defer"></script>
 <script src="/ja/assets/js/main.7573ea74.js" defer="defer"></script>
 </head>
 <body>
@@ -25,7 +25,8 @@
 <code>Absolute</code> などの JSX component で pdfme template を作るための authoring layer です。</p>
 <p>出力は通常の pdfme <code>Template</code> と <code>inputs</code> です。そのため、結果はいつもの <code>generate</code>, <code>Designer</code>,
 <code>Form</code>, <code>Viewer</code> に、通常の plugins / fonts と一緒に渡せます。</p>
-<p><a href="https://playground.pdfme.com/jsx" target="_blank" rel="noopener noreferrer" class="">JSX playground</a> でブラウザ上から試せます。</p>
+<p><a href="https://playground.pdfme.com/jsx" target="_blank" rel="noopener noreferrer" class="">JSX playground</a> でブラウザ上から試せます。playground にはサンプル
+プリセットがあり、preview は <code>Viewer</code> / <code>Form</code> を切り替えられます。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="インストール">インストール<a href="#インストール" class="hash-link" aria-label="インストール への直接リンク" title="インストール への直接リンク" translate="no">​</a></h2>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#bfc7d5"><span class="token plain">npm install @pdfme/jsx</span><br></div></code></pre></div></div>
 <p>TypeScript で JSX を書く場合は JSX runtime を設定します。</p>
@@ -58,6 +59,10 @@
 </ul>
 <p>component に <code>name</code> がある場合は input-backed schema になり、<code>name</code> がない場合は read-only content として
 描画されます。これは pdfme template のデータモデルに合わせた挙動です。</p>
+<p><code>Table</code> の <code>columnWeights</code> は相対的な列幅の重みです。値は pdfme の <code>headWidthPercentages</code> に正規化されるため、
+<code>columnWeights={[30, 70]}</code> は <code>30mm</code> / <code>70mm</code> ではなく 30/70 の比率を意味します。不足している weight や不正な
+weight は <code>1</code> として扱われるため、正確な比率が必要な場合は列数分の weight を指定してください。以前の beta build
+では <code>widths</code> を使っていましたが、今後は <code>columnWeights</code> を使います。</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="jsx-playground-beta">JSX playground beta<a href="#jsx-playground-beta" class="hash-link" aria-label="JSX playground beta への直接リンク" title="JSX playground beta への直接リンク" translate="no">​</a></h2>
 <p>playground では full module ではなく function body を入力します。</p>
 <div class="language-tsx codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-tsx codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#bfc7d5"><span class="token keyword" style="font-style:italic">return</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token plain"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Page</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain-text">    </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Text</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text">Hello from JSX</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;/</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Text</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain-text">  </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;/</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Page</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">;</span><br></div></code></pre></div></div>

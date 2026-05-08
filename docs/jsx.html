@@ -13,7 +13,7 @@
 <link rel="search" type="application/opensearchdescription+xml" title="pdfme" href="/opensearch.xml">
 
 <script src="https://media.ethicalads.io/media/client/ethicalads.min.js" async></script><link rel="stylesheet" href="/assets/css/styles.2b55c8de.css">
-<script src="/assets/js/runtime~main.479027af.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.43a64eac.js" defer="defer"></script>
 <script src="/assets/js/main.4a4c99b9.js" defer="defer"></script>
 </head>
 <body>
@@ -25,7 +25,8 @@
 <code>Page</code>, <code>Stack</code>, <code>Row</code>, <code>Box</code>, <code>Text</code>, <code>Table</code>, <code>Header</code>, <code>Footer</code>, and <code>Absolute</code>.</p>
 <p>It is an authoring layer only. The output is a normal pdfme <code>Template</code> plus <code>inputs</code>, so you can pass
 the result to <code>generate</code>, <code>Designer</code>, <code>Form</code>, or <code>Viewer</code> with the usual plugins and fonts.</p>
-<p>You can try the browser version in the <a href="https://playground.pdfme.com/jsx" target="_blank" rel="noopener noreferrer" class="">JSX playground</a>.</p>
+<p>You can try the browser version in the <a href="https://playground.pdfme.com/jsx" target="_blank" rel="noopener noreferrer" class="">JSX playground</a>. The
+playground includes sample presets and can switch the preview between <code>Viewer</code> and <code>Form</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="installation">Installation<a href="#installation" class="hash-link" aria-label="Direct link to Installation" title="Direct link to Installation" translate="no">​</a></h2>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#bfc7d5"><span class="token plain">npm install @pdfme/jsx</span><br></div></code></pre></div></div>
 <p>If you write JSX in TypeScript, configure the JSX runtime:</p>
@@ -59,6 +60,10 @@ Use <code>gap</code>, <code>margin</code>, <code>alignItems</code>, <code>justif
 </ul>
 <p>If a component has a <code>name</code>, it becomes input-backed by default. If it has no <code>name</code>, it is rendered as
 read-only content. This mirrors the pdfme template data model.</p>
+<p><code>Table</code> uses <code>columnWeights</code> for relative column sizing. The values are normalized to pdfme
+<code>headWidthPercentages</code>, so <code>columnWeights={[30, 70]}</code> means a 30/70 split, not <code>30mm</code> / <code>70mm</code>.
+Missing or invalid weights default to <code>1</code>, so pass one weight per column when the exact ratio
+matters. Earlier beta builds used <code>widths</code>; use <code>columnWeights</code> going forward.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="jsx-playground-beta">JSX Playground Beta<a href="#jsx-playground-beta" class="hash-link" aria-label="Direct link to JSX Playground Beta" title="Direct link to JSX Playground Beta" translate="no">​</a></h2>
 <p>The playground accepts a function body, not a full module:</p>
 <div class="language-tsx codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-tsx codeBlock_bY9V thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#bfc7d5"><span class="token keyword" style="font-style:italic">return</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(199, 146, 234)">(</span><span class="token plain"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">  </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Page</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain-text">    </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Text</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text">Hello from JSX</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;/</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Text</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain-text"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain-text">  </span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&lt;/</span><span class="token tag class-name" style="color:rgb(255, 203, 107)">Page</span><span class="token tag punctuation" style="color:rgb(199, 146, 234)">&gt;</span><span class="token plain"></span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain"></span><span class="token punctuation" style="color:rgb(199, 146, 234)">)</span><span class="token punctuation" style="color:rgb(199, 146, 234)">;</span><br></div></code></pre></div></div>
