@@ -6,8 +6,8 @@
 
 `@pdfme/jsx` で stacking layout を使った template authoring を整備し、その考え方を
 `converter` package の `md2pdf` に応用する。`md2pdf` / `@pdfme/jsx` ともに beta playground と
-docs が入り、実際に試しながら仕様を磨ける状態になった。次は presets / preview 導線を整えつつ、
-layout 品質と rich content の応用範囲を広げる。
+docs が入り、実際に試しながら仕様を磨ける状態になった。次は playground で見えた違和感を拾い、
+layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
 
 ## 基本方針
 
@@ -25,20 +25,18 @@ layout 品質と rich content の応用範囲を広げる。
 
 ## 次に進めること
 
-### 1. playground / examples UX フォローアップ
+### 1. `@pdfme/jsx` authoring UX / API フォローアップ
 
-- `md2pdf` / `jsx` playground は複数の sample preset を切り替えられるようにする。invoice / report /
-  article / header-footer / absolute badge など、AI や人間が真似しやすい例を優先する。
-- JSX playground は Viewer だけでなく Form preview も切り替えられるようにする。生成 template から
-  Designer に遷移する導線も検討する。
 - JSX static schema API は、`Header` / `Footer` / `Static` が後続 `Page` に暗黙反映される点と、
   page margin の影響を受けない点が直感に反する。`Document` component を `Page` の上位に置き、
   `Document` 内に `Header` / `Footer` / `Static` を宣言する API も含めて、react-pdf の component
   model を参考に再設計を検討する。
+- JSX playground で生成した template から Designer に遷移する導線を検討する。source JSX と生成後
+  template JSON のどちらを編集の正とするかを先に決める。
+- JSX playground の preset は増やせる状態になった。次は「よいサンプルを増やす」より、preset / draft /
+  imported template の扱い、reset、共有可能 URL、保存済み template の見せ方を整理する。
 - Template 一覧は template type に応じて Designer / FormViewer / `md2pdf` / `jsx` playground へ
   遷移する導線を検討する。ただし preset が増えた時に一覧性が落ちないかも検証する。
-- playground の `localStorage` 保存運用は、preset / draft / imported template の扱いが混ざりやすい。
-  永続化スコープ、reset、共有可能 URL、保存済み template の見せ方を整理する。
 
 ### 2. `md2pdf` layout 品質フォローアップ
 
@@ -90,6 +88,8 @@ layout 品質と rich content の応用範囲を広げる。
   必要になった時に追加検討する。
 - `Absolute` は flow に参加しない overlay。座標は親の layout frame 基準で、`Page` body 内では page
   margin 内、`Static` 内では page 全体、`Box` 内では box content frame。bottom `Static` 内では使えない。
+- `Table` component の `columnWeights` は mm 指定ではなく相対 weight。pdfme の
+  `headWidthPercentages` に正規化され、不足 / 不正な weight は `1` として扱う。
 - text / MVT の `padding`, `borderWidth`, `borderColor` は table cell と共通の box helper で扱う。
   `overflow: "expand"` で行分割される場合は、左右の padding / border は各 chunk に残し、上辺は最初の
   chunk、下辺は最後の chunk だけに残す。
@@ -160,6 +160,9 @@ layout 品質と rich content の応用範囲を広げる。
   PDF generation / render timing を同じ画面で試せるようにした。
 - PR #1487: `/jsx` playground、共有 Monaco `CodeEditor`、Template JSON / `md2pdf` editor の Monaco 化、
   `@pdfme/jsx` beta docs を追加。JSX evaluation は Web Worker + Sucrase + restricted globals で扱う。
+- PR #1488: `/jsx` / `/md2pdf` playground に sample preset 切り替え、JSX Form preview、
+  Template JSON download、mobile preview sizing、JSX template validation、`Table columnWeights`
+  docs / tests を追加。
 
 ## 参考
 
