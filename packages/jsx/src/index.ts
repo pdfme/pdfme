@@ -1,6 +1,7 @@
 export {
   Absolute,
   Box,
+  Document,
   Ellipse,
   Footer,
   Header,
@@ -25,6 +26,7 @@ export type {
   BoxProps,
   BoxSides,
   CellStyle,
+  DocumentProps,
   EllipseProps,
   FooterProps,
   HeaderProps,

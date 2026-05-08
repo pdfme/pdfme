@@ -11,9 +11,8 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     label: 'Invoice layout',
     description: 'A two-page invoice with Header, Footer, Absolute, Table, and visual schemas.',
     source: `return (
-  <>
-    <Page size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
-      <Header>
+  <Document size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
+    <Header>
         <Row height={12} alignItems="center" justifyContent="space-between">
           <Text width={80} height={6} size={8} color="#64748b">
             @pdfme/jsx beta
@@ -22,9 +21,9 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
             Header / Footer / Absolute
           </Text>
         </Row>
-      </Header>
+    </Header>
 
-      <Footer>
+    <Footer>
         <Line height={0.3} color="#cbd5e1" />
         <Row height={10} alignItems="center" justifyContent="space-between">
           <Text width={80} height={5} size={7} color="#64748b">
@@ -34,8 +33,9 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
             {'Page {currentPage} of {totalPages}'}
           </Text>
         </Row>
-      </Footer>
+    </Footer>
 
+    <Page>
       <Absolute x={138} y={20} width={42} height={18}>
         <Rectangle width={42} height={18} fill="#dcfce7" borderColor="#16a34a" borderWidth={0.4} />
         <Text width={42} height={18} size={8} align="center" valign="middle" color="#166534">
@@ -127,7 +127,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
       </Stack>
     </Page>
 
-    <Page size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
+    <Page>
       <Stack gap={6}>
         <Text height={10} size={18} color="#0f172a">
           Second page
@@ -142,7 +142,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         </Box>
       </Stack>
     </Page>
-  </>
+  </Document>
 );`,
   },
   {
@@ -150,7 +150,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     label: 'Form fields',
     description: 'Input-backed Text, MultiVariableText, and Image fields for testing Form preview.',
     source: `return (
-  <Page size="A4" margin={{ x: 18, y: 18 }} font="NotoSansJP">
+  <Document size="A4" margin={{ x: 18, y: 18 }} font="NotoSansJP">
     <Header>
       <Text height={7} size={8} color="#64748b">
         Editable fields example
@@ -163,6 +163,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
       </Text>
     </Footer>
 
+    <Page>
     <Stack gap={7}>
       <Text height={12} size={22} color="#111827">
         Customer Intake Form
@@ -229,7 +230,8 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         </Box>
       </Row>
     </Stack>
-  </Page>
+    </Page>
+  </Document>
 );`,
   },
   {
@@ -238,7 +240,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     description:
       'A dashboard-style report with cards, progress bars, list content, and page footer.',
     source: `return (
-  <Page size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
+  <Document size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
     <Footer>
       <Row height={8} justifyContent="space-between" alignItems="center">
         <Text width={80} height={5} size={7} color="#64748b">
@@ -250,6 +252,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
       </Row>
     </Footer>
 
+    <Page>
     <Stack gap={7}>
       <Row justifyContent="space-between" alignItems="end">
         <Stack width={110} gap={2}>
@@ -300,7 +303,8 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         </Stack>
       </Box>
     </Stack>
-  </Page>
+    </Page>
+  </Document>
 );`,
   },
   {
@@ -308,13 +312,14 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     label: 'Japanese notice',
     description: 'A Japanese preset that uses NotoSansJP and static footer page numbers.',
     source: `return (
-  <Page size="A4" margin={{ x: 18, y: 20 }} font="NotoSansJP">
+  <Document size="A4" margin={{ x: 18, y: 20 }} font="NotoSansJP">
     <Footer>
       <Text height={6} size={7} align="right" color="#64748b">
         {'{currentPage} / {totalPages} ページ'}
       </Text>
     </Footer>
 
+    <Page>
     <Stack gap={7}>
       <Text height={12} size={22} color="#0f172a">
         お知らせ
@@ -345,7 +350,8 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         bodyStyles={{ borderColor: '#cbd5e1', borderWidth: 0.25, padding: 2 }}
       />
     </Stack>
-  </Page>
+    </Page>
+  </Document>
 );`,
   },
 ];

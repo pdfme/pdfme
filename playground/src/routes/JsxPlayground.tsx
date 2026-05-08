@@ -59,6 +59,7 @@ const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (mon
   typeScriptLanguage.typescriptDefaults.addExtraLib(
     `
 declare const Fragment: unique symbol;
+declare function Document(props: Record<string, unknown>): unknown;
 declare function Page(props: Record<string, unknown>): unknown;
 declare function Header(props: Record<string, unknown>): unknown;
 declare function Footer(props: Record<string, unknown>): unknown;
@@ -346,8 +347,8 @@ export default function JsxPlayground() {
           </div>
           <p className="mt-1 break-words text-xs text-gray-500">{selectedPreset?.description}</p>
           <p className="mt-1 break-words text-xs text-gray-500">
-            Write a JSX function body that returns pdfme pages. Imports are intentionally disabled
-            in this beta playground.
+            Write a JSX function body that returns a pdfme Document or Page nodes. Imports are
+            intentionally disabled in this beta playground.
           </p>
         </div>
         <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:pl-4">

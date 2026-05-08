@@ -15,7 +15,10 @@ import type {
 export type { PageOrientation, PageSize, PageSizePreset } from '@pdfme/common';
 
 export type BuiltinKind =
+  | 'document'
   | 'page'
+  | 'header'
+  | 'footer'
   | 'static'
   | 'absolute'
   | 'stack'
@@ -89,6 +92,14 @@ export type LayoutProps = {
 
 export type CommonProps = LayoutProps & Partial<Pick<Schema, 'rotate' | 'opacity'>>;
 
+export type DocumentProps = {
+  size?: PageSize;
+  orientation?: PageOrientation;
+  margin?: number | BoxSides;
+  font?: string;
+  children?: PdfJsxChild;
+};
+
 export type PageProps = {
   size?: PageSize;
   orientation?: PageOrientation;
@@ -100,13 +111,18 @@ export type PageProps = {
 export type StaticPlacement = 'top' | 'bottom';
 
 export type StaticProps = {
-  /** Page edge used to anchor this read-only static block. Defaults to top. */
+  /** Page edge used to anchor this low-level repeated block. Defaults to top. */
   placement?: StaticPlacement;
   children?: PdfJsxChild;
 };
 
-export type HeaderProps = Omit<StaticProps, 'placement'>;
-export type FooterProps = Omit<StaticProps, 'placement'>;
+export type HeaderProps = {
+  children?: PdfJsxChild;
+};
+
+export type FooterProps = {
+  children?: PdfJsxChild;
+};
 
 export type AbsoluteProps = {
   x?: number;

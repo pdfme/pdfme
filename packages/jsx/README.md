@@ -4,21 +4,23 @@ Small JSX authoring layer for creating pdfme templates from stacking layout prim
 
 ```tsx
 /** @jsxImportSource @pdfme/jsx */
-import { MultiVariableText, Page, Stack, Text, renderToTemplate } from '@pdfme/jsx';
+import { Document, MultiVariableText, Page, Stack, Text, renderToTemplate } from '@pdfme/jsx';
 
 const { template, inputs } = await renderToTemplate(
-  <Page margin={{ x: 12, y: 16 }}>
-    <Stack gap={4}>
-      <Text size={18}>Invoice</Text>
-      <Text name="customerName">Alice</Text>
-      <MultiVariableText
-        name="message"
-        text="Hello **{name}**, status: `{status}`"
-        values={{ name: 'Alice **literal**', status: 'draft' }}
-        textFormat="inline-markdown"
-      />
-    </Stack>
-  </Page>,
+  <Document margin={{ x: 12, y: 16 }}>
+    <Page>
+      <Stack gap={4}>
+        <Text size={18}>Invoice</Text>
+        <Text name="customerName">Alice</Text>
+        <MultiVariableText
+          name="message"
+          text="Hello **{name}**, status: `{status}`"
+          values={{ name: 'Alice **literal**', status: 'draft' }}
+          textFormat="inline-markdown"
+        />
+      </Stack>
+    </Page>
+  </Document>,
 );
 ```
 
@@ -40,33 +42,44 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   content.
 - `Rectangle`, `Ellipse`, and `Line` are static visual schemas for backgrounds, dividers, and simple
   shapes.
-- `Static`, `Header`, and `Footer` can be used as direct children of the first `Page` to render
-  read-only header/footer style content into blank `basePdf.staticSchema`. Their children use page
-  coordinates, not page margin coordinates, and custom `basePdf` is not supported.
-- `Header` is a shorthand for `<Static placement="top">`; `Footer` is a shorthand for
-  `<Static placement="bottom">`.
+- `Document` is the root component for document-level settings and repeated static content. It can
+  contain `Header`, `Footer`, `Static`, and `Page` children.
+- `Header` and `Footer` render read-only content into blank `basePdf.staticSchema`. `Header` uses the
+  top margin area and `Footer` uses the bottom margin area, so body content stays inside the `Page`
+  margin frame.
+- `Static` is a lower-level repeated overlay that uses full-page coordinates. It is useful for
+  watermarks and other fixed page-coordinate content. Custom `basePdf` is not supported when
+  document static content is present.
 
 ```tsx
-<Header>
-  <Text height={8}>Header</Text>
-</Header>
-<Footer>
-  <Text height={8}>Footer</Text>
-</Footer>
+<Document size="A4" margin={{ x: 16, y: 18 }}>
+  <Header>
+    <Text height={8}>Header</Text>
+  </Header>
+  <Footer>
+    <Text height={8}>Footer</Text>
+  </Footer>
+  <Page>
+    <Text height={8}>Body</Text>
+  </Page>
+</Document>
 ```
 
+- `Header`, `Footer`, and `Static` must be direct children of `Document`. They are intentionally not
+  allowed inside `Page`, because they render into document-level `staticSchema` and are repeated on
+  every page.
 - Multiple `Static` blocks with the same placement are concatenated in declaration order. Top blocks
   start at the top of the page; bottom blocks are stacked together in declaration order and anchored
-  to the page bottom, so the last bottom block sits at the page edge. If top and bottom static
-  content together exceed the page height, they may overlap.
+  to the page bottom, so the last bottom block sits at the page edge. If static content overlaps the
+  header/footer/body areas, pdfme will draw the schemas in static schema order.
 - Static content currently accepts read-only `Stack`, `Row`, `Box`, `Spacer`, `Text`, `Image`, `Svg`,
   `Rectangle`, `Ellipse`, and `Line` content. `MultiVariableText`, `List`, `Table`, input-backed
   schemas, and `PageBreak` are rejected.
-- `Absolute` can be used inside `Page`, top `Static`, or `Box` as a small manual placement escape
-  hatch. It uses the parent layout frame as its coordinate origin and does not advance the
-  surrounding stack/row flow. When `width` or `height` is omitted, it uses the remaining parent
-  frame size from `x` / `y`. Direct `Stack` / `Row` support is intentionally left for later; wrap
-  with an explicit-size `Box` when you need a local manual-placement frame inside flow content.
+- `Absolute` can be used inside `Page`, `Header`, `Footer`, top `Static`, or `Box` as a small manual
+  placement escape hatch. It uses the parent layout frame as its coordinate origin and does not
+  advance the surrounding stack/row flow. When `width` or `height` is omitted, it uses the remaining
+  parent frame size from `x` / `y`. Direct `Stack` / `Row` support is intentionally left for later;
+  wrap with an explicit-size `Box` when you need a local manual-placement frame inside flow content.
 
 ```tsx
 <Page margin={12}>

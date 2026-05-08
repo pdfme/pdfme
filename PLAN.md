@@ -27,10 +27,10 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
 
 ### 1. `@pdfme/jsx` authoring UX / API フォローアップ
 
-- JSX static schema API は、`Header` / `Footer` / `Static` が後続 `Page` に暗黙反映される点と、
-  page margin の影響を受けない点が直感に反する。`Document` component を `Page` の上位に置き、
-  `Document` 内に `Header` / `Footer` / `Static` を宣言する API も含めて、react-pdf の component
-  model を参考に再設計を検討する。
+- JSX static schema API は `Document` root に寄せる。`Header` / `Footer` / `Static` は
+  `Document` 直下にだけ置ける document-level repeated layer とし、`Page` 内には置けない。
+  `Header` / `Footer` は page margin 領域を使い、低レベルな `Static` は page 全体座標の
+  repeated overlay として扱う。
 - JSX playground で生成した template から Designer に遷移する導線を検討する。source JSX と生成後
   template JSON のどちらを編集の正とするかを先に決める。
 - JSX playground の preset は増やせる状態になった。次は「よいサンプルを増やす」より、preset / draft /
@@ -88,6 +88,9 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
   必要になった時に追加検討する。
 - `Absolute` は flow に参加しない overlay。座標は親の layout frame 基準で、`Page` body 内では page
   margin 内、`Static` 内では page 全体、`Box` 内では box content frame。bottom `Static` 内では使えない。
+- `@pdfme/jsx` の `Document` は root component。`Page` は `Document` から `size`, `orientation`,
+  `margin`, `font` を継承できる。`Header` / `Footer` は blank `basePdf.staticSchema` に変換されるが、
+  座標系は `Document` の page margin 領域に合わせる。
 - `Table` component の `columnWeights` は mm 指定ではなく相対 weight。pdfme の
   `headWidthPercentages` に正規化され、不足 / 不正な weight は `1` として扱う。
 - text / MVT の `padding`, `borderWidth`, `borderColor` は table cell と共通の box helper で扱う。
