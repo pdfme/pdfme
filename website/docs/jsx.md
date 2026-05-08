@@ -6,7 +6,8 @@
 It is an authoring layer only. The output is a normal pdfme `Template` plus `inputs`, so you can pass
 the result to `generate`, `Designer`, `Form`, or `Viewer` with the usual plugins and fonts.
 
-You can try the browser version in the [JSX playground](https://playground.pdfme.com/jsx).
+You can try the browser version in the [JSX playground](https://playground.pdfme.com/jsx). The
+playground includes sample presets and can switch the preview between `Viewer` and `Form`.
 
 ## Installation
 

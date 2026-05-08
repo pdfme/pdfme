@@ -1,5 +1,15 @@
-import { getDefaultFont } from '@pdfme/common';
+import { DEFAULT_FONT_NAME, getDefaultFont } from '@pdfme/common';
 import { compileJsxFunctionBody, renderJsxSource } from '../src/routes/jsxPlaygroundRuntime';
+import { jsxPlaygroundPresets } from '../src/routes/jsxPlaygroundExamples';
+
+const defaultFont = getDefaultFont();
+const testFont = {
+  ...defaultFont,
+  NotoSansJP: {
+    ...defaultFont[DEFAULT_FONT_NAME],
+    fallback: false,
+  },
+};
 
 describe('JSX playground runtime', () => {
   it('compiles JSX function bodies with pdfme component calls', () => {
@@ -40,7 +50,7 @@ describe('JSX playground runtime', () => {
   it('renders JSX into a normal pdfme template result', async () => {
     const result = await renderJsxSource(
       'return (<Page size="A4"><Text height={10}>Hello JSX</Text></Page>);',
-      getDefaultFont(),
+      testFont,
     );
 
     expect(result.inputs).toEqual([{}]);
@@ -52,5 +62,13 @@ describe('JSX playground runtime', () => {
       readOnly: true,
       type: 'text',
     });
+  });
+
+  it.each(jsxPlaygroundPresets)('renders the $label preset', async ({ source }) => {
+    const result = await renderJsxSource(source, testFont);
+
+    expect(result.inputs).toHaveLength(1);
+    expect(result.template.schemas.length).toBeGreaterThan(0);
+    expect(result.template.schemas[0]?.length).toBeGreaterThan(0);
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
@@ -7,36 +7,14 @@ import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
+import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
-
-const initialMarkdown = `# md2pdf playground
-
-Markdownからpdfme Templateを作ります。日本語もフォントを指定すれば表示できます。
-
-## Blocks
-
-- Paragraph
-- **Bold**, *italic*, ~~strike~~, \`inline code\`
-- [pdfme](https://pdfme.com)
-
----
-
-> Blockquote uses a left rule and padding.
-
-\`\`\`ts
-const template = await md2pdf(markdown);
-\`\`\`
-
-| Feature | Status |
-| --- | --- |
-| Table grid | Supported |
-| Remote image | Link fallback |
-`;
 
 export default function Md2Pdf() {
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
+  const [selectedPresetId, setSelectedPresetId] = useState(md2PdfPresets[0]?.id ?? '');
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
@@ -44,6 +22,8 @@ export default function Md2Pdf() {
   const [renderDuration, setRenderDuration] = useState<number | null>(null);
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const selectedPreset =
+    md2PdfPresets.find((preset) => preset.id === selectedPresetId) ?? md2PdfPresets[0];
 
   useEffect(() => {
     let cancelled = false;
@@ -121,6 +101,15 @@ export default function Md2Pdf() {
     }
   };
 
+  const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
+    const preset = md2PdfPresets.find((item) => item.id === event.target.value);
+    if (!preset) return;
+    setSelectedPresetId(preset.id);
+    setMarkdown(preset.markdown);
+    setError(null);
+    setPdfDuration(null);
+  };
+
   return (
     <main className="flex min-h-0 flex-1 flex-col bg-gray-100">
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
@@ -137,12 +126,25 @@ export default function Md2Pdf() {
               <ExternalLink className="size-3" />
             </a>
           </div>
+          <p className="mt-1 text-xs text-gray-500">{selectedPreset?.description}</p>
           <p className="mt-1 text-xs text-gray-500">
             GFM support is intentionally partial: complex table/list content and remote images are
             simplified.
           </p>
         </div>
-        <div className="shrink-0 pl-4">
+        <div className="flex shrink-0 items-center gap-2 pl-4">
+          <select
+            aria-label="Markdown preset"
+            value={selectedPresetId}
+            onChange={onChangePreset}
+            className="rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700"
+          >
+            {md2PdfPresets.map((preset) => (
+              <option key={preset.id} value={preset.id}>
+                {preset.label}
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             disabled={!template || Boolean(error) || isGeneratingPdf}

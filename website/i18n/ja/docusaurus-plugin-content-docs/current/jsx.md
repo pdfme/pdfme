@@ -6,7 +6,8 @@
 出力は通常の pdfme `Template` と `inputs` です。そのため、結果はいつもの `generate`, `Designer`,
 `Form`, `Viewer` に、通常の plugins / fonts と一緒に渡せます。
 
-[JSX playground](https://playground.pdfme.com/jsx) でブラウザ上から試せます。
+[JSX playground](https://playground.pdfme.com/jsx) でブラウザ上から試せます。playground には sample
+preset があり、preview は `Viewer` / `Form` を切り替えられます。
 
 ## インストール
 
