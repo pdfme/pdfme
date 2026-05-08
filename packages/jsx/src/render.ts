@@ -1123,7 +1123,7 @@ const normalizeColumnWeights = (
   if (columnWeights && columnWeights.length > 0) {
     const normalizedWidths = Array.from({ length: columnCount }, (_, index) => {
       const width = columnWeights[index];
-      return Number.isFinite(width) && Number(width) > 0 ? Number(width) : 1;
+      return typeof width === 'number' && Number.isFinite(width) && width > 0 ? width : 1;
     });
 
     const totalWidth = normalizedWidths.reduce((sum, width) => sum + width, 0);

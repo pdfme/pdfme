@@ -90,6 +90,11 @@ Use `gap`, `margin`, `alignItems`, `justifyContent`, and `flex` / `flexGrow` for
 If a component has a `name`, it becomes input-backed by default. If it has no `name`, it is rendered as
 read-only content. This mirrors the pdfme template data model.
 
+`Table` uses `columnWeights` for relative column sizing. The values are normalized to pdfme
+`headWidthPercentages`, so `columnWeights={[30, 70]}` means a 30/70 split, not `30mm` / `70mm`.
+Missing or invalid weights default to `1`, so pass one weight per column when the exact ratio
+matters. Earlier beta builds used `widths`; use `columnWeights` going forward.
+
 ## JSX Playground Beta
 
 The playground accepts a function body, not a full module:

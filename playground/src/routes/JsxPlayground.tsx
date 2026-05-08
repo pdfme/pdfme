@@ -86,6 +86,7 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 export default function JsxPlayground() {
   const previewRootRef = useRef<HTMLDivElement | null>(null);
   const previewRef = useRef<PreviewInstance | null>(null);
+  const inputsRef = useRef<Record<string, string>[]>([{}]);
   const renderWorkerRef = useRef<Worker | null>(null);
   const pendingRenderRef = useRef<PendingRender | null>(null);
   const nextRenderRequestIdRef = useRef(0);
@@ -167,6 +168,10 @@ export default function JsxPlayground() {
   );
 
   useEffect(() => {
+    inputsRef.current = inputs;
+  }, [inputs]);
+
+  useEffect(() => {
     let cancelled = false;
     const timer = window.setTimeout(async () => {
       const startTimer = performance.now();
@@ -175,6 +180,7 @@ export default function JsxPlayground() {
         if (cancelled) return;
         setTemplate(result.template);
         setInputs(result.inputs);
+        inputsRef.current = result.inputs;
         setRenderDuration(Math.round(performance.now() - startTimer));
         setError(null);
       } catch (err) {
@@ -192,6 +198,7 @@ export default function JsxPlayground() {
 
   useEffect(() => {
     if (!previewRootRef.current || !template) return;
+    const currentInputs = inputsRef.current;
 
     try {
       if (previewRef.current && previewRef.current.mode !== previewMode) {
@@ -201,13 +208,13 @@ export default function JsxPlayground() {
 
       if (previewRef.current) {
         previewRef.current.ui.updateTemplate(template);
-        previewRef.current.ui.setInputs(inputs);
+        previewRef.current.ui.setInputs(currentInputs);
       } else {
         const Ui = previewMode === 'form' ? Form : Viewer;
         const ui = new Ui({
           domContainer: previewRootRef.current,
           template,
-          inputs,
+          inputs: currentInputs,
           options: {
             font: getFontsData(),
             lang: 'en',
@@ -223,8 +230,10 @@ export default function JsxPlayground() {
         if (previewMode === 'form') {
           (ui as Form).onChangeInput(({ index, name, value }) => {
             setInputs((previousInputs) => {
+              if (previousInputs[index]?.[name] === value) return previousInputs;
               const nextInputs = [...previousInputs];
               nextInputs[index] = { ...nextInputs[index], [name]: value };
+              inputsRef.current = nextInputs;
               return nextInputs;
             });
           });
@@ -235,7 +244,19 @@ export default function JsxPlayground() {
     } catch (err) {
       setError(getErrorMessage(err));
     }
-  }, [template, inputs, previewMode, previewRefreshKey]);
+  }, [template, previewMode, previewRefreshKey]);
+
+  useEffect(() => {
+    if (previewMode !== 'viewer' || !previewRef.current || previewRef.current.mode !== 'viewer') {
+      return;
+    }
+
+    try {
+      previewRef.current.ui.setInputs(inputs);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  }, [inputs, previewMode]);
 
   useEffect(() => {
     if (!template) return;

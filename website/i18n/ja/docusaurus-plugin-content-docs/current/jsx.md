@@ -6,8 +6,8 @@
 出力は通常の pdfme `Template` と `inputs` です。そのため、結果はいつもの `generate`, `Designer`,
 `Form`, `Viewer` に、通常の plugins / fonts と一緒に渡せます。
 
-[JSX playground](https://playground.pdfme.com/jsx) でブラウザ上から試せます。playground には sample
-preset があり、preview は `Viewer` / `Form` を切り替えられます。
+[JSX playground](https://playground.pdfme.com/jsx) でブラウザ上から試せます。playground にはサンプル
+プリセットがあり、preview は `Viewer` / `Form` を切り替えられます。
 
 ## インストール
 
@@ -88,6 +88,11 @@ layout API は CSS/Flexbox 互換を目指していません。`gap`, `margin`, 
 
 component に `name` がある場合は input-backed schema になり、`name` がない場合は read-only content として
 描画されます。これは pdfme template のデータモデルに合わせた挙動です。
+
+`Table` の `columnWeights` は相対的な列幅の重みです。値は pdfme の `headWidthPercentages` に正規化されるため、
+`columnWeights={[30, 70]}` は `30mm` / `70mm` ではなく 30/70 の比率を意味します。不足している weight や不正な
+weight は `1` として扱われるため、正確な比率が必要な場合は列数分の weight を指定してください。以前の beta build
+では `widths` を使っていましたが、今後は `columnWeights` を使います。
 
 ## JSX playground beta
 

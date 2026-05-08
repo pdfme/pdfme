@@ -620,6 +620,26 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(table?.headWidthPercentages).toEqual([29.230769230769234, 70.76923076923077]);
   });
 
+  it('defaults missing or invalid Table columnWeights to 1', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table
+          head={['A', 'B', 'C', 'D']}
+          rows={[['1', '2', '3', '4']]}
+          columnWeights={[50, 0, Number.NaN]}
+        />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    const widths = table?.headWidthPercentages ?? [];
+    expect(widths).toHaveLength(4);
+    expect(widths[0]).toBeCloseTo((50 / 53) * 100);
+    expect(widths[1]).toBeCloseTo((1 / 53) * 100);
+    expect(widths[2]).toBeCloseTo((1 / 53) * 100);
+    expect(widths[3]).toBeCloseTo((1 / 53) * 100);
+  });
+
   it('renders Image and Svg schemas', async () => {
     const result = await renderToTemplate(
       <Page margin={0}>

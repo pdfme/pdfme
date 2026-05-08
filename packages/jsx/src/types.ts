@@ -288,7 +288,10 @@ export type TableProps = CommonProps & {
   head: string[];
   rows?: (string | number)[][];
   data?: (string | number)[][];
-  /** Relative column width weights, not millimeter widths. Values are normalized to pdfme headWidthPercentages. */
+  /**
+   * Relative column width weights, not millimeter widths. Values are normalized to pdfme
+   * headWidthPercentages. Missing or invalid weights default to 1.
+   */
   columnWeights?: number[];
   width?: number;
   height?: number;

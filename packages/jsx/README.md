@@ -104,3 +104,5 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
   margin because a pdfme blank `basePdf` has one shared size and padding.
 - `Table columnWeights` are relative column width weights, not millimeter widths. They are
   normalized to pdfme `headWidthPercentages`, for example `columnWeights={[70, 30]}`.
+  Missing or invalid weights default to `1`, so pass one weight per column when you need exact
+  ratios. Earlier beta builds used `widths`; use `columnWeights` going forward.
