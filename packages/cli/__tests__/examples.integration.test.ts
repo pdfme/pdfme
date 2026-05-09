@@ -11,6 +11,7 @@ const PRELOAD = pathToFileURL(join(__dirname, 'fixtures', 'fetch-fixture-loader.
 const TMP = join(__dirname, '..', '.test-tmp-examples-integration');
 const ASSETS_DIR = resolve(__dirname, '..', '..', '..', 'playground', 'public', 'template-assets');
 const MANIFEST_PATH = join(ASSETS_DIR, 'manifest.json');
+const METADATA_PATH = join(ASSETS_DIR, 'metadata.json');
 const VERSIONED_MANIFEST_DIR = join(ASSETS_DIR, 'manifests');
 const FONT_FIXTURES_DIR = resolve(
   __dirname,
@@ -29,12 +30,17 @@ interface ExampleManifestEntry {
   author: string;
   path: string;
   thumbnailPath: string;
+  description?: string;
+  order?: number;
   pageCount: number;
   fieldCount: number;
   schemaTypes: string[];
   fontNames: string[];
   hasCJK: boolean;
   basePdfKind: string;
+  sourceKind?: string;
+  tags?: string[];
+  title?: string;
 }
 
 interface ExampleManifest {
@@ -128,16 +134,32 @@ function detectBasePdfKind(basePdf: unknown): string {
   return 'unknown';
 }
 
+function inferSourceKind(name: string): string {
+  if (name.startsWith('jsx-')) return 'jsx';
+  if (name.startsWith('md2pdf-')) return 'md2pdf';
+  return 'designer';
+}
+
+function readTemplateMetadata(name: string): Record<string, unknown> {
+  const metadata = readJson<Record<string, Record<string, unknown>>>(METADATA_PATH);
+  return metadata[name] ?? {};
+}
+
 function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
   const template = readJson<Record<string, unknown>>(join(ASSETS_DIR, name, 'template.json'));
+  const metadata = readTemplateMetadata(name);
   const schemas = normalizeSchemas(template.schemas);
   const flattenedSchemas = schemas.flat();
 
-  return {
+  const entry: ExampleManifestEntry = {
     name,
     author: typeof template.author === 'string' && template.author.length > 0 ? template.author : 'pdfme',
     path: `${name}/template.json`,
     thumbnailPath: `${name}/thumbnail.png`,
+    description: typeof metadata.description === 'string' ? metadata.description : undefined,
+    ...(typeof metadata.order === 'number' && Number.isFinite(metadata.order)
+      ? { order: metadata.order }
+      : {}),
     pageCount: schemas.length,
     fieldCount: flattenedSchemas.length,
     schemaTypes: [
@@ -156,7 +178,17 @@ function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
     ].sort(),
     hasCJK: hasCjkContent(flattenedSchemas),
     basePdfKind: detectBasePdfKind(template.basePdf),
+    sourceKind: typeof metadata.sourceKind === 'string' ? metadata.sourceKind : inferSourceKind(name),
+    tags: Array.isArray(metadata.tags)
+      ? metadata.tags.filter((tag): tag is string => typeof tag === 'string' && tag.length > 0)
+      : [],
   };
+
+  if (typeof metadata.title === 'string') {
+    entry.title = metadata.title;
+  }
+
+  return entry;
 }
 
 describe('examples integration smoke', () => {
@@ -259,13 +291,14 @@ describe('examples integration smoke', () => {
   });
 
   it(
-    'generates every playground example through examples -w and generate',
+    'exports every playground example through examples -w and generates authoring starters',
     () => {
       mkdirSync(TMP, { recursive: true });
       const env = createFixtureEnv(TMP);
       const manifest = readJson<ExampleManifest>(MANIFEST_PATH);
+      const generatedTemplateNames: string[] = [];
 
-      for (const { name } of manifest.templates) {
+      for (const { name, sourceKind } of manifest.templates) {
         const jobPath = join(TMP, `${name}.job.json`);
         const pdfPath = join(TMP, `${name}.pdf`);
 
@@ -288,6 +321,14 @@ describe('examples integration smoke', () => {
         expect(Array.isArray(job.inputs)).toBe(true);
         expect(existsSync(jobPath)).toBe(true);
 
+        // Full PDF rendering for every playground template is covered by the generator
+        // integration snapshots. Keep this CLI test focused on exported job validity for
+        // all examples, then run PDF generation for the generated authoring starters where
+        // sample input shape regressions are most likely.
+        if (sourceKind === 'designer') {
+          continue;
+        }
+
         const generateResult = runCli(['generate', jobPath, '-o', pdfPath, '--json'], { env });
         if (generateResult.exitCode !== 0) {
           throw new Error(
@@ -300,7 +341,15 @@ describe('examples integration smoke', () => {
         expect(payload.command).toBe('generate');
         expect(payload.outputPath).toBe(pdfPath);
         expect(existsSync(pdfPath)).toBe(true);
+        generatedTemplateNames.push(name);
       }
+
+      expect(generatedTemplateNames.sort()).toEqual(
+        manifest.templates
+          .filter((entry) => entry.sourceKind !== 'designer')
+          .map((entry) => entry.name)
+          .sort(),
+      );
     },
     180000,
   );

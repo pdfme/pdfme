@@ -8,46 +8,32 @@ const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
+const metadataFilePath = path.join(templatesDir, 'metadata.json');
 const manifestFilePath = path.join(templatesDir, 'manifest.json');
 const versionedManifestDir = path.join(templatesDir, 'manifests');
-
-const featuredTemplates = [
-  'invoice',
-  'quotes',
-  'pedigree',
-  'certificate-black',
-  'a4-blank',
-  'QR-lines',
-];
 
 function generateTemplatesListJson() {
   const cliVersion = PDFME_VERSION;
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
-
-  const result = items
+  const metadataByTemplate = loadTemplateMetadata();
+  const templateDirs = items
     .filter((item) => {
       if (!item.isDirectory() || item.name.startsWith('.')) return false;
 
       const templateJsonPath = path.join(templatesDir, item.name, 'template.json');
       return fs.existsSync(templateJsonPath);
     })
-    .map((item) => {
-      const templateJsonPath = path.join(templatesDir, item.name, 'template.json');
+    .map((item) => item.name);
+
+  validateTemplateMetadata(metadataByTemplate, templateDirs);
+
+  const result = templateDirs
+    .map((name) => {
+      const templateJsonPath = path.join(templatesDir, name, 'template.json');
       const templateJson = JSON.parse(fs.readFileSync(templateJsonPath, 'utf8'));
-      return buildTemplateEntry(item.name, templateJson);
+      return buildTemplateEntry(name, templateJson, metadataByTemplate[name]);
     })
-    .sort((a, b) => {
-      const aIndex = featuredTemplates.indexOf(a.name);
-      const bIndex = featuredTemplates.indexOf(b.name);
-
-      if (aIndex > -1 && bIndex > -1) return aIndex - bIndex;
-
-      if (aIndex > -1) return -1;
-
-      if (bIndex > -1) return 1;
-
-      return 0;
-    });
+    .sort(compareTemplateEntries);
 
   const manifest = {
     schemaVersion: 1,
@@ -72,16 +58,117 @@ function generateTemplatesListJson() {
 
   fs.writeFileSync(indexFilePath, JSON.stringify(result, null, 2));
   fs.writeFileSync(manifestFilePath, JSON.stringify(manifest, null, 2));
-  fs.writeFileSync(path.join(versionedManifestDir, `${cliVersion}.json`), JSON.stringify(manifest, null, 2));
+  fs.writeFileSync(
+    path.join(versionedManifestDir, `${cliVersion}.json`),
+    JSON.stringify(manifest, null, 2),
+  );
   console.log(`Generated index.json with templates: ${result.map((t) => t.name).join(', ')}`);
   console.log(`Generated manifest.json for CLI version ${cliVersion}`);
 }
 
-function buildTemplateEntry(name, templateJson) {
+function loadTemplateMetadata() {
+  if (!fs.existsSync(metadataFilePath)) {
+    return {};
+  }
+
+  const parsed = JSON.parse(fs.readFileSync(metadataFilePath, 'utf8'));
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('template-assets/metadata.json must be an object keyed by template name.');
+  }
+
+  return parsed;
+}
+
+function normalizeMetadata(rawMetadata) {
+  if (!rawMetadata || typeof rawMetadata !== 'object' || Array.isArray(rawMetadata)) {
+    return {};
+  }
+
+  const metadata = {};
+  if (typeof rawMetadata.title === 'string') metadata.title = rawMetadata.title;
+  if (typeof rawMetadata.description === 'string') metadata.description = rawMetadata.description;
+  if (typeof rawMetadata.order === 'number' && Number.isFinite(rawMetadata.order)) {
+    metadata.order = rawMetadata.order;
+  }
+  if (['designer', 'jsx', 'md2pdf'].includes(rawMetadata.sourceKind)) {
+    metadata.sourceKind = rawMetadata.sourceKind;
+  }
+  if (Array.isArray(rawMetadata.tags)) {
+    metadata.tags = [
+      ...new Set(rawMetadata.tags.filter((tag) => typeof tag === 'string' && tag.trim())),
+    ];
+  }
+
+  return metadata;
+}
+
+function validateTemplateMetadata(metadataByTemplate, templateDirs) {
+  const templateNameSet = new Set(templateDirs);
+  const metadataNames = Object.keys(metadataByTemplate);
+  const missingMetadata = templateDirs.filter((name) => !metadataByTemplate[name]);
+  const orphanMetadata = metadataNames.filter((name) => !templateNameSet.has(name));
+
+  if (missingMetadata.length > 0) {
+    throw new Error(
+      `template-assets/metadata.json is missing entries for templates: ${missingMetadata.join(', ')}`,
+    );
+  }
+
+  if (orphanMetadata.length > 0) {
+    throw new Error(
+      `template-assets/metadata.json contains entries without template.json: ${orphanMetadata.join(', ')}`,
+    );
+  }
+
+  for (const [name, rawMetadata] of Object.entries(metadataByTemplate)) {
+    const metadata = normalizeMetadata(rawMetadata);
+    if (!metadata.description) {
+      throw new Error(`template-assets/metadata.json entry "${name}" must include description.`);
+    }
+    if (!metadata.tags || metadata.tags.length === 0) {
+      throw new Error(`template-assets/metadata.json entry "${name}" must include tags.`);
+    }
+
+    const inferredSourceKind = inferSourceKind(name);
+    if (metadata.sourceKind && metadata.sourceKind !== inferredSourceKind) {
+      throw new Error(
+        `template-assets/metadata.json entry "${name}" has sourceKind "${metadata.sourceKind}", expected "${inferredSourceKind}".`,
+      );
+    }
+  }
+
+  const orderedEntries = Object.entries(metadataByTemplate)
+    .map(([name, rawMetadata]) => [name, normalizeMetadata(rawMetadata)])
+    .filter(([, metadata]) => metadata.order != null);
+  const seenOrders = new Map();
+  for (const [name, metadata] of orderedEntries) {
+    const existingName = seenOrders.get(metadata.order);
+    if (existingName) {
+      throw new Error(
+        `template-assets/metadata.json entries "${existingName}" and "${name}" both use order ${metadata.order}.`,
+      );
+    }
+    seenOrders.set(metadata.order, name);
+  }
+}
+
+function inferSourceKind(name) {
+  if (name.startsWith('jsx-')) return 'jsx';
+  if (name.startsWith('md2pdf-')) return 'md2pdf';
+  return 'designer';
+}
+
+function buildTemplateEntry(name, templateJson, rawMetadata) {
   const schemas = normalizeSchemas(templateJson.schemas);
   const flattenedSchemas = schemas.flat();
-  const schemaTypes = [...new Set(flattenedSchemas.map((schema) => schema.type).filter(Boolean))].sort();
-  const fontNames = [...new Set(flattenedSchemas.map((schema) => schema.fontName).filter(Boolean))].sort();
+  const metadata = normalizeMetadata(rawMetadata);
+  const sourceKind = metadata.sourceKind ?? inferSourceKind(name);
+  const schemaTypes = [
+    ...new Set(flattenedSchemas.map((schema) => schema.type).filter(Boolean)),
+  ].sort();
+  const fontNames = [
+    ...new Set(flattenedSchemas.map((schema) => schema.fontName).filter(Boolean)),
+  ].sort();
 
   return {
     name,
@@ -94,7 +181,25 @@ function buildTemplateEntry(name, templateJson) {
     fontNames,
     hasCJK: hasCJKContent(flattenedSchemas),
     basePdfKind: detectBasePdfKind(templateJson.basePdf),
+    description: metadata.description,
+    order: metadata.order,
+    sourceKind,
+    tags: metadata.tags ?? [],
+    title: metadata.title,
   };
+}
+
+function compareTemplateEntries(a, b) {
+  if (a.order != null && b.order != null) return a.order - b.order;
+  if (a.order != null) return -1;
+  if (b.order != null) return 1;
+
+  const aTitle = a.title ?? a.name;
+  const bTitle = b.title ?? b.name;
+  const titleResult = aTitle.localeCompare(bTitle);
+  if (titleResult !== 0) return titleResult;
+
+  return a.name.localeCompare(b.name);
 }
 
 function normalizeSchemas(rawSchemas) {
@@ -117,8 +222,10 @@ function normalizeSchemas(rawSchemas) {
 
 function hasCJKContent(schemas) {
   return schemas.some((schema) =>
-    ['content', 'title', 'placeholder'].some((key) =>
-      typeof schema[key] === 'string' && /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/.test(schema[key]),
+    ['content', 'title', 'placeholder'].some(
+      (key) =>
+        typeof schema[key] === 'string' &&
+        /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/.test(schema[key]),
     ),
   );
 }

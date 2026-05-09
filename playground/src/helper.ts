@@ -61,14 +61,6 @@ export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuf
   });
 };
 
-const getTemplateFromJsonFile = (file: File) => {
-  return readFile(file, 'text').then((jsonStr) => {
-    const template: Template = JSON.parse(jsonStr as string);
-    checkTemplate(template);
-    return template;
-  });
-};
-
 export const downloadJsonFile = (json: unknown, title: string) => {
   if (typeof window !== 'undefined') {
     const blob = new Blob([JSON.stringify(json)], {
@@ -80,24 +72,6 @@ export const downloadJsonFile = (json: unknown, title: string) => {
     link.download = `${title}.json`;
     link.click();
     URL.revokeObjectURL(url);
-  }
-};
-
-export const handleLoadTemplate = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  currentRef: Designer | Form | Viewer | null,
-) => {
-  if (e.target && e.target.files && e.target.files[0]) {
-    getTemplateFromJsonFile(e.target.files[0])
-      .then((t) => {
-        if (!currentRef) return;
-        currentRef.updateTemplate(t);
-      })
-      .catch((e) => {
-        alert(`Invalid template file.
---------------------------
-${e}`);
-      });
   }
 };
 
@@ -157,6 +131,8 @@ export const isJsonString = (str: string) => {
   return true;
 };
 
+export const DEFAULT_PLAYGROUND_TEMPLATE_ID = 'invoice';
+
 export const getBlankTemplate = () =>
   ({
     schemas: [{}],
@@ -173,3 +149,5 @@ export const getTemplateById = async (templateId: string): Promise<Template> => 
   checkTemplate(template);
   return template as Template;
 };
+
+export const getDefaultPlaygroundTemplate = () => getTemplateById(DEFAULT_PLAYGROUND_TEMPLATE_ID);

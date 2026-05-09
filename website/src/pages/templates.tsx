@@ -1,40 +1,29 @@
 import React, { useEffect } from 'react';
+import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
-import { useHistory } from '@docusaurus/router';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { playgroundUrl } from '../constants';
 
-const TemplateDesign = () => {
-  const history = useHistory();
-  const { i18n } = useDocusaurusContext();
-  const { currentLocale } = i18n;
-
+const TemplatesPage = () => {
   useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === 'navigate') {
-        const { name = "", ui = "" } = e.data?.payload;
-        if (name && ui) {
-            const localePath = currentLocale === 'en' ? '' : `/${currentLocale}`;
-            history.push(`${localePath}/template-design?template=${name}&ui=${ui}`);
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [history, currentLocale]);
+    window.location.replace(playgroundUrl);
+  }, []);
 
   return (
     <Layout title="Sample Templates" description="Explore sample templates with our interactive playground.">
-      <iframe
-        src={`${playgroundUrl}/templates?embed=true`}
-        style={{ width: '100%', height: '100vh' }}
-        allow="clipboard-write"
-      />
+      <Head>
+        <link rel="canonical" href={playgroundUrl} />
+        <meta httpEquiv="refresh" content={`0; url=${playgroundUrl}`} />
+      </Head>
+      <main style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+        <p>Opening the pdfme playground...</p>
+        <p>
+          <a href={playgroundUrl} target="_blank" rel="noopener noreferrer">
+            Open playground in a new window
+          </a>
+        </p>
+      </main>
     </Layout>
   );
 };
 
-export default TemplateDesign;
+export default TemplatesPage;

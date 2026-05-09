@@ -1,0 +1,252 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      20,
+      15,
+      20,
+      15
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "release-notes",
+        "type": "text",
+        "content": "Release Notes",
+        "position": {
+          "x": 15,
+          "y": 20
+        },
+        "width": 180,
+        "height": 10.1728,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 20,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "This preset is useful for checking how md2pdf handles headings, task lists, tables, and longer paragraphs.",
+        "position": {
+          "x": 15,
+          "y": 35.1728
+        },
+        "width": 180,
+        "height": 5.5864,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "highlights",
+        "type": "text",
+        "content": "Highlights",
+        "position": {
+          "x": 15,
+          "y": 44.75920000000001
+        },
+        "width": 180,
+        "height": 8.56756,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16.5,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "list_1",
+        "type": "list",
+        "content": "[\"[x] JSX playground with Monaco editor\",\"[x] md2pdf live preview\",\"[ ] Remote image fetching\",\"[ ] Rich inline content inside table cells\"]",
+        "position": {
+          "x": 15,
+          "y": 57.82676000000001
+        },
+        "width": 180,
+        "height": 26.5456,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "listStyle": "bullet",
+        "markerWidth": 6,
+        "markerGap": 2,
+        "indentSize": 6,
+        "itemSpacing": 1.4,
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "changes",
+        "type": "text",
+        "content": "Changes",
+        "position": {
+          "x": 15,
+          "y": 88.37236000000001
+        },
+        "width": 180,
+        "height": 8.56756,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16.5,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "table_1",
+        "type": "table",
+        "content": "[[\"Playground\",\"Added presets\",\"Selector is intentionally simple\"],[\"JSX\",\"Viewer and Form preview\",\"Input-backed fields can be edited\"],[\"Markdown\",\"Partial GFM support\",\"Complex nested blocks are simplified\"]]",
+        "position": {
+          "x": 15,
+          "y": 101.43992000000001
+        },
+        "width": 180,
+        "height": 31,
+        "readOnly": true,
+        "showHead": true,
+        "repeatHead": false,
+        "head": [
+          "Area",
+          "Change",
+          "Notes"
+        ],
+        "headWidthPercentages": [
+          33.333333333333336,
+          33.333333333333336,
+          33.333333333333336
+        ],
+        "tableStyles": {
+          "borderColor": "#d0d7de",
+          "borderWidth": 0.2
+        },
+        "headStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 10,
+          "lineHeight": 1.3,
+          "characterSpacing": 0,
+          "fontColor": "#111827",
+          "backgroundColor": "#f6f8fa",
+          "borderColor": "#d0d7de",
+          "borderWidth": {
+            "top": 0.1,
+            "right": 0.1,
+            "bottom": 0.1,
+            "left": 0.1
+          },
+          "padding": {
+            "top": 3,
+            "right": 3,
+            "bottom": 3,
+            "left": 3
+          }
+        },
+        "bodyStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 10,
+          "lineHeight": 1.3,
+          "characterSpacing": 0,
+          "fontColor": "#111827",
+          "backgroundColor": "#ffffff",
+          "borderColor": "#d0d7de",
+          "borderWidth": {
+            "top": 0.1,
+            "right": 0.1,
+            "bottom": 0.1,
+            "left": 0.1
+          },
+          "padding": {
+            "top": 3,
+            "right": 3,
+            "bottom": 3,
+            "left": 3
+          },
+          "alternateBackgroundColor": "#f9fafb"
+        },
+        "columnStyles": {}
+      },
+      {
+        "name": "notes",
+        "type": "text",
+        "content": "Notes",
+        "position": {
+          "x": 15,
+          "y": 136.43992000000003
+        },
+        "width": 180,
+        "height": 8.56756,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16.5,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "Longer documents are converted into regular pdfme schemas. Paragraphs use expandable text schemas, while tables and images still need keep-together improvements.",
+        "position": {
+          "x": 15,
+          "y": 149.50748000000004
+        },
+        "width": 180,
+        "height": 5.5864,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

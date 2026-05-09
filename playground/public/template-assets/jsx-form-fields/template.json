@@ -1,0 +1,464 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      18,
+      18,
+      18,
+      18
+    ],
+    "staticSchema": [
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "Editable fields example",
+        "position": {
+          "x": 18,
+          "y": 0
+        },
+        "width": 174,
+        "height": 7,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "Page {currentPage} of {totalPages}",
+        "position": {
+          "x": 18,
+          "y": 279
+        },
+        "width": 174,
+        "height": 6,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "text_3",
+        "type": "text",
+        "content": "Customer Intake Form",
+        "position": {
+          "x": 18,
+          "y": 18
+        },
+        "width": 174,
+        "height": 12,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_4",
+        "type": "text",
+        "content": "Switch the preview to Form and edit the fields directly.",
+        "position": {
+          "x": 18,
+          "y": 37
+        },
+        "width": 174,
+        "height": 8,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#6b7280",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "box_1",
+        "type": "rectangle",
+        "position": {
+          "x": 18,
+          "y": 52
+        },
+        "width": 84,
+        "height": 24,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "",
+        "borderColor": "#d1d5db",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_5",
+        "type": "text",
+        "content": "Customer name",
+        "position": {
+          "x": 22,
+          "y": 56
+        },
+        "width": 76,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#6b7280",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "customerName",
+        "type": "text",
+        "content": "Mina Carter",
+        "position": {
+          "x": 22,
+          "y": 63
+        },
+        "width": 76,
+        "height": 9,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": false,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 11,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false,
+        "borderColor": "#cbd5e1",
+        "borderWidth": {
+          "top": 0.3,
+          "right": 0.3,
+          "bottom": 0.3,
+          "left": 0.3
+        },
+        "padding": {
+          "top": 1.5,
+          "right": 1.5,
+          "bottom": 1.5,
+          "left": 1.5
+        }
+      },
+      {
+        "name": "box_2",
+        "type": "rectangle",
+        "position": {
+          "x": 108,
+          "y": 52
+        },
+        "width": 84,
+        "height": 24,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "",
+        "borderColor": "#d1d5db",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_6",
+        "type": "text",
+        "content": "Email",
+        "position": {
+          "x": 112,
+          "y": 56
+        },
+        "width": 76,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#6b7280",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "email",
+        "type": "text",
+        "content": "mina@example.com",
+        "position": {
+          "x": 112,
+          "y": 63
+        },
+        "width": 76,
+        "height": 9,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": false,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 11,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false,
+        "borderColor": "#cbd5e1",
+        "borderWidth": {
+          "top": 0.3,
+          "right": 0.3,
+          "bottom": 0.3,
+          "left": 0.3
+        },
+        "padding": {
+          "top": 1.5,
+          "right": 1.5,
+          "bottom": 1.5,
+          "left": 1.5
+        }
+      },
+      {
+        "name": "box_3",
+        "type": "rectangle",
+        "position": {
+          "x": 18,
+          "y": 83
+        },
+        "width": 174,
+        "height": 34.093024,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#f8fafc",
+        "borderColor": "#cbd5e1",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_7",
+        "type": "text",
+        "content": "Message",
+        "position": {
+          "x": 22,
+          "y": 87
+        },
+        "width": 166,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "message",
+        "type": "multiVariableText",
+        "content": "{\"firstName\":\"Mina\",\"plan\":\"Growth\",\"status\":\"Ready for review\"}",
+        "position": {
+          "x": 22,
+          "y": 94
+        },
+        "width": 166,
+        "height": 19.093024,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": false,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "overflow": "expand",
+        "strikethrough": false,
+        "underline": false,
+        "text": "Hello {firstName},\nYour plan is {plan}.\nStatus: {status}",
+        "variables": [
+          "firstName",
+          "plan",
+          "status"
+        ],
+        "borderColor": "#cbd5e1",
+        "borderWidth": {
+          "top": 0.3,
+          "right": 0.3,
+          "bottom": 0.3,
+          "left": 0.3
+        },
+        "padding": {
+          "top": 2,
+          "right": 2,
+          "bottom": 2,
+          "left": 2
+        }
+      },
+      {
+        "name": "box_4",
+        "type": "rectangle",
+        "position": {
+          "x": 18,
+          "y": 124.093024
+        },
+        "width": 56,
+        "height": 43,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "",
+        "borderColor": "#d1d5db",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_8",
+        "type": "text",
+        "content": "Logo upload",
+        "position": {
+          "x": 22,
+          "y": 128.093024
+        },
+        "width": 48,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#6b7280",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "logo",
+        "type": "image",
+        "content": "",
+        "position": {
+          "x": 22,
+          "y": 135.093024
+        },
+        "width": 48,
+        "height": 28,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": false
+      },
+      {
+        "name": "box_5",
+        "type": "rectangle",
+        "position": {
+          "x": 80,
+          "y": 124.093024
+        },
+        "width": 112,
+        "height": 38,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#ecfeff",
+        "borderColor": "#06b6d4",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_9",
+        "type": "text",
+        "content": "This preset keeps the generated template editable. The Form preview writes changed input values back into the playground state, so Generate PDF uses the latest edits.",
+        "position": {
+          "x": 84,
+          "y": 128.093024
+        },
+        "width": 104,
+        "height": 30,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.35,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

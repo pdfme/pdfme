@@ -3,103 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
-import { getDefaultFont, getInputFromTemplate } from '@pdfme/common';
-import { pdf2img } from '@pdfme/converter';
-import { generate } from '@pdfme/generator';
-import {
-  multiVariableText,
-  text,
-  barcodes,
-  image,
-  signature,
-  svg,
-  line,
-  table,
-  list,
-  rectangle,
-  ellipse,
-  dateTime,
-  date,
-  time,
-  select,
-  checkbox,
-  radioGroup,
-} from '@pdfme/schemas';
+import { createThumbnailFromTemplate } from './template-thumbnail-utils.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const fontDir = path.resolve(__dirname, '../../packages/generator/__tests__/assets/fonts');
-
-const readFont = (fileName) => fs.readFileSync(path.join(fontDir, fileName));
-
-const plugins = {
-  multiVariableText,
-  text,
-  list,
-  qrcode: barcodes.qrcode,
-  japanpost: barcodes.japanpost,
-  ean13: barcodes.ean13,
-  code128: barcodes.code128,
-  image,
-  svg,
-  line,
-  table,
-  rectangle,
-  ellipse,
-  dateTime,
-  date,
-  time,
-  select,
-  checkbox,
-  radioGroup,
-  signature,
-};
-
-const font = {
-  ...getDefaultFont(),
-  'PinyonScript-Regular': {
-    fallback: false,
-    data: readFont('PinyonScript-Regular.ttf'),
-  },
-  NotoSerifJP: {
-    fallback: false,
-    data: readFont('NotoSerifJP-Regular.ttf'),
-  },
-  NotoSansJP: {
-    fallback: false,
-    data: readFont('NotoSansJP-Regular.ttf'),
-  },
-};
 
 const limit = pLimit(4);
 
 function calcHash(content) {
   return crypto.createHash('md5').update(content, 'utf8').digest('hex');
-}
-
-async function createThumbnailFromTemplate(templatePath, thumbnailPath) {
-  try {
-    const templateJsonStr = fs.readFileSync(templatePath, 'utf-8');
-    const templateJson = JSON.parse(templateJsonStr);
-
-    const pdf = await generate({
-      template: templateJson,
-      inputs: getInputFromTemplate(templateJson),
-      options: { font },
-      plugins,
-    });
-
-    const images = await pdf2img(pdf.buffer, {
-      imageType: 'png',
-      range: { end: 1 },
-    });
-
-    const thumbnail = images[0];
-    fs.writeFileSync(thumbnailPath, Buffer.from(thumbnail));
-  } catch (err) {
-    console.error(`Failed to create thumbnail from ${templatePath}:`, err);
-    throw err;
-  }
 }
 
 async function main() {

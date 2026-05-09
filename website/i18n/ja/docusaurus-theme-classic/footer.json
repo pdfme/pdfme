@@ -21,11 +21,11 @@
   },
   "link.item.label.Examples": {
     "message": "サンプル",
-    "description": "The label of footer link with label=Examples linking to /templates"
+    "description": "The label of footer link with label=Examples linking to the playground"
   },
   "link.item.label.Template Design": {
     "message": "テンプレート設計",
-    "description": "The label of footer link with label=Template Design linking to /template-design"
+    "description": "The label of footer link with label=Template Design linking to the playground Designer"
   },
   "link.item.label.Try pdfme Cloud": {
     "message": "pdfme Cloudを試す",
