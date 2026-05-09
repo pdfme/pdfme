@@ -7,7 +7,9 @@ import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
+import GeneratedTemplateControls from '../components/GeneratedTemplateControls';
 import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
+import { useGeneratedTemplateActions } from './useGeneratedTemplateActions';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
@@ -27,6 +29,10 @@ export default function Md2Pdf() {
   const [viewerRefreshKey, setViewerRefreshKey] = useState(0);
   const selectedPreset =
     md2PdfPresets.find((preset) => preset.id === selectedPresetId) ?? md2PdfPresets[0];
+  const { downloadTemplate, openDesigner } = useGeneratedTemplateActions({
+    template,
+    templateFileName: 'md2pdf-template',
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -167,6 +173,11 @@ export default function Md2Pdf() {
               </option>
             ))}
           </select>
+          <GeneratedTemplateControls
+            disabled={!template || Boolean(error)}
+            onDownloadTemplate={downloadTemplate}
+            onOpenDesigner={openDesigner}
+          />
           <button
             type="button"
             disabled={!template || Boolean(error) || isGeneratingPdf}
