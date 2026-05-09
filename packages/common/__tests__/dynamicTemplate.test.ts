@@ -222,6 +222,24 @@ describe('getDynamicTemplate', () => {
   });
 
   describe('Edge cases', () => {
+    test('should preserve explicit blank pages', async () => {
+      const blankTemplate: Template = {
+        schemas: [[]],
+        basePdf: { width: 100, height: 100, padding: [padding, padding, padding, padding] },
+      };
+      const getDynamicHeights = vi.fn();
+
+      const dynamicTemplate = await getDynamicTemplate({
+        ...getDynamicTemplateArg,
+        template: blankTemplate,
+        getDynamicHeights,
+      });
+
+      expect(dynamicTemplate).toBe(blankTemplate);
+      expect(dynamicTemplate.schemas).toEqual([[]]);
+      expect(getDynamicHeights).not.toHaveBeenCalled();
+    });
+
     test('should handle empty increase heights', async () => {
       const increaseHeights: number[] = [];
       const dynamicTemplate = await getDynamicTemplate(
