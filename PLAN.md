@@ -28,9 +28,10 @@ rich content の応用範囲を磨く。
 
 ### 1. Playground project workspace polish
 
-- Templates gallery / local project workspace は入った。次は「保存した project を迷わず育てられるか」を見る。
-- Project の rename / duplicate / Save As / metadata edit を検討する。特に title, tags, source kind, description を
-  JSON 直編集ではなく UI から扱えるようにしたい。
+- Templates gallery / local project workspace は入り、rename / duplicate / Save As も追加済み。
+  次は「保存した project が増えても軽く、壊れず、見つけやすいか」を見る。
+- Local project metadata edit は現時点では入れない。sample / starter の metadata は
+  `playground/public/template-assets/metadata.json` で repo 管理し、local project の title は Rename で扱う。
 - My Workspace の thumbnail 生成は、初回生成コスト、失敗時 fallback、再生成タイミング、localStorage 容量上限を確認する。
   必要なら IndexedDB や thumbnail cache TTL を検討する。
 - Project import / export は Template JSON download だけで足りるか、inputs / source / metadata を含む
@@ -191,6 +192,8 @@ rich content の応用範囲を磨く。
 - PR #1495: Playground を Templates gallery / local project workspace に統合。Sample template、JSX starter、
   md2pdf starter、local project を共通カードで管理し、Designer / FormViewer / authoring playground へ
   project kind に応じて遷移できるようにした。template metadata / thumbnail 生成 / website redirect も整理。
+- PR #1496: My Workspace project の Rename / Duplicate、Designer / FormViewer / JSX / md2pdf の
+  Save As、project card の More menu、Designer toolbar の重なり修正を追加。
 
 ## 参考
 
