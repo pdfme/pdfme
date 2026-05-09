@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { checkTemplate, getInputFromTemplate, type Template } from '@pdfme/common';
 import {
   Code2,
+  Copy,
   Download,
   Eye,
   FileText,
+  MoreHorizontal,
+  Pencil,
   PencilRuler,
   Trash2,
   Upload,
@@ -17,9 +20,11 @@ import { jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import { md2PdfPresets } from './md2PdfPresets';
 import {
   deletePlaygroundProject,
+  duplicatePlaygroundProject,
   getProjectAuthoringPath,
   getProjectKindLabel,
   readPlaygroundProjects,
+  renamePlaygroundProject,
   savePlaygroundProject,
   setActivePlaygroundProjectId,
   setPlaygroundProjectThumbnail,
@@ -190,7 +195,7 @@ const GalleryCard = ({
   thumbnail: React.ReactNode;
   title: string;
 }) => (
-  <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+  <div className="relative flex h-full flex-col rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
     <div className="relative overflow-hidden rounded border border-gray-100 bg-gray-100">
       {thumbnail}
       <span className="absolute left-2 top-2 rounded bg-white/95 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-green-700 shadow-sm">
@@ -216,6 +221,132 @@ const GalleryCard = ({
     <div className="mt-4">{actions}</div>
   </div>
 );
+
+type ProjectActionHandler = (project: PlaygroundProject) => void;
+
+type ProjectMoreActionsProps = {
+  onDeleteProject: ProjectActionHandler;
+  onDownloadProjectTemplate: ProjectActionHandler;
+  onDuplicateProject: ProjectActionHandler;
+  onOpenDesigner: ProjectActionHandler;
+  onRenameProject: ProjectActionHandler;
+  project: PlaygroundProject;
+};
+
+const ProjectMenuItem = ({
+  buttonRef,
+  children,
+  danger = false,
+  onClick,
+}: {
+  buttonRef?: React.Ref<HTMLButtonElement>;
+  children: React.ReactNode;
+  danger?: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    ref={buttonRef}
+    type="button"
+    role="menuitem"
+    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition ${
+      danger ? 'text-red-600 hover:bg-red-50' : 'text-gray-700 hover:bg-gray-50'
+    }`}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+);
+
+function ProjectMoreActions({
+  onDeleteProject,
+  onDownloadProjectTemplate,
+  onDuplicateProject,
+  onOpenDesigner,
+  onRenameProject,
+  project,
+}: ProjectMoreActionsProps) {
+  const [open, setOpen] = useState(false);
+  const firstMenuItemRef = React.useRef<HTMLButtonElement | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const runAction = (handler: ProjectActionHandler) => {
+    setOpen(false);
+    handler(project);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+
+    firstMenuItemRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  return (
+    <div className="relative">
+      <PlaygroundButton
+        ref={triggerRef}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={`More actions for ${project.title}`}
+        className="px-2 sm:px-2"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <MoreHorizontal className="size-4" />
+      </PlaygroundButton>
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label="Close project actions"
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            role="menu"
+            className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+          >
+            {project.source && (
+              <ProjectMenuItem
+                buttonRef={firstMenuItemRef}
+                onClick={() => runAction(onOpenDesigner)}
+              >
+                <PencilRuler className="size-4" />
+                Designer
+              </ProjectMenuItem>
+            )}
+            <ProjectMenuItem
+              buttonRef={project.source ? undefined : firstMenuItemRef}
+              onClick={() => runAction(onRenameProject)}
+            >
+              <Pencil className="size-4" />
+              Rename
+            </ProjectMenuItem>
+            <ProjectMenuItem onClick={() => runAction(onDuplicateProject)}>
+              <Copy className="size-4" />
+              Duplicate
+            </ProjectMenuItem>
+            <ProjectMenuItem onClick={() => runAction(onDownloadProjectTemplate)}>
+              <Download className="size-4" />
+              Template JSON
+            </ProjectMenuItem>
+            <ProjectMenuItem danger onClick={() => runAction(onDeleteProject)}>
+              <Trash2 className="size-4" />
+              Delete
+            </ProjectMenuItem>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 // Author link component to avoid duplication
 const AuthorLink = ({ author }: { author: string }) => {
@@ -393,6 +524,34 @@ function TemplatesApp() {
     toast.info(`Deleted "${project.title}"`);
   };
 
+  const onRenameProject = (project: PlaygroundProject) => {
+    const title = window.prompt('Project name', project.title) ?? '';
+    if (!title.trim()) return;
+
+    const renamedProject = renamePlaygroundProject(project.id, title);
+    if (!renamedProject) {
+      toast.error('Project not found');
+      return;
+    }
+
+    refreshProjects();
+    toast.success(`Renamed to "${renamedProject.title}"`);
+  };
+
+  const onDuplicateProject = (project: PlaygroundProject) => {
+    const title = window.prompt('Duplicate as', `${project.title} Copy`) ?? '';
+    if (!title.trim()) return;
+
+    const duplicatedProject = duplicatePlaygroundProject(project.id, title);
+    if (!duplicatedProject) {
+      toast.error('Project not found');
+      return;
+    }
+
+    refreshProjects();
+    toast.success(`Duplicated "${duplicatedProject.title}"`);
+  };
+
   const onDownloadProjectTemplate = (project: PlaygroundProject) => {
     const fileName = project.title.trim().replace(/[\\/:*?"<>|]+/g, '-') || 'template';
     downloadJsonFile(project.template, fileName);
@@ -447,33 +606,36 @@ function TemplatesApp() {
                     <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
                   }
                   actions={
-                    <div className="grid grid-cols-2 gap-2">
-                      {project.source && (
-                        <PlaygroundButton onClick={() => navigateToProject(project, 'source')}>
-                          <Code2 className="size-4" />
-                          Source
-                        </PlaygroundButton>
-                      )}
-                      <PlaygroundButton onClick={() => navigateToProject(project, 'designer')}>
-                        <PencilRuler className="size-4" />
-                        Designer
+                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
+                      <PlaygroundButton
+                        onClick={() =>
+                          navigateToProject(project, project.source ? 'source' : 'designer')
+                        }
+                      >
+                        {project.source ? (
+                          <>
+                            <Code2 className="size-4" />
+                            Source
+                          </>
+                        ) : (
+                          <>
+                            <PencilRuler className="size-4" />
+                            Designer
+                          </>
+                        )}
                       </PlaygroundButton>
                       <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
                         <Eye className="size-4" />
-                        Form/Viewer
+                        Preview
                       </PlaygroundButton>
-                      <PlaygroundButton onClick={() => onDownloadProjectTemplate(project)}>
-                        <Download className="size-4" />
-                        Template JSON
-                      </PlaygroundButton>
-                      <PlaygroundButton
-                        onClick={() => onDeleteProject(project)}
-                        variant="danger"
-                        aria-label={`Delete ${project.title}`}
-                      >
-                        <Trash2 className="size-4" />
-                        Delete
-                      </PlaygroundButton>
+                      <ProjectMoreActions
+                        project={project}
+                        onOpenDesigner={(item) => navigateToProject(item, 'designer')}
+                        onRenameProject={onRenameProject}
+                        onDuplicateProject={onDuplicateProject}
+                        onDownloadProjectTemplate={onDownloadProjectTemplate}
+                        onDeleteProject={onDeleteProject}
+                      />
                     </div>
                   }
                 />

@@ -160,23 +160,23 @@ function FormAndViewerApp() {
     }
   };
 
-  const onSaveInputs = async () => {
+  const onSaveInputs = async (saveAs = false) => {
     if (!ui.current) return;
 
     const currentProject = projectRef.current;
     const nextInputs = ui.current.getInputs();
     const nextTemplate = ui.current.getTemplate();
-    const title =
-      currentProject?.title ??
-      window.prompt('Project name', projectTitle || 'Untitled Template') ??
-      '';
+    const currentTitle = (currentProject?.title ?? projectTitle) || 'Untitled Template';
+    const title = saveAs
+      ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
+      : currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '';
     if (!title.trim()) return;
 
     const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate, nextInputs).catch(
       () => currentProject?.thumbnail,
     );
     const savedProject = savePlaygroundProject({
-      id: currentProject?.id,
+      id: saveAs ? undefined : currentProject?.id,
       inputs: nextInputs,
       kind: currentProject?.kind ?? 'template',
       source: currentProject?.source,
@@ -251,6 +251,7 @@ function FormAndViewerApp() {
           <PlaygroundButton onClick={() => void onSaveInputs()}>
             Save
           </PlaygroundButton>
+          <PlaygroundButton onClick={() => void onSaveInputs(true)}>Save As</PlaygroundButton>
           <PlaygroundButton onClick={onResetInputs}>Reset</PlaygroundButton>
         </div>
       ),

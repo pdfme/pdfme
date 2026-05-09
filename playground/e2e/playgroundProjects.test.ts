@@ -1,8 +1,10 @@
 import type { Template } from '@pdfme/common';
 import {
   deletePlaygroundProject,
+  duplicatePlaygroundProject,
   getActivePlaygroundProject,
   readPlaygroundProjects,
+  renamePlaygroundProject,
   savePlaygroundProject,
   setPlaygroundProjectThumbnail,
 } from '../src/lib/playgroundProjects';
@@ -80,6 +82,51 @@ describe('playground project storage', () => {
     deletePlaygroundProject(saved.id, storage);
     expect(readPlaygroundProjects(storage)).toEqual([]);
     expect(getActivePlaygroundProject(storage)).toBeNull();
+  });
+
+  it('renames and duplicates projects without changing the original content', () => {
+    const storage = new MemoryStorage();
+    const saved = savePlaygroundProject(
+      {
+        inputs: [{ name: 'Ada' }],
+        kind: 'template',
+        template,
+        thumbnail: 'data:image/png;base64,abc',
+        title: 'Original',
+      },
+      storage,
+    );
+
+    const renamed = renamePlaygroundProject(saved.id, ' Renamed project ', storage);
+    expect(renamed?.id).toBe(saved.id);
+    expect(renamed?.title).toBe('Renamed project');
+    expect(readPlaygroundProjects(storage)).toHaveLength(1);
+
+    const duplicated = duplicatePlaygroundProject(saved.id, ' Copy project ', storage);
+    expect(duplicated?.id).not.toBe(saved.id);
+    expect(duplicated?.title).toBe('Copy project');
+    expect(duplicated?.template).toEqual(template);
+    expect(duplicated?.inputs).toEqual([{ name: 'Ada' }]);
+    expect(duplicated?.thumbnail).toBe('data:image/png;base64,abc');
+    expect(getActivePlaygroundProject(storage)?.id).toBe(duplicated?.id);
+
+    const duplicateWithSameTitle = duplicatePlaygroundProject(saved.id, ' Copy project ', storage);
+    expect(duplicateWithSameTitle?.title).toBe('Copy project 2');
+
+    const projects = readPlaygroundProjects(storage);
+    expect(projects).toHaveLength(3);
+    expect(projects.map((project) => project.title).sort()).toEqual([
+      'Copy project',
+      'Copy project 2',
+      'Renamed project',
+    ]);
+  });
+
+  it('returns null when project actions target a missing project', () => {
+    const storage = new MemoryStorage();
+
+    expect(renamePlaygroundProject('missing', 'Nope', storage)).toBeNull();
+    expect(duplicatePlaygroundProject('missing', 'Nope', storage)).toBeNull();
   });
 
   it('migrates legacy localStorage template state into a project', () => {

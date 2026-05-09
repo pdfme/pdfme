@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
-import { ExternalLink, Save } from 'lucide-react';
+import { Copy, ExternalLink, Save } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
@@ -173,11 +173,13 @@ export default function Md2Pdf() {
     }
   };
 
-  const onSaveProject = async () => {
+  const onSaveProject = async (saveAs = false) => {
     if (!template) return;
 
-    const title =
-      projectRef.current?.title ?? window.prompt('Project name', `md2pdf - ${sourceTitle}`) ?? '';
+    const currentTitle = projectRef.current?.title ?? `md2pdf - ${sourceTitle}`;
+    const title = saveAs
+      ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
+      : projectRef.current?.title ?? window.prompt('Project name', currentTitle) ?? '';
     if (!title.trim()) return;
 
     try {
@@ -185,7 +187,7 @@ export default function Md2Pdf() {
         () => projectRef.current?.thumbnail,
       );
       const savedProject = savePlaygroundProject({
-        id: projectRef.current?.id,
+        id: saveAs ? undefined : projectRef.current?.id,
         inputs,
         kind: 'md2pdf',
         source: {
@@ -240,6 +242,13 @@ export default function Md2Pdf() {
           >
             <Save className="size-4" />
             Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
+            disabled={!template || Boolean(error)}
+            onClick={() => void onSaveProject(true)}
+          >
+            <Copy className="size-4" />
+            Save As
           </PlaygroundButton>
           <PlaygroundButton
             disabled={!template || Boolean(error) || isGeneratingPdf}

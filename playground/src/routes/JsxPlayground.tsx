@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { checkTemplate, type Template } from '@pdfme/common';
 import type { RenderResult } from '@pdfme/jsx';
 import { Viewer } from '@pdfme/ui';
-import { Download, ExternalLink, PencilRuler, Save } from 'lucide-react';
+import { Copy, Download, ExternalLink, PencilRuler, Save } from 'lucide-react';
 import { toast } from 'react-toastify';
 import CodeEditor from '../components/CodeEditor';
 import PlaygroundButton from '../components/PlaygroundButton';
@@ -334,13 +334,15 @@ export default function JsxPlayground() {
     downloadJsonFile(template, 'jsx-template');
   };
 
-  const saveCurrentProject = async (title?: string) => {
+  const saveCurrentProject = async (title?: string, saveAs = false) => {
     if (!template) return null;
 
+    const currentTitle = projectRef.current?.title ?? `JSX - ${sourceTitle}`;
     const projectTitle =
       title ??
-      projectRef.current?.title ??
-      window.prompt('Project name', `JSX - ${sourceTitle}`) ??
+      (saveAs
+        ? window.prompt('Save as', `${currentTitle} Copy`)
+        : projectRef.current?.title ?? window.prompt('Project name', currentTitle)) ??
       '';
     if (!projectTitle.trim()) return null;
 
@@ -348,7 +350,7 @@ export default function JsxPlayground() {
       () => projectRef.current?.thumbnail,
     );
     const savedProject = savePlaygroundProject({
-      id: projectRef.current?.id,
+      id: saveAs ? undefined : projectRef.current?.id,
       inputs: inputsRef.current,
       kind: 'jsx',
       source: {
@@ -373,6 +375,16 @@ export default function JsxPlayground() {
     try {
       checkTemplate(template);
       const savedProject = await saveCurrentProject();
+      if (savedProject) toast.success(<ProjectSavedToast title={savedProject.title} />);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
+  const onSaveAsProject = async () => {
+    try {
+      checkTemplate(template);
+      const savedProject = await saveCurrentProject(undefined, true);
       if (savedProject) toast.success(<ProjectSavedToast title={savedProject.title} />);
     } catch (err) {
       toast.error(getErrorMessage(err));
@@ -434,6 +446,13 @@ export default function JsxPlayground() {
           >
             <Save className="size-4" />
             Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
+            disabled={!template || Boolean(error)}
+            onClick={() => void onSaveAsProject()}
+          >
+            <Copy className="size-4" />
+            Save As
           </PlaygroundButton>
           <PlaygroundButton
             disabled={!template || Boolean(error)}
