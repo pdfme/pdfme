@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
-import type { Template } from '@pdfme/common';
+import { useNavigate } from 'react-router-dom';
+import { checkTemplate, type Template } from '@pdfme/common';
 import type { RenderResult } from '@pdfme/jsx';
 import { Form, Viewer } from '@pdfme/ui';
-import { ExternalLink } from 'lucide-react';
+import { Download, ExternalLink, PencilRuler } from 'lucide-react';
 import { toast } from 'react-toastify';
 import CodeEditor from '../components/CodeEditor';
-import GeneratedTemplateControls from '../components/GeneratedTemplateControls';
-import { generatePDF, getFontsData } from '../helper';
+import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
-import { useGeneratedTemplateActions } from './useGeneratedTemplateActions';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
@@ -45,6 +44,9 @@ type PreviewInstance = {
 
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
+
+const generatedTemplateButtonClassName =
+  'inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3';
 
 const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
   const typeScriptLanguage = monaco.languages.typescript;
@@ -88,6 +90,7 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 };
 
 export default function JsxPlayground() {
+  const navigate = useNavigate();
   const pageRootRef = useRef<HTMLElement | null>(null);
   const previewRootRef = useRef<HTMLDivElement | null>(null);
   const previewRef = useRef<PreviewInstance | null>(null);
@@ -108,10 +111,6 @@ export default function JsxPlayground() {
   const selectedPreset =
     jsxPlaygroundPresets.find((preset) => preset.id === selectedPresetId) ??
     jsxPlaygroundPresets[0];
-  const { downloadTemplate, openDesigner } = useGeneratedTemplateActions({
-    template,
-    templateFileName: 'jsx-template',
-  });
 
   const terminateRenderWorker = useCallback(() => {
     renderWorkerRef.current?.terminate();
@@ -319,6 +318,37 @@ export default function JsxPlayground() {
     }
   };
 
+  const onDownloadTemplate = () => {
+    if (!template) return;
+    downloadJsonFile(template, 'jsx-template');
+  };
+
+  const onOpenDesigner = () => {
+    if (!template) return;
+
+    try {
+      checkTemplate(template);
+      const serializedTemplate = JSON.stringify(template);
+      const savedTemplate = localStorage.getItem('template');
+      if (
+        savedTemplate &&
+        savedTemplate !== serializedTemplate &&
+        !window.confirm(
+          'Opening Designer will replace the template saved in local storage. Continue?',
+        )
+      ) {
+        return;
+      }
+
+      localStorage.setItem('template', serializedTemplate);
+      localStorage.removeItem('inputs');
+      toast.success('Saved generated template — opening Designer');
+      navigate('/designer');
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
   const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
     const preset = jsxPlaygroundPresets.find((item) => item.id === event.target.value);
     if (!preset) return;
@@ -366,11 +396,24 @@ export default function JsxPlayground() {
               </option>
             ))}
           </select>
-          <GeneratedTemplateControls
+          <button
+            type="button"
             disabled={!template || Boolean(error)}
-            onDownloadTemplate={downloadTemplate}
-            onOpenDesigner={openDesigner}
-          />
+            onClick={onDownloadTemplate}
+            className={generatedTemplateButtonClassName}
+          >
+            <Download className="size-4" />
+            Template JSON
+          </button>
+          <button
+            type="button"
+            disabled={!template || Boolean(error)}
+            onClick={onOpenDesigner}
+            className={generatedTemplateButtonClassName}
+          >
+            <PencilRuler className="size-4" />
+            Open Designer
+          </button>
           <button
             type="button"
             disabled={!template || Boolean(error) || isGeneratingPdf}
