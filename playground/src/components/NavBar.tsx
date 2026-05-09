@@ -16,17 +16,12 @@ export function NavBar({ items }: NavBarProps) {
       {({ open }) => (
         <>
           <div className="mx-auto px-2">
-            <div className="relative flex h-16 items-center justify-between">
-              <div className="flex flex-1 items-center justify-start lg:items-stretch lg:justify-start">
-                <div className="hidden lg:block">
-                  <div
-                    className={'grid gap-4 text-sm items-end justify-items-center'}
-                    style={{
-                      gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
-                    }}
-                  >
+            <div className="relative flex min-h-16 items-center justify-between py-2 lg:py-0">
+              <div className="flex min-w-0 flex-1 items-center justify-start lg:items-stretch lg:justify-start">
+                <div className="hidden min-w-0 lg:block lg:w-full">
+                  <div className="flex min-w-0 items-end gap-5 overflow-x-auto text-sm">
                     {items.map(({ label, content }, index) => (
-                      <div key={label || String(index)}>
+                      <div key={label || String(index)} className="shrink-0">
                         <label className="block mb-1 font-medium text-gray-700">{label}</label>
                         {content}
                       </div>

@@ -54,6 +54,17 @@ const normalizeTitle = (title: string, fallback: string) => {
   return normalized || fallback;
 };
 
+const createUniqueProjectTitle = (title: string, projects: PlaygroundProject[]) => {
+  const normalizedTitle = normalizeTitle(title, 'Untitled Project');
+  const existingTitles = new Set(projects.map((project) => project.title));
+  if (!existingTitles.has(normalizedTitle)) return normalizedTitle;
+
+  for (let index = 2; ; index += 1) {
+    const candidate = `${normalizedTitle} ${index}`;
+    if (!existingTitles.has(candidate)) return candidate;
+  }
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
@@ -210,6 +221,55 @@ export const deletePlaygroundProject = (projectId: string, storage = getStorage(
   if (getActivePlaygroundProjectId(storage) === projectId) {
     storage?.removeItem(ACTIVE_PROJECT_STORAGE_KEY);
   }
+};
+
+export const renamePlaygroundProject = (
+  projectId: string,
+  title: string,
+  storage = getStorage(),
+) => {
+  const projects = readPlaygroundProjects(storage);
+  const project = projects.find((item) => item.id === projectId);
+  if (!project) return null;
+
+  const updatedProject: PlaygroundProject = {
+    ...project,
+    title: normalizeTitle(title, project.title),
+    updatedAt: Date.now(),
+  };
+  writePlaygroundProjects(
+    projects
+      .map((item) => (item.id === projectId ? updatedProject : item))
+      .sort((a, b) => b.updatedAt - a.updatedAt),
+    storage,
+  );
+  return updatedProject;
+};
+
+export const duplicatePlaygroundProject = (
+  projectId: string,
+  title?: string,
+  storage = getStorage(),
+) => {
+  const projects = readPlaygroundProjects(storage);
+  const project = projects.find((item) => item.id === projectId);
+  if (!project) return null;
+
+  const now = Date.now();
+  const duplicatedProject: PlaygroundProject = {
+    ...project,
+    createdAt: now,
+    id: createProjectId(),
+    title: createUniqueProjectTitle(title ?? `${project.title} Copy`, projects),
+    updatedAt: now,
+  };
+
+  writePlaygroundProjects(
+    [duplicatedProject, ...projects].sort((a, b) => b.updatedAt - a.updatedAt),
+    storage,
+  );
+  setActivePlaygroundProjectId(duplicatedProject.id, storage);
+  return duplicatedProject;
 };
 
 export const setPlaygroundProjectThumbnail = (

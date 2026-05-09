@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Code2, Download, Save } from 'lucide-react';
+import { Code2, Copy, Download, Save } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
 import { Designer } from '@pdfme/ui';
 import {
@@ -116,15 +116,16 @@ function DesignerApp() {
   }, []);
 
   const onSaveTemplate = useCallback(
-    async (template?: Template) => {
+    async (template?: Template, saveAs = false) => {
       if (!designer.current) return;
 
       const currentProject = projectRef.current;
       const nextTemplate = template || designer.current.getTemplate();
-      const title =
-        currentProject?.title ??
-        window.prompt('Project name', projectTitleRef.current || 'Untitled Template') ??
-        '';
+      const currentTitle =
+        (currentProject?.title ?? projectTitleRef.current) || 'Untitled Template';
+      const title = saveAs
+        ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
+        : currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '';
       if (!title.trim()) return;
 
       const thumbnail = await createTemplateThumbnailDataUrl(
@@ -132,7 +133,7 @@ function DesignerApp() {
         currentProject?.inputs,
       ).catch(() => currentProject?.thumbnail);
       const savedProject = savePlaygroundProject({
-        id: currentProject?.id,
+        id: saveAs ? undefined : currentProject?.id,
         inputs: currentProject?.inputs,
         kind: currentProject?.kind ?? 'template',
         source: currentProject?.source,
@@ -404,6 +405,14 @@ function DesignerApp() {
           >
             <Save className="size-3.5" />
             Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
+            id="save-as"
+            disabled={editingStaticSchemas}
+            onClick={() => void onSaveTemplate(undefined, true)}
+          >
+            <Copy className="size-3.5" />
+            Save As
           </PlaygroundButton>
           <PlaygroundButton
             id="reset-template"
