@@ -2,13 +2,15 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'reac
 import type { Template } from '@pdfme/common';
 import type { RenderResult } from '@pdfme/jsx';
 import { Form, Viewer } from '@pdfme/ui';
-import { Download, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { toast } from 'react-toastify';
 import CodeEditor from '../components/CodeEditor';
-import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
+import GeneratedTemplateControls from '../components/GeneratedTemplateControls';
+import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
+import { useGeneratedTemplateActions } from './useGeneratedTemplateActions';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
@@ -106,6 +108,10 @@ export default function JsxPlayground() {
   const selectedPreset =
     jsxPlaygroundPresets.find((preset) => preset.id === selectedPresetId) ??
     jsxPlaygroundPresets[0];
+  const { downloadTemplate, openDesigner } = useGeneratedTemplateActions({
+    template,
+    templateFileName: 'jsx-template',
+  });
 
   const terminateRenderWorker = useCallback(() => {
     renderWorkerRef.current?.terminate();
@@ -313,11 +319,6 @@ export default function JsxPlayground() {
     }
   };
 
-  const onDownloadTemplate = () => {
-    if (!template) return;
-    downloadJsonFile(template, 'jsx-template');
-  };
-
   const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
     const preset = jsxPlaygroundPresets.find((item) => item.id === event.target.value);
     if (!preset) return;
@@ -365,15 +366,11 @@ export default function JsxPlayground() {
               </option>
             ))}
           </select>
-          <button
-            type="button"
+          <GeneratedTemplateControls
             disabled={!template || Boolean(error)}
-            onClick={onDownloadTemplate}
-            className="inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
-          >
-            <Download className="size-4" />
-            Template JSON
-          </button>
+            onDownloadTemplate={downloadTemplate}
+            onOpenDesigner={openDesigner}
+          />
           <button
             type="button"
             disabled={!template || Boolean(error) || isGeneratingPdf}
