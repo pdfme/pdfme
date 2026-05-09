@@ -6,9 +6,9 @@
 
 `@pdfme/jsx` で stacking layout を使った template authoring を整備し、その考え方を
 `converter` package の `md2pdf` に応用する。`md2pdf` / `@pdfme/jsx` ともに beta playground と
-docs が入り、実際に試しながら仕様を磨ける状態になった。`Document` root による static
-layout API も入ったため、次は playground で見えた違和感を拾い、JSX authoring UX、layout 品質、
-rich content の応用範囲を広げる。
+docs が入り、Templates gallery / local project workspace から試せる状態になった。次は実際に
+保存・再編集・Designer / FormViewer 遷移を使いながら、workspace 体験、authoring UX、layout 品質、
+rich content の応用範囲を磨く。
 
 ## 基本方針
 
@@ -26,30 +26,35 @@ rich content の応用範囲を広げる。
 
 ## 次に進めること
 
-### 1. `@pdfme/jsx` playground / authoring UX フォローアップ
+### 1. Playground project workspace polish
 
-- `Document` root、margin-aware な `Header` / `Footer`、page 全体座標の `Static` は入った。
-  次は playground preset / docs を通じて、repeated layer、margin area、`Absolute` origin が
-  直感とズレないかを確認し、必要なら wording やサンプルを直す。
-- `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを
-  preset に残す。`Page` 直下 static を禁止した新 API の書き方も docs 上で迷わないようにする。
-- Playground は単一の `localStorage.template` / `inputs` スロットではなく、local project workspace として
-  整理する。Project は `Template + inputs` を正とし、JSX / Markdown source は生成元 metadata として保持する。
-- Template 一覧は sample gallery / authoring starter / imported Template JSON / local projects の共通入口として扱う。
-  Project kind に応じて Designer / FormViewer / `jsx` / `md2pdf` playground へ戻れる導線を作る。
-- JSX / md2pdf playground は preset を選ぶ場所ではなく、Templates から選んだ starter / project を編集する
-  authoring surface として扱う。次は project rename、duplicate、export/import、共有可能 URL、draft reset の
-  使い勝手を検証する。
-- Form / Viewer 確認は生成方法に依存しない共通 project 導線として扱う。JSX playground は source authoring と
-  Viewer preview に寄せ、Form 入力の確認は project を FormViewer で開いて行う。
+- Templates gallery / local project workspace は入った。次は「保存した project を迷わず育てられるか」を見る。
+- Project の rename / duplicate / Save As / metadata edit を検討する。特に title, tags, source kind, description を
+  JSON 直編集ではなく UI から扱えるようにしたい。
+- My Workspace の thumbnail 生成は、初回生成コスト、失敗時 fallback、再生成タイミング、localStorage 容量上限を確認する。
+  必要なら IndexedDB や thumbnail cache TTL を検討する。
+- Project import / export は Template JSON download だけで足りるか、inputs / source / metadata を含む
+  workspace project export が必要かを見極める。
+- Designer / FormViewer / JSX / md2pdf 間の active project 読み込みと reset の E2E を増やす。特に blank template、
+  schema なし template、project deleted 後の URL、mobile viewport を固定する。
 
-### 2. `md2pdf` layout 品質フォローアップ
+### 2. `@pdfme/jsx` authoring UX フォローアップ
+
+- `Document` root、margin-aware な `Header` / `Footer`、page 全体座標の `Static` は入った。Templates starter / docs
+  を通じて repeated layer、margin area、`Absolute` origin が直感とズレないかを確認し、必要なら wording やサンプルを直す。
+- `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを starter に残す。
+- 編集の正は generated `Template + inputs`。JSX source は初期生成 / regeneration 用の metadata として扱う。
+  Designer で編集した template を JSX に自動逆変換することは当面目指さない。
+- JSX playground は source authoring と Viewer preview に寄せる。Form 入力確認は生成方法に依存しない共通 project 導線として
+  FormViewer で行う。
+
+### 3. `md2pdf` layout 品質フォローアップ
 
 - heading 直後の keep-with-next、table / image / code block の keep-together、widow/orphan を検討する。
 - 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
 - blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
 
-### 3. `@pdfme/jsx` layout / dynamic container フォローアップ
+### 4. `@pdfme/jsx` layout / dynamic container フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
@@ -61,7 +66,7 @@ rich content の応用範囲を広げる。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 
-### 4. `md2pdf` assets / rich content 方針
+### 5. `md2pdf` assets / rich content 方針
 
 - remote image は当面 link fallback のままにする。実装する場合は converter 内で安全に fetch して
   PNG / JPEG data URI 化する案を、CORS、content-type、size limit、timeout とセットで検討する。
@@ -183,6 +188,9 @@ rich content の応用範囲を広げる。
   blank template も FormViewer で表示できるようにした。
 - PR #1494: `/md2pdf` playground から Template JSON / Open Designer を外し、md2pdf は Markdown preview と
   PDF generation に絞る形へ戻した。
+- PR #1495: Playground を Templates gallery / local project workspace に統合。Sample template、JSX starter、
+  md2pdf starter、local project を共通カードで管理し、Designer / FormViewer / authoring playground へ
+  project kind に応じて遷移できるようにした。template metadata / thumbnail 生成 / website redirect も整理。
 
 ## 参考
 
