@@ -33,8 +33,9 @@ rich content の応用範囲を広げる。
   直感とズレないかを確認し、必要なら wording やサンプルを直す。
 - `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを
   preset に残す。`Page` 直下 static を禁止した新 API の書き方も docs 上で迷わないようにする。
-- JSX playground で生成した template から Designer に遷移する導線を検討する。source JSX と生成後
-  template JSON のどちらを編集の正とするかを先に決める。
+- JSX playground で生成した template から Designer に遷移する導線を作る。編集の正は generated
+  template / inputs とし、JSX source は初期生成用の seed として扱う。Designer 遷移後に JSX source へ
+  逆同期することは当面しない。
 - JSX playground の preset は増やせる状態になった。次は「よいサンプルを増やす」より、preset / draft /
   imported template の扱い、reset、共有可能 URL、保存済み template の見せ方を整理する。
 - Template 一覧は template type に応じて Designer / FormViewer / `md2pdf` / `jsx` playground へ
