@@ -1,0 +1,152 @@
+{
+  "a4-blank": {
+    "order": 130,
+    "description": "A clean blank A4 document for starting from scratch in Designer.",
+    "tags": ["Blank", "Starter"]
+  },
+  "address-label-10": {
+    "description": "A 10-label address sheet for shipping and mailing workflows.",
+    "tags": ["Labels", "Shipping"]
+  },
+  "address-label-30": {
+    "description": "A compact 30-label address sheet for dense mailing labels.",
+    "tags": ["Labels", "Shipping"]
+  },
+  "address-label-6": {
+    "description": "A larger 6-label address sheet with room for longer addresses.",
+    "tags": ["Labels", "Shipping"]
+  },
+  "certificate-black": {
+    "order": 120,
+    "description": "A high-contrast certificate layout with a formal dark theme.",
+    "tags": ["Certificate", "Award"]
+  },
+  "certificate-blue": {
+    "description": "A polished blue certificate layout for awards and completion documents.",
+    "tags": ["Certificate", "Award"]
+  },
+  "certificate-gold": {
+    "description": "A warm gold certificate layout with a classic presentation style.",
+    "tags": ["Certificate", "Award"]
+  },
+  "certificate-white": {
+    "description": "A minimal certificate layout that works well with light branding.",
+    "tags": ["Certificate", "Award"]
+  },
+  "hihokensha-shikaku-shutoku-todoke": {
+    "description": "A Japanese social insurance form template for structured government-style documents.",
+    "tags": ["Government", "CJK", "Form"]
+  },
+  "inline-markdown-mvt": {
+    "description": "A focused demo of inline markdown and MultiVariableText editing.",
+    "tags": ["Markdown", "MVT", "Form"]
+  },
+  "invoice": {
+    "order": 90,
+    "description": "A practical invoice with customer details, line items, totals, and payment notes.",
+    "tags": ["Invoice", "Business", "Table", "Visual"]
+  },
+  "invoice-blue": {
+    "description": "A blue invoice variant for a more branded business document.",
+    "tags": ["Invoice", "Business", "Table"]
+  },
+  "invoice-green": {
+    "description": "A green invoice variant with a calm accounting-oriented look.",
+    "tags": ["Invoice", "Business", "Table"]
+  },
+  "invoice-ja-simple": {
+    "description": "A simple Japanese invoice layout with CJK font usage.",
+    "tags": ["Invoice", "Business", "CJK"]
+  },
+  "invoice-ja-simple-landscape": {
+    "description": "A landscape Japanese invoice layout for wider table content.",
+    "tags": ["Invoice", "Business", "CJK"]
+  },
+  "invoice-white": {
+    "description": "A restrained white invoice layout with a clean printable style.",
+    "tags": ["Invoice", "Business", "Table"]
+  },
+  "jsx-form-fields": {
+    "title": "Form fields",
+    "description": "Input-backed Text, MultiVariableText, and Image fields for testing Form preview.",
+    "sourceKind": "jsx",
+    "tags": ["Form", "MVT", "Image"]
+  },
+  "jsx-invoice": {
+    "title": "Invoice layout",
+    "description": "A two-page invoice with Header, Footer, Absolute, Table, and visual schemas.",
+    "sourceKind": "jsx",
+    "tags": ["Invoice", "Business", "Table", "Visual", "Multi-page"]
+  },
+  "jsx-japanese-notice": {
+    "title": "Japanese notice",
+    "description": "A Japanese preset that uses NotoSansJP and static footer page numbers.",
+    "sourceKind": "jsx",
+    "tags": ["CJK", "Table"]
+  },
+  "jsx-report": {
+    "title": "Report page",
+    "description": "A dashboard-style report with cards, progress bars, list content, and page footer.",
+    "sourceKind": "jsx",
+    "tags": ["Report", "Dashboard", "List"]
+  },
+  "location-arrow": {
+    "description": "A location marker template that highlights points with arrow indicators.",
+    "tags": ["Map", "Visual"]
+  },
+  "location-number": {
+    "description": "A location marker template that labels points with numbered badges.",
+    "tags": ["Map", "Visual"]
+  },
+  "md2pdf-article": {
+    "title": "Article",
+    "description": "A longer article-like sample for pagination and text wrapping checks.",
+    "sourceKind": "md2pdf",
+    "tags": ["Markdown", "Article"]
+  },
+  "md2pdf-japanese-report": {
+    "title": "Japanese report",
+    "description": "A Japanese Markdown sample for CJK font and table rendering checks.",
+    "sourceKind": "md2pdf",
+    "tags": ["Markdown", "CJK", "Report"]
+  },
+  "md2pdf-overview": {
+    "title": "Overview",
+    "description": "Basic GFM blocks, inline formatting, horizontal rule, blockquote, code, and table.",
+    "sourceKind": "md2pdf",
+    "tags": ["Markdown", "Table", "Code"]
+  },
+  "md2pdf-release-notes": {
+    "title": "Release notes",
+    "description": "A product-note style document with task list syntax and tables.",
+    "sourceKind": "md2pdf",
+    "tags": ["Markdown", "Release Notes", "Checklist"]
+  },
+  "new-sale-quotation": {
+    "description": "A sales quotation template with product rows and business summary fields.",
+    "tags": ["Quote", "Business", "Table"]
+  },
+  "pedigree": {
+    "order": 110,
+    "description": "A pedigree-style relationship chart for structured family or lineage data.",
+    "tags": ["Chart", "QR", "Image", "Visual"]
+  },
+  "qr-lines": {
+    "order": 140,
+    "description": "A QR code template with line-based metadata and compact supporting text.",
+    "tags": ["QR", "Label"]
+  },
+  "qr-title": {
+    "description": "A QR code template with a prominent title and simple scan instructions.",
+    "tags": ["QR", "Label"]
+  },
+  "quotes": {
+    "order": 100,
+    "description": "A quote document layout for proposals, estimates, and short commercial offers.",
+    "tags": ["Quote", "Business", "Table", "Visual"]
+  },
+  "z-fold-brochure": {
+    "description": "A z-fold brochure layout for tri-fold print and promotional material.",
+    "tags": ["Brochure", "Print"]
+  }
+}
