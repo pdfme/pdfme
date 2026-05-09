@@ -126,7 +126,7 @@ const template: Template = {
 };
 ```
 
-[テンプレートデザインページ](/template-design?ui=designer&template=a4-blank)からテンプレートを作成できます。または、テンプレート作成機能をアプリケーションに統合したい場合は、[デザイナーセクション](/docs/getting-started#designer)をご覧ください。
+[playground Designer](https://playground.pdfme.com/designer?template=a4-blank)からテンプレートを作成できます。または、テンプレート作成機能をアプリケーションに統合したい場合は、[デザイナーセクション](/docs/getting-started#designer)をご覧ください。
 
 ### プラグインの使用
 
@@ -247,7 +247,7 @@ UIは[デザイナー](/docs/getting-started#designer)、[フォーム](/docs/ge
 
 デザイナーを使用すると、テンプレートスキーマを編集でき、誰でも簡単にテンプレートJSONオブジェクトを作成できます。
 
-[テンプレートデザインページ](/template-design?ui=designer&template=a4-blank)から独自のテンプレートをデザインするか、デザイナーをアプリケーションに統合することができます。
+[playground Designer](https://playground.pdfme.com/designer?template=a4-blank)から独自のテンプレートをデザインするか、デザイナーをアプリケーションに統合することができます。
 
 上記で作成したテンプレートをデフォルトテンプレートとして使用し、デザイナーを統合してみましょう。
 
@@ -295,7 +295,7 @@ const designer = new Designer({ domContainer, template, options });
 
 フォームは、ユーザーがテンプレートに基づいてスキーマを入力するためのUIを作成します。
 
-[こちら](/template-design?ui=form-viewer&template=invoice)から請求書テンプレートを使用したフォームを試すことができます。
+[playground Form/Viewer](https://playground.pdfme.com/form-viewer?template=invoice)で請求書テンプレートを使用したフォームを試すことができます。
 
 ```ts
 import type { Template } from '@pdfme/common';

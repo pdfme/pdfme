@@ -1,21 +1,32 @@
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { Template } from '@pdfme/common';
 import { md2pdf } from '@pdfme/converter/md2pdf';
 import { Viewer } from '@pdfme/ui';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Save } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
+import PlaygroundButton from '../components/PlaygroundButton';
+import ProjectSavedToast from '../components/ProjectSavedToast';
 import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
+import {
+  getPlaygroundProject,
+  savePlaygroundProject,
+  type PlaygroundProject,
+} from '../lib/playgroundProjects';
+import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
 
 export default function Md2Pdf() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const pageRootRef = useRef<HTMLElement | null>(null);
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
+  const projectRef = useRef<PlaygroundProject | null>(null);
   const [selectedPresetId, setSelectedPresetId] = useState(md2PdfPresets[0]?.id ?? '');
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [template, setTemplate] = useState<Template | null>(null);
@@ -25,8 +36,50 @@ export default function Md2Pdf() {
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [viewerRefreshKey, setViewerRefreshKey] = useState(0);
-  const selectedPreset =
-    md2PdfPresets.find((preset) => preset.id === selectedPresetId) ?? md2PdfPresets[0];
+  const selectedPreset = md2PdfPresets.find((preset) => preset.id === selectedPresetId);
+  const sourceTitle = projectRef.current?.title ?? selectedPreset?.label ?? 'Custom Markdown';
+
+  useEffect(() => {
+    const projectId = searchParams.get('project');
+    const presetId = searchParams.get('preset');
+    if (!projectId && !presetId) return;
+
+    const consumeQuery = () => {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      nextSearchParams.delete('project');
+      nextSearchParams.delete('preset');
+      setSearchParams(nextSearchParams, { replace: true });
+    };
+
+    if (projectId) {
+      const project = getPlaygroundProject(projectId);
+      if (!project || project.kind !== 'md2pdf' || !project.source) {
+        toast.error('md2pdf project not found');
+        return;
+      }
+
+      consumeQuery();
+      projectRef.current = project;
+      setSelectedPresetId(project.source.presetId ?? '');
+      setMarkdown(project.source.content);
+      setTemplate(project.template);
+      setInputs(project.inputs);
+      return;
+    }
+
+    const preset = md2PdfPresets.find((item) => item.id === presetId);
+    if (!preset) {
+      toast.error('md2pdf starter not found');
+      return;
+    }
+
+    consumeQuery();
+    projectRef.current = null;
+    setSelectedPresetId(preset.id);
+    setMarkdown(preset.markdown);
+    setError(null);
+    setPdfDuration(null);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,13 +173,36 @@ export default function Md2Pdf() {
     }
   };
 
-  const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
-    const preset = md2PdfPresets.find((item) => item.id === event.target.value);
-    if (!preset) return;
-    setSelectedPresetId(preset.id);
-    setMarkdown(preset.markdown);
-    setError(null);
-    setPdfDuration(null);
+  const onSaveProject = async () => {
+    if (!template) return;
+
+    const title =
+      projectRef.current?.title ?? window.prompt('Project name', `md2pdf - ${sourceTitle}`) ?? '';
+    if (!title.trim()) return;
+
+    try {
+      const thumbnail = await createTemplateThumbnailDataUrl(template, inputs).catch(
+        () => projectRef.current?.thumbnail,
+      );
+      const savedProject = savePlaygroundProject({
+        id: projectRef.current?.id,
+        inputs,
+        kind: 'md2pdf',
+        source: {
+          content: markdown,
+          language: 'markdown',
+          presetId: selectedPresetId,
+          route: '/md2pdf',
+        },
+        template,
+        thumbnail,
+        title,
+      });
+      projectRef.current = savedProject;
+      toast.success(<ProjectSavedToast title={savedProject.title} />);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    }
   };
 
   return (
@@ -148,33 +224,30 @@ export default function Md2Pdf() {
               <ExternalLink className="size-3" />
             </a>
           </div>
-          <p className="mt-1 break-words text-xs text-gray-500">{selectedPreset?.description}</p>
+          <p className="mt-1 break-words text-xs text-gray-500">
+            {sourceTitle}
+            {selectedPreset?.description ? ` - ${selectedPreset.description}` : ''}
+          </p>
           <p className="mt-1 break-words text-xs text-gray-500">
             GFM support is intentionally partial: complex table/list content and remote images are
             simplified.
           </p>
         </div>
         <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:pl-4">
-          <select
-            aria-label="Markdown preset"
-            value={selectedPresetId}
-            onChange={onChangePreset}
-            className="col-span-2 max-w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700 sm:col-span-1 sm:min-w-40"
+          <PlaygroundButton
+            disabled={!template || Boolean(error)}
+            onClick={() => void onSaveProject()}
           >
-            {md2PdfPresets.map((preset) => (
-              <option key={preset.id} value={preset.id}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
+            <Save className="size-4" />
+            Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
             disabled={!template || Boolean(error) || isGeneratingPdf}
             onClick={onGeneratePdf}
-            className="col-span-2 min-w-0 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:col-span-1 sm:px-3"
+            className="col-span-2 sm:col-span-1"
           >
             {isGeneratingPdf ? 'Generating...' : 'Generate PDF'}
-          </button>
+          </PlaygroundButton>
         </div>
       </div>
       <div className="grid min-w-0 flex-none grid-cols-1 gap-0 lg:min-h-0 lg:flex-1 lg:grid-cols-2">

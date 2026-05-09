@@ -33,10 +33,11 @@ function generateSampleInputs(template: Record<string, unknown>): Record<string,
     const name = schema.name as string;
     const content = schema.content as string | undefined;
     const readOnly = schema.readOnly as boolean | undefined;
+    const type = schema.type as string | undefined;
 
     if (readOnly) continue;
     if (name) {
-      input[name] = content || `Sample ${name}`;
+      input[name] = content || (type === 'image' || type === 'signature' ? '' : `Sample ${name}`);
     }
   }
 

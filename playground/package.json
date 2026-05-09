@@ -10,7 +10,7 @@
     "preview": "vp preview",
     "deploy": "npm run build && gh-pages -d dist -b playground",
     "copy-vercel-config": "node -e \"require('fs').copyFileSync('vercel.json', 'dist/vercel.json')\"",
-    "generate-template-assets": "node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
+    "generate-template-assets": "node scripts/generate-authoring-starter-assets.mjs && node scripts/generate-templates-list-json.mjs && node scripts/generate-templates-thumbnail.mjs",
     "test:exports": "node scripts/verify-package-exports.mjs",
     "test": "npm run test:exports && vitest run --config ../vitest.config.ts",
     "test:update-snapshots": "npm run test:exports && vitest run --config ../vitest.config.ts -u",

@@ -4,61 +4,114 @@ import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from '@pdfme/common';
 import { Form, Viewer } from '@pdfme/ui';
 import {
+  fromKebabCase,
   getFontsData,
   getTemplateById,
   getBlankTemplate,
-  handleLoadTemplate,
+  getDefaultPlaygroundTemplate,
   generatePDF,
   isJsonString,
   translations,
 } from '../helper';
 import { getPlugins } from '../plugins';
+import PlaygroundButton from '../components/PlaygroundButton';
+import ProjectSavedToast from '../components/ProjectSavedToast';
 import { NavItem, NavBar } from '../components/NavBar';
+import {
+  getActivePlaygroundProject,
+  getPlaygroundProject,
+  savePlaygroundProject,
+  type PlaygroundProject,
+} from '../lib/playgroundProjects';
+import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 
 type Mode = 'form' | 'viewer';
 
 function FormAndViewerApp() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
+  const projectRef = useRef<PlaygroundProject | null>(null);
+  const buildIdRef = useRef(0);
+  const currentSourceKeyRef = useRef<string | null>(null);
+  const currentTemplateRef = useRef<Template | null>(null);
+  const currentInputsRef = useRef<Record<string, string>[] | null>(null);
 
   const [mode, setMode] = useState<Mode>((localStorage.getItem('mode') as Mode) ?? 'form');
+  const [projectTitle, setProjectTitle] = useState('Untitled Template');
+
+  const snapshotCurrentUi = useCallback(() => {
+    if (!ui.current) return;
+
+    currentTemplateRef.current = ui.current.getTemplate();
+    currentInputsRef.current = ui.current.getInputs();
+  }, []);
+
+  const destroyCurrentUi = useCallback(() => {
+    if (!ui.current) return;
+
+    snapshotCurrentUi();
+    ui.current.destroy();
+    ui.current = null;
+  }, [snapshotCurrentUi]);
 
   const buildUi = useCallback(
     async (mode: Mode) => {
       if (!uiRef.current) return;
+      const buildId = ++buildIdRef.current;
+
       try {
         let template: Template = getBlankTemplate();
+        let project: PlaygroundProject | null = null;
+        let inputs: Record<string, string>[] | null = null;
         const templateIdFromQuery = searchParams.get('template');
-        searchParams.delete('template');
-        setSearchParams(searchParams, { replace: true });
-        const templateFromLocal = localStorage.getItem('template');
+        const projectIdFromQuery = searchParams.get('project');
+        const sourceKey = projectIdFromQuery
+          ? `project:${projectIdFromQuery}`
+          : templateIdFromQuery
+            ? `template:${templateIdFromQuery}`
+            : 'current-or-default';
 
-        if (templateIdFromQuery) {
+        if (currentSourceKeyRef.current === sourceKey && currentTemplateRef.current) {
+          template = currentTemplateRef.current;
+          inputs = ui.current?.getInputs() ?? currentInputsRef.current;
+          project = projectRef.current;
+        } else if (projectIdFromQuery) {
+          project = getPlaygroundProject(projectIdFromQuery);
+          if (!project) throw new Error('Project not found');
+          template = project.template;
+          inputs = project.inputs;
+        } else if (templateIdFromQuery) {
           const templateJson = await getTemplateById(templateIdFromQuery);
           checkTemplate(templateJson);
           template = templateJson;
-
-          if (!templateFromLocal) {
-            localStorage.setItem('template', JSON.stringify(templateJson));
+          setProjectTitle(fromKebabCase(templateIdFromQuery));
+        } else {
+          project = getActivePlaygroundProject();
+          if (project) {
+            template = project.template;
+            inputs = project.inputs;
+          } else {
+            template = await getDefaultPlaygroundTemplate();
+            setProjectTitle(fromKebabCase('invoice'));
           }
-        } else if (templateFromLocal) {
-          const templateJson = JSON.parse(templateFromLocal) as Template;
-          checkTemplate(templateJson);
-          template = templateJson;
         }
 
-        let inputs = getInputFromTemplate(template);
-        const inputsString = localStorage.getItem('inputs');
-        if (inputsString) {
-          const inputsJson = JSON.parse(inputsString);
-          inputs = inputsJson;
-        }
+        const resolvedInputs = inputs ?? getInputFromTemplate(template);
+
+        if (buildId !== buildIdRef.current || !uiRef.current) return;
+
+        destroyCurrentUi();
+        projectRef.current = project;
+        currentSourceKeyRef.current = sourceKey;
+        currentTemplateRef.current = template;
+        currentInputsRef.current = resolvedInputs;
+        if (project) setProjectTitle(project.title);
 
         ui.current = new (mode === 'form' ? Form : Viewer)({
           domContainer: uiRef.current,
           template,
-          inputs,
+          inputs: resolvedInputs,
           options: {
             font: getFontsData(),
             lang: 'en',
@@ -71,19 +124,20 @@ function FormAndViewerApp() {
           },
           plugins: getPlugins(),
         });
-      } catch {
-        localStorage.removeItem('inputs');
-        localStorage.removeItem('template');
+      } catch (error) {
+        projectRef.current = null;
+        currentSourceKeyRef.current = null;
+        currentTemplateRef.current = null;
+        currentInputsRef.current = null;
+        console.error(error);
       }
     },
-    [searchParams, setSearchParams],
+    [destroyCurrentUi, searchParams],
   );
 
-  const onChangeMode = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value as Mode;
+  const updateMode = (value: Mode) => {
     setMode(value);
     localStorage.setItem('mode', value);
-    buildUi(value);
   };
 
   const onGetInputs = () => {
@@ -106,30 +160,53 @@ function FormAndViewerApp() {
     }
   };
 
-  const onSaveInputs = () => {
-    if (ui.current) {
-      const inputs = ui.current.getInputs();
-      localStorage.setItem('inputs', JSON.stringify(inputs));
-      toast.success('Saved on local storage');
-    }
+  const onSaveInputs = async () => {
+    if (!ui.current) return;
+
+    const currentProject = projectRef.current;
+    const nextInputs = ui.current.getInputs();
+    const nextTemplate = ui.current.getTemplate();
+    const title =
+      currentProject?.title ??
+      window.prompt('Project name', projectTitle || 'Untitled Template') ??
+      '';
+    if (!title.trim()) return;
+
+    const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate, nextInputs).catch(
+      () => currentProject?.thumbnail,
+    );
+    const savedProject = savePlaygroundProject({
+      id: currentProject?.id,
+      inputs: nextInputs,
+      kind: currentProject?.kind ?? 'template',
+      source: currentProject?.source,
+      template: nextTemplate,
+      thumbnail,
+      title,
+    });
+    projectRef.current = savedProject;
+    currentTemplateRef.current = nextTemplate;
+    currentInputsRef.current = nextInputs;
+    setProjectTitle(savedProject.title);
+    toast.success(<ProjectSavedToast title={savedProject.title} />);
   };
 
   const onResetInputs = () => {
-    localStorage.removeItem('inputs');
     if (ui.current) {
       const template = ui.current.getTemplate();
-      ui.current.setInputs(getInputFromTemplate(template));
+      const nextInputs = getInputFromTemplate(template);
+      ui.current.setInputs(nextInputs);
+      currentInputsRef.current = nextInputs;
     }
   };
 
   useEffect(() => {
     buildUi(mode);
     return () => {
-      if (ui.current) {
-        ui.current.destroy();
-      }
+      buildIdRef.current += 1;
+      destroyCurrentUi();
     };
-  }, [mode, uiRef, buildUi]);
+  }, [mode, uiRef, buildUi, destroyCurrentUi]);
 
   const navItems: NavItem[] = [
     {
@@ -152,84 +229,37 @@ function FormAndViewerApp() {
     {
       label: 'Mode',
       content: (
-        <div className="mt-2">
-          <input
-            type="radio"
-            id="form"
-            value="form"
-            checked={mode === 'form'}
-            onChange={onChangeMode}
-          />
-          <label htmlFor="form" className="mr-2">
-            {' '}
-            Form{' '}
-          </label>
-          <input
-            type="radio"
-            id="viewer"
-            value="viewer"
-            checked={mode === 'viewer'}
-            onChange={onChangeMode}
-          />
-          <label htmlFor="viewer"> Viewer </label>
+        <div className="flex gap-1">
+          {(['form', 'viewer'] as const).map((item) => (
+            <PlaygroundButton
+              key={item}
+              variant={mode === item ? 'primary' : 'secondary'}
+              onClick={() => updateMode(item)}
+            >
+              {item === 'form' ? 'Form' : 'Viewer'}
+            </PlaygroundButton>
+          ))}
         </div>
       ),
     },
     {
-      label: 'Load Template',
+      label: 'Inputs',
       content: (
-        <input
-          type="file"
-          accept="application/json"
-          onChange={(e) => handleLoadTemplate(e, ui.current)}
-          className="w-full text-sm border rounded border-gray-300"
-        />
-      ),
-    },
-    {
-      label: '',
-      content: (
-        <div className="flex gap-2">
-          <button
-            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
-            onClick={onGetInputs}
-          >
-            Get Inputs
-          </button>
-          <button
-            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
-            onClick={onSetInputs}
-          >
-            Set Inputs
-          </button>
+        <div className="flex gap-1">
+          <PlaygroundButton onClick={onGetInputs}>Get</PlaygroundButton>
+          <PlaygroundButton onClick={onSetInputs}>Set</PlaygroundButton>
+          <PlaygroundButton onClick={() => void onSaveInputs()}>
+            Save
+          </PlaygroundButton>
+          <PlaygroundButton onClick={onResetInputs}>Reset</PlaygroundButton>
         </div>
       ),
     },
     {
-      label: '',
+      label: 'Output',
       content: (
-        <div className="flex gap-2">
-          <button
-            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
-            onClick={onSaveInputs}
-          >
-            Save Inputs
-          </button>
-          <button
-            className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
-            onClick={onResetInputs}
-          >
-            Reset Inputs
-          </button>
-        </div>
-      ),
-    },
-    {
-      label: '',
-      content: (
-        <button
+        <PlaygroundButton
           id="generate-pdf"
-          className="px-2 py-1 border rounded hover:bg-gray-100 border-gray-300"
           onClick={async (e) => {
             const output = e.altKey ? 'form' : 'pdf';
             const startTimer = performance.now();
@@ -243,7 +273,7 @@ function FormAndViewerApp() {
           }}
         >
           Generate PDF
-        </button>
+        </PlaygroundButton>
       ),
     },
   ];

@@ -1,16 +1,24 @@
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { checkTemplate, type Template } from '@pdfme/common';
 import type { RenderResult } from '@pdfme/jsx';
-import { Form, Viewer } from '@pdfme/ui';
-import { Download, ExternalLink, PencilRuler } from 'lucide-react';
+import { Viewer } from '@pdfme/ui';
+import { Download, ExternalLink, PencilRuler, Save } from 'lucide-react';
 import { toast } from 'react-toastify';
 import CodeEditor from '../components/CodeEditor';
+import PlaygroundButton from '../components/PlaygroundButton';
+import ProjectSavedToast from '../components/ProjectSavedToast';
 import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
 import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
+import {
+  getPlaygroundProject,
+  savePlaygroundProject,
+  type PlaygroundProject,
+} from '../lib/playgroundProjects';
+import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
 const JSX_EDITOR_PATH = 'file:///jsx-playground.tsx';
@@ -35,18 +43,8 @@ type PendingRender = {
   timeoutId: number;
 };
 
-type PreviewMode = 'viewer' | 'form';
-
-type PreviewInstance = {
-  mode: PreviewMode;
-  ui: Form | Viewer;
-};
-
 const getErrorMessage = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
-
-const generatedTemplateButtonClassName =
-  'inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3';
 
 const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
   const typeScriptLanguage = monaco.languages.typescript;
@@ -91,15 +89,20 @@ declare function PageBreak(props?: Record<string, unknown>): unknown;
 
 export default function JsxPlayground() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pageRootRef = useRef<HTMLElement | null>(null);
   const previewRootRef = useRef<HTMLDivElement | null>(null);
-  const previewRef = useRef<PreviewInstance | null>(null);
+  const previewRef = useRef<Viewer | null>(null);
   const inputsRef = useRef<Record<string, string>[]>([{}]);
+  const projectRef = useRef<PlaygroundProject | null>(null);
+  const savedInputsForSourceRef = useRef<{
+    inputs: Record<string, string>[];
+    source: string;
+  } | null>(null);
   const renderWorkerRef = useRef<Worker | null>(null);
   const pendingRenderRef = useRef<PendingRender | null>(null);
   const nextRenderRequestIdRef = useRef(0);
   const [selectedPresetId, setSelectedPresetId] = useState(jsxPlaygroundPresets[0]?.id ?? '');
-  const [previewMode, setPreviewMode] = useState<PreviewMode>('viewer');
   const [source, setSource] = useState(initialJsx);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
@@ -108,9 +111,56 @@ export default function JsxPlayground() {
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [previewRefreshKey, setPreviewRefreshKey] = useState(0);
-  const selectedPreset =
-    jsxPlaygroundPresets.find((preset) => preset.id === selectedPresetId) ??
-    jsxPlaygroundPresets[0];
+  const selectedPreset = jsxPlaygroundPresets.find((preset) => preset.id === selectedPresetId);
+  const sourceTitle = projectRef.current?.title ?? selectedPreset?.label ?? 'Custom JSX';
+
+  useEffect(() => {
+    const projectId = searchParams.get('project');
+    const presetId = searchParams.get('preset');
+    if (!projectId && !presetId) return;
+
+    const consumeQuery = () => {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      nextSearchParams.delete('project');
+      nextSearchParams.delete('preset');
+      setSearchParams(nextSearchParams, { replace: true });
+    };
+
+    if (projectId) {
+      const project = getPlaygroundProject(projectId);
+      if (!project || project.kind !== 'jsx' || !project.source) {
+        toast.error('JSX project not found');
+        return;
+      }
+
+      consumeQuery();
+      projectRef.current = project;
+      savedInputsForSourceRef.current = {
+        inputs: project.inputs,
+        source: project.source.content,
+      };
+      setSelectedPresetId(project.source.presetId ?? '');
+      setSource(project.source.content);
+      setTemplate(project.template);
+      setInputs(project.inputs);
+      inputsRef.current = project.inputs;
+      return;
+    }
+
+    const preset = jsxPlaygroundPresets.find((item) => item.id === presetId);
+    if (!preset) {
+      toast.error('JSX starter not found');
+      return;
+    }
+
+    consumeQuery();
+    projectRef.current = null;
+    savedInputsForSourceRef.current = null;
+    setSelectedPresetId(preset.id);
+    setSource(preset.source);
+    setError(null);
+    setPdfDuration(null);
+  }, [searchParams, setSearchParams]);
 
   const terminateRenderWorker = useCallback(() => {
     renderWorkerRef.current?.terminate();
@@ -186,9 +236,12 @@ export default function JsxPlayground() {
       try {
         const result = await renderJsxSourceInWorker(source);
         if (cancelled) return;
+        const savedInputsForSource = savedInputsForSourceRef.current;
+        const nextInputs =
+          savedInputsForSource?.source === source ? savedInputsForSource.inputs : result.inputs;
         setTemplate(result.template);
-        setInputs(result.inputs);
-        inputsRef.current = result.inputs;
+        setInputs(nextInputs);
+        inputsRef.current = nextInputs;
         setRenderDuration(Math.round(performance.now() - startTimer));
         setError(null);
       } catch (err) {
@@ -209,19 +262,12 @@ export default function JsxPlayground() {
     const currentInputs = inputsRef.current;
 
     try {
-      if (previewRef.current && previewRef.current.mode !== previewMode) {
-        previewRef.current.ui.destroy();
-        previewRef.current = null;
-      }
-
       if (previewRef.current) {
-        previewRef.current.ui.updateTemplate(template);
-        previewRef.current.ui.setInputs(currentInputs);
+        previewRef.current.updateTemplate(template);
+        previewRef.current.setInputs(currentInputs);
       } else {
-        const Ui = previewMode === 'form' ? Form : Viewer;
-        const ui = new Ui({
+        previewRef.current = new Viewer({
           domContainer: previewRootRef.current,
-          template,
           inputs: currentInputs,
           options: {
             font: getFontsData(),
@@ -233,54 +279,19 @@ export default function JsxPlayground() {
             },
           },
           plugins: getPlugins(),
+          template,
         });
-
-        if (previewMode === 'form') {
-          (ui as Form).onChangeInput(({ index, name, value }) => {
-            const nextValue = value as string | undefined;
-            setInputs((previousInputs) => {
-              const previousInput = previousInputs[index] ?? {};
-              if (nextValue === undefined && !(name in previousInput)) return previousInputs;
-              if (previousInput[name] === nextValue) return previousInputs;
-
-              const nextInputs = [...previousInputs];
-              const nextInput = { ...previousInput };
-              if (nextValue === undefined) {
-                delete nextInput[name];
-              } else {
-                nextInput[name] = nextValue;
-              }
-              nextInputs[index] = nextInput;
-              inputsRef.current = nextInputs;
-              return nextInputs;
-            });
-          });
-        }
-
-        previewRef.current = { mode: previewMode, ui };
       }
     } catch (err) {
       setError(getErrorMessage(err));
     }
-  }, [template, previewMode, previewRefreshKey]);
-
-  useEffect(() => {
-    if (previewMode !== 'viewer' || !previewRef.current || previewRef.current.mode !== 'viewer') {
-      return;
-    }
-
-    try {
-      previewRef.current.ui.setInputs(inputs);
-    } catch (err) {
-      setError(getErrorMessage(err));
-    }
-  }, [inputs, previewMode]);
+  }, [inputs, template, previewRefreshKey]);
 
   const refreshCollapsedPreview = useCallback(() => {
     const preview = previewRef.current;
     if (!preview) return;
 
-    preview.ui.destroy();
+    preview.destroy();
     previewRef.current = null;
     setPreviewRefreshKey((key) => key + 1);
   }, []);
@@ -296,7 +307,7 @@ export default function JsxPlayground() {
     return () => {
       clearPendingRender(new Error('JSX render cancelled.'));
       terminateRenderWorker();
-      previewRef.current?.ui.destroy();
+      previewRef.current?.destroy();
       previewRef.current = null;
     };
   }, [clearPendingRender, terminateRenderWorker]);
@@ -307,7 +318,7 @@ export default function JsxPlayground() {
     const startTimer = performance.now();
     setIsGeneratingPdf(true);
     try {
-      await generatePDF(previewRef.current?.ui ?? null);
+      await generatePDF(previewRef.current);
       const duration = Math.round(performance.now() - startTimer);
       setPdfDuration(duration);
       toast.info(`Generated PDF in ${duration}ms`);
@@ -323,39 +334,65 @@ export default function JsxPlayground() {
     downloadJsonFile(template, 'jsx-template');
   };
 
-  const onOpenDesigner = () => {
-    if (!template) return;
+  const saveCurrentProject = async (title?: string) => {
+    if (!template) return null;
 
+    const projectTitle =
+      title ??
+      projectRef.current?.title ??
+      window.prompt('Project name', `JSX - ${sourceTitle}`) ??
+      '';
+    if (!projectTitle.trim()) return null;
+
+    const thumbnail = await createTemplateThumbnailDataUrl(template, inputsRef.current).catch(
+      () => projectRef.current?.thumbnail,
+    );
+    const savedProject = savePlaygroundProject({
+      id: projectRef.current?.id,
+      inputs: inputsRef.current,
+      kind: 'jsx',
+      source: {
+        content: source,
+        language: 'jsx',
+        presetId: selectedPresetId,
+        route: '/jsx',
+      },
+      template,
+      thumbnail,
+      title: projectTitle,
+    });
+    projectRef.current = savedProject;
+    savedInputsForSourceRef.current = {
+      inputs: savedProject.inputs,
+      source,
+    };
+    return savedProject;
+  };
+
+  const onSaveProject = async () => {
     try {
       checkTemplate(template);
-      const serializedTemplate = JSON.stringify(template);
-      const savedTemplate = localStorage.getItem('template');
-      if (
-        savedTemplate &&
-        savedTemplate !== serializedTemplate &&
-        !window.confirm(
-          'Opening Designer will replace the template saved in local storage. Continue?',
-        )
-      ) {
-        return;
-      }
-
-      localStorage.setItem('template', serializedTemplate);
-      localStorage.removeItem('inputs');
-      toast.success('Saved generated template — opening Designer');
-      navigate('/designer');
+      const savedProject = await saveCurrentProject();
+      if (savedProject) toast.success(<ProjectSavedToast title={savedProject.title} />);
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
   };
 
-  const onChangePreset = (event: ChangeEvent<HTMLSelectElement>) => {
-    const preset = jsxPlaygroundPresets.find((item) => item.id === event.target.value);
-    if (!preset) return;
-    setSelectedPresetId(preset.id);
-    setSource(preset.source);
-    setError(null);
-    setPdfDuration(null);
+  const onOpenDesigner = async () => {
+    if (!template) return;
+
+    try {
+      checkTemplate(template);
+      const savedProject = await saveCurrentProject(
+        projectRef.current?.title ?? `JSX - ${sourceTitle}`,
+      );
+      if (!savedProject) return;
+      toast.success(`Saved "${savedProject.title}" — opening Designer`);
+      navigate(`/designer?project=${encodeURIComponent(savedProject.id)}`);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
   };
 
   return (
@@ -377,51 +414,40 @@ export default function JsxPlayground() {
               <ExternalLink className="size-3" />
             </a>
           </div>
-          <p className="mt-1 break-words text-xs text-gray-500">{selectedPreset?.description}</p>
+          <p className="mt-1 break-words text-xs text-gray-500">
+            {sourceTitle}
+            {selectedPreset?.description ? ` - ${selectedPreset.description}` : ''}
+          </p>
           <p className="mt-1 break-words text-xs text-gray-500">
             Write a JSX function body that returns a pdfme Document or Page nodes. Imports are
             intentionally disabled in this beta playground.
           </p>
         </div>
         <div className="grid w-full min-w-0 grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:items-center sm:pl-4">
-          <select
-            aria-label="JSX preset"
-            value={selectedPresetId}
-            onChange={onChangePreset}
-            className="col-span-2 max-w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-700 sm:col-span-1 sm:min-w-40"
-          >
-            {jsxPlaygroundPresets.map((preset) => (
-              <option key={preset.id} value={preset.id}>
-                {preset.label}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            disabled={!template || Boolean(error)}
-            onClick={onDownloadTemplate}
-            className={generatedTemplateButtonClassName}
-          >
+          <PlaygroundButton disabled={!template || Boolean(error)} onClick={onDownloadTemplate}>
             <Download className="size-4" />
             Template JSON
-          </button>
-          <button
-            type="button"
+          </PlaygroundButton>
+          <PlaygroundButton
             disabled={!template || Boolean(error)}
-            onClick={onOpenDesigner}
-            className={generatedTemplateButtonClassName}
+            onClick={() => void onSaveProject()}
+          >
+            <Save className="size-4" />
+            Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
+            disabled={!template || Boolean(error)}
+            onClick={() => void onOpenDesigner()}
           >
             <PencilRuler className="size-4" />
             Open Designer
-          </button>
-          <button
-            type="button"
+          </PlaygroundButton>
+          <PlaygroundButton
             disabled={!template || Boolean(error) || isGeneratingPdf}
             onClick={onGeneratePdf}
-            className="min-w-0 whitespace-nowrap rounded border border-gray-300 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3"
           >
             {isGeneratingPdf ? 'Generating...' : 'Generate PDF'}
-          </button>
+          </PlaygroundButton>
         </div>
       </div>
       <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-900">
@@ -445,25 +471,7 @@ export default function JsxPlayground() {
         </section>
         <section className="flex min-h-[44rem] min-w-0 flex-col bg-gray-100 lg:min-h-0">
           <div className="flex flex-col gap-2 border-b border-gray-200 bg-white px-4 py-2 text-xs font-medium uppercase tracking-wide text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <span>{previewMode === 'form' ? 'Form' : 'Viewer'}</span>
-              <div className="inline-flex overflow-hidden rounded border border-gray-300 normal-case tracking-normal">
-                {(['viewer', 'form'] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    type="button"
-                    onClick={() => setPreviewMode(mode)}
-                    className={`px-2 py-1 text-xs ${
-                      previewMode === mode
-                        ? 'bg-green-50 text-green-700'
-                        : 'bg-white text-gray-600 hover:bg-gray-50'
-                    }`}
-                  >
-                    {mode === 'form' ? 'Form' : 'Viewer'}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <span>Viewer</span>
             <div className="flex items-center gap-3 normal-case tracking-normal">
               {renderDuration !== null && <span>render {renderDuration}ms</span>}
               {pdfDuration !== null && <span>pdf {pdfDuration}ms</span>}

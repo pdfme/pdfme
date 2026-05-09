@@ -1,9 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardCopy } from 'lucide-react';
+import { checkTemplate, getInputFromTemplate, type Template } from '@pdfme/common';
+import {
+  Code2,
+  Download,
+  Eye,
+  FileText,
+  PencilRuler,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 import { toast } from 'react-toastify';
-import { fromKebabCase } from '../helper';
-import ExternalButton from '../components/ExternalButton';
+import { downloadJsonFile, fromKebabCase, readFile } from '../helper';
+import PlaygroundButton from '../components/PlaygroundButton';
+import { jsxPlaygroundPresets } from './jsxPlaygroundExamples';
+import { md2PdfPresets } from './md2PdfPresets';
+import {
+  deletePlaygroundProject,
+  getProjectAuthoringPath,
+  getProjectKindLabel,
+  readPlaygroundProjects,
+  savePlaygroundProject,
+  setActivePlaygroundProjectId,
+  setPlaygroundProjectThumbnail,
+  type PlaygroundProject,
+} from '../lib/playgroundProjects';
+import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 
 declare global {
   interface Window {
@@ -17,79 +39,181 @@ declare global {
 type TemplateData = {
   name: string;
   author: string;
+  basePdfKind?: string;
+  description?: string;
+  fieldCount?: number;
+  fontNames?: string[];
+  hasCJK?: boolean;
+  pageCount?: number;
+  schemaTypes?: string[];
+  sourceKind?: Exclude<GenerationFilter, 'all'>;
+  tags?: string[];
+  title?: string;
 };
 
 type UIType = 'designer' | 'form-viewer';
+type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf';
+
+type AuthoringPreset = {
+  assetName: string;
+  id: string;
+  kind: 'jsx' | 'md2pdf';
+};
 
 // Constants
 const DEVIN_AI_AUTHOR = 'Devin AI';
 const DEVIN_INVITE_URL = 'https://app.devin.ai/invite/KyOTXVPrlFl2TjcT';
+const authoringPresets: AuthoringPreset[] = [
+  ...jsxPlaygroundPresets.map(({ id }) => ({
+    assetName: `jsx-${id}`,
+    id,
+    kind: 'jsx' as const,
+  })),
+  ...md2PdfPresets.map(({ id }) => ({
+    assetName: `md2pdf-${id}`,
+    id,
+    kind: 'md2pdf' as const,
+  })),
+];
+const authoringPresetByAssetName = new Map(
+  authoringPresets.map((preset) => [preset.assetName, preset]),
+);
 
-const CopyButton = ({ ui, name }: { ui: UIType; name: string }) => {
-  const handleCopy = async () => {
-    const shareableUrl = `https://pdfme.com/template-design?ui=${ui}&template=${name}`;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(shareableUrl);
-      } else {
-        const textArea = document.createElement('textarea');
-        textArea.value = shareableUrl;
-        textArea.style.position = 'fixed';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        if (!document.execCommand('copy')) {
-          throw new Error('Fallback: Copying text command was unsuccessful');
-        }
-        document.body.removeChild(textArea);
-      }
-      toast.info(`Copied shareable link to clipboard - "${fromKebabCase(name)}"`);
-    } catch (error) {
-      toast.error('Failed to copy shareable link');
-      console.error('Copy failed:', error);
-    }
-  };
+const tagSortOrder = [
+  'Invoice',
+  'Quote',
+  'Business',
+  'Form',
+  'Report',
+  'Markdown',
+  'CJK',
+  'Certificate',
+  'Labels',
+  'QR',
+  'Table',
+  'Visual',
+  'Image',
+  'MVT',
+  'Government',
+  'Brochure',
+  'Blank',
+];
 
-  return (
-    <button
-      className="rounded-md border border-transparent bg-gray-100 p-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
-      onClick={handleCopy}
-      aria-label="Copy shareable link"
-    >
-      <ClipboardCopy size={20} />
-    </button>
-  );
+const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
+  { label: 'All', value: 'all' },
+  { label: 'Designer', value: 'designer' },
+  { label: 'JSX', value: 'jsx' },
+  { label: 'md2pdf', value: 'md2pdf' },
+];
+
+const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
+  template.sourceKind ?? authoringPresetByAssetName.get(template.name)?.kind ?? 'designer';
+
+const getTemplateTags = (template: TemplateData) => {
+  const tags = new Set(template.tags ?? []);
+
+  return [...tags].sort((a, b) => {
+    const aIndex = tagSortOrder.indexOf(a);
+    const bIndex = tagSortOrder.indexOf(b);
+    if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+    if (aIndex !== -1) return -1;
+    if (bIndex !== -1) return 1;
+    return a.localeCompare(b);
+  });
 };
 
-// Contribution card component
-const ContributionCard = () => (
-  <div className="flex items-center justify-center">
-    <div className="relative border-2 border-green-300 rounded-lg p-6 bg-green-50 shadow-md">
-      <div className="relative mt-4">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://pdfme.com/docs/template-contribution-guide"
-          className="text-md font-extrabold text-green-700 underline decoration-green-400 hover:text-green-600 hover:decoration-green-500 transition duration-300"
-        >
-          Contribute Your Template ❤️
-        </a>
-        <p className="mt-2 text-sm text-green-800 flex items-center gap-2 font-medium">
-          Share the templates you've created! Contributing your templates is extremely beneficial
-          for other users.
-        </p>
-      </div>
-      <div className="mt-6">
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://pdfme.com/docs/template-contribution-guide"
-          className="w-full relative flex items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-green-600 px-8 py-3 text-sm font-semibold text-white hover:opacity-90 transition duration-300"
-        >
-          See Contribution Guide
-        </a>
-      </div>
+const ThumbnailImage = ({ alt, src }: { alt: string; src?: string }) =>
+  src ? (
+    <img alt={alt} src={src} className="h-72 w-full object-contain" />
+  ) : (
+    <div className="flex h-72 w-full items-center justify-center bg-gray-100 p-4 text-center text-xs text-gray-500">
+      Creating thumbnail...
     </div>
+  );
+
+const ProjectThumbnailImage = ({
+  onCreated,
+  project,
+}: {
+  onCreated: () => void;
+  project: PlaygroundProject;
+}) => {
+  const [src, setSrc] = useState(project.thumbnail);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSrc(project.thumbnail);
+    setError(null);
+    if (project.thumbnail) return;
+
+    let cancelled = false;
+    void createTemplateThumbnailDataUrl(project.template, project.inputs)
+      .then((thumbnail) => {
+        if (cancelled) return;
+        setSrc(thumbnail);
+        setPlaygroundProjectThumbnail(project.id, thumbnail);
+        onCreated();
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to create thumbnail');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [onCreated, project]);
+
+  if (error) {
+    return (
+      <div className="flex h-72 w-full items-center justify-center bg-red-50 p-4 text-center text-xs text-red-700">
+        {error}
+      </div>
+    );
+  }
+
+  return <ThumbnailImage alt={project.title} src={src} />;
+};
+
+const GalleryCard = ({
+  actions,
+  description,
+  tags = [],
+  tag,
+  thumbnail,
+  title,
+}: {
+  actions: React.ReactNode;
+  description: React.ReactNode;
+  tags?: string[];
+  tag: string;
+  thumbnail: React.ReactNode;
+  title: string;
+}) => (
+  <div className="relative flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="relative overflow-hidden rounded border border-gray-100 bg-gray-100">
+      {thumbnail}
+      <span className="absolute left-2 top-2 rounded bg-white/95 px-2 py-1 text-xs font-semibold uppercase tracking-wide text-green-700 shadow-sm">
+        {tag}
+      </span>
+    </div>
+    <div className="mt-4 min-w-0 flex-1">
+      <h3 className="truncate text-base font-bold text-gray-900">{title}</h3>
+      <div className="mt-2 text-sm text-gray-600">{description}</div>
+      {tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {tags.map((item) => (
+            <span
+              key={item}
+              className="rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+    <div className="mt-4">{actions}</div>
   </div>
 );
 
@@ -120,11 +244,57 @@ const AuthorLink = ({ author }: { author: string }) => {
   );
 };
 
-function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
+function TemplatesApp() {
   const navigate = useNavigate();
+  const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
+  const [projects, setProjects] = useState<PlaygroundProject[]>([]);
+  const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
+  const [tagFilter, setTagFilter] = useState('all');
+
+  const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+
+  const tagOptions = useMemo(() => {
+    const tags = new Set<string>();
+    templates.forEach((template) => getTemplateTags(template).forEach((tag) => tags.add(tag)));
+
+    return [...tags].sort((a, b) => {
+      const aIndex = tagSortOrder.indexOf(a);
+      const bIndex = tagSortOrder.indexOf(b);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }, [templates]);
+
+  const filteredTemplates = useMemo(
+    () =>
+      templates.filter((template) => {
+        const generation = getTemplateGeneration(template);
+        if (generationFilter !== 'all' && generation !== generationFilter) {
+          return false;
+        }
+
+        return tagFilter === 'all' || getTemplateTags(template).includes(tagFilter);
+      }),
+    [generationFilter, tagFilter, templates],
+  );
+
+  const hasActiveTemplateFilter = generationFilter !== 'all' || tagFilter !== 'all';
+
+  const clearTemplateFilters = () => {
+    setGenerationFilter('all');
+    setTagFilter('all');
+  };
+
+  useEffect(() => {
+    refreshProjects();
+    window.addEventListener('focus', refreshProjects);
+    return () => window.removeEventListener('focus', refreshProjects);
+  }, [refreshProjects]);
 
   // Fetch templates and author avatars
   useEffect(() => {
@@ -166,92 +336,305 @@ function TemplatesApp({ isEmbedded }: { isEmbedded: boolean }) {
 
   // Unified navigation function
   const navigateTo = (name: string, ui: UIType) => {
-    if (isEmbedded) {
-      window.parent.postMessage({ type: 'navigate', payload: { name, ui } }, '*');
-    } else {
-      const path = ui === 'designer' ? '/' : '/form-viewer';
-      navigate(`${path}?template=${name}`);
+    const path = ui === 'designer' ? '/designer' : '/form-viewer';
+    navigate(`${path}?template=${name}`);
+  };
+
+  const navigateToProject = (project: PlaygroundProject, target: UIType | 'source') => {
+    setActivePlaygroundProjectId(project.id);
+    if (target === 'source') {
+      navigate(getProjectAuthoringPath(project));
+      return;
     }
+
+    const path = target === 'designer' ? '/designer' : '/form-viewer';
+    navigate(`${path}?project=${encodeURIComponent(project.id)}`);
+  };
+
+  const navigateToAuthoringPreset = (preset: AuthoringPreset) => {
+    const route = preset.kind === 'jsx' ? '/jsx' : '/md2pdf';
+    navigate(`${route}?preset=${encodeURIComponent(preset.id)}`);
+  };
+
+  const onImportTemplateJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const rawJson = await readFile(file, 'text');
+      const template = JSON.parse(rawJson as string) as Template;
+      checkTemplate(template);
+
+      const title = file.name.replace(/\.json$/i, '').trim() || 'Imported Template';
+      const inputs = getInputFromTemplate(template);
+      const thumbnail = await createTemplateThumbnailDataUrl(template, inputs).catch(
+        () => undefined,
+      );
+      const project = savePlaygroundProject({
+        inputs,
+        kind: 'template',
+        template,
+        thumbnail,
+        title,
+      });
+      refreshProjects();
+      toast.success(`Imported "${project.title}" into My Workspace`);
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : 'Invalid template JSON');
+    }
+  };
+
+  const onDeleteProject = (project: PlaygroundProject) => {
+    if (!window.confirm(`Delete "${project.title}" from this browser?`)) return;
+    deletePlaygroundProject(project.id);
+    refreshProjects();
+    toast.info(`Deleted "${project.title}"`);
+  };
+
+  const onDownloadProjectTemplate = (project: PlaygroundProject) => {
+    const fileName = project.title.trim().replace(/[\\/:*?"<>|]+/g, '-') || 'template';
+    downloadJsonFile(project.template, fileName);
   };
 
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
-        <h2 className="text-2xl font-bold text-gray-900">Sample Templates</h2>
-        <div className="lg:flex items-center border-b border-dashed border-gray-200 pb-2">
-          <p className="mt-4 text-md text-gray-600">
-            If you can't find the template you need, you can request it on Github.
-          </p>
-          <div className="mt-4 ml-auto">
-            {React.createElement(ExternalButton, {
-              href: 'https://github.com/pdfme/pdfme/issues/new?template=template_request.yml&title=TEMPLATE_NAME',
-              title: 'Request a Template',
-            })}
+        <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
+              <p className="mt-2 max-w-3xl text-sm text-green-900">
+                Save templates from Designer, JSX, or md2pdf as local projects. A project keeps the
+                generated template, inputs, and source when available.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <PlaygroundButton
+                onClick={() => importTemplateInputRef.current?.click()}
+                variant="secondary"
+              >
+                <Upload className="size-4" />
+                Import Template JSON
+              </PlaygroundButton>
+              <input
+                ref={importTemplateInputRef}
+                type="file"
+                accept="application/json"
+                className="sr-only"
+                onChange={onImportTemplateJson}
+              />
+              <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
+                <PencilRuler className="size-4" />
+                New Template
+              </PlaygroundButton>
+            </div>
           </div>
-        </div>
-        <div className="mt-8 grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-          {templates.map(({ name, author }, index) => (
-            <React.Fragment key={name}>
-              {index === 3 && (
-                <div
-                  data-ea-publisher="pdfmecom"
-                  data-ea-type="image"
-                  style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-                />
-              )}
-              <div>
-                <div className="relative border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
-                  <div className="relative h-72 w-full overflow-hidden">
-                    <img
-                      id={`template-img-${name}`}
-                      onClick={() => navigateTo(name, 'designer')}
-                      alt={fromKebabCase(name)}
-                      src={`/template-assets/${name}/thumbnail.png`}
-                      className="border border-gray-100 size-full object-contain cursor-pointer"
-                    />
-                  </div>
-                  <div className="relative mt-4">
-                    <h3 className="text-md font-bold text-green-600">{fromKebabCase(name)}</h3>
-                    <p className="mt-1 text-sm text-gray-600 flex items-center gap-2">
-                      by{' '}
-                      {avatarUrlMap[author] && (
-                        <img
-                          src={avatarUrlMap[author]}
-                          alt={author}
-                          className="inline-block w-10 h-10 rounded-full bg-gray-100"
-                        />
-                      )}
-                      <AuthorLink author={author} />
+          {projects.length > 0 ? (
+            <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+              {projects.map((project) => (
+                <GalleryCard
+                  key={project.id}
+                  tag={getProjectKindLabel(project.kind)}
+                  title={project.title}
+                  description={
+                    <p className="text-xs text-gray-500">
+                      Updated {new Date(project.updatedAt).toLocaleString()}
                     </p>
-                  </div>
-                  <div className="mt-6">
-                    <div className="flex gap-1 items-center">
-                      <button
-                        onClick={() => navigateTo(name, 'designer')}
-                        className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                  }
+                  thumbnail={
+                    <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
+                  }
+                  actions={
+                    <div className="grid grid-cols-2 gap-2">
+                      {project.source && (
+                        <PlaygroundButton onClick={() => navigateToProject(project, 'source')}>
+                          <Code2 className="size-4" />
+                          Source
+                        </PlaygroundButton>
+                      )}
+                      <PlaygroundButton onClick={() => navigateToProject(project, 'designer')}>
+                        <PencilRuler className="size-4" />
+                        Designer
+                      </PlaygroundButton>
+                      <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
+                        <Eye className="size-4" />
+                        Form/Viewer
+                      </PlaygroundButton>
+                      <PlaygroundButton onClick={() => onDownloadProjectTemplate(project)}>
+                        <Download className="size-4" />
+                        Template JSON
+                      </PlaygroundButton>
+                      <PlaygroundButton
+                        onClick={() => onDeleteProject(project)}
+                        variant="danger"
+                        aria-label={`Delete ${project.title}`}
                       >
-                        Go to Designer
-                      </button>
-                      <CopyButton ui="designer" name={name} />
+                        <Trash2 className="size-4" />
+                        Delete
+                      </PlaygroundButton>
                     </div>
-                  </div>
-                  <div className="mt-3">
-                    <div className="flex gap-1 items-center">
-                      <button
-                        onClick={() => navigateTo(name, 'form-viewer')}
-                        className="w-full relative flex items-center justify-center rounded-md border border-transparent bg-gray-100 px-8 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200"
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+              No local projects yet. Start from a sample, JSX, md2pdf, or a blank Designer template.
+            </div>
+          )}
+        </div>
+        <section>
+          <div className="border-b border-dashed border-gray-200 pb-2">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Templates</h2>
+              <p className="mt-2 max-w-3xl text-sm text-gray-600">
+                Choose a Designer sample, JSX starter, or md2pdf starter from the same gallery.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0 flex-1 space-y-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <span className="w-24 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Type
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {generationFilters.map((filter) => (
+                      <PlaygroundButton
+                        key={filter.value}
+                        className="px-2 py-1 text-xs sm:px-2"
+                        variant={generationFilter === filter.value ? 'primary' : 'secondary'}
+                        onClick={() => setGenerationFilter(filter.value)}
                       >
-                        Go to Form/Viewer
-                      </button>
-                      <CopyButton ui="form-viewer" name={name} />
-                    </div>
+                        {filter.label}
+                      </PlaygroundButton>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                  <span className="w-24 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Tags
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <PlaygroundButton
+                      className="px-2 py-1 text-xs sm:px-2"
+                      variant={tagFilter === 'all' ? 'primary' : 'secondary'}
+                      onClick={() => setTagFilter('all')}
+                    >
+                      All
+                    </PlaygroundButton>
+                    {tagOptions.map((tag) => (
+                      <PlaygroundButton
+                        key={tag}
+                        className="px-2 py-1 text-xs sm:px-2"
+                        variant={tagFilter === tag ? 'primary' : 'secondary'}
+                        onClick={() => setTagFilter(tag)}
+                      >
+                        {tag}
+                      </PlaygroundButton>
+                    ))}
                   </div>
                 </div>
               </div>
-            </React.Fragment>
-          ))}
-          <ContributionCard />
-        </div>
+              {hasActiveTemplateFilter && (
+                <PlaygroundButton variant="ghost" onClick={clearTemplateFilters}>
+                  Clear
+                </PlaygroundButton>
+              )}
+            </div>
+          </div>
+          <div className="mt-8 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+            {filteredTemplates.map((template, index) => {
+              const { name, author } = template;
+              const authoringPreset = authoringPresetByAssetName.get(name);
+              const title = template.title ?? fromKebabCase(name);
+              const generation = getTemplateGeneration(template);
+              const tag =
+                generation === 'jsx' ? 'JSX' : generation === 'md2pdf' ? 'md2pdf' : 'Designer';
+              const Icon = generation === 'md2pdf' ? FileText : Code2;
+              const tags = getTemplateTags(template);
+
+              return (
+                <React.Fragment key={name}>
+                  {index === 3 && (
+                    <div
+                      data-ea-publisher="pdfmecom"
+                      data-ea-type="image"
+                      style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                    />
+                  )}
+                  <GalleryCard
+                    tag={tag}
+                    title={title}
+                    tags={tags}
+                    description={
+                      <div className="space-y-3">
+                        <p>{template.description ?? 'A ready-to-edit pdfme sample template.'}</p>
+                        <p className="flex items-center gap-2 text-xs text-gray-500">
+                          by{' '}
+                          {avatarUrlMap[author] && (
+                            <img
+                              src={avatarUrlMap[author]}
+                              alt={author}
+                              className="inline-block size-7 rounded-full bg-gray-100"
+                            />
+                          )}
+                          <AuthorLink author={author} />
+                        </p>
+                      </div>
+                    }
+                    thumbnail={
+                      <img
+                        id={`template-img-${name}`}
+                        onClick={() =>
+                          authoringPreset
+                            ? navigateToAuthoringPreset(authoringPreset)
+                            : navigateTo(name, 'designer')
+                        }
+                        alt={title}
+                        src={`/template-assets/${name}/thumbnail.png`}
+                        className="h-72 w-full cursor-pointer object-contain"
+                      />
+                    }
+                    actions={
+                      authoringPreset ? (
+                        <PlaygroundButton
+                          fullWidth
+                          onClick={() => navigateToAuthoringPreset(authoringPreset)}
+                        >
+                          <Icon className="size-4" />
+                          Open Starter
+                        </PlaygroundButton>
+                      ) : (
+                        <div className="space-y-2">
+                          <PlaygroundButton fullWidth onClick={() => navigateTo(name, 'designer')}>
+                            <PencilRuler className="size-4" />
+                            Designer
+                          </PlaygroundButton>
+                          <PlaygroundButton
+                            fullWidth
+                            onClick={() => navigateTo(name, 'form-viewer')}
+                          >
+                            <Eye className="size-4" />
+                            Form/Viewer
+                          </PlaygroundButton>
+                        </div>
+                      )
+                    }
+                  />
+                </React.Fragment>
+              );
+            })}
+            {filteredTemplates.length === 0 && (
+              <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-sm text-gray-600 sm:col-span-2 lg:col-span-4">
+                No templates match the selected filters.
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

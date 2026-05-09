@@ -5,12 +5,17 @@ export interface ExampleManifestEntry {
   author: string;
   path: string;
   thumbnailPath: string;
+  description?: string;
+  order?: number;
   pageCount: number;
   fieldCount: number;
   schemaTypes: string[];
   fontNames: string[];
   hasCJK: boolean;
   basePdfKind: string;
+  sourceKind?: string;
+  tags?: string[];
+  title?: string;
 }
 
 export interface ExampleManifest {
@@ -155,6 +160,10 @@ function normalizeEntries(rawTemplates: unknown[]): ExampleManifestEntry[] {
           typeof entry.thumbnailPath === 'string' && entry.thumbnailPath.length > 0
             ? entry.thumbnailPath
             : `${name}/thumbnail.png`,
+        ...(typeof entry.description === 'string' ? { description: entry.description } : {}),
+        ...(typeof entry.order === 'number' && Number.isFinite(entry.order)
+          ? { order: entry.order }
+          : {}),
         pageCount:
           typeof entry.pageCount === 'number' && Number.isFinite(entry.pageCount)
             ? entry.pageCount
@@ -170,6 +179,9 @@ function normalizeEntries(rawTemplates: unknown[]): ExampleManifestEntry[] {
           typeof entry.basePdfKind === 'string' && entry.basePdfKind.length > 0
             ? entry.basePdfKind
             : 'unknown',
+        ...(typeof entry.sourceKind === 'string' ? { sourceKind: entry.sourceKind } : {}),
+        ...(Array.isArray(entry.tags) ? { tags: normalizeStringArray(entry.tags) } : {}),
+        ...(typeof entry.title === 'string' ? { title: entry.title } : {}),
       };
     })
     .filter((entry) => entry.name.length > 0);

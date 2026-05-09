@@ -1,0 +1,630 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      18,
+      16,
+      18,
+      16
+    ],
+    "staticSchema": [
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "@pdfme/jsx beta",
+        "position": {
+          "x": 16,
+          "y": 3
+        },
+        "width": 80,
+        "height": 6,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "Header / Footer / Absolute",
+        "position": {
+          "x": 96,
+          "y": 3
+        },
+        "width": 80,
+        "height": 6,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "line_1",
+        "type": "line",
+        "position": {
+          "x": 16,
+          "y": 279
+        },
+        "width": 178,
+        "height": 0.3,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#cbd5e1"
+      },
+      {
+        "name": "text_3",
+        "type": "text",
+        "content": "Generated from JSX",
+        "position": {
+          "x": 16,
+          "y": 281.8
+        },
+        "width": 80,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_4",
+        "type": "text",
+        "content": "Page {currentPage} of {totalPages}",
+        "position": {
+          "x": 96,
+          "y": 281.8
+        },
+        "width": 54,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "rectangle_1",
+        "type": "rectangle",
+        "position": {
+          "x": 154,
+          "y": 38
+        },
+        "width": 42,
+        "height": 18,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "borderWidth": 0.4,
+        "borderColor": "#16a34a",
+        "color": "#dcfce7",
+        "radius": 0
+      },
+      {
+        "name": "text_5",
+        "type": "text",
+        "content": "APPROVED",
+        "position": {
+          "x": 154,
+          "y": 56
+        },
+        "width": 42,
+        "height": 18,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#166534",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_6",
+        "type": "text",
+        "content": "Invoice",
+        "position": {
+          "x": 16,
+          "y": 19
+        },
+        "width": 92,
+        "height": 12,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 24,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#0f172a",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_7",
+        "type": "text",
+        "content": "A compact authoring example using Stack, Row, Table and visual schemas.",
+        "position": {
+          "x": 16,
+          "y": 33
+        },
+        "width": 92,
+        "height": 6,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#475569",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "svg_1",
+        "type": "svg",
+        "content": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 80\"><rect width=\"120\" height=\"80\" rx=\"12\" fill=\"#0f172a\"/><circle cx=\"42\" cy=\"40\" r=\"22\" fill=\"#22c55e\"/><rect x=\"62\" y=\"22\" width=\"34\" height=\"36\" rx=\"7\" fill=\"#e0f2fe\"/></svg>",
+        "position": {
+          "x": 108,
+          "y": 18
+        },
+        "width": 34,
+        "height": 22,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true
+      },
+      {
+        "name": "box_1",
+        "type": "rectangle",
+        "position": {
+          "x": 16,
+          "y": 47
+        },
+        "width": 82,
+        "height": 30,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#f8fafc",
+        "borderColor": "#e2e8f0",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_8",
+        "type": "text",
+        "content": "Bill to",
+        "position": {
+          "x": 20,
+          "y": 51
+        },
+        "width": 74,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "multiVariableText_1",
+        "type": "multiVariableText",
+        "content": "Kumo Coffee\nAki Tanaka\naki@example.com",
+        "position": {
+          "x": 20,
+          "y": 58
+        },
+        "width": 74,
+        "height": 15,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.25,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false,
+        "text": "{company}\n{name}\n{email}",
+        "variables": [
+          "company",
+          "name",
+          "email"
+        ]
+      },
+      {
+        "name": "box_2",
+        "type": "rectangle",
+        "position": {
+          "x": 104,
+          "y": 47
+        },
+        "width": 90,
+        "height": 39,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "",
+        "borderColor": "#e2e8f0",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_9",
+        "type": "text",
+        "content": "Summary",
+        "position": {
+          "x": 108,
+          "y": 51
+        },
+        "width": 82,
+        "height": 5,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "list_1",
+        "type": "list",
+        "content": "[\"Layout primitives create regular pdfme schemas.\",\"\\tNested rows and boxes stay readable.\",\"Download the generated template JSON.\"]",
+        "position": {
+          "x": 108,
+          "y": 58
+        },
+        "width": 82,
+        "height": 24,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "listStyle": "bullet",
+        "markerWidth": 6,
+        "markerGap": 2,
+        "indentSize": 6,
+        "itemSpacing": 1
+      },
+      {
+        "name": "table_1",
+        "type": "table",
+        "content": "[[\"Design system setup\",\"1\",\"$800\"],[\"PDF template automation\",\"2\",\"$1,200\"],[\"QA and playground review\",\"1\",\"$350\"]]",
+        "position": {
+          "x": 16,
+          "y": 93
+        },
+        "width": 178,
+        "height": 36,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "showHead": true,
+        "repeatHead": false,
+        "head": [
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "headWidthPercentages": [
+          55.00000000000001,
+          15,
+          30
+        ],
+        "tableStyles": {
+          "borderColor": "#000000",
+          "borderWidth": 0.3
+        },
+        "headStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 8,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#ffffff",
+          "backgroundColor": "#0f766e",
+          "borderColor": "#0f766e",
+          "borderWidth": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "padding": {
+            "top": 2,
+            "right": 2,
+            "bottom": 2,
+            "left": 2
+          }
+        },
+        "bodyStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 8,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#000000",
+          "backgroundColor": "#ffffff",
+          "borderColor": "#cbd5e1",
+          "borderWidth": {
+            "top": 0.25,
+            "right": 0.25,
+            "bottom": 0.25,
+            "left": 0.25
+          },
+          "padding": {
+            "top": 2,
+            "right": 2,
+            "bottom": 2,
+            "left": 2
+          },
+          "alternateBackgroundColor": "#f5f5f5"
+        },
+        "columnStyles": {}
+      },
+      {
+        "name": "box_3",
+        "type": "rectangle",
+        "position": {
+          "x": 16,
+          "y": 136
+        },
+        "width": 130,
+        "height": 28,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#fefce8",
+        "borderColor": "#facc15",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_10",
+        "type": "text",
+        "content": "**Note:** read-only Text can use inline-markdown. Editable Text intentionally cannot.",
+        "position": {
+          "x": 20,
+          "y": 140
+        },
+        "width": 122,
+        "height": 20,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 8,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.35,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "ellipse_1",
+        "type": "ellipse",
+        "position": {
+          "x": 152,
+          "y": 136
+        },
+        "width": 22,
+        "height": 22,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "borderWidth": 0.4,
+        "borderColor": "#2563eb",
+        "color": "#dbeafe",
+        "radius": 0
+      },
+      {
+        "name": "rectangle_2",
+        "type": "rectangle",
+        "position": {
+          "x": 176,
+          "y": 136
+        },
+        "width": 18,
+        "height": 22,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "borderWidth": 0.4,
+        "borderColor": "#ef4444",
+        "color": "#fee2e2",
+        "radius": 0
+      }
+    ],
+    [
+      {
+        "name": "text_11",
+        "type": "text",
+        "content": "Second page",
+        "position": {
+          "x": 16,
+          "y": 18
+        },
+        "width": 178,
+        "height": 10,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 18,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#0f172a",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_12",
+        "type": "text",
+        "content": "PageBreak creates another schemas array in the generated template. This page shows that JSX is only an authoring layer: the output remains a normal pdfme Template.",
+        "position": {
+          "x": 16,
+          "y": 34
+        },
+        "width": 178,
+        "height": 22,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.35,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "overflow": "expand",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "box_4",
+        "type": "rectangle",
+        "position": {
+          "x": 16,
+          "y": 62
+        },
+        "width": 178,
+        "height": 34,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#f8fafc",
+        "borderColor": "#cbd5e1",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_13",
+        "type": "text",
+        "content": "Try changing numbers, colors, Stack gaps, Row widths, or Table rows. The Viewer updates after a short debounce.",
+        "position": {
+          "x": 21,
+          "y": 67
+        },
+        "width": 168,
+        "height": 24,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.35,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

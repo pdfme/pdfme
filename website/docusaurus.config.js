@@ -1,6 +1,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+const playgroundUrl = 'https://playground.pdfme.com';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'pdfme',
@@ -67,23 +69,23 @@ const config = {
             from: '/development-guide',
           },
           {
-            to: '/templates',
+            to: playgroundUrl,
             from: '/demo'
           },
           {
-            to: '/templates',
+            to: playgroundUrl,
             from: '/demo/address-label-maker'
           },
           {
-            to: '/templates',
+            to: playgroundUrl,
             from: '/demo/barcode-qrcode-generator'
           },
           {
-            to: '/templates',
+            to: playgroundUrl,
             from: '/demo/free-invoice-generator'
           },
           {
-            to: '/templates',
+            to: playgroundUrl,
             from: '/demo/online-certificate-maker'
           }
         ],
@@ -114,14 +116,16 @@ const config = {
           label: 'Docs',
         },
         {
-          to: '/templates',
+          href: playgroundUrl,
           position: 'right',
           label: 'Examples',
+          target: '_blank',
         },
         {
-          to: '/template-design',
+          href: `${playgroundUrl}/designer`,
           position: 'right',
           label: 'Template Design',
+          target: '_blank',
         },
         {
           href: 'https://github.com/pdfme/pdfme',
@@ -170,11 +174,13 @@ const config = {
           items: [
             {
               label: 'Examples',
-              to: '/templates',
+              href: playgroundUrl,
+              target: '_blank',
             },
             {
               label: 'Template Design',
-              to: '/template-design',
+              href: `${playgroundUrl}/designer`,
+              target: '_blank',
             },
             {
               label: 'Try pdfme Cloud',

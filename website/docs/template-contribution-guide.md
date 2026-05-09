@@ -1,7 +1,7 @@
 # Template Contribution Guide ❤️
 
 Add your template to pdfme's Example Templates!  
-**The [Template List page](/templates) is one of the most important pages on pdfme.com, created to help new users find templates that match their requirements and save time.**
+**The [playground template gallery](https://playground.pdfme.com/) is one of the most important entry points for pdfme, created to help new users find templates that match their requirements and save time.**
 
 By adding your template, you can contribute to the pdfme community.  
 We use GitHub pull requests for template additions - no builds or code changes required.  
@@ -11,7 +11,7 @@ Even if you're new to OSS contributions, you can easily contribute by following 
 ## Template Addition Steps
 
 ### 1. Create Your Template
-Design your template in the [Template Designer](/template-design), then download `template.json` using the `DL Template` button
+Design your template in the [playground Designer](https://playground.pdfme.com/designer), then download `template.json` using the `Template JSON` button
 
 ### 2. Prepare Repository
 1. **[Create Fork]**  
@@ -36,7 +36,7 @@ Design your template in the [Template Designer](/template-design), then download
    ```bash
    mkdir -p playground/public/template-assets/my-new-template
    ```
-   - Directory name will appear as `My New Template` on [Template List page](/templates)
+   - Directory name will appear as `My New Template` in the [playground template gallery](https://playground.pdfme.com/)
 
 2. **[Place Files]**  
    Place downloaded `template.json` in the new directory  

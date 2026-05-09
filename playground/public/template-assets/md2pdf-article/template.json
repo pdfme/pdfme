@@ -1,0 +1,229 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      20,
+      15,
+      20,
+      15
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "designing-pdf-templates-with-structure",
+        "type": "text",
+        "content": "Designing PDF templates with structure",
+        "position": {
+          "x": 15,
+          "y": 20
+        },
+        "width": 180,
+        "height": 10.1728,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 20,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "When a document grows, absolute coordinates become hard to maintain. A structured authoring layer lets you describe intent first and turn it into pdfme schemas later.",
+        "position": {
+          "x": 15,
+          "y": 35.1728
+        },
+        "width": 180,
+        "height": 5.5864,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "why-structure-helps",
+        "type": "text",
+        "content": "Why structure helps",
+        "position": {
+          "x": 15,
+          "y": 44.75920000000001
+        },
+        "width": 180,
+        "height": 8.56756,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16.5,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "list_1",
+        "type": "list",
+        "content": "[\"Repeated patterns can be expressed once.\",\"Rows and stacks make spacing easier to review.\",\"The output still stays compatible with normal pdfme tooling.\"]",
+        "position": {
+          "x": 15,
+          "y": 57.82676000000001
+        },
+        "width": 180,
+        "height": 19.5592,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "listStyle": "ordered",
+        "markerWidth": 6,
+        "markerGap": 2,
+        "indentSize": 6,
+        "itemSpacing": 1.4,
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "The goal is not to turn pdfme into a browser layout engine. The goal is to make common document authoring tasks less fragile.",
+        "position": {
+          "x": 15,
+          "y": 81.38596000000001
+        },
+        "width": 180,
+        "height": 9.586400000000001,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "#f8fafc",
+        "borderColor": "#d0d7de",
+        "borderWidth": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0.8
+        },
+        "padding": {
+          "top": 2,
+          "right": 3,
+          "bottom": 2,
+          "left": 3
+        },
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "example-checklist",
+        "type": "text",
+        "content": "Example checklist",
+        "position": {
+          "x": 15,
+          "y": 94.97236000000001
+        },
+        "width": 180,
+        "height": 8.56756,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 16.5,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "list_2",
+        "type": "list",
+        "content": "[\"Start with semantic sections.\",\"Use tables for grid data.\",\"Use static headers and footers for repeated page content.\",\"Keep custom positioning as an escape hatch.\"]",
+        "position": {
+          "x": 15,
+          "y": 108.03992000000001
+        },
+        "width": 180,
+        "height": 26.5456,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "listStyle": "bullet",
+        "markerWidth": 6,
+        "markerGap": 2,
+        "indentSize": 6,
+        "itemSpacing": 1.4,
+        "textFormat": "inline-markdown",
+        "overflow": "expand"
+      },
+      {
+        "name": "text_3",
+        "type": "text",
+        "content": "return (\n  <Page>\n    <Stack gap={6}>\n      <Text>Structured authoring</Text>\n    </Stack>\n  </Page>\n);",
+        "position": {
+          "x": 15,
+          "y": 138.58552
+        },
+        "width": 180,
+        "height": 37.30480000000001,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "#f6f8fa",
+        "borderColor": "#d0d7de",
+        "borderWidth": {
+          "top": 0.1,
+          "right": 0.1,
+          "bottom": 0.1,
+          "left": 0.1
+        },
+        "padding": {
+          "top": 2,
+          "right": 3,
+          "bottom": 2,
+          "left": 3
+        },
+        "textFormat": "plain",
+        "overflow": "expand"
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

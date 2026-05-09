@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Check, X } from 'lucide-react';
 import { Template, checkTemplate } from '@pdfme/common';
+import PlaygroundButton from './PlaygroundButton';
 
 const CodeEditor = lazy(() => import('./CodeEditor'));
 
@@ -191,23 +192,18 @@ export default function TemplateJsonDialog({
             Edit Template JSON
           </DialogTitle>
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCommit}
-              className="inline-flex items-center justify-center gap-1 rounded border border-green-600 bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            >
+            <PlaygroundButton onClick={handleCommit} variant="primary">
               <Check className="size-4" />
               Commit
-            </button>
-            <button
-              type="button"
+            </PlaygroundButton>
+            <PlaygroundButton
               title="Close"
               aria-label="Close"
               onClick={onClose}
-              className="inline-flex size-9 items-center justify-center rounded border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              className="px-2 sm:px-2"
             >
               <X className="size-4" />
-            </button>
+            </PlaygroundButton>
           </div>
         </div>
         {error && (

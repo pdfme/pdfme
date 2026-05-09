@@ -1,56 +1,203 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Code2 } from 'lucide-react';
+import { Code2, Download, Save } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
 import { Designer } from '@pdfme/ui';
 import {
+  fromKebabCase,
   getFontsData,
   getTemplateById,
   getBlankTemplate,
+  getDefaultPlaygroundTemplate,
   readFile,
-  handleLoadTemplate,
   generatePDF,
   downloadJsonFile,
   translations,
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
+import PlaygroundButton from '../components/PlaygroundButton';
+import ProjectSavedToast from '../components/ProjectSavedToast';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
+import {
+  clearActivePlaygroundProject,
+  getActivePlaygroundProject,
+  getPlaygroundProject,
+  savePlaygroundProject,
+  type PlaygroundProject,
+} from '../lib/playgroundProjects';
+import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+
+function destroyDesignerInstance(instance: Designer) {
+  try {
+    instance.destroy();
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !error.message.includes('this instance is already destroyed')
+    ) {
+      throw error;
+    }
+  }
+}
+
+type DesignerLoadRequest = {
+  projectId: string | null;
+  searchParams: URLSearchParams;
+  shouldCreateNewProject: boolean;
+  shouldConsumeQuery: boolean;
+  templateId: string | null;
+};
+
+function getDesignerLoadRequest(): DesignerLoadRequest {
+  const searchParams = new URLSearchParams(window.location.search);
+  const shouldCreateNewProject = searchParams.get('new') === '1';
+  const templateId = searchParams.get('template');
+  const projectId = searchParams.get('project');
+
+  return {
+    projectId,
+    searchParams,
+    shouldCreateNewProject,
+    shouldConsumeQuery: shouldCreateNewProject || templateId != null || projectId != null,
+    templateId,
+  };
+}
+
+type DesignerFileButtonProps = {
+  accept: string;
+  disabled?: boolean;
+  label: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+function DesignerFileButton({
+  accept,
+  disabled = false,
+  label,
+  onChange,
+}: DesignerFileButtonProps) {
+  return (
+    <label
+      aria-disabled={disabled}
+      className={`inline-flex min-w-0 items-center justify-center whitespace-nowrap rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 transition focus-within:outline-none focus-within:ring-2 focus-within:ring-gray-300 focus-within:ring-offset-2 ${
+        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+      }`}
+    >
+      {label}
+      <input
+        disabled={disabled}
+        type="file"
+        accept={accept}
+        className="sr-only"
+        onChange={onChange}
+      />
+    </label>
+  );
+}
 
 function DesignerApp() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
+  const projectRef = useRef<PlaygroundProject | null>(null);
+  const projectTitleRef = useRef('Untitled Template');
+  const loadRequestRef = useRef<DesignerLoadRequest | null>(null);
+  const didCleanLoadQueryRef = useRef(false);
 
   const [editingStaticSchemas, setEditingStaticSchemas] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
 
-  const buildDesigner = useCallback(async () => {
+  const setCurrentProjectTitle = useCallback((title: string) => {
+    projectTitleRef.current = title;
+  }, []);
+
+  const onSaveTemplate = useCallback(
+    async (template?: Template) => {
+      if (!designer.current) return;
+
+      const currentProject = projectRef.current;
+      const nextTemplate = template || designer.current.getTemplate();
+      const title =
+        currentProject?.title ??
+        window.prompt('Project name', projectTitleRef.current || 'Untitled Template') ??
+        '';
+      if (!title.trim()) return;
+
+      const thumbnail = await createTemplateThumbnailDataUrl(
+        nextTemplate,
+        currentProject?.inputs,
+      ).catch(() => currentProject?.thumbnail);
+      const savedProject = savePlaygroundProject({
+        id: currentProject?.id,
+        inputs: currentProject?.inputs,
+        kind: currentProject?.kind ?? 'template',
+        source: currentProject?.source,
+        template: nextTemplate,
+        thumbnail,
+        title,
+      });
+      projectRef.current = savedProject;
+      setCurrentProjectTitle(savedProject.title);
+      toast.success(<ProjectSavedToast title={savedProject.title} />);
+    },
+    [setCurrentProjectTitle],
+  );
+
+  const buildDesigner = useCallback(async (isCancelled: () => boolean) => {
     if (!designerRef.current) return;
     try {
       let template: Template = getBlankTemplate();
-      const templateIdFromQuery = searchParams.get('template');
-      searchParams.delete('template');
-      setSearchParams(searchParams, { replace: true });
-      const templateFromLocal = localStorage.getItem('template');
+      let project: PlaygroundProject | null = null;
+      loadRequestRef.current ??= getDesignerLoadRequest();
+      const {
+        projectId: projectIdFromQuery,
+        searchParams: initialSearchParams,
+        shouldConsumeQuery,
+        shouldCreateNewProject,
+        templateId: templateIdFromQuery,
+      } = loadRequestRef.current;
 
-      if (templateIdFromQuery) {
+      if (shouldCreateNewProject) {
+        clearActivePlaygroundProject();
+        setCurrentProjectTitle('Untitled Template');
+      } else if (projectIdFromQuery) {
+        project = getPlaygroundProject(projectIdFromQuery);
+        if (!project) throw new Error('Project not found');
+        template = project.template;
+      } else if (templateIdFromQuery) {
         const templateJson = await getTemplateById(templateIdFromQuery);
         checkTemplate(templateJson);
         template = templateJson;
-        if (!templateFromLocal) {
-          localStorage.setItem('template', JSON.stringify(templateJson));
+        setCurrentProjectTitle(fromKebabCase(templateIdFromQuery));
+      } else {
+        project = getActivePlaygroundProject();
+        if (project) {
+          template = project.template;
+        } else {
+          template = await getDefaultPlaygroundTemplate();
+          setCurrentProjectTitle(fromKebabCase('invoice'));
         }
-      } else if (templateFromLocal) {
-        const templateJson = JSON.parse(templateFromLocal) as Template;
-        checkTemplate(templateJson);
-        template = templateJson;
       }
 
-      designer.current = new Designer({
+      projectRef.current = project;
+      if (project) setCurrentProjectTitle(project.title);
+
+      if (shouldConsumeQuery && !didCleanLoadQueryRef.current) {
+        const nextSearchParams = new URLSearchParams(initialSearchParams);
+        nextSearchParams.delete('new');
+        nextSearchParams.delete('template');
+        nextSearchParams.delete('project');
+        didCleanLoadQueryRef.current = true;
+        setSearchParams(nextSearchParams, { replace: true });
+      }
+
+      if (isCancelled() || !designerRef.current) return null;
+
+      const nextDesigner = new Designer({
         domContainer: designerRef.current,
         template,
         options: {
@@ -70,12 +217,16 @@ function DesignerApp() {
         },
         plugins: getPlugins(),
       });
-      designer.current.onSaveTemplate(onSaveTemplate);
+      designer.current = nextDesigner;
+      nextDesigner.onSaveTemplate(onSaveTemplate);
+      return nextDesigner;
     } catch (error) {
-      localStorage.removeItem('template');
+      if (isCancelled()) return null;
+      projectRef.current = null;
       console.error(error);
+      return null;
     }
-  }, [searchParams, setSearchParams]);
+  }, [onSaveTemplate, setCurrentProjectTitle, setSearchParams]);
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -92,31 +243,15 @@ function DesignerApp() {
   const onDownloadTemplate = () => {
     if (designer.current) {
       downloadJsonFile(designer.current.getTemplate(), 'template');
-      toast.success(
-        <div>
-          <p>Can you share the template you created? ❤️</p>
-          <a
-            className="text-blue-500 underline"
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://pdfme.com/docs/template-contribution-guide"
-          >
-            See: Template Contribution Guide
-          </a>
-        </div>,
-      );
-    }
-  };
-
-  const onSaveTemplate = (template?: Template) => {
-    if (designer.current) {
-      localStorage.setItem('template', JSON.stringify(template || designer.current.getTemplate()));
-      toast.success('Saved on local storage');
+      toast.success('Downloaded template JSON');
     }
   };
 
   const onResetTemplate = () => {
-    localStorage.removeItem('template');
+    projectRef.current = null;
+    setCurrentProjectTitle('Untitled Template');
+    clearActivePlaygroundProject();
+    setSearchParams(new URLSearchParams([['new', '1']]), { replace: true });
     if (designer.current) {
       designer.current.updateTemplate(getBlankTemplate());
     }
@@ -186,13 +321,29 @@ function DesignerApp() {
   };
 
   useEffect(() => {
-    if (designerRef.current) {
-      buildDesigner();
-    }
+    let cancelled = false;
+    let mountedDesigner: Designer | null = null;
+
+    void buildDesigner(() => cancelled).then((nextDesigner) => {
+      if (!nextDesigner) return;
+
+      if (cancelled) {
+        if (designer.current === nextDesigner) designer.current = null;
+        destroyDesignerInstance(nextDesigner);
+        return;
+      }
+
+      mountedDesigner = nextDesigner;
+    });
+
     return () => {
-      designer.current?.destroy();
+      cancelled = true;
+      if (!mountedDesigner) return;
+
+      if (designer.current === mountedDesigner) designer.current = null;
+      destroyDesignerInstance(mountedDesigner);
     };
-  }, [designerRef, buildDesigner]);
+  }, [buildDesigner]);
 
   const navItems: NavItem[] = [
     {
@@ -216,106 +367,65 @@ function DesignerApp() {
       ),
     },
     {
-      label: 'Change BasePDF',
+      label: 'Base PDF',
       content: (
-        <input
-          disabled={editingStaticSchemas}
-          type="file"
-          accept="application/pdf"
-          className={`w-full text-sm border rounded border-gray-300 ${
-            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          onChange={onChangeBasePDF}
-        />
-      ),
-    },
-    {
-      label: 'Load Template',
-      content: (
-        <input
-          disabled={editingStaticSchemas}
-          type="file"
-          accept="application/json"
-          className={`w-full text-sm border rounded border-gray-300 ${
-            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          onChange={(e) => handleLoadTemplate(e, designer.current)}
-        />
-      ),
-    },
-    {
-      label: 'Edit static schema',
-      content: (
-        <button
-          className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed`}
-          onClick={toggleEditingStaticSchemas}
-        >
-          {editingStaticSchemas ? 'End editing' : 'Start editing'}
-        </button>
-      ),
-    },
-    {
-      label: 'Template JSON',
-      content: (
-        <button
-          type="button"
-          disabled={editingStaticSchemas}
-          className={`inline-flex items-center justify-center gap-1 px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 w-full whitespace-nowrap ${
-            editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          onClick={onOpenTemplateJson}
-        >
-          <Code2 className="size-4" />
-          Edit JSON
-        </button>
-      ),
-    },
-    {
-      label: '',
-      content: (
-        <div className="flex gap-2">
-          <button
-            id="save-local"
+        <div className="flex gap-1">
+          <DesignerFileButton
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
-              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            onClick={() => onSaveTemplate()}
-          >
-            Save Local
-          </button>
-          <button
-            id="reset-template"
-            disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
-              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            onClick={onResetTemplate}
-          >
-            Reset
-          </button>
+            label="Change PDF"
+            accept="application/pdf"
+            onChange={onChangeBasePDF}
+          />
         </div>
       ),
     },
     {
-      label: '',
+      label: 'Edit',
       content: (
-        <div className="flex gap-2">
-          <button
+        <div className="flex gap-1">
+          <PlaygroundButton onClick={toggleEditingStaticSchemas}>
+            {editingStaticSchemas ? 'End editing' : 'Static schema'}
+          </PlaygroundButton>
+          <PlaygroundButton disabled={editingStaticSchemas} onClick={onOpenTemplateJson}>
+            <Code2 className="size-3.5" />
+            JSON
+          </PlaygroundButton>
+        </div>
+      ),
+    },
+    {
+      label: 'Project',
+      content: (
+        <div className="flex gap-1">
+          <PlaygroundButton
+            id="save-local"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
-              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            onClick={onDownloadTemplate}
+            onClick={() => void onSaveTemplate()}
           >
-            DL Template
-          </button>
-          <button
+            <Save className="size-3.5" />
+            Save Project
+          </PlaygroundButton>
+          <PlaygroundButton
+            id="reset-template"
+            disabled={editingStaticSchemas}
+            onClick={onResetTemplate}
+          >
+            Reset
+          </PlaygroundButton>
+        </div>
+      ),
+    },
+    {
+      label: 'Output',
+      content: (
+        <div className="flex gap-1">
+          <PlaygroundButton disabled={editingStaticSchemas} onClick={onDownloadTemplate}>
+            <Download className="size-3.5" />
+            Template JSON
+          </PlaygroundButton>
+          <PlaygroundButton
             id="generate-pdf"
             disabled={editingStaticSchemas}
-            className={`px-2 py-1 border rounded hover:bg-gray-100 border-gray-300 whitespace-nowrap ${
-              editingStaticSchemas ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
             onClick={async (e) => {
               const output = e.altKey ? 'form' : 'pdf';
               const startTimer = performance.now();
@@ -329,7 +439,7 @@ function DesignerApp() {
             }}
           >
             Generate PDF
-          </button>
+          </PlaygroundButton>
         </div>
       ),
     },

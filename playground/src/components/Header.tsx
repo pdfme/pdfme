@@ -108,7 +108,7 @@ export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
 
   const navLinks = [
-    { id: 'templates-nav', to: '/templates', label: 'Templates' },
+    { id: 'templates-nav', to: '/', label: 'Templates' },
     { id: 'designer-nav', to: '/designer', label: 'Designer' },
     { id: 'form-viewer-nav', to: '/form-viewer', label: 'Form/Viewer' },
     { id: 'jsx-nav', to: '/jsx', label: 'JSX' },

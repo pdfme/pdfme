@@ -1,0 +1,213 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      20,
+      18,
+      20,
+      18
+    ],
+    "staticSchema": [
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "{currentPage} / {totalPages} ページ",
+        "position": {
+          "x": 18,
+          "y": 277
+        },
+        "width": 174,
+        "height": 6,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "お知らせ",
+        "position": {
+          "x": 18,
+          "y": 20
+        },
+        "width": 174,
+        "height": 12,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 22,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#0f172a",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_3",
+        "type": "text",
+        "content": "JSX から日本語を含むテンプレートを作成する例です。",
+        "position": {
+          "x": 18,
+          "y": 39
+        },
+        "width": 174,
+        "height": 8,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "box_1",
+        "type": "rectangle",
+        "position": {
+          "x": 18,
+          "y": 54
+        },
+        "width": 174,
+        "height": 46,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#f8fafc",
+        "borderColor": "#cbd5e1",
+        "borderWidth": 0.4,
+        "radius": 0
+      },
+      {
+        "name": "text_4",
+        "type": "text",
+        "content": "pdfme の JSX authoring は、通常の pdfme Template と inputs を生成するための薄いレイヤーです。日本語を扱う場合は、Viewer や generator の options.font に NotoSansJP などのフォントを登録してください。",
+        "position": {
+          "x": 23,
+          "y": 59
+        },
+        "width": 164,
+        "height": 36,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 10,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.45,
+        "characterSpacing": 0,
+        "fontColor": "#000000",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "overflow": "expand",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "table_1",
+        "type": "table",
+        "content": "[[\"フォント\",\"NotoSansJP\"],[\"出力\",\"Template + inputs\"],[\"プレビュー\",\"Viewer / Form\"]]",
+        "position": {
+          "x": 18,
+          "y": 107
+        },
+        "width": 174,
+        "height": 36,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "showHead": true,
+        "repeatHead": false,
+        "head": [
+          "項目",
+          "内容"
+        ],
+        "headWidthPercentages": [
+          30,
+          70
+        ],
+        "tableStyles": {
+          "borderColor": "#000000",
+          "borderWidth": 0.3
+        },
+        "headStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 8,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#ffffff",
+          "backgroundColor": "#0f766e",
+          "borderColor": "#0f766e",
+          "borderWidth": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "padding": {
+            "top": 2,
+            "right": 2,
+            "bottom": 2,
+            "left": 2
+          }
+        },
+        "bodyStyles": {
+          "fontName": "NotoSansJP",
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 8,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#000000",
+          "backgroundColor": "#ffffff",
+          "borderColor": "#cbd5e1",
+          "borderWidth": {
+            "top": 0.25,
+            "right": 0.25,
+            "bottom": 0.25,
+            "left": 0.25
+          },
+          "padding": {
+            "top": 2,
+            "right": 2,
+            "bottom": 2,
+            "left": 2
+          },
+          "alternateBackgroundColor": "#f5f5f5"
+        },
+        "columnStyles": {}
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

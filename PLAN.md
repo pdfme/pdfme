@@ -33,13 +33,15 @@ rich content の応用範囲を広げる。
   直感とズレないかを確認し、必要なら wording やサンプルを直す。
 - `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを
   preset に残す。`Page` 直下 static を禁止した新 API の書き方も docs 上で迷わないようにする。
-- JSX playground で生成した template から Designer に遷移する導線を作る。編集の正は generated
-  template / inputs とし、JSX source は初期生成用の seed として扱う。Designer 遷移後に JSX source へ
-  逆同期することは当面しない。
-- JSX playground の preset は増やせる状態になった。次は「よいサンプルを増やす」より、preset / draft /
-  imported template の扱い、reset、共有可能 URL、保存済み template の見せ方を整理する。
-- Template 一覧は template type に応じて Designer / FormViewer / `md2pdf` / `jsx` playground へ
-  遷移する導線を検討する。ただし preset が増えた時に一覧性が落ちないかも検証する。
+- Playground は単一の `localStorage.template` / `inputs` スロットではなく、local project workspace として
+  整理する。Project は `Template + inputs` を正とし、JSX / Markdown source は生成元 metadata として保持する。
+- Template 一覧は sample gallery / authoring starter / imported Template JSON / local projects の共通入口として扱う。
+  Project kind に応じて Designer / FormViewer / `jsx` / `md2pdf` playground へ戻れる導線を作る。
+- JSX / md2pdf playground は preset を選ぶ場所ではなく、Templates から選んだ starter / project を編集する
+  authoring surface として扱う。次は project rename、duplicate、export/import、共有可能 URL、draft reset の
+  使い勝手を検証する。
+- Form / Viewer 確認は生成方法に依存しない共通 project 導線として扱う。JSX playground は source authoring と
+  Viewer preview に寄せ、Form 入力の確認は project を FormViewer で開いて行う。
 
 ### 2. `md2pdf` layout 品質フォローアップ
 
@@ -175,6 +177,12 @@ rich content の応用範囲を広げる。
 - PR #1491: `@pdfme/jsx` static layout API を `Document` root に再設計。`Header` / `Footer` /
   `Static` は `Document` 直下に限定し、`Header` / `Footer` は page margin 領域、`Static` は page
   全体座標の repeated overlay として扱うようにした。
+- PR #1492: `/jsx` playground で generated template を Designer に開ける導線を追加。編集の正は
+  generated template / inputs とし、JSX source は初期生成用の seed として扱う方針にした。
+- PR #1493: `getDynamicTemplate` が blank page `schemas: [[]]` を保持するようにし、入力 schema のない
+  blank template も FormViewer で表示できるようにした。
+- PR #1494: `/md2pdf` playground から Template JSON / Open Designer を外し、md2pdf は Markdown preview と
+  PDF generation に絞る形へ戻した。
 
 ## 参考
 

@@ -1,6 +1,6 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { pdf2img } from '@pdfme/converter';
-import { Template, Schema, PAGE_SIZE_PRESETS, cloneDeep } from '@pdfme/common';
+import { Template, Schema, PAGE_SIZE_PRESETS, cloneDeep, getInputFromTemplate } from '@pdfme/common';
 import { text, table, image, barcodes, select, checkbox, radioGroup } from '@pdfme/schemas';
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import { stripVTControlCharacters } from 'node:util';
@@ -157,6 +157,9 @@ type PlaygroundStorageState = {
   mode?: 'form' | 'viewer';
 };
 
+const playgroundProjectsStorageKey = 'playground:projects:v1';
+const activePlaygroundProjectStorageKey = 'playground:activeProjectId:v1';
+
 const cloneSchema = <T extends Schema>(schema: T, overrides: Partial<T>): T =>
   ({
     ...cloneDeep(schema),
@@ -236,23 +239,44 @@ async function loadRouteWithStorage(
   path: '/designer' | '/form-viewer',
   storageState: PlaygroundStorageState,
 ) {
-  await page.goto(`${baseUrl}${path}`, { waitUntil: 'networkidle2', timeout });
-  await page.evaluate((state) => {
+  const projectId = 'project_e2e_deterministic_template';
+  const inputs = storageState.inputs ?? (storageState.template ? getInputFromTemplate(storageState.template) : []);
+
+  await page.goto(baseUrl, { waitUntil: 'networkidle2', timeout });
+  await page.evaluate((state, resolvedInputs, id, projectsStorageKey, activeProjectStorageKey) => {
     localStorage.removeItem('template');
     localStorage.removeItem('inputs');
     localStorage.removeItem('mode');
+    localStorage.removeItem(projectsStorageKey);
+    localStorage.removeItem(activeProjectStorageKey);
 
     if (state.template) {
-      localStorage.setItem('template', JSON.stringify(state.template));
-    }
-    if (state.inputs) {
-      localStorage.setItem('inputs', JSON.stringify(state.inputs));
+      const now = Date.now();
+      localStorage.setItem(
+        projectsStorageKey,
+        JSON.stringify([
+          {
+            createdAt: now,
+            id,
+            inputs: resolvedInputs,
+            kind: 'template',
+            template: state.template,
+            title: 'E2E deterministic template',
+            updatedAt: now,
+          },
+        ]),
+      );
+      localStorage.setItem(activeProjectStorageKey, id);
     }
     if (state.mode) {
       localStorage.setItem('mode', state.mode);
     }
-  }, storageState);
-  await page.reload({ waitUntil: 'networkidle2', timeout });
+  }, storageState, inputs, projectId, playgroundProjectsStorageKey, activePlaygroundProjectStorageKey);
+
+  await page.goto(`${baseUrl}${path}?project=${encodeURIComponent(projectId)}`, {
+    waitUntil: 'networkidle2',
+    timeout,
+  });
 }
 
 async function waitForDesignerReady(page: Page, expectedText?: string) {
@@ -468,7 +492,7 @@ describe('Playground E2E Tests', () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
 
     // 5. Load the Pedigree designer directly to avoid flaky list-page navigation in CI
-    await page.goto(`${baseUrl}/?template=pedigree`, { waitUntil: 'networkidle2', timeout });
+    await page.goto(`${baseUrl}/designer?template=pedigree`, { waitUntil: 'networkidle2', timeout });
 
     await waitForDesignerReady(page, 'Pet Name');
 
