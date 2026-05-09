@@ -342,7 +342,7 @@ export default function JsxPlayground() {
       title ??
       (saveAs
         ? window.prompt('Save as', `${currentTitle} Copy`)
-        : projectRef.current?.title ?? window.prompt('Project name', currentTitle)) ??
+        : (projectRef.current?.title ?? window.prompt('Project name', currentTitle))) ??
       '';
     if (!projectTitle.trim()) return null;
 

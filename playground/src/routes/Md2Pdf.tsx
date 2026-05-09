@@ -178,8 +178,8 @@ export default function Md2Pdf() {
 
     const currentTitle = projectRef.current?.title ?? `md2pdf - ${sourceTitle}`;
     const title = saveAs
-      ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
-      : projectRef.current?.title ?? window.prompt('Project name', currentTitle) ?? '';
+      ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
+      : (projectRef.current?.title ?? window.prompt('Project name', currentTitle) ?? '');
     if (!title.trim()) return;
 
     try {

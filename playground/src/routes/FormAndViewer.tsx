@@ -168,8 +168,8 @@ function FormAndViewerApp() {
     const nextTemplate = ui.current.getTemplate();
     const currentTitle = (currentProject?.title ?? projectTitle) || 'Untitled Template';
     const title = saveAs
-      ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
-      : currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '';
+      ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
+      : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
     if (!title.trim()) return;
 
     const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate, nextInputs).catch(
@@ -248,9 +248,7 @@ function FormAndViewerApp() {
         <div className="flex gap-1">
           <PlaygroundButton onClick={onGetInputs}>Get</PlaygroundButton>
           <PlaygroundButton onClick={onSetInputs}>Set</PlaygroundButton>
-          <PlaygroundButton onClick={() => void onSaveInputs()}>
-            Save
-          </PlaygroundButton>
+          <PlaygroundButton onClick={() => void onSaveInputs()}>Save</PlaygroundButton>
           <PlaygroundButton onClick={() => void onSaveInputs(true)}>Save As</PlaygroundButton>
           <PlaygroundButton onClick={onResetInputs}>Reset</PlaygroundButton>
         </div>

@@ -349,35 +349,36 @@ const layoutStaticBlocks = async (arg: {
   _cache: Map<string | number, unknown>;
 }) => {
   const contentWidth = Math.max(0, arg.pageSize.width - arg.margin.left - arg.margin.right);
-  const blockFrames: Array<{ children: PdfJsxChild[]; frame: Rect; placement?: StaticPlacement }> = [
-    {
-      children: arg.blocks.staticTop,
-      frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
-    },
-    {
-      children: arg.blocks.header,
-      frame: {
-        x: arg.margin.left,
-        y: 0,
-        width: contentWidth,
-        height: arg.margin.top,
+  const blockFrames: Array<{ children: PdfJsxChild[]; frame: Rect; placement?: StaticPlacement }> =
+    [
+      {
+        children: arg.blocks.staticTop,
+        frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
       },
-    },
-    {
-      children: arg.blocks.footer,
-      frame: {
-        x: arg.margin.left,
-        y: arg.pageSize.height - arg.margin.bottom,
-        width: contentWidth,
-        height: arg.margin.bottom,
+      {
+        children: arg.blocks.header,
+        frame: {
+          x: arg.margin.left,
+          y: 0,
+          width: contentWidth,
+          height: arg.margin.top,
+        },
       },
-    },
-    {
-      children: arg.blocks.staticBottom,
-      frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
-      placement: 'bottom',
-    },
-  ];
+      {
+        children: arg.blocks.footer,
+        frame: {
+          x: arg.margin.left,
+          y: arg.pageSize.height - arg.margin.bottom,
+          width: contentWidth,
+          height: arg.margin.bottom,
+        },
+      },
+      {
+        children: arg.blocks.staticBottom,
+        frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
+        placement: 'bottom',
+      },
+    ];
 
   for (const { children, frame, placement } of blockFrames) {
     if (children.length === 0) continue;

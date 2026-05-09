@@ -18,29 +18,25 @@ const buttonVariants: Record<PlaygroundButtonVariant, string> = {
 const joinClassNames = (...classes: Array<string | false | null | undefined>) =>
   classes.filter(Boolean).join(' ');
 
-const PlaygroundButton = forwardRef<HTMLButtonElement, PlaygroundButtonProps>(function PlaygroundButton(
-  {
-    className,
-    fullWidth = false,
-    type = 'button',
-    variant = 'secondary',
-    ...props
+const PlaygroundButton = forwardRef<HTMLButtonElement, PlaygroundButtonProps>(
+  function PlaygroundButton(
+    { className, fullWidth = false, type = 'button', variant = 'secondary', ...props },
+    ref,
+  ) {
+    return (
+      <button
+        ref={ref}
+        type={type}
+        className={joinClassNames(
+          'inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border px-2 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:px-3',
+          buttonVariants[variant],
+          fullWidth && 'w-full',
+          className,
+        )}
+        {...props}
+      />
+    );
   },
-  ref,
-) {
-  return (
-    <button
-      ref={ref}
-      type={type}
-      className={joinClassNames(
-        'inline-flex min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border px-2 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:px-3',
-        buttonVariants[variant],
-        fullWidth && 'w-full',
-        className,
-      )}
-      {...props}
-    />
-  );
-});
+);
 
 export default PlaygroundButton;

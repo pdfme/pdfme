@@ -124,8 +124,8 @@ function DesignerApp() {
       const currentTitle =
         (currentProject?.title ?? projectTitleRef.current) || 'Untitled Template';
       const title = saveAs
-        ? window.prompt('Save as', `${currentTitle} Copy`) ?? ''
-        : currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '';
+        ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
+        : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
       if (!title.trim()) return;
 
       const thumbnail = await createTemplateThumbnailDataUrl(
@@ -148,86 +148,89 @@ function DesignerApp() {
     [setCurrentProjectTitle],
   );
 
-  const buildDesigner = useCallback(async (isCancelled: () => boolean) => {
-    if (!designerRef.current) return;
-    try {
-      let template: Template = getBlankTemplate();
-      let project: PlaygroundProject | null = null;
-      loadRequestRef.current ??= getDesignerLoadRequest();
-      const {
-        projectId: projectIdFromQuery,
-        searchParams: initialSearchParams,
-        shouldConsumeQuery,
-        shouldCreateNewProject,
-        templateId: templateIdFromQuery,
-      } = loadRequestRef.current;
+  const buildDesigner = useCallback(
+    async (isCancelled: () => boolean) => {
+      if (!designerRef.current) return;
+      try {
+        let template: Template = getBlankTemplate();
+        let project: PlaygroundProject | null = null;
+        loadRequestRef.current ??= getDesignerLoadRequest();
+        const {
+          projectId: projectIdFromQuery,
+          searchParams: initialSearchParams,
+          shouldConsumeQuery,
+          shouldCreateNewProject,
+          templateId: templateIdFromQuery,
+        } = loadRequestRef.current;
 
-      if (shouldCreateNewProject) {
-        clearActivePlaygroundProject();
-        setCurrentProjectTitle('Untitled Template');
-      } else if (projectIdFromQuery) {
-        project = getPlaygroundProject(projectIdFromQuery);
-        if (!project) throw new Error('Project not found');
-        template = project.template;
-      } else if (templateIdFromQuery) {
-        const templateJson = await getTemplateById(templateIdFromQuery);
-        checkTemplate(templateJson);
-        template = templateJson;
-        setCurrentProjectTitle(fromKebabCase(templateIdFromQuery));
-      } else {
-        project = getActivePlaygroundProject();
-        if (project) {
+        if (shouldCreateNewProject) {
+          clearActivePlaygroundProject();
+          setCurrentProjectTitle('Untitled Template');
+        } else if (projectIdFromQuery) {
+          project = getPlaygroundProject(projectIdFromQuery);
+          if (!project) throw new Error('Project not found');
           template = project.template;
+        } else if (templateIdFromQuery) {
+          const templateJson = await getTemplateById(templateIdFromQuery);
+          checkTemplate(templateJson);
+          template = templateJson;
+          setCurrentProjectTitle(fromKebabCase(templateIdFromQuery));
         } else {
-          template = await getDefaultPlaygroundTemplate();
-          setCurrentProjectTitle(fromKebabCase('invoice'));
+          project = getActivePlaygroundProject();
+          if (project) {
+            template = project.template;
+          } else {
+            template = await getDefaultPlaygroundTemplate();
+            setCurrentProjectTitle(fromKebabCase('invoice'));
+          }
         }
+
+        projectRef.current = project;
+        if (project) setCurrentProjectTitle(project.title);
+
+        if (shouldConsumeQuery && !didCleanLoadQueryRef.current) {
+          const nextSearchParams = new URLSearchParams(initialSearchParams);
+          nextSearchParams.delete('new');
+          nextSearchParams.delete('template');
+          nextSearchParams.delete('project');
+          didCleanLoadQueryRef.current = true;
+          setSearchParams(nextSearchParams, { replace: true });
+        }
+
+        if (isCancelled() || !designerRef.current) return null;
+
+        const nextDesigner = new Designer({
+          domContainer: designerRef.current,
+          template,
+          options: {
+            font: getFontsData(),
+            lang: 'en',
+            labels: {
+              'signature.clear': '🗑️',
+            },
+            theme: {
+              token: { colorPrimary: '#25c2a0' },
+            },
+            icons: {
+              multiVariableText:
+                '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>',
+            },
+            maxZoom: 250,
+          },
+          plugins: getPlugins(),
+        });
+        designer.current = nextDesigner;
+        nextDesigner.onSaveTemplate(onSaveTemplate);
+        return nextDesigner;
+      } catch (error) {
+        if (isCancelled()) return null;
+        projectRef.current = null;
+        console.error(error);
+        return null;
       }
-
-      projectRef.current = project;
-      if (project) setCurrentProjectTitle(project.title);
-
-      if (shouldConsumeQuery && !didCleanLoadQueryRef.current) {
-        const nextSearchParams = new URLSearchParams(initialSearchParams);
-        nextSearchParams.delete('new');
-        nextSearchParams.delete('template');
-        nextSearchParams.delete('project');
-        didCleanLoadQueryRef.current = true;
-        setSearchParams(nextSearchParams, { replace: true });
-      }
-
-      if (isCancelled() || !designerRef.current) return null;
-
-      const nextDesigner = new Designer({
-        domContainer: designerRef.current,
-        template,
-        options: {
-          font: getFontsData(),
-          lang: 'en',
-          labels: {
-            'signature.clear': '🗑️',
-          },
-          theme: {
-            token: { colorPrimary: '#25c2a0' },
-          },
-          icons: {
-            multiVariableText:
-              '<svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24"><path d="M6.643,13.072,17.414,2.3a1.027,1.027,0,0,1,1.452,0L20.7,4.134a1.027,1.027,0,0,1,0,1.452L9.928,16.357,5,18ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/></svg>',
-          },
-          maxZoom: 250,
-        },
-        plugins: getPlugins(),
-      });
-      designer.current = nextDesigner;
-      nextDesigner.onSaveTemplate(onSaveTemplate);
-      return nextDesigner;
-    } catch (error) {
-      if (isCancelled()) return null;
-      projectRef.current = null;
-      console.error(error);
-      return null;
-    }
-  }, [onSaveTemplate, setCurrentProjectTitle, setSearchParams]);
+    },
+    [onSaveTemplate, setCurrentProjectTitle, setSearchParams],
+  );
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
