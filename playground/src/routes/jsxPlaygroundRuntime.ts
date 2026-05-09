@@ -2,6 +2,7 @@ import { checkTemplate, type Font } from '@pdfme/common';
 import {
   Absolute,
   Box,
+  Document,
   Ellipse,
   Footer,
   Header,
@@ -57,6 +58,7 @@ const JS_COMMENT_OR_STRING_PATTERN =
 const jsxScope = {
   Absolute,
   Box,
+  Document,
   Ellipse,
   Footer,
   Header,
@@ -94,7 +96,7 @@ const stripCommentsAndQuotedStrings = (source: string) =>
 const assertNoImportExport = (source: string) => {
   if (IMPORT_EXPORT_PATTERN.test(source)) {
     throw new Error(
-      'The JSX playground beta does not support import/export. Use a function body that returns <Page> nodes.',
+      'The JSX playground beta does not support import/export. Use a function body that returns <Document> or <Page> nodes.',
     );
   }
 };

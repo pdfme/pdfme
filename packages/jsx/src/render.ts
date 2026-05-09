@@ -23,6 +23,7 @@ import type {
   BoxProps,
   BoxSides,
   CellStyle,
+  DocumentProps,
   EllipseProps,
   ImageProps,
   LineProps,
@@ -55,7 +56,17 @@ type LayoutItem = {
   schemaEnd: number;
   outerHeight: number;
 };
-type StaticBlocks = Record<StaticPlacement, PdfJsxChild[]>;
+type StaticBlocks = {
+  footer: PdfJsxChild[];
+  header: PdfJsxChild[];
+  staticBottom: PdfJsxChild[];
+  staticTop: PdfJsxChild[];
+};
+type RenderRoot = {
+  children: PdfJsxChild[];
+  documentProps?: DocumentProps;
+  hasDocument: boolean;
+};
 
 type RenderCtx = {
   schemas: Schema[];
@@ -86,12 +97,11 @@ export const renderToTemplate = async (
   options: RenderOptions = {},
 ): Promise<RenderResult> => {
   validatePageBreakPlacement(node);
-  const expanded = expandPageBreaks(node);
-  validateAbsolutePlacement(expanded);
-  validateNoTopLevelStatic(expanded);
-  const pages = flattenChildren(expanded).filter(
-    (child): child is PdfJsxElement<'page'> => isPdfJsxElement(child) && child.kind === 'page',
-  );
+  const root = resolveRenderRoot(node);
+  validateAbsolutePlacement(root.children);
+  validateStaticPlacement(root.children, root.hasDocument);
+  const { pages: rawPages, blocks: staticBlocks } = extractDocumentChildren(root);
+  const pages = rawPages.map((page) => applyDocumentPageDefaults(page, root.documentProps));
 
   if (pages.length === 0) {
     throw new Error('@pdfme/jsx: renderToTemplate root must contain at least one <Page>.');
@@ -101,8 +111,6 @@ export const renderToTemplate = async (
   const firstMargin = resolveBoxSides(firstPageProps.margin);
   const pageSize = resolvePageSize(firstPageProps.size, firstPageProps.orientation);
   validateConsistentPageProps(pages, pageSize, firstMargin);
-  validateStaticPlacement(pages);
-  const { pages: bodyPages, blocks: staticBlocks } = extractStaticChildren(pages);
   const inputs: Record<string, string> = {};
   const usedNames = new Set<string>();
   const nameCounters: Record<string, number> = {};
@@ -113,13 +121,16 @@ export const renderToTemplate = async (
   const hasStaticChildren = hasStaticBlocks(staticBlocks);
 
   if (hasStaticChildren && options.basePdf != null && !isBlankPdf(options.basePdf)) {
-    throw new Error('@pdfme/jsx: <Static> is supported only with a blank basePdf.');
+    throw new Error(
+      '@pdfme/jsx: <Header>, <Footer>, and <Static> are supported only with a blank basePdf.',
+    );
   }
 
   if (hasStaticChildren) {
     await layoutStaticBlocks({
       blocks: staticBlocks,
-      frame: { x: 0, y: 0, width: pageSize.width, height: pageSize.height },
+      margin: firstMargin,
+      pageSize,
       staticSchemas,
       inputs,
       usedNames,
@@ -130,7 +141,7 @@ export const renderToTemplate = async (
     });
   }
 
-  for (const page of bodyPages) {
+  for (const page of pages) {
     const props = page.props as PageProps;
     const margin = resolveBoxSides(props.margin);
     const frame = {
@@ -239,33 +250,96 @@ const flattenForSplitting = (children: PdfJsxChild | PdfJsxChild[]): PdfJsxChild
 const expandPageBreaks = (node: PdfJsxChild): PdfJsxChild[] =>
   splitChildrenByPageBreak(node).flat();
 
-const extractStaticChildren = (
-  pages: PdfJsxElement<'page'>[],
-): { pages: PdfJsxElement<'page'>[]; blocks: StaticBlocks } => {
-  const blocks: StaticBlocks = { top: [], bottom: [] };
-  const bodyPages = pages.map((page, pageIndex) => {
-    const bodyChildren: PdfJsxChild[] = [];
-    for (const child of flattenForSplitting(page.children)) {
-      if (isPdfJsxElement(child) && child.kind === 'static') {
-        if (pageIndex === 0) {
-          const placement = getStaticPlacement(child as PdfJsxElement<'static'>);
-          blocks[placement].push(child.children);
-        }
-        continue;
-      }
-      bodyChildren.push(child);
-    }
-    return cloneElementWithChildren(page, bodyChildren) as PdfJsxElement<'page'>;
-  });
+const STATIC_DIRECT_KINDS = new Set(['header', 'footer', 'static']);
 
-  return { pages: bodyPages, blocks };
+const createEmptyStaticBlocks = (): StaticBlocks => ({
+  footer: [],
+  header: [],
+  staticBottom: [],
+  staticTop: [],
+});
+
+const resolveRenderRoot = (node: PdfJsxChild): RenderRoot => {
+  const topLevelChildren = flattenChildren(node);
+  const documents = topLevelChildren.filter(
+    (child): child is PdfJsxElement<'document'> =>
+      isPdfJsxElement(child) && child.kind === 'document',
+  );
+
+  if (documents.length === 0) {
+    return { children: expandPageBreaks(node), hasDocument: false };
+  }
+
+  if (documents.length > 1) {
+    throw new Error('@pdfme/jsx: only one <Document> root is supported.');
+  }
+
+  if (topLevelChildren.some((child) => child !== documents[0])) {
+    throw new Error('@pdfme/jsx: <Document> must be the only root element.');
+  }
+
+  const document = documents[0];
+  return {
+    children: expandPageBreaks(document.children),
+    documentProps: document.props as DocumentProps,
+    hasDocument: true,
+  };
 };
 
-const hasStaticBlocks = (blocks: StaticBlocks) => blocks.top.length > 0 || blocks.bottom.length > 0;
+const extractDocumentChildren = (
+  root: RenderRoot,
+): { pages: PdfJsxElement<'page'>[]; blocks: StaticBlocks } => {
+  const blocks = createEmptyStaticBlocks();
+  const pages: PdfJsxElement<'page'>[] = [];
+
+  for (const child of flattenChildren(root.children)) {
+    if (!isPdfJsxElement(child)) continue;
+
+    if (child.kind === 'page') {
+      pages.push(child as PdfJsxElement<'page'>);
+      continue;
+    }
+
+    if (!root.hasDocument || !STATIC_DIRECT_KINDS.has(child.kind)) continue;
+
+    if (child.kind === 'header') {
+      blocks.header.push(...child.children);
+    } else if (child.kind === 'footer') {
+      blocks.footer.push(...child.children);
+    } else if (child.kind === 'static') {
+      const placement = getStaticPlacement(child as PdfJsxElement<'static'>);
+      blocks[placement === 'top' ? 'staticTop' : 'staticBottom'].push(...child.children);
+    }
+  }
+
+  return { pages, blocks };
+};
+
+const applyDocumentPageDefaults = (
+  page: PdfJsxElement<'page'>,
+  documentProps: DocumentProps | undefined,
+): PdfJsxElement<'page'> => {
+  if (!documentProps) return page;
+  const { children: _children, ...props } = documentProps;
+  return {
+    ...page,
+    props: {
+      ...props,
+      ...page.props,
+    },
+  };
+};
+
+const hasStaticBlocks = (blocks: StaticBlocks) =>
+  blocks.header.length > 0 ||
+  blocks.footer.length > 0 ||
+  blocks.staticTop.length > 0 ||
+  blocks.staticBottom.length > 0;
 
 const layoutStaticBlocks = async (arg: {
   blocks: StaticBlocks;
-  frame: Rect;
+  margin: Box;
+  pageSize: { width: number; height: number };
   staticSchemas: Schema[];
   inputs: Record<string, string>;
   usedNames: Set<string>;
@@ -274,8 +348,38 @@ const layoutStaticBlocks = async (arg: {
   font: Font;
   _cache: Map<string | number, unknown>;
 }) => {
-  for (const placement of ['top', 'bottom'] as const) {
-    const children = arg.blocks[placement];
+  const contentWidth = Math.max(0, arg.pageSize.width - arg.margin.left - arg.margin.right);
+  const blockFrames: Array<{ children: PdfJsxChild[]; frame: Rect; placement?: StaticPlacement }> = [
+    {
+      children: arg.blocks.staticTop,
+      frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
+    },
+    {
+      children: arg.blocks.header,
+      frame: {
+        x: arg.margin.left,
+        y: 0,
+        width: contentWidth,
+        height: arg.margin.top,
+      },
+    },
+    {
+      children: arg.blocks.footer,
+      frame: {
+        x: arg.margin.left,
+        y: arg.pageSize.height - arg.margin.bottom,
+        width: contentWidth,
+        height: arg.margin.bottom,
+      },
+    },
+    {
+      children: arg.blocks.staticBottom,
+      frame: { x: 0, y: 0, width: arg.pageSize.width, height: arg.pageSize.height },
+      placement: 'bottom',
+    },
+  ];
+
+  for (const { children, frame, placement } of blockFrames) {
     if (children.length === 0) continue;
 
     const schemas: Schema[] = [];
@@ -290,7 +394,7 @@ const layoutStaticBlocks = async (arg: {
     };
     const size = await layoutChildren(
       children,
-      arg.frame,
+      frame,
       'stack',
       {
         gap: 0,
@@ -301,7 +405,7 @@ const layoutStaticBlocks = async (arg: {
     );
 
     if (placement === 'bottom') {
-      shiftSchemas(schemas, 0, schemas.length, 0, Math.max(0, arg.frame.height - size.height));
+      shiftSchemas(schemas, 0, schemas.length, 0, Math.max(0, frame.height - size.height));
     }
     arg.staticSchemas.push(...schemas);
   }
@@ -562,9 +666,13 @@ const renderElement = async (
       return renderList({ ...(props as ListProps), children: element.children }, frame, ctx);
     case 'table':
       return renderTable(props as TableProps, frame, ctx);
+    case 'document':
+      throw new Error('@pdfme/jsx: <Document> must be the root element.');
+    case 'header':
+    case 'footer':
     case 'static':
       throw new Error(
-        '@pdfme/jsx: <Static> can only be used as a direct child of the first <Page>.',
+        '@pdfme/jsx: <Header>, <Footer>, and <Static> can only be used as direct children of <Document>.',
       );
     case 'absolute':
       return renderAbsolute(props as AbsoluteProps, element.children, frame, ctx);
@@ -1237,7 +1345,8 @@ const STATIC_LEAF_KINDS = new Set([
   'ellipse',
   'line',
 ]);
-const ABSOLUTE_PARENT_KINDS = new Set(['page', 'static', 'box']);
+const ABSOLUTE_PARENT_KINDS = new Set(['page', 'header', 'footer', 'static', 'box']);
+const STATIC_BLOCK_KINDS = new Set(['header', 'footer', 'static']);
 
 const validatePageBreakPlacement = (
   node: PdfJsxChild | PdfJsxChild[],
@@ -1270,47 +1379,64 @@ const validateAbsolutePlacement = (
     if (!isPdfJsxElement(child)) continue;
 
     if (child.kind === 'absolute' && (!parentKind || !ABSOLUTE_PARENT_KINDS.has(parentKind))) {
-      throw new Error('@pdfme/jsx: <Absolute> can only be used inside <Page>, <Static>, or <Box>.');
+      throw new Error(
+        '@pdfme/jsx: <Absolute> can only be used inside <Page>, <Header>, <Footer>, <Static>, or <Box>.',
+      );
     }
 
     validateAbsolutePlacement(child.children, child.kind);
   }
 };
 
-const validateStaticPlacement = (pages: PdfJsxElement<'page'>[]) => {
-  for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
-    const page = pages[pageIndex];
-    for (const child of flattenForSplitting(page?.children ?? [])) {
-      if (isPdfJsxElement(child) && child.kind === 'static') {
-        if (pageIndex !== 0) {
-          throw new Error(
-            '@pdfme/jsx: <Static> must appear before any <PageBreak> and can only be used inside the first <Page>.',
-          );
-        }
+const validateStaticPlacement = (children: PdfJsxChild[], hasDocument: boolean) => {
+  for (const child of flattenChildren(children)) {
+    if (!isPdfJsxElement(child)) {
+      if (hasDocument && String(child).trim() !== '') {
+        throw new Error(
+          '@pdfme/jsx: <Document> children must be <Header>, <Footer>, <Static>, or <Page>.',
+        );
+      }
+      continue;
+    }
+
+    if (STATIC_BLOCK_KINDS.has(child.kind)) {
+      if (!hasDocument) {
+        throw new Error(
+          '@pdfme/jsx: <Header>, <Footer>, and <Static> can only be used as direct children of <Document>.',
+        );
+      }
+      if (child.kind === 'static') {
         // Validate dynamic JavaScript callers before static children are extracted for layout.
         const placement = getStaticPlacement(child as PdfJsxElement<'static'>);
         if (placement === 'bottom' && hasElementKind(child.children, 'absolute')) {
           throw new Error(
-            '@pdfme/jsx: <Absolute> is not supported inside bottom <Static>. Use top <Static> or <Page> for fixed page coordinates.',
+            '@pdfme/jsx: <Absolute> is not supported inside bottom <Static>. Use top <Static>, <Header>, <Footer>, or <Page> for fixed page coordinates.',
           );
         }
-        validateStaticChildren(child.children);
-        continue;
       }
-      validateNoNestedStatic(child);
+      validateStaticChildren(child.children);
+      continue;
     }
+
+    if (hasDocument && child.kind !== 'page') {
+      throw new Error(
+        '@pdfme/jsx: <Document> children must be <Header>, <Footer>, <Static>, or <Page>.',
+      );
+    }
+
+    validateNoNestedStaticBlock(child);
   }
 };
 
-const validateNoNestedStatic = (node: PdfJsxChild) => {
+const validateNoNestedStaticBlock = (node: PdfJsxChild) => {
   if (!isPdfJsxElement(node)) return;
   for (const child of flattenForSplitting(node.children)) {
-    if (isPdfJsxElement(child) && child.kind === 'static') {
+    if (isPdfJsxElement(child) && STATIC_BLOCK_KINDS.has(child.kind)) {
       throw new Error(
-        '@pdfme/jsx: <Static> can only be used as a direct child of the first <Page>.',
+        '@pdfme/jsx: <Header>, <Footer>, and <Static> can only be used as direct children of <Document>.',
       );
     }
-    validateNoNestedStatic(child);
+    validateNoNestedStaticBlock(child);
   }
 };
 
@@ -1320,16 +1446,6 @@ const hasElementKind = (node: PdfJsxChild | PdfJsxChild[], kind: string): boolea
     if (child.kind === kind || hasElementKind(child.children, kind)) return true;
   }
   return false;
-};
-
-const validateNoTopLevelStatic = (node: PdfJsxChild | PdfJsxChild[]) => {
-  for (const child of flattenChildren(node)) {
-    if (isPdfJsxElement(child) && child.kind === 'static') {
-      throw new Error(
-        '@pdfme/jsx: <Static> can only be used as a direct child of the first <Page>.',
-      );
-    }
-  }
 };
 
 const validateStaticChildren = (children: PdfJsxChild | PdfJsxChild[]) => {
