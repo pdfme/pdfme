@@ -1,13 +1,14 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-08
+最終更新: 2026-05-09
 
 ## 目的
 
 `@pdfme/jsx` で stacking layout を使った template authoring を整備し、その考え方を
 `converter` package の `md2pdf` に応用する。`md2pdf` / `@pdfme/jsx` ともに beta playground と
-docs が入り、実際に試しながら仕様を磨ける状態になった。次は playground で見えた違和感を拾い、
-layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
+docs が入り、実際に試しながら仕様を磨ける状態になった。`Document` root による static
+layout API も入ったため、次は playground で見えた違和感を拾い、JSX authoring UX、layout 品質、
+rich content の応用範囲を広げる。
 
 ## 基本方針
 
@@ -25,12 +26,13 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
 
 ## 次に進めること
 
-### 1. `@pdfme/jsx` authoring UX / API フォローアップ
+### 1. `@pdfme/jsx` playground / authoring UX フォローアップ
 
-- JSX static schema API は `Document` root に寄せる。`Header` / `Footer` / `Static` は
-  `Document` 直下にだけ置ける document-level repeated layer とし、`Page` 内には置けない。
-  `Header` / `Footer` は page margin 領域を使い、低レベルな `Static` は page 全体座標の
-  repeated overlay として扱う。
+- `Document` root、margin-aware な `Header` / `Footer`、page 全体座標の `Static` は入った。
+  次は playground preset / docs を通じて、repeated layer、margin area、`Absolute` origin が
+  直感とズレないかを確認し、必要なら wording やサンプルを直す。
+- `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを
+  preset に残す。`Page` 直下 static を禁止した新 API の書き方も docs 上で迷わないようにする。
 - JSX playground で生成した template から Designer に遷移する導線を検討する。source JSX と生成後
   template JSON のどちらを編集の正とするかを先に決める。
 - JSX playground の preset は増やせる状態になった。次は「よいサンプルを増やす」より、preset / draft /
@@ -44,14 +46,7 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
 - 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
 - blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
 
-### 3. `md2pdf` assets / rich content 方針
-
-- remote image は converter 内で fetch して data URI 化するか、引き続き link fallback とするかを決める。
-- `Template + inputs` API を崩さずに済むなら、まず converter 内 fetch + data URI 化を検討する。
-- table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
-  分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
-
-### 4. `@pdfme/jsx` layout 品質フォローアップ
+### 3. `@pdfme/jsx` layout / dynamic container フォローアップ
 
 - CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
 - `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
@@ -62,6 +57,14 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
   layout は将来の設計課題として扱う。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
+
+### 4. `md2pdf` assets / rich content 方針
+
+- remote image は当面 link fallback のままにする。実装する場合は converter 内で安全に fetch して
+  PNG / JPEG data URI 化する案を、CORS、content-type、size limit、timeout とセットで検討する。
+- `Template + inputs` API は維持する。assets metadata や warnings は、必要になった時に追加検討する。
+- table cell / list item 内の bold, italic, inline code, link を schema 拡張で保持するか、複数 schema に
+  分解するかを後で決める。完璧な GFM より PDF として破綻しないことを優先する。
 
 ## 仕様メモ
 
@@ -166,6 +169,11 @@ layout 品質、JSX authoring UX、rich content の応用範囲を広げる。
 - PR #1488: `/jsx` / `/md2pdf` playground に sample preset 切り替え、JSX Form preview、
   Template JSON download、mobile preview sizing、JSX template validation、`Table columnWeights`
   docs / tests を追加。
+- PR #1490: `/jsx` / `/md2pdf` playground の mobile preview refresh を修正。スクロールコンテナと
+  zero-height preview の再マウント判定を調整。
+- PR #1491: `@pdfme/jsx` static layout API を `Document` root に再設計。`Header` / `Footer` /
+  `Static` は `Document` 直下に限定し、`Header` / `Footer` は page margin 領域、`Static` は page
+  全体座標の repeated overlay として扱うようにした。
 
 ## 参考
 
