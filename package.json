@@ -44,19 +44,20 @@
     "typecheck": "node packages/common/set-version.js && tsc -b",
     "test": "vp run --filter '@pdfme/*' test",
     "lint": "vp run --filter '@pdfme/*' lint && npm --prefix playground run lint",
-    "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/jsx/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
+    "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/jsx/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix",
+    "knip": "knip --no-config-hints",
+    "knip:production": "knip --production --no-config-hints"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "jsdom": "^29.1.0",
+    "knip": "^6.12.0",
     "lodash": "^4.18.1",
-    "lodash-es": "^4.18.1",
     "rimraf": "^6.1.3",
     "typescript": "^6.0.3",
     "vite": "^8.0.10",
     "vite-plus": "^0.1.19",
-    "vitest": "^4.1.5",
-    "vitest-image-snapshot": "^0.6.50"
+    "vitest": "^4.1.5"
   },
   "packageManager": "npm@11.12.1"
 }

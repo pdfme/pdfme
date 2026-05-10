@@ -253,8 +253,6 @@ async function loadRouteWithStorage(
   await page.goto(baseUrl, { waitUntil: 'networkidle2', timeout });
   await page.evaluate(
     (state, resolvedInputs, id, projectsStorageKey, activeProjectStorageKey) => {
-      localStorage.removeItem('template');
-      localStorage.removeItem('inputs');
       localStorage.removeItem('mode');
       localStorage.removeItem(projectsStorageKey);
       localStorage.removeItem(activeProjectStorageKey);
@@ -489,7 +487,7 @@ describe('Playground E2E Tests', () => {
     if (!browser || !page) throw new Error('Browser/Page not initialized');
 
     // 1. Navigate to templates list & click on Invoice template
-    await page.goto(`${baseUrl}/templates`);
+    await page.goto(baseUrl);
     await page.waitForSelector('#template-img-invoice', { timeout });
     await page.click('#template-img-invoice');
 

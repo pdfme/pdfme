@@ -1,0 +1,130 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreExportsUsedInFile": true,
+  "ignoreIssues": {
+    "packages/cli/src/example-templates.ts": ["exports"],
+    "packages/common/src/constants.ts": ["duplicates"],
+    "packages/jsx/src/jsx-runtime.ts": ["duplicates"],
+    "packages/schemas/src/list/constants.ts": ["duplicates"],
+    "packages/schemas/src/multiVariableText/variables.ts": ["exports"],
+    "packages/schemas/src/text/constants.ts": ["duplicates"],
+    "packages/schemas/src/text/richText.ts": ["exports"]
+  },
+  "ignore": ["**/dist/**", "tmp/**", "website/build/**", "website/.docusaurus/**"],
+  "workspaces": {
+    ".": {
+      "ignoreDependencies": ["lodash"],
+      "entry": [
+        "vite.config.mts!",
+        "vitest.config.ts!",
+        "scripts/**/*.{js,mjs,ts}!",
+        "package.json!"
+      ],
+      "project": ["*.{js,mjs,ts,mts,json}!", "scripts/**/*.{js,mjs,ts}!"]
+    },
+    "packages/cli": {
+      "entry": ["src/index.ts!", "__tests__/**/*.test.ts", "__tests__/fixtures/*.mjs"],
+      "project": ["src/**/*.ts!", "__tests__/**/*.{ts,mjs}", "vite.config.mts!", "package.json!"]
+    },
+    "packages/common": {
+      "ignoreDependencies": ["buffer"],
+      "entry": ["src/index.ts!", "set-version.js!", "__tests__/**/*.test.ts"],
+      "project": ["src/**/*.ts!", "__tests__/**/*.ts", "set-version.js!", "vite.config.mts!", "package.json!"]
+    },
+    "packages/converter": {
+      "entry": [
+        "src/index.browser.ts!",
+        "src/index.node.ts!",
+        "src/md2pdf.ts!",
+        "__tests__/**/*.test.ts"
+      ],
+      "project": ["src/**/*.ts!", "__tests__/**/*.ts", "vite.config.mts!", "package.json!"]
+    },
+    "packages/generator": {
+      "entry": [
+        "src/index.ts!",
+        "__tests__/**/*.test.ts",
+        "__tests__/cssTransform.js",
+        "vitest.setup.ts"
+      ],
+      "project": [
+        "src/**/*.ts!",
+        "__tests__/**/*.{ts,js}",
+        "vitest.setup.ts",
+        "vite.config.mts!",
+        "package.json!"
+      ]
+    },
+    "packages/jsx": {
+      "entry": [
+        "src/index.ts!",
+        "src/jsx-runtime.ts!",
+        "src/jsx-dev-runtime.ts!",
+        "src/__tests__/**/*.test.tsx"
+      ],
+      "project": ["src/**/*.{ts,tsx}!", "vite.config.mts!", "package.json!"]
+    },
+    "packages/manipulator": {
+      "entry": ["src/index.ts!", "__tests__/**/*.test.ts", "vitest.setup.ts"],
+      "project": [
+        "src/**/*.ts!",
+        "__tests__/**/*.ts",
+        "vitest.setup.ts",
+        "vite.config.mts!",
+        "package.json!"
+      ]
+    },
+    "packages/pdf-lib": {
+      "entry": ["src/index.ts!", "__tests__/**/*.{test,spec}.ts"],
+      "project": ["src/**/*.ts!", "__tests__/**/*.ts", "vite.config.mts!", "package.json!"]
+    },
+    "packages/schemas": {
+      "entry": [
+        "src/index.ts!",
+        "src/builtins.ts!",
+        "src/dynamicLayout.ts!",
+        "src/lists.ts!",
+        "src/tables.ts!",
+        "src/texts.ts!",
+        "src/types.ts!",
+        "src/utils.ts!",
+        "__tests__/**/*.test.ts"
+      ],
+      "project": ["src/**/*.ts!", "__tests__/**/*.ts", "vite.config.mts!", "package.json!"]
+    },
+    "packages/ui": {
+      "entry": ["src/index.ts!", "__tests__/**/*.{test.ts,test.tsx}", "vitest.setup.ts"],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "__tests__/**/*.{ts,tsx}",
+        "__mocks__/**/*.ts",
+        "vitest.setup.ts",
+        "vite.config.mts!",
+        "package.json!"
+      ]
+    },
+    "playground": {
+      "entry": [
+        "src/index.tsx!",
+        "e2e/**/*.test.ts",
+        "scripts/**/*.mjs!",
+        "vite.config.ts!",
+        "vitest.setup.ts",
+        "postcss.config.js!",
+        "tailwind.config.js!"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}!",
+        "e2e/**/*.ts",
+        "scripts/**/*.mjs!",
+        "*.{js,ts,json}!",
+        "package.json!"
+      ]
+    },
+    "website": {
+      "ignoreDependencies": ["@docusaurus/plugin-google-gtag"],
+      "entry": ["src/**/*.{ts,tsx}!", "docusaurus.config.js!", "sidebars.js!"],
+      "project": ["src/**/*.{ts,tsx}!", "*.{js,ts,json}!", "docs/**/*.md!", "i18n/**/*.md!"]
+    }
+  }
+}

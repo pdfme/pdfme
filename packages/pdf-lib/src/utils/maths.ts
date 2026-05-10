@@ -26,10 +26,6 @@ export const isColinear = ({ x: ux, y: uy }: Coordinates, { x: vx, y: vy }: Coor
 export const isEqual = (a: number, b: number): boolean =>
   Math.round(Math.abs(a - b) / FLOAT_APPROXIMATION) === 0;
 
-/** Return true if a is proportional to b: (a = kb), considering float imprecision */
-export const isProportional = (a: number, b: number): boolean =>
-  isEqual((Math.abs(a) + FLOAT_APPROXIMATION / 10) % b, 0);
-
 /** Calculate the scalar product between 2 vectors */
 export const scalar = ({ x: ux, y: uy }: Coordinates, { x: vx, y: vy }: Coordinates): number =>
   ux * vx + uy * vy;

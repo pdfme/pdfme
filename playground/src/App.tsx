@@ -20,7 +20,6 @@ export default function App() {
           <Route path="/form-viewer" element={<FormAndViewer />} />
           <Route path="/jsx" element={<JsxPlayground />} />
           <Route path="/md2pdf" element={<Md2Pdf />} />
-          <Route path="/templates" element={<Templates />} />
         </Routes>
       </Suspense>
       <ToastContainer />

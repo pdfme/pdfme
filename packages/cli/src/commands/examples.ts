@@ -7,6 +7,7 @@ import {
   getExamplesBaseUrl,
 } from '../example-templates.js';
 import { getOfficialExampleFonts } from '../example-fonts.js';
+import { normalizeSchemaPages } from '../schema-pages.js';
 
 const examplesArgs = {
   name: { type: 'positional' as const, description: 'Template name to output', required: false },
@@ -23,7 +24,7 @@ const examplesArgs = {
 };
 
 function generateSampleInputs(template: Record<string, unknown>): Record<string, string>[] {
-  const fields = normalizeSchemaPages(template.schemas).flat();
+  const fields = normalizeSchemaPages(template.schemas, { inferObjectSchemaNames: true }).flat();
 
   if (fields.length === 0) return [{}];
 
@@ -211,39 +212,9 @@ function countTemplateStats(template: Record<string, unknown>): {
   templatePageCount: number;
   fieldCount: number;
 } {
-  const schemaPages = normalizeSchemaPages(template.schemas);
+  const schemaPages = normalizeSchemaPages(template.schemas, { inferObjectSchemaNames: true });
   return {
     templatePageCount: schemaPages.length,
     fieldCount: schemaPages.reduce((count, page) => count + page.length, 0),
   };
-}
-
-function normalizeSchemaPages(rawSchemas: unknown): Array<Array<Record<string, unknown>>> {
-  if (!Array.isArray(rawSchemas)) {
-    return [];
-  }
-
-  return rawSchemas.map((page) => {
-    if (Array.isArray(page)) {
-      return page.filter(
-        (schema): schema is Record<string, unknown> =>
-          typeof schema === 'object' && schema !== null,
-      );
-    }
-
-    if (typeof page === 'object' && page !== null) {
-      return Object.entries(page)
-        .map(([name, schema]) =>
-          typeof schema === 'object' && schema !== null
-            ? ({ ...schema, name: (schema as Record<string, unknown>).name ?? name } as Record<
-                string,
-                unknown
-              >)
-            : null,
-        )
-        .filter((schema): schema is Record<string, unknown> => schema !== null);
-    }
-
-    return [];
-  });
 }

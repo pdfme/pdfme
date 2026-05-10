@@ -55,7 +55,8 @@
   "devDependencies": {
     "@pdfme/common": "*",
     "@pdfme/converter": "*",
-    "@pdfme/schemas": "*"
+    "@pdfme/schemas": "*",
+    "vitest-image-snapshot": "^0.6.50"
   },
   "peerDependencies": {
     "@pdfme/common": "latest",

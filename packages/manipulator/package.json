@@ -52,6 +52,7 @@
     "@pdfme/pdf-lib": "*"
   },
   "devDependencies": {
-    "@pdfme/converter": "*"
+    "@pdfme/converter": "*",
+    "vitest-image-snapshot": "^0.6.50"
   }
 }

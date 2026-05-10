@@ -36,10 +36,6 @@ export function intersections(A: GraphicElement, B: GraphicElement): Coordinates
   return A;
 }
 
-export function intersection(A: GraphicElement, B: GraphicElement): Coordinates | undefined {
-  return intersections(A, B)[0];
-}
-
 function intersectionsLine(A: Line, B: Exclude<GraphicElement, Text | Point>): Coordinates[] {
   if (B instanceof Line) return intersectionLine(A, B);
   else if (B instanceof Segment) {
@@ -224,14 +220,4 @@ function intersectionsCircle(A: Circle, B: Exclude<GraphicElement, Text | Point>
   else if (B instanceof Rectangle) return intersectionsRectangle(B, A);
   else if (B instanceof Ellipse) return intersectionsEllipse(B, A);
   return B;
-}
-
-export function getIntersections(elements: GraphicElement[]) {
-  const checked: GraphicElement[] = [];
-  const inters: Coordinates[] = [];
-  elements.forEach((elt) => {
-    checked.forEach((e) => inters.push(...intersections(e, elt)));
-    checked.push(elt);
-  });
-  return inters;
 }

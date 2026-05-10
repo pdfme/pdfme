@@ -625,7 +625,6 @@ function TemplatesApp() {
                         )}
                       </PlaygroundButton>
                       <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
-                        <Eye className="size-4" />
                         Preview
                       </PlaygroundButton>
                       <ProjectMoreActions

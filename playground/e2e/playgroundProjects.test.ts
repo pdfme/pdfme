@@ -26,7 +26,6 @@ class MemoryStorage {
 }
 
 const projectsStorageKey = 'playground:projects:v1';
-const activeProjectStorageKey = 'playground:activeProjectId:v1';
 
 const template: Template = {
   basePdf: { height: 100, padding: [0, 0, 0, 0], width: 100 },
@@ -127,22 +126,6 @@ describe('playground project storage', () => {
 
     expect(renamePlaygroundProject('missing', 'Nope', storage)).toBeNull();
     expect(duplicatePlaygroundProject('missing', 'Nope', storage)).toBeNull();
-  });
-
-  it('migrates legacy localStorage template state into a project', () => {
-    const storage = new MemoryStorage();
-    storage.setItem('template', JSON.stringify(template));
-    storage.setItem('inputs', JSON.stringify([{ field: 'value' }]));
-
-    const projects = readPlaygroundProjects(storage);
-
-    expect(projects).toHaveLength(1);
-    expect(projects[0]?.title).toBe('Imported local template');
-    expect(projects[0]?.inputs).toEqual([{ field: 'value' }]);
-    expect(storage.getItem('template')).toBeNull();
-    expect(storage.getItem('inputs')).toBeNull();
-    expect(storage.getItem(projectsStorageKey)).toBeTruthy();
-    expect(storage.getItem(activeProjectStorageKey)).toBe(projects[0]?.id);
   });
 
   it('ignores malformed stored projects', () => {

@@ -18,7 +18,7 @@ const trackedSpecifiers = [
   '@pdfme/ui',
 ];
 
-const trackedDirs = ['src', 'scripts', 'e2e', 'node-playground'];
+const trackedDirs = ['src', 'scripts', 'e2e'];
 const trackedExtensions = new Set(['.ts', '.tsx', '.js', '.mjs', '.json']);
 const forbiddenSegments = ['/src/', '/cjs/src/', '/esm/src/', '/dist/cjs/src/', '/dist/esm/src/'];
 const forbiddenImportPatterns = [

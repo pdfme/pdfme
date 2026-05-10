@@ -16,16 +16,18 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.10.0",
-    "@docusaurus/module-type-aliases": "^3.10.0",
-    "@docusaurus/plugin-client-redirects": "^3.10.0",
-    "@docusaurus/plugin-google-gtag": "^3.10.0",
-    "@docusaurus/preset-classic": "^3.10.0",
+    "@docusaurus/core": "^3.10.1",
+    "@docusaurus/module-type-aliases": "^3.10.1",
+    "@docusaurus/plugin-client-redirects": "^3.10.1",
+    "@docusaurus/plugin-google-gtag": "^3.10.1",
+    "@docusaurus/preset-classic": "^3.10.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-github-btn": "^1.2.1"
   },
   "devDependencies": {
+    "@docusaurus/plugin-content-docs": "^3.10.1",
+    "@docusaurus/types": "^3.10.1",
     "@tsconfig/docusaurus": "^2.0.9",
     "typescript": "^6.0.3"
   },

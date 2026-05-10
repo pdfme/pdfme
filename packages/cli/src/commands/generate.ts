@@ -24,6 +24,7 @@ import { normalizeExplicitFontOption, resolveFont } from '../fonts.js';
 import { detectCJKInTemplate, detectCJKInInputs } from '../cjk-detect.js';
 import { drawGridOnImage } from '../grid.js';
 import { schemaPlugins, schemaTypes } from '../schema-plugins.js';
+import { normalizeSchemaPages } from '../schema-pages.js';
 
 const generateArgs = {
   file: {
@@ -328,28 +329,4 @@ function describeGenerateInput(
   }
 
   return '(unknown)';
-}
-
-function normalizeSchemaPages(rawSchemas: unknown): Array<Array<Record<string, unknown>>> {
-  if (!Array.isArray(rawSchemas)) {
-    return [];
-  }
-
-  return rawSchemas.map((page) => {
-    if (Array.isArray(page)) {
-      return page.filter(
-        (schema): schema is Record<string, unknown> =>
-          typeof schema === 'object' && schema !== null,
-      );
-    }
-
-    if (typeof page === 'object' && page !== null) {
-      return Object.values(page).filter(
-        (schema): schema is Record<string, unknown> =>
-          typeof schema === 'object' && schema !== null,
-      );
-    }
-
-    return [];
-  });
 }

@@ -33,8 +33,6 @@ export type SavePlaygroundProjectInput = {
 
 const PROJECTS_STORAGE_KEY = 'playground:projects:v1';
 const ACTIVE_PROJECT_STORAGE_KEY = 'playground:activeProjectId:v1';
-const LEGACY_TEMPLATE_STORAGE_KEY = 'template';
-const LEGACY_INPUTS_STORAGE_KEY = 'inputs';
 
 type StorageLike = Pick<Storage, 'getItem' | 'removeItem' | 'setItem'>;
 
@@ -127,36 +125,6 @@ const writePlaygroundProjects = (projects: PlaygroundProject[], storage = getSto
   storage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
 };
 
-const migrateLegacyProject = (storage: StorageLike): PlaygroundProject | null => {
-  const legacyTemplate = storage.getItem(LEGACY_TEMPLATE_STORAGE_KEY);
-  if (!legacyTemplate) return null;
-
-  try {
-    const template = JSON.parse(legacyTemplate) as Template;
-    checkTemplate(template);
-
-    const parsedInputs = JSON.parse(storage.getItem(LEGACY_INPUTS_STORAGE_KEY) ?? 'null');
-    const now = Date.now();
-    const project: PlaygroundProject = {
-      createdAt: now,
-      id: `project_legacy_${now.toString(36)}`,
-      inputs: parseInputs(parsedInputs) ?? getInputFromTemplate(template),
-      kind: 'template',
-      template,
-      title: 'Imported local template',
-      updatedAt: now,
-    };
-
-    writePlaygroundProjects([project], storage);
-    setActivePlaygroundProjectId(project.id, storage);
-    storage.removeItem(LEGACY_TEMPLATE_STORAGE_KEY);
-    storage.removeItem(LEGACY_INPUTS_STORAGE_KEY);
-    return project;
-  } catch {
-    return null;
-  }
-};
-
 export const readPlaygroundProjects = (storage = getStorage()): PlaygroundProject[] => {
   if (!storage) return [];
 
@@ -169,10 +137,7 @@ export const readPlaygroundProjects = (storage = getStorage()): PlaygroundProjec
       .filter((project): project is PlaygroundProject => project != null)
       .sort((a, b) => b.updatedAt - a.updatedAt);
 
-    if (projects.length > 0) return projects;
-
-    const migratedProject = migrateLegacyProject(storage);
-    return migratedProject ? [migratedProject] : [];
+    return projects;
   } catch {
     return [];
   }
@@ -228,22 +193,15 @@ export const renamePlaygroundProject = (
   title: string,
   storage = getStorage(),
 ) => {
-  const projects = readPlaygroundProjects(storage);
-  const project = projects.find((item) => item.id === projectId);
-  if (!project) return null;
-
-  const updatedProject: PlaygroundProject = {
-    ...project,
-    title: normalizeTitle(title, project.title),
-    updatedAt: Date.now(),
-  };
-  writePlaygroundProjects(
-    projects
-      .map((item) => (item.id === projectId ? updatedProject : item))
-      .sort((a, b) => b.updatedAt - a.updatedAt),
+  return updatePlaygroundProject(
+    projectId,
     storage,
+    (project) => ({
+      title: normalizeTitle(title, project.title),
+      updatedAt: Date.now(),
+    }),
+    { sortByUpdatedAt: true },
   );
-  return updatedProject;
 };
 
 export const duplicatePlaygroundProject = (
@@ -277,13 +235,25 @@ export const setPlaygroundProjectThumbnail = (
   thumbnail: string,
   storage = getStorage(),
 ) => {
+  return updatePlaygroundProject(projectId, storage, () => ({ thumbnail }));
+};
+
+const updatePlaygroundProject = (
+  projectId: string,
+  storage: StorageLike | null,
+  update: (project: PlaygroundProject) => Partial<PlaygroundProject>,
+  options: { sortByUpdatedAt?: boolean } = {},
+) => {
   const projects = readPlaygroundProjects(storage);
   const project = projects.find((item) => item.id === projectId);
   if (!project) return null;
 
-  const updatedProject = { ...project, thumbnail };
+  const updatedProject = { ...project, ...update(project) };
+  const updatedProjects = projects.map((item) => (item.id === projectId ? updatedProject : item));
   writePlaygroundProjects(
-    projects.map((item) => (item.id === projectId ? updatedProject : item)),
+    options.sortByUpdatedAt
+      ? updatedProjects.sort((a, b) => b.updatedAt - a.updatedAt)
+      : updatedProjects,
     storage,
   );
   return updatedProject;

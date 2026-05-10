@@ -20,6 +20,7 @@ type EmbeddedAssetInfo = {
 };
 
 type EmbeddedAssetMap = Record<string, EmbeddedAssetInfo>;
+const CONTINUE_JSON_WALK = Symbol('continueJsonWalk');
 
 type TemplateJsonDialogProps = {
   isOpen: boolean;
@@ -81,7 +82,7 @@ const replaceEmbeddedAssetsWithPlaceholders = (template: Template) => {
   const assets: EmbeddedAssetMap = {};
   let assetIndex = 0;
 
-  const replace = (value: unknown, path: JsonPathSegment[]): unknown => {
+  const templateWithPlaceholders = mapJsonValue(template, [], (value, path) => {
     if (typeof value === 'string' && isEmbeddedAsset(value)) {
       const placeholder = `${ASSET_PLACEHOLDER_PREFIX}asset_${assetIndex + 1}`;
       assetIndex += 1;
@@ -95,22 +96,14 @@ const replaceEmbeddedAssetsWithPlaceholders = (template: Template) => {
       return placeholder;
     }
 
-    if (Array.isArray(value)) return value.map((item, index) => replace(item, [...path, index]));
+    return CONTINUE_JSON_WALK;
+  }) as Template;
 
-    if (isRecord(value)) {
-      return Object.fromEntries(
-        Object.entries(value).map(([key, item]) => [key, replace(item, [...path, key])]),
-      );
-    }
-
-    return value;
-  };
-
-  return { assets, template: replace(template, []) as Template };
+  return { assets, template: templateWithPlaceholders };
 };
 
 const restoreEmbeddedAssetsFromPlaceholders = (template: unknown, assets: EmbeddedAssetMap) => {
-  const restore = (value: unknown, path: JsonPathSegment[]): unknown => {
+  return mapJsonValue(template, [], (value, path) => {
     if (typeof value === 'string') {
       if (!value.startsWith(ASSET_PLACEHOLDER_PREFIX)) return value;
 
@@ -129,18 +122,32 @@ const restoreEmbeddedAssetsFromPlaceholders = (template: unknown, assets: Embedd
       return assetInfo.value;
     }
 
-    if (Array.isArray(value)) return value.map((item, index) => restore(item, [...path, index]));
+    return CONTINUE_JSON_WALK;
+  }) as Template;
+};
 
-    if (isRecord(value)) {
-      return Object.fromEntries(
-        Object.entries(value).map(([key, item]) => [key, restore(item, [...path, key])]),
-      );
-    }
+const mapJsonValue = (
+  value: unknown,
+  path: JsonPathSegment[],
+  mapValue: (value: unknown, path: JsonPathSegment[]) => unknown | typeof CONTINUE_JSON_WALK,
+): unknown => {
+  const mappedValue = mapValue(value, path);
+  if (mappedValue !== CONTINUE_JSON_WALK) return mappedValue;
 
-    return value;
-  };
+  if (Array.isArray(value)) {
+    return value.map((item, index) => mapJsonValue(item, [...path, index], mapValue));
+  }
 
-  return restore(template, []) as Template;
+  if (isRecord(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        mapJsonValue(item, [...path, key], mapValue),
+      ]),
+    );
+  }
+
+  return value;
 };
 
 export default function TemplateJsonDialog({

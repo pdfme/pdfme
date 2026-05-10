@@ -37,11 +37,6 @@ export const getBoxInsets = (schema: BoxStyleSchema) => ({
   padding: normalizeBoxDimension(schema.padding),
 });
 
-export const getBoxHorizontalInset = (schema: BoxStyleSchema) => {
-  const { borderWidth, padding } = getBoxInsets(schema);
-  return borderWidth.left + borderWidth.right + padding.left + padding.right;
-};
-
 export const getBoxVerticalInset = (schema: BoxStyleSchema) => {
   const { borderWidth, padding } = getBoxInsets(schema);
   return borderWidth.top + borderWidth.bottom + padding.top + padding.bottom;

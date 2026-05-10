@@ -2,6 +2,7 @@ import { dirname, resolve } from 'node:path';
 import { PAGE_SIZE_PRESETS, checkTemplate } from '@pdfme/common';
 import { fail } from './contract.js';
 import { schemaTypes } from './schema-plugins.js';
+import { normalizeSchemaPages } from './schema-pages.js';
 import { detectPaperSize, readJsonFile, readJsonFromStdin } from './utils.js';
 
 export const KNOWN_TEMPLATE_KEYS = new Set([
@@ -351,30 +352,6 @@ function assertRecordObject(value: unknown, label: string): Record<string, unkno
   }
 
   return value as Record<string, unknown>;
-}
-
-export function normalizeSchemaPages(rawSchemas: unknown): Array<Array<Record<string, unknown>>> {
-  if (!Array.isArray(rawSchemas)) {
-    return [];
-  }
-
-  return rawSchemas.map((page) => {
-    if (Array.isArray(page)) {
-      return page.filter(
-        (schema): schema is Record<string, unknown> =>
-          typeof schema === 'object' && schema !== null,
-      );
-    }
-
-    if (typeof page === 'object' && page !== null) {
-      return Object.values(page).filter(
-        (schema): schema is Record<string, unknown> =>
-          typeof schema === 'object' && schema !== null,
-      );
-    }
-
-    return [];
-  });
 }
 
 function buildFieldInputHint(
@@ -841,28 +818,13 @@ function getStringMatrixInputIssue(
   input: Record<string, unknown>,
   inputIndex: number,
 ): string | null {
-  const rawValue = input[hint.name];
-  const example = hint.expectedInput.example;
-
-  if (rawValue === undefined || rawValue === '') {
-    return null;
-  }
-
-  const parsedValue =
-    typeof rawValue === 'string' && hint.expectedInput.acceptsJsonString === true
-      ? (parseTableStringMatrix(rawValue) ?? rawValue)
-      : rawValue;
-
-  const issue = getStringMatrixShapeIssue(parsedValue, hint.expectedInput.columnCount);
-  if (!issue) {
-    return null;
-  }
-
-  return buildStringMatrixErrorMessage({
+  return getStructuredInputIssue({
     hint,
+    input,
     inputIndex,
-    extra: issue,
-    example,
+    parseJsonString: parseTableStringMatrix,
+    getShapeIssue: (value) => getStringMatrixShapeIssue(value, hint.expectedInput.columnCount),
+    buildErrorMessage: buildStringMatrixErrorMessage,
   });
 }
 
@@ -871,28 +833,50 @@ function getStringArrayInputIssue(
   input: Record<string, unknown>,
   inputIndex: number,
 ): string | null {
-  const rawValue = input[hint.name];
-  const example = hint.expectedInput.example;
+  return getStructuredInputIssue({
+    hint,
+    input,
+    inputIndex,
+    parseJsonString: parseListJsonInput,
+    getShapeIssue: getStringArrayShapeIssue,
+    buildErrorMessage: buildStringArrayErrorMessage,
+  });
+}
+
+function getStructuredInputIssue(args: {
+  hint: FieldInputHint;
+  input: Record<string, unknown>;
+  inputIndex: number;
+  parseJsonString: (rawValue: unknown) => unknown | null;
+  getShapeIssue: (value: unknown) => string | null;
+  buildErrorMessage: (messageArgs: {
+    hint: FieldInputHint;
+    inputIndex: number;
+    extra: string;
+    example?: string | string[] | string[][];
+  }) => string;
+}): string | null {
+  const rawValue = args.input[args.hint.name];
 
   if (rawValue === undefined || rawValue === '') {
     return null;
   }
 
   const parsedValue =
-    typeof rawValue === 'string' && hint.expectedInput.acceptsJsonString === true
-      ? (parseListJsonInput(rawValue) ?? rawValue)
+    typeof rawValue === 'string' && args.hint.expectedInput.acceptsJsonString === true
+      ? (args.parseJsonString(rawValue) ?? rawValue)
       : rawValue;
 
-  const issue = getStringArrayShapeIssue(parsedValue);
+  const issue = args.getShapeIssue(parsedValue);
   if (!issue) {
     return null;
   }
 
-  return buildStringArrayErrorMessage({
-    hint,
-    inputIndex,
+  return args.buildErrorMessage({
+    hint: args.hint,
+    inputIndex: args.inputIndex,
     extra: issue,
-    example,
+    example: args.hint.expectedInput.example,
   });
 }
 
@@ -1040,18 +1024,16 @@ function isValidCanonicalDateValue(value: string, type: 'date' | 'time' | 'dateT
 }
 
 function isValidCanonicalDate(value: string): boolean {
-  const match = value.match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
-  if (!match) {
+  const date = parseCanonicalDateParts(value, /^(\d{4})\/(\d{2})\/(\d{2})$/);
+  if (!date) {
     return false;
   }
 
-  const [, year, month, day] = match;
-  if (!isValidCalendarDate(Number(year), Number(month), Number(day))) {
+  if (!isValidCalendarDate(date.year, date.month, date.day)) {
     return false;
   }
 
-  const parsed = parseRendererDateValue(value, 'date');
-  return parsed !== null && formatCanonicalDateValue(parsed, 'date') === value;
+  return isCanonicalDateRoundTrip(value, 'date');
 }
 
 function isValidCanonicalTime(value: string): boolean {
@@ -1065,21 +1047,43 @@ function isValidCanonicalTime(value: string): boolean {
 }
 
 function isValidCanonicalDateTime(value: string): boolean {
-  const match = value.match(/^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})$/);
-  if (!match) {
+  const date = parseCanonicalDateParts(value, /^(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2})$/);
+  if (!date) {
     return false;
   }
 
-  const [, year, month, day, hours, minutes] = match;
   if (
-    !isValidCalendarDate(Number(year), Number(month), Number(day)) ||
-    !isValidClockTime(Number(hours), Number(minutes))
+    !isValidCalendarDate(date.year, date.month, date.day) ||
+    !isValidClockTime(date.hours, date.minutes)
   ) {
     return false;
   }
 
-  const parsed = parseRendererDateValue(value, 'dateTime');
-  return parsed !== null && formatCanonicalDateValue(parsed, 'dateTime') === value;
+  return isCanonicalDateRoundTrip(value, 'dateTime');
+}
+
+function parseCanonicalDateParts(
+  value: string,
+  pattern: RegExp,
+): { day: number; hours: number; minutes: number; month: number; year: number } | null {
+  const match = value.match(pattern);
+  if (!match) {
+    return null;
+  }
+
+  const [, year, month, day, hours = '0', minutes = '0'] = match;
+  return {
+    day: Number(day),
+    hours: Number(hours),
+    minutes: Number(minutes),
+    month: Number(month),
+    year: Number(year),
+  };
+}
+
+function isCanonicalDateRoundTrip(value: string, type: 'date' | 'dateTime'): boolean {
+  const parsed = parseRendererDateValue(value, type);
+  return parsed !== null && formatCanonicalDateValue(parsed, type) === value;
 }
 
 function isValidCalendarDate(year: number, month: number, day: number): boolean {

@@ -52,6 +52,7 @@
     "@pdfme/common": "*",
     "@pdfme/converter": "*",
     "@pdfme/generator": "*",
+    "@pdfme/pdf-lib": "*",
     "@pdfme/schemas": "*",
     "citty": "^0.2.2"
   },

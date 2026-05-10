@@ -13,12 +13,6 @@ import { fail, isOptionProvided } from './contract.js';
 
 export { detectPaperSize };
 
-export interface UnifiedJob {
-  template: Record<string, unknown>;
-  inputs: Record<string, unknown>[];
-  options?: unknown;
-}
-
 interface LoadedInput {
   template: Record<string, unknown>;
   inputs: Record<string, unknown>[];

@@ -67,6 +67,11 @@ type RenderRoot = {
   documentProps?: DocumentProps;
   hasDocument: boolean;
 };
+type VisualSchema = ImageSchema | SVGSchema;
+type VisualSchemaProps = Pick<
+  ImageProps | SvgProps,
+  'height' | 'name' | 'opacity' | 'readOnly' | 'required' | 'rotate' | 'width'
+>;
 
 type RenderCtx = {
   schemas: Schema[];
@@ -942,29 +947,7 @@ const renderImage = (
   frame: Rect,
   ctx: RenderCtx,
 ): { width: number; height: number } => {
-  const width = props.width ?? frame.width;
-  const height = props.height ?? DEFAULT_VISUAL_HEIGHT;
-  const name = resolveName(ctx, 'image', props.name);
-  const readOnly = props.readOnly ?? props.name == null;
-  const content = props.src ?? '';
-
-  const schema: ImageSchema = {
-    name,
-    type: 'image',
-    content,
-    position: { x: frame.x, y: frame.y },
-    width,
-    height,
-    rotate: props.rotate ?? 0,
-    opacity: props.opacity ?? 1,
-    readOnly,
-    required: props.required,
-  };
-
-  if (!readOnly) ctx.inputs[name] = content;
-  ctx.schemas.push(schema);
-
-  return { width, height };
+  return renderVisualSchema('image', props, frame, ctx, props.src ?? '');
 };
 
 const renderSvg = (
@@ -972,15 +955,30 @@ const renderSvg = (
   frame: Rect,
   ctx: RenderCtx,
 ): { width: number; height: number } => {
+  return renderVisualSchema(
+    'svg',
+    props,
+    frame,
+    ctx,
+    props.svg ?? childrenToString(props.children),
+  );
+};
+
+function renderVisualSchema(
+  type: VisualSchema['type'],
+  props: VisualSchemaProps,
+  frame: Rect,
+  ctx: RenderCtx,
+  content: string,
+): { width: number; height: number } {
   const width = props.width ?? frame.width;
   const height = props.height ?? DEFAULT_VISUAL_HEIGHT;
-  const name = resolveName(ctx, 'svg', props.name);
+  const name = resolveName(ctx, type, props.name);
   const readOnly = props.readOnly ?? props.name == null;
-  const content = props.svg ?? childrenToString(props.children);
 
-  const schema: SVGSchema = {
+  const schema: VisualSchema = {
     name,
-    type: 'svg',
+    type,
     content,
     position: { x: frame.x, y: frame.y },
     width,
@@ -995,7 +993,7 @@ const renderSvg = (
   ctx.schemas.push(schema);
 
   return { width, height };
-};
+}
 
 const renderShape = (
   type: ShapeSchema['type'],

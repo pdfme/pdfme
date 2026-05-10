@@ -285,39 +285,6 @@ export const drawRectangle = (options: {
 
 const KAPPA = 4.0 * ((Math.sqrt(2) - 1.0) / 3.0);
 
-/** @deprecated */
-export const drawEllipsePath = (config: {
-  x: number | PDFNumber;
-  y: number | PDFNumber;
-  xScale: number | PDFNumber;
-  yScale: number | PDFNumber;
-}): PDFOperator[] => {
-  let x = asNumber(config.x);
-  let y = asNumber(config.y);
-  const xScale = asNumber(config.xScale);
-  const yScale = asNumber(config.yScale);
-
-  x -= xScale;
-  y -= yScale;
-
-  const ox = xScale * KAPPA;
-  const oy = yScale * KAPPA;
-  const xe = x + xScale * 2;
-  const ye = y + yScale * 2;
-  const xm = x + xScale;
-  const ym = y + yScale;
-
-  return [
-    pushGraphicsState(),
-    moveTo(x, ym),
-    appendBezierCurve(x, ym - oy, xm - ox, y, xm, y),
-    appendBezierCurve(xm + ox, y, xe, ym - oy, xe, ym),
-    appendBezierCurve(xe, ym + oy, xm + ox, ye, xm, ye),
-    appendBezierCurve(xm - ox, ye, x, ym + oy, x, ym),
-    popGraphicsState(),
-  ];
-};
-
 const drawEllipseCurves = (config: {
   x: number | PDFNumber;
   y: number | PDFNumber;
@@ -378,22 +345,13 @@ export const drawEllipse = (options: {
     options.borderLineCap && setLineCap(options.borderLineCap),
     setDashPattern(options.borderDashArray ?? [], options.borderDashPhase ?? 0),
 
-    // The `drawEllipsePath` branch is only here for backwards compatibility.
-    // See https://github.com/Hopding/pdf-lib/pull/511#issuecomment-667685655.
-    ...(options.rotate === undefined
-      ? drawEllipsePath({
-          x: options.x,
-          y: options.y,
-          xScale: options.xScale,
-          yScale: options.yScale,
-        })
-      : drawEllipseCurves({
-          x: options.x,
-          y: options.y,
-          xScale: options.xScale,
-          yScale: options.yScale,
-          rotate: options.rotate ?? degrees(0),
-        })),
+    ...drawEllipseCurves({
+      x: options.x,
+      y: options.y,
+      xScale: options.xScale,
+      yScale: options.yScale,
+      rotate: options.rotate ?? degrees(0),
+    }),
 
     // prettier-ignore
     options.color && options.borderWidth ? fillAndStroke()
