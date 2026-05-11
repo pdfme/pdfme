@@ -14,3 +14,7 @@ coverage/
 **/__image_actual__/**
 **/__image_diffs__/**
 **/__image_diff_report__/**
+
+# Local agent output and memory files should stay out of public PRs.
+/tmp/claude-reviews/
+/memories/
